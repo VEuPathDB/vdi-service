@@ -1,0 +1,143 @@
+= User Dataset System
+
+Dataset Store = Minio
+
+== User Dataset Service
+
+=== Actions
+
+[%header, cols="3,1,6"]
+|===
+| Action | Source | Description
+
+| <<List User Datasets>>
+| HTTP
+| List all user datasets owned by or shared with a user.
+
+| Get User Dataset Info
+| HTTP
+| Get details about a user dataset including who it has been shared with.
+
+| Prepare User Dataset Upload
+| HTTP
+|
+
+| Upload User Dataset
+| HTTP
+|
+
+| Update UD Metadata
+| HTTP
+| Update the user metadata for a user dataset.
+
+| Offer UD Share
+| HTTP
+| Offer to share a user dataset.
+
+| Revoke UD Share
+| HTTP
+| Revoke an outgoing share offer for a user dataset.
+
+| Accept UD Share Offer
+| HTTP
+| Accept an incoming share offer for a user dataset.
+
+| Reject UD Share Offer
+| HTTP
+| Reject an incoming share offer for a user dataset.
+
+| Delete User Dataset
+| HTTP
+| Remove a user dataset.
+
+| Process Upload
+| RabbitMQ
+| Submit an uploaded user dataset to the appropriate import handler for
+  validation and processing.
+
+|===
+
+.General Q & A
+--
+====
+* What if the communication between the service and the import plugin was
+  handled via a RabbitMQ queue?
+** This adds too much complication to the design.  If we had a stream management
+   platform such as Apache Spark testing and debugging the intermediate queues
+   would be difficult.
+* How do we hide endpoints from the public API?
+====
+--
+
+==== List User Datasets
+
+. Client makes a `GET` request with the following optional query parameters:
+.. project_id=<string>
+.. shared_only=<boolean>
+.. owned_only=<boolean>
+. Service queries the postgres database for a listing of relevant results
+. Service returns a listing of relevant results, each of which will include:
+.. user dataset id
+.. upload/import/install status
+
+=== Submitting a User Dataset
+
+. Client sends "prep" request with metadata about the dataset to be
+  uploaded.
+.. Service sanity checks the posted metadata to ensure that it at least _could
+   be_ valid.
+.. Service puts the metadata into an in-memory cache with a short, configurable
+   expiration
+.. Service generates a user dataset ID
+.. Service returns a user dataset ID
+. Client sends an upload request with the file or files comprising the user
+  dataset.
+.. Service pulls the metadata for the user dataset out of the in-memory cache.
+.. Service submits the metadata and the uploaded files to an internal job queue.
+.. Service returns a status indicating whether the import process has been
+   started
+
+=== Updating a User Dataset's Metadata
+
+Question: Does the import handler have a say in this?
+
+. Client sends a PUT request containing the new metadata for the target user
+  dataset.
+. Service sanity checks the PUT metadata to ensure that it at least _could be_
+  valid.
+. ???
+. ???
+. Profit
+
+=== Offering to Share a User Dataset
+
+. Client sends a POST request containing
+.. the user ID of the target user the user dataset share should be offered to
+.. an action of "grant" indicating the share should be granted
+. ???
+
+=== Accepting a User Dataset Share
+
+. Client sends a POST request containing
+.. an action of "accept"
+. ???
+
+=== [Internal] Processing an Import
+
+When a worker thread becomes available to process an import, it will be pulled
+from the queue and the following will be executed.
+
+. Worker submits the metadata for the job to be processed to the import handler
+  plugin.
+.. Import handler does whatever it needs to do to prepare for processing a user
+   dataset.
+. Worker submits the files for the dataset to the import handler.
+.. Import handler processes user dataset and produces a gzip bundle of the
+   dataset state to be uploaded to the Dataset Store
+. Worker unpacks dataset bundle
+. Worker uploads dataset files to the Dataset Store
+. Worker updates the status of the dataset to "imported" or similar
+
+// TODO: make a flowchart of a single "event" going through the process
+
+// Multiple import queues?  Import queue per importer? (maybe phase 2)
