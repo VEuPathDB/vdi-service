@@ -14,15 +14,15 @@ Dataset Store = Minio
 | HTTP
 | List all user datasets owned by or shared with a user.
 
-| Get User Dataset Info
+| <<Get User Dataset Info>>
 | HTTP
 | Get details about a user dataset including who it has been shared with.
 
-| Prepare User Dataset Upload
+| <<Prepare User Dataset Upload>>
 | HTTP
 |
 
-| Upload User Dataset
+| <<Upload User Dataset>>
 | HTTP
 |
 
@@ -60,12 +60,14 @@ Dataset Store = Minio
 .General Q & A
 --
 ====
-* What if the communication between the service and the import plugin was
-  handled via a RabbitMQ queue?
+* [x] What if the communication between the service and the import plugin was
+      handled via a RabbitMQ queue?
 ** This adds too much complication to the design.  If we had a stream management
    platform such as Apache Spark testing and debugging the intermediate queues
    would be difficult.
-* How do we hide endpoints from the public API?
+* [ ] How do we hide endpoints from the public API?
+* [ ] How are statuses displayed to the client/user?  We have multiple statuses
+      for a single dataset, and it might be confusing to show them separately?
 ====
 --
 
@@ -78,7 +80,41 @@ Dataset Store = Minio
 . Service queries the postgres database for a listing of relevant results
 . Service returns a listing of relevant results, each of which will include:
 .. user dataset id
-.. upload/import/install status
+.. status(es)?
+
+
+==== Get User Dataset Info
+
+. Client makes a `GET` request for the target user dataset.
+. Service queries postgres database for information about the target dataset?
+. Service returns information about the target dataset which will include:
+.. user dataset id
+.. offered shares?
+.. status(es)?
+
+
+==== Prepare User Dataset Upload
+
+.Q & A
+--
+====
+* [ ] What metadata is needed from the client about the dataset to be uploaded?
+====
+--
+
+. Client makes a `POST` request with metadata about the dataset to be uploaded.
+. Service sanity checks the metadata
+. Service puts the metadata into a timed memory cache
+. Service generates a dataset ID
+. Service returns generated dataset ID
+
+
+==== Upload User Dataset
+
+. Client makes a multipart `POST` request with the dataset files to be uploaded.
+. Service verifies the existence of the target user dataset ID in the memory cache.
+.
+
 
 === Submitting a User Dataset
 
@@ -99,15 +135,23 @@ Dataset Store = Minio
 
 === Updating a User Dataset's Metadata
 
-Question: Does the import handler have a say in this?
+.Q & A
+--
+====
+* [x] Does the import handler have a say in this?
+** Not initially as the only fields the user may change are the name, summary,
+   and description.
+* [ ] Should this endpoint be a `PATCH` instead of a `PUT` request?
+====
+--
 
 . Client sends a PUT request containing the new metadata for the target user
   dataset.
 . Service sanity checks the PUT metadata to ensure that it at least _could be_
   valid.
-. ???
-. ???
-. Profit
+. Service verifies that only the allowed fields have been altered
+. Service replaces the `meta.json` file for the target user dataset in the User
+  Dataset Store
 
 === Offering to Share a User Dataset
 
@@ -141,3 +185,30 @@ from the queue and the following will be executed.
 // TODO: make a flowchart of a single "event" going through the process
 
 // Multiple import queues?  Import queue per importer? (maybe phase 2)
+
+== Misc Notes
+
+Notes and thoughts to be folded into the design doc above once resolved.
+
+=== Statuses
+
+What different statuses are there?::
+* Upload status
+* `userdataset` table status (appears to also be upload status?)
+* Install status (per project)
++
+.Status representation idea?
+[source, json]
+----
+{
+  "statuses": {
+    "upload": "complete",
+    "install": [
+      {
+        "projectID": "PlasmoDB",
+        "status": "complete"
+      }
+    ]
+  }
+}
+----
