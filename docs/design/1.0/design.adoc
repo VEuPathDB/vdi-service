@@ -50,14 +50,15 @@ Dataset Store = Minio
 | HTTP
 | Remove a user dataset.
 
-| Process Upload
+| <<Process Upload>>
 | RabbitMQ
 | Submit an uploaded user dataset to the appropriate import handler for
   validation and processing.
 
-| Process User Dataset Store Change
+| <<Process User Dataset Store Change>>
 | RabbitMQ
-|
+| Process a change in the User Dataset Store that has been published to
+  RabbitMQ.
 |===
 
 .General Q & A
@@ -183,6 +184,30 @@ NOTE: Path: `/user-datasets/\{ud-id}`
   Store
 
 
+==== Process Upload
+
+. Service downloads the relevant files from the temp file store and pipes them
+  through to the import handler as a multipart `POST` request.
+.. ? Should the old style of a separate prep request and submission request be
+   kept?  Is that necessary anymore?  I don't remember why it was done as two
+   separate requests in the first place.
+. Import handler does whatever it needs to validate and/or transform the
+  imported user dataset and returns an archive file containing the outputs to be
+  pushed to the user dataset store.
+. Service unpacks the archive returned by the import handler
+. Service uploads the files from the archive as a new dataset to the User
+  Dataset Store
+
+==== Process User Dataset Store Change
+
+. Determine the nature of the change ???
+. ???
+. Update postgres?
+. Queue changes to relevant application databases?
+
+
+== Unorganized Notes
+
 === Submitting a User Dataset
 
 . Client sends "prep" request with metadata about the dataset to be
@@ -199,6 +224,7 @@ NOTE: Path: `/user-datasets/\{ud-id}`
 .. Service submits the metadata and the uploaded files to an internal job queue.
 .. Service returns a status indicating whether the import process has been
    started
+
 
 === Updating a User Dataset's Metadata
 
