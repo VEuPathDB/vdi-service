@@ -26,11 +26,11 @@ Dataset Store = Minio
 | HTTP
 |
 
-| Update UD Metadata
+| <<Update User Dataset Metadata>>
 | HTTP
 | Update the user metadata for a user dataset.
 
-| Offer UD Share
+| <<Offer User Dataset Share>>
 | HTTP
 | Offer to share a user dataset.
 
@@ -38,7 +38,7 @@ Dataset Store = Minio
 | HTTP
 | Revoke an outgoing share offer for a user dataset.
 
-| Accept UD Share Offer
+| <<Accept User Dataset Share>>
 | HTTP
 | Accept an incoming share offer for a user dataset.
 
@@ -55,6 +55,9 @@ Dataset Store = Minio
 | Submit an uploaded user dataset to the appropriate import handler for
   validation and processing.
 
+| Process User Dataset Store Change
+| RabbitMQ
+|
 |===
 
 .General Q & A
@@ -68,6 +71,8 @@ Dataset Store = Minio
 * [ ] How do we hide endpoints from the public API?
 * [ ] How are statuses displayed to the client/user?  We have multiple statuses
       for a single dataset, and it might be confusing to show them separately?
+* [ ] Service will have to check the soft-delete flag before performing any
+      actions?
 ====
 --
 
@@ -112,8 +117,70 @@ Dataset Store = Minio
 ==== Upload User Dataset
 
 . Client makes a multipart `POST` request with the dataset files to be uploaded.
-. Service verifies the existence of the target user dataset ID in the memory cache.
-.
+. Service verifies the existence of the target user dataset ID in the memory
+  cache.
+. Service updates the status of the dataset upload to "uploading" (or similar)
+. Service writes metadata file to a temp store to await processing by the import
+  handler.
+.. What is this temp store?
+. Service writes the dataset files to the temp store to await processing by the
+  import handler.
+. Service marks the status of the dataset upload as "awaiting import" (or
+  similar)
+. Service queues the dataset to be import processed
+
+
+==== Update User Dataset Metadata
+
+. Client makes a `PATCH` request to the user dataset containing the fields that
+  should be updated.
+. Service verifies the existence of the target user dataset
+.. How?
+. Service verifies ownership of the target user dataset
+.. How?
+. Service performs sanity checking on the metadata being changed.
+.. Ensure only mutable fields are being changed
+.. Ensure the data going into those mutable fields is the correct type
+. Service writes the updated metadata to the User Dataset Store
+. Service returns OK
+
+
+==== Offer User Dataset Share
+
+NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
+
+. Client makes a `PUT` request to the above URL with a body containing an action
+  of "grant" or "revoke".
+. Service sanity checks PUT request body
+. Service verifies the existence of the target user dataset
+. Service verifies that the target user dataset is owned by the requesting user
+. Service writes a share offer file containing the requested action to the User
+  Dataset Store
+
+
+==== Accept User Dataset Share
+
+NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
+
+. Client makes a PUT request to the above URL with a body containing an action
+  of "accept" or "reject"
+. Service sanity checks PUT request body.
+. Service verifies the existence of the target user dataset
+. Service verifies that the target user dataset has a share offer available with
+  an offer action of "grant"
+. Service writes a share receipt file containing the requested action to the
+  User Dataset Store
+
+
+==== Delete User Dataset
+
+NOTE: Path: `/user-datasets/\{ud-id}`
+
+. Client makes a `DELETE` request to the above service path.
+. Service verifies the target user dataset exists
+. Service verifies the requesting user owns the target user dataset
+. Service creates a `deleted` flag file for the user dataset in the User Dataset
+  Store
 
 
 === Submitting a User Dataset
@@ -195,14 +262,15 @@ Notes and thoughts to be folded into the design doc above once resolved.
 What different statuses are there?::
 * Upload status
 * `userdataset` table status (appears to also be upload status?)
-* Install status (per project)
+* Install status (per project) (this field will be omitted or empty until the
+  import is completed successfully)
 +
 .Status representation idea?
 [source, json]
 ----
 {
   "statuses": {
-    "upload": "complete",
+    "import": "complete",
     "install": [
       {
         "projectID": "PlasmoDB",
@@ -212,3 +280,8 @@ What different statuses are there?::
   }
 }
 ----
+
+=== Misc Diagrams
+
+.User Dataset Import Components
+image:assets/ds-import-components.png[]
