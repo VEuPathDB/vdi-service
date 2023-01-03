@@ -46,7 +46,7 @@ Dataset Store = Minio
 | HTTP
 | Reject an incoming share offer for a user dataset.
 
-| Delete User Dataset
+| <<Delete User Dataset>>
 | HTTP
 | Remove a user dataset.
 
@@ -201,6 +201,17 @@ NOTE: Path: `/user-datasets/\{ud-id}`
 ==== Process User Dataset Store Change
 
 . Determine the nature of the change ???
+.. What are the possible changes that could happen?
+... marked as deleted
+... actually deleted?
+... share granted
+... share accepted
+... share rejected
+... share revoked
+... initial upload
+... meta changed
+.. Compare the last modified timestamps in S3 to the timestamps in the postgres
+   `sync_control` table.
 . ???
 . Update postgres?
 . Queue changes to relevant application databases?
@@ -311,3 +322,206 @@ What different statuses are there?::
 
 .User Dataset Import Components
 image:assets/ds-import-components.png[]
+
+== Database Schemata
+
+=== Internal PostgreSQL Database
+
+==== `sync_control`
+
+This table indicates the last modified timestamp for the various components that
+comprise a user dataset.
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| shares_update_time
+| TIMESTAMPTZ
+| Timestamp of the most recent last_modified date from the user dataset share
+  files.
+
+| data_update_time
+| TIMESTAMPTZ
+| Timestamp of the most recent last_modified date from the user dataset data
+  files.
+
+| meta_update_time
+| TIMESTAMPTZ
+| Timestamp of the meta.json last_modified date for the user dataset.
+|===
+
+==== `owner_share`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| shared_with
+| BIGINT
+| User ID of the user the dataset was shared with
+
+| status
+| granted \| revoked
+| Current status of the share
+|===
+
+==== `recipient_share`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| shared_with
+| BIGINT
+| User ID of the user the dataset was shared with
+
+| status
+| accepted \| rejected
+| Current status of the share receipt
+|===
+
+==== `user_dataset_control`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| upload_status
+| enum
+| "awaiting-upload", "uploading", "awaiting-import", "importing", "imported", "failed"
+|===
+
+==== `user_datasets`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| type_name
+| VARCHAR
+|
+
+| type_version
+| VARCHAR
+|
+
+| user_id
+| BIGINT
+|
+
+| is_deleted
+| BOOLEAN
+|
+
+| status
+|
+| ???
+
+|===
+
+==== `user_dataset_files`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| file_name
+| VARCHAR
+|
+|===
+
+==== `user_dataset_projects`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| project_id
+| VARCHAR
+|
+|===
+
+==== `user_dataset_metadata`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| name
+| VARCHAR
+|
+
+| summary
+| VARCHAR
+|
+
+| description
+| VARCHAR
+|
+|===
+
+=== Application Database
+
+==== `user_datasets`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| owner
+| BIGINT
+| Owner user ID
+
+| type
+| VARCHAR
+|
+
+| version
+| VARCHAR
+|
+
+| creation_time
+| TIMESTAMP
+|
+
+| is_deleted
+| TINYINT(1)
+| Soft delete flag.
+|===
