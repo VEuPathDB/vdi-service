@@ -59,6 +59,10 @@ Dataset Store = Minio
 | RabbitMQ
 | Process a change in the User Dataset Store that has been published to
   RabbitMQ.
+
+| Reconciliation
+| ???
+| ???
 |===
 
 .General Q & A
@@ -524,4 +528,61 @@ comprise a user dataset.
 | is_deleted
 | TINYINT(1)
 | Soft delete flag.
+|===
+
+==== `user_dataset_install_messages`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| message_id
+|
+| ???
+
+| install_type
+|
+| ???
+
+| status
+| enum
+| "running", "complete", "failed", "ready-for-reinstall"
+
+| message
+| VARCHAR
+| failure message?
+|===
+
+==== `user_dataset_visibility`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| user_id
+| BIGINT
+| ID of the share recipient user who should be able to see the user dataset.
+|===
+
+==== `user_dataset_projects`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| user_dataset_id
+| CHAR(32)
+|
+
+| project_id
+| VARCHAR
+|
 |===
