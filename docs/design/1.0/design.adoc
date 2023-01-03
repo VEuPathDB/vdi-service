@@ -51,17 +51,21 @@ Dataset Store = Minio
 | Remove a user dataset.
 
 | <<Process Upload>>
-| RabbitMQ
+| RabbitMQ <1>
 | Submit an uploaded user dataset to the appropriate import handler for
   validation and processing.
 
 | <<Process User Dataset Store Change>>
-| RabbitMQ
+| RabbitMQ <2>
 | Process a change in the User Dataset Store that has been published to
   RabbitMQ.
 
 | Reconciliation
 | ???
+| ???
+
+| Project Sync
+| RabbitMQ <3>
 | ???
 |===
 
@@ -74,10 +78,13 @@ Dataset Store = Minio
    platform such as Apache Spark testing and debugging the intermediate queues
    would be difficult.
 * [ ] How do we hide endpoints from the public API?
-* [ ] How are statuses displayed to the client/user?  We have multiple statuses
+* [x] How are statuses displayed to the client/user?  We have multiple statuses
       for a single dataset, and it might be confusing to show them separately?
+** Yes, the statuses will be separate as described in the misc notes below.
 * [ ] Service will have to check the soft-delete flag before performing any
       actions?
+* [ ] Installers: what are the inputs and outputs?  Do we just post the dataset
+      at the installer as a bulk request and let it rip from there?
 ====
 --
 
