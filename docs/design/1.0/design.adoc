@@ -248,39 +248,6 @@ NOTE: Path: `/user-datasets/\{ud-id}`
    started
 
 
-=== Updating a User Dataset's Metadata
-
-.Q & A
---
-====
-* [x] Does the import handler have a say in this?
-** Not initially as the only fields the user may change are the name, summary,
-   and description.
-* [ ] Should this endpoint be a `PATCH` instead of a `PUT` request?
-====
---
-
-. Client sends a PUT request containing the new metadata for the target user
-  dataset.
-. Service sanity checks the PUT metadata to ensure that it at least _could be_
-  valid.
-. Service verifies that only the allowed fields have been altered
-. Service replaces the `meta.json` file for the target user dataset in the User
-  Dataset Store
-
-=== Offering to Share a User Dataset
-
-. Client sends a POST request containing
-.. the user ID of the target user the user dataset share should be offered to
-.. an action of "grant" indicating the share should be granted
-. ???
-
-=== Accepting a User Dataset Share
-
-. Client sends a POST request containing
-.. an action of "accept"
-. ???
-
 === [Internal] Processing an Import
 
 When a worker thread becomes available to process an import, it will be pulled
