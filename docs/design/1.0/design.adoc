@@ -1,6 +1,6 @@
 = User Dataset System
 :icons: font
-:toc: macro
+:toc: preamble
 
 ifdef::env-github[]
 :tip-caption: :bulb:
@@ -9,9 +9,6 @@ endif::[]
 
 Dataset Store = Minio
 
-== Table of Contents
-
-toc::[]
 
 == User Dataset Service
 
