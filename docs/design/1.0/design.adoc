@@ -29,7 +29,7 @@ Dataset Store = Minio
 
 | <<Upload User Dataset>>
 | HTTP
-|
+| Upload a new user dataset to be imported.
 
 | <<Update User Dataset Metadata>>
 | HTTP
@@ -310,7 +310,10 @@ h| How are the statuses displayed to the client/user? We have multiple status
 
 |===
 h| Installers: What are the inputs and outputs?
-|
+
+a| Installers will have their data posted to them the same as with the import
+handler.  A bulk HTTP request containing the dataset files and metadata will be
+submitted to the Installer Service and the installer will take it from there.
 |===
 
 |===
@@ -347,7 +350,9 @@ h| How do failed installations get reported to users?
 * Service will have to check the soft delete flag before permitting any actions
   on a user dataset.
 
-
+* The service wrapping the installer and import handler should be written in
+  a JVM language to make use of the existing tooling for handling multipart that
+  we have established.
 
 == Unorganized Notes
 
