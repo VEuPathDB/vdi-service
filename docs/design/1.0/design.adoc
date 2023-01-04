@@ -1,4 +1,5 @@
 = User Dataset System
+:source-highlighter: highlightjs
 :icons: font
 :toc: preamble
 
@@ -25,10 +26,6 @@ Dataset Store = Minio
 | <<Get User Dataset Info>>
 | HTTP
 | Get details about a user dataset including who it has been shared with.
-
-| <<Prepare User Dataset Upload>>
-| HTTP
-|
 
 | <<Upload User Dataset>>
 | HTTP
@@ -79,16 +76,81 @@ Dataset Store = Minio
 
 ==== List User Datasets
 
-. Client makes a `GET` request with the following optional query parameters:
-.. project_id=<string>
-.. shared_only=<boolean>
-.. owned_only=<boolean>
+. Client makes a `GET` request.
 . Service queries the postgres database for a listing of relevant results
 . Service queries relevant application databases for installation status of each
   dataset.
 . Service returns a listing of relevant results, each of which will include:
 .. user dataset id
+.. owner id
+.. target project id
 .. status(es)?
+
+.Response types?
+[source, typescript]
+----
+interface Response {
+  offset: number
+  resultCount: number
+  results: Array<Result>
+}
+
+interface Result {
+  userDatasetID: string
+  ownerID: number
+  projectIDs: Array<String>
+  status: StatusInfo
+}
+
+interface StatusInfo {
+  import: "awaiting-import" | "importing" | "imported" | "failed"
+  install?: Array<InstallStatusInfo>
+}
+
+interface InstallStatusInfo {
+  projectID: string
+  status: "running" | "complete" | "failed" | "ready-for-reinstall"
+}
+----
+
+.Response Example
+[source, json]
+----
+{
+  "offset": 0,
+  "resultCount": 2,
+  "results": [
+    {
+      "userDatasetID": "df8fede7ff71608e24a5576326e41c75",
+      "ownerID": 123456,
+      "projectIDs": [
+        "PlasmoDB",
+        "ToxoDB"
+      ],
+      "status": {
+        "import": "importing"
+      }
+    },
+    {
+      "userDatasetID": "7fa3b767c460b54a2be4d49030b349c7",
+      "ownerID": 123456,
+      "projectIDs": [
+        "FungiDB"
+      ],
+      "status": {
+        "import": "imported",
+        "install": [
+          {
+            "projectID": "FungiDB",
+            "status": "ready-for-reinstall"
+          }
+        ]
+      }
+    }
+  ]
+}
+----
+
 
 ==== Get User Dataset Info
 
@@ -264,6 +326,16 @@ a| . Deletion flag is created
    . ???
 |===
 
+|===
+h| How do installers surface warnings?
+|
+|===
+
+|===
+h| How do failed installations get reported to users?
+|
+|===
+
 
 == General Implementation Notes / Thoughts
 
@@ -392,8 +464,9 @@ comprise a user dataset.
 | User ID of the user the dataset was shared with
 
 | status
-| granted \| revoked
-| Current status of the share
+| enum
+| Current status of the share +
+One of "granted" \| "revoked"
 |===
 
 ==== `recipient_share`
@@ -411,8 +484,9 @@ comprise a user dataset.
 | User ID of the user the dataset was shared with
 
 | status
-| accepted \| rejected
-| Current status of the share receipt
+| enum
+| Current status of the share receipt. +
+One of "accepted" \| "rejected"
 |===
 
 ==== `user_dataset_control`
@@ -427,7 +501,7 @@ comprise a user dataset.
 
 | upload_status
 | enum
-| "awaiting-upload", "uploading", "awaiting-import", "importing", "imported", "failed"
+| "awaiting-import", "importing", "imported", "failed"
 |===
 
 ==== `user_datasets`
