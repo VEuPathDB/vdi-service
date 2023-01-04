@@ -162,35 +162,36 @@ interface InstallStatusInfo {
 .. offered shares?
 .. status(es)?
 
-==== Prepare User Dataset Upload
-
-.Q & A
---
-====
-* [ ] What metadata is needed from the client about the dataset to be uploaded?
-====
---
-
-. Client makes a `POST` request with metadata about the dataset to be uploaded.
-. Service sanity checks the metadata
-. Service puts the metadata into a timed memory cache
-. Service generates a dataset ID
-. Service returns generated dataset ID
-
 ==== Upload User Dataset
 
-. Client makes a multipart `POST` request with the dataset files to be uploaded.
-. Service verifies the existence of the target user dataset ID in the memory
-  cache.
-. Service updates the status of the dataset upload to "uploading" (or similar)
-. Service writes metadata file to a temp store to await processing by the import
-  handler.
+. Client makes a multipart `POST` request with the metadata and dataset files to
+  be imported.
+. Service sanity checks metadata
+.. Check dataset type matches something we can import
+.. Check target project IDs exist
+. Service generates a dataset ID
+. Service pushes uploaded data to a temp store
 .. What is this temp store?
-. Service writes the dataset files to the temp store to await processing by the
-  import handler.
-. Service marks the status of the dataset upload as "awaiting import" (or
-  similar)
-. Service queues the dataset to be import processed
+. Service creates a record for the import in the PostgreSQL database with the
+  status awaiting import
+. Service queues the dataset to be imported.
+. Service returns the dataset ID to the client
+
+.Response Type
+[source, typescript]
+----
+interface Response {
+  userDatasetID: string
+}
+----
+
+.Response Example
+[source, json]
+----
+{
+  "userDatasetID": "89e837da8dc2b299b592f4ad82c4667a"
+}
+----
 
 ==== Update User Dataset Metadata
 
@@ -204,7 +205,27 @@ interface InstallStatusInfo {
 .. Ensure only mutable fields are being changed
 .. Ensure the data going into those mutable fields is the correct type
 . Service writes the updated metadata to the User Dataset Store
-. Service returns OK
+. Service returns 204
+
+.Request Type
+[source, typescript]
+----
+interface Request {
+  userDatasetID: string
+  name?: string
+  summary?: string
+  description?: string
+}
+----
+
+.Request Example
+[source, json]
+----
+{
+  "userDatasetID": "89e837da8dc2b299b592f4ad82c4667a",
+  "description": "My new description text."
+}
+----
 
 ==== Offer User Dataset Share
 
