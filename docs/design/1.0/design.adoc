@@ -214,34 +214,37 @@ NOTE: Path: `/user-datasets/\{ud-id}`
 
 == General Q & A
 
-[TIP]
-.What if the communication between the service and the import plugin was handled via a RabbitMQ queue?
-====
-This adds a lot of complexity to the design.  If we had a stream management
-platform such as Apache Spark or Kafka, this would be more feasible, but
-without such a platform it would be difficult to test and maintain.
-====
+|===
+h| What if the communication between the service and the import plugin was
+   handled via a RabbitMQ queue?
 
-[TIP]
-.Why not write the whole thing as a stream system in Spark or Kafka?
-====
-====
+| This adds a lot of complexity to the design.  If we had a stream management
+  platform such as Apache Spark or Kafka, this would be more feasible, but
+  without such a platform it would be difficult to test and maintain.
+|===
 
-[TIP]
-.How do we hide endpoints from the public API?
-====
-====
+|===
+h| Why not write the whole thing as a stream system in Spark or Kafka?
+|
+|===
 
-[TIP]
-.How are the statuses displayed to the client/user? We have multiple status types; it could be confusing.
-====
-The statuses will be returned in a "status object" as described in the misc notes below.
-====
+|===
+h| How do we hide endpoints from the public API?
+|
+|===
 
-[TIP]
-.Installers: What are the inputs and outputs?
-====
-====
+|===
+h| How are the statuses displayed to the client/user? We have multiple status
+   types; it could be confusing.
+
+| The statuses will be returned in a "status object" as described in the misc
+  notes below.
+|===
+
+|===
+h| Installers: What are the inputs and outputs?
+|
+|===
 
 
 == General Implementation Notes / Thoughts
