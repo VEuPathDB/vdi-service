@@ -164,18 +164,7 @@ interface InstallStatusInfo {
 
 ==== Upload User Dataset
 
-. Client makes a multipart `POST` request with the metadata and dataset files to
-  be imported.
-. Service sanity checks metadata
-.. Check dataset type matches something we can import
-.. Check target project IDs exist
-. Service generates a dataset ID
-. Service pushes uploaded data to a temp store
-.. What is this temp store?
-. Service creates a record for the import in the PostgreSQL database with the
-  status awaiting import
-. Service queues the dataset to be imported.
-. Service returns the dataset ID to the client
+image:assets/upload-ud.png[]
 
 .Response Type
 [source, typescript]
@@ -229,8 +218,6 @@ interface Request {
 
 ==== Offer User Dataset Share
 
-NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
-
 . Client makes a `PUT` request to the above URL with a body containing an action
   of "grant" or "revoke".
 . Service sanity checks PUT request body
@@ -240,8 +227,6 @@ NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
   Dataset Store
 
 ==== Accept User Dataset Share
-
-NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
 
 . Client makes a PUT request to the above URL with a body containing an action
   of "accept" or "reject"
@@ -253,8 +238,6 @@ NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
   User Dataset Store
 
 ==== Delete User Dataset
-
-NOTE: Path: `/user-datasets/\{ud-id}`
 
 . Client makes a `DELETE` request to the above service path.
 . Service verifies the target user dataset exists
