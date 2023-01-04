@@ -251,7 +251,11 @@ h| Why is it a 2 request process to create a user dataset upload? +
 Originally, the 2-step process was because we needed to guarantee ordering of
 receipt of the metadata followed by dataset files, but since the data is going
 to a cache/queue before being processed, does this matter anymore?
-|
+
+| We can ditch the 2-step process.  Now that we have
+link:https://github.com/VEuPathDB/lib-jersey-multipart-jackson-pojo[lib-jersey-multipart-jackson-pojo]
+we don't need to separate the meta upload from the file uploads as all the
+uploaded data will be preloaded into files for us automatically.
 |===
 
 |===
