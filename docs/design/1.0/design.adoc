@@ -1,6 +1,17 @@
 = User Dataset System
+:icons: font
+:toc: macro
+
+ifdef::env-github[]
+:tip-caption: :bulb:
+endif::[]
+
 
 Dataset Store = Minio
+
+== Table of Contents
+
+toc::[]
 
 == User Dataset Service
 
@@ -69,25 +80,6 @@ Dataset Store = Minio
 | ???
 |===
 
-.General Q & A
---
-====
-* [x] What if the communication between the service and the import plugin was
-      handled via a RabbitMQ queue?
-** This adds too much complication to the design.  If we had a stream management
-   platform such as Apache Spark testing and debugging the intermediate queues
-   would be difficult.
-* [ ] How do we hide endpoints from the public API?
-* [x] How are statuses displayed to the client/user?  We have multiple statuses
-      for a single dataset, and it might be confusing to show them separately?
-** Yes, the statuses will be separate as described in the misc notes below.
-* [ ] Service will have to check the soft-delete flag before performing any
-      actions?
-* [ ] Installers: what are the inputs and outputs?  Do we just post the dataset
-      at the installer as a bulk request and let it rip from there?
-====
---
-
 ==== List User Datasets
 
 . Client makes a `GET` request with the following optional query parameters:
@@ -101,7 +93,6 @@ Dataset Store = Minio
 .. user dataset id
 .. status(es)?
 
-
 ==== Get User Dataset Info
 
 . Client makes a `GET` request for the target user dataset.
@@ -111,7 +102,6 @@ Dataset Store = Minio
 .. user dataset id
 .. offered shares?
 .. status(es)?
-
 
 ==== Prepare User Dataset Upload
 
@@ -128,7 +118,6 @@ Dataset Store = Minio
 . Service generates a dataset ID
 . Service returns generated dataset ID
 
-
 ==== Upload User Dataset
 
 . Client makes a multipart `POST` request with the dataset files to be uploaded.
@@ -144,7 +133,6 @@ Dataset Store = Minio
   similar)
 . Service queues the dataset to be import processed
 
-
 ==== Update User Dataset Metadata
 
 . Client makes a `PATCH` request to the user dataset containing the fields that
@@ -159,7 +147,6 @@ Dataset Store = Minio
 . Service writes the updated metadata to the User Dataset Store
 . Service returns OK
 
-
 ==== Offer User Dataset Share
 
 NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
@@ -171,7 +158,6 @@ NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
 . Service verifies that the target user dataset is owned by the requesting user
 . Service writes a share offer file containing the requested action to the User
   Dataset Store
-
 
 ==== Accept User Dataset Share
 
@@ -186,7 +172,6 @@ NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
 . Service writes a share receipt file containing the requested action to the
   User Dataset Store
 
-
 ==== Delete User Dataset
 
 NOTE: Path: `/user-datasets/\{ud-id}`
@@ -196,7 +181,6 @@ NOTE: Path: `/user-datasets/\{ud-id}`
 . Service verifies the requesting user owns the target user dataset
 . Service creates a `deleted` flag file for the user dataset in the User Dataset
   Store
-
 
 ==== Process Upload
 
@@ -229,6 +213,45 @@ NOTE: Path: `/user-datasets/\{ud-id}`
 . ???
 . Update postgres?
 . Queue changes to relevant application databases?
+
+
+== General Q & A
+
+[TIP]
+.What if the communication between the service and the import plugin was handled via a RabbitMQ queue?
+====
+This adds a lot of complexity to the design.  If we had a stream management
+platform such as Apache Spark or Kafka, this would be more feasible, but
+without such a platform it would be difficult to test and maintain.
+====
+
+[TIP]
+.Why not write the whole thing as a stream system in Spark or Kafka?
+====
+====
+
+[TIP]
+.How do we hide endpoints from the public API?
+====
+====
+
+[TIP]
+.How are the statuses displayed to the client/user? We have multiple status types; it could be confusing.
+====
+The statuses will be returned in a "status object" as described in the misc notes below.
+====
+
+[TIP]
+.Installers: What are the inputs and outputs?
+====
+====
+
+
+== General Implementation Notes / Thoughts
+
+* Service will have to check the soft delete flag before permitting any actions
+  on a user dataset.
+
 
 
 == Unorganized Notes
