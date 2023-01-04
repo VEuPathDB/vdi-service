@@ -95,6 +95,8 @@ Dataset Store = Minio
 .. shared_only=<boolean>
 .. owned_only=<boolean>
 . Service queries the postgres database for a listing of relevant results
+. Service queries relevant application databases for installation status of each
+  dataset.
 . Service returns a listing of relevant results, each of which will include:
 .. user dataset id
 .. status(es)?
@@ -104,6 +106,7 @@ Dataset Store = Minio
 
 . Client makes a `GET` request for the target user dataset.
 . Service queries postgres database for information about the target dataset?
+. Service queries application databases for installation status of dataset.
 . Service returns information about the target dataset which will include:
 .. user dataset id
 .. offered shares?
