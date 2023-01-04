@@ -1,0 +1,137 @@
+#%RAML 1.0 Extension
+
+extends: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.2.0/libraries/base-service.raml
+
+title: VEuPathDB Dataset Installer
+version: 1.0.0
+mediaType: application/json
+
+uses:
+  err: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.2.0/libraries/errors.raml
+
+
+/user-datasets:
+  get:
+    displayName: List User Datasets
+    description: |
+      Returns a list of user datasets available to the requesting user,
+      optionally filtered by query parameters.
+    queryParameters:
+      project_id:
+        displayName: Project ID Filter
+        description: |
+          ID of the VEuPathDB project that results should be filtered to.
+          
+          This means only user datasets that are relevant to the project ID
+          given will be returned.
+        type: string
+        example: PlasmoDB
+        required: false
+        default: null
+      ownership:
+        displayName: Dataset Ownership Filter
+        description: |
+          Ownership status filter.
+          
+          Enum of:
+          
+          * `any`
+          * `owned`
+          * `shared`
+          
+          If set to `any` the results are not filtered.
+          
+          If set to `owned`, the results will be filtered to only results that
+          are owned by the requesting user.
+          
+          If set to `shared`, the results will be filtered to only results that
+          are shared with the requesting user.
+        type: string
+        default: any
+        required: false
+      offset:
+        displayName: Result Offset
+        description: |
+          This many results will be skipped before the first result returned.
+          
+          Used to implement result pagination.
+        type: integer
+        default: 0
+        required: false
+      limit:
+        displayName: Result Count Limit
+        description: |
+          Limits the number of results returned to this count.
+        
+          Used to implement result pagination.
+        type: integer
+        default: 100
+        minimum: 1
+        maximum: 100
+        required: false
+    responses:
+      200:
+        description: Success
+      400:
+        description: Bad Query Parameter(s)
+      401:
+        description: Unauthorized
+      500:
+        description: Internal Error
+
+  post:
+    displayName: Upload User Dataset
+
+/user-datasets/admin:
+  /reconcile:
+  /cleanup:
+
+/user-datasets/{ud-id}:
+  uriParameters:
+    ud-id:
+      displayName: User Dataset ID
+      description: |
+        A 32 digit hex string that is the unique identifier for a user dataset.
+      type: string
+      minLength: 32
+      maxLength: 32
+      pattern: ^[0-9A-F]{32}$
+      required: true
+
+  get:
+    displayName: Lookup User Dataset
+
+  delete:
+    displayName: Delete User Dataset
+
+
+/user-datasets/{ud-id}/shares/{user-id}:
+  uriParameters:
+    ud-id:
+      displayName: User Dataset ID
+      description: |
+        A 32 digit hex string that is the unique identifier for a user dataset.
+      type: string
+      minLength: 32
+      maxLength: 32
+      pattern: ^[0-9A-F]{32}$
+      required: true
+    user-id:
+      displayName: User ID
+      description: |
+        ID of the user the user dataset share is being offered to or accepted
+        by.
+      type: integer
+      minimum: 1
+      maximum: 9223372036854775807
+      format: int64
+      required: true
+
+  /offer:
+    put:
+      displayName: Offer to Share a UD
+
+  /receipt:
+    put:
+      displayName: Receive a UD Share
+
