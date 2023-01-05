@@ -129,9 +129,86 @@ uses:
 
   /offer:
     put:
-      displayName: Offer to Share a UD
+      displayName: Offer to Share a Dataset
+      description: |
+        PUT an offer to share (or revoke a share for) a user dataset with
+        another target user.
+      body:
+        application/json:
+          displayName: Offer Object
+          type: object
+          additionalProperties: false
+          properties:
+            action:
+              displayName: Offer Action
+              description: |
+                What action to take with the dataset share offer.
+              
+                Either `grant` or `revoke`.
+                
+                A value of `grant` means the share should be offered to the user
+                if they do not already have the dataset, or continue to be
+                allowed if they already have access to the dataset.
+                
+                A value of `revoke` means the share should not be offered to the
+                target user if they do not already have the dataset, or the
+                sharing should be stopped if the user did already have access to
+                the dataset.
+              type: string
+              enum:
+              - grant
+              - revoke
+      responses:
+        204:
+          description: Share offer was successfully (re)placed.
+        400:
+          description: Request body did not resemble the expected JSON form.
+        401:
+          description: Unauthorized.
+        422:
+          description: Request body failed validation.
+        500:
+          description: Internal server error.
 
   /receipt:
     put:
       displayName: Receive a UD Share
+      description: |
+        PUT a receipt of a User Dataset share offer.  The receipt can either be
+        accepting or rejecting the offered share.
+      body:
+        application/json:
+          displayName: Receipt Object
+          type: object
+          additionalProperties: false
+          properties:
+            action:
+              displayName: Acknowledgement Action
+              description: |
+                What action to take with acknowledging a dataset share offer.
+                
+                Either `accept` or `reject`.
+                
+                A value of `accept` means that the dataset that a share was
+                offered for should become available to the accepting user.
+                
+                A value of `reject` means that the dataset that a share was
+                offered for should become unavailable to the rejecting user.
+              type: string
+              enum:
+              - accept
+              - reject
+      responses:
+        204:
+          description: Share offer acknowledgement was successfully (re)placed.
+        400:
+          description: Request body did not resemble the expected JSON form.
+        401:
+          description: Unauthorized
+        422:
+          description: Request body failed validation.
+        500:
+          description: Internal server error.
+
+
 
