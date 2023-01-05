@@ -29,7 +29,7 @@ Dataset Store = Minio
 
 | <<Upload User Dataset>>
 | HTTP
-|
+| Upload a new user dataset to be imported.
 
 | <<Update User Dataset Metadata>>
 | HTTP
@@ -55,7 +55,7 @@ Dataset Store = Minio
 | HTTP
 | Remove a user dataset.
 
-| <<Process Upload>>
+| <<Process Import>>
 | RabbitMQ <1>
 | Submit an uploaded user dataset to the appropriate import handler for
   validation and processing.
@@ -164,18 +164,7 @@ interface InstallStatusInfo {
 
 ==== Upload User Dataset
 
-. Client makes a multipart `POST` request with the metadata and dataset files to
-  be imported.
-. Service sanity checks metadata
-.. Check dataset type matches something we can import
-.. Check target project IDs exist
-. Service generates a dataset ID
-. Service pushes uploaded data to a temp store
-.. What is this temp store?
-. Service creates a record for the import in the PostgreSQL database with the
-  status awaiting import
-. Service queues the dataset to be imported.
-. Service returns the dataset ID to the client
+image:assets/upload-ud.png[]
 
 .Response Type
 [source, typescript]
@@ -229,8 +218,6 @@ interface Request {
 
 ==== Offer User Dataset Share
 
-NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
-
 . Client makes a `PUT` request to the above URL with a body containing an action
   of "grant" or "revoke".
 . Service sanity checks PUT request body
@@ -240,8 +227,6 @@ NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
   Dataset Store
 
 ==== Accept User Dataset Share
-
-NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
 
 . Client makes a PUT request to the above URL with a body containing an action
   of "accept" or "reject"
@@ -254,27 +239,26 @@ NOTE: Path: `/user-datasets/\{ud-id}/shares/\{user-id}`
 
 ==== Delete User Dataset
 
-NOTE: Path: `/user-datasets/\{ud-id}`
-
 . Client makes a `DELETE` request to the above service path.
 . Service verifies the target user dataset exists
 . Service verifies the requesting user owns the target user dataset
 . Service creates a `deleted` flag file for the user dataset in the User Dataset
   Store
 
-==== Process Upload
+==== Process Import
 
-. Service downloads the relevant files from the temp file store and pipes them
-  through to the import handler as a multipart `POST` request.
-.. ? Should the old style of a separate prep request and submission request be
-   kept?  Is that necessary anymore?  I don't remember why it was done as two
-   separate requests in the first place.
-. Import handler does whatever it needs to validate and/or transform the
-  imported user dataset and returns an archive file containing the outputs to be
-  pushed to the user dataset store.
-. Service unpacks the archive returned by the import handler
-. Service uploads the files from the archive as a new dataset to the User
+. VDI Service downloads the relevant files from the temp file store and pipes
+  them through to the import handler as a single multipart `POST` request.
+. VDI Service marks the dataset status as "importing"
+. Import Handler Service writes the files to an "input" directory for an import
+  plugin execution.
+. Import Handler Service executes the import plugin.
+. Import Handler Service bundles the output directory from the plugin execution.
+. Import Handler Service returns the bundled output to the VDI Service
+. VDI Service unpacks the archive returned by the import handler
+. VDI Service uploads the files from the archive as a new dataset to the User
   Dataset Store
+. VDI Service updates the dataset status to "imported"
 
 ==== Process User Dataset Store Change
 
@@ -326,7 +310,10 @@ h| How are the statuses displayed to the client/user? We have multiple status
 
 |===
 h| Installers: What are the inputs and outputs?
-|
+
+a| Installers will have their data posted to them the same as with the import
+handler.  A bulk HTTP request containing the dataset files and metadata will be
+submitted to the Installer Service and the installer will take it from there.
 |===
 
 |===
@@ -363,7 +350,9 @@ h| How do failed installations get reported to users?
 * Service will have to check the soft delete flag before permitting any actions
   on a user dataset.
 
-
+* The service wrapping the installer and import handler should be written in
+  a JVM language to make use of the existing tooling for handling multipart that
+  we have established.
 
 == Unorganized Notes
 
