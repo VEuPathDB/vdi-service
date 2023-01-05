@@ -76,15 +76,7 @@ Dataset Store = Minio
 
 ==== List User Datasets
 
-. Client makes a `GET` request.
-. Service queries the postgres database for a listing of relevant results
-. Service queries relevant application databases for installation status of each
-  dataset.
-. Service returns a listing of relevant results, each of which will include:
-.. user dataset id
-.. owner id
-.. target project id
-.. status(es)?
+image:assets/list-uds.png[]
 
 .Response types?
 [source, typescript]
