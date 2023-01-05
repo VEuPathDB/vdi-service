@@ -336,6 +336,11 @@ h| How do failed installations get reported to users?
 |
 |===
 
+|===
+h| How does undeleting work?
+|
+|===
+
 
 == General Implementation Notes / Thoughts
 
