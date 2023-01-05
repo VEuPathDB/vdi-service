@@ -78,54 +78,95 @@ uses:
         description: Unauthorized
       500:
         description: Internal Error
+        body: err.ServerError
 
   post:
     displayName: Upload User Dataset
 
-/user-datasets/admin:
+/user-datasets/rpc:
   /reconcile:
-  /cleanup:
+    post:
+      displayName: Run Reconciliation
+      description: |
+        Runs the Dataset Reconciliation process.
+        
+        TODO: DESCRIBE THIS PROCESS!
+
+  /install-cleanup:
+    post:
+      displayName: Run Install Cleanup
+      description: |
+        Marks all or target datasets that are in a status of installation
+        failure into a ready-for-reinstall status.
+      body:
+        application/json: Install-Cleanup-Request
+      responses:
+        204:
+          description: Action completed successfully.
+        400:
+          description: Request body did not resemble the expected JSON form.
+        401:
+          description: Unauthorized
+        500:
+          description: Internal server error.
+          body: err.ServerError
+
+  /delete-cleanup:
+    post:
+      displayName: Cleanup Deleted Jobs
+      description: |
+        Permanently delete jobs that were soft deleted more than 24 prior to the
+        execution of this task.
+        
 
 /user-datasets/{ud-id}:
   uriParameters:
     ud-id:
-      displayName: User Dataset ID
-      description: |
-        A 32 digit hex string that is the unique identifier for a user dataset.
-      type: string
-      minLength: 32
-      maxLength: 32
-      pattern: ^[0-9A-F]{32}$
+      type: VDI-ID
       required: true
 
   get:
     displayName: Lookup User Dataset
+    description: |
+      Fetch details about a user dataset and its status(es).
+    responses:
+      200:
+        description: Target dataset was located and returned.
+      401:
+        description: Unauthorized
+      404:
+        description: |
+          Target dataset was not located or is not visible to the requesting
+          user.
+      500:
+        description: Internal server error.
+        body: err.ServerError
 
   delete:
     displayName: Delete User Dataset
+    description: |
+      Marks the target dataset as deleted.
+      
+      Datasets that have been marked as deleted are still recoverable for a
+      short period of time before they are permanently deleted from the system.
+    responses:
+      204:
+        description: Target dataset was marked as deleted.
+      401:
+        description: Unauthorized
+      403:
+        description: Target dataset is now owned by the requesting user.
+      404:
+        description: Target dataset was not located.
+      500:
+        description: Internal server error.
+        body: err.ServerError
 
 
 /user-datasets/{ud-id}/shares/{user-id}:
   uriParameters:
-    ud-id:
-      displayName: User Dataset ID
-      description: |
-        A 32 digit hex string that is the unique identifier for a user dataset.
-      type: string
-      minLength: 32
-      maxLength: 32
-      pattern: ^[0-9A-F]{32}$
-      required: true
-    user-id:
-      displayName: User ID
-      description: |
-        ID of the user the user dataset share is being offered to or accepted
-        by.
-      type: integer
-      minimum: 1
-      maximum: 9223372036854775807
-      format: int64
-      required: true
+    ud-id: VDI-ID
+    user-id: User-ID
 
   /offer:
     put:
@@ -134,30 +175,7 @@ uses:
         PUT an offer to share (or revoke a share for) a user dataset with
         another target user.
       body:
-        application/json:
-          displayName: Offer Object
-          type: object
-          additionalProperties: false
-          properties:
-            action:
-              displayName: Offer Action
-              description: |
-                What action to take with the dataset share offer.
-              
-                Either `grant` or `revoke`.
-                
-                A value of `grant` means the share should be offered to the user
-                if they do not already have the dataset, or continue to be
-                allowed if they already have access to the dataset.
-                
-                A value of `revoke` means the share should not be offered to the
-                target user if they do not already have the dataset, or the
-                sharing should be stopped if the user did already have access to
-                the dataset.
-              type: string
-              enum:
-              - grant
-              - revoke
+        application/json: Dataset-Share-Offer
       responses:
         204:
           description: Share offer was successfully (re)placed.
@@ -198,6 +216,7 @@ uses:
               enum:
               - accept
               - reject
+              required: true
       responses:
         204:
           description: Share offer acknowledgement was successfully (re)placed.
@@ -210,5 +229,85 @@ uses:
         500:
           description: Internal server error.
 
+types:
+  VDI-ID:
+    displayName: VDI ID
+    description: Unique VDI identifier string.
+    type: string
+    minLength: 32
+    maxLength: 32
+    pattern: ^[0-9a-fA-F]{32}$
+    example: 78609580dba2787a5cf677d6f334a707
 
+  User-ID:
+    displayName: WDK User ID
+    description: Unique user identifier
+    type: integer
+    format: int64
+    minimum: 1
+    maximum: 9223372036854775807
 
+  Authorization-Key:
+    displayName: RPC Authorization Key
+    description: |
+      A token unique to an RPC action that allows the action to be run via an
+      HTTP call.
+    type: string
+    minLength: 64
+    maxLength: 64
+    example: e903d4d92fb20751a15a02e1558cb1163da5dac093efa65422cbb22af4588c65
+
+  Install-Cleanup-Request:
+    displayName: Install Cleanup Request
+    description: |
+      Object controlling the install cleanup process and what datasets it should
+      target.
+      
+      Requesters should specify one of the fields `all` or `targets` to control
+      what datasets will be cleaned up.  If neither is specified the endpoint
+      will do nothing.
+    type: object
+    additionalProperties: false
+    properties:
+      authorization:
+        type: Authorization-Key
+        required: true
+      all:
+        type: boolean
+        default: false
+        required: false
+      targets:
+        type: array
+        items:
+          type: VDI-ID
+        minItems: 1
+        uniqueItems: true
+        required: false
+
+  Dataset-Share-Offer:
+    displayName: Dataset Share Offer
+    description: |
+      An offer to share (or un-share) a dataset with a single target user.
+    type: object
+    additionalProperties: false
+    properties:
+      action:
+        displayName: Offer Action
+        description: |
+          What action to take with the dataset share offer.
+          
+          Either `grant` or `revoke`.
+          
+          A value of `grant` means the share should be offered to the user
+          if they do not already have the dataset, or continue to be
+          allowed if they already have access to the dataset.
+          
+          A value of `revoke` means the share should not be offered to the
+          target user if they do not already have the dataset, or the
+          sharing should be stopped if the user did already have access to
+          the dataset.
+        type: string
+        enum:
+        - grant
+        - revoke
+        required: true
