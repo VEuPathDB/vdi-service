@@ -239,18 +239,7 @@ interface Request {
 
 ==== Process Import
 
-. VDI Service downloads the relevant files from the temp file store and pipes
-  them through to the import handler as a single multipart `POST` request.
-. VDI Service marks the dataset status as "importing"
-. Import Handler Service writes the files to an "input" directory for an import
-  plugin execution.
-. Import Handler Service executes the import plugin.
-. Import Handler Service bundles the output directory from the plugin execution.
-. Import Handler Service returns the bundled output to the VDI Service
-. VDI Service unpacks the archive returned by the import handler
-. VDI Service uploads the files from the archive as a new dataset to the User
-  Dataset Store
-. VDI Service updates the dataset status to "imported"
+image:assets/process-import.png[]
 
 ==== Process User Dataset Store Change
 
