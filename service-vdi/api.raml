@@ -24,7 +24,7 @@ uses:
           
           This means only user datasets that are relevant to the project ID
           given will be returned.
-        type: string
+        type: Project-ID
         example: PlasmoDB
         required: false
         default: null
@@ -256,6 +256,29 @@ types:
     minLength: 64
     maxLength: 64
     example: e903d4d92fb20751a15a02e1558cb1163da5dac093efa65422cbb22af4588c65
+
+  Project-ID:
+    displayName: Project ID
+    description: |
+      Name or ID of a target VEuPathDB project.
+      
+      Valid project IDs are:
+      
+      - AmoebaDB
+      - CryptoDB
+      - FungiDB
+      - GiardiaDB
+      - HostDB
+      - MicrosporidiaDB
+      - PiroplasmaDB
+      - PlasmoDB
+      - ToxoDB
+      - TrichDB
+      - TriTrypDB
+      - VectorBase
+      - VEuPathDB
+    type: string
+    example: PlasmoDB
 
   Install-Cleanup-Request:
     displayName: Install Cleanup Request
