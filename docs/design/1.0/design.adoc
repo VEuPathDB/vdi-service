@@ -239,18 +239,7 @@ interface Request {
 
 ==== Process Import
 
-. VDI Service downloads the relevant files from the temp file store and pipes
-  them through to the import handler as a single multipart `POST` request.
-. VDI Service marks the dataset status as "importing"
-. Import Handler Service writes the files to an "input" directory for an import
-  plugin execution.
-. Import Handler Service executes the import plugin.
-. Import Handler Service bundles the output directory from the plugin execution.
-. Import Handler Service returns the bundled output to the VDI Service
-. VDI Service unpacks the archive returned by the import handler
-. VDI Service uploads the files from the archive as a new dataset to the User
-  Dataset Store
-. VDI Service updates the dataset status to "imported"
+image:assets/process-import.png[]
 
 ==== Process User Dataset Store Change
 
@@ -269,6 +258,47 @@ interface Request {
 . ???
 . Update postgres?
 . Queue changes to relevant application databases?
+
+
+== Import Handler Service
+
+=== Actions
+
+[%headers, cols="3,1,6"]
+|===
+| Action | Source | Description
+
+| <<Process Import>>
+| HTTP
+| Performs import validation/transformations on an uploaded dataset to prepare
+  it for import and eventual installation into one or more VEuPathDB sites.
+|===
+
+==== Process Import
+
+Performs import validation/transformations on an uploaded dataset to prepare it
+for import and eventual installation into one or more VEuPathDB sites.
+
+[WARNING]
+--
+|===
+h| What is the contract for data being placed in the inputs directory? +
+   Should the meta file always have the same name? +
+   How are files differentiated?
+
+|
+|===
+--
+
+. Create workspace directory for the import being processed
+.. Create "input" subdirectory
+.. Create "output" subdirectory
+. Push the files uploaded for the dataset to the "input" subdirectory of the
+  import workspace
+. Call the import script, passing in the paths to the input and output
+  directories
+. Bundle the files placed in the output directory
+. Return the bundled archive to the HTTP caller
 
 
 == General Q & A
