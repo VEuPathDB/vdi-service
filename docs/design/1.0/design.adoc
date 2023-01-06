@@ -297,6 +297,8 @@ h| What is the contract for data being placed in the inputs directory? +
   import workspace
 . Call the import script, passing in the paths to the input and output
   directories
+. Generate a `dataset.json` file
+. Generate a `meta.json` file
 . Bundle the files placed in the output directory
 . Return the bundled archive to the HTTP caller
 
