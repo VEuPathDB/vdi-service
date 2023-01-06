@@ -264,7 +264,7 @@ image:assets/process-import.png[]
 
 === Actions
 
-[%headers, cols="3,1,6"]
+[%headers, cols="2,1,7"]
 |===
 | Action | Source | Description
 
