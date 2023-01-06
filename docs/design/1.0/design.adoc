@@ -271,6 +271,47 @@ interface Request {
 . Queue changes to relevant application databases?
 
 
+== Import Handler Service
+
+=== Actions
+
+[%headers, cols="3,1,6"]
+|===
+| Action | Source | Description
+
+| <<Process Import>>
+| HTTP
+| Performs import validation/transformations on an uploaded dataset to prepare
+  it for import and eventual installation into one or more VEuPathDB sites.
+|===
+
+==== Process Import
+
+Performs import validation/transformations on an uploaded dataset to prepare it
+for import and eventual installation into one or more VEuPathDB sites.
+
+[WARNING]
+--
+|===
+h| What is the contract for data being placed in the inputs directory? +
+   Should the meta file always have the same name? +
+   How are files differentiated?
+
+|
+|===
+--
+
+. Create workspace directory for the import being processed
+.. Create "input" subdirectory
+.. Create "output" subdirectory
+. Push the files uploaded for the dataset to the "input" subdirectory of the
+  import workspace
+. Call the import script, passing in the paths to the input and output
+  directories
+. Bundle the files placed in the output directory
+. Return the bundled archive to the HTTP caller
+
+
 == General Q & A
 
 |===
