@@ -8,6 +8,7 @@ mediaType: application/json
 
 uses:
   err: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.2.0/libraries/errors.raml
+  lib: schema/library.raml
 
 
 /user-datasets:
@@ -24,7 +25,7 @@ uses:
           
           This means only user datasets that are relevant to the project ID
           given will be returned.
-        type: Project-ID
+        type: lib.Project-ID
         example: PlasmoDB
         required: false
         default: null
@@ -74,14 +75,31 @@ uses:
         description: Success
       400:
         description: Bad Query Parameter(s)
+        body: err.BadRequestError
       401:
         description: Unauthorized
+        body: err.UnauthorizedError
       500:
         description: Internal Error
         body: err.ServerError
 
   post:
     displayName: Upload User Dataset
+    responses:
+      200:
+        description: Success
+      400:
+        description: Request body did not resemble the expected form.
+        body: err.BadRequestError
+      401:
+        description: Unauthorized
+        body: err.UnauthorizedError
+      422:
+        description: Request failed validation.
+        body: err.UnprocessableEntityError
+      500:
+        description: Internal server error
+        body: err.ServerError
 
 /user-datasets/rpc:
   /reconcile:
@@ -99,14 +117,16 @@ uses:
         Marks all or target datasets that are in a status of installation
         failure into a ready-for-reinstall status.
       body:
-        application/json: Install-Cleanup-Request
+        application/json: lib.Install-Cleanup-Request
       responses:
         204:
           description: Action completed successfully.
         400:
           description: Request body did not resemble the expected JSON form.
+          body: err.BadRequestError
         401:
           description: Unauthorized
+          body: err.UnauthorizedError
         500:
           description: Internal server error.
           body: err.ServerError
@@ -115,15 +135,27 @@ uses:
     post:
       displayName: Cleanup Deleted Jobs
       description: |
-        Permanently delete jobs that were soft deleted more than 24 prior to the
-        execution of this task.
-        
+        Permanently delete jobs that were soft deleted more than 24 hours prior
+        to the execution of this task.
+      body:
+        application/json: lib.Delete-Cleanup-Request
+      responses:
+        204:
+          description: Action completed successfully.
+        400:
+          description: Request body did not resemble the expected JSON form.
+          body: err.BadRequestError
+        401:
+          description: Unauthorized
+          body: err.UnauthorizedError
+        500:
+          description: Internal server error.
+          body: err.ServerError
+
 
 /user-datasets/{ud-id}:
   uriParameters:
-    ud-id:
-      type: VDI-ID
-      required: true
+    ud-id: lib.VDI-ID
 
   get:
     displayName: Lookup User Dataset
@@ -132,12 +164,15 @@ uses:
     responses:
       200:
         description: Target dataset was located and returned.
+        body: lib.Dataset-Details
       401:
         description: Unauthorized
+        body: err.UnauthorizedError
       404:
         description: |
           Target dataset was not located or is not visible to the requesting
           user.
+        body: err.NotFoundError
       500:
         description: Internal server error.
         body: err.ServerError
@@ -154,10 +189,13 @@ uses:
         description: Target dataset was marked as deleted.
       401:
         description: Unauthorized
+        body: err.UnauthorizedError
       403:
-        description: Target dataset is now owned by the requesting user.
+        description: Target dataset is not owned by the requesting user.
+        body: err.ForbiddenError
       404:
         description: Target dataset was not located.
+        body: err.NotFoundError
       500:
         description: Internal server error.
         body: err.ServerError
@@ -165,8 +203,8 @@ uses:
 
 /user-datasets/{ud-id}/shares/{user-id}:
   uriParameters:
-    ud-id: VDI-ID
-    user-id: User-ID
+    ud-id: lib.VDI-ID
+    user-id: lib.User-ID
 
   /offer:
     put:
@@ -175,18 +213,22 @@ uses:
         PUT an offer to share (or revoke a share for) a user dataset with
         another target user.
       body:
-        application/json: Dataset-Share-Offer
+        application/json: lib.Dataset-Share-Offer
       responses:
         204:
           description: Share offer was successfully (re)placed.
         400:
           description: Request body did not resemble the expected JSON form.
+          body: err.BadRequestError
         401:
           description: Unauthorized.
+          body: err.UnauthorizedError
         422:
           description: Request body failed validation.
+          body: err.UnprocessableEntityError
         500:
           description: Internal server error.
+          body: err.ServerError
 
   /receipt:
     put:
@@ -195,142 +237,19 @@ uses:
         PUT a receipt of a User Dataset share offer.  The receipt can either be
         accepting or rejecting the offered share.
       body:
-        application/json:
-          displayName: Receipt Object
-          type: object
-          additionalProperties: false
-          properties:
-            action:
-              displayName: Acknowledgement Action
-              description: |
-                What action to take with acknowledging a dataset share offer.
-                
-                Either `accept` or `reject`.
-                
-                A value of `accept` means that the dataset that a share was
-                offered for should become available to the accepting user.
-                
-                A value of `reject` means that the dataset that a share was
-                offered for should become unavailable to the rejecting user.
-              type: string
-              enum:
-              - accept
-              - reject
-              required: true
+        application/json: lib.Dataset-Share-Receipt
       responses:
         204:
           description: Share offer acknowledgement was successfully (re)placed.
         400:
           description: Request body did not resemble the expected JSON form.
+          body: err.BadRequestError
         401:
           description: Unauthorized
+          body: err.UnauthorizedError
         422:
           description: Request body failed validation.
+          body: err.UnprocessableEntityError
         500:
           description: Internal server error.
-
-types:
-  VDI-ID:
-    displayName: VDI ID
-    description: Unique VDI identifier string.
-    type: string
-    minLength: 32
-    maxLength: 32
-    pattern: ^[0-9a-fA-F]{32}$
-    example: 78609580dba2787a5cf677d6f334a707
-
-  User-ID:
-    displayName: WDK User ID
-    description: Unique user identifier
-    type: integer
-    format: int64
-    minimum: 1
-    maximum: 9223372036854775807
-
-  Authorization-Key:
-    displayName: RPC Authorization Key
-    description: |
-      A token unique to an RPC action that allows the action to be run via an
-      HTTP call.
-    type: string
-    minLength: 64
-    maxLength: 64
-    example: e903d4d92fb20751a15a02e1558cb1163da5dac093efa65422cbb22af4588c65
-
-  Project-ID:
-    displayName: Project ID
-    description: |
-      Name or ID of a target VEuPathDB project.
-      
-      Valid project IDs are:
-      
-      - AmoebaDB
-      - CryptoDB
-      - FungiDB
-      - GiardiaDB
-      - HostDB
-      - MicrosporidiaDB
-      - PiroplasmaDB
-      - PlasmoDB
-      - ToxoDB
-      - TrichDB
-      - TriTrypDB
-      - VectorBase
-      - VEuPathDB
-    type: string
-    example: PlasmoDB
-
-  Install-Cleanup-Request:
-    displayName: Install Cleanup Request
-    description: |
-      Object controlling the install cleanup process and what datasets it should
-      target.
-      
-      Requesters should specify one of the fields `all` or `targets` to control
-      what datasets will be cleaned up.  If neither is specified the endpoint
-      will do nothing.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization:
-        type: Authorization-Key
-        required: true
-      all:
-        type: boolean
-        default: false
-        required: false
-      targets:
-        type: array
-        items:
-          type: VDI-ID
-        minItems: 1
-        uniqueItems: true
-        required: false
-
-  Dataset-Share-Offer:
-    displayName: Dataset Share Offer
-    description: |
-      An offer to share (or un-share) a dataset with a single target user.
-    type: object
-    additionalProperties: false
-    properties:
-      action:
-        displayName: Offer Action
-        description: |
-          What action to take with the dataset share offer.
-          
-          Either `grant` or `revoke`.
-          
-          A value of `grant` means the share should be offered to the user
-          if they do not already have the dataset, or continue to be
-          allowed if they already have access to the dataset.
-          
-          A value of `revoke` means the share should not be offered to the
-          target user if they do not already have the dataset, or the
-          sharing should be stopped if the user did already have access to
-          the dataset.
-        type: string
-        enum:
-        - grant
-        - revoke
-        required: true
+          body: err.ServerError
