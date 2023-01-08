@@ -21,7 +21,7 @@ types:
     format: int64
     minimum: 1
     maximum: 9223372036854775807
-  Authorization-Key:
+  AuthorizationKey:
     displayName: RPC Authorization Key
     description: |
       A token unique to an RPC action that allows the action to be run via an
@@ -30,7 +30,7 @@ types:
     pattern: ^[0-9a-fA-F]{64}$
     minLength: 64
     maxLength: 64
-  Project-ID:
+  ProjectID:
     displayName: Project ID
     description: |
       Name or ID of a target VEuPathDB project.
@@ -53,7 +53,7 @@ types:
     type: string
     example: !!omap
       - "": PlasmoDB
-  Delete-Cleanup-Request:
+  DeleteCleanupRequest:
     displayName: Delete Cleanup Request
     description: |
       Request for the service to clean up datasets that were soft deleted more
@@ -61,8 +61,8 @@ types:
     type: object
     additionalProperties: false
     properties:
-      authorization: Authorization-Key
-  Install-Cleanup-Request:
+      authorization: AuthorizationKey
+  InstallCleanupRequest:
     displayName: Install Cleanup Request
     description: |
       Object controlling the install cleanup process and what datasets it should
@@ -74,7 +74,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      authorization: Authorization-Key
+      authorization: AuthorizationKey
       all:
         type: boolean
         default: false
@@ -85,7 +85,7 @@ types:
         uniqueItems: true
         minItems: 1
         items: VDI-ID
-  Dataset-Share-Offer:
+  DatasetShareOffer:
     displayName: Dataset Share Offer
     description: |
       An offer to share (or un-share) a dataset with a single target user.
@@ -111,7 +111,7 @@ types:
         enum:
           - grant
           - revoke
-  Dataset-Share-Receipt:
+  DatasetShareReceipt:
     displayName: Dataset Share Receipt
     description: |
       A receipt or response to a share offer of a dataset to a single user.
@@ -134,7 +134,7 @@ types:
         enum:
           - accept
           - reject
-  Dataset-Details:
+  DatasetDetails:
     displayName: Dataset Details
     description: |
       Details about a specific singular dataset.
@@ -143,12 +143,13 @@ types:
     properties:
       datasetID: VDI-ID
       ownerID: User-ID
-      type: Dataset-Details-Type-Info
+      type: DatasetDetailsTypeInfo
       meta:
-        type: Dataset-Details-Meta
+        type: DatasetDetailsMeta
         default: null
         required: false
-  Dataset-Details-Type-Info:
+      status: DatasetStatusInfo
+  DatasetDetailsTypeInfo:
     displayName: Dataset Type Info
     description: Information about a specific dataset type.
     type: object
@@ -160,7 +161,7 @@ types:
       version:
         displayName: Type Version
         type: string
-  Dataset-Details-Meta:
+  DatasetDetailsMeta:
     displayName: Dataset Meta Info
     description: User provided meta information about a dataset.
     type: object
@@ -181,4 +182,85 @@ types:
         type: string
         default: null
         required: false
+  DatasetStatusInfo:
+    displayName: Dataset Status Info
+    description: Information about the import and install status of a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      import: DatasetImportStatus
+      install:
+        type: DatasetInstallStatusEntry[]
+        default: null
+        required: false
+  DatasetImportStatus:
+    displayName: Dataset Import Status
+    type: string
+    enum:
+      - awaiting-import
+      - importing
+      - imported
+      - import-failed
+  DatasetInstallStatus:
+    displayName: Dataset Install Status
+    type: string
+    enum:
+      - running
+      - complete
+      - failed
+      - ready-for-reinstall
+  DatasetInstallStatusEntry:
+    displayName: Dataset Install Status Entry
+    description: Entry in a list of install statuses for a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      projectID: ProjectID
+      status: DatasetInstallStatus
+  DatasetListEntry:
+    displayName: Dataset List Item
+    description: Short entry with basic details about a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID: VDI-ID
+      ownerID: User-ID
+      type: DatasetDetailsTypeInfo
+      meta:
+        type: DatasetDetailsMeta
+        default: null
+        required: false
+      status: DatasetStatusInfo
+  DatasetPostRequest:
+    displayName: Dataset Upload Post Request
+    description: |
+      Dataset upload post request body.
+
+      This request body contains a JSON blob with details about the dataset
+      being uploaded in addition to the files that make up the dataset.
+    type: object
+    properties:
+      details: DatasetPostRequestDetails
+  DatasetPostRequestDetails:
+    displayName: Dataset Upload Details
+    description: Details about a dataset being uploaded.
+    type: object
+    additionalProperties: false
+    properties:
+      meta:
+        type: DatasetDetailsMeta
+        default: null
+        required: false
+  DatasetPostResponse:
+    displayName: Dataset Upload Response
+    description: |
+      Response object returned on successful upload of a dataset.
+
+      Note that the dataset being uploaded is not the same as the dataset being
+      imported.  The importing of a dataset happens asynchronously at some point
+      after the dataset is uploaded.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID: VDI-ID
 

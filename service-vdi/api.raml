@@ -25,7 +25,7 @@ uses:
           
           This means only user datasets that are relevant to the project ID
           given will be returned.
-        type: lib.Project-ID
+        type: lib.ProjectID
         example: PlasmoDB
         required: false
         default: null
@@ -73,6 +73,7 @@ uses:
     responses:
       200:
         description: Success
+        body: lib.DatasetListEntry[]
       400:
         description: Bad Query Parameter(s)
         body: err.BadRequestError
@@ -85,9 +86,12 @@ uses:
 
   post:
     displayName: Upload User Dataset
+    body:
+      multipart/form-data: lib.DatasetPostRequest
     responses:
       200:
         description: Success
+        body: lib.DatasetPostResponse
       400:
         description: Request body did not resemble the expected form.
         body: err.BadRequestError
@@ -164,7 +168,7 @@ uses:
     responses:
       200:
         description: Target dataset was located and returned.
-        body: lib.Dataset-Details
+        body: lib.DatasetDetails
       401:
         description: Unauthorized
         body: err.UnauthorizedError
