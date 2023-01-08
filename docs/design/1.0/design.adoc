@@ -284,7 +284,7 @@ image:assets/process-import.png[]
 Performs import validation/transformations on an uploaded dataset to prepare it
 for import and eventual installation into one or more VEuPathDB sites.
 
-[WARNING]
+[IMPORTANT]
 --
 |===
 h| What is the contract for data being placed in the inputs directory? +
@@ -466,10 +466,20 @@ What different statuses are there?::
 .User Dataset Import Components
 image:assets/ds-import-components.png[]
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 == Database Schemata
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 === Internal PostgreSQL Database
 
+Tables here cannot be the single source of truth for information about the
+datasets.  While this database should not be wiped, it needs to be constructable
+from the state of the Dataset Store.
+
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `sync_control`
 
 This table indicates the last modified timestamp for the various components that
@@ -479,7 +489,7 @@ comprise a user dataset.
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
 |
 
@@ -498,13 +508,15 @@ comprise a user dataset.
 | Timestamp of the meta.json last_modified date for the user dataset.
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `owner_share`
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
 |
 
@@ -518,13 +530,15 @@ comprise a user dataset.
 One of "granted" \| "revoked"
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `recipient_share`
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
 |
 
@@ -538,13 +552,15 @@ One of "granted" \| "revoked"
 One of "accepted" \| "rejected"
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `user_dataset_control`
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
 |
 
@@ -553,13 +569,15 @@ One of "accepted" \| "rejected"
 | "awaiting-import", "importing", "imported", "failed"
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `user_datasets`
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
 |
 
@@ -585,13 +603,15 @@ One of "accepted" \| "rejected"
 
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `user_dataset_files`
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
 |
 
@@ -600,13 +620,15 @@ One of "accepted" \| "rejected"
 |
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `user_dataset_projects`
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
 |
 
@@ -615,13 +637,15 @@ One of "accepted" \| "rejected"
 |
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `user_dataset_metadata`
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
 |
 
@@ -638,15 +662,35 @@ One of "accepted" \| "rejected"
 |
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 === Application Database
 
+[IMPORTANT]
+====
+|===
+h| What schema will these tables live in?
+| ???
+|===
+====
+
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `user_datasets`
+
+[IMPORTANT]
+====
+|===
+h| What date gets stored in the `creation_time` column?
+| ???
+|===
+====
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
 |
 
@@ -656,30 +700,42 @@ One of "accepted" \| "rejected"
 
 | type
 | VARCHAR
-|
+| Dataset type string.
 
 | version
 | VARCHAR
-|
+| Dataset type version string.
 
 | creation_time
 | TIMESTAMP
-|
+| ???
 
 | is_deleted
 | TINYINT(1)
 | Soft delete flag.
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `user_dataset_install_messages`
+
+[IMPORTANT]
+====
+|===
+h| What is a message_id?
+| ???
+h| What is an install type?
+| ???
+|===
+====
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
-|
+| Foreign key to `user_datasets.dataset_id`
 
 | message_id
 |
@@ -698,32 +754,46 @@ One of "accepted" \| "rejected"
 | failure message?
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `user_dataset_visibility`
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
-|
+| Foreign key to `user_datasets.dataset_id`
 
 | user_id
 | BIGINT
 | ID of the share recipient user who should be able to see the user dataset.
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== `user_dataset_projects`
+
+[IMPORTANT]
+====
+|===
+h| What is the purpose of this table being in the application database?  Does an
+   application care about what _other_ sites a dataset is installed in?  Should
+   the VDI service be the only point of truth for this?
+| ???
+|===
+====
 
 [%header, cols="2m,1m,7"]
 |===
 | Column | Type | Comment
 
-| user_dataset_id
+| dataset_id
 | CHAR(32)
-|
+| Foreign key to `user_datasets.dataset_id`
 
 | project_id
 | VARCHAR
-|
+| Name/ID of the target site for the user dataset.
 |===
