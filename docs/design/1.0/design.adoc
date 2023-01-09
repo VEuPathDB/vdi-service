@@ -5,6 +5,7 @@
 
 ifdef::env-github[]
 :tip-caption: :bulb:
+:important-caption: :heavy_exclamation_mark:
 endif::[]
 
 
@@ -93,7 +94,7 @@ interface Response {
 }
 
 interface Result {
-  userDatasetID: string
+  datasetID: string
   ownerID: number
   projectIDs: Array<String>
   status: StatusInfo
@@ -118,7 +119,7 @@ interface InstallStatusInfo {
   "resultCount": 2,
   "results": [
     {
-      "userDatasetID": "df8fede7ff71608e24a5576326e41c75",
+      "datasetID": "df8fede7ff71608e24a5576326e41c75",
       "ownerID": 123456,
       "projectIDs": [
         "PlasmoDB",
@@ -129,7 +130,7 @@ interface InstallStatusInfo {
       }
     },
     {
-      "userDatasetID": "7fa3b767c460b54a2be4d49030b349c7",
+      "datasetID": "7fa3b767c460b54a2be4d49030b349c7",
       "ownerID": 123456,
       "projectIDs": [
         "FungiDB"
@@ -163,11 +164,35 @@ interface InstallStatusInfo {
 
 image:assets/upload-ud.png[]
 
+.Request Type
+[source, typescript]
+----
+interface Request {
+  meta: RequestMeta
+  file: File
+  url: string
+}
+
+interface RequestMeta {
+  name: string
+  type: string
+  summary: string
+  description: string
+  projects: Array<string>
+  params: Array<FormatParam>
+}
+
+interface FormatParam {
+  key: string
+  value: string
+}
+----
+
 .Response Type
 [source, typescript]
 ----
 interface Response {
-  userDatasetID: string
+  datasetID: string
 }
 ----
 
@@ -175,7 +200,7 @@ interface Response {
 [source, json]
 ----
 {
-  "userDatasetID": "89e837da8dc2b299b592f4ad82c4667a"
+  "datasetID": "89e837da8dc2b299b592f4ad82c4667a"
 }
 ----
 
@@ -197,7 +222,7 @@ interface Response {
 [source, typescript]
 ----
 interface Request {
-  userDatasetID: string
+  datasetID: string
   name?: string
   summary?: string
   description?: string
@@ -208,7 +233,7 @@ interface Request {
 [source, json]
 ----
 {
-  "userDatasetID": "89e837da8dc2b299b592f4ad82c4667a",
+  "datasetID": "89e837da8dc2b299b592f4ad82c4667a",
   "description": "My new description text."
 }
 ----
