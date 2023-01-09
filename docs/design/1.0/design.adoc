@@ -164,6 +164,30 @@ interface InstallStatusInfo {
 
 image:assets/upload-ud.png[]
 
+.Request Type
+[source, typescript]
+----
+interface Request {
+  meta: RequestMeta
+  file: File
+  url: string
+}
+
+interface RequestMeta {
+  name: string
+  type: string
+  summary: string
+  description: string
+  projects: Array<string>
+  params: Array<FormatParam>
+}
+
+interface FormatParam {
+  key: string
+  value: string
+}
+----
+
 .Response Type
 [source, typescript]
 ----
