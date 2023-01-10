@@ -9,6 +9,9 @@ tasks.create("generate-raml-docs") {
 
     docsDir.mkdir()
 
-    vdiDocsFile.copyTo(docsDir.resolve("vdi-api.html"))
+    with(docsDir.resolve("vdi-api.html")) {
+      delete()
+      vdiDocsFile.copyTo(this)
+    }
   }
 }
