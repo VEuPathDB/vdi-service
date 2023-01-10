@@ -9,7 +9,7 @@ types:
     description: |
       HTTP POST request body requesting the creation of a dataset from the
       components included in the request.
-      
+
       For a request to be considered valid, it must contain exactly 1 of the
       optional parameters `file` or `url`.  If a request body contains both a
       `file` and a `url` field value, the service will return a `400` error.
@@ -25,7 +25,7 @@ types:
         displayName: Dataset File
         description: |
           Dataset file to upload.
-          
+
           This field is incompatible with the `url` field.
         type: file
         required: false
@@ -33,7 +33,7 @@ types:
         displayName: Dataset URL
         description: |
           URL to a dataset file to upload.
-          
+
           This field is incompatible with the `file` field.
         type: string
         required: false
@@ -93,7 +93,7 @@ types:
     displayName: Dataset Upload Response
     description: |
       Response object returned on successful upload of a dataset.
-      
+
       Note that the dataset being uploaded is not the same as the dataset being
       imported.  The importing of a dataset happens asynchronously at some point
       after the dataset is uploaded.
@@ -101,5 +101,5 @@ types:
     additionalProperties: false
     properties:
       datasetID:
-        type: common.VDI-ID
+        type: common.SD-ID
         required: true
