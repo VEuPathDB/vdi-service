@@ -154,9 +154,9 @@ uses:
           body: lib.ServerError
 
   /delete-cleanup:
-    displayName: Delete Cleanup
+    displayName: Deleted Dataset Cleanup
     post:
-      displayName: Cleanup Deleted Jobs
+      displayName: Run Deleted Dataset Cleanup
       description: |
         Permanently delete jobs that were soft deleted more than 24 hours prior
         to the execution of this task.
