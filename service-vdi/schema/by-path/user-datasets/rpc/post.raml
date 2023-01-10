@@ -60,7 +60,17 @@ types:
       targets:
         type: array
         items:
-          type: common.VDI-ID
+          type: InstallCleanupTarget
         minItems: 1
         uniqueItems: true
         required: false
+
+  InstallCleanupTarget:
+    displayName: Install Cleanup Target
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        type: common.VDI-ID
+      projectID:
+        type: common.ProjectID

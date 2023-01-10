@@ -139,7 +139,10 @@ uses:
 
         TODO: DESCRIBE THIS PROCESS!
       body:
-        application/json: lib.ReconciliationRequest
+        application/json:
+          type: lib.ReconciliationRequest
+          example:
+            authorization: 964d72e72d053d501f2949969849b96c31d7c3e829be03400641f80b821ef728
       responses:
         204:
           description: Action completed successfully.
