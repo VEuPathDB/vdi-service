@@ -87,11 +87,15 @@ uses:
   post:
     displayName: Upload User Dataset
     body:
-      multipart/form-data: lib.DatasetPostRequest
+      multipart/form-data:
+        type: lib.DatasetPostRequest
     responses:
       200:
         description: Success
-        body: lib.DatasetPostResponse
+        body:
+          type: lib.DatasetPostResponse
+          example:
+            datasetID: b18dcdf1a19c9415cd6594c00d611699
       400:
         description: Request body did not resemble the expected form.
         body: lib.BadRequestError
@@ -188,7 +192,35 @@ uses:
     responses:
       200:
         description: Target dataset was located and returned.
-        body: lib.DatasetDetails
+        body:
+          type: lib.DatasetDetails
+          example:
+            datasetID: b18dcdf1a19c9415cd6594c00d611699
+            ownerID: 123456
+            type:
+              name: ISA
+              version: 1.0
+            name: My Dataset
+            summary: A short description of my dataset.
+            description: A longer description of my dataset.
+            projectIDs:
+            - PlasmoDB
+            - ToxoDB
+            importMessages:
+            - Import warning 1
+            - Import warning 2
+            installMessages:
+              PlasmoDB:
+              - Install warning 1
+              - Install warning 2
+              - Install Error
+            status:
+              import: imported
+              install:
+              - projectID: PlasmoDB
+                status: failed
+              - projectID: ToxoDB
+                status: complete
       401:
         description: Unauthorized
         body: lib.UnauthorizedError
