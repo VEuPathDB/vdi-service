@@ -14,7 +14,6 @@ types:
     properties:
       datasetID:
         displayName: Dataset ID
-
         type: common.VDI-ID
         required: true
       ownerID:
@@ -43,7 +42,23 @@ types:
           Project IDs for projects the user dataset record was submitted to.
         type: common.ProjectID[]
         required: true
+      importMessages:
+        displayName: Import Messages
+        description: |
+          Log lines from the import process.
+
+          These messages will be warnings and/or validation errors.
+        type: string[]
+        required: false
+        default: []
+      installMessages:
+        displayName: Install Messages
+        type: object
+        properties:
+          /[a-zA-Z]+/:
+            type: string[]
       status:
         displayName: Dataset Status Info
         type: common.DatasetStatusInfo
         required: true
+
