@@ -73,7 +73,25 @@ uses:
     responses:
       200:
         description: Success
-        body: lib.DatasetListEntry[]
+        body:
+          type: lib.DatasetListEntry[]
+          example:
+          - datasetID: b18dcdf1a19c9415cd6594c00d611699
+            ownerID: 123456
+            datasetType:
+              name: ISA
+              version: 1.0
+            name: My Dataset
+            summary: A short description of my dataset.
+            description: A longer description of my dataset.
+            projectIDs:
+            - PlasmoDB
+            - ToxoDB
+            status:
+            - projectID: PlasmoDB
+              status: failed
+            - projectID: ToxoDB
+              status: complete
       400:
         description: Bad Query Parameter(s)
         body: lib.BadRequestError
@@ -197,7 +215,7 @@ uses:
           example:
             datasetID: b18dcdf1a19c9415cd6594c00d611699
             ownerID: 123456
-            type:
+            datasetType:
               name: ISA
               version: 1.0
             name: My Dataset
