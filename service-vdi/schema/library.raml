@@ -7,43 +7,6 @@
 ################################################################################
 
 types:
-  DatasetListEntry:
-    displayName: Dataset List Item
-    description: Short entry with basic details about a dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      datasetID:
-        displayName: Dataset ID
-        type: SD-ID
-      ownerID:
-        displayName: Owner ID
-        type: User-ID
-      datasetType:
-        displayName: Dataset Type
-        type: DatasetTypeInfo
-      name:
-        displayName: Dataset Name
-        description: User provided name for the dataset.
-        type: string
-      summary:
-        displayName: Summary
-        description: User provided summary of the dataset.
-        type: string
-        required: false
-      description:
-        displayName: Description
-        description: User provided description of the dataset.
-        type: string
-        required: false
-      projectIDs:
-        displayName: Project IDs
-        description: |
-          Project IDs for projects the user dataset record was submitted to.
-        type: ProjectID[]
-      status:
-        displayName: Status Info
-        type: DatasetStatusInfo
   DatasetPostRequest:
     displayName: Dataset Post Request
     description: |
@@ -238,119 +201,6 @@ types:
         description: User provided description for a dataset.
         type: string
         required: false
-  Error:
-    type: object
-    additionalProperties: false
-    discriminator: status
-    properties:
-      status: ErrorType
-      message: string
-  ErrorType:
-    type: string
-    enum:
-      - bad-request
-      - unauthorized
-      - forbidden
-      - not-found
-      - bad-method
-      - invalid-input
-      - server-error
-  BadRequestError:
-    displayName: Bad Request
-    description: Request could not be parsed or was otherwise unusable.
-    type: Error
-    discriminatorValue: bad-request
-    example: !!omap
-      - status: bad-request
-      - message: malformed JSON
-  UnauthorizedError:
-    displayName: Unauthorized
-    description: |
-      Unauthenticated client requested a resource that requires authentication.
-    type: Error
-    discriminatorValue: unauthorized
-    example: !!omap
-      - status: unauthorized
-      - message: users must be logged in to access this resource
-  ForbiddenError:
-    displayName: Forbidden
-    description: |
-      Server understood the request but is refusing it.
-
-      Could be caused by incorrect instructions or an authenticated client
-      requesting a resource or action that requires permissions that the client
-      does not have assigned.
-    type: Error
-    discriminatorValue: forbidden
-    example: !!omap
-      - status: forbidden
-      - message: the current user is not permitted to perform this action
-  NotFoundError:
-    displayName: Not Found
-    description: The requested resource was not found on this server.
-    type: Error
-    discriminatorValue: not-found
-    example: !!omap
-      - status: not-found
-      - message: the requested resource could not be found
-  MethodNotAllowedError:
-    displayName: Method Not Allowed
-    description: |
-      The HTTP method used to request a resource is not allowed or configured by
-      the server.
-    type: Error
-    discriminatorValue: bad-method
-    example: !!omap
-      - status: bad-method
-      - message: PUT requests are not permitted on this endpoint
-  ConflictError:
-    displayName: Conflict
-    description: |
-      The request could not be completed due to a conflict with the current
-      state of the resource.
-
-      If you submitted a resource, that resource may already exist.
-    type: string
-  GoneError:
-    displayName: Gone
-    description: |
-      The request could not be completed due to the requested resource or its
-      underlying data no longer being present on the server.
-    type: string
-  UnprocessableEntityError:
-    displayName: Unprocessable Entity
-    description: |
-      The request payload or parameters are correctly structured but fail resource
-      specific validation.
-    type: Error
-    discriminatorValue: invalid-input
-    properties:
-      errors:
-        properties:
-          general:
-            description: Non-field specific errors.
-            type: string[]
-          byKey:
-            description: Field specific errors
-            properties:
-              //: string[]
-    example: !!omap
-      - status: invalid-input
-      - message: JSON validation failed
-      - errors:
-          general: []
-          byKey:
-            id: [Given ID value does not point to an existing record.]
-  ServerError:
-    displayName: Internal Server Error
-    type: Error
-    discriminatorValue: server-error
-    properties:
-      requestId: string
-    example: !!omap
-      - status: server-error
-      - message: Datastore connection lost
-      - requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
   DatasetShareOffer:
     displayName: Dataset Share Offer
     description: |
@@ -482,4 +332,154 @@ types:
     properties:
       projectID: ProjectID
       status: DatasetInstallStatus
+  DatasetListEntry:
+    displayName: Dataset List Item
+    description: Short entry with basic details about a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        displayName: Dataset ID
+        type: SD-ID
+      ownerID:
+        displayName: Owner ID
+        type: User-ID
+      datasetType:
+        displayName: Dataset Type
+        type: DatasetTypeInfo
+      name:
+        displayName: Dataset Name
+        description: User provided name for the dataset.
+        type: string
+      summary:
+        displayName: Summary
+        description: User provided summary of the dataset.
+        type: string
+        required: false
+      description:
+        displayName: Description
+        description: User provided description of the dataset.
+        type: string
+        required: false
+      projectIDs:
+        displayName: Project IDs
+        description: |
+          Project IDs for projects the user dataset record was submitted to.
+        type: ProjectID[]
+      status:
+        displayName: Status Info
+        type: DatasetStatusInfo
+  Error:
+    type: object
+    additionalProperties: false
+    discriminator: status
+    properties:
+      status: ErrorType
+      message: string
+  ErrorType:
+    type: string
+    enum:
+      - bad-request
+      - unauthorized
+      - forbidden
+      - not-found
+      - bad-method
+      - invalid-input
+      - server-error
+  BadRequestError:
+    displayName: Bad Request
+    description: Request could not be parsed or was otherwise unusable.
+    type: Error
+    discriminatorValue: bad-request
+    example: !!omap
+      - status: bad-request
+      - message: malformed JSON
+  UnauthorizedError:
+    displayName: Unauthorized
+    description: |
+      Unauthenticated client requested a resource that requires authentication.
+    type: Error
+    discriminatorValue: unauthorized
+    example: !!omap
+      - status: unauthorized
+      - message: users must be logged in to access this resource
+  ForbiddenError:
+    displayName: Forbidden
+    description: |
+      Server understood the request but is refusing it.
+
+      Could be caused by incorrect instructions or an authenticated client
+      requesting a resource or action that requires permissions that the client
+      does not have assigned.
+    type: Error
+    discriminatorValue: forbidden
+    example: !!omap
+      - status: forbidden
+      - message: the current user is not permitted to perform this action
+  NotFoundError:
+    displayName: Not Found
+    description: The requested resource was not found on this server.
+    type: Error
+    discriminatorValue: not-found
+    example: !!omap
+      - status: not-found
+      - message: the requested resource could not be found
+  MethodNotAllowedError:
+    displayName: Method Not Allowed
+    description: |
+      The HTTP method used to request a resource is not allowed or configured by
+      the server.
+    type: Error
+    discriminatorValue: bad-method
+    example: !!omap
+      - status: bad-method
+      - message: PUT requests are not permitted on this endpoint
+  ConflictError:
+    displayName: Conflict
+    description: |
+      The request could not be completed due to a conflict with the current
+      state of the resource.
+
+      If you submitted a resource, that resource may already exist.
+    type: string
+  GoneError:
+    displayName: Gone
+    description: |
+      The request could not be completed due to the requested resource or its
+      underlying data no longer being present on the server.
+    type: string
+  UnprocessableEntityError:
+    displayName: Unprocessable Entity
+    description: |
+      The request payload or parameters are correctly structured but fail resource
+      specific validation.
+    type: Error
+    discriminatorValue: invalid-input
+    properties:
+      errors:
+        properties:
+          general:
+            description: Non-field specific errors.
+            type: string[]
+          byKey:
+            description: Field specific errors
+            properties:
+              //: string[]
+    example: !!omap
+      - status: invalid-input
+      - message: JSON validation failed
+      - errors:
+          general: []
+          byKey:
+            id: [Given ID value does not point to an existing record.]
+  ServerError:
+    displayName: Internal Server Error
+    type: Error
+    discriminatorValue: server-error
+    properties:
+      requestId: string
+    example: !!omap
+      - status: server-error
+      - message: Datastore connection lost
+      - requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
