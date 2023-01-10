@@ -9,9 +9,9 @@ mediaType: application/json
 uses:
   lib: schema/library.raml
 
-
 /user-datasets:
   displayName: Datasets
+
   get:
     displayName: List User Datasets
     description: |
@@ -22,7 +22,7 @@ uses:
         displayName: Project ID Filter
         description: |
           ID of the VEuPathDB project that results should be filtered to.
-          
+
           This means only user datasets that are relevant to the project ID
           given will be returned.
         type: lib.ProjectID
@@ -33,18 +33,18 @@ uses:
         displayName: Dataset Ownership Filter
         description: |
           Ownership status filter.
-          
+
           Enum of:
-          
+
           * `any`
           * `owned`
           * `shared`
-          
+
           If set to `any` the results are not filtered.
-          
+
           If set to `owned`, the results will be filtered to only results that
           are owned by the requesting user.
-          
+
           If set to `shared`, the results will be filtered to only results that
           are shared with the requesting user.
         type: string
@@ -54,7 +54,7 @@ uses:
         displayName: Result Offset
         description: |
           This many results will be skipped before the first result returned.
-          
+
           Used to implement result pagination.
         type: integer
         default: 0
@@ -63,7 +63,7 @@ uses:
         displayName: Result Count Limit
         description: |
           Limits the number of results returned to this count.
-        
+
           Used to implement result pagination.
         type: integer
         default: 100
@@ -83,6 +83,7 @@ uses:
       500:
         description: Internal Error
         body: lib.ServerError
+
   post:
     displayName: Upload User Dataset
     body:
@@ -108,11 +109,12 @@ uses:
   displayName: RPC
 
   /reconcile:
+    displayName: Reconciliation
     post:
       displayName: Run Reconciliation
       description: |
         Runs the Dataset Reconciliation process.
-        
+
         TODO: DESCRIBE THIS PROCESS!
       body:
         application/json: lib.ReconciliationRequest
@@ -130,6 +132,7 @@ uses:
           body: lib.ServerError
 
   /install-cleanup:
+    displayName: Install Cleanup
     post:
       displayName: Run Install Cleanup
       description: |
@@ -151,6 +154,7 @@ uses:
           body: lib.ServerError
 
   /delete-cleanup:
+    displayName: Delete Cleanup
     post:
       displayName: Cleanup Deleted Jobs
       description: |
@@ -229,7 +233,7 @@ uses:
     displayName: Delete User Dataset
     description: |
       Marks the target dataset as deleted.
-      
+
       Datasets that have been marked as deleted are still recoverable for a
       short period of time before they are permanently deleted from the system.
     responses:
