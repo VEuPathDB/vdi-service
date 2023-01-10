@@ -53,6 +53,22 @@ types:
         default: []
       installMessages:
         displayName: Install Messages
+        description: |
+          Mapping of project IDs to log line arrays containing messages from the
+          installation.
+
+          Example:
+          ```json
+          {
+            "PlasmoDB": [
+              "Some installation warning 1",
+              "Some installation warning 2",
+            ],
+            "ToxoDB": [
+              "Some installation warning 1"
+            ]
+          }
+          ```
         type: object
         properties:
           /[a-zA-Z]+/:

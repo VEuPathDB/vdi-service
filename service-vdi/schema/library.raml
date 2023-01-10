@@ -7,6 +7,77 @@
 ################################################################################
 
 types:
+  DatasetPatchRequest:
+    displayName: Dataset Patch Request
+    description: |
+      Request to update the metadata for a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        displayName: Dataset Name
+        description: User provided name for a dataset.
+        type: string
+        required: false
+      summary:
+        displayName: Dataset Summary
+        description: User provided summary for a dataset.
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        description: User provided description for a dataset.
+        type: string
+        required: false
+  DatasetShareOffer:
+    displayName: Dataset Share Offer
+    description: |
+      An offer to share (or un-share) a dataset with a single target user.
+    type: object
+    additionalProperties: false
+    properties:
+      action:
+        displayName: Offer Action
+        description: |
+          What action to take with the dataset share offer.
+
+          Either `grant` or `revoke`.
+
+          A value of `grant` means the share should be offered to the user
+          if they do not already have the dataset, or continue to be
+          allowed if they already have access to the dataset.
+
+          A value of `revoke` means the share should not be offered to the
+          target user if they do not already have the dataset, or the
+          sharing should be stopped if the user did already have access to
+          the dataset.
+        type: string
+        enum:
+          - grant
+          - revoke
+  DatasetShareReceipt:
+    displayName: Dataset Share Receipt
+    description: |
+      A receipt or response to a share offer of a dataset to a single user.
+    type: object
+    additionalProperties: false
+    properties:
+      action:
+        displayName: Acknowledgement Action
+        description: |
+          What action to take with acknowledging a dataset share offer.
+
+          Either `accept` or `reject`.
+
+          A value of `accept` means that the dataset that a share was
+          offered for should become available to the accepting user.
+
+          A value of `reject` means that the dataset that a share was
+          offered for should become unavailable to the rejecting user.
+        type: string
+        enum:
+          - accept
+          - reject
   VDI-ID:
     displayName: VDI ID
     description: Unique VDI Dataset identifier string.
@@ -419,81 +490,26 @@ types:
         required: false
       installMessages:
         displayName: Install Messages
+        description: |
+          Mapping of project IDs to log line arrays containing messages from the
+          installation.
+
+          Example:
+          ```json
+          {
+            "PlasmoDB": [
+              "Some installation warning 1",
+              "Some installation warning 2",
+            ],
+            "ToxoDB": [
+              "Some installation warning 1"
+            ]
+          }
+          ```
         type: object
         properties:
           /[a-zA-Z]+/: string[]
       status:
         displayName: Dataset Status Info
         type: DatasetStatusInfo
-  DatasetPatchRequest:
-    displayName: Dataset Patch Request
-    description: |
-      Request to update the metadata for a dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      name:
-        displayName: Dataset Name
-        description: User provided name for a dataset.
-        type: string
-        required: false
-      summary:
-        displayName: Dataset Summary
-        description: User provided summary for a dataset.
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        description: User provided description for a dataset.
-        type: string
-        required: false
-  DatasetShareOffer:
-    displayName: Dataset Share Offer
-    description: |
-      An offer to share (or un-share) a dataset with a single target user.
-    type: object
-    additionalProperties: false
-    properties:
-      action:
-        displayName: Offer Action
-        description: |
-          What action to take with the dataset share offer.
-
-          Either `grant` or `revoke`.
-
-          A value of `grant` means the share should be offered to the user
-          if they do not already have the dataset, or continue to be
-          allowed if they already have access to the dataset.
-
-          A value of `revoke` means the share should not be offered to the
-          target user if they do not already have the dataset, or the
-          sharing should be stopped if the user did already have access to
-          the dataset.
-        type: string
-        enum:
-          - grant
-          - revoke
-  DatasetShareReceipt:
-    displayName: Dataset Share Receipt
-    description: |
-      A receipt or response to a share offer of a dataset to a single user.
-    type: object
-    additionalProperties: false
-    properties:
-      action:
-        displayName: Acknowledgement Action
-        description: |
-          What action to take with acknowledging a dataset share offer.
-
-          Either `accept` or `reject`.
-
-          A value of `accept` means that the dataset that a share was
-          offered for should become available to the accepting user.
-
-          A value of `reject` means that the dataset that a share was
-          offered for should become unavailable to the rejecting user.
-        type: string
-        enum:
-          - accept
-          - reject
 
