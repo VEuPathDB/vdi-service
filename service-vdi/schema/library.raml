@@ -7,6 +7,120 @@
 ################################################################################
 
 types:
+  AuthorizationKey:
+    displayName: RPC Authorization Key
+    description: |
+      A token unique to an RPC action that allows the action to be run via an
+      HTTP call.
+    type: string
+    pattern: ^[0-9a-fA-F]{64}$
+    minLength: 64
+    maxLength: 64
+  ReconciliationRequest:
+    displayName: Reconciliation Request
+    description: |
+      Request for the service to run the reconciliation process.
+    type: object
+    additionalProperties: false
+    properties:
+      authorization: AuthorizationKey
+  DeleteCleanupRequest:
+    displayName: Delete Cleanup Request
+    description: |
+      Request for the service to clean up datasets that were soft deleted more
+      than 24 hours prior to the request.
+    type: object
+    additionalProperties: false
+    properties:
+      authorization: AuthorizationKey
+  InstallCleanupRequest:
+    displayName: Install Cleanup Request
+    description: |
+      Object controlling the install cleanup process and what datasets it should
+      target.
+
+      Requesters should specify one of the fields `all` or `targets` to control
+      what datasets will be cleaned up.  If neither is specified the endpoint
+      will do nothing.
+    type: object
+    additionalProperties: false
+    properties:
+      authorization: AuthorizationKey
+      all:
+        type: boolean
+        default: false
+        required: false
+      targets:
+        type: array
+        required: false
+        uniqueItems: true
+        minItems: 1
+        items: VDI-ID
+  DatasetDetails:
+    displayName: Dataset Details
+    description: |
+      Details about a specific singular dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        displayName: Dataset ID
+        type: VDI-ID
+      ownerID:
+        displayName: Owner ID
+        type: User-ID
+      type:
+        displayName: Dataset Type Info
+        type: DatasetTypeInfo
+      name:
+        displayName: Dataset Name
+        type: string
+      summary:
+        displayName: Dataset Summary
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        type: string
+        required: false
+      projectIDs:
+        displayName: Project IDs
+        description: |
+          Project IDs for projects the user dataset record was submitted to.
+        type: ProjectID[]
+      importMessages:
+        displayName: Import Messages
+        description: |
+          Log lines from the import process.
+
+          These messages will be warnings and/or validation errors.
+        type: string[]
+        default: []
+        required: false
+      installMessages:
+        displayName: Install Messages
+        description: |
+          Mapping of project IDs to log line arrays containing messages from the
+          installation.
+
+          Example:
+          ```json
+          {
+            "PlasmoDB": [
+              "Some installation warning 1",
+              "Some installation warning 2",
+            ],
+            "ToxoDB": [
+              "Some installation warning 1"
+            ]
+          }
+          ```
+        type: object
+        properties:
+          /[a-zA-Z]+/: string[]
+      status:
+        displayName: Dataset Status Info
+        type: DatasetStatusInfo
   DatasetPatchRequest:
     displayName: Dataset Patch Request
     description: |
@@ -398,113 +512,4 @@ types:
     additionalProperties: false
     properties:
       datasetID: VDI-ID
-  AuthorizationKey:
-    displayName: RPC Authorization Key
-    description: |
-      A token unique to an RPC action that allows the action to be run via an
-      HTTP call.
-    type: string
-    pattern: ^[0-9a-fA-F]{64}$
-    minLength: 64
-    maxLength: 64
-  ReconciliationRequest:
-    displayName: Reconciliation Request
-    description: |
-      Request for the service to run the reconciliation process.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization: AuthorizationKey
-  DeleteCleanupRequest:
-    displayName: Delete Cleanup Request
-    description: |
-      Request for the service to clean up datasets that were soft deleted more
-      than 24 hours prior to the request.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization: AuthorizationKey
-  InstallCleanupRequest:
-    displayName: Install Cleanup Request
-    description: |
-      Object controlling the install cleanup process and what datasets it should
-      target.
-
-      Requesters should specify one of the fields `all` or `targets` to control
-      what datasets will be cleaned up.  If neither is specified the endpoint
-      will do nothing.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization: AuthorizationKey
-      all:
-        type: boolean
-        default: false
-        required: false
-      targets:
-        type: array
-        required: false
-        uniqueItems: true
-        minItems: 1
-        items: VDI-ID
-  DatasetDetails:
-    displayName: Dataset Details
-    description: |
-      Details about a specific singular dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      datasetID:
-        displayName: Dataset ID
-        type: VDI-ID
-      ownerID:
-        displayName: Owner ID
-        type: User-ID
-      type:
-        displayName: Dataset Type Info
-        type: DatasetTypeInfo
-      name:
-        displayName: Dataset Name
-        type: string
-      summary:
-        displayName: Dataset Summary
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        type: string
-        required: false
-      projectIDs:
-        displayName: Project IDs
-        description: |
-          Project IDs for projects the user dataset record was submitted to.
-        type: ProjectID[]
-      importMessages:
-        displayName: Import Messages
-        description: |
-          Log lines from the import process.
-
-          These messages will be warnings and/or validation errors.
-        type: string[]
-        default: []
-        required: false
-      installMessages:
-        displayName: Install Messages
-        description: |
-          Mapping of project IDs to log line arrays containing messages from the installation.
-          Example: ```json {
-            "PlasmoDB": [
-              "Some installation warning 1",
-              "Some installation warning 2",
-            ],
-            "ToxoDB": [
-              "Some installation warning 1"
-            ]
-          } ```
-        type: object
-        properties:
-          /[a-zA-Z]+/: string[]
-      status:
-        displayName: Dataset Status Info
-        type: DatasetStatusInfo
 
