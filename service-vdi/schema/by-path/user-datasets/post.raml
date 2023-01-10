@@ -68,26 +68,6 @@ types:
         type: common.ProjectID[]
         required: true
         minItems: 1
-      formatParams:
-        displayName: Format Params
-        description: Additional parameters used by the import process.
-        type: DatasetPostFormatParam[]
-        required: false
-
-  DatasetPostFormatParam:
-    type: object
-    additionalProperties: false
-    properties:
-      key:
-        displayName: Param Key
-        description: Parameter pair key.
-        type: string
-        required: true
-      value:
-        displayName: Param Value
-        description: Parameter pair value.
-        type: string
-        required: true
 
   DatasetPostResponse:
     displayName: Dataset Upload Response

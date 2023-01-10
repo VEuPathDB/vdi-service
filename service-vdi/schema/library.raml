@@ -66,23 +66,6 @@ types:
         description: IDs of the projects this dataset is being submitted to.
         type: ProjectID[]
         minItems: 1
-      formatParams:
-        displayName: Format Params
-        description: Additional parameters used by the import process.
-        type: DatasetPostFormatParam[]
-        required: false
-  DatasetPostFormatParam:
-    type: object
-    additionalProperties: false
-    properties:
-      key:
-        displayName: Param Key
-        description: Parameter pair key.
-        type: string
-      value:
-        displayName: Param Value
-        description: Parameter pair value.
-        type: string
   DatasetPostResponse:
     displayName: Dataset Upload Response
     description: |
@@ -287,6 +270,88 @@ types:
         enum:
           - accept
           - reject
+  VDI-ID:
+    displayName: VDI ID
+    description: Unique VDI Dataset identifier string.
+    type: string
+    pattern: ^[0-9a-fA-F]{32}$
+    minLength: 32
+    maxLength: 32
+  User-ID:
+    displayName: WDK User ID
+    description: Unique user identifier
+    type: integer
+    format: int64
+    minimum: 1
+    maximum: 9223372036854775807
+  ProjectID:
+    displayName: Project ID
+    description: |
+      Name or ID of a target VEuPathDB project.
+
+      Valid project IDs are:
+
+      - AmoebaDB
+      - CryptoDB
+      - FungiDB
+      - GiardiaDB
+      - HostDB
+      - MicrosporidiaDB
+      - PiroplasmaDB
+      - PlasmoDB
+      - ToxoDB
+      - TrichDB
+      - TriTrypDB
+      - VectorBase
+      - VEuPathDB
+    type: string
+  DatasetTypeInfo:
+    displayName: Dataset Type Info
+    description: Information about a specific dataset type.
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        displayName: Type Name
+        type: string
+      version:
+        displayName: Type Version
+        type: string
+  DatasetStatusInfo:
+    displayName: Dataset Status Info
+    description: Information about the import and install status of a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      import: DatasetImportStatus
+      install:
+        type: DatasetInstallStatusEntry[]
+        default: null
+        required: false
+  DatasetImportStatus:
+    displayName: Dataset Import Status
+    type: string
+    enum:
+      - awaiting-import
+      - importing
+      - imported
+      - import-failed
+  DatasetInstallStatus:
+    displayName: Dataset Install Status
+    type: string
+    enum:
+      - running
+      - complete
+      - failed
+      - ready-for-reinstall
+  DatasetInstallStatusEntry:
+    displayName: Dataset Install Status Entry
+    description: Entry in a list of install statuses for a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      projectID: ProjectID
+      status: DatasetInstallStatus
   Error:
     type: object
     additionalProperties: false
@@ -400,88 +465,6 @@ types:
       - status: server-error
       - message: Datastore connection lost
       - requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
-  VDI-ID:
-    displayName: VDI ID
-    description: Unique VDI Dataset identifier string.
-    type: string
-    pattern: ^[0-9a-fA-F]{32}$
-    minLength: 32
-    maxLength: 32
-  User-ID:
-    displayName: WDK User ID
-    description: Unique user identifier
-    type: integer
-    format: int64
-    minimum: 1
-    maximum: 9223372036854775807
-  ProjectID:
-    displayName: Project ID
-    description: |
-      Name or ID of a target VEuPathDB project.
-
-      Valid project IDs are:
-
-      - AmoebaDB
-      - CryptoDB
-      - FungiDB
-      - GiardiaDB
-      - HostDB
-      - MicrosporidiaDB
-      - PiroplasmaDB
-      - PlasmoDB
-      - ToxoDB
-      - TrichDB
-      - TriTrypDB
-      - VectorBase
-      - VEuPathDB
-    type: string
-  DatasetTypeInfo:
-    displayName: Dataset Type Info
-    description: Information about a specific dataset type.
-    type: object
-    additionalProperties: false
-    properties:
-      name:
-        displayName: Type Name
-        type: string
-      version:
-        displayName: Type Version
-        type: string
-  DatasetStatusInfo:
-    displayName: Dataset Status Info
-    description: Information about the import and install status of a dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      import: DatasetImportStatus
-      install:
-        type: DatasetInstallStatusEntry[]
-        default: null
-        required: false
-  DatasetImportStatus:
-    displayName: Dataset Import Status
-    type: string
-    enum:
-      - awaiting-import
-      - importing
-      - imported
-      - import-failed
-  DatasetInstallStatus:
-    displayName: Dataset Install Status
-    type: string
-    enum:
-      - running
-      - complete
-      - failed
-      - ready-for-reinstall
-  DatasetInstallStatusEntry:
-    displayName: Dataset Install Status Entry
-    description: Entry in a list of install statuses for a dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      projectID: ProjectID
-      status: DatasetInstallStatus
   DatasetListEntry:
     displayName: Dataset List Item
     description: Short entry with basic details about a dataset.
