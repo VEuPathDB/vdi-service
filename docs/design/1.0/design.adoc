@@ -391,6 +391,8 @@ uploaded data will be preloaded into files for us automatically.
 h| What does the dataset delete flow look like?
 a| . Deletion flag is created
    . ???
+h| How are full deletes handled?  We make a soft delete flag but what happens
+   after that and who takes care of it?
 |===
 
 |===
