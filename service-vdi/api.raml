@@ -7,11 +7,11 @@ version: 1.0.0
 mediaType: application/json
 
 uses:
-  err: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.2.0/libraries/errors.raml
   lib: schema/library.raml
 
 
 /user-datasets:
+  displayName: Datasets
   get:
     displayName: List User Datasets
     description: |
@@ -76,14 +76,13 @@ uses:
         body: lib.DatasetListEntry[]
       400:
         description: Bad Query Parameter(s)
-        body: err.BadRequestError
+        body: lib.BadRequestError
       401:
         description: Unauthorized
-        body: err.UnauthorizedError
+        body: lib.UnauthorizedError
       500:
         description: Internal Error
-        body: err.ServerError
-
+        body: lib.ServerError
   post:
     displayName: Upload User Dataset
     body:
@@ -94,18 +93,20 @@ uses:
         body: lib.DatasetPostResponse
       400:
         description: Request body did not resemble the expected form.
-        body: err.BadRequestError
+        body: lib.BadRequestError
       401:
         description: Unauthorized
-        body: err.UnauthorizedError
+        body: lib.UnauthorizedError
       422:
         description: Request failed validation.
-        body: err.UnprocessableEntityError
+        body: lib.UnprocessableEntityError
       500:
         description: Internal server error
-        body: err.ServerError
+        body: lib.ServerError
 
 /user-datasets/rpc:
+  displayName: RPC
+
   /reconcile:
     post:
       displayName: Run Reconciliation
@@ -113,6 +114,20 @@ uses:
         Runs the Dataset Reconciliation process.
         
         TODO: DESCRIBE THIS PROCESS!
+      body:
+        application/json: lib.ReconciliationRequest
+      responses:
+        204:
+          description: Action completed successfully.
+        400:
+          description: Request body did not resemble the expected JSON form.
+          body: lib.BadRequestError
+        401:
+          description: Unauthorized
+          body: lib.UnauthorizedError
+        500:
+          description: Internal server error.
+          body: lib.ServerError
 
   /install-cleanup:
     post:
@@ -121,19 +136,19 @@ uses:
         Marks all or target datasets that are in a status of installation
         failure into a ready-for-reinstall status.
       body:
-        application/json: lib.Install-Cleanup-Request
+        application/json: lib.InstallCleanupRequest
       responses:
         204:
           description: Action completed successfully.
         400:
           description: Request body did not resemble the expected JSON form.
-          body: err.BadRequestError
+          body: lib.BadRequestError
         401:
           description: Unauthorized
-          body: err.UnauthorizedError
+          body: lib.UnauthorizedError
         500:
           description: Internal server error.
-          body: err.ServerError
+          body: lib.ServerError
 
   /delete-cleanup:
     post:
@@ -142,24 +157,25 @@ uses:
         Permanently delete jobs that were soft deleted more than 24 hours prior
         to the execution of this task.
       body:
-        application/json: lib.Delete-Cleanup-Request
+        application/json: lib.DeleteCleanupRequest
       responses:
         204:
           description: Action completed successfully.
         400:
           description: Request body did not resemble the expected JSON form.
-          body: err.BadRequestError
+          body: lib.BadRequestError
         401:
           description: Unauthorized
-          body: err.UnauthorizedError
+          body: lib.UnauthorizedError
         500:
           description: Internal server error.
-          body: err.ServerError
-
+          body: lib.ServerError
 
 /user-datasets/{ud-id}:
+  displayName: Dataset by ID
+
   uriParameters:
-    ud-id: lib.VDI-ID
+    ud-id: lib.SD-ID
 
   get:
     displayName: Lookup User Dataset
@@ -171,15 +187,43 @@ uses:
         body: lib.DatasetDetails
       401:
         description: Unauthorized
-        body: err.UnauthorizedError
+        body: lib.UnauthorizedError
       404:
         description: |
           Target dataset was not located or is not visible to the requesting
           user.
-        body: err.NotFoundError
+        body: lib.NotFoundError
       500:
         description: Internal server error.
-        body: err.ServerError
+        body: lib.ServerError
+
+  patch:
+    displayName: Update User Dataset
+    description: |
+      Updates the metadata for a target dataset.
+    body:
+      application/json: lib.DatasetPatchRequest
+    responses:
+      204:
+        description: Target dataset metadata was updated.
+      400:
+        description: Request body did not resemble the expected JSON form.
+        body: lib.BadRequestError
+      401:
+        description: Unauthorized
+        body: lib.UnauthorizedError
+      403:
+        description: Target dataset is not owned by the requesting user.
+        body: lib.ForbiddenError
+      404:
+        description: Target dataset was not found.
+        body: lib.NotFoundError
+      422:
+        description: Request body failed validation.
+        body: lib.UnprocessableEntityError
+      500:
+        description: Internal server error.
+        body: lib.ServerError
 
   delete:
     displayName: Delete User Dataset
@@ -193,67 +237,71 @@ uses:
         description: Target dataset was marked as deleted.
       401:
         description: Unauthorized
-        body: err.UnauthorizedError
+        body: lib.UnauthorizedError
       403:
         description: Target dataset is not owned by the requesting user.
-        body: err.ForbiddenError
+        body: lib.ForbiddenError
       404:
         description: Target dataset was not located.
-        body: err.NotFoundError
+        body: lib.NotFoundError
       500:
         description: Internal server error.
-        body: err.ServerError
+        body: lib.ServerError
 
 
 /user-datasets/{ud-id}/shares/{user-id}:
+  displayName: Dataset Sharing
+
   uriParameters:
-    ud-id: lib.VDI-ID
+    ud-id: lib.SD-ID
     user-id: lib.User-ID
 
   /offer:
+    displayName: Share Offers
     put:
       displayName: Offer to Share a Dataset
       description: |
         PUT an offer to share (or revoke a share for) a user dataset with
         another target user.
       body:
-        application/json: lib.Dataset-Share-Offer
+        application/json: lib.DatasetShareOffer
       responses:
         204:
           description: Share offer was successfully (re)placed.
         400:
           description: Request body did not resemble the expected JSON form.
-          body: err.BadRequestError
+          body: lib.BadRequestError
         401:
           description: Unauthorized.
-          body: err.UnauthorizedError
+          body: lib.UnauthorizedError
         422:
           description: Request body failed validation.
-          body: err.UnprocessableEntityError
+          body: lib.UnprocessableEntityError
         500:
           description: Internal server error.
-          body: err.ServerError
+          body: lib.ServerError
 
   /receipt:
+    displayName: Share Receipts
     put:
       displayName: Receive a UD Share
       description: |
         PUT a receipt of a User Dataset share offer.  The receipt can either be
         accepting or rejecting the offered share.
       body:
-        application/json: lib.Dataset-Share-Receipt
+        application/json: lib.DatasetShareReceipt
       responses:
         204:
           description: Share offer acknowledgement was successfully (re)placed.
         400:
           description: Request body did not resemble the expected JSON form.
-          body: err.BadRequestError
+          body: lib.BadRequestError
         401:
           description: Unauthorized
-          body: err.UnauthorizedError
+          body: lib.UnauthorizedError
         422:
           description: Request body failed validation.
-          body: err.UnprocessableEntityError
+          body: lib.UnprocessableEntityError
         500:
           description: Internal server error.
-          body: err.ServerError
+          body: lib.ServerError

@@ -1,0 +1,49 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../common.raml
+
+types:
+
+  DatasetDetails:
+    displayName: Dataset Details
+    description: |
+      Details about a specific singular dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        displayName: Dataset ID
+
+        type: common.SD-ID
+        required: true
+      ownerID:
+        displayName: Owner ID
+        type: common.User-ID
+        required: true
+      type:
+        displayName: Dataset Type Info
+        type: common.DatasetTypeInfo
+        required: true
+      name:
+        displayName: Dataset Name
+        type: string
+        required: true
+      summary:
+        displayName: Dataset Summary
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        type: string
+        required: false
+      projectIDs:
+        displayName: Project IDs
+        description: |
+          Project IDs for projects the user dataset record was submitted to.
+        type: common.ProjectID[]
+        required: true
+      status:
+        displayName: Dataset Status Info
+        type: common.DatasetStatusInfo
+        required: true

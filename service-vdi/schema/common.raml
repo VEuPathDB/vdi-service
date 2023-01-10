@@ -1,0 +1,107 @@
+#%RAML 1.0 Library
+
+uses:
+  error: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.2.0/libraries/errors.raml
+
+types:
+  SD-ID:
+    displayName: SD ID
+    description: Unique SID Dataset identifier string.
+    type: string
+    minLength: 32
+    maxLength: 32
+    pattern: ^[0-9a-fA-F]{32}$
+
+  User-ID:
+    displayName: WDK User ID
+    description: Unique user identifier
+    type: integer
+    format: int64
+    minimum: 1
+    maximum: 9223372036854775807
+
+  ProjectID:
+    displayName: Project ID
+    description: |
+      Name or ID of a target VEuPathDB project.
+
+      Valid project IDs are:
+
+      - AmoebaDB
+      - CryptoDB
+      - FungiDB
+      - GiardiaDB
+      - HostDB
+      - MicrosporidiaDB
+      - PiroplasmaDB
+      - PlasmoDB
+      - ToxoDB
+      - TrichDB
+      - TriTrypDB
+      - VectorBase
+      - VEuPathDB
+    type: string
+
+  DatasetTypeInfo:
+    displayName: Dataset Type Info
+    description: Information about a specific dataset type.
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        displayName: Type Name
+        type: string
+        required: true
+      version:
+        displayName: Type Version
+        type: string
+        required: true
+
+  # region Dataset Status
+
+  DatasetStatusInfo:
+    displayName: Dataset Status Info
+    description: Information about the import and install status of a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      import:
+        type: DatasetImportStatus
+        required: true
+      install:
+        type: DatasetInstallStatusEntry[]
+        required: false
+        default: null
+
+  DatasetImportStatus:
+    displayName: Dataset Import Status
+    type: string
+    enum:
+    - awaiting-import
+    - importing
+    - imported
+    - import-failed
+
+  DatasetInstallStatus:
+    displayName: Dataset Install Status
+    type: string
+    enum:
+    - running
+    - complete
+    - failed
+    - ready-for-reinstall
+
+  DatasetInstallStatusEntry:
+    displayName: Dataset Install Status Entry
+    description: Entry in a list of install statuses for a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      projectID:
+        type: ProjectID
+        required: true
+      status:
+        type: DatasetInstallStatus
+        required: true
+
+  # endregion Dataset Status
