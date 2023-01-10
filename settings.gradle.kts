@@ -43,3 +43,7 @@ pluginManagement {
     }
   }
 }
+
+rootProject.name = "vdi"
+
+include("service-vdi")
