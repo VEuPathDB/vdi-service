@@ -160,43 +160,6 @@ types:
     properties:
       projectID: ProjectID
       status: DatasetInstallStatus
-  DatasetListEntry:
-    displayName: Dataset List Item
-    description: Short entry with basic details about a dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      datasetID:
-        displayName: Dataset ID
-        type: VDI-ID
-      ownerID:
-        displayName: Owner ID
-        type: User-ID
-      datasetType:
-        displayName: Dataset Type
-        type: DatasetTypeInfo
-      name:
-        displayName: Dataset Name
-        description: User provided name for the dataset.
-        type: string
-      summary:
-        displayName: Dataset Summary
-        description: User provided summary of the dataset.
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        description: User provided description of the dataset.
-        type: string
-        required: false
-      projectIDs:
-        displayName: Project IDs
-        description: |
-          Project IDs for projects the user dataset record was submitted to.
-        type: ProjectID[]
-      status:
-        displayName: Status Info
-        type: DatasetStatusInfo
   Error:
     type: object
     additionalProperties: false
@@ -310,6 +273,43 @@ types:
       - status: server-error
       - message: Datastore connection lost
       - requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+  DatasetListEntry:
+    displayName: Dataset List Item
+    description: Short entry with basic details about a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        displayName: Dataset ID
+        type: VDI-ID
+      ownerID:
+        displayName: Owner ID
+        type: User-ID
+      datasetType:
+        displayName: Dataset Type
+        type: DatasetTypeInfo
+      name:
+        displayName: Dataset Name
+        description: User provided name for the dataset.
+        type: string
+      summary:
+        displayName: Dataset Summary
+        description: User provided summary of the dataset.
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        description: User provided description of the dataset.
+        type: string
+        required: false
+      projectIDs:
+        displayName: Project IDs
+        description: |
+          Project IDs for projects the user dataset record was submitted to.
+        type: ProjectID[]
+      status:
+        displayName: Status Info
+        type: DatasetStatusInfo
   DatasetPostRequest:
     displayName: Dataset Post Request
     description: |
@@ -491,12 +491,8 @@ types:
       installMessages:
         displayName: Install Messages
         description: |
-          Mapping of project IDs to log line arrays containing messages from the
-          installation.
-
-          Example:
-          ```json
-          {
+          Mapping of project IDs to log line arrays containing messages from the installation.
+          Example: ```json {
             "PlasmoDB": [
               "Some installation warning 1",
               "Some installation warning 2",
@@ -504,8 +500,7 @@ types:
             "ToxoDB": [
               "Some installation warning 1"
             ]
-          }
-          ```
+          } ```
         type: object
         properties:
           /[a-zA-Z]+/: string[]
