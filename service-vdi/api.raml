@@ -200,11 +200,11 @@ uses:
           description: Internal server error.
           body: lib.ServerError
 
-/user-datasets/{ud-id}:
+/user-datasets/{vd-id}:
   displayName: Dataset by ID
 
   uriParameters:
-    ud-id: lib.VDI-ID
+    vd-id: lib.VDI-ID
 
   get:
     displayName: Lookup User Dataset
@@ -306,11 +306,11 @@ uses:
         body: lib.ServerError
 
 
-/user-datasets/{ud-id}/shares/{user-id}:
+/user-datasets/{vd-id}/shares/{user-id}:
   displayName: Dataset Sharing
 
   uriParameters:
-    ud-id: lib.VDI-ID
+    vd-id: lib.VDI-ID
     user-id: lib.User-ID
 
   /offer:
