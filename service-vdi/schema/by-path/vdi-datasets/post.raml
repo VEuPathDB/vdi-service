@@ -74,9 +74,10 @@ types:
     description: |
       Response object returned on successful upload of a dataset.
 
-      Note that the dataset being uploaded is not the same as the dataset being
-      imported.  The importing of a dataset happens asynchronously at some point
-      after the dataset is uploaded.
+      Note that this response does not mean the uploaded dataset has been made
+      available on the target site(s).  The upload must first be processed and
+      installed into the target sites before the dataset will become available
+      for use.
     type: object
     additionalProperties: false
     properties:
