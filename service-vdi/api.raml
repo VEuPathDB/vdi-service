@@ -111,6 +111,13 @@ uses:
 
   post:
     displayName: Upload Dataset
+    description: |
+      `multipart/form-data` HTTP `POST` request to upload a new dataset.
+
+      Note, the body description below is of the multipart form data fields and
+      not of a JSON object.
+
+      The `meta` field, however, is expected to be JSON text.
     body:
       multipart/form-data:
         type: lib.DatasetPostRequest

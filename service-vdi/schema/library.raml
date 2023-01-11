@@ -7,119 +7,77 @@
 ################################################################################
 
 types:
-  Error:
+  DatasetPostRequest:
+    displayName: Dataset Post Request
+    description: |
+      HTTP POST request body requesting the creation of a dataset from the
+      components included in the request.
+
+      For a request to be considered valid, it must contain exactly 1 of the
+      optional parameters `file` or `url`.  If a request body contains both a
+      `file` and a `url` field value, the service will return a `400` error.
     type: object
     additionalProperties: false
-    discriminator: status
     properties:
-      status: ErrorType
-      message: string
-  ErrorType:
-    type: string
-    enum:
-      - bad-request
-      - unauthorized
-      - forbidden
-      - not-found
-      - bad-method
-      - invalid-input
-      - server-error
-  BadRequestError:
-    displayName: Bad Request
-    description: Request could not be parsed or was otherwise unusable.
-    type: Error
-    discriminatorValue: bad-request
-    example: !!omap
-      - status: bad-request
-      - message: malformed JSON
-  UnauthorizedError:
-    displayName: Unauthorized
-    description: |
-      Unauthenticated client requested a resource that requires authentication.
-    type: Error
-    discriminatorValue: unauthorized
-    example: !!omap
-      - status: unauthorized
-      - message: users must be logged in to access this resource
-  ForbiddenError:
-    displayName: Forbidden
-    description: |
-      Server understood the request but is refusing it.
+      meta:
+        displayName: Dataset Meta
+        description: Metadata about the dataset being submitted.
+        type: DatasetPostMeta
+      file:
+        displayName: Dataset File
+        description: |
+          Dataset file to upload.
 
-      Could be caused by incorrect instructions or an authenticated client
-      requesting a resource or action that requires permissions that the client
-      does not have assigned.
-    type: Error
-    discriminatorValue: forbidden
-    example: !!omap
-      - status: forbidden
-      - message: the current user is not permitted to perform this action
-  NotFoundError:
-    displayName: Not Found
-    description: The requested resource was not found on this server.
-    type: Error
-    discriminatorValue: not-found
-    example: !!omap
-      - status: not-found
-      - message: the requested resource could not be found
-  MethodNotAllowedError:
-    displayName: Method Not Allowed
-    description: |
-      The HTTP method used to request a resource is not allowed or configured by
-      the server.
-    type: Error
-    discriminatorValue: bad-method
-    example: !!omap
-      - status: bad-method
-      - message: PUT requests are not permitted on this endpoint
-  ConflictError:
-    displayName: Conflict
-    description: |
-      The request could not be completed due to a conflict with the current
-      state of the resource.
+          This field is incompatible with the `url` field.
+        type: file
+        required: false
+      url:
+        displayName: Dataset URL
+        description: |
+          URL to a dataset file to upload.
 
-      If you submitted a resource, that resource may already exist.
-    type: string
-  GoneError:
-    displayName: Gone
-    description: |
-      The request could not be completed due to the requested resource or its
-      underlying data no longer being present on the server.
-    type: string
-  UnprocessableEntityError:
-    displayName: Unprocessable Entity
-    description: |
-      The request payload or parameters are correctly structured but fail resource
-      specific validation.
-    type: Error
-    discriminatorValue: invalid-input
+          This field is incompatible with the `file` field.
+        type: string
+        required: false
+  DatasetPostMeta:
+    type: object
+    additionalProperties: false
     properties:
-      errors:
-        properties:
-          general:
-            description: Non-field specific errors.
-            type: string[]
-          byKey:
-            description: Field specific errors
-            properties:
-              //: string[]
-    example: !!omap
-      - status: invalid-input
-      - message: JSON validation failed
-      - errors:
-          general: []
-          byKey:
-            id: [Given ID value does not point to an existing record.]
-  ServerError:
-    displayName: Internal Server Error
-    type: Error
-    discriminatorValue: server-error
+      datasetType:
+        displayName: Dataset Type
+        description: Type of the dataset that is being uploaded.
+        type: string
+      name:
+        displayName: Dataset Name
+        description: User provided name for the dataset.
+        type: string
+      summary:
+        displayName: Dataset Summary
+        description: User provided summary for the dataset.
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        description: User provided description for the dataset.
+        type: string
+        required: false
+      projects:
+        displayName: Project IDs
+        description: IDs of the projects this dataset is being submitted to.
+        type: ProjectID[]
+        minItems: 1
+  DatasetPostResponse:
+    displayName: Dataset Upload Response
+    description: |
+      Response object returned on successful upload of a dataset.
+
+      Note that the dataset being uploaded is not the same as the dataset being
+      imported.  The importing of a dataset happens asynchronously at some point
+      after the dataset is uploaded.
+    type: object
+    additionalProperties: false
     properties:
-      requestId: string
-    example: !!omap
-      - status: server-error
-      - message: Datastore connection lost
-      - requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+      datasetID: VDI-ID
   DatasetDetails:
     displayName: Dataset Details
     description: |
@@ -354,6 +312,119 @@ types:
     properties:
       projectID: ProjectID
       status: DatasetInstallStatus
+  Error:
+    type: object
+    additionalProperties: false
+    discriminator: status
+    properties:
+      status: ErrorType
+      message: string
+  ErrorType:
+    type: string
+    enum:
+      - bad-request
+      - unauthorized
+      - forbidden
+      - not-found
+      - bad-method
+      - invalid-input
+      - server-error
+  BadRequestError:
+    displayName: Bad Request
+    description: Request could not be parsed or was otherwise unusable.
+    type: Error
+    discriminatorValue: bad-request
+    example: !!omap
+      - status: bad-request
+      - message: malformed JSON
+  UnauthorizedError:
+    displayName: Unauthorized
+    description: |
+      Unauthenticated client requested a resource that requires authentication.
+    type: Error
+    discriminatorValue: unauthorized
+    example: !!omap
+      - status: unauthorized
+      - message: users must be logged in to access this resource
+  ForbiddenError:
+    displayName: Forbidden
+    description: |
+      Server understood the request but is refusing it.
+
+      Could be caused by incorrect instructions or an authenticated client
+      requesting a resource or action that requires permissions that the client
+      does not have assigned.
+    type: Error
+    discriminatorValue: forbidden
+    example: !!omap
+      - status: forbidden
+      - message: the current user is not permitted to perform this action
+  NotFoundError:
+    displayName: Not Found
+    description: The requested resource was not found on this server.
+    type: Error
+    discriminatorValue: not-found
+    example: !!omap
+      - status: not-found
+      - message: the requested resource could not be found
+  MethodNotAllowedError:
+    displayName: Method Not Allowed
+    description: |
+      The HTTP method used to request a resource is not allowed or configured by
+      the server.
+    type: Error
+    discriminatorValue: bad-method
+    example: !!omap
+      - status: bad-method
+      - message: PUT requests are not permitted on this endpoint
+  ConflictError:
+    displayName: Conflict
+    description: |
+      The request could not be completed due to a conflict with the current
+      state of the resource.
+
+      If you submitted a resource, that resource may already exist.
+    type: string
+  GoneError:
+    displayName: Gone
+    description: |
+      The request could not be completed due to the requested resource or its
+      underlying data no longer being present on the server.
+    type: string
+  UnprocessableEntityError:
+    displayName: Unprocessable Entity
+    description: |
+      The request payload or parameters are correctly structured but fail resource
+      specific validation.
+    type: Error
+    discriminatorValue: invalid-input
+    properties:
+      errors:
+        properties:
+          general:
+            description: Non-field specific errors.
+            type: string[]
+          byKey:
+            description: Field specific errors
+            properties:
+              //: string[]
+    example: !!omap
+      - status: invalid-input
+      - message: JSON validation failed
+      - errors:
+          general: []
+          byKey:
+            id: [Given ID value does not point to an existing record.]
+  ServerError:
+    displayName: Internal Server Error
+    type: Error
+    discriminatorValue: server-error
+    properties:
+      requestId: string
+    example: !!omap
+      - status: server-error
+      - message: Datastore connection lost
+      - requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
   AuthorizationKey:
     displayName: RPC Authorization Key
     description: |
@@ -447,75 +518,4 @@ types:
       status:
         displayName: Status Info
         type: DatasetStatusInfo
-  DatasetPostRequest:
-    displayName: Dataset Post Request
-    description: |
-      HTTP POST request body requesting the creation of a dataset from the
-      components included in the request.
-
-      For a request to be considered valid, it must contain exactly 1 of the
-      optional parameters `file` or `url`.  If a request body contains both a
-      `file` and a `url` field value, the service will return a `400` error.
-    type: object
-    additionalProperties: false
-    properties:
-      meta:
-        displayName: Dataset Meta
-        description: Metadata about the dataset being submitted.
-        type: DatasetPostMeta
-      file:
-        displayName: Dataset File
-        description: |
-          Dataset file to upload.
-
-          This field is incompatible with the `url` field.
-        type: file
-        required: false
-      url:
-        displayName: Dataset URL
-        description: |
-          URL to a dataset file to upload.
-
-          This field is incompatible with the `file` field.
-        type: string
-        required: false
-  DatasetPostMeta:
-    type: object
-    additionalProperties: false
-    properties:
-      datasetType:
-        displayName: Dataset Type
-        description: Type of the dataset that is being uploaded.
-        type: string
-      name:
-        displayName: Dataset Name
-        description: User provided name for the dataset.
-        type: string
-      summary:
-        displayName: Dataset Summary
-        description: User provided summary for the dataset.
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        description: User provided description for the dataset.
-        type: string
-        required: false
-      projects:
-        displayName: Project IDs
-        description: IDs of the projects this dataset is being submitted to.
-        type: ProjectID[]
-        minItems: 1
-  DatasetPostResponse:
-    displayName: Dataset Upload Response
-    description: |
-      Response object returned on successful upload of a dataset.
-
-      Note that the dataset being uploaded is not the same as the dataset being
-      imported.  The importing of a dataset happens asynchronously at some point
-      after the dataset is uploaded.
-    type: object
-    additionalProperties: false
-    properties:
-      datasetID: VDI-ID
 
