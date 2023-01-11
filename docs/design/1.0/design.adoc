@@ -90,6 +90,8 @@ user.
 | Hard delete datasets that were soft deleted more than 24 hours prior.
 |===
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== List Available Datasets
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets:get[API Docs]
@@ -97,12 +99,50 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 ===== Process Flow
 image::assets/list-uds.png[align="center"]
 
+
+// ////////////////////////////////////////////////////////////////////////// //
 ==== Upload Dataset
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets:post[API Docs]
 
 ===== Process Flow
+
 image::assets/upload-ud.png[align=center]
+
+
+// ////////////////////////////////////////////////////////////////////////// //
+==== Lookup Dataset
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}:get[API Docs]
+
+===== Process Flow
+
+. Client makes a `GET` request for the target user dataset
+. Service queries postgres for information about the target dataset
+. Service queries S3 to ensure the dataset hasn't been soft deleted
+. Service queries application databases for installation status of dataset
+. Service returns information about the target dataset
+
+
+// ////////////////////////////////////////////////////////////////////////// //
+==== Update Dataset Metadata
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}:patch[API Docs]
+
+===== Process Flow
+
+. Client makes a `PATCH` request to the user dataset containing the meta fields
+  that should be updated.
+. Service queries postgres for information about the target dataset
+. Service verifies the requesting user owns the target dataset
+. Service checks the <<Dataset Store>> to ensure the dataset hasn't been soft
+  deleted
+. Service verifies only mutable fields are being changed
+. Service verifies the sanity of the data in the meta fields
+. Service downloads the old meta JSON for the dataset from the <<Dataset Store>>
+. Service generates a new meta JSON blob for the dataset
+. Service posts the new meta JSON blob to the <<Dataset Store>>
+. Service returns a `204` to the client.
 
 
 === Internal Actions
@@ -161,14 +201,6 @@ This section is being split into the 2 sections above: <<API Actions>> and
 |===
 | Action | Source | Description
 
-| <<Get User Dataset Info>>
-| HTTP
-| Get details about a user dataset including who it has been shared with.
-
-| <<Update User Dataset Metadata>>
-| HTTP
-| Update the user metadata for a user dataset.
-
 | <<Offer User Dataset Share>>
 | HTTP
 | Offer to share a user dataset.
@@ -191,49 +223,6 @@ This section is being split into the 2 sections above: <<API Actions>> and
 | ???
 |===
 
-==== Get User Dataset Info
-
-. Client makes a `GET` request for the target user dataset.
-. Service queries postgres database for information about the target dataset?
-. Service queries application databases for installation status of dataset.
-. Service returns information about the target dataset which will include:
-.. user dataset id
-.. offered shares?
-.. status(es)?
-
-==== Update User Dataset Metadata
-
-. Client makes a `PATCH` request to the user dataset containing the fields that
-  should be updated.
-. Service verifies the existence of the target user dataset
-.. How?
-. Service verifies ownership of the target user dataset
-.. How?
-. Service performs sanity checking on the metadata being changed.
-.. Ensure only mutable fields are being changed
-.. Ensure the data going into those mutable fields is the correct type
-. Service writes the updated metadata to the User Dataset Store
-. Service returns 204
-
-.Request Type
-[source, typescript]
-----
-interface Request {
-  datasetID: string
-  name?: string
-  summary?: string
-  description?: string
-}
-----
-
-.Request Example
-[source, json]
-----
-{
-  "datasetID": "89e837da8dc2b299b592f4ad82c4667a",
-  "description": "My new description text."
-}
-----
 
 ==== Offer User Dataset Share
 
