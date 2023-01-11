@@ -77,7 +77,10 @@ uses:
           type: lib.DatasetListEntry[]
           example:
           - datasetID: b18dcdf1a19c9415cd6594c00d611699
-            ownerID: 123456
+            owner:
+              userID: 123456
+              displayName: Joe User
+              organization: University of Joe
             datasetType:
               name: ISA
               version: "1.0"
@@ -88,10 +91,12 @@ uses:
             - PlasmoDB
             - ToxoDB
             status:
-            - projectID: PlasmoDB
-              status: failed
-            - projectID: ToxoDB
-              status: complete
+              import: imported
+              install:
+              - projectID: PlasmoDB
+                status: failed
+              - projectID: ToxoDB
+                status: complete
       400:
         description: Bad Query Parameter(s)
         body: lib.BadRequestError
@@ -163,8 +168,30 @@ uses:
       description: |
         Marks all or target datasets that are in a status of installation
         failure into a ready-for-reinstall status.
+        
+        The request body should specify exactly one of `all` or `targets` to
+        select whether install cleanup should target all failed datasets across
+        all sites, or if install cleanup should target only specific datasets on
+        specific sites.
+        
+        If the request specifies neither `all` or `targets` the endpoint will do
+        nothing.
       body:
-        application/json: lib.InstallCleanupRequest
+        application/json:
+          type: lib.InstallCleanupRequest
+          examples:
+            all:
+              displayName: All Example
+              value:
+                authorization: 7f55a0ed8b021080de00960cc73768fb31d7c3e829be03400641f80b821ef728
+                all: true
+            targeted:
+              displayName: Target Example
+              value:
+                authorization: 7f55a0ed8b021080de00960cc73768fb31d7c3e829be03400641f80b821ef728
+                targets:
+                - datasetID: 404a6e35ea5384667d3527e6bd89f3a8
+                  projectID: PlasmoDB
       responses:
         204:
           description: Action completed successfully.
@@ -186,7 +213,10 @@ uses:
         Permanently delete jobs that were soft deleted more than 24 hours prior
         to the execution of this task.
       body:
-        application/json: lib.DeleteCleanupRequest
+        application/json:
+          type: lib.DeleteCleanupRequest
+          example:
+            authorization: 26d881d64cac205a140a3329e7fc686ded15d1dce86231a921bad0bd6506af9b
       responses:
         204:
           description: Action completed successfully.
@@ -217,7 +247,10 @@ uses:
           type: lib.DatasetDetails
           example:
             datasetID: b18dcdf1a19c9415cd6594c00d611699
-            ownerID: 123456
+            owner:
+              userID: 123456
+              displayName: Joe User
+              organization: University of Joe
             datasetType:
               name: ISA
               version: "1.0"

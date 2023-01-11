@@ -42,6 +42,25 @@ types:
       - VEuPathDB
     type: string
 
+  DatasetOwner:
+    displayName: Dataset Owner
+    description: Details about the owner of a VDI dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      userID:
+        displayName: Owner User ID
+        type: User-ID
+        required: true
+      displayName:
+        displayName: Owner Display Name
+        type: string
+        required: true
+      organization:
+        displayName: Owner Organization
+        type: string
+        required: true
+
   DatasetTypeInfo:
     displayName: Dataset Type Info
     description: Information about a specific dataset type.
