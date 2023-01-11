@@ -94,15 +94,15 @@ user.
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets:get[API Docs]
 
-.Process Flow
-image:assets/list-uds.png[]
+===== Process Flow
+image::assets/list-uds.png[align="center"]
 
 ==== Upload Dataset
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets:post[API Docs]
 
-.Process Flow
-image:assets/upload-ud.png[]
+===== Process Flow
+image::assets/upload-ud.png[align=center]
 
 
 === Internal Actions
@@ -145,8 +145,9 @@ Queue>>.
 
 ==== Import Dataset
 
-.Process Flow
-image:assets/process-import.png[]
+===== Process Flow
+
+image::assets/process-import.png[align="center"]
 
 === [OLD] Actions
 
