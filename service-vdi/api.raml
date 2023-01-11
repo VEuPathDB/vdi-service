@@ -9,22 +9,22 @@ mediaType: application/json
 uses:
   lib: schema/library.raml
 
-/user-datasets:
+/vdi-datasets:
   displayName: Datasets
 
   get:
-    displayName: List User Datasets
+    displayName: List Datasets
     description: |
-      Returns a list of user datasets available to the requesting user,
-      optionally filtered by query parameters.
+      Returns a list of datasets available to the requesting user, optionally
+      filtered by query parameters.
     queryParameters:
       project_id:
         displayName: Project ID Filter
         description: |
           ID of the VEuPathDB project that results should be filtered to.
 
-          This means only user datasets that are relevant to the project ID
-          given will be returned.
+          This means only datasets that are relevant to the project ID given
+          will be returned.
         type: lib.ProjectID
         example: PlasmoDB
         required: false
@@ -108,7 +108,7 @@ uses:
         body: lib.ServerError
 
   post:
-    displayName: Upload User Dataset
+    displayName: Upload Dataset
     body:
       multipart/form-data:
         type: lib.DatasetPostRequest
@@ -132,7 +132,7 @@ uses:
         description: Internal server error
         body: lib.ServerError
 
-/user-datasets/rpc:
+/vdi-datasets/rpc:
   displayName: RPC
 
   /reconcile:
@@ -230,16 +230,16 @@ uses:
           description: Internal server error.
           body: lib.ServerError
 
-/user-datasets/{vd-id}:
+/vdi-datasets/{vd-id}:
   displayName: Dataset by ID
 
   uriParameters:
     vd-id: lib.VDI-ID
 
   get:
-    displayName: Lookup User Dataset
+    displayName: Lookup Dataset
     description: |
-      Fetch details about a user dataset and its status(es).
+      Fetch details about a dataset and its status(es).
     responses:
       200:
         description: Target dataset was located and returned.
@@ -288,7 +288,7 @@ uses:
         body: lib.ServerError
 
   patch:
-    displayName: Update User Dataset
+    displayName: Update Dataset
     description: |
       Updates the metadata for a target dataset.
     body:
@@ -321,7 +321,7 @@ uses:
         body: lib.ServerError
 
   delete:
-    displayName: Delete User Dataset
+    displayName: Delete Dataset
     description: |
       Marks the target dataset as deleted.
 
@@ -344,7 +344,7 @@ uses:
         body: lib.ServerError
 
 
-/user-datasets/{vd-id}/shares/{user-id}:
+/vdi-datasets/{vd-id}/shares/{user-id}:
   displayName: Dataset Sharing
 
   uriParameters:
@@ -356,8 +356,8 @@ uses:
     put:
       displayName: Offer to Share a Dataset
       description: |
-        PUT an offer to share (or revoke a share for) a user dataset with
-        another target user.
+        PUT an offer to share (or revoke a share for) a dataset with another
+        target user.
       body:
         application/json:
           type: lib.DatasetShareOffer
@@ -389,9 +389,9 @@ uses:
   /receipt:
     displayName: Share Receipts
     put:
-      displayName: Receive a UD Share
+      displayName: Receive a dataset Share
       description: |
-        PUT a receipt of a User Dataset share offer.  The receipt can either be
+        PUT a receipt of a dataset share offer.  The receipt can either be
         accepting or rejecting the offered share.
       body:
         application/json:
