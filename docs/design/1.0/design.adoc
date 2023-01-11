@@ -145,6 +145,24 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 . Service returns a `204` to the client.
 
 
+// ////////////////////////////////////////////////////////////////////////// //
+==== Delete Dataset
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}:delete[API Docs]
+
+===== Process Flow
+
+. Client makes a `DELETE` request to the service for a target dataset.
+. Service queries postgres for information about the target dataset.
+. Service verifies the requesting user owns the target dataset.
+. Service checks the <<Dataset Store>> to ensure the dataset hasn't been soft
+  deleted already.
+.. Shortcut to `204` if it has.
+. Service creates a soft-delete marker object in the <<Dataset Store>> for the
+  dataset.
+. Service returns a `204` to the client.
+
+
 === Internal Actions
 
 [%header, cols="1,1,2"]
@@ -209,10 +227,6 @@ This section is being split into the 2 sections above: <<API Actions>> and
 | HTTP
 | Accept an incoming share offer for a user dataset.
 
-| <<Delete User Dataset>>
-| HTTP
-| Remove a user dataset.
-
 | <<Process User Dataset Store Change>>
 | RabbitMQ <2>
 | Process a change in the User Dataset Store that has been published to
@@ -244,14 +258,6 @@ This section is being split into the 2 sections above: <<API Actions>> and
   an offer action of "grant"
 . Service writes a share receipt file containing the requested action to the
   User Dataset Store
-
-==== Delete User Dataset
-
-. Client makes a `DELETE` request to the above service path.
-. Service verifies the target user dataset exists
-. Service verifies the requesting user owns the target user dataset
-. Service creates a `deleted` flag file for the user dataset in the User Dataset
-  Store
 
 ==== Process User Dataset Store Change
 
