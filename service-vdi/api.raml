@@ -359,7 +359,17 @@ uses:
         PUT an offer to share (or revoke a share for) a user dataset with
         another target user.
       body:
-        application/json: lib.DatasetShareOffer
+        application/json:
+          type: lib.DatasetShareOffer
+          examples:
+            grant:
+              displayName: Grant Example
+              value:
+                action: grant
+            revoke:
+              displayName: Revoke Example
+              value:
+                action: revoke
       responses:
         204:
           description: Share offer was successfully (re)placed.
@@ -384,7 +394,17 @@ uses:
         PUT a receipt of a User Dataset share offer.  The receipt can either be
         accepting or rejecting the offered share.
       body:
-        application/json: lib.DatasetShareReceipt
+        application/json:
+          type: lib.DatasetShareReceipt
+          examples:
+            accept:
+              displayName: Accept Example
+              value:
+                action: accept
+            reject:
+              displayName: Reject Example
+              value:
+                action: reject
       responses:
         204:
           description: Share offer acknowledgement was successfully (re)placed.
