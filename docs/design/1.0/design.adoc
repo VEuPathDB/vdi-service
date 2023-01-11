@@ -410,6 +410,24 @@ h| How does undeleting work?
 |
 |===
 
+|===
+h| Are the handler servers per type & database or just per type?
+| Just per type, each handler will connect to multiple databases.
+
+h| How are the credentials passed to the handler server?
+a| A mounted JSON configuration file that will contain the credentials in a
+mapping of objects keyed on the target Project ID. +
+[source, json]
+----
+{
+  "credentials": {
+    "PlasmoDB": {
+      
+    }
+  }
+}
+----
+|===
 
 == General Implementation Notes / Thoughts
 
