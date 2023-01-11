@@ -292,7 +292,12 @@ uses:
     description: |
       Updates the metadata for a target dataset.
     body:
-      application/json: lib.DatasetPatchRequest
+      application/json:
+        type: lib.DatasetPatchRequest
+        example:
+          name: My Dataset
+          summary: A short summary of my dataset.
+          description: A longer description of my dataset.
     responses:
       204:
         description: Target dataset metadata was updated.
