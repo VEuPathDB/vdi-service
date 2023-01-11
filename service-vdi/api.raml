@@ -168,12 +168,12 @@ uses:
       description: |
         Marks all or target datasets that are in a status of installation
         failure into a ready-for-reinstall status.
-        
+
         The request body should specify exactly one of `all` or `targets` to
         select whether install cleanup should target all failed datasets across
         all sites, or if install cleanup should target only specific datasets on
         specific sites.
-        
+
         If the request specifies neither `all` or `targets` the endpoint will do
         nothing.
       body:
@@ -349,7 +349,9 @@ uses:
 
   uriParameters:
     vd-id: lib.VDI-ID
-    user-id: lib.User-ID
+    user-id:
+      displayName: Recipient User ID
+      type: lib.User-ID
 
   /offer:
     displayName: Share Offers
