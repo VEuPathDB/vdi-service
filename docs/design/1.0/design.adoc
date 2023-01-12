@@ -9,8 +9,6 @@ ifdef::env-github[]
 endif::[]
 
 
-Dataset Store = Minio
-
 == Queues
 // TODO: Move this section below the Service section
 
@@ -36,8 +34,24 @@ acted on to process changes to, installations of, or deletions of datasets.
 *TODO*: Describe the action queue.  (the queue right before the project multiplexer)
 ====
 
+== Dataset Store
+
+Dataset Store = Minio
+
+[IMPORTANT]
+====
+*TODO*: Describe the data store.
+====
 
 == VDI Service
+
+=== Configuration
+
+[IMPORTANT]
+====
+*TODO*: Describe how the service is configured via a mounted JSON configuration
+file containing the structured secrets and config options for the service.
+====
 
 === API Actions
 
@@ -68,10 +82,13 @@ requesting user.
 | User
 | Delete a dataset that is owned by the requesting user.
 
-| <<Offer/Revoke Dataset Share>>
+| <<Offer Dataset Share>>
 | User
-| Offer to share access to or revoke access to a dataset with a specific target
-user.
+| Offer to share access to a dataset with a specific target user.
+
+| <<Revoke Dataset Share>>
+| User
+| Revoke an existing share offer for a specific target dataset and user.
 
 | <<Accept/Reject Dataset Share Offer>>
 | User
@@ -112,8 +129,12 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 ===== Process Flow
 
 . Client makes a `GET` request for the target user dataset
+. Service validates the requesting user.
+.. If the request user is invalid, return `401`
 . Service queries postgres for information about the target dataset
-. Service queries S3 to ensure the dataset hasn't been soft deleted
+.. If the dataset doesn't exist, return `404`
+.. If the dataset isn't visible to the target user, return `403`
+.. if the dataset has been soft deleted, return `404`
 . Service queries application databases for installation status of dataset
 . Service returns information about the target dataset
 
@@ -125,12 +146,15 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 
 . Client makes a `PATCH` request to the user dataset containing the meta fields
   that should be updated.
+. Service validates requesting user.
+.. If the request user is invalid, return `401`
+. Service validates request body
+.. If the data in the meta fields is of the wrong type, return `400`
+.. If the data in the meta fields is otherwise invalid, return `422`
 . Service queries postgres for information about the target dataset
-. Service verifies the requesting user owns the target dataset
-. Service checks the <<Dataset Store>> to ensure the dataset hasn't been soft
-  deleted
-. Service verifies only mutable fields are being changed
-. Service verifies the sanity of the data in the meta fields
+.. If the target dataset does not exist, return `404`
+.. If the target dataset has been soft deleted, return `404`
+.. If the dataset is not owned by the requesting user, return
 . Service downloads the old meta JSON for the dataset from the <<Dataset Store>>
 . Service generates a new meta JSON blob for the dataset
 . Service posts the new meta JSON blob to the <<Dataset Store>>
@@ -154,25 +178,30 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 
 ==== Offer/Revoke Dataset Share
 
+TODO: REMOVE ME IN FAVOR OF SEPARATE OFFER & REVOKE SECTIONS.
+
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{user-id}/offer:put[API Docs]
 
 ===== Process Flow
 
 image::assets/share-offer.png[align="center"]
 
-. Start: The client makes a `PUT` request to the service with a payload
-  containing a share action of either `grant` or `revoke`.
-. Service looks up requesting user.
-.. Return `401` if the user is not found or is invalid.
-. Service looks up the target dataset in the PostgreSQL database.
-.. Return `404` if the target dataset does not exist.
-. Service verifies the target dataset is owned by the requesting user.
-.. Return `403` if the target dataset is not owned by the requesting user.
-. Service verifies the target dataset is not marked as deleted.
-.. Return `403` if the target dataset is marked as deleted.
-. Service puts the share offer into the <<Dataset Store>>
-. Service returns `204` to client.
+==== Accept/Reject Dataset Share Offer
 
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{user-id}/receipt:put[API Docs]
+
+===== Process Flow
+
+. Client makes a `PUT` request to the service with a payload containing a share
+  receipt action of `accept` or `reject`.
+. Service validates the requesting user.
+.. If the requesting user is invalid, return `401`
+. Service looks up the target dataset in the postgres database.
+.. If the target dataset does not exist, return `404`
+.. If the target dataset has been soft deleted, return `404`
+.. If the target dataset has no open share offer for the requesting user, return `403`
+. If the receipt action is `accept`
+..
 
 === Internal Actions
 
@@ -504,6 +533,19 @@ What different statuses are there?::
   }
 }
 ----
+
+=== Shares
+
+Sharing datasets is done as a 2 part process, a source user offers to share a
+dataset with a target user, and the target user has to accept the share offer.
+
+Both these pieces must exist for a share to be valid, an active offer, and
+active receipt, if either side is rejected or deleted then the share is
+invalidated.
+
+In the <<Dataset Store>> a share is represented by 2 empty objects, an offer
+object and a receipt object.  These objects are keyed on both the dataset ID and
+the target user ID.
 
 === Misc Diagrams
 
