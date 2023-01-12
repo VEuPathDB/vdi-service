@@ -82,10 +82,13 @@ requesting user.
 | User
 | Delete a dataset that is owned by the requesting user.
 
-| <<Offer/Revoke Dataset Share>>
+| <<Offer Dataset Share>>
 | User
-| Offer to share access to or revoke access to a dataset with a specific target
-user.
+| Offer to share access to a dataset with a specific target user.
+
+| <<Revoke Dataset Share>>
+| User
+| Revoke an existing share offer for a specific target dataset and user.
 
 | <<Accept/Reject Dataset Share Offer>>
 | User
@@ -175,6 +178,8 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 
 ==== Offer/Revoke Dataset Share
 
+TODO: REMOVE ME IN FAVOR OF SEPARATE OFFER & REVOKE SECTIONS.
+
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{user-id}/offer:put[API Docs]
 
 ===== Process Flow
@@ -195,6 +200,8 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 .. If the target dataset does not exist, return `404`
 .. If the target dataset has been soft deleted, return `404`
 .. If the target dataset has no open share offer for the requesting user, return `403`
+. If the receipt action is `accept`
+..
 
 === Internal Actions
 
@@ -532,7 +539,7 @@ What different statuses are there?::
 Sharing datasets is done as a 2 part process, a source user offers to share a
 dataset with a target user, and the target user has to accept the share offer.
 
-Both these pieces must exist for a share to be valid, an active offer, and and
+Both these pieces must exist for a share to be valid, an active offer, and
 active receipt, if either side is rejected or deleted then the share is
 invalidated.
 
