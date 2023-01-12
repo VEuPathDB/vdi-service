@@ -90,8 +90,6 @@ user.
 | Hard delete datasets that were soft deleted more than 24 hours prior.
 |===
 
-
-// ////////////////////////////////////////////////////////////////////////// //
 ==== List Available Datasets
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets:get[API Docs]
@@ -99,8 +97,6 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 ===== Process Flow
 image::assets/list-uds.png[align="center"]
 
-
-// ////////////////////////////////////////////////////////////////////////// //
 ==== Upload Dataset
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets:post[API Docs]
@@ -109,8 +105,6 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 
 image::assets/upload-ud.png[align=center]
 
-
-// ////////////////////////////////////////////////////////////////////////// //
 ==== Lookup Dataset
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}:get[API Docs]
@@ -123,8 +117,6 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 . Service queries application databases for installation status of dataset
 . Service returns information about the target dataset
 
-
-// ////////////////////////////////////////////////////////////////////////// //
 ==== Update Dataset Metadata
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}:patch[API Docs]
@@ -144,8 +136,6 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 . Service posts the new meta JSON blob to the <<Dataset Store>>
 . Service returns a `204` to the client.
 
-
-// ////////////////////////////////////////////////////////////////////////// //
 ==== Delete Dataset
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}:delete[API Docs]
@@ -161,6 +151,14 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 . Service creates a soft-delete marker object in the <<Dataset Store>> for the
   dataset.
 . Service returns a `204` to the client.
+
+==== Offer/Revoke Dataset Share
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{user-id}/offer:put[API Docs]
+
+===== Process Flow
+
+image::assets/share-offer.png[align="center"]
 
 
 === Internal Actions
