@@ -1,4 +1,4 @@
-= User Dataset System
+= VEuPathDB Dataset Installer System
 :source-highlighter: highlightjs
 :icons: font
 :toc: preamble
@@ -11,232 +11,243 @@ endif::[]
 
 Dataset Store = Minio
 
+== Queues
+// TODO: Move this section below the Service section
 
-== User Dataset Service
+=== Import Queue
 
-=== Actions
+[IMPORTANT]
+====
+*TODO*: Describe the import queue.
+====
+
+=== Dataset Store Queue
+
+Message queue that is delivered messages for every change to any object in the
+dataset store.
+
+These messages must be filtered down and translated into actions that can be
+acted on to process changes to, installations of, or deletions of datasets.
+
+=== Action Queue
+
+[IMPORTANT]
+====
+*TODO*: Describe the action queue.  (the queue right before the project multiplexer)
+====
+
+
+== VDI Service
+
+=== API Actions
+
+Service actions that are exposed through and executed via the HTTP API.
+
+[%header, cols="3,1,6"]
+|===
+| Action | Type | Description
+
+| <<List Available Datasets>>
+| User
+| List the datasets available to the requesting user.
+
+| <<Upload Dataset>>
+| User
+| Upload a new dataset.
+
+| <<Lookup Dataset>>
+| User
+| Lookup an existing dataset that is owned by or has been shared with the
+requesting user.
+
+| <<Update Dataset Metadata>>
+| User
+| Update the metadata for a dataset that is owned by the requesting user.
+
+| <<Delete Dataset>>
+| User
+| Delete a dataset that is owned by the requesting user.
+
+| <<Offer/Revoke Dataset Share>>
+| User
+| Offer to share access to or revoke access to a dataset with a specific target
+user.
+
+| <<Accept/Reject Dataset Share Offer>>
+| User
+| Accept or reject a dataset share offer.
+
+| <<Reconciliation>>
+| Admin
+| Run the reconciliation process.
+
+| <<Failed Install Cleanup>>
+| Admin
+| Run the failed install cleanup process.
+
+| <<Deleted Dataset Cleanup>>
+| Admin
+| Hard delete datasets that were soft deleted more than 24 hours prior.
+|===
+
+==== List Available Datasets
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets:get[API Docs]
+
+===== Process Flow
+image::assets/list-uds.png[align="center"]
+
+==== Upload Dataset
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets:post[API Docs]
+
+===== Process Flow
+
+image::assets/upload-ud.png[align=center]
+
+==== Lookup Dataset
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}:get[API Docs]
+
+===== Process Flow
+
+. Client makes a `GET` request for the target user dataset
+. Service queries postgres for information about the target dataset
+. Service queries S3 to ensure the dataset hasn't been soft deleted
+. Service queries application databases for installation status of dataset
+. Service returns information about the target dataset
+
+==== Update Dataset Metadata
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}:patch[API Docs]
+
+===== Process Flow
+
+. Client makes a `PATCH` request to the user dataset containing the meta fields
+  that should be updated.
+. Service queries postgres for information about the target dataset
+. Service verifies the requesting user owns the target dataset
+. Service checks the <<Dataset Store>> to ensure the dataset hasn't been soft
+  deleted
+. Service verifies only mutable fields are being changed
+. Service verifies the sanity of the data in the meta fields
+. Service downloads the old meta JSON for the dataset from the <<Dataset Store>>
+. Service generates a new meta JSON blob for the dataset
+. Service posts the new meta JSON blob to the <<Dataset Store>>
+. Service returns a `204` to the client.
+
+==== Delete Dataset
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}:delete[API Docs]
+
+===== Process Flow
+
+. Client makes a `DELETE` request to the service for a target dataset.
+. Service queries postgres for information about the target dataset.
+. Service verifies the requesting user owns the target dataset.
+. Service checks the <<Dataset Store>> to ensure the dataset hasn't been soft
+  deleted already.
+.. Shortcut to `204` if it has.
+. Service creates a soft-delete marker object in the <<Dataset Store>> for the
+  dataset.
+. Service returns a `204` to the client.
+
+==== Offer/Revoke Dataset Share
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{user-id}/offer:put[API Docs]
+
+===== Process Flow
+
+image::assets/share-offer.png[align="center"]
+
+. Start: The client makes a `PUT` request to the service with a payload
+  containing a share action of either `grant` or `revoke`.
+. Service looks up requesting user.
+.. Return `401` if the user is not found or is invalid.
+. Service looks up the target dataset in the PostgreSQL database.
+.. Return `404` if the target dataset does not exist.
+. Service verifies the target dataset is owned by the requesting user.
+.. Return `403` if the target dataset is not owned by the requesting user.
+. Service verifies the target dataset is not marked as deleted.
+.. Return `403` if the target dataset is marked as deleted.
+. Service puts the share offer into the <<Dataset Store>>
+. Service returns `204` to client.
+
+
+=== Internal Actions
+
+[%header, cols="1,1,2"]
+|===
+| Action | Source | Description
+
+| <<Import Dataset>>
+| <<Import Queue>>
+| Validate and transform an uploaded dataset in preparation for installation
+into the target site(s) database(s).
+
+| <<Sort Dataset Store Change>>
+| <<Dataset Store Queue>>
+| Handle a change notification from the Dataset Store, sort/transform the notice
+into a dataset change action and publish that action message to the <<Action
+Queue>>.
+
+| <<Dataset Installation>>
+| <<Action Queue>>
+| ???
+
+| <<Dataset Soft Delete>>
+| <<Action Queue>>
+| TODO: what happens downstream of S3 after a soft delete?
+
+| <<Dataset Hard Delete>>
+| <<Action Queue>>
+| TODO: what happens downstream of S3 after a hard delete?
+
+| <<Dataset Meta Change>>
+| <<Action Queue>>
+| TODO: what happens downstream of S3 after a metadata change?
+
+| <<Dataset Shares Change>>
+| <<Action Queue>>
+| TODO: what does this look like?  Are there separate actions for shares being granted/revoked/accepted/rejected?
+|===
+
+==== Import Dataset
+
+===== Process Flow
+
+image::assets/process-import.png[align="center"]
+
+=== [OLD] Actions
+
+[WARNING]
+====
+This section is being split into the 2 sections above: <<API Actions>> and
+<<Internal Actions>>
+====
 
 [%header, cols="3,1,6"]
 |===
 | Action | Source | Description
 
-| <<List User Datasets>>
-| HTTP
-| List all user datasets owned by or shared with a user.
-
-| <<Get User Dataset Info>>
-| HTTP
-| Get details about a user dataset including who it has been shared with.
-
-| <<Upload User Dataset>>
-| HTTP
-| Upload a new user dataset to be imported.
-
-| <<Update User Dataset Metadata>>
-| HTTP
-| Update the user metadata for a user dataset.
-
 | <<Offer User Dataset Share>>
 | HTTP
 | Offer to share a user dataset.
 
-| Revoke UD Share
-| HTTP
-| Revoke an outgoing share offer for a user dataset.
-
 | <<Accept User Dataset Share>>
 | HTTP
 | Accept an incoming share offer for a user dataset.
-
-| Reject UD Share Offer
-| HTTP
-| Reject an incoming share offer for a user dataset.
-
-| <<Delete User Dataset>>
-| HTTP
-| Remove a user dataset.
-
-| <<Process Import>>
-| RabbitMQ <1>
-| Submit an uploaded user dataset to the appropriate import handler for
-  validation and processing.
 
 | <<Process User Dataset Store Change>>
 | RabbitMQ <2>
 | Process a change in the User Dataset Store that has been published to
   RabbitMQ.
 
-| Reconciliation
-| ???
-| ???
-
 | Project Sync
 | RabbitMQ <3>
 | ???
-
-| Hard Delete Datasets
-| ???
-| Hard delete datasets from the Dataset Store that have been soft deleted for
-  longer than a specified duration.
 |===
 
-==== List User Datasets
-
-image:assets/list-uds.png[]
-
-.Response types?
-[source, typescript]
-----
-interface Response {
-  offset: number
-  resultCount: number
-  results: Array<Result>
-}
-
-interface Result {
-  datasetID: string
-  ownerID: number
-  projectIDs: Array<String>
-  status: StatusInfo
-}
-
-interface StatusInfo {
-  import: "awaiting-import" | "importing" | "imported" | "failed"
-  install?: Array<InstallStatusInfo>
-}
-
-interface InstallStatusInfo {
-  projectID: string
-  status: "running" | "complete" | "failed" | "ready-for-reinstall"
-}
-----
-
-.Response Example
-[source, json]
-----
-{
-  "offset": 0,
-  "resultCount": 2,
-  "results": [
-    {
-      "datasetID": "df8fede7ff71608e24a5576326e41c75",
-      "ownerID": 123456,
-      "projectIDs": [
-        "PlasmoDB",
-        "ToxoDB"
-      ],
-      "status": {
-        "import": "importing"
-      }
-    },
-    {
-      "datasetID": "7fa3b767c460b54a2be4d49030b349c7",
-      "ownerID": 123456,
-      "projectIDs": [
-        "FungiDB"
-      ],
-      "status": {
-        "import": "imported",
-        "install": [
-          {
-            "projectID": "FungiDB",
-            "status": "ready-for-reinstall"
-          }
-        ]
-      }
-    }
-  ]
-}
-----
-
-
-==== Get User Dataset Info
-
-. Client makes a `GET` request for the target user dataset.
-. Service queries postgres database for information about the target dataset?
-. Service queries application databases for installation status of dataset.
-. Service returns information about the target dataset which will include:
-.. user dataset id
-.. offered shares?
-.. status(es)?
-
-==== Upload User Dataset
-
-image:assets/upload-ud.png[]
-
-.Request Type
-[source, typescript]
-----
-interface Request {
-  meta: RequestMeta
-  file: File
-  url: string
-}
-
-interface RequestMeta {
-  name: string
-  type: string
-  summary: string
-  description: string
-  projects: Array<string>
-  params: Array<FormatParam>
-}
-
-interface FormatParam {
-  key: string
-  value: string
-}
-----
-
-.Response Type
-[source, typescript]
-----
-interface Response {
-  datasetID: string
-}
-----
-
-.Response Example
-[source, json]
-----
-{
-  "datasetID": "89e837da8dc2b299b592f4ad82c4667a"
-}
-----
-
-==== Update User Dataset Metadata
-
-. Client makes a `PATCH` request to the user dataset containing the fields that
-  should be updated.
-. Service verifies the existence of the target user dataset
-.. How?
-. Service verifies ownership of the target user dataset
-.. How?
-. Service performs sanity checking on the metadata being changed.
-.. Ensure only mutable fields are being changed
-.. Ensure the data going into those mutable fields is the correct type
-. Service writes the updated metadata to the User Dataset Store
-. Service returns 204
-
-.Request Type
-[source, typescript]
-----
-interface Request {
-  datasetID: string
-  name?: string
-  summary?: string
-  description?: string
-}
-----
-
-.Request Example
-[source, json]
-----
-{
-  "datasetID": "89e837da8dc2b299b592f4ad82c4667a",
-  "description": "My new description text."
-}
-----
 
 ==== Offer User Dataset Share
 
@@ -258,18 +269,6 @@ interface Request {
   an offer action of "grant"
 . Service writes a share receipt file containing the requested action to the
   User Dataset Store
-
-==== Delete User Dataset
-
-. Client makes a `DELETE` request to the above service path.
-. Service verifies the target user dataset exists
-. Service verifies the requesting user owns the target user dataset
-. Service creates a `deleted` flag file for the user dataset in the User Dataset
-  Store
-
-==== Process Import
-
-image:assets/process-import.png[]
 
 ==== Process User Dataset Store Change
 
@@ -356,7 +355,8 @@ h| Why not write the whole thing as a stream system in Spark or Kafka?
 
 |===
 h| How do we hide endpoints from the public API?
-|
+| We don't.  The endpoints will be publicly available, but will be secured with
+an API token
 |===
 
 |===
@@ -390,19 +390,18 @@ uploaded data will be preloaded into files for us automatically.
 |===
 h| What does the dataset delete flow look like?
 a| . Deletion flag is created
-   . ???
+   . After 24 hours the dataset is subject to deletion by the
+     <<cleanup-deleted-datasets>> endpoint
 h| How are full deletes handled?  We make a soft delete flag but what happens
    after that and who takes care of it?
 |===
 
 |===
-h| How do installers surface warnings?
-|
-|===
-
-|===
-h| How do failed installations get reported to users?
-|
+h| How do installers surface warnings? +
+   How do failed installations get reported to users?
+| STDOUT log output from the process is gathered and posted to S3.  If the
+  installation succeeded, then these messages are considered warnings.  If the
+  installation failed, then the last of these messages is considered an error.
 |===
 
 |===
@@ -422,7 +421,7 @@ mapping of objects keyed on the target Project ID. +
 {
   "credentials": {
     "PlasmoDB": {
-      
+
     }
   }
 }
