@@ -181,6 +181,21 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 
 image::assets/share-offer.png[align="center"]
 
+==== Accept/Reject Dataset Share Offer
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{user-id}/receipt:put[API Docs]
+
+===== Process Flow
+
+. Client makes a `PUT` request to the service with a payload containing a share
+  receipt action of `accept` or `reject`.
+. Service validates the requesting user.
+.. If the requesting user is invalid, return `401`
+. Service looks up the target dataset in the postgres database.
+.. If the target dataset does not exist, return `404`
+.. If the target dataset has been soft deleted, return `404`
+.. If the target dataset has no open share offer for the requesting user, return `403`
+
 === Internal Actions
 
 [%header, cols="1,1,2"]
@@ -511,6 +526,19 @@ What different statuses are there?::
   }
 }
 ----
+
+=== Shares
+
+Sharing datasets is done as a 2 part process, a source user offers to share a
+dataset with a target user, and the target user has to accept the share offer.
+
+Both these pieces must exist for a share to be valid, an active offer, and and
+active receipt, if either side is rejected or deleted then the share is
+invalidated.
+
+In the <<Dataset Store>> a share is represented by 2 empty objects, an offer
+object and a receipt object.  These objects are keyed on both the dataset ID and
+the target user ID.
 
 === Misc Diagrams
 
