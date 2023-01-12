@@ -160,6 +160,19 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 
 image::assets/share-offer.png[align="center"]
 
+. Start: The client makes a `PUT` request to the service with a payload
+  containing a share action of either `grant` or `revoke`.
+. Service looks up requesting user.
+.. Return `401` if the user is not found or is invalid.
+. Service looks up the target dataset in the PostgreSQL database.
+.. Return `404` if the target dataset does not exist.
+. Service verifies the target dataset is owned by the requesting user.
+.. Return `403` if the target dataset is not owned by the requesting user.
+. Service verifies the target dataset is not marked as deleted.
+.. Return `403` if the target dataset is marked as deleted.
+. Service puts the share offer into the <<Dataset Store>>
+. Service returns `204` to client.
+
 
 === Internal Actions
 
