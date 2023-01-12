@@ -348,7 +348,8 @@ h| Why not write the whole thing as a stream system in Spark or Kafka?
 
 |===
 h| How do we hide endpoints from the public API?
-|
+| We don't.  The endpoints will be publicly available, but will be secured with
+an API token
 |===
 
 |===
