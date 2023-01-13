@@ -100,13 +100,24 @@ uses:
               - projectID: ToxoDB
                 status: complete
       400:
-        description: Bad Query Parameter(s)
+        description: |
+          Bad Request.
+          
+          One or more request query parameters were not valid.
         body: lib.BadRequestError
       401:
-        description: Unauthorized
+        description: |
+          Unauthorized.
+          
+          This status is returned when the request contains either no user
+          authorization token or an invalid user authorization token.
         body: lib.UnauthorizedError
       500:
-        description: Internal Error
+        description: |
+          Internal Server Error.
+          
+          This status is returned when an unhandled or unexpected issue arises
+          when attempting to process the request.
         body: lib.ServerError
 
   post:
@@ -129,16 +140,31 @@ uses:
           example:
             datasetID: b18dcdf1a19c9415cd6594c00d611699
       400:
-        description: Request body did not resemble the expected form.
+        description: |
+          Bad Request.
+          
+          Request body did not resemble the expected JSON form.
         body: lib.BadRequestError
       401:
-        description: Unauthorized
+        description: |
+          Unauthorized.
+          
+          This status is returned when the request contains either no user
+          authorization token or an invalid user authorization token.
         body: lib.UnauthorizedError
       422:
-        description: Request failed validation.
+        description: |
+          Unprocessable Entity.
+          
+          Request body was syntactically valid JSON, however the body failed
+          validation.
         body: lib.UnprocessableEntityError
       500:
-        description: Internal server error
+        description: |
+          Internal Server Error.
+          
+          This status is returned when an unhandled or unexpected issue arises
+          when attempting to process the request.
         body: lib.ServerError
 
 /vdi-datasets/rpc:
@@ -159,15 +185,29 @@ uses:
             authorization: 964d72e72d053d501f2949969849b96c31d7c3e829be03400641f80b821ef728
       responses:
         204:
-          description: Action completed successfully.
+          description: |
+            Success.
+            
+            Reconciliation process completed successfully.
         400:
-          description: Request body did not resemble the expected JSON form.
+          description: |
+            Bad Request.
+            
+            Request body did not resemble the expected JSON form.
           body: lib.BadRequestError
         401:
-          description: Unauthorized
+          description: |
+            Unauthorized.
+            
+            This status is returned when the request contains either no user
+            authorization token or an invalid user authorization token.
           body: lib.UnauthorizedError
         500:
-          description: Internal server error.
+          description: |
+            Internal Server Error.
+            
+            This status is returned when an unhandled or unexpected issue arises
+            when attempting to process the request.
           body: lib.ServerError
 
   /install-cleanup:
@@ -203,15 +243,29 @@ uses:
                   projectID: PlasmoDB
       responses:
         204:
-          description: Action completed successfully.
+          description: |
+            Success.
+            
+            Dataset install cleanup process completed successfully.
         400:
-          description: Request body did not resemble the expected JSON form.
+          description: |
+            Bad Request.
+            
+            Request body did not resemble the expected JSON form.
           body: lib.BadRequestError
         401:
-          description: Unauthorized
+          description: |
+            Unauthorized.
+            
+            This status is returned when the request contains either no user
+            authorization token or an invalid user authorization token.
           body: lib.UnauthorizedError
         500:
-          description: Internal server error.
+          description: |
+            Internal Server Error.
+            
+            This status is returned when an unhandled or unexpected issue arises
+            when attempting to process the request.
           body: lib.ServerError
 
   /delete-cleanup:
@@ -230,13 +284,24 @@ uses:
         204:
           description: Action completed successfully.
         400:
-          description: Request body did not resemble the expected JSON form.
+          description: |
+            Bad Request.
+            
+            Request body did not resemble the expected JSON form.
           body: lib.BadRequestError
         401:
-          description: Unauthorized
+          description: |
+            Unauthorized.
+            
+            This status is returned when the request contains either no user
+            authorization token or an invalid user authorization token.
           body: lib.UnauthorizedError
         500:
-          description: Internal server error.
+          description: |
+            Internal Server Error.
+  
+            This status is returned when an unhandled or unexpected issue arises
+            when attempting to process the request.
           body: lib.ServerError
 
 /vdi-datasets/{vd-id}:
@@ -285,7 +350,11 @@ uses:
               - projectID: ToxoDB
                 status: complete
       401:
-        description: Unauthorized
+        description: |
+          Unauthorized.
+          
+          This status is returned when the request contains either no user
+          authorization token or an invalid user authorization token.
         body: lib.UnauthorizedError
       404:
         description: |
@@ -293,7 +362,11 @@ uses:
           user.
         body: lib.NotFoundError
       500:
-        description: Internal server error.
+        description: |
+          Internal Server Error.
+
+          This status is returned when an unhandled or unexpected issue arises
+          when attempting to process the request.
         body: lib.ServerError
 
   patch:
@@ -311,22 +384,40 @@ uses:
       204:
         description: Target dataset metadata was updated.
       400:
-        description: Request body did not resemble the expected JSON form.
+        description: |
+          Bad Request.
+          
+          Request body did not resemble the expected JSON form.
         body: lib.BadRequestError
       401:
-        description: Unauthorized
+        description: |
+          Unauthorized.
+          
+          This status is returned when the request contains either no user
+          authorization token or an invalid user authorization token.
         body: lib.UnauthorizedError
       403:
-        description: Target dataset is not owned by the requesting user.
+        description: |
+          Action Forbidden.
+          
+          Target dataset is not owned by the requesting user.
         body: lib.ForbiddenError
       404:
         description: Target dataset was not found.
         body: lib.NotFoundError
       422:
-        description: Request body failed validation.
+        description: |
+          Unprocessable Entity.
+          
+          Request body was syntactically valid JSON, however the body failed
+          validation.
         body: lib.UnprocessableEntityError
       500:
-        description: Internal server error.
+        description: |
+          Internal Server Error.
+
+          This status is returned when an unhandled or unexpected issue arises
+          when attempting to process the request.
         body: lib.ServerError
 
   delete:
@@ -340,18 +431,28 @@ uses:
       204:
         description: Target dataset was marked as deleted.
       401:
-        description: Unauthorized
+        description: |
+          Unauthorized.
+          
+          This status is returned when the request contains either no user
+          authorization token or an invalid user authorization token.
         body: lib.UnauthorizedError
       403:
-        description: Target dataset is not owned by the requesting user.
+        description: |
+          Action Forbidden.
+          
+          Target dataset is not owned by the requesting user.
         body: lib.ForbiddenError
       404:
         description: Target dataset was not located.
         body: lib.NotFoundError
       500:
-        description: Internal server error.
-        body: lib.ServerError
+        description: |
+          Internal Server Error.
 
+          This status is returned when an unhandled or unexpected issue arises
+          when attempting to process the request.
+        body: lib.ServerError
 
 /vdi-datasets/{vd-id}/shares/{user-id}:
   displayName: Dataset Sharing
@@ -364,10 +465,13 @@ uses:
 
   /offer:
     displayName: Share Offers
+
     put:
       displayName: Offer to Share a Dataset
       description: |
-        PUT an offer to share a dataset with another target user.
+        `PUT` a record that is either an offer to share a dataset with another
+        target user, or the revocation of an existing open share offer with a
+        target user.
       body:
         application/json:
           type: lib.DatasetShareOffer
@@ -382,47 +486,40 @@ uses:
                 action: revoke
       responses:
         204:
-          description: Share offer was successfully (re)placed.
+          description: Share offer record was successfully (re)placed.
         400:
-          description: Request body did not resemble the expected JSON form.
+          description: |
+            Bad Request.
+            
+            Request body did not resemble the expected JSON form.
           body: lib.BadRequestError
-        401:
-          description: Unauthorized.
-          body: lib.UnauthorizedError
-        422:
-          description: Request body failed validation.
-          body: lib.UnprocessableEntityError
-        500:
-          description: Internal server error.
-          body: lib.ServerError
-    delete:
-      displayName: Revoke an Open Share
-      description: |
-        `DELETE` an existing offer to share a dataset with another target user.
-      responses:
-        204:
-          description: Share offer was successfully revoked.
         401:
           description: |
             Unauthorized.
-
+            
             This status is returned when the request contains either no user
             authorization token or an invalid user authorization token.
+          body: lib.UnauthorizedError
         403:
           description: |
             Action Forbidden.
-
+            
             This status is returned when the dataset target of the operation is
             not owned by the requesting user, thus the requesting user is
-            forbidden from revoking shares for the dataset.
+            forbidden from offering shares to the dataset.
           body: lib.ForbiddenError
         404:
           description: |
-            Resource Not Found.
-
-            This status is returned when either the target dataset or target
-            share does not exist.
-          body: lib.NotFoundError
+            Not Found.
+            
+            Either the target dataset or target user was not found.
+        422:
+          description: |
+            Unprocessable Entity.
+            
+            Request body was syntactically valid JSON, however the body failed
+            validation.
+          body: lib.UnprocessableEntityError
         500:
           description: |
             Internal Server Error.
@@ -433,11 +530,12 @@ uses:
 
   /receipt:
     displayName: Share Receipts
+
     put:
       displayName: Receive a dataset Share
       description: |
-        PUT a receipt of a dataset share offer.  The receipt can either be
-        accepting or rejecting the offered share.
+        `PUT` a receipt of a dataset share offer, marking the share offer as
+        either `accepted` or `rejected`.
       body:
         application/json:
           type: lib.DatasetShareReceipt
@@ -452,16 +550,146 @@ uses:
                 action: reject
       responses:
         204:
-          description: Share offer acknowledgement was successfully (re)placed.
+          description: Share offer receipt record was successfully created.
         400:
-          description: Request body did not resemble the expected JSON form.
+          description: |
+            Bad Request.
+            
+            Request body did not resemble the expected JSON form.
           body: lib.BadRequestError
         401:
-          description: Unauthorized
+          description: |
+            Unauthorized.
+            
+            This status is returned when the request contains either no user
+            authorization token or an invalid user authorization token.
           body: lib.UnauthorizedError
+        403:
+          description: |
+            Action Forbidden.
+            
+            This status is returned when the requesting user is not the target
+            user and/or the target user was not offered a share for the target
+            dataset.
+        404:
+          description: |
+            Not Found.
+            
+            This status is returned when the target dataset does not exist.
+          body: lib.NotFoundError
         422:
-          description: Request body failed validation.
+          description: |
+            Unprocessable Entity.
+            
+            Request body was syntactically valid JSON, however the body failed
+            validation.
           body: lib.UnprocessableEntityError
         500:
-          description: Internal server error.
+          description: |
+            Internal Server Error.
+
+            This status is returned when an unhandled or unexpected issue arises
+            when attempting to process the request.
           body: lib.ServerError
+
+/vdi-datasets/share-offers:
+  displayName: Share Offers
+
+  get:
+    displayName: List Share Offers
+    description: |
+      Lists the open share offers available to the requesting user.
+      
+      An open share offer is an offer that has not yet been accepted or rejected
+      by the recipient user.
+    queryParameters:
+      status:
+        displayName: Share Status
+        description: |
+          Controls the results by filtering them to only shares that are in the
+          specified target status.
+          
+          Valid `status` values are:
+          
+          - `open`
+          - `accepted`
+          - `rejected`
+          - `all`
+          
+          These status values mean:
+          
+          <table>
+            <tr>
+              <th>Status</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>`open`</td>
+              <td>Only return share offers that have not yet been accepted or
+                  rejected.</td>
+            </tr>
+            <tr>
+              <td>`accepted`</td>
+              <td>Only return share offers that have been accepted by the          
+                  requesting user.</td>
+            </tr>
+            <tr>
+              <td>`rejected`</td>
+              <td>Only return share offers that have been rejected by the
+                  requesting user.</td>
+            </tr>
+            <tr>
+              <td>`all`</td>
+              <td>Return all share offers regardless of whether they have been
+                  acknowledged, accepted, or rejected.</td>
+            </tr>
+          </table>
+        type: string
+        required: false
+        default: open
+    responses:
+      200:
+        description: |
+          Success.
+          
+          A list of zero or more dataset shares were found for the requesting
+          user.
+        body:
+          type: lib.ShareOfferEntry[]
+      400:
+        description: |
+          Bad Request.
+          
+          This response is returned when the `status` query parameter was
+          provided but was an invalid value.
+        body:
+          application/json:
+            type: lib.BadRequestError
+      401:
+        description: |
+          Unauthorized.
+          
+          This response is returned when the request either contained an invalid
+          user authorization token, or did not contain a user authorization
+          token at all.
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+      500:
+        description: |
+          Internal Server Error.
+
+          This response is returned when an unhandled or unexpected issue arises
+          when attempting to process the request.
+        body:
+          application/json:
+            type: lib.ServerError
+
+
+
+# TODO: what happens when a user attempts to share a dataset that failed installation?
+#       we should probably reject it with a 403
+# TODO: Endpoint that lists open share offers to a user
+# TODO: dataset details should list open share offers to other users
+# TODO: Shares should be automatically accepted
+# TODO: Some notification needs to be sent out when a share is made (email or something)

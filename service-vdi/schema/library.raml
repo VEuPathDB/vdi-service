@@ -7,28 +7,88 @@
 ################################################################################
 
 types:
-  DatasetPatchRequest:
-    displayName: Dataset Patch Request
-    description: |
-      Request to update the metadata for a dataset.
+  ShareOfferEntry:
+    displayName: Share Offer
     type: object
     additionalProperties: false
     properties:
+      datasetID: VDI-ID
+      owner: DatasetOwner
+      shareStatus: ShareOfferStatus
+      datasetType: DatasetTypeInfo
+      projectIDs: ProjectID[]
+  ShareOfferStatus:
+    displayName: Share Offer Status
+    type: string
+    enum:
+      - open
+      - accepted
+      - rejected
+  DatasetDetails:
+    displayName: Dataset Details
+    description: |
+      Details about a specific singular dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        displayName: Dataset ID
+        type: VDI-ID
+      owner:
+        displayName: Owner Details
+        type: DatasetOwner
+      datasetType:
+        displayName: Dataset Type Info
+        type: DatasetTypeInfo
       name:
         displayName: Dataset Name
-        description: User provided name for a dataset.
         type: string
-        required: false
       summary:
         displayName: Dataset Summary
-        description: User provided summary for a dataset.
         type: string
         required: false
       description:
         displayName: Dataset Description
-        description: User provided description for a dataset.
         type: string
         required: false
+      projectIDs:
+        displayName: Project IDs
+        description: |
+          Project IDs for projects the user dataset record was submitted to.
+        type: ProjectID[]
+      importMessages:
+        displayName: Import Messages
+        description: |
+          Log lines from the import process.
+
+          These messages will be warnings and/or validation errors.
+        type: string[]
+        default: []
+        required: false
+      installMessages:
+        displayName: Install Messages
+        description: |
+          Mapping of project IDs to log line arrays containing messages from the
+          installation.
+
+          Example:
+          ```json
+          {
+            "PlasmoDB": [
+              "Some installation warning 1",
+              "Some installation warning 2",
+            ],
+            "ToxoDB": [
+              "Some installation warning 1"
+            ]
+          }
+          ```
+        type: object
+        properties:
+          /[a-zA-Z]+/: string[]
+      status:
+        displayName: Dataset Status Info
+        type: DatasetStatusInfo
   DatasetShareOffer:
     displayName: Dataset Share Offer
     description: |
@@ -78,6 +138,62 @@ types:
         enum:
           - accept
           - reject
+  AuthorizationKey:
+    displayName: RPC Authorization Key
+    description: |
+      A token unique to an RPC action that allows the action to be run via an
+      HTTP call.
+    type: string
+    pattern: ^[0-9a-fA-F]{64}$
+    minLength: 64
+    maxLength: 64
+  ReconciliationRequest:
+    displayName: Reconciliation Request
+    description: |
+      Request for the service to run the reconciliation process.
+    type: object
+    additionalProperties: false
+    properties:
+      authorization: AuthorizationKey
+  DeleteCleanupRequest:
+    displayName: Delete Cleanup Request
+    description: |
+      Request for the service to clean up datasets that were soft deleted more
+      than 24 hours prior to the request.
+    type: object
+    additionalProperties: false
+    properties:
+      authorization: AuthorizationKey
+  InstallCleanupRequest:
+    displayName: Install Cleanup Request
+    description: |
+      Object controlling the install cleanup process and what datasets it should
+      target.
+
+      Requesters should specify one of the fields `all` or `targets` to control
+      what datasets will be cleaned up.  If neither is specified the endpoint
+      will do nothing.
+    type: object
+    additionalProperties: false
+    properties:
+      authorization: AuthorizationKey
+      all:
+        type: boolean
+        default: false
+        required: false
+      targets:
+        type: array
+        required: false
+        uniqueItems: true
+        minItems: 1
+        items: InstallCleanupTarget
+  InstallCleanupTarget:
+    displayName: Install Cleanup Target
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID: VDI-ID
+      projectID: ProjectID
   Error:
     type: object
     additionalProperties: false
@@ -191,6 +307,100 @@ types:
       - status: server-error
       - message: Datastore connection lost
       - requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+  DatasetPostRequest:
+    displayName: Dataset Post Request
+    description: |
+      HTTP POST request body requesting the creation of a dataset from the
+      components included in the request.
+
+      For a request to be considered valid, it must contain exactly 1 of the
+      optional parameters `file` or `url`.  If a request body contains both a
+      `file` and a `url` field value, the service will return a `400` error.
+    type: object
+    additionalProperties: false
+    properties:
+      meta:
+        displayName: Dataset Meta
+        description: Metadata about the dataset being submitted.
+        type: DatasetPostMeta
+      file:
+        displayName: Dataset File
+        description: |
+          Dataset file to upload.
+
+          This field is incompatible with the `url` field.
+        type: file
+        required: false
+      url:
+        displayName: Dataset URL
+        description: |
+          URL to a dataset file to upload.
+
+          This field is incompatible with the `file` field.
+        type: string
+        required: false
+  DatasetPostMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetType:
+        displayName: Dataset Type
+        description: Type of the dataset that is being uploaded.
+        type: string
+      name:
+        displayName: Dataset Name
+        description: User provided name for the dataset.
+        type: string
+      summary:
+        displayName: Dataset Summary
+        description: User provided summary for the dataset.
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        description: User provided description for the dataset.
+        type: string
+        required: false
+      projects:
+        displayName: Project IDs
+        description: IDs of the projects this dataset is being submitted to.
+        type: ProjectID[]
+        minItems: 1
+  DatasetPostResponse:
+    displayName: Dataset Upload Response
+    description: |
+      Response object returned on successful upload of a dataset.
+
+      Note that this response does not mean the uploaded dataset has been made
+      available on the target site(s).  The upload must first be processed and
+      installed into the target sites before the dataset will become available
+      for use.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID: VDI-ID
+  DatasetPatchRequest:
+    displayName: Dataset Patch Request
+    description: |
+      Request to update the metadata for a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        displayName: Dataset Name
+        description: User provided name for a dataset.
+        type: string
+        required: false
+      summary:
+        displayName: Dataset Summary
+        description: User provided summary for a dataset.
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        description: User provided description for a dataset.
+        type: string
+        required: false
   VDI-ID:
     displayName: VDI ID
     description: Unique VDI Dataset identifier string.
@@ -289,62 +499,6 @@ types:
     properties:
       projectID: ProjectID
       status: DatasetInstallStatus
-  AuthorizationKey:
-    displayName: RPC Authorization Key
-    description: |
-      A token unique to an RPC action that allows the action to be run via an
-      HTTP call.
-    type: string
-    pattern: ^[0-9a-fA-F]{64}$
-    minLength: 64
-    maxLength: 64
-  ReconciliationRequest:
-    displayName: Reconciliation Request
-    description: |
-      Request for the service to run the reconciliation process.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization: AuthorizationKey
-  DeleteCleanupRequest:
-    displayName: Delete Cleanup Request
-    description: |
-      Request for the service to clean up datasets that were soft deleted more
-      than 24 hours prior to the request.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization: AuthorizationKey
-  InstallCleanupRequest:
-    displayName: Install Cleanup Request
-    description: |
-      Object controlling the install cleanup process and what datasets it should
-      target.
-
-      Requesters should specify one of the fields `all` or `targets` to control
-      what datasets will be cleaned up.  If neither is specified the endpoint
-      will do nothing.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization: AuthorizationKey
-      all:
-        type: boolean
-        default: false
-        required: false
-      targets:
-        type: array
-        required: false
-        uniqueItems: true
-        minItems: 1
-        items: InstallCleanupTarget
-  InstallCleanupTarget:
-    displayName: Install Cleanup Target
-    type: object
-    additionalProperties: false
-    properties:
-      datasetID: VDI-ID
-      projectID: ProjectID
   DatasetListEntry:
     displayName: Dataset List Item
     description: Short entry with basic details about a dataset.
@@ -381,142 +535,5 @@ types:
         type: ProjectID[]
       status:
         displayName: Status Info
-        type: DatasetStatusInfo
-  DatasetPostRequest:
-    displayName: Dataset Post Request
-    description: |
-      HTTP POST request body requesting the creation of a dataset from the
-      components included in the request.
-
-      For a request to be considered valid, it must contain exactly 1 of the
-      optional parameters `file` or `url`.  If a request body contains both a
-      `file` and a `url` field value, the service will return a `400` error.
-    type: object
-    additionalProperties: false
-    properties:
-      meta:
-        displayName: Dataset Meta
-        description: Metadata about the dataset being submitted.
-        type: DatasetPostMeta
-      file:
-        displayName: Dataset File
-        description: |
-          Dataset file to upload.
-
-          This field is incompatible with the `url` field.
-        type: file
-        required: false
-      url:
-        displayName: Dataset URL
-        description: |
-          URL to a dataset file to upload.
-
-          This field is incompatible with the `file` field.
-        type: string
-        required: false
-  DatasetPostMeta:
-    type: object
-    additionalProperties: false
-    properties:
-      datasetType:
-        displayName: Dataset Type
-        description: Type of the dataset that is being uploaded.
-        type: string
-      name:
-        displayName: Dataset Name
-        description: User provided name for the dataset.
-        type: string
-      summary:
-        displayName: Dataset Summary
-        description: User provided summary for the dataset.
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        description: User provided description for the dataset.
-        type: string
-        required: false
-      projects:
-        displayName: Project IDs
-        description: IDs of the projects this dataset is being submitted to.
-        type: ProjectID[]
-        minItems: 1
-  DatasetPostResponse:
-    displayName: Dataset Upload Response
-    description: |
-      Response object returned on successful upload of a dataset.
-
-      Note that this response does not mean the uploaded dataset has been made
-      available on the target site(s).  The upload must first be processed and
-      installed into the target sites before the dataset will become available
-      for use.
-    type: object
-    additionalProperties: false
-    properties:
-      datasetID: VDI-ID
-  DatasetDetails:
-    displayName: Dataset Details
-    description: |
-      Details about a specific singular dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      datasetID:
-        displayName: Dataset ID
-        type: VDI-ID
-      owner:
-        displayName: Owner Details
-        type: DatasetOwner
-      datasetType:
-        displayName: Dataset Type Info
-        type: DatasetTypeInfo
-      name:
-        displayName: Dataset Name
-        type: string
-      summary:
-        displayName: Dataset Summary
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        type: string
-        required: false
-      projectIDs:
-        displayName: Project IDs
-        description: |
-          Project IDs for projects the user dataset record was submitted to.
-        type: ProjectID[]
-      importMessages:
-        displayName: Import Messages
-        description: |
-          Log lines from the import process.
-
-          These messages will be warnings and/or validation errors.
-        type: string[]
-        default: []
-        required: false
-      installMessages:
-        displayName: Install Messages
-        description: |
-          Mapping of project IDs to log line arrays containing messages from the
-          installation.
-
-          Example:
-          ```json
-          {
-            "PlasmoDB": [
-              "Some installation warning 1",
-              "Some installation warning 2",
-            ],
-            "ToxoDB": [
-              "Some installation warning 1"
-            ]
-          }
-          ```
-        type: object
-        properties:
-          /[a-zA-Z]+/: string[]
-      status:
-        displayName: Dataset Status Info
         type: DatasetStatusInfo
 
