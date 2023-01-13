@@ -18,7 +18,9 @@ uses:
       Returns a list of datasets available to the requesting user, optionally
       filtered by query parameters.
 
-      Results are sorted by creation date in reverse order.
+      Results are sorted by creation date in reverse order.  This means the most
+      recently created datasets will be first and the oldest dataset will be
+      last in the list.
     queryParameters:
       project_id:
         displayName: Project ID Filter
@@ -27,6 +29,13 @@ uses:
 
           This means only datasets that are relevant to the project ID given
           will be returned.
+          
+          Additionally, this controls the sites on which the dataset
+          installation status will be checked.  Meaning, if this parameter is
+          specified and set to, for example, `PlasmoDB`, the status block in the
+          response objects will only include installation status details for
+          `PlasmoDB` and not any other sites that the dataset may have been
+          installed into.
         type: lib.ProjectID
         example: PlasmoDB
         required: false
@@ -72,53 +81,121 @@ uses:
         minimum: 1
         maximum: 100
         required: false
+      sort_field:
+        displayName: Sorting Field
+        description: |
+          Field used to sort the results of this endpoint.
+          
+          Valid options are:
+          
+          - `creation_timestamp`
+          - `name`
+          
+          By default, results are sorted by `creation_timestamp` with a
+          `sort_order` query param value of `descending`, however if the sort
+          field is changed, then the default value of the `sort_order` query
+          param will be `ascending`.
+
+          This means that given the URI `{site}/vdi-datasets` the results will
+          be returned in descending order by the creation timestamp of the
+          results.
+          
+          However, given the URI `{site}/vdi-datasets?sort_field=name` the
+          results will be returned in ascending order by the user provided name
+          for the datasets.
+        type: string
+        required: false
+        default: creation_timestamp
+      sort_order:
+        displayName: Sorting Order
+        description: |
+          Sort ordering of the results of this endpoint.
+          
+          Valid options are:
+          
+          - ascending
+          - descending
+          
+          By default, results are sorted by the `sort_field` value
+          `"creation_timestamp"` in `"descending"` order, however if the sort
+          field is changed then the default value of this query parameter
+          becomes `"ascending"` by default.
+          
+          This means that given the URI `{site}/vdi-datasets` the results will
+          be returned in descending order by the creation timestamp of the
+          results.
+          
+          However, given the URI `{site}/vdi-datasets?sort_field=name` the
+          results will be returned in ascending order by the user provided name
+          for the datasets.
     responses:
       200:
-        description: Success
+        description: |
+          Success.
+          
+          This response means that all checks passed and zero or more dataset
+          records were found for the requesting user.
         body:
-          type: lib.DatasetListEntry[]
-          example:
-          - datasetID: b18dcdf1a19c9415cd6594c00d611699
-            owner:
-              userID: 123456
-              displayName: Joe User
-              organization: University of Joe
-            datasetType:
-              name: ISA
-              version: "1.0"
-            name: My Dataset
-            summary: A short description of my dataset.
-            description: A longer description of my dataset.
-            projectIDs:
-            - PlasmoDB
-            - ToxoDB
-            status:
-              import: imported
-              install:
-              - projectID: PlasmoDB
-                status: failed
-              - projectID: ToxoDB
-                status: complete
+          application/json:
+            type: lib.DatasetListEntry[]
+            example:
+            - datasetID: b18dcdf1a19c9415cd6594c00d611699
+              owner:
+                userID: 123456
+                displayName: Joe User
+                organization: University of Joe
+              datasetType:
+                name: ISA
+                version: "1.0"
+              name: My Dataset
+              summary: A short description of my dataset.
+              description: A longer description of my dataset.
+              projectIDs:
+              - PlasmoDB
+              - ToxoDB
+              status:
+                import: imported
+                install:
+                - projectID: PlasmoDB
+                  status: failed
+                - projectID: ToxoDB
+                  status: complete
       400:
         description: |
           Bad Request.
           
           One or more request query parameters were not valid.
-        body: lib.BadRequestError
+        body:
+          application/json:
+            type: lib.BadRequestError
+            example:
+              status: bad-request
+              message: Invalid project_id value.
       401:
         description: |
           Unauthorized.
           
           This status is returned when the request contains either no user
           authorization token or an invalid user authorization token.
-        body: lib.UnauthorizedError
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
       500:
         description: |
           Internal Server Error.
           
           This status is returned when an unhandled or unexpected issue arises
           when attempting to process the request.
-        body: lib.ServerError
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
   post:
     displayName: Upload Dataset
@@ -128,7 +205,7 @@ uses:
       Note, the body description below is of the multipart form data fields and
       not of a JSON object.
 
-      The `meta` field, however, is expected to be JSON text.
+      The `meta` field, however, is expected to be a JSON blob.
     body:
       multipart/form-data:
         type: lib.DatasetPostRequest
@@ -144,28 +221,40 @@ uses:
           Bad Request.
           
           Request body did not resemble the expected JSON form.
-        body: lib.BadRequestError
+        body:
+          application/json:
+            type: lib.BadRequestError
       401:
         description: |
           Unauthorized.
           
           This status is returned when the request contains either no user
           authorization token or an invalid user authorization token.
-        body: lib.UnauthorizedError
+        body:
+          application/json:
+            type: lib.UnauthorizedError
       422:
         description: |
           Unprocessable Entity.
           
           Request body was syntactically valid JSON, however the body failed
           validation.
-        body: lib.UnprocessableEntityError
+        body:
+          application/json:
+            type: lib.UnprocessableEntityError
       500:
         description: |
           Internal Server Error.
           
           This status is returned when an unhandled or unexpected issue arises
           when attempting to process the request.
-        body: lib.ServerError
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
 /vdi-datasets/rpc:
   displayName: RPC
@@ -208,7 +297,13 @@ uses:
             
             This status is returned when an unhandled or unexpected issue arises
             when attempting to process the request.
-          body: lib.ServerError
+          body:
+            application/json:
+              type: lib.ServerError
+              example:
+                status: server-error
+                message: Dataset store is unreachable
+                requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
   /install-cleanup:
     displayName: Install Cleanup
@@ -266,7 +361,13 @@ uses:
             
             This status is returned when an unhandled or unexpected issue arises
             when attempting to process the request.
-          body: lib.ServerError
+          body:
+            application/json:
+              type: lib.ServerError
+              example:
+                status: server-error
+                message: Dataset store is unreachable
+                requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
   /delete-cleanup:
     displayName: Deleted Dataset Cleanup
