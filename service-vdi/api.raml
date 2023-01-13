@@ -367,8 +367,7 @@ uses:
     put:
       displayName: Offer to Share a Dataset
       description: |
-        PUT an offer to share (or revoke a share for) a dataset with another
-        target user.
+        PUT an offer to share a dataset with another target user.
       body:
         application/json:
           type: lib.DatasetShareOffer
@@ -395,6 +394,41 @@ uses:
           body: lib.UnprocessableEntityError
         500:
           description: Internal server error.
+          body: lib.ServerError
+    delete:
+      displayName: Revoke an Open Share
+      description: |
+        `DELETE` an existing offer to share a dataset with another target user.
+      responses:
+        204:
+          description: Share offer was successfully revoked.
+        401:
+          description: |
+            Unauthorized.
+
+            This status is returned when the request contains either no user
+            authorization token or an invalid user authorization token.
+        403:
+          description: |
+            Action Forbidden.
+
+            This status is returned when the dataset target of the operation is
+            not owned by the requesting user, thus the requesting user is
+            forbidden from revoking shares for the dataset.
+          body: lib.ForbiddenError
+        404:
+          description: |
+            Resource Not Found.
+
+            This status is returned when either the target dataset or target
+            share does not exist.
+          body: lib.NotFoundError
+        500:
+          description: |
+            Internal Server Error.
+
+            This status is returned when an unhandled or unexpected issue arises
+            when attempting to process the request.
           body: lib.ServerError
 
   /receipt:
