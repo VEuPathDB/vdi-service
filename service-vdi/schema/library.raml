@@ -7,6 +7,171 @@
 ################################################################################
 
 types:
+  AuthorizationKey:
+    displayName: RPC Authorization Key
+    description: |
+      A token unique to an RPC action that allows the action to be run via an
+      HTTP call.
+    type: string
+    pattern: ^[0-9a-fA-F]{64}$
+    minLength: 64
+    maxLength: 64
+  ReconciliationRequest:
+    displayName: Reconciliation Request
+    description: |
+      Request for the service to run the reconciliation process.
+    type: object
+    additionalProperties: false
+    properties:
+      authorization: AuthorizationKey
+  DeleteCleanupRequest:
+    displayName: Delete Cleanup Request
+    description: |
+      Request for the service to clean up datasets that were soft deleted more
+      than 24 hours prior to the request.
+    type: object
+    additionalProperties: false
+    properties:
+      authorization: AuthorizationKey
+  InstallCleanupRequest:
+    displayName: Install Cleanup Request
+    description: |
+      Object controlling the install cleanup process and what datasets it should
+      target.
+
+      Requesters should specify one of the fields `all` or `targets` to control
+      what datasets will be cleaned up.  If neither is specified the endpoint
+      will do nothing.
+    type: object
+    additionalProperties: false
+    properties:
+      authorization: AuthorizationKey
+      all:
+        type: boolean
+        default: false
+        required: false
+      targets:
+        type: array
+        required: false
+        uniqueItems: true
+        minItems: 1
+        items: InstallCleanupTarget
+  InstallCleanupTarget:
+    displayName: Install Cleanup Target
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID: VDI-ID
+      projectID: ProjectID
+  DatasetListEntry:
+    displayName: Dataset List Item
+    description: Short entry with basic details about a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        displayName: Dataset ID
+        type: VDI-ID
+      owner:
+        displayName: Owner Details
+        type: DatasetOwner
+      datasetType:
+        displayName: Dataset Type
+        type: DatasetTypeInfo
+      name:
+        displayName: Dataset Name
+        description: User provided name for the dataset.
+        type: string
+      summary:
+        displayName: Dataset Summary
+        description: User provided summary of the dataset.
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        description: User provided description of the dataset.
+        type: string
+        required: false
+      projectIDs:
+        displayName: Project IDs
+        description: |
+          Project IDs for projects the dataset record was submitted to.
+        type: ProjectID[]
+      status:
+        displayName: Status Info
+        type: DatasetStatusInfo
+  DatasetPostRequest:
+    displayName: Dataset Post Request
+    description: |
+      HTTP POST request body requesting the creation of a dataset from the
+      components included in the request.
+
+      For a request to be considered valid, it must contain exactly 1 of the
+      optional parameters `file` or `url`.  If a request body contains both a
+      `file` and a `url` field value, the service will return a `400` error.
+    type: object
+    additionalProperties: false
+    properties:
+      meta:
+        displayName: Dataset Meta
+        description: Metadata about the dataset being submitted.
+        type: DatasetPostMeta
+      file:
+        displayName: Dataset File
+        description: |
+          Dataset file to upload.
+
+          This field is incompatible with the `url` field.
+        type: file
+        required: false
+      url:
+        displayName: Dataset URL
+        description: |
+          URL to a dataset file to upload.
+
+          This field is incompatible with the `file` field.
+        type: string
+        required: false
+  DatasetPostMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetType:
+        displayName: Dataset Type
+        description: Type of the dataset that is being uploaded.
+        type: string
+      name:
+        displayName: Dataset Name
+        description: User provided name for the dataset.
+        type: string
+      summary:
+        displayName: Dataset Summary
+        description: User provided summary for the dataset.
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        description: User provided description for the dataset.
+        type: string
+        required: false
+      projects:
+        displayName: Project IDs
+        description: IDs of the projects this dataset is being submitted to.
+        type: ProjectID[]
+        minItems: 1
+  DatasetPostResponse:
+    displayName: Dataset Upload Response
+    description: |
+      Response object returned on successful upload of a dataset.
+
+      Note that this response does not mean the uploaded dataset has been made
+      available on the target site(s).  The upload must first be processed and
+      installed into the target sites before the dataset will become available
+      for use.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID: VDI-ID
   ShareOfferEntry:
     displayName: Share Offer
     type: object
@@ -70,138 +235,39 @@ types:
         description: |
           Mapping of project IDs to log line arrays containing messages from the
           installation.
-
-          Example:
-          ```json
-          {
-            "PlasmoDB": [
-              "Some installation warning 1",
-              "Some installation warning 2",
-            ],
-            "ToxoDB": [
-              "Some installation warning 1"
-            ]
-          }
-          ```
         type: object
         properties:
           /[a-zA-Z]+/: string[]
       status:
         displayName: Dataset Status Info
         type: DatasetStatusInfo
-  Error:
+      shares:
+        displayName: Shares
+        description: |
+          Array of share offers that have been created by the owner of this
+          dataset to share it with other users.
+        type: array
+  ShareOffer:
+    displayName: Share Offer
     type: object
     additionalProperties: false
-    discriminator: status
     properties:
-      status: ErrorType
-      message: string
-  ErrorType:
-    type: string
-    enum:
-      - bad-request
-      - unauthorized
-      - forbidden
-      - not-found
-      - bad-method
-      - invalid-input
-      - server-error
-  BadRequestError:
-    displayName: Bad Request
-    description: Request could not be parsed or was otherwise unusable.
-    type: Error
-    discriminatorValue: bad-request
-    example: !!omap
-      - status: bad-request
-      - message: malformed JSON
-  UnauthorizedError:
-    displayName: Unauthorized
-    description: |
-      Unauthenticated client requested a resource that requires authentication.
-    type: Error
-    discriminatorValue: unauthorized
-    example: !!omap
-      - status: unauthorized
-      - message: users must be logged in to access this resource
-  ForbiddenError:
-    displayName: Forbidden
-    description: |
-      Server understood the request but is refusing it.
-
-      Could be caused by incorrect instructions or an authenticated client
-      requesting a resource or action that requires permissions that the client
-      does not have assigned.
-    type: Error
-    discriminatorValue: forbidden
-    example: !!omap
-      - status: forbidden
-      - message: the current user is not permitted to perform this action
-  NotFoundError:
-    displayName: Not Found
-    description: The requested resource was not found on this server.
-    type: Error
-    discriminatorValue: not-found
-    example: !!omap
-      - status: not-found
-      - message: the requested resource could not be found
-  MethodNotAllowedError:
-    displayName: Method Not Allowed
-    description: |
-      The HTTP method used to request a resource is not allowed or configured by
-      the server.
-    type: Error
-    discriminatorValue: bad-method
-    example: !!omap
-      - status: bad-method
-      - message: PUT requests are not permitted on this endpoint
-  ConflictError:
-    displayName: Conflict
-    description: |
-      The request could not be completed due to a conflict with the current
-      state of the resource.
-
-      If you submitted a resource, that resource may already exist.
-    type: string
-  GoneError:
-    displayName: Gone
-    description: |
-      The request could not be completed due to the requested resource or its
-      underlying data no longer being present on the server.
-    type: string
-  UnprocessableEntityError:
-    displayName: Unprocessable Entity
-    description: |
-      The request payload or parameters are correctly structured but fail resource
-      specific validation.
-    type: Error
-    discriminatorValue: invalid-input
+      recipient: ShareOfferRecipient
+  ShareOfferRecipient:
+    displayName: Share Offer Recipient
+    description: I AM A UNION!
+    type: object
+    additionalProperties: false
     properties:
-      errors:
-        properties:
-          general:
-            description: Non-field specific errors.
-            type: string[]
-          byKey:
-            description: Field specific errors
-            properties:
-              //: string[]
-    example: !!omap
-      - status: invalid-input
-      - message: JSON validation failed
-      - errors:
-          general: []
-          byKey:
-            id: [Given ID value does not point to an existing record.]
-  ServerError:
-    displayName: Internal Server Error
-    type: Error
-    discriminatorValue: server-error
-    properties:
-      requestId: string
-    example: !!omap
-      - status: server-error
-      - message: Datastore connection lost
-      - requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+      displayName:
+        type: string
+        required: false
+      organization:
+        type: string
+        required: false
+      email:
+        type: string
+        required: false
   DatasetPatchRequest:
     displayName: Dataset Patch Request
     description: |
@@ -224,6 +290,55 @@ types:
         description: User provided description for a dataset.
         type: string
         required: false
+  DatasetShareOffer:
+    displayName: Dataset Share Offer
+    description: |
+      An offer to share (or un-share) a dataset with a single target user.
+    type: object
+    additionalProperties: false
+    properties:
+      action:
+        displayName: Offer Action
+        description: |
+          What action to take with the dataset share offer.
+
+          Either `grant` or `revoke`.
+
+          A value of `grant` means the share should be offered to the user
+          if they do not already have the dataset, or continue to be
+          allowed if they already have access to the dataset.
+
+          A value of `revoke` means the share should not be offered to the
+          target user if they do not already have the dataset, or the
+          sharing should be stopped if the user did already have access to
+          the dataset.
+        type: string
+        enum:
+          - grant
+          - revoke
+  DatasetShareReceipt:
+    displayName: Dataset Share Receipt
+    description: |
+      A receipt or response to a share offer of a dataset to a single user.
+    type: object
+    additionalProperties: false
+    properties:
+      action:
+        displayName: Acknowledgement Action
+        description: |
+          What action to take with acknowledging a dataset share offer.
+
+          Either `accept` or `reject`.
+
+          A value of `accept` means that the dataset that a share was
+          offered for should become available to the accepting user.
+
+          A value of `reject` means that the dataset that a share was
+          offered for should become unavailable to the rejecting user.
+        type: string
+        enum:
+          - accept
+          - reject
   VDI-ID:
     displayName: VDI ID
     description: Unique VDI Dataset identifier string.
@@ -322,218 +437,117 @@ types:
     properties:
       projectID: ProjectID
       status: DatasetInstallStatus
-  DatasetPostRequest:
-    displayName: Dataset Post Request
-    description: |
-      HTTP POST request body requesting the creation of a dataset from the
-      components included in the request.
-
-      For a request to be considered valid, it must contain exactly 1 of the
-      optional parameters `file` or `url`.  If a request body contains both a
-      `file` and a `url` field value, the service will return a `400` error.
+  Error:
     type: object
     additionalProperties: false
+    discriminator: status
     properties:
-      meta:
-        displayName: Dataset Meta
-        description: Metadata about the dataset being submitted.
-        type: DatasetPostMeta
-      file:
-        displayName: Dataset File
-        description: |
-          Dataset file to upload.
-
-          This field is incompatible with the `url` field.
-        type: file
-        required: false
-      url:
-        displayName: Dataset URL
-        description: |
-          URL to a dataset file to upload.
-
-          This field is incompatible with the `file` field.
-        type: string
-        required: false
-  DatasetPostMeta:
-    type: object
-    additionalProperties: false
-    properties:
-      datasetType:
-        displayName: Dataset Type
-        description: Type of the dataset that is being uploaded.
-        type: string
-      name:
-        displayName: Dataset Name
-        description: User provided name for the dataset.
-        type: string
-      summary:
-        displayName: Dataset Summary
-        description: User provided summary for the dataset.
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        description: User provided description for the dataset.
-        type: string
-        required: false
-      projects:
-        displayName: Project IDs
-        description: IDs of the projects this dataset is being submitted to.
-        type: ProjectID[]
-        minItems: 1
-  DatasetPostResponse:
-    displayName: Dataset Upload Response
-    description: |
-      Response object returned on successful upload of a dataset.
-
-      Note that this response does not mean the uploaded dataset has been made
-      available on the target site(s).  The upload must first be processed and
-      installed into the target sites before the dataset will become available
-      for use.
-    type: object
-    additionalProperties: false
-    properties:
-      datasetID: VDI-ID
-  DatasetShareOffer:
-    displayName: Dataset Share Offer
-    description: |
-      An offer to share (or un-share) a dataset with a single target user.
-    type: object
-    additionalProperties: false
-    properties:
-      action:
-        displayName: Offer Action
-        description: |
-          What action to take with the dataset share offer.
-
-          Either `grant` or `revoke`.
-
-          A value of `grant` means the share should be offered to the user
-          if they do not already have the dataset, or continue to be
-          allowed if they already have access to the dataset.
-
-          A value of `revoke` means the share should not be offered to the
-          target user if they do not already have the dataset, or the
-          sharing should be stopped if the user did already have access to
-          the dataset.
-        type: string
-        enum:
-          - grant
-          - revoke
-  DatasetShareReceipt:
-    displayName: Dataset Share Receipt
-    description: |
-      A receipt or response to a share offer of a dataset to a single user.
-    type: object
-    additionalProperties: false
-    properties:
-      action:
-        displayName: Acknowledgement Action
-        description: |
-          What action to take with acknowledging a dataset share offer.
-
-          Either `accept` or `reject`.
-
-          A value of `accept` means that the dataset that a share was
-          offered for should become available to the accepting user.
-
-          A value of `reject` means that the dataset that a share was
-          offered for should become unavailable to the rejecting user.
-        type: string
-        enum:
-          - accept
-          - reject
-  AuthorizationKey:
-    displayName: RPC Authorization Key
-    description: |
-      A token unique to an RPC action that allows the action to be run via an
-      HTTP call.
+      status: ErrorType
+      message: string
+  ErrorType:
     type: string
-    pattern: ^[0-9a-fA-F]{64}$
-    minLength: 64
-    maxLength: 64
-  ReconciliationRequest:
-    displayName: Reconciliation Request
+    enum:
+      - bad-request
+      - unauthorized
+      - forbidden
+      - not-found
+      - bad-method
+      - invalid-input
+      - server-error
+  BadRequestError:
+    displayName: Bad Request
+    description: Request could not be parsed or was otherwise unusable.
+    type: Error
+    discriminatorValue: bad-request
+    example:
+      status: bad-request
+      message: malformed JSON
+  UnauthorizedError:
+    displayName: Unauthorized
     description: |
-      Request for the service to run the reconciliation process.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization: AuthorizationKey
-  DeleteCleanupRequest:
-    displayName: Delete Cleanup Request
+      Unauthenticated client requested a resource that requires authentication.
+    type: Error
+    discriminatorValue: unauthorized
+    example:
+      status: unauthorized
+      message: users must be logged in to access this resource
+  ForbiddenError:
+    displayName: Forbidden
     description: |
-      Request for the service to clean up datasets that were soft deleted more
-      than 24 hours prior to the request.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization: AuthorizationKey
-  InstallCleanupRequest:
-    displayName: Install Cleanup Request
-    description: |
-      Object controlling the install cleanup process and what datasets it should
-      target.
+      Server understood the request but is refusing it.
 
-      Requesters should specify one of the fields `all` or `targets` to control
-      what datasets will be cleaned up.  If neither is specified the endpoint
-      will do nothing.
-    type: object
-    additionalProperties: false
+      Could be caused by incorrect instructions or an authenticated client
+      requesting a resource or action that requires permissions that the client
+      does not have assigned.
+    type: Error
+    discriminatorValue: forbidden
+    example:
+      status: forbidden
+      message: the current user is not permitted to perform this action
+  NotFoundError:
+    displayName: Not Found
+    description: The requested resource was not found on this server.
+    type: Error
+    discriminatorValue: not-found
+    example:
+      status: not-found
+      message: the requested resource could not be found
+  MethodNotAllowedError:
+    displayName: Method Not Allowed
+    description: |
+      The HTTP method used to request a resource is not allowed or configured by
+      the server.
+    type: Error
+    discriminatorValue: bad-method
+    example:
+      status: bad-method
+      message: PUT requests are not permitted on this endpoint
+  ConflictError:
+    displayName: Conflict
+    description: |
+      The request could not be completed due to a conflict with the current
+      state of the resource.
+
+      If you submitted a resource, that resource may already exist.
+    type: string
+  GoneError:
+    displayName: Gone
+    description: |
+      The request could not be completed due to the requested resource or its
+      underlying data no longer being present on the server.
+    type: string
+  UnprocessableEntityError:
+    displayName: Unprocessable Entity
+    description: |
+      The request payload or parameters are correctly structured but fail resource
+      specific validation.
+    type: Error
+    discriminatorValue: invalid-input
     properties:
-      authorization: AuthorizationKey
-      all:
-        type: boolean
-        default: false
-        required: false
-      targets:
-        type: array
-        required: false
-        uniqueItems: true
-        minItems: 1
-        items: InstallCleanupTarget
-  InstallCleanupTarget:
-    displayName: Install Cleanup Target
-    type: object
-    additionalProperties: false
+      errors:
+        properties:
+          general:
+            description: Non-field specific errors.
+            type: string[]
+          byKey:
+            description: Field specific errors
+            properties:
+              //: string[]
+    example:
+      status: invalid-input
+      message: JSON validation failed
+      errors:
+        general: []
+        byKey:
+          id: [Given ID value does not point to an existing record.]
+  ServerError:
+    displayName: Internal Server Error
+    type: Error
+    discriminatorValue: server-error
     properties:
-      datasetID: VDI-ID
-      projectID: ProjectID
-  DatasetListEntry:
-    displayName: Dataset List Item
-    description: Short entry with basic details about a dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      datasetID:
-        displayName: Dataset ID
-        type: VDI-ID
-      owner:
-        displayName: Owner Details
-        type: DatasetOwner
-      datasetType:
-        displayName: Dataset Type
-        type: DatasetTypeInfo
-      name:
-        displayName: Dataset Name
-        description: User provided name for the dataset.
-        type: string
-      summary:
-        displayName: Dataset Summary
-        description: User provided summary of the dataset.
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        description: User provided description of the dataset.
-        type: string
-        required: false
-      projectIDs:
-        displayName: Project IDs
-        description: |
-          Project IDs for projects the dataset record was submitted to.
-        type: ProjectID[]
-      status:
-        displayName: Status Info
-        type: DatasetStatusInfo
+      requestId: string
+    example:
+      status: server-error
+      message: Datastore connection lost
+      requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 

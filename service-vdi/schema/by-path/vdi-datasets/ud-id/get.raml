@@ -56,19 +56,6 @@ types:
         description: |
           Mapping of project IDs to log line arrays containing messages from the
           installation.
-
-          Example:
-          ```json
-          {
-            "PlasmoDB": [
-              "Some installation warning 1",
-              "Some installation warning 2",
-            ],
-            "ToxoDB": [
-              "Some installation warning 1"
-            ]
-          }
-          ```
         type: object
         properties:
           /[a-zA-Z]+/:
@@ -77,4 +64,35 @@ types:
         displayName: Dataset Status Info
         type: common.DatasetStatusInfo
         required: true
+      shares:
+        displayName: Shares
+        description: |
+          Array of share offers that have been created by the owner of this
+          dataset to share it with other users.
+        type: array
+
+  ShareOffer:
+    displayName: Share Offer
+    type: object
+    additionalProperties: false
+    properties:
+      recipient:
+        type: ShareOfferRecipient
+        required: true
+
+  ShareOfferRecipient:
+    displayName: Share Offer Recipient
+    description: I AM A UNION!
+    type: object
+    additionalProperties: false
+    properties:
+      displayName:
+        type: string
+        required: false
+      organization:
+        type: string
+        required: false
+      email:
+        type: string
+        required: false
 
