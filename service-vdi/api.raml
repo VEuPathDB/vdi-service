@@ -224,6 +224,9 @@ uses:
         body:
           application/json:
             type: lib.BadRequestError
+            example:
+              status: bad-request
+              message: Invalid project_id value.
       401:
         description: |
           Unauthorized.
@@ -233,6 +236,9 @@ uses:
         body:
           application/json:
             type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
       422:
         description: |
           Unprocessable Entity.
@@ -283,14 +289,24 @@ uses:
             Bad Request.
             
             Request body did not resemble the expected JSON form.
-          body: lib.BadRequestError
+          body:
+            application/json:
+              type: lib.BadRequestError
+              example:
+                status: bad-request
+                message: Invalid project_id value.
         401:
           description: |
             Unauthorized.
             
             This status is returned when the request contains either no user
             authorization token or an invalid user authorization token.
-          body: lib.UnauthorizedError
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+              example:
+                status: unauthorized
+                message: Users must be logged in to access this resource.
         500:
           description: |
             Internal Server Error.
@@ -347,14 +363,24 @@ uses:
             Bad Request.
             
             Request body did not resemble the expected JSON form.
-          body: lib.BadRequestError
+          body:
+            application/json:
+              type: lib.BadRequestError
+              example:
+                status: bad-request
+                message: Invalid project_id value.
         401:
           description: |
             Unauthorized.
             
             This status is returned when the request contains either no user
             authorization token or an invalid user authorization token.
-          body: lib.UnauthorizedError
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+              example:
+                status: unauthorized
+                message: Users must be logged in to access this resource.
         500:
           description: |
             Internal Server Error.
@@ -389,21 +415,37 @@ uses:
             Bad Request.
             
             Request body did not resemble the expected JSON form.
-          body: lib.BadRequestError
+          body:
+            application/json:
+              type: lib.BadRequestError
+              example:
+                status: bad-request
+                message: Invalid project_id value.
         401:
           description: |
             Unauthorized.
             
             This status is returned when the request contains either no user
             authorization token or an invalid user authorization token.
-          body: lib.UnauthorizedError
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+              example:
+                status: unauthorized
+                message: Users must be logged in to access this resource.
         500:
           description: |
             Internal Server Error.
   
             This status is returned when an unhandled or unexpected issue arises
             when attempting to process the request.
-          body: lib.ServerError
+          body:
+            application/json:
+              type: lib.ServerError
+              example:
+                status: server-error
+                message: Dataset store is unreachable
+                requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
 /vdi-datasets/{vd-id}:
   displayName: Dataset by ID
@@ -456,7 +498,12 @@ uses:
           
           This status is returned when the request contains either no user
           authorization token or an invalid user authorization token.
-        body: lib.UnauthorizedError
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
       404:
         description: |
           Target dataset was not located or is not visible to the requesting
@@ -468,7 +515,13 @@ uses:
 
           This status is returned when an unhandled or unexpected issue arises
           when attempting to process the request.
-        body: lib.ServerError
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
   patch:
     displayName: Update Dataset
@@ -489,14 +542,24 @@ uses:
           Bad Request.
           
           Request body did not resemble the expected JSON form.
-        body: lib.BadRequestError
+        body:
+          application/json:
+            type: lib.BadRequestError
+            example:
+              status: bad-request
+              message: Invalid project_id value.
       401:
         description: |
           Unauthorized.
           
           This status is returned when the request contains either no user
           authorization token or an invalid user authorization token.
-        body: lib.UnauthorizedError
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
       403:
         description: |
           Action Forbidden.
@@ -519,7 +582,13 @@ uses:
 
           This status is returned when an unhandled or unexpected issue arises
           when attempting to process the request.
-        body: lib.ServerError
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
   delete:
     displayName: Delete Dataset
@@ -537,7 +606,12 @@ uses:
           
           This status is returned when the request contains either no user
           authorization token or an invalid user authorization token.
-        body: lib.UnauthorizedError
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
       403:
         description: |
           Action Forbidden.
@@ -553,7 +627,13 @@ uses:
 
           This status is returned when an unhandled or unexpected issue arises
           when attempting to process the request.
-        body: lib.ServerError
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
 /vdi-datasets/{vd-id}/shares/{user-id}:
   displayName: Dataset Sharing
@@ -593,14 +673,24 @@ uses:
             Bad Request.
             
             Request body did not resemble the expected JSON form.
-          body: lib.BadRequestError
+          body:
+            application/json:
+              type: lib.BadRequestError
+              example:
+                status: bad-request
+                message: Invalid project_id value.
         401:
           description: |
             Unauthorized.
             
             This status is returned when the request contains either no user
             authorization token or an invalid user authorization token.
-          body: lib.UnauthorizedError
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+              example:
+                status: unauthorized
+                message: Users must be logged in to access this resource.
         403:
           description: |
             Action Forbidden.
@@ -627,7 +717,13 @@ uses:
 
             This status is returned when an unhandled or unexpected issue arises
             when attempting to process the request.
-          body: lib.ServerError
+          body:
+            application/json:
+              type: lib.ServerError
+              example:
+                status: server-error
+                message: Dataset store is unreachable
+                requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
   /receipt:
     displayName: Share Receipts
@@ -657,14 +753,24 @@ uses:
             Bad Request.
             
             Request body did not resemble the expected JSON form.
-          body: lib.BadRequestError
+          body:
+            application/json:
+              type: lib.BadRequestError
+              example:
+                status: bad-request
+                message: Invalid project_id value.
         401:
           description: |
             Unauthorized.
             
             This status is returned when the request contains either no user
             authorization token or an invalid user authorization token.
-          body: lib.UnauthorizedError
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+              example:
+                status: unauthorized
+                message: Users must be logged in to access this resource.
         403:
           description: |
             Action Forbidden.
@@ -691,7 +797,13 @@ uses:
 
             This status is returned when an unhandled or unexpected issue arises
             when attempting to process the request.
-          body: lib.ServerError
+          body:
+            application/json:
+              type: lib.ServerError
+              example:
+                status: server-error
+                message: Dataset store is unreachable
+                requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
 /vdi-datasets/share-offers:
   displayName: Share Offers
@@ -766,6 +878,9 @@ uses:
         body:
           application/json:
             type: lib.BadRequestError
+            example:
+              status: bad-request
+              message: Invalid status value.
       401:
         description: |
           Unauthorized.
@@ -776,6 +891,9 @@ uses:
         body:
           application/json:
             type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
       500:
         description: |
           Internal Server Error.
@@ -785,7 +903,10 @@ uses:
         body:
           application/json:
             type: lib.ServerError
-
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
 
 # TODO: what happens when a user attempts to share a dataset that failed installation?
