@@ -70,6 +70,9 @@ types:
           Array of share offers that have been created by the owner of this
           dataset to share it with other users.
         type: array
+        items:
+          type: ShareOffer
+        required: false
 
   ShareOffer:
     displayName: Share Offer
@@ -79,6 +82,14 @@ types:
       recipient:
         type: ShareOfferRecipient
         required: true
+      status:
+        type: common.ShareOfferAction
+        required: true
+    example:
+      recipient:
+        displayName: Joe User
+        organization: University of Joe
+      status: revoke
 
   ShareOfferRecipient:
     displayName: Share Offer Recipient
@@ -95,4 +106,5 @@ types:
       email:
         type: string
         required: false
-
+    example:
+      email: myusername@someuniversity.edu

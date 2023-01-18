@@ -77,6 +77,18 @@ types:
         type: string
         required: true
 
+  ShareOfferAction:
+    type: string
+    enum:
+    - grant
+    - revoke
+
+  ShareReceiptAction:
+    type: string
+    enum:
+    - accept
+    - reject
+
   # region Dataset Status
 
   DatasetStatusInfo:

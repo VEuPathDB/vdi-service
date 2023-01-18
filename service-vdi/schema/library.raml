@@ -247,12 +247,20 @@ types:
           Array of share offers that have been created by the owner of this
           dataset to share it with other users.
         type: array
+        required: false
+        items: ShareOffer
   ShareOffer:
     displayName: Share Offer
     type: object
     additionalProperties: false
     properties:
       recipient: ShareOfferRecipient
+      status: ShareOfferAction
+    example:
+      recipient:
+        displayName: Joe User
+        organization: University of Joe
+      status: revoke
   ShareOfferRecipient:
     displayName: Share Offer Recipient
     description: I AM A UNION!
@@ -268,6 +276,8 @@ types:
       email:
         type: string
         required: false
+    example:
+      email: myusername@someuniversity.edu
   DatasetPatchRequest:
     displayName: Dataset Patch Request
     description: |
@@ -402,6 +412,16 @@ types:
       version:
         displayName: Type Version
         type: string
+  ShareOfferAction:
+    type: string
+    enum:
+      - grant
+      - revoke
+  ShareReceiptAction:
+    type: string
+    enum:
+      - accept
+      - reject
   DatasetStatusInfo:
     displayName: Dataset Status Info
     description: Information about the import and install status of a dataset.
