@@ -26,10 +26,7 @@ types:
           target user if they do not already have the dataset, or the
           sharing should be stopped if the user did already have access to
           the dataset.
-        type: string
-        enum:
-        - grant
-        - revoke
+        type: common.ShareOfferAction
         required: true
 
   DatasetShareReceipt:
@@ -51,8 +48,5 @@ types:
 
           A value of `reject` means that the dataset that a share was
           offered for should become unavailable to the rejecting user.
-        type: string
-        enum:
-        - accept
-        - reject
+        type: common.ShareReceiptAction
         required: true

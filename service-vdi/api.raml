@@ -262,8 +262,8 @@ uses:
               message: Dataset store is unreachable
               requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
-/vdi-datasets/rpc:
-  displayName: RPC
+/vdi-datasets/admin:
+  displayName: Admin RPC
 
   /reconcile:
     displayName: Reconciliation
@@ -635,12 +635,12 @@ uses:
               message: Dataset store is unreachable
               requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
-/vdi-datasets/{vd-id}/shares/{user-id}:
+/vdi-datasets/{vd-id}/shares/{recipient-user-id}:
   displayName: Dataset Sharing
 
   uriParameters:
     vd-id: lib.VDI-ID
-    user-id:
+    recipient-user-id:
       displayName: Recipient User ID
       type: lib.User-ID
 
@@ -810,7 +810,9 @@ uses:
 
   get:
     displayName: List Share Offers
-    description: "TODO: Describe me"
+    description: |
+      Endpoint to list dataset shares that have been offered to the requesting
+      user.
     queryParameters:
       status:
         displayName: Share Status
@@ -863,20 +865,14 @@ uses:
           
           A list of zero or more dataset shares were found for the requesting
           user.
-        body:
-          type: lib.ShareOfferEntry[]
+        body: lib.ShareOfferEntry[]
       400:
         description: |
           Bad Request.
           
           This response is returned when the `status` query parameter was
           provided but was an invalid value.
-        body:
-          application/json:
-            type: lib.BadRequestError
-            example:
-              status: bad-request
-              message: Invalid status value.
+        body: lib.BadRequestError
       401:
         description: |
           Unauthorized.
@@ -884,25 +880,14 @@ uses:
           This response is returned when the request either contained an invalid
           user authorization token, or did not contain a user authorization
           token at all.
-        body:
-          application/json:
-            type: lib.UnauthorizedError
-            example:
-              status: unauthorized
-              message: Users must be logged in to access this resource.
+        body: lib.UnauthorizedError
       500:
         description: |
           Internal Server Error.
 
           This response is returned when an unhandled or unexpected issue arises
           when attempting to process the request.
-        body:
-          application/json:
-            type: lib.ServerError
-            example:
-              status: server-error
-              message: Dataset store is unreachable
-              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+        body: lib.ServerError
 
 
 # TODO: what happens when a user attempts to share a dataset that failed installation?

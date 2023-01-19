@@ -322,10 +322,7 @@ types:
           target user if they do not already have the dataset, or the
           sharing should be stopped if the user did already have access to
           the dataset.
-        type: string
-        enum:
-          - grant
-          - revoke
+        type: ShareOfferAction
   DatasetShareReceipt:
     displayName: Dataset Share Receipt
     description: |
@@ -345,10 +342,7 @@ types:
 
           A value of `reject` means that the dataset that a share was
           offered for should become unavailable to the rejecting user.
-        type: string
-        enum:
-          - accept
-          - reject
+        type: ShareReceiptAction
   VDI-ID:
     displayName: VDI ID
     description: Unique VDI Dataset identifier string.
@@ -447,6 +441,7 @@ types:
     enum:
       - running
       - complete
+      - invalid
       - failed
       - ready-for-reinstall
   DatasetInstallStatusEntry:
