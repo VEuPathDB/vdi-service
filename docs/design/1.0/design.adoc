@@ -261,6 +261,63 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 [IMPORTANT]
 *TODO*
 
+____
+We need reconciliation to cover the (rare) case where messages get lost.  This
+can happen if minio is up (and emitting messages) but rabbit is down so does not
+receive them, or… for unforeseen reasons.
+
+The service has an admin/reconciliation endpoint,  protected by admin auth.
+
+This endpoint is automatically activated on service start up.  (Caution:
+consider race conditions with the other campus).  It can also be invoked
+manually by an Ops person.  It is also scheduled nightly for production
+services.
+
+The process is:
+
+. the reconciliation is triggered, one way or another
+. The service first reconciles the internal Postgres database.
+.. The reconciler gets a listing of all files in S3, including last-modified timestamps
+.. The reconciler iterates across those files, comparing timestamps to those in the internal DB
+.. The reconciler synchronizes files that are out of date
+. After the postgres reconciliation is complete, we determine which UDs are out of sync with target appdbs.
+.. Query MinIO to get a list of all user datasets
+.. Query Postgres to determine which projects datasets are targeted for
+.. Use that list of projects to segment the complete list of UDs into per-project lists
+.. For each list, compare timestamps between minio and appdb, using a bulk operation
+.. For each UD (if any) that are out of date, invoke the standard UD appDB synchronizer
+____
+
+[TIP]
+====
+|===
+h| What happens if an exception occurs when iterating through the datasets in
+   the Dataset Store and processing them in Postgres?
+a| ???
+
+h| What happens if an exception occurs when iterating through the datasets in
+   the Dataset Store and processing them in the App DBs?
+a| ???
+|===
+====
+
+===== Process Flow
+
+. Client makes a `POST` request to the admin/reconciliation endpoint.
+. Service verifies the auth token in the request.
+.. If the request contains no auth token, return `401`
+.. If the request contains an invalid auth token, return `401`
+. Service gets a stream over the contents of the <<Dataset Store>>
+. Service groups the Dataset Store content stream into bundles of individual
+  dataset contents
+. Service iterates through the stream of dataset bundles and:
+.. Compares the timestamps of the bundle files to the timestamps recorded in the
+   PostgresDB
+.. Synchronizes files that are out of date (*TODO* define "synchronizes")
+. ???
+. ???
+
+
 ==== Failed Install Cleanup
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/admin/install-cleanup:post[API Docs]
@@ -274,7 +331,6 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 
 [IMPORTANT]
 *TODO*
-
 
 === Internal Actions
 
