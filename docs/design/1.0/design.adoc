@@ -180,16 +180,6 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
   dataset.
 . Service returns a `204` to the client.
 
-==== [OLD] Offer/Revoke Dataset Share
-
-TODO: REMOVE ME IN FAVOR OF SEPARATE OFFER & REVOKE SECTIONS.
-
-link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{user-id}/offer:put[API Docs]
-
-===== Process Flow
-
-image::assets/share-offer.png[align="center"]
-
 ==== Offer Dataset Share
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{recipient-user-id}/offer:put[API Docs]
@@ -223,7 +213,6 @@ a| We want the share to work regardless of install status, the share won't
 . Service (re)places the dataset share offer in the <<Dataset Store>>.
 . Service returns `204` to the client.
 
-
 ==== Revoke Dataset Share
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{recipient-user-id}/offer:put[API Docs]
@@ -241,7 +230,6 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 . Service (re)places the dataset share offer in the <<Dataset Store>>
 . Service returns `204` to the client.
 
-
 ==== Accept/Reject Dataset Share Offer
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{user-id}/receipt:put[API Docs]
@@ -258,6 +246,35 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 .. If the target dataset has no open share offer for the requesting user, return `403`
 . If the receipt action is `accept`
 ..
+
+==== List Share Offers
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/share-offers:get[API Docs]
+
+[IMPORTANT]
+*TODO*
+
+==== Reconciliation
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/admin/reconcile:post[API Docs]
+
+[IMPORTANT]
+*TODO*
+
+==== Failed Install Cleanup
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/admin/install-cleanup:post[API Docs]
+
+[IMPORTANT]
+*TODO*
+
+==== Deleted Dataset Cleanup
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/admin/delete-cleanup:post[API Docs]
+
+[IMPORTANT]
+*TODO*
+
 
 === Internal Actions
 
