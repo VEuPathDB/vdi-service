@@ -94,6 +94,10 @@ requesting user.
 | User
 | Accept or reject a dataset share offer.
 
+| <<List Share Offers>>
+| User
+| List shares offered to the requesting user.
+
 | <<Reconciliation>>
 | Admin
 | Run the reconciliation process.
@@ -176,7 +180,7 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
   dataset.
 . Service returns a `204` to the client.
 
-==== Offer/Revoke Dataset Share
+==== [OLD] Offer/Revoke Dataset Share
 
 TODO: REMOVE ME IN FAVOR OF SEPARATE OFFER & REVOKE SECTIONS.
 
@@ -185,6 +189,32 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 ===== Process Flow
 
 image::assets/share-offer.png[align="center"]
+
+==== Offer Dataset Share
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{recipient-user-id}/offer:put[API Docs]
+
+[IMPORTANT]
+====
+TODO
+====
+
+[TIP]
+====
+|===
+h| What happens when a user attempts to share a dataset that failed import or installation?
+| ???
+|===
+====
+
+==== Revoke Dataset Share
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{recipient-user-id}/offer:put[API Docs]
+
+[IMPORTANT]
+====
+TODO
+====
 
 ==== Accept/Reject Dataset Share Offer
 
