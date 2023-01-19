@@ -213,14 +213,14 @@ a| We want the share to work regardless of install status, the share won't
 ===== Process Flow
 
 . Client makes a `PUT` request to the service with a payload containing a share
-  offer action of `grant` or `revoke`.
+  offer action of `grant`.
 . Service validates the requesting user.
 .. If the requesting user is invalid, return `401`
 . Service looks up details about the target dataset in the Postgres DB
 .. If the target dataset does not exist, return `404`
 .. If the target dataset failed import, return `403`
 .. If the target dataset has been soft-deleted, return `403`
-. Service (re)places the dataset share offer in the Dataset Store.
+. Service (re)places the dataset share offer in the <<Dataset Store>>.
 . Service returns `204` to the client.
 
 
@@ -228,10 +228,19 @@ a| We want the share to work regardless of install status, the share won't
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{recipient-user-id}/offer:put[API Docs]
 
-[IMPORTANT]
-====
-TODO
-====
+===== Process Flow
+
+. Client makes a `PUT` request to the service with a payload containing a share
+  offer action of `revoke`.
+. Service validates the requesting user.
+.. If the requesting user is invalid, return `401`
+. Service looks up details about the target dataset in the Postgres DB
+.. If the target dataset does not exist, return a `404`
+.. If the target dataset has failed import, return `403`
+.. If the target dataset has been soft-deleted, return `403`
+. Service (re)places the dataset share offer in the <<Dataset Store>>
+. Service returns `204` to the client.
+
 
 ==== Accept/Reject Dataset Share Offer
 
@@ -291,6 +300,11 @@ Queue>>.
 ==== Import Dataset
 
 ===== Process Flow
+
+[IMPORTANT]
+====
+TODO: the flowchart below is outdated and needs to be replaced.
+====
 
 image::assets/process-import.png[align="center"]
 
