@@ -184,8 +184,8 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{recipient-user-id}/offer:put[API Docs]
 
-[TIP]
-====
+===== Q & A
+
 |===
 h| What happens when a user attempts to share a dataset that failed import or
    installation?
@@ -198,7 +198,6 @@ a| We want the share to work regardless of install status, the share won't
    precipitate down to the App DBs if the installation of the dataset into those
    App DBs has failed.
 |===
-====
 
 ===== Process Flow
 
@@ -288,8 +287,8 @@ The process is:
 .. For each UD (if any) that are out of date, invoke the standard UD appDB synchronizer
 ____
 
-[TIP]
-====
+===== Q & A
+
 |===
 h| What happens if an exception occurs when iterating through the datasets in
    the Dataset Store and processing them in Postgres?
@@ -299,7 +298,6 @@ h| What happens if an exception occurs when iterating through the datasets in
    the Dataset Store and processing them in the App DBs?
 a| ???
 |===
-====
 
 ===== Process Flow
 
@@ -405,10 +403,31 @@ Queue>>.
 
 [IMPORTANT]
 ====
-TODO: the flowchart below is outdated and needs to be replaced.
+*TODO*: the flowchart below is outdated and needs to be replaced.
 ====
 
 image::assets/process-import.png[align="center"]
+
+
+==== Sort Dataset Store Change
+
+[IMPORTANT]
+*TODO*
+
+==== Dataset Installation
+
+[IMPORTANT]
+*TODO*
+
+==== Dataset Soft Delete
+
+[IMPORTANT]
+*TODO*
+
+==== Dataset Hard Delete
+
+[IMPORTANT]
+*TODO*
 
 === [OLD] Actions
 
@@ -422,14 +441,6 @@ This section is being split into the 2 sections above: <<API Actions>> and
 |===
 | Action | Source | Description
 
-| <<Offer User Dataset Share>>
-| HTTP
-| Offer to share a user dataset.
-
-| <<Accept User Dataset Share>>
-| HTTP
-| Accept an incoming share offer for a user dataset.
-
 | <<Process User Dataset Store Change>>
 | RabbitMQ <2>
 | Process a change in the User Dataset Store that has been published to
@@ -439,28 +450,6 @@ This section is being split into the 2 sections above: <<API Actions>> and
 | RabbitMQ <3>
 | ???
 |===
-
-
-==== Offer User Dataset Share
-
-. Client makes a `PUT` request to the above URL with a body containing an action
-  of "grant" or "revoke".
-. Service sanity checks PUT request body
-. Service verifies the existence of the target user dataset
-. Service verifies that the target user dataset is owned by the requesting user
-. Service writes a share offer file containing the requested action to the User
-  Dataset Store
-
-==== Accept User Dataset Share
-
-. Client makes a PUT request to the above URL with a body containing an action
-  of "accept" or "reject"
-. Service sanity checks PUT request body.
-. Service verifies the existence of the target user dataset
-. Service verifies that the target user dataset has a share offer available with
-  an offer action of "grant"
-. Service writes a share receipt file containing the requested action to the
-  User Dataset Store
 
 ==== Process User Dataset Store Change
 
