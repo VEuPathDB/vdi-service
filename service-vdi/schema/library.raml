@@ -350,6 +350,8 @@ types:
     pattern: ^[0-9a-fA-F]{32}$
     minLength: 32
     maxLength: 32
+    example:
+      "": 78609580dba2787a5cf677d6f334a707
   User-ID:
     displayName: VEuPathDB User ID
     description: Unique user identifier
@@ -357,6 +359,8 @@ types:
     format: int64
     minimum: 1
     maximum: 9223372036854775807
+    example:
+      "": 204435
   ProjectID:
     displayName: Project ID
     description: |
@@ -378,6 +382,8 @@ types:
       - VectorBase
       - VEuPathDB
     type: string
+    example:
+      "": PlasmoDB
   DatasetOwner:
     displayName: Dataset Owner
     description: Details about the owner of a VDI dataset.
@@ -394,6 +400,10 @@ types:
       organization:
         displayName: Owner Organization
         type: string
+    example:
+      displayName: Joe User
+      userID: 202203
+      organization: University of Joe
   DatasetTypeInfo:
     displayName: Dataset Type Info
     description: Information about a specific dataset type.
@@ -406,6 +416,9 @@ types:
       version:
         displayName: Type Version
         type: string
+    example:
+      name: BIOM
+      version: "1.0"
   ShareOfferAction:
     type: string
     enum:
@@ -427,6 +440,11 @@ types:
         type: DatasetInstallStatusEntry[]
         default: null
         required: false
+    example:
+      import: imported
+      install:
+        - projectID: PlasmoDB
+          status: invalid
   DatasetImportStatus:
     displayName: Dataset Import Status
     type: string
@@ -452,6 +470,9 @@ types:
     properties:
       projectID: ProjectID
       status: DatasetInstallStatus
+    example:
+      projectID: VectorBase
+      status: complete
   Error:
     type: object
     additionalProperties: false
