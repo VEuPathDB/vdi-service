@@ -322,8 +322,37 @@ a| ???
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/admin/install-cleanup:post[API Docs]
 
-[IMPORTANT]
-*TODO*
+There are two branches to this endpoint, the "all" branch and the "targets"
+branch.  The "all" branch must go through and find all the failed dataset
+installs to process, while the "target" branch must validate that all the given
+dataset IDs have a broken install.
+
+===== Process Flow
+
+====== All Branch
+
+. Client makes a `POST` request to the admin/install-cleanup endpoint
+. Service verifies the auth token in the request
+.. If the request contains no auth token, return `401`
+.. If the request contains an invalid auth token, return `401`
+. Service gets a list of all failed dataset installs (*TODO*: Define how this is done)
+. Service marks all the failed dataset installs with the `ready-for-reinstall` status
+. Service returns `204` to the client.
+
+====== Targets Branch
+
+. Client makes a `POST` request to the admin/install-cleanup endpoint
+. Service verifies the auth token in the request
+.. If the request contains no auth token, return `401`
+.. If the request contains an invalid auth token, return `401`
+. Service iterates through the given list of failed dataset IDs and
+.. Service looks up the target failed dataset ID in the Postgres DB
+... If the target dataset does not exist, skip to the next dataset ID
+.. Service iterates through the list of relevant App DBs to find installation
+   failures
+... When a failure is found, service marks the dataset with the
+    `ready-for-reinstall` status.
+. Service returns `204` to the client.
 
 ==== Deleted Dataset Cleanup
 
