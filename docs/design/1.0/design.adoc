@@ -194,18 +194,35 @@ image::assets/share-offer.png[align="center"]
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{recipient-user-id}/offer:put[API Docs]
 
-[IMPORTANT]
-====
-TODO
-====
-
 [TIP]
 ====
 |===
-h| What happens when a user attempts to share a dataset that failed import or installation?
-| ???
+h| What happens when a user attempts to share a dataset that failed import or
+   installation?
+a| If the dataset failed import then it cannot be shared as the share action
+   impacts the App DB, and a non-imported dataset will not have any records in
+   the App DB.
+
+h| What about if it failed installation on some but not all of the target sites?
+a| We want the share to work regardless of install status, the share won't
+   precipitate down to the App DBs if the installation of the dataset into those
+   App DBs has failed.
 |===
 ====
+
+===== Process Flow
+
+. Client makes a `PUT` request to the service with a payload containing a share
+  offer action of `grant` or `revoke`.
+. Service validates the requesting user.
+.. If the requesting user is invalid, return `401`
+. Service looks up details about the target dataset in the Postgres DB
+.. If the target dataset does not exist, return `404`
+.. If the target dataset failed import, return `403`
+.. If the target dataset has been soft-deleted, return `403`
+. Service (re)places the dataset share offer in the Dataset Store.
+. Service returns `204` to the client.
+
 
 ==== Revoke Dataset Share
 
