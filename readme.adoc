@@ -1,0 +1,4 @@
+= VEuPathDB Dataset Installer Service (VDI)
+:source-highlighter: highlightjs
+:toc: preamble
+

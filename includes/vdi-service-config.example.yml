@@ -1,0 +1,44 @@
+smtp:
+  host: some.smtp.host
+
+queues:
+  datastore:
+    host: some.rabbit.host
+    port: 5672
+    user: someuser
+    pass: somepass
+    queue: some-queue-name
+  import:
+    host: some.rabbit.host
+    port: 5672
+    user: someuser
+    pass: somepass
+    queue: some-queue-name
+  action:
+    host: some.rabbit.host
+    port: 5672
+    user: someuser
+    pass: somepass
+    queue: some-queue-name
+
+postgres:
+  user: someuser
+  pass: somepass
+  host: somehost
+  port: 5432
+  database: postgres
+  poolSize: 5
+
+applicationDatabases:
+  PlasmoDB:
+    ldap: ""
+    user: someusername
+    pass: somepassword
+  ToxoDB:
+    ldap: ""
+    user: someusername
+    pass: somepassword
+  VectorBase:
+    ldap: ""
+    user: someuser
+    pass: somepass

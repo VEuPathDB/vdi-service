@@ -1,9 +1,10 @@
 = VEuPathDB Dataset Installer System
 :source-highlighter: highlightjs
 :icons: font
-:toc: preamble
+:toc: left
 
 ifdef::env-github[]
+:toc: preamble
 :tip-caption: :bulb:
 :important-caption: :heavy_exclamation_mark:
 endif::[]
@@ -51,6 +52,25 @@ Dataset Store = Minio
 ====
 *TODO*: Describe how the service is configured via a mounted JSON configuration
 file containing the structured secrets and config options for the service.
+====
+
+.Configuration Schema
+[%collapsible]
+====
+[source, json]
+----
+include::../../../includes/vdi-service-config.schema.json[]
+----
+====
+
+
+.Configuration Example
+[%collapsible]
+====
+[source, yaml]
+----
+include::../../../includes/vdi-service-config.example.yml[]
+----
 ====
 
 === API Actions
@@ -183,6 +203,20 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 ==== Offer Dataset Share
 
 link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{recipient-user-id}/offer:put[API Docs]
+
+[IMPORTANT]
+====
+Share offers are automatically accepted on behalf of the recipient by the
+service.
+====
+
+[TIP]
+====
+The service sends out an email notification to the recipient notifying them of
+the share offer.
+
+This means that the service will need to be connected to an SMTP server.
+====
 
 ===== Q & A
 

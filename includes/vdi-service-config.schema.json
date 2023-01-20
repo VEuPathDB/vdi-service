@@ -1,0 +1,157 @@
+{
+  "title": "VDI Core Service Config Schema",
+  "$schema": "https://json-schema.org/draft-07/schema",
+
+  "definitions": {
+
+    "queueSettings": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "description": "Hostname of the RabbitMQ instance.",
+          "type": "string",
+          "format": "hostname"
+        },
+        "port": {
+          "description": "Port to use when connecting to RabbitMQ.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "default": 5672
+        },
+        "user": {
+          "description": "RabbitMQ username.",
+          "type": [ "string", "null" ],
+          "default": null
+        },
+        "pass": {
+          "description": "RabbitMQ password.",
+          "type": [ "string", "null" ],
+          "default": null
+        },
+        "queue": {
+          "description": "RabbitMQ queue name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "host",
+        "queue"
+      ]
+    },
+
+    "applicationDatabase": {
+      "type": "object",
+      "properties": {
+        "ldap": {
+          "description": "LDAP query to use to retrieve the connection details for the target database.",
+          "type": "string"
+        },
+        "user": {
+          "description": "Database connection username",
+          "type": "string"
+        },
+        "pass": {
+          "description": "Database connection password",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ldap",
+        "user",
+        "pass"
+      ]
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+
+    "smtp": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "format": "hostname"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "default": 25
+        }
+        // TODO: fill this out
+      },
+      "required": [
+        "host"
+        // TODO: fill this out
+      ]
+    },
+
+    "queues": {
+      "type": "object",
+      "properties": {
+        "datastore": { "$ref": "#/definitions/queueSettings" },
+        "import": { "$ref": "#/definitions/queueSettings" },
+        "action": { "$ref": "#/definitions/queueSettings" }
+      },
+      "required": [
+        "datastore",
+        "import",
+        "action"
+      ]
+    },
+
+    "postgres": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "format": "hostname"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "default": 5432
+        },
+        "database": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        },
+        "pass": {
+          "type": "string"
+        },
+        "poolSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 5
+        }
+      },
+      "required": [
+        "host",
+        "database",
+        "user",
+        "pass"
+      ]
+    },
+
+    "applicationDatabases": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/applicationDatabase" }
+    }
+  },
+
+  "additionalProperties": false,
+
+  "required": [
+    "smtp",
+    "queues",
+    "postgres",
+    "applicationDatabases"
+  ]
+}
