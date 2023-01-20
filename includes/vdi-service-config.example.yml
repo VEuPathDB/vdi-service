@@ -1,44 +1,68 @@
-smtp:
-  host: some.smtp.host
+web-server:
+  port: 80
+  enable-trace-headers: false
 
-queues:
-  datastore:
-    host: some.rabbit.host
-    port: 5672
-    user: someuser
-    pass: somepass
-    queue: some-queue-name
-  import:
-    host: some.rabbit.host
-    port: 5672
-    user: someuser
-    pass: somepass
-    queue: some-queue-name
-  action:
-    host: some.rabbit.host
-    port: 5672
-    user: someuser
-    pass: somepass
-    queue: some-queue-name
+service:
+  enable-email-sending: false
+  support-email-address: someone@veupathdb.org
+  workers:
+    import-event-handler-count: 5
+    datastore-event-handler-count: 5
+    action-event-handler-count: 5
 
-postgres:
-  user: someuser
-  pass: somepass
-  host: somehost
-  port: 5432
-  database: postgres
-  poolSize: 5
+connections:
+  ldap:
+    servers:
+    - ldap1.somesite.com:389
+    - ldap2.somesite.com:389
+    base-dn: ""
 
-applicationDatabases:
-  PlasmoDB:
-    ldap: ""
-    user: someusername
-    pass: somepassword
-  ToxoDB:
-    ldap: ""
-    user: someusername
-    pass: somepassword
-  VectorBase:
-    ldap: ""
+  handler:
+    host: handler.server
+    port: 80
+
+  smtp:
+    host: some.smtp.host
+    port: 25
+
+  queues:
+    datastore:
+      host: some.rabbit.host
+      port: 5672
+      user: someuser
+      pass: somepass
+      queue: some-queue-name
+    import:
+      host: some.rabbit.host
+      port: 5672
+      user: someuser
+      pass: somepass
+      queue: some-queue-name
+    action:
+      host: some.rabbit.host
+      port: 5672
+      user: someuser
+      pass: somepass
+      queue: some-queue-name
+
+  postgres:
     user: someuser
     pass: somepass
+    host: somehost
+    port: 5432
+    database: postgres
+    poolSize: 5
+
+  application-databases:
+    PlasmoDB:
+      ldap: ""
+      user: someusername
+      pass: somepassword
+    ToxoDB:
+      ldap: ""
+      user: someusername
+      pass: somepassword
+    VectorBase:
+      ldap: ""
+      user: someuser
+      pass: somepass
