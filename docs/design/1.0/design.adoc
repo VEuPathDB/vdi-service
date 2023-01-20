@@ -94,6 +94,10 @@ requesting user.
 | User
 | Accept or reject a dataset share offer.
 
+| <<List Share Offers>>
+| User
+| List shares offered to the requesting user.
+
 | <<Reconciliation>>
 | Admin
 | Run the reconciliation process.
@@ -176,15 +180,54 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
   dataset.
 . Service returns a `204` to the client.
 
-==== Offer/Revoke Dataset Share
+==== Offer Dataset Share
 
-TODO: REMOVE ME IN FAVOR OF SEPARATE OFFER & REVOKE SECTIONS.
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{recipient-user-id}/offer:put[API Docs]
 
-link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{user-id}/offer:put[API Docs]
+===== Q & A
+
+|===
+h| What happens when a user attempts to share a dataset that failed import or
+   installation?
+a| If the dataset failed import then it cannot be shared as the share action
+   impacts the App DB, and a non-imported dataset will not have any records in
+   the App DB.
+
+h| What about if it failed installation on some but not all of the target sites?
+a| We want the share to work regardless of install status, the share won't
+   precipitate down to the App DBs if the installation of the dataset into those
+   App DBs has failed.
+|===
 
 ===== Process Flow
 
-image::assets/share-offer.png[align="center"]
+. Client makes a `PUT` request to the service with a payload containing a share
+  offer action of `grant`.
+. Service validates the requesting user.
+.. If the requesting user is invalid, return `401`
+. Service looks up details about the target dataset in the Postgres DB
+.. If the target dataset does not exist, return `404`
+.. If the target dataset failed import, return `403`
+.. If the target dataset has been soft-deleted, return `403`
+. Service (re)places the dataset share offer in the <<Dataset Store>>.
+. Service returns `204` to the client.
+
+==== Revoke Dataset Share
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/\{vd-id}/shares/\{recipient-user-id}/offer:put[API Docs]
+
+===== Process Flow
+
+. Client makes a `PUT` request to the service with a payload containing a share
+  offer action of `revoke`.
+. Service validates the requesting user.
+.. If the requesting user is invalid, return `401`
+. Service looks up details about the target dataset in the Postgres DB
+.. If the target dataset does not exist, return a `404`
+.. If the target dataset has failed import, return `403`
+.. If the target dataset has been soft-deleted, return `403`
+. Service (re)places the dataset share offer in the <<Dataset Store>>
+. Service returns `204` to the client.
 
 ==== Accept/Reject Dataset Share Offer
 
@@ -202,6 +245,119 @@ link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/v
 .. If the target dataset has no open share offer for the requesting user, return `403`
 . If the receipt action is `accept`
 ..
+
+==== List Share Offers
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/share-offers:get[API Docs]
+
+[IMPORTANT]
+*TODO*
+
+==== Reconciliation
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/admin/reconcile:post[API Docs]
+
+[IMPORTANT]
+*TODO*
+
+____
+We need reconciliation to cover the (rare) case where messages get lost.  This
+can happen if minio is up (and emitting messages) but rabbit is down so does not
+receive them, or… for unforeseen reasons.
+
+The service has an admin/reconciliation endpoint,  protected by admin auth.
+
+This endpoint is automatically activated on service start up.  (Caution:
+consider race conditions with the other campus).  It can also be invoked
+manually by an Ops person.  It is also scheduled nightly for production
+services.
+
+The process is:
+
+. the reconciliation is triggered, one way or another
+. The service first reconciles the internal Postgres database.
+.. The reconciler gets a listing of all files in S3, including last-modified timestamps
+.. The reconciler iterates across those files, comparing timestamps to those in the internal DB
+.. The reconciler synchronizes files that are out of date
+. After the postgres reconciliation is complete, we determine which UDs are out of sync with target appdbs.
+.. Query MinIO to get a list of all user datasets
+.. Query Postgres to determine which projects datasets are targeted for
+.. Use that list of projects to segment the complete list of UDs into per-project lists
+.. For each list, compare timestamps between minio and appdb, using a bulk operation
+.. For each UD (if any) that are out of date, invoke the standard UD appDB synchronizer
+____
+
+===== Q & A
+
+|===
+h| What happens if an exception occurs when iterating through the datasets in
+   the Dataset Store and processing them in Postgres?
+a| ???
+
+h| What happens if an exception occurs when iterating through the datasets in
+   the Dataset Store and processing them in the App DBs?
+a| ???
+|===
+
+===== Process Flow
+
+. Client makes a `POST` request to the admin/reconciliation endpoint.
+. Service verifies the auth token in the request.
+.. If the request contains no auth token, return `401`
+.. If the request contains an invalid auth token, return `401`
+. Service gets a stream over the contents of the <<Dataset Store>>
+. Service groups the Dataset Store content stream into bundles of individual
+  dataset contents
+. Service iterates through the stream of dataset bundles and:
+.. Compares the timestamps of the bundle files to the timestamps recorded in the
+   PostgresDB
+.. Synchronizes files that are out of date (*TODO* define "synchronizes")
+. ???
+. ???
+
+
+==== Failed Install Cleanup
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/admin/install-cleanup:post[API Docs]
+
+There are two branches to this endpoint, the "all" branch and the "targets"
+branch.  The "all" branch must go through and find all the failed dataset
+installs to process, while the "target" branch must validate that all the given
+dataset IDs have a broken install.
+
+===== Process Flow
+
+====== All Branch
+
+. Client makes a `POST` request to the admin/install-cleanup endpoint
+. Service verifies the auth token in the request
+.. If the request contains no auth token, return `401`
+.. If the request contains an invalid auth token, return `401`
+. Service gets a list of all failed dataset installs (*TODO*: Define how this is done)
+. Service marks all the failed dataset installs with the `ready-for-reinstall` status
+. Service returns `204` to the client.
+
+====== Targets Branch
+
+. Client makes a `POST` request to the admin/install-cleanup endpoint
+. Service verifies the auth token in the request
+.. If the request contains no auth token, return `401`
+.. If the request contains an invalid auth token, return `401`
+. Service iterates through the given list of failed dataset IDs and
+.. Service looks up the target failed dataset ID in the Postgres DB
+... If the target dataset does not exist, skip to the next dataset ID
+.. Service iterates through the list of relevant App DBs to find installation
+   failures
+... When a failure is found, service marks the dataset with the
+    `ready-for-reinstall` status.
+. Service returns `204` to the client.
+
+==== Deleted Dataset Cleanup
+
+link:https://veupathdb.github.io/service-user-datasets/vdi-api.html#resources:/vdi-datasets/admin/delete-cleanup:post[API Docs]
+
+[IMPORTANT]
+*TODO*
 
 === Internal Actions
 
@@ -245,7 +401,33 @@ Queue>>.
 
 ===== Process Flow
 
+[IMPORTANT]
+====
+*TODO*: the flowchart below is outdated and needs to be replaced.
+====
+
 image::assets/process-import.png[align="center"]
+
+
+==== Sort Dataset Store Change
+
+[IMPORTANT]
+*TODO*
+
+==== Dataset Installation
+
+[IMPORTANT]
+*TODO*
+
+==== Dataset Soft Delete
+
+[IMPORTANT]
+*TODO*
+
+==== Dataset Hard Delete
+
+[IMPORTANT]
+*TODO*
 
 === [OLD] Actions
 
@@ -259,14 +441,6 @@ This section is being split into the 2 sections above: <<API Actions>> and
 |===
 | Action | Source | Description
 
-| <<Offer User Dataset Share>>
-| HTTP
-| Offer to share a user dataset.
-
-| <<Accept User Dataset Share>>
-| HTTP
-| Accept an incoming share offer for a user dataset.
-
 | <<Process User Dataset Store Change>>
 | RabbitMQ <2>
 | Process a change in the User Dataset Store that has been published to
@@ -276,28 +450,6 @@ This section is being split into the 2 sections above: <<API Actions>> and
 | RabbitMQ <3>
 | ???
 |===
-
-
-==== Offer User Dataset Share
-
-. Client makes a `PUT` request to the above URL with a body containing an action
-  of "grant" or "revoke".
-. Service sanity checks PUT request body
-. Service verifies the existence of the target user dataset
-. Service verifies that the target user dataset is owned by the requesting user
-. Service writes a share offer file containing the requested action to the User
-  Dataset Store
-
-==== Accept User Dataset Share
-
-. Client makes a PUT request to the above URL with a body containing an action
-  of "accept" or "reject"
-. Service sanity checks PUT request body.
-. Service verifies the existence of the target user dataset
-. Service verifies that the target user dataset has a share offer available with
-  an offer action of "grant"
-. Service writes a share receipt file containing the requested action to the
-  User Dataset Store
 
 ==== Process User Dataset Store Change
 
