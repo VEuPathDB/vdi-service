@@ -1,0 +1,86 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../common.raml
+
+types:
+  DatasetPostRequest:
+    displayName: Dataset Post Request
+    description: |
+      HTTP POST request body requesting the creation of a dataset from the
+      components included in the request.
+
+      For a request to be considered valid, it must contain exactly 1 of the
+      optional parameters `file` or `url`.  If a request body contains both a
+      `file` and a `url` field value, the service will return a `400` error.
+    type: object
+    additionalProperties: false
+    properties:
+      meta:
+        displayName: Dataset Meta
+        description: Metadata about the dataset being submitted.
+        type: DatasetPostMeta
+        required: true
+      file:
+        displayName: Dataset File
+        description: |
+          Dataset file to upload.
+
+          This field is incompatible with the `url` field.
+        type: file
+        required: false
+      url:
+        displayName: Dataset URL
+        description: |
+          URL to a dataset file to upload.
+
+          This field is incompatible with the `file` field.
+        type: string
+        required: false
+
+  DatasetPostMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetType:
+        displayName: Dataset Type
+        description: Type of the dataset that is being uploaded.
+        type: string
+        required: true
+      name:
+        displayName: Dataset Name
+        description: User provided name for the dataset.
+        type: string
+        required: true
+      summary:
+        displayName: Dataset Summary
+        description: User provided summary for the dataset.
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        description: User provided description for the dataset.
+        type: string
+        required: false
+      projects:
+        displayName: Project IDs
+        description: IDs of the projects this dataset is being submitted to.
+        type: common.ProjectID[]
+        required: true
+        minItems: 1
+
+  DatasetPostResponse:
+    displayName: Dataset Upload Response
+    description: |
+      Response object returned on successful upload of a dataset.
+
+      Note that this response does not mean the uploaded dataset has been made
+      available on the target site(s).  The upload must first be processed and
+      installed into the target sites before the dataset will become available
+      for use.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        type: common.VDI-ID
+        required: true

@@ -1,0 +1,158 @@
+#%RAML 1.0 Library
+
+uses:
+  error: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.2.0/libraries/errors.raml
+
+types:
+  VDI-ID:
+    displayName: VDI ID
+    description: Unique VDI Dataset identifier string.
+    type: string
+    minLength: 32
+    maxLength: 32
+    pattern: ^[0-9a-fA-F]{32}$
+    example: 78609580dba2787a5cf677d6f334a707
+
+  User-ID:
+    displayName: VEuPathDB User ID
+    description: Unique user identifier
+    type: integer
+    format: int64
+    minimum: 1
+    maximum: 9223372036854775807
+    example: 204435
+
+  ProjectID:
+    displayName: Project ID
+    description: |
+      Name or ID of a target VEuPathDB project.
+
+      Valid project IDs are:
+
+      - AmoebaDB
+      - CryptoDB
+      - FungiDB
+      - GiardiaDB
+      - HostDB
+      - MicrosporidiaDB
+      - PiroplasmaDB
+      - PlasmoDB
+      - ToxoDB
+      - TrichDB
+      - TriTrypDB
+      - VectorBase
+      - VEuPathDB
+    type: string
+    example: PlasmoDB
+
+  DatasetOwner:
+    displayName: Dataset Owner
+    description: Details about the owner of a VDI dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      userID:
+        displayName: Owner User ID
+        description: VEuPathDB user ID of the owner of the dataset.
+        type: User-ID
+        required: true
+      displayName:
+        displayName: Owner Display Name
+        type: string
+        required: true
+      organization:
+        displayName: Owner Organization
+        type: string
+        required: true
+    example:
+      userID: 202203
+      displayName: Joe User
+      organization: University of Joe
+
+  DatasetTypeInfo:
+    displayName: Dataset Type Info
+    description: Information about a specific dataset type.
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        displayName: Type Name
+        type: string
+        required: true
+      version:
+        displayName: Type Version
+        type: string
+        required: true
+    example:
+      name: BIOM
+      version: "1.0"
+
+  ShareOfferAction:
+    type: string
+    enum:
+    - grant
+    - revoke
+
+  ShareReceiptAction:
+    type: string
+    enum:
+    - accept
+    - reject
+
+  # region Dataset Status
+
+  DatasetStatusInfo:
+    displayName: Dataset Status Info
+    description: Information about the import and install status of a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      import:
+        type: DatasetImportStatus
+        required: true
+      install:
+        type: DatasetInstallStatusEntry[]
+        required: false
+        default: null
+    example:
+      import: imported
+      install:
+      - projectID: PlasmoDB
+        status: invalid
+
+  DatasetImportStatus:
+    displayName: Dataset Import Status
+    type: string
+    enum:
+    - awaiting-import
+    - importing
+    - imported
+    - import-failed
+
+  DatasetInstallStatus:
+    displayName: Dataset Install Status
+    type: string
+    enum:
+    - running
+    - complete
+    - invalid
+    - failed
+    - ready-for-reinstall
+
+  DatasetInstallStatusEntry:
+    displayName: Dataset Install Status Entry
+    description: Entry in a list of install statuses for a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      projectID:
+        type: ProjectID
+        required: true
+      status:
+        type: DatasetInstallStatus
+        required: true
+    example:
+      projectID: VectorBase
+      status: complete
+
+  # endregion Dataset Status

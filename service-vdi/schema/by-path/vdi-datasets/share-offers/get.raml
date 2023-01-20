@@ -1,0 +1,34 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../common.raml
+
+types:
+  ShareOfferEntry:
+    displayName: Share Offer
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        type: common.VDI-ID
+        required: true
+      owner:
+        type: common.DatasetOwner
+        required: true
+      shareStatus:
+        type: ShareOfferStatus
+        required: true
+      datasetType:
+        type: common.DatasetTypeInfo
+        required: true
+      projectIDs:
+        type: common.ProjectID[]
+        required: true
+
+  ShareOfferStatus:
+    displayName: Share Offer Status
+    type: string
+    enum:
+    - open
+    - accepted
+    - rejected

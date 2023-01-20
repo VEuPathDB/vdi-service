@@ -1,0 +1,51 @@
+#%RAML 1.0 Library
+
+uses:
+  common: "../../common.raml"
+
+types:
+
+  DatasetListEntry:
+    displayName: Dataset List Item
+    description: Short entry with basic details about a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        displayName: Dataset ID
+        type: common.VDI-ID
+        required: true
+      owner:
+        displayName: Owner Details
+        type: common.DatasetOwner
+        required: true
+      datasetType:
+        displayName: Dataset Type
+        type: common.DatasetTypeInfo
+        required: true
+      name:
+        displayName: Dataset Name
+        description: User provided name for the dataset.
+        type: string
+        required: true
+      summary:
+        displayName: Dataset Summary
+        description: User provided summary of the dataset.
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        description: User provided description of the dataset.
+        type: string
+        required: false
+      projectIDs:
+        displayName: Project IDs
+        description: |
+          Project IDs for projects the dataset record was submitted to.
+        type: common.ProjectID[]
+        required: true
+      status:
+        displayName: Status Info
+        type: common.DatasetStatusInfo
+        required: true
+

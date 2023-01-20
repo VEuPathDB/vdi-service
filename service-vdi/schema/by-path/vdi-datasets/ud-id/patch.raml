@@ -1,0 +1,25 @@
+#%RAML 1.0 Library
+
+types:
+  DatasetPatchRequest:
+    displayName: Dataset Patch Request
+    description: |
+      Request to update the metadata for a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        displayName: Dataset Name
+        description: User provided name for a dataset.
+        type: string
+        required: false
+      summary:
+        displayName: Dataset Summary
+        description: User provided summary for a dataset.
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        description: User provided description for a dataset.
+        type: string
+        required: false

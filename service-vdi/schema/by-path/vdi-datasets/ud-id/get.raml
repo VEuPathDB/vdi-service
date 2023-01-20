@@ -1,0 +1,110 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../common.raml
+
+types:
+
+  DatasetDetails:
+    displayName: Dataset Details
+    description: |
+      Details about a specific singular dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID:
+        displayName: Dataset ID
+        type: common.VDI-ID
+        required: true
+      owner:
+        displayName: Owner Details
+        type: common.DatasetOwner
+        required: true
+      datasetType:
+        displayName: Dataset Type Info
+        type: common.DatasetTypeInfo
+        required: true
+      name:
+        displayName: Dataset Name
+        type: string
+        required: true
+      summary:
+        displayName: Dataset Summary
+        type: string
+        required: false
+      description:
+        displayName: Dataset Description
+        type: string
+        required: false
+      projectIDs:
+        displayName: Project IDs
+        description: |
+          Project IDs for projects the user dataset record was submitted to.
+        type: common.ProjectID[]
+        required: true
+      importMessages:
+        displayName: Import Messages
+        description: |
+          Log lines from the import process.
+
+          These messages will be warnings and/or validation errors.
+        type: string[]
+        required: false
+        default: []
+      installMessages:
+        displayName: Install Messages
+        description: |
+          Mapping of project IDs to log line arrays containing messages from the
+          installation.
+        type: object
+        properties:
+          /[a-zA-Z]+/:
+            type: string[]
+      status:
+        displayName: Dataset Status Info
+        type: common.DatasetStatusInfo
+        required: true
+      shares:
+        displayName: Shares
+        description: |
+          Array of share offers that have been created by the owner of this
+          dataset to share it with other users.
+        type: array
+        items:
+          type: ShareOffer
+        required: false
+
+  ShareOffer:
+    displayName: Share Offer
+    type: object
+    additionalProperties: false
+    properties:
+      recipient:
+        type: ShareOfferRecipient
+        required: true
+      status:
+        type: common.ShareOfferAction
+        required: true
+    example:
+      recipient:
+        displayName: Joe User
+        organization: University of Joe
+      status: revoke
+
+  ShareOfferRecipient:
+    displayName: Share Offer Recipient
+    description: I AM A UNION!
+    type: object
+    additionalProperties: false
+    properties:
+      displayName:
+        type: string
+        required: false
+      organization:
+        type: string
+        required: false
+      email:
+        type: string
+        required: false
+    example:
+      email: myusername@someuniversity.edu
