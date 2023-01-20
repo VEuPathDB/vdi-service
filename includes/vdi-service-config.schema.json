@@ -214,6 +214,7 @@
             "host"
           ]
         },
+
         "smtp": {
           "type": "object",
           "properties": {
@@ -227,13 +228,12 @@
               "maximum": 65535,
               "default": 25
             }
-            // TODO: fill this out
           },
           "required": [
             "host"
-            // TODO: fill this out
           ]
         },
+
         "queues": {
           "type": "object",
           "properties": {
