@@ -4,18 +4,54 @@ title: VEuPathDB Dataset Handler Server
 version: 1.0.0
 mediaType: application/json
 
-/import/{vdi-id}:
+/import-processing/{vdi-id}:
   uriParameters:
     vdi-id: VDI-ID
 
   post:
+    displayName: Perform Import Processing
+    description: |
+      Perform dataset validation and any pre-installation transformation that
+      needs to be done.
+      
+      The output of this endpoint is a tarball containing the processing result
+      files that are ready to be imported into the VDI Dataset Store (MinIO at
+      the time of this writing)
     body:
       multipart/form-data:
-        type: ImportMultipartPostBody
+        type: DatasetMultipartPostBody
 
     responses:
       200:
+        description: |
+          Success
+          
+          Server has successfully processed the dataset for import and is
+          returning the result.
+
+      400:
+        description: |
+          Malformed Request
+          
+          The request body was malformed in a way that prevented the server from
+          parsing it.
+
+      422:
+        description: |
+          Dataset Validation Failure
+          
+          The provided dataset failed the import validation portion of the
+          dataset processing.
+
+        body:
+          application/json:
+            type: DatasetValidationFailureResponse
+
       500:
+        description: |
+          Internal Server Error
+          
+          Congratulations!  You found a bug!
 
 /install/{vdi-id}:
   uriParameters:
@@ -46,6 +82,11 @@ mediaType: application/json
           body:
             application/json:
 
+        418:
+          description: Installation Error?
+          body:
+            application/json:
+
         500:
           description: Internal Server Error
           body:
@@ -56,6 +97,7 @@ mediaType: application/json
   uriParameters:
     vdi-id: VDI-ID
   post:
+    displayName: Delete Dataset
 
 /update/{vdi-id}:
   uriParameters:
@@ -63,6 +105,7 @@ mediaType: application/json
 
   /meta:
     post:
+      displayName: Update Dataset Meta
       body:
         application/json:
           type: DatasetMeta
@@ -195,3 +238,19 @@ types:
       resourceDisplayName:
         type: any
         required: true
+
+  DatasetValidationFailureResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      general:
+        type: string[]
+        required: false
+        default: []
+      keyed:
+        type: object
+        properties:
+          /^.+$/:
+            type: string[]
+        required: false
+        default: {}
