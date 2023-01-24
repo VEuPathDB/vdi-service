@@ -36,8 +36,21 @@ mediaType: application/json
         application/json:
           type: DatasetMultipartPostBody
       responses:
-        204:
+        200:
+          description: Success
+          body:
+            application/json:
+
+        400:
+          description: Validation Error
+          body:
+            application/json:
+
         500:
+          description: Internal Server Error
+          body:
+            application/json:
+
 
 /delete/{vdi-id}:
   uriParameters:
