@@ -1,0 +1,184 @@
+#%RAML 1.0
+
+title: VEuPathDB Dataset Handler Server
+version: 1.0.0
+mediaType: application/json
+
+/import/{vdi-id}:
+  uriParameters:
+    vdi-id: VDI-ID
+
+  post:
+    body:
+      multipart/form-data:
+        type: ImportMultipartPostBody
+
+    responses:
+      200:
+      500:
+
+/install/{vdi-id}:
+  uriParameters:
+    vdi-id: VDI-ID
+
+  /meta:
+    post:
+      body:
+        application/json:
+          type: DatasetMeta
+      responses:
+        204:
+        500:
+
+  /data:
+    post:
+      body:
+        application/json:
+          type: DatasetMultipartPostBody
+      responses:
+        204:
+        500:
+
+/delete/{vdi-id}:
+  uriParameters:
+    vdi-id: VDI-ID
+  post:
+
+/update/{vdi-id}:
+  uriParameters:
+    vdi-id: VDI-ID
+
+  /meta:
+    post:
+      body:
+        application/json:
+          type: DatasetMeta
+      responses:
+        204:
+        500:
+
+types:
+  VDI-ID:
+    displayName: VDI ID
+    description: Unique VDI Dataset identifier string.
+    type: string
+    minLength: 32
+    maxLength: 32
+    pattern: ^[0-9a-fA-F]{32}$
+    example: 78609580dba2787a5cf677d6f334a707
+
+  User-ID:
+    displayName: VEuPathDB User ID
+    description: Unique user identifier
+    type: integer
+    format: int64
+    minimum: 1
+    maximum: 9223372036854775807
+    example: 204435
+
+  ProjectID:
+    displayName: Project ID
+    description: |
+      Name or ID of a target VEuPathDB project.
+
+      Valid project IDs are:
+
+      - AmoebaDB
+      - CryptoDB
+      - FungiDB
+      - GiardiaDB
+      - HostDB
+      - MicrosporidiaDB
+      - PiroplasmaDB
+      - PlasmoDB
+      - ToxoDB
+      - TrichDB
+      - TriTrypDB
+      - VectorBase
+      - VEuPathDB
+    type: string
+    example: PlasmoDB
+
+  DatasetMultipartPostBody:
+    type: object
+    properties:
+      manifest:
+        type: DatasetManifest
+        required: true
+      meta:
+        type: DatasetMeta
+        required: true
+      /^.+$/:
+        type: file
+    minProperties: 3
+
+  DatasetManifest:
+    type: object
+    additionalProperties: false
+    properties:
+      dataFiles:
+        type: DatasetManifestDataFileEntry[]
+        required: true
+
+  DatasetManifestDataFileEntry:
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        required: true
+      path:
+        type: string
+        required: true
+
+  DatasetMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      type:
+        type: DatasetMetaType
+        required: true
+      projects:
+        type: ProjectID[]
+        required: true
+        minItems: 1
+      owner:
+        type: User-ID
+        required: true
+      name:
+        type: string
+        required: true
+      summary:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+      dependencies:
+        type: DatasetMetaDependency[]
+        required: true
+
+  DatasetMetaType:
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
+
+  DatasetMetaDependency:
+    type: object
+    additionalProperties: false
+    properties:
+      resourceIdentifier:
+        type: any
+        required: true
+      resourceVersion:
+        type: any
+        required: true
+      resourceDisplayName:
+        type: any
+        required: true
