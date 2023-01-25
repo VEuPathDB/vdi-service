@@ -25,16 +25,24 @@ tasks.create("generate-raml-docs") {
   group = "monorepo"
 
   dependsOn(":service-vdi:generate-raml-docs")
+  dependsOn(":util-handler-server:generate-raml-docs")
 
   doLast {
     val docsDir = file("docs")
-    val vdiDocsFile =  file("service-vdi/docs/api.html")
-
     docsDir.mkdir()
 
+    val vdiDocsFile =  file("service-vdi/docs/api.html")
     with(docsDir.resolve("vdi-api.html")) {
       delete()
       vdiDocsFile.copyTo(this)
+      vdiDocsFile.delete()
+    }
+
+    val handlerDocsFile = file("util-handler-server/api.html")
+    with(docsDir.resolve("handler-api.html")) {
+      delete()
+      handlerDocsFile.copyTo(this)
+      handlerDocsFile.delete()
     }
   }
 }

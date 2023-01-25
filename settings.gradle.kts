@@ -47,3 +47,4 @@ pluginManagement {
 rootProject.name = "vdi"
 
 include("service-vdi")
+include("util-handler-server")
