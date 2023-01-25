@@ -28,6 +28,9 @@ mediaType: application/json
           
           Server has successfully processed the dataset for import and is
           returning the result.
+        body:
+          application/octet-stream:
+            type: file
 
       400:
         description: |
@@ -35,6 +38,9 @@ mediaType: application/json
           
           The request body was malformed in a way that prevented the server from
           parsing it.
+        body:
+          application/json:
+            type: BadRequestResponse
 
       422:
         description: |
@@ -52,6 +58,10 @@ mediaType: application/json
           Internal Server Error
           
           Congratulations!  You found a bug!
+        body:
+          application/json:
+            type: InternalServerErrorResponse
+
 
 /install/{vdi-id}:
   uriParameters:
@@ -64,14 +74,39 @@ mediaType: application/json
           type: DatasetMeta
       responses:
         204:
+          description: |
+            Success
+            
+            The metadata for the dataset was successfully installed into the
+            target application database.
+
+        400:
+          description: |
+            Bad Request
+            
+            The request body was malformed.
+          body:
+            application/json:
+              type: BadRequestResponse
+
         500:
+          description: |
+            Internal Server Error
+            
+            Congratulations!  You found a bug!
+          body:
+            application/json:
+              type: InternalServerErrorResponse
 
   /data:
     post:
+
       body:
         application/json:
           type: DatasetMultipartPostBody
+
       responses:
+
         200:
           description: Success
           body:
@@ -254,3 +289,19 @@ types:
             type: string[]
         required: false
         default: {}
+
+  BadRequestResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      message:
+        type: string
+        required: true
+
+  InternalServerErrorResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      message:
+        type: string
+        required: true
