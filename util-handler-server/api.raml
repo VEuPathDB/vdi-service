@@ -5,6 +5,8 @@ version: 1.0.0
 mediaType: application/json
 
 /import-processing/{vdi-id}:
+  displayName: Import Actions
+
   uriParameters:
     vdi-id: VDI-ID
 
@@ -51,7 +53,7 @@ mediaType: application/json
 
         body:
           application/json:
-            type: DatasetValidationFailureResponse
+            type: ValidationFailureResponse
 
       500:
         description: |
@@ -64,6 +66,8 @@ mediaType: application/json
 
 
 /install/{vdi-id}:
+  displayName: Install Actions
+
   uriParameters:
     vdi-id: VDI-ID
 
@@ -132,7 +136,7 @@ mediaType: application/json
 
 
 /delete/{vdi-id}:
-  displayName: Handler Delete Actions
+  displayName: Delete Actions
 
   uriParameters:
     vdi-id: VDI-ID
@@ -147,6 +151,8 @@ mediaType: application/json
             type: InternalServerErrorResponse
 
 /update/{vdi-id}:
+  displayName: Update Actions
+
   uriParameters:
     vdi-id: VDI-ID
 
@@ -163,6 +169,11 @@ mediaType: application/json
           body:
             application/json:
               type: BadRequestResponse
+        422:
+          description: Request Validation Error
+          body:
+            application/json:
+              type: ValidationFailureResponse
         500:
           description: Internal Server Error
           body:
@@ -304,7 +315,7 @@ types:
         required: false
         default: []
 
-  DatasetValidationFailureResponse:
+  ValidationFailureResponse:
     type: object
     additionalProperties: false
     properties:
