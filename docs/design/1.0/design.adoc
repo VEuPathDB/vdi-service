@@ -555,6 +555,11 @@ h| What is the contract for data being placed in the inputs directory? +
 == General Q & A
 
 |===
+h| Who generates the `manifest.json` file?
+a| ???
+|===
+
+|===
 h| What if the communication between the service and the import plugin was
    handled via a RabbitMQ queue?
 
