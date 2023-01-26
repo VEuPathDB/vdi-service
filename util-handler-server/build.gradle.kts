@@ -24,16 +24,3 @@ tasks.create("generate-raml-docs") {
     }
   }
 }
-
-/**
- * old generation of installer that installs eda studies into an eda database
- *
- * it does the same work as the workflow
- *
- * it invokes a system called next-flow? which is a container orchestration
- * system
- *
- * how do we run containers in a container?
- *
- * nextflow as a service?
- */

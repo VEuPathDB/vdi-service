@@ -111,11 +111,13 @@ mediaType: application/json
           description: Success
           body:
             application/json:
+              type: DatasetInstallationResponse
 
         400:
           description: Validation Error
           body:
             application/json:
+              type: BadRequestResponse
 
         418:
           description: Installation Error?
@@ -126,13 +128,23 @@ mediaType: application/json
           description: Internal Server Error
           body:
             application/json:
+              type: InternalServerErrorResponse
 
 
 /delete/{vdi-id}:
+  displayName: Handler Delete Actions
+
   uriParameters:
     vdi-id: VDI-ID
   post:
     displayName: Delete Dataset
+    responses:
+      204:
+      500:
+        description: Internal Server Error
+        body:
+          application/json:
+            type: InternalServerErrorResponse
 
 /update/{vdi-id}:
   uriParameters:
@@ -146,7 +158,16 @@ mediaType: application/json
           type: DatasetMeta
       responses:
         204:
+        400:
+          description: Malformed Request
+          body:
+            application/json:
+              type: BadRequestResponse
         500:
+          description: Internal Server Error
+          body:
+            application/json:
+              type: InternalServerErrorResponse
 
 types:
   VDI-ID:
@@ -273,6 +294,15 @@ types:
       resourceDisplayName:
         type: any
         required: true
+
+  DatasetInstallationResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      warnings:
+        type: string[]
+        required: false
+        default: []
 
   DatasetValidationFailureResponse:
     type: object
