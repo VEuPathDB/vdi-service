@@ -2084,7 +2084,60 @@ directories</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>???</p>
+<p>The <code>manifest.json</code> file will be simplified.  Instead of attempting to keep
+a mapping of input file name to output file name, which is both restrictive and
+forces the import script to generate the file, we will change the <code>"dataFiles"</code>
+array to be an array of output file names instead of a mapping of input to
+output file names.</p>
+</div>
+<div class="listingblock">
+<div class="title">Original Design</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "dataFiles": [
+    {
+      "name": "some-file-name.txt",
+      "path": "original-crazy-user-provided-name.txt"
+    },
+    {
+      "name": "some-other-file.tsv",
+      "path": "original-other-file-name.txt"
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">New Design</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "dataFiles": [
+    "some-file-name.txt",
+    "some-other-file.tsv"
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If necessary, the input file names can be maintained as a separate array which
+would give us the information without implicitly enforcing any rules on input to
+output mapping.</p>
+</div>
+<div class="listingblock">
+<div class="title">Optional Input Names</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "inputFiles": [
+    "foo-bar-fizz.txt",
+    "my-dog-dexter.jpg",
+    "my-grandmas-famous-apple-pie-recipe.pdf"
+  ],
+  "dataFiles": [
+    "some-output.biom",
+    "some-other-output.tsv"
+  ]
+}</code></pre>
+</div>
 </div></div></td>
 </tr>
 </tbody>
@@ -3040,7 +3093,7 @@ One of "accepted" | "rejected"</p></td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-01-26 11:22:06 -0500
+Last updated 2023-01-26 11:43:51 -0500
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
