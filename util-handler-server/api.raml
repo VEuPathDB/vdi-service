@@ -14,6 +14,10 @@ description: |
   means, more specifically, that no automated tooling or code generation are
   being used to translate this API definition to actual server implementation
   source code.
+  
+  Every endpoint declared as part of this API is backed by a shell or system
+  call to a "plugin" script being hosted in the same container as this util
+  server.
 
 /import-processing/{vdi-id}:
   displayName: Import Actions
@@ -30,6 +34,12 @@ description: |
       The output of this endpoint is a tarball containing the processing result
       files that are ready to be imported into the VDI Dataset Store (MinIO at
       the time of this writing)
+      
+      **Note**: The definition of the request body below appears no differently
+      than if it were defining a JSON object to be posted, however, it is
+      instead defining fields that are part of a `multipart/form-data` request.
+      This means that the properties defined as part of the root "object" are
+      actually fields in the multipart request.
     body:
       multipart/form-data:
         type: DatasetMultipartPostBody
@@ -83,6 +93,8 @@ description: |
     vdi-id: VDI-ID
 
   /meta:
+    displayName: Install Dataset Meta
+
     post:
       body:
         application/json:
@@ -114,6 +126,8 @@ description: |
               type: InternalServerErrorResponse
 
   /data:
+    displayName: Install Dataset Data
+
     post:
 
       body:
