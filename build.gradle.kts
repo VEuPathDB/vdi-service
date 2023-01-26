@@ -31,18 +31,16 @@ tasks.create("generate-raml-docs") {
     val docsDir = file("docs")
     docsDir.mkdir()
 
-    val vdiDocsFile =  file("service-vdi/docs/api.html")
-    with(docsDir.resolve("vdi-api.html")) {
-      delete()
-      vdiDocsFile.copyTo(this)
-      vdiDocsFile.delete()
-    }
+    val docFiles = arrayOf(
+      // Source File                       to Target File
+      file("service-vdi/docs/api.html")    to docsDir.resolve("vdi-api.html"),
+      file("util-handler-server/api.html") to docsDir.resolve("handler-api.html"),
+    )
 
-    val handlerDocsFile = file("util-handler-server/api.html")
-    with(docsDir.resolve("handler-api.html")) {
-      delete()
-      handlerDocsFile.copyTo(this)
-      handlerDocsFile.delete()
+    for ((source, target) in docFiles) {
+      target.delete()
+      source.copyTo(target)
+      source.delete()
     }
   }
 }
