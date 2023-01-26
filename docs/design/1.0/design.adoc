@@ -560,6 +560,11 @@ a| ???
 |===
 
 |===
+h| How is the user quota measured and managed?
+a| ???
+|===
+
+|===
 h| What if the communication between the service and the import plugin was
    handled via a RabbitMQ queue?
 

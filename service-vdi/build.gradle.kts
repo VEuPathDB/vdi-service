@@ -16,7 +16,7 @@ containerBuild {
   project {
 
     // Project Name
-    name = "demo-service"
+    name = "vdi-service"
 
     // Project Group
     group = "org.veupathdb.service"
@@ -25,7 +25,7 @@ containerBuild {
     version = "1.0.0"
 
     // Project Root Package
-    projectPackage = "org.veupathdb.service.demo"
+    projectPackage = "org.veupathdb.service.vdi"
 
     // Main Class Name
     mainClassName = "Main"
@@ -41,7 +41,7 @@ containerBuild {
     dockerFile = "Dockerfile"
 
     // Resulting image tag
-    imageName = "example-service"
+    imageName = "vdi-service"
 
   }
 
