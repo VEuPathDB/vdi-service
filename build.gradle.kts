@@ -1,3 +1,9 @@
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+}
+
 tasks.create("compile-design-doc") {
   group = "monorepo"
 
