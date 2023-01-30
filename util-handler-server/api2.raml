@@ -15,7 +15,17 @@ description: |
   server.
 
 /import:
+  displayName: Import Actions
+
   post:
+    displayName: Perform Import Processing
+    description: |
+      Perform dataset validation and any pre-installation transformation that
+      needs to be done.
+      
+      The output of this endpoint is a tarball containing the processing result
+      files that are ready to be imported into the VDI Dataset Store (MinIO at
+      the time of this writing)
     body:
       multipart/form-data:
         type: object
@@ -29,13 +39,31 @@ description: |
             required: true
     responses:
       200:
-        description: Success
+        description: |
+          Success
+          
+          Server has successfully processed the dataset for import and is
+          returning the result.
+        body:
+          application/octet-stream:
+            type: file
       400:
-        description: Bad Request
-      422:
-        description: Unprocessable Request
+        description: |
+          Malformed Request
+          
+          The request body was malformed in a way that prevented the server from
+          parsing it.
+        body:
+          application/json:
+            type: Error400
+      418:
+        description: Validation Failure
+      420:
+        description: Transformation Failure
       500:
         description: Server Error
+
+# TODO: how does the server communicate back to the caller that the script failed for validation reasons vs non-validation reasons
 
 /install:
   /meta:
@@ -140,8 +168,24 @@ types:
         type: any
         required: true
 
-  Error500:
+  Error400:
     type: object
     additionalProperties: false
     properties:
       message:
+        type: string
+        required: true
+
+  Error500:
+    type: object
+    additionalProperties: false
+    properties:
+      status:
+        type: string
+        enum:
+        - failed-plugin
+        - failed-server
+        required: true
+      message:
+        type: string
+        required: true

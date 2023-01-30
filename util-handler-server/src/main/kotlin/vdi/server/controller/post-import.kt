@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import vdi.server.middleware.HTTPError400
 import vdi.server.middleware.HTTPError404
+import vdi.service.importing.processImport
 import vdi.util.makeTempDirectory
 import vdi.util.requireValidVDIID
 import vdi.util.withTempDirectory
@@ -39,9 +40,7 @@ suspend fun PipelineContext<*, ApplicationCall>.handleImportProcessingPost() {
       archive.outputStream().use { partData.streamProvider().transferTo(it) }
     }
 
-    // TODO: verify the file is actually a tar.gz archive
-
-    processImport(vdiID, tempDir, archive)
+    call.processImport(vdiID, tempDir, archive)
   }
 }
 
