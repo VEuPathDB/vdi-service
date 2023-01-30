@@ -1,0 +1,147 @@
+#%RAML 1.0
+
+title: VEuPathDB Dataset Handler Server
+version: 1.0.0
+mediaType: application/json
+description: |
+  HTTP API for the VDI Handler Plugin Server.
+  
+  The VDI Handler Plugin Server is a small HTTP server that collects, organizes,
+  and wraps calls to VDI import and install scripts, allowing them to be
+  executed via HTTP calls.
+  
+  Every endpoint declared as part of this API is backed by a shell or system
+  call to a "plugin" script being hosted in the same container as this util
+  server.
+
+/import:
+  post:
+    body:
+      multipart/form-data:
+        type: object
+        additionalProperties: false
+        properties:
+          vdi-id:
+            type: VDI-ID
+            required: true
+          payload:
+            type: file
+            required: true
+    responses:
+      200:
+        description: Success
+      400:
+        description: Bad Request
+      422:
+        description: Unprocessable Request
+      500:
+        description: Server Error
+
+/install:
+  /meta:
+    post:
+
+  /data:
+
+/update:
+  /meta:
+
+types:
+  VDI-ID:
+    displayName: VDI ID
+    description: Unique VDI Dataset identifier string.
+    type: string
+    minLength: 32
+    maxLength: 32
+    pattern: ^[0-9a-fA-F]{32}$
+    example: 78609580dba2787a5cf677d6f334a707
+
+  User-ID:
+    displayName: VEuPathDB User ID
+    description: Unique user identifier
+    type: integer
+    format: int64
+    minimum: 1
+    maximum: 9223372036854775807
+    example: 204435
+
+  ProjectID:
+    displayName: Project ID
+    description: |
+      Name or ID of a target VEuPathDB project.
+
+      Valid project IDs are:
+
+      - AmoebaDB
+      - CryptoDB
+      - FungiDB
+      - GiardiaDB
+      - HostDB
+      - MicrosporidiaDB
+      - PiroplasmaDB
+      - PlasmoDB
+      - ToxoDB
+      - TrichDB
+      - TriTrypDB
+      - VectorBase
+      - VEuPathDB
+    type: string
+    example: PlasmoDB
+
+  DatasetMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      type:
+        type: DatasetMetaType
+        required: true
+      projects:
+        type: ProjectID[]
+        required: true
+        minItems: 1
+      owner:
+        type: User-ID
+        required: true
+      name:
+        type: string
+        required: true
+      summary:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+      dependencies:
+        type: DatasetMetaDependency[]
+        required: true
+
+  DatasetMetaType:
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
+
+  DatasetMetaDependency:
+    type: object
+    additionalProperties: false
+    properties:
+      resourceIdentifier:
+        type: any
+        required: true
+      resourceVersion:
+        type: any
+        required: true
+      resourceDisplayName:
+        type: any
+        required: true
+
+  Error500:
+    type: object
+    additionalProperties: false
+    properties:
+      message:

@@ -1,82 +1,50 @@
 package vdi.server.controller
 
-import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import vdi.server.model.make400JSONString
-import vdi.server.model.make404JSONString
-import vdi.util.JSON
+import vdi.server.middleware.HTTPError400
+import vdi.server.middleware.HTTPError404
 import vdi.util.makeTempDirectory
 import vdi.util.requireValidVDIID
-import java.io.File
+import vdi.util.withTempDirectory
 
 suspend fun PipelineContext<*, ApplicationCall>.handleImportProcessingPost() {
-  val vdiID = call.parameters["vdi-id"]?.let(::requireValidVDIID)
+  val vdiID = call.parameters["vdi-id"]?.let(::requireValidVDIID) ?: throw HTTPError404()
 
-  if (vdiID == null) {
-    call.respond(HttpStatusCode.NotFound, make404JSONString("unrecognized VDI ID"))
-    return
-  }
-
-  var unexpectedFields = false
-
-  var manifestJSON = ""
-  var metaJSON = ""
-  var tempFiles = mutableListOf<File>()
-  val inputDirectory = makeTempDirectory()
-
-  val multipart = call.receiveMultipart()
-
-  multipart.forEachPart { part ->
-    when (part) {
-      is PartData.FormItem -> {
-        when (part.name) {
-          "manifest" -> manifestJSON = part.value
-          "meta"     -> metaJSON = part.value
-        }
-      }
-
-      is PartData.FileItem -> {
-        val name = part.originalFileName ?: part.name!!
-        val file = inputDirectory.resolve(name)
-
-        withContext(Dispatchers.IO) {
-          file.createNewFile()
-        }
-        file.outputStream()
-          .buffered()
-          .use { part.streamProvider().transferTo(it) }
-
-        tempFiles.add(file)
-      }
-
-      else -> {}
+  val partData = call.receiveMultipart()
+    .readPart()
+    .let {
+      if (it == null)
+        throw HTTPError400("no multipart body provided")
+      it
     }
+
+  if (partData.name != "payload")
+    throw HTTPError400("unexpected form param submitted")
+
+  if (partData !is PartData.FileItem)
+    throw HTTPError400("expected form param was not of type file")
+
+  withTempDirectory { tempDir ->
+    val archive = tempDir.resolve("$vdiID.tar.gz")
+
+    withContext(Dispatchers.IO) {
+      // Create the temp file for the archive being posted
+      archive.createNewFile()
+      // transfer the archive contents to the file
+      archive.outputStream().use { partData.streamProvider().transferTo(it) }
+    }
+
+    // TODO: verify the file is actually a tar.gz archive
+
+    processImport(vdiID, tempDir, archive)
   }
-
-  if (manifestJSON.isBlank()) {
-    call.respond(HttpStatusCode.BadRequest, make400JSONString("empty or absent manifest value"))
-    inputDirectory.deleteRecursively()
-    return
-  }
-
-  if (metaJSON.isBlank()) {
-    call.respond(HttpStatusCode.BadRequest, make400JSONString("empty or absent meta value"))
-    inputDirectory.deleteRecursively()
-    return
-  }
-
-  if (tempFiles.isEmpty()) {
-    call.respond(HttpStatusCode.BadRequest, make400JSONString("no dataset files were provided"))
-    inputDirectory.deleteRecursively()
-    return
-  }
-
-  val manifest = JSON.readValue(manifestJSON, Data)
-
 }
+
+// TODO: errors that are recoverable vs errors that are not recoverable...
+//       response codes?  this is an RPC api, so maybe look at what the standard
+//       approach is for this?   Why roll our own when gRPC exists?
