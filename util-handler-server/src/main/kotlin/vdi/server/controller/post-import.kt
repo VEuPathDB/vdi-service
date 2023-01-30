@@ -9,7 +9,6 @@ import kotlinx.coroutines.withContext
 import vdi.server.middleware.HTTPError400
 import vdi.server.middleware.HTTPError404
 import vdi.service.importing.processImport
-import vdi.util.makeTempDirectory
 import vdi.util.requireValidVDIID
 import vdi.util.withTempDirectory
 
