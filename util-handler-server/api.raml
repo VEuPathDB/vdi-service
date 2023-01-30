@@ -29,15 +29,12 @@ description: |
       The output of this endpoint is a tarball containing the processing result
       files that are ready to be imported into the VDI Dataset Store (MinIO at
       the time of this writing)
-      
-      **Note**: The definition of the request body below appears no differently
-      than if it were defining a JSON object to be posted, however, it is
-      instead defining fields that are part of a `multipart/form-data` request.
-      This means that the properties defined as part of the root "object" are
-      actually fields in the multipart request.
     body:
       multipart/form-data:
-        type: DatasetMultipartPostBody
+        type: object
+        additionalProperties: false
+        properties:
+          payload: file
 
     responses:
       200:
@@ -126,8 +123,11 @@ description: |
     post:
 
       body:
-        application/json:
-          type: DatasetMultipartPostBody
+        multipart/form-data:
+          type: object
+          additionalProperties: false
+          properties:
+            payload: file
 
       responses:
 
@@ -241,38 +241,6 @@ types:
       - VEuPathDB
     type: string
     example: PlasmoDB
-
-  DatasetMultipartPostBody:
-    type: object
-    properties:
-      manifest:
-        type: DatasetManifest
-        required: true
-      meta:
-        type: DatasetMeta
-        required: true
-      /^.+$/:
-        type: file
-    minProperties: 3
-
-  DatasetManifest:
-    type: object
-    additionalProperties: false
-    properties:
-      dataFiles:
-        type: DatasetManifestDataFileEntry[]
-        required: true
-
-  DatasetManifestDataFileEntry:
-    type: object
-    additionalProperties: false
-    properties:
-      name:
-        type: string
-        required: true
-      path:
-        type: string
-        required: true
 
   DatasetMeta:
     type: object
