@@ -1,6 +1,6 @@
 package vdi.conf
 
-import vdi.Consts
+import vdi.Const
 
 /**
  * HTTP Server Specific Configuration Options
@@ -13,7 +13,7 @@ data class ServerConfiguration(
   val host: String
 ) {
   constructor(env: Map<String, String> = System.getenv()) : this(
-    port = (env[Consts.ENV_SERVER_PORT] ?: Consts.DEFAULT_SERVER_PORT).toUShort(),
-    host = env[Consts.ENV_SERVER_HOST] ?: Consts.DEFAULT_SERVER_HOST,
+    port = (env[Const.EnvKey.SERVER_PORT] ?: Const.ConfigDefault.SERVER_PORT).toUShort(),
+    host = env[Const.EnvKey.SERVER_HOST] ?: Const.ConfigDefault.SERVER_HOST,
   )
 }

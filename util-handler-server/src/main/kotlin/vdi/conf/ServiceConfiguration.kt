@@ -1,6 +1,6 @@
 package vdi.conf
 
-import vdi.Consts
+import vdi.Const
 import kotlin.time.Duration
 
 /**
@@ -23,14 +23,14 @@ data class ServiceConfiguration(
   val uninstallScriptMaxSeconds: Long,
 ) {
   constructor(env: Map<String, String> = System.getenv()) : this(
-    env[Consts.ENV_IMPORT_SCRIPT_PATH] ?: Consts.DEFAULT_IMPORT_SCRIPT_PATH,
-    (env[Consts.ENV_IMPORT_SCRIPT_MAX_DURATION] ?: Consts.DEFAULT_IMPORT_SCRIPT_MAX_DURATION).toDurSeconds(),
-    env[Consts.ENV_INSTALL_DATA_SCRIPT_PATH] ?: Consts.DEFAULT_DATA_INSTALL_SCRIPT_PATH,
-    (env[Consts.ENV_INSTALL_DATA_SCRIPT_MAX_DURATION] ?: Consts.DEFAULT_INSTALL_DATA_SCRIPT_MAX_DURATION).toDurSeconds(),
-    env[Consts.ENV_INSTALL_META_SCRIPT_PATH] ?: Consts.DEFAULT_META_INSTALL_SCRIPT_PATH,
-    (env[Consts.ENV_INSTALL_META_SCRIPT_MAX_DURATION] ?: Consts.DEFAULT_INSTALL_META_SCRIPT_MAX_DURATION).toDurSeconds(),
-    env[Consts.ENV_UNINSTALL_SCRIPT_PATH] ?: Consts.DEFAULT_UNINSTALL_SCRIPT_PATH,
-    (env[Consts.ENV_UNINSTALL_SCRIPT_MAX_DURATION] ?: Consts.DEFAULT_UNINSTALL_SCRIPT_MAX_DURATION).toDurSeconds()
+    env[Const.EnvKey.IMPORT_SCRIPT_PATH] ?: Const.ConfigDefault.IMPORT_SCRIPT_PATH,
+    (env[Const.EnvKey.IMPORT_SCRIPT_MAX_DURATION] ?: Const.ConfigDefault.IMPORT_SCRIPT_MAX_DURATION).toDurSeconds(),
+    env[Const.EnvKey.INSTALL_DATA_SCRIPT_PATH] ?: Const.ConfigDefault.DATA_INSTALL_SCRIPT_PATH,
+    (env[Const.EnvKey.INSTALL_DATA_SCRIPT_MAX_DURATION] ?: Const.ConfigDefault.INSTALL_DATA_SCRIPT_MAX_DURATION).toDurSeconds(),
+    env[Const.EnvKey.INSTALL_META_SCRIPT_PATH] ?: Const.ConfigDefault.META_INSTALL_SCRIPT_PATH,
+    (env[Const.EnvKey.INSTALL_META_SCRIPT_MAX_DURATION] ?: Const.ConfigDefault.INSTALL_META_SCRIPT_MAX_DURATION).toDurSeconds(),
+    env[Const.EnvKey.UNINSTALL_SCRIPT_PATH] ?: Const.ConfigDefault.UNINSTALL_SCRIPT_PATH,
+    (env[Const.EnvKey.UNINSTALL_SCRIPT_MAX_DURATION] ?: Const.ConfigDefault.UNINSTALL_SCRIPT_MAX_DURATION).toDurSeconds()
   )
 }
 
