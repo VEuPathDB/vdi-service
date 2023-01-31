@@ -6,6 +6,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
 
+/**
+ * Jackson Object Mapper
+ */
 val JSON = JsonMapper.builder()
   .addModule(ParameterNamesModule())
   .addModule(Jdk8Module())
@@ -13,5 +16,8 @@ val JSON = JsonMapper.builder()
   .addModule(KotlinModule.Builder().build())
   .build()
 
+/**
+ * Writes an arbitrary value as a JSON string.
+ */
 @Suppress("NOTHING_TO_INLINE")
 inline fun Any.toJSONString() = JSON.writeValueAsString(this)!!
