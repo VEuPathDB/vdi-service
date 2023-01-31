@@ -25,8 +25,8 @@ fun ApplicationCall.processImport(vdiID: String, parentDir: File, inputArchive: 
   ).apply {
     directory(parentDir)
   }.start()) {
-    inputStream.lines()
-    errorStream.log()
+//    inputStream.lines()
+//    errorStream.log()
 
     if (!waitFor(ServiceConfiguration.importScriptMaxSeconds, TimeUnit.SECONDS)) {
       destroyForcibly()
