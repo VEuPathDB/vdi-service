@@ -3,8 +3,8 @@ FROM veupathdb/alpine-dev-base:jdk-18-gradle-7.5.1 AS build
 WORKDIR /project
 RUN touch settings.gradle.kts
 
-COPY ../_util-handler-server/build.gradle.kts build.gradle.kts
-COPY ../_util-handler-server/src src/
+COPY build.gradle.kts build.gradle.kts
+COPY src src/
 
 RUN gradle test shadowJar
 
