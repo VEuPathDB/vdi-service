@@ -11,6 +11,9 @@ import vdi.service.importing.processImport
 import vdi.util.requireValidVDIID
 import vdi.util.withTempDirectory
 
+/**
+ * Handles Import `POST` Requests
+ */
 suspend fun PipelineContext<*, ApplicationCall>.handlePostImport() {
   val (vdiID, partData) = call.parseBody()
 
