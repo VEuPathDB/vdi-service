@@ -7,9 +7,17 @@ import io.ktor.util.pipeline.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import vdi.server.middleware.HTTPError400
-import vdi.service.importing.processImport
+import vdi.service.imports.processImport
 import vdi.util.requireValidVDIID
 import vdi.util.withTempDirectory
+import java.io.File
+
+data class PostImportRequestContext(
+  val controller:   ApplicationCall,
+  val vdiID:        String,
+  val workspace:    File,
+  val inputArchive: File,
+)
 
 /**
  * Handles Import `POST` Requests

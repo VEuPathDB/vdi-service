@@ -18,6 +18,7 @@ dependencies {
 
   implementation("org.apache.logging.log4j:log4j-core:2.19.0")
   implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
+  implementation("org.apache.logging.log4j:log4j-iostreams:2.19.0")
 
   implementation("io.micrometer:micrometer-registry-prometheus:1.10.3")
 
