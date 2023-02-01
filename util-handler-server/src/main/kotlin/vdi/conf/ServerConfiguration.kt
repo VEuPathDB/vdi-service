@@ -13,7 +13,7 @@ data class ServerConfiguration(
   val host: String
 ) {
   constructor(env: Map<String, String> = System.getenv()) : this(
-    port = (env[Const.EnvKey.SERVER_PORT] ?: Const.ConfigDefault.SERVER_PORT).toUShort(),
-    host = env[Const.EnvKey.SERVER_HOST] ?: Const.ConfigDefault.SERVER_HOST,
+    port = (env[Const.EnvKey.ServerPort] ?: Const.ConfigDefault.ServerPort).toUShort(),
+    host = env[Const.EnvKey.ServerHost] ?: Const.ConfigDefault.ServerHost,
   )
 }

@@ -1,13 +1,16 @@
 package vdi.service.importing
 
+import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.response.*
 import vdi.Const
 import vdi.conf.Configuration.ServiceConfiguration
+import vdi.server.model.makeSimpleErrorJSONString
 import vdi.util.unpackAsTarGZ
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-fun ApplicationCall.processImport(vdiID: String, parentDir: File, inputArchive: File) {
+suspend fun ApplicationCall.processImport(vdiID: String, parentDir: File, inputArchive: File) {
 
   val scriptInputDirectory  = parentDir.resolve("plugin-input")
   val scriptOutputDirectory = parentDir.resolve("plugin-output")
@@ -30,14 +33,15 @@ fun ApplicationCall.processImport(vdiID: String, parentDir: File, inputArchive: 
 
     if (!waitFor(ServiceConfiguration.importScriptMaxSeconds, TimeUnit.SECONDS)) {
       destroyForcibly()
-      TODO("500 import script took too long")
+      respond(HttpStatusCode.InternalServerError, makeSimpleErrorJSONString("import script was forcibly killed due to timeout"))
+      return
     }
 
     when (exitValue()) {
-      Const.ExitCode.IMPORT_SCRIPT_SUCCESS_CODE -> TODO("SUCCESS")
-      Const.ExitCode.IMPORT_SCRIPT_FAIL_VALIDATION_CODE -> TODO("Failed validation")
-      Const.ExitCode.IMPORT_SCRIPT_FAIL_TRANSFORMATION_CODE -> TODO("Failed transformation")
-      else                                              -> TODO("Failed unexpected")
+      Const.ExitCode.ImportScriptSuccess                    -> TODO("SUCCESS")
+      Const.ExitCode.ImportScriptValidationFailure     -> TODO("Failed validation")
+      Const.ExitCode.ImportScriptTransformationFailure -> TODO("Failed transformation")
+      else                                             -> TODO("Failed unexpected")
     }
   }
 }
