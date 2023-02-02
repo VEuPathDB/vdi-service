@@ -56,9 +56,11 @@ object Const {
   }
 
   object FieldName {
+    const val DataFiles = "dataFiles"
     const val Dependencies = "dependencies"
     const val Description = "description"
     const val Details = "details"
+    const val InputFiles = "inputFiles"
     const val Message = "message"
     const val Messages = "messages"
     const val Name = "name"
