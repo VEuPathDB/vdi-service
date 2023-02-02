@@ -17,8 +17,8 @@ suspend fun PipelineContext<*, ApplicationCall>.withExceptionMapping(
     fn()
   } catch (e: Throwable) {
     when (e) {
-      is HTTPError400 -> {
-        log.debug("Thrown 400 exception: ${e.message}", e)
+      is BadRequestException -> {
+        log.debug("Thrown 400 exception.", e)
         call.respondText(
           SimpleErrorResponse(e.message!!).toJSONString(),
           ContentType.Application.Json,
@@ -26,12 +26,30 @@ suspend fun PipelineContext<*, ApplicationCall>.withExceptionMapping(
         )
       }
 
-      is HTTPError404 -> {
-        log.trace("Thrown 404 exception.")
+      is NotFoundException -> {
+        log.debug("Thrown 404 exception.", e)
         call.respondText(
           SimpleErrorResponse(e.message!!).toJSONString(),
           ContentType.Application.Json,
-          HttpStatusCode.NotFound
+          HttpStatusCode.NotFound,
+        )
+      }
+
+      is UnsupportedMediaTypeException -> {
+        log.debug("Thrown 415 exception.", e)
+        call.respondText(
+          SimpleErrorResponse(e.message!!).toJSONString(),
+          ContentType.Application.Json,
+          HttpStatusCode.UnsupportedMediaType,
+        )
+      }
+
+      is InternalServerException -> {
+        log.warn("Thrown 500 exception.", e)
+        call.respondText(
+          SimpleErrorResponse(e.message!!).toJSONString(),
+          ContentType.Application.Json,
+          HttpStatusCode.InternalServerError,
         )
       }
 
@@ -47,5 +65,11 @@ suspend fun PipelineContext<*, ApplicationCall>.withExceptionMapping(
   }
 }
 
-class HTTPError404() : RuntimeException("resource not found")
-class HTTPError400(message: String) : RuntimeException(message)
+// 400
+class BadRequestException(message: String) : RuntimeException(message)
+// 404
+class NotFoundException : RuntimeException("resource not found")
+// 415
+class UnsupportedMediaTypeException(message: String = "unsupported Content-Type") : RuntimeException(message)
+// 500
+class InternalServerException(message: String) : RuntimeException(message)

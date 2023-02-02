@@ -8,6 +8,21 @@ object Const {
     const val ImportScriptTransformationFailure = 2
   }
 
+  object ProcessOpt {
+
+    /**
+     * Maximum number of bytes for the "details" field in the import processing
+     * multipart post body.
+     */
+    const val MaxDetailsFieldBytes = 16384uL
+
+    /**
+     * What we name the payload posted to the handler server with the import
+     * processing multipart post body.
+     */
+    const val ImportPayloadName = "import-payload.tar.gz"
+  }
+
   object ConfigDefault {
     const val ServerPort = "80"
     const val ServerHost = "0.0.0.0"
