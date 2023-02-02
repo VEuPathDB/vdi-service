@@ -1,4 +1,6 @@
 = Example VDI Handler Plugin
+:toc: left
+:toclevels: 3
 :repo-url: https://github.com/VEuPathDB/service-user-datasets
 :handler-server-url: {repo-url}/tree/main/util-handler-server
 
