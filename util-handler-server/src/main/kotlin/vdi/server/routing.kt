@@ -21,27 +21,27 @@ fun Application.configureRouting() {
   routing {
     post("/import") {
       withExceptionMapping {
-        handlePostImport()
+        call.handlePostImport()
       }
     }
 
     route("/install") {
       post("/meta") {
         withExceptionMapping {
-          handlePostInstallMeta()
+          call.handlePostInstallMeta()
         }
       }
 
       post("/data") {
         withExceptionMapping {
-          handlePostInstallData()
+          call.handlePostInstallData()
         }
       }
     }
 
     post("/uninstall") {
       withExceptionMapping {
-        handlePostUninstall()
+        call.handlePostUninstall()
       }
     }
 
