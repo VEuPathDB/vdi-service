@@ -5,7 +5,8 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 import org.slf4j.LoggerFactory
-import vdi.server.model.makeSimpleErrorJSONString
+import vdi.server.model.SimpleErrorResponse
+import vdi.util.toJSONString
 
 private val log = LoggerFactory.getLogger("ExceptionMiddleware")
 
@@ -18,17 +19,29 @@ suspend fun PipelineContext<*, ApplicationCall>.withExceptionMapping(
     when (e) {
       is HTTPError400 -> {
         log.debug("Thrown 400 exception: ${e.message}", e)
-        call.respond(HttpStatusCode.BadRequest, makeSimpleErrorJSONString(e.message!!))
+        call.respondText(
+          SimpleErrorResponse(e.message!!).toJSONString(),
+          ContentType.Application.Json,
+          HttpStatusCode.BadRequest,
+        )
       }
 
       is HTTPError404 -> {
         log.trace("Thrown 404 exception.")
-        call.respond(HttpStatusCode.NotFound, makeSimpleErrorJSONString(e.message!!))
+        call.respondText(
+          SimpleErrorResponse(e.message!!).toJSONString(),
+          ContentType.Application.Json,
+          HttpStatusCode.NotFound
+        )
       }
 
       else -> {
         log.error("Uncaught exception", e)
-        call.respond(HttpStatusCode.InternalServerError, makeSimpleErrorJSONString(e.message!!))
+        call.respondText(
+          SimpleErrorResponse(e.message!!).toJSONString(),
+          ContentType.Application.Json,
+          HttpStatusCode.InternalServerError,
+        )
       }
     }
   }

@@ -39,4 +39,23 @@ object Const {
     const val ServerPort = "SERVER_PORT"
     const val ServerHost = "SERVER_HOST"
   }
+
+  object FieldName {
+    const val Dependencies = "dependencies"
+    const val Description = "description"
+    const val Details = "details"
+    const val Message = "message"
+    const val Messages = "messages"
+    const val Name = "name"
+    const val Owner = "owner"
+    const val Payload = "payload"
+    const val Projects = "projects"
+    const val ResourceIdentifier = "resourceIdentifier"
+    const val ResourceVersion = "resourceVersion"
+    const val ResourceDisplayName = "resourceDisplayName"
+    const val Summary = "summary"
+    const val Type = "type"
+    const val VDIID = "vdiID"
+    const val Version = "version"
+  }
 }
