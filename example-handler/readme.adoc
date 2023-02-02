@@ -1,4 +1,6 @@
 = Example VDI Handler Plugin
+:repo-url: https://github.com/VEuPathDB/service-user-datasets
+:handler-server-url: {repo-url}/tree/main/util-handler-server
 
 This repository defines an example implementation of the VDI Handler Plugin API.
 
@@ -16,9 +18,7 @@ expected to perform its processing, producing one or more output files which
 will be used as the final form of the data to be installed into the target
 VEuPathDB sites.
 
-==== Execution
-
-===== Inputs
+==== Inputs
 
 As inputs the import script will be passed 2 parameters, an input directory path
 and an output directory path.
@@ -35,20 +35,48 @@ deleted.
 
 The output directory path will point to a temp directory that is to be populated
 by the import script.  The output files placed into the output directory will be
-consumed by the <<VDI Handler Server>>.  After the import script has exited, the
-output directory will be deleted.
+consumed by the link:{handler-server-url}[VDI Handler Server].  After the import
+script has exited, the contents of the output directory will be collected, then
+the directory will be deleted.
 
-===== Outputs
+==== Outputs
 
 As output, the script will be expected to write "installable" files to the
 output directory handed to the import script on execution.
 
 After the script execution has been completed, the files the import script
-places in the output directory will be consumed by the <<VDI Handler Server>>
-and will become the VDI dataset bundle that is installed into the target
-VEuPathDB sites.
+places in the output directory will be consumed by the
+link:{handler-server-url}[VDI Handler Server] and will become the VDI dataset
+bundle that is installed into the target VEuPathDB sites.
 
-===== Logging
+===== Reserved File Names
+
+The import script may produce any files it needs, provided they are not named
+with one of the following reserved file names.
+
+`meta.json`:: This file name is reserved for the dataset's metadata file which
+is produced by the link:{handler-server-url}[VDI Handler Server] itself after
+the import script has completed execution.
++
+If the import script _does_ produce a file named `meta.json`, the handler server
+will throw an exception.
+
+`manifest.json`:: This file name is reserved for the dataset's manifest file
+which is produced by the link:{handler-server-url}[VDI Handler Server] itself
+after the import script has completed execution.
++
+If the import script _does_ produce a file named `manifest.json`, the handler
+server will throw an exception.
+
+`warnings.json`:: This file name is reserved for the dataset's validation
+warning messages file which is produced by the
+link:{handler-server-url}[VDI Handler Server] itself after the import script has
+completed execution.
++
+If the import script _does_ produce a file named `warnings.json`, the handler
+server will throw an exception.
+
+==== Logging
 
 The import script is expected to log messages to 2 separate channels with
 specific meaning assigned to each, `STDOUT` and `STDERR`.
@@ -59,14 +87,14 @@ VDI dataset being processed.
 
 `STDERR` is expected to be used to emit general script log output.  All messages
 written to this channel will be passed through to the standard logging of the
-<<VDI Handler Server>>.
+link:{handler-server-url}[VDI Handler Server].
 
-===== Exit Codes
+==== Exit Codes
 
 The import script is expected to conform to the following specification of
 process exit codes.  Each exit code has an assigned meaning and is used to
-determine how the <<VDI Handler Server>> process should proceed after the script
-exits.
+determine how the link:{handler-server-url}[VDI Handler Server] process should
+proceed after the script exits.
 
 .Exit Codes
 [source]
@@ -76,3 +104,9 @@ exits.
 2   - Failure due to transformation errors
 3+  - Failure due to unexpected/undefined error
 ----
+
+=== Metadata Installation Script
+
+=== Dataset Installation Script
+
+=== Dataset Uninstallation Script
