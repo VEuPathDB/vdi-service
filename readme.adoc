@@ -3,5 +3,4 @@
 :toc: preamble
 
 * link:https://veupathdb.github.io/service-user-datasets/vdi-api.html[VDI Service API Doc]
-* link:https://veupathdb.github.io/service-user-datasets/handler-api.html[Handler Service API Doc]
 * link:https://veupathdb.github.io/service-user-datasets/design/1.0/design.html[VDI Service Design Doc]

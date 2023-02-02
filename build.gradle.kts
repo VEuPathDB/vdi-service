@@ -31,7 +31,6 @@ tasks.create("generate-raml-docs") {
   group = "monorepo"
 
   dependsOn(":service-vdi:generate-raml-docs")
-  dependsOn(":util-handler-server:generate-raml-docs")
 
   doLast {
     val docsDir = file("docs")
@@ -40,7 +39,6 @@ tasks.create("generate-raml-docs") {
     val docFiles = arrayOf(
       // Source File                       to Target File
       file("service-vdi/docs/api.html")    to docsDir.resolve("vdi-api.html"),
-      file("util-handler-server/api.html") to docsDir.resolve("handler-api.html"),
     )
 
     for ((source, target) in docFiles) {
