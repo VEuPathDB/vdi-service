@@ -5,6 +5,9 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import vdi.util.toJSONString
 
+suspend inline fun ApplicationCall.respondJSON400(body: Any) =
+  respondJSON(body, StatusBadRequest)
+
 suspend inline fun ApplicationCall.respondJSON418(body: Any) =
   respondJSON(body, StatusValidationError)
 

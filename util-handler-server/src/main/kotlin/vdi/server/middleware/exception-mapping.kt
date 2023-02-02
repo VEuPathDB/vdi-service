@@ -66,10 +66,16 @@ suspend fun PipelineContext<*, ApplicationCall>.withExceptionMapping(
 }
 
 // 400
-class BadRequestException(message: String) : RuntimeException(message)
+class BadRequestException : RuntimeException {
+  constructor(message: String) : super(message)
+  constructor(cause: Throwable) : super(cause)
+}
+
 // 404
 class NotFoundException : RuntimeException("resource not found")
+
 // 415
 class UnsupportedMediaTypeException(message: String = "unsupported Content-Type") : RuntimeException(message)
+
 // 500
 class InternalServerException(message: String) : RuntimeException(message)
