@@ -46,4 +46,6 @@ pluginManagement {
 
 rootProject.name = "vdi"
 
-include("service-vdi")
+include(":service")
+include(":service:components:plugin-handler-client")
+project(":service:components:plugin-handler-client").name = "plugin-handler-client"
