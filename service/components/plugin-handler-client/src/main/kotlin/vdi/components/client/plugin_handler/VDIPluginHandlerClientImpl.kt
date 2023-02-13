@@ -191,7 +191,35 @@ internal class VDIPluginHandlerClientImpl(
   override fun sendUninstallRequest(details: UninstallRequest): UninstallResponse {
     log.trace("sendUninstallRequest(details={})", details)
 
-    TODO("Not yet implemented")
+    log.debug("sending POST request to vdi-plugin-server {}", EP.Uninstall)
+    val response = httpClient.send(
+      HttpRequest.newBuilder(pluginHandlerURI.resolve(EP.Uninstall))
+        .header(Header.ContentType, ContentType.JSON)
+        .POST(HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(details)))
+        .build(),
+      HttpResponse.BodyHandlers.ofString(),
+    )
+    log.debug("vdi-plugin-server {} responded with status code {}", EP.Uninstall, response.statusCode())
+
+    return when (response.statusCode()) {
+      204  -> UninstallResponseNoContent
+      400  -> response.parseUninstallResponseWithMessage()
+      500  -> response.parseUninstallResponseWithMessage()
+      else -> throw IllegalStateException("unexpected response code from vdi-plugin-server ${EP.Uninstall} endpoint")
+    }
+  }
+
+  private fun HttpResponse<String>.parseUninstallResponseWithMessage(): UninstallResponse {
+    log.trace("parseUninstallResponseWithMessage(this={})", this)
+    requireContentType(ContentType.JSON, EP.Uninstall)
+    return UninstallResponseWithMessage(
+      when (statusCode()) {
+        400  -> UninstallResponseType.BadRequest
+        500  -> UninstallResponseType.ServerError
+        else -> throw IllegalStateException("how did this happen to me")
+      },
+      JSON.readTree(body()).requireMessageObject(EP.Uninstall)
+    )
   }
 
   private fun JsonNode.requireWarningsObject(ep: String): Collection<String> {

@@ -2,7 +2,7 @@ package vdi.components.client.plugin_handler.model
 
 
 sealed interface UninstallResponse {
-  val type: UninstallRequest
+  val type: UninstallResponseType
 
   val hasMessage: Boolean
 
@@ -16,13 +16,19 @@ enum class UninstallResponseType {
 }
 
 internal object UninstallResponseNoContent : UninstallResponse {
-  override val type: UninstallRequest
-    get() = TODO("Not yet implemented")
-  override val hasMessage: Boolean
-    get() = TODO("Not yet implemented")
-
-  override fun getMessage(): String {
-    TODO("Not yet implemented")
-  }
-
+  override val type = UninstallResponseType.Success
+  override val hasMessage = false
+  override fun getMessage(): String = throw noMessageError()
 }
+
+internal class UninstallResponseWithMessage(
+  override val type: UninstallResponseType,
+  private val msg: String,
+) : UninstallResponse {
+  override val hasMessage = msg.isNotBlank()
+  override fun getMessage(): String = if (hasMessage) msg else throw noMessageError()
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun noMessageError() =
+  IllegalStateException("called getMessage() on an UninstallResponse that has no message")
