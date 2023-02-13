@@ -189,6 +189,8 @@ internal class VDIPluginHandlerClientImpl(
 
 
   override fun sendUninstallRequest(details: UninstallRequest): UninstallResponse {
+    log.trace("sendUninstallRequest(details={})", details)
+
     TODO("Not yet implemented")
   }
 
