@@ -1,0 +1,8 @@
+version: "3.5"
+
+services:
+  queue-postgres:
+    image: postgres:15.2-alpine3.17
+    environment:
+      POSTGRES_USER: ${QUEUE_DB_USERNAME:?}
+      POSTGRES_PASSWORD: ${QUEUE_DB_PASSWORD:?}

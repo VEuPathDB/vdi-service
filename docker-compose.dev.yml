@@ -1,0 +1,61 @@
+version: "3.5"
+
+networks:
+  monitoring-ext:
+
+services:
+  minio-external:
+    image: minio/minio
+    depends_on:
+    - global-rabbit
+    links:
+    - global-rabbit
+    ports:
+    - "9000:9000"
+    - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_TOKEN:?}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:?}
+
+      MINIO_NOTIFY_AMQP_ENABLE_RABBIT: on
+      MINIO_NOTIFY_AMQP_URL_RABBIT: amqp://${GLOBAL_RABBIT_USERNAME:?}:${GLOBAL_RABBIT_PASSWORD:?}@${GLOBAL_RABBIT_HOST:?}:${GLOBAL_RABBIT_PORT:?}
+      MINIO_NOTIFY_AMQP_EXCHANGE_RABBIT: minio
+      MINIO_NOTIFY_AMQP_EXCHANGE_TYPE_RABBIT: direct
+      MINIO_NOTIFY_AMQP_DURABLE_RABBIT: on
+    entrypoint: >
+      /bin/sh -c "
+      microdnf install nc;
+      while ! nc -zv ${GLOBAL_RABBIT_HOST:?} ${GLOBAL_RABBIT_PORT}; do sleep 3; done;
+      minio server --console-address ':9001' /data;
+      "
+
+  minio-create-buckets:
+    image: minio/mc
+    depends_on:
+    - minio-external
+    entrypoint: >
+      /bin/sh -c "
+      microdnf install nc;
+      while ! nc -zv minio-external 9000; do sleep 3; done;
+      mc alias set minioc http://minio-external:9000 ${S3_ACCESS_TOKEN:?} ${S3_SECRET_KEY:?};
+      mc mb minioc/${S3_UPLOAD_BUCKET:?};
+      mc policy set public minioc/${S3_UPLOAD_BUCKET:?};
+      mc event add minioc/${S3_UPLOAD_BUCKET:?} arn:minio:sqs::RABBIT:amqp --event put,delete;
+      exit 0;
+      "
+
+  global-rabbit:
+    image: rabbitmq:3.11.9-management-alpine
+    ports:
+    - "5672:5672"
+    - "9003:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${GLOBAL_RABBIT_USERNAME:?}
+      RABBITMQ_DEFAULT_PASS: ${GLOBAL_RABBIT_PASSWORD:?}
+    healthcheck:
+      test: [ CMD, curl, -f, http://localhost:15672 ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+#  rabbit-internal:
