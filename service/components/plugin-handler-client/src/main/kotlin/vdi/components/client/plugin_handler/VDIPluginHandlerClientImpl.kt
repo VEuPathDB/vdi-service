@@ -264,8 +264,9 @@ internal class VDIPluginHandlerClientImpl(
     val contentType: String = headers()
       .firstValue(Header.ContentType)
       .orElseThrow { IllegalStateException("response from vdi-plugin-server $ep contained no Content-Type header") }
+      .split(';')[0]
 
-    if (contentType != "application/json")
+    if (contentType != ct)
       throw IllegalStateException("response from vdi-plugin-server $ep was of an unexpected Content-Type (expected $ct, got $contentType)")
   }
 }
