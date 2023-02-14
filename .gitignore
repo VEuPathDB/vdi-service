@@ -19,7 +19,7 @@ local.properties
 
 !gradle-wrapper.jar
 /run.sh
-*.env
+.env
 
 .classpath
 .project
