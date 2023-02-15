@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":service:components:json"))
+  implementation(project(":components:json"))
 
   implementation("org.slf4j:slf4j-api:1.7.36")
   implementation("io.foxcapades.lib:k-multipart:1.2.0")
