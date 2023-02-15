@@ -47,8 +47,7 @@ services:
   global-rabbit:
     image: rabbitmq:3.11.9-management-alpine
     ports:
-    - "5672:5672"
-    - "9003:15672"
+    - "9002:15672"
     environment:
       RABBITMQ_DEFAULT_USER: ${GLOBAL_RABBIT_USERNAME:?}
       RABBITMQ_DEFAULT_PASS: ${GLOBAL_RABBIT_PASSWORD:?}
@@ -58,4 +57,16 @@ services:
       timeout: 10s
       retries: 5
 
-#  rabbit-internal:
+  queue-postgres:
+    ports:
+    - "5432:5432"
+
+  queue-rabbit:
+    ports:
+    - "9003:15672"
+
+  vdi-service:
+    build:
+      context: service
+    ports:
+    - "8080:${VDI_SERVICE_HTTP_PORT:-80}"
