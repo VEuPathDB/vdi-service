@@ -5,8 +5,6 @@ allprojects {
 }
 
 tasks.create("compile-design-doc") {
-  group = "monorepo"
-
   doLast {
     val command = arrayOf(
       "asciidoctor",
@@ -19,8 +17,8 @@ tasks.create("compile-design-doc") {
     println(command.joinToString(" "))
 
     with(ProcessBuilder(*command).start()) {
+      errorStream.bufferedReader().use { it.lines().forEach(::println) }
       if (waitFor() != 0) {
-        errorStream.bufferedReader().use { it.lines().forEach(::println) }
         throw RuntimeException("ASCIIDoctor command execution failed.")
       }
     }
@@ -28,9 +26,7 @@ tasks.create("compile-design-doc") {
 }
 
 tasks.create("generate-raml-docs") {
-  group = "monorepo"
-
-  dependsOn(":service-vdi:generate-raml-docs")
+  dependsOn(":service:generate-raml-docs")
 
   doLast {
     val docsDir = file("docs")
