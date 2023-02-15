@@ -67,6 +67,6 @@ services:
 
   vdi-service:
     build:
-      context: service
+      context: .
     ports:
     - "8080:${VDI_SERVICE_HTTP_PORT:-80}"

@@ -4,15 +4,12 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-FROM veupathdb/alpine-dev-base:jdk-18-gradle-7.5.1 AS prep
+FROM veupathdb/alpine-dev-base:jdk-18-gradle-7.6 AS prep
 
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
 
 WORKDIR /workspace
-
-RUN apk add --no-cache git npm \
-    && git config --global advice.detachedHead false
 
 COPY settings.gradle.kts settings.gradle.kts
 COPY build.gradle.kts build.gradle.kts
@@ -28,7 +25,7 @@ RUN gradle --no-daemon test shadowJar
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-FROM amazoncorretto:18-alpine3.16
+FROM amazoncorretto:19-alpine3.17
 
 RUN apk add --no-cache tzdata \
     && cp /usr/share/zoneinfo/America/New_York /etc/localtime \
@@ -37,6 +34,6 @@ RUN apk add --no-cache tzdata \
 ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
     JVM_ARGS=""
 
-COPY --from=prep /workspace/build/libs/service.jar /service.jar
+COPY --from=prep /workspace/service/build/libs/service.jar /service.jar
 
 CMD java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /service.jar
