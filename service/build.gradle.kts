@@ -85,6 +85,10 @@ dependencies {
 
   // Core lib
   implementation("org.veupathdb.lib:jaxrs-container-core:6.13.0")
+  implementation("org.veupathdb.lib:ldap-utils:1.0.0")
+
+  implementation("com.zaxxer:HikariCP:5.0.1")
+  implementation("com.oracle.database.jdbc:ojdbc8:21.1.0.0")
 
   // Jersey
   implementation("org.glassfish.jersey.core:jersey-server:3.1.0")
@@ -94,8 +98,9 @@ dependencies {
   implementation("com.fasterxml.jackson.core:jackson-annotations:2.14.0")
 
   // Log4J
-  implementation("org.apache.logging.log4j:log4j-api:2.19.0")
+  implementation("org.slf4j:slf4j-api:1.7.36")
   implementation("org.apache.logging.log4j:log4j-core:2.19.0")
+  implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
 
   // Metrics (can remove if not adding custom service metrics over those provided by container core)
   implementation("io.prometheus:simpleclient:0.16.0")

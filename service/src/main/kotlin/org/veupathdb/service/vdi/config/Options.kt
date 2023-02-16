@@ -1,6 +1,7 @@
 package org.veupathdb.service.vdi.config
 
 import org.veupathdb.lib.container.jaxrs.config.Options
+import org.veupathdb.lib.ldap.LDAPHost
 
 object Options : Options() {
 
@@ -9,7 +10,8 @@ object Options : Options() {
   }
 
   object LDAP {
-    val ldapServers = requireEnv("LDAP_SERVERS").split(',')
+    val ldapServers = requireEnv("LDAP_SERVERS").split(',').map(LDAPHost.Companion::ofString)
+    val oracleBaseDN = requireEnv("ORACLE_BASE_DN")
   }
 
   object Auth {

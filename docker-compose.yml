@@ -33,7 +33,9 @@ services:
 
       AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:?}
 
-      LDAP_SERVERS: ${LDAP_SERVERS:?}
+      LDAP_SERVER: ${LDAP_SERVER:?}
+
+      ORACLE_BASE_DN: ${ORACLE_BASE_DN:?}
 
       # Connection details for the global RabbitMQ instance.
       GLOBAL_RABBIT_USERNAME: ${GLOBAL_RABBIT_USERNAME:?}
