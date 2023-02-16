@@ -454,7 +454,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_dataset_store">Dataset Store</a></li>
 <li><a href="#_vdi_service">VDI Service</a>
 <ul class="sectlevel2">
-<li><a href="#_configuration">Configuration</a></li>
 <li><a href="#_api_actions">API Actions</a></li>
 <li><a href="#_internal_actions">Internal Actions</a></li>
 <li><a href="#_old_actions">[OLD] Actions</a></li>
@@ -565,383 +564,6 @@ acted on to process changes to, installations of, or deletions of datasets.</p>
 <div class="sect1">
 <h2 id="_vdi_service">VDI Service</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_configuration">Configuration</h3>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p><strong>TODO</strong>: Describe how the service is configured via a mounted JSON configuration
-file containing the structured secrets and config options for the service.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<details>
-<summary class="title">Configuration Schema</summary>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "title": "VDI Core Service Config Schema",
-  "$schema": "https://json-schema.org/draft-07/schema",
-
-  "definitions": {
-
-    "port": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 65535
-    },
-
-    "queueSettings": {
-      "type": "object",
-      "properties": {
-        "host": {
-          "description": "Hostname of the RabbitMQ instance.",
-          "type": "string",
-          "format": "hostname"
-        },
-        "port": {
-          "description": "Port to use when connecting to RabbitMQ.",
-          "$ref": "#/definitions/port",
-          "default": 5672
-        },
-        "user": {
-          "description": "RabbitMQ username.",
-          "type": [ "string", "null" ],
-          "default": null
-        },
-        "pass": {
-          "description": "RabbitMQ password.",
-          "type": [ "string", "null" ],
-          "default": null
-        },
-        "queue": {
-          "description": "RabbitMQ queue name.",
-          "type": "string"
-        }
-      },
-      "required": [
-        "host",
-        "queue"
-      ]
-    },
-
-    "postgresDatabase": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "host": {
-          "type": "string",
-          "format": "hostname"
-        },
-        "port": {
-          "$ref": "#/definitions/port",
-          "default": 5432
-        },
-        "database": {
-          "type": "string"
-        },
-        "user": {
-          "type": "string"
-        },
-        "pass": {
-          "type": "string"
-        },
-        "poolSize": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 20,
-          "default": 5
-        }
-      },
-      "required": [
-        "host",
-        "database",
-        "user",
-        "pass"
-      ]
-    },
-
-    "applicationDatabase": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "ldap": {
-          "description": "LDAP query to use to retrieve the connection details for the target database.",
-          "type": "string"
-        },
-        "user": {
-          "description": "Database connection username",
-          "type": "string"
-        },
-        "pass": {
-          "description": "Database connection password",
-          "type": "string"
-        }
-      },
-      "required": [
-        "ldap",
-        "user",
-        "pass"
-      ]
-    }
-  },
-
-  "type": "object",
-
-  "properties": {
-
-    "web-server": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "port": {
-          "$ref": "#/definitions/port",
-          "default": 80
-        },
-        "enable-trace-headers": {
-          "type": "boolean",
-          "default": false
-        }
-      }
-    },
-
-    "service": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "enable-email-sending": {
-          "type": "boolean"
-        },
-
-        "support-email-address": {
-          "type": "string",
-          "format": "email"
-        },
-
-        "workers": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "import-event-handler-count": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 20
-            },
-            "datastore-event-handler-count": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 20
-            },
-            "action-event-handler-count": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 20
-            }
-          },
-          "required": [
-            "import-event-handler-count",
-            "datastore-event-handler-count",
-            "action-event-handler-count"
-          ]
-        }
-      },
-      "required": [
-        "enable-email-sending",
-        "support-email-address",
-        "workers"
-      ]
-    },
-
-
-    "connections": {
-      "type": "object",
-      "properties": {
-        "ldap": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "servers": {
-              "type": "array",
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "type": "string"
-              }
-            },
-            "base-dn": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "servers",
-            "base-dn"
-          ]
-        },
-
-        "handler": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "host": {
-              "type": "string",
-              "format": "hostname"
-            },
-            "port": {
-              "$ref": "#/definitions/port",
-              "default": 80
-            }
-          },
-          "required": [
-            "host"
-          ]
-        },
-
-        "smtp": {
-          "type": "object",
-          "properties": {
-            "host": {
-              "type": "string",
-              "format": "hostname"
-            },
-            "port": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 65535,
-              "default": 25
-            }
-          },
-          "required": [
-            "host"
-          ]
-        },
-
-        "queues": {
-          "type": "object",
-          "properties": {
-            "datastore": { "$ref": "#/definitions/queueSettings" },
-            "import": { "$ref": "#/definitions/queueSettings" },
-            "action": { "$ref": "#/definitions/queueSettings" }
-          },
-          "required": [
-            "datastore",
-            "import",
-            "action"
-          ]
-        },
-        "postgres": { "$ref": "#/definitions/postgresDatabase" },
-        "application-databases": {
-          "type": "object",
-          "additionalProperties": { "$ref": "#/definitions/applicationDatabase" },
-          "minProperties": 1
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "handler",
-        "smtp",
-        "queues",
-        "postgres",
-        "application-databases"
-      ]
-    }
-  },
-  "additionalProperties": false,
-  "required": [
-    "connections",
-    "web-server",
-    "service"
-  ]
-}</code></pre>
-</div>
-</div>
-</div>
-</details>
-<details>
-<summary class="title">Configuration Example</summary>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">web-server:
-  port: 80
-  enable-trace-headers: false
-
-service:
-  enable-email-sending: false
-  support-email-address: someone@veupathdb.org
-  workers:
-    import-event-handler-count: 5
-    datastore-event-handler-count: 5
-    action-event-handler-count: 5
-
-connections:
-  ldap:
-    servers:
-    - ldap1.somesite.com:389
-    - ldap2.somesite.com:389
-    base-dn: ""
-
-  handler:
-    host: handler.server
-    port: 80
-
-  smtp:
-    host: some.smtp.host
-    port: 25
-
-  queues:
-    datastore:
-      host: some.rabbit.host
-      port: 5672
-      user: someuser
-      pass: somepass
-      queue: some-queue-name
-    import:
-      host: some.rabbit.host
-      port: 5672
-      user: someuser
-      pass: somepass
-      queue: some-queue-name
-    action:
-      host: some.rabbit.host
-      port: 5672
-      user: someuser
-      pass: somepass
-      queue: some-queue-name
-
-  postgres:
-    user: someuser
-    pass: somepass
-    host: somehost
-    port: 5432
-    database: postgres
-    poolSize: 5
-
-  application-databases:
-    PlasmoDB:
-      ldap: ""
-      user: someusername
-      pass: somepassword
-    ToxoDB:
-      ldap: ""
-      user: someusername
-      pass: somepassword
-    VectorBase:
-      ldap: ""
-      user: someuser
-      pass: somepass</code></pre>
-</div>
-</div>
-</div>
-</details>
-</div>
 <div class="sect2">
 <h3 id="_api_actions">API Actions</h3>
 <div class="paragraph">
@@ -2540,151 +2162,7 @@ datasets.  While this database should not be wiped, it needs to be constructable
 from the state of the Dataset Store.</p>
 </div>
 <div class="sect3">
-<h4 id="_sync_control"><code>sync_control</code></h4>
-<div class="paragraph">
-<p>This table indicates the last modified timestamp for the various components that
-comprise a user dataset.</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 10%;">
-<col style="width: 70%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Column</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Comment</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>shares_update_time</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TIMESTAMPTZ</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp of the most recent last_modified date from the user dataset share
-  files.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data_update_time</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TIMESTAMPTZ</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp of the most recent last_modified date from the user dataset data
-  files.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>meta_update_time</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TIMESTAMPTZ</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp of the meta.json last_modified date for the user dataset.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_owner_share"><code>owner_share</code></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 10%;">
-<col style="width: 70%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Column</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Comment</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>shared_with</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BIGINT</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">User ID of the user the dataset was shared with</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>enum</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Current status of the share<br>
-One of "granted" | "revoked"</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_recipient_share"><code>recipient_share</code></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 10%;">
-<col style="width: 70%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Column</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Comment</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>shared_with</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BIGINT</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">User ID of the user the dataset was shared with</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>enum</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Current status of the share receipt.<br>
-One of "accepted" | "rejected"</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_user_dataset_control"><code>user_dataset_control</code></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 10%;">
-<col style="width: 70%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Column</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Comment</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>upload_status</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>enum</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"awaiting-import", "importing", "imported", "failed"</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_user_datasets"><code>user_datasets</code></h4>
+<h4 id="_vdi_datasets"><code>vdi.datasets</code></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -2731,67 +2209,23 @@ One of "accepted" | "rejected"</p></td>
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>What is the <code>status</code> field?</p>
 </div>
-<div class="sect3">
-<h4 id="_user_dataset_files"><code>user_dataset_files</code></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 10%;">
-<col style="width: 70%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Column</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Comment</th>
+</td>
 </tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>file_name</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VARCHAR</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_user_dataset_projects"><code>user_dataset_projects</code></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 10%;">
-<col style="width: 70%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Column</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Comment</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>project_id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VARCHAR</code></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="sect3">
-<h4 id="_user_dataset_metadata"><code>user_dataset_metadata</code></h4>
+<h4 id="_vdi_dataset_metadata"><code>vdi.dataset_metadata</code></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -2829,6 +2263,208 @@ One of "accepted" | "rejected"</p></td>
 </tbody>
 </table>
 </div>
+<div class="sect3">
+<h4 id="_vdi_sync_control"><code>vdi.sync_control</code></h4>
+<div class="paragraph">
+<p>This table indicates the last modified timestamp for the various components that
+comprise a user dataset.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 70%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Column</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>shares_update_time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TIMESTAMPTZ</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp of the most recent last_modified date from the user dataset share
+  files.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data_update_time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TIMESTAMPTZ</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp of the most recent last_modified date from the user dataset data
+  files.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>meta_update_time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TIMESTAMPTZ</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp of the meta.json last_modified date for the user dataset.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_vdi_owner_share"><code>vdi.owner_share</code></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 70%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Column</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>shared_with</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BIGINT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User ID of the user the dataset was shared with</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>enum</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Current status of the share<br>
+One of "grant" | "revoke"</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_vdi_recipient_share"><code>vdi.recipient_share</code></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 70%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Column</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>shared_with</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BIGINT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User ID of the user the dataset was shared with</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>enum</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Current status of the share receipt.<br>
+One of "accept" | "reject"</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_vdi_dataset_control"><code>vdi.dataset_control</code></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 70%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Column</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>upload_status</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>enum</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"awaiting-import", "importing", "imported", "failed"</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_vdi_dataset_files"><code>vdi.dataset_files</code></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 70%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Column</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>file_name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VARCHAR</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_vdi_dataset_projects"><code>vdi.dataset_projects</code></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 70%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Column</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dataset_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHAR(32)</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>project_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VARCHAR</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_application_database">Application Database</h3>
@@ -2857,7 +2493,7 @@ One of "accepted" | "rejected"</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_user_datasets_2"><code>user_datasets</code></h4>
+<h4 id="_user_datasets"><code>user_datasets</code></h4>
 <div class="admonitionblock important">
 <table>
 <tr>
@@ -3033,7 +2669,7 @@ One of "accepted" | "rejected"</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_user_dataset_projects_2"><code>user_dataset_projects</code></h4>
+<h4 id="_user_dataset_projects"><code>user_dataset_projects</code></h4>
 <div class="admonitionblock important">
 <table>
 <tr>
@@ -3093,7 +2729,7 @@ One of "accepted" | "rejected"</p></td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-01-26 11:43:51 -0500
+Last updated 2023-02-16 10:55:08 -0500
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

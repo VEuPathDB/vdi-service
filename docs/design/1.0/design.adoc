@@ -46,33 +46,6 @@ Dataset Store = Minio
 
 == VDI Service
 
-=== Configuration
-
-[IMPORTANT]
-====
-*TODO*: Describe how the service is configured via a mounted JSON configuration
-file containing the structured secrets and config options for the service.
-====
-
-.Configuration Schema
-[%collapsible]
-====
-[source, json]
-----
-include::../../../includes/vdi-service-config.schema.json[]
-----
-====
-
-
-.Configuration Example
-[%collapsible]
-====
-[source, yaml]
-----
-include::../../../includes/vdi-service-config.example.yml[]
-----
-====
-
 === API Actions
 
 Service actions that are exposed through and executed via the HTTP API.
@@ -814,98 +787,7 @@ from the state of the Dataset Store.
 
 
 // ////////////////////////////////////////////////////////////////////////// //
-==== `sync_control`
-
-This table indicates the last modified timestamp for the various components that
-comprise a user dataset.
-
-[%header, cols="2m,1m,7"]
-|===
-| Column | Type | Comment
-
-| dataset_id
-| CHAR(32)
-|
-
-| shares_update_time
-| TIMESTAMPTZ
-| Timestamp of the most recent last_modified date from the user dataset share
-  files.
-
-| data_update_time
-| TIMESTAMPTZ
-| Timestamp of the most recent last_modified date from the user dataset data
-  files.
-
-| meta_update_time
-| TIMESTAMPTZ
-| Timestamp of the meta.json last_modified date for the user dataset.
-|===
-
-
-// ////////////////////////////////////////////////////////////////////////// //
-==== `owner_share`
-
-[%header, cols="2m,1m,7"]
-|===
-| Column | Type | Comment
-
-| dataset_id
-| CHAR(32)
-|
-
-| shared_with
-| BIGINT
-| User ID of the user the dataset was shared with
-
-| status
-| enum
-| Current status of the share +
-One of "granted" \| "revoked"
-|===
-
-
-// ////////////////////////////////////////////////////////////////////////// //
-==== `recipient_share`
-
-[%header, cols="2m,1m,7"]
-|===
-| Column | Type | Comment
-
-| dataset_id
-| CHAR(32)
-|
-
-| shared_with
-| BIGINT
-| User ID of the user the dataset was shared with
-
-| status
-| enum
-| Current status of the share receipt. +
-One of "accepted" \| "rejected"
-|===
-
-
-// ////////////////////////////////////////////////////////////////////////// //
-==== `user_dataset_control`
-
-[%header, cols="2m,1m,7"]
-|===
-| Column | Type | Comment
-
-| dataset_id
-| CHAR(32)
-|
-
-| upload_status
-| enum
-| "awaiting-import", "importing", "imported", "failed"
-|===
-
-
-// ////////////////////////////////////////////////////////////////////////// //
-==== `user_datasets`
+==== `vdi.datasets`
 
 [%header, cols="2m,1m,7"]
 |===
@@ -937,43 +819,14 @@ One of "accepted" \| "rejected"
 
 |===
 
-
-// ////////////////////////////////////////////////////////////////////////// //
-==== `user_dataset_files`
-
-[%header, cols="2m,1m,7"]
-|===
-| Column | Type | Comment
-
-| dataset_id
-| CHAR(32)
-|
-
-| file_name
-| VARCHAR
-|
-|===
+[IMPORTANT]
+--
+What is the `status` field?
+--
 
 
 // ////////////////////////////////////////////////////////////////////////// //
-==== `user_dataset_projects`
-
-[%header, cols="2m,1m,7"]
-|===
-| Column | Type | Comment
-
-| dataset_id
-| CHAR(32)
-|
-
-| project_id
-| VARCHAR
-|
-|===
-
-
-// ////////////////////////////////////////////////////////////////////////// //
-==== `user_dataset_metadata`
+==== `vdi.dataset_metadata`
 
 [%header, cols="2m,1m,7"]
 |===
@@ -992,6 +845,132 @@ One of "accepted" \| "rejected"
 |
 
 | description
+| VARCHAR
+|
+|===
+
+
+// ////////////////////////////////////////////////////////////////////////// //
+==== `vdi.sync_control`
+
+This table indicates the last modified timestamp for the various components that
+comprise a user dataset.
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| dataset_id
+| CHAR(32)
+|
+
+| shares_update_time
+| TIMESTAMPTZ
+| Timestamp of the most recent last_modified date from the user dataset share
+  files.
+
+| data_update_time
+| TIMESTAMPTZ
+| Timestamp of the most recent last_modified date from the user dataset data
+  files.
+
+| meta_update_time
+| TIMESTAMPTZ
+| Timestamp of the meta.json last_modified date for the user dataset.
+|===
+
+
+// ////////////////////////////////////////////////////////////////////////// //
+==== `vdi.owner_share`
+
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| dataset_id
+| CHAR(32)
+|
+
+| shared_with
+| BIGINT
+| User ID of the user the dataset was shared with
+
+| status
+| enum
+| Current status of the share +
+One of "grant" \| "revoke"
+|===
+
+
+// ////////////////////////////////////////////////////////////////////////// //
+==== `vdi.recipient_share`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| dataset_id
+| CHAR(32)
+|
+
+| shared_with
+| BIGINT
+| User ID of the user the dataset was shared with
+
+| status
+| enum
+| Current status of the share receipt. +
+One of "accept" \| "reject"
+|===
+
+
+// ////////////////////////////////////////////////////////////////////////// //
+==== `vdi.dataset_control`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| dataset_id
+| CHAR(32)
+|
+
+| upload_status
+| enum
+| "awaiting-import", "importing", "imported", "failed"
+|===
+
+
+// ////////////////////////////////////////////////////////////////////////// //
+==== `vdi.dataset_files`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| dataset_id
+| CHAR(32)
+|
+
+| file_name
+| VARCHAR
+|
+|===
+
+
+// ////////////////////////////////////////////////////////////////////////// //
+==== `vdi.dataset_projects`
+
+[%header, cols="2m,1m,7"]
+|===
+| Column | Type | Comment
+
+| dataset_id
+| CHAR(32)
+|
+
+| project_id
 | VARCHAR
 |
 |===
