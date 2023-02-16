@@ -813,16 +813,7 @@ from the state of the Dataset Store.
 | BOOLEAN
 |
 
-| status
-|
-| ???
-
 |===
-
-[IMPORTANT]
---
-What is the `status` field?
---
 
 
 // ////////////////////////////////////////////////////////////////////////// //
