@@ -31,6 +31,10 @@ services:
     environment:
       HTTP_SERVER_PORT: ${VDI_SERVICE_HTTP_PORT:-80}
 
+      AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:?}
+
+      LDAP_SERVERS: ${LDAP_SERVERS:?}
+
       # Connection details for the global RabbitMQ instance.
       GLOBAL_RABBIT_USERNAME: ${GLOBAL_RABBIT_USERNAME:?}
       GLOBAL_RABBIT_PASSWORD: ${GLOBAL_RABBIT_PASSWORD:?}
@@ -57,6 +61,8 @@ services:
       QUEUE_DB_PASSWORD: ${QUEUE_DB_PASSWORD:?}
       QUEUE_DB_HOST: ${QUEUE_DB_HOST:?}
       QUEUE_DB_PORT: ${QUEUE_DB_PORT:?}
+      QUEUE_DB_NAME: ${QUEUE_DB_NAME:?}
+      QUEUE_DB_POOL_SIZE: ${QUEUE_DB_POOL_SIZE:-5}
 
       # Account DB connection details
       ACCT_DB_TNS_NAME: ${ACCT_DB_TNS_NAME:?}
