@@ -22,7 +22,10 @@ fun initDatabaseConnections(ldap: LDAP): Array<Dependency> {
       } }
       .let { HikariDataSource(it) }
 
-    out.add(DatabaseDependency(db.name, ld.host, ld.port.toInt(), ds))
+    val dd = DatabaseDependency(db.name, ld.host, ld.port.toInt(), ds)
+    dd.setTestQuery("SELECT 1 FROM dual")
+
+    out.add(dd)
 
     AppDatabases[db.name] = ds
   }

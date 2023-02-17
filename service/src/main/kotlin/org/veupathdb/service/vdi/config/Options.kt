@@ -10,7 +10,7 @@ object Options : Options() {
   }
 
   object LDAP {
-    val ldapServers = requireEnv("LDAP_SERVERS").split(',').map(LDAPHost.Companion::ofString)
+    val ldapServers = requireEnv("LDAP_SERVER").split(',').map(LDAPHost.Companion::ofString)
     val oracleBaseDN = requireEnv("ORACLE_BASE_DN")
   }
 

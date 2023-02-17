@@ -731,6 +731,28 @@ from the queue and the following will be executed.
 
 Notes and thoughts to be folded into the design doc above once resolved.
 
+=== S3 Structure
+
+[source, file-tree]
+----
+bucket/
+  |- {user-id}/
+  |   |- {dataset-id}/
+  |   |   |- uploaded/
+  |   |   |   |- user-upload.tar.gz
+  |   |   |- imported/
+  |   |   |   |- data/
+  |   |   |   |   |- data1.csv
+  |   |   |   |   |- data2.csv
+  |   |   |   |- share/
+  |   |   |   |   |- {recipient-id}/
+  |   |   |   |   |   |- owner-state.json
+  |   |   |   |   |   |- recipient-state.json
+  |   |   |   |- manifest.json
+  |   |   |   |- meta.json
+  |   |   |   |- deleted
+----
+
 === Statuses
 
 What different statuses are there?::

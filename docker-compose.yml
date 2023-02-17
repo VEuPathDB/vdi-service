@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${QUEUE_DB_USERNAME:?}
       POSTGRES_PASSWORD: ${QUEUE_DB_PASSWORD:?}
     healthcheck:
-      test: "pg_isready -U postgres"
+      test: "pg_isready -U ${QUEUE_DB_USERNAME:?}"
       interval: 30s
       timeout: 10s
       retries: 5
@@ -29,7 +29,7 @@ services:
     - queue-postgres
     - queue-rabbit
     environment:
-      HTTP_SERVER_PORT: ${VDI_SERVICE_HTTP_PORT:-80}
+      SERVER_PORT: ${VDI_SERVICE_HTTP_PORT:-80}
 
       AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:?}
 
@@ -68,8 +68,8 @@ services:
 
       # Account DB connection details
       ACCT_DB_TNS_NAME: ${ACCT_DB_TNS_NAME:?}
-      ACCT_DB_USERNAME: ${ACCT_DB_USERNAME:?}
-      ACCT_DB_PASSWORD: ${ACCT_DB_PASSWORD:?}
+      ACCT_DB_USER: ${ACCT_DB_USERNAME:?}
+      ACCT_DB_PASS: ${ACCT_DB_PASSWORD:?}
       ACCT_DB_POOL_SIZE: ${ACCT_DB_POOL_SIZE:-5}
 
       # Wildcard Environment Variables

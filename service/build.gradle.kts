@@ -84,7 +84,7 @@ repositories {
 dependencies {
 
   // Core lib
-  implementation("org.veupathdb.lib:jaxrs-container-core:6.13.0")
+  implementation("org.veupathdb.lib:jaxrs-container-core:6.14.2")
   implementation("org.veupathdb.lib:ldap-utils:1.0.0")
 
   implementation("com.zaxxer:HikariCP:5.0.1")
