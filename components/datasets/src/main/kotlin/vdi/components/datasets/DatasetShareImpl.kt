@@ -14,7 +14,7 @@ internal class DatasetShareImpl(
   private  val bucket: S3Bucket,
 ) : DatasetShare {
 
-  override fun getGrantState(): DatasetShare.GrantState =
+  override fun getGrantState() =
     S3Path.shareOwnerStateFile(ownerID, datasetID, recipientID)
       .let { bucket.objects.open(it) ?: throw IllegalStateException("owner-state.json doesn't exist: $it") }
       .stream
@@ -28,12 +28,22 @@ internal class DatasetShareImpl(
     )
   }
 
-  override fun getReceiptState(): DatasetShare.ReceiptState =
+  override fun getGrantTimestamp() =
+    S3Path.shareOwnerStateFile(ownerID, datasetID, recipientID)
+      .let { bucket.objects.stat(it) ?: throw IllegalStateException("owner-state.json doesn't exist: $it") }
+      .lastModified
+
+  override fun getReceiptState() =
     S3Path.shareRecipientStateFile(ownerID, datasetID, recipientID)
-      .let { bucket.objects.open(it) ?: throw IllegalStateException("recipient-state.json doesn't exzist: $it") }
+      .let { bucket.objects.open(it) ?: throw IllegalStateException("recipient-state.json doesn't exist: $it") }
       .stream
       .use { JSON.readValue<ReceiptObject>(it) }
       .state
+
+  override fun getReceiptTimestamp() =
+    S3Path.shareRecipientStateFile(ownerID, datasetID, recipientID)
+      .let { bucket.objects.stat(it) ?: throw IllegalStateException("recipient-state.json doesn't exist: $it") }
+      .lastModified
 
   override fun setReceiptState(state: DatasetShare.ReceiptState) {
     bucket.objects.put(

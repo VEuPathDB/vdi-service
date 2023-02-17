@@ -1,6 +1,7 @@
 package vdi.components.datasets
 
 import java.io.InputStream
+import java.time.OffsetDateTime
 import vdi.components.datasets.model.DatasetManifest
 import vdi.components.datasets.model.DatasetMeta
 
@@ -35,16 +36,20 @@ interface DatasetDirectory {
    * Put a new share.
    */
   fun putShare(recipientID: Long)
-  
+
   fun hasManifest(): Boolean
 
   fun getManifest(): DatasetManifest
+
+  fun getManifestTimestamp(): OffsetDateTime
 
   fun putManifest(manifest: DatasetManifest)
 
   fun hasMeta(): Boolean
 
   fun getMeta(): DatasetMeta
+
+  fun getMetaTimestamp(): OffsetDateTime
 
   fun putMeta(meta: DatasetMeta)
 

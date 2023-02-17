@@ -3,6 +3,7 @@ package vdi.components.datasets
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import java.io.InputStream
+import java.time.OffsetDateTime
 import vdi.components.common.DatasetID
 import vdi.components.datasets.model.DatasetManifest
 import vdi.components.datasets.model.DatasetMeta
@@ -73,6 +74,11 @@ internal class DatasetDirectoryImpl(
     bucket.objects.put(S3Path.metaFile(ownerID, datasetID), JSON.writeValueAsBytes(meta).inputStream())
   }
 
+  override fun getMetaTimestamp() =
+    S3Path.metaFile(ownerID, datasetID)
+      .let { bucket.objects.stat(it) ?: throw IllegalStateException("meta file does not exist: $it") }
+      .lastModified
+
   override fun hasManifest() = S3Path.manifestFile(ownerID, datasetID) in bucket.objects
 
   override fun getManifest(): DatasetManifest =
@@ -84,6 +90,11 @@ internal class DatasetDirectoryImpl(
   override fun putManifest(manifest: DatasetManifest) {
     bucket.objects.put(S3Path.manifestFile(ownerID, datasetID), JSON.writeValueAsBytes(manifest).inputStream())
   }
+
+  override fun getManifestTimestamp() =
+    S3Path.manifestFile(ownerID, datasetID)
+      .let { bucket.objects.stat(it) ?: throw IllegalStateException("manifest file does not exist: $it") }
+      .lastModified
 
   override fun hasDeletedFlag() = S3Path.deletedFlagFile(ownerID, datasetID) in bucket.objects
 

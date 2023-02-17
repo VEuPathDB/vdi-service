@@ -2,6 +2,7 @@ package vdi.components.datasets
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
+import java.time.OffsetDateTime
 
 interface DatasetShare {
   val recipientID: Long
@@ -10,9 +11,13 @@ interface DatasetShare {
 
   fun setGrantState(state: GrantState)
 
+  fun getGrantTimestamp(): OffsetDateTime
+
   fun getReceiptState(): ReceiptState
 
   fun setReceiptState(state: ReceiptState)
+
+  fun getReceiptTimestamp(): OffsetDateTime
 
   enum class GrantState {
     Granted,
