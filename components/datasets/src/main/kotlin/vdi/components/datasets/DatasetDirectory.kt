@@ -37,10 +37,19 @@ interface DatasetDirectory {
    */
   fun putShare(recipientID: Long)
 
+  /**
+   * Whether this dataset directory currently contains a manifest file.
+   */
   fun hasManifest(): Boolean
 
+  /**
+   * Loads the manifest file from this dataset directory.
+   */
   fun getManifest(): DatasetManifest
 
+  /**
+   * Gets the last modified timestamp for the manifest file
+   */
   fun getManifestTimestamp(): OffsetDateTime
 
   fun putManifest(manifest: DatasetManifest)
