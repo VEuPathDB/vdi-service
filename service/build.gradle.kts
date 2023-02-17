@@ -68,24 +68,14 @@ tasks.shadowJar {
   archiveFileName.set("service.jar")
 }
 
-repositories {
-  mavenCentral()
-  mavenLocal()
-  maven {
-    name = "GitHubPackages"
-    url  = uri("https://maven.pkg.github.com/veupathdb/maven-packages")
-    credentials {
-      username = if (extra.has("gpr.user")) extra["gpr.user"] as String? else System.getenv("GITHUB_USERNAME")
-      password = if (extra.has("gpr.key")) extra["gpr.key"] as String? else System.getenv("GITHUB_TOKEN")
-    }
-  }
-}
-
 dependencies {
+  implementation(project(":components:common"))
 
-  // Core lib
   implementation("org.veupathdb.lib:jaxrs-container-core:6.14.2")
   implementation("org.veupathdb.lib:ldap-utils:1.0.0")
+  implementation("org.veupathdb.lib.s3:s34k-minio:0.3.6+s34k-0.7.2")
+  implementation("org.veupathdb.lib.s3:workspaces:4.0.4")
+
 
   implementation("com.zaxxer:HikariCP:5.0.1")
   implementation("com.oracle.database.jdbc:ojdbc8:21.1.0.0")

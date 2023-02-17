@@ -47,5 +47,7 @@ pluginManagement {
 rootProject.name = "vdi"
 
 include(":service")
+include(":components:common")
+include(":components:datasets")
 include(":components:json")
 include(":components:plugin-handler-client")
