@@ -11,7 +11,6 @@ types:
     minLength: 32
     maxLength: 32
     pattern: ^[0-9a-fA-F]{32}$
-    example: 78609580dba2787a5cf677d6f334a707
 
   User-ID:
     displayName: VEuPathDB User ID
@@ -20,7 +19,6 @@ types:
     format: int64
     minimum: 1
     maximum: 9223372036854775807
-    example: 204435
 
   ProjectID:
     displayName: Project ID
@@ -43,7 +41,6 @@ types:
       - VectorBase
       - VEuPathDB
     type: string
-    example: PlasmoDB
 
   DatasetOwner:
     displayName: Dataset Owner
@@ -64,10 +61,6 @@ types:
         displayName: Owner Organization
         type: string
         required: true
-    example:
-      userID: 202203
-      displayName: Joe User
-      organization: University of Joe
 
   DatasetTypeInfo:
     displayName: Dataset Type Info
@@ -83,9 +76,6 @@ types:
         displayName: Type Version
         type: string
         required: true
-    example:
-      name: BIOM
-      version: "1.0"
 
   ShareOfferAction:
     type: string
@@ -114,11 +104,6 @@ types:
         type: DatasetInstallStatusEntry[]
         required: false
         default: null
-    example:
-      import: imported
-      install:
-      - projectID: PlasmoDB
-        status: invalid
 
   DatasetImportStatus:
     displayName: Dataset Import Status
@@ -151,8 +136,5 @@ types:
       status:
         type: DatasetInstallStatus
         required: true
-    example:
-      projectID: VectorBase
-      status: complete
 
   # endregion Dataset Status
