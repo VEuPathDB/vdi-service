@@ -1,120 +1,95 @@
 package vdi.components.datasets
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import java.io.InputStream
-import java.time.OffsetDateTime
-import vdi.components.common.DatasetID
 import vdi.components.datasets.model.DatasetManifest
 import vdi.components.datasets.model.DatasetMeta
-import vdi.components.datasets.model.GrantObject
-import vdi.components.datasets.model.ReceiptObject
+import vdi.components.datasets.paths.S3DatasetPathFactory
 import vdi.components.json.JSON
 
 internal class DatasetDirectoryImpl(
-  private val ownerID: Long,
-  private val datasetID: DatasetID,
-  private val bucket: S3Bucket
+  override val ownerID: String,
+  override val datasetID: String,
+  private val bucket: S3Bucket,
+  private val pathFactory: S3DatasetPathFactory,
 ) : DatasetDirectory {
 
-  override fun listUploadFiles(): List<DatasetFileHandle> {
-    return bucket.objects
-      .list(S3Path.uploadDir(ownerID, datasetID))
-      .map { DatasetFileHandleImpl(bucket, it) }
+  override fun exists(): Boolean {
+    TODO("Not yet implemented")
   }
 
-  override fun putUploadFile(fileName: String, fn: () -> InputStream) {
-    fn().use { bucket.objects.put(S3Path.uploadFile(ownerID, datasetID, fileName), it) }
-  }
+  override fun hasMeta() =
+    pathFactory.datasetMetaFile() in bucket.objects
 
-  override fun listDataFiles(): List<DatasetFileHandle> {
-    return bucket.objects
-      .list(S3Path.dataDir(ownerID, datasetID))
-      .map { DatasetFileHandleImpl(bucket, it) }
-  }
-
-  override fun putDataFile(fileName: String, fn: () -> InputStream) {
-    fn().use { bucket.objects.put(S3Path.dataFile(ownerID, datasetID, fileName), it) }
-  }
-
-  override fun listShares(): List<DatasetShare> {
-    val prefix = S3Path.shareDir(ownerID, datasetID)
-
-    return bucket.objects.list(prefix)
-      .stream()
-      .map { parseRecipientID(prefix, it.path) }
-      .distinct()
-      .map { DatasetShareImpl(ownerID, datasetID, it, bucket) }
-      .toList() as List<DatasetShare>
-  }
-
-  override fun putShare(recipientID: Long) {
-    // Put the share grant
-    bucket.objects.put(
-      S3Path.shareOwnerStateFile(ownerID, datasetID, recipientID),
-      JSON.writeValueAsBytes(GrantObject(DatasetShare.GrantState.Granted)).inputStream()
-    )
-
-    // Put the receipt accept
-    bucket.objects.put(
-      S3Path.shareRecipientStateFile(ownerID, datasetID, recipientID),
-      JSON.writeValueAsBytes(ReceiptObject(DatasetShare.ReceiptState.Accepted)).inputStream()
-    )
-  }
-
-  override fun hasMeta() = S3Path.metaFile(ownerID, datasetID) in bucket.objects
-
-  override fun getMeta(): DatasetMeta =
-    S3Path.metaFile(ownerID, datasetID)
-      .let { bucket.objects.open(it) ?: throw IllegalStateException("meta file does not exist: $it") }
-      .stream
-      .use { JSON.readValue(it) }
+  override fun getMeta() =
+    DatasetMetaFileImpl(bucket, pathFactory.datasetMetaFile())
 
   override fun putMeta(meta: DatasetMeta) {
-    bucket.objects.put(S3Path.metaFile(ownerID, datasetID), JSON.writeValueAsBytes(meta).inputStream())
+    bucket.objects.put(pathFactory.datasetMetaFile(), JSON.writeValueAsBytes(meta).inputStream())
   }
 
-  override fun getMetaTimestamp() =
-    S3Path.metaFile(ownerID, datasetID)
-      .let { bucket.objects.stat(it) ?: throw IllegalStateException("meta file does not exist: $it") }
-      .lastModified
 
-  override fun hasManifest() = S3Path.manifestFile(ownerID, datasetID) in bucket.objects
+  override fun hasManifest() =
+    pathFactory.datasetManifestFile() in bucket.objects
 
-  override fun getManifest(): DatasetManifest =
-    S3Path.manifestFile(ownerID, datasetID)
-      .let { bucket.objects.open(it) ?: throw IllegalStateException("manifest file does not exist: $it") }
-      .stream
-      .use { JSON.readValue(it) }
+  override fun getManifest() =
+    DatasetManifestFileImpl(bucket, pathFactory.datasetManifestFile())
 
   override fun putManifest(manifest: DatasetManifest) {
-    bucket.objects.put(S3Path.manifestFile(ownerID, datasetID), JSON.writeValueAsBytes(manifest).inputStream())
+    bucket.objects.put(pathFactory.datasetManifestFile(), JSON.writeValueAsBytes(manifest).inputStream())
   }
 
-  override fun getManifestTimestamp() =
-    S3Path.manifestFile(ownerID, datasetID)
-      .let { bucket.objects.stat(it) ?: throw IllegalStateException("manifest file does not exist: $it") }
-      .lastModified
 
-  override fun hasDeletedFlag() = S3Path.deletedFlagFile(ownerID, datasetID) in bucket.objects
+  override fun hasDeleteFlag() =
+    pathFactory.datasetDeleteFlagFile() in bucket.objects
 
-  override fun putDeletedFlag() {
-    bucket.objects.touch(S3Path.deletedFlagFile(ownerID, datasetID))
+  override fun getDeleteFlag() =
+    DatasetDeleteFlagFileImpl(bucket, pathFactory.datasetDeleteFlagFile())
+
+  override fun putDeleteFlag() {
+    bucket.objects.touch(pathFactory.datasetDeleteFlagFile())
   }
 
-  private fun parseRecipientID(prefix: String, path: String): Long {
-    val slash = path.indexOf('/', prefix.length)
 
-    if (slash < 0)
-      throw IllegalStateException("invalid share path: $path")
+  override fun getUploadFiles() =
+    bucket.objects.list(pathFactory.datasetUploadsDir())
+      .map { DatasetUploadFileImpl(bucket, it.path) }
 
-    val substr = path.substring(prefix.length, slash)
+  override fun putUploadFile(name: String, fn: () -> InputStream) {
+    fn().use { bucket.objects.put(pathFactory.datasetUploadFile(name), it) }
+  }
 
-    return try {
-      substr.toLong()
-    } catch (e: Throwable) {
-      throw IllegalStateException("invalid share path: $path", e)
+
+  override fun getDataFiles() =
+    bucket.objects.list(pathFactory.datasetDataDir())
+      .map { DatasetDataFileImpl(bucket, it.path) }
+
+  override fun putDataFile(name: String, fn: () -> InputStream) {
+    fn().use { bucket.objects.put(pathFactory.datasetDataFile(name), it) }
+  }
+
+  override fun getShares(): Map<String, DatasetShare> {
+    val pathPrefix = pathFactory.datasetSharesDir()
+    val subPaths   = bucket.objects.listSubPaths(pathPrefix).commonPrefixes()
+    val retValue   = HashMap<String, DatasetShare>(subPaths.size)
+
+    subPaths.forEach {
+      val recipientID = it.substring(pathPrefix.length)
+
+      retValue[recipientID] = DatasetShareImpl(
+        recipientID,
+        DatasetShareOfferFileImpl(bucket, pathFactory.datasetShareOfferFile(recipientID)),
+        DatasetShareReceiptFileImpl(bucket, pathFactory.datasetShareReceiptFile(recipientID)),
+      )
     }
+
+    // list shares
+    // map to either share offer or share receipt
+
+    TODO("Not yet implemented")
+  }
+
+  override fun putShare(recipientID: String) {
+    TODO("Not yet implemented")
   }
 }
-

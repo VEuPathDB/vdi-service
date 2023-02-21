@@ -7,5 +7,5 @@ data class DatasetManifest(
   val inputFiles: Collection<String>,
 
   @JsonProperty("dataFiles")
-  val dataFiles: Collection<String>,
+  val dataFiles: Collection<String>
 )

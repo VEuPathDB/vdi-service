@@ -1,68 +1,161 @@
 package vdi.components.datasets
 
 import java.io.InputStream
-import java.time.OffsetDateTime
 import vdi.components.datasets.model.DatasetManifest
 import vdi.components.datasets.model.DatasetMeta
 
 interface DatasetDirectory {
 
-  /**
-   * List the files in the Dataset's upload directory.
-   */
-  fun listUploadFiles(): List<DatasetFileHandle>
+  val ownerID: String
+
+  val datasetID: String
 
   /**
-   * Put a file into the Dataset's upload directory.
+   * Tests whether this [DatasetDirectory] currently exists.
+   *
+   * As S3 does not have the concept of a "directory" itself, the existence of
+   * this [DatasetDirectory] representation is determined by whether an object
+   * already exists under this "directory's" path (prefix).
+   *
+   * This means that if this method returns false, then no contents have been
+   * uploaded to S3 for this dataset yet.
+   *
+   * @return `true` if this [DatasetDirectory] exists (contains something),
+   * otherwise `false`.
    */
-  fun putUploadFile(fileName: String, fn: () -> InputStream)
+  fun exists(): Boolean
 
   /**
-   * List the files in the Dataset's data files directory.
+   * Tests whether this [DatasetDirectory] currently contains a `meta.json`
+   * file.
+   *
+   * @return `true` if this dataset contains or, at the time of this method
+   * call, contained a `meta.json` file.
    */
-  fun listDataFiles(): List<DatasetFileHandle>
+  fun hasMeta(): Boolean
 
   /**
-   * Put a file into the Dataset's data files directory.
+   * Returns a representation of this [DatasetDirectory]'s `meta.json` file.
+   *
+   * This method will return a value regardless of whether the `meta.json` file
+   * exists or existed.  The existence of the file can be tested using the
+   * returned object's [DatasetMetaFile.exists] method.
    */
-  fun putDataFile(fileName: String, fn: () -> InputStream)
+  fun getMeta(): DatasetMetaFile
 
   /**
-   * List existing shares.
+   * Puts a `meta.json` file into this [DatasetDirectory] overwriting any
+   * previously existing `meta.json` file.
+   *
+   * @param meta Dataset metadata to write to the `meta.json` file.
    */
-  fun listShares(): List<DatasetShare>
+  fun putMeta(meta: DatasetMeta)
 
   /**
-   * Put a new share.
-   */
-  fun putShare(recipientID: Long)
-
-  /**
-   * Whether this dataset directory currently contains a manifest file.
+   * Tests whether this [DatasetDirectory] currently contains a `manifest.json`
+   * file.
+   *
+   * @return `true` if this dataset contains, or at the time of this method
+   * call, contained a `manifest.json` file.
    */
   fun hasManifest(): Boolean
 
   /**
-   * Loads the manifest file from this dataset directory.
+   * Returns a representation of this [DatasetDirectory]'s `manifest.json` file.
+   *
+   * This method will return a value regardless of whether the `manifest.json`
+   * file exists or existed.  The existence of the file can be tested using the
+   * returned object's [DatasetManifestFile.exists] method.
    */
-  fun getManifest(): DatasetManifest
+  fun getManifest(): DatasetManifestFile
 
   /**
-   * Gets the last modified timestamp for the manifest file
+   * Puts a `manifest.json` file into this [DatasetDirectory] overwriting any
+   * previously existing `manifest.json` file.
+   *
+   * @param manifest Dataset manifest to write to the `manifest.json` file.
    */
-  fun getManifestTimestamp(): OffsetDateTime
-
   fun putManifest(manifest: DatasetManifest)
 
-  fun hasMeta(): Boolean
+  /**
+   * Tests whether this [DatasetDirectory] currently contains a `delete-flag`
+   * file.
+   *
+   * @return `true` if this dataset contains, or at the time of this method
+   * call, contained a `delete-flag` file.
+   */
+  fun hasDeleteFlag(): Boolean
 
-  fun getMeta(): DatasetMeta
+  /**
+   * Returns a representation of this [DatasetDirectory]'s `delete-flag` file.
+   *
+   * This method will return a value regardless of whether the `delete-flag`
+   * file exists or existed.  The existence of the file can be tested using the
+   * returned object's [DatasetDeleteFlagFile.exists] method.
+   */
+  fun getDeleteFlag(): DatasetDeleteFlagFile
 
-  fun getMetaTimestamp(): OffsetDateTime
+  /**
+   * Puts a `delete-flag` file into this [DatasetDirectory].
+   */
+  fun putDeleteFlag()
 
-  fun putMeta(meta: DatasetMeta)
+  /**
+   * Fetches a list of files under this [DatasetDirectory]'s upload file
+   * path/key prefix.
+   *
+   * If no upload files have been put into this [DatasetDirectory], the returned
+   * list will be empty.
+   */
+  fun getUploadFiles(): List<DatasetUploadFile>
 
-  fun hasDeletedFlag(): Boolean
+  /**
+   * Puts a file under this [DatasetDirectory]'s upload file path/key prefix,
+   * overwriting any previously existing object with the given [name].
+   *
+   * @param name Name of the file to upload.
+   *
+   * @param fn Provider of an input stream over the contents of the file to
+   * upload.
+   */
+  fun putUploadFile(name: String, fn: () -> InputStream)
 
-  fun putDeletedFlag()
+  /**
+   * Fetches a list of files under t his [DatasetDirectory]'s data file path/key
+   * prefix.
+   *
+   * If no data files have been put into this [DatasetDirectory], the returned
+   * list will be empty.
+   */
+  fun getDataFiles(): List<DatasetDataFile>
+
+  /**
+   * Puts a file under this [DatasetDirectory]'s data file path/key prefix,
+   * overwriting any previously existing object with the given [name].
+   *
+   * @param name Name of the file to upload.
+   *
+   * @param fn Provider of an input stream over the contents of the file to
+   * upload.
+   */
+  fun putDataFile(name: String, fn: () -> InputStream)
+
+  /**
+   * Fetches a map of [DatasetShare]s from this [DatasetDirectory].
+   *
+   * The returned map will be keyed on the ID of the share recipient.
+   *
+   * The values in the returned map provide access to further information about
+   * the share itself.
+   */
+  fun getShares(): Map<String, DatasetShare>
+
+  /**
+   * Puts a new "share" into this [DatasetDirectory] by creating a share offer
+   * and share receipt file into the `DatasetDirectory`.
+   *
+   * @param recipientID ID of the share recipient.
+   */
+  fun putShare(recipientID: String)
 }
+

@@ -12,7 +12,7 @@ dependencies {
   implementation(project(":components:common"))
   implementation(project(":components:json"))
 
-  implementation("org.veupathdb.lib.s3:s34k-minio:0.3.6+s34k-0.7.2")
+  implementation("org.veupathdb.lib.s3:s34k-minio:0.4.0+s34k-0.8.0")
 
   implementation("org.slf4j:slf4j-api:1.7.36")
 

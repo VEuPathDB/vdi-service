@@ -55,8 +55,7 @@ services:
       S3_USE_HTTPS: ${S3_USE_HTTPS:-false}
       S3_ACCESS_TOKEN: ${S3_ACCESS_TOKEN:?}
       S3_SECRET_KEY: ${S3_SECRET_KEY:?}
-      S3_UPLOAD_BUCKET_NAME: ${S3_UPLOAD_BUCKET:?}
-      S3_DATASET_BUCKET_NAME: ${S3_DATASET_BUCKET:?}
+      S3_BUCKET_NAME: ${S3_BUCKET:?}
 
       # Connection details for the stack-internal Postgres instance.
       QUEUE_DB_USERNAME: ${QUEUE_DB_USERNAME:?}

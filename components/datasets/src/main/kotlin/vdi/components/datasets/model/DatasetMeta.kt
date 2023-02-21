@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class DatasetMeta(
   @JsonProperty("type")
-  val type: DatasetMetaType,
+  val type: DatasetType,
 
   @JsonProperty("projects")
   val projects: Collection<String>,
@@ -26,4 +26,3 @@ data class DatasetMeta(
   @JsonProperty("dependencies")
   val dependencies: Collection<DatasetDependency>
 )
-
