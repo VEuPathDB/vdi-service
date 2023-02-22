@@ -1,10 +1,24 @@
 package vdi.components.datasets.util
 
+/**
+ * Path Builder
+ *
+ * Utility class for building a path by appending segments to a mutable
+ * collection.
+ *
+ * @constructor Constructs a new `PathBuilder` instance.
+ *
+ * @param root Root path segment.
+ *
+ * @param segments Maximum number of path segments the path builder can contain.
+ *
+ * @param delimiter Path segment delimiter.
+ */
 internal class PathBuilder(root: String, segments: Int = 8, private val delimiter: String = "/") {
   private val segments = arrayOfNulls<String>(segments).also { it[0] = root }
   private var index = 1
 
-  operator fun div(segment: String): PathBuilder {
+  fun append(segment: String): PathBuilder {
     if (index == segments.size)
       throw IllegalStateException("attempted to assemble a path with more segments than were allocated for (allocated size = ${segments.size}, current path = )")
 
@@ -12,6 +26,12 @@ internal class PathBuilder(root: String, segments: Int = 8, private val delimite
 
     return this
   }
+
+  @Suppress("NOTHING_TO_INLINE")
+  inline operator fun div(segment: String) = append(segment)
+
+  @Suppress("NOTHING_TO_INLINE")
+  inline operator fun plus(segment: String) = append(segment)
 
   override fun toString(): String {
     val sb = StringBuilder(calcSize())
