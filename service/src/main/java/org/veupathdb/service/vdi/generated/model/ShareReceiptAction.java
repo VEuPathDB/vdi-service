@@ -9,14 +9,13 @@ public enum ShareReceiptAction {
   @JsonProperty("reject")
   REJECT("reject");
 
-  public final String name;
+  private final String value;
 
-  ShareReceiptAction(String name) {
-    this.name = name;
+  public String getValue() {
+    return this.value;
   }
 
-
-  public String getName() {
-    return this.name;
+  ShareReceiptAction(String name) {
+    this.value = name;
   }
 }

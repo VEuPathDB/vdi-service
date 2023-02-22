@@ -25,8 +25,8 @@ public interface VdiDatasets {
   @Produces("application/json")
   GetVdiDatasetsResponse getVdiDatasets(@QueryParam("project_id") String projectId,
       @QueryParam("ownership") @DefaultValue("any") String ownership,
-      @QueryParam("offset") @DefaultValue("0") int offset,
-      @QueryParam("limit") @DefaultValue("100") int limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset,
+      @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("sort_field") @DefaultValue("creation_timestamp") String sortField,
       @QueryParam("sort_order") String sortOrder);
 

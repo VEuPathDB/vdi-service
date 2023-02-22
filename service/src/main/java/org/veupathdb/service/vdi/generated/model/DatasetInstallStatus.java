@@ -18,14 +18,13 @@ public enum DatasetInstallStatus {
   @JsonProperty("ready-for-reinstall")
   READYFORREINSTALL("ready-for-reinstall");
 
-  public final String name;
+  private final String value;
 
-  DatasetInstallStatus(String name) {
-    this.name = name;
+  public String getValue() {
+    return this.value;
   }
 
-
-  public String getName() {
-    return this.name;
+  DatasetInstallStatus(String name) {
+    this.value = name;
   }
 }

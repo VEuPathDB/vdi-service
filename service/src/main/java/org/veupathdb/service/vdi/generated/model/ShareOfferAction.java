@@ -9,14 +9,13 @@ public enum ShareOfferAction {
   @JsonProperty("revoke")
   REVOKE("revoke");
 
-  public final String name;
+  private final String value;
 
-  ShareOfferAction(String name) {
-    this.name = name;
+  public String getValue() {
+    return this.value;
   }
 
-
-  public String getName() {
-    return this.name;
+  ShareOfferAction(String name) {
+    this.value = name;
   }
 }
