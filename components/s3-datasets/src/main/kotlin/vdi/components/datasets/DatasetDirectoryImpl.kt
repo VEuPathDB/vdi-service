@@ -2,8 +2,7 @@ package vdi.components.datasets
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import java.io.InputStream
-import vdi.components.datasets.model.DatasetManifest
-import vdi.components.datasets.model.DatasetMeta
+import vdi.components.datasets.model.*
 import vdi.components.datasets.paths.S3DatasetPathFactory
 import vdi.components.json.JSON
 
@@ -14,9 +13,8 @@ internal class DatasetDirectoryImpl(
   private val pathFactory: S3DatasetPathFactory,
 ) : DatasetDirectory {
 
-  override fun exists(): Boolean {
-    TODO("Not yet implemented")
-  }
+  override fun exists(): Boolean =
+    bucket.objects.listSubPaths(pathFactory.datasetDir()).count > 0
 
   override fun hasMeta() =
     pathFactory.datasetMetaFile() in bucket.objects
@@ -83,13 +81,14 @@ internal class DatasetDirectoryImpl(
       )
     }
 
-    // list shares
-    // map to either share offer or share receipt
-
-    TODO("Not yet implemented")
+    return retValue
   }
 
   override fun putShare(recipientID: String) {
-    TODO("Not yet implemented")
+    val offer   = DatasetShareOffer(DatasetShareOfferAction.Grant)
+    val receipt = DatasetShareReceipt(DatasetShareReceiptAction.Accept)
+
+    bucket.objects.put(pathFactory.datasetShareOfferFile(recipientID), JSON.writeValueAsBytes(offer).inputStream())
+    bucket.objects.put(pathFactory.datasetShareReceiptFile(recipientID), JSON.writeValueAsBytes(receipt).inputStream())
   }
 }
