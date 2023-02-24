@@ -46,6 +46,9 @@ pluginManagement {
 
 rootProject.name = "vdi"
 
+include(":modules:event-router")
+include(":modules:import-handler")
+include(":modules:install-handler")
 include(":modules:rest-service")
 include(":components:common")
 include(":components:s3-datasets")
