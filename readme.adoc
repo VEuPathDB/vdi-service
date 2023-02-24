@@ -34,3 +34,68 @@ image::docs/design/1.0/assets/3-user-action-delete.svg[]
 ==== Event Routing
 
 image::docs/design/1.0/assets/3-event-routing.svg[]
+
+== Queues
+
+Bucket Events:: Events coming from MinIO for operations on objects in the VDI
+bucket.
+
+Import Triggers:: An event indicating that a dataset has been uploaded and is
+ready to be imported.
++
+[source, protobuf]
+----
+message ImportTrigger {
+  required string vdid = 1;
+}
+----
+
+Import Results:: An event containing the result of an import attempt.
++
+[source, protobuf]
+----
+enum ImportStatus {
+  SUCCESS = 0;
+  FAILURE = 1;
+}
+
+message ImportResult {
+  required string vdid = 1;
+  required ImportStatus status = 2;
+}
+----
+
+Install Triggers:: An event indicating that a dataset has been imported and is
+ready to be installed.
++
+[source, protobuf]
+----
+message InstallTrigger {
+  required string vdid = 1;
+}
+----
+
+Install Results:: An event containing the result of a dataset install attempt.
++
+[source, protobuf]
+----
+enum InstallStatus {
+  SUCCESS = 0;
+  FAILURE = 1;
+}
+
+message InstallResult {
+  required string vdid = 1;
+  required string projectId = 2;
+  required InstallStatus status = 3;
+}
+----
+
+* Update Triggers
+* Update Results
+
+* Soft Delete Triggers
+* Soft Delete Results
+
+* Hard Delete Triggers
+* Hard Delete Results
