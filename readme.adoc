@@ -40,7 +40,7 @@ image::docs/design/1.0/assets/3-event-routing.svg[]
 Bucket Events:: Events coming from MinIO for operations on objects in the VDI
 bucket.
 
-Import Triggers:: An event indicating that a dataset has been uploaded and is
+Import Triggers:: Events that each indicate a dataset has been uploaded and is
 ready to be imported.
 +
 [source, protobuf]
@@ -50,7 +50,7 @@ message ImportTrigger {
 }
 ----
 
-Import Results:: An event containing the result of an import attempt.
+Import Results:: Events containing the result of an import attempt.
 +
 [source, protobuf]
 ----
@@ -65,7 +65,7 @@ message ImportResult {
 }
 ----
 
-Install Triggers:: An event indicating that a dataset has been imported and is
+Install Triggers:: Events that each indicate a dataset has been imported and is
 ready to be installed.
 +
 [source, protobuf]
@@ -75,7 +75,7 @@ message InstallTrigger {
 }
 ----
 
-Install Results:: An event containing the result of a dataset install attempt.
+Install Results:: Events containing the result of a dataset install attempt.
 +
 [source, protobuf]
 ----
