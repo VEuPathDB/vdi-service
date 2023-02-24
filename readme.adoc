@@ -91,8 +91,32 @@ message InstallResult {
 }
 ----
 
-* Update Triggers
-* Update Results
+Update Triggers:: Events that each indicate a dataset's metadata has been
+updated by the user and the update needs to be installed.
++
+[source, protobuf]
+----
+message UpdateTrigger {
+  required string vdid = 1;
+}
+----
+
+Update Results:: Events containing the result of a dataset metadata install
+attempt.
++
+[source, protobuf]
+----
+enum UpdateStatus {
+  SUCCESS = 0;
+  FAILURE = 1;
+}
+
+message UpdateResult {
+  required string vdid = 1;
+  required string projectId = 2;
+  required UpdateStatus status = 3;
+}
+----
 
 * Soft Delete Triggers
 * Soft Delete Results
