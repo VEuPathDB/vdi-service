@@ -43,7 +43,7 @@ image::docs/design/1.0/assets/3-event-routing.svg[]
 
 image::docs/design/1.0/assets/3-import-handling.svg[]
 
-== Queues
+== Queues / Topics
 
 Bucket Events:: Events coming from MinIO for operations on objects in the VDI
 bucket.
@@ -125,7 +125,16 @@ message UpdateResult {
 }
 ----
 
-* Soft Delete Triggers
+Soft Delete Triggers:: Events that each indicate a dataset has been soft deleted
+and the deletion needs to be persisted to the Application databases.
++
+[source, protobuf]
+----
+message SoftDeleteTrigger {
+  required string vdid = 1;
+}
+----
+
 * Soft Delete Results
 
 * Hard Delete Triggers
