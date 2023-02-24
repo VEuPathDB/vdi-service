@@ -88,7 +88,7 @@ private const val ORDER_DESC = "DESC"
 
 
 @Suppress("UNCHECKED_CAST")
-fun Connection.selectUserDatasetList(query: DatasetListQuery) : List<DatasetListEntry> {
+fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetListEntry> {
   // List of params that we will collect as we assemble the query.
   val params = ArrayList<Pair<Any, Int>>(12)
 

@@ -4,3 +4,33 @@
 
 * link:https://veupathdb.github.io/vdi-service/vdi-api.html[VDI Service API Doc]
 * link:https://veupathdb.github.io/vdi-service/design/1.0/design.html[VDI Service Design Doc]
+
+
+== Project Structure
+
+=== Modules
+
+* Event Router
+* Import Handler
+* Installation Handler
+* REST Service
+
+=== Components
+
+== Workflow
+
+=== User Actions
+
+==== Create VD
+
+image::docs/design/1.0/assets/3-vd-upload.svg[]
+
+==== Delete VD
+
+image::docs/design/1.0/assets/3-user-action-delete.svg[]
+
+=== Internal Actions
+
+==== Event Routing
+
+image::docs/design/1.0/assets/3-event-routing.svg[]
