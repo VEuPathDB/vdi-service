@@ -29,6 +29,10 @@ image::docs/design/1.0/assets/3-vd-upload.svg[]
 
 image::docs/design/1.0/assets/3-user-action-delete.svg[]
 
+==== Update VD Metadata
+
+image::docs/design/1.0/assets/3-vd-patch.svg[]
+
 === Internal Actions
 
 ==== Event Routing
@@ -114,7 +118,6 @@ enum UpdateStatus {
 message UpdateResult {
   required string vdid = 1;
   required string projectId = 2;
-  required UpdateStatus status = 3;
 }
 ----
 
