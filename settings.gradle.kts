@@ -46,7 +46,7 @@ pluginManagement {
 
 rootProject.name = "vdi"
 
-include(":service")
+include(":modules:rest-service")
 include(":components:common")
 include(":components:s3-datasets")
 include(":components:json")
