@@ -39,6 +39,10 @@ image::docs/design/1.0/assets/3-vd-patch.svg[]
 
 image::docs/design/1.0/assets/3-event-routing.svg[]
 
+==== Import Handling
+
+image::docs/design/1.0/assets/3-import-handling.svg[]
+
 == Queues
 
 Bucket Events:: Events coming from MinIO for operations on objects in the VDI
