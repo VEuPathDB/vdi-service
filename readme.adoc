@@ -39,9 +39,13 @@ image::docs/design/1.0/assets/3-vd-patch.svg[]
 
 image::docs/design/1.0/assets/3-event-routing.svg[]
 
-==== Import Handling
+==== Import Trigger Handling
 
 image::docs/design/1.0/assets/3-import-handling.svg[]
+
+==== Import Result Handling
+
+image::docs/design/1.0/assets/3-import-result-handling.svg[]
 
 == Queues / Topics
 
