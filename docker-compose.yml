@@ -1,7 +1,7 @@
 version: "3.5"
 
 services:
-  queue-postgres:
+  vdi-cache-db:
     image: postgres:15.2-alpine3.17
     environment:
       POSTGRES_USER: ${QUEUE_DB_USERNAME:?}
@@ -12,13 +12,10 @@ services:
       timeout: 10s
       retries: 5
 
-  queue-rabbit:
-    image: rabbitmq:3.11.9-management-alpine
-    environment:
-      RABBITMQ_DEFAULT_USER: ${INTERNAL_RABBIT_USERNAME:?}
-      RABBITMQ_DEFAULT_PASS: ${INTERNAL_RABBIT_PASSWORD:?}
+  vdi-kafka:
+    image: foxcapades/apache-kafka:3.4.0
     healthcheck:
-      test: [ CMD, curl, -f, http://localhost:15672 ]
+      test: nc -z localhost 9092 || exit 1
       interval: 30s
       timeout: 10s
       retries: 5
@@ -26,8 +23,11 @@ services:
   vdi-service:
     image: veupathdb/vdi-service:${VDI_SERVICE_TAG:-latest}
     depends_on:
-    - queue-postgres
-    - queue-rabbit
+    - vdi-cache-db
+    - vdi-kafka
+    links:
+    - vdi-cache-db
+    - vdi-kafka
     environment:
       SERVER_PORT: ${VDI_SERVICE_HTTP_PORT:-80}
 
@@ -43,11 +43,20 @@ services:
       GLOBAL_RABBIT_HOST: ${GLOBAL_RABBIT_HOST:?}
       GLOBAL_RABBIT_PORT: ${GLOBAL_RABBIT_PORT:?}
 
-      # Connection details for the stack-internal RabbitMQ instance.
-      INTERNAL_RABBIT_USERNAME: ${INTERNAL_RABBIT_USERNAME:?}
-      INTERNAL_RABBIT_PASSWORD: ${INTERNAL_RABBIT_PASSWORD:?}
-      INTERNAL_RABBIT_HOST: ${INTERNAL_RABBIT_HOST:?}
-      INTERNAL_RABBIT_PORT: ${INTERNAL_RABBIT_PORT:?}
+      # Connection details for the stack-internal Kafka instance.
+      KAFKA_HOST: ${KAFKA_HOST:-vdi-kafka}
+      KAFKA_PORT: ${KAFKA_PORT:-9092}
+      KAFKA_TOPIC_BUCKET_NOTIFICATIONS: ${KAFKA_TOPIC_BUCKET_NOTIFICATIONS:-bucket-notifications}
+      KAFKA_TOPIC_IMPORT_TRIGGERS: ${KAFKA_TOPIC_IMPORT_TRIGGERS:-import-triggers}
+      KAFKA_TOPIC_IMPORT_RESULTS: ${KAFKA_TOPIC_IMPORT_RESULTS:-import-results}
+      KAFKA_TOPIC_INSTALL_TRIGGERS: ${KAFKA_TOPIC_INSTALL_TRIGGERS:-install-triggers}
+      KAFKA_TOPIC_INSTALL_RESULTS: ${KAFKA_TOPIC_INSTALL_RESULTS:-install-results}
+      KAFKA_TOPIC_UPDATE_META_TRIGGERS: ${KAFKA_TOPIC_UPDATE_META_TRIGGERS:-update-meta-triggers}
+      KAFKA_TOPIC_UPDATE_META_RESULTS: ${KAFKA_TOPIC_UPDATE_META_RESULTS:-update-meta-results}
+      KAFKA_TOPIC_DELETE_TRIGGERS: ${KAFKA_TOPIC_DELETE_TRIGGERS:-delete-triggers}
+      KAFKA_TOPIC_DELETE_RESULTS: ${KAFKA_TOPIC_DELETE_RESULTS:-delete-results}
+      KAFKA_TOPIC_SHARE_TRIGGERS: ${KAFKA_TOPIC_SHARE_TRIGGERS:-share-triggers}
+      KAFKA_TOPIC_SHARE_RESULTS: ${KAFKA_TOPIC_SHARE_RESULTS:-share-results}
 
       # Connection details for the global S3 instance.
       S3_HOST: ${S3_HOST:?}
