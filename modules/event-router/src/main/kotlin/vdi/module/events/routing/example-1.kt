@@ -11,6 +11,8 @@ import java.time.Duration
 import java.util.Properties
 import java.util.UUID
 
+const val TOPIC = "vdi-bucket-notifications"
+
 
 fun makeProducer() =
   Properties()
@@ -31,21 +33,19 @@ fun makeConsumer() =
     .let { KafkaConsumer(it, StringDeserializer(), StringDeserializer()) }
 
 fun main() {
-  val topic = "some-topic"
-
   if (System.currentTimeMillis() % 2 == 1L) {
 
     println("I'm a producer!")
 
     val producer = makeProducer()
-    producer.send(ProducerRecord(topic, "how", "it's just a graphical glitch")).get()
+    producer.send(ProducerRecord(TOPIC, "how", "it's just a graphical glitch")).get()
 
   } else {
 
     println("I'm a consumer!")
 
     val consumer = makeConsumer()
-    consumer.subscribe(listOf(topic))
+    consumer.subscribe(listOf(TOPIC))
 
     consumer.poll(Duration.ofSeconds(10))
       .forEach { println(it) }
