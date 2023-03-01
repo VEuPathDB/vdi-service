@@ -1,0 +1,250 @@
+= Event Router Environment Variables
+:toc:
+
+These are the environment variables declared and used by the `event-router` VDI
+project module.
+
+== RabbitMQ Configuration
+
+=== Connection
+
+`GLOBAL_RABBIT_USERNAME`::
+Connection credentials username.
++
+[cols="1h,9m"]
+|===
+h| Required
+| true
+h| Type
+| string
+|===
+
+`GLOBAL_RABBIT_PASSWORD`::
+Connection credentials password.
++
+[cols="1h,9m"]
+|===
+h| Required
+| true
+h| Type
+| string
+|===
+
+`GLOBAL_RABBIT_HOST`::
+RabbitMQ server host.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "localhost"
+|===
+
+`GLOBAL_RABBIT_PORT`::
+RabbitMQ server port.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| uint16
+h| Default
+| 5672
+|===
+
+`GLOBAL_RABBIT_CONNECTION_NAME`::
+Connection name (this appears in the RabbitMQ management console).
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string?
+h| Default
+| null
+|===
+
+=== Exchange
+
+`GLOBAL_RABBIT_VDI_EXCHANGE_NAME`::
+Name of the exchange that will be declared.
++
+[cols="1h,9m"]
+|===
+h| Required
+| true
+h| Type
+| string
+h| Default
+|
+|===
+
+`GLOBAL_RABBIT_VDI_EXCHANGE_TYPE`::
+Type of the exchange that will be declared.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "direct"
+|===
+
+`GLOBAL_RABBIT_VDI_EXCHANGE_DURABLE`::
+Whether the declared exchange should be durable.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| boolean
+h| Default
+| true
+|===
+
+`GLOBAL_RABBIT_VDI_EXCHANGE_AUTO_DELETE`::
+Whether the declared exchange should be deleted when the final queue is unbound.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| boolean
+h| Default
+| false
+|===
+
+`GLOBAL_RABBIT_VDI_EXCHANGE_ARGUMENTS`::
+Extra arguments to be passed when the exchange is declared.
++
+The format for this environment variable is `key1:value,key2:value`.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| map<string, string>
+h| Default
+| emptyMap()
+|===
+
+=== Queue
+
+`GLOBAL_RABBIT_VDI_QUEUE_NAME`::
+Name of the queue that will be declared.
++
+[cols="1h,9m"]
+|===
+h| Required
+| true
+h| Type
+| string
+|===
+
+`GLOBAL_RABBIT_VDI_QUEUE_DURABLE`::
+Whether the declared queue should be durable.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| boolean
+h| Default
+| true
+|===
+
+`GLOBAL_RABBIT_VDI_QUEUE_EXCLUSIVE`::
+Whether the declared queue should be exclusive to this process instance.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| boolean
+h| Default
+| false
+|===
+
+`GLOBAL_RABBIT_VDI_QUEUE_AUTO_DELETE`::
+If the declared queue should be deleted when this process instance disconnects
+from it.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| boolean
+h| Default
+| false
+|===
+
+`GLOBAL_RABBIT_VDI_QUEUE_ARGUMENTS`::
+Additional arguments to be passed when the queue is declared.
++
+The format for this environment variable is `key1:value,key2:value`.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| map<string, string>
+h| Default
+| emptyMap()
+|===
+
+=== Routing
+
+`GLOBAL_RABBIT_VDI_ROUTING_KEY`::
+The routing key to use when binding the declared queue to the declared exchange.
++
+[cols="1h,9m"]
+|===
+h| Required
+| true
+h| Type
+| string
+|===
+
+`GLOBAL_RABBIT_VDI_ROUTING_ARGUMENTS`::
+Additional arguments to be passed when creating the binding between the declared
+queue and the declared exchange.
++
+The format for this environment variable is `key1:value,key2:value`.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| map<string, string>
+h| Default
+| emptyMap()
+|===
+
+
+////
++
+[cols="1h,9m"]
+|===
+h| Required
+|
+h| Type
+|
+h| Default
+|
+|===
+////
