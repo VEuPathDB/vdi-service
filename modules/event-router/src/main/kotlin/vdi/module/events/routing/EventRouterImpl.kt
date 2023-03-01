@@ -27,6 +27,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     val stream = es.stream(shutdownSignal)
 
     while (!shutdownSignal.isTriggered() && stream.hasNext()) {
+      // This is just a temporary stand-in for testing.
       println(stream.next())
     }
 
