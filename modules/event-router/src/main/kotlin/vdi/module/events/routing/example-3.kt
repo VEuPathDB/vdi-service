@@ -6,6 +6,7 @@ import vdi.components.common.SecretString
 import vdi.module.events.routing.config.*
 
 
+// Dummy class for testing purposes.
 object Example3 {
 
   private val config = EventRouterConfig(
