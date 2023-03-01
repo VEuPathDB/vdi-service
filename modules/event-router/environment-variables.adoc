@@ -7,7 +7,7 @@ project module.
 
 == RabbitMQ Configuration
 
-[source, dotenv]
+[source, kotlin]
 ----
 GLOBAL_RABBIT_USERNAME=<required>
 GLOBAL_RABBIT_PASSWORD=<required>
