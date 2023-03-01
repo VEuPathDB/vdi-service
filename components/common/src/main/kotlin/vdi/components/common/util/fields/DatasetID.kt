@@ -1,4 +1,4 @@
-package vdi.components.common
+package vdi.components.common.util.fields
 
 @JvmInline
 value class DatasetID(val value: String) {

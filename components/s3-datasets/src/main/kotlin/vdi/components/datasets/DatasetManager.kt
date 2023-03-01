@@ -1,7 +1,7 @@
 package vdi.components.datasets
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
-import vdi.components.common.DatasetID
+import vdi.components.common.util.fields.DatasetID
 import vdi.components.datasets.paths.S3DatasetPathFactory
 import vdi.components.datasets.paths.S3PathFactory
 
