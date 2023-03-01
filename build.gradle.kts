@@ -39,15 +39,16 @@ tasks.create("compile-design-doc") {
 }
 
 tasks.create("generate-raml-docs") {
-  dependsOn(":service:generate-raml-docs")
+  dependsOn(":modules:rest-service:generate-raml-docs")
 
   doLast {
+    val restModule = project(":modules:rest-service")
     val docsDir = file("docs")
     docsDir.mkdir()
 
     val docFiles = arrayOf(
-      // Source File                       to Target File
-      file("service-vdi/docs/api.html")    to docsDir.resolve("vdi-api.html"),
+      // Source File to Target File
+      restModule.projectDir.resolve("docs/api.html") to docsDir.resolve("vdi-api.html"),
     )
 
     for ((source, target) in docFiles) {

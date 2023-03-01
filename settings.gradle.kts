@@ -47,17 +47,27 @@ pluginManagement {
 rootProject.name = "vdi"
 
 include(":modules:event-router")
-include(":modules:delete-trigger-handler")
-include(":modules:delete-result-handler")
+
+include(":modules:hard-delete-trigger-handler")
+include(":modules:hard-delete-result-handler")
+
 include(":modules:import-trigger-handler")
 include(":modules:import-result-handler")
+
 include(":modules:install-trigger-handler")
 include(":modules:install-result-handler")
+
 include(":modules:share-trigger-handler")
 include(":modules:share-result-handler")
+
 include(":modules:update-meta-trigger-handler")
 include(":modules:update-meta-result-handler")
+
+include(":modules:soft-delete-trigger-handler")
+include(":modules:soft-delete-result-handler")
+
 include(":modules:rest-service")
+
 include(":components:common")
 include(":components:s3-datasets")
 include(":components:json")

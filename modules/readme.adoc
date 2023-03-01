@@ -1,0 +1,100 @@
+= VDI Service Modules
+
+Service modules are the asynchronous sub-services that make up the VDI service.
+
+Each module could, and possibly should be its own, standalone service.
+
+== Services
+
+link:rest-service[VDI REST Service]::
++
+--
+--
+
+
+== Event Routing
+
+link:event-router/[MinIO Bucket Event Router]::
++
+--
+Event router whose input is raw MinIO object put and delete events.  This router
+parses the events coming from MinIO and routes them to the correct Kafka
+"trigger" topics to be picked up by the relevant trigger handlers.
+--
+
+
+== Event Trigger Handlers
+
+link:hard-delete-trigger-handler/[Dataset Hard Delete Trigger Handler]::
++
+--
+Event handler that is triggered for every object that is deleted from MinIO.
+--
+
+link:import-trigger-handler/[Dataset Import Trigger Handler]::
++
+--
+Event handler that is triggered when a new dataset is first uploaded to MinIO to
+perform import processing on the uploaded file(s).
+--
+
+link:install-trigger-handler/[Dataset Install Trigger Handler]::
++
+--
+Event handler that is triggered when a dataset object is uploaded to MinIO
+(including overwrites of existing objects).
+--
+
+link:share-trigger-handler/[Dataset Share Trigger Handler]::
++
+--
+Event handler that is triggered when a dataset share object is uploaded to MinIO
+(including overwrites of existing objects).
+--
+
+link:soft-delete-trigger-handler/[Dataset Soft Delete Trigger Handler]::
++
+--
+Event handler that is triggered when a soft-delete flag object is uploaded to
+MinIO for a target dataset.
+--
+
+link:update-meta-trigger-handler/[Dataset Metadata Update Trigger Handler]::
++
+--
+Event handler that is triggered when a new copy of the dataset metadata object
+is uploaded to MinIO.
+--
+
+
+== Action Result Handlers
+
+link:hard-delete-result-handler/[Dataset Hard Delete Action Result Handler]::
++
+--
+--
+
+link:import-result-handler/[Dataset Import Action Result Handler]::
++
+--
+--
+
+link:install-result-handler/[Dataset Install Action Result Handler]::
++
+--
+--
+
+link:share-result-handler/[Dataset Share Action Result Handler]::
++
+--
+--
+
+link:soft-delete-result-handler/[Dataset Soft Delete Action Result Handler]::
++
+--
+--
+
+link:update-meta-result-handler/[Update Dataset Metadata Action Result Handler]::
++
+--
+--
