@@ -1,0 +1,3 @@
+= VDI Event Router Module
+
+image:../../docs/1.0/assets/modules/event-router/vdi-module-structure-event-router.svg[]
