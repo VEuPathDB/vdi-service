@@ -1,10 +1,32 @@
 = Event Router Environment Variables
+:source-highlighter: highlightjs
 :toc:
 
 These are the environment variables declared and used by the `event-router` VDI
 project module.
 
 == RabbitMQ Configuration
+
+[source, bash]
+----
+GLOBAL_RABBIT_USERNAME=<required>
+GLOBAL_RABBIT_PASSWORD=<required>
+GLOBAL_RABBIT_HOST=[optional]
+GLOBAL_RABBIT_PORT=[optional]
+GLOBAL_RABBIT_CONNECTION_NAME=[optional]
+GLOBAL_RABBIT_VDI_EXCHANGE_NAME=<required>
+GLOBAL_RABBIT_VDI_EXCHANGE_TYPE=[optional]
+GLOBAL_RABBIT_VDI_EXCHANGE_DURABLE=[optional]
+GLOBAL_RABBIT_VDI_EXCHANGE_AUTO_DELETE=[optional]
+GLOBAL_RABBIT_VDI_EXCHANGE_ARGUMENTS=[optional]
+GLOBAL_RABBIT_VDI_QUEUE_NAME=<required>
+GLOBAL_RABBIT_VDI_QUEUE_DURABLE=[optional]
+GLOBAL_RABBIT_VDI_QUEUE_EXCLUSIVE=[optional]
+GLOBAL_RABBIT_VDI_QUEUE_AUTO_DELETE=[optional]
+GLOBAL_RABBIT_VDI_QUEUE_ARGUMENTS=[optional]
+GLOBAL_RABBIT_VDI_ROUTING_KEY=<required>
+GLOBAL_RABBIT_VDI_ROUTING_ARGUMENTS=[optional]
+----
 
 === Connection
 
