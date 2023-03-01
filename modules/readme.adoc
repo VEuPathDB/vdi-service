@@ -1,5 +1,9 @@
 = VDI Service Modules
 
+Service modules are the asynchronous sub-services that make up the VDI service.
+
+Each module could, and possibly should be its own, standalone service.
+
 == Services
 
 link:rest-service[VDI REST Service]::
