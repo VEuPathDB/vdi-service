@@ -1,9 +1,7 @@
 package vdi.components.datasets.paths
 
-internal class S3PathFactory(root: String) {
-  private val root = root.trim('/')
+internal class S3PathFactory {
+  fun rootDir() = S3Paths.rootDir()
 
-  fun rootDir() = S3Paths.rootDir(root)
-
-  fun userDir(ownerID: String) = S3Paths.userDir(root, ownerID)
+  fun userDir(ownerID: String) = S3Paths.userDir(ownerID)
 }

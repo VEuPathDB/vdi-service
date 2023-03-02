@@ -9,7 +9,7 @@ internal class KafkaConsumerImpl(
   override val pollDuration: Duration,
   private  val kafka:        KConsumer<String, String>
 ) : KafkaConsumer {
-  override suspend fun receive(): List<KafkaMessage> {
+  override fun receive(): List<KafkaMessage> {
     return kafka.poll(pollDuration.toJavaDuration())
       .records(topic)
       .map { KafkaMessage(it.key(), it.value()) }

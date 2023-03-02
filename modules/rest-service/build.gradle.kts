@@ -74,7 +74,6 @@ dependencies {
   implementation("org.veupathdb.lib:jaxrs-container-core:6.14.2")
   implementation("org.veupathdb.lib:ldap-utils:1.0.0")
   implementation("org.veupathdb.lib.s3:s34k-minio:0.3.6+s34k-0.7.2")
-  implementation("org.veupathdb.lib.s3:workspaces:4.0.4")
 
 
   implementation("com.zaxxer:HikariCP:5.0.1")

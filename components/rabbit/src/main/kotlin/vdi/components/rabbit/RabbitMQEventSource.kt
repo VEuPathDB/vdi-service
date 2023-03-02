@@ -4,7 +4,7 @@ import com.rabbitmq.client.ConnectionFactory
 import vdi.components.common.ShutdownSignal
 import vdi.components.common.util.SuspendingSequence
 
-internal class RabbitMQEventSource<T>(
+class RabbitMQEventSource<T>(
   private val config: RabbitMQConfig,
   private val shutdownSignal: ShutdownSignal,
   private val mappingFunction: (ByteArray) -> T
@@ -50,7 +50,7 @@ internal class RabbitMQEventSource<T>(
   }
 
   override fun iterator() =
-    RabbitMQBucketEventStream(config.queueName, rChan, config.messagePollingInterval, shutdownSignal, mappingFunction)
+    RabbitMQEventIterator(config.queueName, rChan, config.messagePollingInterval, shutdownSignal, mappingFunction)
 
   override fun close() {
     rChan.close()

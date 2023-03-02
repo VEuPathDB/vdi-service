@@ -1,4 +1,4 @@
-package vdi.components.common
+package vdi.components.common.fields
 
 /**
  * Inline string wrapper used to prevent passwords or other secrets from being

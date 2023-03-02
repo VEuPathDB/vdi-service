@@ -49,4 +49,6 @@ data class KafkaConsumerConfig(
   val reconnectBackoffTime: Duration = 50.milliseconds,
   // retry.backoff.ms
   val retryBackoffTime: Duration = 100.milliseconds,
+
+  val pollDuration: Duration = 500.milliseconds,
 )

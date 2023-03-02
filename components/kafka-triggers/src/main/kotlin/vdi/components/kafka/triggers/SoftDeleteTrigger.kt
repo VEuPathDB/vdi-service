@@ -1,3 +1,11 @@
 package vdi.components.kafka.triggers
 
-data class SoftDeleteTrigger(val userID: String, val datasetID: String)
+import com.fasterxml.jackson.annotation.JsonProperty
+
+data class SoftDeleteTrigger(
+  @JsonProperty("userID")
+  val userID:    String,
+
+  @JsonProperty("datasetID")
+  val datasetID: String,
+)

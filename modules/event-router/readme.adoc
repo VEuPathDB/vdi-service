@@ -1,3 +1,7 @@
 = VDI Event Router Module
 
 image:../../docs/1.0/assets/modules/event-router/vdi-module-structure-event-router.svg[]
+
+The event-router module listens for bucket notification events coming from MinIO
+through RabbitMQ, then translates and routes those messages to the appropriate
+Kafka topic in the stack-internal Kafka instance.

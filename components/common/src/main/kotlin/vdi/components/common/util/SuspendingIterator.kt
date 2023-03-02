@@ -1,4 +1,4 @@
-package vdi.components.rabbit
+package vdi.components.common.util
 
 
 interface SuspendingIterator<out T> {

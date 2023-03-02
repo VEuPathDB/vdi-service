@@ -1,15 +1,12 @@
 package vdi.components.datasets
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
-import vdi.components.common.util.fields.DatasetID
+import vdi.components.common.fields.DatasetID
 import vdi.components.datasets.paths.S3DatasetPathFactory
 import vdi.components.datasets.paths.S3PathFactory
 
-class DatasetManager(
-  private val rootPrefix: String,
-  private val s3Bucket: S3Bucket
-) {
-  private val pathFactory = S3PathFactory(rootPrefix)
+class DatasetManager(private val s3Bucket: S3Bucket) {
+  private val pathFactory = S3PathFactory()
 
   /**
    * Returns a [DatasetDirectory] instance representing the S3 "directory" for
@@ -30,7 +27,7 @@ class DatasetManager(
     val ownerID = ownerID.toString()
     val datasetID = datasetID.value
 
-    return DatasetDirectoryImpl(ownerID, datasetID, s3Bucket, S3DatasetPathFactory(rootPrefix, ownerID, datasetID))
+    return DatasetDirectoryImpl(ownerID, datasetID, s3Bucket, S3DatasetPathFactory(ownerID, datasetID))
   }
 
   /**

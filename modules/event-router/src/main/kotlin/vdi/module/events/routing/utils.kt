@@ -39,8 +39,7 @@ internal fun MinIOEvent.isDatasetEvent(bucketName: String): Boolean {
   return true
 }
 
-
-data class DatasetPathSplit(
+internal data class DatasetPathSplit(
   val userID: String,
   val datasetID: String,
   val segment: String,
@@ -70,4 +69,17 @@ internal fun String.isSharePath(): Boolean {
     false
   else
     substring(dirEnd) == S3Paths.SHARES_DIR_NAME
+}
+
+internal data class SharePathSplit(
+  val recipientID: String,
+  val fileName: String,
+)
+
+internal fun String.splitSharePath(): SharePathSplit {
+  val recipientStart = indexOf('/') + 1
+  val recipientEnd   = indexOf('/', recipientStart)
+  val fileStart      = recipientEnd + 1
+
+  return SharePathSplit(substring(recipientStart, recipientEnd), substring(fileStart))
 }

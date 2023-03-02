@@ -7,25 +7,30 @@ project module.
 
 == RabbitMQ Configuration
 
-[source, kotlin]
+[source, shell]
 ----
-GLOBAL_RABBIT_USERNAME=<required>
-GLOBAL_RABBIT_PASSWORD=<required>
-GLOBAL_RABBIT_HOST=[optional]
-GLOBAL_RABBIT_PORT=[optional]
-GLOBAL_RABBIT_CONNECTION_NAME=[optional]
-GLOBAL_RABBIT_VDI_EXCHANGE_NAME=<required>
-GLOBAL_RABBIT_VDI_EXCHANGE_TYPE=[optional]
-GLOBAL_RABBIT_VDI_EXCHANGE_DURABLE=[optional]
-GLOBAL_RABBIT_VDI_EXCHANGE_AUTO_DELETE=[optional]
-GLOBAL_RABBIT_VDI_EXCHANGE_ARGUMENTS=[optional]
-GLOBAL_RABBIT_VDI_QUEUE_NAME=<required>
-GLOBAL_RABBIT_VDI_QUEUE_DURABLE=[optional]
-GLOBAL_RABBIT_VDI_QUEUE_EXCLUSIVE=[optional]
-GLOBAL_RABBIT_VDI_QUEUE_AUTO_DELETE=[optional]
-GLOBAL_RABBIT_VDI_QUEUE_ARGUMENTS=[optional]
-GLOBAL_RABBIT_VDI_ROUTING_KEY=<required>
-GLOBAL_RABBIT_VDI_ROUTING_ARGUMENTS=[optional]
+# Required Environment Variables
+GLOBAL_RABBIT_USERNAME=
+GLOBAL_RABBIT_PASSWORD=
+GLOBAL_RABBIT_VDI_EXCHANGE_NAME=
+GLOBAL_RABBIT_VDI_QUEUE_NAME=
+GLOBAL_RABBIT_VDI_ROUTING_KEY=
+S3_BUCKET_NAME=
+
+# Optional Environment Variables (with their defaults)
+GLOBAL_RABBIT_HOST=localhost
+GLOBAL_RABBIT_PORT=5672
+GLOBAL_RABBIT_CONNECTION_NAME=
+GLOBAL_RABBIT_VDI_EXCHANGE_TYPE=direct
+GLOBAL_RABBIT_VDI_EXCHANGE_DURABLE=true
+GLOBAL_RABBIT_VDI_EXCHANGE_AUTO_DELETE=false
+GLOBAL_RABBIT_VDI_EXCHANGE_ARGUMENTS=
+GLOBAL_RABBIT_VDI_QUEUE_DURABLE=true
+GLOBAL_RABBIT_VDI_QUEUE_EXCLUSIVE=false
+GLOBAL_RABBIT_VDI_QUEUE_AUTO_DELETE=false
+GLOBAL_RABBIT_VDI_QUEUE_ARGUMENTS=
+GLOBAL_RABBIT_VDI_ROUTING_ARGUMENTS=
+GLOBAL_RABBIT_VDI_POLLING_INTERVAL=500ms
 ----
 
 === Connection
@@ -255,6 +260,573 @@ h| Type
 | map<string, string>
 h| Default
 | emptyMap()
+|===
+
+=== Misc
+
+`GLOBAL_RABBIT_VDI_POLLING_INTERVAL`::
+Interval at which RabbitMQ will be polled for new messages.
++
+Valid duration formats include:
++
+[source]
+----
+500ms
+30s
+10m
+5h
+5h 10m 30s 500ms
+----
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| duration
+h| Default
+| 500ms
+|===
+
+`S3_BUCKET_NAME`::
+Name of the S3 (MinIO) bucket that from which events should be listened for.
+Events coming from buckets with names other than this value will be ignored.
++
+[cols="1h,9m"]
+|===
+h| Required
+| true
+h| Type
+| string
+|===
+
+== Kafka Configuration
+
+[source, shell]
+----
+# Required Environment Variables
+KAFKA_SERVERS=
+KAFKA_PRODUCER_CLIENT_ID=
+
+# Optional Environment Variables (with their defaults)
+KAFKA_PRODUCER_BUFFER_MEMORY_BYTES=33554432
+KAFKA_PRODUCER_COMPRESSION_TYPE=none
+KAFKA_PRODUCER_SEND_RETRIES=2147483647
+KAFKA_PRODUCER_BATCH_SIZE=16384
+KAFKA_PRODUCER_CONNECTIONS_MAX_IDLE=9m
+KAFKA_PRODUCER_DELIVERY_TIMEOUT=2m
+KAFKA_PRODUCER_LINGER_TIME=0ms
+KAFKA_PRODUCER_MAX_BLOCKING_TIMEOUT=1m
+KAFKA_PRODUCER_MAX_REQUEST_SIZE_BYTES=1048576
+KAFKA_PRODUCER_RECEIVE_BUFFER_SIZE_BYTES=32768
+KAFKA_PRODUCER_REQUEST_TIMEOUT=30s
+KAFKA_PRODUCER_SEND_BUFFER_SIZE_BYTES=131072
+KAFKA_PRODUCER_RECONNECT_BACKOFF_MAX_TIME=1s
+KAFKA_PRODUCER_RECONNECT_BACKOFF_TIME=50ms
+KAFKA_PRODUCER_RETRY_BACKOFF_TIME=100ms
+KAFKA_MESSAGE_KEY_IMPORT_TRIGGERS=import-trigger
+KAFKA_MESSAGE_KEY_INSTALL_TRIGGERS=install-trigger
+KAFKA_MESSAGE_KEY_UPDATE_META_TRIGGERS=update-meta-trigger
+KAFKA_MESSAGE_KEY_SOFT_DELETE_TRIGGERS=soft-delete-trigger
+KAFKA_MESSAGE_KEY_HARD_DELETE_TRIGGERS=hard-delete-trigger
+KAFKA_MESSAGE_KEY_SHARE_TRIGGERS=share-trigger
+KAFKA_TOPIC_IMPORT_TRIGGERS=import-triggers
+KAFKA_TOPIC_INSTALL_TRIGGERS=install-triggers
+KAFKA_TOPIC_UPDATE_META_TRIGGERS=update-meta-triggers
+KAFKA_TOPIC_SOFT_DELETE_TRIGGERS=soft-delete-triggers
+KAFKA_TOPIC_HARD_DELETE_TRIGGERS=hard-delete-triggers
+KAFKA_TOPIC_SHARE_TRIGGERS=share-triggers
+----
+
+`KAFKA_SERVERS`::
+A comma separated list of `host:port` pairs for Kafka hosts.
++
+.Example
+----
+KAFKA_SERVERS=kafka1.site.com:9092,kafka2.site.com:9092
+----
++
+[cols="1h,9m"]
+|===
+h| Required
+| true
+h| Type
+| list<string>
+|===
+
+=== Producers
+
+`KAFKA_PRODUCER_BUFFER_MEMORY_BYTES`::
+Total memory (in bytes) that individual message producers may use to buffer
+records waiting to be sent to the Kafka server.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| uint64
+h| Default
+| 33554432
+|===
+
+`KAFKA_PRODUCER_COMPRESSION_TYPE`::
+Compression type for compressing messages sent by message producers.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| enum: "none", "gzip", "snappy", "lz4", "zstd"
+h| Default
+| "none"
+|===
+
+`KAFKA_PRODUCER_SEND_RETRIES`::
+How many attempts should be made to retry sending a message or batch of messages
+when sending fails for a transient error.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| uint32
+h| Default
+| 2147483647
+|===
+
+`KAFKA_PRODUCER_BATCH_SIZE`::
+How many messages should be batched together before sending to the Kafka broker.
++
+Messages will be batched for the configured `KAFKA_PRODUCER_LINGER_TIME`
+duration at most before sending.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| uint32
+h| Default
+| 16384
+|===
+
+`KAFKA_PRODUCER_CLIENT_ID`::
+ID of the producer client that will be sent to the Kafka broker when making
+requests.
++
+[cols="1h,9m"]
+|===
+h| Required
+| true
+h| Type
+| string
+|===
+
+`KAFKA_PRODUCER_CONNECTIONS_MAX_IDLE`::
+Close idle connections after this duration.
++
+Valid duration formats include:
++
+[source]
+----
+500ms
+30s
+10m
+5h
+5h 10m 30s 500ms
+----
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| duration
+h| Default
+| 9m
+|===
+
+`KAFKA_PRODUCER_DELIVERY_TIMEOUT`::
+Upper bound on the time to report success or failure after attempting to send
+a message to the Kafka broker.
++
+Valid duration formats include:
++
+[source]
+----
+500ms
+30s
+10m
+5h
+5h 10m 30s 500ms
+----
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| duration
+h| Default
+| 2m
+|===
+
+`KAFKA_PRODUCER_LINGER_TIME`::
+How long to wait for messages to form message batches.  If there are no current
+batches being built, an attempt to send a message will wait for this long for
+additional messages before the batch of one or more messages is sent to the
+Kafka broker.
++
+Setting this value to `0` effectively disables message batching.
++
+Valid duration formats include:
++
+[source]
+----
+500ms
+30s
+10m
+5h
+5h 10m 30s 500ms
+----
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| duration
+h| Default
+| 0ms
+|===
+
+`KAFKA_PRODUCER_MAX_BLOCKING_TIMEOUT`::
+Controls how long attempting to send a message may block for.
++
+Valid duration formats include:
++
+[source]
+----
+500ms
+30s
+10m
+5h
+5h 10m 30s 500ms
+----
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| duration
+h| Default
+| 1m
+|===
+
+`KAFKA_PRODUCER_MAX_REQUEST_SIZE_BYTES`::
+Controls the maximum size (in bytes) of a single request to Kafka.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| uint32
+h| Default
+| 1048576
+|===
+
+`KAFKA_PRODUCER_RECEIVE_BUFFER_SIZE_BYTES`::
+The size (in bytes) of the TCP receive buffer (`SO_RCVBUF`) to use when reading
+data. If the value is -1, the OS default will be used.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| int
+h| Default
+| 32768
+|===
+
+`KAFKA_PRODUCER_REQUEST_TIMEOUT`::
+Controls the maximum amount of time the client will wait for a response to a
+request.
++
+Valid duration formats include:
++
+[source]
+----
+500ms
+30s
+10m
+5h
+5h 10m 30s 500ms
+----
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| duration
+h| Default
+| 30s
+|===
+
+`KAFKA_PRODUCER_SEND_BUFFER_SIZE_BYTES`::
+The size (in bytes) of the TCP send buffer (`SO_SNDBUF`) to use when sending
+data. If the value is -1, the OS default will be used.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| int
+h| Default
+| 131072
+|===
+
+`KAFKA_PRODUCER_RECONNECT_BACKOFF_MAX_TIME`::
+The maximum amount of time in milliseconds to wait when reconnecting to a broker
+that has repeatedly failed to connect.
++
+Valid duration formats include:
++
+[source]
+----
+500ms
+30s
+10m
+5h
+5h 10m 30s 500ms
+----
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| link:environment-variables.adoc[duration]
+h| Default
+| 1s
+|===
+
+`KAFKA_PRODUCER_RECONNECT_BACKOFF_TIME`::
+The base amount of time to wait before attempting to reconnect to a given host.
++
+Valid duration formats include:
++
+[source]
+----
+500ms
+30s
+10m
+5h
+5h 10m 30s 500ms
+----
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| duration
+h| Default
+| 50ms
+|===
+
+`KAFKA_PRODUCER_RETRY_BACKOFF_TIME`::
+The amount of time to wait before attempting to retry a failed request to a
+given topic partition.
++
+Valid duration formats include:
++
+[source]
+----
+500ms
+30s
+10m
+5h
+5h 10m 30s 500ms
+----
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| duration
+h| Default
+| 100ms
+|===
+
+
+=== Message Keys
+
+`KAFKA_MESSAGE_KEY_IMPORT_TRIGGERS`::
+Message key to use when sending import trigger events.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "import-trigger"
+|===
+
+`KAFKA_MESSAGE_KEY_INSTALL_TRIGGERS`::
+Message key to use when sending install trigger events.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "install-trigger"
+|===
+
+`KAFKA_MESSAGE_KEY_UPDATE_META_TRIGGERS`::
+Message key to use when sending update-meta trigger events.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "update-meta-trigger"
+|===
+
+`KAFKA_MESSAGE_KEY_SOFT_DELETE_TRIGGERS`::
+Message key to use when sending soft-delete trigger events.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "soft-delete-trigger"
+|===
+
+`KAFKA_MESSAGE_KEY_HARD_DELETE_TRIGGERS`::
+Message key to use when sending hard-delete trigger events.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "hard-delete-trigger"
+|===
+
+`KAFKA_MESSAGE_KEY_SHARE_TRIGGERS`::
+Message key to use when sending share trigger events.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "share-trigger"
+|===
+
+
+=== Topics
+
+`KAFKA_TOPIC_IMPORT_TRIGGERS`::
+Name of the topic to which import trigger events will be sent.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "import-triggers"
+|===
+
+`KAFKA_TOPIC_INSTALL_TRIGGERS`::
+Name of the topic to which install trigger events will be sent.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "install-triggers"
+|===
+
+`KAFKA_TOPIC_UPDATE_META_TRIGGERS`::
+Name of the topic to which update-meta trigger events will be sent.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "update-meta-triggers"
+|===
+
+`KAFKA_TOPIC_SOFT_DELETE_TRIGGERS`::
+Name of the topic to which soft-delete trigger events will be sent.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "soft-delete-triggers"
+|===
+
+`KAFKA_TOPIC_HARD_DELETE_TRIGGERS`::
+Name of the topic to which hard-delete trigger events will be sent.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "hard-delete-triggers"
+|===
+
+`KAFKA_TOPIC_SHARE_TRIGGERS`::
+Name of the topic to which share trigger events will be sent.
++
+[cols="1h,9m"]
+|===
+h| Required
+| false
+h| Type
+| string
+h| Default
+| "share-triggers"
 |===
 
 

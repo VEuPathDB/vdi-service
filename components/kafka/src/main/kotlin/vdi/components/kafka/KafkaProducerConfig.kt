@@ -1,45 +1,57 @@
 package vdi.components.kafka
 
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import vdi.components.common.util.HostAddress
 
 data class KafkaProducerConfig(
   // bootstrap.servers
   val servers: Array<HostAddress>,
+
   // buffer.memory
-  val bufferMemoryBytes: Long = 33554432L,
+  val bufferMemoryBytes: Long = KafkaProducerConfigDefaults.BUFFER_MEMORY_BYTES,
+
   // compression.type
-  val compressionType: KafkaCompressionType = KafkaCompressionType.NONE,
+  val compressionType: KafkaCompressionType = KafkaProducerConfigDefaults.COMPRESSION_TYPE,
+
   // retries
-  val sendRetries: Int = 2147483647,
+  val sendRetries: Int = KafkaProducerConfigDefaults.SEND_RETRIES,
+
   // batch.size
-  val batchSize: Int = 16384,
+  val batchSize: Int = KafkaProducerConfigDefaults.BATCH_SIZE,
+
   // client.id
   val clientID: String,
-  // connections.max.idle.ms
-  val connectionsMaxIdle: Duration = 9.minutes,
-  // delivery.timeout.ms
-  val deliveryTimeout: Duration = 2.minutes,
-  // linger.ms
-  val lingerTime: Duration = 0.milliseconds,
-  // max.block.ms
-  val maxBlockingTimeout: Duration = 1.minutes,
-  // max.request.size
-  val maxRequestSizeBytes: Int = 1048576,
-  // receive.buffer.bytes
-  val receiveBufferSizeBytes: Int = 32768,
-  // request.timeout.ms
-  val requestTimeout: Duration = 30.seconds,
-  // send.buffer.bytes
-  val sendBufferSizeBytes: Int = 131072,
-  // reconnect.backoff.max.ms
-  val reconnectBackoffMaxTime: Duration = 1.seconds,
-  // reconnect.backoff.ms
-  val reconnectBackoffTime: Duration = 50.milliseconds,
-  // retry.backoff.ms
-  val retryBackoffTime: Duration = 100.milliseconds,
-)
 
+  // connections.max.idle.ms
+  val connectionsMaxIdle: Duration = KafkaProducerConfigDefaults.CONNECTIONS_MAX_IDLE,
+
+  // delivery.timeout.ms
+  val deliveryTimeout: Duration = KafkaProducerConfigDefaults.DELIVERY_TIMEOUT,
+
+  // linger.ms
+  val lingerTime: Duration = KafkaProducerConfigDefaults.LINGER_TIME,
+
+  // max.block.ms
+  val maxBlockingTimeout: Duration = KafkaProducerConfigDefaults.MAX_BLOCKING_TIMEOUT,
+
+  // max.request.size
+  val maxRequestSizeBytes: Int = KafkaProducerConfigDefaults.MAX_REQUEST_SIZE_BYTES,
+
+  // receive.buffer.bytes
+  val receiveBufferSizeBytes: Int = KafkaProducerConfigDefaults.RECEIVE_BUFFER_SIZE_BYTES,
+
+  // request.timeout.ms
+  val requestTimeout: Duration = KafkaProducerConfigDefaults.REQUEST_TIMEOUT,
+
+  // send.buffer.bytes
+  val sendBufferSizeBytes: Int = KafkaProducerConfigDefaults.SEND_BUFFER_SIZE_BYTES,
+
+  // reconnect.backoff.max.ms
+  val reconnectBackoffMaxTime: Duration = KafkaProducerConfigDefaults.RECONNECT_BACKOFF_MAX_TIME,
+
+  // reconnect.backoff.ms
+  val reconnectBackoffTime: Duration = KafkaProducerConfigDefaults.RECONNECT_BACKOFF_TIME,
+
+  // retry.backoff.ms
+  val retryBackoffTime: Duration = KafkaProducerConfigDefaults.RETRY_BACKOFF_TIME,
+)

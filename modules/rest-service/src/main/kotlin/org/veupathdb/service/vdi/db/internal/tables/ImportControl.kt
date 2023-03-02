@@ -2,7 +2,7 @@ package org.veupathdb.service.vdi.db.internal.tables
 
 import org.veupathdb.service.vdi.generated.model.DatasetImportStatus
 import java.sql.Connection
-import vdi.components.common.util.fields.DatasetID
+import vdi.components.common.fields.DatasetID
 
 object ImportControl {
   private const val STATUS_AWAITING_IMPORT = "awaiting-import"

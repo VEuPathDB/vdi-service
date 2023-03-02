@@ -20,3 +20,7 @@ dependencies {
   testImplementation("org.mockito:mockito-core:4.8.0")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
 }
+
+tasks.test {
+  useJUnitPlatform()
+}

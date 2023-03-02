@@ -9,7 +9,7 @@ import com.rabbitmq.client.Channel as RChannel
 
 private const val MAX_LOGGABLE_MESSAGE_SIZE_BYTES = 1024 * 16
 
-internal class RabbitMQBucketEventStream<T>(
+class RabbitMQEventIterator<T>(
   private val queue: String,
   private val rChan: RChannel,
   private val pollingInterval: Duration,

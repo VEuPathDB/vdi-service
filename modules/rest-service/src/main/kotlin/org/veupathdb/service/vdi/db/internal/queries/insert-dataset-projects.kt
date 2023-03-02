@@ -1,7 +1,7 @@
 package org.veupathdb.service.vdi.db.internal.queries
 
 import java.sql.Connection
-import vdi.components.common.util.fields.DatasetID
+import vdi.components.common.fields.DatasetID
 
 // language=postgresql
 private const val SQL = """
