@@ -1,17 +1,14 @@
-package vdi.module.events.routing.rabbit
+package vdi.components.rabbit
 
 import com.rabbitmq.client.ConnectionFactory
 import vdi.components.common.ShutdownSignal
-import vdi.module.events.routing.config.EventRouterRabbitConfig
+import vdi.components.common.util.SuspendingSequence
 
-/**
- * RabbitMQ implementation for [BucketEventSource].
- *
- * @author Elizabeth Paige Harper - https://github.com/foxcapades
- */
-internal class RabbitMQBucketEventSource(
-  private val config: EventRouterRabbitConfig
-) : BucketEventSource {
+internal class RabbitMQEventSource<T>(
+  private val config: RabbitMQConfig,
+  private val shutdownSignal: ShutdownSignal,
+  private val mappingFunction: (ByteArray) -> T
+) : SuspendingSequence<T> {
   private val rCon = ConnectionFactory()
     .apply {
       host = config.serverHost
@@ -27,8 +24,6 @@ internal class RabbitMQBucketEventSource(
     }!!
 
   private val rChan = rCon.createChannel()
-
-  var pollingIntervalMillis: UInt = 500u
 
   init {
     rChan.exchangeDeclare(
@@ -54,8 +49,8 @@ internal class RabbitMQBucketEventSource(
     )
   }
 
-  override fun stream(shutdownSignal: ShutdownSignal) =
-    RabbitMQBucketEventStream(config.queueName, rChan, pollingIntervalMillis, shutdownSignal)
+  override fun iterator() =
+    RabbitMQBucketEventStream(config.queueName, rChan, config.messagePollingInterval, shutdownSignal, mappingFunction)
 
   override fun close() {
     rChan.close()

@@ -1,30 +1,25 @@
-package vdi.module.events.routing.rabbit
+package vdi.components.rabbit
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
+import kotlin.time.Duration
 import kotlinx.coroutines.delay
 import vdi.components.common.ShutdownSignal
-import vdi.components.json.JSON
-import vdi.module.events.routing.model.MinIOEvent
+import vdi.components.common.util.SuspendingIterator
 import com.rabbitmq.client.Channel as RChannel
 
 private const val MAX_LOGGABLE_MESSAGE_SIZE_BYTES = 1024 * 16
 
-/**
- * RabbitMQ implementation of [BucketEventStream].
- *
- * @author Elizabeth Paige Harper - https://github.com/foxcapades
- */
-internal class RabbitMQBucketEventStream(
+internal class RabbitMQBucketEventStream<T>(
   private val queue: String,
   private val rChan: RChannel,
-  private val pollingIntervalMillis: UInt = 500u,
-  override val shutdownSignal: ShutdownSignal
-) : BucketEventStream {
+  private val pollingInterval: Duration,
+  private val shutdownSignal: ShutdownSignal,
+  private val mappingFunction: (ByteArray) -> T
+) : SuspendingIterator<T> {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private var nextValue: MinIOEvent? = null
+  private var nextValue: T? = null
 
   override suspend fun hasNext(): Boolean {
     log.trace("hasNext()")
@@ -38,7 +33,7 @@ internal class RabbitMQBucketEventStream(
           log.debug("received a message from RabbitMQ, attempting to parse the message as a MinIO event.")
 
            try {
-            nextValue = JSON.readValue(res.body)
+            nextValue = mappingFunction(res.body)
             return true
           } catch (e: Throwable) {
              log.error("message from RabbitMQ could not be parsed as a MinIO event", e)
@@ -49,7 +44,7 @@ internal class RabbitMQBucketEventStream(
                log.error("message was too large to print")
           }
         } else {
-          delay(pollingIntervalMillis.toLong())
+          delay(pollingInterval)
         }
       } else {
         return false
@@ -59,7 +54,7 @@ internal class RabbitMQBucketEventStream(
     return false
   }
 
-  override fun next(): MinIOEvent {
+  override suspend fun next(): T {
     log.trace("next()")
     return nextValue.also { nextValue = null } ?: throw NoSuchElementException()
   }

@@ -21,9 +21,13 @@ class ShutdownSignal {
     else if (channel.isEmpty)
       false
     else {
-      channel.receive()
-      triggered = true
+      await()
       true
     }
+  }
+
+  suspend fun await() {
+    channel.receive()
+    triggered = true
   }
 }

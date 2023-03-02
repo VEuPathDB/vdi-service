@@ -17,6 +17,22 @@ allprojects {
   }
 }
 
+dependencies {
+  implementation(project(":components:common"))
+
+  implementation(project(":modules:event-router"))
+
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+
+  implementation("org.slf4j:slf4j-api:1.7.36")
+  implementation("org.apache.logging.log4j:log4j-api:2.20.0")
+  implementation("org.apache.logging.log4j:log4j-core:2.20.0")
+  implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.20.0")
+}
+
+
+// region Custom Tasks
+
 tasks.create("compile-design-doc") {
   doLast {
     val command = arrayOf(
@@ -58,3 +74,5 @@ tasks.create("generate-raml-docs") {
     }
   }
 }
+
+// endregion Custom Tasks
