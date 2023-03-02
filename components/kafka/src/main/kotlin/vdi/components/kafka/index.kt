@@ -34,7 +34,12 @@ fun KafkaConsumer(topic: String, config: KafkaConsumerConfig): KafkaConsumer {
       setProperty(ConsumerConfig.RETRY_BACKOFF_MS_CONFIG, config.retryBackoffTime.inWholeMilliseconds.toString())
     }
 
-  return KafkaConsumerImpl(topic, config.pollDuration, StringDeserializer().let { KConsumer(props, it, it) })
+  return KafkaConsumerImpl(
+    topic,
+    config.pollDuration,
+    StringDeserializer()
+      .let { KConsumer(props, it, it).apply { subscribe(listOf(topic)) } }
+  )
 }
 
 fun KafkaProducer(config: KafkaProducerConfig): KafkaProducer {

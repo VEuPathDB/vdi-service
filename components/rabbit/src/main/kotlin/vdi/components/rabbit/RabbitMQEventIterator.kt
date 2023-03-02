@@ -26,7 +26,6 @@ class RabbitMQEventIterator<T>(
 
     while (!shutdownSignal.isTriggered()) {
       if (rChan.isOpen) {
-        log.trace("polling RabbitMQ for a message.")
         val res = rChan.basicGet(queue, true)
 
         if (res != null) {

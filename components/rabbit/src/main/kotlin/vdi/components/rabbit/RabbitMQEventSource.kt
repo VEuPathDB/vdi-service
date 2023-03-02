@@ -11,8 +11,8 @@ class RabbitMQEventSource<T>(
 ) : SuspendingSequence<T> {
   private val rCon = ConnectionFactory()
     .apply {
-      host = config.serverHost
-      port = config.serverPort.toInt()
+      host = config.serverAddress.host
+      port = config.serverAddress.port.toInt()
       username = config.serverUsername
       password = config.serverPassword.value
     }

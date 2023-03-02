@@ -6,7 +6,7 @@ import vdi.components.common.fields.SecretString
 import vdi.components.common.util.HostAddress
 
 data class RabbitMQConfig(
-  val serverAddress: HostAddress,
+  val serverAddress: HostAddress = HostAddress("localhost", 5672u),
   val serverUsername: String,
   val serverPassword: SecretString,
   val serverConnectionName: String? = null,

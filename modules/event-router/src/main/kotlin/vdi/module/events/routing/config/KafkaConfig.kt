@@ -2,7 +2,7 @@ package vdi.module.events.routing.config
 
 import vdi.components.kafka.KafkaProducerConfig
 
-internal data class KafkaConfig(
+data class KafkaConfig(
   val producerConfig: KafkaProducerConfig,
 
   val importTriggerMessageKey: String = KafkaConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
