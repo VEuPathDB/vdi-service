@@ -2,12 +2,6 @@ plugins {
   kotlin("jvm") version "1.8.0"
 }
 
-java {
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(18))
-  }
-}
-
 dependencies {
   implementation(project(":components:common"))
   implementation(project(":components:json"))

@@ -62,15 +62,15 @@ services:
       timeout: 10s
       retries: 5
 
-  vdi-cache-db:
+  cache-db:
     ports:
     - "5432:5432"
 
-  vdi-kafka:
+  kafka:
     ports:
     - "9092:9092"
 
-  vdi-service:
+  service:
     build:
       context: .
     ports:

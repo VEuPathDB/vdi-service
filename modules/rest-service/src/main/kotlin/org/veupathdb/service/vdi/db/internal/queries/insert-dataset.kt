@@ -25,7 +25,7 @@ fun Connection.insertDatasetRecord(
   ownerID: Long,
 ) {
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, datasetID.value)
+    ps.setString(1, datasetID.toString())
     ps.setString(2, typeName)
     ps.setString(3, typeVersion)
     ps.setString(4, ownerID.toString())

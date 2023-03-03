@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import vdi.components.common.fields.SecretString
 import vdi.components.common.VDIServiceModule
+import vdi.components.common.fields.DatasetID
+import vdi.components.common.fields.UserID
 import vdi.components.common.util.HostAddress
 import vdi.components.datasets.paths.S3Paths
 import vdi.components.kafka.KafkaConsumer
@@ -81,7 +83,10 @@ object Flumps {
 
     val bucket = s3.buckets[BucketName("some-other-bucket")]!!
 
-    bucket.objects.put(S3Paths.datasetMetaFile("123456", "146eff4f2050bf87dd8a14fd359a210d"), "contents".byteInputStream())
+    bucket.objects.put(S3Paths.datasetMetaFile(
+      UserID("123456"),
+      DatasetID("146eff4f2050bf87dd8a14fd359a210d")
+    ), "contents".byteInputStream())
   }
 }
 

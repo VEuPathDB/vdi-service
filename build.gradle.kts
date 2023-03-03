@@ -1,5 +1,10 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   kotlin("jvm") version "1.8.0"
+  id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 allprojects {
@@ -13,6 +18,34 @@ allprojects {
         username = if (extra.has("gpr.user")) extra["gpr.user"] as String? else System.getenv("GITHUB_USERNAME")
         password = if (extra.has("gpr.key")) extra["gpr.key"] as String? else System.getenv("GITHUB_TOKEN")
       }
+    }
+  }
+
+  tasks.withType<KotlinCompile> {
+    compilerOptions {
+      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_18)
+    }
+  }
+
+  tasks.withType<JavaCompile> {
+    sourceCompatibility = "18"
+    targetCompatibility = "18"
+  }
+
+  tasks.withType<Test> {
+    testLogging {
+      events(
+        TestLogEvent.FAILED,
+        TestLogEvent.SKIPPED,
+        TestLogEvent.STANDARD_OUT,
+        TestLogEvent.STANDARD_ERROR,
+        TestLogEvent.PASSED
+      )
+
+      exceptionFormat = TestExceptionFormat.FULL
+      showExceptions = true
+      showCauses = true
+      showStackTraces = true
     }
   }
 }
@@ -40,6 +73,10 @@ dependencies {
   implementation("org.apache.kafka:kafka-clients:3.4.0")
 }
 
+tasks.shadowJar {
+  exclude("**/Log4j2Plugins.dat")
+  archiveFileName.set("service.jar")
+}
 
 // region Custom Tasks
 

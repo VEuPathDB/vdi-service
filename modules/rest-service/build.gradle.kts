@@ -3,7 +3,6 @@ import org.veupathdb.lib.gradle.container.util.Logger.Level
 plugins {
   kotlin("jvm")
   id("org.veupathdb.lib.gradle.container.container-utils") version "4.8.3"
-  id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 // configure VEupathDB container plugin
@@ -55,17 +54,6 @@ containerBuild {
     environment = mapOf(/*Pair("env-key", "env-val"), Pair("env-key", "env-val")*/)
   }
 
-}
-
-java {
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(18))
-  }
-}
-
-tasks.shadowJar {
-  exclude("**/Log4j2Plugins.dat")
-  archiveFileName.set("service.jar")
 }
 
 dependencies {

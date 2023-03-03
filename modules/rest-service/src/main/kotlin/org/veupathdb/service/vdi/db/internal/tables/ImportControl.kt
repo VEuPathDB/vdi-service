@@ -22,7 +22,7 @@ object ImportControl {
 
   fun delete(con: Connection, datasetID: DatasetID) {
     con.prepareStatement(DELETE_SQL).use { ps ->
-      ps.setString(1, datasetID.value)
+      ps.setString(1, datasetID.toString())
       ps.execute()
     }
   }
@@ -44,7 +44,7 @@ object ImportControl {
 
   fun insert(con: Connection, datasetID: DatasetID, status: DatasetImportStatus) {
     con.prepareStatement(INSERT_SQL).use { ps ->
-      ps.setString(1, datasetID.value)
+      ps.setString(1, datasetID.toString())
       ps.setString(2, status.toDBString())
       ps.execute()
     }
@@ -66,7 +66,7 @@ object ImportControl {
 
   fun select(con: Connection, datasetID: DatasetID): DatasetImportStatus? =
     con.prepareStatement(SELECT_SQL).use { ps ->
-      ps.setString(1, datasetID.value)
+      ps.setString(1, datasetID.toString())
       ps.executeQuery().use { rs ->
         if (rs.next())
           null
@@ -92,7 +92,7 @@ object ImportControl {
   fun update(con: Connection, datasetID: DatasetID, status: DatasetImportStatus) {
     con.prepareStatement(UPDATE_SQL).use { ps ->
       ps.setString(1, status.toDBString())
-      ps.setString(2, datasetID.value)
+      ps.setString(2, datasetID.toString())
     }
   }
 

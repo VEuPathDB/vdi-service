@@ -14,7 +14,8 @@ WORKDIR /workspace
 COPY settings.gradle.kts settings.gradle.kts
 COPY build.gradle.kts build.gradle.kts
 COPY components components
-COPY service service
+COPY modules modules
+COPY src src
 
 RUN gradle --no-daemon test shadowJar
 
@@ -34,6 +35,6 @@ RUN apk add --no-cache tzdata \
 ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
     JVM_ARGS=""
 
-COPY --from=prep /workspace/service/build/libs/service.jar /service.jar
+COPY --from=prep /workspace/build/libs/service.jar /service.jar
 
 CMD java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /service.jar

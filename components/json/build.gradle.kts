@@ -2,10 +2,6 @@ plugins {
   kotlin("jvm") version "1.8.0"
 }
 
-kotlin {
-  this.jvmToolchain(18)
-}
-
 dependencies {
   api("com.fasterxml.jackson.core:jackson-core:2.14.2")
   api("com.fasterxml.jackson.core:jackson-databind:2.14.2")

@@ -17,7 +17,7 @@ VALUES
 fun Connection.insertDatasetProjects(datasetID: DatasetID, projects: Iterable<String>) {
   prepareStatement(SQL).use { ps ->
     for (project in projects) {
-      ps.setString(1, datasetID.value)
+      ps.setString(1, datasetID.toString())
       ps.setString(2, project)
       ps.addBatch()
     }

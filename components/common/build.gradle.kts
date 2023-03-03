@@ -2,10 +2,6 @@ plugins {
   kotlin("jvm") version "1.8.0"
 }
 
-kotlin {
-  jvmToolchain(18)
-}
-
 dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
