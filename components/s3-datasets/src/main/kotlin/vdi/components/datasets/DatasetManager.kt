@@ -2,6 +2,8 @@ package vdi.components.datasets
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import vdi.components.common.fields.DatasetID
+import vdi.components.common.fields.UserID
+import vdi.components.common.fields.toUserIDOrNull
 import vdi.components.datasets.paths.S3DatasetPathFactory
 import vdi.components.datasets.paths.S3PathFactory
 
@@ -23,10 +25,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
    * @return A new [DatasetDirectory] instance representing the S3 path for the
    * target dataset.
    */
-  fun getDatasetDirectory(ownerID: Long, datasetID: DatasetID): DatasetDirectory {
-    val ownerID = ownerID.toString()
-    val datasetID = datasetID.toString()
-
+  fun getDatasetDirectory(ownerID: UserID, datasetID: DatasetID): DatasetDirectory {
     return DatasetDirectoryImpl(ownerID, datasetID, s3Bucket, S3DatasetPathFactory(ownerID, datasetID))
   }
 
@@ -37,15 +36,15 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
    *
    * @param ownerID WDK user ID of the user who owns or will own the dataset.
    */
-  fun listDatasets(ownerID: Long): List<DatasetID> {
-    return s3Bucket.objects.listSubPaths(pathFactory.userDir(ownerID.toString()))
+  fun listDatasets(ownerID: UserID): List<DatasetID> {
+    return s3Bucket.objects.listSubPaths(pathFactory.userDir(ownerID))
       .commonPrefixes()
       .map(::DatasetID)
   }
 
-  fun listUsers(): List<Long> {
+  fun listUsers(): List<UserID> {
     return s3Bucket.objects.listSubPaths(pathFactory.rootDir())
       .commonPrefixes()
-      .map(String::toLong)
+      .map { it.toUserIDOrNull() ?: throw IllegalStateException("invalid user ID: $it") }
   }
 }

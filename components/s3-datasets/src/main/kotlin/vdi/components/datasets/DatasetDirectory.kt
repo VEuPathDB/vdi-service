@@ -1,14 +1,16 @@
 package vdi.components.datasets
 
 import java.io.InputStream
+import vdi.components.common.fields.DatasetID
+import vdi.components.common.fields.UserID
 import vdi.components.datasets.model.DatasetManifest
 import vdi.components.datasets.model.DatasetMeta
 
 interface DatasetDirectory {
 
-  val ownerID: String
+  val ownerID: UserID
 
-  val datasetID: String
+  val datasetID: DatasetID
 
   /**
    * Tests whether this [DatasetDirectory] currently exists.
@@ -148,7 +150,7 @@ interface DatasetDirectory {
    * The values in the returned map provide access to further information about
    * the share itself.
    */
-  fun getShares(): Map<String, DatasetShare>
+  fun getShares(): Map<UserID, DatasetShare>
 
   /**
    * Puts a new "share" into this [DatasetDirectory] by creating a share offer
@@ -156,6 +158,6 @@ interface DatasetDirectory {
    *
    * @param recipientID ID of the share recipient.
    */
-  fun putShare(recipientID: String)
+  fun putShare(recipientID: UserID)
 }
 

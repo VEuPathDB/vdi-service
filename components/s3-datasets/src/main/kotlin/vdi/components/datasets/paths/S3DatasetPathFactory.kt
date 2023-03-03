@@ -1,8 +1,11 @@
 package vdi.components.datasets.paths
 
+import vdi.components.common.fields.DatasetID
+import vdi.components.common.fields.UserID
+
 internal class S3DatasetPathFactory(
-  private val ownerID: String,
-  private val datasetID: String,
+  private val ownerID: UserID,
+  private val datasetID: DatasetID,
 ) {
   fun rootDir() = S3Paths.rootDir()
 
@@ -25,9 +28,9 @@ internal class S3DatasetPathFactory(
 
   fun datasetSharesDir() = S3Paths.datasetSharesDir(ownerID, datasetID)
 
-  fun datasetShareOfferFile(recipientID: String) = S3Paths.datasetShareOfferFile(ownerID, datasetID, recipientID)
+  fun datasetShareOfferFile(recipientID: UserID) = S3Paths.datasetShareOfferFile(ownerID, datasetID, recipientID)
 
-  fun datasetShareReceiptFile(recipientID: String) =
+  fun datasetShareReceiptFile(recipientID: UserID) =
     S3Paths.datasetShareReceiptFile(ownerID, datasetID, recipientID)
 
 

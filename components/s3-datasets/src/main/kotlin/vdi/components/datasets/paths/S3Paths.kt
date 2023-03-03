@@ -1,5 +1,7 @@
 package vdi.components.datasets.paths
 
+import vdi.components.common.fields.DatasetID
+import vdi.components.common.fields.UserID
 import vdi.components.datasets.util.PathBuilder
 
 @Suppress("NOTHING_TO_INLINE")
@@ -29,47 +31,47 @@ object S3Paths {
   /**
    * `{root}/{user-id}/`
    */
-  fun userDir(userID: String) =
+  fun userDir(userID: UserID) =
     (userPath(userID) / "").toString()
 
   /**
    * `{root}/{user-id}/{dataset-id}`
    */
-  fun datasetDir(userID: String, datasetID: String) =
+  fun datasetDir(userID: UserID, datasetID: DatasetID) =
     (datasetPath(userID, datasetID) / "").toString()
 
 
-  fun datasetManifestFile(userID: String, datasetID: String) =
+  fun datasetManifestFile(userID: UserID, datasetID: DatasetID) =
     (datasetContentPath(userID, datasetID) / MANIFEST_FILE_NAME).toString()
 
-  fun datasetMetaFile(userID: String, datasetID: String) =
+  fun datasetMetaFile(userID: UserID, datasetID: DatasetID) =
     (datasetContentPath(userID, datasetID) / META_FILE_NAME).toString()
 
-  fun datasetDeleteFlagFile(userID: String, datasetID: String) =
+  fun datasetDeleteFlagFile(userID: UserID, datasetID: DatasetID) =
     (datasetContentPath(userID, datasetID) / DELETE_FLAG_FILE_NAME).toString()
 
 
-  fun datasetDataDir(userID: String, datasetID: String) =
+  fun datasetDataDir(userID: UserID, datasetID: DatasetID) =
     (dataPath(userID, datasetID) / "").toString()
 
-  fun datasetDataFile(userID: String, datasetID: String, fileName: String) =
+  fun datasetDataFile(userID: UserID, datasetID: DatasetID, fileName: String) =
     (dataPath(userID, datasetID) / fileName).toString()
 
 
-  fun datasetSharesDir(userID: String, datasetID: String) =
+  fun datasetSharesDir(userID: UserID, datasetID: DatasetID) =
     (sharePath(userID, datasetID) / "").toString()
 
-  fun datasetShareOfferFile(userID: String, datasetID: String, recipientID: String) =
+  fun datasetShareOfferFile(userID: UserID, datasetID: DatasetID, recipientID: UserID) =
     (shareUserPath(userID, datasetID, recipientID) / SHARE_OFFER_FILE_NAME).toString()
 
-  fun datasetShareReceiptFile(userID: String, datasetID: String, recipientID: String) =
+  fun datasetShareReceiptFile(userID: UserID, datasetID: DatasetID, recipientID: UserID) =
     (shareUserPath(userID, datasetID, recipientID) / SHARE_RECEIPT_FILE_NAME).toString()
 
 
-  fun datasetUploadsDir(userID: String, datasetID: String) =
+  fun datasetUploadsDir(userID: UserID, datasetID: DatasetID) =
     (uploadPath(userID, datasetID) / "").toString()
 
-  fun datasetUploadFile(userID: String, datasetID: String, fileName: String) =
+  fun datasetUploadFile(userID: UserID, datasetID: DatasetID, fileName: String) =
     (uploadPath(userID, datasetID) / fileName).toString()
 
   // endregion Public API
@@ -80,26 +82,26 @@ object S3Paths {
   private inline fun rootPath() =
     PathBuilder(ROOT_DIR_NAME)
 
-  private inline fun userPath(userID: String) =
-    rootPath() / userID
+  private inline fun userPath(userID: UserID) =
+    rootPath() / userID.toString()
 
-  private inline fun datasetPath(userID: String, datasetID: String) =
-    userPath(userID) / datasetID
+  private inline fun datasetPath(userID: UserID, datasetID: DatasetID) =
+    userPath(userID) / datasetID.toString()
 
-  private inline fun datasetContentPath(userID: String, datasetID: String) =
+  private inline fun datasetContentPath(userID: UserID, datasetID: DatasetID) =
     datasetPath(userID, datasetID) / DATASET_DIR_NAME
 
-  private inline fun uploadPath(userID: String, datasetID: String) =
+  private inline fun uploadPath(userID: UserID, datasetID: DatasetID) =
     datasetPath(userID, datasetID) / UPLOAD_DIR_NAME
 
-  private inline fun dataPath(userID: String, datasetID: String) =
+  private inline fun dataPath(userID: UserID, datasetID: DatasetID) =
     datasetContentPath(userID, datasetID) / DATA_DIR_NAME
 
-  private inline fun sharePath(userID: String, datasetID: String) =
+  private inline fun sharePath(userID: UserID, datasetID: DatasetID) =
     datasetContentPath(userID, datasetID) / SHARES_DIR_NAME
 
-  private inline fun shareUserPath(userID: String, datasetID: String, shareUserID: String) =
-    sharePath(userID, datasetID) / shareUserID
+  private inline fun shareUserPath(userID: UserID, datasetID: DatasetID, shareUserID: UserID) =
+    sharePath(userID, datasetID) / shareUserID.toString()
 
   // endregion Path "Constants"
 }

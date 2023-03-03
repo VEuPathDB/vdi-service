@@ -1,11 +1,13 @@
 package vdi.components.datasets
 
+import vdi.components.common.fields.UserID
+
 interface DatasetShare {
 
   /**
    * ID of the share recipient.
    */
-  val recipientID: String
+  val recipientID: UserID
 
   /**
    * A handle on this share offer's offer file.

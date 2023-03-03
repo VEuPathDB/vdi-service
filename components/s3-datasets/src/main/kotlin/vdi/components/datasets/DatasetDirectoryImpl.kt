@@ -2,13 +2,16 @@ package vdi.components.datasets
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import java.io.InputStream
+import vdi.components.common.fields.DatasetID
+import vdi.components.common.fields.UserID
+import vdi.components.common.fields.toUserIDOrNull
 import vdi.components.datasets.model.*
 import vdi.components.datasets.paths.S3DatasetPathFactory
 import vdi.components.json.JSON
 
 internal class DatasetDirectoryImpl(
-  override val ownerID: String,
-  override val datasetID: String,
+  override val ownerID: UserID,
+  override val datasetID: DatasetID,
   private val bucket: S3Bucket,
   private val pathFactory: S3DatasetPathFactory,
 ) : DatasetDirectory {
@@ -66,13 +69,14 @@ internal class DatasetDirectoryImpl(
     fn().use { bucket.objects.put(pathFactory.datasetDataFile(name), it) }
   }
 
-  override fun getShares(): Map<String, DatasetShare> {
+  override fun getShares(): Map<UserID, DatasetShare> {
     val pathPrefix = pathFactory.datasetSharesDir()
     val subPaths   = bucket.objects.listSubPaths(pathPrefix).commonPrefixes()
-    val retValue   = HashMap<String, DatasetShare>(subPaths.size)
+    val retValue   = HashMap<UserID, DatasetShare>(subPaths.size)
 
     subPaths.forEach {
-      val recipientID = it.substring(pathPrefix.length)
+      val recipientID = it.substring(pathPrefix.length).toUserIDOrNull()
+        ?: throw IllegalStateException("invalid user ID")
 
       retValue[recipientID] = DatasetShareImpl(
         recipientID,
@@ -84,7 +88,7 @@ internal class DatasetDirectoryImpl(
     return retValue
   }
 
-  override fun putShare(recipientID: String) {
+  override fun putShare(recipientID: UserID) {
     val offer   = DatasetShareOffer(DatasetShareOfferAction.Grant)
     val receipt = DatasetShareReceipt(DatasetShareReceiptAction.Accept)
 
