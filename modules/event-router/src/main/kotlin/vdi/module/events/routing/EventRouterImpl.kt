@@ -72,38 +72,38 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
         event.eventType.action == MinIOEventAction.DELETE -> {
           log.debug("received a hard delete event for dataset {} owned by user {}", path.datasetID.toString(), path.userID.toString())
 
-          safeSend(HardDeleteTrigger(path.userID.toString(), path.datasetID.toString()), kr::sendHardDeleteTrigger)
+          safeSend(HardDeleteTrigger(path.userID, path.datasetID), kr::sendHardDeleteTrigger)
         }
 
         // If the path was for an upload file then it's an import trigger as we
         // only ever put something in the upload directory when the dataset is
         // first uploaded by the client.
         path is VDUploadPath -> {
-          log.debug("received an import event for dataset {} owned by user {}", path.datasetID.toString(), path.userID.toString())
+          log.debug("received an import event for dataset {} owned by user {}", path.datasetID, path.userID)
 
-          safeSend(ImportTrigger(path.userID.toString(), path.datasetID.toString()), kr::sendImportTrigger)
+          safeSend(ImportTrigger(path.userID, path.datasetID), kr::sendImportTrigger)
         }
 
         // If the path was to a soft delete flag then we have a soft-delete
         // event.
         path is VDDatasetFilePath && path.subPath == S3Paths.DELETE_FLAG_FILE_NAME -> {
-          log.debug("received a soft delete event for dataset {} owned by user {}", path.datasetID.toString(), path.userID.toString())
+          log.debug("received a soft delete event for dataset {} owned by user {}", path.datasetID, path.userID)
 
-          safeSend(SoftDeleteTrigger(path.userID.toString(), path.datasetID.toString()), kr::sendSoftDeleteTrigger)
+          safeSend(SoftDeleteTrigger(path.userID, path.datasetID), kr::sendSoftDeleteTrigger)
         }
 
         // If the path is to a share file then we have a share event.
         path is VDDatasetShareFilePath -> {
-          log.debug("received a share event for dataset {} owned by user {}", path.datasetID.toString(), path.userID.toString())
+          log.debug("received a share event for dataset {} owned by user {}", path.datasetID, path.userID)
 
-          safeSend(ShareTrigger(path.userID.toString(), path.datasetID.toString(), path.recipientID.toString()), kr::sendShareTrigger)
+          safeSend(ShareTrigger(path.userID, path.datasetID, path.recipientID), kr::sendShareTrigger)
         }
 
         // Else, we have an install event.
         else                                              -> {
-          log.debug("received an install event for dataset {} owned by user {}", path.datasetID.toString(), path.userID.toString())
+          log.debug("received an install event for dataset {} owned by user {}", path.datasetID, path.userID)
 
-          safeSend(InstallTrigger(path.userID.toString(), path.datasetID.toString()), kr::sendInstallTrigger)
+          safeSend(InstallTrigger(path.userID, path.datasetID), kr::sendInstallTrigger)
 
           // If the object that got created was the meta.json file then we also
           // have an update-meta event in addition to our install event.
@@ -112,9 +112,9 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
           // first time the meta.json file was put into the bucket or if this is
           // an update.
           if (path is VDDatasetFilePath && path.subPath == S3Paths.META_FILE_NAME) {
-            log.debug("received an update-meta event for dataset {} owned by user {}", path.datasetID.toString(), path.userID.toString())
+            log.debug("received an update-meta event for dataset {} owned by user {}", path.datasetID, path.userID)
 
-            safeSend(UpdateMetaTrigger(path.userID.toString(), path.datasetID.toString()), kr::sendUpdateMetaTrigger)
+            safeSend(UpdateMetaTrigger(path.userID, path.datasetID), kr::sendUpdateMetaTrigger)
           }
         }
       }

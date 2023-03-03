@@ -1,15 +1,17 @@
 package vdi.components.kafka.triggers
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import vdi.components.common.fields.DatasetID
+import vdi.components.common.fields.UserID
 
 data class ShareTrigger(
   @JsonProperty("userID")
-  val userID:    String,
+  val userID: UserID,
 
   @JsonProperty("datasetID")
-  val datasetID: String,
+  val datasetID: DatasetID,
 
   @JsonProperty("recipientID")
-  val recipientID: String,
+  val recipientID: UserID,
 )
 
