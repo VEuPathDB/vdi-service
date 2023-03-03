@@ -1,18 +1,19 @@
 version: "3.5"
 
 services:
-  vdi-cache-db:
-    image: postgres:15.2-alpine3.17
+  cache-db:
+    image: veupathdb/vdi-internal-db:latest
     environment:
-      POSTGRES_USER: ${QUEUE_DB_USERNAME:?}
-      POSTGRES_PASSWORD: ${QUEUE_DB_PASSWORD:?}
+      POSTGRES_USER: ${CACHE_DB_USERNAME:?}
+      POSTGRES_PASSWORD: ${CACHE_DB_PASSWORD:?}
+      POSTGRES_DB: ${CACHE_DB_NAME:?}
     healthcheck:
-      test: "pg_isready -U ${QUEUE_DB_USERNAME:?}"
+      test: "pg_isready -U ${CACHE_DB_USERNAME:?}"
       interval: 30s
       timeout: 10s
       retries: 5
 
-  vdi-kafka:
+  kafka:
     image: foxcapades/apache-kafka:3.4.0
     healthcheck:
       test: nc -z localhost 9092 || exit 1
@@ -20,7 +21,7 @@ services:
       timeout: 10s
       retries: 5
 
-  vdi-service:
+  service:
     image: veupathdb/vdi-service:${VDI_SERVICE_TAG:-latest}
     depends_on:
     - vdi-cache-db
@@ -58,12 +59,12 @@ services:
       S3_BUCKET_NAME: ${S3_BUCKET:?}
 
       # Connection details for the stack-internal Postgres instance.
-      QUEUE_DB_USERNAME: ${QUEUE_DB_USERNAME:?}
-      QUEUE_DB_PASSWORD: ${QUEUE_DB_PASSWORD:?}
-      QUEUE_DB_HOST: ${QUEUE_DB_HOST:?}
-      QUEUE_DB_PORT: ${QUEUE_DB_PORT:?}
-      QUEUE_DB_NAME: ${QUEUE_DB_NAME:?}
-      QUEUE_DB_POOL_SIZE: ${QUEUE_DB_POOL_SIZE:-5}
+      CACHE_DB_USERNAME: ${CACHE_DB_USERNAME:?}
+      CACHE_DB_PASSWORD: ${CACHE_DB_PASSWORD:?}
+      CACHE_DB_HOST: ${CACHE_DB_HOST:?}
+      CACHE_DB_PORT: ${CACHE_DB_PORT:?}
+      CACHE_DB_NAME: ${CACHE_DB_NAME:?}
+      CACHE_DB_POOL_SIZE: ${CACHE_DB_POOL_SIZE:-5}
 
       # Account DB connection details
       ACCT_DB_TNS_NAME: ${ACCT_DB_TNS_NAME:?}

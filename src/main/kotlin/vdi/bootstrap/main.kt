@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
+import org.veupathdb.service.vdi.RestService
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.launch
@@ -47,6 +48,8 @@ object Main {
       EventRouter(eventRouterConfig)
     )
 
+    val restService = Thread { RestService.main(args) }
+
     Runtime.getRuntime().addShutdownHook(Thread {
       log.info("shutting down modules")
       runBlocking {
@@ -59,6 +62,8 @@ object Main {
     runBlocking {
       for (module in modules)
         launch { module.start() }
+
+      restService.start()
     }
   }
 }

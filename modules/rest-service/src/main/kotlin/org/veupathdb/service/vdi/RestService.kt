@@ -7,7 +7,7 @@ import org.veupathdb.lib.ldap.LDAPConfig
 import org.veupathdb.service.vdi.db.initDatabaseConnections
 import org.veupathdb.service.vdi.config.Options as Opts
 
-object Main : Server() {
+object RestService : Server() {
   val LDAP = LDAP(LDAPConfig(Opts.LDAP.ldapServers, Opts.LDAP.oracleBaseDN))
 
   @JvmStatic

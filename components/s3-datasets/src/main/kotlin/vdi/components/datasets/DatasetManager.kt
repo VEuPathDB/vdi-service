@@ -25,7 +25,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
    */
   fun getDatasetDirectory(ownerID: Long, datasetID: DatasetID): DatasetDirectory {
     val ownerID = ownerID.toString()
-    val datasetID = datasetID.value
+    val datasetID = datasetID.toString()
 
     return DatasetDirectoryImpl(ownerID, datasetID, s3Bucket, S3DatasetPathFactory(ownerID, datasetID))
   }
