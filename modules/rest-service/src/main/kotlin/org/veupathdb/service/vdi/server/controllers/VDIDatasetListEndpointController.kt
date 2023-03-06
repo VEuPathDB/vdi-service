@@ -1,14 +1,10 @@
 package org.veupathdb.service.vdi.server.controllers
 
 import jakarta.ws.rs.BadRequestException
-import jakarta.ws.rs.InternalServerErrorException
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
-import org.veupathdb.service.vdi.db.internal.CacheDB
-import org.veupathdb.service.vdi.db.internal.model.DatasetRecord
-import org.veupathdb.service.vdi.generated.model.DatasetImportStatus
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.generated.model.DatasetPostResponseImpl
 import org.veupathdb.service.vdi.generated.model.validate
@@ -17,20 +13,11 @@ import org.veupathdb.service.vdi.model.DatasetListQuery
 import org.veupathdb.service.vdi.model.DatasetListSortField
 import org.veupathdb.service.vdi.model.DatasetOwnershipFilter
 import org.veupathdb.service.vdi.model.SortOrder
-import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.list.fetchUserDatasetList
-import java.net.URL
-import java.time.OffsetDateTime
 import java.util.*
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
-import vdi.components.common.compression.Tar
 import vdi.components.common.fields.DatasetID
 import vdi.components.common.fields.asWDKUserID
-import vdi.components.common.util.Tmp
-import vdi.components.common.util.useThenDelete
 
 private const val DEFAULT_OFFSET = 0
 private const val DEFAULT_LIMIT  = 100
@@ -69,17 +56,29 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
     val parsedSortField: DatasetListSortField
     val parsedSortOrder: SortOrder
 
+    // If no sorting field was provided
     if (sortField == null) {
+      // Default the sorting field to the creation timestamp.
       parsedSortField = DatasetListSortField.CREATION_TIMESTAMP
+
+      // If the sort order was provided, then use the user defined value,
+      // otherwise, if no sort order was provided, fall back to "descending".
       parsedSortOrder = sortOrder
         ?.let {
           SortOrder.fromStringOrNull(it)
             ?: throw BadRequestException("invalid sort order query param value")
         }
         ?: SortOrder.DESCENDING
-    } else {
+    }
+
+    // else, if a sorting field _was_ provided
+    else {
+      // Use the user provided sorting field value.
       parsedSortField = DatasetListSortField.fromStringOrNull(sortField)
         ?: throw BadRequestException("invalid sort field query param value")
+
+      // If the sort order was provided, then use the user defined value,
+      // otherwise, if no sort order was provided, fall back to "ascending".
       parsedSortOrder = sortOrder
         ?.let {
           SortOrder.fromStringOrNull(it)
