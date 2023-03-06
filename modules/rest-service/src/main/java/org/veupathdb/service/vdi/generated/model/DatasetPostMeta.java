@@ -9,10 +9,10 @@ import java.util.List;
 )
 public interface DatasetPostMeta {
   @JsonProperty("datasetType")
-  String getDatasetType();
+  DatasetPostType getDatasetType();
 
   @JsonProperty("datasetType")
-  void setDatasetType(String datasetType);
+  void setDatasetType(DatasetPostType datasetType);
 
   @JsonProperty("name")
   String getName();

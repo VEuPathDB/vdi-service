@@ -15,7 +15,7 @@ import java.util.List;
 })
 public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("datasetType")
-  private String datasetType;
+  private DatasetPostType datasetType;
 
   @JsonProperty("name")
   private String name;
@@ -30,12 +30,12 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   private List<String> projects;
 
   @JsonProperty("datasetType")
-  public String getDatasetType() {
+  public DatasetPostType getDatasetType() {
     return this.datasetType;
   }
 
   @JsonProperty("datasetType")
-  public void setDatasetType(String datasetType) {
+  public void setDatasetType(DatasetPostType datasetType) {
     this.datasetType = datasetType;
   }
 

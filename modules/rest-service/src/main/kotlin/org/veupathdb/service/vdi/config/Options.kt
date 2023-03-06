@@ -34,21 +34,20 @@ object Options : Options() {
 
   object S3 {
     val host = requireEnv("S3_HOST")
-    val port = requireEnv("S3_PORT")
+    val port = requireEnv("S3_PORT").toUShort()
     val useHttps = requireEnv("S3_USE_HTTPS").toBoolean()
     val accessToken = requireEnv("S3_ACCESS_TOKEN")
     val secretKey = requireEnv("S3_SECRET_KEY")
-    val uploadBucketName = requireEnv("S3_UPLOAD_BUCKET_NAME")
-    val datasetBucketName = requireEnv("S3_DATASET_BUCKET_NAME")
+    val bucketName = requireEnv("S3_BUCKET_NAME")
   }
 
-  object QueueDB {
+  object CacheDB {
     val host = requireEnv("QUEUE_DB_HOST")
     val port = requireEnv("QUEUE_DB_PORT").toUShort()
     val name = requireEnv("QUEUE_DB_NAME")
     val username = requireEnv("QUEUE_DB_USERNAME")
     val password = requireEnv("QUEUE_DB_PASSWORD")
-    val poolSize = requireEnv("QUEUE_DB_POOL_SIZE").toInt()
+    val poolSize = optionalEnv("QUEUE_DB_POOL_SIZE")?.toInt() ?: 20
   }
 
   object AppDatabases {
@@ -101,10 +100,14 @@ object Options : Options() {
         ldap = get(DB_LDAP_PREFIX + suffix) ?: parsingFailed(suffix),
         username = get(DB_USER_PREFIX + suffix) ?: parsingFailed(suffix),
         password = get(DB_PASS_PREFIX + suffix) ?: parsingFailed(suffix),
-        poolSize = get(DB_POOL_PREFIX + suffix)?.toInt() ?: parsingFailed(suffix)
+        poolSize = get(DB_POOL_PREFIX + suffix)?.toInt() ?: 5
       )
   }
 }
+
+private fun optionalEnv(key: String): String? =
+  System.getenv(key)
+    .let { if (it.isNullOrBlank()) null else it }
 
 private fun requireEnv(key: String): String =
   System.getenv(key)

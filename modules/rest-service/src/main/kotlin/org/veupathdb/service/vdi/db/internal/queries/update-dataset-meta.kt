@@ -5,28 +5,27 @@ import vdi.components.common.fields.DatasetID
 
 // language=postgresql
 private const val SQL = """
-INSERT INTO
-  vdi.dataset_metadata (
-    dataset_id
-  , name
-  , summary
-  , description
-  )
-VALUES
-  (?, ?, ?, ?)
+UPDATE
+  vdi.dataset_metadata
+SET
+  name = ?
+, summary = ?
+, description = ?
+WHERE
+  dataset_id = ?
 """
 
-internal fun Connection.insertDatasetMeta(
+internal fun Connection.updateDatasetMeta(
   datasetID: DatasetID,
   name: String,
   summary: String?,
   description: String?,
 ) {
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, datasetID.toString())
-    ps.setString(2, name)
-    ps.setString(3, summary)
-    ps.setString(4, description)
+    ps.setString(1, name)
+    ps.setString(2, summary)
+    ps.setString(3, description)
+    ps.setString(4, datasetID.toString())
 
     ps.execute()
   }

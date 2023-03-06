@@ -2,11 +2,10 @@ version: "3.5"
 
 services:
   cache-db:
-    image: veupathdb/vdi-internal-db:latest
+    image: veupathdb/vdi-internal-db:${VDI_CACHE_DB_TAG:-latest}
     environment:
       POSTGRES_USER: ${CACHE_DB_USERNAME:?}
       POSTGRES_PASSWORD: ${CACHE_DB_PASSWORD:?}
-      POSTGRES_DB: ${CACHE_DB_NAME:?}
     healthcheck:
       test: "pg_isready -U ${CACHE_DB_USERNAME:?}"
       interval: 30s
@@ -64,7 +63,6 @@ services:
       CACHE_DB_PASSWORD: ${CACHE_DB_PASSWORD:?}
       CACHE_DB_HOST: ${CACHE_DB_HOST:?}
       CACHE_DB_PORT: ${CACHE_DB_PORT:?}
-      CACHE_DB_NAME: ${CACHE_DB_NAME:?}
       CACHE_DB_POOL_SIZE: ${CACHE_DB_POOL_SIZE:-5}
 
       # Account DB connection details
@@ -165,7 +163,7 @@ services:
       DB_CONNECTION_POOL_SIZE_MICROBIOME: ${DB_CONNECTION_POOL_SIZE_MICROBIOME:-5}
 
   handler-example:
-    image: veupathdb/vdi-handler-example:${VDI_HANDLER_EXAMPLE:-latest}
+    image: veupathdb/vdi-handler-example:${VDI_HANDLER_EXAMPLE_TAG:-latest}
     environment:
       DB_CONNECTION_NAME_AMOEBA: ${DB_CONNECTION_NAME_AMOEBA:?}
       DB_CONNECTION_LDAP_AMOEBA: ${DB_CONNECTION_LDAP_AMOEBA:?}

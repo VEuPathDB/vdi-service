@@ -58,15 +58,19 @@ containerBuild {
 
 dependencies {
   implementation(project(":components:common"))
+  implementation(project(":components:json"))
+  implementation(project(":components:s3-datasets"))
 
   api("org.veupathdb.lib:jaxrs-container-core:6.14.2")
 
   implementation("org.veupathdb.lib:ldap-utils:1.0.0")
   implementation("org.veupathdb.lib.s3:s34k-minio:0.3.6+s34k-0.7.2")
 
-
+  // Database Connectivity
   implementation("com.zaxxer:HikariCP:5.0.1")
   implementation("com.oracle.database.jdbc:ojdbc8:21.1.0.0")
+  implementation("org.postgresql:postgresql:42.5.4")
+
 
   // Jersey
   implementation("org.glassfish.jersey.core:jersey-server:3.1.0")

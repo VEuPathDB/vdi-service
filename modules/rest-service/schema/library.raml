@@ -139,7 +139,7 @@ types:
       datasetType:
         displayName: Dataset Type
         description: Type of the dataset that is being uploaded.
-        type: string
+        type: DatasetPostType
       name:
         displayName: Dataset Name
         description: User provided name for the dataset.
@@ -159,6 +159,12 @@ types:
         description: IDs of the projects this dataset is being submitted to.
         type: ProjectID[]
         minItems: 1
+  DatasetPostType:
+    type: object
+    additionalProperties: false
+    properties:
+      name: string
+      version: string
   DatasetPostResponse:
     displayName: Dataset Upload Response
     description: |

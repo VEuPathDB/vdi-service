@@ -60,13 +60,13 @@ private const val PREFIX_OWNERSHIP_SHARED = """
   SELECT
     dataset_id
   FROM
-    vdi.recipient_share AS r
-    INNER JOIN vdi.owner_share AS o
-      USING (dataset_id, shared_with)
+    vdi.dataset_share_receipts AS r
+    INNER JOIN vdi.dataset_share_offers AS o
+      USING (dataset_id, recipient_id)
   WHERE
     r.status = 'accept'
     AND o.status = 'grant'
-    AND r.shared_with = ?
+    AND r.recipient_id = ?
 """
 
 // language=postgresql

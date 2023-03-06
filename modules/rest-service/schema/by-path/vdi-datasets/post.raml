@@ -45,7 +45,7 @@ types:
       datasetType:
         displayName: Dataset Type
         description: Type of the dataset that is being uploaded.
-        type: string
+        type: DatasetPostType
         required: true
       name:
         displayName: Dataset Name
@@ -68,6 +68,17 @@ types:
         type: common.ProjectID[]
         required: true
         minItems: 1
+
+  DatasetPostType:
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
 
   DatasetPostResponse:
     displayName: Dataset Upload Response
