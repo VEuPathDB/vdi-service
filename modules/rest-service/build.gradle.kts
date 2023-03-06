@@ -61,7 +61,8 @@ dependencies {
   implementation(project(":components:json"))
   implementation(project(":components:s3-datasets"))
 
-  api("org.veupathdb.lib:jaxrs-container-core:6.14.2")
+  api("org.veupathdb.lib:jaxrs-container-core:6.14.3")
+  implementation("org.veupathdb.lib:multipart-jackson-pojo:1.1.0")
 
   implementation("org.veupathdb.lib:ldap-utils:1.0.0")
   implementation("org.veupathdb.lib.s3:s34k-minio:0.3.6+s34k-0.7.2")

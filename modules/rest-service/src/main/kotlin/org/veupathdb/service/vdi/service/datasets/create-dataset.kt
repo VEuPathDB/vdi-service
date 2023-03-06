@@ -3,11 +3,13 @@ package org.veupathdb.service.vdi.service.datasets
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.InternalServerErrorException
 import org.slf4j.LoggerFactory
+import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import org.veupathdb.service.vdi.db.internal.CacheDB
 import org.veupathdb.service.vdi.db.internal.model.DatasetRecord
 import org.veupathdb.service.vdi.generated.model.DatasetImportStatus
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.s3.DatasetStore
+import org.veupathdb.service.vdi.util.BoundedInputStream
 import java.net.URL
 import java.time.OffsetDateTime
 import kotlin.io.path.deleteIfExists
@@ -60,7 +62,9 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
 
     // Try to download the file from the source URL.
     try {
-      connection.getInputStream()
+      BoundedInputStream(JaxRSMultipartUpload.maxFileUploadSize, connection.getInputStream()) {
+        BadRequestException("given source file URL pointed to a file that exceeded the max allowed upload size of ${JaxRSMultipartUpload.maxFileUploadSize} bytes.")
+      }
         .use { inp -> path.outputStream().use { out -> inp.transferTo(out) } }
     } catch (e: Throwable) {
       log.error("failed to download file from target URL", e)
