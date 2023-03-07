@@ -1,5 +1,10 @@
 version: "3.5"
 
+networks:
+  internal:
+  external:
+    external: true
+
 services:
   cache-db:
     image: veupathdb/vdi-internal-db:${VDI_CACHE_DB_TAG:-latest}
@@ -11,6 +16,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    networks:
+    - internal
 
   kafka:
     image: foxcapades/apache-kafka:3.4.0
@@ -19,6 +26,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    networks:
+    - internal
 
   service:
     image: veupathdb/vdi-service:${VDI_SERVICE_TAG:-latest}
@@ -29,6 +38,9 @@ services:
     links:
     - cache-db
     - kafka
+    networks:
+    - internal
+    - external
     environment:
       SERVER_PORT: ${VDI_SERVICE_HTTP_PORT:-80}
 
@@ -42,6 +54,7 @@ services:
       GLOBAL_RABBIT_USERNAME: ${GLOBAL_RABBIT_USERNAME:?}
       GLOBAL_RABBIT_PASSWORD: ${GLOBAL_RABBIT_PASSWORD:?}
       GLOBAL_RABBIT_HOST: ${GLOBAL_RABBIT_HOST:?}
+      GLOBAL_RABBIT_PORT: ${GLOBAL_RABBIT_PORT:?}
       GLOBAL_RABBIT_VDI_EXCHANGE_NAME: ${GLOBAL_RABBIT_VDI_EXCHANGE_NAME:?}
       GLOBAL_RABBIT_VDI_QUEUE_NAME: ${GLOBAL_RABBIT_VDI_QUEUE_NAME:?}
       GLOBAL_RABBIT_VDI_ROUTING_KEY: ${GLOBAL_RABBIT_VDI_ROUTING_KEY:?}
@@ -165,6 +178,8 @@ services:
   handler-example:
     image: veupathdb/vdi-handler-example:${VDI_HANDLER_EXAMPLE_TAG:-latest}
     environment:
+      LDAP_SERVER: ${LDAP_SERVER:?}
+
       DB_CONNECTION_NAME_AMOEBA: ${DB_CONNECTION_NAME_AMOEBA:?}
       DB_CONNECTION_LDAP_AMOEBA: ${DB_CONNECTION_LDAP_AMOEBA:?}
       DB_CONNECTION_USER_AMOEBA: ${DB_CONNECTION_USER_AMOEBA:?}

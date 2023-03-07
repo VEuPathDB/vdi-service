@@ -36,5 +36,6 @@ ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
     JVM_ARGS=""
 
 COPY --from=prep /workspace/build/libs/service.jar /service.jar
+COPY startup.sh startup.sh
 
-CMD java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /service.jar
+CMD chmod +x /startup.sh && /startup.sh

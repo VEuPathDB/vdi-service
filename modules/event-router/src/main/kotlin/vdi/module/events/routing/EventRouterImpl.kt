@@ -45,11 +45,19 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
 
     try {
       es = RabbitMQEventSource(config.rabbitConfig, shutdownTrigger) { JSON.readValue(it) }
+    } catch (e: Throwable) {
+      shutdownTrigger.trigger()
+      shutdownConfirm.trigger()
+      log.error("failed to create a RabbitMQEventSource", e)
+      throw e
+    }
+
+    try {
       kr = KafkaRouterFactory(config.kafkaConfig).newKafkaRouter()
     } catch (e: Throwable) {
       shutdownTrigger.trigger()
       shutdownConfirm.trigger()
-      log.error("failed to create a RabbitMQBucketEventSource", e)
+      log.error("failed to create a KafkaRouterFactory", e)
       throw e
     }
 

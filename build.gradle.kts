@@ -76,6 +76,10 @@ dependencies {
 tasks.shadowJar {
   exclude("**/Log4j2Plugins.dat")
   archiveFileName.set("service.jar")
+
+  manifest {
+    attributes["Main-Class"] = "vdi.bootstrap.Main"
+  }
 }
 
 // region Custom Tasks

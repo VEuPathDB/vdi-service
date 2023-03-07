@@ -1,6 +1,7 @@
 package vdi.components.rabbit
 
 import com.rabbitmq.client.ConnectionFactory
+import org.slf4j.LoggerFactory
 import vdi.components.common.ShutdownSignal
 import vdi.components.common.util.SuspendingSequence
 
@@ -9,6 +10,8 @@ class RabbitMQEventSource<T>(
   private val shutdownSignal: ShutdownSignal,
   private val mappingFunction: (ByteArray) -> T
 ) : SuspendingSequence<T> {
+  private val log = LoggerFactory.getLogger(javaClass)
+
   private val rCon = ConnectionFactory()
     .apply {
       host = config.serverAddress.host
@@ -17,15 +20,19 @@ class RabbitMQEventSource<T>(
       password = config.serverPassword.value
     }
     .let {
-      if (config.serverConnectionName.isNullOrBlank())
+      if (config.serverConnectionName.isNullOrBlank()) {
+        log.info("creating new unnamed RabbitMQ connection")
         it.newConnection()
-      else
+      } else {
+        log.info("creating new RabbitMQ connection named ${config.serverConnectionName}")
         it.newConnection(config.serverConnectionName)
+      }
     }!!
 
   private val rChan = rCon.createChannel()
 
   init {
+    log.debug("declaring RabbitMQ exchange ${config.exchangeName}")
     rChan.exchangeDeclare(
       config.exchangeName,
       config.exchangeType,
@@ -34,6 +41,7 @@ class RabbitMQEventSource<T>(
       config.exchangeArguments
     )
 
+    log.debug("declaring RabbitMQ queue ${config.queueName}")
     rChan.queueDeclare(
       config.queueName,
       config.queueDurable,
@@ -42,7 +50,9 @@ class RabbitMQEventSource<T>(
       config.queueArguments,
     )
 
-    rChan.queueBind(config.queueName,
+    log.debug("binding RabbitMQ queue ${config.queueName} to exchange ${config.exchangeName} with routing key ${config.routingKey}")
+    rChan.queueBind(
+      config.queueName,
       config.exchangeName,
       config.routingKey,
       config.routingArgs
