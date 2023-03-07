@@ -1,5 +1,6 @@
 package vdi.components.common.fields
 
+import java.util.UUID
 import vdi.components.common.util.byteOf
 import vdi.components.common.util.isHexDigit
 
@@ -10,6 +11,17 @@ interface DatasetID {
 fun DatasetID(datasetID: String): DatasetID =
   datasetID.toDatasetIDOrNull()
     ?: throw IllegalArgumentException("given string does not resemble a valid dataset ID: $datasetID")
+
+fun DatasetID(): DatasetID {
+  val uu = UUID.randomUUID().toString()
+  return DatasetID(StringBuilder(32)
+    .append(uu, 0, 8)
+    .append(uu, 9, 13)
+    .append(uu, 14, 18)
+    .append(uu, 19, 23)
+    .append(uu, 24, 36)
+    .toString())
+}
 
 fun String.toDatasetIDOrNull(): DatasetID? {
   if (length != 32)

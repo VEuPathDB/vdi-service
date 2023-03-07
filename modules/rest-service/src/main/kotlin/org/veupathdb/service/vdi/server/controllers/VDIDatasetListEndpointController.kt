@@ -110,10 +110,7 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
     entity.validate()
       .throwIfNotEmpty()
 
-    val datasetID = UUID.randomUUID()
-      .toString()
-      .replace("-", "")
-      .let(::DatasetID)
+    val datasetID = DatasetID()
 
     log.debug("issuing dataset ID {}", datasetID)
 
