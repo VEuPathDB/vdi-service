@@ -8,10 +8,25 @@ interface DatasetID {
   override fun toString(): String
 }
 
+/**
+ * Validates and wraps the given string value as a [DatasetID] instance.
+ *
+ * If the given string does not appear to be a valid DatasetID then this method
+ * will throw an [IllegalArgumentException].
+ *
+ * @param datasetID ID string to wrap.
+ *
+ * @return A [DatasetID] instance wrapping the given string value.
+ */
 fun DatasetID(datasetID: String): DatasetID =
   datasetID.toDatasetIDOrNull()
     ?: throw IllegalArgumentException("given string does not resemble a valid dataset ID: $datasetID")
 
+/**
+ * Generates a new, random [DatasetID] instance.
+ *
+ * @return A new [DatasetID].
+ */
 fun DatasetID(): DatasetID {
   val uu = UUID.randomUUID().toString()
   return DatasetID(StringBuilder(32)
