@@ -28,26 +28,26 @@ object Main {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  // FIXME: This is for testing only!!!
-  private val eventRouterConfig = EventRouterConfig(
-    RabbitMQConfig(
-      serverUsername = "someUser",
-      serverPassword = SecretString("somePassword"),
-      exchangeName = "vdi-bucket-notifications",
-      queueName = "vdi-bucket-notifications",
-      routingKey = "vdi-bucket-notifications",
-    ),
-    "some-other-bucket",
-    KafkaConfig(
-      KafkaProducerConfig(arrayOf(HostAddress("localhost", 9092u)), clientID = "vdi")
-    )
-  )
+//  // FIXME: This is for testing only!!!
+//  private val eventRouterConfig = EventRouterConfig(
+//    RabbitMQConfig(
+//      serverUsername = "someUser",
+//      serverPassword = SecretString("somePassword"),
+//      exchangeName = "vdi-bucket-notifications",
+//      queueName = "vdi-bucket-notifications",
+//      routingKey = "vdi-bucket-notifications",
+//    ),
+//    "some-other-bucket",
+//    KafkaConfig(
+//      KafkaProducerConfig(arrayOf(HostAddress("localhost", 9092u)), clientID = "vdi")
+//    )
+//  )
 
   @JvmStatic
   fun main(args: Array<String>) {
     log.info("initializing modules")
     val modules = listOf<VDIServiceModule>(
-      EventRouter(eventRouterConfig)
+      EventRouter()
     )
 
     val restService = Thread { RestService.main(args) }

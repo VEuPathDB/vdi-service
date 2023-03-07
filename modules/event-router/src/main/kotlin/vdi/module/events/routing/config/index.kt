@@ -1,5 +1,6 @@
 package vdi.module.events.routing.config
 
+import org.slf4j.LoggerFactory
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import vdi.components.common.fields.SecretString
