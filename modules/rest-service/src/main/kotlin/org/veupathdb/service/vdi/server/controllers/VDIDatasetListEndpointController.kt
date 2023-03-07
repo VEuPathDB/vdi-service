@@ -39,7 +39,7 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
     log.trace("getVdiDatasets(projectId={}, ownership={}, offset={}, limit={}, sortField={}, sortOrder={}", projectId, ownership, offset, limit, sortField, sortOrder)
 
     // Get or default the offset value.
-    val parsedOffset = offset ?: 0
+    val parsedOffset = offset ?: DEFAULT_OFFSET
 
     // Get or default the limit value.
     val parsedLimit  = limit ?: DEFAULT_LIMIT
