@@ -15,11 +15,11 @@ import java.time.OffsetDateTime
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
-import vdi.components.common.compression.Tar
 import vdi.components.common.fields.DatasetID
 import vdi.components.common.fields.UserID
 import vdi.components.common.util.Tmp
 import vdi.components.common.util.useThenDelete
+import vdi.components.compression.Tar
 
 private val log = LoggerFactory.getLogger("create-dataset.kt")
 

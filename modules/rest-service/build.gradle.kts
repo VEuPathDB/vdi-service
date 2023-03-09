@@ -58,7 +58,8 @@ containerBuild {
 
 dependencies {
   implementation(project(":components:common"))
-  implementation(project(":components:common:env"))
+  implementation(project(":components:compression"))
+  implementation(project(":components:env"))
   implementation(project(":components:json"))
   implementation(project(":components:s3-datasets"))
 

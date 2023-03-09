@@ -1,4 +1,4 @@
-package vdi.components.common.compression
+package vdi.components.compression
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream

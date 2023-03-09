@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
   implementation(project(":components:common"))
-  implementation(project(":components:common:env"))
+  implementation(project(":components:env"))
   implementation(project(":components:s3-datasets"))
   implementation(project(":components:json"))
   implementation(project(":components:kafka"))
