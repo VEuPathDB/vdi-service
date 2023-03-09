@@ -2,52 +2,31 @@ package org.veupathdb.service.vdi.config
 
 import org.veupathdb.lib.container.jaxrs.config.Options
 import org.veupathdb.lib.ldap.LDAPHost
+import vdi.components.common.env.EnvKey
 
 object Options : Options() {
 
-  object Server {
-    val port = requireEnv("VDI_SERVICE_HTTP_PORT").toUShort()
-  }
-
   object LDAP {
-    val ldapServers = requireEnv("LDAP_SERVER").split(',').map(LDAPHost.Companion::ofString)
+    val ldapServers  = requireEnv("LDAP_SERVER").split(',').map(LDAPHost.Companion::ofString)
     val oracleBaseDN = requireEnv("ORACLE_BASE_DN")
   }
 
-  object Auth {
-    val authSecretKey = requireEnv("AUTH_SECRET_KEY")
-  }
-
-  object GlobalRabbit {
-    val username = requireEnv("GLOBAL_RABBIT_USERNAME")
-    val password = requireEnv("GLOBAL_RABBIT_PASSWORD")
-    val host = requireEnv("GLOBAL_RABBIT_HOST")
-    val port = requireEnv("GLOBAL_RABBIT_PORT").toUShort()
-  }
-
-  object InternalRabbit {
-    val username = requireEnv("INTERNAL_RABBIT_USERNAME")
-    val password = requireEnv("INTERNAL_RABBIT_PASSWORD")
-    val host = requireEnv("INTERNAL_RABBIT_HOST")
-    val port = requireEnv("INTERNAL_RABBIT_PORT").toUShort()
-  }
-
   object S3 {
-    val host = requireEnv("S3_HOST")
-    val port = requireEnv("S3_PORT").toUShort()
-    val useHttps = requireEnv("S3_USE_HTTPS").toBoolean()
-    val accessToken = requireEnv("S3_ACCESS_TOKEN")
-    val secretKey = requireEnv("S3_SECRET_KEY")
-    val bucketName = requireEnv("S3_BUCKET_NAME")
+    val host        = requireEnv(EnvKey.S3.Host)
+    val port        = requireEnv(EnvKey.S3.Port).toUShort()
+    val useHttps    = requireEnv(EnvKey.S3.UseHTTPS).toBoolean()
+    val accessToken = requireEnv(EnvKey.S3.AccessToken)
+    val secretKey   = requireEnv(EnvKey.S3.SecretKey)
+    val bucketName  = requireEnv(EnvKey.S3.BucketName)
   }
 
   object CacheDB {
-    val host = requireEnv("QUEUE_DB_HOST")
-    val port = requireEnv("QUEUE_DB_PORT").toUShort()
-    val name = requireEnv("QUEUE_DB_NAME")
-    val username = requireEnv("QUEUE_DB_USERNAME")
-    val password = requireEnv("QUEUE_DB_PASSWORD")
-    val poolSize = optionalEnv("QUEUE_DB_POOL_SIZE")?.toInt() ?: 20
+    val host     = requireEnv(EnvKey.CacheDB.Host)
+    val port     = requireEnv(EnvKey.CacheDB.Port).toUShort()
+    val name     = requireEnv(EnvKey.CacheDB.Name)
+    val username = requireEnv(EnvKey.CacheDB.Username)
+    val password = requireEnv(EnvKey.CacheDB.Password)
+    val poolSize = optionalEnv(EnvKey.CacheDB.PoolSize)?.toInt() ?: 20
   }
 
   object AppDatabases {

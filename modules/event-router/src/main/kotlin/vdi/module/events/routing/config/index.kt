@@ -1,8 +1,7 @@
 package vdi.module.events.routing.config
 
-import org.slf4j.LoggerFactory
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import vdi.components.common.env.*
 import vdi.components.common.fields.SecretString
 import vdi.components.common.util.HostAddress
 import vdi.components.kafka.KafkaCompressionType
@@ -10,196 +9,111 @@ import vdi.components.kafka.KafkaProducerConfig
 import vdi.components.kafka.KafkaProducerConfigDefaults
 import vdi.components.rabbit.RabbitMQConfig
 
-internal object EnvKey {
-  const val RABBIT_USERNAME        = "GLOBAL_RABBIT_USERNAME"
-  const val RABBIT_PASSWORD        = "GLOBAL_RABBIT_PASSWORD"
-  const val RABBIT_HOST            = "GLOBAL_RABBIT_HOST"
-  const val RABBIT_PORT            = "GLOBAL_RABBIT_PORT"
-  const val RABBIT_CONNECTION_NAME = "GLOBAL_RABBIT_CONNECTION_NAME"
-
-  const val RABBIT_EXCHANGE_NAME        = "GLOBAL_RABBIT_VDI_EXCHANGE_NAME"
-  const val RABBIT_EXCHANGE_TYPE        = "GLOBAL_RABBIT_VDI_EXCHANGE_TYPE"
-  const val RABBIT_EXCHANGE_DURABLE     = "GLOBAL_RABBIT_VDI_EXCHANGE_DURABLE"
-  const val RABBIT_EXCHANGE_AUTO_DELETE = "GLOBAL_RABBIT_VDI_EXCHANGE_AUTO_DELETE"
-  const val RABBIT_EXCHANGE_ARGUMENTS   = "GLOBAL_RABBIT_VDI_EXCHANGE_ARGUMENTS"
-
-  const val RABBIT_QUEUE_NAME        = "GLOBAL_RABBIT_VDI_QUEUE_NAME"
-  const val RABBIT_QUEUE_DURABLE     = "GLOBAL_RABBIT_VDI_QUEUE_DURABLE"
-  const val RABBIT_QUEUE_EXCLUSIVE   = "GLOBAL_RABBIT_VDI_QUEUE_EXCLUSIVE"
-  const val RABBIT_QUEUE_AUTO_DELETE = "GLOBAL_RABBIT_VDI_QUEUE_AUTO_DELETE"
-  const val RABBIT_QUEUE_ARGUMENTS   = "GLOBAL_RABBIT_VDI_QUEUE_ARGUMENTS"
-
-  const val RABBIT_ROUTING_KEY       = "GLOBAL_RABBIT_VDI_ROUTING_KEY"
-  const val RABBIT_ROUTING_ARGUMENTS = "GLOBAL_RABBIT_VDI_ROUTING_ARGUMENTS"
-
-  const val RABBIT_POLLING_INTERVAL = "GLOBAL_RABBIT_VDI_POLLING_INTERVAL"
-
-  const val S3_BUCKET_NAME = "S3_BUCKET_NAME"
-
-  const val KAFKA_SERVERS = "KAFKA_SERVERS"
-
-  const val KAFKA_PRODUCER_BUFFER_MEMORY_BYTES = "KAFKA_PRODUCER_BUFFER_MEMORY_BYTES"
-  const val KAFKA_PRODUCER_COMPRESSION_TYPE = "KAFKA_PRODUCER_COMPRESSION_TYPE"
-  const val KAFKA_PRODUCER_SEND_RETRIES = "KAFKA_PRODUCER_SEND_RETRIES"
-  const val KAFKA_PRODUCER_BATCH_SIZE = "KAFKA_PRODUCER_BATCH_SIZE"
-  const val KAFKA_PRODUCER_CLIENT_ID = "KAFKA_PRODUCER_CLIENT_ID"
-  const val KAFKA_PRODUCER_CONNECTIONS_MAX_IDLE = "KAFKA_PRODUCER_CONNECTIONS_MAX_IDLE"
-  const val KAFKA_PRODUCER_DELIVERY_TIMEOUT = "KAFKA_PRODUCER_DELIVERY_TIMEOUT"
-  const val KAFKA_PRODUCER_LINGER_TIME = "KAFKA_PRODUCER_LINGER_TIME"
-  const val KAFKA_PRODUCER_MAX_BLOCKING_TIMEOUT = "KAFKA_PRODUCER_MAX_BLOCKING_TIMEOUT"
-  const val KAFKA_PRODUCER_MAX_REQUEST_SIZE_BYTES = "KAFKA_PRODUCER_MAX_REQUEST_SIZE_BYTES"
-  const val KAFKA_PRODUCER_RECEIVE_BUFFER_SIZE_BYTES = "KAFKA_PRODUCER_RECEIVE_BUFFER_SIZE_BYTES"
-  const val KAFKA_PRODUCER_REQUEST_TIMEOUT = "KAFKA_PRODUCER_REQUEST_TIMEOUT"
-  const val KAFKA_PRODUCER_SEND_BUFFER_SIZE_BYTES = "KAFKA_PRODUCER_SEND_BUFFER_SIZE_BYTES"
-  const val KAFKA_PRODUCER_RECONNECT_BACKOFF_MAX_TIME = "KAFKA_PRODUCER_RECONNECT_BACKOFF_MAX_TIME"
-  const val KAFKA_PRODUCER_RECONNECT_BACKOFF_TIME = "KAFKA_PRODUCER_RECONNECT_BACKOFF_TIME"
-  const val KAFKA_PRODUCER_RETRY_BACKOFF_TIME = "KAFKA_PRODUCER_RETRY_BACKOFF_TIME"
-
-  const val KAFKA_MESSAGE_KEY_IMPORT_TRIGGERS = "KAFKA_MESSAGE_KEY_IMPORT_TRIGGERS"
-  const val KAFKA_MESSAGE_KEY_INSTALL_TRIGGERS = "KAFKA_MESSAGE_KEY_INSTALL_TRIGGERS"
-  const val KAFKA_MESSAGE_KEY_UPDATE_META_TRIGGERS = "KAFKA_MESSAGE_KEY_UPDATE_META_TRIGGERS"
-  const val KAFKA_MESSAGE_KEY_SOFT_DELETE_TRIGGERS = "KAFKA_MESSAGE_KEY_SOFT_DELETE_TRIGGERS"
-  const val KAFKA_MESSAGE_KEY_HARD_DELETE_TRIGGERS = "KAFKA_MESSAGE_KEY_HARD_DELETE_TRIGGERS"
-  const val KAFKA_MESSAGE_KEY_SHARE_TRIGGERS = "KAFKA_MESSAGE_KEY_SHARE_TRIGGERS"
-
-  const val KAFKA_TOPIC_IMPORT_TRIGGERS = "KAFKA_TOPIC_IMPORT_TRIGGERS"
-  const val KAFKA_TOPIC_INSTALL_TRIGGERS = "KAFKA_TOPIC_INSTALL_TRIGGERS"
-  const val KAFKA_TOPIC_UPDATE_META_TRIGGERS = "KAFKA_TOPIC_UPDATE_META_TRIGGERS"
-  const val KAFKA_TOPIC_SOFT_DELETE_TRIGGERS = "KAFKA_TOPIC_SOFT_DELETE_TRIGGERS"
-  const val KAFKA_TOPIC_HARD_DELETE_TRIGGERS = "KAFKA_TOPIC_HARD_DELETE_TRIGGERS"
-  const val KAFKA_TOPIC_SHARE_TRIGGERS = "KAFKA_TOPIC_SHARE_TRIGGERS"
-}
-
-
 internal fun loadConfigFromEnvironment() = loadConfigFromEnvironment(System.getenv())
 
 internal fun loadConfigFromEnvironment(env: Map<String, String>) =
   EventRouterConfig(
     rabbitConfig = loadRabbitConfigFromEnvironment(env),
-    s3Bucket     = env.require(EnvKey.S3_BUCKET_NAME),
+    s3Bucket     = env.require(EnvKey.S3.BucketName),
     kafkaConfig  = loadKafkaConfigFromEnvironment(env)
   )
 
 internal fun loadRabbitConfigFromEnvironment(env: Map<String, String>) =
   RabbitMQConfig(
     serverAddress          = HostAddress(
-      host = env.optional(EnvKey.RABBIT_HOST) ?: "localhost",
-      port = env.optional(EnvKey.RABBIT_PORT)?.toUShort() ?: 5672u,
+      host = env.optional(EnvKey.Rabbit.Host) ?: "localhost",
+      port = env.optional(EnvKey.Rabbit.Port)?.toUShort() ?: 5672u,
     ),
-    serverUsername         = env.require(EnvKey.RABBIT_USERNAME),
-    serverPassword         = SecretString(env.require(EnvKey.RABBIT_PASSWORD)),
-    serverConnectionName   = env.optional(EnvKey.RABBIT_CONNECTION_NAME),
+    serverUsername         = env.require(EnvKey.Rabbit.Username),
+    serverPassword         = SecretString(env.require(EnvKey.Rabbit.Password)),
+    serverConnectionName   = env.optional(EnvKey.Rabbit.ConnectionName),
 
-    exchangeName           = env.require(EnvKey.RABBIT_EXCHANGE_NAME),
-    exchangeType           = env.optional(EnvKey.RABBIT_EXCHANGE_TYPE) ?: "direct",
-    exchangeDurable        = env.optional(EnvKey.RABBIT_EXCHANGE_DURABLE)?.toBool() ?: true,
-    exchangeAutoDelete     = env.optional(EnvKey.RABBIT_EXCHANGE_AUTO_DELETE)?.toBool() ?: false,
-    exchangeArguments      = env.optional(EnvKey.RABBIT_EXCHANGE_ARGUMENTS)?.toMap() ?: emptyMap(),
+    exchangeName           = env.require(EnvKey.Rabbit.Exchange.Name),
+    exchangeType           = env.optional(EnvKey.Rabbit.Exchange.Type) ?: "direct",
+    exchangeDurable        = env.optBool(EnvKey.Rabbit.Exchange.Durable) ?: true,
+    exchangeAutoDelete     = env.optBool(EnvKey.Rabbit.Exchange.AutoDelete) ?: false,
+    exchangeArguments      = env.optMap(EnvKey.Rabbit.Exchange.Arguments) ?: emptyMap(),
 
-    queueName              = env.require(EnvKey.RABBIT_QUEUE_NAME),
-    queueDurable           = env.optional(EnvKey.RABBIT_QUEUE_DURABLE)?.toBool() ?: true,
-    queueExclusive         = env.optional(EnvKey.RABBIT_QUEUE_EXCLUSIVE)?.toBool() ?: false,
-    queueAutoDelete        = env.optional(EnvKey.RABBIT_QUEUE_AUTO_DELETE)?.toBool() ?: false,
-    queueArguments         = env.optional(EnvKey.RABBIT_QUEUE_ARGUMENTS)?.toMap() ?: emptyMap(),
+    queueName              = env.require(EnvKey.Rabbit.Queue.Name),
+    queueDurable           = env.optBool(EnvKey.Rabbit.Queue.Durable) ?: true,
+    queueExclusive         = env.optBool(EnvKey.Rabbit.Queue.Exclusive) ?: false,
+    queueAutoDelete        = env.optBool(EnvKey.Rabbit.Queue.AutoDelete) ?: false,
+    queueArguments         = env.optMap(EnvKey.Rabbit.Queue.Arguments) ?: emptyMap(),
 
-    routingKey             = env.optional(EnvKey.RABBIT_ROUTING_KEY) ?: "",
-    routingArgs            = env.optional(EnvKey.RABBIT_ROUTING_ARGUMENTS)?.toMap() ?: emptyMap(),
-    messagePollingInterval = env.optional(EnvKey.RABBIT_POLLING_INTERVAL)?.let(Duration::parse) ?: 500.milliseconds
+    routingKey             = env.optional(EnvKey.Rabbit.Routing.Key) ?: "",
+    routingArgs            = env.optMap(EnvKey.Rabbit.Routing.Arguments) ?: emptyMap(),
+
+    messagePollingInterval = env.optDuration(EnvKey.Rabbit.PollingInterval) ?: 500.milliseconds
   )
-
 
 internal fun loadKafkaConfigFromEnvironment(env: Map<String, String>) =
   KafkaConfig(
     producerConfig = KafkaProducerConfig(
-      servers                 = env.require(EnvKey.KAFKA_SERVERS)
+      servers                 = env.require(EnvKey.Kafka.Servers)
                                    .toHostAddresses(),
-      bufferMemoryBytes       = env.optional(EnvKey.KAFKA_PRODUCER_BUFFER_MEMORY_BYTES)
+      bufferMemoryBytes       = env.optional(EnvKey.Kafka.Producer.BufferMemoryBytes)
                                    ?.toLong()
                                    ?: KafkaProducerConfigDefaults.BUFFER_MEMORY_BYTES,
-      compressionType         = env.optional(EnvKey.KAFKA_PRODUCER_COMPRESSION_TYPE)
+      compressionType         = env.optional(EnvKey.Kafka.Producer.CompressionType)
                                    ?.let(KafkaCompressionType.Companion::fromString)
                                    ?: KafkaProducerConfigDefaults.COMPRESSION_TYPE,
-      sendRetries             = env.optional(EnvKey.KAFKA_PRODUCER_SEND_RETRIES)
-                                   ?.toInt()
+      sendRetries             = env.optInt(EnvKey.Kafka.Producer.SendRetries)
                                    ?: KafkaProducerConfigDefaults.SEND_RETRIES,
-      batchSize               = env.optional(EnvKey.KAFKA_PRODUCER_BATCH_SIZE)
-                                   ?.toInt()
+      batchSize               = env.optInt(EnvKey.Kafka.Producer.BatchSize)
                                    ?: KafkaProducerConfigDefaults.BATCH_SIZE,
-      clientID                = env.require(EnvKey.KAFKA_PRODUCER_CLIENT_ID),
-      connectionsMaxIdle      = env.optional(EnvKey.KAFKA_PRODUCER_CONNECTIONS_MAX_IDLE)
-                                   ?.let(Duration.Companion::parse)
+      clientID                = env.require(EnvKey.Kafka.Producer.ClientID),
+      connectionsMaxIdle      = env.optDuration(EnvKey.Kafka.Producer.ConnectionsMaxIdle)
                                    ?: KafkaProducerConfigDefaults.CONNECTIONS_MAX_IDLE,
-      deliveryTimeout         = env.optional(EnvKey.KAFKA_PRODUCER_DELIVERY_TIMEOUT)
-                                   ?.let(Duration.Companion::parse)
+      deliveryTimeout         = env.optDuration(EnvKey.Kafka.Producer.DeliveryTimeout)
                                    ?: KafkaProducerConfigDefaults.DELIVERY_TIMEOUT,
-      lingerTime              = env.optional(EnvKey.KAFKA_PRODUCER_LINGER_TIME)
-                                   ?.let(Duration.Companion::parse)
+      lingerTime              = env.optDuration(EnvKey.Kafka.Producer.LingerTime)
                                    ?: KafkaProducerConfigDefaults.LINGER_TIME,
-      maxBlockingTimeout      = env.optional(EnvKey.KAFKA_PRODUCER_MAX_BLOCKING_TIMEOUT)
-                                   ?.let(Duration.Companion::parse)
+      maxBlockingTimeout      = env.optDuration(EnvKey.Kafka.Producer.MaxBlockingTimeout)
                                    ?: KafkaProducerConfigDefaults.MAX_BLOCKING_TIMEOUT,
-      maxRequestSizeBytes     = env.optional(EnvKey.KAFKA_PRODUCER_MAX_REQUEST_SIZE_BYTES)
-                                   ?.toInt()
+      maxRequestSizeBytes     = env.optInt(EnvKey.Kafka.Producer.MaxRequestSizeBytes)
                                    ?: KafkaProducerConfigDefaults.MAX_REQUEST_SIZE_BYTES,
-      receiveBufferSizeBytes  = env.optional(EnvKey.KAFKA_PRODUCER_RECEIVE_BUFFER_SIZE_BYTES)
-                                   ?.toInt()
+      receiveBufferSizeBytes  = env.optInt(EnvKey.Kafka.Producer.ReceiveBufferSizeBytes)
                                    ?: KafkaProducerConfigDefaults.RECEIVE_BUFFER_SIZE_BYTES,
-      requestTimeout          = env.optional(EnvKey.KAFKA_PRODUCER_REQUEST_TIMEOUT)
-                                   ?.let(Duration.Companion::parse)
+      requestTimeout          = env.optDuration(EnvKey.Kafka.Producer.RequestTimeout)
                                    ?: KafkaProducerConfigDefaults.REQUEST_TIMEOUT,
-      sendBufferSizeBytes     = env.optional(EnvKey.KAFKA_PRODUCER_SEND_BUFFER_SIZE_BYTES)
-                                   ?.toInt()
+      sendBufferSizeBytes     = env.optInt(EnvKey.Kafka.Producer.SendBufferSizeBytes)
                                    ?: KafkaProducerConfigDefaults.SEND_BUFFER_SIZE_BYTES,
-      reconnectBackoffMaxTime = env.optional(EnvKey.KAFKA_PRODUCER_RECONNECT_BACKOFF_MAX_TIME)
-                                   ?.let(Duration.Companion::parse)
+      reconnectBackoffMaxTime = env.optDuration(EnvKey.Kafka.Producer.ReconnectBackoffMaxTime)
                                    ?: KafkaProducerConfigDefaults.RECONNECT_BACKOFF_MAX_TIME,
-      reconnectBackoffTime    = env.optional(EnvKey.KAFKA_PRODUCER_RECONNECT_BACKOFF_TIME)
-                                   ?.let(Duration.Companion::parse)
+      reconnectBackoffTime    = env.optDuration(EnvKey.Kafka.Producer.ReconnectBackoffTime)
                                    ?: KafkaProducerConfigDefaults.RECONNECT_BACKOFF_TIME,
-      retryBackoffTime        = env.optional(EnvKey.KAFKA_PRODUCER_RETRY_BACKOFF_TIME)
-                                   ?.let(Duration.Companion::parse)
+      retryBackoffTime        = env.optDuration(EnvKey.Kafka.Producer.RetryBackoffTime)
                                    ?: KafkaProducerConfigDefaults.RETRY_BACKOFF_TIME
     ),
 
-    importTriggerMessageKey     = env.optional(EnvKey.KAFKA_MESSAGE_KEY_IMPORT_TRIGGERS)
+    importTriggerMessageKey     = env.optional(EnvKey.Kafka.MessageKey.ImportTriggers)
                                      ?: KafkaConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
-    importTriggerTopic          = env.optional(EnvKey.KAFKA_TOPIC_IMPORT_TRIGGERS)
+    importTriggerTopic          = env.optional(EnvKey.Kafka.Topic.ImportTriggers)
                                      ?: KafkaConfigDefaults.IMPORT_TRIGGER_TOPIC,
-    installTriggerMessageKey    = env.optional(EnvKey.KAFKA_MESSAGE_KEY_INSTALL_TRIGGERS)
+    installTriggerMessageKey    = env.optional(EnvKey.Kafka.MessageKey.InstallTriggers)
                                      ?: KafkaConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY,
-    installTriggerTopic         = env.optional(EnvKey.KAFKA_TOPIC_INSTALL_TRIGGERS)
+    installTriggerTopic         = env.optional(EnvKey.Kafka.Topic.InstallTriggers)
                                      ?: KafkaConfigDefaults.INSTALL_TRIGGER_TOPIC,
-    updateMetaTriggerMessageKey = env.optional(EnvKey.KAFKA_MESSAGE_KEY_UPDATE_META_TRIGGERS)
+    updateMetaTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.UpdateMetaTriggers)
                                      ?: KafkaConfigDefaults.UPDATE_META_TRIGGER_MESSAGE_KEY,
-    updateMetaTriggerTopic      = env.optional(EnvKey.KAFKA_TOPIC_UPDATE_META_TRIGGERS)
+    updateMetaTriggerTopic      = env.optional(EnvKey.Kafka.Topic.UpdateMetaTriggers)
                                      ?: KafkaConfigDefaults.UPDATE_META_TRIGGER_TOPIC,
-    softDeleteTriggerMessageKey = env.optional(EnvKey.KAFKA_MESSAGE_KEY_SOFT_DELETE_TRIGGERS)
+    softDeleteTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.SoftDeleteTriggers)
                                      ?: KafkaConfigDefaults.SOFT_DELETE_TRIGGER_MESSAGE_KEY,
-    softDeleteTriggerTopic      = env.optional(EnvKey.KAFKA_TOPIC_SOFT_DELETE_TRIGGERS)
+    softDeleteTriggerTopic      = env.optional(EnvKey.Kafka.Topic.SoftDeleteTriggers)
                                      ?: KafkaConfigDefaults.SOFT_DELETE_TRIGGER_TOPIC,
-    hardDeleteTriggerMessageKey = env.optional(EnvKey.KAFKA_MESSAGE_KEY_HARD_DELETE_TRIGGERS)
+    hardDeleteTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.HardDeleteTriggers)
                                      ?: KafkaConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY,
-    hardDeleteTriggerTopic      = env.optional(EnvKey.KAFKA_TOPIC_HARD_DELETE_TRIGGERS)
+    hardDeleteTriggerTopic      = env.optional(EnvKey.Kafka.Topic.HardDeleteTriggers)
                                      ?: KafkaConfigDefaults.HARD_DELETE_TRIGGER_TOPIC,
-    shareTriggerMessageKey      = env.optional(EnvKey.KAFKA_MESSAGE_KEY_SHARE_TRIGGERS)
+    shareTriggerMessageKey      = env.optional(EnvKey.Kafka.MessageKey.ShareTriggers)
                                      ?: KafkaConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY,
-    shareTriggerTopic           = env.optional(EnvKey.KAFKA_TOPIC_SHARE_TRIGGERS)
+    shareTriggerTopic           = env.optional(EnvKey.Kafka.Topic.ShareTriggers)
                                      ?: KafkaConfigDefaults.SHARE_TRIGGER_TOPIC,
   )
 
-
-
-private fun String.toBool() =
-  when (this.lowercase()) {
-    "true", "yes", "on", "1" -> true
-    else                     -> false
-  }
-
 private fun String.toPairSequence() = splitToSequence(',')
   .map { it.toKeyValue() }
-
-private fun String.toMap() = toPairSequence()
-  .toMap()
 
 private fun String.toHostAddresses() = toPairSequence()
   .map { HostAddress(it.first, it.second.toUShort()) }
@@ -215,22 +129,4 @@ private fun String.toKeyValue(): Pair<String, String> {
     throw IllegalStateException("malformed map in environment variable, entry with empty key was found")
 
   return substring(0, index) to substring(index+1)
-}
-
-private fun Map<String, String>.optional(key: String): String? {
-  val value = get(key)
-
-  return if (value.isNullOrBlank())
-    null
-  else
-    value
-}
-
-private fun Map<String, String>.require(key: String): String {
-  val value = get(key)
-
-  return if (value.isNullOrBlank())
-    throw IllegalStateException("Missing required environment variable: $key")
-  else
-    value
 }

@@ -4,9 +4,14 @@ import java.util.UUID
 import vdi.components.common.util.byteOf
 import vdi.components.common.util.isHexDigit
 
-interface DatasetID {
-  override fun toString(): String
-}
+/**
+ * Dataset ID is a 128 bit identifier for a VDI dataset.
+ *
+ * These identifiers are randomized values, not sequential.
+ *
+ * @author Elizabeth Paige Harper - https://github.com/foxcapades
+ */
+interface DatasetID
 
 /**
  * Validates and wraps the given string value as a [DatasetID] instance.

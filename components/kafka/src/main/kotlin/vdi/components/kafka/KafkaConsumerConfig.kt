@@ -1,54 +1,72 @@
 package vdi.components.kafka
 
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import vdi.components.common.util.HostAddress
 
 data class KafkaConsumerConfig(
   // bootstrap.servers
   val servers: Array<HostAddress>,
+
   // fetch.min.bytes
-  val fetchMinBytes: Int = 1,
+  val fetchMinBytes: Int = KafkaConsumerConfigDefaults.FetchMinBytes,
+
   // group.id
   val groupID: String,
+
   // heartbeat.interval.ms
-  val heartbeatInterval: Duration = 3.seconds,
+  val heartbeatInterval: Duration = KafkaConsumerConfigDefaults.HeartbeatInterval,
+
   // session.timeout.ms
-  val sessionTimeout: Duration = 45.seconds,
+  val sessionTimeout: Duration = KafkaConsumerConfigDefaults.SessionTimeout,
+
   // auto.offset.reset
-  val autoOffsetReset: KafkaOffsetType = KafkaOffsetType.EARLIEST,
+  val autoOffsetReset: KafkaOffsetType = KafkaConsumerConfigDefaults.AutoOffsetReset,
+
   // connections.max.idle.ms
-  val connectionsMaxIdle: Duration = 9.minutes,
+  val connectionsMaxIdle: Duration = KafkaConsumerConfigDefaults.ConnectionsMaxIdle,
+
   // default.api.timeout.ms
-  val defaultAPITimeout: Duration = 1.minutes,
+  val defaultAPITimeout: Duration = KafkaConsumerConfigDefaults.DefaultAPITimeout,
+
   // enable.auto.commit
-  val enableAutoCommit: Boolean = true,
+  val enableAutoCommit: Boolean = KafkaConsumerConfigDefaults.EnableAutoCommit,
+
   // fetch.max.bytes
-  val fetchMaxBytes: Int = 52428800,
+  val fetchMaxBytes: Int = KafkaConsumerConfigDefaults.FetchMaxBytes,
+
   // group.instance.id
-  val groupInstanceID: String? = null,
+  val groupInstanceID: String? = KafkaConsumerConfigDefaults.GroupInstanceID,
+
   // max.poll.interval.ms
-  val maxPollInterval: Duration = 5.minutes,
+  val maxPollInterval: Duration = KafkaConsumerConfigDefaults.MaxPollInterval,
+
   // max.poll.records
-  val maxPollRecords: Int = 500,
+  val maxPollRecords: Int = KafkaConsumerConfigDefaults.MaxPollRecords,
+
   // receive.buffer.byte
-  val receiveBufferSizeBytes: Int = 65536,
+  val receiveBufferSizeBytes: Int = KafkaConsumerConfigDefaults.ReceiveBufferSizeBytes,
+
   // request.timeout.ms
-  val requestTimeout: Duration = 30.seconds,
+  val requestTimeout: Duration = KafkaConsumerConfigDefaults.RequestTimeout,
+
   // send.buffer.bytes
-  val sendBufferSizeBytes: Int = 131072,
+  val sendBufferSizeBytes: Int = KafkaConsumerConfigDefaults.SendBufferSizeBytes,
+
   // auto.commit.interval.ms
-  val autoCommitInterval: Duration = 5.seconds,
+  val autoCommitInterval: Duration = KafkaConsumerConfigDefaults.AutoCommitInterval,
+
   // client.id
   val clientID: String,
-  // reconnect.backoff.max.ms
-  val reconnectBackoffMaxTime: Duration = 1.seconds,
-  // reconnect.backoff.ms
-  val reconnectBackoffTime: Duration = 50.milliseconds,
-  // retry.backoff.ms
-  val retryBackoffTime: Duration = 100.milliseconds,
 
-  val pollDuration: Duration = 500.milliseconds,
+  // reconnect.backoff.max.ms
+  val reconnectBackoffMaxTime: Duration = KafkaConsumerConfigDefaults.ReconnectBackoffMaxTime,
+
+  // reconnect.backoff.ms
+  val reconnectBackoffTime: Duration = KafkaConsumerConfigDefaults.ReconnectBackoffTime,
+
+  // retry.backoff.ms
+  val retryBackoffTime: Duration = KafkaConsumerConfigDefaults.RetryBackoffTime,
+
+  val pollDuration: Duration = KafkaConsumerConfigDefaults.PollDuration,
 )
+

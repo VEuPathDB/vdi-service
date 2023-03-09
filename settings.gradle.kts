@@ -69,6 +69,7 @@ include(":modules:soft-delete-result-handler")
 include(":modules:rest-service")
 
 include(":components:common")
+include(":components:common:env")
 include(":components:json")
 include(":components:kafka")
 include(":components:kafka-triggers")
