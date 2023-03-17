@@ -1,9 +1,6 @@
 package vdi.component.db.cache
 
 import org.slf4j.LoggerFactory
-import org.veupathdb.service.vdi.db.internal.model.*
-import org.veupathdb.service.vdi.db.internal.queries.*
-import org.veupathdb.service.vdi.generated.model.DatasetImportStatus
 import java.sql.Connection
 import vdi.component.db.cache.model.*
 import vdi.component.db.cache.sql.*

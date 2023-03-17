@@ -2,9 +2,9 @@ package vdi.component.db.cache
 
 import org.slf4j.LoggerFactory
 import vdi.component.db.cache.sql.selectDatasetList
-import org.veupathdb.service.vdi.generated.model.DatasetListEntry
 import javax.sql.DataSource
 import vdi.component.db.cache.model.DatasetListQuery
+import vdi.component.db.cache.model.DatasetRecord
 
 object CacheDB {
   private val log = LoggerFactory.getLogger(javaClass)
@@ -18,7 +18,7 @@ object CacheDB {
     source = db
   }
 
-  fun selectDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
+  fun selectDatasetList(query: DatasetListQuery): List<DatasetRecord> {
     log.debug("selecting dataset list for user {}", query.userID)
     return connection.use { it.selectDatasetList(query) }
   }
