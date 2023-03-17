@@ -16,4 +16,8 @@ object Tmp {
     return path
   }
 
+  inline fun withPath(fn: (tmp: Path) -> Unit) {
+    newPath().useThenDelete(fn)
+  }
+
 }

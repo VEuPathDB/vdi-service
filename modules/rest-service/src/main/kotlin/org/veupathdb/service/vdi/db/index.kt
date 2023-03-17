@@ -9,7 +9,7 @@ import org.veupathdb.lib.container.jaxrs.health.DatabaseDependency
 import org.veupathdb.lib.container.jaxrs.health.Dependency
 import org.veupathdb.lib.ldap.LDAP
 import org.veupathdb.service.vdi.config.Options
-import org.veupathdb.service.vdi.db.internal.CacheDB
+import vdi.component.db.cache.CacheDB
 import org.postgresql.Driver as PostgresDriver
 
 

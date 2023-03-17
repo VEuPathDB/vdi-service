@@ -9,13 +9,12 @@ import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.generated.model.DatasetPostResponseImpl
 import org.veupathdb.service.vdi.generated.model.validate
 import org.veupathdb.service.vdi.generated.resources.VdiDatasets
-import org.veupathdb.service.vdi.model.DatasetListQuery
-import org.veupathdb.service.vdi.model.DatasetListSortField
-import org.veupathdb.service.vdi.model.DatasetOwnershipFilter
-import org.veupathdb.service.vdi.model.SortOrder
+import vdi.component.db.cache.model.DatasetListQuery
+import vdi.component.db.cache.model.DatasetListSortField
+import vdi.component.db.cache.model.DatasetOwnershipFilter
+import vdi.component.db.cache.model.SortOrder
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.list.fetchUserDatasetList
-import java.util.*
 import vdi.components.common.fields.DatasetID
 import vdi.components.common.fields.asWDKUserID
 
@@ -93,7 +92,8 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
     if (parsedLimit < 0 || parsedLimit > MAX_LIMIT)
       throw BadRequestException("Invalid limit value, must be greater than or equal to 0 and less than or equal to 100")
 
-    return VdiDatasets.GetVdiDatasetsResponse.respond200WithApplicationJson(fetchUserDatasetList(DatasetListQuery(
+    return VdiDatasets.GetVdiDatasetsResponse.respond200WithApplicationJson(fetchUserDatasetList(
+      DatasetListQuery(
       userID,
       projectId,
       parsedOwnership,
@@ -101,7 +101,8 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
       parsedLimit,
       parsedSortField,
       parsedSortOrder
-    )))
+    )
+    ))
   }
 
   override fun postVdiDatasets(entity: DatasetPostRequest): VdiDatasets.PostVdiDatasetsResponse {

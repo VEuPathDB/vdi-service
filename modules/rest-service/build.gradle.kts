@@ -57,6 +57,7 @@ containerBuild {
 }
 
 dependencies {
+  implementation(project(":components:cache-db"))
   implementation(project(":components:common"))
   implementation(project(":components:compression"))
   implementation(project(":components:env"))
