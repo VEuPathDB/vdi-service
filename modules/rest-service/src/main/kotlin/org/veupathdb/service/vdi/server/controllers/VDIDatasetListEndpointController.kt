@@ -94,14 +94,14 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
 
     return VdiDatasets.GetVdiDatasetsResponse.respond200WithApplicationJson(fetchUserDatasetList(
       DatasetListQuery(
-      userID,
-      projectId,
-      parsedOwnership,
-      parsedOffset,
-      parsedLimit,
-      parsedSortField,
-      parsedSortOrder
-    )
+        userID,
+        projectId,
+        parsedOwnership,
+        parsedOffset,
+        parsedLimit,
+        parsedSortField,
+        parsedSortOrder
+      )
     ))
   }
 
