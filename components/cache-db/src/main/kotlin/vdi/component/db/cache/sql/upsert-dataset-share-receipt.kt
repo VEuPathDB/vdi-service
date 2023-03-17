@@ -1,12 +1,9 @@
 package vdi.component.db.cache.sql
 
-import org.veupathdb.service.vdi.generated.model.ShareReceiptAction
 import java.sql.Connection
+import vdi.component.db.cache.model.ShareReceiptAction
 import vdi.components.common.fields.DatasetID
 import vdi.components.common.fields.UserID
-
-private const val STATUS_ENUM_ACCEPT_VALUE = "accept"
-private const val STATUS_ENUM_REJECT_VALUE = "reject"
 
 // language=postgresql
 private const val SQL = """
@@ -27,13 +24,7 @@ internal fun Connection.upsertDatasetShareReceipt(
   prepareStatement(SQL).use { ps ->
     ps.setString(1, datasetID.toString())
     ps.setString(2, recipientID.toString())
-    ps.setString(3, status.toDBStatus())
-    ps.setString(4, status.toDBStatus())
+    ps.setString(3, status.value)
+    ps.setString(4, status.value)
   }
 }
-
-private fun ShareReceiptAction.toDBStatus() =
-  when (this) {
-    ShareReceiptAction.ACCEPT -> vdi.component.db.cache.queries.STATUS_ENUM_ACCEPT_VALUE
-    ShareReceiptAction.REJECT -> vdi.component.db.cache.queries.STATUS_ENUM_REJECT_VALUE
-  }
