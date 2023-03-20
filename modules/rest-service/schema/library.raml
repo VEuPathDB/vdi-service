@@ -394,12 +394,18 @@ types:
         displayName: Owner User ID
         description: VEuPathDB user ID of the owner of the dataset.
         type: User-ID
-      displayName:
-        displayName: Owner Display Name
+      firstName:
+        displayName: Owner First Name
         type: string
+        required: false
+      lastName:
+        displayName: Owner Last Name
+        type: string
+        required: false
       organization:
         displayName: Owner Organization
         type: string
+        required: false
   DatasetTypeInfo:
     displayName: Dataset Type Info
     description: Information about a specific dataset type.

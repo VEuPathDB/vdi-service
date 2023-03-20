@@ -34,6 +34,7 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
     ownerID     = userID,
     isDeleted   = false,
     created     = OffsetDateTime.now(),
+    importStatus = vdi.component.db.cache.model.DatasetImportStatus.AwaitingImport,
     name        = entity.meta.name,
     summary     = entity.meta.summary,
     description = entity.meta.description,
@@ -60,7 +61,7 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
               it.insertDataset(datasetRow)
               it.insertDatasetMeta(datasetRow)
               it.insertDatasetProjects(datasetRow)
-              it.insertImportControl(datasetID, DatasetImportStatus.AWAITINGIMPORT)
+              it.insertImportControl(datasetID, datasetRow.importStatus)
 
               DatasetStore.putUserUpload(datasetRow.ownerID, datasetID, tarFile::inputStream)
             } catch (e: Throwable) {

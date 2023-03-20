@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 import vdi.components.common.fields.DatasetID
 import vdi.components.common.fields.UserID
 
-internal data class DatasetRecordImpl(
+data class DatasetRecordImpl(
   override val datasetID: DatasetID,
   override val typeName: String,
   override val typeVersion: String,

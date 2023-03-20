@@ -7,15 +7,19 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "userID",
-    "displayName",
+    "firstName",
+    "lastName",
     "organization"
 })
 public class DatasetOwnerImpl implements DatasetOwner {
   @JsonProperty("userID")
   private Long userID;
 
-  @JsonProperty("displayName")
-  private String displayName;
+  @JsonProperty("firstName")
+  private String firstName;
+
+  @JsonProperty("lastName")
+  private String lastName;
 
   @JsonProperty("organization")
   private String organization;
@@ -30,14 +34,24 @@ public class DatasetOwnerImpl implements DatasetOwner {
     this.userID = userID;
   }
 
-  @JsonProperty("displayName")
-  public String getDisplayName() {
-    return this.displayName;
+  @JsonProperty("firstName")
+  public String getFirstName() {
+    return this.firstName;
   }
 
-  @JsonProperty("displayName")
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
+  @JsonProperty("firstName")
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  @JsonProperty("lastName")
+  public String getLastName() {
+    return this.lastName;
+  }
+
+  @JsonProperty("lastName")
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
   }
 
   @JsonProperty("organization")
