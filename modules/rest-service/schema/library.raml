@@ -453,8 +453,8 @@ types:
     enum:
       - running
       - complete
-      - invalid
-      - failed
+      - failed-validation
+      - failed-installation
       - ready-for-reinstall
   DatasetInstallStatusEntry:
     displayName: Dataset Install Status Entry
@@ -463,7 +463,18 @@ types:
     additionalProperties: false
     properties:
       projectID: ProjectID
-      status: DatasetInstallStatus
+      metaStatus:
+        type: DatasetInstallStatus
+        required: false
+      metaMessage:
+        type: string
+        required: false
+      dataStatus:
+        type: DatasetInstallStatus
+        required: false
+      dataMessage:
+        type: string
+        required: false
   Error:
     type: object
     additionalProperties: false

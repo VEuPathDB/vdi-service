@@ -124,8 +124,8 @@ types:
     enum:
     - running
     - complete
-    - invalid
-    - failed
+    - failed-validation
+    - failed-installation
     - ready-for-reinstall
 
   DatasetInstallStatusEntry:
@@ -137,8 +137,17 @@ types:
       projectID:
         type: ProjectID
         required: true
-      status:
+      metaStatus:
         type: DatasetInstallStatus
-        required: true
+        required: false
+      metaMessage:
+        type: string
+        required: false
+      dataStatus:
+        type: DatasetInstallStatus
+        required: false
+      dataMessage:
+        type: string
+        required: false
 
   # endregion Dataset Status

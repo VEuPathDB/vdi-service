@@ -9,11 +9,11 @@ public enum DatasetInstallStatus {
   @JsonProperty("complete")
   COMPLETE("complete"),
 
-  @JsonProperty("invalid")
-  INVALID("invalid"),
+  @JsonProperty("failed-validation")
+  FAILEDVALIDATION("failed-validation"),
 
-  @JsonProperty("failed")
-  FAILED("failed"),
+  @JsonProperty("failed-installation")
+  FAILEDINSTALLATION("failed-installation"),
 
   @JsonProperty("ready-for-reinstall")
   READYFORREINSTALL("ready-for-reinstall");

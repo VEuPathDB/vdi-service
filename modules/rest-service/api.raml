@@ -158,9 +158,12 @@ uses:
                 import: imported
                 install:
                 - projectID: PlasmoDB
-                  status: failed
+                  metaStatus: complete
+                  dataStatus: failed-installation
+                  dataMessage: Failed due to some reason.
                 - projectID: ToxoDB
-                  status: complete
+                  metaStatus: complete
+                  dataStatus: complete
       400:
         description: |
           Bad Request.
@@ -491,9 +494,12 @@ uses:
               import: imported
               install:
               - projectID: PlasmoDB
-                status: failed
+                metaStatus: complete
+                dataStatus: failed-installation
+                dataMessage: Failed due to some reason.
               - projectID: ToxoDB
-                status: complete
+                metaStatus: complete
+                dataStatus: complete
       401:
         description: |
           Unauthorized.

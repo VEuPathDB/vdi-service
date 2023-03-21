@@ -71,14 +71,16 @@ internal fun Connection.selectUserDetails(userIDs: Collection<UserID>): Map<User
       }
 
       ps.executeQuery().use { rs ->
-        val userID = rs.getLong(1).asWDKUserID()
+        while (rs.next()) {
+          val userID = rs.getLong(1).asWDKUserID()
 
-        out[userID] = UserDetails(
-          userID,
-          rs.getString("first_name"),
-          rs.getString("last_name"),
-          rs.getString("organization")
-        )
+          out[userID] = UserDetails(
+            userID,
+            rs.getString("first_name"),
+            rs.getString("last_name"),
+            rs.getString("organization")
+          )
+        }
       }
     }
   }

@@ -58,9 +58,10 @@ fun String.toDatasetIDOrNull(): DatasetID? {
   return ByteArrayDatasetID(out)
 }
 
-@JvmInline
-internal value class ByteArrayDatasetID(val value: ByteArray) : DatasetID {
+internal data class ByteArrayDatasetID(val value: ByteArray) : DatasetID {
   override fun toString() = String(CharArray(32).also(value::toHexString))
+  override fun hashCode() = value.contentHashCode()
+  override fun equals(other: Any?) = other is ByteArrayDatasetID && other.value.contentEquals(value)
 }
 
 @Suppress("NOTHING_TO_INLINE")

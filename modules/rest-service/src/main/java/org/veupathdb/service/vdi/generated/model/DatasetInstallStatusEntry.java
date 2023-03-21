@@ -13,9 +13,27 @@ public interface DatasetInstallStatusEntry {
   @JsonProperty("projectID")
   void setProjectID(String projectID);
 
-  @JsonProperty("status")
-  DatasetInstallStatus getStatus();
+  @JsonProperty("metaStatus")
+  DatasetInstallStatus getMetaStatus();
 
-  @JsonProperty("status")
-  void setStatus(DatasetInstallStatus status);
+  @JsonProperty("metaStatus")
+  void setMetaStatus(DatasetInstallStatus metaStatus);
+
+  @JsonProperty("metaMessage")
+  String getMetaMessage();
+
+  @JsonProperty("metaMessage")
+  void setMetaMessage(String metaMessage);
+
+  @JsonProperty("dataStatus")
+  DatasetInstallStatus getDataStatus();
+
+  @JsonProperty("dataStatus")
+  void setDataStatus(DatasetInstallStatus dataStatus);
+
+  @JsonProperty("dataMessage")
+  String getDataMessage();
+
+  @JsonProperty("dataMessage")
+  void setDataMessage(String dataMessage);
 }
