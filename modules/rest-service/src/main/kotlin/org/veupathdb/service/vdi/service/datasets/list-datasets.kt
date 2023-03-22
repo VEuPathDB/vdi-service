@@ -86,13 +86,7 @@ private fun DatasetRecord.toListEntry(
     it.install = ArrayList(statuses.size)
 
     for ((projectID, status) in statuses) {
-      it.install.add(DatasetInstallStatusEntryImpl().also { dise ->
-        dise.projectID  = projectID
-        dise.metaStatus = status.meta?.toDatasetInstallStatus()
-        dise.metaMessage = status.metaMessage
-        dise.dataStatus = status.data?.toDatasetInstallStatus()
-        dise.dataMessage = status.dataMessage
-      })
+      it.install.add(DatasetInstallStatusEntry(projectID, status))
     }
   }
 }

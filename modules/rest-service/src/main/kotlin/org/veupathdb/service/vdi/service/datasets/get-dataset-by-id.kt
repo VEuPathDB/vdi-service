@@ -52,13 +52,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
       status.install = ArrayList(statuses.size)
 
       statuses.forEach { (projectID, installStatus) ->
-        status.install.add(DatasetInstallStatusEntryImpl().also { entry ->
-          entry.projectID = projectID
-          entry.metaStatus = installStatus.meta?.let(::DatasetInstallStatus)
-          entry.metaMessage = installStatus.metaMessage
-          entry.dataStatus = installStatus.data?.let(::DatasetInstallStatus)
-          entry.dataMessage = installStatus.dataMessage
-        })
+        status.install.add(DatasetInstallStatusEntry(projectID, installStatus))
       }
     }
 
