@@ -23,5 +23,17 @@ object AppDB {
 
     return result
   }
+
+  fun getDatasetStatuses(target: DatasetID, projects: Collection<ProjectID>): Map<ProjectID, InstallStatuses> {
+    val out = HashMap<ProjectID, InstallStatuses>(projects.size)
+
+    for (projectID in projects) {
+      val ds = AppDatabases[projectID] ?: throw IllegalStateException("missing application database entry for project ID \"$projectID\"")
+
+      ds.connection.use { con -> out[projectID] = con.selectInstallStatuses(target) }
+    }
+
+    return out
+  }
 }
 

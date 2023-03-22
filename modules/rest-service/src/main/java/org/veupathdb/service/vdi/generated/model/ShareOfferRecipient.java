@@ -7,11 +7,17 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = ShareOfferRecipientImpl.class
 )
 public interface ShareOfferRecipient {
-  @JsonProperty("displayName")
-  String getDisplayName();
+  @JsonProperty("firstName")
+  String getFirstName();
 
-  @JsonProperty("displayName")
-  void setDisplayName(String displayName);
+  @JsonProperty("firstName")
+  void setFirstName(String firstName);
+
+  @JsonProperty("lastName")
+  String getLastName();
+
+  @JsonProperty("lastName")
+  void setLastName(String lastName);
 
   @JsonProperty("organization")
   String getOrganization();

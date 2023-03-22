@@ -25,6 +25,12 @@ public interface DatasetOwner {
   @JsonProperty("lastName")
   void setLastName(String lastName);
 
+  @JsonProperty("email")
+  String getEmail();
+
+  @JsonProperty("email")
+  void setEmail(String email);
+
   @JsonProperty("organization")
   String getOrganization();
 

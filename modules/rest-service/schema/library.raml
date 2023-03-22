@@ -236,14 +236,6 @@ types:
         type: string[]
         default: []
         required: false
-      installMessages:
-        displayName: Install Messages
-        description: |
-          Mapping of project IDs to log line arrays containing messages from the
-          installation.
-        type: object
-        properties:
-          /[a-zA-Z]+/: string[]
       status:
         displayName: Dataset Status Info
         type: DatasetStatusInfo
@@ -264,7 +256,9 @@ types:
       status: ShareOfferAction
     example:
       recipient:
-        displayName: Joe User
+        firstName: Joe
+        lastName: User
+        email: juser@ujoe.edu
         organization: University of Joe
       status: revoke
   ShareOfferRecipient:
@@ -273,13 +267,20 @@ types:
     type: object
     additionalProperties: false
     properties:
-      displayName:
+      firstName:
+        displayName: First Name
+        type: string
+        required: false
+      lastName:
+        displayName: Last Name
         type: string
         required: false
       organization:
+        displayName: Organization
         type: string
         required: false
       email:
+        displayName: Email
         type: string
         required: false
     example:
@@ -400,6 +401,10 @@ types:
         required: false
       lastName:
         displayName: Owner Last Name
+        type: string
+        required: false
+      email:
+        displayName: Owner Email
         type: string
         required: false
       organization:

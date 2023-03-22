@@ -2,15 +2,8 @@ package org.veupathdb.service.vdi.service.datasets
 
 import org.veupathdb.service.vdi.db.AppDB
 import org.veupathdb.service.vdi.db.UserDB
-import org.veupathdb.service.vdi.generated.model.DatasetImportStatus
-import org.veupathdb.service.vdi.generated.model.DatasetInstallStatus
-import org.veupathdb.service.vdi.generated.model.DatasetInstallStatusEntryImpl
+import org.veupathdb.service.vdi.generated.model.*
 import vdi.component.db.cache.CacheDB
-import org.veupathdb.service.vdi.generated.model.DatasetListEntry
-import org.veupathdb.service.vdi.generated.model.DatasetListEntryImpl
-import org.veupathdb.service.vdi.generated.model.DatasetOwnerImpl
-import org.veupathdb.service.vdi.generated.model.DatasetStatusInfoImpl
-import org.veupathdb.service.vdi.generated.model.DatasetTypeInfoImpl
 import org.veupathdb.service.vdi.model.InstallStatus
 import org.veupathdb.service.vdi.model.InstallStatuses
 import org.veupathdb.service.vdi.model.UserDetails
@@ -19,7 +12,6 @@ import vdi.component.db.cache.model.DatasetRecord
 import vdi.components.common.fields.DatasetID
 import vdi.components.common.fields.ProjectID
 import vdi.components.common.fields.UserID
-import vdi.component.db.cache.model.DatasetImportStatus as DIS
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
   // get a list of all the datasets matching the given query
@@ -80,12 +72,7 @@ private fun DatasetRecord.toListEntry(
   statuses: Map<ProjectID, InstallStatuses>
 ) = DatasetListEntryImpl().also { out ->
   out.datasetID = datasetID.toString()
-  out.owner     = DatasetOwnerImpl().also {
-    it.userID = owner.userID.toString().toLong()
-    it.firstName = owner.firstName
-    it.lastName = owner.lastName
-    it.organization = owner.organization
-  }
+  out.owner     = DatasetOwner(owner)
   out.datasetType = DatasetTypeInfoImpl().also {
     it.name = typeName
     it.version = typeVersion
@@ -95,7 +82,7 @@ private fun DatasetRecord.toListEntry(
   out.description = description
   out.projectIDs = projects.toList()
   out.status = DatasetStatusInfoImpl().also {
-    it.import = importStatus.toDatasetImportStatus()
+    it.import = DatasetImportStatus(importStatus)
     it.install = ArrayList(statuses.size)
 
     for ((projectID, status) in statuses) {
@@ -107,15 +94,6 @@ private fun DatasetRecord.toListEntry(
         dise.dataMessage = status.dataMessage
       })
     }
-  }
-}
-
-private fun DIS.toDatasetImportStatus(): DatasetImportStatus {
-  return when (this) {
-    DIS.AwaitingImport -> DatasetImportStatus.AWAITINGIMPORT
-    DIS.Importing      -> DatasetImportStatus.IMPORTING
-    DIS.Imported       -> DatasetImportStatus.IMPORTED
-    DIS.ImportFailed   -> DatasetImportStatus.IMPORTFAILED
   }
 }
 

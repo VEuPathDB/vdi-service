@@ -6,13 +6,17 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "displayName",
+    "firstName",
+    "lastName",
     "organization",
     "email"
 })
 public class ShareOfferRecipientImpl implements ShareOfferRecipient {
-  @JsonProperty("displayName")
-  private String displayName;
+  @JsonProperty("firstName")
+  private String firstName;
+
+  @JsonProperty("lastName")
+  private String lastName;
 
   @JsonProperty("organization")
   private String organization;
@@ -20,14 +24,24 @@ public class ShareOfferRecipientImpl implements ShareOfferRecipient {
   @JsonProperty("email")
   private String email;
 
-  @JsonProperty("displayName")
-  public String getDisplayName() {
-    return this.displayName;
+  @JsonProperty("firstName")
+  public String getFirstName() {
+    return this.firstName;
   }
 
-  @JsonProperty("displayName")
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
+  @JsonProperty("firstName")
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  @JsonProperty("lastName")
+  public String getLastName() {
+    return this.lastName;
+  }
+
+  @JsonProperty("lastName")
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
   }
 
   @JsonProperty("organization")

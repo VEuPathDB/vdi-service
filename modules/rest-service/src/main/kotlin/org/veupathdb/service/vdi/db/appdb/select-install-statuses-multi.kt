@@ -3,7 +3,6 @@ package org.veupathdb.service.vdi.db.appdb
 import org.veupathdb.service.vdi.model.InstallStatus
 import org.veupathdb.service.vdi.model.InstallStatuses
 import org.veupathdb.service.vdi.model.InstallType
-import org.veupathdb.service.vdi.model.UserDetails
 import java.sql.Connection
 import kotlin.math.max
 import kotlin.math.min

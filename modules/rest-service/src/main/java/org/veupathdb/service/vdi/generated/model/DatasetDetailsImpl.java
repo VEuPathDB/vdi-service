@@ -1,14 +1,9 @@
 package org.veupathdb.service.vdi.generated.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -20,7 +15,6 @@ import java.util.regex.Pattern;
     "description",
     "projectIDs",
     "importMessages",
-    "installMessages",
     "status",
     "shares"
 })
@@ -53,9 +47,6 @@ public class DatasetDetailsImpl implements DatasetDetails {
               + "]"
   )
   private List<String> importMessages;
-
-  @JsonProperty("installMessages")
-  private DatasetDetails.InstallMessagesType installMessages;
 
   @JsonProperty("status")
   private DatasetStatusInfo status;
@@ -153,16 +144,6 @@ public class DatasetDetailsImpl implements DatasetDetails {
     this.importMessages = importMessages;
   }
 
-  @JsonProperty("installMessages")
-  public DatasetDetails.InstallMessagesType getInstallMessages() {
-    return this.installMessages;
-  }
-
-  @JsonProperty("installMessages")
-  public void setInstallMessages(DatasetDetails.InstallMessagesType installMessages) {
-    this.installMessages = installMessages;
-  }
-
   @JsonProperty("status")
   public DatasetStatusInfo getStatus() {
     return this.status;
@@ -181,27 +162,5 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("shares")
   public void setShares(List<ShareOffer> shares) {
     this.shares = shares;
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder
-  public static class InstallMessagesTypeImpl implements DatasetDetails.InstallMessagesType {
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new ExcludingMap() {
-       {
-        addAcceptedPattern(Pattern.compile("[a-zA-Z]+"));
-      }
-    }
-    ;
-
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-      return additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperties(String key, Object value) {
-      this.additionalProperties.put(key, value);
-    }
   }
 }

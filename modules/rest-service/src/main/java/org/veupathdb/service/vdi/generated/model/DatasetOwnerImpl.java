@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "userID",
     "firstName",
     "lastName",
+    "email",
     "organization"
 })
 public class DatasetOwnerImpl implements DatasetOwner {
@@ -20,6 +21,9 @@ public class DatasetOwnerImpl implements DatasetOwner {
 
   @JsonProperty("lastName")
   private String lastName;
+
+  @JsonProperty("email")
+  private String email;
 
   @JsonProperty("organization")
   private String organization;
@@ -52,6 +56,16 @@ public class DatasetOwnerImpl implements DatasetOwner {
   @JsonProperty("lastName")
   public void setLastName(String lastName) {
     this.lastName = lastName;
+  }
+
+  @JsonProperty("email")
+  public String getEmail() {
+    return this.email;
+  }
+
+  @JsonProperty("email")
+  public void setEmail(String email) {
+    this.email = email;
   }
 
   @JsonProperty("organization")

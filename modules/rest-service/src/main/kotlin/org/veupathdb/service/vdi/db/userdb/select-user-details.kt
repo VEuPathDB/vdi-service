@@ -16,19 +16,25 @@ SELECT
     FROM useraccounts.account_properties ap2
     WHERE ap1.user_id = ap2.user_id
       AND key = 'first_name'
-  ) as first_name
+  ) AS first_name
 , (
     SELECT value
     FROM useraccounts.account_properties ap2
     WHERE ap1.user_id = ap2.user_id
       AND key = 'last_name'
-  )  as last_name
+  ) AS last_name
 , (
     SELECT value
     FROM useraccounts.account_properties ap2
     WHERE ap1.user_id = ap2.user_id
       AND key = 'organization'
-  ) as organization
+  ) AS organization
+, (
+    SELECT value
+    FROM useraccounts.account_properties ap2
+    WHERE ap1.user_id = ap2.user_id
+      AND key = 'email'
+  ) AS email 
 FROM
   useraccounts.account_properties ap1
 WHERE
@@ -75,10 +81,11 @@ internal fun Connection.selectUserDetails(userIDs: Collection<UserID>): Map<User
           val userID = rs.getLong(1).asWDKUserID()
 
           out[userID] = UserDetails(
-            userID,
-            rs.getString("first_name"),
-            rs.getString("last_name"),
-            rs.getString("organization")
+            userID       = userID,
+            firstName    = rs.getString("first_name"),
+            lastName     = rs.getString("last_name"),
+            email        = rs.getString("email"),
+            organization = rs.getString("organization"),
           )
         }
       }

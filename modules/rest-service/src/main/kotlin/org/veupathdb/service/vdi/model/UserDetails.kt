@@ -6,5 +6,6 @@ data class UserDetails(
   val userID: UserID,
   val firstName: String?,
   val lastName: String?,
+  val email: String?,
   val organization: String?,
 )
