@@ -71,24 +71,14 @@ private fun DatasetRecord.toListEntry(
   owner: UserDetails,
   statuses: Map<ProjectID, InstallStatuses>
 ) = DatasetListEntryImpl().also { out ->
-  out.datasetID = datasetID.toString()
-  out.owner     = DatasetOwner(owner)
-  out.datasetType = DatasetTypeInfoImpl().also {
-    it.name = typeName
-    it.version = typeVersion
-  }
-  out.name = name
-  out.summary = summary
+  out.datasetID   = datasetID.toString()
+  out.owner       = DatasetOwner(owner)
+  out.datasetType = DatasetTypeInfo(this)
+  out.name        = name
+  out.summary     = summary
   out.description = description
-  out.projectIDs = projects.toList()
-  out.status = DatasetStatusInfoImpl().also {
-    it.import = DatasetImportStatus(importStatus)
-    it.install = ArrayList(statuses.size)
-
-    for ((projectID, status) in statuses) {
-      it.install.add(DatasetInstallStatusEntry(projectID, status))
-    }
-  }
+  out.projectIDs  = projects.toList()
+  out.status      = DatasetStatusInfo(importStatus, statuses)
 }
 
 private fun InstallStatus.toDatasetInstallStatus(): DatasetInstallStatus {

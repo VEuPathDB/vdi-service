@@ -32,44 +32,21 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 
   // return the dataset
   return DatasetDetailsImpl().also { out ->
-    out.datasetID = datasetID.toString()
-
-    out.owner = DatasetOwner(userDetails[userID] ?: throw IllegalStateException("no user details for dataset owner"))
-
-    out.datasetType = DatasetTypeInfoImpl().also { type ->
-      type.name    = dataset.typeName
-      type.version = dataset.typeVersion
-    }
-
-    out.name        = dataset.name
-    out.summary     = dataset.summary
-    out.description = dataset.description
-
+    out.datasetID      = datasetID.toString()
+    out.owner          = DatasetOwner(userDetails[userID] ?: throw IllegalStateException("no user details for dataset owner"))
+    out.datasetType    = DatasetTypeInfo(dataset)
+    out.name           = dataset.name
+    out.summary        = dataset.summary
+    out.description    = dataset.description
     out.importMessages = importMessages
-
-    out.status = DatasetStatusInfoImpl().also { status ->
-      status.import = DatasetImportStatus(dataset.importStatus)
-      status.install = ArrayList(statuses.size)
-
-      statuses.forEach { (projectID, installStatus) ->
-        status.install.add(DatasetInstallStatusEntry(projectID, installStatus))
-      }
-    }
-
-    out.shares = ArrayList(shares.size)
+    out.status         = DatasetStatusInfo(dataset.importStatus, statuses)
+    out.shares         = ArrayList(shares.size)
 
     shares.forEach { share ->
-      out.shares.add(ShareOfferImpl().also { offer ->
-        offer.recipient = ShareOfferRecipientImpl().also { recip ->
-          val user = userDetails[share.recipientID] ?: throw IllegalStateException("no user details for share recipient")
-
-          recip.firstName    = user.firstName
-          recip.lastName     = user.lastName
-          recip.organization = user.organization
-          recip.email        = user.email
-        }
-        offer.status = ShareOfferAction(share.offerStatus)
-      })
+      out.shares.add(ShareOffer(
+        userDetails[share.recipientID] ?: throw IllegalStateException("no user details for share recipient"),
+        share.offerStatus
+      ))
     }
   }
 }
