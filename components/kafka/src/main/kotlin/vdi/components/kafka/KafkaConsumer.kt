@@ -1,8 +1,6 @@
 package vdi.components.kafka
 
 import kotlin.time.Duration
-import kotlinx.coroutines.Dispatchers
-
 
 /**
  * Kafka Message Consumer

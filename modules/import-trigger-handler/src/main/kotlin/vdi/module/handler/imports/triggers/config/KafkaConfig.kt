@@ -1,12 +1,18 @@
 package vdi.module.handler.imports.triggers.config
 
 import vdi.components.kafka.KafkaConsumerConfig
+import vdi.components.kafka.KafkaProducerConfig
 
 data class KafkaConfig(
   /**
    * Kafka Consumer Client Configuration.
    */
   val consumerConfig: KafkaConsumerConfig,
+
+  /**
+   * Kafka Producer Client Configuration.
+   */
+  val producerConfig: KafkaProducerConfig,
 
   /**
    * Import Triggers Message Key

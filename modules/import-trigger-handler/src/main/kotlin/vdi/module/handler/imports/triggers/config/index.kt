@@ -2,9 +2,7 @@ package vdi.module.handler.imports.triggers.config
 
 import vdi.components.common.env.*
 import vdi.components.common.util.HostAddress
-import vdi.components.kafka.KafkaConsumerConfig
-import vdi.components.kafka.KafkaConsumerConfigDefaults
-import vdi.components.kafka.KafkaOffsetType
+import vdi.components.kafka.*
 
 internal fun loadConfigFromEnvironment() = loadConfigFromEnvironment(System.getenv())
 
@@ -61,6 +59,44 @@ internal fun loadKafkaConfigFromEnvironment(env: Map<String, String>) =
       pollDuration            = env.optDuration(EnvKey.Kafka.Consumer.PollDuration)
                                    ?: KafkaConsumerConfigDefaults.PollDuration
     ),
+
+    producerConfig = KafkaProducerConfig(
+      servers                 = env.require(EnvKey.Kafka.Servers)
+                                   .toHostAddresses(),
+      bufferMemoryBytes       = env.optLong(EnvKey.Kafka.Producer.BufferMemoryBytes)
+                                   ?: KafkaProducerConfigDefaults.BUFFER_MEMORY_BYTES,
+      compressionType         = env.optional(EnvKey.Kafka.Producer.CompressionType)
+                                   ?.let(KafkaCompressionType::fromString)
+                                   ?: KafkaProducerConfigDefaults.COMPRESSION_TYPE,
+      sendRetries             = env.optInt(EnvKey.Kafka.Producer.SendRetries)
+                                   ?: KafkaProducerConfigDefaults.SEND_RETRIES,
+      batchSize               = env.optInt(EnvKey.Kafka.Producer.BatchSize)
+                                   ?: KafkaProducerConfigDefaults.BATCH_SIZE,
+      clientID                = env.require(EnvKey.Kafka.Producer.ClientID),
+      connectionsMaxIdle      = env.optDuration(EnvKey.Kafka.Producer.ConnectionsMaxIdle)
+                                   ?: KafkaProducerConfigDefaults.CONNECTIONS_MAX_IDLE,
+      deliveryTimeout         = env.optDuration(EnvKey.Kafka.Producer.DeliveryTimeout)
+                                   ?: KafkaProducerConfigDefaults.DELIVERY_TIMEOUT,
+      lingerTime              = env.optDuration(EnvKey.Kafka.Producer.LingerTime)
+                                   ?: KafkaProducerConfigDefaults.LINGER_TIME,
+      maxBlockingTimeout      = env.optDuration(EnvKey.Kafka.Producer.MaxBlockingTimeout)
+                                   ?: KafkaProducerConfigDefaults.MAX_BLOCKING_TIMEOUT,
+      maxRequestSizeBytes     = env.optInt(EnvKey.Kafka.Producer.MaxRequestSizeBytes)
+                                   ?: KafkaProducerConfigDefaults.MAX_REQUEST_SIZE_BYTES,
+      receiveBufferSizeBytes  = env.optInt(EnvKey.Kafka.Producer.ReceiveBufferSizeBytes)
+                                   ?: KafkaProducerConfigDefaults.RECEIVE_BUFFER_SIZE_BYTES,
+      requestTimeout          = env.optDuration(EnvKey.Kafka.Producer.RequestTimeout)
+                                   ?: KafkaProducerConfigDefaults.REQUEST_TIMEOUT,
+      sendBufferSizeBytes     = env.optInt(EnvKey.Kafka.Producer.SendBufferSizeBytes)
+                                   ?: KafkaProducerConfigDefaults.SEND_BUFFER_SIZE_BYTES,
+      reconnectBackoffMaxTime = env.optDuration(EnvKey.Kafka.Producer.ReconnectBackoffMaxTime)
+                                   ?: KafkaProducerConfigDefaults.RECONNECT_BACKOFF_MAX_TIME,
+      reconnectBackoffTime    = env.optDuration(EnvKey.Kafka.Producer.ReconnectBackoffTime)
+                                   ?: KafkaProducerConfigDefaults.RECONNECT_BACKOFF_TIME,
+      retryBackoffTime        = env.optDuration(EnvKey.Kafka.Producer.RetryBackoffTime)
+                                   ?: KafkaProducerConfigDefaults.RETRY_BACKOFF_TIME
+    ),
+
     importTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.ImportTriggers)
                                  ?: KafkaConfigDefaults.ImportTriggerMessageKey,
     importTriggerTopic      = env.optional(EnvKey.Kafka.Topic.ImportTriggers)

@@ -13,3 +13,4 @@ import vdi.components.common.VDIServiceModule
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
 interface ImportTriggerHandler : VDIServiceModule
+

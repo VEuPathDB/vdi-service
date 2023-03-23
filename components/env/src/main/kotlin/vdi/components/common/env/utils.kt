@@ -26,6 +26,13 @@ fun Environment.optInt(key: String) =
     throw IllegalStateException("environment variable $key could not be parsed as an int value")
   }
 
+fun Environment.optLong(key: String) =
+  try {
+    optional(key)?.toLong()
+  } catch (e: Throwable) {
+    throw IllegalStateException("environment variable $key could not be parsed as a long value")
+  }
+
 fun Environment.optDuration(key: String) =
   try {
     optional(key)?.let(Duration.Companion::parse)
