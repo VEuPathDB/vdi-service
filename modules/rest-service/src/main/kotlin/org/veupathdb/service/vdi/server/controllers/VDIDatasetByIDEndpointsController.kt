@@ -5,6 +5,7 @@ import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdId
 import org.veupathdb.service.vdi.service.datasets.getDatasetByID
+import org.veupathdb.service.vdi.service.datasets.updateDatasetMeta
 import vdi.components.common.fields.asWDKUserID
 
 class VDIDatasetByIDEndpointsController(@Context request: ContainerRequest) : VdiDatasetsVdId, ControllerBase(request) {
@@ -13,11 +14,9 @@ class VDIDatasetByIDEndpointsController(@Context request: ContainerRequest) : Vd
     VdiDatasetsVdId.GetVdiDatasetsByVdIdResponse
       .respond200WithApplicationJson(getDatasetByID(userID.asWDKUserID(), vdID.asVDIID()))
 
-  override fun patchVdiDatasetsByVdId(
-    vdID: String,
-    entity: DatasetPatchRequest,
-  ): VdiDatasetsVdId.PatchVdiDatasetsByVdIdResponse {
-    TODO("Not yet implemented")
+  override fun patchVdiDatasetsByVdId(vdID: String, entity: DatasetPatchRequest): VdiDatasetsVdId.PatchVdiDatasetsByVdIdResponse {
+    updateDatasetMeta(userID.asWDKUserID(), vdID.asVDIID(), entity)
+    return VdiDatasetsVdId.PatchVdiDatasetsByVdIdResponse.respond204()
   }
 
   override fun deleteVdiDatasetsByVdId(vdID: String): VdiDatasetsVdId.DeleteVdiDatasetsByVdIdResponse {

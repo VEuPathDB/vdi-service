@@ -5,8 +5,8 @@ import javax.sql.DataSource
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.model.DatasetShare
+import vdi.component.db.cache.sql.*
 import vdi.component.db.cache.sql.selectDatasetForUser
-import vdi.component.db.cache.sql.selectDatasetList
 import vdi.component.db.cache.sql.selectImportMessages
 import vdi.component.db.cache.sql.selectSharesFor
 import vdi.components.common.fields.DatasetID
@@ -22,6 +22,11 @@ object CacheDB {
 
   fun init(db: DataSource) {
     source = db
+  }
+
+  fun selectDataset(datasetID: DatasetID): DatasetRecord? {
+    log.debug("selecting dataset {}", datasetID)
+    return connection.use { it.selectDataset(datasetID) }
   }
 
   fun selectDatasetList(query: DatasetListQuery): List<DatasetRecord> {
