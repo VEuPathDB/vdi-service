@@ -5,7 +5,6 @@
 * link:https://veupathdb.github.io/vdi-service/vdi-api.html[VDI Service API Doc]
 * link:https://veupathdb.github.io/vdi-service/design/1.0/design.html[VDI Service Design Doc]
 
-
 == Project Structure
 
 === Modules
