@@ -1,6 +1,6 @@
-package vdi.module.events.routing.config
+package vdi.components.kafka.router
 
-internal object KafkaConfigDefaults {
+object KafkaRouterConfigDefaults {
   const val IMPORT_TRIGGER_MESSAGE_KEY = "import-trigger"
   const val IMPORT_TRIGGER_TOPIC = "import-triggers"
 

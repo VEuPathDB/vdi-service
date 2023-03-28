@@ -4,16 +4,16 @@ import jakarta.ws.rs.NotFoundException
 import org.veupathdb.service.vdi.db.AppDB
 import org.veupathdb.service.vdi.db.UserDB
 import org.veupathdb.service.vdi.generated.model.*
-import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.OldCacheDB
 import vdi.components.common.fields.DatasetID
 import vdi.components.common.fields.UserID
 
 fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // Lookup dataset that is owned by or shared with the current user
-  val dataset = CacheDB.selectDatasetForUser(userID, datasetID) ?: throw NotFoundException()
+  val dataset = OldCacheDB.selectDatasetForUser(userID, datasetID) ?: throw NotFoundException()
 
   val shares = if (dataset.ownerID == userID) {
-    CacheDB.selectSharesForDataset(datasetID)
+    OldCacheDB.selectSharesForDataset(datasetID)
   } else {
     emptyList()
   }
@@ -28,7 +28,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // Lookup status information for the dataset
   val statuses = AppDB.getDatasetStatuses(datasetID, dataset.projects)
 
-  val importMessages = CacheDB.selectImportMessages(datasetID)
+  val importMessages = OldCacheDB.selectImportMessages(datasetID)
 
   // return the dataset
   return DatasetDetailsImpl().also { out ->

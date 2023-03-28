@@ -1,7 +1,7 @@
 package vdi.module.handler.imports.triggers.config
 
 import vdi.components.kafka.KafkaConsumerConfig
-import vdi.components.kafka.KafkaProducerConfig
+import vdi.components.kafka.router.KafkaRouterConfig
 
 data class KafkaConfig(
   /**
@@ -12,7 +12,7 @@ data class KafkaConfig(
   /**
    * Kafka Producer Client Configuration.
    */
-  val producerConfig: KafkaProducerConfig,
+  val routerConfig: KafkaRouterConfig,
 
   /**
    * Import Triggers Message Key
@@ -33,18 +33,4 @@ data class KafkaConfig(
    */
   val importTriggerTopic: String = KafkaConfigDefaults.ImportTriggerTopic,
 
-  /**
-   * Import Results Message Key
-   *
-   * This value defines the message key that will be sent on import result
-   * messages published to the configured Kafka topic: [importResultTopic].
-   */
-  val importResultMessageKey: String = KafkaConfigDefaults.ImportResultMessageKey,
-
-  /**
-   * Import Results Topic
-   *
-   * Name of the Kafka topic that import result messages will be published to.
-   */
-  val importResultTopic: String = KafkaConfigDefaults.ImportResultTopic,
 )

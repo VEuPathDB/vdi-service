@@ -3,11 +3,13 @@ plugins {
 }
 
 dependencies {
+  implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
+
   implementation(project(":components:common"))
   implementation(project(":components:env"))
   implementation(project(":components:s3-datasets"))
-  implementation(project(":components:json"))
   implementation(project(":components:kafka"))
+  implementation(project(":components:kafka-router"))
   implementation(project(":components:kafka-triggers"))
   implementation(project(":components:rabbit"))
 

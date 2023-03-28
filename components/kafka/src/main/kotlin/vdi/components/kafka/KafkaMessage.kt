@@ -10,7 +10,7 @@ data class KafkaMessage(
   /**
    * Message Key
    */
-  val key: String,
+  val key: String?,
 
   /**
    * Message Value

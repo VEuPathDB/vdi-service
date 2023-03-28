@@ -7,6 +7,7 @@ import vdi.components.common.util.HostAddress
 import vdi.components.kafka.KafkaCompressionType
 import vdi.components.kafka.KafkaProducerConfig
 import vdi.components.kafka.KafkaProducerConfigDefaults
+import vdi.components.kafka.router.KafkaRouterConfigDefaults
 import vdi.components.rabbit.RabbitMQConfig
 
 internal fun loadConfigFromEnvironment() = loadConfigFromEnvironment(System.getenv())
@@ -87,29 +88,29 @@ internal fun loadKafkaConfigFromEnvironment(env: Map<String, String>) =
     ),
 
     importTriggerMessageKey     = env.optional(EnvKey.Kafka.MessageKey.ImportTriggers)
-                                     ?: KafkaConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
+                                     ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
     importTriggerTopic          = env.optional(EnvKey.Kafka.Topic.ImportTriggers)
-                                     ?: KafkaConfigDefaults.IMPORT_TRIGGER_TOPIC,
+                                     ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
     installTriggerMessageKey    = env.optional(EnvKey.Kafka.MessageKey.InstallTriggers)
-                                     ?: KafkaConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY,
+                                     ?: KafkaRouterConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY,
     installTriggerTopic         = env.optional(EnvKey.Kafka.Topic.InstallTriggers)
-                                     ?: KafkaConfigDefaults.INSTALL_TRIGGER_TOPIC,
+                                     ?: KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC,
     updateMetaTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.UpdateMetaTriggers)
-                                     ?: KafkaConfigDefaults.UPDATE_META_TRIGGER_MESSAGE_KEY,
+                                     ?: KafkaRouterConfigDefaults.UPDATE_META_TRIGGER_MESSAGE_KEY,
     updateMetaTriggerTopic      = env.optional(EnvKey.Kafka.Topic.UpdateMetaTriggers)
-                                     ?: KafkaConfigDefaults.UPDATE_META_TRIGGER_TOPIC,
+                                     ?: KafkaRouterConfigDefaults.UPDATE_META_TRIGGER_TOPIC,
     softDeleteTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.SoftDeleteTriggers)
-                                     ?: KafkaConfigDefaults.SOFT_DELETE_TRIGGER_MESSAGE_KEY,
+                                     ?: KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_MESSAGE_KEY,
     softDeleteTriggerTopic      = env.optional(EnvKey.Kafka.Topic.SoftDeleteTriggers)
-                                     ?: KafkaConfigDefaults.SOFT_DELETE_TRIGGER_TOPIC,
+                                     ?: KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_TOPIC,
     hardDeleteTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.HardDeleteTriggers)
-                                     ?: KafkaConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY,
+                                     ?: KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY,
     hardDeleteTriggerTopic      = env.optional(EnvKey.Kafka.Topic.HardDeleteTriggers)
-                                     ?: KafkaConfigDefaults.HARD_DELETE_TRIGGER_TOPIC,
+                                     ?: KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC,
     shareTriggerMessageKey      = env.optional(EnvKey.Kafka.MessageKey.ShareTriggers)
-                                     ?: KafkaConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY,
+                                     ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY,
     shareTriggerTopic           = env.optional(EnvKey.Kafka.Topic.ShareTriggers)
-                                     ?: KafkaConfigDefaults.SHARE_TRIGGER_TOPIC,
+                                     ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_TOPIC,
   )
 
 private fun String.toPairSequence() = splitToSequence(',')

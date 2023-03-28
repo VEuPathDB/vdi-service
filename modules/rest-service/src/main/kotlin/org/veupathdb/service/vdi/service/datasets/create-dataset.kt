@@ -4,9 +4,8 @@ import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.InternalServerErrorException
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
-import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.OldCacheDB
 import vdi.component.db.cache.model.DatasetRecordImpl
-import org.veupathdb.service.vdi.generated.model.DatasetImportStatus
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.util.BoundedInputStream
@@ -55,7 +54,7 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
 
         Tar.compressWithGZip(tarFile, listOf(tmpFile))
 
-        CacheDB.openTransaction()
+        OldCacheDB.openTransaction()
           .use {
             try {
               it.insertDataset(datasetRow)

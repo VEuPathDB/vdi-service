@@ -32,5 +32,10 @@ interface KafkaProducer {
    * @param message Message to send.
    */
   fun send(topic: String, message: KafkaSerializable, wait: Boolean = false)
+
+  /**
+   * Closes the producer connection.
+   */
+  fun close()
 }
 

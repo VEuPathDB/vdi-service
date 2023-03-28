@@ -61,8 +61,9 @@ dependencies {
   implementation(project(":components:common"))
   implementation(project(":components:compression"))
   implementation(project(":components:env"))
-  implementation(project(":components:json"))
   implementation(project(":components:s3-datasets"))
+
+  implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
 
   api("org.veupathdb.lib:jaxrs-container-core:6.14.3")
   implementation("org.veupathdb.lib:multipart-jackson-pojo:1.1.0")

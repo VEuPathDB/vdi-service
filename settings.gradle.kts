@@ -72,9 +72,13 @@ include(":components:cache-db")
 include(":components:common")
 include(":components:compression")
 include(":components:env")
-include(":components:json")
+
+include(":components:handler-client")
+
 include(":components:kafka")
+include(":components:kafka-router")
 include(":components:kafka-triggers")
+
 include(":components:plugin-handler-client")
 include(":components:rabbit")
 include(":components:s3-datasets")

@@ -4,7 +4,7 @@ import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.lib.container.jaxrs.errors.UnprocessableEntityException
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
-import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.OldCacheDB
 import vdi.component.db.cache.model.DatasetMeta
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.components.common.fields.DatasetID
@@ -16,14 +16,14 @@ fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchR
     throw UnprocessableEntityException(mapOf("name" to listOf("cannot be blank")))
 
   // Lookup dataset
-  val dataset: DatasetRecord = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
+  val dataset: DatasetRecord = OldCacheDB.selectDataset(datasetID) ?: throw NotFoundException()
 
   // ensure user owns dataset
   if (dataset.ownerID != userID)
     throw ForbiddenException()
 
   // apply metadata patch to dataset
-  CacheDB.openTransaction().use {
+  OldCacheDB.openTransaction().use {
     it.updateDatasetMeta(object : DatasetMeta {
       override val datasetID   get() = datasetID
       override val name        get() = patch.name ?: dataset.name

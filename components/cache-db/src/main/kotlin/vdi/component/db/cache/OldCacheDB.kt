@@ -1,27 +1,28 @@
 package vdi.component.db.cache
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
-import org.postgresql.Driver
 import org.slf4j.LoggerFactory
 import javax.sql.DataSource
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.model.DatasetShare
 import vdi.component.db.cache.sql.*
-import vdi.component.db.cache.sql.selectDataset
-import vdi.component.db.cache.sql.selectDatasetForUser
-import vdi.component.db.cache.sql.selectSharesFor
 import vdi.components.common.fields.DatasetID
 import vdi.components.common.fields.UserID
 
-class CacheDB(private val dataSource: DataSource) {
+// TODO: This thing should be a class and not an object, different modules
+//  should have their own instances of it.
+@Deprecated("use CacheDB")
+object OldCacheDB {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val connection
-    get() = dataSource.connection
+  private lateinit var source: DataSource
 
-  constructor(config: CacheDBConfig) : this(setupDataSource(config))
+  private val connection
+    get() = source.connection
+
+  fun init(db: DataSource) {
+    source = db
+  }
 
   fun selectDataset(datasetID: DatasetID): DatasetRecord? {
     log.debug("selecting dataset {}", datasetID)
@@ -50,24 +51,5 @@ class CacheDB(private val dataSource: DataSource) {
 
   fun openTransaction() =
     CacheDBTransaction(connection.apply { autoCommit = false })
-
-  private companion object {
-    @JvmStatic
-    private fun setupDataSource(config: CacheDBConfig): DataSource {
-      return HikariConfig()
-        .apply {
-          jdbcUrl = makeJDBCPostgresConnectionString(config)
-          username = config.username.value
-          password = config.password.value
-          maximumPoolSize = config.poolSize.toInt()
-          driverClassName =  Driver::class.java.name
-        }
-        .let(::HikariDataSource)
-    }
-
-    @JvmStatic
-    private fun makeJDBCPostgresConnectionString(config: CacheDBConfig) =
-      "jdbc:postgresql://${config.host}:${config.port}/${config.name}"
-  }
-
 }
+

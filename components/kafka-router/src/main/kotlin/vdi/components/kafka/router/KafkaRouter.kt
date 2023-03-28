@@ -1,14 +1,13 @@
-package vdi.module.events.routing.router
+package vdi.components.kafka.router
 
 import vdi.components.json.JSON
 import vdi.components.kafka.KafkaMessage
 import vdi.components.kafka.KafkaProducer
 import vdi.components.kafka.triggers.*
-import vdi.module.events.routing.config.KafkaConfig
 
 
-internal class KafkaRouter(
-  private val config: KafkaConfig,
+class KafkaRouter(
+  private val config: KafkaRouterConfig,
   private val producer: KafkaProducer,
 ) {
   fun sendImportTrigger(trigger: ImportTrigger) {
@@ -51,5 +50,9 @@ internal class KafkaRouter(
       config.shareTriggerTopic,
       KafkaMessage(config.shareTriggerMessageKey, JSON.writeValueAsString(trigger))
     )
+  }
+
+  fun close() {
+    producer.close()
   }
 }

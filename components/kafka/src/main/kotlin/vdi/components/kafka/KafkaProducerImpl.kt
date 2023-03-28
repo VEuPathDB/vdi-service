@@ -14,4 +14,8 @@ class KafkaProducerImpl(val kafka: Producer<String, String>) : KafkaProducer {
     if (wait)
       future.get()
   }
+
+  override fun close() {
+    kafka.close()
+  }
 }

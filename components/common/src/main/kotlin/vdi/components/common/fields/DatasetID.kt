@@ -1,89 +1,78 @@
 package vdi.components.common.fields
 
 import java.util.UUID
-import vdi.components.common.util.byteOf
-import vdi.components.common.util.isHexDigit
 
 /**
- * Dataset ID is a 128 bit identifier for a VDI dataset.
+ * Dataset Identifier
  *
- * These identifiers are randomized values, not sequential.
+ * An opaque identifier that is unique to a single VDI dataset.
  *
+ * @since 1.0.0
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-interface DatasetID
+sealed interface DatasetID
+
+@JvmInline
+private value class StringDatasetID(val value: String) : DatasetID
 
 /**
- * Validates and wraps the given string value as a [DatasetID] instance.
+ * Attempts to construct a new [DatasetID] instance from the given string value.
  *
- * If the given string does not appear to be a valid DatasetID then this method
- * will throw an [IllegalArgumentException].
+ * If the given string value could not be a valid [DatasetID] value, an
+ * [IllegalArgumentException] will be thrown.
  *
- * @param datasetID ID string to wrap.
+ * For a string value to appear valid, it must be a 32 digit string consisting
+ * of only hex characters.
  *
- * @return A [DatasetID] instance wrapping the given string value.
+ * For example:
+ * * `78609580dba2787a5cf677d6f334a707`
+ * * `A5FA4B2B38398ADD73D5929F3DCFDEA8`
+ *
+ * @param raw Raw string value that should be parsed as a [DatasetID] instance.
+ *
+ * @return A [DatasetID] instance parsed from the given [raw] string.
+ *
+ * @throws IllegalArgumentException If the given raw string is not 32 characters
+ * in length, or contains a non-hex character.
  */
-fun DatasetID(datasetID: String): DatasetID =
-  datasetID.toDatasetIDOrNull()
-    ?: throw IllegalArgumentException("given string does not resemble a valid dataset ID: $datasetID")
+fun DatasetID(raw: String): DatasetID {
+  if (raw.length != 32)
+    throw IllegalArgumentException("invalid Dataset ID string, must be exactly 32 hex characters")
+
+  for (c in raw)
+    if (!c.isHex())
+      throw IllegalArgumentException("invalid Dataset ID string, must contain only hex characters")
+
+  return StringDatasetID(raw.uppercase())
+}
 
 /**
- * Generates a new, random [DatasetID] instance.
+ * Generates a new dataset, random dataset ID.
  *
- * @return A new [DatasetID].
+ * Generated IDs are not guaranteed to be 100% unique, however the chance of
+ * collision with another dataset ID is 1 in 2.71 quintillion, and thus may be
+ * safely considered unique for most applications.
+ *
+ * @return A new random dataset ID.
  */
 fun DatasetID(): DatasetID {
-  val uu = UUID.randomUUID().toString()
-  return DatasetID(StringBuilder(32)
-    .append(uu, 0, 8)
-    .append(uu, 9, 13)
-    .append(uu, 14, 18)
-    .append(uu, 19, 23)
-    .append(uu, 24, 36)
-    .toString())
-}
+  val start  = UUID.randomUUID().toString()
+  val buffer = CharArray(32)
 
-fun String.toDatasetIDOrNull(): DatasetID? {
-  if (length != 32)
-    return null
-
-  for (c in this)
-    if (!c.isHexDigit())
-      return null
-
-  val out = ByteArray(16)
-  for (i in 0 until 32 step 2)
-    out[i / 2] = byteOf(get(i), get(i + 1))
-
-  return ByteArrayDatasetID(out)
-}
-
-internal data class ByteArrayDatasetID(val value: ByteArray) : DatasetID {
-  override fun toString() = String(CharArray(32).also(value::toHexString))
-  override fun hashCode() = value.contentHashCode()
-  override fun equals(other: Any?) = other is ByteArrayDatasetID && other.value.contentEquals(value)
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun ByteArray.toHexString(ca: CharArray) {
   var i = 0
-  for (b in this) {
-    b.toHexString(ca, i)
-    i += 2
-  }
+  for (c in start)
+    if (c.isHex())
+      buffer[i++] = c
+
+  if (i != 32)
+    throw IllegalStateException("what the literal heck (a uuid contained fewer than 32 hex digits???)")
+
+  return DatasetID(String(buffer))
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun Byte.toHexString(ca: CharArray, offset: Int) {
-  val i = toInt()
-  ca[offset]     = (i.shr(4) and 0xF).toHexDigit()
-  ca[offset + 1] = (i and 0xF).toHexDigit()
+private fun Char.isHex() = when {
+  this <= '9' -> this >= '0'
+  this <= 'F' -> this >= 'A'
+  this <= 'f' -> this >= 'a'
+  else        -> false
 }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun Int.toHexDigit() =
-  when {
-    this < 10 -> '0' + this
-    this < 16 -> 'A' + (this - 10)
-    else      -> throw IllegalStateException()
-  }

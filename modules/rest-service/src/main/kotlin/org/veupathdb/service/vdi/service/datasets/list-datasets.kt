@@ -3,7 +3,7 @@ package org.veupathdb.service.vdi.service.datasets
 import org.veupathdb.service.vdi.db.AppDB
 import org.veupathdb.service.vdi.db.UserDB
 import org.veupathdb.service.vdi.generated.model.*
-import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.OldCacheDB
 import org.veupathdb.service.vdi.model.InstallStatus
 import org.veupathdb.service.vdi.model.InstallStatuses
 import org.veupathdb.service.vdi.model.UserDetails
@@ -15,7 +15,7 @@ import vdi.components.common.fields.UserID
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
   // get a list of all the datasets matching the given query
-  val datasetList = CacheDB.selectDatasetList(query)
+  val datasetList = OldCacheDB.selectDatasetList(query)
 
   // build a set for collecting user IDs to use when querying for user details
   val userIDs = HashSet<UserID>(datasetList.size)

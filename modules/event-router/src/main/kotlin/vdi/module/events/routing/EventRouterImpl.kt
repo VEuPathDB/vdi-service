@@ -5,14 +5,14 @@ import org.slf4j.LoggerFactory
 import vdi.components.common.ShutdownSignal
 import vdi.components.datasets.paths.*
 import vdi.components.json.JSON
+import vdi.components.kafka.router.KafkaRouter
+import vdi.components.kafka.router.KafkaRouterFactory
 import vdi.components.kafka.triggers.*
 import vdi.components.rabbit.RabbitMQEventIterator
 import vdi.components.rabbit.RabbitMQEventSource
 import vdi.module.events.routing.config.EventRouterConfig
 import vdi.module.events.routing.model.MinIOEvent
 import vdi.module.events.routing.model.MinIOEventAction
-import vdi.module.events.routing.router.*
-import vdi.module.events.routing.router.KafkaRouterFactory
 
 internal class EventRouterImpl(private val config: EventRouterConfig) : EventRouter {
 
@@ -130,6 +130,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
 
     log.info("shutting down event-router")
 
+    kr.close()
     es.close()
     shutdownConfirm.trigger()
   }
