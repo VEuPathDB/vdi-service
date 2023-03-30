@@ -57,8 +57,6 @@ containerBuild {
 }
 
 dependencies {
-  implementation(project(":components:compression"))
-
   implementation("org.veupathdb.vdi:vdi-component-cache-db:1.0.0-SNAPSHOT") { isChanging = true }
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
   implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
@@ -95,5 +93,5 @@ dependencies {
   // Unit Testing
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
   testImplementation("org.mockito:mockito-core:4.8.0")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
 }

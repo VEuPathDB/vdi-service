@@ -67,5 +67,3 @@ include(":modules:soft-delete-trigger-handler")
 include(":modules:soft-delete-result-handler")
 
 include(":modules:rest-service")
-
-include(":components:compression")
