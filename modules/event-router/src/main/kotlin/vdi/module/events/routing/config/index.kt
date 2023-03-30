@@ -8,8 +8,8 @@ import org.veupathdb.vdi.lib.kafka.KafkaProducerConfig
 import org.veupathdb.vdi.lib.kafka.KafkaProducerConfigDefaults
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
+import org.veupathdb.vdi.lib.rabbit.RabbitMQConfig
 import kotlin.time.Duration.Companion.milliseconds
-import vdi.components.rabbit.RabbitMQConfig
 
 internal fun loadConfigFromEnvironment() = loadConfigFromEnvironment(System.getenv())
 

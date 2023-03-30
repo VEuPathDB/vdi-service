@@ -69,6 +69,3 @@ include(":modules:soft-delete-result-handler")
 include(":modules:rest-service")
 
 include(":components:compression")
-
-include(":components:plugin-handler-client")
-include(":components:rabbit")
