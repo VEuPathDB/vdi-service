@@ -4,6 +4,8 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.postgresql.Driver
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
 import javax.sql.DataSource
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.model.DatasetRecord
@@ -12,8 +14,6 @@ import vdi.component.db.cache.sql.*
 import vdi.component.db.cache.sql.selectDataset
 import vdi.component.db.cache.sql.selectDatasetForUser
 import vdi.component.db.cache.sql.selectSharesFor
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
 
 class CacheDB(private val dataSource: DataSource) {
   private val log = LoggerFactory.getLogger(javaClass)
@@ -57,8 +57,8 @@ class CacheDB(private val dataSource: DataSource) {
       return HikariConfig()
         .apply {
           jdbcUrl = makeJDBCPostgresConnectionString(config)
-          username = config.username.value
-          password = config.password.value
+          username = config.username.unwrap()
+          password = config.password.unwrap()
           maximumPoolSize = config.poolSize.toInt()
           driverClassName =  Driver::class.java.name
         }

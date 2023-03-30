@@ -1,8 +1,8 @@
 package vdi.component.db.cache.sql
 
+import org.veupathdb.vdi.lib.common.field.DatasetID
 import java.sql.Connection
 import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.components.common.fields.DatasetID
 
 // language=postgresql
 private const val SQL = """

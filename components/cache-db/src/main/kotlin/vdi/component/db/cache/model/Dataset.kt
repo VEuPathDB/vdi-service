@@ -1,8 +1,8 @@
 package vdi.component.db.cache.model
 
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
 import java.time.OffsetDateTime
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
 
 interface Dataset {
   val datasetID: DatasetID

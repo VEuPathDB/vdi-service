@@ -1,13 +1,13 @@
 package vdi.component.db.cache
 
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.field.DatasetID
 import java.sql.Connection
 import vdi.component.db.cache.model.*
 import vdi.component.db.cache.sql.*
 import vdi.component.db.cache.sql.insertDatasetFiles
 import vdi.component.db.cache.sql.updateDatasetMeta
 import vdi.component.db.cache.sql.upsertDatasetShareOffer
-import vdi.components.common.fields.DatasetID
 
 class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
 

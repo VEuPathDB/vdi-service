@@ -15,8 +15,8 @@ import vdi.component.db.cache.model.DatasetOwnershipFilter
 import vdi.component.db.cache.model.SortOrder
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.fetchUserDatasetList
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.asWDKUserID
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.toUserID
 
 private const val DEFAULT_OFFSET = 0
 private const val DEFAULT_LIMIT  = 100
@@ -117,7 +117,7 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
 
     log.debug("issuing dataset ID {}", datasetID)
 
-    createDataset(userID.asWDKUserID(), datasetID, entity)
+    createDataset(userID.toUserID(), datasetID, entity)
 
     return VdiDatasets.PostVdiDatasetsResponse
       .respond200WithApplicationJson(DatasetPostResponseImpl().apply { this.datasetID = datasetID.toString() })

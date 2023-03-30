@@ -8,9 +8,14 @@ plugins {
 }
 
 allprojects {
+
+  configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+  }
+
   repositories {
-    mavenCentral()
     mavenLocal()
+    mavenCentral()
     maven {
       name = "GitHubPackages"
       url  = uri("https://maven.pkg.github.com/veupathdb/maven-packages")
@@ -51,10 +56,10 @@ allprojects {
 }
 
 dependencies {
+  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
+  implementation("org.veupathdb.vdi:vdi-component-s3:1.0.0")
 
-  implementation(project(":components:common"))
   implementation(project(":components:rabbit"))
-  implementation(project(":components:s3-datasets"))
 
   implementation(project(":modules:event-router"))
   implementation(project(":modules:rest-service"))

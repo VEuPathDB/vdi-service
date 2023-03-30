@@ -1,11 +1,11 @@
 package vdi.component.db.cache.sql
 
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
+import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import java.sql.Connection
 import vdi.component.db.cache.model.DatasetShare
-import vdi.component.db.cache.model.ShareOfferAction
-import vdi.component.db.cache.model.ShareReceiptAction
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
 
 // language=postgresql
 private const val SQL = """
@@ -31,8 +31,8 @@ internal fun Connection.selectSharesFor(datasetID: DatasetID): List<DatasetShare
         out.add(
           DatasetShare(
             recipientID   = UserID(rs.getString("recipient_id")),
-            offerStatus   = ShareOfferAction.fromString(rs.getString("offer_status")),
-            receiptStatus = rs.getString("receipt_status")?.let(ShareReceiptAction::fromString) ?: ShareReceiptAction.Accept
+            offerStatus   = VDIShareOfferAction.fromString(rs.getString("offer_status")),
+            receiptStatus = rs.getString("receipt_status")?.let(VDIShareReceiptAction::fromString) ?: VDIShareReceiptAction.Accept
           )
         )
       }

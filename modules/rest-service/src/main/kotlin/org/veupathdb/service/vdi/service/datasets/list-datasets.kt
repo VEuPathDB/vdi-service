@@ -7,11 +7,11 @@ import vdi.component.db.cache.OldCacheDB
 import org.veupathdb.service.vdi.model.InstallStatus
 import org.veupathdb.service.vdi.model.InstallStatuses
 import org.veupathdb.service.vdi.model.UserDetails
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.model.DatasetRecord
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.ProjectID
-import vdi.components.common.fields.UserID
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
   // get a list of all the datasets matching the given query

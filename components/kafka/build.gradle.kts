@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":components:common"))
+  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 

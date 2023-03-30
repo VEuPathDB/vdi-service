@@ -1,7 +1,7 @@
 package vdi.module.events.routing
 
-import vdi.components.common.fields.DatasetID
-import vdi.components.datasets.paths.S3Paths
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import vdi.module.events.routing.model.MinIOEvent
 
 @OptIn(ExperimentalStdlibApi::class)

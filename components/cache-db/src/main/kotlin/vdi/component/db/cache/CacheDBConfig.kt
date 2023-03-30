@@ -1,6 +1,6 @@
 package vdi.component.db.cache
 
-import vdi.components.common.fields.SecretString
+import org.veupathdb.vdi.lib.common.field.SecretString
 
 data class CacheDBConfig(
   val host: String,

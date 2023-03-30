@@ -3,8 +3,8 @@ package org.veupathdb.service.vdi.db.appdb
 import org.veupathdb.service.vdi.model.InstallStatus
 import org.veupathdb.service.vdi.model.InstallStatuses
 import org.veupathdb.service.vdi.model.InstallType
+import org.veupathdb.vdi.lib.common.field.DatasetID
 import java.sql.Connection
-import vdi.components.common.fields.DatasetID
 
 // language=oracle
 private const val SQL = """

@@ -1,9 +1,11 @@
 package vdi.component.db.cache.model
 
-import vdi.components.common.fields.UserID
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
+import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 
 data class DatasetShare(
   val recipientID: UserID,
-  val offerStatus: ShareOfferAction,
-  val receiptStatus: ShareReceiptAction,
+  val offerStatus: VDIShareOfferAction,
+  val receiptStatus: VDIShareReceiptAction,
 )

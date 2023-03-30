@@ -4,10 +4,10 @@ import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.service.vdi.config.Options
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.io.InputStream
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
-import vdi.components.datasets.paths.S3Paths
 
 private const val UPLOAD_FILE_NAME = "upload.tar.gz"
 

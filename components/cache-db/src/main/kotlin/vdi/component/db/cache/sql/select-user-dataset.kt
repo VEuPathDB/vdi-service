@@ -1,10 +1,12 @@
 package vdi.component.db.cache.sql
 
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
+import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import java.sql.Connection
 import java.time.OffsetDateTime
 import vdi.component.db.cache.model.*
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
 
 // language=postgresql
 private val SQL = """
@@ -40,8 +42,8 @@ WHERE
         WHERE
           recipient_id = ?
           AND dataset_id = vd.dataset_id
-          AND dsr.status = '${ShareReceiptAction.Accept.value}'
-          AND dso.status = '${ShareOfferAction.Grant.value}'
+          AND dsr.status = '${VDIShareReceiptAction.Accept.value}'
+          AND dso.status = '${VDIShareOfferAction.Grant.value}'
     )
   )
 """

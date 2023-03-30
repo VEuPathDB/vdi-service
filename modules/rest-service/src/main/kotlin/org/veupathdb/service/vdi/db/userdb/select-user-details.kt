@@ -1,11 +1,11 @@
 package org.veupathdb.service.vdi.db.userdb
 
 import org.veupathdb.service.vdi.model.UserDetails
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.field.toUserID
 import java.sql.Connection
 import kotlin.math.max
 import kotlin.math.min
-import vdi.components.common.fields.UserID
-import vdi.components.common.fields.asWDKUserID
 
 // language=oracle
 private const val SQL_PREFIX_LOOKUP_USER_DETAILS = """
@@ -78,7 +78,7 @@ internal fun Connection.selectUserDetails(userIDs: Collection<UserID>): Map<User
 
       ps.executeQuery().use { rs ->
         while (rs.next()) {
-          val userID = rs.getLong(1).asWDKUserID()
+          val userID = rs.getLong(1).toUserID()
 
           out[userID] = UserDetails(
             userID       = userID,

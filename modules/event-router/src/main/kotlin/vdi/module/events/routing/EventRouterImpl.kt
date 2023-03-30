@@ -2,9 +2,9 @@ package vdi.module.events.routing
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
-import vdi.components.common.ShutdownSignal
-import vdi.components.datasets.paths.*
-import vdi.components.json.JSON
+import org.veupathdb.vdi.lib.common.async.ShutdownSignal
+import org.veupathdb.vdi.lib.json.JSON
+import org.veupathdb.vdi.lib.s3.datasets.paths.*
 import vdi.components.kafka.router.KafkaRouter
 import vdi.components.kafka.router.KafkaRouterFactory
 import vdi.components.kafka.triggers.*

@@ -1,13 +1,13 @@
 package vdi.component.db.cache
 
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
 import javax.sql.DataSource
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.model.DatasetShare
 import vdi.component.db.cache.sql.*
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
 
 // TODO: This thing should be a class and not an object, different modules
 //  should have their own instances of it.

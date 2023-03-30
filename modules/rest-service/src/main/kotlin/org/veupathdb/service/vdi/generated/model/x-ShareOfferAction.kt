@@ -1,9 +1,9 @@
 package org.veupathdb.service.vdi.generated.model
 
-import vdi.component.db.cache.model.ShareOfferAction as SOA
+import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 
-fun ShareOfferAction(action: SOA): ShareOfferAction =
+fun ShareOfferAction(action: VDIShareOfferAction): ShareOfferAction =
   when (action) {
-    SOA.Grant  -> ShareOfferAction.GRANT
-    SOA.Revoke -> ShareOfferAction.REVOKE
+    VDIShareOfferAction.Grant  -> ShareOfferAction.GRANT
+    VDIShareOfferAction.Revoke -> ShareOfferAction.REVOKE
   }

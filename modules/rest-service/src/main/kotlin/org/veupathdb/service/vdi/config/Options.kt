@@ -2,7 +2,7 @@ package org.veupathdb.service.vdi.config
 
 import org.veupathdb.lib.container.jaxrs.config.Options
 import org.veupathdb.lib.ldap.LDAPHost
-import vdi.components.common.env.EnvKey
+import org.veupathdb.vdi.lib.common.env.EnvKey
 
 object Options : Options() {
 

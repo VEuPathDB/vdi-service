@@ -1,6 +1,6 @@
 package vdi.components.kafka.router
 
-import vdi.components.json.JSON
+import org.veupathdb.vdi.lib.json.JSON
 import vdi.components.kafka.KafkaMessage
 import vdi.components.kafka.KafkaProducer
 import vdi.components.kafka.triggers.*

@@ -3,8 +3,7 @@ package org.veupathdb.service.vdi.server.controllers
 import jakarta.ws.rs.NotFoundException
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.asWDKUserID
+import org.veupathdb.vdi.lib.common.field.DatasetID
 
 sealed class ControllerBase(protected val request: ContainerRequest) {
 

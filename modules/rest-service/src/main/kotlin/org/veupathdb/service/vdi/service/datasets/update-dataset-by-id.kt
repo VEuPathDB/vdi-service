@@ -4,11 +4,11 @@ import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.lib.container.jaxrs.errors.UnprocessableEntityException
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.cache.OldCacheDB
 import vdi.component.db.cache.model.DatasetMeta
 import vdi.component.db.cache.model.DatasetRecord
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
 
 fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequest) {
   // Validate patch request

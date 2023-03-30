@@ -1,8 +1,8 @@
 package vdi.components.kafka.triggers
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
 
 data class UpdateMetaTrigger(
   @JsonProperty("userID")

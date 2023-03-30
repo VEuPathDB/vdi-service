@@ -1,6 +1,6 @@
 package vdi.component.db.cache.model
 
-import vdi.components.common.fields.DatasetID
+import org.veupathdb.vdi.lib.common.field.DatasetID
 
 interface DatasetProjectLinks {
   val datasetID: DatasetID

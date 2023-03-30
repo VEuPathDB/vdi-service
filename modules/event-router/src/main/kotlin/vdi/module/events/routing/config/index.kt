@@ -1,9 +1,9 @@
 package vdi.module.events.routing.config
 
+import org.veupathdb.vdi.lib.common.env.*
+import org.veupathdb.vdi.lib.common.field.SecretString
+import org.veupathdb.vdi.lib.common.util.HostAddress
 import kotlin.time.Duration.Companion.milliseconds
-import vdi.components.common.env.*
-import vdi.components.common.fields.SecretString
-import vdi.components.common.util.HostAddress
 import vdi.components.kafka.KafkaCompressionType
 import vdi.components.kafka.KafkaProducerConfig
 import vdi.components.kafka.KafkaProducerConfigDefaults
@@ -12,7 +12,7 @@ import vdi.components.rabbit.RabbitMQConfig
 
 internal fun loadConfigFromEnvironment() = loadConfigFromEnvironment(System.getenv())
 
-internal fun loadConfigFromEnvironment(env: Map<String, String>) =
+internal fun loadConfigFromEnvironment(env: Environment) =
   EventRouterConfig(
     rabbitConfig = loadRabbitConfigFromEnvironment(env),
     s3Bucket     = env.require(EnvKey.S3.BucketName),

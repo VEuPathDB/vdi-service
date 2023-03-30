@@ -1,7 +1,7 @@
 package vdi.components.kafka
 
+import org.veupathdb.vdi.lib.common.util.HostAddress
 import kotlin.time.Duration
-import vdi.components.common.util.HostAddress
 
 data class KafkaConsumerConfig(
   // bootstrap.servers

@@ -3,7 +3,7 @@ package org.veupathdb.service.vdi.util
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.databind.JsonNode
 import org.veupathdb.lib.container.jaxrs.errors.UnprocessableEntityException
-import vdi.components.json.JSON
+import org.veupathdb.vdi.lib.json.JSON
 
 /**
  * Request Validation Error Bundle

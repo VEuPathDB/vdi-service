@@ -1,9 +1,9 @@
 package vdi.component.db.cache.sql
 
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import java.sql.Connection
-import vdi.component.db.cache.model.ShareOfferAction
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
 
 // language=postgresql
 private const val SQL = """
@@ -19,7 +19,7 @@ SET
 internal fun Connection.upsertDatasetShareOffer(
   datasetID: DatasetID,
   recipientID: UserID,
-  status: ShareOfferAction,
+  status: VDIShareOfferAction,
 ) {
   prepareStatement(SQL).use { ps ->
     ps.setString(1, datasetID.toString())

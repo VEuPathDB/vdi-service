@@ -6,16 +6,16 @@ import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdId
 import org.veupathdb.service.vdi.service.datasets.getDatasetByID
 import org.veupathdb.service.vdi.service.datasets.updateDatasetMeta
-import vdi.components.common.fields.asWDKUserID
+import org.veupathdb.vdi.lib.common.field.toUserID
 
 class VDIDatasetByIDEndpointsController(@Context request: ContainerRequest) : VdiDatasetsVdId, ControllerBase(request) {
 
   override fun getVdiDatasetsByVdId(vdID: String): VdiDatasetsVdId.GetVdiDatasetsByVdIdResponse =
     VdiDatasetsVdId.GetVdiDatasetsByVdIdResponse
-      .respond200WithApplicationJson(getDatasetByID(userID.asWDKUserID(), vdID.asVDIID()))
+      .respond200WithApplicationJson(getDatasetByID(userID.toUserID(), vdID.asVDIID()))
 
   override fun patchVdiDatasetsByVdId(vdID: String, entity: DatasetPatchRequest): VdiDatasetsVdId.PatchVdiDatasetsByVdIdResponse {
-    updateDatasetMeta(userID.asWDKUserID(), vdID.asVDIID(), entity)
+    updateDatasetMeta(userID.toUserID(), vdID.asVDIID(), entity)
     return VdiDatasetsVdId.PatchVdiDatasetsByVdIdResponse.respond204()
   }
 

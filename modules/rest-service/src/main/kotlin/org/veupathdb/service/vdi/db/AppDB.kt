@@ -2,8 +2,8 @@ package org.veupathdb.service.vdi.db
 
 import org.veupathdb.service.vdi.db.appdb.selectInstallStatuses
 import org.veupathdb.service.vdi.model.InstallStatuses
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.ProjectID
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.ProjectID
 
 
 object AppDB {

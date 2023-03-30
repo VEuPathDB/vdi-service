@@ -9,15 +9,15 @@ import vdi.component.db.cache.model.DatasetRecordImpl
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.util.BoundedInputStream
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.fs.Tmp
+import org.veupathdb.vdi.lib.common.fs.useThenDelete
 import java.net.URL
 import java.time.OffsetDateTime
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
-import vdi.components.common.util.Tmp
-import vdi.components.common.util.useThenDelete
 import vdi.components.compression.Tar
 
 private val log = LoggerFactory.getLogger("create-dataset.kt")

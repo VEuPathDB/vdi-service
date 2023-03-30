@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.utils.db.DbManager
 import org.veupathdb.service.vdi.db.userdb.selectUserDetails
 import org.veupathdb.service.vdi.model.UserDetails
-import vdi.components.common.fields.UserID
+import org.veupathdb.vdi.lib.common.field.UserID
 
 
 object UserDB {

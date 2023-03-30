@@ -1,13 +1,13 @@
 package vdi.component.db.cache.sql
 
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
 import java.sql.Connection
 import java.sql.Types
 import java.time.OffsetDateTime
 import vdi.component.db.cache.model.*
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.fields.UserID
 
-// TODO: what about is deleted!
+// TODO: filter out is_deleted?  or not?  maybe downstream of here?
 
 // language=postgresql
 private fun sqlBody(

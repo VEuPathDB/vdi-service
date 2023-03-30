@@ -1,6 +1,6 @@
 package org.veupathdb.service.vdi.model
 
-import vdi.components.common.fields.UserID
+import org.veupathdb.vdi.lib.common.field.UserID
 
 data class UserDetails(
   val userID: UserID,
