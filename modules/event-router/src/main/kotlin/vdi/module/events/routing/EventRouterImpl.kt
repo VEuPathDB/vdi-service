@@ -4,10 +4,10 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.json.JSON
+import org.veupathdb.vdi.lib.kafka.model.triggers.*
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.s3.datasets.paths.*
-import vdi.components.kafka.router.KafkaRouter
-import vdi.components.kafka.router.KafkaRouterFactory
-import vdi.components.kafka.triggers.*
 import vdi.components.rabbit.RabbitMQEventIterator
 import vdi.components.rabbit.RabbitMQEventSource
 import vdi.module.events.routing.config.EventRouterConfig

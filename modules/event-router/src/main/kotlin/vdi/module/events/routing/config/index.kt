@@ -3,11 +3,12 @@ package vdi.module.events.routing.config
 import org.veupathdb.vdi.lib.common.env.*
 import org.veupathdb.vdi.lib.common.field.SecretString
 import org.veupathdb.vdi.lib.common.util.HostAddress
+import org.veupathdb.vdi.lib.kafka.KafkaCompressionType
+import org.veupathdb.vdi.lib.kafka.KafkaProducerConfig
+import org.veupathdb.vdi.lib.kafka.KafkaProducerConfigDefaults
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
 import kotlin.time.Duration.Companion.milliseconds
-import vdi.components.kafka.KafkaCompressionType
-import vdi.components.kafka.KafkaProducerConfig
-import vdi.components.kafka.KafkaProducerConfigDefaults
-import vdi.components.kafka.router.KafkaRouterConfigDefaults
 import vdi.components.rabbit.RabbitMQConfig
 
 internal fun loadConfigFromEnvironment() = loadConfigFromEnvironment(System.getenv())
@@ -48,7 +49,7 @@ internal fun loadRabbitConfigFromEnvironment(env: Map<String, String>) =
   )
 
 internal fun loadKafkaConfigFromEnvironment(env: Map<String, String>) =
-  KafkaConfig(
+  KafkaRouterConfig(
     producerConfig = KafkaProducerConfig(
       servers                 = env.require(EnvKey.Kafka.Servers)
                                    .toHostAddresses(),
