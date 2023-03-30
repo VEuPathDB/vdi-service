@@ -4,8 +4,6 @@ import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.InternalServerErrorException
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
-import vdi.component.db.cache.OldCacheDB
-import vdi.component.db.cache.model.DatasetRecordImpl
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.util.BoundedInputStream
@@ -13,6 +11,8 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.Tmp
 import org.veupathdb.vdi.lib.common.fs.useThenDelete
+import org.veupathdb.vdi.lib.db.cache.OldCacheDB
+import org.veupathdb.vdi.lib.db.cache.model.DatasetRecordImpl
 import java.net.URL
 import java.time.OffsetDateTime
 import kotlin.io.path.deleteIfExists
@@ -33,7 +33,7 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
     ownerID     = userID,
     isDeleted   = false,
     created     = OffsetDateTime.now(),
-    importStatus = vdi.component.db.cache.model.DatasetImportStatus.AwaitingImport,
+    importStatus = org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus.AwaitingImport,
     name        = entity.meta.name,
     summary     = entity.meta.summary,
     description = entity.meta.description,

@@ -57,9 +57,9 @@ containerBuild {
 }
 
 dependencies {
-  implementation(project(":components:cache-db"))
   implementation(project(":components:compression"))
 
+  implementation("org.veupathdb.vdi:vdi-component-cache-db:1.0.0-SNAPSHOT") { isChanging = true }
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
   implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
   implementation("org.veupathdb.vdi:vdi-component-s3:1.0.0")

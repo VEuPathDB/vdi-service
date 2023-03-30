@@ -6,7 +6,7 @@ import org.veupathdb.service.vdi.db.UserDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.OldCacheDB
+import org.veupathdb.vdi.lib.db.cache.OldCacheDB
 
 fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // Lookup dataset that is owned by or shared with the current user

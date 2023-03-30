@@ -3,15 +3,15 @@ package org.veupathdb.service.vdi.service.datasets
 import org.veupathdb.service.vdi.db.AppDB
 import org.veupathdb.service.vdi.db.UserDB
 import org.veupathdb.service.vdi.generated.model.*
-import vdi.component.db.cache.OldCacheDB
 import org.veupathdb.service.vdi.model.InstallStatus
 import org.veupathdb.service.vdi.model.InstallStatuses
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.model.DatasetListQuery
-import vdi.component.db.cache.model.DatasetRecord
+import org.veupathdb.vdi.lib.db.cache.OldCacheDB
+import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
+import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
   // get a list of all the datasets matching the given query
