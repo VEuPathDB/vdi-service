@@ -9,7 +9,7 @@ import org.veupathdb.lib.container.jaxrs.health.DatabaseDependency
 import org.veupathdb.lib.container.jaxrs.health.Dependency
 import org.veupathdb.lib.ldap.LDAP
 import org.veupathdb.service.vdi.config.Options
-import vdi.component.db.cache.OldCacheDB
+import org.veupathdb.vdi.lib.db.app.AppDatabases
 import org.postgresql.Driver as PostgresDriver
 
 
@@ -38,12 +38,10 @@ private fun initCacheDBConnection(log: Logger): Dependency {
       )
       username = Options.CacheDB.username
       password = Options.CacheDB.password
-      maximumPoolSize = Options.CacheDB.poolSize
+      maximumPoolSize = Options.CacheDB.poolSize.toInt()
       driverClassName =  PostgresDriver::class.java.name
     }
     .let(::HikariDataSource)
-
-  OldCacheDB.init(ds)
 
   val dd = DatabaseDependency("cache-db", Options.CacheDB.host, Options.CacheDB.port.toInt(), ds)
   dd.setTestQuery("SELECT 1")

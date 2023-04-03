@@ -1,7 +1,7 @@
 package org.veupathdb.service.vdi.generated.model
 
-import org.veupathdb.service.vdi.model.InstallStatuses
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 
 fun DatasetStatusInfo(imp: org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus, inst: Map<ProjectID, InstallStatuses>): DatasetStatusInfo =
   DatasetStatusInfoImpl().also {

@@ -3,22 +3,17 @@ package vdi.module.handler.imports.triggers
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
-import org.veupathdb.lib.s3.s34k.S3Config
+import org.veupathdb.vdi.lib.common.async.ShutdownSignal
+import org.veupathdb.vdi.lib.common.async.WorkerPool
+import org.veupathdb.vdi.lib.db.cache.CacheDB
+import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.json.JSON
+import org.veupathdb.vdi.lib.kafka.KafkaConsumer
+import org.veupathdb.vdi.lib.kafka.model.triggers.ImportTrigger
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
+import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import java.lang.IllegalStateException
-import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.components.common.ShutdownSignal
-import vdi.components.common.fields.DatasetID
-import vdi.components.common.jobs.WorkerPool
-import vdi.components.datasets.DatasetManager
-import vdi.components.json.JSON
-import vdi.components.kafka.KafkaConsumer
-import vdi.components.kafka.KafkaProducer
-import vdi.components.kafka.router.KafkaRouter
-import vdi.components.kafka.router.KafkaRouterFactory
-import vdi.components.kafka.triggers.ImportTrigger
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
 
 class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) : ImportTriggerHandler {
@@ -45,9 +40,6 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
   }
 
   private suspend fun run() {
-    // get a handle on the cache database
-    val ds = CacheDB(config.cacheDBConfig)
-
     val s3 = try {
       S3Api.newClient(config.s3Config)
     } catch (e: Throwable) {
@@ -118,7 +110,7 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
           .forEach { trigger ->
             // lookup the target dataset in the cache database
             val dataset = try {
-              ds.selectDataset(trigger.datasetID)
+              CacheDB.selectDataset(trigger.datasetID)
             } catch (e: Throwable) {
               log.error("failed to lookup dataset ${trigger.datasetID}", e)
               return@forEach
@@ -147,7 +139,7 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
 
             // update the cache-db record for the target dataset to say it is
             // importing
-            ds.updateDatasetStatus(trigger.datasetID, DatasetImportStatus.Importing)
+            CacheDB.updateImportStatus(trigger.datasetID, DatasetImportStatus.Importing)
 
             // retrieve the dataset data from S3
             val uploadFiles = dm.getDatasetDirectory(trigger.userID, trigger.datasetID)

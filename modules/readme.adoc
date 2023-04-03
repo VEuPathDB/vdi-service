@@ -2,7 +2,7 @@
 
 Service modules are the asynchronous sub-services that make up the VDI service.
 
-Each module could, and possibly should be its own, standalone service.
+Each module functions as its own standalone service.
 
 == Services
 
@@ -17,8 +17,8 @@ link:rest-service[VDI REST Service]::
 link:event-router/[MinIO Bucket Event Router]::
 +
 --
-Event router whose input is raw MinIO object put and delete events.  This router
-parses the events coming from MinIO and routes them to the correct Kafka
+Event router whose input is raw MinIO object `put` and `delete` events.  This
+router parses the events coming from MinIO and routes them to the correct Kafka
 "trigger" topics to be picked up by the relevant trigger handlers.
 --
 

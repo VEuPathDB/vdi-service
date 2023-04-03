@@ -6,6 +6,8 @@ import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.json.toJSONString
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.io.InputStream
 
@@ -24,6 +26,10 @@ object DatasetStore {
     get() = try { client.buckets[BucketName(Options.S3.bucketName)] }
     catch (e: Throwable) { throw IllegalStateException("invalid S3 bucket name") }
       ?: throw IllegalStateException("bucket ${Options.S3.bucketName} does not exist!")
+
+  fun putDatasetMeta(userID: UserID, datasetID: DatasetID, meta: VDIDatasetMeta) {
+    bucket.objects.put(S3Paths.datasetMetaFile(userID, datasetID), meta.toJSONString().byteInputStream())
+  }
 
   fun putUserUpload(userID: UserID, datasetID: DatasetID, fn: () -> InputStream) {
     fn().use { bucket.objects.put(S3Paths.datasetUploadFile(userID, datasetID, UPLOAD_FILE_NAME), it) }

@@ -37,4 +37,10 @@ public interface DatasetPostMeta {
 
   @JsonProperty("projects")
   void setProjects(List<String> projects);
+
+  @JsonProperty("dependencies")
+  List<DatasetDependency> getDependencies();
+
+  @JsonProperty("dependencies")
+  void setDependencies(List<DatasetDependency> dependencies);
 }

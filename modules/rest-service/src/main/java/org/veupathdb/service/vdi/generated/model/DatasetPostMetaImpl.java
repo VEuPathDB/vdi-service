@@ -11,7 +11,8 @@ import java.util.List;
     "name",
     "summary",
     "description",
-    "projects"
+    "projects",
+    "dependencies"
 })
 public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("datasetType")
@@ -28,6 +29,9 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
 
   @JsonProperty("projects")
   private List<String> projects;
+
+  @JsonProperty("dependencies")
+  private List<DatasetDependency> dependencies;
 
   @JsonProperty("datasetType")
   public DatasetPostType getDatasetType() {
@@ -77,5 +81,15 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("projects")
   public void setProjects(List<String> projects) {
     this.projects = projects;
+  }
+
+  @JsonProperty("dependencies")
+  public List<DatasetDependency> getDependencies() {
+    return this.dependencies;
+  }
+
+  @JsonProperty("dependencies")
+  public void setDependencies(List<DatasetDependency> dependencies) {
+    this.dependencies = dependencies;
   }
 }

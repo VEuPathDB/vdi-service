@@ -6,9 +6,8 @@ import org.veupathdb.lib.container.jaxrs.errors.UnprocessableEntityException
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.db.cache.OldCacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetMeta
-import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
+import org.veupathdb.vdi.lib.db.cache.CacheDB
+import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
 
 fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequest) {
   // Validate patch request
@@ -16,19 +15,19 @@ fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchR
     throw UnprocessableEntityException(mapOf("name" to listOf("cannot be blank")))
 
   // Lookup dataset
-  val dataset: DatasetRecord = OldCacheDB.selectDataset(datasetID) ?: throw NotFoundException()
+  val dataset = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
 
   // ensure user owns dataset
   if (dataset.ownerID != userID)
     throw ForbiddenException()
 
   // apply metadata patch to dataset
-  OldCacheDB.openTransaction().use {
-    it.updateDatasetMeta(object : DatasetMeta {
-      override val datasetID   get() = datasetID
-      override val name        get() = patch.name ?: dataset.name
-      override val summary     get() = patch.summary ?: dataset.summary
-      override val description get() = patch.description ?: dataset.description
-    })
+  CacheDB.openTransaction().use {
+    it.updateDatasetMeta(DatasetMetaImpl(
+      datasetID,
+      patch.name ?: dataset.name,
+      patch.summary ?: dataset.summary,
+      patch.description ?: dataset.description,
+    ))
   }
 }

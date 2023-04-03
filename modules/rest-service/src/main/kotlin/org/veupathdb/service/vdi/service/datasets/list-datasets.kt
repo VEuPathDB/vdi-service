@@ -1,21 +1,21 @@
 package org.veupathdb.service.vdi.service.datasets
 
-import org.veupathdb.service.vdi.db.AppDB
 import org.veupathdb.service.vdi.db.UserDB
 import org.veupathdb.service.vdi.generated.model.*
-import org.veupathdb.service.vdi.model.InstallStatus
-import org.veupathdb.service.vdi.model.InstallStatuses
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.db.cache.OldCacheDB
+import org.veupathdb.vdi.lib.db.app.AppDB
+import org.veupathdb.vdi.lib.db.app.model.InstallStatus
+import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
+import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
   // get a list of all the datasets matching the given query
-  val datasetList = OldCacheDB.selectDatasetList(query)
+  val datasetList = CacheDB.selectDatasetList(query)
 
   // build a set for collecting user IDs to use when querying for user details
   val userIDs = HashSet<UserID>(datasetList.size)
@@ -79,14 +79,4 @@ private fun DatasetRecord.toListEntry(
   out.description = description
   out.projectIDs  = projects.toList()
   out.status      = DatasetStatusInfo(importStatus, statuses)
-}
-
-private fun InstallStatus.toDatasetInstallStatus(): DatasetInstallStatus {
-  return when (this) {
-    InstallStatus.Running            -> DatasetInstallStatus.RUNNING
-    InstallStatus.Complete           -> DatasetInstallStatus.COMPLETE
-    InstallStatus.FailedValidation   -> DatasetInstallStatus.FAILEDVALIDATION
-    InstallStatus.FailedInstallation -> DatasetInstallStatus.FAILEDINSTALLATION
-    InstallStatus.ReadyForReinstall  -> DatasetInstallStatus.READYFORREINSTALL
-  }
 }

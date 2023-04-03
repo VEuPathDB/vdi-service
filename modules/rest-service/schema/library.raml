@@ -159,12 +159,22 @@ types:
         description: IDs of the projects this dataset is being submitted to.
         type: ProjectID[]
         minItems: 1
+      dependencies:
+        displayName: Dataset Dependencies
+        type: DatasetDependency[]
   DatasetPostType:
     type: object
     additionalProperties: false
     properties:
       name: string
       version: string
+  DatasetDependency:
+    type: object
+    additionalProperties: false
+    properties:
+      resourceIdentifier: string
+      resourceDisplayName: string
+      resourceVersion: string
   DatasetPostResponse:
     displayName: Dataset Upload Response
     description: |

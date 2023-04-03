@@ -68,6 +68,11 @@ types:
         type: common.ProjectID[]
         required: true
         minItems: 1
+      dependencies:
+        displayName: Dataset Dependencies
+        type: DatasetDependency[]
+        required: true
+
 
   DatasetPostType:
     type: object
@@ -79,6 +84,21 @@ types:
       version:
         type: string
         required: true
+
+  DatasetDependency:
+    type: object
+    additionalProperties: false
+    properties:
+      resourceIdentifier:
+        type: string
+        required: true
+      resourceDisplayName:
+        type: string
+        required: true
+      resourceVersion:
+        type: string
+        required: true
+
 
   DatasetPostResponse:
     displayName: Dataset Upload Response

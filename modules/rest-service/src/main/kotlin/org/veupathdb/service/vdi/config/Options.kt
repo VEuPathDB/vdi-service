@@ -26,7 +26,7 @@ object Options : Options() {
     val name     = requireEnv(EnvKey.CacheDB.Name)
     val username = requireEnv(EnvKey.CacheDB.Username)
     val password = requireEnv(EnvKey.CacheDB.Password)
-    val poolSize = optionalEnv(EnvKey.CacheDB.PoolSize)?.toInt() ?: 20
+    val poolSize = optionalEnv(EnvKey.CacheDB.PoolSize)?.toUByte() ?: 20u
   }
 
   object AppDatabases {
