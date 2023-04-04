@@ -69,18 +69,28 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
 }
 
 private fun Path.repack(into: Path) {
+  // If it resembles a zip file
   if (name.endsWith(".zip")) {
+    // Validate that it is actually a zip file
     when (getZipType()) {
+      // if it is an empty archive, throw an error
       ZipType.Empty -> throw BadRequestException("uploaded zip file is empty")
 
+      // if it is part of a spanned archive, throw an error
       ZipType.Spanned -> throw BadRequestException("uploaded zip file is part of a set of spanned zip files")
 
+      // if it is a standard zip file
       ZipType.Standard -> {
+        // TODO validate the zip entries
+
+        // unpack the zip file
         val unzippedFiles: Collection<Path> = TODO("unzip")
 
+        // ensure that the zip actually contained some files
         if (unzippedFiles.isEmpty())
           throw BadRequestException("uploaded zip file contains no files")
 
+        // recompress the files as a tgz file
         Tar.compressWithGZip(into, unzippedFiles)
       }
 

@@ -3,16 +3,28 @@ package vdi.module.handler.imports.triggers
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
+import org.veupathdb.lib.s3.s34k.S3Client
+import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
+import org.veupathdb.lib.s3.s34k.fields.BucketName
+import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.common.async.WorkerPool
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
+import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.model.triggers.ImportTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
+import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import java.lang.IllegalStateException
+import java.time.OffsetDateTime
 import kotlinx.coroutines.runBlocking
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
 
@@ -40,48 +52,12 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
   }
 
   private suspend fun run() {
-    val s3 = try {
-      S3Api.newClient(config.s3Config)
-    } catch (e: Throwable) {
-      shutdownTrigger.trigger()
-      shutdownConfirm.trigger()
-      log.error("failed to create S3 client instance", e)
-      throw e
-    }
-
-    val bucket = s3.buckets[config.s3Bucket]
-
-    if (bucket == null) {
-      shutdownTrigger.trigger()
-      shutdownConfirm.trigger()
-      log.error("s3 bucket {} does not appear to exist", config.s3Bucket)
-      throw IllegalStateException("s3 bucket ${config.s3Bucket} does not appear to exist")
-    }
-
-    val dm = DatasetManager(bucket)
-
-    // get a Kafka consumer for reading messages from the import trigger topic
-    val kc = try {
-      KafkaConsumer(config.kafkaConfig.importTriggerTopic, config.kafkaConfig.consumerConfig)
-    } catch (e: Throwable) {
-      shutdownTrigger.trigger()
-      shutdownConfirm.trigger()
-      log.error("failed to create KafkaConsumer instance", e)
-      throw e
-    }
-
-    // get a Kafka producer for writing messages to the import result topic
-    val kr = try {
-      KafkaRouterFactory(config.kafkaConfig.routerConfig).newKafkaRouter()
-    } catch (e: Throwable) {
-      shutdownTrigger.trigger()
-      shutdownConfirm.trigger()
-      log.error("failed to create KafkaProducer instance", e)
-    }
-
-    // set up executor pool of some configurable number of executors
-    // TODO: the queue size could be different than the worker count
-    val wp = WorkerPool(config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
+    val s3     = S3Api.requireClient()
+    val bucket = s3.requireBucket(config.s3Bucket)
+    val dm     = DatasetManager(bucket)
+    val kc     = requireKafkaConsumer()
+    val kr     = requireKafkaRouter()
+    val wp     = WorkerPool(config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
       // Spin up the worker pool (in the background)
@@ -91,83 +67,65 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
       while (!shutdownTrigger.isTriggered()) {
 
         // Read messages from the kafka consumer
-        kc.receive().asSequence()
-          // Filter the messages down to only those we care about
-          .filter { it.key == config.kafkaConfig.importTriggerMessageKey }
-          // Pop the value out of the message
-          .map { it.value }
-          // Translate value to an import trigger message
-          .map {
-            try {
-              JSON.readValue<ImportTrigger>(it)
-            } catch (e: Throwable) {
-              log.warn("received an invalid message body from Kafka: {}", it)
-              null
+        kc.selectImportTriggers()
+          .forEach { (userID, datasetID) ->
+            wp.submit {
+              // lookup the dataset in S3
+              val dir = dm.getDatasetDirectory(userID, datasetID)
+
+              // If the dataset does not exist in S3
+              if (!dir.exists()) {
+                log.warn("got an import event for a dataset directory that does not exist?  Dataset: {}, User: {}", datasetID, userID)
+                return@submit
+              }
+
+              // If the dataset has a soft-delete flag present
+              if (dir.hasDeleteFlag()) {
+                log.info("got an import event for a dataset with a delete flag, ignoring it.  Dataset: {}, User: {}", datasetID, userID)
+                return@submit
+              }
+
+              // If the dataset does not yet have a meta.json file
+              if (!dir.hasMeta()) {
+                log.info("got an import event for a dataset that does not yet have a meta.json file, ignoring it.  Dataset: {}, User: {}", datasetID, userID)
+                return@submit
+              }
+
+              // Load the dataset metadata from S3
+              val datasetMeta = dir.getMeta().load()!!
+
+              // lookup the target dataset in the cache database
+              val datasetRecord = CacheDB.selectDataset(datasetID) or {
+                // or create the target dataset in the cache database
+                CacheDB.initializeDataset(datasetID, datasetMeta)
+                CacheDB.selectDataset(datasetID)!!
+              }
+
+              // lookup the sync control record for the dataset in the cache
+              // database
+              val syncControl = CacheDB.selectSyncControl(datasetID) or {
+                // or create the sync control record in the cache database
+                CacheDB.initSyncControl(datasetID)
+                CacheDB.selectSyncControl(datasetID)!!
+              }
+
+              val actions = comparison(dir, syncControl)
+
+              if (actions.doDataSync) {
+                // TODO: Sync data
+                //       Does this mean actually running the installers or does
+                //       this mean just emitting an event to Kafka that says we
+                //       need to sync the data?
+              }
+
+              if (actions.doMetaSync) {
+                // TODO: Sync metadata
+              }
+
+              if (actions.doShareSync) {
+                // TODO: Sync shares
+              }
             }
-          }
-          // Filter out the null values (invalid dataset IDs)
-          .filterNotNull()
-          .forEach { trigger ->
-            // lookup the target dataset in the cache database
-            val dataset = try {
-              CacheDB.selectDataset(trigger.datasetID)
-            } catch (e: Throwable) {
-              log.error("failed to lookup dataset ${trigger.datasetID}", e)
-              return@forEach
-            }
-
-            // If the target dataset was not found, skip this message
-            if (dataset == null) {
-              log.warn("received a dataset ID for a non-existent dataset from Kafka: {}", trigger.datasetID)
-              return@forEach
-            }
-
-            // If the target dataset is no longer in the awaiting import status,
-            // skip this message as it is a duplicate.
-            if (dataset.importStatus != DatasetImportStatus.AwaitingImport) {
-              log.debug("received a duplicate import trigger for dataset {}", trigger.datasetID)
-              return@forEach
-            }
-
-            // There is a race condition here between checking the status and
-            // updating it, some other worker could claim it and mark it as in
-            // progress and start processing it.  We don't care.  The end result
-            // will be the same either way, the check above is just to filter
-            // out as much duplicated work as we reasonably can.
-
-            // TODO: figure out where the worker's work should start
-
-            // update the cache-db record for the target dataset to say it is
-            // importing
-            CacheDB.updateImportStatus(trigger.datasetID, DatasetImportStatus.Importing)
-
-            // retrieve the dataset data from S3
-            val uploadFiles = dm.getDatasetDirectory(trigger.userID, trigger.datasetID)
-              .getUploadFiles()
-
-            if (uploadFiles.isEmpty()) {
-              log.error("dataset {} had zero files in its upload files directory", trigger.datasetID)
-              return@forEach
-            } else if (uploadFiles.size > 1) {
-              log.error("dataset {} had more than one file in its upload files directory", trigger.datasetID)
-              return@forEach
-            }
-
-            // TODO: Dataset upload file should have a name property!!
-
-            val uploadFile = uploadFiles[0]
-
-            // Create a temp file that will be deleted after this call (maybe using a `use` block or something)
-            // Download the upload tar file into that temp file
-            //
-
-            // TODO: create an API wrapping client for the handler server
-
-            // call the plugin handler import endpoint with the dataset data
-            // update the cache-db record for the target dataset with its import result status
-            // write any import warnings or errors to the cache db
-            // write the result (on success only) of the import to S3
-            // post a message to the kafka producer with the result status
           }
 
       }
@@ -177,5 +135,137 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
       wp.stop()
       shutdownConfirm.trigger()
     }
+  }
+
+  private suspend fun requireKafkaConsumer() = safeExec("failed to create KafkaConsumer instance") {
+    KafkaConsumer(config.kafkaConfig.importTriggerTopic, config.kafkaConfig.consumerConfig)
+  }
+
+  private suspend fun requireKafkaRouter() = safeExec("failed to create KafkaRouter instance") {
+    KafkaRouterFactory(config.kafkaConfig.routerConfig).newKafkaRouter()
+  }
+
+  private suspend inline fun <T> safeExec(err: String, fn: () -> T): T =
+    try {
+      fn()
+    } catch (e: Throwable) {
+      shutdownTrigger.trigger()
+      shutdownConfirm.trigger()
+      log.error(err, e)
+      throw e
+    }
+
+  private suspend fun S3Api.requireClient() = safeExec("failed to create S3 client instance") { newClient(config.s3Config) }
+
+  private suspend fun S3Client.requireBucket(name: BucketName): S3Bucket {
+    val bucket = buckets[name]
+
+    if (bucket == null) {
+      shutdownTrigger.trigger()
+      shutdownConfirm.trigger()
+      log.error("s3 bucket {} does not appear to exist", config.s3Bucket)
+      throw IllegalStateException("s3 bucket ${config.s3Bucket} does not appear to exist")
+    }
+
+    return bucket
+  }
+
+  private fun KafkaConsumer.selectImportTriggers() =
+    receive()
+      .asSequence()
+      .filter { it.key == config.kafkaConfig.importTriggerMessageKey }
+      .map {
+        try {
+          JSON.readValue<ImportTrigger>(it.value)
+        } catch (e: Throwable) {
+          log.warn("received an invalid message body from Kafka: {}", it)
+          null
+        }
+      }
+      .filterNotNull()
+
+  private data class SyncActions(
+    val doShareSync: Boolean,
+    val doDataSync:  Boolean,
+    val doMetaSync:  Boolean,
+  )
+
+  private fun comparison(ds: DatasetDirectory, lu: VDISyncControlRecord): SyncActions {
+    return SyncActions(
+      doShareSync = lu.sharesUpdated.isBefore(ds.getLatestShareTimestamp(lu.sharesUpdated)),
+      doDataSync  = lu.dataUpdated.isBefore(ds.getLatestDataTimestamp(lu.dataUpdated)),
+      doMetaSync  = lu.metaUpdated.isBefore(ds.getMetaTimestamp(lu.metaUpdated))
+    )
+  }
+
+  private fun CacheDB.initSyncControl(datasetID: DatasetID) {
+    openTransaction().use { it.initSyncControl(datasetID) }
+  }
+
+  private fun CacheDBTransaction.initSyncControl(datasetID: DatasetID) {
+    tryInsertSyncControl(VDISyncControlRecord(
+      datasetID     = datasetID,
+      sharesUpdated = OriginTimestamp,
+      dataUpdated   = OriginTimestamp,
+      metaUpdated   = OriginTimestamp
+    ))
+  }
+
+  private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
+    openTransaction().use {
+
+      // Insert a new dataset record
+      it.tryInsertDataset(DatasetImpl(
+        datasetID   = datasetID,
+        typeName    = meta.type.name,
+        typeVersion = meta.type.version,
+        ownerID     = UserID(meta.owner),
+        isDeleted   = false,
+        created     = OffsetDateTime.now(),
+        DatasetImportStatus.AwaitingImport
+      ))
+
+      // insert metadata for the dataset
+      it.tryInsertDatasetMeta(DatasetMetaImpl(
+        datasetID   = datasetID,
+        name        = meta.name,
+        summary     = meta.summary,
+        description = meta.description,
+      ))
+
+      // Insert an import control record for the dataset
+      it.tryInsertImportControl(datasetID, DatasetImportStatus.AwaitingImport)
+
+      // insert project links for the dataset
+      it.tryInsertDatasetProjects(datasetID, meta.projects)
+
+      // insert a sync control record for the dataset using an old timestamp
+      // that will predate any possible upload timestamp.
+      it.initSyncControl(datasetID)
+    }
+  }
+
+  private fun DatasetDirectory.getLatestShareTimestamp(fallback: OffsetDateTime): OffsetDateTime {
+    var latest = fallback
+
+    getShares().forEach { (_, share) ->
+      share.offer.lastModified()?.also { if (it.isAfter(latest)) latest = it }
+      share.receipt.lastModified()?.also { if (it.isAfter(latest)) latest = it }
+    }
+
+    return latest
+  }
+
+  private fun DatasetDirectory.getLatestDataTimestamp(fallback: OffsetDateTime): OffsetDateTime {
+    var latest = fallback
+
+    getDataFiles()
+      .forEach { df -> df.lastModified()?.also { if (it.isAfter(latest)) latest = it } }
+
+    return latest
+  }
+
+  private fun DatasetDirectory.getMetaTimestamp(fallback: OffsetDateTime): OffsetDateTime {
+    return getMeta().lastModified() ?: fallback
   }
 }
