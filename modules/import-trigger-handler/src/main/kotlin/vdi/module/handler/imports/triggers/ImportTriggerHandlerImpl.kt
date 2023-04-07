@@ -20,6 +20,9 @@ import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.model.triggers.ImportTrigger
+import org.veupathdb.vdi.lib.kafka.model.triggers.InstallTrigger
+import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
+import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
@@ -48,7 +51,9 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
   }
 
   override suspend fun stop() {
-    TODO("this should use a ShutdownSignal to indicate that the process wants to stop, then block and wait for shutdown confirmation")
+    log.info("triggering import-trigger-handler shutdown")
+    shutdownTrigger.trigger()
+    shutdownConfirm.await()
   }
 
   private suspend fun run() {
@@ -58,6 +63,7 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
     val kc     = requireKafkaConsumer()
     val kr     = requireKafkaRouter()
     val wp     = WorkerPool(config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
+    val hc     = PluginHandlerClient
 
     runBlocking {
       // Spin up the worker pool (in the background)
@@ -94,12 +100,9 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
               // Load the dataset metadata from S3
               val datasetMeta = dir.getMeta().load()!!
 
-              // lookup the target dataset in the cache database
-              val datasetRecord = CacheDB.selectDataset(datasetID) or {
-                // or create the target dataset in the cache database
-                CacheDB.initializeDataset(datasetID, datasetMeta)
-                CacheDB.selectDataset(datasetID)!!
-              }
+              // lookup the target dataset in the cache database to ensure it
+              // exists, initializing the dataset if it doesn't yet exist.
+              CacheDB.selectDataset(datasetID) ?: CacheDB.initializeDataset(datasetID, datasetMeta)
 
               // lookup the sync control record for the dataset in the cache
               // database
@@ -109,22 +112,40 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
                 CacheDB.selectSyncControl(datasetID)!!
               }
 
-              val actions = comparison(dir, syncControl)
+              comparison(dir, syncControl).also {
+                if (it.doDataSync)
+                  kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
 
-              if (actions.doDataSync) {
-                // TODO: Sync data
-                //       Does this mean actually running the installers or does
-                //       this mean just emitting an event to Kafka that says we
-                //       need to sync the data?
+                if (it.doMetaSync)
+                  kr.sendUpdateMetaTrigger(UpdateMetaTrigger(userID, datasetID))
+
+                if (it.doShareSync)
+                  kr.sendShareTrigger(ShareTrigger(userID, datasetID))
               }
 
-              if (actions.doMetaSync) {
-                // TODO: Sync metadata
+              val uploadFiles = dir.getUploadFiles()
+
+              if (uploadFiles.isEmpty()) {
+                log.info("received an import event where the upload file doesn't yet exist. Dataset: {}, User: {}", datasetID, userID)
+                return@submit
               }
 
-              if (actions.doShareSync) {
-                // TODO: Sync shares
+              if (uploadFiles.size > 1) {
+                log.warn("received an import event for a dataset with more than one upload file.  using file {} for dataset {}, user {}", uploadFiles[0].name, datasetID, userID)
               }
+
+              uploadFiles[0]
+                .open()!!
+                .use { uploadStream ->
+
+                }
+
+
+              // TODO:
+              //  . Download the user upload from S3
+              //    . if the user upload doesn't exist yet, log and abort
+              //  . Submit it to the plugin handler import endpoint
+              //  . Send the result down the line on the kafka router
             }
           }
 

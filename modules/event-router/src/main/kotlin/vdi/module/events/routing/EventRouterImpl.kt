@@ -83,12 +83,19 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
           safeSend(HardDeleteTrigger(path.userID, path.datasetID), kr::sendHardDeleteTrigger)
         }
 
-        // If the path was for an upload file then it's an import trigger as we
+        // If the path was for an upload file or the meta file then it's an import trigger as we
         // only ever put something in the upload directory when the dataset is
         // first uploaded by the client.
         path is VDUploadPath -> {
           log.debug("received an import event for dataset {} owned by user {}", path.datasetID, path.userID)
 
+          safeSend(ImportTrigger(path.userID, path.datasetID), kr::sendImportTrigger)
+        }
+
+        path is VDDatasetFilePath && path.subPath == S3Paths.META_FILE_NAME -> {
+          log.debug("received an meta.json event for dataset {} owned by user {}", path.datasetID, path.userID)
+
+          safeSend(UpdateMetaTrigger(path.userID, path.datasetID), kr::sendUpdateMetaTrigger)
           safeSend(ImportTrigger(path.userID, path.datasetID), kr::sendImportTrigger)
         }
 
@@ -104,7 +111,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
         path is VDDatasetShareFilePath -> {
           log.debug("received a share event for dataset {} owned by user {}", path.datasetID, path.userID)
 
-          safeSend(ShareTrigger(path.userID, path.datasetID, path.recipientID), kr::sendShareTrigger)
+          safeSend(ShareTrigger(path.userID, path.datasetID), kr::sendShareTrigger)
         }
 
         // Else, we have an install event.
@@ -112,18 +119,6 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
           log.debug("received an install event for dataset {} owned by user {}", path.datasetID, path.userID)
 
           safeSend(InstallTrigger(path.userID, path.datasetID), kr::sendInstallTrigger)
-
-          // If the object that got created was the meta.json file then we also
-          // have an update-meta event in addition to our install event.
-          //
-          // This is because we don't know at this point whether this is the
-          // first time the meta.json file was put into the bucket or if this is
-          // an update.
-          if (path is VDDatasetFilePath && path.subPath == S3Paths.META_FILE_NAME) {
-            log.debug("received an update-meta event for dataset {} owned by user {}", path.datasetID, path.userID)
-
-            safeSend(UpdateMetaTrigger(path.userID, path.datasetID), kr::sendUpdateMetaTrigger)
-          }
         }
       }
     }
