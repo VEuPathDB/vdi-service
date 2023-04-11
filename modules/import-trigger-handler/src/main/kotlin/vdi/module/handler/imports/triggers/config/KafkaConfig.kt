@@ -1,7 +1,8 @@
 package vdi.module.handler.imports.triggers.config
 
-import vdi.components.kafka.KafkaConsumerConfig
-import vdi.components.kafka.router.KafkaRouterConfig
+import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
+
 
 data class KafkaConfig(
   /**
@@ -33,4 +34,4 @@ data class KafkaConfig(
    */
   val importTriggerTopic: String = KafkaConfigDefaults.ImportTriggerTopic,
 
-)
+  )

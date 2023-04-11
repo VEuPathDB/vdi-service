@@ -2,7 +2,8 @@ package vdi.module.handler.imports.triggers.config
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import vdi.component.db.cache.CacheDBConfig
+import org.veupathdb.vdi.lib.common.util.HostAddress
+import org.veupathdb.vdi.lib.db.cache.CacheDBConfig
 
 data class ImportTriggerHandlerConfig(
   val workerPoolSize: UInt,
@@ -10,5 +11,5 @@ data class ImportTriggerHandlerConfig(
   val s3Config: S3Config,
   val s3Bucket: BucketName,
   val cacheDBConfig: CacheDBConfig,
+  val handlerAddress: HostAddress
 )
-

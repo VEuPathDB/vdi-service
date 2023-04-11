@@ -17,6 +17,8 @@ import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
 import org.veupathdb.vdi.lib.db.cache.model.*
+import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
+import org.veupathdb.vdi.lib.handler.client.PluginHandlerClientConfig
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.model.triggers.ImportTrigger
@@ -63,7 +65,9 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
     val kc     = requireKafkaConsumer()
     val kr     = requireKafkaRouter()
     val wp     = WorkerPool(config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
-    val hc     = PluginHandlerClient
+    val hc     = PluginHandlerClient(PluginHandlerClientConfig(
+
+    ))
 
     runBlocking {
       // Spin up the worker pool (in the background)
@@ -205,6 +209,7 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
       }
       .filterNotNull()
 
+
   private data class SyncActions(
     val doShareSync: Boolean,
     val doDataSync:  Boolean,
@@ -218,6 +223,7 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
       doMetaSync  = lu.metaUpdated.isBefore(ds.getMetaTimestamp(lu.metaUpdated))
     )
   }
+
 
   private fun CacheDB.initSyncControl(datasetID: DatasetID) {
     openTransaction().use { it.initSyncControl(datasetID) }
@@ -240,7 +246,7 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
         datasetID   = datasetID,
         typeName    = meta.type.name,
         typeVersion = meta.type.version,
-        ownerID     = UserID(meta.owner),
+        ownerID     = meta.owner,
         isDeleted   = false,
         created     = OffsetDateTime.now(),
         DatasetImportStatus.AwaitingImport
