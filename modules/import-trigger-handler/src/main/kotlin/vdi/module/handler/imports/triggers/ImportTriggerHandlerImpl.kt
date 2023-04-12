@@ -33,7 +33,7 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.runBlocking
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
 
-class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) : ImportTriggerHandler {
+internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) : ImportTriggerHandler {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -65,9 +65,7 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
     val kc     = requireKafkaConsumer()
     val kr     = requireKafkaRouter()
     val wp     = WorkerPool(config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
-    val hc     = PluginHandlerClient(PluginHandlerClientConfig(
-
-    ))
+    val hc     = PluginHandlerClient(config.handlerConfig)
 
     runBlocking {
       // Spin up the worker pool (in the background)
@@ -106,7 +104,8 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
 
               // lookup the target dataset in the cache database to ensure it
               // exists, initializing the dataset if it doesn't yet exist.
-              CacheDB.selectDataset(datasetID) ?: CacheDB.initializeDataset(datasetID, datasetMeta)
+              CacheDB.selectDataset(datasetID)
+                ?: CacheDB.initializeDataset(datasetID, datasetMeta)
 
               // lookup the sync control record for the dataset in the cache
               // database
@@ -116,16 +115,17 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
                 CacheDB.selectSyncControl(datasetID)!!
               }
 
-              comparison(dir, syncControl).also {
-                if (it.doDataSync)
-                  kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
+              comparison(dir, syncControl)
+                .also {
+                  if (it.doDataSync)
+                    kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
 
-                if (it.doMetaSync)
-                  kr.sendUpdateMetaTrigger(UpdateMetaTrigger(userID, datasetID))
+                  if (it.doMetaSync)
+                    kr.sendUpdateMetaTrigger(UpdateMetaTrigger(userID, datasetID))
 
-                if (it.doShareSync)
-                  kr.sendShareTrigger(ShareTrigger(userID, datasetID))
-              }
+                  if (it.doShareSync)
+                    kr.sendShareTrigger(ShareTrigger(userID, datasetID))
+                }
 
               val uploadFiles = dir.getUploadFiles()
 
@@ -138,18 +138,30 @@ class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) :
                 log.warn("received an import event for a dataset with more than one upload file.  using file {} for dataset {}, user {}", uploadFiles[0].name, datasetID, userID)
               }
 
-              uploadFiles[0]
+              val result = uploadFiles[0]
                 .open()!!
-                .use { uploadStream ->
-
-                }
-
+                .use { hc.postImport(datasetID, datasetMeta, it) }
 
               // TODO:
-              //  . Download the user upload from S3
-              //    . if the user upload doesn't exist yet, log and abort
-              //  . Submit it to the plugin handler import endpoint
-              //  . Send the result down the line on the kafka router
+              //   If the result was "success":
+              //     . receive and unpack the result tar file
+              //     . read and record the warnings from the included warnings json file
+              //     . record the job as successful
+              //     . Upload the data files unpacked from the tar file to s3
+              //     . send a success result message to the appropriate kafka topic
+              //   If the result was "bad request":
+              //     . Emit an error log message about it
+              //     . Record the job as failed for internal reasons
+              //     . send a failure result message to the appropriate kafka topic
+              //   If the result was "validation error":
+              //     . Emit an info log message about it
+              //     . record the job as failed for validation reasons
+              //     . send a failure result message to the appropriate kafka topic
+              //   If the result was "unhandled exception":
+              //     . Emit a warning log message about it
+              //     . record the job as failed for internal reasons
+              //     . send a failure result message to the appropriate kafka topic
+
             }
           }
 
