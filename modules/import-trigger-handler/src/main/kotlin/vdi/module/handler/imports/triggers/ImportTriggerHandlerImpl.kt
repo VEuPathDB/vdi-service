@@ -107,6 +107,9 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
               CacheDB.selectDataset(datasetID)
                 ?: CacheDB.initializeDataset(datasetID, datasetMeta)
 
+              // region MOVE ME TO THE META SYNC PATH
+              // FIXME FIXME FIXME
+
               // lookup the sync control record for the dataset in the cache
               // database
               val syncControl = CacheDB.selectSyncControl(datasetID) or {
@@ -126,6 +129,9 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
                   if (it.doShareSync)
                     kr.sendShareTrigger(ShareTrigger(userID, datasetID))
                 }
+
+              // FIXME FIXME FIXME
+              // endregion MOVE ME TO THE META SYNC PATH
 
               val uploadFiles = dir.getUploadFiles()
 
