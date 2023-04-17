@@ -1,7 +1,6 @@
 package vdi.module.handler.imports.triggers.config
 
 import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
 
 
@@ -10,11 +9,6 @@ data class KafkaConfig(
    * Kafka Consumer Client Configuration.
    */
   val consumerConfig: KafkaConsumerConfig,
-
-  /**
-   * Kafka Producer Client Configuration.
-   */
-  val routerConfig: KafkaRouterConfig,
 
   /**
    * Import Triggers Message Key

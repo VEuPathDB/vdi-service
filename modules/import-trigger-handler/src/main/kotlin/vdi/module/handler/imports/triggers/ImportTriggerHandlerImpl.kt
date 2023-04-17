@@ -13,20 +13,13 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
 import org.veupathdb.vdi.lib.db.cache.model.*
-import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
-import org.veupathdb.vdi.lib.handler.client.PluginHandlerClientConfig
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.model.triggers.ImportTrigger
-import org.veupathdb.vdi.lib.kafka.model.triggers.InstallTrigger
-import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
-import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import java.lang.IllegalStateException
@@ -65,7 +58,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     val bucket = s3.requireBucket(config.s3Bucket)
     val dm     = DatasetManager(bucket)
     val kc     = requireKafkaConsumer()
-    val kr     = requireKafkaRouter()
     val wp     = WorkerPool(config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
@@ -171,10 +163,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private suspend fun requireKafkaConsumer() = safeExec("failed to create KafkaConsumer instance") {
     KafkaConsumer(config.kafkaConfig.importTriggerTopic, config.kafkaConfig.consumerConfig)
-  }
-
-  private suspend fun requireKafkaRouter() = safeExec("failed to create KafkaRouter instance") {
-    KafkaRouterFactory(config.kafkaConfig.routerConfig).newKafkaRouter()
   }
 
   private suspend inline fun <T> safeExec(err: String, fn: () -> T): T =
