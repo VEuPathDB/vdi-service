@@ -9,14 +9,14 @@ import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.generated.model.DatasetPostResponseImpl
 import org.veupathdb.service.vdi.generated.model.validate
 import org.veupathdb.service.vdi.generated.resources.VdiDatasets
-import vdi.component.db.cache.model.DatasetListQuery
-import vdi.component.db.cache.model.DatasetListSortField
-import vdi.component.db.cache.model.DatasetOwnershipFilter
-import vdi.component.db.cache.model.SortOrder
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.fetchUserDatasetList
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.toUserID
+import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
+import org.veupathdb.vdi.lib.db.cache.model.DatasetListSortField
+import org.veupathdb.vdi.lib.db.cache.model.DatasetOwnershipFilter
+import org.veupathdb.vdi.lib.db.cache.model.SortOrder
 
 private const val DEFAULT_OFFSET = 0
 private const val DEFAULT_LIMIT  = 100

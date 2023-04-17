@@ -107,31 +107,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
               CacheDB.selectDataset(datasetID)
                 ?: CacheDB.initializeDataset(datasetID, datasetMeta)
 
-              // region MOVE ME TO THE META SYNC PATH
-              // FIXME FIXME FIXME
-
-              // lookup the sync control record for the dataset in the cache
-              // database
-              val syncControl = CacheDB.selectSyncControl(datasetID) or {
-                // or create the sync control record in the cache database
-                CacheDB.initSyncControl(datasetID)
-                CacheDB.selectSyncControl(datasetID)!!
-              }
-
-              comparison(dir, syncControl)
-                .also {
-                  if (it.doDataSync)
-                    kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
-
-                  if (it.doMetaSync)
-                    kr.sendUpdateMetaTrigger(UpdateMetaTrigger(userID, datasetID))
-
-                  if (it.doShareSync)
-                    kr.sendShareTrigger(ShareTrigger(userID, datasetID))
-                }
-
-              // FIXME FIXME FIXME
-              // endregion MOVE ME TO THE META SYNC PATH
 
               val uploadFiles = dir.getUploadFiles()
 
@@ -227,26 +202,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       }
       .filterNotNull()
 
-
-  private data class SyncActions(
-    val doShareSync: Boolean,
-    val doDataSync:  Boolean,
-    val doMetaSync:  Boolean,
-  )
-
-  private fun comparison(ds: DatasetDirectory, lu: VDISyncControlRecord): SyncActions {
-    return SyncActions(
-      doShareSync = lu.sharesUpdated.isBefore(ds.getLatestShareTimestamp(lu.sharesUpdated)),
-      doDataSync  = lu.dataUpdated.isBefore(ds.getLatestDataTimestamp(lu.dataUpdated)),
-      doMetaSync  = lu.metaUpdated.isBefore(ds.getMetaTimestamp(lu.metaUpdated))
-    )
-  }
-
-
-  private fun CacheDB.initSyncControl(datasetID: DatasetID) {
-    openTransaction().use { it.initSyncControl(datasetID) }
-  }
-
   private fun CacheDBTransaction.initSyncControl(datasetID: DatasetID) {
     tryInsertSyncControl(VDISyncControlRecord(
       datasetID     = datasetID,
@@ -288,29 +243,5 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       // that will predate any possible upload timestamp.
       it.initSyncControl(datasetID)
     }
-  }
-
-  private fun DatasetDirectory.getLatestShareTimestamp(fallback: OffsetDateTime): OffsetDateTime {
-    var latest = fallback
-
-    getShares().forEach { (_, share) ->
-      share.offer.lastModified()?.also { if (it.isAfter(latest)) latest = it }
-      share.receipt.lastModified()?.also { if (it.isAfter(latest)) latest = it }
-    }
-
-    return latest
-  }
-
-  private fun DatasetDirectory.getLatestDataTimestamp(fallback: OffsetDateTime): OffsetDateTime {
-    var latest = fallback
-
-    getDataFiles()
-      .forEach { df -> df.lastModified()?.also { if (it.isAfter(latest)) latest = it } }
-
-    return latest
-  }
-
-  private fun DatasetDirectory.getMetaTimestamp(fallback: OffsetDateTime): OffsetDateTime {
-    return getMeta().lastModified() ?: fallback
   }
 }

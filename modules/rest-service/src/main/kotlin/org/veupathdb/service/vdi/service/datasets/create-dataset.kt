@@ -8,44 +8,55 @@ import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.util.BoundedInputStream
 import org.veupathdb.vdi.lib.common.compression.Tar
+import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.compression.Zip.getZipType
 import org.veupathdb.vdi.lib.common.compression.ZipType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.fs.useThenDelete
-import org.veupathdb.vdi.lib.common.model.VDIDatasetDependency
-import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
-import org.veupathdb.vdi.lib.common.model.VDIDatasetType
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
-import org.veupathdb.vdi.lib.db.cache.model.DatasetRecordImpl
+import org.veupathdb.vdi.lib.common.model.*
 import java.net.URL
 import java.nio.file.Path
-import java.time.OffsetDateTime
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.inputStream
-import kotlin.io.path.name
-import kotlin.io.path.outputStream
+import kotlin.io.path.*
 
 private val log = LoggerFactory.getLogger("create-dataset.kt")
 
 fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostRequest) {
   log.trace("createDataset(userID={}, datasetID={}, entity={})", userID, datasetID, entity)
 
-  // Create a record for the dataset to be inserted into the database.
-  val datasetMeta = VDIDatasetMeta(
-    type         = VDIDatasetType(
-      name    = entity.meta.datasetType.name,
-      version = entity.meta.datasetType.version,
+  val datasetMeta = entity.toDatasetMeta(userID)
+
+  log.debug("uploading dataset metadata to S3 for new dataset {} by user {}", datasetID, userID)
+  DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
+
+  // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
+  TempFiles.withTempDirectory { directory ->
+    TempFiles.withTempPath { archive ->
+      entity.getDatasetFile()
+        .useThenDelete { rawUpload ->
+          rawUpload.repack(into = archive, using = directory)
+
+          log.debug("uploading raw user data to S3 for new dataset {} by user {}", datasetID, userID)
+          DatasetStore.putUserUpload(userID, datasetID, archive::inputStream)
+        }
+    }
+  }
+}
+
+private fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
+  VDIDatasetMetaImpl(
+    type         = VDIDatasetTypeImpl(
+      name    = meta.datasetType.name,
+      version = meta.datasetType.version,
     ),
-    projects     = entity.meta.projects.toSet(),
-    owner        = userID.toString(),
-    name         = entity.meta.name,
-    summary      = entity.meta.summary,
-    description  = entity.meta.description,
-    dependencies = entity.meta.dependencies.map {
-      VDIDatasetDependency(
+    projects     = meta.projects.toSet(),
+    owner        = userID,
+    name         = meta.name,
+    summary      = meta.summary,
+    description  = meta.description,
+    dependencies = meta.dependencies.map {
+      VDIDatasetDependencyImpl(
         identifier  = it.resourceIdentifier,
         version     = it.resourceVersion,
         displayName = it.resourceDisplayName
@@ -53,55 +64,43 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
     },
   )
 
-  log.debug("uploading dataset metadata to S3 for new dataset {} by user {}", datasetID, userID)
-  DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
-
-  // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
-  TempFiles.withTempPath { archive ->
-    entity.getDatasetFile()
-      .useThenDelete { rawUpload ->
-        rawUpload.repack(into = archive)
-
-        log.debug("uploading raw user data to S3 for new dataset {} by user {}", datasetID, userID)
-        DatasetStore.putUserUpload(userID, datasetID, archive::inputStream)
-      }
-  }
-}
-
-private fun Path.repack(into: Path) {
+private fun Path.repack(into: Path, using: Path) {
   // If it resembles a zip file
   if (name.endsWith(".zip")) {
-    // Validate that it is actually a zip file
-    when (getZipType()) {
-      // if it is an empty archive, throw an error
-      ZipType.Empty -> throw BadRequestException("uploaded zip file is empty")
 
-      // if it is part of a spanned archive, throw an error
-      ZipType.Spanned -> throw BadRequestException("uploaded zip file is part of a set of spanned zip files")
+    // Validate that the zip appears usable.
+    validateZip()
 
-      // if it is a standard zip file
-      ZipType.Standard -> {
-        // TODO validate the zip entries
+    // List of paths for the unpacked files
+    val unpacked = ArrayList<Path>(12)
 
-        // unpack the zip file
-        val unzippedFiles: Collection<Path> = TODO("unzip")
+    // Iterate through the zip entries
+    Zip.zipEntries(this)
+      .forEach { (entry, input) ->
 
-        // ensure that the zip actually contained some files
-        if (unzippedFiles.isEmpty())
-          throw BadRequestException("uploaded zip file contains no files")
+        // If the zip entry contains a slash, we reject it (we don't presently allow subdirectories)
+        if (entry.name.contains('/') || entry.isDirectory)
+          throw BadRequestException("uploaded zip file must not contain subdirectories")
 
-        // recompress the files as a tgz file
-        Tar.compressWithGZip(into, unzippedFiles)
+        val tmpFile = using.resolve(entry.name)
+
+        tmpFile.createFile()
+        tmpFile.outputStream().use { out -> input.transferTo(out) }
+
+        unpacked.add(tmpFile)
       }
 
-      ZipType.Invalid -> throw BadRequestException("uploaded zip file is invalid")
-    }
+    // ensure that the zip actually contained some files
+    if (unpacked.isEmpty())
+      throw BadRequestException("uploaded zip file contains no files")
+
+    // recompress the files as a tgz file
+    Tar.compressWithGZip(into, unpacked)
   }
 
   else {
     Tar.compressWithGZip(into, listOf(this))
   }
-
 }
 
 private fun DatasetPostRequest.getDatasetFile(): Path =
@@ -137,3 +136,12 @@ private fun DatasetPostRequest.getDatasetFile(): Path =
 
     path
   }
+
+private fun Path.validateZip() {
+  when (getZipType()) {
+    ZipType.Empty    -> throw BadRequestException("uploaded zip file is empty")
+    ZipType.Standard -> { /* OK */ }
+    ZipType.Spanned  -> throw BadRequestException("uploaded zip file is part of a spanned archive")
+    ZipType.Invalid  -> throw BadRequestException("uploaded zip file is invalid")
+  }
+}

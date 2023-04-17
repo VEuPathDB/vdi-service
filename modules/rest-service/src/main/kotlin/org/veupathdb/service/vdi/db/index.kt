@@ -2,14 +2,13 @@ package org.veupathdb.service.vdi.db
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import oracle.jdbc.OracleDriver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.health.DatabaseDependency
 import org.veupathdb.lib.container.jaxrs.health.Dependency
 import org.veupathdb.lib.ldap.LDAP
 import org.veupathdb.service.vdi.config.Options
-import org.veupathdb.vdi.lib.db.app.AppDatabases
+import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.postgresql.Driver as PostgresDriver
 
 
@@ -54,25 +53,10 @@ private fun initAppDBConnections(ldap: LDAP, log: Logger): List<Dependency> {
 
   val out = ArrayList<Dependency>(12)
 
-  for (db in Options.AppDatabases) {
-    log.debug("initializing connection to {}", db.name)
-    val ld = ldap.requireSingularOracleNetDesc(db.ldap)
-    val ds = makeJDBCOracleConnectionString(ld.host, ld.port, ld.serviceName)
-      .let { jdbcString -> HikariConfig().apply {
-        jdbcUrl = jdbcString
-        username = db.username
-        password = db.password
-        maximumPoolSize = db.poolSize
-        driverClassName = OracleDriver::class.java.name
-      } }
-      .let { HikariDataSource(it) }
-
-    val dd = DatabaseDependency(db.name, ld.host, ld.port.toInt(), ds)
+  for ((name, ds) in AppDatabaseRegistry) {
+    val dd = DatabaseDependency(name, ds.host, ds.port.toInt(), ds.source)
     dd.setTestQuery("SELECT 1 FROM dual")
-
     out.add(dd)
-
-    AppDatabases[db.name] = ds
   }
 
   return out
