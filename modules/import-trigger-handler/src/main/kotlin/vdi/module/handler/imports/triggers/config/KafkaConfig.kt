@@ -2,6 +2,7 @@ package vdi.module.handler.imports.triggers.config
 
 import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
 
 
 data class KafkaConfig(
@@ -24,7 +25,7 @@ data class KafkaConfig(
    * Messages received on the import trigger topic that do not have this message
    * key will be ignored with a warning.
    */
-  val importTriggerMessageKey: String = KafkaConfigDefaults.ImportTriggerMessageKey,
+  val importTriggerMessageKey: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
 
   /**
    * Import Triggers Topic
@@ -32,6 +33,6 @@ data class KafkaConfig(
    * Name of the Kafka topic that import trigger messages will be listened for
    * on.
    */
-  val importTriggerTopic: String = KafkaConfigDefaults.ImportTriggerTopic,
+  val importTriggerTopic: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
 
   )

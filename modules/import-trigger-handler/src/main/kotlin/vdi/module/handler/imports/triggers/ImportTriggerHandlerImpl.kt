@@ -19,6 +19,7 @@ import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
 import org.veupathdb.vdi.lib.handler.client.PluginHandlerClientConfig
+import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.model.triggers.ImportTrigger
@@ -58,6 +59,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     shutdownConfirm.await()
   }
 
+
   private suspend fun run() {
     val s3     = S3Api.requireClient()
     val bucket = s3.requireBucket(config.s3Bucket)
@@ -65,7 +67,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     val kc     = requireKafkaConsumer()
     val kr     = requireKafkaRouter()
     val wp     = WorkerPool(config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
-    val hc     = PluginHandlerClient(config.handlerConfig)
 
     runBlocking {
       // Spin up the worker pool (in the background)
@@ -81,23 +82,8 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
               // lookup the dataset in S3
               val dir = dm.getDatasetDirectory(userID, datasetID)
 
-              // If the dataset does not exist in S3
-              if (!dir.exists()) {
-                log.warn("got an import event for a dataset directory that does not exist?  Dataset: {}, User: {}", datasetID, userID)
+              if (!dir.isUsable(datasetID, userID))
                 return@submit
-              }
-
-              // If the dataset has a soft-delete flag present
-              if (dir.hasDeleteFlag()) {
-                log.info("got an import event for a dataset with a delete flag, ignoring it.  Dataset: {}, User: {}", datasetID, userID)
-                return@submit
-              }
-
-              // If the dataset does not yet have a meta.json file
-              if (!dir.hasMeta()) {
-                log.info("got an import event for a dataset that does not yet have a meta.json file, ignoring it.  Dataset: {}, User: {}", datasetID, userID)
-                return@submit
-              }
 
               // Load the dataset metadata from S3
               val datasetMeta = dir.getMeta().load()!!
@@ -119,9 +105,18 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
                 log.warn("received an import event for a dataset with more than one upload file.  using file {} for dataset {}, user {}", uploadFiles[0].name, datasetID, userID)
               }
 
-              val result = uploadFiles[0]
-                .open()!!
-                .use { hc.postImport(datasetID, datasetMeta, it) }
+              for (projectID in datasetMeta.projects) {
+                val handler = PluginHandlers[projectID]
+                  .also {
+                    if (it == null)
+                      log.error("dataset {} targets project {} which is not registered with the plugin handlers", datasetID, projectID)
+                  }
+                  ?: continue
+
+                val result = uploadFiles[0]
+                  .open()!!
+                  .use { handler.client.postImport(datasetID, datasetMeta, it) }
+              }
 
               // TODO:
               //   If the result was "success":
@@ -153,6 +148,25 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       wp.stop()
       shutdownConfirm.trigger()
     }
+  }
+
+  private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
+    if (!exists()) {
+      log.warn("got an import event for a dataset directory that does not exist?  Dataset: {}, User: {}", datasetID, userID)
+      return false
+    }
+
+    if (hasDeleteFlag()) {
+      log.info("got an import event for a dataset with a delete flag, ignoring it.  Dataset: {}, User: {}", datasetID, userID)
+      return false
+    }
+
+    if (!hasMeta()) {
+      log.info("got an import event for a dataset that does not yet have a meta.json file, ignoring it.  Dataset: {}, User: {}", datasetID, userID)
+      return false
+    }
+
+    return true
   }
 
   private suspend fun requireKafkaConsumer() = safeExec("failed to create KafkaConsumer instance") {
