@@ -16,6 +16,7 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.fs.useThenDelete
 import org.veupathdb.vdi.lib.common.model.*
+import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import java.net.URL
 import java.nio.file.Path
 import kotlin.io.path.*
@@ -26,6 +27,14 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
   log.trace("createDataset(userID={}, datasetID={}, entity={})", userID, datasetID, entity)
 
   val datasetMeta = entity.toDatasetMeta(userID)
+
+  val handler = PluginHandlers[datasetMeta.type.name]
+    ?: throw BadRequestException("target dataset type is unknown to the VDI service")
+
+  for (projectID in datasetMeta.projects) {
+    if (!handler.appliesToProject(projectID))
+      throw BadRequestException("target dataset type does not apply to project $projectID")
+  }
 
   log.debug("uploading dataset metadata to S3 for new dataset {} by user {}", datasetID, userID)
   DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
