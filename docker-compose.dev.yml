@@ -2,6 +2,7 @@ version: "3.5"
 
 networks:
   monitoring-ext:
+    external: true
 
 services:
   minio-external:

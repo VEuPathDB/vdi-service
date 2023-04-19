@@ -9,23 +9,31 @@ import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.common.async.WorkerPool
+import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.fs.TempFiles
+import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
 import org.veupathdb.vdi.lib.db.cache.model.*
+import org.veupathdb.vdi.lib.handler.client.response.imp.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.model.triggers.ImportTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import java.lang.IllegalStateException
+import java.nio.file.Path
 import java.time.OffsetDateTime
+import kotlin.IllegalStateException
+import kotlin.io.path.*
 import kotlinx.coroutines.runBlocking
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
+import vdi.module.handler.imports.triggers.model.WarningsFile
 
 internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig) : ImportTriggerHandler {
 
@@ -54,9 +62,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
 
   private suspend fun run() {
-    val s3     = S3Api.requireClient()
-    val bucket = s3.requireBucket(config.s3Bucket)
-    val dm     = DatasetManager(bucket)
+    val dm     = DatasetManager(S3Api.requireClient().requireBucket(config.s3Bucket))
     val kc     = requireKafkaConsumer()
     val wp     = WorkerPool(config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
@@ -69,69 +75,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
         // Read messages from the kafka consumer
         kc.selectImportTriggers()
-          .forEach { (userID, datasetID) ->
-            wp.submit {
-              // lookup the dataset in S3
-              val dir = dm.getDatasetDirectory(userID, datasetID)
-
-              if (!dir.isUsable(datasetID, userID))
-                return@submit
-
-              // Load the dataset metadata from S3
-              val datasetMeta = dir.getMeta().load()!!
-
-              // lookup the target dataset in the cache database to ensure it
-              // exists, initializing the dataset if it doesn't yet exist.
-              CacheDB.selectDataset(datasetID)
-                ?: CacheDB.initializeDataset(datasetID, datasetMeta)
-
-
-              val uploadFiles = dir.getUploadFiles()
-
-              if (uploadFiles.isEmpty()) {
-                log.info("received an import event where the upload file doesn't yet exist. Dataset: {}, User: {}", datasetID, userID)
-                return@submit
-              }
-
-              if (uploadFiles.size > 1) {
-                log.warn("received an import event for a dataset with more than one upload file.  using file {} for dataset {}, user {}", uploadFiles[0].name, datasetID, userID)
-              }
-
-              for (projectID in datasetMeta.projects) {
-                val handler = PluginHandlers[projectID]
-                  .also {
-                    if (it == null)
-                      log.error("dataset {} targets project {} which is not registered with the plugin handlers", datasetID, projectID)
-                  }
-                  ?: continue
-
-                val result = uploadFiles[0]
-                  .open()!!
-                  .use { handler.client.postImport(datasetID, datasetMeta, it) }
-              }
-
-              // TODO:
-              //   If the result was "success":
-              //     . receive and unpack the result tar file
-              //     . read and record the warnings from the included warnings json file
-              //     . record the job as successful
-              //     . Upload the data files unpacked from the tar file to s3
-              //     . send a success result message to the appropriate kafka topic
-              //   If the result was "bad request":
-              //     . Emit an error log message about it
-              //     . Record the job as failed for internal reasons
-              //     . send a failure result message to the appropriate kafka topic
-              //   If the result was "validation error":
-              //     . Emit an info log message about it
-              //     . record the job as failed for validation reasons
-              //     . send a failure result message to the appropriate kafka topic
-              //   If the result was "unhandled exception":
-              //     . Emit a warning log message about it
-              //     . record the job as failed for internal reasons
-              //     . send a failure result message to the appropriate kafka topic
-
-            }
-          }
+          .forEach { (userID, datasetID) -> wp.submit { importJob(dm, userID, datasetID) } }
 
       }
 
@@ -140,6 +84,128 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       wp.stop()
       shutdownConfirm.trigger()
     }
+  }
+
+  private fun importJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
+    // lookup the dataset in S3
+    val datasetDir = dm.getDatasetDirectory(userID, datasetID)
+
+    if (!datasetDir.isUsable(datasetID, userID))
+      return
+
+    // Load the dataset metadata from S3
+    val datasetMeta = datasetDir.getMeta().load()!!
+
+    // lookup the target dataset in the cache database to ensure it
+    // exists, initializing the dataset if it doesn't yet exist.
+    CacheDB.selectDataset(datasetID)
+      ?: CacheDB.initializeDataset(datasetID, datasetMeta)
+
+    CacheDB.withTransaction {
+      it.tryInsertImportControl(datasetID, DatasetImportStatus.Importing)
+    }
+
+    try {
+      val uploadFiles = datasetDir.getUploadFiles()
+
+      if (uploadFiles.isEmpty()) {
+        log.info("received an import event where the upload file doesn't yet exist. Dataset: {}, User: {}", datasetID, userID)
+        return
+      }
+
+      if (uploadFiles.size > 1) {
+        log.warn("received an import event for a dataset with more than one upload file.  using file {} for dataset {}, user {}", uploadFiles[0].name, datasetID, userID)
+      }
+
+      // For the import, it doesn't matter what project id we use, this
+      // step does not impact the project application database.  We just
+      // need to get a handler client.
+      val handler = PluginHandlers[datasetMeta.type.name] or {
+        log.error("No plugin handler registered for dataset type {}", datasetMeta.type.name)
+        throw IllegalStateException("No plugin handler registered for dataset type ${datasetMeta.type.name}")
+      }
+
+      val result = uploadFiles[0]
+        .open()!!
+        .use { handler.client.postImport(datasetID, datasetMeta, it) }
+
+      when (result) {
+        is ImportSuccessResponse         -> handleImportSuccessResult(datasetID, result, datasetDir)
+        is ImportBadRequestResponse      -> handleImportBadRequestResult(datasetID, result)
+        is ImportValidationErrorResponse -> handleImportInvalidResult(datasetID, result)
+        is ImportUnhandledErrorResponse  -> handleImport500Result(datasetID, result)
+      }
+    } catch (e: Throwable) {
+      CacheDB.withTransaction { tran ->
+        tran.updateImportControl(datasetID, DatasetImportStatus.ImportFailed)
+        tran.tryInsertImportMessages(datasetID, "Process error: ${e.message}")
+      }
+      throw e
+    }
+  }
+
+  private fun handleImportSuccessResult(datasetID: DatasetID, result: ImportSuccessResponse, dd: DatasetDirectory) {
+    log.info("dataset handler server reports dataset {} imported successfully", datasetID)
+
+    // Create a temp directory to use as a workspace for the following process
+    TempFiles.withTempDirectory { tempDirectory ->
+
+      // Write the tar file result to a temp file that we can immediately unpack
+      // into our temp directory
+      TempFiles.withTempPath { tempArchive ->
+        result.resultArchive.use { input -> tempArchive.outputStream().use { output -> input.transferTo(output) } }
+        Tar.decompressWithGZip(tempArchive, tempDirectory)
+      }
+
+      // Consume the warnings file and delete it from the data directory.
+      val warnings = tempDirectory.resolve("warnings.json")
+        .consumeAsJSON<WarningsFile>()
+        .warnings
+
+      // Remove the meta file and delete it from the data directory.
+      tempDirectory.resolve("meta.json").deleteExisting()
+
+      // Consume the manifest file and delete it from the data directory.
+      val manifest = tempDirectory.resolve("manifest.json")
+        .consumeAsJSON<VDIDatasetManifest>()
+
+      // After deleting warnings.json, meta.json, and manifest.json the
+      // remaining files should be the ones we care about for importing into the
+      // data files directory in S3
+      val dataFiles = tempDirectory.listDirectoryEntries()
+
+      // For each data file, push to S3
+      dataFiles.forEach { dataFile -> dd.putDataFile(dataFile.name, dataFile::inputStream) }
+      dd.putManifest(manifest)
+
+      // Record the status update to the cache DB
+      CacheDB.withTransaction { transaction ->
+        if (warnings.isNotEmpty()) {
+          transaction.upsertImportMessages(datasetID, warnings.joinToString("\n"))
+        }
+
+        transaction.updateDataSyncControl(datasetID, OffsetDateTime.now())
+        transaction.updateImportControl(datasetID, DatasetImportStatus.Imported)
+      }
+    }
+  }
+
+  private fun handleImportBadRequestResult(datasetID: DatasetID, result: ImportBadRequestResponse) {
+    log.error("dataset handler server reports 400 error for dataset {}, message: {}", datasetID, result.message)
+    throw IllegalStateException(result.message)
+  }
+
+  private fun handleImportInvalidResult(datasetID: DatasetID, result: ImportValidationErrorResponse) {
+    log.info("dataset handler server reports dataset {} failed validation", datasetID)
+    CacheDB.withTransaction {
+      it.updateImportControl(datasetID, DatasetImportStatus.ImportFailed)
+      it.upsertImportMessages(datasetID, result.warnings.joinToString("\n"))
+    }
+  }
+
+  private fun handleImport500Result(datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
+    log.error("dataset handler server reports 500 for dataset {}, message {}", datasetID, result.message)
+    throw IllegalStateException(result.message)
   }
 
   private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
@@ -245,5 +311,11 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       // that will predate any possible upload timestamp.
       it.initSyncControl(datasetID)
     }
+  }
+
+  private inline fun <reified T> Path.consumeAsJSON(): T {
+    val value = inputStream().use { JSON.readValue<T>(it) }
+    deleteExisting()
+    return value
   }
 }

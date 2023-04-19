@@ -62,6 +62,7 @@ dependencies {
 
 
   implementation(project(":modules:event-router"))
+  implementation(project(":modules:import-trigger-handler"))
   implementation(project(":modules:rest-service"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")

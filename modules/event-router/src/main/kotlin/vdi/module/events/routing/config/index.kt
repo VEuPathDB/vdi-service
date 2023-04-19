@@ -3,11 +3,7 @@ package vdi.module.events.routing.config
 import org.veupathdb.vdi.lib.common.env.*
 import org.veupathdb.vdi.lib.common.field.SecretString
 import org.veupathdb.vdi.lib.common.util.HostAddress
-import org.veupathdb.vdi.lib.kafka.KafkaCompressionType
-import org.veupathdb.vdi.lib.kafka.KafkaProducerConfig
-import org.veupathdb.vdi.lib.kafka.KafkaProducerConfigDefaults
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
 import org.veupathdb.vdi.lib.rabbit.RabbitMQConfig
 import kotlin.time.Duration.Companion.milliseconds
 
