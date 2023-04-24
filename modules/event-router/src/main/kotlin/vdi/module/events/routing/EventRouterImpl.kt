@@ -44,6 +44,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     val kr: KafkaRouter
 
     try {
+      log.debug("Connecting to RabbitMQ: {}", config.rabbitConfig.serverAddress)
       es = RabbitMQEventSource(config.rabbitConfig, shutdownTrigger) { JSON.readValue(it) }
     } catch (e: Throwable) {
       shutdownTrigger.trigger()
@@ -149,4 +150,3 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
       throw e
     }
 }
-

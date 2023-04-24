@@ -19,8 +19,8 @@ internal fun loadConfigFromEnvironment(env: Environment) =
 internal fun loadRabbitConfigFromEnvironment(env: Map<String, String>) =
   RabbitMQConfig(
     serverAddress          = HostAddress(
-      host = env.optional(EnvKey.Rabbit.Host) ?: "localhost",
-      port = env.optional(EnvKey.Rabbit.Port)?.toUShort() ?: 5672u,
+      host = env.require(EnvKey.Rabbit.Host),
+      port = env.optUShort(EnvKey.Rabbit.Port) ?: 5672u,
     ),
     serverUsername         = env.require(EnvKey.Rabbit.Username),
     serverPassword         = SecretString(env.require(EnvKey.Rabbit.Password)),
