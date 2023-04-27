@@ -1,0 +1,25 @@
+Configuration:
+  name: Default
+  status: error
+  Appenders:
+    Console:
+      name: Console_Appender
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} [rid:%5X{traceId}] %-5level %c - %m%n}"
+  Loggers:
+    Root:
+      level: trace
+      AppenderRef:
+      - ref: Console_Appender
+    Logger:
+    - name: com.zaxxer
+      level: info
+      additivity: false
+      AppenderRef:
+      - ref: Console_Appender
+    - name: org.apache
+      level: info
+      additivity: false
+      AppenderRef:
+      - ref: Console_Appender

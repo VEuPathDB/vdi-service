@@ -77,7 +77,6 @@ dependencies {
 
 tasks.shadowJar {
   exclude("**/Log4j2Plugins.dat")
-  exclude("**/log4j2.yml")
   archiveFileName.set("service.jar")
 
   manifest {

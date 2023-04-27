@@ -54,7 +54,7 @@ services:
       "
 
   rabbit-external:
-    image: rabbitmq:3.11.9-management-alpine
+    image: rabbitmq:3.11.13-management-alpine
     ports:
     - "5672:5672"
     - "9002:15672"
@@ -86,6 +86,7 @@ services:
     - handler-example
     - rabbit-external
     - minio-external
+    - minio-create-buckets
     links:
     - cache-db
     - kafka

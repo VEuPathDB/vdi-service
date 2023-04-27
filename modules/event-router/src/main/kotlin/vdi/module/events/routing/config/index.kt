@@ -5,7 +5,7 @@ import org.veupathdb.vdi.lib.common.field.SecretString
 import org.veupathdb.vdi.lib.common.util.HostAddress
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
 import org.veupathdb.vdi.lib.rabbit.RabbitMQConfig
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 internal fun loadConfigFromEnvironment() = loadConfigFromEnvironment(System.getenv())
 
@@ -41,7 +41,7 @@ internal fun loadRabbitConfigFromEnvironment(env: Map<String, String>) =
     routingKey             = env.optional(EnvKey.Rabbit.Routing.Key) ?: "",
     routingArgs            = env.optMap(EnvKey.Rabbit.Routing.Arguments) ?: emptyMap(),
 
-    messagePollingInterval = env.optDuration(EnvKey.Rabbit.PollingInterval) ?: 500.milliseconds
+    messagePollingInterval = env.optDuration(EnvKey.Rabbit.PollingInterval) ?: 1.seconds
   )
 
 internal fun loadKafkaConfigFromEnvironment(env: Environment) = KafkaRouterConfig(env)

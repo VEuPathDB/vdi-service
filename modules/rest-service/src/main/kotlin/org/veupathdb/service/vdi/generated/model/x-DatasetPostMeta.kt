@@ -17,9 +17,9 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
 
   if (projects == null || projects.isEmpty())
     validationErrors.add("meta.projects", "one or more projects is required")
-
-  projects.forEachIndexed { i, it ->
-    if (it.isNullOrBlank())
-      validationErrors.add("meta.projects[$i]", "must not be null or blank")
-  }
+  else
+    projects.forEachIndexed { i, it ->
+      if (it.isNullOrBlank())
+        validationErrors.add("meta.projects[$i]", "must not be null or blank")
+    }
 }

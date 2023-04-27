@@ -107,8 +107,10 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
     )
   }
 
-  override fun postVdiDatasets(entity: DatasetPostRequest): VdiDatasets.PostVdiDatasetsResponse {
+  override fun postVdiDatasets(entity: DatasetPostRequest?): VdiDatasets.PostVdiDatasetsResponse {
     log.trace("postVdiDatasets(entity={})", entity)
+
+    entity ?: throw BadRequestException()
 
     entity.validate()
       .throwIfNotEmpty()

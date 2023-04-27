@@ -13,4 +13,4 @@ compose-up:
 	@docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env up
 
 compose-down:
-	@docker compose -f docker-compose.yml -f docker-compose.dev.yml down
+	@docker compose -f docker-compose.yml -f docker-compose.dev.yml down -v

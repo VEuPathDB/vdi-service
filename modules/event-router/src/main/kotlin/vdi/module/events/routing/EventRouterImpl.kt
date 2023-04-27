@@ -40,12 +40,10 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
   }
 
   private suspend fun run() {
-    val es: RabbitMQEventSource<MinIOEvent>
-    val kr: KafkaRouter
 
-    try {
+    val es = try {
       log.debug("Connecting to RabbitMQ: {}", config.rabbitConfig.serverAddress)
-      es = RabbitMQEventSource(config.rabbitConfig, shutdownTrigger) { JSON.readValue(it) }
+      RabbitMQEventSource(config.rabbitConfig, shutdownTrigger) { JSON.readValue<MinIOEvent>(it) }
     } catch (e: Throwable) {
       shutdownTrigger.trigger()
       shutdownConfirm.trigger()
@@ -53,8 +51,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
       throw e
     }
 
-    try {
-      kr = KafkaRouterFactory(config.kafkaConfig).newKafkaRouter()
+    val kr = try {
+      KafkaRouterFactory(config.kafkaConfig).newKafkaRouter()
     } catch (e: Throwable) {
       shutdownTrigger.trigger()
       shutdownConfirm.trigger()
@@ -141,7 +139,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     }
   }
 
-  private suspend fun RabbitMQEventIterator<MinIOEvent>.safeHasNext() =
+  private suspend fun RabbitMQEventIterator<*>.safeHasNext() =
     try {
       hasNext()
     } catch (e: Throwable) {

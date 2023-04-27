@@ -2,11 +2,11 @@ package vdi.bootstrap
 
 import org.slf4j.LoggerFactory
 import org.veupathdb.service.vdi.RestService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import vdi.module.events.routing.EventRouter
 import vdi.module.handler.imports.triggers.ImportTriggerHandler
-
 
 object Main {
 
@@ -20,8 +20,6 @@ object Main {
       ImportTriggerHandler()
     )
 
-    val restService = Thread { RestService.main(args) }
-
     Runtime.getRuntime().addShutdownHook(Thread {
       log.info("shutting down modules")
       runBlocking {
@@ -31,11 +29,11 @@ object Main {
     })
 
     log.info("starting modules")
-    runBlocking {
+    runBlocking(Dispatchers.Unconfined) {
       for (module in modules)
         launch { module.start() }
 
-      restService.start()
+      RestService.main(args)
     }
   }
 }

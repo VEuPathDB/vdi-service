@@ -64,7 +64,7 @@ private fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
     name         = meta.name,
     summary      = meta.summary,
     description  = meta.description,
-    dependencies = meta.dependencies.map {
+    dependencies = (meta.dependencies ?: emptyList()).map {
       VDIDatasetDependencyImpl(
         identifier  = it.resourceIdentifier,
         version     = it.resourceVersion,

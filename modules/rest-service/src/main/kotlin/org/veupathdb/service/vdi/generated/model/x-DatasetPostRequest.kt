@@ -12,7 +12,7 @@ fun DatasetPostRequest.validate(): ValidationErrors {
 
   if (file == null && url.isNullOrBlank())
     validationErrors.add("must provide an upload file or url to a source file")
-  if (file != null && url.isNotBlank())
+  if (file != null && (url != null && url.isNotBlank()))
     validationErrors.add("cannot provide both an upload file and a source file URL")
 
   return validationErrors
