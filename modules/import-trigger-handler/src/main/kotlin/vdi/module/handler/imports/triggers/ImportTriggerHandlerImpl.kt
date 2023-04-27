@@ -31,6 +31,7 @@ import java.nio.file.Path
 import java.time.OffsetDateTime
 import kotlin.IllegalStateException
 import kotlin.io.path.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
 import vdi.module.handler.imports.triggers.model.WarningsFile
@@ -62,9 +63,11 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
 
   private suspend fun run() {
-    val dm     = DatasetManager(S3Api.requireClient().requireBucket(config.s3Bucket))
-    val kc     = requireKafkaConsumer()
-    val wp     = WorkerPool(config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
+    log.trace("run()")
+
+    val dm = DatasetManager(S3Api.requireClient().requireBucket(config.s3Bucket))
+    val kc = requireKafkaConsumer()
+    val wp = WorkerPool("import-trigger-workers", config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
       // Spin up the worker pool (in the background)
@@ -75,7 +78,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
         // Read messages from the kafka consumer
         kc.selectImportTriggers()
-          .forEach { (userID, datasetID) -> wp.submit { importJob(dm, userID, datasetID) } }
+          .forEach { (userID, datasetID) ->
+            log.info("received import job for dataset {}, user {}", datasetID, userID)
+            wp.submit { importJob(dm, userID, datasetID) }
+          }
 
       }
 
@@ -87,6 +93,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   }
 
   private fun importJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
+    log.trace("importJob(dm=..., userID={}, datasetID={}", userID, datasetID)
     // lookup the dataset in S3
     val datasetDir = dm.getDatasetDirectory(userID, datasetID)
 
@@ -98,8 +105,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
     // lookup the target dataset in the cache database to ensure it
     // exists, initializing the dataset if it doesn't yet exist.
-    CacheDB.selectDataset(datasetID)
-      ?: CacheDB.initializeDataset(datasetID, datasetMeta)
+    CacheDB.selectDataset(datasetID) or {
+      log.info("initializing dataset {} for user {}", datasetID, userID)
+      CacheDB.initializeDataset(datasetID, datasetMeta)
+    }
 
     CacheDB.withTransaction {
       it.tryInsertImportControl(datasetID, DatasetImportStatus.Importing)
@@ -256,7 +265,15 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   private fun KafkaConsumer.selectImportTriggers() =
     receive()
       .asSequence()
-      .filter { it.key == config.kafkaConfig.importTriggerMessageKey }
+      .onEach { log.debug("received message from kafka with key: \"${it.key}\"") }
+      .filter {
+        if (it.key == config.kafkaConfig.importTriggerMessageKey) {
+          true
+        } else {
+          log.warn("received message from kafka with incorrect message key.  expected {}, got {}", config.kafkaConfig.importTriggerMessageKey, it.key)
+          false
+        }
+      }
       .map {
         try {
           JSON.readValue<ImportTrigger>(it.value)

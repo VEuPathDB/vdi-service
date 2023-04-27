@@ -65,7 +65,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     val dm = DatasetManager(s3.requireBucket(config.s3Bucket))
     val kc = requireKafkaConsumer()
     val kr = requireKafkaRouter()
-    val wp = WorkerPool(config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
+    val wp = WorkerPool("update-meta-workers", config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
       wp.start(this)
