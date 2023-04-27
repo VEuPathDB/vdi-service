@@ -57,7 +57,6 @@ allprojects {
 
 dependencies {
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
-  implementation("org.veupathdb.vdi:vdi-component-rabbit:1.0.0-SNAPSHOT") { isChanging = true }
   implementation("org.veupathdb.vdi:vdi-component-s3:1.0.0")
 
 
