@@ -37,8 +37,9 @@ services:
     depends_on:
     - cache-db
     - kafka
-    - handler-example
+    - plugin-example
     links:
+    - plugin-example
     - cache-db
     - kafka
     networks:

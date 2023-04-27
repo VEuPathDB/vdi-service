@@ -83,7 +83,6 @@ services:
     depends_on:
     - cache-db
     - kafka
-    - handler-example
     - rabbit-external
     - minio-external
     - minio-create-buckets
