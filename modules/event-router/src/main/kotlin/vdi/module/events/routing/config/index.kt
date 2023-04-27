@@ -29,7 +29,7 @@ internal fun loadConfigFromEnvironment(env: Environment) =
     kafkaConfig  = loadKafkaConfigFromEnvironment(env)
   )
 
-internal fun loadRabbitConfigFromEnvironment(env: Map<String, String>) =
+internal fun loadRabbitConfigFromEnvironment(env: Environment) =
   RabbitMQConfig(
     serverAddress          = HostAddress(
       host = env.require(EnvKey.Rabbit.Host),
