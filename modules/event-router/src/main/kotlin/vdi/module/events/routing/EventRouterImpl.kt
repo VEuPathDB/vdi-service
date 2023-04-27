@@ -41,6 +41,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
 
   private suspend fun run() {
 
+    // Get a RabbitMQ Event Source which we will use to get an event stream
+    // later.
     val es = try {
       log.debug("Connecting to RabbitMQ: {}", config.rabbitConfig.serverAddress)
       RabbitMQEventSource(config.rabbitConfig, shutdownTrigger) { JSON.readValue<MinIOEvent>(it) }
@@ -51,6 +53,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
       throw e
     }
 
+    // Get a Kafka Router which we will use to publish messages to the
+    // appropriate Kafka topics as messages come in from RabbitMQ.
     val kr = try {
       KafkaRouterFactory(config.kafkaConfig).newKafkaRouter()
     } catch (e: Throwable) {
@@ -60,12 +64,21 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
       throw e
     }
 
+    // Get a handle on the stream of messages from RabbitMQ.
     val stream = es.iterator()
 
+    // While we haven't been told to shut down, and the stream hasn't yet been
+    // closed:
     while (!shutdownTrigger.isTriggered() && stream.safeHasNext()) {
-      val event = stream.next()
-      val path  = event.objectKey.toVDPathOrNull()
 
+      // Get the next event from the RabbitMQ stream.
+      val event = stream.next()
+
+      // Convert the event target object path to a VDPath instance (if possible)
+      val path = event.objectKey.toVDPathOrNull()
+
+      // If the event source object path was not for an object in the dataset
+      // "directory" structure then warn and ignore it.
       if (path == null) {
         log.warn("received bucket event that was not a dataset event for object: ${event.objectKey}")
         continue
@@ -91,6 +104,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
           safeSend(ImportTrigger(path.userID, path.datasetID), kr::sendImportTrigger)
         }
 
+        // If the meta file was updated...
         path is VDDatasetFilePath && path.subPath == S3Paths.META_FILE_NAME -> {
           log.debug("received an meta.json event for dataset {} owned by user {}", path.datasetID, path.userID)
 
@@ -129,6 +143,15 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     shutdownConfirm.trigger()
   }
 
+  /**
+   * Attempts to send a new event message on a Kafka topic controlled by the
+   * given publishing function ([fn]), shutting down the process if sending the
+   * event fails.
+   *
+   * @param event Event message to send.
+   *
+   * @param fn Kafka publishing function.
+   */
   private suspend fun <T> safeSend(event: T, fn: (T) -> Unit) {
     try {
       fn(event)
