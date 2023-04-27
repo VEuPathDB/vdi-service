@@ -21,7 +21,8 @@ internal fun loadConfigFromEnvironment() = loadConfigFromEnvironment(System.gete
  *
  * @return The loaded `EventRouterConfig` instance.
  */
-internal fun loadConfigFromEnvironment(env: Environment) =
+@Suppress("NOTHING_TO_INLINE")
+private inline fun loadConfigFromEnvironment(env: Environment) =
   EventRouterConfig(
     rabbitConfig = RabbitMQConfig(env),
     s3Bucket     = env.require(EnvKey.S3.BucketName),
