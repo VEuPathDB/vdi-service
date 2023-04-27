@@ -7,8 +7,21 @@ import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
 import org.veupathdb.vdi.lib.rabbit.RabbitMQConfig
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Loads the [EventRouterConfig] from environment variables.
+ *
+ * @return The loaded `EventRouterConfig` instance.
+ */
 internal fun loadConfigFromEnvironment() = loadConfigFromEnvironment(System.getenv())
 
+/**
+ * Loads the [EventRouterConfig] from the given map of environment variables.
+ *
+ * @param env Map of environment variables from which the config should be
+ * loaded.
+ *
+ * @return The loaded `EventRouterConfig` instance.
+ */
 internal fun loadConfigFromEnvironment(env: Environment) =
   EventRouterConfig(
     rabbitConfig = loadRabbitConfigFromEnvironment(env),
@@ -45,22 +58,3 @@ internal fun loadRabbitConfigFromEnvironment(env: Map<String, String>) =
   )
 
 internal fun loadKafkaConfigFromEnvironment(env: Environment) = KafkaRouterConfig(env)
-
-private fun String.toPairSequence() = splitToSequence(',')
-  .map { it.toKeyValue() }
-
-private fun String.toHostAddresses() = toPairSequence()
-  .map { HostAddress(it.first, it.second.toUShort()) }
-  .toList()
-  .toTypedArray()
-
-private fun String.toKeyValue(): Pair<String, String> {
-  val index = indexOf(':')
-
-  if (index < 0)
-    throw IllegalStateException("malformed map in environment variable, no key/value separator character was found")
-  if (index < 1)
-    throw IllegalStateException("malformed map in environment variable, entry with empty key was found")
-
-  return substring(0, index) to substring(index+1)
-}
