@@ -32,6 +32,7 @@ import java.time.OffsetDateTime
 import kotlin.IllegalStateException
 import kotlin.io.path.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
 import vdi.module.handler.imports.triggers.model.WarningsFile
@@ -69,27 +70,27 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     val kc = requireKafkaConsumer()
     val wp = WorkerPool("import-trigger-workers", config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
-    runBlocking {
-      // Spin up the worker pool (in the background)
-      wp.start(this)
+    runBlocking(Dispatchers.IO) {
+      launch {
+        // While the shutdown trigger has not yet been triggered
+        while (!shutdownTrigger.isTriggered()) {
+          // Read messages from the kafka consumer
+          kc.selectImportTriggers()
+            .forEach { (userID, datasetID) ->
+              log.info("received import job for dataset {}, user {}", datasetID, userID)
+              wp.submit { importJob(dm, userID, datasetID) }
+            }
+        }
 
-      // While the shutdown trigger has not yet been triggered
-      while (!shutdownTrigger.isTriggered()) {
-
-        // Read messages from the kafka consumer
-        kc.selectImportTriggers()
-          .forEach { (userID, datasetID) ->
-            log.info("received import job for dataset {}, user {}", datasetID, userID)
-            wp.submit { importJob(dm, userID, datasetID) }
-          }
-
+        log.info("shutting down worker pool")
+        wp.stop()
       }
 
-      log.info("shutting down worker pool")
-
-      wp.stop()
-      shutdownConfirm.trigger()
+      // Spin up the worker pool (in the background)
+      wp.start()
     }
+
+     shutdownConfirm.trigger()
   }
 
   private fun importJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
@@ -97,8 +98,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     // lookup the dataset in S3
     val datasetDir = dm.getDatasetDirectory(userID, datasetID)
 
-    if (!datasetDir.isUsable(datasetID, userID))
+    if (!datasetDir.isUsable(datasetID, userID)) {
+      log.debug("dataset dir for dataset {} (user {}) is not usable", datasetID, userID)
       return
+    }
 
     // Load the dataset metadata from S3
     val datasetMeta = datasetDir.getMeta().load()!!
@@ -111,10 +114,12 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
 
     CacheDB.withTransaction {
+      log.info("attempting to insert import control record (if one does not exist)")
       it.tryInsertImportControl(datasetID, DatasetImportStatus.Importing)
     }
 
     try {
+      log.debug("fetching upload files for dataset {} (user {})", datasetID, userID)
       val uploadFiles = datasetDir.getUploadFiles()
 
       if (uploadFiles.isEmpty()) {
@@ -142,6 +147,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         is ImportUnhandledErrorResponse  -> handleImport500Result(datasetID, result)
       }
     } catch (e: Throwable) {
+      log.debug("import request to handler server failed with exception:", e)
       CacheDB.withTransaction { tran ->
         tran.updateImportControl(datasetID, DatasetImportStatus.ImportFailed)
         tran.tryInsertImportMessages(datasetID, "Process error: ${e.message}")
@@ -285,6 +291,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       .filterNotNull()
 
   private fun CacheDBTransaction.initSyncControl(datasetID: DatasetID) {
+    log.trace("CacheDBTransaction.initSyncControl(datasetID: {})", datasetID)
     tryInsertSyncControl(VDISyncControlRecord(
       datasetID     = datasetID,
       sharesUpdated = OriginTimestamp,
@@ -294,36 +301,41 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   }
 
   private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
+    log.trace("CacheDB.initializeDataset(datasetID: {}, meta: {})", datasetID, meta)
     openTransaction().use {
+      try {
+        // Insert a new dataset record
+        it.tryInsertDataset(DatasetImpl(
+          datasetID   = datasetID,
+          typeName    = meta.type.name,
+          typeVersion = meta.type.version,
+          ownerID     = meta.owner,
+          isDeleted   = false,
+          created     = OffsetDateTime.now(),
+          DatasetImportStatus.AwaitingImport
+        ))
 
-      // Insert a new dataset record
-      it.tryInsertDataset(DatasetImpl(
-        datasetID   = datasetID,
-        typeName    = meta.type.name,
-        typeVersion = meta.type.version,
-        ownerID     = meta.owner,
-        isDeleted   = false,
-        created     = OffsetDateTime.now(),
-        DatasetImportStatus.AwaitingImport
-      ))
+        // insert metadata for the dataset
+        it.tryInsertDatasetMeta(DatasetMetaImpl(
+          datasetID   = datasetID,
+          name        = meta.name,
+          summary     = meta.summary,
+          description = meta.description,
+        ))
 
-      // insert metadata for the dataset
-      it.tryInsertDatasetMeta(DatasetMetaImpl(
-        datasetID   = datasetID,
-        name        = meta.name,
-        summary     = meta.summary,
-        description = meta.description,
-      ))
+        // Insert an import control record for the dataset
+        it.tryInsertImportControl(datasetID, DatasetImportStatus.AwaitingImport)
 
-      // Insert an import control record for the dataset
-      it.tryInsertImportControl(datasetID, DatasetImportStatus.AwaitingImport)
+        // insert project links for the dataset
+        it.tryInsertDatasetProjects(datasetID, meta.projects)
 
-      // insert project links for the dataset
-      it.tryInsertDatasetProjects(datasetID, meta.projects)
-
-      // insert a sync control record for the dataset using an old timestamp
-      // that will predate any possible upload timestamp.
-      it.initSyncControl(datasetID)
+        // insert a sync control record for the dataset using an old timestamp
+        // that will predate any possible upload timestamp.
+        it.initSyncControl(datasetID)
+      } catch (e: Throwable) {
+        it.rollback()
+        throw e
+      }
     }
   }
 

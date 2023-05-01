@@ -1,13 +1,12 @@
 package org.veupathdb.service.vdi.service.datasets
 
-import org.veupathdb.service.vdi.db.UserDB
+import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.app.AppDB
-import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
@@ -48,7 +47,7 @@ fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
 
   // Get the user details for all the distinct user IDs seen in the dataset
   // listing returned by the original query.
-  val userDetails = UserDB.lookupUserDetails(userIDs)
+  val userDetails = AccountDB.lookupUserDetails(userIDs)
   userIDs.clear()
 
   // Build a list for the results we will be returning.

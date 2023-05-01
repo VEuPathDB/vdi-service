@@ -67,93 +67,91 @@ internal class UpdateMetaTriggerHandlerImpl(
     val kr = requireKafkaRouter()
     val wp = WorkerPool("update-meta-workers", config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
-    runBlocking {
-      wp.start(this)
+    wp.start()
 
-      // While the shutdown trigger has not yet been triggered
-      while (!shutdownTrigger.isTriggered()) {
-        // Select meta trigger messages from Kafka
-        kc.selectMetaTriggers()
-          // and for each of the trigger messages received
-          .forEach { (userID, datasetID) ->
-            // submit a job to the worker pool
-            wp.submit {
-              // lookup the dataset directory for the given userID and datasetID
-              val dir = dm.getDatasetDirectory(userID, datasetID)
+    // While the shutdown trigger has not yet been triggered
+    while (!shutdownTrigger.isTriggered()) {
+      // Select meta trigger messages from Kafka
+      kc.selectMetaTriggers()
+        // and for each of the trigger messages received
+        .forEach { (userID, datasetID) ->
+          // submit a job to the worker pool
+          wp.submit {
+            // lookup the dataset directory for the given userID and datasetID
+            val dir = dm.getDatasetDirectory(userID, datasetID)
 
-              // If the dataset directory is not usable, bail out.
-              //
-              // Don't worry about logging here, the `isUsable` method performs
-              // logging specific to the reason that the dataset directory is
-              // not usable.
-              if (!dir.isUsable(userID, datasetID))
-                return@submit
+            // If the dataset directory is not usable, bail out.
+            //
+            // Don't worry about logging here, the `isUsable` method performs
+            // logging specific to the reason that the dataset directory is
+            // not usable.
+            if (!dir.isUsable(userID, datasetID))
+              return@submit
 
-              // Load the dataset metadata from S3
-              val datasetMeta   = dir.getMeta().load()!!
-              val metaTimestamp = dir.getMeta().lastModified()!!
+            // Load the dataset metadata from S3
+            val datasetMeta   = dir.getMeta().load()!!
+            val metaTimestamp = dir.getMeta().lastModified()!!
 
-              // Attempt to select the dataset details from the cache DB
-              CacheDB.selectDataset(datasetID)
-                // If they were not found, construct them
-                ?: CacheDB.initializeDataset(datasetID, datasetMeta)
+            // Attempt to select the dataset details from the cache DB
+            CacheDB.selectDataset(datasetID)
+              // If they were not found, construct them
+              ?: CacheDB.initializeDataset(datasetID, datasetMeta)
 
-              // Attempt to look up the sync control record for the dataset in
-              // the cache DB.
-              val syncControl = CacheDB.selectSyncControl(datasetID) or {
-                  // If the sync control record was not found for some reason
-                  CacheDB.initSyncControl(datasetID)
-                  CacheDB.selectSyncControl(datasetID)!!
-                }
-
-              // Do a "little" reconciliation
-              comparison(dir, syncControl)
-                .also {
-                  if (it.doDataSync)
-                    kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
-
-                  if (it.doShareSync)
-                    kr.sendShareTrigger(ShareTrigger(userID, datasetID))
-                }
-
-              CacheDB.openTransaction()
-                .use { db ->
-                  // 1. Update meta info
-                  db.updateDatasetMeta(DatasetMetaImpl(
-                    datasetID   = datasetID,
-                    name        = datasetMeta.name,
-                    summary     = datasetMeta.summary,
-                    description = datasetMeta.description,
-                  ))
-
-                  // 2. Update meta timestamp
-                  db.updateMetaSyncControl(datasetID, metaTimestamp)
-                }
-
-              if (datasetMeta.type.name !in PluginHandlers) {
-                log.error("dataset {} declares a type of {} which is unknown to the vdi service", datasetID, datasetMeta.type.name)
-                return@submit
+            // Attempt to look up the sync control record for the dataset in
+            // the cache DB.
+            val syncControl = CacheDB.selectSyncControl(datasetID) or {
+                // If the sync control record was not found for some reason
+                CacheDB.initSyncControl(datasetID)
+                CacheDB.selectSyncControl(datasetID)!!
               }
 
-              val ph = PluginHandlers[datasetMeta.type.name]!!
+            // Do a "little" reconciliation
+            comparison(dir, syncControl)
+              .also {
+                if (it.doDataSync)
+                  kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
 
-              datasetMeta.projects
-                .forEach projects@{ projectID ->
-                  if (!ph.appliesToProject(projectID)) {
-                    log.warn("dataset {} declares a project id of {} which is not applicable to dataset type {}", datasetID, projectID, datasetMeta.type.name)
-                    return@projects
-                  }
+                if (it.doShareSync)
+                  kr.sendShareTrigger(ShareTrigger(userID, datasetID))
+              }
 
-                  // TODO: open an APP db transaction to the target application database and perform the following steps
-                  //       in that transaction:
-                  //       1. Update the meta tables in the target databases
-                  //       2. Submit the update meta request to the plugin handler server for each of the target databases
-                  //       3. Handle the result
-                  val result = ph.client.postInstallMeta(datasetID, projectID, datasetMeta)
-                }
+            CacheDB.openTransaction()
+              .use { db ->
+                // 1. Update meta info
+                db.updateDatasetMeta(DatasetMetaImpl(
+                  datasetID   = datasetID,
+                  name        = datasetMeta.name,
+                  summary     = datasetMeta.summary,
+                  description = datasetMeta.description,
+                ))
+
+                // 2. Update meta timestamp
+                db.updateMetaSyncControl(datasetID, metaTimestamp)
+              }
+
+            if (datasetMeta.type.name !in PluginHandlers) {
+              log.error("dataset {} declares a type of {} which is unknown to the vdi service", datasetID, datasetMeta.type.name)
+              return@submit
             }
+
+            val ph = PluginHandlers[datasetMeta.type.name]!!
+
+            datasetMeta.projects
+              .forEach projects@{ projectID ->
+                if (!ph.appliesToProject(projectID)) {
+                  log.warn("dataset {} declares a project id of {} which is not applicable to dataset type {}", datasetID, projectID, datasetMeta.type.name)
+                  return@projects
+                }
+
+                // TODO: open an APP db transaction to the target application database and perform the following steps
+                //       in that transaction:
+                //       1. Update the meta tables in the target databases
+                //       2. Submit the update meta request to the plugin handler server for each of the target databases
+                //       3. Handle the result
+                val result = ph.client.postInstallMeta(datasetID, projectID, datasetMeta)
+              }
           }
-      }
+        }
     }
   }
 

@@ -1,7 +1,7 @@
 package org.veupathdb.service.vdi.service.datasets
 
 import jakarta.ws.rs.NotFoundException
-import org.veupathdb.service.vdi.db.UserDB
+import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -19,7 +19,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   }
 
   // Lookup user details for the dataset's owner and any share users
-  val userDetails = UserDB.lookupUserDetails(HashSet<UserID>(shares.size + 1)
+  val userDetails = AccountDB.lookupUserDetails(HashSet<UserID>(shares.size + 1)
     .apply {
       add(userID)
       shares.forEach { add(it.recipientID) }

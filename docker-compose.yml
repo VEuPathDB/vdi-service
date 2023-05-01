@@ -204,8 +204,11 @@ services:
 
   plugin-example:
     image: veupathdb/vdi-handler-example:${VDI_HANDLER_EXAMPLE_TAG:-latest}
+    networks:
+    - internal
     environment:
       LDAP_SERVER: ${LDAP_SERVER:?}
+      ORACLE_BASE_DN: ${ORACLE_BASE_DN:?}
 
       DB_CONNECTION_NAME_AMOEBA: ${DB_CONNECTION_NAME_AMOEBA:?}
       DB_CONNECTION_LDAP_AMOEBA: ${DB_CONNECTION_LDAP_AMOEBA:?}

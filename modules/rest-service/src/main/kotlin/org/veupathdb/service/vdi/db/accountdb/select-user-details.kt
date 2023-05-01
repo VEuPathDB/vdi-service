@@ -1,4 +1,4 @@
-package org.veupathdb.service.vdi.db.userdb
+package org.veupathdb.service.vdi.db.accountdb
 
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.UserID
