@@ -145,6 +145,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         is ImportBadRequestResponse      -> handleImportBadRequestResult(datasetID, result)
         is ImportValidationErrorResponse -> handleImportInvalidResult(datasetID, result)
         is ImportUnhandledErrorResponse  -> handleImport500Result(datasetID, result)
+        else                             -> handleImpossibleCase()
       }
     } catch (e: Throwable) {
       log.debug("import request to handler server failed with exception:", e)
@@ -154,6 +155,11 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       }
       throw e
     }
+  }
+
+  private fun handleImpossibleCase() {
+    log.error("developer error of some sort, we hit the impossible case, did we add a new response type to the handler client?")
+    throw IllegalStateException("impossible case hit, did we add a new response type to the handler client?")
   }
 
   private fun handleImportSuccessResult(datasetID: DatasetID, result: ImportSuccessResponse, dd: DatasetDirectory) {

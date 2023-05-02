@@ -74,6 +74,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
       // Get the next event from the RabbitMQ stream.
       val event = stream.next()
 
+      log.debug("received bucket event for object ${event.objectKey}")
+
       // Convert the event target object path to a VDPath instance (if possible)
       val path = event.objectKey.toVDPathOrNull()
 

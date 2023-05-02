@@ -46,11 +46,11 @@ containerBuild {
 }
 
 dependencies {
-  implementation("org.veupathdb.vdi:vdi-component-app-db:1.0.0-SNAPSHOT") { isChanging = true }
-  implementation("org.veupathdb.vdi:vdi-component-cache-db:1.0.0-SNAPSHOT") { isChanging = true }
+  implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
+  implementation("org.veupathdb.vdi:vdi-component-app-db:1.1.0")
+  implementation("org.veupathdb.vdi:vdi-component-cache-db:1.0.0")
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
   implementation("org.veupathdb.vdi:vdi-component-plugin-mapping:1.0.0-SNAPSHOT") { isChanging = true }
-  implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
   implementation("org.veupathdb.vdi:vdi-component-s3:1.2.0-SNAPSHOT") { isChanging = true }
 
   implementation("org.gusdb:fgputil-db:2.12.9")
@@ -79,4 +79,5 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
   testImplementation("org.mockito:mockito-core:5.2.0")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+  implementation(kotlin("stdlib-jdk8"))
 }
