@@ -63,11 +63,10 @@ dependencies {
   implementation(project(":modules:event-router"))
   implementation(project(":modules:import-trigger-handler"))
   implementation(project(":modules:update-meta-trigger-handler"))
+  implementation(project(":modules:share-trigger-handler"))
   implementation(project(":modules:rest-service"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-
-  implementation("org.veupathdb.lib.s3:s34k-minio:0.4.0+s34k-0.8.0")
 
   implementation("org.slf4j:slf4j-api:1.7.36")
   implementation("org.apache.logging.log4j:log4j-api:2.20.0")

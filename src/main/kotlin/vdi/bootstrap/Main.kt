@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import vdi.module.events.routing.EventRouter
 import vdi.module.handler.imports.triggers.ImportTriggerHandler
 import vdi.module.handler.meta.triggers.UpdateMetaTriggerHandler
+import vdi.module.handler.share.trigger.ShareTriggerHandler
 
 object Main {
 
@@ -18,8 +19,9 @@ object Main {
     log.info("initializing modules")
     val modules = listOf(
       EventRouter(),
-//      ImportTriggerHandler(),
+      ImportTriggerHandler(),
       UpdateMetaTriggerHandler(),
+      ShareTriggerHandler(),
     )
 
     Runtime.getRuntime().addShutdownHook(Thread {
