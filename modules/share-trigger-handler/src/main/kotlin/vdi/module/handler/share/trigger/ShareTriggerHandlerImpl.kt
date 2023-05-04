@@ -19,6 +19,7 @@ import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.DatasetShare
 import java.sql.SQLException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import vdi.module.handler.share.trigger.config.ShareTriggerHandlerConfig
@@ -54,10 +55,13 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     val wp = WorkerPool("share-workers", config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
-      launch {
+      launch(Dispatchers.IO) {
         while (!shutdownTrigger.isTriggered()) {
           kc.selectShareTriggers()
-            .forEach { (userID, datasetID) -> wp.submit { executeJob(userID, datasetID, dm) } }
+            .forEach { (userID, datasetID) ->
+              log.debug("submitting job to worker pool for user {}, dataset {}", userID, datasetID)
+              wp.submit { executeJob(userID, datasetID, dm) }
+            }
         }
 
         wp.stop()
@@ -93,7 +97,15 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   private fun KafkaConsumer.selectShareTriggers() =
     receive()
       .asSequence()
-      .filter { it.key == config.shareTriggerMessageKey }
+      .filter {
+        if (it.key == config.shareTriggerMessageKey) {
+          log.debug("received message with key {}", it.key)
+          true
+        } else {
+          log.warn("filtering out message with key {} as it does not match expected key {}", it.key, config.shareTriggerMessageKey)
+          false
+        }
+      }
       .map {
         try {
           JSON.readValue<ShareTrigger>(it.value)
@@ -140,15 +152,6 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
           for (projectID in meta.projects) {
             AppDB.withTransaction(projectID) {
               it.updateSyncControlSharesTimestamp(datasetID, shareTimestamp)
-              it.deleteDatasetVisibility(datasetID, recipientID)
-            }
-          }
-        }
-
-        else {
-          for (projectID in meta.projects) {
-            AppDB.withTransaction(projectID) {
-              it.updateSyncControlSharesTimestamp(datasetID, shareTimestamp)
               try {
                 it.insertDatasetVisibility(datasetID, recipientID)
               } catch (e: SQLException) {
@@ -157,6 +160,15 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
                   throw e
                 }
               }
+            }
+          }
+        }
+
+        else {
+          for (projectID in meta.projects) {
+            AppDB.withTransaction(projectID) {
+              it.updateSyncControlSharesTimestamp(datasetID, shareTimestamp)
+              it.deleteDatasetVisibility(datasetID, recipientID)
             }
           }
         }
