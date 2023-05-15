@@ -126,6 +126,28 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       }
       .filterNotNull()
 
+  /**
+   * Execute Job 1
+   *
+   * Executes the installation on the target dataset on all target projects that
+   * are relevant to the dataset's type.
+   *
+   * This method filters out datasets that do not exist yet, have no sync
+   * control record, have no dataset record, or are not yet import completed.
+   *
+   * This method filters out installs for app dbs that are not relevant for the
+   * target dataset type.
+   *
+   * This method filters out installs for datasets that have no type handler
+   * configured.
+   *
+   * @param userID ID of the owning user for the target dataset.
+   *
+   * @param datasetID ID of the target dataset to install.
+   *
+   * @param dm `DatasetManager` instance that will be used to look up the
+   * dataset's files in S3.
+   */
   private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
     log.trace("executeJob(userID={}, datasetID={}, dm=...)", userID, datasetID)
 
@@ -201,6 +223,19 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       }
   }
 
+  /**
+   * Execute Job 2
+   *
+   * Executes the installation of the target dataset into a singular target
+   * project that is confirmed relevant to the dataset's type.
+   *
+   * This method filters out datasets that have no record in the App DB yet,
+   * that are marked as deleted, or that have a non-"ready-for-reinstall" status
+   * in the target App DB.
+   *
+   * This method calls out to the handler server and deals with the response
+   * status that it gets in reply.
+   */
   private fun executeJob(
     userID:    UserID,
     datasetID: DatasetID,
