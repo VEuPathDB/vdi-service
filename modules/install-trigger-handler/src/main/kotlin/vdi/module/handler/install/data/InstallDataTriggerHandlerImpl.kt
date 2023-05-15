@@ -242,14 +242,41 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
 
     when (response.type) {
-      InstallDataResponseType.Success             -> handleSuccessResponse(response as InstallDataSuccessResponse, datasetID, projectID)
-      InstallDataResponseType.BadRequest          -> handleBadRequestResponse(response as InstallDataBadRequestResponse, datasetID, projectID)
-      InstallDataResponseType.ValidationFailure   -> handleValidationFailureResponse(response as InstallDataValidationFailureResponse, datasetID, projectID)
-      InstallDataResponseType.MissingDependencies -> handleMissingDependenciesResponse(response as InstallDataMissingDependenciesResponse, datasetID, projectID)
-      InstallDataResponseType.UnexpectedError     -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, datasetID, projectID)
+      InstallDataResponseType.Success
+      -> handleSuccessResponse(response as InstallDataSuccessResponse, datasetID, projectID)
+
+      InstallDataResponseType.BadRequest
+      -> handleBadRequestResponse(response as InstallDataBadRequestResponse, datasetID, projectID)
+
+      InstallDataResponseType.ValidationFailure
+      -> handleValidationFailureResponse(response as InstallDataValidationFailureResponse, datasetID, projectID)
+
+      InstallDataResponseType.MissingDependencies
+      -> handleMissingDependenciesResponse(response as InstallDataMissingDependenciesResponse, datasetID, projectID)
+
+      InstallDataResponseType.UnexpectedError
+      -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, datasetID, projectID)
     }
   }
 
+  /**
+   * Executes the given function in the context of a temporary directory with a
+   * `tar.gz` containing the necessary files for a dataset installation passed
+   * to the function.
+   *
+   * On completion of this function call, the temporary directory and tar file
+   * will be deleted.
+   *
+   * @param s3Dir `DatasetDirectory` instance used to download the data files
+   * for the target dataset into the temp directory to be packaged into the tar
+   * file that will be passed to the given function.
+   *
+   * @param fn Function that will be called and passed the packaged tar file.
+   *
+   * @param T The return type for the value returned by the given function.
+   *
+   * @return The value returned by the given function.
+   */
   private fun <T> withDataTar(s3Dir: DatasetDirectory, fn: (Path) -> T): T {
     TempFiles.withTempDirectory { tempDir ->
       val tarFile      = tempDir.resolve("dataset.tar.gz")
@@ -344,6 +371,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
   }
 
+  /**
+   * Handles an unexpected error response from the handler service.
+   */
   private fun handleUnexpectedErrorResponse(res: InstallDataUnexpectedErrorResponse, datasetID: DatasetID, projectID: ProjectID) {
     log.error("dataset {} install into {} failed with a 500 from the handler server", datasetID, projectID)
 
@@ -361,6 +391,14 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     throw Exception(res.message)
   }
 
+  /**
+   * Updates the sync control status for the data installation date for both the
+   * target app db and the cache db.
+   *
+   * @param datasetID Target dataset ID
+   *
+   * @param projectID Target project ID
+   */
   private fun updateDataSyncControl(datasetID: DatasetID, projectID: ProjectID) {
     log.trace("updateDataSyncControl(datasetID={}, projectID={})", datasetID, projectID)
 
