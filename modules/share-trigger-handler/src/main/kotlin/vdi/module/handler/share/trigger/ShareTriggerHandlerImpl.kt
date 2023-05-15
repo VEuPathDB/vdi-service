@@ -59,7 +59,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
         while (!shutdownTrigger.isTriggered()) {
           kc.selectShareTriggers()
             .forEach { (userID, datasetID) ->
-              log.debug("submitting job to worker pool for user {}, dataset {}", userID, datasetID)
+              log.debug("submitting job to share worker pool for user {}, dataset {}", userID, datasetID)
               wp.submit { executeJob(userID, datasetID, dm) }
             }
         }
@@ -99,7 +99,6 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       .asSequence()
       .filter {
         if (it.key == config.shareTriggerMessageKey) {
-          log.debug("received message with key {}", it.key)
           true
         } else {
           log.warn("filtering out message with key {} as it does not match expected key {}", it.key, config.shareTriggerMessageKey)
@@ -117,7 +116,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       .filterNotNull()
 
   private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
-    log.trace("executeJob(userID={}, datasetID={}, dm=...", userID, datasetID)
+    log.trace("executeJob(userID={}, datasetID={}, dm=...)", userID, datasetID)
 
     log.debug("looking up dataset directory for user {}, dataset {}", userID, datasetID)
     val dir = dm.getDatasetDirectory(userID, datasetID)

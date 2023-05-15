@@ -46,6 +46,9 @@ pluginManagement {
 
 rootProject.name = "vdi"
 
+include(":components:handler-client")
+include(":components:plugin-mapping")
+
 include(":modules:event-router")
 include(":modules:hard-delete-trigger-handler")
 include(":modules:import-trigger-handler")
