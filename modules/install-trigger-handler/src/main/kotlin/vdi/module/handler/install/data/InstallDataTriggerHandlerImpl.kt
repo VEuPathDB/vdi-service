@@ -174,7 +174,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       return
     }
 
-    // Load the metadata so we can iterate through the target projects.
+    // Load the metadata so that we can iterate through the target projects.
     val meta = dir.getMeta().load()!!
 
     // Get a handler instance for the target dataset type.
