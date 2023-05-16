@@ -49,6 +49,7 @@ rootProject.name = "vdi"
 include(":components:handler-client")
 include(":components:plugin-mapping")
 include(":components:module-core")
+include(":components:rabbit")
 
 include(":modules:event-router")
 include(":modules:hard-delete-trigger-handler")

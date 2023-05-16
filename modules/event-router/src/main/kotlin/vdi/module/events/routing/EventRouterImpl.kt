@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.model.triggers.*
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.rabbit.RabbitMQEventIterator
 import org.veupathdb.vdi.lib.rabbit.RabbitMQEventSource
