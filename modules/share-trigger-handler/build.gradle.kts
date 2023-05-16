@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
   implementation(project(":components:plugin-mapping"))
+  implementation(project(":components:module-core"))
 
   implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
   implementation("org.veupathdb.vdi:vdi-component-app-db:1.1.0")

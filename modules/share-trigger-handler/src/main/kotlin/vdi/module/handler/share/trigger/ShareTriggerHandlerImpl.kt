@@ -1,11 +1,6 @@
 package vdi.module.handler.share.trigger
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
-import org.veupathdb.lib.s3.s34k.S3Api
-import org.veupathdb.lib.s3.s34k.S3Client
-import org.veupathdb.vdi.lib.common.OriginTimestamp
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -13,8 +8,6 @@ import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.json.JSON
-import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.DatasetShare
@@ -22,42 +15,24 @@ import java.sql.SQLException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import vdi.component.modules.VDIServiceModuleBase
 import vdi.module.handler.share.trigger.config.ShareTriggerHandlerConfig
 
-internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig) : ShareTriggerHandler {
+internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig)
+  : ShareTriggerHandler
+  , VDIServiceModuleBase("share-trigger-handler")
+{
   private val log = LoggerFactory.getLogger(javaClass)
 
-  @Volatile
-  private var started = false
-
-  private val shutdownTrigger = ShutdownSignal()
-  private val shutdownConfirm = ShutdownSignal()
-
-  override suspend fun start() {
-    if (!started) {
-      log.info("starting share-trigger-handler module")
-
-      started = true
-      run()
-    }
-  }
-
-  override suspend fun stop() {
-    log.info("triggering share-trigger-handler module shutdown")
-    shutdownTrigger.trigger()
-    shutdownConfirm.await()
-  }
-
-  private suspend fun run() {
-    val kc = requireKafkaConsumer()
-    val s3 = requireS3Bucket(requireS3Client())
-    val dm = DatasetManager(s3)
+  override suspend fun run() {
+    val kc = requireKafkaConsumer(config.shareTriggerTopic, config.kafkaConsumerConfig)
+    val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
     val wp = WorkerPool("share-workers", config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
       launch(Dispatchers.IO) {
-        while (!shutdownTrigger.isTriggered()) {
-          kc.selectShareTriggers()
+        while (!isShutDown()) {
+          kc.fetchMessages(config.shareTriggerMessageKey, ShareTrigger::class)
             .forEach { (userID, datasetID) ->
               log.debug("submitting job to share worker pool for user {}, dataset {}", userID, datasetID)
               wp.submit { executeJob(userID, datasetID, dm) }
@@ -70,50 +45,8 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       wp.start()
     }
 
-    shutdownConfirm.trigger()
+    confirmShutdown()
   }
-
-  private suspend inline fun <T> safeExec(err: String, fn: () -> T): T =
-    try {
-      fn()
-    } catch (e: Throwable) {
-      log.error(err, e)
-      stop()
-      throw e
-    }
-
-  private suspend fun requireKafkaConsumer() = safeExec("failed to create KafkaConsumer instance") {
-    KafkaConsumer(config.shareTriggerTopic, config.kafkaConsumerConfig)
-  }
-
-  private suspend fun requireS3Client() = safeExec("failed to create S3 client instance") {
-    S3Api.newClient(config.s3Config)
-  }
-
-  private suspend fun requireS3Bucket(s3: S3Client) = safeExec("failed to lookup target S3 bucket") {
-    s3.buckets[config.s3Bucket] ?: throw IllegalStateException("bucket ${config.s3Bucket} does not exist!")
-  }
-
-  private fun KafkaConsumer.selectShareTriggers() =
-    receive()
-      .asSequence()
-      .filter {
-        if (it.key == config.shareTriggerMessageKey) {
-          true
-        } else {
-          log.warn("filtering out message with key {} as it does not match expected key {}", it.key, config.shareTriggerMessageKey)
-          false
-        }
-      }
-      .map {
-        try {
-          JSON.readValue<ShareTrigger>(it.value)
-        } catch (e: Throwable) {
-          log.warn("received an invalid message body from Kafka: {}", it)
-          null
-        }
-      }
-      .filterNotNull()
 
   private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
     log.trace("executeJob(userID={}, datasetID={}, dm=...)", userID, datasetID)

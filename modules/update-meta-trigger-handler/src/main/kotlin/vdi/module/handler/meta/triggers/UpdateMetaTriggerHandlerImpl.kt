@@ -1,13 +1,7 @@
 package vdi.module.handler.meta.triggers
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
-import org.veupathdb.lib.s3.s34k.S3Api
-import org.veupathdb.lib.s3.s34k.S3Client
-import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
-import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.OriginTimestamp
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -27,8 +21,6 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
 import org.veupathdb.vdi.lib.handler.client.response.inm.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
-import org.veupathdb.vdi.lib.json.JSON
-import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.model.triggers.InstallTrigger
 import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
 import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
@@ -40,46 +32,26 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import vdi.component.modules.VDIServiceModuleBase
 import vdi.module.handler.meta.triggers.config.UpdateMetaTriggerHandlerConfig
 
-internal class UpdateMetaTriggerHandlerImpl(
-  private val config: UpdateMetaTriggerHandlerConfig
-) : UpdateMetaTriggerHandler {
-
+internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTriggerHandlerConfig)
+  : UpdateMetaTriggerHandler
+  , VDIServiceModuleBase("update-meta-trigger-handler")
+{
   private val log = LoggerFactory.getLogger(javaClass)
 
-  @Volatile
-  private var started = false
-
-  private val shutdownTrigger = ShutdownSignal()
-  private val shutdownConfirm = ShutdownSignal()
-
-  override suspend fun start() {
-    if (!started) {
-      log.info("starting update-meta-trigger-handler module")
-
-      started = true
-      run()
-    }
-  }
-
-  override suspend fun stop() {
-    log.info("triggering update-meta-trigger-handler shutdown")
-    shutdownTrigger.trigger()
-    shutdownConfirm.await()
-  }
-
-  private suspend fun run() {
-    val dm = DatasetManager(S3Api.requireClient().requireBucket(config.s3Bucket))
-    val kc = requireKafkaConsumer()
+  override suspend fun run() {
+    val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
+    val kc = requireKafkaConsumer(config.kafkaRouterConfig.updateMetaTriggerTopic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter()
     val wp = WorkerPool("update-meta-workers", config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking(Dispatchers.IO) {
       launch {
-        while (!shutdownTrigger.isTriggered()) {
+        while (!isShutDown()) {
           // Select meta trigger messages from Kafka
-          kc.selectMetaTriggers()
+          kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey, UpdateMetaTrigger::class)
             // and for each of the trigger messages received
             .forEach { (userID, datasetID) -> wp.submit { executeJob(dm, kr, userID, datasetID) } }
         }
@@ -90,7 +62,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       wp.start()
     }
 
-    shutdownConfirm.trigger()
+    confirmShutdown()
   }
 
   private fun executeJob(dm: DatasetManager, kr: KafkaRouter, userID: UserID, datasetID: DatasetID) {
@@ -257,55 +229,9 @@ internal class UpdateMetaTriggerHandlerImpl(
     throw IllegalStateException("impossible case hit, did we add a new response type to the handler client?")
   }
 
-
-  private suspend inline fun <T> safeExec(err: String, fn: () -> T): T =
-    try {
-      fn()
-    } catch (e: Throwable) {
-      shutdownTrigger.trigger()
-      shutdownConfirm.trigger()
-      log.error(err, e)
-      throw e
-    }
-
-  private suspend fun S3Api.requireClient() = safeExec("failed to create S3 client instance") {
-    newClient(config.s3Config)
-  }
-
-  private suspend fun S3Client.requireBucket(name: BucketName): S3Bucket {
-    val bucket = buckets[name]
-
-    if (bucket == null) {
-      shutdownTrigger.trigger()
-      shutdownConfirm.trigger()
-      log.error("s3 bucket {} does not appear to exist", config.s3Bucket)
-      throw IllegalStateException("s3 bucket ${config.s3Bucket} does not appear to exist")
-    }
-
-    return bucket
-  }
-
-  private suspend fun requireKafkaConsumer() = safeExec("failed to create KafkaConsumer instance") {
-    KafkaConsumer(config.kafkaRouterConfig.updateMetaTriggerTopic, config.kafkaConsumerConfig)
-  }
-
   private suspend fun requireKafkaRouter() = safeExec("failed to create KafkaRouter instance") {
     KafkaRouterFactory(config.kafkaRouterConfig).newKafkaRouter()
   }
-
-  private fun KafkaConsumer.selectMetaTriggers() =
-    receive()
-      .asSequence()
-      .filter { it.key == config.kafkaRouterConfig.updateMetaTriggerMessageKey }
-      .map {
-        try {
-          JSON.readValue<UpdateMetaTrigger>(it.value)
-        } catch (e: Throwable) {
-          log.warn("received an invalid message body from Kafka: {}", it)
-          null
-        }
-      }
-      .filterNotNull()
 
   private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
     if (!exists()) {

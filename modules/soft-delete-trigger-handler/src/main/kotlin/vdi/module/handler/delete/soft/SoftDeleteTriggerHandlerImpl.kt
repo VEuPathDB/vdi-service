@@ -1,10 +1,6 @@
 package vdi.module.handler.delete.soft
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
-import org.veupathdb.lib.s3.s34k.S3Api
-import org.veupathdb.lib.s3.s34k.S3Client
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -16,49 +12,29 @@ import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallBadRequestResp
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallResponseType
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallUnexpectedErrorResponse
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
-import org.veupathdb.vdi.lib.json.JSON
-import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.model.triggers.SoftDeleteTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import vdi.component.modules.VDIServiceModuleBase
 import vdi.module.handler.delete.soft.config.SoftDeleteTriggerHandlerConfig
 
-internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTriggerHandlerConfig) : SoftDeleteTriggerHandler {
-
+internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTriggerHandlerConfig)
+  : SoftDeleteTriggerHandler
+  , VDIServiceModuleBase("soft-delete-trigger-handler")
+{
   private val log = LoggerFactory.getLogger(javaClass)
 
-  @Volatile
-  private var started = false
-
-  private val shutdownTrigger = ShutdownSignal()
-  private val shutdownConfirm = ShutdownSignal()
-
-  override suspend fun start() {
-    if (!started) {
-      log.info("starting soft-delete-trigger-handler module")
-
-      started = true
-      run()
-    }
-  }
-
-  override suspend fun stop() {
-    log.info("triggering soft-delete-trigger-handler module shutdown")
-    shutdownTrigger.trigger()
-    shutdownConfirm.await()
-  }
-
-  private suspend fun run() {
-    val kc = requireKafkaConsumer()
-    val dm = DatasetManager(requireS3Bucket(requireS3Client()))
+  override suspend fun run() {
+    val kc = requireKafkaConsumer(config.softDeleteTriggerTopic, config.kafkaConsumerConfig)
+    val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
     val wp = WorkerPool("soft-delete-workers", config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
       launch(Dispatchers.IO) {
-        while (!shutdownTrigger.isTriggered()) {
-          kc.selectTriggers()
+        while (!isShutDown()) {
+          kc.fetchMessages(config.softDeleteTriggerMessageKey, SoftDeleteTrigger::class)
             .forEach { (userID, datasetID) -> runJob(userID, datasetID, dm) }
         }
 
@@ -67,6 +43,8 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
 
       wp.start()
     }
+
+    confirmShutdown()
   }
 
   private fun runJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
@@ -138,48 +116,4 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     log.error("dataset handler server reports 500 for uninstall on dataset {}, project {}", datasetID, projectID)
     throw IllegalStateException(res.message)
   }
-
-  private suspend inline fun <T> safeExec(err: String, fn: () -> T): T =
-    try {
-      fn()
-    } catch (e: Throwable) {
-      log.error(err, e)
-      stop()
-      throw e
-    }
-
-  private suspend fun requireKafkaConsumer() = safeExec("failed to create KafkaConsumer instance") {
-    KafkaConsumer(config.softDeleteTriggerTopic, config.kafkaConsumerConfig)
-  }
-
-  private suspend fun requireS3Client() = safeExec("failed to create S3 client instance") {
-    S3Api.newClient(config.s3Config)
-  }
-
-  private suspend fun requireS3Bucket(s3: S3Client) = safeExec("failed to lookup target S3 bucket") {
-    s3.buckets[config.s3Bucket] ?: throw IllegalStateException("bucket ${config.s3Bucket} does not exist!")
-  }
-
-  private fun KafkaConsumer.selectTriggers() =
-    receive()
-      .asSequence()
-      .filter {
-        if (it.key == config.softDeleteTriggerMessageKey) {
-          true
-        } else {
-          log.warn("filtering out message with key {} as ti does not match expected key {}", it.key, config.softDeleteTriggerMessageKey)
-          false
-        }
-      }
-      .map {
-        try {
-          JSON.readValue<SoftDeleteTrigger>(it.value)
-        } catch (e: Throwable) {
-          log.warn("received an invalid message body from Kafka: {}", it)
-          null
-        }
-      }
-      .filterNotNull()
-
 }
-

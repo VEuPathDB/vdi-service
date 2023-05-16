@@ -1,10 +1,6 @@
 package vdi.module.handler.install.data
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
-import org.veupathdb.lib.s3.s34k.S3Api
-import org.veupathdb.lib.s3.s34k.S3Client
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -19,13 +15,10 @@ import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
 import org.veupathdb.vdi.lib.handler.client.response.ind.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
-import org.veupathdb.vdi.lib.json.JSON
-import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.model.triggers.InstallTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
-import java.lang.IllegalStateException
 import java.nio.file.Path
 import java.time.OffsetDateTime
 import kotlin.io.path.inputStream
@@ -33,42 +26,24 @@ import kotlin.io.path.outputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import vdi.component.modules.VDIServiceModuleBase
 import vdi.module.handler.install.data.config.InstallTriggerHandlerConfig
 
-internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig) : InstallDataTriggerHandler {
-
+internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig)
+  : InstallDataTriggerHandler
+  , VDIServiceModuleBase("install-data-trigger-handler")
+{
   private val log = LoggerFactory.getLogger(javaClass)
 
-  @Volatile
-  private var started = false
-
-  private val shutdownTrigger = ShutdownSignal()
-  private val shutdownConfirm = ShutdownSignal()
-
-  override suspend fun start() {
-    if (!started) {
-      log.info("starting install-data-trigger-handler module")
-
-      started = true
-      run()
-    }
-  }
-
-  override suspend fun stop() {
-    log.info("triggering install-data-trigger-handler module shutdown")
-    shutdownTrigger.trigger()
-    shutdownConfirm.await()
-  }
-
-  private suspend fun run() {
-    val kc = requireKafkaConsumer()
-    val dm = DatasetManager(requireS3Bucket(requireS3Client()))
+  override suspend fun run() {
+    val kc = requireKafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
+    val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
     val wp = WorkerPool("install-data-workers", config.workerPoolSize.toInt(), config.jobQueueSize.toInt())
 
     runBlocking {
       launch(Dispatchers.IO) {
-        while (!shutdownTrigger.isTriggered()) {
-          kc.selectInstallTriggers()
+        while (!isShutDown()) {
+          kc.fetchMessages(config.installDataTriggerMessageKey, InstallTrigger::class)
             .forEach { (userID, datasetID) ->
               log.debug("submitting job to install-data worker pool for user {}, dataset {}", userID, datasetID)
               wp.submit { executeJob(userID, datasetID, dm) }
@@ -81,50 +56,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       wp.start()
     }
 
-    shutdownConfirm.trigger()
+    confirmShutdown()
   }
-
-  private suspend inline fun <T> safeExec(err: String, fn: () -> T): T =
-    try {
-      fn()
-    } catch(e: Throwable) {
-      log.error(err, e)
-      stop()
-      throw e
-    }
-
-  private suspend fun requireKafkaConsumer() = safeExec("failed to create KafkaConsumer instance") {
-    KafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
-  }
-
-  private suspend fun requireS3Client() = safeExec("failed to create S3 client instance") {
-    S3Api.newClient(config.s3Config)
-  }
-
-  private suspend fun requireS3Bucket(s3: S3Client) = safeExec("failed to lookup target S3 bucket") {
-    s3.buckets[config.s3Bucket] ?: throw IllegalStateException("bucket ${config.s3Bucket} does not exist!")
-  }
-
-  private fun KafkaConsumer.selectInstallTriggers() =
-    receive()
-      .asSequence()
-      .filter {
-        if (it.key == config.installDataTriggerMessageKey) {
-          true
-        } else {
-          log.warn("filtering out message with key {} as it does not match expected key {}", it.key, config.installDataTriggerMessageKey)
-          false
-        }
-      }
-      .map {
-        try {
-          JSON.readValue<InstallTrigger>(it.value)
-        } catch (e: Throwable) {
-          log.warn("received an invalid message body from Kafka: {}", it)
-          null
-        }
-      }
-      .filterNotNull()
 
   /**
    * Execute Job 1

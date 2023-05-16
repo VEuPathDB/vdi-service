@@ -1,6 +1,6 @@
 package vdi.module.handler.install.data
 
-import org.veupathdb.vdi.lib.common.VDIServiceModule
+import vdi.component.modules.VDIServiceModule
 
 /**
  * Install Data Trigger Handler

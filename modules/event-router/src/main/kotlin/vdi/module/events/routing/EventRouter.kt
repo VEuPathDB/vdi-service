@@ -1,6 +1,6 @@
 package vdi.module.events.routing
 
-import org.veupathdb.vdi.lib.common.VDIServiceModule
+import vdi.component.modules.VDIServiceModule
 
 /**
  * Represents an instance of the `event-router` VDI Service module.

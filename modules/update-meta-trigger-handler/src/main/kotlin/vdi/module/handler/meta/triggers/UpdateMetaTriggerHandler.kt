@@ -1,6 +1,6 @@
 package vdi.module.handler.meta.triggers
 
-import org.veupathdb.vdi.lib.common.VDIServiceModule
+import vdi.component.modules.VDIServiceModule
 
 /**
  * Update Meta Trigger Handling Module

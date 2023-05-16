@@ -1,6 +1,6 @@
 package vdi.module.handler.share.trigger
 
-import org.veupathdb.vdi.lib.common.VDIServiceModule
+import vdi.component.modules.VDIServiceModule
 
 /**
  * Share Trigger Handling Module

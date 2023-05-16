@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+  implementation(project(":components:module-core"))
+
   implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
   implementation("org.veupathdb.vdi:vdi-component-s3:1.2.0-SNAPSHOT") { isChanging = true }
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }

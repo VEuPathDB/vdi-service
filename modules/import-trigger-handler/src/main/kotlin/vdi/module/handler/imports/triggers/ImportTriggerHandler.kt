@@ -1,6 +1,6 @@
 package vdi.module.handler.imports.triggers
 
-import org.veupathdb.vdi.lib.common.VDIServiceModule
+import vdi.component.modules.VDIServiceModule
 
 /**
  * Import Trigger Handling Module

@@ -1,6 +1,6 @@
 package vdi.module.handler.delete.soft
 
-import org.veupathdb.vdi.lib.common.VDIServiceModule
+import vdi.component.modules.VDIServiceModule
 
 /**
  * Soft Delete Trigger Handling Module
