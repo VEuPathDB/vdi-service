@@ -38,7 +38,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
     val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
-    val wp = WorkerPool("install-data-workers", config.workerPoolSize.toInt(), config.jobQueueSize.toInt())
+    val wp = WorkerPool("install-data-workers", config.jobQueueSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
       launch(Dispatchers.IO) {

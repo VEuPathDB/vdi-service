@@ -61,10 +61,13 @@ dependencies {
 
 
   implementation(project(":modules:event-router"))
+  implementation(project(":modules:hard-delete-trigger-handler"))
   implementation(project(":modules:import-trigger-handler"))
-  implementation(project(":modules:update-meta-trigger-handler"))
-  implementation(project(":modules:share-trigger-handler"))
+  implementation(project(":modules:install-trigger-handler"))
   implementation(project(":modules:rest-service"))
+  implementation(project(":modules:share-trigger-handler"))
+  implementation(project(":modules:soft-delete-trigger-handler"))
+  implementation(project(":modules:update-meta-trigger-handler"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
