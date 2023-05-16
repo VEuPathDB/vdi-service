@@ -5,140 +5,59 @@
 * link:https://veupathdb.github.io/vdi-service/vdi-api.html[VDI Service API Doc]
 * link:https://veupathdb.github.io/vdi-service/design/1.0/design.html[VDI Service Design Doc]
 
-== Project Structure
+== Repo Structure
 
-=== Modules
+The VDI service repository is divided into 3 categories: components, modules,
+and the core bootstrapper.
 
-* Event Router
-* Import Handler
-* Installation Handler
-* REST Service
+The bootstrapper is the core of the service, and the root level Gradle project.
+This piece is responsible for starting up and shutting down the various project
+modules.
 
 === Components
 
-== Workflow
+Components are small shared libraries that contain code specific to a target
+purpose that is not the core focus of the VDI service.
 
-=== User Actions
+* link:https://github.com/VEuPathDB/vdi-component-app-db[App DB Client]
+* link:https://github.com/VEuPathDB/vdi-component-cache-db[Cache DB Client]
+* link:https://github.com/VEuPathDB/vdi-component-common[Commons]
+* link:https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
+* link:https://github.com/VEuPathDB/vdi-component-kafka[Kafka Client]
+* link:https://github.com/VEuPathDB/vdi-component-ldap[LDAP Utilities]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/plugin-mapping[Plugin Mapping]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/handler-client[Plugin Server Client]
+* link:https://github.com/VEuPathDB/vdi-component-rabbit[Rabbit Client]
+* link:https://github.com/VEuPathDB/vdi-component-reconciler[Reconciler]
+* link:https://github.com/VEuPathDB/vdi-component-s3[S3 Utilities]
 
-==== Create VD
+=== Modules
 
-image::docs/design/1.0/assets/3-vd-upload.svg[]
+Modules are, in effect, separate services that are bootstrapped into a single
+service by the bootstrapper.
 
-==== Delete VD
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/event-router[Event Router]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/hard-delete-trigger-handler[Hard Delete Event Handler]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/import-trigger-handler[Import Event Handler]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/install-trigger-handler[Install Data Event Handler]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/rest-service[Rest API Service]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/share-trigger-handler[Share Event Handler]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/soft-delete-trigger-handler[Soft Delete Event Handler]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/update-meta-trigger-handler[Update Meta Event Handler]
 
-image::docs/design/1.0/assets/3-user-action-delete.svg[]
+=== Bootstrapper
 
-==== Update VD Metadata
+The bootstrapper is the core of the service, and the root level Gradle project.
+This piece is responsible for starting up and shutting down the various project
+modules.
 
-image::docs/design/1.0/assets/3-vd-patch.svg[]
+== Development
 
-=== Internal Actions
+=== Running the Stack
 
-==== Event Routing
-
-image::docs/design/1.0/assets/3-event-routing.svg[]
-
-==== Import Trigger Handling
-
-image::docs/design/1.0/assets/3-import-handling.svg[]
-
-==== Import Result Handling
-
-image::docs/design/1.0/assets/3-import-result-handling.svg[]
-
-== Queues / Topics
-
-Bucket Events:: Events coming from MinIO for operations on objects in the VDI
-bucket.
-
-Import Triggers:: Events that each indicate a dataset has been uploaded and is
-ready to be imported.
-+
-[source, protobuf]
-----
-message ImportTrigger {
-  required string vdid = 1;
-}
-----
-
-Import Results:: Events containing the result of an import attempt.
-+
-[source, protobuf]
-----
-enum ImportStatus {
-  SUCCESS = 0;
-  FAILURE = 1;
-}
-
-message ImportResult {
-  required string vdid = 1;
-  required ImportStatus status = 2;
-}
-----
-
-Install Triggers:: Events that each indicate a dataset has been imported and is
-ready to be installed.
-+
-[source, protobuf]
-----
-message InstallTrigger {
-  required string vdid = 1;
-}
-----
-
-Install Results:: Events containing the result of a dataset install attempt.
-+
-[source, protobuf]
-----
-enum InstallStatus {
-  SUCCESS = 0;
-  FAILURE = 1;
-}
-
-message InstallResult {
-  required string vdid = 1;
-  required string projectId = 2;
-  required InstallStatus status = 3;
-}
-----
-
-Update Triggers:: Events that each indicate a dataset's metadata has been
-updated by the user and the update needs to be installed.
-+
-[source, protobuf]
-----
-message UpdateTrigger {
-  required string vdid = 1;
-}
-----
-
-Update Results:: Events containing the result of a dataset metadata install
-attempt.
-+
-[source, protobuf]
-----
-enum UpdateStatus {
-  SUCCESS = 0;
-  FAILURE = 1;
-}
-
-message UpdateResult {
-  required string vdid = 1;
-  required string projectId = 2;
-}
-----
-
-Soft Delete Triggers:: Events that each indicate a dataset has been soft deleted
-and the deletion needs to be persisted to the Application databases.
-+
-[source, protobuf]
-----
-message SoftDeleteTrigger {
-  required string vdid = 1;
-}
-----
-
-* Soft Delete Results
-
-* Hard Delete Triggers
-* Hard Delete Results
+. `make compose-build` +
+or `make cb`
+. `make compose-up` +
+or `make cu`
+. `make compose-down` +
+or `make cd`
