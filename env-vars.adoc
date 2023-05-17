@@ -15,6 +15,11 @@ used to configure the VDI service stack.
 |===
 | Req. | Name | Type | Description
 
+|
+| VDI_SERVICE_HTTP_PORT
+| uint16
+| Port exposed and used by the VDI REST API service.
+
 | :exclamation:
 | LDAP_SERVER
 | List<HostAddress>
@@ -24,6 +29,12 @@ used to configure the VDI service stack.
 | ORACLE_BASE_DN
 | String
 |
+
+| :exclamation:
+| AUTH_SECRET_KEY
+| String
+| Secret key value used to decode and validate WDK user tokens for user
+authentication.
 
 |===
 
@@ -765,13 +776,15 @@ instance.
 |
 | GLOBAL_RABBIT_VDI_EXCHANGE_AUTO_DELETE
 | boolean
-| Whether the exchange should be auto deleted when the connection from the VDI
-service is closed.
+| Whether the exchange should be auto deleted when the connections from MinIO
+and the VDI service are closed.
 
 |
 | GLOBAL_RABBIT_VDI_EXCHANGE_DURABLE
 | boolean
 | Whether the exchange should be durable (persisted to disk).
+
+This value must align with the exchange configuration as set by MinIO.
 
 |
 | GLOBAL_RABBIT_VDI_EXCHANGE_ARGUMENTS
@@ -780,6 +793,96 @@ service is closed.
 |===
 
 ===== Queue Config
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+| :exclamation:
+| GLOBAL_RABBIT_VDI_QUEUE_NAME
+| String
+| Name of the RabbitMQ queue to declare.
+
+This value must align with the queue name as configured in MinIO.
+
+|
+| GLOBAL_RABBIT_VDI_QUEUE_AUTO_DELETE
+| boolean
+| Whether the queue should be auto deleted when the connections from MinIO and
+the VDI service are closed.
+
+|
+| GLOBAL_RABBIT_VDI_QUEUE_EXCLUSIVE
+| boolean
+|
+
+|
+| GLOBAL_RABBIT_VDI_QUEUE_DURABLE
+| boolean
+| Whether the queue should be durable (persisted to disk).
+
+This value must align with the queue configuration as set by MinIO.
+
+|
+| GLOBAL_RABBIT_VDI_QUEUE_ARGUMENTS
+| Map<String, String>
+| Additional arguments to pass to the queue declaration.
+|===
+
+===== Routing
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+|
+| GLOBAL_RABBIT_VDI_ROUTING_KEY
+| String
+|
+
+|
+| GLOBAL_RABBIT_VDI_ROUTING_ARGUMENTS
+| Map<String, String>
+|
+|===
+
+==== S3 (MinIO)
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+| :exclamation:
+| S3_HOST
+| String
+| MinIO hostname.
+
+| :exclamation:
+| S3_PORT
+| uint16
+| MinIO connection port.
+
+| :exclamation:
+| S3_USE_HTTPS
+| boolean
+| Whether HTTPS should be used when connecting to the MinIO instance.
+
+| :exclamation:
+| S3_BUCKET_NAME
+| String
+| Name of the MinIO bucket that will be used by the VDI service.
+
+| :exclamation:
+| S3_ACCESS_TOKEN
+| String
+| MinIO username/access token to use when authenticating with the MinIO
+instance.
+
+| :exclamation:
+| S3_SECRET_KEY
+| String
+| MinIO password/secret key to use when authenticating with the MinIO instance.
+|===
 
 === Wildcard Environment Variables
 
@@ -889,51 +992,3 @@ DB_CONNECTION_POOL_SIZE_PLASMO
 | uint8
 | Connection pool size for the JDBC `DataSource`.
 |===
-
-== Kafka {
-
-[%header, cols="1,3m,3m,8"]
-|===
-| Req. | Name | Type | Description
-|===
-
-object Queue {
-`GLOBAL_RABBIT_VDI_QUEUE_ARGUMENTS`::
-`GLOBAL_RABBIT_VDI_QUEUE_AUTO_DELETE`::
-`GLOBAL_RABBIT_VDI_QUEUE_EXCLUSIVE`::
-`GLOBAL_RABBIT_VDI_QUEUE_DURABLE`::
-`GLOBAL_RABBIT_VDI_QUEUE_NAME`::
-}
-
-object Routing {
-`GLOBAL_RABBIT_VDI_ROUTING_KEY`::
-`GLOBAL_RABBIT_VDI_ROUTING_ARGUMENTS`::
-}
-}
-
-object S3 {
-
-Type: `String` +
-Required: yes
-`S3_ACCESS_TOKEN`::
-
-Type: `String` +
-Required: yes
-`S3_BUCKET_NAME`::
-
-Type: `String` +
-Required: yes
-`S3_HOST`::
-
-Type: UShort
-Required: yes
-`S3_PORT`::
-
-Type: `String` +
-Required: yes
-`S3_SECRET_KEY`::
-
-Type: Boolean
-Required: yes
-`S3_USE_HTTPS`::
-}
