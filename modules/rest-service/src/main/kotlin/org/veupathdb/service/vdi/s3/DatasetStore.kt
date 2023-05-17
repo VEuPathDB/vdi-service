@@ -52,4 +52,9 @@ object DatasetStore {
     log.debug("uploading share receipt for owner {}, dataset {}, recipient {}, action {}", userID, datasetID, recipientID, receipt.action)
     bucket.objects.put(S3Paths.datasetShareReceiptFile(userID, datasetID, recipientID), receipt.toJSONString().byteInputStream())
   }
+
+  fun putDeleteFlag(userID: UserID, datasetID: DatasetID) {
+    log.debug("uploading soft-delete flag for owner {}, dataset {}", userID, datasetID)
+    bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID))
+  }
 }
