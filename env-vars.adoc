@@ -1,11 +1,83 @@
 = VDI Stack Environment Configuration
 :toc:
 :toclevels: 4
+:source-highlighter: highlightjs
 
 == Environment Variables
 
 The following is an index of all the possible environment variables that may be
 used to configure the VDI service stack.
+
+=== Examples
+
+==== Minimal Example
+
+This example is the minimal configuration necessary to spin up the service.
+
+[IMPORTANT]
+--
+This configuration does not include the database configuration for any
+application databases or plugin handler service configurations.
+--
+
+[source, shell]
+----
+# Rest Service Configuration
+VDI_SERVICE_HTTP_PORT=80
+
+AUTH_SECRET_KEY=someSecretKey
+
+LDAP_SERVER=some.ldap.server:1234,other.ldap.server:2313
+ORACLE_BASE_DN=ou=applications,dc=apidb,dc=org
+
+ACCT_DB_TNS_NAME=some-tns-name
+ACCT_DB_USERNAME=someUser
+ACCT_DB_PASSWORD=somePassword
+ACCT_DB_POOL_SIZE=5
+
+USER_DB_TNS_NAME=some-tns-name
+USER_DB_USERNAME=someUser
+USER_DB_PASSWORD=somePassword
+USER_DB_POOL_SIZE=5
+
+# External RabbitMQ Connection
+GLOBAL_RABBIT_USERNAME=someUser
+GLOBAL_RABBIT_PASSWORD=somePassword
+GLOBAL_RABBIT_HOST=rabbit-external
+GLOBAL_RABBIT_VDI_EXCHANGE_NAME=vdi-bucket-notifications
+GLOBAL_RABBIT_VDI_QUEUE_NAME=vdi-bucket-notifications
+GLOBAL_RABBIT_VDI_ROUTING_KEY=vdi-bucket-notifications
+
+# Handler Configurations
+IMPORT_HANDLER_KAFKA_CONSUMER_CLIENT_ID=import-handler
+UPDATE_META_HANDLER_KAFKA_CONSUMER_CLIENT_ID=update-meta-handler
+INSTALL_DATA_HANDLER_KAFKA_CONSUMER_CLIENT_ID=install-data-handler
+SHARE_HANDLER_KAFKA_CONSUMER_CLIENT_ID=share-handler
+SOFT_DELETE_HANDLER_KAFKA_CONSUMER_CLIENT_ID=soft-delete-handler
+HARD_DELETE_HANDLER_KAFKA_CONSUMER_CLIENT_ID=hard-delete-handler
+
+# Internal Kafka Connection
+KAFKA_SERVERS=kafka:9092
+KAFKA_PRODUCER_CLIENT_ID=vdi-event-router
+KAFKA_CONSUMER_GROUP_ID=vdi-kafka-consumers
+KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+
+# External MinIO Connection
+S3_HOST=minio-external
+S3_PORT=9000
+S3_USE_HTTPS=false
+S3_ACCESS_TOKEN=someToken
+S3_SECRET_KEY=someSecretKey
+S3_BUCKET=some-other-bucket
+
+# Internal Cache DB Connection
+CACHE_DB_USERNAME=someUser
+CACHE_DB_PASSWORD=somePassword
+CACHE_DB_NAME=vdi
+CACHE_DB_HOST=cache-db
+CACHE_DB_PORT=5432
+CACHE_DB_POOL_SIZE=5
+----
 
 === Modules
 
@@ -36,6 +108,45 @@ used to configure the VDI service stack.
 | Secret key value used to decode and validate WDK user tokens for user
 authentication.
 
+| :exclamation:
+| ACCT_DB_TNS_NAME
+| String
+| Oracle TNS name of the account database.
+
+| :exclamation:
+| ACCT_DB_USERNAME
+| String
+|
+
+| :exclamation:
+| ACCT_DB_PASSWORD
+| String
+|
+
+|
+| ACCT_DB_POOL_SIZE
+| uint8
+|
+
+| :exclamation:
+| USER_DB_TNS_NAME
+| String
+|
+
+| :exclamation:
+| USER_DB_USERNAME
+| String
+|
+
+| :exclamation:
+| USER_DB_PASSWORD
+| String
+|
+
+|
+| USER_DB_POOL_SIZE
+| uint8
+|
 |===
 
 ==== Hard Delete Trigger Handler
@@ -992,3 +1103,77 @@ DB_CONNECTION_POOL_SIZE_PLASMO
 | uint8
 | Connection pool size for the JDBC `DataSource`.
 |===
+
+=== Environment Variable Types
+
+`Duration`::
+Durations are a string representation of a time interval.  Durations are
+represented as one or more numeric values followed by a shorthand notation of
+the time unit.
++
+Time Unit Notations:
++
+[cols=3]
+|===
+| ns
+| Nanoseconds
+| 5ns
+
+| us
+| Microseconds
+| 5us
+
+| ms
+| Milliseconds
+| 5ms
+
+| s
+| Seconds
+| 5s
+
+| m
+| Minutes
+| 5m
+
+| h
+| Hours
+| 5h
+
+| d
+| Days
+| 5d
+|===
++
+Durations may also be a combination of multiple values such as `1d 12h`,
+`1h 0m 30.340s`
++
+[IMPORTANT]
+--
+Only the last segment of a duration may have a fractional part.
+--
+
+`HostAddress`::
+A `HostAddress` is a hostname port pair in the form `{host}:{port}`, for example
+`google.com:443`.
+
+`List<T>`::
+A list is a comma separated set of values that may be of any type that does not
+itself contain a comma, for example, a list may be of Durations or
+HostAddresses.
++
+Example:
+[source,shell]
+----
+SOME_VARIABLE=item1,item2,item3
+----
+
+`Map<K, V>`::
+A map is a list of key/value pairs with the keys separated from values by a
+colon and the pairs separated by commas.  Keys may only be simple types, and
+values may be of any type that does not contain a comma.
++
+Example:
+[source, shell]
+----
+SOME_VARIABLE=key1:value,key2:value,key3:value
+----
