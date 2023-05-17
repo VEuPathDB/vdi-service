@@ -54,6 +54,7 @@ include(":components:ldap")
 include(":components:plugin-mapping")
 include(":components:module-core")
 include(":components:rabbit")
+include(":components:s3")
 
 include(":modules:event-router")
 include(":modules:hard-delete-trigger-handler")

@@ -29,7 +29,7 @@ purpose that is not the core focus of the VDI service.
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/handler-client[Plugin Server Client]
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/rabbit[Rabbit Client]
 * link:https://github.com/VEuPathDB/vdi-component-reconciler[Reconciler]
-* link:https://github.com/VEuPathDB/vdi-component-s3[S3 Utilities]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/s3[S3 Utilities]
 
 === Modules
 

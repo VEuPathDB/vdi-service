@@ -49,10 +49,10 @@ dependencies {
   implementation(project(":components:app-db"))
   implementation(project(":components:cache-db"))
   implementation(project(":components:plugin-mapping"))
+  implementation(project(":components:s3"))
 
   implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
-  implementation("org.veupathdb.vdi:vdi-component-s3:1.2.0-SNAPSHOT") { isChanging = true }
 
   implementation("org.gusdb:fgputil-db:2.12.9")
   api("org.veupathdb.lib:jaxrs-container-core:6.14.5")

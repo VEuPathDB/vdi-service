@@ -1,0 +1,18 @@
+package org.veupathdb.vdi.lib.s3.datasets.paths
+
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
+
+sealed interface VDUploadPath : VDPath {
+  val subPath: String
+}
+
+data class VDUploadPathImpl(
+  override val bucketName: String,
+  override val rootSegment: String,
+  override val userID: UserID,
+  override val datasetID: DatasetID,
+  override val subPath: String
+) : VDUploadPath {
+  override fun toString() = "$bucketName/$rootSegment/$userID/$datasetID/${S3Paths.UPLOAD_DIR_NAME}/$subPath"
+}

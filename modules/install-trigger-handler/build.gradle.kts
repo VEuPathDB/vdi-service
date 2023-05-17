@@ -9,9 +9,9 @@ dependencies {
   implementation(project(":components:kafka"))
   implementation(project(":components:module-core"))
   implementation(project(":components:plugin-mapping"))
+  implementation(project(":components:s3"))
 
   implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
-  implementation("org.veupathdb.vdi:vdi-component-s3:1.2.0-SNAPSHOT") { isChanging = true }
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
