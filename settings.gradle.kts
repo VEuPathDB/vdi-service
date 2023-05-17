@@ -46,6 +46,7 @@ pluginManagement {
 
 rootProject.name = "vdi"
 
+include(":components:app-db")
 include(":components:cache-db")
 include(":components:handler-client")
 include(":components:plugin-mapping")

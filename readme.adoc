@@ -19,7 +19,7 @@ modules.
 Components are small shared libraries that contain code specific to a target
 purpose that is not the core focus of the VDI service.
 
-* link:https://github.com/VEuPathDB/vdi-component-app-db[App DB Client]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/app-db[App DB Client]
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/cache-db[Cache DB Client]
 * link:https://github.com/VEuPathDB/vdi-component-common[Commons]
 * link:https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
