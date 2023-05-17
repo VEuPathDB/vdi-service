@@ -11,6 +11,16 @@ import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
 import kotlin.reflect.KClass
 
+/**
+ * VDI Service Module Abstract Base
+ *
+ * Provides common functionality used by most implementations of the
+ * [VDIServiceModule] interface.
+ *
+ * @since 1.0.0
+ *
+ * @author Elizabeth Paige Harper - https://github.com/foxcapades
+ */
 abstract class VDIServiceModuleBase(
   protected val moduleName: String,
 ) : VDIServiceModule {
@@ -38,12 +48,24 @@ abstract class VDIServiceModuleBase(
     shutdownConfirm.await()
   }
 
+  /**
+   * Indicates whether a module shutdown has been requested.
+   */
   protected suspend fun isShutDown(): Boolean = shutdownTrigger.isTriggered()
 
+  /**
+   * Request the module shut down.
+   */
   protected suspend fun triggerShutdown() = shutdownTrigger.trigger()
 
+  /**
+   * Confirm that the module is now shut down.
+   */
   protected suspend fun confirmShutdown() = shutdownConfirm.trigger()
 
+  /**
+   * Executes the module's core loop.
+   */
   protected abstract suspend fun run()
 
   /**
