@@ -3,8 +3,9 @@ plugins {
 }
 
 dependencies {
+  implementation(project(":components:ldap"))
+
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
-  implementation("org.veupathdb.vdi:vdi-component-ldap:1.0.0")
 
   implementation("com.zaxxer:HikariCP:5.0.1")
   implementation("com.oracle.database.jdbc:ojdbc8:21.9.0.0")
