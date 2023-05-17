@@ -14,6 +14,7 @@ WORKDIR /workspace
 COPY settings.gradle.kts settings.gradle.kts
 COPY build.gradle.kts build.gradle.kts
 COPY modules modules
+COPY components components
 COPY src src
 
 RUN gradle --no-daemon test shadowJar
