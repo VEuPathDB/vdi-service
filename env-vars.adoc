@@ -1,6 +1,6 @@
 = VDI Stack Environment Configuration
 :toc:
-:toclevels: 3
+:toclevels: 4
 
 == Environment Variables
 
@@ -343,7 +343,443 @@ Kafka consumer client tuning and configuration.
   that this value does not impact the underlying fetching behavior.  The
   consumer will cache the records from each fetch request and returns them
   incrementally from each poll.
+
+|
+| KAFKA_CONSUMER_POLL_DURATION
+| Duration
+| The amount of time to block waiting for input.
+
+|
+| KAFKA_CONSUMER_RECEIVE_BUFFER_SIZE_BYTES
+| uint32
+| The size of the TCP receive buffer (`SO_RCVBUF`) to use when reading data.  If
+  the value is `-1`, the OS default will be used.
+
+|
+| KAFKA_CONSUMER_RECONNECT_BACKOFF_MAX_TIME
+| Duration
+| The maximum amount of time in milliseconds to wait when reconnecting to a
+  broker that has repeatedly failed to connect.  If provided, the backoff per
+  host will increase exponentially for each consecutive connection failure, up
+  to this maximum.  After calculating the backoff increase, 20% random jitter is
+  added to avoid connection storms.
+
+|
+| KAFKA_CONSUMER_RECONNECT_BACKOFF_TIME
+| Duration
+| The base amount of time to wait before attempting to reconnect to a given
+  host. This avoids repeatedly connecting to a host in a tight loop.  This
+  backoff applies to all connection attempts by the client to a broker.
+
+|
+| KAFKA_CONSUMER_REQUEST_TIMEOUT
+| Duration
+| The configuration controls the maximum amount of time the client will wait for
+  the response of a request.  If the response is not received before the timeout
+  elapses the client will resend the request if necessary or fail the request if
+  retries are exhausted.
+
+|
+| KAFKA_CONSUMER_RETRY_BACKOFF_TIME
+| Duration
+| The amount of time to wait before attempting to retry a failed request to a
+  given topic partition.  This avoids repeatedly sending requests in a tight
+  loop under some failure scenarios.
+
+|
+| KAFKA_CONSUMER_SEND_BUFFER_SIZE_BYTES
+| uint32
+| The size of the TCP send buffer (`SO_SNDBUF`) to use when sending data.  If
+  the value is `-1`, the OS default will be used.
+
+|
+| KAFKA_CONSUMER_SESSION_TIMEOUT
+| Duration
+| The timeout used to detect worker failures.  The worker sends periodic
+  heartbeats to indicate its liveness to the broker.  If no heartbeats are
+  received by the broker before the expiration of this session timeout, then the
+  broker will remove the worker from the group and initiate a rebalance.  Note
+  that the value must be in the allowable range as configured in the broker
+  configuration by `group.min.session.timeout.ms` and
+  `group.max.session.timeout.ms`.
 |===
+
+===== Producer Client
+
+Kafka message producer client tuning and configuration.
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+|
+| KAFKA_PRODUCER_BATCH_SIZE
+| uint32
+| The producer will attempt to batch records together into fewer requests
+whenever multiple records are being sent to the same partition.  This helps
+performance on both the client and the server.  This configuration controls the
+default batch size in bytes.
+
+No attempt will be made to batch records larger than this size.
+
+Requests sent to brokers will contain multiple batches, one for each partition
+with data available to be sent.
+
+A small batch size will make batching less common and may reduce throughput (a
+batch size of zero will disable batching entirely).  A very large batch size may
+use memory a bit more wastefully as we will always allocate a buffer of the
+specified batch size in anticipation of additional records.
+
+Note: This setting gives the upper bound of the batch size to be sent.  If we
+have fewer than this many bytes accumulated for this partition, we will 'linger'
+for the `KAFKA_PRODUCER_LINGER_TIME` time waiting for more records to show up.
+This `KAFKA_PRODUCER_LINGER_TIME` setting defaults to `0`, which means we'll
+immediately send out a record even the accumulated batch size is under this
+`KAFKA_PRODUCER_BATCH_SIZE` setting.
+
+|
+| KAFKA_PRODUCER_BUFFER_MEMORY_BYTES
+| uint32
+| The total bytes of memory the producer can use to buffer records waiting to be
+sent to the server. If records are sent faster than they can be delivered to the
+server the producer will block for `KAFKA_PRODUCER_MAX_BLOCKING_TIMEOUT` after
+which it will throw an exception.
+
+This setting should correspond roughly to the total memory the producer will
+use, but is not a hard bound since not all memory the producer uses is used for
+buffering. Some additional memory will be used for compression (if compression
+is enabled) as well as for maintaining in-flight requests.
+
+| :exclamation:
+| KAFKA_PRODUCER_CLIENT_ID
+| String
+| An id string to pass to the server when making requests. The purpose of this
+  is to be able to track the source of requests beyond just ip/port by allowing
+  a logical application name to be included in server-side request logging.
+
+|
+| KAFKA_PRODUCER_COMPRESSION_TYPE
+| none +
+gzip +
+snappy +
+lz4 +
+zstd
+| The compression type for all data generated by the producer. The default is
+none (i.e. no compression). Valid values are `none`, `gzip`, `snappy`, `lz4`, or
+`zstd`. Compression is of full batches of data, so the efficacy of batching will
+also impact the compression ratio (more batching means better compression).
+
+|
+| KAFKA_PRODUCER_CONNECTIONS_MAX_IDLE
+| Duration
+| Close idle connections after the number of milliseconds specified by this
+config.
+
+|
+| KAFKA_PRODUCER_DELIVERY_TIMEOUT
+| Duration
+| An upper bound on the time to report success or failure after a call to
+`send()` returns. This limits the total time that a record will be delayed prior
+to sending, the time to await acknowledgement from the broker (if expected), and
+the time allowed for retriable send failures. The producer may report failure to
+send a record earlier than this config if either an unrecoverable error is
+encountered, the retries have been exhausted, or the record is added to a batch
+which reached an earlier delivery expiration deadline. The value of this config
+should be greater than or equal to the sum of `KAFKA_PRODUCER_REQUEST_TIMEOUT`
+and `KAFKA_PRODUCER_LINGER_TIME`.
+
+|
+| KAFKA_PRODUCER_LINGER_TIME
+| Duration
+| The producer groups together any records that arrive in between request
+transmissions into a single batched request. Normally this occurs only under
+load when records arrive faster than they can be sent out. However, in some
+circumstances the client may want to reduce the number of requests even under
+moderate load. This setting accomplishes this by adding a small amount of
+artificial delay—that is, rather than immediately sending out a record, the
+producer will wait for up to the given delay to allow other records to be sent
+so that the sends can be batched together. This can be thought of as analogous
+to Nagle's algorithm in TCP. This setting gives the upper bound on the delay for
+batching: once we get `KAFKA_PRODUCER_BATCH_SIZE` worth of records for a
+partition it will be sent immediately regardless of this setting, however if we
+have fewer than this many bytes accumulated for this partition we will 'linger'
+for the specified time waiting for more records to show up. This setting
+defaults to `0` (i.e. no delay). Setting `KAFKA_PRODUCER_LINGER_TIME=5`, for
+example, would have the effect of reducing the number of requests sent but would
+add up to `5ms` of latency to records sent in the absence of load.
+
+|
+| KAFKA_PRODUCER_MAX_BLOCKING_TIMEOUT
+| Duration
+| The configuration controls how long the ``KafkaProducer``'s `send()`,
+`partitionsFor()`, `initTransactions()`, `sendOffsetsToTransaction()`,
+`commitTransaction()` and `abortTransaction()` methods will block. For `send()`
+this timeout bounds the total time waiting for both metadata fetch and buffer
+allocation (blocking in the user-supplied serializers or partitioner is not
+counted against this timeout). For `partitionsFor()` this timeout bounds the
+time spent waiting for metadata if it is unavailable. The transaction-related
+methods always block, but may time out if the transaction coordinator could not
+be discovered or did not respond within the timeout.
+
+|
+| KAFKA_PRODUCER_MAX_REQUEST_SIZE_BYTES
+| uint32
+| The maximum size of a request in bytes. This setting will limit the number of
+record batches the producer will send in a single request to avoid sending huge
+requests. This is also effectively a cap on the maximum uncompressed record
+batch size. Note that the server has its own cap on the record batch size (after
+compression if compression is enabled) which may be different from this.
+
+|
+| KAFKA_PRODUCER_RECEIVE_BUFFER_SIZE_BYTES
+| uint32
+| The size of the TCP receive buffer (`SO_RCVBUF`) to use when reading data. If
+the value is `-1`, the OS default will be used.
+
+|
+| KAFKA_PRODUCER_RECONNECT_BACKOFF_MAX_TIME
+| Duration
+| The maximum amount of time in milliseconds to wait when reconnecting to a
+broker that has repeatedly failed to connect. If provided, the backoff per host
+will increase exponentially for each consecutive connection failure, up to thisz
+maximum. After calculating the backoff increase, 20% random jitter is added to
+avoid connection storms.
+
+|
+| KAFKA_PRODUCER_RECONNECT_BACKOFF_TIME
+| Duration
+| The base amount of time to wait before attempting to reconnect to a given
+host. This avoids repeatedly connecting to a host in a tight loop. This backoff
+applies to all connection attempts by the client to a broker.
+
+|
+| KAFKA_PRODUCER_REQUEST_TIMEOUT
+| Duration
+| The configuration controls the maximum amount of time the client will wait for
+the response of a request. If the response is not received before the timeout
+elapses the client will resend the request if necessary or fail the request if
+retries are exhausted. This should be larger than `replica.lag.time.max.ms` (a
+broker configuration) to reduce the possibility of message duplication due to
+unnecessary producer retries.
+
+|
+| KAFKA_PRODUCER_RETRY_BACKOFF_TIME
+| Duration
+| The amount of time to wait before attempting to retry a failed request to a
+given topic partition. This avoids repeatedly sending requests in a tight loop
+under some failure scenarios.
+
+|
+| KAFKA_PRODUCER_SEND_BUFFER_SIZE_BYTES
+| uint32
+| The size of the TCP send buffer (`SO_SNDBUF`) to use when sending data. If the
+value is `-1`, the OS default will be used.
+
+|
+| KAFKA_PRODUCER_SEND_RETRIES
+| uint32
+| Setting a value greater than zero will cause the client to resend any record
+whose send fails with a potentially transient error. Note that this retry is no
+different than if the client resent the record upon receiving the error. Produce
+requests will be failed before the number of retries has been exhausted if the
+timeout configured by delivery.timeout.ms expires first before successful
+acknowledgement. Users should generally prefer to leave this config unset and
+instead use `KAFKA_PRODUCER_DELIVERY_TIMEOUT` to control retry behavior.
+
+Enabling idempotence requires this config value to be greater than `0`. If
+conflicting configurations are set and idempotence is not explicitly enabled,
+idempotence is disabled.
+|===
+
+===== Trigger Topics
+
+Names of the topics that various trigger events will be published to.
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+|
+| KAFKA_TOPIC_HARD_DELETE_TRIGGERS
+| String
+| Name of the hard-delete trigger topic that messages will be routed to for
+object hard-delete events from MinIO.
+
+A hard-delete event is the removal of a VDI dataset object in MinIO.  Presently
+these events do not trigger any behavior in the VDI service.
+
+|
+| KAFKA_TOPIC_IMPORT_TRIGGERS
+| String
+| Name of the import trigger topic that messages will be routed to for import
+events from MinIO.
+
+An import event is the creation or overwriting of a user upload object in MinIO.
+These events will trigger a call to the plugin handler server to process the
+user upload to prepare it for installation.
+
+|
+| KAFKA_TOPIC_INSTALL_TRIGGERS
+| String
+| Name of the install-data trigger topic that messages will be routed to for
+data installation triggers from MinIO.
+
+An install-data event is the creation or overwriting of a VDI dataset data
+object in MinIO.  These events will trigger a call to the plugin handler server
+to install the data that has just landed in MinIO.
+
+|
+| KAFKA_TOPIC_SHARE_TRIGGERS
+| String
+| Name of the share trigger topic that messages will be routed to for share
+events from MinIO.
+
+A share event is the creation or overwriting of a "share" object in MinIO. These
+events will trigger an update to the share/visibility configuration for the
+target dataset.
+
+|
+| KAFKA_TOPIC_SOFT_DELETE_TRIGGERS
+| String
+| Name of the soft-delete trigger topic that messages will be routed to for
+soft-delete events from MinIO.
+
+A soft-delete event is the creation or overwriting of a soft-delete flag object
+in MinIO.  These events will trigger a call to the plugin handler server to
+uninstall the data from the target application databases.
+
+|
+| KAFKA_TOPIC_UPDATE_META_TRIGGERS
+| String
+| Name of the update-meta trigger topic that messages will be routed to for
+metadata update events from MinIO.
+
+An update-meta event is the creation or overwriting of the dataset metadata
+object in MinIO.  These events will trigger a call to the plugin handler server
+to install or update the metadata for the dataset in the target application
+databases.
+|===
+
+===== Message Keys
+
+Names of the message key values that events will be keyed on when published to
+the various Kafka topics.  Event messages that are not keyed on the appropriate
+value will be ignored by the VDI service.
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+|
+| KAFKA_MESSAGE_KEY_HARD_DELETE_TRIGGERS
+| String
+| Message key for hard-delete trigger events.
+
+|
+| KAFKA_MESSAGE_KEY_IMPORT_TRIGGERS
+| String
+| Message key for import trigger events.
+
+|
+| KAFKA_MESSAGE_KEY_INSTALL_TRIGGERS
+| String
+| Message key for install-data trigger events.
+
+|
+| KAFKA_MESSAGE_KEY_SHARE_TRIGGERS
+| String
+| Message key for share trigger events.
+
+|
+| KAFKA_MESSAGE_KEY_SOFT_DELETE_TRIGGERS
+| String
+| Message key for soft-delete trigger events.
+
+|
+| KAFKA_MESSAGE_KEY_UPDATE_META_TRIGGERS
+| String
+| Message key for update-meta trigger events.
+|===
+
+==== Rabbit
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+|
+| GLOBAL_RABBIT_CONNECTION_NAME
+| String
+| Optional name of the connection to the RabbitMQ service.  This value will show
+in the RabbitMQ logs and in the management console to identify the VDI service's
+connection.
+
+| :exclamation:
+| GLOBAL_RABBIT_HOST
+| String
+| Hostname of the global RabbitMQ instance that the VDI service will connect to.
+
+|
+| GLOBAL_RABBIT_PORT
+| uint16
+| Port to use when connecting to the global RabbitMQ instance.
+
+| :exclamation:
+| GLOBAL_RABBIT_USERNAME
+| String
+| Credentials username used to authenticate with the global RabbitMQ instance.
+
+| :exclamation:
+| GLOBAL_RABBIT_PASSWORD
+| String
+| Credentials password used to authenticate with the global RabbitMQ instance.
+
+|
+| GLOBAL_RABBIT_VDI_POLLING_INTERVAL
+| Duration
+| Frequency that the global RabbitMQ instance will be polled for new messages
+from MinIO.
+|===
+
+===== Exchange Config
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+| :exclamation:
+| GLOBAL_RABBIT_VDI_EXCHANGE_NAME
+| String
+| Name of the target RabbitMQ exchange that will be declared by both the MinIO
+instance and the VDI service.
+
+|
+| GLOBAL_RABBIT_VDI_EXCHANGE_TYPE
+| direct +
+fanout +
+topic +
+match
+| Exchange type as declared bt the MinIO connection to the global RabbitMQ
+instance.
+
+|
+| GLOBAL_RABBIT_VDI_EXCHANGE_AUTO_DELETE
+| boolean
+| Whether the exchange should be auto deleted when the connection from the VDI
+service is closed.
+
+|
+| GLOBAL_RABBIT_VDI_EXCHANGE_DURABLE
+| boolean
+| Whether the exchange should be durable (persisted to disk).
+
+|
+| GLOBAL_RABBIT_VDI_EXCHANGE_ARGUMENTS
+| Map<String, String>
+| Additional arguments to pass to the exchange declaration.
+|===
+
+===== Queue Config
 
 === Wildcard Environment Variables
 
@@ -378,7 +814,7 @@ PLUGIN_HANDLER_RNASEQ_ADDRESS
 | :exclamation:
 | PLUGIN_HANDLER_<NAME>_NAME
 | String
-| Name of the plugin handler.  This will generally be the type name of the
+| Name of the plugin handler.  This will typically be the type name of the
   dataset type that the plugin handles.
 
 | :exclamation:
@@ -456,175 +892,10 @@ DB_CONNECTION_POOL_SIZE_PLASMO
 
 == Kafka {
 
-Type: Duration
-Required: no
-`KAFKA_CONSUMER_POLL_DURATION`::
-
-Type: `UInt`
-Required: no
-`KAFKA_CONSUMER_RECEIVE_BUFFER_SIZE_BYTES`::
-
-Type: Duration
-Required: no
-`KAFKA_CONSUMER_RECONNECT_BACKOFF_MAX_TIME`::
-
-Type: Duration
-Required: no
-`KAFKA_CONSUMER_RECONNECT_BACKOFF_TIME`::
-
-Type: Duration
-Required: no
-`KAFKA_CONSUMER_REQUEST_TIMEOUT`::
-
-Type: Duration
-Required: no
-`KAFKA_CONSUMER_RETRY_BACKOFF_TIME`::
-
-Type: `UInt`
-Required: no
-`KAFKA_CONSUMER_SEND_BUFFER_SIZE_BYTES`::
-
-Type: Duration
-Required: no
-`KAFKA_CONSUMER_SESSION_TIMEOUT`::
-}
-
-object Producer {
-
-Type: `UInt`
-Required: no
-`KAFKA_PRODUCER_BATCH_SIZE`::
-
-Type: `UInt`
-Required: no
-`KAFKA_PRODUCER_BUFFER_MEMORY_BYTES`::
-
-Type: `String` +
-Required: yes
-`KAFKA_PRODUCER_CLIENT_ID`::
-
-Type: Enum("none"|"gzip"|"snappy"|"lz4"|"zstd")
-Required: no
-`KAFKA_PRODUCER_COMPRESSION_TYPE`::
-
-Type: Duration
-Required: no
-`KAFKA_PRODUCER_CONNECTIONS_MAX_IDLE`::
-
-Type: Duration
-Required: no
-`KAFKA_PRODUCER_DELIVERY_TIMEOUT`::
-
-Type: Duration
-Required: no
-`KAFKA_PRODUCER_LINGER_TIME`::
-
-Type: Duration
-Required: no
-`KAFKA_PRODUCER_MAX_BLOCKING_TIMEOUT`::
-
-Type: `UInt`
-Required: no
-`KAFKA_PRODUCER_MAX_REQUEST_SIZE_BYTES`::
-
-Type: Uint
-Required: no
-`KAFKA_PRODUCER_RECEIVE_BUFFER_SIZE_BYTES`::
-
-Type: Duration
-Required: no
-`KAFKA_PRODUCER_RECONNECT_BACKOFF_MAX_TIME`::
-
-Type: Duration
-Required: no
-`KAFKA_PRODUCER_RECONNECT_BACKOFF_TIME`::
-
-Type: Duration
-Required: no
-`KAFKA_PRODUCER_REQUEST_TIMEOUT`::
-
-Type: Duration
-Required: no
-`KAFKA_PRODUCER_RETRY_BACKOFF_TIME`::
-
-Type: `UInt`
-Required: no
-`KAFKA_PRODUCER_SEND_BUFFER_SIZE_BYTES`::
-
-Type: `UInt`
-Required: no
-`KAFKA_PRODUCER_SEND_RETRIES`::
-}
-
-object Topic {
-
-Type: `String` +
-Required: no
-`KAFKA_TOPIC_HARD_DELETE_TRIGGERS`::
-
-Type: `String` +
-Required: no
-`KAFKA_TOPIC_IMPORT_TRIGGERS`::
-
-Type: `String` +
-Required: no
-`KAFKA_TOPIC_INSTALL_TRIGGERS`::
-
-Type: `String` +
-Required: no
-`KAFKA_TOPIC_SHARE_TRIGGERS`::
-
-Type: `String` +
-Required: no
-`KAFKA_TOPIC_SOFT_DELETE_TRIGGERS`::
-
-Type: `String` +
-Required: no
-`KAFKA_TOPIC_UPDATE_META_TRIGGERS`::
-}
-
-object MessageKey {
-Type: `String` +
-Required: no
-`KAFKA_MESSAGE_KEY_HARD_DELETE_TRIGGERS`::
-
-Type: `String` +
-Required: no
-`KAFKA_MESSAGE_KEY_IMPORT_TRIGGERS`::
-
-Type: `String` +
-Required: no
-`KAFKA_MESSAGE_KEY_INSTALL_TRIGGERS`::
-
-Type: `String` +
-Required: no
-`KAFKA_MESSAGE_KEY_SHARE_TRIGGERS`::
-
-Type: `String` +
-Required: no
-`KAFKA_MESSAGE_KEY_SOFT_DELETE_TRIGGERS`::
-
-Type: `String` +
-Required: no
-`KAFKA_MESSAGE_KEY_UPDATE_META_TRIGGERS`::
-}
-}
-
-object Rabbit {
-`GLOBAL_RABBIT_CONNECTION_NAME`::
-`GLOBAL_RABBIT_HOST`::
-`GLOBAL_RABBIT_PASSWORD`::
-`GLOBAL_RABBIT_VDI_POLLING_INTERVAL`::
-`GLOBAL_RABBIT_PORT`::
-`GLOBAL_RABBIT_USERNAME`::
-
-object Exchange {
-`GLOBAL_RABBIT_VDI_EXCHANGE_ARGUMENTS`::
-`GLOBAL_RABBIT_VDI_EXCHANGE_AUTO_DELETE`::
-`GLOBAL_RABBIT_VDI_EXCHANGE_DURABLE`::
-`GLOBAL_RABBIT_VDI_EXCHANGE_NAME`::
-`GLOBAL_RABBIT_VDI_EXCHANGE_TYPE`::
-}
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+|===
 
 object Queue {
 `GLOBAL_RABBIT_VDI_QUEUE_ARGUMENTS`::
