@@ -3,8 +3,9 @@ plugins {
 }
 
 dependencies {
+  implementation(project(":components:kafka"))
+
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
-  implementation("org.veupathdb.vdi:vdi-component-kafka:1.0.0-SNAPSHOT") { isChanging = true }
   implementation("org.veupathdb.vdi:vdi-component-s3:1.2.0-SNAPSHOT") { isChanging = true }
 
   implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")

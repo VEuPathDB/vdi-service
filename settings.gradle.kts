@@ -49,6 +49,7 @@ rootProject.name = "vdi"
 include(":components:app-db")
 include(":components:cache-db")
 include(":components:handler-client")
+include(":components:kafka")
 include(":components:plugin-mapping")
 include(":components:module-core")
 include(":components:rabbit")
