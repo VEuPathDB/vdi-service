@@ -34,8 +34,6 @@ enum class InstallStatus(val value: String) {
   /**
    * Dataset installation could not be completed due to one or more missing
    * dependencies.
-   *
-   * @since 1.2.0
    */
   MissingDependency("missing-dependency"),
 
