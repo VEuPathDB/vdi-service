@@ -16,7 +16,10 @@ public enum DatasetInstallStatus {
   FAILEDINSTALLATION("failed-installation"),
 
   @JsonProperty("ready-for-reinstall")
-  READYFORREINSTALL("ready-for-reinstall");
+  READYFORREINSTALL("ready-for-reinstall"),
+
+  @JsonProperty("missing-dependency")
+  MISSINGDEPENDENCY("missing-dependency");
 
   private final String value;
 

@@ -1,5 +1,6 @@
 package org.veupathdb.service.vdi.s3
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Config
@@ -10,6 +11,7 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
+import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.io.InputStream
@@ -32,6 +34,13 @@ object DatasetStore {
     get() = try { client.buckets[BucketName(Options.S3.bucketName)] }
     catch (e: Throwable) { throw IllegalStateException("invalid S3 bucket name") }
       ?: throw IllegalStateException("bucket ${Options.S3.bucketName} does not exist!")
+
+  fun getDatasetMeta(userID: UserID, datasetID: DatasetID): VDIDatasetMeta? {
+    log.debug("fetching dataset meta file for user {}, dataset {}", userID, datasetID)
+
+    return bucket.objects.open(S3Paths.datasetMetaFile(userID, datasetID))
+      ?.use { JSON.readValue<VDIDatasetMeta>(it.stream) }
+  }
 
   fun putDatasetMeta(userID: UserID, datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.debug("uploading dataset meta file for user {}, dataset {}", userID, datasetID)

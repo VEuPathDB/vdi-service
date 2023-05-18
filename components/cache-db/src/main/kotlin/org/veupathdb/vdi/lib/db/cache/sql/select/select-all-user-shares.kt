@@ -16,6 +16,7 @@ SELECT
 , ds.owner_id
 , ds.type_name
 , ds.type_version
+, dsr.status
 , ARRAY(
     SELECT
       project_id
@@ -28,16 +29,15 @@ FROM
   vdi.dataset_share_offers AS dso
   INNER JOIN vdi.datasets AS ds
     USING (dataset_id)
-  INNER JOIN vdi.dataset_share_receipts AS dsr
+  LEFT JOIN vdi.dataset_share_receipts AS dsr
     USING (dataset_id, recipient_id)
 WHERE
   dso.recipient_id = ?
   AND ds.is_deleted = FALSE
   AND dso.status = '${OfferStatus.Granted}'
-  AND dsr.status = '${ReceiptStatus.Accepted}'
 """
 
-internal fun Connection.selectAcceptedSharesFor(userID: UserID): List<DatasetShareListEntry> {
+internal fun Connection.selectAllSharesFor(userID: UserID): List<DatasetShareListEntry> {
   val out = ArrayList<DatasetShareListEntry>()
 
   prepareStatement(SQL).use { ps ->
@@ -50,7 +50,7 @@ internal fun Connection.selectAcceptedSharesFor(userID: UserID): List<DatasetSha
             ownerID       = UserID(rs.getString("owner_id")),
             typeName      = rs.getString("type_name"),
             typeVersion   = rs.getString("type_version"),
-            receiptStatus = VDIShareReceiptAction.Accept,
+            receiptStatus = rs.getString("status")?.let(VDIShareReceiptAction::fromString),
             projects      = rs.getArray("projects").gatherProjectIDs()
           )
         )

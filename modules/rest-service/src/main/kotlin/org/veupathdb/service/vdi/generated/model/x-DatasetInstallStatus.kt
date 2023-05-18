@@ -9,4 +9,5 @@ fun DatasetInstallStatus(status: InstallStatus): DatasetInstallStatus =
     InstallStatus.FailedValidation   -> DatasetInstallStatus.FAILEDVALIDATION
     InstallStatus.FailedInstallation -> DatasetInstallStatus.FAILEDINSTALLATION
     InstallStatus.ReadyForReinstall  -> DatasetInstallStatus.READYFORREINSTALL
+    InstallStatus.MissingDependency  -> DatasetInstallStatus.MISSINGDEPENDENCY
   }

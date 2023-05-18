@@ -7,11 +7,27 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 
+/**
+ * Marks the target dataset as deleted in S3 if it exists and is owned by the
+ * requesting user.
+ *
+ * @param userID ID of the requesting user.
+ *
+ * @param datasetID ID of the dataset to delete.
+ *
+ * @throws NotFoundException If the target dataset does not exist.
+ *
+ * @throws ForbiddenException If the target dataset is not owned by the
+ * requesting user.
+ */
 internal fun deleteDataset(userID: UserID, datasetID: DatasetID) {
+  // Verify that the target dataset exists.
   val ds = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
 
+  // Verify the dataset is owned by the requesting user.
   if (ds.ownerID != userID)
     throw ForbiddenException()
 
+  // Put a delete flag in S3 for the target dataset.
   DatasetStore.putDeleteFlag(userID, datasetID)
 }

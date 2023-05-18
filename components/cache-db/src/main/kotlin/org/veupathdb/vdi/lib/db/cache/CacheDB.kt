@@ -106,6 +106,11 @@ object CacheDB {
     return connection.use { it.selectRejectedSharesFor(recipientID) }
   }
 
+  fun selectAllSharesForUser(recipientID: UserID): List<DatasetShareListEntry> {
+    log.debug("selecting all shares for recipient {}", recipientID)
+    return connection.use { it.selectAllSharesFor(recipientID) }
+  }
+
   fun openTransaction() =
     CacheDBTransaction(connection.apply { autoCommit = false })
 

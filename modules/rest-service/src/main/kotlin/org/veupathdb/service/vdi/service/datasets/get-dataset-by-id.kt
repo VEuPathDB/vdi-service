@@ -10,7 +10,11 @@ import org.veupathdb.vdi.lib.db.cache.CacheDB
 
 fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // Lookup dataset that is owned by or shared with the current user
-  val dataset = CacheDB.selectDatasetForUser(userID, datasetID) ?: throw NotFoundException()
+  val dataset = CacheDB.selectDatasetForUser(userID, datasetID)
+    ?: throw NotFoundException()
+
+  if (dataset.isDeleted)
+    throw NotFoundException()
 
   val shares = if (dataset.ownerID == userID) {
     CacheDB.selectSharesForDataset(datasetID)

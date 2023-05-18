@@ -5,9 +5,7 @@ import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
-import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
-import org.veupathdb.service.vdi.generated.model.DatasetPostResponseImpl
-import org.veupathdb.service.vdi.generated.model.validate
+import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasets
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.fetchUserDatasetList
@@ -93,8 +91,7 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
       throw BadRequestException("Invalid limit value, must be greater than or equal to 0 and less than or equal to 100")
 
     return VdiDatasets.GetVdiDatasetsResponse.respond200WithApplicationJson(
-      fetchUserDatasetList(
-      DatasetListQuery(
+      fetchUserDatasetList(DatasetListQuery(
         userID,
         projectId,
         parsedOwnership,
@@ -102,27 +99,27 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
         parsedLimit,
         parsedSortField,
         parsedSortOrder
-      )
-    )
+      ))
     )
   }
 
   override fun postVdiDatasets(entity: DatasetPostRequest?): VdiDatasets.PostVdiDatasetsResponse {
     log.trace("postVdiDatasets(entity={})", entity)
 
-    entity ?: throw BadRequestException()
-
-    entity.validate()
+    // Require and validate the request body.
+    (entity ?: throw BadRequestException("request body must not be empty"))
+      .validate()
       .throwIfNotEmpty()
 
+    // Generate a new dataset ID.
     val datasetID = DatasetID()
 
-    log.debug("issuing dataset ID {}", datasetID)
+    log.info("issuing dataset ID {}", datasetID)
 
     createDataset(userID.toUserID(), datasetID, entity)
 
     return VdiDatasets.PostVdiDatasetsResponse
-      .respond200WithApplicationJson(DatasetPostResponseImpl().apply { this.datasetID = datasetID.toString() })
+      .respond200WithApplicationJson(DatasetPostResponse(datasetID))
   }
 }
 

@@ -13,16 +13,11 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated(allowGuests = false)
-@Path("/vdi-datasets/{vd-id}/shares/{recipient-user-id}")
-class VDIDatasetShareController(@Context request: ContainerRequest) : VdiDatasetsVdIdSharesRecipientUserId, ControllerBase(request) {
+class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiDatasetsVdIdSharesRecipientUserId, ControllerBase(request) {
 
-  @PUT
-  @Path("/offer")
-  @Produces("application/json")
-  @Consumes("application/json")
   override fun putVdiDatasetsSharesOfferByVdIdAndRecipientUserId(
-    @PathParam("vd-id") vdId: String,
-    @PathParam("recipient-user-id") recipientUserId: Long,
+    vdId: String,
+    recipientUserId: Long,
     entity: DatasetShareOffer?,
   ): VdiDatasetsVdIdSharesRecipientUserId.PutVdiDatasetsSharesOfferByVdIdAndRecipientUserIdResponse {
     if (entity == null)
@@ -33,13 +28,9 @@ class VDIDatasetShareController(@Context request: ContainerRequest) : VdiDataset
     return VdiDatasetsVdIdSharesRecipientUserId.PutVdiDatasetsSharesOfferByVdIdAndRecipientUserIdResponse.respond204()
   }
 
-  @PUT
-  @Path("/receipt")
-  @Produces("application/json")
-  @Consumes("application/json")
   override fun putVdiDatasetsSharesReceiptByVdIdAndRecipientUserId(
-    @PathParam("vd-id") vdId: String,
-    @PathParam("recipient-user-id") recipientUserId: Long,
+    vdId: String,
+    recipientUserId: Long,
     entity: DatasetShareReceipt?,
   ): VdiDatasetsVdIdSharesRecipientUserId.PutVdiDatasetsSharesReceiptByVdIdAndRecipientUserIdResponse {
     if (entity == null)
