@@ -20,6 +20,7 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
 import org.veupathdb.vdi.lib.handler.client.response.inm.*
+import org.veupathdb.vdi.lib.handler.mapping.PluginHandler
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.kafka.model.triggers.InstallTrigger
 import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
@@ -131,79 +132,89 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val ph = PluginHandlers[datasetMeta.type.name]!!
 
     datasetMeta.projects
-      .forEach projects@{ projectID ->
-        if (!ph.appliesToProject(projectID)) {
-          log.warn("dataset {} declares a project id of {} which is not applicable to dataset type {}", datasetID, projectID, datasetMeta.type.name)
-          return@projects
+      .forEach { projectID -> executeJob(ph, datasetMeta, syncControl, metaTimestamp, datasetID, projectID) }
+  }
+
+  private fun executeJob(
+    ph:            PluginHandler,
+    meta:          VDIDatasetMeta,
+    syncControl:   VDISyncControlRecord,
+    metaTimestamp: OffsetDateTime,
+    datasetID:     DatasetID,
+    projectID:     ProjectID
+  ) {
+    if (!ph.appliesToProject(projectID)) {
+      log.warn("dataset {} declares a project id of {} which is not applicable to dataset type {}", datasetID, projectID, meta.type.name)
+      return
+    }
+
+    // TODO: Verify there isn't a failed install record here already!!!
+    val failed = AppDB.accessor(projectID)
+      .selectDatasetInstallMessages(datasetID)
+      .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
+
+    if (failed) {
+      log.info("dataset {}, project {} install-meta is being skipped due to previous failures", datasetID, projectID)
+      return
+    }
+
+    AppDB.withTransaction(projectID) {
+      try {
+        log.debug("testing for existence of dataset {} in app db for project {}", datasetID, projectID)
+        it.selectDataset(datasetID) or {
+          log.debug("inserting dataset record for dataset {} into app db for project {}", datasetID, projectID)
+          it.insertDataset(DatasetRecord(
+            datasetID   = datasetID,
+            owner       = meta.owner,
+            typeName    = meta.type.name,
+            typeVersion = meta.type.version,
+            isDeleted   = false
+          ))
+
+          log.debug("inserting sync control record for dataset {} into app db for project {}", datasetID, projectID)
+          it.insertSyncControl(VDISyncControlRecord(
+            datasetID     = datasetID,
+            sharesUpdated = syncControl.sharesUpdated,
+            dataUpdated   = syncControl.dataUpdated,
+            metaUpdated   = metaTimestamp
+          ))
+
+          log.debug("inserting dataset project link for dataset {} into app db for project {}", datasetID, projectID)
+          it.insertDatasetProjectLink(datasetID, projectID)
         }
 
-        // TODO: Verify there isn't a failed install record here already!!!
-        val failed = AppDB.accessor(projectID)
-          .selectDatasetInstallMessages(datasetID)
-          .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
-
-        if (failed) {
-          log.debug("dataset {}, project {} install-meta is being skipped due to previous failures", datasetID, projectID)
-          return@projects
+        it.selectDatasetSyncControlRecord(datasetID) or {
+          it.insertSyncControl(VDISyncControlRecord(
+            datasetID     = datasetID,
+            sharesUpdated = syncControl.sharesUpdated,
+            dataUpdated   = syncControl.dataUpdated,
+            metaUpdated   = metaTimestamp
+          ))
         }
-
-        AppDB.withTransaction(projectID) {
-          try {
-            log.debug("testing for existence of dataset {} in app db for project {}", datasetID, projectID)
-            it.selectDataset(datasetID) or {
-              log.debug("inserting dataset record for dataset {} into app db for project {}", datasetID, projectID)
-              it.insertDataset(DatasetRecord(
-                datasetID   = datasetID,
-                owner       = datasetMeta.owner,
-                typeName    = datasetMeta.type.name,
-                typeVersion = datasetMeta.type.version,
-                isDeleted   = false
-              ))
-
-              log.debug("inserting sync control record for dataset {} into app db for project {}", datasetID, projectID)
-              it.insertSyncControl(VDISyncControlRecord(
-                datasetID     = datasetID,
-                sharesUpdated = syncControl.sharesUpdated,
-                dataUpdated   = syncControl.dataUpdated,
-                metaUpdated   = metaTimestamp
-              ))
-
-              log.debug("inserting dataset project link for dataset {} into app db for project {}", datasetID, projectID)
-              it.insertDatasetProjectLink(datasetID, projectID)
-            }
-
-            it.selectDatasetSyncControlRecord(datasetID) or {
-              it.insertSyncControl(VDISyncControlRecord(
-                datasetID     = datasetID,
-                sharesUpdated = syncControl.sharesUpdated,
-                dataUpdated   = syncControl.dataUpdated,
-                metaUpdated   = metaTimestamp
-              ))
-            }
-          } catch (e: Throwable) {
-            log.error("exception while attempting to getOrCreate app db records for dataset $datasetID", e)
-            it.rollback()
-            throw e
-          }
-        }
-
-        val result = ph.client.postInstallMeta(datasetID, projectID, datasetMeta)
-
-        try {
-          when (result) {
-            is InstallMetaSuccessResponse         -> handleSuccessResponse(datasetID, projectID)
-            is InstallMetaBadRequestResponse      -> handleBadRequestResponse(datasetID, projectID, result)
-            is InstallMetaUnexpectedErrorResponse -> handleUnexpectedErrorResponse(datasetID, projectID, result)
-            else                                  -> handleImpossibleCase()
-          }
-        } catch (e: Throwable) {
-          log.debug("install-meta request to handler server failed with exception:", e)
-          AppDB.withTransaction(projectID) {
-            it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.FailedInstallation, e.message))
-          }
-          throw e
-        }
+      } catch (e: Throwable) {
+        log.error("exception while attempting to getOrCreate app db records for dataset $datasetID", e)
+        it.rollback()
+        throw e
       }
+    }
+
+    val result = ph.client.postInstallMeta(datasetID, projectID, meta)
+
+    try {
+      when (result) {
+        is InstallMetaSuccessResponse         -> handleSuccessResponse(datasetID, projectID)
+        is InstallMetaBadRequestResponse      -> handleBadRequestResponse(datasetID, projectID, result)
+        is InstallMetaUnexpectedErrorResponse -> handleUnexpectedErrorResponse(datasetID, projectID, result)
+        else                                  -> handleImpossibleCase()
+      }
+    } catch (e: Throwable) {
+      log.debug("install-meta request to handler server failed with exception:", e)
+      AppDB.withTransaction(projectID) {
+        it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.FailedInstallation, e.message))
+      }
+      throw e
+    }
+
   }
 
   private fun handleSuccessResponse(datasetID: DatasetID, projectID: ProjectID) {
