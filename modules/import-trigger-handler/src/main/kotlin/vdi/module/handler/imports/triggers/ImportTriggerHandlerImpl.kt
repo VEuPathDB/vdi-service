@@ -11,6 +11,7 @@ import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.util.isNull
 import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
@@ -83,9 +84,15 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
     // lookup the target dataset in the cache database to ensure it
     // exists, initializing the dataset if it doesn't yet exist.
-    CacheDB.selectDataset(datasetID) or {
-      log.info("initializing dataset {} for user {}", datasetID, userID)
-      CacheDB.initializeDataset(datasetID, datasetMeta)
+    with(CacheDB.selectDataset(datasetID)) {
+      if (isNull()) {
+        log.info("initializing dataset {} for user {}", datasetID, userID)
+        CacheDB.initializeDataset(datasetID, datasetMeta)
+      } else {
+        if (isDeleted)
+          log.info("skipping import event for dataset {}/{} as it is marked as deleted in the cache db", userID, datasetID)
+          return
+      }
     }
 
     CacheDB.withTransaction {
