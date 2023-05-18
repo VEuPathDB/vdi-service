@@ -86,10 +86,22 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val metaTimestamp = dir.getMeta().lastModified()!!
 
     // Attempt to select the dataset details from the cache DB
-    CacheDB.selectDataset(datasetID) or {
+    val cachedDataset = CacheDB.selectDataset(datasetID)
+
+    // If no dataset record was found in the cache DB then this is (likely) the
+    // first event for the dataset coming through the pipeline.
+    if (cachedDataset == null) {
       log.debug("dataset details were not found for dataset {}, creating them", datasetID)
       // If they were not found, construct them
       CacheDB.initializeDataset(datasetID, datasetMeta)
+    }
+
+    // Else if the dataset is marked as deleted already, then bail here.
+    else {
+      if (cachedDataset.isDeleted) {
+        log.info("refusing to update dataset {}/{} meta due to it being marked as deleted", userID, datasetID)
+        return
+      }
     }
 
     // Attempt to look up the sync control record for the dataset in
@@ -100,7 +112,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       CacheDB.selectSyncControl(datasetID)!!
     }
 
-    // Do a "little" reconciliation
+    // Do the "little" reconciliation
     comparison(dir, syncControl)
       .also {
         if (it.doDataSync)

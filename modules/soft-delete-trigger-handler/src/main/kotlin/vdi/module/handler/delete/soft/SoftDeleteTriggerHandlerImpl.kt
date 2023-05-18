@@ -48,19 +48,31 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
   }
 
   private fun runJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
+    val dataset = CacheDB.selectDataset(datasetID)
+
+    if (dataset == null || dataset.isDeleted)
+      return
+
+    // Fetch the dataset directory from S3
     val dir = dm.getDatasetDirectory(userID, datasetID)
 
+    // If the directory doesn't exist, then something has gone terribly wrong.
     if (!dir.exists())
       throw IllegalStateException("got an uninstall event for non-existent dataset $datasetID (user $userID)")
 
+    // Load the dataset metadata from S3
     val meta = dir.getMeta().load()
       ?: throw IllegalStateException("got an uninstall event for a dataset that has no meta file: dataset $datasetID, user $userID")
 
+    // Mark the dataset as deleted in the cache DB
     CacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
 
+    // Grab a handler instance for this dataset type.
     val handler = PluginHandlers[meta.type.name]
       ?: throw IllegalStateException("got an uninstall event for a dataset type that has no associated handler.  dataset $datasetID, user $userID")
 
+    // Iterate through the projects that the metadata is targeting and call
+    // the uninstall path on each.
     meta.projects.forEach { projectID ->
       if (!handler.appliesToProject(projectID)) {
         log.warn("type handler for type {} does not apply to project {} (dataset {}, user {})", handler.type, projectID, datasetID, userID)
