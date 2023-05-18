@@ -48,11 +48,6 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
   }
 
   private fun runJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
-    val dataset = CacheDB.selectDataset(datasetID)
-
-    if (dataset == null || dataset.isDeleted)
-      return
-
     // Fetch the dataset directory from S3
     val dir = dm.getDatasetDirectory(userID, datasetID)
 
