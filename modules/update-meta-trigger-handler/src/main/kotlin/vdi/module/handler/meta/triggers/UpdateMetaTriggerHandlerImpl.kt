@@ -148,7 +148,6 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       return
     }
 
-    // TODO: Verify there isn't a failed install record here already!!!
     val failed = AppDB.accessor(projectID)
       .selectDatasetInstallMessages(datasetID)
       .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
@@ -201,11 +200,10 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val result = ph.client.postInstallMeta(datasetID, projectID, meta)
 
     try {
-      when (result) {
-        is InstallMetaSuccessResponse         -> handleSuccessResponse(datasetID, projectID)
-        is InstallMetaBadRequestResponse      -> handleBadRequestResponse(datasetID, projectID, result)
-        is InstallMetaUnexpectedErrorResponse -> handleUnexpectedErrorResponse(datasetID, projectID, result)
-        else                                  -> handleImpossibleCase()
+      when (result.type) {
+        InstallMetaResponseType.Success -> handleSuccessResponse(datasetID, projectID)
+        InstallMetaResponseType.BadRequest -> handleBadRequestResponse(datasetID, projectID, result as InstallMetaBadRequestResponse)
+        InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(datasetID, projectID, result as InstallMetaUnexpectedErrorResponse)
       }
     } catch (e: Throwable) {
       log.debug("install-meta request to handler server failed with exception:", e)
@@ -233,11 +231,6 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
   private fun handleUnexpectedErrorResponse(datasetID: DatasetID, projectID: ProjectID, res: InstallMetaUnexpectedErrorResponse) {
     log.error("dataset handler server reports 500 error for meta-install on dataset {}, project {}", datasetID, projectID)
     throw IllegalStateException(res.message)
-  }
-
-  private fun handleImpossibleCase()  {
-    log.error("developer error of some sort, we hit the impossible case, did we add a new response type to the handler client?")
-    throw IllegalStateException("impossible case hit, did we add a new response type to the handler client?")
   }
 
   private suspend fun requireKafkaRouter() = safeExec("failed to create KafkaRouter instance") {
