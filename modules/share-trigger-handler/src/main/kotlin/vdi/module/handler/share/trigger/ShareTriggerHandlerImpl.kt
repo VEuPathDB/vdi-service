@@ -6,6 +6,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
+import org.veupathdb.vdi.lib.common.util.isNull
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
@@ -50,6 +51,11 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
 
   private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
     log.trace("executeJob(userID={}, datasetID={}, dm=...)", userID, datasetID)
+
+    with(CacheDB.selectDataset(datasetID)) {
+      if (isNull() || isDeleted)
+        return
+    }
 
     log.debug("looking up dataset directory for user {}, dataset {}", userID, datasetID)
     val dir = dm.getDatasetDirectory(userID, datasetID)
