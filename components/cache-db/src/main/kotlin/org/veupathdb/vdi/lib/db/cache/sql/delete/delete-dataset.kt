@@ -1,6 +1,7 @@
 package org.veupathdb.vdi.lib.db.cache.sql.delete
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.db.cache.util.preparedUpdate
 import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import java.sql.Connection
 
@@ -12,9 +13,5 @@ WHERE
   dataset_id = ?
 """
 
-internal fun Connection.deleteDataset(datasetID: DatasetID) {
-  prepareStatement(SQL).use { ps ->
-    ps.setDatasetID(1, datasetID)
-    ps.execute()
-  }
-}
+internal fun Connection.deleteDataset(datasetID: DatasetID) =
+  preparedUpdate(SQL) { setDatasetID(1, datasetID) }
