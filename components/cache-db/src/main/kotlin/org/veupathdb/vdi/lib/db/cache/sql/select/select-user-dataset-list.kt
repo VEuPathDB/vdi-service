@@ -3,6 +3,11 @@ package org.veupathdb.vdi.lib.db.cache.sql.select
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.cache.model.*
+import org.veupathdb.vdi.lib.db.cache.util.*
+import org.veupathdb.vdi.lib.db.cache.util.getDatasetID
+import org.veupathdb.vdi.lib.db.cache.util.getUserID
+import org.veupathdb.vdi.lib.db.cache.util.map
+import org.veupathdb.vdi.lib.db.cache.util.withResults
 import java.sql.Connection
 import java.sql.Types
 import java.time.OffsetDateTime
@@ -39,6 +44,7 @@ FROM
   INNER JOIN vdi.import_control AS ic
     USING (dataset_id)
 WHERE
+  d.is_deleted = FALSE
   $projectFilter
 ORDER BY
   $orderBy $order
@@ -79,9 +85,9 @@ $PREFIX_OWNERSHIP_OWNED
 $PREFIX_OWNERSHIP_SHARED
 """
 
-private const val PROJECT_ID_FILTER = "EXISTS (SELECT 1 FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id AND p.project_id = ?)"
+private const val PROJECT_ID_FILTER = "AND EXISTS (SELECT 1 FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id AND p.project_id = ?)"
 
-private const val DUMMY_FILTER = "1 = 1"
+private const val DUMMY_FILTER = "AND 1 = 1"
 
 private const val ORDER_BY_CREATED = "created"
 private const val ORDER_BY_NAME    = "name"
@@ -156,27 +162,23 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
     ps.setInt(++i, query.offset)
     ps.setInt(++i, query.limit)
 
-    ps.executeQuery().use { rs ->
-      val out = ArrayList<DatasetRecord>(12)
-
-      while (rs.next()) {
-        out.add(DatasetRecordImpl(
-          datasetID    = DatasetID(rs.getString(1)),
-          typeName     = rs.getString(2),
-          typeVersion  = rs.getString(3),
-          ownerID      = UserID(rs.getString(4)),
-          isDeleted    = rs.getBoolean(5),
-          created      = rs.getObject(6, OffsetDateTime::class.java),
-          importStatus = DatasetImportStatus.fromString(rs.getString(12)),
-          name         = rs.getString(7),
-          summary      = rs.getString(8),
-          description  = rs.getString(9),
-          files        = rs.getArray(10).toList(),
-          projects     = rs.getArray(11).toList(),
-        ))
+    ps.withResults {
+      map {
+        DatasetRecordImpl(
+          datasetID    = it.getDatasetID("dataset_id"),
+          typeName     = it.getString("type_name"),
+          typeVersion  = it.getString("type_version"),
+          ownerID      = it.getUserID("owner_id"),
+          isDeleted    = it.getBoolean("is_deleted"),
+          created      = it.getDateTime("created"),
+          importStatus = DatasetImportStatus.fromString(it.getString("status")),
+          name         = it.getString("name"),
+          summary      = it.getString("summary"),
+          description  = it.getString("description"),
+          files        = it.getArray("files").toList(),
+          projects     = it.getArray("projects").toList(),
+        )
       }
-
-      out
     }
   }
 }
