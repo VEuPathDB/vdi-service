@@ -2,6 +2,8 @@ package org.veupathdb.vdi.lib.db.cache.sql.insert
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
+import org.veupathdb.vdi.lib.db.cache.util.setUserID
 import java.sql.Connection
 import java.time.OffsetDateTime
 
@@ -31,10 +33,10 @@ internal fun Connection.tryInsertDatasetRecord(
   created:     OffsetDateTime,
 ) {
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, datasetID.toString())
+    ps.setDatasetID(1, datasetID)
     ps.setString(2, typeName)
     ps.setString(3, typeVersion)
-    ps.setString(4, ownerID.toString())
+    ps.setUserID(4, ownerID)
     ps.setBoolean(5, isDeleted)
     ps.setObject(6, created)
 

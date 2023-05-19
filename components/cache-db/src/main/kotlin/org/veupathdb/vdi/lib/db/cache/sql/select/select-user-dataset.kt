@@ -7,6 +7,8 @@ import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecordImpl
+import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
+import org.veupathdb.vdi.lib.db.cache.util.setUserID
 import java.sql.Connection
 import java.time.OffsetDateTime
 
@@ -52,9 +54,9 @@ WHERE
 
 internal fun Connection.selectDatasetForUser(userID: UserID, datasetID: DatasetID): DatasetRecord? {
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, datasetID.toString())
-    ps.setString(2, userID.toString())
-    ps.setString(3, userID.toString())
+    ps.setDatasetID(1, datasetID)
+    ps.setUserID(2, userID)
+    ps.setUserID(3, userID)
 
     ps.executeQuery().use { rs ->
       if (!rs.next())

@@ -1,6 +1,7 @@
 package org.veupathdb.vdi.lib.db.cache.sql.insert
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -25,7 +26,7 @@ internal fun Connection.tryInsertDatasetMeta(
   description: String?,
 ) {
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, datasetID.toString())
+    ps.setDatasetID(1, datasetID)
     ps.setString(2, name)
     ps.setString(3, summary)
     ps.setString(4, description)

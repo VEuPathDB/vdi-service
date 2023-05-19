@@ -4,7 +4,8 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.cache.consts.OfferStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShareListEntry
-import org.veupathdb.vdi.lib.db.cache.util.gatherProjectIDs
+import org.veupathdb.vdi.lib.db.cache.util.getProjectIDList
+import org.veupathdb.vdi.lib.db.cache.util.setUserID
 import java.sql.Connection
 
 // language=postgresql
@@ -45,7 +46,7 @@ internal fun Connection.selectOpenSharesFor(userID: UserID): List<DatasetShareLi
   val out = ArrayList<DatasetShareListEntry>()
 
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, userID.toString())
+    ps.setUserID(1, userID)
     ps.executeQuery().use { rs ->
       while (rs.next()) {
         out.add(
@@ -55,7 +56,7 @@ internal fun Connection.selectOpenSharesFor(userID: UserID): List<DatasetShareLi
             typeName      = rs.getString("type_name"),
             typeVersion   = rs.getString("type_version"),
             receiptStatus = null,
-            projects      = rs.getArray("projects").gatherProjectIDs()
+            projects      = rs.getProjectIDList("projects")
           )
         )
       }

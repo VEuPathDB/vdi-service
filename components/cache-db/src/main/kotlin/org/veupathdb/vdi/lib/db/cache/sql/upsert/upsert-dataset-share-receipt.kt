@@ -3,6 +3,8 @@ package org.veupathdb.vdi.lib.db.cache.sql.upsert
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
+import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
+import org.veupathdb.vdi.lib.db.cache.util.setUserID
 import java.sql.Connection
 
 // language=postgresql
@@ -22,8 +24,8 @@ internal fun Connection.upsertDatasetShareReceipt(
   status: VDIShareReceiptAction,
 ) {
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, datasetID.toString())
-    ps.setString(2, recipientID.toString())
+    ps.setDatasetID(1, datasetID)
+    ps.setUserID(2, recipientID)
     ps.setString(3, status.value)
     ps.setString(4, status.value)
   }
