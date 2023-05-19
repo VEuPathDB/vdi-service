@@ -1,3 +1,12 @@
 = VDI Module: Event Router
 
+ifdef::env-github[]
+++++
+<p align="center">
+  <img src="https://raw.githubusercontent.com/VEuPathDB/vdi-service/main/docs/1.0/assets/modules/event-router/images/event-router-overview.svg" />
+</p>
+++++
+endif::[]
+ifndef::env-github[]
 image:images/event-router-overview.svg[]
+endif::[]
