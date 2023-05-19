@@ -5,19 +5,62 @@
 * link:https://veupathdb.github.io/vdi-service/vdi-api.html[VDI Service API Doc]
 * link:https://veupathdb.github.io/vdi-service/design/1.0/design.html[VDI Service Design Doc]
 
+== VDI Project Index
+
+=== Services
+
+* https://github.com/VEuPathDB/vdi-service[VDI Core Service]
+* https://github.com/VEuPathDB/vdi-plugin-handler-server[VDI Plugin Handler Service]
+
+=== Docker Images
+
+* https://github.com/VEuPathDB/vdi-internal-db[Cache DB Docker Image]
+* https://github.com/VEuPathDB/vdi-docker-handler-base[Plugin Handler Base]
+
+=== Libraries
+
+==== Service Libraries
+
+* https://github.com/VEuPathDB/vdi-component-common[Commons Library]
+* https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
+
+==== Plugin Libraries
+
+* https://github.com/VEuPathDB/lib-vdi-plugin-rnaseq[lib-rnaseq]
+* https://github.com/VEuPathDB/lib-vdi-plugin-study[lib-study]
+
+=== Plugins
+
+==== Production
+
+* https://github.com/VEuPathDB/vdi-plugin-bigwig[bigwig]
+* https://github.com/VEuPathDB/vdi-plugin-biom[biom]
+* https://github.com/VEuPathDB/vdi-plugin-isasimple[isasimple]
+* https://github.com/VEuPathDB/vdi-plugin-rnaseq[rnaseq]
+* https://github.com/VEuPathDB/vdi-plugin-genelist[genelist]
+
+==== Examples
+
+* https://github.com/VEuPathDB/vdi-handler-plugin-example[Example Plugin]
+* https://github.com/VEuPathDB/vdi-handler-no-op-plugin[No-Op Plugin]
+
+
 == Repo Structure
 
 The VDI service repository is divided into 3 categories: components, modules,
 and the core bootstrapper.
+
+Components are small shared libraries that contain code specific to a target
+purpose that is not the core focus of the VDI service.
+
+Modules are essentially separate services that are bootstrapped into a single
+service by the bootstrapper.
 
 The bootstrapper is the core of the service, and the root level Gradle project.
 This piece is responsible for starting up and shutting down the various project
 modules.
 
 === Components
-
-Components are small shared libraries that contain code specific to a target
-purpose that is not the core focus of the VDI service.
 
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/app-db[App DB Client]
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/cache-db[Cache DB Client]
@@ -32,9 +75,6 @@ purpose that is not the core focus of the VDI service.
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/s3[S3 Utilities]
 
 === Modules
-
-Modules are, in effect, separate services that are bootstrapped into a single
-service by the bootstrapper.
 
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/event-router[Event Router]
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/hard-delete-trigger-handler[Hard Delete Event Handler]
