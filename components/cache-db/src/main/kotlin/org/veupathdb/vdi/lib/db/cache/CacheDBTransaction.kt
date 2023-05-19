@@ -6,23 +6,9 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.sql.delete.*
-import org.veupathdb.vdi.lib.db.cache.sql.delete.deleteDatasetMetadata
-import org.veupathdb.vdi.lib.db.cache.sql.delete.deleteDatasetShareOffers
-import org.veupathdb.vdi.lib.db.cache.sql.delete.deleteDatasetShareReceipts
-import org.veupathdb.vdi.lib.db.cache.sql.delete.deleteImportMessages
 import org.veupathdb.vdi.lib.db.cache.sql.insert.*
-import org.veupathdb.vdi.lib.db.cache.sql.insert.tryInsertDatasetFiles
-import org.veupathdb.vdi.lib.db.cache.sql.insert.tryInsertDatasetProjects
-import org.veupathdb.vdi.lib.db.cache.sql.insert.tryInsertDatasetRecord
-import org.veupathdb.vdi.lib.db.cache.sql.insert.tryInsertSyncControl
 import org.veupathdb.vdi.lib.db.cache.sql.update.*
-import org.veupathdb.vdi.lib.db.cache.sql.update.updateDatasetDeleteFlag
-import org.veupathdb.vdi.lib.db.cache.sql.update.updateDatasetMeta
-import org.veupathdb.vdi.lib.db.cache.sql.update.updateSyncControlData
-import org.veupathdb.vdi.lib.db.cache.sql.update.updateSyncControlShare
-import org.veupathdb.vdi.lib.db.cache.sql.upsert.upsertDatasetShareOffer
-import org.veupathdb.vdi.lib.db.cache.sql.upsert.upsertDatasetShareReceipt
-import org.veupathdb.vdi.lib.db.cache.sql.upsert.upsertImportMessages
+import org.veupathdb.vdi.lib.db.cache.sql.upsert.*
 import java.sql.Connection
 import java.time.OffsetDateTime
 
