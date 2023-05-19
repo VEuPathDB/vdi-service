@@ -44,14 +44,41 @@ object Pruner {
 
   private val config = PrunerConfig()
 
+  /**
+   * Locks the pruner and prunes old/dead datasets.
+   *
+   * This method locks until completion, blocking multiple instances of the
+   * operation being performed simultaneously.  To test if a prune operation is
+   * currently in progress call [canPrune].
+   */
   fun pruneDatasets() {
-    log.info("starting dataset pruning job")
     lock.withLock { doPruning() }
+  }
+
+  /**
+   * Tries to lock the pruner to prune old/dead datasets.
+   *
+   * If the pruner could not be locked because a pruning job is already in
+   * progress, this method will return immediately without doing anything.
+   *
+   * If the pruner was not already active, this method will lock the pruner and
+   * execute the pruning job, only unlocking once the job is completed.
+   */
+  fun tryPruneDatasets() {
+    if (lock.tryLock()) {
+      try {
+        doPruning()
+      } finally {
+        lock.unlock()
+      }
+    }
   }
 
   fun canPrune() = !lock.isLocked
 
   private fun doPruning() {
+    log.info("starting dataset pruning job")
+
     val s3Client = S3Api.newClient(config.s3Config)
     val s3Bucket = s3Client.buckets[config.bucketName]
       ?: throw IllegalStateException("bucket ${config.bucketName} does not exist!")
