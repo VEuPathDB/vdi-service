@@ -7,8 +7,11 @@ import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecordImpl
+import org.veupathdb.vdi.lib.db.cache.util.*
 import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import org.veupathdb.vdi.lib.db.cache.util.setUserID
+import org.veupathdb.vdi.lib.db.cache.util.withPreparedStatement
+import org.veupathdb.vdi.lib.db.cache.util.withResults
 import java.sql.Connection
 import java.time.OffsetDateTime
 
@@ -52,33 +55,32 @@ WHERE
   )
 """
 
-internal fun Connection.selectDatasetForUser(userID: UserID, datasetID: DatasetID): DatasetRecord? {
-  prepareStatement(SQL).use { ps ->
-    ps.setDatasetID(1, datasetID)
-    ps.setUserID(2, userID)
-    ps.setUserID(3, userID)
+internal fun Connection.selectDatasetForUser(userID: UserID, datasetID: DatasetID): DatasetRecord? =
+  withPreparedStatement(SQL) {
+    setDatasetID(1, datasetID)
+    setUserID(2, userID)
+    setUserID(3, userID)
 
-    ps.executeQuery().use { rs ->
-      if (!rs.next())
-        return null
-
-      return DatasetRecordImpl(
-        datasetID,
-        rs.getString("type_name"),
-        rs.getString("type_version"),
-        UserID(rs.getString("owner_id")),
-        rs.getBoolean("is_deleted"),
-        rs.getObject("created", OffsetDateTime::class.java),
-        DatasetImportStatus.fromString(rs.getString("status")),
-        rs.getString("name"),
-        rs.getString("summary"),
-        rs.getString("description"),
-        rs.getArray("files").toList(),
-        rs.getArray("projects").toList(),
-      )
+    withResults {
+      if (!next())
+        null
+      else
+        DatasetRecordImpl(
+          datasetID,
+          getString("type_name"),
+          getString("type_version"),
+          getUserID("owner_id"),
+          getBoolean("is_deleted"),
+          getDateTime("created"),
+          DatasetImportStatus.fromString(getString("status")),
+          getString("name"),
+          getString("summary"),
+          getString("description"),
+          getArray("files").toList(),
+          getProjectIDList("projects"),
+        )
     }
   }
-}
 
 @Suppress("UNCHECKED_CAST")
 private fun java.sql.Array.toList() = (this.array as Array<String>).asList()

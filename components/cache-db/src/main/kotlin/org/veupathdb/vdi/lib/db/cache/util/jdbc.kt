@@ -3,8 +3,49 @@ package org.veupathdb.vdi.lib.db.cache.util
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.time.OffsetDateTime
+
+// region Connection
+
+internal inline fun <T> Connection.withPreparedStatement(sql: String, fn: PreparedStatement.() -> T): T =
+  prepareStatement(sql).use(fn)
+
+internal inline fun Connection.preparedUpdate(sql: String, fn: PreparedStatement.() -> Unit) =
+  prepareStatement(sql).use { fn(it); it.executeUpdate() }
+
+// endregion Connection
+
+// region PreparedStatement
+
+/**
+ * Sets the designated parameter to the given [DatasetID] value.
+ *
+ * @param index 1 based index of the parameter to set.
+ *
+ * @param datasetID Dataset ID to set to the target parameter.
+ */
+internal fun PreparedStatement.setDatasetID(index: Int, datasetID: DatasetID) =
+  setString(index, datasetID.toString())
+
+/**
+ * Sets the designated parameter to the given [UserID] value.
+ *
+ * @param index 1 based index of the parameter to set.
+ *
+ * @param userID User ID to set to the target parameter.
+ */
+internal fun PreparedStatement.setUserID(index: Int, userID: UserID) =
+  setString(index, userID.toString())
+
+internal inline fun <T> PreparedStatement.withResults(fn: ResultSet.() -> T): T =
+  executeQuery().use(fn)
+
+// endregion PreparedStatement
+
+// region ResultSet
 
 /**
  * Parses the column data in the column with the given name as an array of
@@ -17,8 +58,18 @@ import java.sql.ResultSet
  *
  * @return A list of [ProjectID] values parsed from the target [ResultSet].
  */
-internal fun ResultSet.getProjectIDList(column: String): List<ProjectID> =
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun ResultSet.getProjectIDList(column: String): List<ProjectID> =
   getArray(column).resultSet.map { it.getString(2) }
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun ResultSet.getDatasetID(column: String) = DatasetID(getString(column))
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun ResultSet.getUserID(column: String) = UserID(getString(column))
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun ResultSet.getDateTime(column: String) = getObject(column, OffsetDateTime::class.java)
 
 /**
  * Iterates over the results in the result set, calling the given function on
@@ -50,22 +101,4 @@ internal inline fun ResultSet.forEach(fn: (rs: ResultSet) -> Unit) {
 internal inline fun <T> ResultSet.map(fn: (rs: ResultSet) -> T): List<T> =
   with(ArrayList<T>(16)) { this@map.forEach { add(fn(it)) }; this }
 
-/**
- * Sets the designated parameter to the given [DatasetID] value.
- *
- * @param index 1 based index of the parameter to set.
- *
- * @param datasetID Dataset ID to set to the target parameter.
- */
-internal fun PreparedStatement.setDatasetID(index: Int, datasetID: DatasetID) =
-  setString(index, datasetID.toString())
-
-/**
- * Sets the designated parameter to the given [UserID] value.
- *
- * @param index 1 based index of the parameter to set.
- *
- * @param userID User ID to set to the target parameter.
- */
-internal fun PreparedStatement.setUserID(index: Int, userID: UserID) =
-  setString(index, userID.toString())
+// endregion ResultSet

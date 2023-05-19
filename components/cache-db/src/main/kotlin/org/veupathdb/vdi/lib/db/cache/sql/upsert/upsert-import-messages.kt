@@ -1,6 +1,7 @@
 package org.veupathdb.vdi.lib.db.cache.sql.upsert
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.db.cache.util.preparedUpdate
 import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import java.sql.Connection
 
@@ -18,12 +19,9 @@ SET
   message = ?
 """
 
-internal fun Connection.upsertImportMessages(datasetID: DatasetID, messages: String) {
-  prepareStatement(SQL)
-    .use { ps ->
-      ps.setDatasetID(1, datasetID)
-      ps.setString(2, messages)
-      ps.setString(3, messages)
-      ps.executeUpdate()
-    }
-}
+internal fun Connection.upsertImportMessages(datasetID: DatasetID, messages: String) =
+  preparedUpdate(SQL) {
+    setDatasetID(1, datasetID)
+    setString(2, messages)
+    setString(3, messages)
+  }
