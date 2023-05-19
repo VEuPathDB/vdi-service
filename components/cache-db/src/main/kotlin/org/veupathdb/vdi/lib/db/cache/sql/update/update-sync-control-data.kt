@@ -1,6 +1,7 @@
 package org.veupathdb.vdi.lib.db.cache.sql.update
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.db.cache.util.preparedUpdate
 import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import java.sql.Connection
 import java.time.OffsetDateTime
@@ -34,11 +35,9 @@ WHERE
  * exist, or that the given [timestamp] value was before or equal to the value
  * that was already set in the existing sync control record.
  */
-internal fun Connection.updateSyncControlData(datasetID: DatasetID, timestamp: OffsetDateTime): Boolean {
-  prepareStatement(SQL).use { ps ->
-    ps.setObject(1, timestamp)
-    ps.setDatasetID(2, datasetID)
-    ps.setObject(3, timestamp)
-    return ps.executeUpdate() > 0
-  }
-}
+internal fun Connection.updateSyncControlData(datasetID: DatasetID, timestamp: OffsetDateTime) =
+  preparedUpdate(SQL) {
+    setObject(1, timestamp)
+    setDatasetID(2, datasetID)
+    setObject(3, timestamp)
+  } > 0

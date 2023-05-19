@@ -3,6 +3,7 @@ package org.veupathdb.vdi.lib.db.cache
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.sql.delete.*
@@ -25,6 +26,16 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
       throw IllegalStateException("cannot execute queries on a connection that has already been closed or committed")
     else
       connection
+
+  fun deleteShareOffer(datasetID: DatasetID, recipientID: UserID) {
+    log.debug("deleting share offer record for dataset {}, recipient {}", datasetID, recipientID)
+    con.deleteShareOffer(datasetID, recipientID)
+  }
+
+  fun deleteShareReceipt(datasetID: DatasetID, recipientID: UserID) {
+    log.debug("deleting share receipt record for dataset {}, recipient {}", datasetID, recipientID)
+    con.deleteShareReceipt(datasetID, recipientID)
+  }
 
   /**
    * Deletes all entries in the `vdi.dataset_files` table for a target dataset
@@ -207,7 +218,7 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
    */
   fun tryInsertSyncControl(record: VDISyncControlRecord) {
     log.debug("trying to insert a sync control record for dataset {}", record.datasetID)
-    return con.tryInsertSyncControl(record)
+    con.tryInsertSyncControl(record)
   }
 
   fun tryInsertImportMessages(datasetID: DatasetID, messages: String) {

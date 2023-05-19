@@ -1,13 +1,11 @@
 package org.veupathdb.vdi.lib.db.cache.sql.select
 
-import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.cache.consts.OfferStatus
 import org.veupathdb.vdi.lib.db.cache.consts.ReceiptStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShareListEntry
-import org.veupathdb.vdi.lib.db.cache.util.getProjectIDList
-import org.veupathdb.vdi.lib.db.cache.util.setUserID
+import org.veupathdb.vdi.lib.db.cache.util.*
 import java.sql.Connection
 
 // language=postgresql
@@ -38,26 +36,19 @@ WHERE
   AND dsr.status = '${ReceiptStatus.Rejected}'
 """
 
-internal fun Connection.selectRejectedSharesFor(userID: UserID): List<DatasetShareListEntry> {
-  val out = ArrayList<DatasetShareListEntry>()
-
-  prepareStatement(SQL).use { ps ->
-    ps.setUserID(1, userID)
-    ps.executeQuery().use { rs ->
-      while (rs.next()) {
-        out.add(
-          DatasetShareListEntry(
-            datasetID     = DatasetID(rs.getString("dataset_id")),
-            ownerID       = UserID(rs.getString("owner_id")),
-            typeName      = rs.getString("type_name"),
-            typeVersion   = rs.getString("type_version"),
-            receiptStatus = VDIShareReceiptAction.Reject,
-            projects      = rs.getProjectIDList("projects")
-          )
+internal fun Connection.selectRejectedSharesFor(userID: UserID) =
+  withPreparedStatement(SQL) {
+    setUserID(1, userID)
+    withResults {
+      map {
+        DatasetShareListEntry(
+          datasetID     = it.getDatasetID("dataset_id"),
+          ownerID       = it.getUserID("owner_id"),
+          typeName      = it.getString("type_name"),
+          typeVersion   = it.getString("type_version"),
+          receiptStatus = VDIShareReceiptAction.Reject,
+          projects      = it.getProjectIDList("projects")
         )
       }
     }
   }
-
-  return out
-}

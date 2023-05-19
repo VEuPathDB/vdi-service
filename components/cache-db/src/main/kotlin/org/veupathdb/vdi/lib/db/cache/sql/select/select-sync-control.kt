@@ -2,9 +2,11 @@ package org.veupathdb.vdi.lib.db.cache.sql.select
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.db.cache.util.getDateTime
 import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
+import org.veupathdb.vdi.lib.db.cache.util.withPreparedStatement
+import org.veupathdb.vdi.lib.db.cache.util.withResults
 import java.sql.Connection
-import java.time.OffsetDateTime
 
 // language=postgresql
 private const val SQL = """
@@ -18,20 +20,18 @@ WHERE
   dataset_id = ?
 """
 
-internal fun Connection.selectSyncControl(datasetID: DatasetID): VDISyncControlRecord? {
-  prepareStatement(SQL).use { ps ->
-    ps.setDatasetID(1, datasetID)
-
-    ps.executeQuery().use { rs ->
-      if (!rs.next())
-        return null
-
-      return VDISyncControlRecord(
-        datasetID     = datasetID,
-        sharesUpdated = rs.getObject("shares_update_time", OffsetDateTime::class.java),
-        dataUpdated   = rs.getObject("data_update_time", OffsetDateTime::class.java),
-        metaUpdated   = rs.getObject("meta_update_time", OffsetDateTime::class.java)
-      )
+internal fun Connection.selectSyncControl(datasetID: DatasetID) =
+  withPreparedStatement(SQL) {
+    setDatasetID(1, datasetID)
+    withResults {
+      if (!next())
+        null
+      else
+        VDISyncControlRecord(
+          datasetID     = datasetID,
+          sharesUpdated = getDateTime("shares_update_time"),
+          dataUpdated   = getDateTime("data_update_time"),
+          metaUpdated   = getDateTime("meta_update_time")
+        )
     }
   }
-}

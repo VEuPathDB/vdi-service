@@ -3,6 +3,7 @@ package org.veupathdb.vdi.lib.db.cache.sql.upsert
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
+import org.veupathdb.vdi.lib.db.cache.util.preparedUpdate
 import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import org.veupathdb.vdi.lib.db.cache.util.setUserID
 import java.sql.Connection
@@ -22,13 +23,10 @@ internal fun Connection.upsertDatasetShareOffer(
   datasetID: DatasetID,
   recipientID: UserID,
   status: VDIShareOfferAction,
-) {
-  prepareStatement(SQL).use { ps ->
-    ps.setDatasetID(1, datasetID)
-    ps.setUserID(2, recipientID)
-    ps.setString(3, status.value)
-    ps.setString(4, status.value)
-
-    ps.execute()
+) =
+  preparedUpdate(SQL) {
+    setDatasetID(1, datasetID)
+    setUserID(2, recipientID)
+    setString(3, status.value)
+    setString(4, status.value)
   }
-}

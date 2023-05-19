@@ -278,17 +278,13 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
     updateDataSyncControl(datasetID, projectID)
 
-    if (res.warnings.isNotEmpty()) {
-      log.debug("dataset {} installed into project {} with warnings, writing warnings to app db", datasetID, projectID)
-
-      AppDB.withTransaction(projectID) {
-        it.updateDatasetInstallMessage(DatasetInstallMessage(
-          datasetID,
-          InstallType.Data,
-          InstallStatus.Complete,
-          res.warnings.joinToString("\n")
-        ))
-      }
+    AppDB.withTransaction(projectID) {
+      it.updateDatasetInstallMessage(DatasetInstallMessage(
+        datasetID,
+        InstallType.Data,
+        InstallStatus.Complete,
+        res.warnings.takeUnless { it.isEmpty() }?.joinToString("\n")
+      ))
     }
   }
 
