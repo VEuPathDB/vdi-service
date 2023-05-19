@@ -47,6 +47,10 @@ internal inline fun <T> PreparedStatement.withResults(fn: ResultSet.() -> T): T 
 
 // region ResultSet
 
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun ResultSet.getStringList(column: String): List<String> =
+  getArray(column).resultSet.map { it.getString(2) }
+
 /**
  * Parses the column data in the column with the given name as an array of
  * String [ProjectID] values.
@@ -60,7 +64,7 @@ internal inline fun <T> PreparedStatement.withResults(fn: ResultSet.() -> T): T 
  */
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun ResultSet.getProjectIDList(column: String): List<ProjectID> =
-  getArray(column).resultSet.map { it.getString(2) }
+  getStringList(column)
 
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun ResultSet.getDatasetID(column: String) = DatasetID(getString(column))

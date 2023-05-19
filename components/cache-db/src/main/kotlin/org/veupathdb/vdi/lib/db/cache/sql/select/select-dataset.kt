@@ -49,11 +49,8 @@ internal fun Connection.selectDataset(datasetID: DatasetID): DatasetRecord? =
           getString("name"),
           getString("summary"),
           getString("description"),
-          getArray("files").toList(),
+          getStringList("files"),
           getProjectIDList("projects"),
         )
     }
   }
-
-@Suppress("UNCHECKED_CAST")
-private fun java.sql.Array.toList() = (this.array as Array<String>).asList()
