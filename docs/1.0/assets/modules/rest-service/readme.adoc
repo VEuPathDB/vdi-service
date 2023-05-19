@@ -1,0 +1,8 @@
+= VDI Module: Rest Service
+
+The rest service module exposes the public HTTP REST API.
+
+As a rule, this service does not ever write any dataset data directly to any
+database.  This service exclusively writes to S3, and reads from S3, the
+internal cache DB, and the configured application databases.
+

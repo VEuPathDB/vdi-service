@@ -1,0 +1,18 @@
+= VDI Module: Import Trigger Handler
+
+ifdef::env-github[]
+++++
+<p align="center">
+  <img src="https://raw.githubusercontent.com/VEuPathDB/vdi-service/main/docs/1.0/assets/modules/import-trigger-handler/images/import-trigger-overview.svg" />
+</p>
+++++
+endif::[]
+ifndef::env-github[]
+image::images/import-trigger-overview.svg[align="center"]
+endif::[]
+
+
+This VDI module consumes import trigger messages from Kafka and performs dataset
+import operations by writing to the internal cache DB, writing to target
+application database control tables, and calling the appropriate plugin handler
+for the dataset's type for each target project.
