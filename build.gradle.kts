@@ -71,7 +71,7 @@ dependencies {
   implementation(project(":modules:soft-delete-trigger-handler"))
   implementation(project(":modules:update-meta-trigger-handler"))
 
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
 
   implementation("org.slf4j:slf4j-api:1.7.36")
   implementation("org.apache.logging.log4j:log4j-api:2.20.0")
