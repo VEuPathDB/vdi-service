@@ -1,6 +1,7 @@
 package org.veupathdb.vdi.lib.db.cache.sql.delete
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -13,7 +14,7 @@ WHERE
 
 internal fun Connection.deleteDatasetShareOffers(datasetID: DatasetID) {
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, datasetID.toString())
+    ps.setDatasetID(1, datasetID)
     ps.execute()
   }
 }
