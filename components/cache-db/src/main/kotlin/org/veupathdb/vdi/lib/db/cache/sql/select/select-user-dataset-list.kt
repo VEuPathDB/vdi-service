@@ -175,13 +175,10 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
           name         = it.getString("name"),
           summary      = it.getString("summary"),
           description  = it.getString("description"),
-          files        = it.getArray("files").toList(),
-          projects     = it.getArray("projects").toList(),
+          files        = it.getStringList("files"),
+          projects     = it.getProjectIDList("projects"),
         )
       }
     }
   }
 }
-
-@Suppress("UNCHECKED_CAST")
-private fun java.sql.Array.toList() = (this.array as Array<String>).asList()

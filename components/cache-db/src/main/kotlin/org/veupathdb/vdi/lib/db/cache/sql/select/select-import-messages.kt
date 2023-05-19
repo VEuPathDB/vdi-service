@@ -20,9 +20,5 @@ WHERE
 internal fun Connection.selectImportMessages(datasetID: DatasetID) =
   withPreparedStatement(SQL) {
     setDatasetID(1, datasetID)
-    withResults {
-      map {
-        it.getString(1)
-      }
-    }
+    withResults { map { it.getString(1) } }
   }
