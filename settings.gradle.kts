@@ -53,6 +53,7 @@ include(":components:kafka")
 include(":components:ldap")
 include(":components:plugin-mapping")
 include(":components:module-core")
+include(":components:pruner")
 include(":components:rabbit")
 include(":components:s3")
 

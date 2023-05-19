@@ -5,6 +5,11 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.db.cache.model.*
+import org.veupathdb.vdi.lib.db.cache.sql.delete.*
+import org.veupathdb.vdi.lib.db.cache.sql.delete.deleteDatasetMetadata
+import org.veupathdb.vdi.lib.db.cache.sql.delete.deleteDatasetShareOffers
+import org.veupathdb.vdi.lib.db.cache.sql.delete.deleteDatasetShareReceipts
+import org.veupathdb.vdi.lib.db.cache.sql.delete.deleteImportMessages
 import org.veupathdb.vdi.lib.db.cache.sql.insert.*
 import org.veupathdb.vdi.lib.db.cache.sql.insert.tryInsertDatasetFiles
 import org.veupathdb.vdi.lib.db.cache.sql.insert.tryInsertDatasetProjects
@@ -34,6 +39,51 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
       throw IllegalStateException("cannot execute queries on a connection that has already been closed or committed")
     else
       connection
+
+  fun deleteDatasetFiles(datasetID: DatasetID) {
+    log.debug("deleting dataset file records for dataset {}", datasetID)
+    con.deleteDatasetFiles(datasetID)
+  }
+
+  fun deleteDatasetMetadata(datasetID: DatasetID) {
+    log.debug("deleting dataset metadata for dataset {}", datasetID)
+    con.deleteDatasetMetadata(datasetID)
+  }
+
+  fun deleteDatasetProjects(datasetID: DatasetID) {
+    log.debug("deleting dataset project links for dataset {}", datasetID)
+    con.deleteDatasetProjects(datasetID)
+  }
+
+  fun deleteDatasetShareOffers(datasetID: DatasetID) {
+    log.debug("deleting dataset share offers for dataset {}", datasetID)
+    con.deleteDatasetShareOffers(datasetID)
+  }
+
+  fun deleteDatasetShareReceipts(datasetID: DatasetID) {
+    log.debug("deleting dataset share receipts for dataset {}", datasetID)
+    con.deleteDatasetShareReceipts(datasetID)
+  }
+
+  fun deleteDataset(datasetID: DatasetID) {
+    log.debug("deleting dataset {}", datasetID)
+    con.deleteDataset(datasetID)
+  }
+
+  fun deleteImportControl(datasetID: DatasetID) {
+    log.debug("deleting import control record for dataset {}", datasetID)
+    con.deleteImportControl(datasetID)
+  }
+
+  fun deleteImportMessages(datasetID: DatasetID) {
+    log.debug("deleting import messages for dataset {}", datasetID)
+    con.deleteImportMessages(datasetID)
+  }
+
+  fun deleteSyncControl(datasetID: DatasetID) {
+    log.debug("deleting sync control record for dataset {}", datasetID)
+    con.deleteSyncControl(datasetID)
+  }
 
   /**
    * Attempts to insert a dataset record for the given dataset details, aborting
