@@ -6,7 +6,8 @@ import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.cache.consts.OfferStatus
 import org.veupathdb.vdi.lib.db.cache.consts.ReceiptStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShareListEntry
-import org.veupathdb.vdi.lib.db.cache.util.gatherProjectIDs
+import org.veupathdb.vdi.lib.db.cache.util.getProjectIDList
+import org.veupathdb.vdi.lib.db.cache.util.setUserID
 import java.sql.Connection
 
 // language=postgresql
@@ -41,7 +42,7 @@ internal fun Connection.selectRejectedSharesFor(userID: UserID): List<DatasetSha
   val out = ArrayList<DatasetShareListEntry>()
 
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, userID.toString())
+    ps.setUserID(1, userID)
     ps.executeQuery().use { rs ->
       while (rs.next()) {
         out.add(
@@ -51,7 +52,7 @@ internal fun Connection.selectRejectedSharesFor(userID: UserID): List<DatasetSha
             typeName      = rs.getString("type_name"),
             typeVersion   = rs.getString("type_version"),
             receiptStatus = VDIShareReceiptAction.Reject,
-            projects      = rs.getArray("projects").gatherProjectIDs()
+            projects      = rs.getProjectIDList("projects")
           )
         )
       }

@@ -5,6 +5,7 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShare
+import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -25,7 +26,7 @@ internal fun Connection.selectSharesFor(datasetID: DatasetID): List<DatasetShare
   val out = ArrayList<DatasetShare>()
 
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, datasetID.toString())
+    ps.setDatasetID(1, datasetID)
     ps.executeQuery().use { rs ->
       while (rs.next()) {
         out.add(

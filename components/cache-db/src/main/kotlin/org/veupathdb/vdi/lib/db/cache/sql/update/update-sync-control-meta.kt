@@ -1,6 +1,7 @@
 package org.veupathdb.vdi.lib.db.cache.sql.update
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import java.sql.Connection
 import java.time.OffsetDateTime
 
@@ -36,7 +37,7 @@ WHERE
 internal fun Connection.updateSyncControlMeta(datasetID: DatasetID, timestamp: OffsetDateTime): Boolean {
   prepareStatement(SQL).use { ps ->
     ps.setObject(1, timestamp)
-    ps.setString(2, datasetID.toString())
+    ps.setDatasetID(2, datasetID)
     ps.setObject(3, timestamp)
     return ps.executeUpdate() > 0
   }

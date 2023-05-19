@@ -2,6 +2,7 @@ package org.veupathdb.vdi.lib.db.cache.sql.select
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import java.sql.Connection
 import java.time.OffsetDateTime
 
@@ -19,7 +20,7 @@ WHERE
 
 internal fun Connection.selectSyncControl(datasetID: DatasetID): VDISyncControlRecord? {
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, datasetID.toString())
+    ps.setDatasetID(1, datasetID)
 
     ps.executeQuery().use { rs ->
       if (!rs.next())

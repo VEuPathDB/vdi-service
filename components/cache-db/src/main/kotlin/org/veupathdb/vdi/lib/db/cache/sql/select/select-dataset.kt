@@ -5,6 +5,7 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecordImpl
+import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import java.sql.Connection
 import java.time.OffsetDateTime
 
@@ -34,7 +35,7 @@ WHERE
 
 internal fun Connection.selectDataset(datasetID: DatasetID): DatasetRecord? {
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, datasetID.toString())
+    ps.setDatasetID(1, datasetID)
 
     ps.executeQuery().use { rs ->
       if (!rs.next())

@@ -1,6 +1,7 @@
 package org.veupathdb.vdi.lib.db.cache.sql.insert
 
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -20,7 +21,7 @@ ON CONFLICT (dataset_id)
 
 internal fun Connection.tryInsertSyncControl(record: VDISyncControlRecord) {
   prepareStatement(SQL).use { ps ->
-    ps.setString(1, record.datasetID.toString())
+    ps.setDatasetID(1, record.datasetID)
     ps.setObject(2, record.sharesUpdated)
     ps.setObject(3, record.dataUpdated)
     ps.setObject(4, record.metaUpdated)
