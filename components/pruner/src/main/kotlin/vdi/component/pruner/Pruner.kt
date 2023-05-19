@@ -14,6 +14,29 @@ import java.time.temporal.ChronoUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
+/**
+ * Dataset Pruner
+ *
+ * This object represents and performs the task of pruning old/dead datasets
+ * from the VDI system.
+ *
+ * Datasets are considered "prunable" if they have been marked as soft-deleted
+ * for longer than a configured amount of time.  After this point they are
+ * subject to the following operations:
+ *
+ * 1. Deletion from the control tables in all relevant application databases.
+ * 2. Deletion from the control tables in the VDI cache database.
+ * 3. Deletion of all relevant objects in the S3 instance.
+ *
+ * Only one pruning operation may be performed at a time, and multiple calls to
+ * the [pruneDatasets] method will block until previous calls have completed.
+ * Whether a call to [pruneDatasets] will block may be tested by calling the
+ * [canPrune] method.
+ *
+ * @since 1.0.0
+ *
+ * @author Elizabeth Paige Harper - https://github.com/foxcapades
+ */
 object Pruner {
   private val log = LoggerFactory.getLogger(javaClass)
 
