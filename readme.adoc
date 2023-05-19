@@ -1,37 +1,42 @@
 = VEuPathDB Dataset Installer Service (VDI)
 :source-highlighter: highlightjs
-:toc: preamble
+:toc:
+
+== Links
+
+=== Documentation
 
 * link:https://veupathdb.github.io/vdi-service/vdi-api.html[VDI Service API Doc]
-* link:https://veupathdb.github.io/vdi-service/design/1.0/design.html[VDI Service Design Doc]
+* link:https://veupathdb.github.io/vdi-service/design/1.0/design.html[Service Design Doc]
+* link:https://veupathdb.atlassian.net/wiki/spaces/UI/pages/36438144/VDI+User+Datasets+Design[Original Design Doc]
 
-== VDI Project Index
+=== VDI Project Index
 
-=== Services
+==== Services
 
 * https://github.com/VEuPathDB/vdi-service[VDI Core Service]
 * https://github.com/VEuPathDB/vdi-plugin-handler-server[VDI Plugin Handler Service]
 
-=== Docker Images
+==== Docker Images
 
 * https://github.com/VEuPathDB/vdi-internal-db[Cache DB Docker Image]
 * https://github.com/VEuPathDB/vdi-docker-handler-base[Plugin Handler Base]
 
-=== Libraries
+==== Libraries
 
-==== Service Libraries
+===== Service Libraries
 
 * https://github.com/VEuPathDB/vdi-component-common[Commons Library]
 * https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
 
-==== Plugin Libraries
+===== Plugin Libraries
 
 * https://github.com/VEuPathDB/lib-vdi-plugin-rnaseq[lib-rnaseq]
 * https://github.com/VEuPathDB/lib-vdi-plugin-study[lib-study]
 
-=== Plugins
+==== Plugins
 
-==== Production
+===== Production
 
 * https://github.com/VEuPathDB/vdi-plugin-bigwig[bigwig]
 * https://github.com/VEuPathDB/vdi-plugin-biom[biom]
@@ -39,7 +44,7 @@
 * https://github.com/VEuPathDB/vdi-plugin-rnaseq[rnaseq]
 * https://github.com/VEuPathDB/vdi-plugin-genelist[genelist]
 
-==== Examples
+===== Examples
 
 * https://github.com/VEuPathDB/vdi-handler-plugin-example[Example Plugin]
 * https://github.com/VEuPathDB/vdi-handler-no-op-plugin[No-Op Plugin]
