@@ -313,4 +313,3 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
     closed = true
   }
 }
-
