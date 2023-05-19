@@ -31,7 +31,7 @@ import kotlin.concurrent.withLock
  * Only one pruning operation may be performed at a time, and multiple calls to
  * the [pruneDatasets] method will block until previous calls have completed.
  * Whether a call to [pruneDatasets] will block may be tested by calling the
- * [canPrune] method.
+ * [isLocked] method.
  *
  * @since 1.0.0
  *
@@ -49,7 +49,7 @@ object Pruner {
    *
    * This method locks until completion, blocking multiple instances of the
    * operation being performed simultaneously.  To test if a prune operation is
-   * currently in progress call [canPrune].
+   * currently in progress call [isLocked].
    */
   fun pruneDatasets() {
     lock.withLock { doPruning() }
@@ -74,7 +74,14 @@ object Pruner {
     }
   }
 
-  fun canPrune() = !lock.isLocked
+  /**
+   * Tests whether the [Pruner] is currently locked (has a prune job in
+   * progress).
+   *
+   * @return `true` if the Pruner is currently executing a prune job, otherwise
+   * `false`.
+   */
+  fun isLocked() = lock.isLocked
 
   private fun doPruning() {
     log.info("starting dataset pruning job")
