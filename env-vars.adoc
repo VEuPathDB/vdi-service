@@ -199,7 +199,7 @@ from the VDI Kafka instance. +
 *THIS VALUE MUST BE UNIQUE ACROSS ALL KAFKA CLIENT IDS*
 |===
 
-==== InstallDataTriggerHandler
+==== Install Data Trigger Handler
 
 [%header, cols="1,3m,3m,8"]
 |===
@@ -222,6 +222,19 @@ from the VDI Kafka instance. +
 from the VDI Kafka instance. +
 
 *THIS VALUE MUST BE UNIQUE ACROSS ALL KAFKA CLIENT IDS*
+|===
+
+==== Pruner
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+|
+| DATASET_PRUNING_WAKEUP_INTERVAL
+| Duration
+| Frequency at which the pruner module will wake up and check for a service
+  shutdown signal.
 |===
 
 ==== Share Trigger Handler
