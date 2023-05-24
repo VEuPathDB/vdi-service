@@ -86,6 +86,11 @@ object CacheDB {
     return connection.use { it.selectSyncControl(datasetID) }
   }
 
+  fun selectDeletedDatasets(): List<DeletedDataset> {
+    log.debug("selecting deleted datasets")
+    return connection.use { it.selectDeletedDatasets() }
+  }
+
   fun updateImportStatus(datasetID: DatasetID, status: DatasetImportStatus) {
     log.debug("updating import status for dataset {} to status {}", datasetID, status)
     return connection.use { it.updateDatasetImportStatus(datasetID, status) }

@@ -823,6 +823,24 @@ value will be ignored by the VDI service.
 | Message key for update-meta trigger events.
 |===
 
+==== Pruner
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+|
+| DATASET_PRUNING_DELETION_THRESHOLD
+| Duration
+| Age at which a soft-deleted dataset becomes a candidate for pruning from S3.
+
+|
+| DATASET_PRUNING_INTERVAL
+| Duration
+| Frequency at which the pruner will run automatically.
+
+|===
+
 ==== Rabbit
 
 [%header, cols="1,3m,3m,8"]

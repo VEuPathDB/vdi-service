@@ -75,6 +75,7 @@ modules.
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/ldap[LDAP Utilities]
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/plugin-mapping[Plugin Mapping]
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/handler-client[Plugin Server Client]
+* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/pruner[Dataset Pruner]
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/rabbit[Rabbit Client]
 * link:https://github.com/VEuPathDB/vdi-component-reconciler[Reconciler]
 * link:https://github.com/VEuPathDB/vdi-service/tree/main/components/s3[S3 Utilities]

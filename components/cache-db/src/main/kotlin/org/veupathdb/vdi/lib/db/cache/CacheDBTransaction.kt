@@ -38,6 +38,114 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
   }
 
   /**
+   * Deletes all entries in the `vdi.dataset_files` table for a target dataset
+   * identified by the given [DatasetID].
+   *
+   * @param datasetID ID of the target dataset whose `vdi.dataset_files` records
+   * should be deleted.
+   */
+  fun deleteDatasetFiles(datasetID: DatasetID) {
+    log.debug("deleting dataset file records for dataset {}", datasetID)
+    con.deleteDatasetFiles(datasetID)
+  }
+
+  /**
+   * Deletes the `vdi.dataset_metadata` table entry for a target dataset
+   * identified by the given [DatasetID].
+   *
+   * @param datasetID ID of the target dataset whose `vdi.dataset_metadata`
+   * record should be deleted.
+   */
+  fun deleteDatasetMetadata(datasetID: DatasetID) {
+    log.debug("deleting dataset metadata for dataset {}", datasetID)
+    con.deleteDatasetMetadata(datasetID)
+  }
+
+  /**
+   * Deletes all entries in the `vdi.dataset_projects` table for a target
+   * dataset identified by the given [DatasetID].
+   *
+   * @param datasetID ID of the target dataset whose `vdi.dataset_projects`
+   * records should be deleted.
+   */
+  fun deleteDatasetProjects(datasetID: DatasetID) {
+    log.debug("deleting dataset project links for dataset {}", datasetID)
+    con.deleteDatasetProjects(datasetID)
+  }
+
+  /**
+   * Deletes all entries in the `vdi.dataset_share_offers` table for a target
+   * dataset identified by the given [DatasetID].
+   *
+   * @param datasetID ID of the target dataset whose `vdi.dataset_share_offers`
+   * records should be deleted.
+   */
+  fun deleteDatasetShareOffers(datasetID: DatasetID) {
+    log.debug("deleting dataset share offers for dataset {}", datasetID)
+    con.deleteDatasetShareOffers(datasetID)
+  }
+
+  /**
+   * Deletes all entries in the `vdi.dataset_share_receipts` table for a target
+   * dataset identified by the given [DatasetID].
+   *
+   * @param datasetID ID of the target dataset whose
+   * `vdi.dataset_share_receipts` records should be deleted.
+   */
+  fun deleteDatasetShareReceipts(datasetID: DatasetID) {
+    log.debug("deleting dataset share receipts for dataset {}", datasetID)
+    con.deleteDatasetShareReceipts(datasetID)
+  }
+
+  /**
+   * Deletes the `vdi.datasets` table entry for a target dataset identified by
+   * the given [DatasetID].
+   *
+   * @param datasetID ID of the target dataset whose `vdi.datasets` record
+   * should be deleted.
+   */
+  fun deleteDataset(datasetID: DatasetID) {
+    log.debug("deleting dataset {}", datasetID)
+    con.deleteDataset(datasetID)
+  }
+
+  /**
+   * Deletes the `vdi.import_control` table entry for a target dataset
+   * identified by the given [DatasetID].
+   *
+   * @param datasetID ID of the target dataset whose `vdi.import_control` record
+   * should be deleted.
+   */
+  fun deleteImportControl(datasetID: DatasetID) {
+    log.debug("deleting import control record for dataset {}", datasetID)
+    con.deleteImportControl(datasetID)
+  }
+
+  /**
+   * Deletes the `vdi.import_messages` table entry for a target dataset
+   * identified by the given [DatasetID].
+   *
+   * @param datasetID ID of the target dataset whose `vdi.import_messages`
+   * record should be deleted.
+   */
+  fun deleteImportMessages(datasetID: DatasetID) {
+    log.debug("deleting import messages for dataset {}", datasetID)
+    con.deleteImportMessages(datasetID)
+  }
+
+  /**
+   * Deletes the `vdi.sync_control` table entry for a target dataset identified
+   * by the given [DatasetID].
+   *
+   * @param datasetID ID of the target dataset whose `vdi.sync_control` record
+   * should be deleted.
+   */
+  fun deleteSyncControl(datasetID: DatasetID) {
+    log.debug("deleting sync control record for dataset {}", datasetID)
+    con.deleteSyncControl(datasetID)
+  }
+
+  /**
    * Attempts to insert a dataset record for the given dataset details, aborting
    * the insert query silently if a conflicting record already exists.
    *
@@ -216,4 +324,3 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
     closed = true
   }
 }
-
