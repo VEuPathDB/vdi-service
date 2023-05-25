@@ -5,7 +5,7 @@ import vdi.component.modules.VDIServiceModule
 /**
  * Soft Delete Trigger Handling Module
  *
- * This modules consumes the Kafka topic for soft delete trigger events and
+ * This module consumes the Kafka topic for soft delete trigger events and
  * sets the soft-delete flag on the cache DB record and relevant application DB
  * records.
  *
