@@ -1,17 +1,29 @@
-package vdi.module.handler.share.trigger.config
+package vdi.module.handler.share.trigger
 
+import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.env.*
 import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
 import org.veupathdb.vdi.lib.s3.datasets.util.S3Config
 
-internal fun loadConfigFromEnvironment() = loadConfigFromEnvironment(System.getenv())
+data class ShareTriggerHandlerConfig(
+  val workerPoolSize:         UInt,
+  val workQueueSize:          UInt,
+  val kafkaConsumerConfig:    KafkaConsumerConfig,
+  val s3Config:               S3Config,
+  val s3Bucket:               BucketName,
+  val shareTriggerTopic:      String,
+  val shareTriggerMessageKey: String,
+) {
+  constructor() : this(System.getenv())
 
-internal fun loadConfigFromEnvironment(env: Environment) =
-  ShareTriggerHandlerConfig(
+  constructor(env: Environment) : this(
     workerPoolSize = env.optUInt(EnvKey.ShareTriggerHandler.WorkerPoolSize)
-      ?: ShareTriggerHandlerConfigDefaults.WorkerPoolSize,
+      ?: Defaults.WorkerPoolSize,
+
+    workQueueSize = env.optUInt(EnvKey.ShareTriggerHandler.WorkQueueSize)
+      ?: Defaults.WorkQueueSize,
 
     kafkaConsumerConfig = KafkaConsumerConfig(
       env.require(EnvKey.ShareTriggerHandler.KafkaConsumerClientID),
@@ -29,3 +41,8 @@ internal fun loadConfigFromEnvironment(env: Environment) =
       ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY
   )
 
+  object Defaults {
+    const val WorkerPoolSize = 10u
+    const val WorkQueueSize = 10u
+  }
+}
