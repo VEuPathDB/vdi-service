@@ -30,6 +30,12 @@ log-plugin-noop:
 log-kafka:
 	@docker logs -f vdi-service-kafka-1
 
+open-minio:
+	@sensible-browser http://localhost:9001
+
+open-rabbit:
+	@sensible-browser http://localhost:9002
+
 env-file-test:
 	@if [ ! -f .env ]; then echo "Missing .env file."; exit 1; fi
 
