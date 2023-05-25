@@ -27,7 +27,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import vdi.component.modules.VDIServiceModuleBase
-import vdi.module.handler.install.data.config.InstallTriggerHandlerConfig
 
 internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig)
   : InstallDataTriggerHandler
