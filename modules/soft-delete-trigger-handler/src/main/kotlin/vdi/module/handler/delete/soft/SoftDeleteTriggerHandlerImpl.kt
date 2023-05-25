@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import vdi.component.modules.VDIServiceModuleBase
-import vdi.module.handler.delete.soft.config.SoftDeleteTriggerHandlerConfig
 
 internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTriggerHandlerConfig)
   : SoftDeleteTriggerHandler
