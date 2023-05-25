@@ -27,6 +27,9 @@ log-service:
 log-plugin-noop:
 	@docker logs -f vdi-service-plugin-example-1
 
+log-kafka:
+	@docker logs -f vdi-service-kafka-1
+
 env-file-test:
 	@if [ ! -f .env ]; then echo "Missing .env file."; exit 1; fi
 
