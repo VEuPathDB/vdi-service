@@ -9,7 +9,7 @@ Configuration:
         pattern: "%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} [rid:%5X{traceId}] %-5level %c - %m%n}"
   Loggers:
     Root:
-      level: trace
+      level: debug
       AppenderRef:
       - ref: Console_Appender
     Logger:

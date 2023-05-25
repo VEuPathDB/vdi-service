@@ -37,7 +37,7 @@ object S3Paths {
     (userPath(userID) / "").toString()
 
   /**
-   * `{root}/{user-id}/{dataset-id}`
+   * `{root}/{user-id}/{dataset-id}/`
    */
   fun datasetDir(userID: UserID, datasetID: DatasetID) =
     (datasetPath(userID, datasetID) / "").toString()
