@@ -9,7 +9,6 @@ import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.rabbit.RabbitMQEventIterator
 import org.veupathdb.vdi.lib.rabbit.RabbitMQEventSource
 import org.veupathdb.vdi.lib.s3.datasets.paths.*
-import vdi.module.events.routing.config.EventRouterConfig
 import vdi.module.events.routing.model.MinIOEvent
 import vdi.module.events.routing.model.MinIOEventAction
 

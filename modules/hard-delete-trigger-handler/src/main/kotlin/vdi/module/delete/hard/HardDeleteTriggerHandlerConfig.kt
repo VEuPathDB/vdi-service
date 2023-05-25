@@ -2,6 +2,7 @@ package vdi.module.delete.hard
 
 import org.veupathdb.vdi.lib.common.env.*
 import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
 
 data class HardDeleteTriggerHandlerConfig(
   val jobQueueSize: UInt,
@@ -14,10 +15,10 @@ data class HardDeleteTriggerHandlerConfig(
 
   constructor(env: Environment) : this(
     jobQueueSize = env.optUInt(EnvKey.HardDeleteTriggerHandler.WorkQueueSize)
-      ?: HardDeleteTriggerHandlerConfigDefaults.JobQueueSize,
+      ?: Defaults.JobQueueSize,
 
     workerPoolSize = env.optUInt(EnvKey.HardDeleteTriggerHandler.WorkerPoolSize)
-      ?: HardDeleteTriggerHandlerConfigDefaults.WorkerPoolSize,
+      ?: Defaults.WorkerPoolSize,
 
     kafkaConsumerConfig = KafkaConsumerConfig(
       env.require(EnvKey.HardDeleteTriggerHandler.KafkaConsumerClientID),
@@ -25,10 +26,21 @@ data class HardDeleteTriggerHandlerConfig(
     ),
 
     hardDeleteTopic = env.optional(EnvKey.Kafka.Topic.HardDeleteTriggers)
-      ?: HardDeleteTriggerHandlerConfigDefaults.HardDeleteTopic,
+      ?: Defaults.HardDeleteTopic,
 
     hardDeleteMessageKey = env.optional(EnvKey.Kafka.MessageKey.HardDeleteTriggers)
-      ?: HardDeleteTriggerHandlerConfigDefaults.HardDeleteMesesageKey
+      ?: Defaults.HardDeleteMesesageKey
   )
+
+  object Defaults {
+    const val JobQueueSize   = 10u
+    const val WorkerPoolSize = 10u
+
+    inline val HardDeleteTopic
+      get() = KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC
+
+    inline val HardDeleteMesesageKey
+      get() = KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY
+  }
 }
 

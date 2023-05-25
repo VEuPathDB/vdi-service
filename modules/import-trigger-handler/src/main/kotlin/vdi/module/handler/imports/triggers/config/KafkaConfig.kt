@@ -1,5 +1,9 @@
 package vdi.module.handler.imports.triggers.config
 
+import org.veupathdb.vdi.lib.common.env.EnvKey
+import org.veupathdb.vdi.lib.common.env.Environment
+import org.veupathdb.vdi.lib.common.env.optional
+import org.veupathdb.vdi.lib.common.env.require
 import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
 
@@ -28,5 +32,17 @@ data class KafkaConfig(
    * on.
    */
   val importTriggerTopic: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
+) {
+  constructor() : this(System.getenv())
 
+  constructor(env: Environment) : this(
+    consumerConfig          = KafkaConsumerConfig(
+      env.require(EnvKey.ImportTriggerHandler.KafkaConsumerClientID),
+      env
+    ),
+    importTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.ImportTriggers)
+      ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
+    importTriggerTopic      = env.optional(EnvKey.Kafka.Topic.ImportTriggers)
+      ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
   )
+}

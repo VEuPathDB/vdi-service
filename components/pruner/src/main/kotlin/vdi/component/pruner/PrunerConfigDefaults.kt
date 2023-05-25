@@ -4,5 +4,5 @@ import kotlin.time.Duration.Companion.days
 
 object PrunerConfigDefaults {
   inline val DeletionThreshold
-    get() = 30.days
+    get() = 5.days
 }

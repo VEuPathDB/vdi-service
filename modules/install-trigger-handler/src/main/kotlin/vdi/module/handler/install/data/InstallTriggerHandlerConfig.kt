@@ -1,9 +1,10 @@
-package vdi.module.handler.install.data.config
+package vdi.module.handler.install.data
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.env.*
 import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
 import org.veupathdb.vdi.lib.s3.datasets.util.S3Config
 
 data class InstallTriggerHandlerConfig(
@@ -19,10 +20,10 @@ data class InstallTriggerHandlerConfig(
 
   constructor(env: Environment) : this(
     workerPoolSize = env.optUInt(EnvKey.InstallDataTriggerHandler.WorkerPoolSize)
-      ?: InstallTriggerHandlerConfigDefaults.WorkerPoolSize,
+      ?: Defaults.WorkerPoolSize,
 
     jobQueueSize = env.optUInt(EnvKey.InstallDataTriggerHandler.WorkQueueSize)
-      ?: InstallTriggerHandlerConfigDefaults.JobQueueSize,
+      ?: Defaults.JobQueueSize,
 
     kafkaConsumerConfig = KafkaConsumerConfig(
       env.require(EnvKey.InstallDataTriggerHandler.KafkaConsumerClientID),
@@ -34,10 +35,22 @@ data class InstallTriggerHandlerConfig(
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
 
     installDataTriggerTopic = env.optional(EnvKey.Kafka.Topic.InstallTriggers)
-      ?: InstallTriggerHandlerConfigDefaults.InstallDataTriggerTopic,
+      ?: Defaults.InstallDataTriggerTopic,
 
     installDataTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.InstallTriggers)
-      ?: InstallTriggerHandlerConfigDefaults.InstallDataTriggerMessageKey,
+      ?: Defaults.InstallDataTriggerMessageKey,
   )
+
+  object Defaults {
+    const val WorkerPoolSize = 5u
+
+    const val JobQueueSize   = 5u
+
+    inline val InstallDataTriggerTopic
+      get() = KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC
+
+    inline val InstallDataTriggerMessageKey
+      get() = KafkaRouterConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY
+  }
 }
 

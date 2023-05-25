@@ -21,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import vdi.component.modules.VDIServiceModuleBase
-import vdi.module.handler.share.trigger.config.ShareTriggerHandlerConfig
 
 internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig)
   : ShareTriggerHandler
@@ -32,7 +31,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.shareTriggerTopic, config.kafkaConsumerConfig)
     val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
-    val wp = WorkerPool("share-workers", config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
+    val wp = WorkerPool("share-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
       launch(Dispatchers.IO) {

@@ -28,11 +28,6 @@ import kotlin.concurrent.withLock
  * 2. Deletion from the control tables in the VDI cache database.
  * 3. Deletion of all relevant objects in the S3 instance.
  *
- * Only one pruning operation may be performed at a time, and multiple calls to
- * the [pruneDatasets] method will block until previous calls have completed.
- * Whether a call to [pruneDatasets] will block may be tested by calling the
- * [isLocked] method.
- *
  * @since 1.0.0
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
@@ -45,17 +40,6 @@ object Pruner {
   private val config = PrunerConfig()
 
   /**
-   * Locks the pruner and prunes old/dead datasets.
-   *
-   * This method locks until completion, blocking multiple instances of the
-   * operation being performed simultaneously.  To test if a prune operation is
-   * currently in progress call [isLocked].
-   */
-  fun pruneDatasets() {
-    lock.withLock { doPruning() }
-  }
-
-  /**
    * Tries to lock the pruner to prune old/dead datasets.
    *
    * If the pruner could not be locked because a pruning job is already in
@@ -63,14 +47,21 @@ object Pruner {
    *
    * If the pruner was not already active, this method will lock the pruner and
    * execute the pruning job, only unlocking once the job is completed.
+   *
+   * @return `true` if the pruning job executed, `false` if the pruner lock
+   * could not be acquired due to an already running pruning job.
    */
-  fun tryPruneDatasets() {
-    if (lock.tryLock()) {
+  fun tryPruneDatasets(): Boolean {
+    return if (lock.tryLock()) {
       try {
         doPruning()
       } finally {
         lock.unlock()
       }
+
+      true
+    } else {
+      false
     }
   }
 

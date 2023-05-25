@@ -231,6 +231,17 @@ from the VDI Kafka instance. +
 | Req. | Name | Type | Description
 
 |
+| DATASET_PRUNING_DELETION_THRESHOLD
+| Duration
+| Age at which a soft-deleted dataset becomes a candidate for pruning from the
+VDI system
+
+|
+| DATASET_PRUNING_INTERVAL
+| Duration
+| Frequency at which the pruner will run automatically.
+
+|
 | DATASET_PRUNING_WAKEUP_INTERVAL
 | Duration
 | Frequency at which the pruner module will wake up and check for a service
@@ -836,24 +847,6 @@ value will be ignored by the VDI service.
 | Message key for update-meta trigger events.
 |===
 
-==== Pruner
-
-[%header, cols="1,3m,3m,8"]
-|===
-| Req. | Name | Type | Description
-
-|
-| DATASET_PRUNING_DELETION_THRESHOLD
-| Duration
-| Age at which a soft-deleted dataset becomes a candidate for pruning from S3.
-
-|
-| DATASET_PRUNING_INTERVAL
-| Duration
-| Frequency at which the pruner will run automatically.
-
-|===
-
 ==== Rabbit
 
 [%header, cols="1,3m,3m,8"]
@@ -956,7 +949,9 @@ the VDI service are closed.
 |
 | GLOBAL_RABBIT_VDI_QUEUE_EXCLUSIVE
 | boolean
-|
+| Whether the queue should be exclusive to the VDI service.
+
+See: https://www.rabbitmq.com/queues.html#exclusive-queues[Exclusive Queues]
 
 |
 | GLOBAL_RABBIT_VDI_QUEUE_DURABLE

@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import vdi.component.modules.VDIServiceModuleBase
-import vdi.module.handler.delete.soft.config.SoftDeleteTriggerHandlerConfig
 
 internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTriggerHandlerConfig)
   : SoftDeleteTriggerHandler
@@ -29,7 +28,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.softDeleteTriggerTopic, config.kafkaConsumerConfig)
     val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
-    val wp = WorkerPool("soft-delete-workers", config.workerPoolSize.toInt(), config.workerPoolSize.toInt())
+    val wp = WorkerPool("soft-delete-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
       launch(Dispatchers.IO) {
