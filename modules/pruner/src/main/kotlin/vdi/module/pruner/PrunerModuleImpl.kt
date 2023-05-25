@@ -28,7 +28,7 @@ internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : Pruner
   }
 
   override suspend fun stop() {
-    log.info("triggering S3 pruning shutdown")
+    log.info("triggering S3 pruning module shutdown")
     shutdownTrigger.trigger()
     shutdownConfirm.await()
   }
