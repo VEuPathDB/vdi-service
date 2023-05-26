@@ -1,7 +1,7 @@
 CREATE USER vdi;
 ALTER USER vdi QUOTA UNLIMITED ON users;
 
-CREATE TABLE vdi.dataset(
+CREATE TABLE vdi.dataset (
   dataset_id CHAR(32)
     PRIMARY KEY
     NOT NULL
