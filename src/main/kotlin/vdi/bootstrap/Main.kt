@@ -12,6 +12,7 @@ import vdi.module.handler.imports.triggers.ImportTriggerHandler
 import vdi.module.handler.install.data.InstallDataTriggerHandler
 import vdi.module.handler.meta.triggers.UpdateMetaTriggerHandler
 import vdi.module.handler.share.trigger.ShareTriggerHandler
+import vdi.module.pruner.PrunerModule
 
 object Main {
 
@@ -25,6 +26,7 @@ object Main {
       HardDeleteTriggerHandler(),
       ImportTriggerHandler(),
       InstallDataTriggerHandler(),
+      PrunerModule(),
       ShareTriggerHandler(),
       SoftDeleteTriggerHandler(),
       UpdateMetaTriggerHandler(),
