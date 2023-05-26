@@ -11,6 +11,7 @@ import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
+import java.util.LinkedList
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -166,11 +167,8 @@ object Pruner {
   private fun DeletedDataset.deleteFromS3(bucket: S3Bucket) {
     log.debug("deleting dataset {}/{} from S3", ownerID, datasetID)
 
-    bucket.objects.listSubPaths(S3Paths.datasetDir(ownerID, datasetID))
-      .contents()
-      .forEach {
-        log.trace("deleting object {} from S3", it.path)
-        it.delete()
-      }
+    bucket.objects.list(prefix = S3Paths.datasetDir(ownerID, datasetID))
+      .map { it.path }
+      .let { bucket.objects.deleteAll(it) }
   }
 }
