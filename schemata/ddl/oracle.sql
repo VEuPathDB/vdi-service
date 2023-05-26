@@ -1,4 +1,9 @@
-CREATE USER vdi;
+-- IMPORTANT:
+--   This is just a reference for the design of the tables in the VDI schema.
+--   The "live" schema creation script lives in the ApiCommonData/Load sql
+--   scripts directory.
+
+CREATE USER vdi IDENTIFIED BY asdfasdfasdfasdfasdf;
 ALTER USER vdi QUOTA UNLIMITED ON users;
 
 CREATE TABLE vdi.dataset (
