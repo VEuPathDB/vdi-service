@@ -7,7 +7,7 @@ import java.sql.Connection
 // language=oracle
 private const val SQL = """
 DELETE FROM
-  vdi.dataset_projects
+  vdi.dataset_project
 WHERE
   dataset_id = ?
   AND project_id = ?

@@ -14,7 +14,7 @@ SELECT
 , type_version
 , is_deleted
 FROM
-  vdi.datasets
+  vdi.dataset
 WHERE
   dataset_id = ?
 """

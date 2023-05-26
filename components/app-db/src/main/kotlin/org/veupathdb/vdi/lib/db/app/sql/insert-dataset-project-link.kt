@@ -7,7 +7,7 @@ import java.sql.Connection
 // language=oracle
 private const val SQL = """
 INSERT INTO
-  vdi.dataset_projects (
+  vdi.dataset_project (
     dataset_id
   , project_id
   )

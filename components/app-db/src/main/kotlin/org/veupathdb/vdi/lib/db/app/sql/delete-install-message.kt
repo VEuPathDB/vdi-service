@@ -7,7 +7,7 @@ import java.sql.Connection
 // language=oracle
 private const val SQL = """
 DELETE FROM
-  vdi.dataset_install_messages
+  vdi.dataset_install_message
 WHERE
   dataset_id = ?
   AND install_type = ?

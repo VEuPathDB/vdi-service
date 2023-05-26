@@ -13,7 +13,7 @@ SELECT
 , status
 , message
 FROM
-  vdi.dataset_install_messages
+  vdi.dataset_install_message
 WHERE
   dataset_id = ?
 """

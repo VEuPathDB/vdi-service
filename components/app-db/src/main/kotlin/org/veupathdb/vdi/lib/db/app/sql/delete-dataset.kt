@@ -6,7 +6,7 @@ import java.sql.Connection
 // language=oracle
 private const val SQL = """
 DELETE FROM
-  vdi.datasets
+  vdi.dataset
 WHERE
   dataset_id = ?
 """

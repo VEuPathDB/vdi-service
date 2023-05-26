@@ -1,7 +1,7 @@
-CREATE USER vdi IDENTIFIED BY asdfasdfasdfasdfasdf;
+CREATE USER vdi;
 ALTER USER vdi QUOTA UNLIMITED ON users;
 
-CREATE TABLE vdi.datasets (
+CREATE TABLE vdi.dataset(
   dataset_id CHAR(32)
     PRIMARY KEY
     NOT NULL
@@ -25,10 +25,10 @@ CREATE TABLE vdi.sync_control (
     NOT NULL
 , meta_update_time TIMESTAMP WITH TIME ZONE
     NOT NULL
-, FOREIGN KEY (dataset_id) REFERENCES vdi.datasets (dataset_id)
+, FOREIGN KEY (dataset_id) REFERENCES vdi.dataset (dataset_id)
 );
 
-CREATE TABLE vdi.dataset_install_messages (
+CREATE TABLE vdi.dataset_install_message (
   dataset_id CHAR(32)
     NOT NULL
 , install_type VARCHAR2(64)
@@ -36,7 +36,7 @@ CREATE TABLE vdi.dataset_install_messages (
 , status VARCHAR2(64)
     NOT NULL
 , message CLOB
-, FOREIGN KEY (dataset_id) REFERENCES vdi.datasets (dataset_id)
+, FOREIGN KEY (dataset_id) REFERENCES vdi.dataset (dataset_id)
 );
 
 CREATE TABLE vdi.dataset_visibility (
@@ -44,13 +44,13 @@ CREATE TABLE vdi.dataset_visibility (
     NOT NULL
 , user_id NUMBER
     NOT NULL
-, FOREIGN KEY (dataset_id) REFERENCES vdi.datasets (dataset_id)
+, FOREIGN KEY (dataset_id) REFERENCES vdi.dataset (dataset_id)
 );
 
-CREATE TABLE vdi.dataset_projects (
+CREATE TABLE vdi.dataset_project (
   dataset_id CHAR(32)
     NOT NULL
 , project_id VARCHAR2(64)
     NOT NULL
-, FOREIGN KEY (dataset_id) REFERENCES vdi.datasets (dataset_id)
+, FOREIGN KEY (dataset_id) REFERENCES vdi.dataset (dataset_id)
 );

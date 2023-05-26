@@ -6,7 +6,7 @@ import java.sql.Connection
 // language=oracle
 private const val SQL = """
 INSERT INTO
-  vdi.dataset_install_messages (
+  vdi.dataset_install_message (
     dataset_id
   , install_type
   , status

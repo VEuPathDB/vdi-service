@@ -6,7 +6,7 @@ import java.sql.Connection
 // language=oracle
 private const val SQL = """
 INSERT INTO
-  vdi.datasets (
+  vdi.dataset (
     dataset_id
   , owner
   , type_name

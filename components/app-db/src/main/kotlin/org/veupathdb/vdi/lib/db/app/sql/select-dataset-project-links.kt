@@ -9,7 +9,7 @@ private const val SQL = """
 SELECT
   project_id
 FROM
-  vdi.dataset_projects
+  vdi.dataset_project
 WHERE
   dataset_id = ?
 """

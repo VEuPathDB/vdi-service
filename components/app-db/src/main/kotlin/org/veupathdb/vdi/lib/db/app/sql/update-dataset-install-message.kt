@@ -6,7 +6,7 @@ import java.sql.Connection
 // language=oracle
 private const val SQL = """
 UPDATE
-  vdi.dataset_install_messages
+  vdi.dataset_install_message
 SET
   status = ?
 , message = ?

@@ -6,7 +6,7 @@ import java.sql.Connection
 // language=oracle
 private const val SQL = """
 UPDATE
-  vdi.datasets
+  vdi.dataset
 SET
   owner = ?
 , type_name = ?
