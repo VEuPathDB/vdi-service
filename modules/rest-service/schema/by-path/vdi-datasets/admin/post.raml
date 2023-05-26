@@ -15,29 +15,6 @@ types:
     maxLength: 64
     pattern: ^[0-9a-fA-F]{64}$
 
-  ReconciliationRequest:
-    displayName: Reconciliation Request
-    description: |
-      Request for the service to run the reconciliation process.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization:
-        type: AuthorizationKey
-        required: true
-
-  DeleteCleanupRequest:
-    displayName: Delete Cleanup Request
-    description: |
-      Request for the service to clean up datasets that were soft deleted more
-      than 24 hours prior to the request.
-    type: object
-    additionalProperties: false
-    properties:
-      authorization:
-        type: AuthorizationKey
-        required: true
-
   InstallCleanupRequest:
     displayName: Install Cleanup Request
     description: |
@@ -50,9 +27,6 @@ types:
     type: object
     additionalProperties: false
     properties:
-      authorization:
-        type: AuthorizationKey
-        required: true
       all:
         type: boolean
         default: false

@@ -1,14 +1,13 @@
 package org.veupathdb.service.vdi.generated.resources;
 
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
-import org.veupathdb.service.vdi.generated.model.DeleteCleanupRequest;
 import org.veupathdb.service.vdi.generated.model.InstallCleanupRequest;
-import org.veupathdb.service.vdi.generated.model.ReconciliationRequest;
 import org.veupathdb.service.vdi.generated.model.ServerError;
 import org.veupathdb.service.vdi.generated.model.UnauthorizedError;
 import org.veupathdb.service.vdi.generated.support.ResponseDelegate;
@@ -18,22 +17,21 @@ public interface VdiDatasetsAdmin {
   @POST
   @Path("/reconcile")
   @Produces("application/json")
-  @Consumes("application/json")
-  PostVdiDatasetsAdminReconcileResponse postVdiDatasetsAdminReconcile(ReconciliationRequest entity);
+  PostVdiDatasetsAdminReconcileResponse postVdiDatasetsAdminReconcile(
+      @HeaderParam("Auth-Key") String authKey);
 
   @POST
   @Path("/install-cleanup")
   @Produces("application/json")
   @Consumes("application/json")
   PostVdiDatasetsAdminInstallCleanupResponse postVdiDatasetsAdminInstallCleanup(
-      InstallCleanupRequest entity);
+      @HeaderParam("Auth-Key") String authKey, InstallCleanupRequest entity);
 
   @POST
   @Path("/delete-cleanup")
   @Produces("application/json")
-  @Consumes("application/json")
   PostVdiDatasetsAdminDeleteCleanupResponse postVdiDatasetsAdminDeleteCleanup(
-      DeleteCleanupRequest entity);
+      @HeaderParam("Auth-Key") String authKey);
 
   class PostVdiDatasetsAdminReconcileResponse extends ResponseDelegate {
     private PostVdiDatasetsAdminReconcileResponse(Response response, Object entity) {

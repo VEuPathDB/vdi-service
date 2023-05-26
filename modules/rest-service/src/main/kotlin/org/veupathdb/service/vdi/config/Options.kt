@@ -13,6 +13,10 @@ object Options : Options() {
     val secretKey   = requireEnv(EnvKey.S3.SecretKey)
     val bucketName  = requireEnv(EnvKey.S3.BucketName)
   }
+
+  object Admin {
+    val secretKey = requireEnv(EnvKey.Admin.SecretKey)
+  }
 }
 
 private fun requireEnv(key: String): String =

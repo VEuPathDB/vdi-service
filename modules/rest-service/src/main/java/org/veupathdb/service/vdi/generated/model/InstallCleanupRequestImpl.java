@@ -7,14 +7,10 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "authorization",
     "all",
     "targets"
 })
 public class InstallCleanupRequestImpl implements InstallCleanupRequest {
-  @JsonProperty("authorization")
-  private String authorization;
-
   @JsonProperty(
       value = "all",
       defaultValue = "false"
@@ -23,16 +19,6 @@ public class InstallCleanupRequestImpl implements InstallCleanupRequest {
 
   @JsonProperty("targets")
   private List<InstallCleanupTarget> targets;
-
-  @JsonProperty("authorization")
-  public String getAuthorization() {
-    return this.authorization;
-  }
-
-  @JsonProperty("authorization")
-  public void setAuthorization(String authorization) {
-    this.authorization = authorization;
-  }
 
   @JsonProperty(
       value = "all",
