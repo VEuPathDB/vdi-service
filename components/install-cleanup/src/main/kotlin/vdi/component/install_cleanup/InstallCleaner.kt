@@ -81,14 +81,18 @@ object InstallCleaner {
 
     for (project in cacheDBRecord.projects) {
       try {
+        // Lookup the existing install message for the dataset
         val message = AppDB.accessor(project)
           .selectDatasetInstallMessage(datasetID, InstallType.Data)
 
+        // If one does not exist, then the dataset was never installed in the
+        // first place.
         if (message == null) {
           log.debug("skipping uninstall of dataset {} from project {} as it has no install message", datasetID, project)
           continue
         }
 
+        // If the status is not failed installation, then we shouldn't touch it.
         if (message.status != InstallStatus.FailedInstallation) {
           log.debug("skipping uninstall of dataset {} from project {} as it is not in a failed state", datasetID, project)
           continue
@@ -107,8 +111,10 @@ object InstallCleaner {
 
     log.info("attempting to uninstall broken dataset {} from project {}", datasetID, projectID)
 
+    // Call out to the plugin server to uninstall the dataset.
     val uninstallResult = handler.client.postUninstall(datasetID, projectID)
 
+    // Handle the result.
     when (uninstallResult.type) {
       UninstallResponseType.Success
       -> { /* do nothing */ }
@@ -122,6 +128,7 @@ object InstallCleaner {
 
     log.debug("marking dataset {} as ready-for-reinstall in project {}", datasetID, projectID)
 
+    // Update the dataset install message in the database.
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
