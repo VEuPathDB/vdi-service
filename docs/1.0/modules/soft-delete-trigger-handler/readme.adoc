@@ -3,7 +3,7 @@
 ifdef::env-github[]
 ++++
 <p align="center">
-  <img src="https://raw.githubusercontent.com/VEuPathDB/vdi-service/main/docs/1.0/modules/import-trigger-handler/images/import-trigger-overview.svg" />
+  <img src="https://raw.githubusercontent.com/VEuPathDB/vdi-service/main/docs/1.0/modules/soft-delete-trigger-handler/images/soft-delete-trigger-overview.svg" />
 </p>
 ++++
 endif::[]
