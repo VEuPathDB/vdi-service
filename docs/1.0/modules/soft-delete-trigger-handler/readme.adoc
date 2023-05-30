@@ -1,0 +1,19 @@
+= VDI Module: Import Trigger Handler
+
+ifdef::env-github[]
+++++
+<p align="center">
+  <img src="https://raw.githubusercontent.com/VEuPathDB/vdi-service/main/docs/1.0/assets/modules/soft-delete-trigger-handler/images/soft-delete-trigger-overview.svg" />
+</p>
+++++
+endif::[]
+ifndef::env-github[]
+image::images/soft-delete-trigger-overview.svg[align="center"]
+endif::[]
+
+
+This VDI module consumes soft-delete trigger messages from Kafka and performs
+dataset uninstallation operations by updating the "deleted" flag in the internal
+cache DB, updating the "deleted" flag in the target application database control
+tables, and calling the appropriate plugin handler for the dataset's type for
+each target project.

@@ -1,0 +1,14 @@
+= VDI Design Overview
+
+--
+* link:modules/event-router/readme.adoc[Event Router]
+--
+
+--
+* link:modules/rest-service/readme.adoc[Rest Service]
+--
+
+--
+* link:modules/import-trigger-handler/readme.adoc[Import Trigger Handler]
+* link:modules/soft-delete-trigger-handler/readme.adoc[Soft-Delete Trigger Handler]
+--
