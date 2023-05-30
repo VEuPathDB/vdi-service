@@ -26,7 +26,7 @@ internal class DatasetMetaFileImpl(override val name: String,
   ): this(
     name = S3Paths.META_FILE_NAME,
     path = path,
-    lastModifiedSupplier = { bucket.objects.list(path).stream().findAny().get().lastModified }, // Wow! This isn't great
+    lastModifiedSupplier = { bucket.objects.stat(path)?.lastModified },
     existsChecker = { path in bucket.objects },
     loadObjectStream = { bucket.objects.open(path)?.stream }
   )

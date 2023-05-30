@@ -140,7 +140,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
 
     return when(InstallDataResponseType.fromCode(response.statusCode())) {
       InstallDataResponseType.Success
-      -> InstallDataSuccessResponseImpl(emptyList()) // TODO: revert, hacked to fix my little error and test
+      -> InstallDataSuccessResponseImpl(JSON.readValue<WarningsResponse>(response.body()).warnings)
 
       InstallDataResponseType.BadRequest
       -> InstallDataBadRequestResponseImpl(JSON.readValue<SimpleError>(response.body()).message)

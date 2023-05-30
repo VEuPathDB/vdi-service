@@ -21,7 +21,7 @@ internal class DatasetManifestFileImpl(path: String,
     path: String,
   ): this(
     path = path,
-    lastModifiedSupplier = { bucket.objects.list(path).stream().findAny().get().lastModified }, // Wow! This isn't great
+    lastModifiedSupplier = { bucket.objects.stat(path)?.lastModified },
     existsChecker = { path in bucket.objects },
     loadObjectStream = { bucket.objects.open(path)?.stream }
   )
