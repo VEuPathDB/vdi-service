@@ -13,8 +13,8 @@ Configuration:
       AppenderRef:
       - ref: Console_Appender
     Logger:
-    - name: com.zaxxer
-      level: info
+    - name: com.zaxxer.hikari
+      level: trace
       additivity: false
       AppenderRef:
       - ref: Console_Appender

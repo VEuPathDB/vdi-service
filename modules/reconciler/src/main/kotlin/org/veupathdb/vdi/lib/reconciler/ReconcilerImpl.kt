@@ -1,0 +1,48 @@
+package org.veupathdb.vdi.lib.reconciler
+
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
+import org.veupathdb.vdi.lib.reconciler.config.ReconcilerConfig
+import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
+import vdi.component.modules.VDIServiceModuleBase
+
+class ReconcilerImpl(private val config: ReconcilerConfig) :
+    Reconciler, VDIServiceModuleBase("reconciler") {
+    private val log = LoggerFactory.getLogger(javaClass)
+
+    override suspend fun run() {
+        log.info("Running ReconcilerImpl module")
+        val datasetManager = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
+        val kafkaRouter = requireKafkaRouter()
+
+        val targets = AppDatabaseRegistry.iterator().asSequence()
+            .map { (project, _) ->
+                ReconcilerInstance(
+                    AppDBTarget(project, project),
+                    datasetManager,
+                    kafkaRouter
+                )
+            }
+            .toMutableList()
+        targets.add(ReconcilerInstance(CacheDBTarget("cache-db-target"), datasetManager, kafkaRouter))
+
+        runBlocking {
+            while (!isShutDown()) {
+                log.info("Scheduling reconciler for {} targets.", targets.size)
+                coroutineScope {
+                    targets.forEach { target -> launch { target.reconcile() } }
+                }
+                delay(config.runInterval.toMillis())
+            }
+        }
+    }
+
+    private suspend fun requireKafkaRouter() = safeExec("failed to create KafkaRouter instance") {
+        KafkaRouterFactory(config.kafkaRouterConfig).newKafkaRouter()
+    }
+}

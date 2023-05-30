@@ -184,7 +184,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
           transaction.upsertImportMessages(datasetID, warnings.joinToString("\n"))
         }
 
-        transaction.updateDataSyncControl(datasetID, OffsetDateTime.now())
+        transaction.updateDataSyncControl(datasetID, dd.getLatestDataTimestamp(OffsetDateTime.now()))
         transaction.updateImportControl(datasetID, DatasetImportStatus.Imported)
       }
     }

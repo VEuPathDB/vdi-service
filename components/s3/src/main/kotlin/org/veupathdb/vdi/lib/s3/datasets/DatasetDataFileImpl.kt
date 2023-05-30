@@ -19,7 +19,7 @@ internal class DatasetDataFileImpl(
     path: String,
   ): this(
     path = path,
-    lastModifiedSupplier = { bucket.objects.stat(path)?.lastModified },
+    lastModifiedSupplier = { bucket.objects.list(path).stream().findAny().get().lastModified }, // Wow! This isn't great
     existsChecker = { path in bucket.objects },
     loadObjectStream = { bucket.objects.open(path)?.stream }
   )

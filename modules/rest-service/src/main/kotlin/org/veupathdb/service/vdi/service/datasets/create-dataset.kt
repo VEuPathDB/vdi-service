@@ -103,12 +103,13 @@ private fun Path.repack(into: Path, using: Path) {
     if (unpacked.isEmpty())
       throw BadRequestException("uploaded zip file contains no files")
 
+    log.info("Compressing file from {} into {}", unpacked, into)
     // recompress the files as a tgz file
     Tar.compressWithGZip(into, unpacked)
   }
 
   // If it resembles a tar file
-  if (name.endsWith(".tar.gz") || name.endsWith(".tgz")) {
+  else if (name.endsWith(".tar.gz") || name.endsWith(".tgz")) {
     Tar.decompressWithGZip(this, using)
 
     val files = using.listDirectoryEntries()

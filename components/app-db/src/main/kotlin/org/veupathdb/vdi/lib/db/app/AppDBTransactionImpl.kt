@@ -5,6 +5,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.model.*
 import org.veupathdb.vdi.lib.db.app.sql.*
 import java.sql.Connection
@@ -161,6 +162,10 @@ class AppDBTransactionImpl(private val connection: Connection) : AppDBTransactio
   override fun selectDatasetProjectLinks(datasetID: DatasetID): List<DatasetProjectLinkRecord> {
     log.debug("selecting dataset project links for dataset {}", datasetID)
     return connection.selectDatasetProjectLinks(datasetID)
+  }
+
+  override fun streamAllSyncControlRecords(): CloseableIterator<VDISyncControlRecord> {
+    return connection.selectAllSyncControl()
   }
 
   override fun testDatasetVisibilityExists(datasetID: DatasetID, userID: UserID): Boolean {

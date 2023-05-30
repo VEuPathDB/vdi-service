@@ -83,6 +83,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     // Load the dataset metadata from S3
     val datasetMeta   = dir.getMeta().load()!!
     val metaTimestamp = dir.getMeta().lastModified()!!
+    log.info("Meta timestamp is {}", metaTimestamp)
 
     // Attempt to select the dataset details from the cache DB
     val cachedDataset = CacheDB.selectDataset(datasetID)
@@ -114,11 +115,15 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     // Do the "little" reconciliation
     comparison(dir, syncControl)
       .also {
-        if (it.doDataSync)
+        if (it.doDataSync) {
+          log.info("Doing little reconciliation data sync")
           kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
+        }
 
-        if (it.doShareSync)
+        if (it.doShareSync) {
+          log.info("Doing little reconciliation share sync")
           kr.sendShareTrigger(ShareTrigger(userID, datasetID))
+        }
       }
 
     CacheDB.openTransaction()

@@ -4,6 +4,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.model.*
 
 interface AppDBAccessor {
@@ -75,6 +76,8 @@ interface AppDBAccessor {
    * representing rows in the target database table.
    */
   fun selectDatasetProjectLinks(datasetID: DatasetID): List<DatasetProjectLinkRecord>
+
+  fun streamAllSyncControlRecords(): CloseableIterator<VDISyncControlRecord>
 
   /**
    * Tests whether a dataset visibility record exists for a target dataset and

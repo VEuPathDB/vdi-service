@@ -169,7 +169,8 @@ private fun S3Object.toDatasetFile(pathFactory: S3DatasetPathFactory): DatasetFi
       this
     )
     this.path.contains(pathFactory.datasetDeleteFlagFile()) -> DatasetDeleteFlagFileImpl(this)
-    else -> throw IllegalStateException()
+    this.path.contains(pathFactory.datasetUploadsDir()) -> DatasetUploadFileImpl(this)
+    else -> throw IllegalStateException("Unable to create a dataset file from path " + this.path)
   }
   return datasetFile
 }
