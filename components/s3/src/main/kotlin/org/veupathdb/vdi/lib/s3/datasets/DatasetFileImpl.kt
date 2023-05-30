@@ -32,7 +32,7 @@ internal sealed class DatasetFileImpl(
   ) : this(
     name = name,
     path = path,
-    lastModifiedSupplier = { bucket.objects.list(path).stream().findAny().get().lastModified }, // Wow! This isn't great
+    lastModifiedSupplier = { bucket.objects.stat(path)?.lastModified },
     existsChecker = { path in bucket.objects },
     loadObjectStream = { bucket.objects.open(path)?.stream }
   )
