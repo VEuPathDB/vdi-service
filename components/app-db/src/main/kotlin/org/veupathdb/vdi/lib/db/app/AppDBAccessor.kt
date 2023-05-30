@@ -77,6 +77,18 @@ interface AppDBAccessor {
   fun selectDatasetProjectLinks(datasetID: DatasetID): List<DatasetProjectLinkRecord>
 
   /**
+   * Retrieves all datasets that have an install message record for the given
+   * install type in the given install status.
+   *
+   * @param installType Install type to filter by.
+   *
+   * @param installStatus Install status to filter by.
+   *
+   * @return List of zero or more located datasets.
+   */
+  fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus): List<DatasetRecord>
+
+  /**
    * Tests whether a dataset visibility record exists for a target dataset and
    * user.
    *

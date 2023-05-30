@@ -49,7 +49,7 @@ rootProject.name = "vdi"
 include(":components:app-db")
 include(":components:cache-db")
 include(":components:handler-client")
-include(":components:install-cleaner")
+include(":components:install-cleanup")
 include(":components:kafka")
 include(":components:ldap")
 include(":components:plugin-mapping")

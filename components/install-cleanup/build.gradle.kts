@@ -5,7 +5,8 @@ plugins {
 dependencies {
   implementation(project(":components:app-db"))
   implementation(project(":components:cache-db"))
-  implementation(project(":components:s3"))
+  implementation(project(":components:handler-client"))
+  implementation(project(":components:plugin-mapping"))
 
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
 
