@@ -1,14 +1,187 @@
 = VDI Design Overview
+:toc:
+
+== Design
+
+image::images/overview.svg[]
+
+=== Database Schemata
+
+==== Internal Cache Database
+
+==== Application Databases
+
+===== `vdi.dataset`
+
+Core registry of all VDI datasets that have had some form of installation
+attempt made on the containing application database.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| PRIMARY KEY NOT NULL
+
+| owner
+| NUMBER
+| NOT NULL
+
+| type_name
+| VARCHAR2(64)
+| NOT NULL
+
+| type_version
+| VARCHAR2(64)
+| NOT NULL
+
+| is_deleted
+| NUMBER
+| NOT NULL
+|===
+
+===== `vdi.dataset_install_message`
+
+Installation status/messages table for dataset installation attempts on the
+containing application database.
+
+Each record will correspond to an attempt to install either metadata or dataset
+data for a target dataset and will contain a mandatory install status as well
+as optional messages emitted by the installer plugin during the installation.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.dataset (dataset_id)
+
+| install_type
+| VARCHAR2(64)
+| NOT NULL
+
+| status
+| VARCHAR(64)
+| NOT NULL
+
+| message
+| CLOB
+|
+|===
+
+The `install_type` and `status` columns are enums controlled by the VDI service
+which originally contained the following values:
+
+`install_type`::
+* `meta`
+* `data`
+
+`status`::
+* `running`
+* `complete`
+* `failed-validation`
+* `failed-installation`
+* `missing dependency`
+* `ready-for-reinstall`
+
+
+===== `vdi.dataset_project`
+
+Link table mapping target datasets to one or more projects that share the same
+application database.
+
+Most often this table will contain only one entry per dataset as most
+application databases are not shared between projects.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.dataset (dataset_id)
+
+| project_id
+| VARCHAR2(64)
+| NOT NULL
+|===
+
+
+===== `vdi.dataset_visibility`
+
+Controls visibility of target datasets to users to whom those datasets hava been
+shared.  Each record in this table declares that a dataset is visible to a user.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.dataset (dataset_id)
+
+| user_id
+| NUMBER
+| NOT NULL
+|===
+
+
+===== `vdi.sync_control`
+
+Contains timestamps of various elements of a dataset as they are recorded in S3.
+
+These timestamps are used to determine when a dataset is out of sync with S3 and
+needs to be resynchronized.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.dataset (dataset_id)
+
+| shares_update_time
+| TIMESTAMP WITH TIMEZONE
+| NOT NULL
+
+| data_update_time
+| TIMESTAMP WITH TIMEZONE
+| NOT NULL
+
+| meta_update_time
+| TIMESTAMP WITH TIMEZONE
+| NOT NULL
+
+|===
+
+== Project Structure
+
+=== Modules
 
 --
 * link:modules/event-router/readme.adoc[Event Router]
---
-
---
-* link:modules/rest-service/readme.adoc[Rest Service]
---
-
---
+* Hard-Delete Trigger Handler
 * link:modules/import-trigger-handler/readme.adoc[Import Trigger Handler]
+* Install Trigger Handler
+* Pruner
+* link:modules/rest-service/readme.adoc[Rest Service]
+* Share Trigger Handler
 * link:modules/soft-delete-trigger-handler/readme.adoc[Soft-Delete Trigger Handler]
+* Update Meta Trigger Handler
 --
+
+=== Components
+
+* App DB
+* Cache DB
+* Handler Client
+* Install Cleanup
+* Kafka
+* LDAP
+* Module Core
+* Plugin Mapping
+* Pruner
+* Rabbit
