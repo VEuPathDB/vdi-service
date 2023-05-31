@@ -1,0 +1,18 @@
+= VDI Module: Install-Data Trigger Handler
+
+ifdef::env-github[]
+++++
+<p align="center">
+  <img src="images/install-data-overview.svg" />
+</p>
+++++
+endif::[]
+ifndef::env-github[]
+image::images/install-data-overview.svg[align="center"]
+endif::[]
+
+
+This VDI module consumes install-data trigger messages from Kafka and performs
+dataset core data installation operations by calling the appropriate plugin
+handlers for the target projects to perform the type specific installation of
+the dataset into those projects' application databases.
