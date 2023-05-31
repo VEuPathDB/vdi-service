@@ -165,7 +165,7 @@ needs to be resynchronized.
 * link:modules/event-router/readme.adoc[Event Router]
 * Hard-Delete Trigger Handler
 * link:modules/import-trigger-handler/readme.adoc[Import Trigger Handler]
-* Install Trigger Handler
+* link:modules/install-data-trigger-handler/readme.adoc[Install Trigger Handler]
 * Pruner
 * link:modules/rest-service/readme.adoc[Rest Service]
 * Share Trigger Handler
