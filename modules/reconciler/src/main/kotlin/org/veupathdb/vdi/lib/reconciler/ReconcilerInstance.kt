@@ -43,19 +43,27 @@ class ReconcilerInstance(
         targetDB.streamSortedSyncControlRecords().use { targetDBStream ->
             val sourceIterator = datasetManager.streamAllDatasets().iterator()
             val targetIterator = targetDBStream.iterator()
+
             nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
+
+            // Iterate through datasets in S3
             while (sourceIterator.hasNext()) {
+
+                // Pop the next DatasetDirectory instance from the S3 stream.
                 val sourceDatasetDir = sourceIterator.next()
+
                 log.info("Checking dataset {} for {}", sourceDatasetDir, targetDB.name)
 
-                // Target stream is exhausted, everything left in source stream is missing!
+                // Target stream is exhausted, everything left in source stream is missing from the target database!
                 // Check again if target stream is exhausted, consume source stream if so.
                 if (nextTargetDataset == null) {
                     consumeEntireSourceStream(sourceIterator, sourceDatasetDir)
                     return@use
                 }
 
-                // If target dataset stream is "ahead" of source stream, delete from stream
+                // If target dataset stream is "ahead" of source stream, delete
+                // the datasets from the target stream until we are aligned
+                // again (or the target stream is consumed).
                 if (sourceDatasetDir.datasetID.toString() > nextTargetDataset!!.datasetID.toString()) {
                     while (nextTargetDataset != null && sourceDatasetDir.datasetID.toString() > nextTargetDataset!!.datasetID.toString()) {
                         // TODO: Are we ok with the reconciler entirely deleting the dataset as soon as detected?
