@@ -3,11 +3,110 @@
 
 == Design
 
-image::images/overview.svg[]
-
 === Database Schemata
 
 ==== Internal Cache Database
+
+===== `vdi.datasets`
+
+Core registry of datasets in the internal cache database.  All other VDI control
+tables in the cache DB foreign key to this table.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| PRIMARY KEY NOT NULL
+
+| type_name
+| VARCHAR
+| NOT NULL
+
+| type_version
+| VARCHAR
+| NOT NULL
+
+| owner_id
+| VARCHAR
+| NOT NULL
+
+| is_deleted
+| BOOLEAN
+| NOT NULL
+
+| created
+| TIMESTAMP WITH TIME ZONE
+| NOT NULL
+|===
+
+===== `vdi.dataset_files`
+
+Listing of dataset data files for each dataset in MinIO (S3).
+
+[IMPORTANT]
+--
+TODO: This table should be dropped.
+--
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.datasets (dataset_id)
+
+| file_name
+| VARCHAR
+| NOT NULL
+|===
+
+.Additional Constraints
+--
+[%header, cols="4m,6"]
+|===
+| Name | Description
+
+| dataset_files_file_to_dataset_uq
+| Unique on `dataset_id` to `file_name` combinations.
+|===
+--
+
+===== `vdi.dataset_metadata`
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.datasets (dataset_id)
+
+| project_id
+| VARCHAR
+| NOT NULL
+|===
+
+.Additional Constraints
+--
+[%header, cols="4m,6"]
+|===
+| Name | Description
+
+| dataset_projects_uq
+| Unique on `dataset_id` to `project_id` combinations.
+|===
+--
+
+
+
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+|===
 
 ==== Application Databases
 
