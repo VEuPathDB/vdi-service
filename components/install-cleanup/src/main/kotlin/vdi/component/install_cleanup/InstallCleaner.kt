@@ -20,8 +20,7 @@ object InstallCleaner {
 
   /**
    * Locate all datasets in all application databases that are in an
-   * install-failed state and uninstall them then mark them as
-   * ready-for-reinstall.
+   * install-failed state and mark them as ready-for-reinstall.
    */
   fun cleanAll() {
     log.info("starting broken install cleanup for all broken datasets")
@@ -53,9 +52,8 @@ object InstallCleaner {
 
   /**
    * For the given target dataset IDs find any broken installations in any of
-   * each dataset's target application databases then run the uninstaller for
-   * those app DBs for the target dataset and update the dataset's status to
-   * ready-for-reinstall in the target database.
+   * each dataset's target application databases then update the dataset's
+   * status to ready-for-reinstall.
    */
   fun cleanTargets(targets: Iterable<DatasetID>) {
     log.info("starting broken install cleanup for target datasets")
