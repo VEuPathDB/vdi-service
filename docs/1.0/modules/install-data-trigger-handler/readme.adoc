@@ -17,7 +17,7 @@ image::images/install-data-overview.svg[align="center"]
 endif::[]
 
 . One or more dataset "data" objects are put into the MinIO (S3) bucket for VDI.
-. MinIO emits events for the created data objects.
+. MinIO emits events through RabbitMQ for the created data objects.
 . The event router module translates the events and routes triggers to the
   relevant Kafka topic.
 . The "Install-Data" trigger handler picks up the triggers and...
