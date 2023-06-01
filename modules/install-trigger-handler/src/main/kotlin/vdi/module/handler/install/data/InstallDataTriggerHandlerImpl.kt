@@ -366,10 +366,12 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   private fun updateDataSyncControl(datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
     log.trace("updateDataSyncControl(datasetID={}, projectID={})", datasetID, projectID)
 
+    val updatedTimestamp = s3Dir.getLatestDataTimestamp(OriginTimestamp)
+
     log.debug("updating cache db data install timestamp for dataset {}", datasetID)
-    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, s3Dir.getLatestDataTimestamp(OriginTimestamp)) }
+    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
     log.debug("updating app db for project {} with data install timestamp for dataset {}", projectID, datasetID)
-    AppDB.withTransaction(projectID) { it.updateSyncControlDataTimestamp(datasetID, s3Dir.getLatestDataTimestamp(OriginTimestamp)) }
+    AppDB.withTransaction(projectID) { it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp) }
   }
 }

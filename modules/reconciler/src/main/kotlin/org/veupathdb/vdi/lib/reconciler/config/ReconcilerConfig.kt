@@ -17,13 +17,13 @@ data class ReconcilerConfig(
   constructor() : this(System.getenv())
 
   constructor(env: Environment) : this(
-    kafkaRouterConfig = KafkaRouterConfig(env),
+    kafkaRouterConfig = KafkaRouterConfig(env, "reconciler"),
 
     s3Config = S3Config(env),
 
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
 
-    runInterval = Duration.ofSeconds(env.getOrDefault(EnvKey.Reconciler.RunIntervalSeconds, "21600").toLong())
+    runInterval = Duration.ofSeconds(env.getOrDefault("temp", "21600").toLong())
   )
 }
 

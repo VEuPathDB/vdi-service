@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
+import org.veupathdb.vdi.lib.common.model.VDIDatasetTypeImpl
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
@@ -29,27 +31,38 @@ class ReconcilerTest {
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
-            closeableIterator(listOf(
-                VDISyncControlRecord(
-                    datasetID = DatasetID("12345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
-                ),
-                // Missing 22345678123456781234567812345678, should be inserted in target.
-                VDISyncControlRecord(
-                    datasetID = DatasetID("32345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
-                ),
-                VDISyncControlRecord(
-                    datasetID = DatasetID("42345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
-                )
-            ).iterator())
+            closeableIterator(
+                listOf(
+                    Pair(
+                        VDIDatasetTypeImpl("Stub", "Stub"),
+                        VDISyncControlRecord(
+                            datasetID = DatasetID("12345678123456781234567812345678"),
+                            sharesUpdated = UpdateTime,
+                            dataUpdated = UpdateTime,
+                            metaUpdated = UpdateTime
+                        )
+                    ),
+                    // Missing 22345678123456781234567812345678, should be inserted in target.
+                    Pair(
+                        VDIDatasetTypeImpl("Stub", "Stub"),
+                        VDISyncControlRecord(
+                            datasetID = DatasetID("32345678123456781234567812345678"),
+                            sharesUpdated = UpdateTime,
+                            dataUpdated = UpdateTime,
+                            metaUpdated = UpdateTime
+                        )
+                    ),
+                    Pair(
+                        VDIDatasetTypeImpl("Stub", "Stub"),
+                        VDISyncControlRecord(
+                            datasetID = DatasetID("42345678123456781234567812345678"),
+                            sharesUpdated = UpdateTime,
+                            dataUpdated = UpdateTime,
+                            metaUpdated = UpdateTime
+                        )
+                    )
+                ).iterator()
+            )
         )
         doReturn(listOf(
             mockDatasetDirectory(111L, "12345678123456781234567812345678"),
@@ -74,14 +87,19 @@ class ReconcilerTest {
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
-            closeableIterator(listOf(
-                VDISyncControlRecord(
-                    datasetID = DatasetID("12345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
-                ),
-            ).iterator())
+            closeableIterator(
+                listOf(
+                    Pair(
+                        VDIDatasetTypeImpl("Stub", "Stub"),
+                        VDISyncControlRecord(
+                            datasetID = DatasetID("12345678123456781234567812345678"),
+                            sharesUpdated = UpdateTime,
+                            dataUpdated = UpdateTime,
+                            metaUpdated = UpdateTime
+                        )
+                    ),
+                ).iterator()
+            )
         )
         doReturn(listOf(
             mockDatasetDirectory(111L, "12345678123456781234567812345678", UpdateTime.plusDays(1)),
@@ -103,14 +121,18 @@ class ReconcilerTest {
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
-            closeableIterator(listOf(
-                VDISyncControlRecord(
-                    datasetID = DatasetID("12345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
-                ),
-            ).iterator())
+            closeableIterator(
+                listOf(
+                    Pair(
+                        VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+                            datasetID = DatasetID("12345678123456781234567812345678"),
+                            sharesUpdated = UpdateTime,
+                            dataUpdated = UpdateTime,
+                            metaUpdated = UpdateTime
+                        )
+                    ),
+                ).iterator()
+            )
         )
         doReturn(listOf(
             mockDatasetDirectory(111L, "12345678123456781234567812345678", UpdateTime),
@@ -128,7 +150,7 @@ class ReconcilerTest {
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
-            closeableIterator(emptyList<VDISyncControlRecord>().iterator())
+            closeableIterator(emptyList<Pair<VDIDatasetType, VDISyncControlRecord>>().iterator())
         )
         doReturn(
             listOf(
@@ -152,29 +174,37 @@ class ReconcilerTest {
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
             closeableIterator(listOf(
-                VDISyncControlRecord(
-                    datasetID = DatasetID("12345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
+                Pair(
+                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+                        datasetID = DatasetID("12345678123456781234567812345678"),
+                        sharesUpdated = UpdateTime,
+                        dataUpdated = UpdateTime,
+                        metaUpdated = UpdateTime
+                    )
                 ),
-                VDISyncControlRecord(
-                    datasetID = DatasetID("22345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
+                Pair(
+                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+                        datasetID = DatasetID("22345678123456781234567812345678"),
+                        sharesUpdated = UpdateTime,
+                        dataUpdated = UpdateTime,
+                        metaUpdated = UpdateTime
+                    )
                 ),
-                VDISyncControlRecord(
-                    datasetID = DatasetID("32345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
+                Pair(
+                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+                        datasetID = DatasetID("32345678123456781234567812345678"),
+                        sharesUpdated = UpdateTime,
+                        dataUpdated = UpdateTime,
+                        metaUpdated = UpdateTime
+                    )
                 ),
-                VDISyncControlRecord(
-                    datasetID = DatasetID("42345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
+                Pair(
+                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+                        datasetID = DatasetID("42345678123456781234567812345678"),
+                        sharesUpdated = UpdateTime,
+                        dataUpdated = UpdateTime,
+                        metaUpdated = UpdateTime
+                    )
                 )
             ).iterator())
         )
@@ -187,7 +217,7 @@ class ReconcilerTest {
         recon.reconcile()
         val capturedDatasetID = mockingDetails(cacheDb).invocations
             .find { it.method.name == "deleteDataset" }!!
-            .getArgument<DatasetID>(0)
+            .getArgument<DatasetID>(1)
         assertEquals("test", "22345678123456781234567812345678", capturedDatasetID.toString())
     }
 
@@ -201,25 +231,30 @@ class ReconcilerTest {
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
             closeableIterator(listOf(
-                VDISyncControlRecord(
-                    datasetID = DatasetID("22345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
+                Pair(
+                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+                        datasetID = DatasetID("22345678123456781234567812345678"),
+                        sharesUpdated = UpdateTime,
+                        dataUpdated = UpdateTime,
+                        metaUpdated = UpdateTime
+                    )
                 ),
-                VDISyncControlRecord(
-                    datasetID = DatasetID("32345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
+                Pair(
+                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+                        datasetID = DatasetID("32345678123456781234567812345678"),
+                        sharesUpdated = UpdateTime,
+                        dataUpdated = UpdateTime,
+                        metaUpdated = UpdateTime
+                    )
                 ),
-                VDISyncControlRecord(
-                    datasetID = DatasetID("42345678123456781234567812345678"),
-                    sharesUpdated = UpdateTime,
-                    dataUpdated = UpdateTime,
-                    metaUpdated = UpdateTime
+                Pair(
+                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+                        datasetID = DatasetID("42345678123456781234567812345678"),
+                        sharesUpdated = UpdateTime,
+                        dataUpdated = UpdateTime,
+                        metaUpdated = UpdateTime
+                    )
                 ),
-
                 ).iterator())
         )
         doReturn(listOf(
@@ -233,14 +268,14 @@ class ReconcilerTest {
             .map { it.getArgument<UpdateMetaTrigger>(0).datasetID.toString() }
         val deletedIDs = mockingDetails(cacheDb).invocations
             .filter { it.method.name == "deleteDataset" }
-            .map { it.getArgument<DatasetID>(0).toString() }
+            .map { it.getArgument<DatasetID>(1).toString() }
 
         assertEquals(listOf("12345678123456781234567812345678", "52345678123456781234567812345678"), syncedIDs)
         assertEquals(listOf("22345678123456781234567812345678", "32345678123456781234567812345678", "42345678123456781234567812345678"), deletedIDs)
     }
 
-    private fun closeableIterator(iterator: Iterator<VDISyncControlRecord>): CloseableIterator<VDISyncControlRecord> {
-        return object: CloseableIterator<VDISyncControlRecord> {
+    private fun closeableIterator(iterator: Iterator<Pair<VDIDatasetType, VDISyncControlRecord>>): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
+        return object: CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
             override fun close() {
                 // do nothing
             }
@@ -249,7 +284,7 @@ class ReconcilerTest {
                 return iterator.hasNext()
             }
 
-            override fun next(): VDISyncControlRecord {
+            override fun next(): Pair<VDIDatasetType, VDISyncControlRecord> {
                 return iterator.next()
             }
         }

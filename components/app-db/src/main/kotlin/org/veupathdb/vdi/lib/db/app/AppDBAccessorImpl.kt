@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.model.*
@@ -51,7 +52,7 @@ internal class AppDBAccessorImpl(private val dataSource: DataSource) : AppDBAcce
     return con.use { it.selectDatasetProjectLinks(datasetID) }
   }
 
-  override fun streamAllSyncControlRecords(): CloseableIterator<VDISyncControlRecord> {
+  override fun streamAllSyncControlRecords(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
     log.debug("Streaming all sync control records")
     return con.selectAllSyncControl()
   }

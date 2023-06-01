@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.env.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.cache.model.*
@@ -117,7 +118,13 @@ object CacheDB {
     return connection.use { it.selectAllSharesFor(recipientID) }
   }
 
-  fun selectAllSyncControlRecords(): CloseableIterator<VDISyncControlRecord> {
+  /**
+   * Streams sorted stream of all dataset control records.
+   *
+   * @return Stream of dataset control records sorted by user ID and then dataset ID. The stream
+   * must be closed to release the db connection.
+   */
+  fun selectAllSyncControlRecords(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
     log.debug("selecting all sync control records")
     return connection.selectAllSyncControl()
   }
