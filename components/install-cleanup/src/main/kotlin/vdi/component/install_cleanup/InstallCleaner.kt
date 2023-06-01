@@ -9,10 +9,6 @@ import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallBadRequestResponse
-import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallResponseType
-import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallUnexpectedErrorResponse
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 object InstallCleaner {
 
@@ -42,7 +38,7 @@ object InstallCleaner {
         // Iterate through the broken datasets and try to clean them
         for (target in targets) {
           try {
-            cleanTarget(target.datasetID, projectID, target.typeName)
+            cleanTarget(target.datasetID, projectID)
           } catch (e: Throwable) {
             log.error(msgFailedByProject(target.datasetID, projectID), e)
           }
@@ -98,33 +94,14 @@ object InstallCleaner {
           continue
         }
 
-        cleanTarget(datasetID, project, cacheDBRecord.typeName)
+        cleanTarget(datasetID, project)
       } catch (e: Throwable) {
         log.error(msgFailedByProject(datasetID, project), e)
       }
     }
   }
 
-  private fun cleanTarget(datasetID: DatasetID, projectID: ProjectID, datasetType: String) {
-    val handler = PluginHandlers[datasetType]
-      ?: throw IllegalStateException("target dataset $datasetID is of type $datasetType which has no handler plugin registered")
-
-    log.info("attempting to uninstall broken dataset {} from project {}", datasetID, projectID)
-
-    // Call out to the plugin server to uninstall the dataset.
-    val uninstallResult = handler.client.postUninstall(datasetID, projectID)
-
-    // Handle the result.
-    when (uninstallResult.type) {
-      UninstallResponseType.Success
-      -> { /* do nothing */ }
-
-      UninstallResponseType.BadRequest
-      -> throw IllegalStateException("failed to uninstall dataset $datasetID from $projectID due to handler plugin 400: " + (uninstallResult as UninstallBadRequestResponse).message)
-
-      UninstallResponseType.UnexpectedError
-      -> throw IllegalStateException("failed to uninstall dataset $datasetID from $projectID due to handle plugin 500: " + (uninstallResult as UninstallUnexpectedErrorResponse).message)
-    }
+  private fun cleanTarget(datasetID: DatasetID, projectID: ProjectID) {
 
     log.debug("marking dataset {} as ready-for-reinstall in project {}", datasetID, projectID)
 
