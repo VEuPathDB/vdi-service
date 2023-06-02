@@ -51,6 +51,7 @@ object DatasetReinstaller {
   private fun run() {
     log.info("starting dataset reinstaller run {}", ++runCounter)
 
+    // For each project registered with the service...
     for ((projectID, _) in AppDatabaseRegistry.iterator()) {
       try {
         processProject(projectID)
@@ -69,6 +70,7 @@ object DatasetReinstaller {
 
     log.info("found {} datasets in project {} that are ready for reinstall", datasets.size, projectID)
 
+    // for each located dataset for the target project...
     for (dataset in datasets) {
       try {
         processDataset(dataset, projectID)
@@ -81,9 +83,13 @@ object DatasetReinstaller {
   private fun processDataset(dataset: DatasetRecord, projectID: ProjectID) {
     log.info("reinstall processing dataset {} for project {}", dataset.datasetID, projectID)
 
+    // Get a plugin handler for the target dataset type
     val handler = PluginHandlers[dataset.typeName]
       ?: throw IllegalStateException("no plugin handler registered for dataset type ${dataset.typeName}")
 
+    // If the handler doesn't apply to the current project then something has
+    // gone wrong or the service configuration has changed since this dataset
+    // was created.
     if (!handler.appliesToProject(projectID))
       throw IllegalStateException("dataset type ${dataset.typeName} does not apply to project $projectID")
 
