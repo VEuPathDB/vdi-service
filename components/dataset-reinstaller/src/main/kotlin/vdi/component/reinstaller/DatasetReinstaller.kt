@@ -35,6 +35,16 @@ object DatasetReinstaller {
 
   private var runCounter = 0uL
 
+  /**
+   * Tries to run the [DatasetReinstaller] if an instance of the reinstaller is
+   * not already in progress.
+   *
+   * If a run of the `DatasetReinstaller` is already in progress, this method
+   * will return `false` immediately.
+   *
+   * If a run of the `DatasetReinstaller` is _not_ already in progress, this
+   * method will return `true` after the process has completed.
+   */
   fun tryRun(): Boolean {
     return if (lock.tryLock()) {
       try {
