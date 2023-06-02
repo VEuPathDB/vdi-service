@@ -149,6 +149,24 @@ authentication.
 |
 |===
 
+==== Dataset Reinstaller
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+|
+| DATASET_REINSTALLER_RUN_INTERVAL
+| Duration
+| Interval at which the automated dataset reinstaller module should run.
+
+|
+| DATASET_REINSTALLER_WAKE_INTERVAL
+| Duration
+| Interval at which the automated dataset reinstaller module should wake up and
+  check for the service shutdown signal.
+|===
+
 ==== Hard Delete Trigger Handler
 
 [%header, cols="1,3m,3m,8"]

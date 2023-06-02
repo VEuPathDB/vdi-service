@@ -48,6 +48,7 @@ rootProject.name = "vdi"
 
 include(":components:app-db")
 include(":components:cache-db")
+include(":components:dataset-reinstaller")
 include(":components:handler-client")
 include(":components:install-cleanup")
 include(":components:kafka")
@@ -58,6 +59,7 @@ include(":components:pruner")
 include(":components:rabbit")
 include(":components:s3")
 
+include(":modules:dataset-reinstaller")
 include(":modules:event-router")
 include(":modules:hard-delete-trigger-handler")
 include(":modules:import-trigger-handler")
