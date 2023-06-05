@@ -33,6 +33,7 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 
 internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTriggerHandlerConfig)
@@ -83,6 +84,10 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     // Load the dataset metadata from S3
     val datasetMeta   = dir.getMeta().load()!!
     val metaTimestamp = dir.getMeta().lastModified()!!
+
+    val timer = Metrics.metaUpdateTimes
+      .labels(datasetMeta.type.name, datasetMeta.type.version)
+      .startTimer()
 
     // Attempt to select the dataset details from the cache DB
     val cachedDataset = CacheDB.selectDataset(datasetID)
@@ -144,6 +149,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
 
     datasetMeta.projects
       .forEach { projectID -> executeJob(ph, datasetMeta, syncControl, metaTimestamp, datasetID, projectID) }
+
+    timer.observeDuration()
   }
 
   private fun executeJob(
@@ -209,6 +216,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     }
 
     val result = ph.client.postInstallMeta(datasetID, projectID, meta)
+
+    Metrics.metaUpdates.labels(meta.type.name, meta.type.version, result.responseCode.toString())
 
     try {
       when (result.type) {
