@@ -32,7 +32,7 @@ data class UpdateMetaTriggerHandlerConfig(
       env
     ),
 
-    kafkaRouterConfig = KafkaRouterConfig(env),
+    kafkaRouterConfig = KafkaRouterConfig(env, "update-meta"),
 
     s3Config = S3Config(env),
 
