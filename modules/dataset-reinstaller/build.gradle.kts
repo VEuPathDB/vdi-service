@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
   implementation(project(":components:dataset-reinstaller"))
+  implementation(project(":components:metrics"))
   implementation(project(":components:module-core"))
 
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }

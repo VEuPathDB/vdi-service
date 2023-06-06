@@ -6,6 +6,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import vdi.component.metrics.Metrics
 import vdi.component.pruner.Pruner
 
 internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : PrunerModule {
@@ -60,6 +61,8 @@ internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : Pruner
 
           val end: Duration
 
+          val timer = Metrics.pruneTimes.startTimer()
+
           // Attempt to start a pruning job.  If the pruning job executed, this
           // function call will return true after pruning completion.  If a
           // pruning job was already in progress at the time this was called,
@@ -69,6 +72,7 @@ internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : Pruner
             // job completed.
             end = now()
             log.info("automatic S3 pruning job {} completed after {}", pruneCount, end - start)
+            timer.observeDuration()
           } else {
             // Since the pruning job did not execute, there's no need to get a
             // new timestamp.

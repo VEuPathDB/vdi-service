@@ -26,6 +26,7 @@ import kotlin.io.path.outputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 
 internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig)
@@ -190,39 +191,47 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       return
     }
 
-    val status = appDB.selectDatasetInstallMessage(datasetID, InstallType.Data)
+    val timer = Metrics.installationTimes.labels(dataset.typeName, dataset.typeVersion).startTimer()
 
-    if (status == null) {
-      AppDB.withTransaction(projectID) {
-        it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Data, InstallStatus.Running, null))
+    try {
+      val status = appDB.selectDatasetInstallMessage(datasetID, InstallType.Data)
+
+      if (status == null) {
+        AppDB.withTransaction(projectID) {
+          it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Data, InstallStatus.Running, null))
+        }
+      } else {
+        if (status.status != InstallStatus.ReadyForReinstall) {
+          log.info("skipping install event for dataset {} into project {} due to the dataset status being {}", datasetID, projectID, status.status)
+          return
+        }
       }
-    } else {
-      if (status.status != InstallStatus.ReadyForReinstall) {
-        log.info("skipping install event for dataset {} into project {} due to the dataset status being {}", datasetID, projectID, status.status)
-        return
+
+      val response = withDataTar(s3Dir) { dataTar ->
+        dataTar.inputStream()
+          .use { inp -> handler.postInstallData(datasetID, projectID, inp) }
       }
-    }
 
-    val response = withDataTar(s3Dir) { dataTar ->
-      dataTar.inputStream()
-        .use { inp -> handler.postInstallData(datasetID, projectID, inp) }
-    }
+      Metrics.installations.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString())
 
-    when (response.type) {
-      InstallDataResponseType.Success
-      -> handleSuccessResponse(response as InstallDataSuccessResponse, datasetID, projectID)
+      when (response.type) {
+        InstallDataResponseType.Success
+        -> handleSuccessResponse(response as InstallDataSuccessResponse, datasetID, projectID)
 
-      InstallDataResponseType.BadRequest
-      -> handleBadRequestResponse(response as InstallDataBadRequestResponse, datasetID, projectID)
+        InstallDataResponseType.BadRequest
+        -> handleBadRequestResponse(response as InstallDataBadRequestResponse, datasetID, projectID)
 
-      InstallDataResponseType.ValidationFailure
-      -> handleValidationFailureResponse(response as InstallDataValidationFailureResponse, datasetID, projectID)
+        InstallDataResponseType.ValidationFailure
+        -> handleValidationFailureResponse(response as InstallDataValidationFailureResponse, datasetID, projectID)
 
-      InstallDataResponseType.MissingDependencies
-      -> handleMissingDependenciesResponse(response as InstallDataMissingDependenciesResponse, datasetID, projectID)
+        InstallDataResponseType.MissingDependencies
+        -> handleMissingDependenciesResponse(response as InstallDataMissingDependenciesResponse, datasetID, projectID)
 
-      InstallDataResponseType.UnexpectedError
-      -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, datasetID, projectID)
+        InstallDataResponseType.UnexpectedError
+        -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, datasetID, projectID)
+      }
+    } finally {
+      timer.observeDuration()
     }
   }
 

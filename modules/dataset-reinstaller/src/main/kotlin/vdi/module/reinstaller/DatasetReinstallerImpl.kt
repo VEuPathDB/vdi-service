@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.async.ShutdownSignal
+import vdi.component.metrics.Metrics
 import kotlin.time.Duration.Companion.milliseconds
 import vdi.component.reinstaller.DatasetReinstaller as Reinstaller
 
@@ -46,9 +47,12 @@ internal class DatasetReinstallerImpl(private val config: DatasetReinstallerConf
         if (lastRun + config.runInterval < now) {
           log.info("attempting to start automatic dataset reinstaller run")
 
+          val timer = Metrics.reinstallationTimes.startTimer()
+
           if (Reinstaller.tryRun()) {
             val end = now()
             log.info("automatic dataset reinstaller run completed after {}", end - now)
+            timer.observeDuration()
           } else {
             log.info("automatic dataset reinstaller run skipped as run was already in progress")
           }

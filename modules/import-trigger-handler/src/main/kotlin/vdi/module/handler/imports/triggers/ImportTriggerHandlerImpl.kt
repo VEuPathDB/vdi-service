@@ -29,6 +29,7 @@ import kotlin.io.path.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
 import vdi.module.handler.imports.triggers.model.WarningsFile
@@ -71,6 +72,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private fun importJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
     log.trace("importJob(dm=..., userID={}, datasetID={}", userID, datasetID)
+
     // lookup the dataset in S3
     val datasetDir = dm.getDatasetDirectory(userID, datasetID)
 
@@ -81,6 +83,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
     // Load the dataset metadata from S3
     val datasetMeta = datasetDir.getMeta().load()!!
+
+    val timer = Metrics.importTimes
+      .labels(datasetMeta.type.name, datasetMeta.type.version)
+      .startTimer()
 
     // lookup the target dataset in the cache database to ensure it
     // exists, initializing the dataset if it doesn't yet exist.
@@ -122,12 +128,17 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         .open()!!
         .use { handler.client.postImport(datasetID, datasetMeta, it) }
 
-      when (result) {
-        is ImportSuccessResponse         -> handleImportSuccessResult(datasetID, result, datasetDir)
-        is ImportBadRequestResponse      -> handleImportBadRequestResult(datasetID, result)
-        is ImportValidationErrorResponse -> handleImportInvalidResult(datasetID, result)
-        is ImportUnhandledErrorResponse  -> handleImport500Result(datasetID, result)
-        else                             -> handleImpossibleCase()
+      Metrics.imports.labels(datasetMeta.type.name, datasetMeta.type.version, result.responseCode.toString())
+
+      when (result.type) {
+        ImportResponseType.Success         -> handleImportSuccessResult(
+          datasetID,
+          result as ImportSuccessResponse,
+          datasetDir
+        )
+        ImportResponseType.BadRequest      -> handleImportBadRequestResult(datasetID, result as ImportBadRequestResponse)
+        ImportResponseType.ValidationError -> handleImportInvalidResult(datasetID, result as ImportValidationErrorResponse)
+        ImportResponseType.UnhandledError  -> handleImport500Result(datasetID, result as ImportUnhandledErrorResponse)
       }
     } catch (e: Throwable) {
       log.debug("import request to handler server failed with exception:", e)
@@ -136,12 +147,9 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         tran.tryInsertImportMessages(datasetID, "Process error: ${e.message}")
       }
       throw e
+    } finally {
+      timer.observeDuration()
     }
-  }
-
-  private fun handleImpossibleCase() {
-    log.error("developer error of some sort, we hit the impossible case, did we add a new response type to the handler client?")
-    throw IllegalStateException("impossible case hit, did we add a new response type to the handler client?")
   }
 
   private fun handleImportSuccessResult(datasetID: DatasetID, result: ImportSuccessResponse, dd: DatasetDirectory) {
