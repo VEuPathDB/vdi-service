@@ -12,7 +12,8 @@ data class ReconcilerConfig(
   val kafkaRouterConfig:            KafkaRouterConfig,
   val s3Config:                     S3Config,
   val s3Bucket:                     BucketName,
-  val runInterval:                  Duration
+  val runInterval:                  Duration,
+  val reconcilerEnabled:            Boolean
 ) {
   constructor() : this(System.getenv())
 
@@ -23,7 +24,9 @@ data class ReconcilerConfig(
 
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
 
-    runInterval = Duration.ofSeconds(env.getOrDefault("temp", "21600").toLong())
+    runInterval = Duration.ofSeconds(env.getOrDefault(EnvKey.Reconciler.RunIntervalSeconds, "21600").toLong()),
+
+    reconcilerEnabled = env.getOrDefault(EnvKey.Reconciler.ReconcilerEnabled, "true").toBoolean()
   )
 }
 
