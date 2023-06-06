@@ -16,7 +16,7 @@ data class EventRouterConfig(
   constructor(env: Environment) : this(
     rabbitConfig = RabbitMQConfig(env),
     s3Bucket     = env.require(EnvKey.S3.BucketName),
-    kafkaConfig  = KafkaRouterConfig(env)
+    kafkaConfig  = KafkaRouterConfig(env, "event-router")
   )
 }
 

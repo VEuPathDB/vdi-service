@@ -72,6 +72,7 @@ dependencies {
   implementation("org.apache.logging.log4j:log4j-core:2.20.0")
   implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.20.0")
 
+
   // Metrics (can remove if not adding custom service metrics over those provided by container core)
   implementation("io.prometheus:simpleclient:0.16.0")
   implementation("io.prometheus:simpleclient_common:0.16.0")

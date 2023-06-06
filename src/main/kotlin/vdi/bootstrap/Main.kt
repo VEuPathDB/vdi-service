@@ -5,6 +5,7 @@ import org.veupathdb.service.vdi.RestService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.veupathdb.vdi.lib.reconciler.Reconciler
 import vdi.module.delete.hard.HardDeleteTriggerHandler
 import vdi.module.events.routing.EventRouter
 import vdi.module.handler.delete.soft.SoftDeleteTriggerHandler
@@ -32,6 +33,7 @@ object Main {
       ShareTriggerHandler(),
       SoftDeleteTriggerHandler(),
       UpdateMetaTriggerHandler(),
+      Reconciler()
     )
 
     Runtime.getRuntime().addShutdownHook(Thread {

@@ -20,12 +20,12 @@ import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.nio.file.Path
-import java.time.OffsetDateTime
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.veupathdb.vdi.lib.common.OriginTimestamp
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 
@@ -216,19 +216,19 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
       when (response.type) {
         InstallDataResponseType.Success
-        -> handleSuccessResponse(response as InstallDataSuccessResponse, datasetID, projectID)
+        -> handleSuccessResponse(response as InstallDataSuccessResponse, datasetID, projectID, s3Dir)
 
         InstallDataResponseType.BadRequest
-        -> handleBadRequestResponse(response as InstallDataBadRequestResponse, datasetID, projectID)
+        -> handleBadRequestResponse(response as InstallDataBadRequestResponse, datasetID, projectID, s3Dir)
 
         InstallDataResponseType.ValidationFailure
-        -> handleValidationFailureResponse(response as InstallDataValidationFailureResponse, datasetID, projectID)
+        -> handleValidationFailureResponse(response as InstallDataValidationFailureResponse, datasetID, projectID, s3Dir)
 
         InstallDataResponseType.MissingDependencies
-        -> handleMissingDependenciesResponse(response as InstallDataMissingDependenciesResponse, datasetID, projectID)
+        -> handleMissingDependenciesResponse(response as InstallDataMissingDependenciesResponse, datasetID, projectID, s3Dir)
 
         InstallDataResponseType.UnexpectedError
-        -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, datasetID, projectID)
+        -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, datasetID, projectID, s3Dir)
       }
     } finally {
       timer.observeDuration()
@@ -281,10 +281,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
   }
 
-  private fun handleSuccessResponse(res: InstallDataSuccessResponse, datasetID: DatasetID, projectID: ProjectID) {
+  private fun handleSuccessResponse(res: InstallDataSuccessResponse, datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
     log.info("dataset {} was installed successfully into project {}", datasetID, projectID)
 
-    updateDataSyncControl(datasetID, projectID)
+    updateDataSyncControl(datasetID, projectID, s3Dir)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -296,10 +296,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
   }
 
-  private fun handleBadRequestResponse(res: InstallDataBadRequestResponse, datasetID: DatasetID, projectID: ProjectID) {
+  private fun handleBadRequestResponse(res: InstallDataBadRequestResponse, datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
     log.error("dataset {} install into {} failed due to bad request exception from handler server: {}", datasetID, projectID, res.message)
 
-    updateDataSyncControl(datasetID, projectID)
+    updateDataSyncControl(datasetID, projectID, s3Dir)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -313,10 +313,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     throw Exception(res.message)
   }
 
-  private fun handleValidationFailureResponse(res: InstallDataValidationFailureResponse, datasetID: DatasetID, projectID: ProjectID) {
+  private fun handleValidationFailureResponse(res: InstallDataValidationFailureResponse, datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
     log.info("dataset {} install into {} failed due to validation error", datasetID, projectID)
 
-    updateDataSyncControl(datasetID, projectID)
+    updateDataSyncControl(datasetID, projectID, s3Dir)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -328,10 +328,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
   }
 
-  private fun handleMissingDependenciesResponse(res: InstallDataMissingDependenciesResponse, datasetID: DatasetID, projectID: ProjectID) {
+  private fun handleMissingDependenciesResponse(res: InstallDataMissingDependenciesResponse, datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
     log.info("dataset {} install into {} was rejected for missing dependencies", datasetID, projectID)
 
-    updateDataSyncControl(datasetID, projectID)
+    updateDataSyncControl(datasetID, projectID, s3Dir)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -346,10 +346,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   /**
    * Handles an unexpected error response from the handler service.
    */
-  private fun handleUnexpectedErrorResponse(res: InstallDataUnexpectedErrorResponse, datasetID: DatasetID, projectID: ProjectID) {
+  private fun handleUnexpectedErrorResponse(res: InstallDataUnexpectedErrorResponse, datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
     log.error("dataset {} install into {} failed with a 500 from the handler server", datasetID, projectID)
 
-    updateDataSyncControl(datasetID, projectID)
+    updateDataSyncControl(datasetID, projectID, s3Dir)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -371,15 +371,15 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
    *
    * @param projectID Target project ID
    */
-  private fun updateDataSyncControl(datasetID: DatasetID, projectID: ProjectID) {
+  private fun updateDataSyncControl(datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
     log.trace("updateDataSyncControl(datasetID={}, projectID={})", datasetID, projectID)
 
-    val timestamp = OffsetDateTime.now()
+    val updatedTimestamp = s3Dir.getLatestDataTimestamp(OriginTimestamp)
 
     log.debug("updating cache db data install timestamp for dataset {}", datasetID)
-    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, timestamp) }
+    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
     log.debug("updating app db for project {} with data install timestamp for dataset {}", projectID, datasetID)
-    AppDB.withTransaction(projectID) { it.updateSyncControlDataTimestamp(datasetID, timestamp) }
+    AppDB.withTransaction(projectID) { it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp) }
   }
 }
