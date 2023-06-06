@@ -126,4 +126,19 @@ object Metrics {
       300.0,
     )
     .register()
+
+  val reconcilerTimes: Histogram = Histogram.build()
+    .name("dataset_reconciler_times")
+    .help("Dataset reconciler run times.")
+    .buckets(
+      5.0,
+      15.0,
+      30.0,
+      60.0,  // 1 minute
+      150.0, // 2.5 minutes
+      300.0, // 5 minutes
+      600.0, // 10 minutes
+      900.0, // 15 minutes
+    )
+    .register()
 }

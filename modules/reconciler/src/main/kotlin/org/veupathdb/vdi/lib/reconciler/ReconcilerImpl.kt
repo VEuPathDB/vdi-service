@@ -9,6 +9,7 @@ import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.reconciler.config.ReconcilerConfig
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
+import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import java.util.*
 
@@ -37,6 +38,9 @@ class ReconcilerImpl(private val config: ReconcilerConfig) :
         runBlocking {
             while (!isShutDown()) {
                 logger().info("Scheduling reconciler for ${targets.size} targets.")
+
+                val timer = Metrics.reconcilerTimes.startTimer()
+
                 // Schedule the reconciler for each target database.
                 targets.forEach { target ->
                     launch(
@@ -52,6 +56,9 @@ class ReconcilerImpl(private val config: ReconcilerConfig) :
                         )
                     ) { target.reconcile() }
                 }
+
+                timer.observeDuration()
+
                 delay(config.runInterval.toMillis())
             }
         }
