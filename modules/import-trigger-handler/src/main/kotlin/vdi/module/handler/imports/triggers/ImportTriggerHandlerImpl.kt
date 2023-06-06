@@ -128,7 +128,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         .open()!!
         .use { handler.client.postImport(datasetID, datasetMeta, it) }
 
-      Metrics.imports.labels(datasetMeta.type.name, datasetMeta.type.version, result.responseCode.toString())
+      Metrics.imports.labels(datasetMeta.type.name, datasetMeta.type.version, result.responseCode.toString()).inc()
 
       when (result.type) {
         ImportResponseType.Success         -> handleImportSuccessResult(

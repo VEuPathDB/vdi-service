@@ -94,7 +94,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
   ) {
     val response = handler.postUninstall(datasetID, projectID)
 
-    Metrics.uninstallations.labels(meta.type.name, meta.type.version, response.responseCode.toString())
+    Metrics.uninstallations.labels(meta.type.name, meta.type.version, response.responseCode.toString()).inc()
 
     when (response.type) {
       UninstallResponseType.Success

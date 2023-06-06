@@ -217,7 +217,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
 
     val result = ph.client.postInstallMeta(datasetID, projectID, meta)
 
-    Metrics.metaUpdates.labels(meta.type.name, meta.type.version, result.responseCode.toString())
+    Metrics.metaUpdates.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
 
     try {
       when (result.type) {

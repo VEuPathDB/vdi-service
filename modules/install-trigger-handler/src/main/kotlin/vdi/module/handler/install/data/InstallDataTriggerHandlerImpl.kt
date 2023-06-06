@@ -212,7 +212,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           .use { inp -> handler.postInstallData(datasetID, projectID, inp) }
       }
 
-      Metrics.installations.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString())
+      Metrics.installations.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
 
       when (response.type) {
         InstallDataResponseType.Success
