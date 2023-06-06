@@ -112,4 +112,18 @@ object Metrics {
       60.0,
     )
     .register()
+
+  val reinstallationTimes: Histogram = Histogram.build()
+    .name("dataset_reinstallation_times")
+    .help("Dataset reinstallation run times.")
+    .buckets(
+      1.0,
+      5.0,
+      15.0,
+      30.0,
+      60.0,
+      150.0,
+      300.0,
+    )
+    .register()
 }
