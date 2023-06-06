@@ -1,10 +1,12 @@
 package org.veupathdb.vdi.lib.reconciler
 
 import org.apache.logging.log4j.kotlin.logger
+import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
+import org.veupathdb.vdi.lib.reconciler.exception.UnsupportedTypeException
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 
@@ -27,6 +29,7 @@ class ReconcilerInstance(
         try {
             tryReconcile()
         } catch (e: Exception) {
+            // Don't re-throw error, ensure exception is logged and soldier on for future reconciliation.
             logger().error("Failure running reconciler for " + targetDB.name, e)
         }
     }
@@ -44,7 +47,7 @@ class ReconcilerInstance(
             while (sourceIterator.hasNext()) {
 
                 // Pop the next DatasetDirectory instance from the S3 stream.
-                val sourceDatasetDir = sourceIterator.next()
+                val sourceDatasetDir: DatasetDirectory = sourceIterator.next()
 
                 logger().info("Checking dataset $sourceDatasetDir for ${targetDB.name}")
 
@@ -60,7 +63,7 @@ class ReconcilerInstance(
                 // again (or the target stream is consumed).
                 if (sourceDatasetDir.datasetID.toString() > nextTargetDataset!!.second.datasetID.toString()) {
                     while (nextTargetDataset != null && sourceDatasetDir.datasetID.toString() > nextTargetDataset!!.second.datasetID.toString()) {
-                        targetDB.deleteDataset(nextTargetDataset!!.first, nextTargetDataset!!.second.datasetID)
+                        tryDeleteDataset(targetDB, nextTargetDataset!!.first, nextTargetDataset!!.second.datasetID)
                         nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
                     }
                 }
@@ -73,7 +76,7 @@ class ReconcilerInstance(
 
                 if (sourceDatasetDir.datasetID.toString() < nextTargetDataset!!.second.datasetID.toString()) {
                     // Dataset is in source, but not in target. Send an event.
-                    sendSyncEvent(sourceDatasetDir) // Do we need a way to specify out of sync targets?
+                    sendSyncEvent(sourceDatasetDir)
                 } else {
                     if (isOutOfSync(sourceDatasetDir, nextTargetDataset!!.second)) {
                         sendSyncEvent(sourceDatasetDir)
@@ -86,10 +89,20 @@ class ReconcilerInstance(
             // Consume target stream, deleting all remaining datasets.
             while (targetIterator.hasNext()) {
                 val targetDatasetControl = targetIterator.next()
-                logger().info("Would delete " + targetDatasetControl.second.datasetID)
-                targetDB.deleteDataset(datasetType = targetDatasetControl.first, datasetID = targetDatasetControl.second.datasetID)
+                logger().info("Attempting to delete " + targetDatasetControl.second.datasetID)
+                tryDeleteDataset(targetDB, datasetType = targetDatasetControl.first, datasetID = targetDatasetControl.second.datasetID)
             }
             logger().info("Completed reconciliation")
+        }
+    }
+
+    private fun tryDeleteDataset(targetDB: ReconcilerTarget, datasetType: VDIDatasetType, datasetID: DatasetID) {
+        try {
+            targetDB.deleteDataset(datasetID = datasetID, datasetType = datasetType)
+        } catch (e: Exception) {
+            // Swallow exception and alert if unable to delete. Reconciler can safely recover, but the dataset
+            // may need a manual inspection.
+            logger().error("Failed to delete dataset $datasetID of type $datasetType from db ${targetDB.name}", e)
         }
     }
 
@@ -97,6 +110,10 @@ class ReconcilerInstance(
      * Returns true if any of our scopes are out of sync.
      */
     private fun isOutOfSync(ds: DatasetDirectory, targetLastUpdated: VDISyncControlRecord): Boolean {
+        logger().info("Shares -- target: ${targetLastUpdated.sharesUpdated} source: ${ds.getLatestShareTimestamp(targetLastUpdated.sharesUpdated)}")
+        logger().info("Data -- target: ${targetLastUpdated.dataUpdated} source: ${ds.getLatestDataTimestamp(targetLastUpdated.dataUpdated)}")
+        logger().info("Meta -- target: ${targetLastUpdated.metaUpdated} source: ${ds.getMeta().lastModified()}")
+
         val shareOos = targetLastUpdated.sharesUpdated.isBefore(ds.getLatestShareTimestamp(targetLastUpdated.sharesUpdated))
         val dataOos = targetLastUpdated.dataUpdated.isBefore(ds.getLatestDataTimestamp(targetLastUpdated.dataUpdated))
         val metaOos = targetLastUpdated.metaUpdated.isBefore(ds.getMeta().lastModified())

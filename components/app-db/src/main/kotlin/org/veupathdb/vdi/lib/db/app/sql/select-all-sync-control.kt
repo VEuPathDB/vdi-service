@@ -23,7 +23,7 @@ FROM
   vdi.sync_control s
   INNER JOIN vdi.dataset d
     ON d.dataset_id = s.dataset_id
-ORDER BY CONCAT(d.owner,'/',s.dataset_id)
+ORDER BY CONCAT(CONCAT(d.owner,'/'), s.dataset_id)
 """
 
 internal fun Connection.selectAllSyncControl(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {

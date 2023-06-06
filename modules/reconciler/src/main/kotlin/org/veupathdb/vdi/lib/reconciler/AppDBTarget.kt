@@ -6,6 +6,7 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import org.veupathdb.vdi.lib.reconciler.exception.UnsupportedTypeException
 
 class AppDBTarget(
     override val name: String,
@@ -17,6 +18,10 @@ class AppDBTarget(
     }
 
     override fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID) {
+        if (datasetType.name !in PluginHandlers) {
+            throw UnsupportedTypeException("Unable to delete unknown dataset type $datasetType from target database " +
+                    "for project $projectID")
+        }
         PluginHandlers[datasetType.name]!!.client.postUninstall(datasetID, projectID)
         AppDB.withTransaction(projectID) {
             it.deleteDatasetVisibilities(datasetID)
