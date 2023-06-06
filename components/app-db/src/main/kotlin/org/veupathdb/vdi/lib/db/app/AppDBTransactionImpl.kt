@@ -178,4 +178,13 @@ class AppDBTransactionImpl(private val connection: Connection) : AppDBTransactio
     log.debug("testing dataset project link for dataset {} and project {}", datasetID, projectID)
     return connection.testDatasetProjectLinkExists(datasetID, projectID)
   }
+
+  override fun selectDatasetsByInstallStatus(
+    installType: InstallType,
+    installStatus: InstallStatus
+  ): List<DatasetRecord> {
+    log.debug("selecting datasets with install type {} in the status {}", installType, installStatus)
+    return connection.selectDatasetsByInstallStatus(installType, installStatus)
+  }
+
 }

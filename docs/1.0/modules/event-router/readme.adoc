@@ -4,7 +4,7 @@
 ifdef::env-github[]
 ++++
 <p align="center">
-  <img src="https://raw.githubusercontent.com/VEuPathDB/vdi-service/main/docs/1.0/assets/modules/event-router/images/event-router-overview.svg" />
+  <img src="https://raw.githubusercontent.com/VEuPathDB/vdi-service/main/docs/1.0/modules/event-router/images/event-router-overview.svg" />
 </p>
 ++++
 endif::[]

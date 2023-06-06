@@ -6,6 +6,7 @@ dependencies {
   implementation(project(":components:cache-db"))
   implementation(project(":components:handler-client"))
   implementation(project(":components:kafka"))
+  implementation(project(":components:metrics"))
   implementation(project(":components:module-core"))
   implementation(project(":components:plugin-mapping"))
   implementation(project(":components:s3"))

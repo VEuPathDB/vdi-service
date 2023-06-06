@@ -13,6 +13,8 @@ import vdi.module.handler.imports.triggers.ImportTriggerHandler
 import vdi.module.handler.install.data.InstallDataTriggerHandler
 import vdi.module.handler.meta.triggers.UpdateMetaTriggerHandler
 import vdi.module.handler.share.trigger.ShareTriggerHandler
+import vdi.module.pruner.PrunerModule
+import vdi.module.reinstaller.DatasetReinstaller
 
 object Main {
 
@@ -22,10 +24,12 @@ object Main {
   fun main(args: Array<String>) {
     log.info("initializing modules")
     val modules = listOf(
+      DatasetReinstaller(),
       EventRouter(),
       HardDeleteTriggerHandler(),
       ImportTriggerHandler(),
       InstallDataTriggerHandler(),
+      PrunerModule(),
       ShareTriggerHandler(),
       SoftDeleteTriggerHandler(),
       UpdateMetaTriggerHandler(),

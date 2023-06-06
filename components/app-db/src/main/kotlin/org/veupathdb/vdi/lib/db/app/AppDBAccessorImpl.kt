@@ -67,4 +67,11 @@ internal class AppDBAccessorImpl(private val dataSource: DataSource) : AppDBAcce
     return con.use { it.testDatasetProjectLinkExists(datasetID, projectID) }
   }
 
+  override fun selectDatasetsByInstallStatus(
+    installType: InstallType,
+    installStatus: InstallStatus
+  ): List<DatasetRecord> {
+    log.debug("selecting datasets with install type {} in the status {}", installType, installStatus)
+    return con.use { it.selectDatasetsByInstallStatus(installType, installStatus) }
+  }
 }
