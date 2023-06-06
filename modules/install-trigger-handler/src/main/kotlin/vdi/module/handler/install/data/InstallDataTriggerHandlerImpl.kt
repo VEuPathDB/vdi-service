@@ -20,17 +20,13 @@ import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.nio.file.Path
-import java.time.OffsetDateTime
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-<<<<<<< HEAD
 import org.veupathdb.vdi.lib.common.OriginTimestamp
-=======
 import vdi.component.metrics.Metrics
->>>>>>> main
 import vdi.component.modules.VDIServiceModuleBase
 
 internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig)
@@ -219,6 +215,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       Metrics.installations.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
 
       when (response.type) {
+        InstallDataResponseType.Success
         -> handleSuccessResponse(response as InstallDataSuccessResponse, datasetID, projectID, s3Dir)
 
         InstallDataResponseType.BadRequest

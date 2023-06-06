@@ -110,10 +110,6 @@ class ReconcilerInstance(
      * Returns true if any of our scopes are out of sync.
      */
     private fun isOutOfSync(ds: DatasetDirectory, targetLastUpdated: VDISyncControlRecord): Boolean {
-        logger().info("Shares -- target: ${targetLastUpdated.sharesUpdated} source: ${ds.getLatestShareTimestamp(targetLastUpdated.sharesUpdated)}")
-        logger().info("Data -- target: ${targetLastUpdated.dataUpdated} source: ${ds.getLatestDataTimestamp(targetLastUpdated.dataUpdated)}")
-        logger().info("Meta -- target: ${targetLastUpdated.metaUpdated} source: ${ds.getMeta().lastModified()}")
-
         val shareOos = targetLastUpdated.sharesUpdated.isBefore(ds.getLatestShareTimestamp(targetLastUpdated.sharesUpdated))
         val dataOos = targetLastUpdated.dataUpdated.isBefore(ds.getLatestDataTimestamp(targetLastUpdated.dataUpdated))
         val metaOos = targetLastUpdated.metaUpdated.isBefore(ds.getMeta().lastModified())
