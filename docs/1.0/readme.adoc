@@ -1,5 +1,6 @@
 = VDI Design Overview
 :toc:
+:toclevels: 3
 
 == Design
 
@@ -33,6 +34,37 @@ enable the visibility of the target dataset to the appropriate user.
 
 
 === Project Structure
+
+==== Components
+
+App DB::
+The app-db component exposes an API for performing actions on target project
+application databases.
+
+Cache DB::
+The cache-db component exposes an API for performing actions on the VDI-internal
+cache database.
+
+Dataset Reinstaller::
+The dataset-reinstaller component exposes an API for reinstalling datasets that
+have been marked as "ready-for-reinstall".
+
+Handler Client::
+The handler-client component exposes an API for interacting with the VDI plugin
+services over HTTP.
+
+Install Cleanup::
+The install-cleanup component exposes an API for marking datasets as
+"ready-for-reinstall".
+
+--
+* Kafka
+* LDAP
+* Module Core
+* Plugin Mapping
+* Pruner
+* Rabbit
+--
 
 ==== Database Schemata
 
@@ -373,17 +405,3 @@ API.
 
 * link:modules/soft-delete-trigger-handler/readme.adoc[Soft-Delete Trigger Handler]
 * Update Meta Trigger Handler
-
-
-=== Components
-
-* App DB
-* Cache DB
-* Handler Client
-* Install Cleanup
-* Kafka
-* LDAP
-* Module Core
-* Plugin Mapping
-* Pruner
-* Rabbit
