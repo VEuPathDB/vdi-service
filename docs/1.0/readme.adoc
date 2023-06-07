@@ -19,6 +19,8 @@ image::images/overview.svg[]
 
 === Dataset Lookup
 
+image::images/dataset-list.svg[]
+
 Via the public HTTP API exposed by the <<rest-service,REST service>> users may
 look up a listing of the datasets they have access to along with in-depth
 details about specific target datasets.
@@ -27,7 +29,6 @@ The dataset listing will contain basic information about the datasets that are
 either owned by or have been shared with the requesting user.  The result will
 include the user-provided metadata attached to the dataset as well as import and
 installation statuses for the dataset's target databases.
-
 
 === Dataset Metadata Update
 
