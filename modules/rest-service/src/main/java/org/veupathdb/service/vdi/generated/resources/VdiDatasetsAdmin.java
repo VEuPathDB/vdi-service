@@ -10,6 +10,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
+import org.veupathdb.service.vdi.generated.model.BrokenDatasetListing;
 import org.veupathdb.service.vdi.generated.model.InstallCleanupRequest;
 import org.veupathdb.service.vdi.generated.model.ServerError;
 import org.veupathdb.service.vdi.generated.model.UnauthorizedError;
@@ -53,7 +54,7 @@ public interface VdiDatasetsAdmin {
     }
 
     public static GetVdiDatasetsAdminListBrokenResponse respond200WithApplicationJson(
-        Object entity) {
+        BrokenDatasetListing entity) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetVdiDatasetsAdminListBrokenResponse(responseBuilder.build(), entity);
