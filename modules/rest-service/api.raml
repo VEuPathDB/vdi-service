@@ -281,6 +281,16 @@ uses:
           description: Secret key used to authenticate admin endpoint requests.
           type: string
           required: true
+      queryParameters:
+        expanded:
+          displayName: Expanded Dataset List
+          description: |
+            Whether the returned broken dataset install list should be expanded
+            to include additional details about each dataset or should be just
+            a simple list of dataset IDs.
+          type: boolean
+          default: true
+          required: false
       responses:
         200:
           description: |
