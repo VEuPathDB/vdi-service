@@ -1,11 +1,13 @@
 package org.veupathdb.service.vdi.generated.resources;
 
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.InstallCleanupRequest;
@@ -19,6 +21,7 @@ public interface VdiDatasetsAdmin {
   @Path("/list-broken")
   @Produces("application/json")
   GetVdiDatasetsAdminListBrokenResponse getVdiDatasetsAdminListBroken(
+      @QueryParam("expanded") @DefaultValue("true") Boolean expanded,
       @HeaderParam("Auth-Key") String authKey);
 
   @POST
