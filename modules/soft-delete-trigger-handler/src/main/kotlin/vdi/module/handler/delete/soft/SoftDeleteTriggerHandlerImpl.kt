@@ -17,6 +17,8 @@ import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 
 internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTriggerHandlerConfig)
@@ -58,6 +60,10 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     val meta = dir.getMeta().load()
       ?: throw IllegalStateException("got an uninstall event for a dataset that has no meta file: dataset $datasetID, user $userID")
 
+    val timer = Metrics.uninstallationTimes
+      .labels(meta.type.name, meta.type.version)
+      .startTimer()
+
     // Mark the dataset as deleted in the cache DB
     CacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
 
@@ -73,12 +79,22 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
         return@forEach
       }
 
-      runJob(userID, datasetID, projectID, handler.client)
+      runJob(userID, datasetID, projectID, handler.client, meta)
     }
+
+    timer.observeDuration()
   }
 
-  private fun runJob(userID: UserID, datasetID: DatasetID, projectID: ProjectID, handler: PluginHandlerClient) {
+  private fun runJob(
+    userID:    UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    handler:   PluginHandlerClient,
+    meta:      VDIDatasetMeta,
+  ) {
     val response = handler.postUninstall(datasetID, projectID)
+
+    Metrics.uninstallations.labels(meta.type.name, meta.type.version, response.responseCode.toString()).inc()
 
     when (response.type) {
       UninstallResponseType.Success

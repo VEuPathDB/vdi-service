@@ -13,10 +13,10 @@ internal enum class ShareFilterStatus {
 
     @JvmStatic
     fun fromStringOrNull(value: String): ShareFilterStatus? {
-      val value = value.lowercase()
+      val lowercaseValue = value.lowercase()
 
       for (enum in values())
-        if (enum.name.lowercase() == value)
+        if (enum.name.lowercase() == lowercaseValue)
           return enum
 
       return null

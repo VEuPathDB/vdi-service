@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+  implementation(project(":components:metrics"))
   implementation(project(":components:module-core"))
   implementation(project(":components:pruner"))
   implementation(project(":components:s3"))

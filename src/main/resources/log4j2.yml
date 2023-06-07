@@ -3,10 +3,15 @@ Configuration:
   status: error
   Appenders:
     Console:
-      name: Console_Appender
+    - name: Console_Appender
       target: SYSTEM_OUT
       PatternLayout:
-        pattern: "%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} [rid:%5X{traceId}] %-5level %c - %m%n}"
+      pattern: "%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} [rid:%5X{traceId}] %-5level %c - %m%n}"
+    - name: Reconciler_Appender
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} [reconciler:%5X{reconciler}] %-5level %c - %m%n}"
+
   Loggers:
     Root:
       level: debug
@@ -23,3 +28,8 @@ Configuration:
       additivity: false
       AppenderRef:
       - ref: Console_Appender
+    - name: org.veupathdb.vdi.lib.reconciler
+      level: debug
+      additivity: false
+      AppenderRef:
+      - ref: Reconciler_Appender

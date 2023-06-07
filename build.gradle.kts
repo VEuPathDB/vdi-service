@@ -62,7 +62,9 @@ dependencies {
 
   implementation(project(":components:module-core"))
 
+  implementation(project(":modules:dataset-reinstaller"))
   implementation(project(":modules:event-router"))
+  implementation(project(":modules:reconciler"))
   implementation(project(":modules:hard-delete-trigger-handler"))
   implementation(project(":modules:import-trigger-handler"))
   implementation(project(":modules:install-trigger-handler"))

@@ -33,6 +33,7 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 
 internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTriggerHandlerConfig)
@@ -83,6 +84,11 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     // Load the dataset metadata from S3
     val datasetMeta   = dir.getMeta().load()!!
     val metaTimestamp = dir.getMeta().lastModified()!!
+    log.info("Meta timestamp is {}", metaTimestamp)
+
+    val timer = Metrics.metaUpdateTimes
+      .labels(datasetMeta.type.name, datasetMeta.type.version)
+      .startTimer()
 
     // Attempt to select the dataset details from the cache DB
     val cachedDataset = CacheDB.selectDataset(datasetID)
@@ -114,11 +120,15 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     // Do the "little" reconciliation
     comparison(dir, syncControl)
       .also {
-        if (it.doDataSync)
+        if (it.doDataSync) {
+          log.info("Doing little reconciliation data sync")
           kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
+        }
 
-        if (it.doShareSync)
+        if (it.doShareSync) {
+          log.info("Doing little reconciliation share sync")
           kr.sendShareTrigger(ShareTrigger(userID, datasetID))
+        }
       }
 
     CacheDB.openTransaction()
@@ -144,6 +154,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
 
     datasetMeta.projects
       .forEach { projectID -> executeJob(ph, datasetMeta, syncControl, metaTimestamp, datasetID, projectID) }
+
+    timer.observeDuration()
   }
 
   private fun executeJob(
@@ -209,6 +221,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     }
 
     val result = ph.client.postInstallMeta(datasetID, projectID, meta)
+
+    Metrics.metaUpdates.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
 
     try {
       when (result.type) {

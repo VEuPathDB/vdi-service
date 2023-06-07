@@ -14,7 +14,7 @@ internal sealed class DatasetFileImpl(
 ) : DatasetFile {
 
   override fun exists() = existsChecker.invoke()
-  override fun lastModified() = lastModifiedSupplier.invoke()
+  override fun lastModified(): OffsetDateTime? = lastModifiedSupplier.invoke()
   override fun loadContents() = loadObjectStream.invoke()
 
   constructor(s3Object: S3Object) : this(
@@ -32,7 +32,8 @@ internal sealed class DatasetFileImpl(
   ) : this(
     name = name,
     path = path,
-    lastModifiedSupplier = { bucket.objects.stat(path)?.lastModified },
+    // This looks weird, but we use list instead of stat since stat only returns seconds resolution, not milliseconds.
+    lastModifiedSupplier = { bucket.objects.list(path).stream().findFirst().map { o -> o.lastModified }.orElse(null) },
     existsChecker = { path in bucket.objects },
     loadObjectStream = { bucket.objects.open(path)?.stream }
   )

@@ -4,7 +4,9 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.model.*
 import org.veupathdb.vdi.lib.db.app.sql.*
 import java.sql.Connection
@@ -163,6 +165,10 @@ class AppDBTransactionImpl(private val connection: Connection) : AppDBTransactio
     return connection.selectDatasetProjectLinks(datasetID)
   }
 
+  override fun streamAllSyncControlRecords(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
+    return connection.selectAllSyncControl()
+  }
+
   override fun testDatasetVisibilityExists(datasetID: DatasetID, userID: UserID): Boolean {
     log.debug("testing dataset visibility for dataset {} and user {}", datasetID, userID)
     return connection.testDatasetVisibilityExists(datasetID, userID)
@@ -172,4 +178,13 @@ class AppDBTransactionImpl(private val connection: Connection) : AppDBTransactio
     log.debug("testing dataset project link for dataset {} and project {}", datasetID, projectID)
     return connection.testDatasetProjectLinkExists(datasetID, projectID)
   }
+
+  override fun selectDatasetsByInstallStatus(
+    installType: InstallType,
+    installStatus: InstallStatus
+  ): List<DatasetRecord> {
+    log.debug("selecting datasets with install type {} in the status {}", installType, installStatus)
+    return connection.selectDatasetsByInstallStatus(installType, installStatus)
+  }
+
 }

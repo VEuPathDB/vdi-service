@@ -48,5 +48,33 @@ data class KafkaRouterConfig(
     shareTriggerTopic           = env.optional(EnvKey.Kafka.Topic.ShareTriggers)
                                      ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_TOPIC,
   )
+
+  constructor(env: Environment, clientID: String) : this(
+    producerConfig              = KafkaProducerConfig(env, clientID),
+    importTriggerMessageKey     = env.optional(EnvKey.Kafka.MessageKey.ImportTriggers)
+        ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
+    importTriggerTopic          = env.optional(EnvKey.Kafka.Topic.ImportTriggers)
+        ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
+    installTriggerMessageKey    = env.optional(EnvKey.Kafka.MessageKey.InstallTriggers)
+        ?: KafkaRouterConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY,
+    installTriggerTopic         = env.optional(EnvKey.Kafka.Topic.InstallTriggers)
+        ?: KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC,
+    updateMetaTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.UpdateMetaTriggers)
+        ?: KafkaRouterConfigDefaults.UPDATE_META_TRIGGER_MESSAGE_KEY,
+    updateMetaTriggerTopic      = env.optional(EnvKey.Kafka.Topic.UpdateMetaTriggers)
+        ?: KafkaRouterConfigDefaults.UPDATE_META_TRIGGER_TOPIC,
+    softDeleteTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.SoftDeleteTriggers)
+        ?: KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_MESSAGE_KEY,
+    softDeleteTriggerTopic      = env.optional(EnvKey.Kafka.Topic.SoftDeleteTriggers)
+        ?: KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_TOPIC,
+    hardDeleteTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.HardDeleteTriggers)
+        ?: KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY,
+    hardDeleteTriggerTopic      = env.optional(EnvKey.Kafka.Topic.HardDeleteTriggers)
+        ?: KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC,
+    shareTriggerMessageKey      = env.optional(EnvKey.Kafka.MessageKey.ShareTriggers)
+        ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY,
+    shareTriggerTopic           = env.optional(EnvKey.Kafka.Topic.ShareTriggers)
+        ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_TOPIC,
+  )
 }
 
