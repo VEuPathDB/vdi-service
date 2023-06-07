@@ -1,8 +1,6 @@
 = VDI Design Overview
 :toc:
-:toclevels: 3
-
-== Design
+:toclevels: 2
 
 The VEuPathDB Dataset Installer (VDI) is a system for installing datasets into
 target VEuPathDB projects such as link:https://plasmodb.org/plasmo/app[PlasmoDB]
@@ -14,9 +12,11 @@ dataset objects.  Those events are then routed through to the various VDI
 <<Modules,modules>> to be processed and installed into one or more target
 project databases.
 
-=== Actions
+image::images/overview.svg[]
 
-==== Dataset Sharing
+== Actions
+
+=== Dataset Sharing
 
 Installed datasets may be shared by the dataset's owner with other target
 VEuPathDB users by way of the VDI sharing mechanism.
@@ -33,293 +33,10 @@ which will perform the updates on the relevant project application databases to
 enable the visibility of the target dataset to the appropriate user.
 
 
-=== Project Structure
+== Project Structure
 
-==== Components
 
-App DB::
-The app-db component exposes an API for performing actions on target project
-application databases.
-
-Cache DB::
-The cache-db component exposes an API for performing actions on the VDI-internal
-cache database.
-
-Dataset Reinstaller::
-The dataset-reinstaller component exposes an API for reinstalling datasets that
-have been marked as "ready-for-reinstall".
-
-Handler Client::
-The handler-client component exposes an API for interacting with the VDI plugin
-services over HTTP.
-
-Install Cleanup::
-The install-cleanup component exposes an API for marking datasets as
-"ready-for-reinstall".
-
---
-* Kafka
-* LDAP
-* Module Core
-* Plugin Mapping
-* Pruner
-* Rabbit
---
-
-==== Database Schemata
-
-===== Internal Cache Database
-
-====== `vdi.datasets`
-
-Core registry of datasets in the internal cache database.  All other VDI control
-tables in the cache DB foreign key to this table.
-
-[%header, cols="2m,2m,6m"]
-|===
-| Column | Type | Constraints
-
-| dataset_id
-| CHAR(32)
-| PRIMARY KEY NOT NULL
-
-| type_name
-| VARCHAR
-| NOT NULL
-
-| type_version
-| VARCHAR
-| NOT NULL
-
-| owner_id
-| VARCHAR
-| NOT NULL
-
-| is_deleted
-| BOOLEAN
-| NOT NULL
-
-| created
-| TIMESTAMP WITH TIME ZONE
-| NOT NULL
-|===
-
-====== `vdi.dataset_files`
-
-Listing of dataset data files for each dataset in MinIO (S3).
-
-[IMPORTANT]
---
-TODO: This table should be dropped.
---
-
-[%header, cols="2m,2m,6m"]
-|===
-| Column | Type | Constraints
-
-| dataset_id
-| CHAR(32)
-| NOT NULL REFERENCES vdi.datasets (dataset_id)
-
-| file_name
-| VARCHAR
-| NOT NULL
-|===
-
-.Additional Constraints
---
-[%header, cols="4m,6"]
-|===
-| Name | Description
-
-| dataset_files_file_to_dataset_uq
-| Unique on `dataset_id` to `file_name` combinations.
-|===
---
-
-====== `vdi.dataset_metadata`
-
-[%header, cols="2m,2m,6m"]
-|===
-| Column | Type | Constraints
-
-| dataset_id
-| CHAR(32)
-| NOT NULL REFERENCES vdi.datasets (dataset_id)
-
-| project_id
-| VARCHAR
-| NOT NULL
-|===
-
-.Additional Constraints
---
-[%header, cols="4m,6"]
-|===
-| Name | Description
-
-| dataset_projects_uq
-| Unique on `dataset_id` to `project_id` combinations.
-|===
---
-
-
-
-
-[%header, cols="2m,2m,6m"]
-|===
-| Column | Type | Constraints
-|===
-
-===== Application Databases
-
-====== `vdi.dataset`
-
-Core registry of all VDI datasets that have had some form of installation
-attempt made on the containing application database.
-
-[%header, cols="2m,2m,6m"]
-|===
-| Column | Type | Constraints
-
-| dataset_id
-| CHAR(32)
-| PRIMARY KEY NOT NULL
-
-| owner
-| NUMBER
-| NOT NULL
-
-| type_name
-| VARCHAR2(64)
-| NOT NULL
-
-| type_version
-| VARCHAR2(64)
-| NOT NULL
-
-| is_deleted
-| NUMBER
-| NOT NULL
-|===
-
-====== `vdi.dataset_install_message`
-
-Installation status/messages table for dataset installation attempts on the
-containing application database.
-
-Each record will correspond to an attempt to install either metadata or dataset
-data for a target dataset and will contain a mandatory install status as well
-as optional messages emitted by the installer plugin during the installation.
-
-[%header, cols="2m,2m,6m"]
-|===
-| Column | Type | Constraints
-
-| dataset_id
-| CHAR(32)
-| NOT NULL REFERENCES vdi.dataset (dataset_id)
-
-| install_type
-| VARCHAR2(64)
-| NOT NULL
-
-| status
-| VARCHAR(64)
-| NOT NULL
-
-| message
-| CLOB
-|
-|===
-
-The `install_type` and `status` columns are enums controlled by the VDI service
-which originally contained the following values:
-
-`install_type`::
-* `meta`
-* `data`
-
-`status`::
-* `running`
-* `complete`
-* `failed-validation`
-* `failed-installation`
-* `missing dependency`
-* `ready-for-reinstall`
-
-
-====== `vdi.dataset_project`
-
-Link table mapping target datasets to one or more projects that share the same
-application database.
-
-Most often this table will contain only one entry per dataset as most
-application databases are not shared between projects.
-
-[%header, cols="2m,2m,6m"]
-|===
-| Column | Type | Constraints
-
-| dataset_id
-| CHAR(32)
-| NOT NULL REFERENCES vdi.dataset (dataset_id)
-
-| project_id
-| VARCHAR2(64)
-| NOT NULL
-|===
-
-
-====== `vdi.dataset_visibility`
-
-Controls visibility of target datasets to users to whom those datasets hava been
-shared.  Each record in this table declares that a dataset is visible to a user.
-
-[%header, cols="2m,2m,6m"]
-|===
-| Column | Type | Constraints
-
-| dataset_id
-| CHAR(32)
-| NOT NULL REFERENCES vdi.dataset (dataset_id)
-
-| user_id
-| NUMBER
-| NOT NULL
-|===
-
-
-====== `vdi.sync_control`
-
-Contains timestamps of various elements of a dataset as they are recorded in S3.
-
-These timestamps are used to determine when a dataset is out of sync with S3 and
-needs to be resynchronized.
-
-[%header, cols="2m,2m,6m"]
-|===
-| Column | Type | Constraints
-
-| dataset_id
-| CHAR(32)
-| NOT NULL REFERENCES vdi.dataset (dataset_id)
-
-| shares_update_time
-| TIMESTAMP WITH TIMEZONE
-| NOT NULL
-
-| data_update_time
-| TIMESTAMP WITH TIMEZONE
-| NOT NULL
-
-| meta_update_time
-| TIMESTAMP WITH TIMEZONE
-| NOT NULL
-
-|===
-
-== Modules
+=== Modules
 
 Modules are self-contained services that operate under the VDI umbrella that
 consume events from MinIO (S3) actions and perform specific actions on datasets
@@ -405,3 +122,288 @@ API.
 
 * link:modules/soft-delete-trigger-handler/readme.adoc[Soft-Delete Trigger Handler]
 * Update Meta Trigger Handler
+
+
+=== Components
+
+App DB::
+The app-db component exposes an API for performing actions on target project
+application databases.
+
+Cache DB::
+The cache-db component exposes an API for performing actions on the VDI-internal
+cache database.
+
+Dataset Reinstaller::
+The dataset-reinstaller component exposes an API for reinstalling datasets that
+have been marked as "ready-for-reinstall".
+
+Handler Client::
+The handler-client component exposes an API for interacting with the VDI plugin
+services over HTTP.
+
+Install Cleanup::
+The install-cleanup component exposes an API for marking datasets as
+"ready-for-reinstall".
+
+--
+* Kafka
+* LDAP
+* Module Core
+* Plugin Mapping
+* Pruner
+* Rabbit
+--
+
+=== Database Schemata
+
+==== Internal Cache Database
+
+===== `vdi.datasets`
+
+Core registry of datasets in the internal cache database.  All other VDI control
+tables in the cache DB foreign key to this table.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| PRIMARY KEY NOT NULL
+
+| type_name
+| VARCHAR
+| NOT NULL
+
+| type_version
+| VARCHAR
+| NOT NULL
+
+| owner_id
+| VARCHAR
+| NOT NULL
+
+| is_deleted
+| BOOLEAN
+| NOT NULL
+
+| created
+| TIMESTAMP WITH TIME ZONE
+| NOT NULL
+|===
+
+===== `vdi.dataset_files`
+
+Listing of dataset data files for each dataset in MinIO (S3).
+
+[IMPORTANT]
+--
+TODO: This table should be dropped.
+--
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.datasets (dataset_id)
+
+| file_name
+| VARCHAR
+| NOT NULL
+|===
+
+.Additional Constraints
+--
+[%header, cols="4m,6"]
+|===
+| Name | Description
+
+| dataset_files_file_to_dataset_uq
+| Unique on `dataset_id` to `file_name` combinations.
+|===
+--
+
+===== `vdi.dataset_metadata`
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.datasets (dataset_id)
+
+| project_id
+| VARCHAR
+| NOT NULL
+|===
+
+.Additional Constraints
+--
+[%header, cols="4m,6"]
+|===
+| Name | Description
+
+| dataset_projects_uq
+| Unique on `dataset_id` to `project_id` combinations.
+|===
+--
+
+
+
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+|===
+
+==== Application Databases
+
+===== `vdi.dataset`
+
+Core registry of all VDI datasets that have had some form of installation
+attempt made on the containing application database.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| PRIMARY KEY NOT NULL
+
+| owner
+| NUMBER
+| NOT NULL
+
+| type_name
+| VARCHAR2(64)
+| NOT NULL
+
+| type_version
+| VARCHAR2(64)
+| NOT NULL
+
+| is_deleted
+| NUMBER
+| NOT NULL
+|===
+
+===== `vdi.dataset_install_message`
+
+Installation status/messages table for dataset installation attempts on the
+containing application database.
+
+Each record will correspond to an attempt to install either metadata or dataset
+data for a target dataset and will contain a mandatory install status as well
+as optional messages emitted by the installer plugin during the installation.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.dataset (dataset_id)
+
+| install_type
+| VARCHAR2(64)
+| NOT NULL
+
+| status
+| VARCHAR(64)
+| NOT NULL
+
+| message
+| CLOB
+|
+|===
+
+The `install_type` and `status` columns are enums controlled by the VDI service
+which originally contained the following values:
+
+`install_type`::
+* `meta`
+* `data`
+
+`status`::
+* `running`
+* `complete`
+* `failed-validation`
+* `failed-installation`
+* `missing dependency`
+* `ready-for-reinstall`
+
+
+===== `vdi.dataset_project`
+
+Link table mapping target datasets to one or more projects that share the same
+application database.
+
+Most often this table will contain only one entry per dataset as most
+application databases are not shared between projects.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.dataset (dataset_id)
+
+| project_id
+| VARCHAR2(64)
+| NOT NULL
+|===
+
+
+===== `vdi.dataset_visibility`
+
+Controls visibility of target datasets to users to whom those datasets hava been
+shared.  Each record in this table declares that a dataset is visible to a user.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.dataset (dataset_id)
+
+| user_id
+| NUMBER
+| NOT NULL
+|===
+
+
+===== `vdi.sync_control`
+
+Contains timestamps of various elements of a dataset as they are recorded in S3.
+
+These timestamps are used to determine when a dataset is out of sync with S3 and
+needs to be resynchronized.
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.dataset (dataset_id)
+
+| shares_update_time
+| TIMESTAMP WITH TIMEZONE
+| NOT NULL
+
+| data_update_time
+| TIMESTAMP WITH TIMEZONE
+| NOT NULL
+
+| meta_update_time
+| TIMESTAMP WITH TIMEZONE
+| NOT NULL
+
+|===
