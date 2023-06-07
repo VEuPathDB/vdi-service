@@ -19,8 +19,6 @@ image::images/overview.svg[]
 
 === Dataset Lookup
 
-image::images/dataset-list.svg[]
-
 Via the public HTTP API exposed by the <<rest-service,REST service>> users may
 look up a listing of the datasets they have access to along with in-depth
 details about specific target datasets.
