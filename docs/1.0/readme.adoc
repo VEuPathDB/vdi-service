@@ -3,11 +3,42 @@
 
 == Design
 
-=== Database Schemata
+The VEuPathDB Dataset Installer (VDI) is a system for installing datasets into
+target VEuPathDB projects such as link:https://plasmodb.org/plasmo/app[PlasmoDB]
+or link:https://microbiomedb.org/mbio/app[MicrobiomeDB].
 
-==== Internal Cache Database
+VDI is an event driven system whose source is a MinIO (S3) object store which
+publishes events for the creation of new dataset objects and deletions of those
+dataset objects.  Those events are then routed through to the various VDI
+<<Modules,modules>> to be processed and installed into one or more target
+project databases.
 
-===== `vdi.datasets`
+=== Actions
+
+==== Dataset Sharing
+
+Installed datasets may be shared by the dataset's owner with other target
+VEuPathDB users by way of the VDI sharing mechanism.
+
+A dataset share is based on a pair of objects that reside in the MinIO object
+store, namely a share offer and a share receipt.  For a dataset to be made
+visible to a target user, both an offer containing a "grant" action and a
+receipt containing an "accept" action must exist.
+
+Once a dataset share object pair have been created in MinIO, the object creation
+events caused by the writing of those objects will be routed through the
+<<event-router,event router>> to the <<share-handler,share trigger handler>>
+which will perform the updates on the relevant project application databases to
+enable the visibility of the target dataset to the appropriate user.
+
+
+=== Project Structure
+
+==== Database Schemata
+
+===== Internal Cache Database
+
+====== `vdi.datasets`
 
 Core registry of datasets in the internal cache database.  All other VDI control
 tables in the cache DB foreign key to this table.
@@ -41,7 +72,7 @@ tables in the cache DB foreign key to this table.
 | NOT NULL
 |===
 
-===== `vdi.dataset_files`
+====== `vdi.dataset_files`
 
 Listing of dataset data files for each dataset in MinIO (S3).
 
@@ -74,7 +105,7 @@ TODO: This table should be dropped.
 |===
 --
 
-===== `vdi.dataset_metadata`
+====== `vdi.dataset_metadata`
 
 [%header, cols="2m,2m,6m"]
 |===
@@ -108,9 +139,9 @@ TODO: This table should be dropped.
 | Column | Type | Constraints
 |===
 
-==== Application Databases
+===== Application Databases
 
-===== `vdi.dataset`
+====== `vdi.dataset`
 
 Core registry of all VDI datasets that have had some form of installation
 attempt made on the containing application database.
@@ -140,7 +171,7 @@ attempt made on the containing application database.
 | NOT NULL
 |===
 
-===== `vdi.dataset_install_message`
+====== `vdi.dataset_install_message`
 
 Installation status/messages table for dataset installation attempts on the
 containing application database.
@@ -186,7 +217,7 @@ which originally contained the following values:
 * `ready-for-reinstall`
 
 
-===== `vdi.dataset_project`
+====== `vdi.dataset_project`
 
 Link table mapping target datasets to one or more projects that share the same
 application database.
@@ -208,7 +239,7 @@ application databases are not shared between projects.
 |===
 
 
-===== `vdi.dataset_visibility`
+====== `vdi.dataset_visibility`
 
 Controls visibility of target datasets to users to whom those datasets hava been
 shared.  Each record in this table declares that a dataset is visible to a user.
@@ -227,7 +258,7 @@ shared.  Each record in this table declares that a dataset is visible to a user.
 |===
 
 
-===== `vdi.sync_control`
+====== `vdi.sync_control`
 
 Contains timestamps of various elements of a dataset as they are recorded in S3.
 
@@ -256,21 +287,93 @@ needs to be resynchronized.
 
 |===
 
-== Project Structure
+== Modules
 
-=== Modules
+Modules are self-contained services that operate under the VDI umbrella that
+consume events from MinIO (S3) actions and perform specific actions on datasets
+such as installing or uninstalling them from target databases.
 
---
-* link:modules/event-router/readme.adoc[Event Router]
-* Hard-Delete Trigger Handler
-* link:modules/import-trigger-handler/readme.adoc[Import Trigger Handler]
-* link:modules/install-data-trigger-handler/readme.adoc[Install Trigger Handler]
-* Pruner
-* link:modules/rest-service/readme.adoc[Rest Service]
-* Share Trigger Handler
+Each module can be thought of as an independent service that just so happens to
+coexist with the other modules in a single Docker container.
+
+
+Dataset Reinstaller::
+The dataset reinstaller module runs periodically or by manual trigger and
+performs the steps necessary to uninstall and reinstall a broken dataset into
+its target projects application databases.
++
+This module is intended to perform cleanup of datasets that failed to install
+due to a system bug or hiccup that has been checked and resolved by the
+VEuPathDB developer team.  Such datasets are marked as ready-for-reinstall and
+then are picked up by this module's next run to be processed.
+
+
+[#event-router]
+link:modules/event-router/readme.adoc[Event Router]::
+The event router module is the first module that a MinIO event will be processed
+by.  This module parses the event and routes it to the appropriate action
+trigger queue (Apache Kafka topic) to be consumed by the appropriate dataset
+processing module.
+
+
+Hard-Delete Trigger Handler::
+The hard-delete trigger handler consumes events stemming from the deletion of an
+object from the MinIO object store.
++
+At present this module is a hold-over from a previous design iteration that now
+just logs hard deletion events.
+
+
+link:modules/import-trigger-handler/readme.adoc[Import Trigger Handler]::
+The import trigger handler consumes events stemming from the upload of a raw
+dataset into MinIO.  This handler calls out to the relevant VDI plugin to
+perform any necessary pre-processing of the dataset such as validation or
+data transformation to ensure the dataset is in a state that is ready for
+installation into the target database(s).
+
+
+link:modules/install-data-trigger-handler/readme.adoc[Install Trigger Handler]::
+The data installation handler consumes events stemming from the upload of
+import-processed dataset data to MinIO.  This handler calls out to the relevant
+VDI plugin to perform the installation of the dataset data into the target
+application database(s).
+
+
+Pruner::
+The pruner module operates on a schedule and purges datasets that have been
+soft-deleted for a configured amount of time from the VDI system.
+
+
+Reconciler::
+The reconciler module periodically checks that the state of the dataset object
+store (MinIO) has been correctly propagated to the target project application
+databases.
++
+This means sifting through every object stored in MinIO and comparing the
+timestamps of those object creations to the last seen timestamp as stored in the
+VDI control tables in the internal cache database as well as each dataset's
+target project application database.
++
+When a dataset is found to be out of sync, a full synchronization of that
+dataset is performed to correct the state in the VDI system.
+
+
+link:modules/rest-service/readme.adoc[Rest Service]::
+The rest-service module exposes the public API over the VDI system that enables
+users to upload datasets to the VDI system as well as access details about their
+upload datasets as well as update, delete, or share those datasets.
+
+[#share-handler]
+Share Trigger Handler::
+The share trigger handler module consumes events stemming from the creation of a
+"<<Dataset Sharing,share object>>" in MinIO.  This module enables or disables
+access to target non-owning users of datasets to see those datasets in the VDI
+API.
+
+
 * link:modules/soft-delete-trigger-handler/readme.adoc[Soft-Delete Trigger Handler]
 * Update Meta Trigger Handler
---
+
 
 === Components
 
