@@ -16,6 +16,28 @@ image::images/overview.svg[]
 
 == Actions
 
+
+=== Dataset Lookup
+
+Via the public HTTP API exposed by the <<rest-service,REST service>> users may
+look up a listing of the datasets they have access to along with in-depth
+details about specific target datasets.
+
+The dataset listing will contain basic information about the datasets that are
+either owned by or have been shared with the requesting user.  The result will
+include the user-provided metadata attached to the dataset as well as import and
+installation statuses for the dataset's target databases.
+
+
+=== Dataset Metadata Update
+
+Via the public HTTP API exposed by the <<rest-service,REST service>> users may
+update the metadata they have attached to a target dataset.  Metadata includes
+name for the dataset, as well as a brief summary and a long-form description.
+
+Metadata changes may be propagated through the system to the target project
+application databases if it is relevant for the dataset's type.
+
 === Dataset Sharing
 
 Installed datasets may be shared by the dataset's owner with other target
@@ -106,7 +128,7 @@ target project application database.
 When a dataset is found to be out of sync, a full synchronization of that
 dataset is performed to correct the state in the VDI system.
 
-
+[#rest-service]
 link:modules/rest-service/readme.adoc[Rest Service]::
 The rest-service module exposes the public API over the VDI system that enables
 users to upload datasets to the VDI system as well as access details about their
