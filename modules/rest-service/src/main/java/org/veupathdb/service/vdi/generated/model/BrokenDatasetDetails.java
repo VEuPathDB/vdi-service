@@ -26,17 +26,11 @@ public interface BrokenDatasetDetails {
   @JsonProperty("datasetType")
   void setDatasetType(DatasetTypeInfo datasetType);
 
-  @JsonProperty("name")
-  String getName();
+  @JsonProperty("projectIDs")
+  List<String> getProjectIDs();
 
-  @JsonProperty("name")
-  void setName(String name);
-
-  @JsonProperty("projectsIDs")
-  List<String> getProjectsIDs();
-
-  @JsonProperty("projectsIDs")
-  void setProjectsIDs(List<String> projectsIDs);
+  @JsonProperty("projectIDs")
+  void setProjectIDs(List<String> projectIDs);
 
   @JsonProperty("status")
   DatasetStatusInfo getStatus();

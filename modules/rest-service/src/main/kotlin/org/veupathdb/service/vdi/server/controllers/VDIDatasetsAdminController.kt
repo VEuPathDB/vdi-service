@@ -4,6 +4,7 @@ import jakarta.ws.rs.ForbiddenException
 import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.service.vdi.generated.model.InstallCleanupRequest
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsAdmin
+import org.veupathdb.service.vdi.service.datasets.listBrokenDatasets
 import vdi.component.pruner.Pruner
 
 class VDIDatasetsAdminController : VdiDatasetsAdmin {
@@ -15,11 +16,8 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
     if (authKey != Options.Admin.secretKey)
       throw ForbiddenException()
 
-    val expanded = expanded ?: true
-
-    TODO("Not yet implemented")
-
-    return VdiDatasetsAdmin.GetVdiDatasetsAdminListBrokenResponse.
+    return VdiDatasetsAdmin.GetVdiDatasetsAdminListBrokenResponse
+      .respond200WithApplicationJson(listBrokenDatasets(expanded ?: true))
   }
 
   override fun postVdiDatasetsAdminReconcile(
