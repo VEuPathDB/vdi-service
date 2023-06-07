@@ -7,6 +7,24 @@
 ################################################################################
 
 types:
+  BrokenDatasetListing:
+    displayName: Broken Dataset Listing
+    type: object
+    additionalProperties: false
+    properties:
+      details?: BrokenDatasetDetails[]
+      ids?: VDI-ID[]
+  BrokenDatasetDetails:
+    displayName: Broken Dataset Details
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID: VDI-ID
+      owner: User-ID
+      datasetType: DatasetTypeInfo
+      name: string
+      projectsIDs: ProjectID[]
+      status: DatasetStatusInfo
   AuthorizationKey:
     displayName: RPC Authorization Key
     description: |

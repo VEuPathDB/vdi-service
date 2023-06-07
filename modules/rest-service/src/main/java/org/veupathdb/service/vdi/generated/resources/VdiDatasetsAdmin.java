@@ -1,6 +1,7 @@
 package org.veupathdb.service.vdi.generated.resources;
 
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -14,6 +15,12 @@ import org.veupathdb.service.vdi.generated.support.ResponseDelegate;
 
 @Path("/vdi-datasets/admin")
 public interface VdiDatasetsAdmin {
+  @GET
+  @Path("/list-broken")
+  @Produces("application/json")
+  GetVdiDatasetsAdminListBrokenResponse getVdiDatasetsAdminListBroken(
+      @HeaderParam("Auth-Key") String authKey);
+
   @POST
   @Path("/reconcile")
   @Produces("application/json")
@@ -32,6 +39,37 @@ public interface VdiDatasetsAdmin {
   @Produces("application/json")
   PostVdiDatasetsAdminDeleteCleanupResponse postVdiDatasetsAdminDeleteCleanup(
       @HeaderParam("Auth-Key") String authKey);
+
+  class GetVdiDatasetsAdminListBrokenResponse extends ResponseDelegate {
+    private GetVdiDatasetsAdminListBrokenResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private GetVdiDatasetsAdminListBrokenResponse(Response response) {
+      super(response);
+    }
+
+    public static GetVdiDatasetsAdminListBrokenResponse respond200WithApplicationJson(
+        Object entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetVdiDatasetsAdminListBrokenResponse(responseBuilder.build(), entity);
+    }
+
+    public static GetVdiDatasetsAdminListBrokenResponse respond401WithApplicationJson(
+        UnauthorizedError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetVdiDatasetsAdminListBrokenResponse(responseBuilder.build(), entity);
+    }
+
+    public static GetVdiDatasetsAdminListBrokenResponse respond500WithApplicationJson(
+        ServerError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetVdiDatasetsAdminListBrokenResponse(responseBuilder.build(), entity);
+    }
+  }
 
   class PostVdiDatasetsAdminReconcileResponse extends ResponseDelegate {
     private PostVdiDatasetsAdminReconcileResponse(Response response, Object entity) {

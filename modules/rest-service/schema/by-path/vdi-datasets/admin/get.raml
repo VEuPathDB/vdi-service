@@ -1,0 +1,25 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../common.raml
+
+types:
+  BrokenDatasetListing:
+    displayName: Broken Dataset Listing
+    type: object
+    additionalProperties: false
+    properties:
+      details?: BrokenDatasetDetails[]
+      ids?: common.VDI-ID[]
+
+  BrokenDatasetDetails:
+    displayName: Broken Dataset Details
+    type: object
+    additionalProperties: false
+    properties:
+      datasetID: common.VDI-ID
+      owner: common.User-ID
+      datasetType: common.DatasetTypeInfo
+      name: string
+      projectsIDs: common.ProjectID[]
+      status: common.DatasetStatusInfo

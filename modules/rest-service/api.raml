@@ -269,6 +269,46 @@ uses:
 /vdi-datasets/admin:
   displayName: Admin RPC
 
+  /list-broken:
+    displayName: Broken Installs
+    get:
+      displayName: List Broken Installs
+      description: |
+        Lists datasets that failed installation due to non-user error.
+      headers:
+        Auth-Key:
+          displayName: Admin Auth Secret Key
+          description: Secret key used to authenticate admin endpoint requests.
+          type: string
+          required: true
+      responses:
+        200:
+          description: |
+            Success.
+            
+            Broken dataset install list successfully generated.
+          body:
+            application/json:
+        401:
+          description: |
+            Unauthorized
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+              example:
+                status: unauthorized
+                message: Users must be logged in to access this resource.
+        500:
+          description: |
+            Internal Server Error
+          body:
+            application/json:
+              type: lib.ServerError
+              example:
+                status: server-error
+                message: Dataset store is unreachable
+                requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+
   /reconcile:
     displayName: Reconciliation
     post:
