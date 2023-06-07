@@ -49,6 +49,7 @@ dependencies {
   implementation(project(":components:app-db"))
   implementation(project(":components:cache-db"))
   implementation(project(":components:plugin-mapping"))
+  implementation(project(":components:pruner"))
   implementation(project(":components:s3"))
 
   implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")

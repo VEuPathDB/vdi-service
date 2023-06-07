@@ -50,6 +50,7 @@ services:
       # Rest Service
       SERVER_PORT: ${VDI_SERVICE_HTTP_PORT:-80}
       AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:?}
+      ADMIN_SECRET_KEY: ${ADMIN_SECRET_KEY:?}
 
       # LDAP Configuration
       LDAP_SERVER: ${LDAP_SERVER:?}

@@ -8,12 +8,6 @@ import java.util.List;
     as = InstallCleanupRequestImpl.class
 )
 public interface InstallCleanupRequest {
-  @JsonProperty("authorization")
-  String getAuthorization();
-
-  @JsonProperty("authorization")
-  void setAuthorization(String authorization);
-
   @JsonProperty(
       value = "all",
       defaultValue = "false"

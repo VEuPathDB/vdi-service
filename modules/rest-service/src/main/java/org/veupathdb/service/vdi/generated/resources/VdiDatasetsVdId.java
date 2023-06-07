@@ -162,6 +162,11 @@ public interface VdiDatasetsVdId {
       return new PatchVdiDatasetsByVdIdResponse(responseBuilder.build(), entity);
     }
 
+    public static PatchVdiDatasetsByVdIdResponse respond425() {
+      Response.ResponseBuilder responseBuilder = Response.status(425);
+      return new PatchVdiDatasetsByVdIdResponse(responseBuilder.build());
+    }
+
     public static PatchVdiDatasetsByVdIdResponse respond500WithApplicationJson(ServerError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);

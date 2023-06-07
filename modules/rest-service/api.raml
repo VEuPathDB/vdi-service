@@ -277,11 +277,12 @@ uses:
         Runs the Dataset Reconciliation process.
 
         TODO: DESCRIBE THIS PROCESS!
-      body:
-        application/json:
-          type: lib.ReconciliationRequest
-          example:
-            authorization: 964d72e72d053d501f2949969849b96c31d7c3e829be03400641f80b821ef728
+      headers:
+        Auth-Key:
+          displayName: Admin Auth Secret Key
+          description: Secret key used to authenticate admin endpoint requests.
+          type: string
+          required: true
       responses:
         204:
           description: |
@@ -340,6 +341,12 @@ uses:
 
         If the request specifies neither `all` or `targets` the endpoint will do
         nothing.
+      headers:
+        Auth-Key:
+          displayName: Admin Auth Secret Key
+          description: Secret key used to authenticate admin endpoint requests.
+          type: string
+          required: true
       body:
         application/json:
           type: lib.InstallCleanupRequest
@@ -347,12 +354,10 @@ uses:
             all:
               displayName: All Example
               value:
-                authorization: 7f55a0ed8b021080de00960cc73768fb31d7c3e829be03400641f80b821ef728
                 all: true
             targeted:
               displayName: Target Example
               value:
-                authorization: 7f55a0ed8b021080de00960cc73768fb31d7c3e829be03400641f80b821ef728
                 targets:
                 - datasetID: 404a6e35ea5384667d3527e6bd89f3a8
                   projectID: PlasmoDB
@@ -406,11 +411,12 @@ uses:
       description: |
         Permanently delete jobs that were soft deleted more than 24 hours prior
         to the execution of this task.
-      body:
-        application/json:
-          type: lib.DeleteCleanupRequest
-          example:
-            authorization: 26d881d64cac205a140a3329e7fc686ded15d1dce86231a921bad0bd6506af9b
+      headers:
+        Auth-Key:
+          displayName: Admin Auth Secret Key
+          description: Secret key used to authenticate admin endpoint requests.
+          type: string
+          required: true
       responses:
         204:
           description: Action completed successfully.

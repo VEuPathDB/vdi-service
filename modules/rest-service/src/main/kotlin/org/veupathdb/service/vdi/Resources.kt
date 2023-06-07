@@ -2,10 +2,7 @@ package org.veupathdb.service.vdi
 
 import org.veupathdb.lib.container.jaxrs.server.ContainerResources
 import org.veupathdb.service.vdi.config.Options
-import org.veupathdb.service.vdi.server.controllers.VDIDatasetByIDEndpointsController
-import org.veupathdb.service.vdi.server.controllers.VDIDatasetListEndpointController
-import org.veupathdb.service.vdi.server.controllers.VDIDatasetShareGetController
-import org.veupathdb.service.vdi.server.controllers.VDIDatasetSharePutController
+import org.veupathdb.service.vdi.server.controllers.*
 
 class Resources(opts: Options) : ContainerResources(opts) {
   init {
@@ -13,6 +10,7 @@ class Resources(opts: Options) : ContainerResources(opts) {
   }
 
   override fun resources() = arrayOf<Any>(
+    VDIDatasetsAdminController::class.java,
     VDIDatasetByIDEndpointsController::class.java,
     VDIDatasetListEndpointController::class.java,
     VDIDatasetShareGetController::class.java,

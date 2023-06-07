@@ -53,6 +53,10 @@ log-plugin-noop:
 log-kafka:
 	@docker logs -f vdi-service-kafka-1
 
+.PHONY: log-minio
+log-minio:
+	@docker logs -f vdi-service-minio-external-1
+
 .PHONY: open-minio
 open-minio:
 	@sensible-browser http://localhost:9001
