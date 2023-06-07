@@ -67,29 +67,34 @@ modules.
 
 === Components
 
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/app-db[App DB Client]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/cache-db[Cache DB Client]
+* link:components/app-db/[App DB Client]
+* link:components/cache-db/[Cache DB Client]
 * link:https://github.com/VEuPathDB/vdi-component-common[Commons]
+* link:components/dataset-reinstaller/[Dataset Reinstaller]
+* link:components/install-cleanup/[Broken Install Cleanup]
 * link:https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/kafka[Kafka Client]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/ldap[LDAP Utilities]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/plugin-mapping[Plugin Mapping]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/handler-client[Plugin Server Client]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/pruner[Dataset Pruner]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/rabbit[Rabbit Client]
-* link:https://github.com/VEuPathDB/vdi-component-reconciler[Reconciler]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/components/s3[S3 Utilities]
+* link:components/kafka[Kafka Client]
+* link:components/ldap[LDAP Utilities]
+* link:components/module-core/[Module Core]
+* link:components/plugin-mapping[Plugin Mapping]
+* link:components/handler-client[Plugin Server Client]
+* link:components/pruner[Dataset Pruner]
+* link:components/rabbit[Rabbit Client]
+* link:components/s3[S3 Utilities]
 
 === Modules
 
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/event-router[Event Router]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/hard-delete-trigger-handler[Hard Delete Event Handler]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/import-trigger-handler[Import Event Handler]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/install-trigger-handler[Install Data Event Handler]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/rest-service[Rest API Service]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/share-trigger-handler[Share Event Handler]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/soft-delete-trigger-handler[Soft Delete Event Handler]
-* link:https://github.com/VEuPathDB/vdi-service/tree/main/modules/update-meta-trigger-handler[Update Meta Event Handler]
+* link:modules/dataset-reinstaller/[Dataset Reinstaller]
+* link:modules/event-router/[Event Router]
+* link:modules/hard-delete-trigger-handler/[Hard Delete Event Handler]
+* link:modules/import-trigger-handler/[Import Event Handler]
+* link:modules/install-trigger-handler/[Install Data Event Handler]
+* link:modules/pruner/[Pruner]
+* link:modules/reconciler/[Reconciler]
+* link:modules/rest-service/[Rest API Service]
+* link:modules/share-trigger-handler/[Share Event Handler]
+* link:modules/soft-delete-trigger-handler/[Soft Delete Event Handler]
+* link:modules/update-meta-trigger-handler/[Update Meta Event Handler]
 
 === Bootstrapper
 
