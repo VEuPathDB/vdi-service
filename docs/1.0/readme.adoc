@@ -1,6 +1,8 @@
 = VDI Design Overview
 :toc:
 :toclevels: 2
+:source-highlighter: highlightjs
+:github-url: https://github.com/VEuPathDB
 
 The VEuPathDB Dataset Installer (VDI) is a system for installing datasets into
 target VEuPathDB projects such as link:https://plasmodb.org/plasmo/app[PlasmoDB]
@@ -428,3 +430,91 @@ needs to be resynchronized.
 | NOT NULL
 
 |===
+
+== Plugins
+
+VDI plugins are collections of scripts or binaries that are packaged in a Docker
+image behind an {github-url}/vdi-plugin-handler-server[HTTP service] that calls
+the relevant scripts as needed.
+
+For a detailed listing of the plugin scripts and their inputs and outputs, see
+the {github-url}/vdi-plugin-handler-server#plugin-scripts[Plugin Server Readme]
+which includes information about each of the plugin scripts.
+
+== S3
+
+=== Structure
+
+[source]
+----
+vdi/{UserID}/{DatasetID}/dataset/delete-flag
+vdi/{UserID}/{DatasetID}/dataset/manifest.json
+vdi/{UserID}/{DatasetID}/dataset/meta.json
+
+vdi/{UserID}/{DatasetID}/dataset/data/{DataFile}
+
+vdi/{UserID}/{DatasetID}/dataset/shares/{RecipientID}/offer.json
+vdi/{UserID}/{DatasetID}/dataset/shares/{RecipientID}/receipt.json
+
+vdi/{UserID}/{DatasetID}/upload/{UploadFile}
+----
+
+=== `manifest.json`
+
+The dataset manifest contains an index of all the raw input files as well as
+import-processed data files.  In VDI 1.0, this file will be immutable, however
+there may be a possible future requirement for updates to the manifest an
+underlying data files.
+
+[source, json]
+----
+{
+  "inputFiles": [
+    "raw-file-1.json",
+    "raw-file-2.csv"
+  ],
+  "dataFiles": [
+    "data-file-1.csv",
+    "data-file-2.csv"
+  ]
+}
+----
+
+=== `meta.json`
+
+The `meta.json` file contains user metadata associated with the dataset.  It
+corresponds exactly to the data provided to the <<rest-service,HTTP API>> in the
+initial `POST` request used to create the dataset.  This file contains both
+mutable (by the owning user) and immutable information.
+
+* Mutable
+** name
+** summary
+** description
+* Immutable
+** type
+** projects
+** owner
+** dependencies
+
+[source, json]
+----
+{
+  "type": {
+    "name": "ISA",
+    "version": "1.0"
+  },
+  "projects": ["ClinEpiDB"],
+  "owner": "12345",
+  "name": "My Awesome Study",
+  "summary": "This is my awesome study",
+  "description": "I used my awesome methodology",
+  "dependencies": [
+    {
+      "resourceIdentifier": <value>,
+      "resourceVersion": <value>,
+      "resourceDisplayName": <value
+    }
+  ]
+}
+----
