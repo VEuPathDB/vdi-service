@@ -292,7 +292,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
         ownerID     = meta.owner,
         isDeleted   = false,
         created     = OffsetDateTime.now(),
-        DatasetImportStatus.AwaitingImport
+        DatasetImportStatus.Queued
       ))
 
       // insert metadata for the dataset
@@ -304,7 +304,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       ))
 
       // Insert an import control record for the dataset
-      it.tryInsertImportControl(datasetID, DatasetImportStatus.AwaitingImport)
+      it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)
 
       // insert project links for the dataset
       it.tryInsertDatasetProjects(datasetID, meta.projects)

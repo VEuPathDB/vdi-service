@@ -1,10 +1,10 @@
 package org.veupathdb.vdi.lib.db.cache.model
 
 enum class DatasetImportStatus(val value: String) {
-  AwaitingImport("queued"),
-  Importing("in-progress"),
-  Imported("complete"),
-  ImportFailed("invalid"),
+  Queued("queued"),
+  InProgress("in-progress"),
+  Complete("complete"),
+  Invalid("invalid"),
   ;
 
   companion object {

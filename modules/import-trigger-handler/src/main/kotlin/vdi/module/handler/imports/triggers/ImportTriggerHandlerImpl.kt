@@ -103,7 +103,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
     CacheDB.withTransaction {
       log.info("attempting to insert import control record (if one does not exist)")
-      it.tryInsertImportControl(datasetID, DatasetImportStatus.Importing)
+      it.tryInsertImportControl(datasetID, DatasetImportStatus.InProgress)
     }
 
     try {
@@ -143,7 +143,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     } catch (e: Throwable) {
       log.debug("import request to handler server failed with exception:", e)
       CacheDB.withTransaction { tran ->
-        tran.updateImportControl(datasetID, DatasetImportStatus.ImportFailed)
+        tran.updateImportControl(datasetID, DatasetImportStatus.Invalid)
         tran.tryInsertImportMessages(datasetID, "Process error: ${e.message}")
       }
       throw e
@@ -193,7 +193,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         }
 
         transaction.updateDataSyncControl(datasetID, dd.getLatestDataTimestamp(OffsetDateTime.now()))
-        transaction.updateImportControl(datasetID, DatasetImportStatus.Imported)
+        transaction.updateImportControl(datasetID, DatasetImportStatus.Complete)
       }
     }
   }
@@ -206,7 +206,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   private fun handleImportInvalidResult(datasetID: DatasetID, result: ImportValidationErrorResponse) {
     log.info("dataset handler server reports dataset {} failed validation", datasetID)
     CacheDB.withTransaction {
-      it.updateImportControl(datasetID, DatasetImportStatus.ImportFailed)
+      it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
       it.upsertImportMessages(datasetID, result.warnings.joinToString("\n"))
     }
   }
@@ -257,7 +257,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
           ownerID     = meta.owner,
           isDeleted   = false,
           created     = OffsetDateTime.now(),
-          DatasetImportStatus.AwaitingImport
+          DatasetImportStatus.Queued
         ))
 
         // insert metadata for the dataset
@@ -269,7 +269,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         ))
 
         // Insert an import control record for the dataset
-        it.tryInsertImportControl(datasetID, DatasetImportStatus.AwaitingImport)
+        it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)
 
         // insert project links for the dataset
         it.tryInsertDatasetProjects(datasetID, meta.projects)
