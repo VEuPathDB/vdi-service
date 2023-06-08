@@ -569,15 +569,15 @@ needs to be resynchronized.
 | NOT NULL REFERENCES vdi.dataset (dataset_id)
 
 | shares_update_time
-| TIMESTAMP WITH TIMEZONE
+| TIMESTAMP WITH TIME ZONE
 | NOT NULL
 
 | data_update_time
-| TIMESTAMP WITH TIMEZONE
+| TIMESTAMP WITH TIME ZONE
 | NOT NULL
 
 | meta_update_time
-| TIMESTAMP WITH TIMEZONE
+| TIMESTAMP WITH TIME ZONE
 | NOT NULL
 
 |===
