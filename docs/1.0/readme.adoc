@@ -518,3 +518,28 @@ mutable (by the owning user) and immutable information.
   ]
 }
 ----
+
+=== `shares/\{RecipientID}/`
+
+Separate files are used to track the owner side and recipient side of a sharing
+"contract".  This allows us to avoid race conditions between these two
+independent pieces of state.  Once a share file is introduced, it is stored in
+S3 along with the dataset data for the lifetime of that dataset.
+
+==== `offer.json`
+
+[source, json]
+----
+{
+  "action": "grant | revoke"
+}
+----
+
+==== `receipt.json`
+
+[source, json]
+----
+{
+  "action": "accept | reject"
+}
+----
