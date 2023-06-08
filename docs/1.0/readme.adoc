@@ -1,6 +1,6 @@
 = VDI Design Overview
 :toc:
-:toclevels: 2
+:toclevels: 4
 :source-highlighter: highlightjs
 :github-url: https://github.com/VEuPathDB
 
@@ -182,6 +182,8 @@ The install-cleanup component exposes an API for marking datasets as
 
 ==== Internal Cache Database
 
+image::images/cache-db-relations.svg[]
+
 ===== `vdi.datasets`
 
 Core registry of datasets in the internal cache database.  All other VDI control
@@ -249,7 +251,7 @@ TODO: This table should be dropped.
 |===
 --
 
-===== `vdi.dataset_metadata`
+===== `vdi.dataset_projects`
 
 [%header, cols="2m,2m,6m"]
 |===
@@ -275,15 +277,164 @@ TODO: This table should be dropped.
 |===
 --
 
-
-
+===== `vdi.dataset_metadata`
 
 [%header, cols="2m,2m,6m"]
 |===
 | Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL UNIQUE REFERENCES vdi.datasets (dataset_id)
+
+| name
+| VARCHAR
+| NOT NULL
+
+| summary
+| VARCHAR
+|
+
+| description
+| VARCHAR
+|
 |===
 
+===== `vdi.sync_control`
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL UNIQUE REFERENCES vdi.datasets (dataset_id)
+
+| shares_update_time
+| TIMESTAMP WITH TIME ZONE
+| NOT NULL
+
+| data_update_time
+| TIMESTAMP WITH TIME ZONE
+| NOT NULL
+
+| meta_update_time
+| TIMESTAMP WITH TIME ZONE
+| NOT NULL
+|===
+
+===== `vdi.dataset_share_offers`
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.datasets (dataset_id)
+
+| recipient_id
+| VARCHAR
+| NOT NULL
+
+| status
+| VARCHAR
+| NOT NULL
+|===
+
+Where `status` will be one of:
+
+* `grant`
+* `revoke`
+
+.Additional Constraints
+--
+[%header, cols="4m,6"]
+|===
+| Name | Description
+
+| owner_share_uq
+| Unique on `dataset_id` to `recipient_id` combinations.
+|===
+--
+
+===== `vdi.dataset_share_receipts`
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL REFERENCES vdi.datasets (dataset_id)
+
+| recipient_id
+| VARCHAR
+| NOT NULL
+
+| status
+| VARCHAR
+| NOT NULL
+|===
+
+Where `status` will be one of:
+
+* `accept`
+* `reject`
+
+.Additional Constraints
+--
+[%header, cols="4m,6"]
+|===
+| Name | Description
+
+| owner_share_uq
+| Unique on `dataset_id` to `recipient_id` combinations.
+|===
+--
+
+===== `vdi.import_control`
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL UNIQUE REFERENCES vdi.datasets (dataset_id)
+
+| status
+| VARCHAR
+| NOT NULL
+
+|===
+
+Where `status` is one of:
+
+* `queued`
+* `in-progress`
+* `complete`
+* `invalid`
+
+===== `vdi.import_messages`
+
+[%header, cols="2m,2m,6m"]
+|===
+| Column | Type | Constraints
+
+| dataset_id
+| CHAR(32)
+| NOT NULL UNIQUE REFERENCES vdi.datasets (dataset_id)
+
+| message
+| VARCHAR
+| NOT NULL
+|===
+
+
 ==== Application Databases
+
+image::images/app-db-relations.svg[]
 
 ===== `vdi.dataset`
 
@@ -513,7 +664,7 @@ mutable (by the owning user) and immutable information.
     {
       "resourceIdentifier": <value>,
       "resourceVersion": <value>,
-      "resourceDisplayName": <value
+      "resourceDisplayName": <value>
     }
   ]
 }
