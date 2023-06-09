@@ -55,18 +55,42 @@ object InstallCleaner {
    * each dataset's target application databases then update the dataset's
    * status to ready-for-reinstall.
    */
-  fun cleanTargets(targets: Iterable<DatasetID>) {
+  fun cleanTargets(targets: Iterable<ReinstallTarget>) {
     log.info("starting broken install cleanup for target datasets")
 
-    for (target in targets) {
+    for ((datasetID, projectID) in targets) {
       try {
-        cleanTarget(target)
+        maybeCleanTarget(datasetID, projectID)
       } catch (e: Throwable) {
-        log.error("failed to clean broken dataset $target installations due to internal error:", e)
+        log.error("failed to clean broken dataset $datasetID for project $projectID installations due to internal error:", e)
       }
     }
 
     log.info("ending broken install cleanup for target datasets")
+  }
+
+  private fun maybeCleanTarget(datasetID: DatasetID, projectID: ProjectID) {
+    try {
+      // Lookup the existing install message for the dataset
+      val message = AppDB.accessor(projectID).selectDatasetInstallMessage(datasetID, InstallType.Data)
+
+      // If one does not exist, then the dataset was never installed in the
+      // first place.
+      if (message == null) {
+        log.debug("skipping uninstall of dataset {} from project {} as it has no install message", datasetID, projectID)
+        return
+      }
+
+      // If the status is not failed installation, then we shouldn't touch it.
+      if (message.status != InstallStatus.FailedInstallation) {
+        log.debug("skipping uninstall of dataset {} from project {} as it is not in a failed state", datasetID, projectID)
+        return
+      }
+
+      cleanTarget(datasetID, projectID)
+    } catch (e: Throwable) {
+      log.error(msgFailedByProject(datasetID, projectID), e)
+    }
   }
 
   private fun cleanTarget(datasetID: DatasetID) {
