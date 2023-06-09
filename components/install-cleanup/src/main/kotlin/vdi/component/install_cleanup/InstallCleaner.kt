@@ -98,28 +98,7 @@ object InstallCleaner {
       ?: throw IllegalStateException("target dataset $datasetID is not in the internal cache database")
 
     for (project in cacheDBRecord.projects) {
-      try {
-        // Lookup the existing install message for the dataset
-        val message = AppDB.accessor(project)
-          .selectDatasetInstallMessage(datasetID, InstallType.Data)
-
-        // If one does not exist, then the dataset was never installed in the
-        // first place.
-        if (message == null) {
-          log.debug("skipping uninstall of dataset {} from project {} as it has no install message", datasetID, project)
-          continue
-        }
-
-        // If the status is not failed installation, then we shouldn't touch it.
-        if (message.status != InstallStatus.FailedInstallation) {
-          log.debug("skipping uninstall of dataset {} from project {} as it is not in a failed state", datasetID, project)
-          continue
-        }
-
-        cleanTarget(datasetID, project)
-      } catch (e: Throwable) {
-        log.error(msgFailedByProject(datasetID, project), e)
-      }
+      maybeCleanTarget(datasetID, project)
     }
   }
 
