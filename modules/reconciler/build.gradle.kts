@@ -12,6 +12,7 @@ dependencies {
   implementation(project(":components:app-db"))
   implementation(project(":components:handler-client"))
   implementation(project(":components:plugin-mapping"))
+  implementation(project(":components:metrics"))
 
   api("org.veupathdb.lib.s3:s34k-minio:0.4.0+s34k-0.8.0")
 
