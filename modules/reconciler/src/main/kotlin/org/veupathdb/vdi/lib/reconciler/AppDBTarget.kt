@@ -18,11 +18,11 @@ class AppDBTarget(
     }
 
     override fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID) {
-        if (datasetType.name !in PluginHandlers) {
+        if (!PluginHandlers.contains(datasetType.name, datasetType.version)) {
             throw UnsupportedTypeException("Unable to delete unknown dataset type $datasetType from target database " +
                     "for project $projectID")
         }
-        PluginHandlers[datasetType.name]!!.client.postUninstall(datasetID, projectID)
+        PluginHandlers.get(datasetType.name, datasetType.version)!!.client.postUninstall(datasetID, projectID)
         AppDB.withTransaction(projectID) {
             it.deleteDatasetVisibilities(datasetID)
             it.deleteDatasetProjectLinks(datasetID)

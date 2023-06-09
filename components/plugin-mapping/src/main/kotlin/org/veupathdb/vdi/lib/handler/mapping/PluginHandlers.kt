@@ -8,7 +8,7 @@ import org.veupathdb.vdi.lib.handler.client.PluginHandlerClientConfig
  * Collection of [PluginHandler] instances mapped by dataset type name.
  */
 object PluginHandlers {
-  private val mapping = HashMap<String, PluginHandler>(12)
+  private val mapping = HashMap<NameVersionPair, PluginHandler>(12)
 
   init {
     init(System.getenv())
@@ -23,7 +23,8 @@ object PluginHandlers {
    * @return `true` if this [PluginHandlers] instance contains a [PluginHandler]
    * for the given dataset type, otherwise `false`.
    */
-  operator fun contains(type: String): Boolean = type in mapping
+  fun contains(type: String, version: String): Boolean =
+    NameVersionPair(type.lowercase(), version) in mapping
 
   /**
    * Attempts to look up a [PluginHandler] for the given dataset type name.
@@ -34,7 +35,8 @@ object PluginHandlers {
    * @return The [PluginHandler] for the given dataset type, or `null` if no
    * such [PluginHandler] exists.
    */
-  operator fun get(type: String): PluginHandler? = mapping[type]
+  fun get(type: String, version: String): PluginHandler? =
+    mapping[NameVersionPair(type.lowercase(), version)]
 
   internal fun init(env: Environment) {
     // Only needed for testing, but doesn't hurt anything in general.
@@ -58,6 +60,7 @@ object PluginHandlers {
       key.endsWith(EnvKey.Handlers.NameSuffix)       -> substringEnvKeyName(key, EnvKey.Handlers.NameSuffix)
       key.endsWith(EnvKey.Handlers.AddressSuffix)    -> substringEnvKeyName(key, EnvKey.Handlers.AddressSuffix)
       key.endsWith(EnvKey.Handlers.ProjectIDsSuffix) -> substringEnvKeyName(key, EnvKey.Handlers.ProjectIDsSuffix)
+      key.endsWith(EnvKey.Handlers.VersionSuffix)    -> substringEnvKeyName(key, EnvKey.Handlers.VersionSuffix)
       else                                           -> null
     }
   }
@@ -67,11 +70,17 @@ object PluginHandlers {
     key.substring(EnvKey.Handlers.Prefix.length, key.length - suffix.length)
 
   private fun parseEnvironmentChunk(env: Environment, key: String) {
-    val name     = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.NameSuffix)
+    val name     = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.NameSuffix).lowercase()
     val address  = env.reqHostAddress(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.AddressSuffix)
+    val version  = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.VersionSuffix)
     val projects = env.optSet(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.ProjectIDsSuffix) ?: emptySet()
 
-    mapping[name] = PluginHandlerImpl(name, PluginHandlerClient(PluginHandlerClientConfig(address)), projects)
+    mapping[NameVersionPair(name, version)] = PluginHandlerImpl(
+      name,
+      PluginHandlerClient(PluginHandlerClientConfig(address)),
+      projects
+    )
   }
-}
 
+  private data class NameVersionPair(val name: String, val version: String)
+}

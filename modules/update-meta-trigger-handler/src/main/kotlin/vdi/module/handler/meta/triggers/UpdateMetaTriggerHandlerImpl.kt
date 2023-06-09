@@ -145,12 +145,12 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
         db.updateMetaSyncControl(datasetID, metaTimestamp)
       }
 
-    if (datasetMeta.type.name !in PluginHandlers) {
+    if (!PluginHandlers.contains(datasetMeta.type.name, datasetMeta.type.version)) {
       log.error("dataset {} declares a type of {} which is unknown to the vdi service", datasetID, datasetMeta.type.name)
       return
     }
 
-    val ph = PluginHandlers[datasetMeta.type.name]!!
+    val ph = PluginHandlers.get(datasetMeta.type.name, datasetMeta.type.version)!!
 
     datasetMeta.projects
       .forEach { projectID -> executeJob(ph, datasetMeta, syncControl, metaTimestamp, datasetID, projectID) }

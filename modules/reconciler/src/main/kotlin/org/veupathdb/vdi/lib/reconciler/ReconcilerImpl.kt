@@ -5,7 +5,6 @@ import org.apache.logging.log4j.kotlin.CoroutineThreadContext
 import org.apache.logging.log4j.kotlin.ThreadContextData
 import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.reconciler.config.ReconcilerConfig
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
