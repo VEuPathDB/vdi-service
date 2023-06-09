@@ -60,7 +60,7 @@ object InstallCleaner {
 
     for ((datasetID, projectID) in targets) {
       try {
-        maybeCleanTargetFromTargetDB(datasetID, projectID)
+        maybeCleanDatasetFromTargetDB(datasetID, projectID)
       } catch (e: Throwable) {
         log.error("failed to clean broken dataset $datasetID for project $projectID installations due to internal error:", e)
       }
@@ -69,7 +69,7 @@ object InstallCleaner {
     log.info("ending broken install cleanup for target datasets")
   }
 
-  private fun maybeCleanTargetFromTargetDB(datasetID: DatasetID, projectID: ProjectID) {
+  private fun maybeCleanDatasetFromTargetDB(datasetID: DatasetID, projectID: ProjectID) {
     try {
       // Lookup the existing install message for the dataset
       val message = AppDB.accessor(projectID).selectDatasetInstallMessage(datasetID, InstallType.Data)
@@ -93,12 +93,12 @@ object InstallCleaner {
     }
   }
 
-  private fun maybeCleanTargetFromAllDBs(datasetID: DatasetID) {
+  private fun maybeCleanDatasetFromAllDBs(datasetID: DatasetID) {
     val cacheDBRecord = CacheDB.selectDataset(datasetID)
       ?: throw IllegalStateException("target dataset $datasetID is not in the internal cache database")
 
     for (project in cacheDBRecord.projects) {
-      maybeCleanTargetFromTargetDB(datasetID, project)
+      maybeCleanDatasetFromTargetDB(datasetID, project)
     }
   }
 
