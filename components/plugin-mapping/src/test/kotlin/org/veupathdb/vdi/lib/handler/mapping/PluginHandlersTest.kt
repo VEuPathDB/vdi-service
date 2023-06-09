@@ -40,13 +40,14 @@ class PluginHandlersTest {
       // Construct a map with a complete environment block for a handler config
       val env2 = mapOf(
         "PLUGIN_HANDLER_BAR_NAME"        to "bar",
+        "PLUGIN_HANDLER_BAR_VERSION"     to "1.0",
         "PLUGIN_HANDLER_BAR_ADDRESS"     to "foo:1234",
         "PLUGIN_HANDLER_BAR_PROJECT_IDS" to "project1,project2,project3"
       )
 
       PluginHandlers.init(env2)
 
-      assertTrue("bar" in PluginHandlers)
+      assertTrue(PluginHandlers.contains("Bar", "1.0"))
     }
   }
 }

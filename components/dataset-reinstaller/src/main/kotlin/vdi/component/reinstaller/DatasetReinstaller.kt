@@ -94,7 +94,7 @@ object DatasetReinstaller {
     log.info("reinstall processing dataset {} for project {}", dataset.datasetID, projectID)
 
     // Get a plugin handler for the target dataset type
-    val handler = PluginHandlers[dataset.typeName]
+    val handler = PluginHandlers.get(dataset.typeName, dataset.typeVersion)
       ?: throw IllegalStateException("no plugin handler registered for dataset type ${dataset.typeName}")
 
     // If the handler doesn't apply to the current project then something has

@@ -1050,9 +1050,12 @@ instance.
 
 ==== Plugin Handler Environment Key Components.
 
+Registers a VDI plugin with the service.
+
 [source]
 ----
 PLUGIN_HANDLER_<NAME>_NAME
+PLUGIN_HANDLER_<NAME>_VERSION
 PLUGIN_HANDLER_<NAME>_ADDRESS
 PLUGIN_HANDLER_<NAME>_PROJECT_IDS
 ----
@@ -1063,12 +1066,13 @@ arbitrary `<NAME>` value between the defined prefix value and suffix options.
 
 The environment variables set using the prefix and suffixes defined below
 must appear in groups that contain the indicated suffixes.  For example, given
-the `<NAME>` value `"RNASEQ"` the following two environment variables must be
+the `<NAME>` value `"RNASEQ"` the following environment variables must be
 present:
 
 [source]
 ----
 PLUGIN_HANDLER_RNASEQ_NAME
+PLUGIN_HANDLER_RNASEQ_VERSION
 PLUGIN_HANDLER_RNASEQ_ADDRESS
 ----
 
@@ -1081,6 +1085,11 @@ PLUGIN_HANDLER_RNASEQ_ADDRESS
 | String
 | Name of the plugin handler.  This will typically be the type name of the
   dataset type that the plugin handles.
+
+| :exclamation:
+| PLUGIN_HANDLER_<NAME>_VERSION
+| String
+| Version for the plugin handler.
 
 | :exclamation:
 | PLUGIN_HANDLER_<NAME>_ADDRESS

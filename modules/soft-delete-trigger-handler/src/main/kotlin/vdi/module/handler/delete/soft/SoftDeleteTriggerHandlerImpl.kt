@@ -68,7 +68,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     CacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
 
     // Grab a handler instance for this dataset type.
-    val handler = PluginHandlers[meta.type.name]
+    val handler = PluginHandlers.get(meta.type.name, meta.type.version)
       ?: throw IllegalStateException("got an uninstall event for a dataset type that has no associated handler.  dataset $datasetID, user $userID")
 
     // Iterate through the projects that the metadata is targeting and call

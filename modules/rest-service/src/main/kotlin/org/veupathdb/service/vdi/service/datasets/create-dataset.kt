@@ -28,7 +28,7 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
 
   val datasetMeta = entity.toDatasetMeta(userID)
 
-  val handler = PluginHandlers[datasetMeta.type.name]
+  val handler = PluginHandlers.get(datasetMeta.type.name, datasetMeta.type.version)
     ?: throw BadRequestException("target dataset type is unknown to the VDI service")
 
   for (projectID in datasetMeta.projects) {

@@ -133,7 +133,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     val meta = dir.getMeta().load()!!
 
     // Get a handler instance for the target dataset type.
-    val handler = PluginHandlers[meta.type.name]
+    val handler = PluginHandlers.get(meta.type.name, meta.type.version)
 
     // If there is no handler for the target type, we shouldn't have gotten
     // here, but we can bail now to prevent issues.

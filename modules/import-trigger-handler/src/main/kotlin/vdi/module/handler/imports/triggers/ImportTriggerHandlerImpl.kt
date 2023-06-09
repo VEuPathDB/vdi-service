@@ -119,7 +119,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         log.warn("received an import event for a dataset with more than one upload file.  using file {} for dataset {}, user {}", uploadFiles[0].name, datasetID, userID)
       }
 
-      val handler = PluginHandlers[datasetMeta.type.name] or {
+      val handler = PluginHandlers.get(datasetMeta.type.name, datasetMeta.type.version) or {
         log.error("No plugin handler registered for dataset type {}", datasetMeta.type.name)
         throw IllegalStateException("No plugin handler registered for dataset type ${datasetMeta.type.name}")
       }
