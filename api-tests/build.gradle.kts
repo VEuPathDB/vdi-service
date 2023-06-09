@@ -5,8 +5,6 @@ plugins {
 }
 
 dependencies {
-  implementation(kotlin("stdlib-jdk8"))
-
   testImplementation("com.fasterxml.jackson.core:jackson-core:2.15.1")
   testImplementation("com.fasterxml.jackson.core:jackson-databind:2.15.1")
   testImplementation("org.awaitility:awaitility:4.2.0")

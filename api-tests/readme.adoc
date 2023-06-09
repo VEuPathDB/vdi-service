@@ -1,0 +1,16 @@
+= VDI API Tests
+:source-highlighter: highlightjs
+:toc:
+
+== Overview
+* Tests use the RestAssured DSL to send and validate rest requests to the VDI service.
+* JUnit is used as the testing framework to manage test execution.
+
+== Running the Tests
+Input arguments required to run the integration tests:
+
+1. BASE_URL -- URL of VDI service to run tests against
+2. AUTH_TOKEN -- Auth token of user to run the tests as
+```
+../gradlew --rerun-tasks test -PBASE_URL=localhost:8080 -PAUTH_TOKEN=<auth-token>
+```

@@ -13,6 +13,7 @@ import java.time.Duration
 
 class ApiTest {
     private val AuthToken: String = System.getProperty("AUTH_TOKEN")
+    private val AuthTokenKey: String = "Auth-Key"
     private val ObjectMapper = ObjectMapper()
 
     object Lifecycle {
@@ -25,11 +26,15 @@ class ApiTest {
 
     @Test
     fun testNoOp() {
+        // Construct the metadata as a map. Another option here would be to make raml-generated types accessible here.
         val meta: Map<String, Any> = mapOf(
-            Pair("datasetType",
+            Pair(
+                "datasetType",
                 mapOf(
                     Pair("name", "noop"),
-                    Pair("version", "1.0"))),
+                    Pair("version", "1.0")
+                )
+            ),
             Pair("name", "test-dataset"),
             Pair("summary", "Integration test for no-op plugin happy path."),
             Pair("projects", listOf("PlasmoDB")),
@@ -37,12 +42,14 @@ class ApiTest {
         )
         val datasetID = given() // Setup request
             .contentType(ContentType.MULTIPART)
-            .header("Auth-Key", AuthToken)
+            .header(AuthTokenKey, AuthToken)
             .multiPart("file", File.createTempFile("no-op-file", ".txt"))
             .multiPart("meta", ObjectMapper.writeValueAsString(meta))
-            .`when`() // Execute request
+            // Execute request
+            .`when`()
             .post("vdi-datasets")
-            .then() // Validate request and extract ID
+            // Validate request and extract ID
+            .then()
             .statusCode(200)
             .extract()
             .path<String>("datasetID")
@@ -59,8 +66,10 @@ class ApiTest {
                     getInstallStatus(datasetID) == status
                 }
         } catch (e: ConditionTimeoutException) {
-            throw AssertionError("Test failed while waiting for inst all status of $datasetID to become \"complete\". " +
-                    "Current status: ${getInstallStatus(datasetID)})", e)
+            throw AssertionError(
+                "Test failed while waiting for inst all status of $datasetID to become \"complete\". " +
+                        "Current status: ${getInstallStatus(datasetID)})", e
+            )
         }
     }
 
@@ -73,14 +82,16 @@ class ApiTest {
                     getImportStatus(datasetID) == status
                 }
         } catch (e: ConditionTimeoutException) {
-            throw AssertionError("Test failed while waiting for import status of $datasetID to become \"complete\". " +
-                    "Current status: ${getImportStatus(datasetID)})", e)
+            throw AssertionError(
+                "Test failed while waiting for import status of $datasetID to become \"complete\". " +
+                        "Current status: ${getImportStatus(datasetID)})", e
+            )
         }
     }
 
     private fun getImportStatus(datasetID: String): String {
         return given()
-            .header("Auth-Key", AuthToken)
+            .header(AuthTokenKey, AuthToken)
             .get("vdi-datasets/$datasetID")
             .then()
             .statusCode(200)
@@ -90,7 +101,7 @@ class ApiTest {
 
     private fun getInstallStatus(datasetID: String): String {
         return given()
-            .header("Auth-Key", AuthToken)
+            .header(AuthTokenKey, AuthToken)
             .get("vdi-datasets/$datasetID")
             .then()
             .statusCode(200)
