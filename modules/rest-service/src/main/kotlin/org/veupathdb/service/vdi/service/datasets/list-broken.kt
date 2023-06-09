@@ -105,7 +105,7 @@ private fun DatasetRecord.toDetails(
     out.owner       = owner.toLong()
     out.datasetType = getTypeInfo()
     out.projectIDs  = projects.toList()
-    out.status      = DatasetStatusInfo(DatasetImportStatus.Imported, statuses)
+    out.status      = DatasetStatusInfo(DatasetImportStatus.Complete, statuses)
   }
 
 private fun DatasetRecord.getTypeInfo() =

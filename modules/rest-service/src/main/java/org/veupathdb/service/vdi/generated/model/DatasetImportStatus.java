@@ -3,17 +3,17 @@ package org.veupathdb.service.vdi.generated.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum DatasetImportStatus {
-  @JsonProperty("awaiting-import")
-  AWAITINGIMPORT("awaiting-import"),
+  @JsonProperty("queued")
+  QUEUED("queued"),
 
-  @JsonProperty("importing")
-  IMPORTING("importing"),
+  @JsonProperty("in-progress")
+  INPROGRESS("in-progress"),
 
-  @JsonProperty("imported")
-  IMPORTED("imported"),
+  @JsonProperty("complete")
+  COMPLETE("complete"),
 
-  @JsonProperty("import-failed")
-  IMPORTFAILED("import-failed");
+  @JsonProperty("invalid")
+  INVALID("invalid");
 
   private final String value;
 
