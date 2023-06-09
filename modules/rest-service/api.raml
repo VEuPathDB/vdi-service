@@ -320,63 +320,6 @@ uses:
                 message: Dataset store is unreachable
                 requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
-  /reconcile:
-    displayName: Reconciliation
-    post:
-      displayName: Run Reconciliation
-      description: |
-        Runs the Dataset Reconciliation process.
-
-        TODO: DESCRIBE THIS PROCESS!
-      headers:
-        Auth-Key:
-          displayName: Admin Auth Secret Key
-          description: Secret key used to authenticate admin endpoint requests.
-          type: string
-          required: true
-      responses:
-        204:
-          description: |
-            Success.
-            
-            Reconciliation process completed successfully.
-        400:
-          description: |
-            Bad Request.
-            
-            Request body did not resemble the expected JSON form.
-          body:
-            application/json:
-              type: lib.BadRequestError
-              example:
-                status: bad-request
-                message: Invalid project_id value.
-        401:
-          description: |
-            Unauthorized.
-            
-            This status is returned when the request contains either no user
-            authorization token or an invalid user authorization token.
-          body:
-            application/json:
-              type: lib.UnauthorizedError
-              example:
-                status: unauthorized
-                message: Users must be logged in to access this resource.
-        500:
-          description: |
-            Internal Server Error.
-            
-            This status is returned when an unhandled or unexpected issue arises
-            when attempting to process the request.
-          body:
-            application/json:
-              type: lib.ServerError
-              example:
-                status: server-error
-                message: Dataset store is unreachable
-                requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
-
   /install-cleanup:
     displayName: Install Cleanup
     post:

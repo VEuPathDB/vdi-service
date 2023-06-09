@@ -26,12 +26,6 @@ public interface VdiDatasetsAdmin {
       @HeaderParam("Auth-Key") String authKey);
 
   @POST
-  @Path("/reconcile")
-  @Produces("application/json")
-  PostVdiDatasetsAdminReconcileResponse postVdiDatasetsAdminReconcile(
-      @HeaderParam("Auth-Key") String authKey);
-
-  @POST
   @Path("/install-cleanup")
   @Produces("application/json")
   @Consumes("application/json")
@@ -72,42 +66,6 @@ public interface VdiDatasetsAdmin {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetVdiDatasetsAdminListBrokenResponse(responseBuilder.build(), entity);
-    }
-  }
-
-  class PostVdiDatasetsAdminReconcileResponse extends ResponseDelegate {
-    private PostVdiDatasetsAdminReconcileResponse(Response response, Object entity) {
-      super(response, entity);
-    }
-
-    private PostVdiDatasetsAdminReconcileResponse(Response response) {
-      super(response);
-    }
-
-    public static PostVdiDatasetsAdminReconcileResponse respond204() {
-      Response.ResponseBuilder responseBuilder = Response.status(204);
-      return new PostVdiDatasetsAdminReconcileResponse(responseBuilder.build());
-    }
-
-    public static PostVdiDatasetsAdminReconcileResponse respond400WithApplicationJson(
-        BadRequestError entity) {
-      Response.ResponseBuilder responseBuilder = Response.status(400).header("Content-Type", "application/json");
-      responseBuilder.entity(entity);
-      return new PostVdiDatasetsAdminReconcileResponse(responseBuilder.build(), entity);
-    }
-
-    public static PostVdiDatasetsAdminReconcileResponse respond401WithApplicationJson(
-        UnauthorizedError entity) {
-      Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
-      responseBuilder.entity(entity);
-      return new PostVdiDatasetsAdminReconcileResponse(responseBuilder.build(), entity);
-    }
-
-    public static PostVdiDatasetsAdminReconcileResponse respond500WithApplicationJson(
-        ServerError entity) {
-      Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
-      responseBuilder.entity(entity);
-      return new PostVdiDatasetsAdminReconcileResponse(responseBuilder.build(), entity);
     }
   }
 
