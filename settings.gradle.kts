@@ -71,3 +71,5 @@ include(":modules:update-meta-trigger-handler")
 include(":modules:soft-delete-trigger-handler")
 include(":modules:rest-service")
 include(":modules:reconciler")
+
+include(":api-tests")
