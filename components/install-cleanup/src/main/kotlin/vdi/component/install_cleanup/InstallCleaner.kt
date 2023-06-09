@@ -69,6 +69,11 @@ object InstallCleaner {
     log.info("ending broken install cleanup for target datasets")
   }
 
+  /**
+   * Marks the target dataset as [InstallStatus.ReadyForReinstall] in the target
+   * database only if it is already in the [InstallStatus.FailedInstallation]
+   * status.
+   */
   private fun maybeCleanDatasetFromTargetDB(datasetID: DatasetID, projectID: ProjectID) {
     try {
       // Lookup the existing install message for the dataset
@@ -93,6 +98,11 @@ object InstallCleaner {
     }
   }
 
+  /**
+   * Marks the target dataset as [InstallStatus.ReadyForReinstall] in all app
+   * databases in which it is already in the [InstallStatus.FailedInstallation]
+   * status.
+   */
   private fun maybeCleanDatasetFromAllDBs(datasetID: DatasetID) {
     val cacheDBRecord = CacheDB.selectDataset(datasetID)
       ?: throw IllegalStateException("target dataset $datasetID is not in the internal cache database")
