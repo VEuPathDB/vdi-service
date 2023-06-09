@@ -20,16 +20,6 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
       .respond200WithApplicationJson(listBrokenDatasets(expanded ?: true))
   }
 
-  override fun postVdiDatasetsAdminReconcile(
-    authKey: String?
-  ): VdiDatasetsAdmin.PostVdiDatasetsAdminReconcileResponse {
-    if (authKey != Options.Admin.secretKey)
-      throw ForbiddenException()
-
-
-    TODO("Not yet implemented")
-  }
-
   override fun postVdiDatasetsAdminInstallCleanup(
     authKey: String?,
     entity: InstallCleanupRequest?,
