@@ -14,7 +14,7 @@ object AccountDB {
     get() = DbManager.accountDatabase().dataSource
 
   fun lookupUserDetails(userIDs: Collection<UserID>): Map<UserID, UserDetails> {
-    log.debug("looking user details for ${userIDs.size} users")
+    log.debug("looking user details for {} users", userIDs.size)
     return userDB.connection.use { con -> con.selectUserDetails(userIDs) }
   }
 }
