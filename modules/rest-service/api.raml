@@ -990,3 +990,32 @@ uses:
           This response is returned when an unhandled or unexpected issue arises
           when attempting to process the request.
         body: lib.ServerError
+
+/vdi-users:
+  displayName: Users
+
+  /self:
+    displayName: User By ID
+
+    /meta:
+      displayName: User Meta
+
+      get:
+        description: Get user metadata.
+
+        responses:
+          200:
+            description: Success
+            body:
+              application/json:
+                type: lib.UserMetadata
+          401:
+            description: Unauthorized
+            body:
+              application/json:
+                type: lib.UnauthorizedError
+          500:
+            description: Internal Server Error
+            body:
+              application/json:
+                type: lib.ServerError
