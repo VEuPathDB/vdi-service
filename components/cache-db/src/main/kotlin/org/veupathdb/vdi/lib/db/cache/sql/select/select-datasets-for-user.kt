@@ -5,10 +5,6 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecordImpl
 import org.veupathdb.vdi.lib.db.cache.util.*
-import org.veupathdb.vdi.lib.db.cache.util.map
-import org.veupathdb.vdi.lib.db.cache.util.setUserID
-import org.veupathdb.vdi.lib.db.cache.util.withPreparedStatement
-import org.veupathdb.vdi.lib.db.cache.util.withResults
 import java.sql.Connection
 
 // language=postgresql
