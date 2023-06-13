@@ -9,23 +9,20 @@ import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 
-internal fun getUserMetadata(userID: UserID): UserMetadata {
-  return UserMetadataImpl().apply {
+internal fun getUserMetadata(userID: UserID): UserMetadata =
+  UserMetadataImpl().apply {
     quota = getUserQuotaInfo(userID)
   }
-}
 
-private fun getUserQuotaInfo(userID: UserID): UserQuotaDetails {
-  return UserQuotaDetailsImpl().apply {
+private fun getUserQuotaInfo(userID: UserID): UserQuotaDetails =
+  UserQuotaDetailsImpl().apply {
     usage = getCurrentQuotaUsage(userID).toLong()
     limit = Options.Quota.quotaLimit.toLong()
   }
-}
 
-internal fun getCurrentQuotaUsage(userID: UserID): ULong {
-  return CacheDB.selectDatasetsForUser(userID)
+internal fun getCurrentQuotaUsage(userID: UserID): ULong =
+  CacheDB.selectDatasetsForUser(userID)
     .asSequence()
     .filter { !it.isDeleted }
     .map { DatasetStore.getUploadsSize(it.ownerID, it.datasetID) }
     .sum()
-}
