@@ -42,6 +42,20 @@ object DatasetStore {
       ?.use { JSON.readValue<VDIDatasetMeta>(it.stream) }
   }
 
+  fun getUploadsSize(userID: UserID, datasetID: DatasetID): ULong {
+    log.debug("fetching user dataset upload files size total for user {}, dataset {}", userID, datasetID)
+
+    var out = 0uL
+
+    bucket.objects.list(prefix = S3Paths.datasetUploadsDir(userID, datasetID))
+      .asSequence()
+      .map { it.stat() }
+      .filterNotNull()
+      .forEach { out += it.size.toULong() }
+
+    return out
+  }
+
   fun putDatasetMeta(userID: UserID, datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.debug("uploading dataset meta file for user {}, dataset {}", userID, datasetID)
     bucket.objects.put(S3Paths.datasetMetaFile(userID, datasetID), meta.toJSONString().byteInputStream())

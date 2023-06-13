@@ -73,6 +73,11 @@ object CacheDB {
     return connection.use { it.selectDatasetForUser(userID, datasetID) }
   }
 
+  fun selectDatasetsForUser(userID: UserID): List<DatasetRecord> {
+    log.debug("selecting dataset list for user {}", userID)
+    return connection.use { it.selectDatasetsForUser(userID) }
+  }
+
   fun selectSharesForDataset(datasetID: DatasetID): List<DatasetShare> {
     log.debug("selecting shares for dataset {}", datasetID)
     return connection.use { it.selectSharesFor(datasetID) }
@@ -128,7 +133,7 @@ object CacheDB {
     log.debug("selecting all sync control records")
     return connection.selectAllSyncControl()
   }
-  
+
 
   fun openTransaction() =
     CacheDBTransaction(connection.apply { autoCommit = false })
