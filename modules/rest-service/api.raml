@@ -210,6 +210,18 @@ uses:
       not of a JSON object.
 
       The `meta` field, however, is expected to be a JSON blob.
+      
+      The `file` field may be one of:
+      
+      * a raw data file to import
+      * a `.zip` file containing one or more files to import
+      * a `.tar.gz` or `.tgz` file containing one or more files to import.
+      
+      The `url` field may point to a file that is one of the allowed upload
+      types.
+      
+      The `url` and `file` fields cannot both be used at the same time, one must
+      be used or the other.
     body:
       multipart/form-data:
         type: lib.DatasetPostRequest
@@ -546,6 +558,9 @@ uses:
     displayName: Lookup Dataset
     description: |
       Fetch details about a dataset and its status(es).
+      
+      If the target dataset has just been posted, this endpoint may return a
+      404 for several seconds until the post has been asynchronously processed.
     responses:
       200:
         description: Target dataset was located and returned.
