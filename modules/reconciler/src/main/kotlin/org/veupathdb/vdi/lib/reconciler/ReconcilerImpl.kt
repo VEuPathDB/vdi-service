@@ -18,6 +18,7 @@ class ReconcilerImpl(private val config: ReconcilerConfig) :
     override suspend fun run() {
         if (!config.reconcilerEnabled) {
             logger().warn("Reconciler is disabled. Skipping run")
+            return
         }
         logger().info("Running ReconcilerImpl module")
         val datasetManager = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))

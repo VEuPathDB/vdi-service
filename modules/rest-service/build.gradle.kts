@@ -48,6 +48,7 @@ containerBuild {
 dependencies {
   implementation(project(":components:app-db"))
   implementation(project(":components:cache-db"))
+  implementation(project(":components:install-cleanup"))
   implementation(project(":components:plugin-mapping"))
   implementation(project(":components:pruner"))
   implementation(project(":components:s3"))

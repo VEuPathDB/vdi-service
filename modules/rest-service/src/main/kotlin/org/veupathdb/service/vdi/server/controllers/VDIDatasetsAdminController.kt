@@ -13,6 +13,8 @@ import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.listBrokenDatasets
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import vdi.component.install_cleanup.InstallCleaner
+import vdi.component.install_cleanup.ReinstallTarget
 import vdi.component.pruner.Pruner
 
 class VDIDatasetsAdminController : VdiDatasetsAdmin {
@@ -35,7 +37,16 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
     if (authKey != Options.Admin.secretKey)
       throw ForbiddenException()
 
-    TODO("Not yet implemented")
+    if (entity == null)
+      throw BadRequestException()
+
+    if (entity.all == true) {
+      InstallCleaner.cleanAll()
+    } else if (entity.targets.isNullOrEmpty()) {
+      InstallCleaner.cleanTargets(entity.targets.map { ReinstallTarget(DatasetID(it.datasetID), it.projectID) })
+    }
+
+    return VdiDatasetsAdmin.PostVdiDatasetsAdminInstallCleanupResponse.respond204()
   }
 
   override fun postVdiDatasetsAdminDeleteCleanup(
