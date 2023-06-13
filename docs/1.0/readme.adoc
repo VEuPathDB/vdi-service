@@ -694,3 +694,37 @@ S3 along with the dataset data for the lifetime of that dataset.
   "action": "accept | reject"
 }
 ----
+
+== User Quotas
+
+To reach feature parity with the original user dataset upload system, the new
+VDI system will implement and enforce user upload quotas, capping users' dataset
+uploads to a configurable limit (the old user dataset system limit was 10GiB).
+
+User quotas are not configurable on a per-user basis, and instead follow a
+global limit set as a configuration parameter on the VDI service.
+
+=== Q & A
+
+Should user uploads count against a user's quota?::
+
+They are the only files that should count against a user's quota.  Processed
+file storage is "our problem" and does not impact a user's quota.
+
+How is quota usage retrieved?::
+
+Quota usage will be retrieved by iterating through a user's "directory" in S3
+and summing the sizes of upload files only.
+
+What should the max individual upload file size be?::
+
+1 GiB will be the starting limit, however the limit will be a configuration
+option that may be changed later.
+
+How are user quota caps determined?::
+
+As a global rule configured on the VDI service.
+
+Do soft deleted datasets count against a user's quota?::
+
+No.
