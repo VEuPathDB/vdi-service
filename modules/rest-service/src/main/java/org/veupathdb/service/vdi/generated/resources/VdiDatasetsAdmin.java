@@ -11,13 +11,25 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.BrokenDatasetListing;
+import org.veupathdb.service.vdi.generated.model.DatasetPostRequest;
+import org.veupathdb.service.vdi.generated.model.DatasetPostResponse;
+import org.veupathdb.service.vdi.generated.model.ForbiddenError;
 import org.veupathdb.service.vdi.generated.model.InstallCleanupRequest;
 import org.veupathdb.service.vdi.generated.model.ServerError;
 import org.veupathdb.service.vdi.generated.model.UnauthorizedError;
+import org.veupathdb.service.vdi.generated.model.UnprocessableEntityError;
 import org.veupathdb.service.vdi.generated.support.ResponseDelegate;
 
 @Path("/vdi-datasets/admin")
 public interface VdiDatasetsAdmin {
+  @POST
+  @Path("/proxy-upload")
+  @Produces("application/json")
+  @Consumes("multipart/form-data")
+  PostVdiDatasetsAdminProxyUploadResponse postVdiDatasetsAdminProxyUpload(
+      @HeaderParam("Auth-Key") String authKey, @HeaderParam("User-ID") Long userID,
+      DatasetPostRequest entity);
+
   @GET
   @Path("/list-broken")
   @Produces("application/json")
@@ -37,6 +49,58 @@ public interface VdiDatasetsAdmin {
   @Produces("application/json")
   PostVdiDatasetsAdminDeleteCleanupResponse postVdiDatasetsAdminDeleteCleanup(
       @HeaderParam("Auth-Key") String authKey);
+
+  class PostVdiDatasetsAdminProxyUploadResponse extends ResponseDelegate {
+    private PostVdiDatasetsAdminProxyUploadResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private PostVdiDatasetsAdminProxyUploadResponse(Response response) {
+      super(response);
+    }
+
+    public static PostVdiDatasetsAdminProxyUploadResponse respond200WithApplicationJson(
+        DatasetPostResponse entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostVdiDatasetsAdminProxyUploadResponse(responseBuilder.build(), entity);
+    }
+
+    public static PostVdiDatasetsAdminProxyUploadResponse respond400WithApplicationJson(
+        BadRequestError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(400).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostVdiDatasetsAdminProxyUploadResponse(responseBuilder.build(), entity);
+    }
+
+    public static PostVdiDatasetsAdminProxyUploadResponse respond401WithApplicationJson(
+        UnauthorizedError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostVdiDatasetsAdminProxyUploadResponse(responseBuilder.build(), entity);
+    }
+
+    public static PostVdiDatasetsAdminProxyUploadResponse respond403WithApplicationJson(
+        ForbiddenError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(403).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostVdiDatasetsAdminProxyUploadResponse(responseBuilder.build(), entity);
+    }
+
+    public static PostVdiDatasetsAdminProxyUploadResponse respond422WithApplicationJson(
+        UnprocessableEntityError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(422).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostVdiDatasetsAdminProxyUploadResponse(responseBuilder.build(), entity);
+    }
+
+    public static PostVdiDatasetsAdminProxyUploadResponse respond500WithApplicationJson(
+        ServerError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostVdiDatasetsAdminProxyUploadResponse(responseBuilder.build(), entity);
+    }
+  }
 
   class GetVdiDatasetsAdminListBrokenResponse extends ResponseDelegate {
     private GetVdiDatasetsAdminListBrokenResponse(Response response, Object entity) {

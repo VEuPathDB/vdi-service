@@ -269,6 +269,91 @@ uses:
 /vdi-datasets/admin:
   displayName: Admin RPC
 
+  /proxy-upload:
+    displayName: Proxy Upload
+    post:
+      description: |
+        Upload a dataset on behalf of another user.
+      headers:
+        Auth-Key:
+          displayName: Admin Auth Secret Key
+          description: Secret key used to authenticate admin endpoint requests.
+          type: string
+          required: true
+        User-ID:
+          displayName: Target User ID
+          description: |
+            ID of the target user on whose behalf a dataset is being uploaded
+          type: lib.User-ID
+          required: true
+      body:
+        multipart/form-data:
+          description: |
+            `multipart/form-data` HTTP `POST` request to upload a new dataset.
+
+            Note, the body description below is of the multipart form data fields and
+            not of a JSON object.
+
+            The `meta` field, however, is expected to be a JSON blob.
+          type: lib.DatasetPostRequest
+      responses:
+        200:
+          description: Success
+          body:
+            type: lib.DatasetPostResponse
+            example:
+              datasetID: b18dcdf1a19c9415cd6594c00d611699
+        400:
+          description: |
+            Bad Request.
+            
+            Request body did not resemble the expected JSON form.
+          body:
+            application/json:
+              type: lib.BadRequestError
+              example:
+                status: bad-request
+                message: Invalid project_id value.
+        401:
+          description: Unauthorized
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+              example:
+                status: unauthorized
+                message: Users must be logged in to access this resource.
+        403:
+          description: Forbidden
+          body:
+            application/json:
+              type: lib.ForbiddenError
+              example:
+                status: forbidden
+                message: Target user does not exist.
+        422:
+          description: |
+            Unprocessable Entity.
+            
+            Request body was syntactically valid JSON, however the body failed
+            validation.
+          body:
+            application/json:
+              type: lib.UnprocessableEntityError
+        500:
+          description: |
+            Internal Server Error.
+            
+            This status is returned when an unhandled or unexpected issue arises
+            when attempting to process the request.
+          body:
+            application/json:
+              type: lib.ServerError
+              example:
+                status: server-error
+                message: Dataset store is unreachable
+                requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+
+
   /list-broken:
     displayName: Broken Installs
     get:
@@ -890,11 +975,3 @@ uses:
           This response is returned when an unhandled or unexpected issue arises
           when attempting to process the request.
         body: lib.ServerError
-
-
-# TODO: what happens when a user attempts to share a dataset that failed installation?
-#       we should probably reject it with a 403
-# TODO: Endpoint that lists open share offers to a user
-# TODO: dataset details should list open share offers to other users
-# TODO: Shares should be automatically accepted
-# TODO: Some notification needs to be sent out when a share is made (email or something)
