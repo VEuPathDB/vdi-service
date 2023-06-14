@@ -44,16 +44,13 @@ object DatasetStore {
 
   fun getUploadsSize(userID: UserID, datasetID: DatasetID): ULong {
     log.debug("fetching user dataset upload files size total for user {}, dataset {}", userID, datasetID)
-
-    var out = 0uL
-
-    bucket.objects.list(prefix = S3Paths.datasetUploadsDir(userID, datasetID))
+    return bucket.objects.list(prefix = S3Paths.datasetUploadsDir(userID, datasetID))
       .asSequence()
       .map { it.stat() }
       .filterNotNull()
-      .forEach { out += it.size.toULong() }
-
-    return out
+      .map { it.size }
+      .sum()
+      .toULong()
   }
 
   fun putDatasetMeta(userID: UserID, datasetID: DatasetID, meta: VDIDatasetMeta) {
