@@ -751,6 +751,91 @@ uses:
               message: Dataset store is unreachable
               requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
+/vdi-datasets/{vd-id}/files:
+  displayName: Dataset Files
+  uriParameters:
+    vd-id: lib.VDI-ID
+  get:
+    displayName: List Files
+    responses:
+      200:
+        description: Success
+        body:
+          application/json:
+            type: lib.DatasetFileListing
+      401:
+        description: Unauthorized
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+      404:
+        description: Not Found
+        body:
+          application/json:
+            type: lib.NotFoundError
+      500:
+        description: Internal Server Error
+        body:
+          application/json:
+            type: lib.ServerError
+
+  /upload/{file-name}:
+    displayName: Dataset Upload File
+    uriParameters:
+      file-name: string
+    get:
+      displayName: Get Upload File
+      responses:
+        200:
+          description: Success
+          body:
+            application/octet-stream:
+              type: any
+        401:
+          description: Unauthorized
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+        404:
+          description: Not Found
+          body:
+            application/json:
+              type: lib.NotFoundError
+        500:
+          description: Internal Server Error
+          body:
+            application/json:
+              type: lib.ServerError
+
+  /data/{file-name}:
+    displayName: Dataset Data File
+    uriParameters:
+      file-name: string
+    get:
+      displayName: Get Data File
+      responses:
+        200:
+          description: Success
+          body:
+            application/octet-stream:
+              type: any
+        401:
+          description: Unauthorized
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+        404:
+          description: Not Found
+          body:
+            application/json:
+              type: lib.NotFoundError
+        500:
+          description: Internal Server Error
+          body:
+            application/json:
+              type: lib.ServerError
+
+
 /vdi-datasets/{vd-id}/shares/{recipient-user-id}:
   displayName: Dataset Sharing
 

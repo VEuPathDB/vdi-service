@@ -204,6 +204,26 @@ types:
       - open
       - accepted
       - rejected
+  DatasetFileListing:
+    displayName: Dataset File Listing
+    type: object
+    additionalProperties: false
+    properties:
+      uploadFiles: DatasetFileDetails[]
+      dataFiles: DatasetFileDetails[]
+  DatasetFileDetails:
+    displayName: Dataset File Details
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        displayName: File Name
+        type: string
+      size:
+        displayName: File Size
+        description: Size of the file in bytes.
+        type: integer
+        format: int64
   DatasetDetails:
     displayName: Dataset Details
     description: |
