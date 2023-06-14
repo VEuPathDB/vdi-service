@@ -359,6 +359,23 @@ types:
           A value of `reject` means that the dataset that a share was
           offered for should become unavailable to the rejecting user.
         type: ShareReceiptAction
+  UserMetadata:
+    type: object
+    additionalProperties: false
+    properties:
+      quota: UserQuotaDetails
+  UserQuotaDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      limit:
+        description: Max number of bytes a user is allowed to upload.
+        type: integer
+        format: int64
+      usage:
+        description: Current number of bytes counted against the user's quota.
+        type: integer
+        format: int64
   VDI-ID:
     displayName: VDI ID
     description: Unique VDI Dataset identifier string.

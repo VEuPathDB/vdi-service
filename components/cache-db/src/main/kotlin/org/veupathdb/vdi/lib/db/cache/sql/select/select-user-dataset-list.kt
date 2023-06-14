@@ -1,16 +1,9 @@
 package org.veupathdb.vdi.lib.db.cache.sql.select
 
-import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.util.*
-import org.veupathdb.vdi.lib.db.cache.util.getDatasetID
-import org.veupathdb.vdi.lib.db.cache.util.getUserID
-import org.veupathdb.vdi.lib.db.cache.util.map
-import org.veupathdb.vdi.lib.db.cache.util.withResults
 import java.sql.Connection
 import java.sql.Types
-import java.time.OffsetDateTime
 
 // TODO: filter out is_deleted?  or not?  maybe downstream of here?
 

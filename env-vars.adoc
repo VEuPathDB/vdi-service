@@ -115,6 +115,16 @@ authentication.
 | String
 | Secret key value used to authenticate requests to administration endpoints.
 
+|
+| MAX_UPLOAD_FILE_SIZE
+| uint64
+| Max file size allowed for a single upload in bytes.
+
+|
+| USER_UPLOAD_QUOTA
+| uint64
+| Quota cap for an individual user's total uploads in bytes.
+
 | :exclamation:
 | ACCT_DB_TNS_NAME
 | String

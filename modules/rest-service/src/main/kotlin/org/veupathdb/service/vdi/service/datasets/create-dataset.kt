@@ -4,8 +4,10 @@ import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.InternalServerErrorException
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
+import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.s3.DatasetStore
+import org.veupathdb.service.vdi.service.users.getCurrentQuotaUsage
 import org.veupathdb.service.vdi.util.BoundedInputStream
 import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
@@ -20,6 +22,7 @@ import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import java.net.URL
 import java.nio.file.Path
 import kotlin.io.path.*
+import kotlin.math.max
 
 private val log = LoggerFactory.getLogger("create-dataset.kt")
 
@@ -36,14 +39,13 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
       throw BadRequestException("target dataset type does not apply to project $projectID")
   }
 
-  log.debug("uploading dataset metadata to S3 for new dataset {} by user {}", datasetID, userID)
-  DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
-
   // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
   TempFiles.withTempDirectory { directory ->
     TempFiles.withTempPath { archive ->
       entity.getDatasetFile()
         .useThenDelete { rawUpload ->
+          verifyFileSize(rawUpload, userID)
+
           rawUpload.repack(into = archive, using = directory)
 
           log.debug("uploading raw user data to S3 for new dataset {} by user {}", datasetID, userID)
@@ -51,6 +53,21 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
         }
     }
   }
+
+  log.debug("uploading dataset metadata to S3 for new dataset {} by user {}", datasetID, userID)
+  DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
+}
+
+private fun verifyFileSize(file: Path, userID: UserID) {
+  val fileSize = file.fileSize()
+
+  if (fileSize > Options.Quota.maxUploadSize.toLong())
+    throw BadRequestException("upload file size larger than the max permitted file size of " + Options.Quota.maxUploadSize.toString() + " bytes")
+
+  val diff = max(0L, Options.Quota.quotaLimit.toLong() - getCurrentQuotaUsage(userID).toLong())
+
+  if (fileSize > diff)
+    throw BadRequestException("upload file size is larger than the remaining space allowed by the user quota ($diff bytes)")
 }
 
 private fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
