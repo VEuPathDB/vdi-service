@@ -64,7 +64,7 @@ private fun verifyFileSize(file: Path, userID: UserID) {
   if (fileSize > Options.Quota.maxUploadSize.toLong())
     throw BadRequestException("upload file size larger than the max permitted file size of " + Options.Quota.maxUploadSize.toString() + " bytes")
 
-  val diff = max(0L, Options.Quota.quotaLimit.toLong() - getCurrentQuotaUsage(userID).toLong())
+  val diff = max(0L, Options.Quota.quotaLimit.toLong() - getCurrentQuotaUsage(userID))
 
   if (fileSize > diff)
     throw BadRequestException("upload file size is larger than the remaining space allowed by the user quota ($diff bytes)")

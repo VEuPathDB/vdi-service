@@ -16,13 +16,16 @@ internal fun getUserMetadata(userID: UserID): UserMetadata =
 
 private fun getUserQuotaInfo(userID: UserID): UserQuotaDetails =
   UserQuotaDetailsImpl().apply {
-    usage = getCurrentQuotaUsage(userID).toLong()
+    usage = getCurrentQuotaUsage(userID)
     limit = Options.Quota.quotaLimit.toLong()
   }
 
-internal fun getCurrentQuotaUsage(userID: UserID): ULong =
-  CacheDB.selectDatasetsForUser(userID)
+internal fun getCurrentQuotaUsage(userID: UserID): Long {
+  val sizes = DatasetStore.listUserUploadFilesSizeTotals(userID)
+
+  return CacheDB.selectDatasetsForUser(userID)
     .asSequence()
     .filter { !it.isDeleted }
-    .map { DatasetStore.getUploadsSize(it.ownerID, it.datasetID) }
+    .map { sizes[it.datasetID] ?: 0L }
     .sum()
+}

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import org.veupathdb.lib.s3.s34k.objects.S3Object
 import org.veupathdb.lib.s3.s34k.objects.StreamObject
 import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -48,6 +47,19 @@ object DatasetStore {
     log.debug("fetching upload file list for dataset {}/{}", userID, datasetID)
     return bucket.objects.list(S3Paths.datasetUploadsDir(userID, datasetID))
       .map { FileEntry(it) }
+  }
+
+  fun listUserUploadFilesSizeTotals(userID: UserID): Map<DatasetID, Long> {
+    log.debug("fetching upload size totals across all datasets for user {}", userID)
+    val out = HashMap<DatasetID, Long>()
+    bucket.objects.list(S3Paths.userDir(UserID(221741260L)))
+      .asSequence()
+      .filter { it.path.contains(S3Paths.UPLOAD_DIR_NAME) }
+      .forEach {
+        val key = it.path.getDatasetIDFromPath()
+        out[key] = it.size + (out[key] ?: 0L)
+      }
+    return out
   }
 
   fun getUploadFile(userID: UserID, datasetID: DatasetID, fileName: String): StreamObject? {
@@ -100,5 +112,12 @@ object DatasetStore {
   fun putDeleteFlag(userID: UserID, datasetID: DatasetID) {
     log.debug("uploading soft-delete flag for dataset {}/{}", userID, datasetID)
     bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID))
+  }
+
+  private fun String.getDatasetIDFromPath(): DatasetID {
+    val it = splitToSequence('/').iterator()
+    it.next() // vdi/
+    it.next() // {user-id}/
+    return DatasetID(it.next())
   }
 }

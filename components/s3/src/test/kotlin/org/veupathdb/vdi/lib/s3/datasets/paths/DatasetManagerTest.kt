@@ -124,10 +124,11 @@ class DatasetManagerTest {
                                  override val baseName: String,
                                  override val dirName: String,
                                  override val eTag: String,
+                                 override val size: Long,
                                  override val lastModified: OffsetDateTime?,
                                  override val tags: ObjectTagContainer,
                                  override val path: String
-    ): AbstractS3Object(path, lastModified, eTag, region, headers, bucket) {
+    ): AbstractS3Object(path, lastModified, eTag, size, region, headers, bucket) {
         constructor(path: String, bucket: S3Bucket) : this(
             bucket,
             BasicHeaders(emptyMap()),
@@ -135,6 +136,7 @@ class DatasetManagerTest {
             path.split("/").last(),
             path,
             "mock-etag",
+            0L,
             OffsetDateTime.now(),
             mock<ObjectTagContainer>(),
             path
