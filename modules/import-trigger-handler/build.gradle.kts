@@ -16,5 +16,6 @@ dependencies {
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
   implementation("org.slf4j:slf4j-api:1.7.36")
+  implementation("org.apache.logging.log4j:log4j-api-kotlin:1.2.0")
   implementation(kotlin("stdlib-jdk8"))
 }
