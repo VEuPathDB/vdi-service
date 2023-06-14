@@ -6,7 +6,7 @@ Configuration:
     - name: Console_Appender
       target: SYSTEM_OUT
       PatternLayout:
-        pattern: "%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} [rid:%5X{traceId}] %-5level %c - %m%n}"
+        pattern: "%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} (wid:%X{workerID}) [rid:%5X{traceId}] %-5level %c - %m%n}"
     - name: Reconciler_Appender
       target: SYSTEM_OUT
       PatternLayout:
