@@ -64,6 +64,16 @@ public class ResponseDelegate extends Response {
     return this.entity;}
 
   @Override
+  public int getStatus() {
+    return this.delegate.getStatus();
+  }
+
+  @Override
+  public Response.StatusType getStatusInfo() {
+    return this.delegate.getStatusInfo();
+  }
+
+  @Override
   public <T> T readEntity(GenericType<T> p0, Annotation[] p1) {
     return this.delegate.readEntity(p0,p1);
   }
@@ -101,16 +111,6 @@ public class ResponseDelegate extends Response {
   @Override
   public Set<String> getAllowedMethods() {
     return this.delegate.getAllowedMethods();
-  }
-
-  @Override
-  public int getStatus() {
-    return this.delegate.getStatus();
-  }
-
-  @Override
-  public Response.StatusType getStatusInfo() {
-    return this.delegate.getStatusInfo();
   }
 
   @Override

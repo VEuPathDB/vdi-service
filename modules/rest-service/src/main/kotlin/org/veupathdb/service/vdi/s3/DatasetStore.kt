@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
+import org.veupathdb.lib.s3.s34k.objects.S3Object
+import org.veupathdb.lib.s3.s34k.objects.StreamObject
 import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -36,14 +38,36 @@ object DatasetStore {
       ?: throw IllegalStateException("bucket ${Options.S3.bucketName} does not exist!")
 
   fun getDatasetMeta(userID: UserID, datasetID: DatasetID): VDIDatasetMeta? {
-    log.debug("fetching dataset meta file for user {}, dataset {}", userID, datasetID)
+    log.debug("fetching dataset meta file for dataset {}/{}", userID, datasetID)
 
     return bucket.objects.open(S3Paths.datasetMetaFile(userID, datasetID))
       ?.use { JSON.readValue<VDIDatasetMeta>(it.stream) }
   }
 
+  fun listUploadFiles(userID: UserID, datasetID: DatasetID): List<FileEntry> {
+    log.debug("fetching upload file list for dataset {}/{}", userID, datasetID)
+    return bucket.objects.list(S3Paths.datasetUploadsDir(userID, datasetID))
+      .map { FileEntry(it) }
+  }
+
+  fun getUploadFile(userID: UserID, datasetID: DatasetID, fileName: String): StreamObject? {
+    log.debug("fetching upload file {} for dataset {}/{}", fileName, userID, datasetID)
+    return bucket.objects.open(S3Paths.datasetUploadFile(userID, datasetID, fileName))
+  }
+
+  fun listDataFiles(userID: UserID, datasetID: DatasetID): List<FileEntry> {
+    log.debug("fetching data file list for dataset {}/{}", userID, datasetID)
+    return bucket.objects.list(S3Paths.datasetDataDir(userID, datasetID))
+      .map { FileEntry(it) }
+  }
+
+  fun getDataFile(userID: UserID, datasetID: DatasetID, fileName: String): StreamObject? {
+    log.debug("fetching data file {} for dataset {}/{}", fileName, userID, datasetID)
+    return bucket.objects.open(S3Paths.datasetDataFile(userID, datasetID, fileName))
+  }
+
   fun getUploadsSize(userID: UserID, datasetID: DatasetID): ULong {
-    log.debug("fetching user dataset upload files size total for user {}, dataset {}", userID, datasetID)
+    log.debug("fetching user dataset upload files size total for dataset {}/{}", userID, datasetID)
     return bucket.objects.list(prefix = S3Paths.datasetUploadsDir(userID, datasetID))
       .asSequence()
       .map { it.stat() }
@@ -54,12 +78,12 @@ object DatasetStore {
   }
 
   fun putDatasetMeta(userID: UserID, datasetID: DatasetID, meta: VDIDatasetMeta) {
-    log.debug("uploading dataset meta file for user {}, dataset {}", userID, datasetID)
+    log.debug("uploading dataset meta file for dataset {}/{}", userID, datasetID)
     bucket.objects.put(S3Paths.datasetMetaFile(userID, datasetID), meta.toJSONString().byteInputStream())
   }
 
   fun putUserUpload(userID: UserID, datasetID: DatasetID, fn: () -> InputStream) {
-    log.debug("uploading dataset user upload for user {}, dataset {}", userID, datasetID)
+    log.debug("uploading dataset user upload for dataset {}/{}", userID, datasetID)
     fn().use { bucket.objects.put(S3Paths.datasetUploadFile(userID, datasetID, UPLOAD_FILE_NAME), it) }
   }
 
@@ -74,7 +98,7 @@ object DatasetStore {
   }
 
   fun putDeleteFlag(userID: UserID, datasetID: DatasetID) {
-    log.debug("uploading soft-delete flag for owner {}, dataset {}", userID, datasetID)
+    log.debug("uploading soft-delete flag for dataset {}/{}", userID, datasetID)
     bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID))
   }
 }

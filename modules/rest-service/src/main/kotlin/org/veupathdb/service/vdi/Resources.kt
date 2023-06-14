@@ -16,5 +16,6 @@ class Resources(opts: Options) : ContainerResources(opts) {
     VDIDatasetShareGetController::class.java,
     VDIDatasetSharePutController::class.java,
     VDIUsersController::class.java,
+    VDIDatasetFilesController::class.java,
   )
 }

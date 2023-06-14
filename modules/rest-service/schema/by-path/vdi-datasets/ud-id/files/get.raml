@@ -1,0 +1,29 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../../common.raml
+
+types:
+  DatasetFileListing:
+    displayName: Dataset File Listing
+    type: object
+    additionalProperties: false
+    properties:
+      uploadFiles:
+        type: DatasetFileDetails[]
+      dataFiles:
+        type: DatasetFileDetails[]
+
+  DatasetFileDetails:
+    displayName: Dataset File Details
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        displayName: File Name
+        type: string
+      size:
+        displayName: File Size
+        description: Size of the file in bytes.
+        type: integer
+        format: int64
