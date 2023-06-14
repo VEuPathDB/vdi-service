@@ -22,7 +22,7 @@ import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import java.net.URL
 import java.nio.file.Path
 import kotlin.io.path.*
-import kotlin.math.min
+import kotlin.math.max
 
 private val log = LoggerFactory.getLogger("create-dataset.kt")
 
@@ -44,8 +44,7 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
     TempFiles.withTempPath { archive ->
       entity.getDatasetFile()
         .useThenDelete { rawUpload ->
-          if (rawUpload.fileSize() > getSizeLimit(userID))
-            throw BadRequestException("upload file size too large")
+          verifyFileSize(rawUpload, userID)
 
           rawUpload.repack(into = archive, using = directory)
 
@@ -59,13 +58,16 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
   DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
 }
 
-private fun getSizeLimit(userID: UserID): Long {
-  val remainder = Options.Quota.quotaLimit.toLong() - getCurrentQuotaUsage(userID).toLong()
+private fun verifyFileSize(file: Path, userID: UserID) {
+  val fileSize = file.fileSize()
 
-  if (remainder <= 0)
-    return 0
+  if (fileSize > Options.Quota.maxUploadSize.toLong())
+    throw BadRequestException("upload file size larger than the max permitted file size of " + Options.Quota.maxUploadSize.toString() + " bytes")
 
-  return min(remainder, Options.Quota.maxUploadSize.toLong())
+  val diff = max(0L, Options.Quota.quotaLimit.toLong() - getCurrentQuotaUsage(userID).toLong())
+
+  if (fileSize > diff)
+    throw BadRequestException("upload file size is larger than the remaining space allowed by the user quota ($diff bytes)")
 }
 
 private fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
