@@ -61,6 +61,18 @@ events caused by the writing of those objects will be routed through the
 which will perform the updates on the relevant project application databases to
 enable the visibility of the target dataset to the appropriate user.
 
+=== Dataset Deletion
+
+Datasets may be marked as deleted by their owning user.  Deletions are "soft" in
+that the data is not removed from the system immediately, and is instead marked
+as deleted by creating a delete flag in MinIO (S3).  The creation of this flag
+will trigger a series of actions by the VDI system to mark the dataset as
+deleted in the relevant databases as well as the removal of dataset data from
+the dataset's target application databases.
+
+Soft deleted datasets are cleaned out of the system at a later date by a
+periodic pruning process.
+
 
 == Project Structure
 
@@ -183,14 +195,30 @@ Kafka::
 The Kafka component exposes an API for working with an Apache Kafka instance in
 a manner that is tailored to the VDI processes.
 
---
-* LDAP
-* Module Core
-* Plugin Mapping
-* Pruner
-* Rabbit
-* S3
---
+LDAP::
+The LDAP component exposes utilities for performing LDAP lookups for the Oracle
+database connection configurations for the target project application databases.
+
+Module Core::
+The module core component provides an API definition and abstract base for
+implementing VDI modules.
+
+Plugin Mapping::
+
+TODO
+
+Pruner::
+The pruner component exposes an API for pruning old soft-deleted datasets from
+the VDI system.
+
+Rabbit::
+
+TODO
+
+S3::
+
+TODO
+
 
 === Database Schemata
 
