@@ -4,6 +4,12 @@
 :source-highlighter: highlightjs
 :github-url: https://github.com/VEuPathDB
 
+ifdef::env-github[]
+:tip-caption: :bulb:
+:important-caption: :heavy_exclamation_mark:
+endif::[]
+
+
 The VEuPathDB Dataset Installer (VDI) is a system for installing datasets into
 target VEuPathDB projects such as link:https://plasmodb.org/plasmo/app[PlasmoDB]
 or link:https://microbiomedb.org/mbio/app[MicrobiomeDB].
@@ -157,6 +163,10 @@ Cache DB::
 The cache-db component exposes an API for performing actions on the VDI-internal
 cache database.
 
+Common::
+The common component provides common functionality shared by most if not all
+other components and modules.
+
 Dataset Reinstaller::
 The dataset-reinstaller component exposes an API for reinstalling datasets that
 have been marked as "ready-for-reinstall".
@@ -169,13 +179,17 @@ Install Cleanup::
 The install-cleanup component exposes an API for marking datasets as
 "ready-for-reinstall".
 
+Kafka::
+The Kafka component exposes an API for working with an Apache Kafka instance in
+a manner that is tailored to the VDI processes.
+
 --
-* Kafka
 * LDAP
 * Module Core
 * Plugin Mapping
 * Pruner
 * Rabbit
+* S3
 --
 
 === Database Schemata
