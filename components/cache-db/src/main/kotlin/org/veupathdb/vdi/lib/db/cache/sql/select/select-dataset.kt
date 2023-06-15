@@ -25,7 +25,7 @@ FROM
   vdi.datasets vd
   INNER JOIN vdi.dataset_metadata dm
     USING (dataset_id)
-  INNER JOIN vdi.import_control ic
+  LEFT JOIN vdi.import_control ic
     USING (dataset_id)
 WHERE
   vd.dataset_id = ?
@@ -45,7 +45,7 @@ internal fun Connection.selectDataset(datasetID: DatasetID): DatasetRecord? =
           getUserID("owner_id"),
           getBoolean("is_deleted"),
           getDateTime("created"),
-          DatasetImportStatus.fromString(getString("status")),
+          getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
           getString("name"),
           getString("summary"),
           getString("description"),

@@ -5,6 +5,7 @@ enum class DatasetImportStatus(val value: String) {
   InProgress("in-progress"),
   Complete("complete"),
   Invalid("invalid"),
+  Failed("failed"),
   ;
 
   companion object {
