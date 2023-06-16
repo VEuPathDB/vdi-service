@@ -57,7 +57,7 @@ dependencies {
   implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
 
   implementation("org.gusdb:fgputil-db:2.12.9")
-  api("org.veupathdb.lib:jaxrs-container-core:6.14.5")
+  api("org.veupathdb.lib:jaxrs-container-core:6.15.0")
   implementation("org.veupathdb.lib:multipart-jackson-pojo:1.1.0")
 
   implementation("org.veupathdb.lib.s3:s34k-minio:0.3.6+s34k-0.7.2")
