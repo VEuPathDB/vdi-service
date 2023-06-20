@@ -13,7 +13,10 @@ public enum DatasetImportStatus {
   COMPLETE("complete"),
 
   @JsonProperty("invalid")
-  INVALID("invalid");
+  INVALID("invalid"),
+
+  @JsonProperty("failed")
+  FAILED("failed");
 
   private final String value;
 

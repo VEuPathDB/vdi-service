@@ -7,4 +7,5 @@ fun DatasetImportStatus(dis: DIS): DatasetImportStatus = when (dis) {
   DIS.InProgress -> DatasetImportStatus.INPROGRESS
   DIS.Complete   -> DatasetImportStatus.COMPLETE
   DIS.Invalid    -> DatasetImportStatus.INVALID
+  DIS.Failed     -> DatasetImportStatus.FAILED
 }

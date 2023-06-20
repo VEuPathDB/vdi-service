@@ -203,6 +203,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private fun handleImportBadRequestResult(datasetID: DatasetID, result: ImportBadRequestResponse) {
     log.error("dataset handler server reports 400 error for dataset $datasetID, message: ${result.message}")
+    CacheDB.withTransaction {
+      it.updateImportControl(datasetID, DatasetImportStatus.Failed)
+      it.upsertImportMessages(datasetID, result.message)
+    }
     throw IllegalStateException(result.message)
   }
 
@@ -216,6 +220,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private fun handleImport500Result(datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
     log.error("dataset handler server reports 500 for dataset $datasetID, message ${result.message}")
+    CacheDB.withTransaction {
+      it.updateImportControl(datasetID, DatasetImportStatus.Failed)
+      it.upsertImportMessages(datasetID, result.message)
+    }
     throw IllegalStateException(result.message)
   }
 

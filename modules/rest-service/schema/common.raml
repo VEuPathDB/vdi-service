@@ -115,12 +115,24 @@ types:
 
   DatasetImportStatus:
     displayName: Dataset Import Status
+    description: |
+      Import status of the dataset.
+
+      | Value         | Description                                                           |
+      |---------------|-----------------------------------------------------------------------|
+      | `queued`      | The dataset has not yet been processed and is waiting in the queue.   |
+      | `in-progress` | The dataset is currently being import processed.                      |
+      | `complete`    | The dataset has been processed and imported for installation.         |
+      | `invalid`     | The dataset failed import validation.                                 |
+      | `failed`      | The dataset import failed due to an internal server error.            |
+
     type: string
     enum:
     - queued
     - in-progress
     - complete
     - invalid
+    - failed
 
   DatasetInstallStatus:
     displayName: Dataset Install Status

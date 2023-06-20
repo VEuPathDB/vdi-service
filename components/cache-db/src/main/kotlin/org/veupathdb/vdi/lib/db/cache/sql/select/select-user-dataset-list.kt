@@ -34,7 +34,7 @@ FROM
   vdi.datasets AS d
   INNER JOIN vdi.dataset_metadata AS md
     USING (dataset_id)
-  INNER JOIN vdi.import_control AS ic
+  LEFT JOIN vdi.import_control AS ic
     USING (dataset_id)
 WHERE
   d.is_deleted = FALSE
@@ -164,7 +164,7 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
           ownerID      = it.getUserID("owner_id"),
           isDeleted    = it.getBoolean("is_deleted"),
           created      = it.getDateTime("created"),
-          importStatus = DatasetImportStatus.fromString(it.getString("status")),
+          importStatus = it.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
           name         = it.getString("name"),
           summary      = it.getString("summary"),
           description  = it.getString("description"),
