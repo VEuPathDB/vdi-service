@@ -77,5 +77,6 @@ private fun DatasetRecord.toListEntry(
   out.summary     = summary
   out.description = description
   out.projectIDs  = projects.toList()
+  out.visibility  = DatasetVisibility(visibility)
   out.status      = DatasetStatusInfo(importStatus, statuses)
 }

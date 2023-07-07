@@ -6,11 +6,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+    "visibility",
     "name",
     "summary",
     "description"
 })
 public class DatasetPatchRequestImpl implements DatasetPatchRequest {
+  @JsonProperty("visibility")
+  private DatasetVisibility visibility;
+
   @JsonProperty("name")
   private String name;
 
@@ -19,6 +23,16 @@ public class DatasetPatchRequestImpl implements DatasetPatchRequest {
 
   @JsonProperty("description")
   private String description;
+
+  @JsonProperty("visibility")
+  public DatasetVisibility getVisibility() {
+    return this.visibility;
+  }
+
+  @JsonProperty("visibility")
+  public void setVisibility(DatasetVisibility visibility) {
+    this.visibility = visibility;
+  }
 
   @JsonProperty("name")
   public String getName() {

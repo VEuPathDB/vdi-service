@@ -7,6 +7,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetPatchRequestImpl.class
 )
 public interface DatasetPatchRequest {
+  @JsonProperty("visibility")
+  DatasetVisibility getVisibility();
+
+  @JsonProperty("visibility")
+  void setVisibility(DatasetVisibility visibility);
+
   @JsonProperty("name")
   String getName();
 

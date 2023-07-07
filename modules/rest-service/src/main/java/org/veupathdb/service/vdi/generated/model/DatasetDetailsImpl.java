@@ -14,6 +14,7 @@ import java.util.List;
     "summary",
     "description",
     "projectIDs",
+    "visibility",
     "importMessages",
     "status",
     "shares"
@@ -39,6 +40,9 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty("projectIDs")
   private List<String> projectIDs;
+
+  @JsonProperty("visibility")
+  private DatasetVisibility visibility;
 
   @JsonProperty(
       value = "importMessages",
@@ -122,6 +126,16 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("projectIDs")
   public void setProjectIDs(List<String> projectIDs) {
     this.projectIDs = projectIDs;
+  }
+
+  @JsonProperty("visibility")
+  public DatasetVisibility getVisibility() {
+    return this.visibility;
+  }
+
+  @JsonProperty("visibility")
+  public void setVisibility(DatasetVisibility visibility) {
+    this.visibility = visibility;
   }
 
   @JsonProperty(

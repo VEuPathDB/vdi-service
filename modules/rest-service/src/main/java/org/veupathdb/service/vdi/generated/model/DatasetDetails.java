@@ -50,6 +50,12 @@ public interface DatasetDetails {
   @JsonProperty("projectIDs")
   void setProjectIDs(List<String> projectIDs);
 
+  @JsonProperty("visibility")
+  DatasetVisibility getVisibility();
+
+  @JsonProperty("visibility")
+  void setVisibility(DatasetVisibility visibility);
+
   @JsonProperty(
       value = "importMessages",
       defaultValue = "[\n"

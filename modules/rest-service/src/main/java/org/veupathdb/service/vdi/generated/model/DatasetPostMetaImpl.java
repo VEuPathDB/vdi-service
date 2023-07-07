@@ -9,6 +9,7 @@ import java.util.List;
 @JsonPropertyOrder({
     "datasetType",
     "name",
+    "visibility",
     "summary",
     "description",
     "projects",
@@ -20,6 +21,12 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
 
   @JsonProperty("name")
   private String name;
+
+  @JsonProperty(
+      value = "visibility",
+      defaultValue = "private"
+  )
+  private DatasetVisibility visibility;
 
   @JsonProperty("summary")
   private String summary;
@@ -51,6 +58,22 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  @JsonProperty(
+      value = "visibility",
+      defaultValue = "private"
+  )
+  public DatasetVisibility getVisibility() {
+    return this.visibility;
+  }
+
+  @JsonProperty(
+      value = "visibility",
+      defaultValue = "private"
+  )
+  public void setVisibility(DatasetVisibility visibility) {
+    this.visibility = visibility;
   }
 
   @JsonProperty("summary")

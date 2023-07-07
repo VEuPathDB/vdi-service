@@ -77,6 +77,9 @@ types:
       datasetType:
         displayName: Dataset Type
         type: DatasetTypeInfo
+      visibility:
+        displayName: Dataset Visibility
+        type: DatasetVisibility
       name:
         displayName: Dataset Name
         description: User provided name for the dataset.
@@ -143,6 +146,11 @@ types:
         displayName: Dataset Name
         description: User provided name for the dataset.
         type: string
+      visibility:
+        displayName: Dataset Visibility
+        type: DatasetVisibility
+        default: "private"
+        required: false
       summary:
         displayName: Dataset Summary
         description: User provided summary for the dataset.
@@ -256,6 +264,9 @@ types:
         description: |
           Project IDs for projects the user dataset record was submitted to.
         type: ProjectID[]
+      visibility:
+        displayName: Dataset Visibility
+        type: DatasetVisibility
       importMessages:
         displayName: Import Messages
         description: |
@@ -321,6 +332,10 @@ types:
     type: object
     additionalProperties: false
     properties:
+      visibility:
+        displayName: Dataset Visibility
+        type: DatasetVisibility
+        required: false
       name:
         displayName: Dataset Name
         description: User provided name for a dataset.
@@ -479,6 +494,12 @@ types:
     enum:
       - accept
       - reject
+  DatasetVisibility:
+    type: string
+    enum:
+      - private
+      - protected
+      - public
   DatasetStatusInfo:
     displayName: Dataset Status Info
     description: Information about the import and install status of a dataset.

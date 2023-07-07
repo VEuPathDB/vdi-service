@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0-SNAPSHOT") { isChanging = true }
+  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0")
 
   api("org.veupathdb.lib:ldap-utils:1.0.0")
 

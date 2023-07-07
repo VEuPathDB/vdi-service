@@ -10,6 +10,7 @@ import java.util.List;
     "datasetID",
     "owner",
     "datasetType",
+    "visibility",
     "name",
     "summary",
     "description",
@@ -25,6 +26,9 @@ public class DatasetListEntryImpl implements DatasetListEntry {
 
   @JsonProperty("datasetType")
   private DatasetTypeInfo datasetType;
+
+  @JsonProperty("visibility")
+  private DatasetVisibility visibility;
 
   @JsonProperty("name")
   private String name;
@@ -69,6 +73,16 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("datasetType")
   public void setDatasetType(DatasetTypeInfo datasetType) {
     this.datasetType = datasetType;
+  }
+
+  @JsonProperty("visibility")
+  public DatasetVisibility getVisibility() {
+    return this.visibility;
+  }
+
+  @JsonProperty("visibility")
+  public void setVisibility(DatasetVisibility visibility) {
+    this.visibility = visibility;
   }
 
   @JsonProperty("name")

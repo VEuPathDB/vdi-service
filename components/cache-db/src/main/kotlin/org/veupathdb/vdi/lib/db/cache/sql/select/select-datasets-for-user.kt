@@ -1,6 +1,7 @@
 package org.veupathdb.vdi.lib.db.cache.sql.select
 
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecordImpl
@@ -19,6 +20,7 @@ SELECT
 , md.name
 , md.summary
 , md.description
+, md.visibility
 , array(SELECT f.file_name FROM vdi.dataset_files AS f WHERE f.dataset_id = d.dataset_id) AS files
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id) AS projects
 , ic.status
@@ -46,6 +48,7 @@ internal fun Connection.selectDatasetsForUser(userID: UserID): List<DatasetRecor
           isDeleted    = getBoolean("is_deleted"),
           created      = getDateTime("created"),
           importStatus = getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
+          visibility   = VDIDatasetVisibility.fromString(getString("visibility")),
           name         = getString("name"),
           summary      = getString("summary"),
           description  = getString("description"),
