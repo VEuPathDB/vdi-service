@@ -13,8 +13,14 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
-  // get a list of all the datasets matching the given query
-  val datasetList = CacheDB.selectDatasetList(query)
+  return fetchDatasetList(CacheDB.selectDatasetList(query))
+}
+
+fun fetchCommunityUserDatasetList(): List<DatasetListEntry> {
+  return fetchDatasetList(CacheDB.selectNonPrivateDatasets())
+}
+
+private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetListEntry> {
 
   // build a set for collecting user IDs to use when querying for user details
   val userIDs = HashSet<UserID>(datasetList.size)

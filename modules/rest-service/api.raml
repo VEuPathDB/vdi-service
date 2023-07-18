@@ -549,6 +549,46 @@ uses:
                 message: Dataset store is unreachable
                 requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
+/vdi-datasets/community:
+  displayName: Community Datasets
+  get:
+    displayName: List Community Datasets
+    description: |
+      Returns a list of datasets that have been made "public" by the owner
+      setting the dataset visibilities to a setting other than `private`.
+    responses:
+      200:
+        description: Success
+        body:
+          application/json:
+            type: lib.DatasetListEntry[]
+      401:
+        description: |
+          Unauthorized.
+          
+          This status is returned when the request contains either no user
+          authorization token or an invalid user authorization token.
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
+      500:
+        description: |
+          Internal Server Error.
+          
+          This status is returned when an unhandled or unexpected issue arises
+          when attempting to process the request.
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+
+
 /vdi-datasets/{vd-id}:
   displayName: Dataset by ID
 

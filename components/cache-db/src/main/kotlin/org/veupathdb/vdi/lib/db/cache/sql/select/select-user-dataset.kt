@@ -14,7 +14,6 @@ import org.veupathdb.vdi.lib.db.cache.util.setUserID
 import org.veupathdb.vdi.lib.db.cache.util.withPreparedStatement
 import org.veupathdb.vdi.lib.db.cache.util.withResults
 import java.sql.Connection
-import java.time.OffsetDateTime
 
 // language=postgresql
 private val SQL = """

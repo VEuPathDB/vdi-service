@@ -78,6 +78,11 @@ object CacheDB {
     return connection.use { it.selectDatasetsForUser(userID) }
   }
 
+  fun selectNonPrivateDatasets(): List<DatasetRecord> {
+    log.debug("selecting list of non-private datasets")
+    return connection.use { it.selectNonPrivateDatasets() }
+  }
+
   fun selectSharesForDataset(datasetID: DatasetID): List<DatasetShare> {
     log.debug("selecting shares for dataset {}", datasetID)
     return connection.use { it.selectSharesFor(datasetID) }
