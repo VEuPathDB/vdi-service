@@ -31,13 +31,11 @@ FROM
   LEFT JOIN vdi.import_control AS ic
     USING (dataset_id)
 WHERE
-  d.owner_id = ?
+  md.visibility != 'private'
 """
 
-internal fun Connection.selectDatasetsForUser(userID: UserID): List<DatasetRecord> {
+internal fun Connection.selectNonPrivateDatasets(): List<DatasetRecord> {
   return withPreparedStatement(SQL) {
-    setUserID(1, userID)
-
     withResults {
       map {
         DatasetRecordImpl(

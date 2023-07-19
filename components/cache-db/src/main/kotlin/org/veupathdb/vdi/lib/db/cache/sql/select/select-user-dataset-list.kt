@@ -1,5 +1,6 @@
 package org.veupathdb.vdi.lib.db.cache.sql.select
 
+import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.util.*
 import java.sql.Connection
@@ -165,6 +166,7 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
           isDeleted    = it.getBoolean("is_deleted"),
           created      = it.getDateTime("created"),
           importStatus = it.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
+          visibility   = VDIDatasetVisibility.fromString(it.getString("visibility")),
           name         = it.getString("name"),
           summary      = it.getString("summary"),
           description  = it.getString("description"),

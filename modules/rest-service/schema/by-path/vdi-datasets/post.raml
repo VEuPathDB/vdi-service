@@ -52,6 +52,11 @@ types:
         description: User provided name for the dataset.
         type: string
         required: true
+      visibility:
+        displayName: Dataset Visibility
+        type: common.DatasetVisibility
+        required: false
+        default: "private"
       summary:
         displayName: Dataset Summary
         description: User provided summary for the dataset.
@@ -72,7 +77,6 @@ types:
         displayName: Dataset Dependencies
         type: DatasetDependency[]
         required: true
-
 
   DatasetPostType:
     type: object

@@ -136,6 +136,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
         // 1. Update meta info
         db.updateDatasetMeta(DatasetMetaImpl(
           datasetID   = datasetID,
+          visibility  = datasetMeta.visibility,
           name        = datasetMeta.name,
           summary     = datasetMeta.summary,
           description = datasetMeta.description,
@@ -298,6 +299,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       // insert metadata for the dataset
       it.tryInsertDatasetMeta(DatasetMetaImpl(
         datasetID   = datasetID,
+        visibility  = meta.visibility,
         name        = meta.name,
         summary     = meta.summary,
         description = meta.description,

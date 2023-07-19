@@ -20,6 +20,18 @@ public interface DatasetPostMeta {
   @JsonProperty("name")
   void setName(String name);
 
+  @JsonProperty(
+      value = "visibility",
+      defaultValue = "private"
+  )
+  DatasetVisibility getVisibility();
+
+  @JsonProperty(
+      value = "visibility",
+      defaultValue = "private"
+  )
+  void setVisibility(DatasetVisibility visibility);
+
   @JsonProperty("summary")
   String getSummary();
 

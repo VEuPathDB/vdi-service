@@ -1,5 +1,8 @@
 #%RAML 1.0 Library
 
+uses:
+  common: ../../../common.raml
+
 types:
   DatasetPatchRequest:
     displayName: Dataset Patch Request
@@ -8,6 +11,10 @@ types:
     type: object
     additionalProperties: false
     properties:
+      visibility:
+        displayName: Dataset Visibility
+        type: common.DatasetVisibility
+        required: false
       name:
         displayName: Dataset Name
         description: User provided name for a dataset.

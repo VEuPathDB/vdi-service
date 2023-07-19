@@ -274,6 +274,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         // insert metadata for the dataset
         it.tryInsertDatasetMeta(DatasetMetaImpl(
           datasetID   = datasetID,
+          visibility  = meta.visibility,
           name        = meta.name,
           summary     = meta.summary,
           description = meta.description,

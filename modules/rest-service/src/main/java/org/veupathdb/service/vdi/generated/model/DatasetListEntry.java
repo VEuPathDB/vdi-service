@@ -26,6 +26,12 @@ public interface DatasetListEntry {
   @JsonProperty("datasetType")
   void setDatasetType(DatasetTypeInfo datasetType);
 
+  @JsonProperty("visibility")
+  DatasetVisibility getVisibility();
+
+  @JsonProperty("visibility")
+  void setVisibility(DatasetVisibility visibility);
+
   @JsonProperty("name")
   String getName();
 

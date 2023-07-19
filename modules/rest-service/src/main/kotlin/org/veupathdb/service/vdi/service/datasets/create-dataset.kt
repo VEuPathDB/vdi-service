@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
+import org.veupathdb.service.vdi.generated.model.toInternalVisibility
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.service.users.getCurrentQuotaUsage
 import org.veupathdb.service.vdi.util.BoundedInputStream
@@ -81,6 +82,7 @@ private fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
     name         = meta.name,
     summary      = meta.summary,
     description  = meta.description,
+    visibility   = meta.visibility?.toInternalVisibility() ?: VDIDatasetVisibility.Private,
     dependencies = (meta.dependencies ?: emptyList()).map {
       VDIDatasetDependencyImpl(
         identifier  = it.resourceIdentifier,

@@ -5,13 +5,14 @@ import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.cache.CacheDB
+import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 
 fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // Lookup dataset that is owned by or shared with the current user
-  val dataset = CacheDB.selectDatasetForUser(userID, datasetID)
-    ?: throw NotFoundException()
+  val dataset = requireDataset(userID, datasetID)
 
   if (dataset.isDeleted)
     throw NotFoundException()
@@ -26,6 +27,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   val userDetails = AccountDB.lookupUserDetails(HashSet<UserID>(shares.size + 1)
     .apply {
       add(userID)
+      add(dataset.ownerID)
       shares.forEach { add(it.recipientID) }
     })
 
@@ -37,7 +39,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // return the dataset
   return DatasetDetailsImpl().also { out ->
     out.datasetID      = datasetID.toString()
-    out.owner          = DatasetOwner(userDetails[userID] ?: throw IllegalStateException("no user details for dataset owner"))
+    out.owner          = DatasetOwner(userDetails[dataset.ownerID] ?: throw IllegalStateException("no user details for dataset owner"))
     out.datasetType    = DatasetTypeInfo(dataset)
     out.name           = dataset.name
     out.summary        = dataset.summary
@@ -45,6 +47,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.importMessages = importMessages
     out.status         = DatasetStatusInfo(dataset.importStatus, statuses)
     out.shares         = ArrayList(shares.size)
+    out.visibility     = DatasetVisibility(dataset.visibility)
 
     shares.forEach { share ->
       out.shares.add(ShareOffer(
@@ -53,4 +56,17 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
       ))
     }
   }
+}
+
+private fun requireDataset(userID: UserID, datasetID: DatasetID): DatasetRecord {
+  var ds = CacheDB.selectDatasetForUser(userID, datasetID)
+
+  if (ds == null) {
+    ds = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
+
+    if (ds.visibility == VDIDatasetVisibility.Private)
+      throw NotFoundException()
+  }
+
+  return ds
 }
