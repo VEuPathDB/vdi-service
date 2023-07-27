@@ -3,9 +3,11 @@ plugins {
 }
 
 dependencies {
+  implementation(platform(project(":platform")))
+
   implementation(project(":components:handler-client"))
 
-  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0")
+  implementation("org.veupathdb.vdi:vdi-component-common")
 
   testImplementation(kotlin("test"))
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")

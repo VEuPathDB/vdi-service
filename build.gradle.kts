@@ -56,9 +56,11 @@ allprojects {
 }
 
 dependencies {
+  implementation(platform(project(":platform")))
+
   implementation(project(":components:s3"))
 
-  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0")
+  implementation("org.veupathdb.vdi:vdi-component-common")
 
   implementation(project(":components:module-core"))
 
@@ -74,12 +76,13 @@ dependencies {
   implementation(project(":modules:soft-delete-trigger-handler"))
   implementation(project(":modules:update-meta-trigger-handler"))
 
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+  implementation("org.veupathdb.lib:jaxrs-container-core")
 
-  implementation("org.slf4j:slf4j-api:1.7.36")
-  implementation("org.apache.logging.log4j:log4j-api:2.20.0")
-  implementation("org.apache.logging.log4j:log4j-core:2.20.0")
-  implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.20.0")
+  implementation("org.slf4j:slf4j-api")
+  implementation("org.apache.logging.log4j:log4j-api")
+  implementation("org.apache.logging.log4j:log4j-core")
+  implementation("org.apache.logging.log4j:log4j-slf4j-impl")
   implementation(kotlin("stdlib-jdk8"))
 }
 

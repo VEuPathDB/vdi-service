@@ -3,11 +3,13 @@ plugins {
 }
 
 dependencies {
-  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0")
+  implementation(platform(project(":platform")))
 
-  api("org.veupathdb.lib:ldap-utils:1.0.0")
+  implementation("org.veupathdb.vdi:vdi-component-common")
 
-  implementation("org.slf4j:slf4j-api:1.7.36")
+  api("org.veupathdb.lib:ldap-utils")
+
+  implementation("org.slf4j:slf4j-api")
 
   testImplementation(kotlin("test"))
 }
