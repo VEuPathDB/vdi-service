@@ -2,7 +2,11 @@ version: "3.5"
 
 networks:
   internal:
-  external:
+  rabbitmq:
+    external: true
+  traefik:
+    external: true
+  monitoring-ext:
     external: true
 
 services:
@@ -44,7 +48,9 @@ services:
     - kafka
     networks:
     - internal
-    - external
+    - rabbitmq
+    - traefik
+    - monitoring-ext
     environment:
 
       # Rest Service
@@ -314,6 +320,7 @@ services:
     image: veupathdb/vdi-plugin-example:${VDI_PLUGIN_EXAMPLE_TAG:-latest}
     networks:
     - internal
+    - monitoring-ext
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_EXAMPLE_WATCHTOWER:-false}"
@@ -400,6 +407,7 @@ services:
     image: veupathdb/vdi-plugin-genelist:${VDI_PLUGIN_GENELIST_TAG:-latest}
     networks:
     - internal
+    - monitoring-ext
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_GENELIST_WATCHTOWER:-false}"
@@ -486,6 +494,7 @@ services:
     image: veupathdb/vdi-plugin-isasimple:${VDI_PLUGIN_ISASIMPLE_TAG:-latest}
     networks:
     - internal
+    - monitoring-ext
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_ISASIMPLE_WATCHTOWER:-false}"
@@ -572,6 +581,7 @@ services:
     image: veupathdb/vdi-plugin-bigwig:${VDI_PLUGIN_BIGWIG_TAG:-latest}
     networks:
     - internal
+    - monitoring-ext
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_BIGWIG_WATCHTOWER:-false}"
@@ -658,6 +668,7 @@ services:
     image: veupathdb/vdi-plugin-biom:${VDI_PLUGIN_BIOM_TAG:-latest}
     networks:
     - internal
+    - monitoring-ext
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_BIOM_WATCHTOWER:-false}"
@@ -744,6 +755,7 @@ services:
     image: veupathdb/vdi-plugin-rnaseq:${VDI_PLUGIN_RNASEQ_TAG:-latest}
     networks:
     - internal
+    - monitoring-ext
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_RNASEQ_WATCHTOWER:-false}"

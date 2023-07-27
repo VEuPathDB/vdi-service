@@ -2,7 +2,9 @@ version: "3.5"
 
 networks:
   monitoring-ext:
-    external: true
+    external: false
+  rabbitmq:
+    external: false
 
 services:
   minio-external:
@@ -15,7 +17,8 @@ services:
     - "9000:9000"
     - "9001:9001"
     networks:
-    - external
+    - internal
+    - rabbitmq
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_TOKEN:?}
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:?}
@@ -41,7 +44,7 @@ services:
     - minio-external
     - rabbit-external
     networks:
-    - external
+    - internal
     entrypoint: >
       /bin/sh -c "
       microdnf install nc;
@@ -59,7 +62,7 @@ services:
     - "5672:5672"
     - "9002:15672"
     networks:
-    - external
+    - rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: ${GLOBAL_RABBIT_USERNAME:?}
       RABBITMQ_DEFAULT_PASS: ${GLOBAL_RABBIT_PASSWORD:?}
