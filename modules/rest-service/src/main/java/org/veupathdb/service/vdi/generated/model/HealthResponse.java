@@ -36,10 +36,14 @@ public interface HealthResponse {
     @JsonProperty("unhealthy")
     UNHEALTHY("unhealthy");
 
-    private String name;
+    public final String value;
+
+    public String getValue() {
+      return this.value;
+    }
 
     StatusType(String name) {
-      this.name = name;
+      this.value = name;
     }
   }
 
@@ -48,10 +52,10 @@ public interface HealthResponse {
   )
   interface InfoType {
     @JsonProperty("threads")
-    int getThreads();
+    Integer getThreads();
 
     @JsonProperty("threads")
-    void setThreads(int threads);
+    void setThreads(Integer threads);
 
     @JsonProperty("uptime")
     String getUptime();
@@ -60,10 +64,10 @@ public interface HealthResponse {
     void setUptime(String uptime);
 
     @JsonProperty("uptimeMillis")
-    long getUptimeMillis();
+    Long getUptimeMillis();
 
     @JsonProperty("uptimeMillis")
-    void setUptimeMillis(long uptimeMillis);
+    void setUptimeMillis(Long uptimeMillis);
 
     @JsonAnyGetter
     Map<String, Object> getAdditionalProperties();

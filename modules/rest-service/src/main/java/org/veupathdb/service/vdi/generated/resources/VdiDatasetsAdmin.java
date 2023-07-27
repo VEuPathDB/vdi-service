@@ -1,14 +1,14 @@
 package org.veupathdb.service.vdi.generated.resources;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.BrokenDatasetListing;
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest;
@@ -27,14 +27,14 @@ public interface VdiDatasetsAdmin {
   @Produces("application/json")
   @Consumes("multipart/form-data")
   PostVdiDatasetsAdminProxyUploadResponse postVdiDatasetsAdminProxyUpload(
-      @HeaderParam("Auth-Key") String authKey, @HeaderParam("User-ID") long userID,
+      @HeaderParam("Auth-Key") String authKey, @HeaderParam("User-ID") Long userID,
       DatasetPostRequest entity);
 
   @GET
   @Path("/list-broken")
   @Produces("application/json")
   GetVdiDatasetsAdminListBrokenResponse getVdiDatasetsAdminListBroken(
-      @QueryParam("expanded") @DefaultValue("true") boolean expanded,
+      @QueryParam("expanded") @DefaultValue("true") Boolean expanded,
       @HeaderParam("Auth-Key") String authKey);
 
   @POST

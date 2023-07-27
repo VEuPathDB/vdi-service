@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = ErrorImpl.class
 )
 public interface Error {
-  String _DISCRIMINATOR_TYPE_NAME = "Error";
+  ErrorType _DISCRIMINATOR_TYPE_NAME = null;
 
   @JsonProperty("status")
   ErrorType getStatus();

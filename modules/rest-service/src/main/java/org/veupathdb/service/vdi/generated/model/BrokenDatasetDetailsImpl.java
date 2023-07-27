@@ -18,7 +18,7 @@ public class BrokenDatasetDetailsImpl implements BrokenDatasetDetails {
   private String datasetID;
 
   @JsonProperty("owner")
-  private long owner;
+  private Long owner;
 
   @JsonProperty("datasetType")
   private DatasetTypeInfo datasetType;
@@ -40,12 +40,12 @@ public class BrokenDatasetDetailsImpl implements BrokenDatasetDetails {
   }
 
   @JsonProperty("owner")
-  public long getOwner() {
+  public Long getOwner() {
     return this.owner;
   }
 
   @JsonProperty("owner")
-  public void setOwner(long owner) {
+  public void setOwner(Long owner) {
     this.owner = owner;
   }
 

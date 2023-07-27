@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = MethodNotAllowedErrorImpl.class
 )
 public interface MethodNotAllowedError extends Error {
-  String _DISCRIMINATOR_TYPE_NAME = "bad-method";
+  ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.BADMETHOD;
 
   @JsonProperty("status")
   ErrorType getStatus();

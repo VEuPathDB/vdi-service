@@ -11,28 +11,28 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class UserQuotaDetailsImpl implements UserQuotaDetails {
   @JsonProperty("limit")
-  private long limit;
+  private Long limit;
 
   @JsonProperty("usage")
-  private long usage;
+  private Long usage;
 
   @JsonProperty("limit")
-  public long getLimit() {
+  public Long getLimit() {
     return this.limit;
   }
 
   @JsonProperty("limit")
-  public void setLimit(long limit) {
+  public void setLimit(Long limit) {
     this.limit = limit;
   }
 
   @JsonProperty("usage")
-  public long getUsage() {
+  public Long getUsage() {
     return this.usage;
   }
 
   @JsonProperty("usage")
-  public void setUsage(long usage) {
+  public void setUsage(Long usage) {
     this.usage = usage;
   }
 }
