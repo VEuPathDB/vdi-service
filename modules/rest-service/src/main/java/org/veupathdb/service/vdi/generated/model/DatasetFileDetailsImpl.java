@@ -14,7 +14,7 @@ public class DatasetFileDetailsImpl implements DatasetFileDetails {
   private String name;
 
   @JsonProperty("size")
-  private Long size;
+  private long size;
 
   @JsonProperty("name")
   public String getName() {
@@ -27,12 +27,12 @@ public class DatasetFileDetailsImpl implements DatasetFileDetails {
   }
 
   @JsonProperty("size")
-  public Long getSize() {
+  public long getSize() {
     return this.size;
   }
 
   @JsonProperty("size")
-  public void setSize(Long size) {
+  public void setSize(long size) {
     this.size = size;
   }
 }

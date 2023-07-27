@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 )
 public interface DatasetOwner {
   @JsonProperty("userID")
-  Long getUserID();
+  long getUserID();
 
   @JsonProperty("userID")
-  void setUserID(Long userID);
+  void setUserID(long userID);
 
   @JsonProperty("firstName")
   String getFirstName();

@@ -15,10 +15,10 @@ public interface BrokenDatasetDetails {
   void setDatasetID(String datasetID);
 
   @JsonProperty("owner")
-  Long getOwner();
+  long getOwner();
 
   @JsonProperty("owner")
-  void setOwner(Long owner);
+  void setOwner(long owner);
 
   @JsonProperty("datasetType")
   DatasetTypeInfo getDatasetType();

@@ -15,7 +15,7 @@ public class DependencyStatusImpl implements DependencyStatus {
   private String name;
 
   @JsonProperty("reachable")
-  private Boolean reachable;
+  private boolean reachable;
 
   @JsonProperty("online")
   private DependencyStatus.OnlineType online;
@@ -31,12 +31,12 @@ public class DependencyStatusImpl implements DependencyStatus {
   }
 
   @JsonProperty("reachable")
-  public Boolean getReachable() {
+  public boolean getReachable() {
     return this.reachable;
   }
 
   @JsonProperty("reachable")
-  public void setReachable(Boolean reachable) {
+  public void setReachable(boolean reachable) {
     this.reachable = reachable;
   }
 

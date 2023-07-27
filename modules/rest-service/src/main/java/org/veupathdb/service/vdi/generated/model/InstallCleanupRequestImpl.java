@@ -15,7 +15,7 @@ public class InstallCleanupRequestImpl implements InstallCleanupRequest {
       value = "all",
       defaultValue = "false"
   )
-  private Boolean all;
+  private boolean all;
 
   @JsonProperty("targets")
   private List<InstallCleanupTarget> targets;
@@ -24,7 +24,7 @@ public class InstallCleanupRequestImpl implements InstallCleanupRequest {
       value = "all",
       defaultValue = "false"
   )
-  public Boolean getAll() {
+  public boolean getAll() {
     return this.all;
   }
 
@@ -32,7 +32,7 @@ public class InstallCleanupRequestImpl implements InstallCleanupRequest {
       value = "all",
       defaultValue = "false"
   )
-  public void setAll(Boolean all) {
+  public void setAll(boolean all) {
     this.all = all;
   }
 

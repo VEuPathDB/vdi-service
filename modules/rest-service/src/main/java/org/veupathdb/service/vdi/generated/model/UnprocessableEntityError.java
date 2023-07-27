@@ -13,7 +13,7 @@ import java.util.Map;
     as = UnprocessableEntityErrorImpl.class
 )
 public interface UnprocessableEntityError extends Error {
-  ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.INVALIDINPUT;
+  String _DISCRIMINATOR_TYPE_NAME = "invalid-input";
 
   @JsonProperty("status")
   ErrorType getStatus();

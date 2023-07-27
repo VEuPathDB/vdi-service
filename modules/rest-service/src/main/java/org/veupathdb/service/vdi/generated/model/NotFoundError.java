@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = NotFoundErrorImpl.class
 )
 public interface NotFoundError extends Error {
-  ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.NOTFOUND;
+  String _DISCRIMINATOR_TYPE_NAME = "not-found";
 
   @JsonProperty("status")
   ErrorType getStatus();

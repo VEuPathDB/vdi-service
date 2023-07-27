@@ -12,13 +12,13 @@ public interface InstallCleanupRequest {
       value = "all",
       defaultValue = "false"
   )
-  Boolean getAll();
+  boolean getAll();
 
   @JsonProperty(
       value = "all",
       defaultValue = "false"
   )
-  void setAll(Boolean all);
+  void setAll(boolean all);
 
   @JsonProperty("targets")
   List<InstallCleanupTarget> getTargets();

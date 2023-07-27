@@ -14,6 +14,7 @@ import java.util.List;
     "name",
     "summary",
     "description",
+    "origin",
     "projectIDs",
     "status"
 })
@@ -38,6 +39,9 @@ public class DatasetListEntryImpl implements DatasetListEntry {
 
   @JsonProperty("description")
   private String description;
+
+  @JsonProperty("origin")
+  private String origin;
 
   @JsonProperty("projectIDs")
   private List<String> projectIDs;
@@ -113,6 +117,16 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("description")
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  @JsonProperty("origin")
+  public String getOrigin() {
+    return this.origin;
+  }
+
+  @JsonProperty("origin")
+  public void setOrigin(String origin) {
+    this.origin = origin;
   }
 
   @JsonProperty("projectIDs")

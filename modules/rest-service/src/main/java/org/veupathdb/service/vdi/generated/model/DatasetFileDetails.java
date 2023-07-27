@@ -14,8 +14,8 @@ public interface DatasetFileDetails {
   void setName(String name);
 
   @JsonProperty("size")
-  Long getSize();
+  long getSize();
 
   @JsonProperty("size")
-  void setSize(Long size);
+  void setSize(long size);
 }

@@ -18,13 +18,9 @@ public enum DatasetImportStatus {
   @JsonProperty("failed")
   FAILED("failed");
 
-  private final String value;
-
-  public String getValue() {
-    return this.value;
-  }
+  private String name;
 
   DatasetImportStatus(String name) {
-    this.value = name;
+    this.name = name;
   }
 }

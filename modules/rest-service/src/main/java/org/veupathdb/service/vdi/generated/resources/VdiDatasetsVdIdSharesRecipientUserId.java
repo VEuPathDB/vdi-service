@@ -1,11 +1,11 @@
 package org.veupathdb.service.vdi.generated.resources;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.DatasetShareOffer;
 import org.veupathdb.service.vdi.generated.model.DatasetShareReceipt;
@@ -23,7 +23,7 @@ public interface VdiDatasetsVdIdSharesRecipientUserId {
   @Produces("application/json")
   @Consumes("application/json")
   PutVdiDatasetsSharesOfferByVdIdAndRecipientUserIdResponse putVdiDatasetsSharesOfferByVdIdAndRecipientUserId(
-      @PathParam("vd-id") String vdId, @PathParam("recipient-user-id") Long recipientUserId,
+      @PathParam("vd-id") String vdId, @PathParam("recipient-user-id") long recipientUserId,
       DatasetShareOffer entity);
 
   @PUT
@@ -31,7 +31,7 @@ public interface VdiDatasetsVdIdSharesRecipientUserId {
   @Produces("application/json")
   @Consumes("application/json")
   PutVdiDatasetsSharesReceiptByVdIdAndRecipientUserIdResponse putVdiDatasetsSharesReceiptByVdIdAndRecipientUserId(
-      @PathParam("vd-id") String vdId, @PathParam("recipient-user-id") Long recipientUserId,
+      @PathParam("vd-id") String vdId, @PathParam("recipient-user-id") long recipientUserId,
       DatasetShareReceipt entity);
 
   class PutVdiDatasetsSharesOfferByVdIdAndRecipientUserIdResponse extends ResponseDelegate {

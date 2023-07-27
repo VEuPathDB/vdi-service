@@ -12,13 +12,9 @@ public enum DatasetVisibility {
   @JsonProperty("public")
   PUBLIC("public");
 
-  private final String value;
-
-  public String getValue() {
-    return this.value;
-  }
+  private String name;
 
   DatasetVisibility(String name) {
-    this.value = name;
+    this.name = name;
   }
 }

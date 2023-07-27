@@ -1,15 +1,15 @@
 package org.veupathdb.service.vdi.generated.resources;
 
 import java.util.List;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.GenericEntity;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.Response;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.DatasetListEntry;
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest;
@@ -25,8 +25,8 @@ public interface VdiDatasets {
   @Produces("application/json")
   GetVdiDatasetsResponse getVdiDatasets(@QueryParam("project_id") String projectId,
       @QueryParam("ownership") @DefaultValue("any") String ownership,
-      @QueryParam("offset") @DefaultValue("0") Integer offset,
-      @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") int offset,
+      @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("sort_field") @DefaultValue("creation_timestamp") String sortField,
       @QueryParam("sort_order") String sortOrder);
 
