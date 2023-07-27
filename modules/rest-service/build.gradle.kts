@@ -46,6 +46,8 @@ containerBuild {
 }
 
 dependencies {
+  implementation(platform(project(":platform")))
+
   implementation(project(":components:app-db"))
   implementation(project(":components:cache-db"))
   implementation(project(":components:install-cleanup"))
@@ -53,31 +55,31 @@ dependencies {
   implementation(project(":components:pruner"))
   implementation(project(":components:s3"))
 
-  implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
-  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0")
+  implementation("org.veupathdb.vdi:vdi-component-json")
+  implementation("org.veupathdb.vdi:vdi-component-common")
 
-  implementation("org.gusdb:fgputil-db:2.12.9")
-  api("org.veupathdb.lib:jaxrs-container-core:6.15.0")
-  implementation("org.veupathdb.lib:multipart-jackson-pojo:1.1.0")
+  implementation("org.gusdb:fgputil-db")
+  implementation("org.veupathdb.lib:jaxrs-container-core")
+  implementation("org.veupathdb.lib:multipart-jackson-pojo")
 
-  implementation("org.veupathdb.lib.s3:s34k-minio:0.3.6+s34k-0.7.2")
+  implementation("org.veupathdb.lib.s3:s34k-minio")
 
   // Jersey
-  implementation("org.glassfish.jersey.core:jersey-server:3.1.1")
+  implementation("org.glassfish.jersey.core:jersey-server")
 
   // Jackson
-  implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
-  implementation("com.fasterxml.jackson.core:jackson-annotations:2.14.2")
+  implementation("com.fasterxml.jackson.core:jackson-databind")
+  implementation("com.fasterxml.jackson.core:jackson-annotations")
 
   // Log4J
-  implementation("org.slf4j:slf4j-api:1.7.36")
-  implementation("org.apache.logging.log4j:log4j-core:2.20.0")
-  implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.20.0")
+  implementation("org.slf4j:slf4j-api")
+  implementation("org.apache.logging.log4j:log4j-core")
+  implementation("org.apache.logging.log4j:log4j-slf4j-impl")
 
 
   // Metrics (can remove if not adding custom service metrics over those provided by container core)
-  implementation("io.prometheus:simpleclient:0.16.0")
-  implementation("io.prometheus:simpleclient_common:0.16.0")
+  implementation("io.prometheus:simpleclient")
+  implementation("io.prometheus:simpleclient_common")
 
   // Unit Testing
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")

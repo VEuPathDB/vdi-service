@@ -3,11 +3,13 @@ plugins {
 }
 
 dependencies {
-  implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
-  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0")
+  implementation(platform(project(":platform")))
 
-  implementation("org.slf4j:slf4j-api:1.7.36")
+  implementation("org.veupathdb.vdi:vdi-component-json")
+  implementation("org.veupathdb.vdi:vdi-component-common")
 
-  implementation("com.zaxxer:HikariCP:5.0.1")
-  implementation("org.postgresql:postgresql:42.5.4")
+  implementation("org.slf4j:slf4j-api")
+
+  implementation("com.zaxxer:HikariCP")
+  implementation("org.postgresql:postgresql")
 }

@@ -3,12 +3,14 @@ plugins {
 }
 
 dependencies {
-  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0")
-  implementation("org.veupathdb.vdi:vdi-component-json:1.0.0")
+  implementation(platform(project(":platform")))
 
-  api("org.veupathdb.lib.s3:s34k-minio:0.6.0+s34k-0.10.0")
+  implementation("org.veupathdb.vdi:vdi-component-common")
+  implementation("org.veupathdb.vdi:vdi-component-json")
 
-  implementation("org.slf4j:slf4j-api:1.7.36")
+  implementation("org.veupathdb.lib.s3:s34k-minio")
+
+  implementation("org.slf4j:slf4j-api")
 
   testImplementation(kotlin("test"))
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")

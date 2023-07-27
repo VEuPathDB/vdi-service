@@ -3,13 +3,15 @@ plugins {
 }
 
 dependencies {
+  implementation(platform(project(":platform")))
+
   implementation(project(":components:ldap"))
 
-  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0")
+  implementation("org.veupathdb.vdi:vdi-component-common")
 
-  implementation("com.zaxxer:HikariCP:5.0.1")
-  implementation("com.oracle.database.jdbc:ojdbc8:21.9.0.0")
-  implementation("org.postgresql:postgresql:42.5.4")
+  implementation("com.zaxxer:HikariCP")
+  implementation("com.oracle.database.jdbc:ojdbc8")
+  implementation("org.postgresql:postgresql")
 
-  implementation("org.slf4j:slf4j-api:1.7.36")
+  implementation("org.slf4j:slf4j-api")
 }

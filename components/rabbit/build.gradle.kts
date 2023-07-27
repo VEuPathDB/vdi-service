@@ -3,8 +3,10 @@ plugins {
 }
 
 dependencies {
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-  implementation("org.veupathdb.vdi:vdi-component-common:1.0.0")
-  implementation("org.slf4j:slf4j-api:1.7.36")
-  implementation("com.rabbitmq:amqp-client:5.17.0")
+  implementation(platform(project(":platform")))
+
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:")
+  implementation("org.veupathdb.vdi:vdi-component-common")
+  implementation("org.slf4j:slf4j-api")
+  implementation("com.rabbitmq:amqp-client")
 }

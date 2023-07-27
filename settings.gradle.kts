@@ -46,6 +46,8 @@ pluginManagement {
 
 rootProject.name = "vdi"
 
+include(":platform")
+
 include(":components:app-db")
 include(":components:cache-db")
 include(":components:dataset-reinstaller")
