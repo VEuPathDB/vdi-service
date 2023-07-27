@@ -36,7 +36,7 @@ public interface HealthResponse {
     @JsonProperty("unhealthy")
     UNHEALTHY("unhealthy");
 
-    private final String value;
+    public final String value;
 
     public String getValue() {
       return this.value;

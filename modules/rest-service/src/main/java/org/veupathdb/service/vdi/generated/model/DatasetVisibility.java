@@ -12,7 +12,7 @@ public enum DatasetVisibility {
   @JsonProperty("public")
   PUBLIC("public");
 
-  private final String value;
+  public final String value;
 
   public String getValue() {
     return this.value;

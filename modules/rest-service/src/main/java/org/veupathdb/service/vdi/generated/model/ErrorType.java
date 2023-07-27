@@ -24,7 +24,7 @@ public enum ErrorType {
   @JsonProperty("server-error")
   SERVERERROR("server-error");
 
-  private final String value;
+  public final String value;
 
   public String getValue() {
     return this.value;
