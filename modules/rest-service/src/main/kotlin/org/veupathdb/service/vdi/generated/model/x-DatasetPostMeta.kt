@@ -15,6 +15,9 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
   if (description != null && description.isBlank())
     description = null
 
+  if (origin.isNullOrBlank())
+    validationErrors.add("meta.origin", "field is required")
+
   if (projects == null || projects.isEmpty())
     validationErrors.add("meta.projects", "one or more projects is required")
   else

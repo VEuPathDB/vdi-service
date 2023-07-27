@@ -85,4 +85,5 @@ private fun DatasetRecord.toListEntry(
   out.projectIDs  = projects.toList()
   out.visibility  = DatasetVisibility(visibility)
   out.status      = DatasetStatusInfo(importStatus, statuses)
+  out.origin      = origin
 }

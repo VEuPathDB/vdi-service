@@ -22,6 +22,7 @@ SELECT
 , vd.type_version
 , vd.owner_id
 , vd.is_deleted
+, vd.origin
 , vd.created
 , dm.name
 , dm.summary
@@ -74,6 +75,7 @@ internal fun Connection.selectDatasetForUser(userID: UserID, datasetID: DatasetI
           getBoolean("is_deleted"),
           getDateTime("created"),
           getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
+          getString("origin"),
           VDIDatasetVisibility.fromString(getString("visibility")),
           getString("name"),
           getString("summary"),

@@ -11,5 +11,6 @@ data class DatasetImpl(
   override val ownerID: UserID,
   override val isDeleted: Boolean,
   override val created: OffsetDateTime,
-  override val importStatus: DatasetImportStatus
+  override val importStatus: DatasetImportStatus,
+  override val origin: String
 ) : Dataset

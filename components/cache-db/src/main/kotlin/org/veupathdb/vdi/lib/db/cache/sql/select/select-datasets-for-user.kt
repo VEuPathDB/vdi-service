@@ -16,6 +16,7 @@ SELECT
 , d.type_version
 , d.owner_id
 , d.is_deleted
+, d.origin
 , d.created
 , md.name
 , md.summary
@@ -48,6 +49,7 @@ internal fun Connection.selectDatasetsForUser(userID: UserID): List<DatasetRecor
           isDeleted    = getBoolean("is_deleted"),
           created      = getDateTime("created"),
           importStatus = getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
+          origin       = getString("origin"),
           visibility   = VDIDatasetVisibility.fromString(getString("visibility")),
           name         = getString("name"),
           summary      = getString("summary"),

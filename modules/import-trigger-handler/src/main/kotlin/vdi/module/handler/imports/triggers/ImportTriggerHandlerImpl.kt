@@ -262,13 +262,14 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       try {
         // Insert a new dataset record
         it.tryInsertDataset(DatasetImpl(
-          datasetID   = datasetID,
-          typeName    = meta.type.name,
-          typeVersion = meta.type.version,
-          ownerID     = meta.owner,
-          isDeleted   = false,
-          created     = OffsetDateTime.now(),
-          DatasetImportStatus.Queued
+          datasetID    = datasetID,
+          typeName     = meta.type.name,
+          typeVersion  = meta.type.version,
+          ownerID      = meta.owner,
+          isDeleted    = false,
+          created      = OffsetDateTime.now(),
+          origin       = meta.origin,
+          importStatus = DatasetImportStatus.Queued
         ))
 
         // insert metadata for the dataset
