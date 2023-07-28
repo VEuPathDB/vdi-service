@@ -13,6 +13,12 @@ public interface DatasetTypeInfo {
   @JsonProperty("name")
   void setName(String name);
 
+  @JsonProperty("displayName")
+  String getDisplayName();
+
+  @JsonProperty("displayName")
+  void setDisplayName(String displayName);
+
   @JsonProperty("version")
   String getVersion();
 
