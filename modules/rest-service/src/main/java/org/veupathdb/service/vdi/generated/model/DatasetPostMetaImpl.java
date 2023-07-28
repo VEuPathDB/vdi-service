@@ -12,6 +12,7 @@ import java.util.List;
     "visibility",
     "summary",
     "description",
+    "origin",
     "projects",
     "dependencies"
 })
@@ -33,6 +34,9 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
 
   @JsonProperty("description")
   private String description;
+
+  @JsonProperty("origin")
+  private String origin;
 
   @JsonProperty("projects")
   private List<String> projects;
@@ -94,6 +98,16 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("description")
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  @JsonProperty("origin")
+  public String getOrigin() {
+    return this.origin;
+  }
+
+  @JsonProperty("origin")
+  public void setOrigin(String origin) {
+    this.origin = origin;
   }
 
   @JsonProperty("projects")

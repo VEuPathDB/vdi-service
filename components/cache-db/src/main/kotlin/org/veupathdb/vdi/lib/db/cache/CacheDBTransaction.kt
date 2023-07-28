@@ -5,6 +5,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.sql.delete.*
 import org.veupathdb.vdi.lib.db.cache.sql.insert.*
@@ -153,7 +154,7 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
    */
   fun tryInsertDataset(row: Dataset) {
     log.debug("inserting dataset record for dataset {}", row.datasetID)
-    con.tryInsertDatasetRecord(row.datasetID, row.typeName, row.typeVersion, row.ownerID, row.isDeleted, row.created)
+    con.tryInsertDatasetRecord(row.datasetID, row.typeName, row.typeVersion, row.ownerID, row.isDeleted, row.origin, row.created)
   }
 
   /**

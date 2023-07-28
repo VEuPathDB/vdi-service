@@ -44,6 +44,12 @@ public interface DatasetPostMeta {
   @JsonProperty("description")
   void setDescription(String description);
 
+  @JsonProperty("origin")
+  String getOrigin();
+
+  @JsonProperty("origin")
+  void setOrigin(String origin);
+
   @JsonProperty("projects")
   List<String> getProjects();
 
