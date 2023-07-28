@@ -1065,6 +1065,7 @@ Registers a VDI plugin with the service.
 [source]
 ----
 PLUGIN_HANDLER_<NAME>_NAME
+PLUGIN_HANDLER_<NAME>_DISPLAY_NAME
 PLUGIN_HANDLER_<NAME>_VERSION
 PLUGIN_HANDLER_<NAME>_ADDRESS
 PLUGIN_HANDLER_<NAME>_PROJECT_IDS
@@ -1082,6 +1083,7 @@ present:
 [source]
 ----
 PLUGIN_HANDLER_RNASEQ_NAME
+PLUGIN_HANDLER_RNASEQ_DISPLAY_NAME
 PLUGIN_HANDLER_RNASEQ_VERSION
 PLUGIN_HANDLER_RNASEQ_ADDRESS
 ----
@@ -1095,6 +1097,12 @@ PLUGIN_HANDLER_RNASEQ_ADDRESS
 | String
 | Name of the plugin handler.  This will typically be the type name of the
   dataset type that the plugin handles.
+
+| :exclamation:
+| PLUGIN_HANDLER_<NAME>_DISPLAY_NAME
+| String
+| Display name for the plugin handler.  This will be shown to the end users as
+the type of their datasets.
 
 | :exclamation:
 | PLUGIN_HANDLER_<NAME>_VERSION
