@@ -16,6 +16,7 @@ SELECT
 , d.type_version
 , d.owner_id
 , d.is_deleted
+, d.origin
 , d.created
 , md.name
 , md.summary
@@ -47,6 +48,7 @@ internal fun Connection.selectNonPrivateDatasets(): List<DatasetRecord> {
           created      = getDateTime("created"),
           importStatus = getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
           visibility   = VDIDatasetVisibility.fromString(getString("visibility")),
+          origin       = getString("origin"),
           name         = getString("name"),
           summary      = getString("summary"),
           description  = getString("description"),

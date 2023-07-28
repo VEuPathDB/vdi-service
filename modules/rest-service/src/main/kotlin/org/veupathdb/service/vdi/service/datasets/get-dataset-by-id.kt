@@ -45,6 +45,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.summary        = dataset.summary
     out.description    = dataset.description
     out.importMessages = importMessages
+    out.origin         = dataset.origin
     out.status         = DatasetStatusInfo(dataset.importStatus, statuses)
     out.shares         = ArrayList(shares.size)
     out.visibility     = DatasetVisibility(dataset.visibility)

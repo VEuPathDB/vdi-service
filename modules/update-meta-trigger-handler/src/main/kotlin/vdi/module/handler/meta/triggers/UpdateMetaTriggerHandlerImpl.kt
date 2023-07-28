@@ -283,17 +283,20 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
   }
 
   private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
+    val dataset = selectDataset(datasetID)
+
     openTransaction().use {
 
       // Insert a new dataset record
       it.tryInsertDataset(DatasetImpl(
-        datasetID   = datasetID,
-        typeName    = meta.type.name,
-        typeVersion = meta.type.version,
-        ownerID     = meta.owner,
-        isDeleted   = false,
-        created     = OffsetDateTime.now(),
-        DatasetImportStatus.Queued
+        datasetID    = datasetID,
+        typeName     = meta.type.name,
+        typeVersion  = meta.type.version,
+        ownerID      = meta.owner,
+        isDeleted    = false,
+        origin       = meta.origin,
+        created      = OffsetDateTime.now(),
+        importStatus = DatasetImportStatus.Queued
       ))
 
       // insert metadata for the dataset

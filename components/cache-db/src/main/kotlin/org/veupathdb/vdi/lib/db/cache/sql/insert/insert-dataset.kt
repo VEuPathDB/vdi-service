@@ -17,10 +17,11 @@ INSERT INTO
   , type_version
   , owner_id
   , is_deleted
+  , origin
   , created
   )
 VALUES
-  (?, ?, ?, ?, ?, ?)
+  (?, ?, ?, ?, ?, ?, ?)
 ON CONFLICT (dataset_id)
   DO NOTHING
 """
@@ -31,6 +32,7 @@ internal fun Connection.tryInsertDatasetRecord(
   typeVersion: String,
   ownerID:     UserID,
   isDeleted:   Boolean,
+  origin:      String,
   created:     OffsetDateTime,
 ) =
   preparedUpdate(SQL) {
@@ -39,5 +41,6 @@ internal fun Connection.tryInsertDatasetRecord(
     setString(3, typeVersion)
     setUserID(4, ownerID)
     setBoolean(5, isDeleted)
-    setObject(6, created)
+    setString(6, origin)
+    setObject(7, created)
   }

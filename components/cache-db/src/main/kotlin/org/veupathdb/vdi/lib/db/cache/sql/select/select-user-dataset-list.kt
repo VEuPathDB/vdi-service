@@ -24,6 +24,7 @@ SELECT
 , d.type_version
 , d.owner_id
 , d.is_deleted
+, d.origin
 , d.created
 , md.name
 , md.summary
@@ -167,6 +168,7 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
           created      = it.getDateTime("created"),
           importStatus = it.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
           visibility   = VDIDatasetVisibility.fromString(it.getString("visibility")),
+          origin       = it.getString("origin"),
           name         = it.getString("name"),
           summary      = it.getString("summary"),
           description  = it.getString("description"),

@@ -13,6 +13,7 @@ data class DatasetRecordImpl(
   override val isDeleted: Boolean,
   override val created: OffsetDateTime,
   override val importStatus: DatasetImportStatus,
+  override val origin: String,
   override val visibility: VDIDatasetVisibility,
   override val name: String,
   override val summary: String?,
