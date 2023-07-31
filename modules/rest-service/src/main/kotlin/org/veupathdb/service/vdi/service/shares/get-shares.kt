@@ -6,6 +6,7 @@ import org.veupathdb.service.vdi.model.ShareFilterStatus
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShareListEntry
+import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 /**
  * Looks up share information for the target recipient user where the share
@@ -45,12 +46,18 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
 
   val owners = AccountDB.lookupUserDetails(ownerIDs)
 
-  return shares.map { ShareOfferEntry(
-    datasetID          = it.datasetID,
-    shareStatus        = ShareFilterStatus.Open,
-    datasetTypeName    = it.typeName,
-    datasetTypeVersion = it.typeVersion,
-    owner              = owners[it.ownerID] ?: throw IllegalStateException("unknown dataset owner ${it.ownerID}"),
-    projectIDs         = it.projects
-  ) }
+  return shares.map {
+    val typeDisplayName = PluginHandlers[it.typeName, it.typeVersion]?.displayName
+      ?: throw IllegalStateException("unregistered dataset type: ${it.typeName}:${it.typeVersion}")
+
+    ShareOfferEntry(
+      datasetID              = it.datasetID,
+      shareStatus            = ShareFilterStatus.Open,
+      datasetTypeName        = it.typeName,
+      datasetTypeVersion     = it.typeVersion,
+      datasetTypeDisplayName = typeDisplayName,
+      owner                  = owners[it.ownerID] ?: throw IllegalStateException("unknown dataset owner ${it.ownerID}"),
+      projectIDs             = it.projects
+    )
+  }
 }

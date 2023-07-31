@@ -11,6 +11,8 @@ import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
+import org.veupathdb.vdi.lib.handler.mapping.PluginHandler
+import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
   return fetchDatasetList(CacheDB.selectDatasetList(query))
@@ -65,6 +67,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
     // (DatasetListEntry) and add it to the result list.
     results.add(it.toListEntry(
       userDetails[it.ownerID] ?: throw IllegalStateException("missing user details for user id ${it.ownerID}"),
+      PluginHandlers[it.typeName, it.typeVersion]?.displayName ?: throw IllegalStateException("missing plugin ${it.typeName}:${it.typeVersion}"),
       datasetInstallStatusMap[it.datasetID] ?: emptyMap()
     ))
   }
@@ -74,11 +77,12 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
 
 private fun DatasetRecord.toListEntry(
   owner: UserDetails,
+  pluginDisplayName: String,
   statuses: Map<ProjectID, InstallStatuses>
 ) = DatasetListEntryImpl().also { out ->
   out.datasetID   = datasetID.toString()
   out.owner       = DatasetOwner(owner)
-  out.datasetType = DatasetTypeInfo(this)
+  out.datasetType = DatasetTypeInfo(this, pluginDisplayName)
   out.name        = name
   out.summary     = summary
   out.description = description

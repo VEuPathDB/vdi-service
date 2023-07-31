@@ -35,7 +35,7 @@ object PluginHandlers {
    * @return The [PluginHandler] for the given dataset type, or `null` if no
    * such [PluginHandler] exists.
    */
-  fun get(type: String, version: String): PluginHandler? =
+  operator fun get(type: String, version: String): PluginHandler? =
     mapping[NameVersionPair(type.lowercase(), version)]
 
   internal fun init(env: Environment) {
