@@ -57,8 +57,8 @@ object PluginHandlers {
 
   private fun parseEnvKeyName(key: String): String? {
     return when {
-      key.endsWith(EnvKey.Handlers.NameSuffix)        -> substringEnvKeyName(key, EnvKey.Handlers.NameSuffix)
       key.endsWith(EnvKey.Handlers.DisplayNameSuffix) -> substringEnvKeyName(key, EnvKey.Handlers.DisplayNameSuffix)
+      key.endsWith(EnvKey.Handlers.NameSuffix)        -> substringEnvKeyName(key, EnvKey.Handlers.NameSuffix)
       key.endsWith(EnvKey.Handlers.AddressSuffix)     -> substringEnvKeyName(key, EnvKey.Handlers.AddressSuffix)
       key.endsWith(EnvKey.Handlers.ProjectIDsSuffix)  -> substringEnvKeyName(key, EnvKey.Handlers.ProjectIDsSuffix)
       key.endsWith(EnvKey.Handlers.VersionSuffix)     -> substringEnvKeyName(key, EnvKey.Handlers.VersionSuffix)
