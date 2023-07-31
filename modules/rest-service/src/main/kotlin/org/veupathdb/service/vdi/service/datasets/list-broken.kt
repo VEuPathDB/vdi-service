@@ -11,6 +11,7 @@ import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 /**
  * Lists datasets across all registered projects that are in the broken install
@@ -108,5 +109,11 @@ private fun DatasetRecord.toDetails(
     out.status      = DatasetStatusInfo(DatasetImportStatus.Complete, statuses)
   }
 
-private fun DatasetRecord.getTypeInfo() =
-  DatasetTypeInfo(typeName, typeVersion)
+private fun DatasetRecord.getTypeInfo(): DatasetTypeInfo {
+  return DatasetTypeInfo(
+    typeName,
+    typeVersion,
+    PluginHandlers[typeName, typeVersion]?.displayName
+      ?: throw IllegalStateException("plugin type missing: ${typeName}:${typeVersion}")
+  )
+}

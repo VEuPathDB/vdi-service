@@ -5,6 +5,7 @@ import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
 
 internal class PluginHandlerImpl(
   override val type: String,
+  override val displayName: String,
   override val client: PluginHandlerClient,
   private val projects: Set<ProjectID>
 ) : PluginHandler {

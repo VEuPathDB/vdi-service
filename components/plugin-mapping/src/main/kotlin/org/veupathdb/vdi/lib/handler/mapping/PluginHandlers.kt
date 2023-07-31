@@ -35,7 +35,7 @@ object PluginHandlers {
    * @return The [PluginHandler] for the given dataset type, or `null` if no
    * such [PluginHandler] exists.
    */
-  fun get(type: String, version: String): PluginHandler? =
+  operator fun get(type: String, version: String): PluginHandler? =
     mapping[NameVersionPair(type.lowercase(), version)]
 
   internal fun init(env: Environment) {
@@ -57,11 +57,12 @@ object PluginHandlers {
 
   private fun parseEnvKeyName(key: String): String? {
     return when {
-      key.endsWith(EnvKey.Handlers.NameSuffix)       -> substringEnvKeyName(key, EnvKey.Handlers.NameSuffix)
-      key.endsWith(EnvKey.Handlers.AddressSuffix)    -> substringEnvKeyName(key, EnvKey.Handlers.AddressSuffix)
-      key.endsWith(EnvKey.Handlers.ProjectIDsSuffix) -> substringEnvKeyName(key, EnvKey.Handlers.ProjectIDsSuffix)
-      key.endsWith(EnvKey.Handlers.VersionSuffix)    -> substringEnvKeyName(key, EnvKey.Handlers.VersionSuffix)
-      else                                           -> null
+      key.endsWith(EnvKey.Handlers.DisplayNameSuffix) -> substringEnvKeyName(key, EnvKey.Handlers.DisplayNameSuffix)
+      key.endsWith(EnvKey.Handlers.NameSuffix)        -> substringEnvKeyName(key, EnvKey.Handlers.NameSuffix)
+      key.endsWith(EnvKey.Handlers.AddressSuffix)     -> substringEnvKeyName(key, EnvKey.Handlers.AddressSuffix)
+      key.endsWith(EnvKey.Handlers.ProjectIDsSuffix)  -> substringEnvKeyName(key, EnvKey.Handlers.ProjectIDsSuffix)
+      key.endsWith(EnvKey.Handlers.VersionSuffix)     -> substringEnvKeyName(key, EnvKey.Handlers.VersionSuffix)
+      else                                            -> null
     }
   }
 
@@ -71,12 +72,14 @@ object PluginHandlers {
 
   private fun parseEnvironmentChunk(env: Environment, key: String) {
     val name     = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.NameSuffix).lowercase()
+    val dispName = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.DisplayNameSuffix)
     val address  = env.reqHostAddress(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.AddressSuffix)
     val version  = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.VersionSuffix)
     val projects = env.optSet(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.ProjectIDsSuffix) ?: emptySet()
 
     mapping[NameVersionPair(name, version)] = PluginHandlerImpl(
       name,
+      dispName,
       PluginHandlerClient(PluginHandlerClientConfig(address)),
       projects
     )

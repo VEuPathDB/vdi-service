@@ -16,6 +16,11 @@ interface PluginHandler {
   val type: String
 
   /**
+   * Display name of the type of dataset that this plugin handler handles.
+   */
+  val displayName: String
+
+  /**
    * The plugin handler API client for connecting to and performing actions on
    * the target plugin handler service.
    */
