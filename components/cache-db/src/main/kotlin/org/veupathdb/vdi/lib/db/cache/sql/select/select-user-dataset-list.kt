@@ -29,6 +29,7 @@ SELECT
 , md.name
 , md.summary
 , md.description
+, md.visibility
 , array(SELECT f.file_name FROM vdi.dataset_files AS f WHERE f.dataset_id = d.dataset_id) AS files
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id) AS projects
 , ic.status
