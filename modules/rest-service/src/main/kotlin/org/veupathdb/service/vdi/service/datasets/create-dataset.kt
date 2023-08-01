@@ -17,7 +17,6 @@ import org.veupathdb.vdi.lib.common.compression.ZipType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
-import org.veupathdb.vdi.lib.common.fs.useThenDelete
 import org.veupathdb.vdi.lib.common.model.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import java.net.URL
