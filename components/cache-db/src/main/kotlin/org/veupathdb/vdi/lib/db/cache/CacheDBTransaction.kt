@@ -39,18 +39,6 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
   }
 
   /**
-   * Deletes all entries in the `vdi.dataset_files` table for a target dataset
-   * identified by the given [DatasetID].
-   *
-   * @param datasetID ID of the target dataset whose `vdi.dataset_files` records
-   * should be deleted.
-   */
-  fun deleteDatasetFiles(datasetID: DatasetID) {
-    log.debug("deleting dataset file records for dataset {}", datasetID)
-    con.deleteDatasetFiles(datasetID)
-  }
-
-  /**
    * Deletes the `vdi.dataset_metadata` table entry for a target dataset
    * identified by the given [DatasetID].
    *
@@ -166,20 +154,6 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
   fun tryInsertDatasetMeta(row: DatasetMeta) {
     log.debug("inserting metadata for dataset {}", row.datasetID)
     con.tryInsertDatasetMeta(row.datasetID, row.visibility, row.name, row.summary, row.description, row.sourceURL)
-  }
-
-  /**
-   * Attempts to insert dataset-to-filename links for a target dataset, aborting
-   * any conflicting inserts silently if they exist.
-   *
-   * @param datasetID ID of the target dataset for which project link records
-   * should be inserted.
-   *
-   * @param files Collection of file names to insert for the target dataset.
-   */
-  fun tryInsertDatasetFiles(datasetID: DatasetID, files: Collection<String>) {
-    log.debug("inserting file links for dataset {}", datasetID)
-    con.tryInsertDatasetFiles(datasetID, files)
   }
 
   /**

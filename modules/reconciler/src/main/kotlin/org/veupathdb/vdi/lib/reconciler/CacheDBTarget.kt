@@ -21,7 +21,6 @@ class CacheDBTarget : ReconcilerTarget {
         transaction.deleteDatasetShareOffers(datasetID)
         transaction.deleteDatasetMetadata(datasetID)
         transaction.deleteDatasetProjects(datasetID)
-        transaction.deleteDatasetFiles(datasetID)
         transaction.deleteDataset(datasetID)
         transaction.deleteSyncControl(datasetID)
         transaction.deleteImportControl(datasetID)

@@ -31,7 +31,6 @@ SELECT
 , md.description
 , md.visibility
 , md.source_url
-, array(SELECT f.file_name FROM vdi.dataset_files AS f WHERE f.dataset_id = d.dataset_id) AS files
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id) AS projects
 , ic.status
 FROM
@@ -175,7 +174,6 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
           summary      = it.getString("summary"),
           description  = it.getString("description"),
           sourceURL    = it.getString("source_url"),
-          files        = it.getStringList("files"),
           projects     = it.getProjectIDList("projects"),
         )
       }
