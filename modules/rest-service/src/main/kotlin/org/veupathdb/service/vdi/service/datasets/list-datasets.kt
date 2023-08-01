@@ -90,4 +90,5 @@ private fun DatasetRecord.toListEntry(
   out.visibility  = DatasetVisibility(visibility)
   out.status      = DatasetStatusInfo(importStatus, statuses)
   out.origin      = origin
+  out.sourceUrl   = sourceURL
 }

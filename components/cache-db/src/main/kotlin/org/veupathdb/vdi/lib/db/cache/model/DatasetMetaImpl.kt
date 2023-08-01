@@ -8,5 +8,6 @@ data class DatasetMetaImpl(
   override val visibility: VDIDatasetVisibility,
   override val name: String,
   override val summary: String?,
-  override val description: String?
+  override val description: String?,
+  override val sourceURL: String?,
 ) : DatasetMeta

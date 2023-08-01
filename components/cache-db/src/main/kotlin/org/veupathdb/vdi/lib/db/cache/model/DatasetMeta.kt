@@ -9,4 +9,5 @@ interface DatasetMeta {
   val name: String
   val summary: String?
   val description: String?
+  val sourceURL: String?
 }

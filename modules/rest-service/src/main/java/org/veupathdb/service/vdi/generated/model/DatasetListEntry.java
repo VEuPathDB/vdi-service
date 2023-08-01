@@ -50,6 +50,12 @@ public interface DatasetListEntry {
   @JsonProperty("description")
   void setDescription(String description);
 
+  @JsonProperty("sourceUrl")
+  String getSourceUrl();
+
+  @JsonProperty("sourceUrl")
+  void setSourceUrl(String sourceUrl);
+
   @JsonProperty("origin")
   String getOrigin();
 

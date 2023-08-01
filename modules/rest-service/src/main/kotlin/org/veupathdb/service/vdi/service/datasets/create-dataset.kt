@@ -84,6 +84,7 @@ private fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
     description  = meta.description,
     visibility   = meta.visibility?.toInternalVisibility() ?: VDIDatasetVisibility.Private,
     origin       = meta.origin,
+    sourceURL    = url,
     dependencies = (meta.dependencies ?: emptyList()).map {
       VDIDatasetDependencyImpl(
         identifier  = it.resourceIdentifier,

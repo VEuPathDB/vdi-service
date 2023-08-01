@@ -15,9 +15,10 @@ INSERT INTO
   , name
   , summary
   , description
+  , source_url
   )
 VALUES
-  (?, ?, ?, ?, ?)
+  (?, ?, ?, ?, ?, ?)
 ON CONFLICT (dataset_id)
   DO NOTHING
 """
@@ -28,6 +29,7 @@ internal fun Connection.tryInsertDatasetMeta(
   name:        String,
   summary:     String?,
   description: String?,
+  sourceURL:   String?,
 ) =
   preparedUpdate(SQL) {
     setDatasetID(1, datasetID)
@@ -35,4 +37,5 @@ internal fun Connection.tryInsertDatasetMeta(
     setString(3, name)
     setString(4, summary)
     setString(5, description)
+    setString(6, sourceURL)
   }

@@ -165,7 +165,7 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
    */
   fun tryInsertDatasetMeta(row: DatasetMeta) {
     log.debug("inserting metadata for dataset {}", row.datasetID)
-    con.tryInsertDatasetMeta(row.datasetID, row.visibility, row.name, row.summary, row.description)
+    con.tryInsertDatasetMeta(row.datasetID, row.visibility, row.name, row.summary, row.description, row.sourceURL)
   }
 
   /**
