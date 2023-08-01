@@ -140,6 +140,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
           name        = datasetMeta.name,
           summary     = datasetMeta.summary,
           description = datasetMeta.description,
+          sourceURL   = datasetMeta.sourceURL,
         ))
 
         // 2. Update meta timestamp
@@ -306,6 +307,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
         name        = meta.name,
         summary     = meta.summary,
         description = meta.description,
+        sourceURL   = meta.sourceURL,
       ))
 
       // Insert an import control record for the dataset

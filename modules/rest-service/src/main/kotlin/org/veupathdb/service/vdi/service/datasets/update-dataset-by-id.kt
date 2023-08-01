@@ -42,6 +42,7 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
       description  = if (patch.description?.isBlank() == true) null else patch.description ?: meta.description,
       origin       = meta.origin,
       dependencies = meta.dependencies,
+      sourceURL    = meta.sourceURL,
     )
   )
 }

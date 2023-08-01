@@ -279,6 +279,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
           name        = meta.name,
           summary     = meta.summary,
           description = meta.description,
+          sourceURL   = meta.sourceURL,
         ))
 
         // Insert an import control record for the dataset

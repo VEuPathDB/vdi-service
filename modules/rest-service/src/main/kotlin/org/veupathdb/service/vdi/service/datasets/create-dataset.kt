@@ -27,6 +27,7 @@ import kotlin.math.max
 
 private val log = LoggerFactory.getLogger("create-dataset.kt")
 
+@OptIn(ExperimentalPathApi::class)
 fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostRequest) {
   log.trace("createDataset(userID={}, datasetID={}, entity={})", userID, datasetID, entity)
 
@@ -43,15 +44,19 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
   // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
   TempFiles.withTempDirectory { directory ->
     TempFiles.withTempPath { archive ->
-      entity.getDatasetFile()
-        .useThenDelete { rawUpload ->
-          verifyFileSize(rawUpload, userID)
+      val paths = entity.getDatasetFile()
 
-          rawUpload.repack(into = archive, using = directory)
+      try {
+        verifyFileSize(paths.second, userID)
 
-          log.debug("uploading raw user data to S3 for new dataset {} by user {}", datasetID, userID)
-          DatasetStore.putUserUpload(userID, datasetID, archive::inputStream)
-        }
+        paths.second.repack(into = archive, using = directory)
+
+        log.debug("uploading raw user data to S3 for new dataset {} by user {}", datasetID, userID)
+        DatasetStore.putUserUpload(userID, datasetID, archive::inputStream)
+      } finally {
+        paths.second.deleteIfExists()
+        paths.first?.deleteRecursively()
+      }
     }
   }
 
@@ -146,15 +151,21 @@ private fun Path.repack(into: Path, using: Path) {
   }
 }
 
-private fun DatasetPostRequest.getDatasetFile(): Path =
+@OptIn(ExperimentalPathApi::class)
+private fun DatasetPostRequest.getDatasetFile(): Pair<Path?, Path> =
   if (file != null) {
     // If the user uploaded a file, then use that
-    file.toPath()
+    null to file.toPath()
   } else {
     // If the user gave us a URL then we have to download the contents of that
     // URL to a local file to be uploaded.   This is done to catch errors with
     // the URL or transfer before we start uploading to the dataset store.
-    val path = TempFiles.makeTempPath()
+    val fileName = url.substring(url.lastIndexOf('/') + 1)
+
+    if (fileName.isBlank())
+      throw BadRequestException("could not determine file name or type from the given URL")
+
+    val paths = TempFiles.makeTempPath(fileName)
 
     // Try to construct a URL instance (validating that the URL is sane)
     val url = try { URL(url) }
@@ -170,14 +181,15 @@ private fun DatasetPostRequest.getDatasetFile(): Path =
       BoundedInputStream(JaxRSMultipartUpload.maxFileUploadSize, connection.getInputStream()) {
         BadRequestException("given source file URL pointed to a file that exceeded the max allowed upload size of ${JaxRSMultipartUpload.maxFileUploadSize} bytes.")
       }
-        .use { inp -> path.outputStream().use { out -> inp.transferTo(out) } }
+        .use { inp -> paths.second.outputStream().use { out -> inp.transferTo(out) } }
     } catch (e: Throwable) {
       log.error("failed to download file from target URL", e)
-      path.deleteIfExists()
+      paths.second.deleteIfExists()
+      paths.first.deleteRecursively()
       throw InternalServerErrorException("error occurred while attempting to download source file from the given URL")
     }
 
-    path
+    paths
   }
 
 private fun Path.validateZip() {
