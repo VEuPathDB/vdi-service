@@ -5,18 +5,22 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.app.model.DatasetVisibilityRecord
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 SELECT
   user_id
 FROM
-  vdi.dataset_visibility
+  ${schema}.dataset_visibility
 WHERE
   dataset_id = ?
 """
 
-internal fun Connection.selectDatasetVisibilityRecords(datasetID: DatasetID): List<DatasetVisibilityRecord> =
-  prepareStatement(SQL).use { ps ->
+internal fun Connection.selectDatasetVisibilityRecords(
+  schema: String,
+  datasetID: DatasetID
+): List<DatasetVisibilityRecord> =
+  prepareStatement(sql(schema)).use { ps ->
     ps.setString(1, datasetID.toString())
     ps.executeQuery().use { rs ->
       val out = ArrayList<DatasetVisibilityRecord>()

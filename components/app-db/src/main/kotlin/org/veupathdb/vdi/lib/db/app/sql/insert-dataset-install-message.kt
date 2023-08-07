@@ -3,10 +3,11 @@ package org.veupathdb.vdi.lib.db.app.sql
 import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 INSERT INTO
-  vdi.dataset_install_message (
+  ${schema}.dataset_install_message (
     dataset_id
   , install_type
   , status
@@ -16,8 +17,8 @@ VALUES
   (?, ?, ?, ?)
 """
 
-internal fun Connection.insertDatasetInstallMessage(message: DatasetInstallMessage) {
-  prepareStatement(SQL)
+internal fun Connection.insertDatasetInstallMessage(schema: String, message: DatasetInstallMessage) {
+  prepareStatement(sql(schema))
     .use { ps ->
       ps.setString(1, message.datasetID.toString())
       ps.setString(2, message.installType.value)

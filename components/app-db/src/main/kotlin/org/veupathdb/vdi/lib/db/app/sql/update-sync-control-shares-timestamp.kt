@@ -4,18 +4,23 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import java.sql.Connection
 import java.time.OffsetDateTime
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 UPDATE
-  vdi.sync_control
+  ${schema}.sync_control
 SET
   shares_update_time = ?
 WHERE
   dataset_id = ?
 """
 
-internal fun Connection.updateSyncControlSharesTimestamp(datasetID: DatasetID, timestamp: OffsetDateTime) {
-  prepareStatement(SQL)
+internal fun Connection.updateSyncControlSharesTimestamp(
+  schema: String,
+  datasetID: DatasetID,
+  timestamp: OffsetDateTime
+) {
+  prepareStatement(sql(schema))
     .use { ps ->
       ps.setObject(1, timestamp)
       ps.setString(2, datasetID.toString())

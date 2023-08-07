@@ -19,8 +19,8 @@ object AppDB {
     for ((projectID, datasetIDs) in targets) {
       val ds = AppDatabaseRegistry.require(projectID)
 
-      ds.connection.use { con ->
-        con.selectInstallStatuses(datasetIDs)
+      ds.source.connection.use { con ->
+        con.selectInstallStatuses(ds.ctlSchema, datasetIDs)
           .forEach { (datasetID, statuses) ->
             result.computeIfAbsent(datasetID) { HashMap() } [projectID] = statuses
           }
@@ -38,17 +38,19 @@ object AppDB {
     for (projectID in projects) {
       val ds = AppDatabaseRegistry.require(projectID)
 
-      ds.connection.use { con -> out[projectID] = con.selectInstallStatuses(target) }
+      ds.source.connection.use { con -> out[projectID] = con.selectInstallStatuses(ds.ctlSchema, target) }
     }
 
     return out
   }
 
   fun accessor(key: ProjectID): AppDBAccessor =
-    AppDBAccessorImpl(AppDatabaseRegistry.require(key))
+    AppDatabaseRegistry.require(key)
+      .let { AppDBAccessorImpl(it.ctlSchema, it.source) }
 
   fun transaction(key: ProjectID): AppDBTransaction =
-    AppDBTransactionImpl(AppDatabaseRegistry.require(key).connection.also { it.autoCommit = false })
+    AppDatabaseRegistry.require(key)
+      .let { ds -> AppDBTransactionImpl(ds.ctlSchema, ds.source.connection.also { it.autoCommit = false }) }
 
   /**
    * Executes the given function ([fn]) in the context of a database

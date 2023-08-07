@@ -4,18 +4,19 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.db.app.model.DatasetProjectLinkRecord
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 SELECT
   project_id
 FROM
-  vdi.dataset_project
+  ${schema}.dataset_project
 WHERE
   dataset_id = ?
 """
 
-internal fun Connection.selectDatasetProjectLinks(datasetID: DatasetID): List<DatasetProjectLinkRecord> =
-  prepareStatement(SQL)
+internal fun Connection.selectDatasetProjectLinks(schema: String, datasetID: DatasetID): List<DatasetProjectLinkRecord> =
+  prepareStatement(sql(schema))
     .use { ps ->
       ps.setString(1, datasetID.toString())
       ps.executeQuery()

@@ -5,8 +5,9 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 SELECT 
   dataset_id
 , owner
@@ -14,13 +15,13 @@ SELECT
 , type_version
 , is_deleted
 FROM
-  vdi.dataset
+  ${schema}.dataset
 WHERE
   dataset_id = ?
 """
 
-internal fun Connection.selectDataset(datasetID: DatasetID): DatasetRecord? {
-  prepareStatement(SQL).use { ps ->
+internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): DatasetRecord? {
+  prepareStatement(sql(schema)).use { ps ->
     ps.setString(1, datasetID.toString())
     ps.executeQuery().use { rs ->
       if (!rs.next())

@@ -20,7 +20,7 @@ object AppDatabaseRegistry {
 
   operator fun contains(key: String): Boolean = dataSources.containsKey(key)
 
-  operator fun get(key: String): DataSource? = dataSources[key]?.source
+  operator fun get(key: String): AppDBRegistryEntry? = dataSources[key]
 
   operator fun iterator() =
     dataSources.entries
@@ -28,7 +28,7 @@ object AppDatabaseRegistry {
       .map { (key, value) -> key to value }
       .iterator()
 
-  fun require(key: String): DataSource =
+  fun require(key: String): AppDBRegistryEntry =
     get(key) ?: throw IllegalStateException("required AppDB connection $key was not registered with AppDatabases")
 
   internal fun init(env: Environment) {
@@ -52,16 +52,20 @@ object AppDatabaseRegistry {
     key.startsWith(EnvKey.AppDB.DBLDAPPrefix) ||
     key.startsWith(EnvKey.AppDB.DBUserPrefix) ||
     key.startsWith(EnvKey.AppDB.DBPassPrefix) ||
-    key.startsWith(EnvKey.AppDB.DBPoolPrefix)
+    key.startsWith(EnvKey.AppDB.DBPoolPrefix) ||
+    key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix) ||
+    key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix)
 
   private fun getEnvName(key: String) =
     when {
-      key.startsWith(EnvKey.AppDB.DBNamePrefix) -> getEnvName(EnvKey.AppDB.DBNamePrefix, key)
-      key.startsWith(EnvKey.AppDB.DBLDAPPrefix) -> getEnvName(EnvKey.AppDB.DBLDAPPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBUserPrefix) -> getEnvName(EnvKey.AppDB.DBUserPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBPassPrefix) -> getEnvName(EnvKey.AppDB.DBPassPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBPoolPrefix) -> getEnvName(EnvKey.AppDB.DBPoolPrefix, key)
-      else                                      -> null
+      key.startsWith(EnvKey.AppDB.DBNamePrefix)          -> getEnvName(EnvKey.AppDB.DBNamePrefix, key)
+      key.startsWith(EnvKey.AppDB.DBLDAPPrefix)          -> getEnvName(EnvKey.AppDB.DBLDAPPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBUserPrefix)          -> getEnvName(EnvKey.AppDB.DBUserPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBPassPrefix)          -> getEnvName(EnvKey.AppDB.DBPassPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBPoolPrefix)          -> getEnvName(EnvKey.AppDB.DBPoolPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix)    -> getEnvName(EnvKey.AppDB.DBDataSchemaPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix) -> getEnvName(EnvKey.AppDB.DBControlSchemaPrefix, key)
+      else                                               -> null
     }
 
   @Suppress("NOTHING_TO_INLINE")
@@ -74,6 +78,8 @@ object AppDatabaseRegistry {
     val user = env.require(EnvKey.AppDB.DBUserPrefix + key)
     val pass = env.require(EnvKey.AppDB.DBPassPrefix + key)
     val pool = env.reqUByte(EnvKey.AppDB.DBPoolPrefix + key)
+    val ctls = env.require(EnvKey.AppDB.DBControlSchemaPrefix + key)
+    val data = env.require(EnvKey.AppDB.DBDataSchemaPrefix + key)
 
     log.debug("looking up LDAP record for database {}", name)
 
@@ -95,7 +101,7 @@ object AppDatabaseRegistry {
       throw IllegalStateException("error encountered while attempting to create a JDBC connection to ${desc.serviceName}", e)
     }
 
-    dataSources[name] = AppDBRegistryEntry(name, desc.host, desc.port, ds)
+    dataSources[name] = AppDBRegistryEntry(name, desc.host, desc.port, ds, data, ctls)
   }
 
   private fun makeJDBCOracleConnectionString(host: String, port: UShort, name: String) =

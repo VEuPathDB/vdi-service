@@ -5,20 +5,21 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import java.sql.Connection
 import java.time.OffsetDateTime
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 SELECT
   shares_update_time
 , data_update_time
 , meta_update_time
 FROM
-  vdi.sync_control
+  ${schema}.sync_control
 WHERE
   dataset_id = ?
 """
 
-internal fun Connection.selectSyncControl(datasetID: DatasetID): VDISyncControlRecord? {
-  prepareStatement(SQL).use { ps ->
+internal fun Connection.selectSyncControl(schema: String, datasetID: DatasetID): VDISyncControlRecord? {
+  prepareStatement(sql(schema)).use { ps ->
     ps.setString(1, datasetID.toString())
 
     ps.executeQuery().use { rs ->
