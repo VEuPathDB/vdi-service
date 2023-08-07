@@ -19,6 +19,5 @@ data class DatasetRecordImpl(
   override val summary: String?,
   override val description: String?,
   override val sourceURL: String?,
-  override val files: Collection<String>,
   override val projects: Collection<String>
 ) : DatasetRecord

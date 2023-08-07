@@ -29,7 +29,6 @@ SELECT
 , dm.description
 , dm.visibility
 , dm.source_url
-, array(SELECT f.file_name FROM vdi.dataset_files AS f WHERE f.dataset_id = vd.dataset_id) AS files
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = vd.dataset_id) AS projects
 , ic.status
 FROM
@@ -82,7 +81,6 @@ internal fun Connection.selectDatasetForUser(userID: UserID, datasetID: DatasetI
           getString("summary"),
           getString("description"),
           getString("source_url"),
-          getStringList("files"),
           getProjectIDList("projects"),
         )
     }
