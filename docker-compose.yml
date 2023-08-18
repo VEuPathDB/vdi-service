@@ -75,7 +75,7 @@ services:
       # User DB connection details
       USER_DB_TNS_NAME: ${USER_DB_TNS_NAME:?}
       USER_DB_USER: ${USER_DB_USER:?}
-      USER_DB_PASS: ${USER_DB_PASSWORD:?}
+      USER_DB_PASS: ${USER_DB_PASS:?}
       USER_DB_POOL_SIZE: ${USER_DB_POOL_SIZE:-5}
 
       # Dataset Reinstaller
