@@ -4,17 +4,18 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 DELETE FROM
-  vdi.dataset_project
+  ${schema}.dataset_project
 WHERE
   dataset_id = ?
   AND project_id = ?
 """
 
-internal fun Connection.deleteDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID): Int =
-  prepareStatement(SQL)
+internal fun Connection.deleteDatasetProjectLink(schema: String, datasetID: DatasetID, projectID: ProjectID): Int =
+  prepareStatement(sql(schema))
     .use { ps ->
       ps.setString(1, datasetID.toString())
       ps.setString(2, projectID)

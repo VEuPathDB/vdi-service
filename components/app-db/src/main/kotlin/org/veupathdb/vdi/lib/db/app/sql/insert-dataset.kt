@@ -3,10 +3,11 @@ package org.veupathdb.vdi.lib.db.app.sql
 import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 INSERT INTO
-  vdi.dataset (
+  ${schema}.dataset (
     dataset_id
   , owner
   , type_name
@@ -17,8 +18,8 @@ VALUES
   (?, ?, ?, ?, ?)
 """
 
-internal fun Connection.insertDataset(dataset: DatasetRecord) {
-  prepareStatement(SQL)
+internal fun Connection.insertDataset(schema: String, dataset: DatasetRecord) {
+  prepareStatement(sql(schema))
     .use { ps ->
       ps.setString(1, dataset.datasetID.toString())
       ps.setLong(2, dataset.owner.toLong())

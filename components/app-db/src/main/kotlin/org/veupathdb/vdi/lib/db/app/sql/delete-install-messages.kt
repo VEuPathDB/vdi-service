@@ -3,16 +3,17 @@ package org.veupathdb.vdi.lib.db.app.sql
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 DELETE FROM
-  vdi.dataset_install_message
+  ${schema}.dataset_install_message
 WHERE
   dataset_id = ?
 """
 
-internal fun Connection.deleteInstallMessages(datasetID: DatasetID): Int =
-  prepareStatement(SQL)
+internal fun Connection.deleteInstallMessages(schema: String, datasetID: DatasetID): Int =
+  prepareStatement(sql(schema))
     .use { ps ->
       ps.setString(1, datasetID.toString())
       ps.executeUpdate()

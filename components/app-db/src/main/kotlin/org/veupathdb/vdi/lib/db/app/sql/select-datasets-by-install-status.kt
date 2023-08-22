@@ -7,8 +7,9 @@ import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 SELECT 
   ds.dataset_id
 , ds.owner
@@ -16,8 +17,8 @@ SELECT
 , ds.type_version
 , ds.is_deleted
 FROM
-  vdi.dataset ds
-  INNER JOIN vdi.dataset_install_message dsim
+  ${schema}.dataset ds
+  INNER JOIN ${schema}.dataset_install_message dsim
     ON ds.dataset_id = dsim.dataset_id
 WHERE
   dsim.install_type = ?
@@ -25,10 +26,11 @@ WHERE
 """
 
 internal fun Connection.selectDatasetsByInstallStatus(
+  schema: String,
   installType: InstallType,
   installStatus: InstallStatus
 ): List<DatasetRecord> {
-  prepareStatement(SQL).use { ps ->
+  prepareStatement(sql(schema)).use { ps ->
     ps.setString(1, installType.value)
     ps.setString(2, installStatus.value)
 

@@ -3,10 +3,11 @@ package org.veupathdb.vdi.lib.db.app.sql
 import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 UPDATE
-  vdi.dataset
+  ${schema}.dataset
 SET
   owner = ?
 , type_name = ?
@@ -16,8 +17,8 @@ WHERE
   dataset_id = ?
 """
 
-internal fun Connection.updateDataset(dataset: DatasetRecord) {
-  prepareStatement(SQL)
+internal fun Connection.updateDataset(schema: String, dataset: DatasetRecord) {
+  prepareStatement(sql(schema))
     .use { ps ->
       ps.setLong(1, dataset.owner.toLong())
       ps.setString(2, dataset.typeName)

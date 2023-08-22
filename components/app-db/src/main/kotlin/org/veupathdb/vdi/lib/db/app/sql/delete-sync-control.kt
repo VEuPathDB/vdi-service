@@ -3,16 +3,17 @@ package org.veupathdb.vdi.lib.db.app.sql
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 DELETE FROM
-  vdi.sync_control
+  ${schema}.sync_control
 WHERE
   dataset_id = ?
 """
 
-internal fun Connection.deleteSyncControl(datasetID: DatasetID): Int =
-  prepareStatement(SQL)
+internal fun Connection.deleteSyncControl(schema: String, datasetID: DatasetID): Int =
+  prepareStatement(sql(schema))
     .use { ps ->
       ps.setString(1, datasetID.toString())
       ps.executeUpdate()

@@ -10,8 +10,9 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.OffsetDateTime
 
+private fun sql(schema: String) =
 // language=postgresql
-private const val SQL = """
+"""
 SELECT
   s.shares_update_time
 , s.data_update_time
@@ -20,14 +21,14 @@ SELECT
 , d.type_name
 , d.type_version
 FROM
-  vdi.sync_control s
-  INNER JOIN vdi.dataset d
+  ${schema}.sync_control s
+  INNER JOIN ${schema}.dataset d
     ON d.dataset_id = s.dataset_id
 ORDER BY CONCAT(CONCAT(d.owner,'/'), s.dataset_id)
 """
 
-internal fun Connection.selectAllSyncControl(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
-  val ps = prepareStatement(SQL)
+internal fun Connection.selectAllSyncControl(schema: String): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
+  val ps = prepareStatement(sql(schema))
   val rs = ps.executeQuery()
   return RecordIterator(rs, this, ps)
 }

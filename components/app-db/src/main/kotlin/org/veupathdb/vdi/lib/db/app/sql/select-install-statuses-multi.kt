@@ -8,15 +8,16 @@ import java.sql.Connection
 import kotlin.math.max
 import kotlin.math.min
 
+private fun sqlStatusPrefix(schema: String) =
 // language=oracle
-private const val SQL_GET_STATUSES_PREFIX = """
+"""
 SELECT
   dataset_id
 , install_type
 , status
 , message
 FROM
-  vdi.dataset_install_message
+  ${schema}.dataset_install_message
 WHERE
   dataset_id IN (
 """
@@ -26,7 +27,10 @@ private const val SQL_GET_STATUSES_SUFFIX = """
   )
 """
 
-internal fun Connection.selectInstallStatuses(datasetIDs: Collection<DatasetID>): Map<DatasetID, InstallStatuses> {
+internal fun Connection.selectInstallStatuses(
+  schema: String,
+  datasetIDs: Collection<DatasetID>
+): Map<DatasetID, InstallStatuses> {
   if (datasetIDs.isEmpty())
     return emptyMap()
 
@@ -40,7 +44,7 @@ internal fun Connection.selectInstallStatuses(datasetIDs: Collection<DatasetID>)
       break
 
     val sb = StringBuilder(2048)
-      .append(SQL_GET_STATUSES_PREFIX)
+      .append(sqlStatusPrefix(schema))
       .append("    ?")
 
     for (i in 1 until limit)

@@ -6,20 +6,24 @@ import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import java.sql.Connection
 
+private fun sql(schema: String) =
 // language=oracle
-private const val SQL = """
+"""
 SELECT
   install_type
 , status
 , message
 FROM
-  vdi.dataset_install_message
+  ${schema}.dataset_install_message
 WHERE
   dataset_id = ?
 """
 
-internal fun Connection.selectDatasetInstallMessages(datasetID: DatasetID): List<DatasetInstallMessage> {
-  prepareStatement(SQL).use { ps ->
+internal fun Connection.selectDatasetInstallMessages(
+  schema: String,
+  datasetID: DatasetID
+): List<DatasetInstallMessage> {
+  prepareStatement(sql(schema)).use { ps ->
     ps.setString(1, datasetID.toString())
 
     ps.executeQuery().use { rs ->
