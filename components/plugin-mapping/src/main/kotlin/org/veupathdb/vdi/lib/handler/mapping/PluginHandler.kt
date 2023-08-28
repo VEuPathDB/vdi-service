@@ -27,6 +27,12 @@ interface PluginHandler {
   val client: PluginHandlerClient
 
   /**
+   * Path in the plugin container to the user dataset files root directory/mount
+   * point.  User dataset files are installed to a subdirectory under this path.
+   */
+  val userFilesRoot: String
+
+  /**
    * Tests whether this [PluginHandler] instance applies to the target
    * [ProjectID].
    *
