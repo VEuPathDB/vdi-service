@@ -53,7 +53,7 @@ object AppDatabaseRegistry {
     key.startsWith(EnvKey.AppDB.DBUserPrefix) ||
     key.startsWith(EnvKey.AppDB.DBPassPrefix) ||
     key.startsWith(EnvKey.AppDB.DBPoolPrefix) ||
-    key.startsWith(EnvKey.AppDB.DBUserDataSchemaPrefix) ||
+    key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix) ||
     key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix)
 
   private fun getEnvName(key: String) =
@@ -63,7 +63,7 @@ object AppDatabaseRegistry {
       key.startsWith(EnvKey.AppDB.DBUserPrefix)           -> getEnvName(EnvKey.AppDB.DBUserPrefix, key)
       key.startsWith(EnvKey.AppDB.DBPassPrefix)           -> getEnvName(EnvKey.AppDB.DBPassPrefix, key)
       key.startsWith(EnvKey.AppDB.DBPoolPrefix)           -> getEnvName(EnvKey.AppDB.DBPoolPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBUserDataSchemaPrefix) -> getEnvName(EnvKey.AppDB.DBUserDataSchemaPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix) -> getEnvName(EnvKey.AppDB.DBDataSchemaPrefix, key)
       key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix)  -> getEnvName(EnvKey.AppDB.DBControlSchemaPrefix, key)
       else                                                -> null
     }
@@ -79,7 +79,7 @@ object AppDatabaseRegistry {
     val pass = env.require(EnvKey.AppDB.DBPassPrefix + key)
     val pool = env.reqUByte(EnvKey.AppDB.DBPoolPrefix + key)
     val ctls = env.require(EnvKey.AppDB.DBControlSchemaPrefix + key)
-    val data = env.require(EnvKey.AppDB.DBUserDataSchemaPrefix + key)
+    val data = env.require(EnvKey.AppDB.DBDataSchemaPrefix + key)
 
     log.debug("looking up LDAP record for database {}", name)
 

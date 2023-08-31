@@ -7,6 +7,6 @@ data class AppDBRegistryEntry(
   val host: String,
   val port: UShort,
   val source: DataSource,
-  val userDataSchema: String,
+  val dataSchema: String,
   val ctlSchema: String,
 )
