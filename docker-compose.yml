@@ -360,9 +360,16 @@ services:
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_EXAMPLE_WATCHTOWER:-false}"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
     environment:
       LDAP_SERVER: ${LDAP_SERVER:?}
       ORACLE_BASE_DN: ${ORACLE_BASE_DN:?}
+      CUSTOM_PATH: ${PLUGIN_HANDLER_NOOP_CUSTOM_PATH}
+      SITE_BUILD: ${SITE_BUILD:?}
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
 
       DB_CONNECTION_NAME_AMOEBA: ${DB_CONNECTION_NAME_AMOEBA:?}
       DB_CONNECTION_LDAP_AMOEBA: ${DB_CONNECTION_LDAP_AMOEBA:?}
@@ -492,9 +499,16 @@ services:
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_GENELIST_WATCHTOWER:-false}"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
     environment:
       LDAP_SERVER: ${LDAP_SERVER:?}
       ORACLE_BASE_DN: ${ORACLE_BASE_DN:?}
+      CUSTOM_PATH: ${PLUGIN_HANDLER_GENELIST_CUSTOM_PATH}
+      SITE_BUILD: ${SITE_BUILD:?}
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
 
       DB_CONNECTION_NAME_AMOEBA: ${DB_CONNECTION_NAME_AMOEBA:?}
       DB_CONNECTION_LDAP_AMOEBA: ${DB_CONNECTION_LDAP_AMOEBA:?}
@@ -624,9 +638,16 @@ services:
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_ISASIMPLE_WATCHTOWER:-false}"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
     environment:
       LDAP_SERVER: ${LDAP_SERVER:?}
       ORACLE_BASE_DN: ${ORACLE_BASE_DN:?}
+      CUSTOM_PATH: ${PLUGIN_HANDLER_ISASIMPLE_CUSTOM_PATH}
+      SITE_BUILD: ${SITE_BUILD:?}
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
 
       DB_CONNECTION_NAME_AMOEBA: ${DB_CONNECTION_NAME_AMOEBA:?}
       DB_CONNECTION_LDAP_AMOEBA: ${DB_CONNECTION_LDAP_AMOEBA:?}
@@ -756,9 +777,16 @@ services:
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_BIGWIG_WATCHTOWER:-false}"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
     environment:
       LDAP_SERVER: ${LDAP_SERVER:?}
       ORACLE_BASE_DN: ${ORACLE_BASE_DN:?}
+      CUSTOM_PATH: ${PLUGIN_HANDLER_BIGWIG_CUSTOM_PATH}
+      SITE_BUILD: ${SITE_BUILD:?}
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
 
       DB_CONNECTION_NAME_AMOEBA: ${DB_CONNECTION_NAME_AMOEBA:?}
       DB_CONNECTION_LDAP_AMOEBA: ${DB_CONNECTION_LDAP_AMOEBA:?}
@@ -888,9 +916,16 @@ services:
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_BIOM_WATCHTOWER:-false}"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
     environment:
       LDAP_SERVER: ${LDAP_SERVER:?}
       ORACLE_BASE_DN: ${ORACLE_BASE_DN:?}
+      CUSTOM_PATH: ${PLUGIN_HANDLER_BIOM_CUSTOM_PATH}
+      SITE_BUILD: ${SITE_BUILD:?}
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
 
       DB_CONNECTION_NAME_AMOEBA: ${DB_CONNECTION_NAME_AMOEBA:?}
       DB_CONNECTION_LDAP_AMOEBA: ${DB_CONNECTION_LDAP_AMOEBA:?}
@@ -1020,9 +1055,16 @@ services:
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${PLUGIN_RNASEQ_WATCHTOWER:-false}"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
     environment:
       LDAP_SERVER: ${LDAP_SERVER:?}
       ORACLE_BASE_DN: ${ORACLE_BASE_DN:?}
+      CUSTOM_PATH: ${PLUGIN_HANDLER_RNASEQ_CUSTOM_PATH}
+      SITE_BUILD: ${SITE_BUILD:?}
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
 
       DB_CONNECTION_NAME_AMOEBA: ${DB_CONNECTION_NAME_AMOEBA:?}
       DB_CONNECTION_LDAP_AMOEBA: ${DB_CONNECTION_LDAP_AMOEBA:?}

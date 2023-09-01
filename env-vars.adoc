@@ -29,6 +29,8 @@ AUTH_SECRET_KEY=someSecretKey
 
 ADMIN_AUTH_TOKEN=someAdminAuthToken
 
+SITE_BUILD=build-65
+
 LDAP_SERVER=some.ldap.server:1234,other.ldap.server:2313
 ORACLE_BASE_DN=ou=applications,dc=apidb,dc=org
 
@@ -1056,6 +1058,26 @@ instance.
 | MinIO password/secret key to use when authenticating with the MinIO instance.
 |===
 
+=== General Plugin Variables
+
+Environment variables used by all plugins.
+
+[%header, cols="1,3m,3m,8"]
+|===
+| Req. | Name | Type | Description
+
+| :exclamation:
+| SITE_BUILD
+| String
+| Site build number string (e.g. `"build-65"`)
+
+| :exclamation:
+| DATASET_INSTALL_ROOT
+| String
+| Mount path in the plugin containers for the dataset install directory tree.
+
+|===
+
 === Wildcard Environment Variables
 
 ==== Plugin Handler Environment Key Components.
@@ -1069,6 +1091,19 @@ PLUGIN_HANDLER_<NAME>_DISPLAY_NAME
 PLUGIN_HANDLER_<NAME>_VERSION
 PLUGIN_HANDLER_<NAME>_ADDRESS
 PLUGIN_HANDLER_<NAME>_PROJECT_IDS
+PLUGIN_HANDLER_<NAME>_CUSTOM_PATH
+PLUGIN_HANDLER_<NAME>_SERVER_PORT
+PLUGIN_HANDLER_<NAME>_SERVER_HOST
+PLUGIN_HANDLER_<NAME>_IMPORT_SCRIPT_PATH
+PLUGIN_HANDLER_<NAME>_IMPORT_SCRIPT_MAX_DURATION
+PLUGIN_HANDLER_<NAME>_CHECK_COMPAT_SCRIPT_PATH
+PLUGIN_HANDLER_<NAME>_CHECK_COMPAT_SCRIPT_MAX_DURATION
+PLUGIN_HANDLER_<NAME>_INSTALL_DATA_SCRIPT_PATH
+PLUGIN_HANDLER_<NAME>_INSTALL_DATA_SCRIPT_MAX_DURATION
+PLUGIN_HANDLER_<NAME>_INSTALL_META_SCRIPT_PATH
+PLUGIN_HANDLER_<NAME>_INSTALL_META_SCRIPT_MAX_DURATION
+PLUGIN_HANDLER_<NAME>_UNINSTALL_SCRIPT_PATH
+PLUGIN_HANDLER_<NAME>_UNINSTALL_SCRIPT_MAX_DURATION
 ----
 
 Unlike most of the other environment key values defined here, these values
@@ -1120,6 +1155,71 @@ the type of their datasets.
 | List of project IDs for which the plugin is relevant.  If this value is
   omitted or set to a blank value, the plugin will be considered relevant to all
   projects.
+
+|
+| PLUGIN_HANDLER_<NAME>_CUSTOM_PATH
+| String
+| Custom $PATH variable additions to pass to plugin scripts.
+
+|
+| PLUGIN_HANDLER_<NAME>_SERVER_PORT
+| uint16
+| Port the plugin handler HTTP server will bind to.
+
+|
+| PLUGIN_HANDLER_<NAME>_SERVER_HOST
+| String
+| Address the plugin handler HTTP server will bind to.
+
+|
+| PLUGIN_HANDLER_<NAME>_IMPORT_SCRIPT_PATH
+| String
+| Path to the import script or binary in the plugin container.
+
+|
+| PLUGIN_HANDLER_<NAME>_IMPORT_SCRIPT_MAX_DURATION
+| Duration
+| Max duration the import script will be permitted to run before being killed.
+
+|
+| PLUGIN_HANDLER_<NAME>_CHECK_COMPAT_SCRIPT_PATH
+| String
+| Path to the compatibility check script or binary in the plugin container.
+
+|
+| PLUGIN_HANDLER_<NAME>_CHECK_COMPAT_SCRIPT_MAX_DURATION
+| Duration
+| Max duration the compatibility check script will be permitted to run before being killed.
+
+|
+| PLUGIN_HANDLER_<NAME>_INSTALL_DATA_SCRIPT_PATH
+| String
+| Path to the data install script or binary in the plugin container.
+
+|
+| PLUGIN_HANDLER_<NAME>_INSTALL_DATA_SCRIPT_MAX_DURATION
+| Duration
+| Max duration the data install script will be permitted to run before being killed.
+
+|
+| PLUGIN_HANDLER_<NAME>_INSTALL_META_SCRIPT_PATH
+| String
+| Path to the metadata install script or binary in the plugin container.
+
+|
+| PLUGIN_HANDLER_<NAME>_INSTALL_META_SCRIPT_MAX_DURATION
+| Duration
+| Max duration the metadata install script will be permitted to run before being killed.
+
+|
+| PLUGIN_HANDLER_<NAME>_UNINSTALL_SCRIPT_PATH
+| String
+| Path to the uninstall script or binary in the plugin container.
+
+|
+| PLUGIN_HANDLER_<NAME>_UNINSTALL_SCRIPT_MAX_DURATION
+| Duration
+| Max duration the uninstall script will be permitted to run before being killed.
 |===
 
 ==== Application Database Key Components
