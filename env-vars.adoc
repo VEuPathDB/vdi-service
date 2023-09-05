@@ -72,7 +72,7 @@ S3_PORT=9000
 S3_USE_HTTPS=true
 S3_ACCESS_TOKEN=someToken
 S3_SECRET_KEY=someSecretKey
-S3_BUCKET=some-other-bucket
+S3_BUCKET_NAME=some-other-bucket
 
 # Internal Cache DB Connection
 CACHE_DB_USERNAME=someUser
