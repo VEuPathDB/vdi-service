@@ -8,7 +8,6 @@ internal class PluginHandlerImpl(
   override val displayName: String,
   override val client: PluginHandlerClient,
   private val projects: Set<ProjectID>,
-  override val userFilesRoot: String,
 ) : PluginHandler {
   override fun appliesToProject(projectID: ProjectID): Boolean {
     return projects.isEmpty() || projects.contains(projectID)

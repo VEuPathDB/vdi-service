@@ -62,7 +62,6 @@ object PluginHandlers {
       key.endsWith(EnvKey.Handlers.AddressSuffix)     -> substringEnvKeyName(key, EnvKey.Handlers.AddressSuffix)
       key.endsWith(EnvKey.Handlers.ProjectIDsSuffix)  -> substringEnvKeyName(key, EnvKey.Handlers.ProjectIDsSuffix)
       key.endsWith(EnvKey.Handlers.VersionSuffix)     -> substringEnvKeyName(key, EnvKey.Handlers.VersionSuffix)
-      key.endsWith(EnvKey.Handlers.UserFilesSuffix)   -> substringEnvKeyName(key, EnvKey.Handlers.UserFilesSuffix)
       else                                            -> null
     }
   }
@@ -77,14 +76,12 @@ object PluginHandlers {
     val address       = env.reqHostAddress(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.AddressSuffix)
     val version       = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.VersionSuffix)
     val projects      = env.optSet(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.ProjectIDsSuffix) ?: emptySet()
-    val userFilesPath = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.UserFilesSuffix)
 
     mapping[NameVersionPair(name, version)] = PluginHandlerImpl(
       name,
       dispName,
       PluginHandlerClient(PluginHandlerClientConfig(address)),
       projects,
-      userFilesPath,
     )
   }
 
