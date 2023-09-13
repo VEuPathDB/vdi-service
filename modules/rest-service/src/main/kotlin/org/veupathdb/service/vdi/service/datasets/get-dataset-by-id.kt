@@ -11,6 +11,35 @@ import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
+/**
+ * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
+ * return user information.
+ */
+fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
+  val dataset = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
+
+  val typeDisplayName = PluginHandlers[dataset.typeName, dataset.typeVersion]?.displayName
+    ?: throw IllegalStateException("plugin missing: ${dataset.typeName}:${dataset.typeVersion}")
+
+  // Lookup status information for the dataset
+  val statuses = AppDB.getDatasetStatuses(datasetID, dataset.projects)
+
+  val importMessages = CacheDB.selectImportMessages(datasetID)
+
+  return DatasetDetailsImpl().also { out ->
+    out.datasetID      = datasetID.toString()
+    out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
+    out.name           = dataset.name
+    out.summary        = dataset.summary
+    out.description    = dataset.description
+    out.importMessages = importMessages
+    out.origin         = dataset.origin
+    out.status         = DatasetStatusInfo(dataset.importStatus, statuses)
+    out.visibility     = DatasetVisibility(dataset.visibility)
+    out.sourceUrl      = dataset.sourceURL
+  }
+}
+
 fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // Lookup dataset that is owned by or shared with the current user
   val dataset = requireDataset(userID, datasetID)
