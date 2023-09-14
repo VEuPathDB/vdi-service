@@ -7,6 +7,8 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.generated.model.DatasetShareOffer
 import org.veupathdb.service.vdi.generated.model.DatasetShareReceipt
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdIdSharesRecipientUserId
+import org.veupathdb.service.vdi.server.middleware.AuthFilter
+import org.veupathdb.service.vdi.service.shares.adminPutShareOffer
 import org.veupathdb.service.vdi.service.shares.putShareOffer
 import org.veupathdb.service.vdi.service.shares.putShareReceipt
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -20,6 +22,7 @@ class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiData
   @Path("/offer")
   @Produces("application/json")
   @Consumes("application/json")
+  @AuthFilter.AllowAdminAuth
   override fun putVdiDatasetsSharesOfferByVdIdAndRecipientUserId(
     @PathParam("vd-id") vdId: String,
     @PathParam("recipient-user-id") recipientUserId: Long,
@@ -28,7 +31,13 @@ class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiData
     if (entity == null)
       throw BadRequestException("body must not be blank or null")
 
-    putShareOffer(vdId.asVDIID(), UserID(userID), UserID(recipientUserId), entity)
+    val userID = maybeUserID?.toUserID()
+
+    if (userID == null) {
+      adminPutShareOffer(vdId.asVDIID(), recipientUserId.toUserID(), entity)
+    } else {
+      putShareOffer(vdId.asVDIID(), userID, UserID(recipientUserId), entity)
+    }
 
     return VdiDatasetsVdIdSharesRecipientUserId.PutVdiDatasetsSharesOfferByVdIdAndRecipientUserIdResponse.respond204()
   }
@@ -37,6 +46,7 @@ class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiData
   @Path("/receipt")
   @Produces("application/json")
   @Consumes("application/json")
+  @AuthFilter.AllowAdminAuth
   override fun putVdiDatasetsSharesReceiptByVdIdAndRecipientUserId(
     @PathParam("vd-id") vdId: String,
     @PathParam("recipient-user-id") recipientUserId: Long,
@@ -45,10 +55,16 @@ class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiData
     if (entity == null)
       throw BadRequestException("body must not be blank or null")
 
-    if (userID != recipientUserId)
-      throw ForbiddenException("cannot accept share offers for other users")
+    val userID = maybeUserID
 
-    putShareReceipt(vdId.asVDIID(), userID.toUserID(), entity)
+    if (userID == null) {
+      putShareReceipt(vdId.asVDIID(), recipientUserId.toUserID(), entity)
+    } else {
+      if (userID != recipientUserId)
+        throw ForbiddenException("cannot accept share offers for other users")
+
+      putShareReceipt(vdId.asVDIID(), userID.toUserID(), entity)
+    }
 
     return VdiDatasetsVdIdSharesRecipientUserId.PutVdiDatasetsSharesReceiptByVdIdAndRecipientUserIdResponse.respond204()
   }

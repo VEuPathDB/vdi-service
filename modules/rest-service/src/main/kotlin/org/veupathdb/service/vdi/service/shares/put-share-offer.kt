@@ -15,6 +15,24 @@ import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 
+internal fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareOffer) {
+  val dataset = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
+
+  // If the dataset has been deleted, then it isn't sharable, throw a 403.
+  if (dataset.isDeleted)
+    throw ForbiddenException("cannot share a deleted dataset")
+
+  if (dataset.importStatus != DatasetImportStatus.Complete)
+    throw ForbiddenException("cannot share a dataset until after it has been processed")
+
+  // Write or overwrite the share offer object.
+  DatasetStore.putShareOffer(dataset.ownerID, datasetID, recipientID, entity.toInternal())
+
+  // We automatically accept share offers on behalf of the recipient user.  The
+  // recipient user can reject the share later if they so choose.
+  DatasetStore.putShareReceipt(dataset.ownerID, datasetID, recipientID, VDIDatasetShareReceipt(VDIShareReceiptAction.Accept))
+}
+
 internal fun putShareOffer(datasetID: DatasetID, ownerID: UserID, recipientID: UserID, entity: DatasetShareOffer) {
   // Lookup the target dataset or throw a 404 if it doesn't exist.
   val dataset = CacheDB.selectDataset(datasetID)
