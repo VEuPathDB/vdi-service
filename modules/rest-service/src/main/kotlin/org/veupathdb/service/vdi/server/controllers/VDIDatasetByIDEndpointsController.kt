@@ -2,10 +2,10 @@ package org.veupathdb.service.vdi.server.controllers
 
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
+import org.veupathdb.lib.container.jaxrs.server.annotations.AllowAdminAuth
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdId
-import org.veupathdb.service.vdi.server.middleware.AuthFilter
 import org.veupathdb.service.vdi.service.datasets.deleteDataset
 import org.veupathdb.service.vdi.service.datasets.getDatasetByID
 import org.veupathdb.service.vdi.service.datasets.adminGetDatasetByID
@@ -15,7 +15,7 @@ import org.veupathdb.vdi.lib.common.field.toUserID
 @Authenticated(allowGuests = false)
 class VDIDatasetByIDEndpointsController(@Context request: ContainerRequest) : VdiDatasetsVdId, ControllerBase(request) {
 
-  @AuthFilter.AllowAdminAuth
+  @AllowAdminAuth
   override fun getVdiDatasetsByVdId(vdID: String): VdiDatasetsVdId.GetVdiDatasetsByVdIdResponse {
     val userID = maybeUserID
       ?: return VdiDatasetsVdId.GetVdiDatasetsByVdIdResponse

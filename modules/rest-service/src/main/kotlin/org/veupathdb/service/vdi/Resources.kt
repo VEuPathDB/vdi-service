@@ -3,11 +3,10 @@ package org.veupathdb.service.vdi
 import org.veupathdb.lib.container.jaxrs.server.ContainerResources
 import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.service.vdi.server.controllers.*
-import org.veupathdb.service.vdi.server.middleware.AuthFilter
 
 class Resources(opts: Options) : ContainerResources(opts) {
   init {
-    registerInstances(AuthFilter(opts))
+    enableAuth()
   }
 
   override fun resources() = arrayOf<Any>(
