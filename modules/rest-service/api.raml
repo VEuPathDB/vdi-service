@@ -289,7 +289,7 @@ uses:
       description: |
         Upload a dataset on behalf of another user.
       headers:
-        Auth-Key:
+        Admin-Token:
           displayName: Admin Auth Secret Key
           description: Secret key used to authenticate admin endpoint requests.
           type: string
@@ -375,7 +375,7 @@ uses:
       description: |
         Lists datasets that failed installation due to non-user error.
       headers:
-        Auth-Key:
+        Admin-Token:
           displayName: Admin Auth Secret Key
           description: Secret key used to authenticate admin endpoint requests.
           type: string
@@ -435,7 +435,7 @@ uses:
         If the request specifies neither `all` or `targets` the endpoint will do
         nothing.
       headers:
-        Auth-Key:
+        Admin-Token:
           displayName: Admin Auth Secret Key
           description: Secret key used to authenticate admin endpoint requests.
           type: string
@@ -505,7 +505,7 @@ uses:
         Permanently delete jobs that were soft deleted more than 24 hours prior
         to the execution of this task.
       headers:
-        Auth-Key:
+        Admin-Token:
           displayName: Admin Auth Secret Key
           description: Secret key used to authenticate admin endpoint requests.
           type: string
