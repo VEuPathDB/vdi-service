@@ -5,7 +5,6 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.sql.delete.*
 import org.veupathdb.vdi.lib.db.cache.sql.insert.*
@@ -267,6 +266,11 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
   fun upsertDatasetShareReceipt(row: DatasetShareReceipt) {
     log.debug("upserting share receipt action {} for dataset {}, recipient {}", row.action, row.datasetID, row.recipientID)
     con.upsertDatasetShareReceipt(row.datasetID, row.recipientID, row.action)
+  }
+
+  fun upsertImportControl(datasetID: DatasetID, status: DatasetImportStatus) {
+    log.debug("upserting share import control record for dataset {} for status {}", datasetID, status)
+    con.upsertImportControl(datasetID, status)
   }
 
   fun upsertImportMessages(datasetID: DatasetID, messages: String) {

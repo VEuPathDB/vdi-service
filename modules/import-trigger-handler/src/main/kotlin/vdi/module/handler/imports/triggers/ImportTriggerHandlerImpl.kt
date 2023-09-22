@@ -34,12 +34,18 @@ import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
 import vdi.module.handler.imports.triggers.model.WarningsFile
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig)
   : ImportTriggerHandler
   , VDIServiceModuleBase("import-trigger-handler")
 {
   private val log = logger()
+
+  private val lock = ReentrantLock()
+
+  private val activeIDs = HashSet<DatasetID>(24)
 
   override suspend fun run() {
     log.trace("run()")
@@ -77,11 +83,36 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     // lookup the dataset in S3
     val datasetDir = dm.getDatasetDirectory(userID, datasetID)
 
+    // If the dataset directory doesn't have all the necessary components, then
+    // bail here.
     if (!datasetDir.isUsable(datasetID, userID)) {
       log.debug("dataset dir for dataset $datasetID (user $userID) is not usable")
       return
     }
 
+    // Since we've decided we're in a state where we can attempt to process the
+    // event for this dataset, ensure we aren't already processing an import for
+    // this dataset.  If we are, bail here, if we aren't, then mark the dataset
+    // as in progress (add it to our set of active imports) and proceed.
+    lock.withLock {
+      if (datasetID in activeIDs) {
+        log.info("skipping import event for dataset $userID/$datasetID as it is already being processed")
+        return
+      }
+
+      activeIDs.add(datasetID)
+    }
+
+    try {
+      processImportJob(dm, userID, datasetID, datasetDir)
+    } finally {
+      lock.withLock {
+        activeIDs.remove(datasetID)
+      }
+    }
+  }
+
+  private fun processImportJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID, datasetDir: DatasetDirectory) {
     // Load the dataset metadata from S3
     val datasetMeta = datasetDir.getMeta().load()!!
 
@@ -104,9 +135,16 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       }
     }
 
+    val impStatus = CacheDB.selectImportControl(datasetID)
+
+    if (impStatus != null && impStatus != DatasetImportStatus.Queued) {
+      log.info("skipping import event for dataset $userID/$datasetID as it is already in status $impStatus")
+      return
+    }
+
     CacheDB.withTransaction {
       log.info("attempting to insert import control record (if one does not exist)")
-      it.tryInsertImportControl(datasetID, DatasetImportStatus.InProgress)
+      it.upsertImportControl(datasetID, DatasetImportStatus.InProgress)
     }
 
     try {
