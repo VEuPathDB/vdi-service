@@ -45,7 +45,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         while (!isShutDown()) {
           kc.fetchMessages(config.installDataTriggerMessageKey, InstallTrigger::class)
             .forEach { (userID, datasetID) ->
-              log.debug("submitting job to install-data worker pool for user {}, dataset {}", userID, datasetID)
+              log.info("received install job for dataset $datasetID, user $userID")
               wp.submit { executeJob(userID, datasetID, dm) }
             }
         }

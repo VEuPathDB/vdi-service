@@ -54,7 +54,10 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
           // Select meta trigger messages from Kafka
           kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey, UpdateMetaTrigger::class)
             // and for each of the trigger messages received
-            .forEach { (userID, datasetID) -> wp.submit { executeJob(dm, kr, userID, datasetID) } }
+            .forEach { (userID, datasetID) ->
+              log.info("received install-meta job for dataset $datasetID, user $userID")
+              wp.submit { executeJob(dm, kr, userID, datasetID) }
+            }
         }
 
         wp.stop()
