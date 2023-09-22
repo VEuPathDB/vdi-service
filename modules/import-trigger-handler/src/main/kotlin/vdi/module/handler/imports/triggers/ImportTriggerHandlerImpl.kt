@@ -135,9 +135,9 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       }
     }
 
-    val impStatus = CacheDB.selectImportControl(datasetID)
+    val impStatus = CacheDB.selectImportControl(datasetID)!!
 
-    if (impStatus != null && impStatus != DatasetImportStatus.Queued) {
+    if (impStatus != DatasetImportStatus.Queued) {
       log.info("skipping import event for dataset $userID/$datasetID as it is already in status $impStatus")
       return
     }
