@@ -243,6 +243,11 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       return false
     }
 
+    if (!isUploadComplete()) {
+      log.info("got an import event for a dataset that does not yet have an upload tarball, ignoring it.  Dataset: $datasetID, User: $userID")
+      return false
+    }
+
     return true
   }
 
