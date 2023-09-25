@@ -169,6 +169,18 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun insertSyncControl(sync: VDISyncControlRecord)
 
+  /**
+   * Inserts a dataset meta record for the target dataset.
+   *
+   * @param datasetID ID of the dataset for which a dataset_meta record should
+   * be inserted.
+   *
+   * @param name Name of the dataset.
+   *
+   * @param description Optional description of the dataset.
+   */
+  fun insertDatasetMeta(datasetID: DatasetID, name: String, description: String?)
+
   // endregion Insert Operations
 
   // region Update Operations
@@ -234,7 +246,35 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun updateDatasetInstallMessage(message: DatasetInstallMessage)
 
+  /**
+   * Updates the target dataset metadata with the new given values.
+   *
+   * @param datasetID ID of the dataset whose meta record will be updated.
+   *
+   * @param name Name of the dataset.
+   *
+   * @param description Optional description of the dataset.
+   */
+  fun updateDatasetMeta(datasetID: DatasetID, name: String, description: String?)
+
   // endregion Update Operations
+
+  // region Upsert Operations
+
+  /**
+   * Upserts the target dataset metadata with the given values.  If the target
+   * record already exists it will be updated, if it does not exist, it will be
+   * created.
+   *
+   * @param datasetID ID of the dataset whose meta record will be upserted.
+   *
+   * @param name Name of the dataset.
+   *
+   * @param description Optional description of the dataset.
+   */
+  fun upsertDatasetMeta(datasetID: DatasetID, name: String, description: String?)
+
+  // endregion Upsert Operations
 
   fun rollback()
 
