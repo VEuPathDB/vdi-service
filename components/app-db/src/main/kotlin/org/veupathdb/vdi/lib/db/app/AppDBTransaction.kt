@@ -103,6 +103,14 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun deleteDatasetVisibility(datasetID: DatasetID, userID: UserID)
 
+  /**
+   * Deletes a specific dataset meta record.
+   *
+   * @param datasetID ID of the dataset whose dataset_meta record should be
+   * deleted.
+   */
+  fun deleteDatasetMeta(datasetID: DatasetID)
+
   // endregion Delete Operations
 
   // region Insert Operations

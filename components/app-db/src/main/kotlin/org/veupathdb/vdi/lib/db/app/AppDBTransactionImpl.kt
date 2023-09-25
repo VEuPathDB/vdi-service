@@ -64,6 +64,11 @@ class AppDBTransactionImpl(
     connection.deleteDatasetProjectLinks(schema, datasetID)
   }
 
+  override fun deleteDatasetMeta(datasetID: DatasetID) {
+    log.debug("deleting dataset meta for dataset {}", datasetID)
+    connection.deleteDatasetMeta(schema, datasetID)
+  }
+
 
   override fun insertDataset(dataset: DatasetRecord) {
     log.debug("inserting dataset record for dataset {}", dataset.datasetID)
