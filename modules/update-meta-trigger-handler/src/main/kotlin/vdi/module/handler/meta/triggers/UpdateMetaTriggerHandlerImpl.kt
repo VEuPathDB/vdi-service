@@ -210,6 +210,9 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
           it.insertDatasetProjectLink(datasetID, projectID)
         }
 
+        log.debug("upserting dataset meta record for dataset {} into app db for project {}", datasetID, projectID)
+        it.upsertDatasetMeta(datasetID, meta.name, meta.description)
+
         it.selectDatasetSyncControlRecord(datasetID) or {
           it.insertSyncControl(VDISyncControlRecord(
             datasetID     = datasetID,

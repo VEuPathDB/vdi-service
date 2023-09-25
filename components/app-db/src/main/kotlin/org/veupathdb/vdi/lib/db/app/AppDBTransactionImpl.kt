@@ -10,6 +10,7 @@ import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.model.*
 import org.veupathdb.vdi.lib.db.app.sql.*
 import java.sql.Connection
+import java.sql.SQLException
 import java.time.OffsetDateTime
 
 class AppDBTransactionImpl(
@@ -63,6 +64,11 @@ class AppDBTransactionImpl(
     connection.deleteDatasetProjectLinks(schema, datasetID)
   }
 
+  override fun deleteDatasetMeta(datasetID: DatasetID) {
+    log.debug("deleting dataset meta for dataset {}", datasetID)
+    connection.deleteDatasetMeta(schema, datasetID)
+  }
+
 
   override fun insertDataset(dataset: DatasetRecord) {
     log.debug("inserting dataset record for dataset {}", dataset.datasetID)
@@ -94,6 +100,11 @@ class AppDBTransactionImpl(
     connection.insertDatasetSyncControl(schema, sync)
   }
 
+  override fun insertDatasetMeta(datasetID: DatasetID, name: String, description: String?) {
+    log.debug("inserting dataset meta record for dataset {}", datasetID)
+    connection.insertDatasetMeta(schema, datasetID, name, description)
+  }
+
 
   override fun updateDataset(dataset: DatasetRecord) {
     log.debug("updating dataset record for dataset {}", dataset.datasetID)
@@ -123,6 +134,25 @@ class AppDBTransactionImpl(
   override fun updateDatasetInstallMessage(message: DatasetInstallMessage) {
     log.debug("updating dataset install message for dataset {}, install type {}", message.datasetID, message.installType)
     connection.updateDatasetInstallMessage(schema, message)
+  }
+
+  override fun updateDatasetMeta(datasetID: DatasetID, name: String, description: String?) {
+    log.debug("updating dataset meta record for dataset {}", datasetID)
+    connection.updateDatasetMeta(schema, datasetID, name, description)
+  }
+
+
+  override fun upsertDatasetMeta(datasetID: DatasetID, name: String, description: String?) {
+    try {
+      insertDatasetMeta(datasetID, name, description)
+    } catch (e: SQLException) {
+      if (e.errorCode == 1) {
+        log.debug("dataset meta record already exists for dataset {}", datasetID)
+        updateDatasetMeta(datasetID, name, description)
+      } else {
+        throw e
+      }
+    }
   }
 
 
