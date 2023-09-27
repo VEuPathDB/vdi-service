@@ -22,6 +22,7 @@ import org.veupathdb.vdi.lib.common.model.*
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import java.net.URL
 import java.nio.file.Path
@@ -55,6 +56,14 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
       OffsetDateTime.now(),
       DatasetImportStatus.Queued,
       datasetMeta.origin
+    ))
+    it.tryInsertDatasetMeta(DatasetMetaImpl(
+      datasetID   = datasetID,
+      visibility  = datasetMeta.visibility,
+      name        = datasetMeta.name,
+      summary     = datasetMeta.summary,
+      description = datasetMeta.description,
+      sourceURL   = datasetMeta.sourceURL,
     ))
     it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)
     it.tryInsertDatasetProjects(datasetID, datasetMeta.projects)
