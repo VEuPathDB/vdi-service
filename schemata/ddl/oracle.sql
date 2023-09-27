@@ -7,7 +7,7 @@ CREATE USER vdi IDENTIFIED BY asdfasdfasdfasdfasdf;
 ALTER USER vdi QUOTA UNLIMITED ON users;
 
 CREATE TABLE vdi.dataset (
-  dataset_id CHAR(32)
+  dataset_id VARCHAR2(32)
     PRIMARY KEY
     NOT NULL
 , owner NUMBER
@@ -21,8 +21,17 @@ CREATE TABLE vdi.dataset (
     NOT NULL
 );
 
+CREATE TABLE vdi.dataset_meta (
+  dataset_id VARCHAR2(32)
+    NOT NULL
+, name VARCHAR2(1024)
+    NOT NULL
+, description VARCHAR2(4000)
+, FOREIGN KEY (dataset_id) REFERENCES vdi.dataset (dataset_id)
+);
+
 CREATE TABLE vdi.sync_control (
-  dataset_id CHAR(32)
+  dataset_id VARCHAR2(32)
     NOT NULL
 , shares_update_time TIMESTAMP WITH TIME ZONE
     NOT NULL
@@ -34,7 +43,7 @@ CREATE TABLE vdi.sync_control (
 );
 
 CREATE TABLE vdi.dataset_install_message (
-  dataset_id CHAR(32)
+  dataset_id VARCHAR(32)
     NOT NULL
 , install_type VARCHAR2(64)
     NOT NULL
@@ -45,7 +54,7 @@ CREATE TABLE vdi.dataset_install_message (
 );
 
 CREATE TABLE vdi.dataset_visibility (
-  dataset_id CHAR(32)
+  dataset_id VARCHAR(32)
     NOT NULL
 , user_id NUMBER
     NOT NULL
@@ -53,7 +62,7 @@ CREATE TABLE vdi.dataset_visibility (
 );
 
 CREATE TABLE vdi.dataset_project (
-  dataset_id CHAR(32)
+  dataset_id VARCHAR(32)
     NOT NULL
 , project_id VARCHAR2(64)
     NOT NULL

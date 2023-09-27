@@ -36,7 +36,10 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
           kc.fetchMessages(config.softDeleteTriggerMessageKey, SoftDeleteTrigger::class)
-            .forEach { (userID, datasetID) -> runJob(userID, datasetID, dm) }
+            .forEach { (userID, datasetID) ->
+              log.info("received uninstall job for dataset $datasetID, user $userID")
+              wp.submit { runJob(userID, datasetID, dm) }
+            }
         }
 
         wp.stop()

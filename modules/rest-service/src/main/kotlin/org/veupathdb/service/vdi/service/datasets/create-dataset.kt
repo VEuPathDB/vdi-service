@@ -10,6 +10,7 @@ import org.veupathdb.service.vdi.generated.model.toInternalVisibility
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.service.users.getCurrentQuotaUsage
 import org.veupathdb.service.vdi.util.BoundedInputStream
+import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.compression.Zip.getZipType
@@ -18,9 +19,14 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.*
+import org.veupathdb.vdi.lib.db.cache.CacheDB
+import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
+import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import java.net.URL
 import java.nio.file.Path
+import java.time.OffsetDateTime
 import kotlin.io.path.*
 import kotlin.math.max
 
@@ -38,6 +44,35 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
   for (projectID in datasetMeta.projects) {
     if (!handler.appliesToProject(projectID))
       throw BadRequestException("target dataset type does not apply to project $projectID")
+  }
+
+  CacheDB.withTransaction {
+    it.tryInsertDataset(DatasetImpl(
+      datasetID,
+      datasetMeta.type.name,
+      datasetMeta.type.version,
+      userID,
+      false,
+      OffsetDateTime.now(),
+      DatasetImportStatus.Queued,
+      datasetMeta.origin
+    ))
+    it.tryInsertDatasetMeta(DatasetMetaImpl(
+      datasetID   = datasetID,
+      visibility  = datasetMeta.visibility,
+      name        = datasetMeta.name,
+      summary     = datasetMeta.summary,
+      description = datasetMeta.description,
+      sourceURL   = datasetMeta.sourceURL,
+    ))
+    it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)
+    it.tryInsertDatasetProjects(datasetID, datasetMeta.projects)
+    it.tryInsertSyncControl(VDISyncControlRecord(
+      datasetID     = datasetID,
+      sharesUpdated = OriginTimestamp,
+      dataUpdated   = OriginTimestamp,
+      metaUpdated   = OriginTimestamp
+    ))
   }
 
   // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)

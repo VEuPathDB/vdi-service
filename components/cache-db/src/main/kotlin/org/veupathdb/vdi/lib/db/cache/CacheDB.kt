@@ -88,6 +88,11 @@ object CacheDB {
     return connection.use { it.selectSharesFor(datasetID) }
   }
 
+  fun selectImportControl(datasetID: DatasetID): DatasetImportStatus? {
+    log.debug("selecting import control record for dataset {}", datasetID)
+    return connection.use { it.selectImportControl(datasetID) }
+  }
+
   fun selectImportMessages(datasetID: DatasetID): List<String> {
     log.debug("selecting import messages for dataset {}", datasetID)
     return connection.use { it.selectImportMessages(datasetID) }
