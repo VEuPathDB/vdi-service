@@ -28,6 +28,11 @@ Configuration:
       additivity: false
       AppenderRef:
       - ref: Console_Appender
+    - name: org.apache.kafka.clients
+      level: error
+      additivity: false
+      AppenderRef:
+        - ref: Console_Appender
     - name: org.veupathdb.vdi.lib.reconciler
       level: debug
       additivity: false
