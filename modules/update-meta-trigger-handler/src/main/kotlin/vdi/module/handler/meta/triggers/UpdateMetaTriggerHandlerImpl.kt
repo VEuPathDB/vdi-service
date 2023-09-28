@@ -198,6 +198,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
             isDeleted   = false
           ))
 
+          it.insertDatasetVisibility(datasetID, meta.owner)
+
           log.debug("inserting sync control record for dataset {} into app db for project {}", datasetID, projectID)
           it.insertSyncControl(VDISyncControlRecord(
             datasetID     = datasetID,
