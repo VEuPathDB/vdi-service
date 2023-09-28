@@ -106,9 +106,6 @@ modules.
 
 === Running the Stack
 
-. `make compose-build` +
-or `make cb`
-. `make compose-up` +
-or `make cu`
-. `make compose-down` +
-or `make cd`
+. `make build` +
+. `make up` +
+. `make down` +
