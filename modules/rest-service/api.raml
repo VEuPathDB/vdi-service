@@ -381,6 +381,10 @@ uses:
           required: true
       responses:
         200:
+          body:
+            application/json:
+              # TODO: this result list will be _huge_ after a while.  Refactor this to be filtered and paginated.
+              type: lib.BrokenImportDetails[]
 
   /list-broken:
     displayName: Broken Installs
