@@ -367,6 +367,20 @@ uses:
                 message: Dataset store is unreachable
                 requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
+  /failed-imports:
+    displayName: Failed Imports
+    get:
+      displayName: List
+      description: |
+        Lists datasets that failed to import.
+      headers:
+        Admin-Token:
+          displayName: Admin Auth Secret Key
+          description: Secret key used to authenticate admin endpoint requests.
+          type: string
+          required: true
+      responses:
+        200:
 
   /list-broken:
     displayName: Broken Installs

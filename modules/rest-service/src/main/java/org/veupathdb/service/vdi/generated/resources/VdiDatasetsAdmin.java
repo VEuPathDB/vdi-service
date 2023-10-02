@@ -31,6 +31,11 @@ public interface VdiDatasetsAdmin {
       DatasetPostRequest entity);
 
   @GET
+  @Path("/failed-imports")
+  GetVdiDatasetsAdminFailedImportsResponse getVdiDatasetsAdminFailedImports(
+      @HeaderParam("Admin-Token") String adminToken);
+
+  @GET
   @Path("/list-broken")
   @Produces("application/json")
   GetVdiDatasetsAdminListBrokenResponse getVdiDatasetsAdminListBroken(
@@ -99,6 +104,21 @@ public interface VdiDatasetsAdmin {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new PostVdiDatasetsAdminProxyUploadResponse(responseBuilder.build(), entity);
+    }
+  }
+
+  class GetVdiDatasetsAdminFailedImportsResponse extends ResponseDelegate {
+    private GetVdiDatasetsAdminFailedImportsResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private GetVdiDatasetsAdminFailedImportsResponse(Response response) {
+      super(response);
+    }
+
+    public static GetVdiDatasetsAdminFailedImportsResponse respond200() {
+      Response.ResponseBuilder responseBuilder = Response.status(200);
+      return new GetVdiDatasetsAdminFailedImportsResponse(responseBuilder.build());
     }
   }
 

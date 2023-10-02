@@ -22,3 +22,13 @@ types:
       datasetType: common.DatasetTypeInfo
       projectIDs: common.ProjectID[]
       status: common.DatasetStatusInfo
+
+  BrokenImportDetails:
+    displayName: Broken Import Details
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: common.VDI-ID
+      owner: common.User-ID
+      datasetType: common.DatasetTypeInfo
+      projectIds: common.ProjectID[]
