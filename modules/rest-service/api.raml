@@ -403,6 +403,23 @@ uses:
           minimum: 0
           default: 0
           required: false
+        sort:
+          description: |
+            One of:
+            
+            * date
+          type: string
+          required: false
+          default: date
+        order:
+          description: |
+            One of:
+            
+            * asc
+            * desc
+          type: string
+          required: false
+          default: desc
       responses:
         200:
           body:

@@ -20,7 +20,6 @@ public class BrokenImportListingMetaImpl implements BrokenImportListingMeta {
   @JsonProperty("count")
   private Integer count;
 
-  @JsonProperty("before")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
@@ -28,8 +27,10 @@ public class BrokenImportListingMetaImpl implements BrokenImportListingMeta {
   @JsonDeserialize(
       using = TimestampDeserializer.class
   )
+  @JsonProperty("before")
   private Date before;
 
+  @JsonProperty("after")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
@@ -37,7 +38,6 @@ public class BrokenImportListingMetaImpl implements BrokenImportListingMeta {
   @JsonDeserialize(
       using = TimestampDeserializer.class
   )
-  @JsonProperty("after")
   private Date after;
 
   @JsonProperty("user")

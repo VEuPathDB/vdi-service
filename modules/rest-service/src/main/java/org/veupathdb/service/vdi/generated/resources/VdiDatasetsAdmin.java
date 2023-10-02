@@ -39,6 +39,8 @@ public interface VdiDatasetsAdmin {
       @QueryParam("user") Long user, @QueryParam("before") Date before,
       @QueryParam("after") Date after, @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset,
+      @QueryParam("sort") @DefaultValue("date") String sort,
+      @QueryParam("order") @DefaultValue("desc") String order,
       @HeaderParam("Admin-Token") String adminToken);
 
   @GET
