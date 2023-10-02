@@ -1,5 +1,6 @@
 package org.veupathdb.vdi.lib.db.cache.sql.select
 
+import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.cache.model.BrokenImportListQuery
 import org.veupathdb.vdi.lib.db.cache.model.BrokenImportRecord
 import org.veupathdb.vdi.lib.db.cache.util.*
@@ -70,12 +71,16 @@ internal fun Connection.selectBrokenImports(query: BrokenImportListQuery): List<
     afterFilter = ""
   }
 
+  val orderBy = when (query.sortBy) {
+    BrokenImportListQuery.SortField.Date -> "d.created"
+  }
+
   val sql = sqlBody(
     userIDFilter = userIDFilter,
     beforeFilter = beforeFilter,
     afterFilter  = afterFilter,
     orderBy      = query.sortBy.toString(),
-    sortOrder    = query.order.toString(),
+    sortOrder    = orderBy,
     limit        = query.limit,
     offset       = query.offset
   )

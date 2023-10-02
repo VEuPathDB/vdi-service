@@ -100,7 +100,7 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
     offset: Int?,
     sort: String?,
     order: String?,
-    adminToken: String
+    adminToken: String?
   ): VdiDatasetsAdmin.GetVdiDatasetsAdminFailedImportsResponse {
     if (adminToken != Options.Admin.secretKey)
       throw ForbiddenException()
