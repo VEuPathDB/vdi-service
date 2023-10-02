@@ -379,12 +379,35 @@ uses:
           description: Secret key used to authenticate admin endpoint requests.
           type: string
           required: true
+      queryParameters:
+        user:
+          type: lib.User-ID
+          required: false
+          default: null
+        before:
+          type: datetime
+          required: false
+          default: null
+        after:
+          type: datetime
+          required: false
+          default: null
+        limit:
+          type: integer
+          minimum: 0
+          maximum: 250
+          default: 100
+          required: false
+        offset:
+          type: integer
+          minimum: 0
+          default: 0
+          required: false
       responses:
         200:
           body:
             application/json:
-              # TODO: this result list will be _huge_ after a while.  Refactor this to be filtered and paginated.
-              type: lib.BrokenImportDetails[]
+              type: lib.BrokenImportListing
 
   /list-broken:
     displayName: Broken Installs

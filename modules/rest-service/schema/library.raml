@@ -24,6 +24,23 @@ types:
       datasetType: DatasetTypeInfo
       projectIDs: ProjectID[]
       status: DatasetStatusInfo
+  BrokenImportListing:
+    displayName: Broken Import Listing
+    type: object
+    additionalProperties: false
+    properties:
+      meta: BrokenImportListingMeta
+      results: BrokenImportDetails[]
+  BrokenImportListingMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      count: integer
+      before?: datetime
+      after?: datetime
+      user?: User-ID
+      limit?: integer
+      offset?: integer
   BrokenImportDetails:
     displayName: Broken Import Details
     type: object

@@ -1,5 +1,6 @@
 package org.veupathdb.service.vdi.generated.resources;
 
+import java.util.Date;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -11,6 +12,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.BrokenDatasetListing;
+import org.veupathdb.service.vdi.generated.model.BrokenImportListing;
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest;
 import org.veupathdb.service.vdi.generated.model.DatasetPostResponse;
 import org.veupathdb.service.vdi.generated.model.ForbiddenError;
@@ -32,7 +34,11 @@ public interface VdiDatasetsAdmin {
 
   @GET
   @Path("/failed-imports")
+  @Produces("application/json")
   GetVdiDatasetsAdminFailedImportsResponse getVdiDatasetsAdminFailedImports(
+      @QueryParam("user") Long user, @QueryParam("before") Date before,
+      @QueryParam("after") Date after, @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset,
       @HeaderParam("Admin-Token") String adminToken);
 
   @GET
@@ -116,9 +122,11 @@ public interface VdiDatasetsAdmin {
       super(response);
     }
 
-    public static GetVdiDatasetsAdminFailedImportsResponse respond200() {
-      Response.ResponseBuilder responseBuilder = Response.status(200);
-      return new GetVdiDatasetsAdminFailedImportsResponse(responseBuilder.build());
+    public static GetVdiDatasetsAdminFailedImportsResponse respond200WithApplicationJson(
+        BrokenImportListing entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetVdiDatasetsAdminFailedImportsResponse(responseBuilder.build(), entity);
     }
   }
 

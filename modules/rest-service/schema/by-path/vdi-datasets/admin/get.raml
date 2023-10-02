@@ -23,6 +23,25 @@ types:
       projectIDs: common.ProjectID[]
       status: common.DatasetStatusInfo
 
+  BrokenImportListing:
+    displayName: Broken Import Listing
+    type: object
+    additionalProperties: false
+    properties:
+      meta: BrokenImportListingMeta
+      results: BrokenImportDetails[]
+
+  BrokenImportListingMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      count: integer
+      before?: datetime
+      after?: datetime
+      user?: common.User-ID
+      limit?: integer
+      offset?: integer
+
   BrokenImportDetails:
     displayName: Broken Import Details
     type: object
