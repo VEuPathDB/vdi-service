@@ -385,11 +385,41 @@ uses:
           required: false
           default: null
         before:
-          type: datetime
+          description: |
+            Filter results to only those records created before the given
+            date-time value.
+            
+            Examples:
+            
+            * 2023
+            * 2023-10
+            * 2023-10-02
+            * 2023-10-02T17:10
+            * 2023-10-02T17:10:00
+            * 2023-10-02T17:10:00.000
+            * 2023-10-02T17:10:00.000Z
+            
+            If no timezone is provided, the service will assume its local zone.
+          type: string
           required: false
           default: null
         after:
-          type: datetime
+          description: |
+            Filter results to only those records created after the given
+            date-time value.
+            
+            Examples:
+            
+            * 2023
+            * 2023-10
+            * 2023-10-02
+            * 2023-10-02T17:10
+            * 2023-10-02T17:10:00
+            * 2023-10-02T17:10:00.000
+            * 2023-10-02T17:10:00.000Z
+            
+            If no timezone is provided, the service will assume its local zone.
+          type: string
           required: false
           default: null
         limit:

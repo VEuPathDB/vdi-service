@@ -1,6 +1,5 @@
 package org.veupathdb.service.vdi.generated.resources;
 
-import java.util.Date;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -36,8 +35,8 @@ public interface VdiDatasetsAdmin {
   @Path("/failed-imports")
   @Produces("application/json")
   GetVdiDatasetsAdminFailedImportsResponse getVdiDatasetsAdminFailedImports(
-      @QueryParam("user") Long user, @QueryParam("before") Date before,
-      @QueryParam("after") Date after, @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("user") Long user, @QueryParam("before") String before,
+      @QueryParam("after") String after, @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset,
       @QueryParam("sort") @DefaultValue("date") String sort,
       @QueryParam("order") @DefaultValue("desc") String order,

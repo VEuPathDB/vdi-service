@@ -8,6 +8,7 @@ import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsAdmin
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.listBrokenDatasets
+import org.veupathdb.service.vdi.util.fixVariableDateString
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserID
@@ -94,8 +95,8 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
 
   override fun getVdiDatasetsAdminFailedImports(
     user: Long?,
-    before: Date?,
-    after: Date?,
+    before: String?,
+    after: String?,
     limit: Int?,
     offset: Int?,
     sort: String?,
@@ -113,10 +114,8 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
 
     val query = BrokenImportListQuery().also {
       it.userID = user?.toUserID()
-      it.before = before?.toInstant()
-        ?.let { OffsetDateTime.ofInstant(it, ZoneId.systemDefault()) }
-      it.after  = before?.toInstant()
-        ?.let { OffsetDateTime.ofInstant(it, ZoneId.systemDefault()) }
+      it.before = before?.let { fixVariableDateString(it) { BadRequestException("invalid before date value") } }
+      it.after  = after?.let { fixVariableDateString(it) { BadRequestException("invalid after date value") } }
       it.limit  = limit?.toUByte() ?: 100u
       it.offset = offset?.toUInt() ?: 0u
       it.sortBy = sort?.let { BrokenImportListQuery.SortField.fromStringOrNull(it) }
@@ -140,6 +139,5 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
         }
         it.results = broken
       })
-
   }
 }

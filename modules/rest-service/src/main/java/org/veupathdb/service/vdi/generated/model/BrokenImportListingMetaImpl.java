@@ -1,11 +1,8 @@
 package org.veupathdb.service.vdi.generated.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -20,25 +17,11 @@ public class BrokenImportListingMetaImpl implements BrokenImportListingMeta {
   @JsonProperty("count")
   private Integer count;
 
-  @JsonFormat(
-      shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-  )
-  @JsonDeserialize(
-      using = TimestampDeserializer.class
-  )
   @JsonProperty("before")
-  private Date before;
+  private String before;
 
   @JsonProperty("after")
-  @JsonFormat(
-      shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-  )
-  @JsonDeserialize(
-      using = TimestampDeserializer.class
-  )
-  private Date after;
+  private String after;
 
   @JsonProperty("user")
   private Long user;
@@ -60,22 +43,22 @@ public class BrokenImportListingMetaImpl implements BrokenImportListingMeta {
   }
 
   @JsonProperty("before")
-  public Date getBefore() {
+  public String getBefore() {
     return this.before;
   }
 
   @JsonProperty("before")
-  public void setBefore(Date before) {
+  public void setBefore(String before) {
     this.before = before;
   }
 
   @JsonProperty("after")
-  public Date getAfter() {
+  public String getAfter() {
     return this.after;
   }
 
   @JsonProperty("after")
-  public void setAfter(Date after) {
+  public void setAfter(String after) {
     this.after = after;
   }
 

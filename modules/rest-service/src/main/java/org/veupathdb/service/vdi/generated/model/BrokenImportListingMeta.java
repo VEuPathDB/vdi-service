@@ -2,7 +2,6 @@ package org.veupathdb.service.vdi.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
 
 @JsonDeserialize(
     as = BrokenImportListingMetaImpl.class
@@ -15,16 +14,16 @@ public interface BrokenImportListingMeta {
   void setCount(Integer count);
 
   @JsonProperty("before")
-  Date getBefore();
+  String getBefore();
 
   @JsonProperty("before")
-  void setBefore(Date before);
+  void setBefore(String before);
 
   @JsonProperty("after")
-  Date getAfter();
+  String getAfter();
 
   @JsonProperty("after")
-  void setAfter(Date after);
+  void setAfter(String after);
 
   @JsonProperty("user")
   Long getUser();
