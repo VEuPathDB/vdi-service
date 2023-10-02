@@ -30,8 +30,10 @@ SELECT
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id) AS projects
 FROM
   vdi.datasets AS d
+  INNER JOIN vdi.import_control AS i
+    USING (dataset_id)
 WHERE
-  1 = 1
+  i.status = 'failed'
   $userIDFilter
   $beforeFilter
   $afterFilter
