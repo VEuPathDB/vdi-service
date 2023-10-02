@@ -89,7 +89,7 @@ internal fun Connection.selectBrokenImports(query: BrokenImportListQuery): List<
 
   return withPreparedStatement(sql) {
     params.forEachIndexed { i, pair ->
-      setObject(i, pair.first, pair.second)
+      setObject(i+1, pair.first, pair.second)
     }
 
     withResults {
