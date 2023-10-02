@@ -9,7 +9,10 @@ enum class SortOrder {
   ;
 
   @JsonValue
-  override fun toString() = name.lowercase()
+  override fun toString() = when (this) {
+    ASCENDING -> "ASC"
+    DESCENDING -> "DESC"
+  }
 
   companion object {
 
@@ -20,10 +23,10 @@ enum class SortOrder {
         ?: throw IllegalArgumentException("unrecognized SortOrder value $value")
 
     fun fromStringOrNull(value: String): SortOrder? {
-      val lowercase = value.lowercase()
+      val uppercase = value.uppercase()
 
       for (enumValue in values())
-        if (enumValue.toString() == lowercase)
+        if (enumValue.toString() == uppercase)
           return enumValue
 
       return null
