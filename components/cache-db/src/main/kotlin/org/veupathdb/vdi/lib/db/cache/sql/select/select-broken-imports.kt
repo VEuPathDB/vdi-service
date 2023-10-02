@@ -81,8 +81,8 @@ internal fun Connection.selectBrokenImports(query: BrokenImportListQuery): List<
     userIDFilter = userIDFilter,
     beforeFilter = beforeFilter,
     afterFilter  = afterFilter,
-    orderBy      = query.sortBy.toString(),
-    sortOrder    = orderBy,
+    orderBy      = orderBy,
+    sortOrder    = query.sortBy.toString(),
     limit        = query.limit,
     offset       = query.offset
   )
