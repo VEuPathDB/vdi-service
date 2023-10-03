@@ -54,7 +54,8 @@ object AppDatabaseRegistry {
     key.startsWith(EnvKey.AppDB.DBPassPrefix) ||
     key.startsWith(EnvKey.AppDB.DBPoolPrefix) ||
     key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix) ||
-    key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix)
+    key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix) ||
+    key.startsWith(EnvKey.AppDB.DBEnabledPrefix)
 
   private fun getEnvName(key: String) =
     when {
@@ -65,6 +66,7 @@ object AppDatabaseRegistry {
       key.startsWith(EnvKey.AppDB.DBPoolPrefix)          -> getEnvName(EnvKey.AppDB.DBPoolPrefix, key)
       key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix)    -> getEnvName(EnvKey.AppDB.DBDataSchemaPrefix, key)
       key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix) -> getEnvName(EnvKey.AppDB.DBControlSchemaPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBEnabledPrefix)       -> getEnvName(EnvKey.AppDB.DBEnabledPrefix, key)
       else                                               -> null
     }
 
@@ -73,7 +75,14 @@ object AppDatabaseRegistry {
     key.substring(prefix.length)
 
   private fun parseEnvironmentChunk(env: Environment, key: String) {
-    val name = env.require(EnvKey.AppDB.DBNamePrefix + key)
+    val enabled = env.reqBool(EnvKey.AppDB.DBEnabledPrefix + key)
+    val name    = env.require(EnvKey.AppDB.DBNamePrefix + key)
+
+    if (!enabled) {
+      log.info("Database {} is marked as disabled, skipping.", name)
+      return
+    }
+
     val ldap = env.require(EnvKey.AppDB.DBLDAPPrefix + key)
     val user = env.require(EnvKey.AppDB.DBUserPrefix + key)
     val pass = env.require(EnvKey.AppDB.DBPassPrefix + key)
