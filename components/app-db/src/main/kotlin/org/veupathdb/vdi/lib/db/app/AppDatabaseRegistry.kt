@@ -58,14 +58,14 @@ object AppDatabaseRegistry {
 
   private fun getEnvName(key: String) =
     when {
-      key.startsWith(EnvKey.AppDB.DBNamePrefix)           -> getEnvName(EnvKey.AppDB.DBNamePrefix, key)
-      key.startsWith(EnvKey.AppDB.DBLDAPPrefix)           -> getEnvName(EnvKey.AppDB.DBLDAPPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBUserPrefix)           -> getEnvName(EnvKey.AppDB.DBUserPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBPassPrefix)           -> getEnvName(EnvKey.AppDB.DBPassPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBPoolPrefix)           -> getEnvName(EnvKey.AppDB.DBPoolPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix) -> getEnvName(EnvKey.AppDB.DBDataSchemaPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix)  -> getEnvName(EnvKey.AppDB.DBControlSchemaPrefix, key)
-      else                                                -> null
+      key.startsWith(EnvKey.AppDB.DBNamePrefix)          -> getEnvName(EnvKey.AppDB.DBNamePrefix, key)
+      key.startsWith(EnvKey.AppDB.DBLDAPPrefix)          -> getEnvName(EnvKey.AppDB.DBLDAPPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBUserPrefix)          -> getEnvName(EnvKey.AppDB.DBUserPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBPassPrefix)          -> getEnvName(EnvKey.AppDB.DBPassPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBPoolPrefix)          -> getEnvName(EnvKey.AppDB.DBPoolPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix)    -> getEnvName(EnvKey.AppDB.DBDataSchemaPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix) -> getEnvName(EnvKey.AppDB.DBControlSchemaPrefix, key)
+      else                                               -> null
     }
 
   @Suppress("NOTHING_TO_INLINE")
