@@ -12,4 +12,5 @@ fun BrokenImportDetails(record: BrokenImportRecord): BrokenImportDetails =
     owner = record.ownerID.toLong()
     datasetType = DatasetTypeInfo(record.typeName, record.typeVersion, datasetTypeName)
     projectIds = record.projects
+    messages = record.messages
   }

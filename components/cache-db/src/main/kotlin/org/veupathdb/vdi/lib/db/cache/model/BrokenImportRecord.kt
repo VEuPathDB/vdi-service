@@ -9,4 +9,5 @@ data class BrokenImportRecord(
   val typeName: String,
   val typeVersion: String,
   val projects: List<String>,
+  val messages: List<String>,
 )

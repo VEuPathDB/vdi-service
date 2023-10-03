@@ -22,6 +22,13 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.util.*
 
+// Broken Import Query Constants
+private const val biQueryLimitMinimum = 0
+private const val biQueryLimitMaximum = 250
+private const val biQueryLimitDefault = 100
+private const val biQueryOffsetMinimum = 0
+private const val biQueryOffsetDefault = 0
+
 class VDIDatasetsAdminController : VdiDatasetsAdmin {
 
   override fun getVdiDatasetsAdminListBroken(
@@ -106,18 +113,18 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
     if (adminToken != Options.Admin.secretKey)
       throw ForbiddenException()
 
-    if (limit != null && (limit < 0 || limit > 250))
+    if (limit != null && (limit < biQueryLimitMinimum || limit > biQueryLimitMaximum))
       throw BadRequestException("invalid limit value")
 
-    if (offset != null && offset < 0)
+    if (offset != null && offset < biQueryOffsetMinimum)
       throw BadRequestException("invalid offset value")
 
     val query = BrokenImportListQuery().also {
       it.userID = user?.toUserID()
       it.before = before?.let { fixVariableDateString(it) { BadRequestException("invalid before date value") } }
       it.after  = after?.let { fixVariableDateString(it) { BadRequestException("invalid after date value") } }
-      it.limit  = limit?.toUByte() ?: 100u
-      it.offset = offset?.toUInt() ?: 0u
+      it.limit  = limit?.toUByte() ?: biQueryLimitDefault.toUByte()
+      it.offset = offset?.toUInt() ?: biQueryOffsetDefault.toUInt()
       it.sortBy = sort?.let { BrokenImportListQuery.SortField.fromStringOrNull(it) }
         ?: throw BadRequestException("invalid sort by value")
       it.order  = order?.let { SortOrder.fromStringOrNull(it) }

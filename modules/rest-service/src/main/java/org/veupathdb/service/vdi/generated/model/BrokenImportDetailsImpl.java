@@ -10,7 +10,8 @@ import java.util.List;
     "datasetId",
     "owner",
     "datasetType",
-    "projectIds"
+    "projectIds",
+    "messages"
 })
 public class BrokenImportDetailsImpl implements BrokenImportDetails {
   @JsonProperty("datasetId")
@@ -24,6 +25,9 @@ public class BrokenImportDetailsImpl implements BrokenImportDetails {
 
   @JsonProperty("projectIds")
   private List<String> projectIds;
+
+  @JsonProperty("messages")
+  private List<String> messages;
 
   @JsonProperty("datasetId")
   public String getDatasetId() {
@@ -63,5 +67,15 @@ public class BrokenImportDetailsImpl implements BrokenImportDetails {
   @JsonProperty("projectIds")
   public void setProjectIds(List<String> projectIds) {
     this.projectIds = projectIds;
+  }
+
+  @JsonProperty("messages")
+  public List<String> getMessages() {
+    return this.messages;
+  }
+
+  @JsonProperty("messages")
+  public void setMessages(List<String> messages) {
+    this.messages = messages;
   }
 }

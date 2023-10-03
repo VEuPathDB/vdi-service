@@ -31,4 +31,10 @@ public interface BrokenImportDetails {
 
   @JsonProperty("projectIds")
   void setProjectIds(List<String> projectIds);
+
+  @JsonProperty("messages")
+  List<String> getMessages();
+
+  @JsonProperty("messages")
+  void setMessages(List<String> messages);
 }

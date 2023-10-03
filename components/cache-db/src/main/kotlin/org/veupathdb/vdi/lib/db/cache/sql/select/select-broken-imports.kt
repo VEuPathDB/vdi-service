@@ -1,6 +1,5 @@
 package org.veupathdb.vdi.lib.db.cache.sql.select
 
-import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.cache.model.BrokenImportListQuery
 import org.veupathdb.vdi.lib.db.cache.model.BrokenImportRecord
 import org.veupathdb.vdi.lib.db.cache.util.*
@@ -9,10 +8,8 @@ import org.veupathdb.vdi.lib.db.cache.util.getUserID
 import org.veupathdb.vdi.lib.db.cache.util.withPreparedStatement
 import org.veupathdb.vdi.lib.db.cache.util.withResults
 import java.sql.Connection
-import java.sql.SQLType
 import java.sql.Types
 
-// language=postgresql
 private fun sqlBody(
   userIDFilter: String,
   beforeFilter: String,
@@ -21,13 +18,16 @@ private fun sqlBody(
   sortOrder:    String,
   limit:        UByte,
   offset:       UInt,
-) = """
+) =
+// language=postgresql
+"""
 SELECT
   d.dataset_id
 , d.type_name
 , d.type_version
 , d.owner_id
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id) AS projects
+, array(SELECT m.message FROM vdi.import_messages AS m WHERE m.dataset_id = d.dataset_id) AS messages
 FROM
   vdi.datasets AS d
   INNER JOIN vdi.import_control AS i
@@ -97,11 +97,12 @@ internal fun Connection.selectBrokenImports(query: BrokenImportListQuery): List<
 
       while (next())
         out.add(BrokenImportRecord(
-          getDatasetID("dataset_id"),
-          getUserID("owner_id"),
-          getString("type_name"),
-          getString("type_version"),
-          getProjectIDList("projects")
+          datasetID   = getDatasetID("dataset_id"),
+          ownerID     = getUserID("owner_id"),
+          typeName    = getString("type_name"),
+          typeVersion = getString("type_version"),
+          projects    = getProjectIDList("projects"),
+          messages    = getStringList("messages"),
         ))
 
       out
