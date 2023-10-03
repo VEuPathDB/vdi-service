@@ -18,7 +18,7 @@ COPY modules modules
 COPY components components
 COPY src src
 
-RUN gradle --no-daemon test shadowJar
+RUN gradle --no-daemon test shadowJar --info
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
