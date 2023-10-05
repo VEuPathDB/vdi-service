@@ -27,3 +27,6 @@ local.properties
 .settings
 *~
 .*~
+
+# Secrets
+k8s/secrets/*.yml
