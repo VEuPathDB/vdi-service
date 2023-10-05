@@ -6,7 +6,6 @@ import oracle.jdbc.OracleDriver
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.env.*
 import org.veupathdb.vdi.lib.ldap.LDAP
-import javax.sql.DataSource
 
 object AppDatabaseRegistry {
 
@@ -54,18 +53,20 @@ object AppDatabaseRegistry {
     key.startsWith(EnvKey.AppDB.DBPassPrefix) ||
     key.startsWith(EnvKey.AppDB.DBPoolPrefix) ||
     key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix) ||
-    key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix)
+    key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix) ||
+    key.startsWith(EnvKey.AppDB.DBEnabledPrefix)
 
   private fun getEnvName(key: String) =
     when {
-      key.startsWith(EnvKey.AppDB.DBNamePrefix)           -> getEnvName(EnvKey.AppDB.DBNamePrefix, key)
-      key.startsWith(EnvKey.AppDB.DBLDAPPrefix)           -> getEnvName(EnvKey.AppDB.DBLDAPPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBUserPrefix)           -> getEnvName(EnvKey.AppDB.DBUserPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBPassPrefix)           -> getEnvName(EnvKey.AppDB.DBPassPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBPoolPrefix)           -> getEnvName(EnvKey.AppDB.DBPoolPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix) -> getEnvName(EnvKey.AppDB.DBDataSchemaPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix)  -> getEnvName(EnvKey.AppDB.DBControlSchemaPrefix, key)
-      else                                                -> null
+      key.startsWith(EnvKey.AppDB.DBNamePrefix)          -> getEnvName(EnvKey.AppDB.DBNamePrefix, key)
+      key.startsWith(EnvKey.AppDB.DBLDAPPrefix)          -> getEnvName(EnvKey.AppDB.DBLDAPPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBUserPrefix)          -> getEnvName(EnvKey.AppDB.DBUserPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBPassPrefix)          -> getEnvName(EnvKey.AppDB.DBPassPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBPoolPrefix)          -> getEnvName(EnvKey.AppDB.DBPoolPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix)    -> getEnvName(EnvKey.AppDB.DBDataSchemaPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix) -> getEnvName(EnvKey.AppDB.DBControlSchemaPrefix, key)
+      key.startsWith(EnvKey.AppDB.DBEnabledPrefix)       -> getEnvName(EnvKey.AppDB.DBEnabledPrefix, key)
+      else                                               -> null
     }
 
   @Suppress("NOTHING_TO_INLINE")
@@ -73,7 +74,14 @@ object AppDatabaseRegistry {
     key.substring(prefix.length)
 
   private fun parseEnvironmentChunk(env: Environment, key: String) {
-    val name = env.require(EnvKey.AppDB.DBNamePrefix + key)
+    val enabled = env.reqBool(EnvKey.AppDB.DBEnabledPrefix + key)
+
+    if (!enabled) {
+      log.info("Database {} is marked as disabled, skipping.", key)
+      return
+    }
+
+    val name    = env.require(EnvKey.AppDB.DBNamePrefix + key)
     val ldap = env.require(EnvKey.AppDB.DBLDAPPrefix + key)
     val user = env.require(EnvKey.AppDB.DBUserPrefix + key)
     val pass = env.require(EnvKey.AppDB.DBPassPrefix + key)
