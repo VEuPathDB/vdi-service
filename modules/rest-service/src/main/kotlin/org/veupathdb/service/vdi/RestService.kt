@@ -18,10 +18,7 @@ object RestService : Server() {
     start(args)
   }
 
-  override fun newResourceConfig(opts: Options) = Resources(opts as Opts).apply {
-    property("jersey.config.server.tracing.type", "ALL")
-    property("jersey.config.server.tracing.threshold", "VERBOSE")
-  }
+  override fun newResourceConfig(opts: Options) = Resources(opts as Opts)
 
   override fun dependencies() = initDatabaseDependencies()
 
