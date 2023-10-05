@@ -11,8 +11,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     property = "status"
 )
 @JsonSubTypes({
-    @JsonSubTypes.Type(org.veupathdb.service.vdi.generated.model.ForbiddenError.class),
     @JsonSubTypes.Type(org.veupathdb.service.vdi.generated.model.ServerError.class),
+    @JsonSubTypes.Type(org.veupathdb.service.vdi.generated.model.ForbiddenError.class),
     @JsonSubTypes.Type(org.veupathdb.service.vdi.generated.model.UnprocessableEntityError.class),
     @JsonSubTypes.Type(org.veupathdb.service.vdi.generated.model.NotFoundError.class),
     @JsonSubTypes.Type(org.veupathdb.service.vdi.generated.model.UnauthorizedError.class),

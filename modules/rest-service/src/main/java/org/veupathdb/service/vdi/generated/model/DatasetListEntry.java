@@ -73,4 +73,10 @@ public interface DatasetListEntry {
 
   @JsonProperty("status")
   void setStatus(DatasetStatusInfo status);
+
+  @JsonProperty("shares")
+  List<DatasetListShareUser> getShares();
+
+  @JsonProperty("shares")
+  void setShares(List<DatasetListShareUser> shares);
 }
