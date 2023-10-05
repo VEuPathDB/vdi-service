@@ -83,7 +83,6 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
         .asSequence()
         .filter { it.offerStatus == VDIShareOfferAction.Grant }
         .map { sh ->
-          log.warn("Shares List = {}", userDetails)
           DatasetListShareUser(
             userDetails[sh.recipientID]!!,
             sh.receiptStatus == VDIShareReceiptAction.Accept
