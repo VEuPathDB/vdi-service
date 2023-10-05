@@ -3,9 +3,12 @@ package org.veupathdb.service.vdi.service.datasets
 import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.model.UserDetails
+import org.veupathdb.service.vdi.util.reduceTo
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
+import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 import org.veupathdb.vdi.lib.db.cache.CacheDB
@@ -22,9 +25,17 @@ fun fetchCommunityUserDatasetList(): List<DatasetListEntry> {
 }
 
 private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetListEntry> {
+  // Get the shares data for the list of results.
+  val shares = CacheDB.selectSharesForDatasets(datasetList.map(DatasetRecord::datasetID))
+  val shareCount = shares.reduceTo(0) { _, _, v -> v.size }
 
   // build a set for collecting user IDs to use when querying for user details
-  val userIDs = HashSet<UserID>(datasetList.size)
+  val userIDs = HashSet<UserID>(shareCount + datasetList.size)
+
+  // Append share recipient user IDs to the user IDs array
+  shares.forEach { (_, v) -> v.asSequence()
+    .filter { it.offerStatus == VDIShareOfferAction.Grant }
+    .forEach { userIDs.add(it.recipientID) }}
 
   // build a map for collecting project ID -> dataset ID collection mappings
   // to use when querying for dataset status info.
@@ -67,7 +78,17 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
     results.add(it.toListEntry(
       userDetails[it.ownerID] ?: throw IllegalStateException("missing user details for user id ${it.ownerID}"),
       PluginHandlers[it.typeName, it.typeVersion]?.displayName ?: throw IllegalStateException("missing plugin ${it.typeName}:${it.typeVersion}"),
-      datasetInstallStatusMap[it.datasetID] ?: emptyMap()
+      datasetInstallStatusMap[it.datasetID] ?: emptyMap(),
+      (shares[it.datasetID] ?: emptyList())
+        .asSequence()
+        .filter { it.offerStatus == VDIShareOfferAction.Grant }
+        .map { sh ->
+          DatasetListShareUser(
+            userDetails[sh.recipientID]!!,
+            sh.receiptStatus == VDIShareReceiptAction.Accept
+          )
+        }
+        .toList()
     ))
   }
 
@@ -77,7 +98,8 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
 private fun DatasetRecord.toListEntry(
   owner: UserDetails,
   pluginDisplayName: String,
-  statuses: Map<ProjectID, InstallStatuses>
+  statuses: Map<ProjectID, InstallStatuses>,
+  shares: List<DatasetListShareUser>,
 ) = DatasetListEntryImpl().also { out ->
   out.datasetID   = datasetID.toString()
   out.owner       = DatasetOwner(owner)
@@ -90,4 +112,5 @@ private fun DatasetRecord.toListEntry(
   out.status      = DatasetStatusInfo(importStatus, statuses)
   out.origin      = origin
   out.sourceUrl   = sourceURL
+  out.shares      = shares
 }

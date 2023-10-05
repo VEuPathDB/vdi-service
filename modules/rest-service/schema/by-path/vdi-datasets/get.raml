@@ -5,6 +5,16 @@ uses:
 
 types:
 
+  DatasetListShareUser:
+    type: object
+    additionalProperties: false
+    properties:
+      userID: common.User-ID
+      firstName: string
+      lastName: string
+      organization: string
+      accepted: boolean
+
   DatasetListEntry:
     displayName: Dataset List Item
     description: Short entry with basic details about a dataset.
@@ -65,4 +75,7 @@ types:
         displayName: Status Info
         type: common.DatasetStatusInfo
         required: true
-
+      shares:
+        displayName: Shared With
+        type: DatasetListShareUser[]
+        required: true

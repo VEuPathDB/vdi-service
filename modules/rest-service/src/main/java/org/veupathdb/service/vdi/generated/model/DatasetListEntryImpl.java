@@ -17,7 +17,8 @@ import java.util.List;
     "sourceUrl",
     "origin",
     "projectIDs",
-    "status"
+    "status",
+    "shares"
 })
 public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("datasetID")
@@ -52,6 +53,9 @@ public class DatasetListEntryImpl implements DatasetListEntry {
 
   @JsonProperty("status")
   private DatasetStatusInfo status;
+
+  @JsonProperty("shares")
+  private List<DatasetListShareUser> shares;
 
   @JsonProperty("datasetID")
   public String getDatasetID() {
@@ -161,5 +165,15 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("status")
   public void setStatus(DatasetStatusInfo status) {
     this.status = status;
+  }
+
+  @JsonProperty("shares")
+  public List<DatasetListShareUser> getShares() {
+    return this.shares;
+  }
+
+  @JsonProperty("shares")
+  public void setShares(List<DatasetListShareUser> shares) {
+    this.shares = shares;
   }
 }

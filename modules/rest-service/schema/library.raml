@@ -62,6 +62,15 @@ types:
     properties:
       datasetID: VDI-ID
       projectID: ProjectID
+  DatasetListShareUser:
+    type: object
+    additionalProperties: false
+    properties:
+      userID: User-ID
+      firstName: string
+      lastName: string
+      organization: string
+      accepted: boolean
   DatasetListEntry:
     displayName: Dataset List Item
     description: Short entry with basic details about a dataset.
@@ -114,6 +123,9 @@ types:
       status:
         displayName: Status Info
         type: DatasetStatusInfo
+      shares:
+        displayName: Shared With
+        type: DatasetListShareUser[]
   DatasetPostRequest:
     displayName: Dataset Post Request
     description: |
