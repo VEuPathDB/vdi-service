@@ -829,12 +829,13 @@ uses:
           application/json:
             type: lib.ServerError
 
-  /upload/{file-name}:
+  /upload:
     displayName: Dataset Upload File
-    uriParameters:
-      file-name: string
     get:
-      displayName: Get Upload File
+      displayName: Get Upload Zip File
+      description: |
+        Returns a zip file containing the contents of the original upload to the
+        dataset importer.
       responses:
         200:
           description: Success
@@ -857,10 +858,12 @@ uses:
             application/json:
               type: lib.ServerError
 
-  /data/{file-name}:
+  /data:
     displayName: Dataset Data File
-    uriParameters:
-      file-name: string
+    description: |
+      Returns a zip file containing the processed files that were/would be
+      installed into the VEuPathDB project site on successful install
+      processing.
     get:
       displayName: Get Data File
       responses:
