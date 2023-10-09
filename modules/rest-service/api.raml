@@ -839,6 +839,10 @@ uses:
       responses:
         200:
           description: Success
+          headers:
+            Content-Disposition:
+              type: string
+              example: attachment; filename="1234567-upload.zip"
           body:
             application/octet-stream:
               type: any
@@ -869,6 +873,10 @@ uses:
       responses:
         200:
           description: Success
+          headers:
+            Content-Disposition:
+              type: string
+              example: attachment; filename="1234567-data.zip"
           body:
             application/octet-stream:
               type: any

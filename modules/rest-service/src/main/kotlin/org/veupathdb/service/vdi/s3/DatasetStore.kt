@@ -15,6 +15,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
+import vdi.constants.InstallZipName
 import vdi.constants.UploadZipName
 import java.io.InputStream
 
@@ -61,9 +62,9 @@ object DatasetStore {
     return out
   }
 
-  fun getUploadFile(userID: UserID, datasetID: DatasetID, fileName: String): StreamObject? {
-    log.debug("fetching upload file {} for dataset {}/{}", fileName, userID, datasetID)
-    return bucket.objects.open(S3Paths.datasetUploadFile(userID, datasetID, fileName))
+  fun getUploadFile(userID: UserID, datasetID: DatasetID): StreamObject? {
+    log.debug("fetching upload zip for dataset {}/{}", userID, datasetID)
+    return bucket.objects.open(S3Paths.datasetUploadFile(userID, datasetID, UploadZipName))
   }
 
   fun listDataFiles(userID: UserID, datasetID: DatasetID): List<FileEntry> {
@@ -72,9 +73,9 @@ object DatasetStore {
       .map { FileEntry(it) }
   }
 
-  fun getDataFile(userID: UserID, datasetID: DatasetID, fileName: String): StreamObject? {
-    log.debug("fetching data file {} for dataset {}/{}", fileName, userID, datasetID)
-    return bucket.objects.open(S3Paths.datasetDataFile(userID, datasetID, fileName))
+  fun getDataFile(userID: UserID, datasetID: DatasetID): StreamObject? {
+    log.debug("fetching data zip for dataset {}/{}", userID, datasetID)
+    return bucket.objects.open(S3Paths.datasetDataFile(userID, datasetID, InstallZipName))
   }
 
   fun getUploadsSize(userID: UserID, datasetID: DatasetID): ULong {

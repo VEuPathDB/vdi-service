@@ -83,10 +83,15 @@ public interface VdiDatasetsVdIdFiles {
       super(response);
     }
 
+    public static HeadersFor200 headersFor200() {
+      return new HeadersFor200();
+    }
+
     public static GetVdiDatasetsFilesUploadByVdIdResponse respond200WithApplicationOctetStream(
-        StreamingOutput entity) {
+        StreamingOutput entity, HeadersFor200 headers) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/octet-stream");
       responseBuilder.entity(entity);
+      headers.toResponseBuilder(responseBuilder);
       return new GetVdiDatasetsFilesUploadByVdIdResponse(responseBuilder.build(), entity);
     }
 
@@ -110,6 +115,16 @@ public interface VdiDatasetsVdIdFiles {
       responseBuilder.entity(entity);
       return new GetVdiDatasetsFilesUploadByVdIdResponse(responseBuilder.build(), entity);
     }
+
+    public static class HeadersFor200 extends HeaderBuilderBase {
+      private HeadersFor200() {
+      }
+
+      public HeadersFor200 withContentDisposition(final String p) {
+        headerMap.put("Content-Disposition", String.valueOf(p));;
+        return this;
+      }
+    }
   }
 
   class GetVdiDatasetsFilesDataByVdIdResponse extends ResponseDelegate {
@@ -121,10 +136,15 @@ public interface VdiDatasetsVdIdFiles {
       super(response);
     }
 
+    public static HeadersFor200 headersFor200() {
+      return new HeadersFor200();
+    }
+
     public static GetVdiDatasetsFilesDataByVdIdResponse respond200WithApplicationOctetStream(
-        StreamingOutput entity) {
+        StreamingOutput entity, HeadersFor200 headers) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/octet-stream");
       responseBuilder.entity(entity);
+      headers.toResponseBuilder(responseBuilder);
       return new GetVdiDatasetsFilesDataByVdIdResponse(responseBuilder.build(), entity);
     }
 
@@ -147,6 +167,16 @@ public interface VdiDatasetsVdIdFiles {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetVdiDatasetsFilesDataByVdIdResponse(responseBuilder.build(), entity);
+    }
+
+    public static class HeadersFor200 extends HeaderBuilderBase {
+      private HeadersFor200() {
+      }
+
+      public HeadersFor200 withContentDisposition(final String p) {
+        headerMap.put("Content-Disposition", String.valueOf(p));;
+        return this;
+      }
     }
   }
 }

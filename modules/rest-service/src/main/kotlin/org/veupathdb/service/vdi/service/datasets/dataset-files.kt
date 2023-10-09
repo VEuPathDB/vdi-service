@@ -16,14 +16,14 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 // Functions in this group are used for fetching import-processed data files
 // from S3.
 
-internal fun getDataFileForAdmin(vdid: DatasetID, fileName: String) =
-  with(CacheDB.selectDataset(vdid) ?: throw NotFoundException()) { getDataFile(ownerID, vdid, fileName) }
+internal fun getDataFileForAdmin(vdid: DatasetID) =
+  with(CacheDB.selectDataset(vdid) ?: throw NotFoundException()) { getDataFile(ownerID, vdid) }
 
-internal fun getDataFileForUser(user: UserID, vdid: DatasetID, fileName: String) =
-  with(requireDataset(user, vdid)) { getDataFile(ownerID, vdid, fileName) }
+internal fun getDataFileForUser(user: UserID, vdid: DatasetID) =
+  with(requireDataset(user, vdid)) { getDataFile(ownerID, vdid) }
 
-private fun getDataFile(owner: UserID, vdid: DatasetID, fileName: String) =
-  DatasetStore.getDataFile(owner, vdid, fileName) ?: throw NotFoundException()
+private fun getDataFile(owner: UserID, vdid: DatasetID) =
+  DatasetStore.getDataFile(owner, vdid) ?: throw NotFoundException()
 
 // endregion Get Data File
 
@@ -31,14 +31,14 @@ private fun getDataFile(owner: UserID, vdid: DatasetID, fileName: String) =
 //
 // Functions in this group are used for fetching raw user upload files from S3.
 
-internal fun getUploadFileForAdmin(vdid: DatasetID, fileName: String) =
-  with(CacheDB.selectDataset(vdid) ?: throw NotFoundException()) { getUploadFile(ownerID, vdid, fileName) }
+internal fun getUploadFileForAdmin(vdid: DatasetID) =
+  with(CacheDB.selectDataset(vdid) ?: throw NotFoundException()) { getUploadFile(ownerID, vdid) }
 
-internal fun getUploadFileForUser(user: UserID, vdid: DatasetID, fileName: String) =
-  with(requireDataset(user, vdid)) { getUploadFile(ownerID, vdid, fileName) }
+internal fun getUploadFileForUser(user: UserID, vdid: DatasetID) =
+  with(requireDataset(user, vdid)) { getUploadFile(ownerID, vdid) }
 
-private fun getUploadFile(owner: UserID, vdid: DatasetID, fileName: String) =
-  DatasetStore.getUploadFile(owner, vdid, fileName) ?: throw NotFoundException()
+private fun getUploadFile(owner: UserID, vdid: DatasetID) =
+  DatasetStore.getUploadFile(owner, vdid) ?: throw NotFoundException()
 
 // endregion Get Upload File
 
