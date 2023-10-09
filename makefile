@@ -49,6 +49,10 @@ log-service:
 log-plugin-noop:
 	@docker logs -f vdi-service-plugin-example-1
 
+.PHONY: log-plugin-genelist
+log-plugin-genelist:
+	@docker logs -f vdi-service-plugin-genelist-1
+
 .PHONY: log-kafka
 log-kafka:
 	@docker logs -f vdi-service-kafka-1
