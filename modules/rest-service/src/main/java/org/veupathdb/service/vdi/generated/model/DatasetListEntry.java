@@ -79,4 +79,16 @@ public interface DatasetListEntry {
 
   @JsonProperty("shares")
   void setShares(List<DatasetListShareUser> shares);
+
+  @JsonProperty("fileCount")
+  Integer getFileCount();
+
+  @JsonProperty("fileCount")
+  void setFileCount(Integer fileCount);
+
+  @JsonProperty("fileSizeTotal")
+  Integer getFileSizeTotal();
+
+  @JsonProperty("fileSizeTotal")
+  void setFileSizeTotal(Integer fileSizeTotal);
 }

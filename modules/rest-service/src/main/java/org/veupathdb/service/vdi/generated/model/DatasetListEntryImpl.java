@@ -18,7 +18,9 @@ import java.util.List;
     "origin",
     "projectIDs",
     "status",
-    "shares"
+    "shares",
+    "fileCount",
+    "fileSizeTotal"
 })
 public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("datasetID")
@@ -56,6 +58,12 @@ public class DatasetListEntryImpl implements DatasetListEntry {
 
   @JsonProperty("shares")
   private List<DatasetListShareUser> shares;
+
+  @JsonProperty("fileCount")
+  private Integer fileCount;
+
+  @JsonProperty("fileSizeTotal")
+  private Integer fileSizeTotal;
 
   @JsonProperty("datasetID")
   public String getDatasetID() {
@@ -175,5 +183,25 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("shares")
   public void setShares(List<DatasetListShareUser> shares) {
     this.shares = shares;
+  }
+
+  @JsonProperty("fileCount")
+  public Integer getFileCount() {
+    return this.fileCount;
+  }
+
+  @JsonProperty("fileCount")
+  public void setFileCount(Integer fileCount) {
+    this.fileCount = fileCount;
+  }
+
+  @JsonProperty("fileSizeTotal")
+  public Integer getFileSizeTotal() {
+    return this.fileSizeTotal;
+  }
+
+  @JsonProperty("fileSizeTotal")
+  public void setFileSizeTotal(Integer fileSizeTotal) {
+    this.fileSizeTotal = fileSizeTotal;
   }
 }
