@@ -139,11 +139,6 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
 
   // region Insert
 
-  fun insertInstallFiles(datasetID: DatasetID, files: Map<String, Long>) {
-    log.debug("inserting dataset install files for dataset {}", datasetID)
-    con.insertInstallFiles(datasetID, files)
-  }
-
   fun insertUploadFiles(datasetID: DatasetID, files: Map<String, Long>) {
     log.debug("inserting dataset upload files for dataset {}", datasetID)
     con.insertUploadFiles(datasetID, files)
@@ -162,6 +157,11 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
   fun tryInsertDataset(row: Dataset) {
     log.debug("inserting dataset record for dataset {}", row.datasetID)
     con.tryInsertDatasetRecord(row.datasetID, row.typeName, row.typeVersion, row.ownerID, row.isDeleted, row.origin, row.created)
+  }
+
+  fun tryInsertInstallFiles(datasetID: DatasetID, files: Map<String, Long>) {
+    log.debug("inserting dataset install files for dataset {}", datasetID)
+    con.tryInsertInstallFiles(datasetID, files)
   }
 
   /**

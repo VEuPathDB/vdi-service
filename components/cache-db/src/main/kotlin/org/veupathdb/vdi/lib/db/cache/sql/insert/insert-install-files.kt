@@ -10,9 +10,10 @@ INSERT INTO
   vdi.install_files (dataset_id, file_name, file_size)
 VALUES
   (?, ?, ?)
+ON CONFLICT DO NOTHING
 """
 
-internal fun Connection.insertInstallFiles(datasetID: DatasetID, files: Map<String, Long>) {
+internal fun Connection.tryInsertInstallFiles(datasetID: DatasetID, files: Map<String, Long>) {
   withPreparedStatement(SQL) {
     setString(1, datasetID.toString())
 
