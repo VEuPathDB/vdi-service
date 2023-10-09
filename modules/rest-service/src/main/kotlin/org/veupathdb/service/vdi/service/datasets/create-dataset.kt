@@ -83,10 +83,12 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
       try {
         verifyFileSize(paths.second, userID)
 
-        paths.second.repack(into = archive, using = directory)
+        val sizes = paths.second.repack(into = archive, using = directory)
 
         log.debug("uploading raw user data to S3 for new dataset {} by user {}", datasetID, userID)
         DatasetStore.putUserUpload(userID, datasetID, archive::inputStream)
+
+        CacheDB.withTransaction { it.insertUploadFiles(datasetID, sizes) }
       } finally {
         paths.second.deleteIfExists()
         paths.first?.deleteRecursively()
@@ -133,56 +135,120 @@ private fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
     },
   )
 
-private fun Path.repack(into: Path, using: Path) {
+/**
+ * Repacks the receiver file or archive into a zip file for upload to S3.
+ *
+ * @receiver Path to the file or archive to repack.
+ *
+ * @param into Path to the new archive that should be created.
+ *
+ * @param using Temp directory to use when unpacking/repacking the upload files.
+ *
+ * @return A map of upload files and their sizes.
+ */
+private fun Path.repack(into: Path, using: Path): Map<String, Long> {
   // If it resembles a zip file
-  if (name.endsWith(".zip")) {
-
-    // Validate that the zip appears usable.
-    validateZip()
-
-    // List of paths for the unpacked files
-    val unpacked = ArrayList<Path>(12)
-
-    // Iterate through the zip entries
-    Zip.zipEntries(this)
-      .forEach { (entry, input) ->
-
-        // If the zip entry contains a slash, we reject it (we don't presently allow subdirectories)
-        if (entry.name.contains('/') || entry.isDirectory)
-          throw BadRequestException("uploaded zip file must not contain subdirectories")
-
-        val tmpFile = using.resolve(entry.name)
-
-        tmpFile.createFile()
-        tmpFile.outputStream().use { out -> input.transferTo(out) }
-
-        unpacked.add(tmpFile)
-      }
-
-    // ensure that the zip actually contained some files
-    if (unpacked.isEmpty())
-      throw BadRequestException("uploaded zip file contains no files")
-
-    log.info("Compressing file from {} into {}", unpacked, into)
-    // recompress the files as a tgz file
-    Tar.compressWithGZip(into, unpacked)
+  return if (name.endsWith(".zip")) {
+    repackZip(into, using)
   }
 
   // If it resembles a tar file
   else if (name.endsWith(".tar.gz") || name.endsWith(".tgz")) {
-    Tar.decompressWithGZip(this, using)
-
-    val files = using.listDirectoryEntries()
-
-    if (files.isEmpty())
-      throw BadRequestException("uploaded tar file contains no files")
-
-    Tar.compressWithGZip(into, files)
+    repackTar(into, using)
   }
 
   else {
-    Tar.compressWithGZip(into, listOf(this))
+    repackRaw(into)
   }
+}
+
+/**
+ * Repacks the receiver zip file into a new highly compressed zip file for
+ * upload to S3.
+ *
+ * @receiver Path to the zip file to repack.
+ *
+ * @param into Path to the new archive that should be created.
+ *
+ * @param using Temp directory to use when unpacking/repacking the upload files.
+ *
+ * @return A map of upload files and their sizes.
+ */
+private fun Path.repackZip(into: Path, using: Path): Map<String, Long> {
+  // Map of file names to sizes that will be stored in the postgres database.
+  val files = HashMap<String, Long>(12)
+
+  // Validate that the zip appears usable.
+  validateZip()
+
+  // List of paths for the unpacked files
+  val unpacked = ArrayList<Path>(12)
+
+  // Iterate through the zip entries
+  Zip.zipEntries(this)
+    .forEach { (entry, input) ->
+
+      // If the zip entry contains a slash, we reject it (we don't presently allow subdirectories)
+      if (entry.name.contains('/') || entry.isDirectory)
+        throw BadRequestException("uploaded zip file must not contain subdirectories")
+
+      val tmpFile = using.resolve(entry.name)
+
+      tmpFile.createFile()
+      tmpFile.outputStream().use { out -> input.transferTo(out) }
+
+      files[entry.name] = tmpFile.fileSize()
+
+      unpacked.add(tmpFile)
+    }
+
+  // ensure that the zip actually contained some files
+  if (unpacked.isEmpty())
+    throw BadRequestException("uploaded zip file contains no files")
+
+  log.info("Compressing file from {} into {}", unpacked, into)
+  // recompress the files as a tgz file
+  Zip.compress(into, unpacked)
+
+  return files
+}
+
+/**
+ * Repacks the receiver tar file into a new highly compressed zip file for
+ * upload to S3.
+ *
+ * @receiver Path to the tar file to repack.
+ *
+ * @param into Path to the new archive that should be created.
+ *
+ * @param using Temp directory to use when unpacking/repacking the upload files.
+ *
+ * @return A map of upload files and their sizes.
+ */
+private fun Path.repackTar(into: Path, using: Path): Map<String, Long> {
+  // Output map of files to sizes that will be written to the postgres DB.
+  val sizes = HashMap<String, Long>(12)
+
+  Tar.decompressWithGZip(this, using)
+
+  val files = using.listDirectoryEntries()
+
+  if (files.isEmpty())
+    throw BadRequestException("uploaded tar file contains no files")
+
+  for (file in files)
+    sizes[file.name] = file.fileSize()
+
+  Zip.compress(into, files)
+
+  return sizes
+}
+
+private fun Path.repackRaw(into: Path): Map<String, Long> {
+  val sizes = HashMap<String, Long>(1)
+  Tar.compressWithGZip(into, listOf(this))
+  sizes[this.name] = this.fileSize()
+  return sizes
 }
 
 @OptIn(ExperimentalPathApi::class)

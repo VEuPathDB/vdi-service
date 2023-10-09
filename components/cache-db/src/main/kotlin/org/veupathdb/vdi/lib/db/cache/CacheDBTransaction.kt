@@ -27,6 +27,8 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
     else
       connection
 
+  // region Delete
+
   fun deleteShareOffer(datasetID: DatasetID, recipientID: UserID) {
     log.debug("deleting share offer record for dataset {}, recipient {}", datasetID, recipientID)
     con.deleteShareOffer(datasetID, recipientID)
@@ -133,6 +135,24 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
     con.deleteSyncControl(datasetID)
   }
 
+  // endregion Delete
+
+  // region Insert
+
+  fun insertInstallFiles(datasetID: DatasetID, files: Map<String, Long>) {
+    log.debug("inserting dataset install files for dataset {}", datasetID)
+    con.insertInstallFiles(datasetID, files)
+  }
+
+  fun insertUploadFiles(datasetID: DatasetID, files: Map<String, Long>) {
+    log.debug("inserting dataset upload files for dataset {}", datasetID)
+    con.insertUploadFiles(datasetID, files)
+  }
+
+  // endregion Insert
+
+  // region Try-Insert
+
   /**
    * Attempts to insert a dataset record for the given dataset details, aborting
    * the insert query silently if a conflicting record already exists.
@@ -199,6 +219,8 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
     log.debug("soft-inserting import messages for dataset {}", datasetID)
     con.tryInsertImportMessages(datasetID, messages)
   }
+
+  // endregion Try-Insert
 
   fun updateImportControl(datasetID: DatasetID, status: DatasetImportStatus) {
     log.debug("updating import status for dataset {} to status {}", datasetID, status)
