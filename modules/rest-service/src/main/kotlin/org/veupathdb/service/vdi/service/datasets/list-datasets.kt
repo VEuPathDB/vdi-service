@@ -12,6 +12,7 @@ import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 import org.veupathdb.vdi.lib.db.cache.CacheDB
+import org.veupathdb.vdi.lib.db.cache.model.DatasetFileSummary
 import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
@@ -25,8 +26,10 @@ fun fetchCommunityUserDatasetList(): List<DatasetListEntry> {
 }
 
 private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetListEntry> {
+  val datasetIDs = datasetList.map(DatasetRecord::datasetID)
+
   // Get the shares data for the list of results.
-  val shares = CacheDB.selectSharesForDatasets(datasetList.map(DatasetRecord::datasetID))
+  val shares = CacheDB.selectSharesForDatasets(datasetIDs)
   val shareCount = shares.reduceTo(0) { _, _, v -> v.size }
 
   // build a set for collecting user IDs to use when querying for user details
@@ -40,6 +43,9 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
   // build a map for collecting project ID -> dataset ID collection mappings
   // to use when querying for dataset status info.
   val projectToDatasetID = HashMap<String, MutableSet<DatasetID>>(12)
+
+  // Get file counts and sizes for the datasets.
+  val fileSummaries = CacheDB.selectUploadFileSummaries(datasetIDs)
 
   // for each dataset the original search returned
   datasetList.forEach { ds ->
@@ -88,7 +94,8 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
             sh.receiptStatus == VDIShareReceiptAction.Accept
           )
         }
-        .toList()
+        .toList(),
+      fileSummaries[it.datasetID]!!
     ))
   }
 
@@ -100,17 +107,20 @@ private fun DatasetRecord.toListEntry(
   pluginDisplayName: String,
   statuses: Map<ProjectID, InstallStatuses>,
   shares: List<DatasetListShareUser>,
+  fileSummary: DatasetFileSummary,
 ) = DatasetListEntryImpl().also { out ->
-  out.datasetID   = datasetID.toString()
-  out.owner       = DatasetOwner(owner)
-  out.datasetType = DatasetTypeInfo(this, pluginDisplayName)
-  out.name        = name
-  out.summary     = summary
-  out.description = description
-  out.projectIDs  = projects.toList()
-  out.visibility  = DatasetVisibility(visibility)
-  out.status      = DatasetStatusInfo(importStatus, statuses)
-  out.origin      = origin
-  out.sourceUrl   = sourceURL
-  out.shares      = shares
+  out.datasetID     = datasetID.toString()
+  out.owner         = DatasetOwner(owner)
+  out.datasetType   = DatasetTypeInfo(this, pluginDisplayName)
+  out.name          = name
+  out.summary       = summary
+  out.description   = description
+  out.projectIDs    = projects.toList()
+  out.visibility    = DatasetVisibility(visibility)
+  out.status        = DatasetStatusInfo(importStatus, statuses)
+  out.origin        = origin
+  out.sourceUrl     = sourceURL
+  out.shares        = shares
+  out.fileCount     = fileSummary.count.toInt()
+  out.fileSizeTotal = fileSummary.size.toLong()
 }

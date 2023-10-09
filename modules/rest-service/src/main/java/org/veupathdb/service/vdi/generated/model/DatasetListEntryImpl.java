@@ -63,7 +63,7 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   private Integer fileCount;
 
   @JsonProperty("fileSizeTotal")
-  private Integer fileSizeTotal;
+  private Long fileSizeTotal;
 
   @JsonProperty("datasetID")
   public String getDatasetID() {
@@ -196,12 +196,12 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   }
 
   @JsonProperty("fileSizeTotal")
-  public Integer getFileSizeTotal() {
+  public Long getFileSizeTotal() {
     return this.fileSizeTotal;
   }
 
   @JsonProperty("fileSizeTotal")
-  public void setFileSizeTotal(Integer fileSizeTotal) {
+  public void setFileSizeTotal(Long fileSizeTotal) {
     this.fileSizeTotal = fileSizeTotal;
   }
 }

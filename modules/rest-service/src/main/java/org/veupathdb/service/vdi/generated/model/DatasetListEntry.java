@@ -87,8 +87,8 @@ public interface DatasetListEntry {
   void setFileCount(Integer fileCount);
 
   @JsonProperty("fileSizeTotal")
-  Integer getFileSizeTotal();
+  Long getFileSizeTotal();
 
   @JsonProperty("fileSizeTotal")
-  void setFileSizeTotal(Integer fileSizeTotal);
+  void setFileSizeTotal(Long fileSizeTotal);
 }
