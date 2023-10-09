@@ -63,6 +63,16 @@ object CacheDB {
     return connection.use { it.selectDataset(datasetID) }
   }
 
+  fun selectInstallFiles(datasetID: DatasetID): List<DatasetFile> {
+    log.debug("selecting install files for dataset {}", datasetID)
+    return connection.use { it.selectInstallFiles(datasetID) }
+  }
+
+  fun selectUploadFiles(datasetID: DatasetID): List<DatasetFile> {
+    log.debug("selecting upload files for dataset {}", datasetID)
+    return connection.use { it.selectUploadFiles(datasetID) }
+  }
+
   fun selectDatasetList(query: DatasetListQuery): List<DatasetRecord> {
     log.debug("selecting dataset list for user {}", query.userID)
     return connection.use { it.selectDatasetList(query) }

@@ -152,6 +152,8 @@ object Pruner {
     log.debug("deleting dataset {} from cache DB", datasetID)
 
     CacheDB.withTransaction {
+      it.deleteInstallFiles(datasetID)
+      it.deleteUpdateFiles(datasetID)
       it.deleteDatasetMetadata(datasetID)
       it.deleteDatasetProjects(datasetID)
       it.deleteDatasetShareOffers(datasetID)

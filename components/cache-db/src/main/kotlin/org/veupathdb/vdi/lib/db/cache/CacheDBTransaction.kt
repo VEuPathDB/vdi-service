@@ -135,6 +135,16 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
     con.deleteSyncControl(datasetID)
   }
 
+  fun deleteInstallFiles(datasetID: DatasetID) {
+    log.debug("deleting install files for dataset {}", datasetID)
+    con.deleteInstallFiles(datasetID)
+  }
+
+  fun deleteUpdateFiles(datasetID: DatasetID) {
+    log.debug("deleting upload files for dataset {}", datasetID)
+    con.deleteUploadFiles(datasetID)
+  }
+
   // endregion Delete
 
   // region Insert
