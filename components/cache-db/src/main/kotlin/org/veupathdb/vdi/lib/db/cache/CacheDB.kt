@@ -73,6 +73,18 @@ object CacheDB {
     return connection.use { it.selectUploadFiles(datasetID) }
   }
 
+  fun selectInstallFileCount(datasetID: DatasetID) =
+    connection.use { it.selectInstallFileCount(datasetID) }
+
+  fun selectInstallFileSummaries(datasetIDs: List<DatasetID>) =
+    connection.use { it.selectInstallFileSummaries(datasetIDs) }
+
+  fun selectUploadFileCount(datasetID: DatasetID) =
+    connection.use { it.selectUploadFileCount(datasetID) }
+
+  fun selectUploadFileSummaries(datasetIDs: List<DatasetID>) =
+    connection.use { it.selectUploadFileSummaries(datasetIDs) }
+
   fun selectDatasetList(query: DatasetListQuery): List<DatasetRecord> {
     log.debug("selecting dataset list for user {}", query.userID)
     return connection.use { it.selectDatasetList(query) }
