@@ -1,8 +1,11 @@
 package org.veupathdb.service.vdi.generated.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Date;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -17,7 +20,11 @@ import java.util.List;
     "sourceUrl",
     "origin",
     "projectIDs",
-    "status"
+    "status",
+    "shares",
+    "fileCount",
+    "fileSizeTotal",
+    "created"
 })
 public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("datasetID")
@@ -52,6 +59,25 @@ public class DatasetListEntryImpl implements DatasetListEntry {
 
   @JsonProperty("status")
   private DatasetStatusInfo status;
+
+  @JsonProperty("shares")
+  private List<DatasetListShareUser> shares;
+
+  @JsonProperty("fileCount")
+  private Integer fileCount;
+
+  @JsonProperty("fileSizeTotal")
+  private Long fileSizeTotal;
+
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+  )
+  @JsonDeserialize(
+      using = TimestampDeserializer.class
+  )
+  @JsonProperty("created")
+  private Date created;
 
   @JsonProperty("datasetID")
   public String getDatasetID() {
@@ -161,5 +187,45 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("status")
   public void setStatus(DatasetStatusInfo status) {
     this.status = status;
+  }
+
+  @JsonProperty("shares")
+  public List<DatasetListShareUser> getShares() {
+    return this.shares;
+  }
+
+  @JsonProperty("shares")
+  public void setShares(List<DatasetListShareUser> shares) {
+    this.shares = shares;
+  }
+
+  @JsonProperty("fileCount")
+  public Integer getFileCount() {
+    return this.fileCount;
+  }
+
+  @JsonProperty("fileCount")
+  public void setFileCount(Integer fileCount) {
+    this.fileCount = fileCount;
+  }
+
+  @JsonProperty("fileSizeTotal")
+  public Long getFileSizeTotal() {
+    return this.fileSizeTotal;
+  }
+
+  @JsonProperty("fileSizeTotal")
+  public void setFileSizeTotal(Long fileSizeTotal) {
+    this.fileSizeTotal = fileSizeTotal;
+  }
+
+  @JsonProperty("created")
+  public Date getCreated() {
+    return this.created;
+  }
+
+  @JsonProperty("created")
+  public void setCreated(Date created) {
+    this.created = created;
   }
 }

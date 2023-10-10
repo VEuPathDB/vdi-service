@@ -10,6 +10,7 @@ import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import java.util.Date
 
 /**
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
@@ -26,6 +27,8 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
+  val files = CacheDB.selectUploadFiles(datasetID)
+
   return DatasetDetailsImpl().also { out ->
     out.datasetID      = datasetID.toString()
     out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
@@ -37,6 +40,8 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
     out.status         = DatasetStatusInfo(dataset.importStatus, statuses)
     out.visibility     = DatasetVisibility(dataset.visibility)
     out.sourceUrl      = dataset.sourceURL
+    out.files          = files.map(::FileSummary)
+    out.created        = Date.from(dataset.created.toInstant())
   }
 }
 
@@ -70,6 +75,8 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
+  val files = CacheDB.selectUploadFiles(datasetID)
+
   // return the dataset
   return DatasetDetailsImpl().also { out ->
     out.datasetID      = datasetID.toString()
@@ -84,6 +91,8 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.shares         = ArrayList(shares.size)
     out.visibility     = DatasetVisibility(dataset.visibility)
     out.sourceUrl      = dataset.sourceURL
+    out.files          = files.map(::FileSummary)
+    out.created        = Date.from(dataset.created.toInstant())
 
     shares.forEach { share ->
       out.shares.add(ShareOffer(

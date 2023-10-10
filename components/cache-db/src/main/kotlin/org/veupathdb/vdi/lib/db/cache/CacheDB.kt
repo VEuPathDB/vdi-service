@@ -63,6 +63,28 @@ object CacheDB {
     return connection.use { it.selectDataset(datasetID) }
   }
 
+  fun selectInstallFiles(datasetID: DatasetID): List<DatasetFile> {
+    log.debug("selecting install files for dataset {}", datasetID)
+    return connection.use { it.selectInstallFiles(datasetID) }
+  }
+
+  fun selectUploadFiles(datasetID: DatasetID): List<DatasetFile> {
+    log.debug("selecting upload files for dataset {}", datasetID)
+    return connection.use { it.selectUploadFiles(datasetID) }
+  }
+
+  fun selectInstallFileCount(datasetID: DatasetID) =
+    connection.use { it.selectInstallFileCount(datasetID) }
+
+  fun selectInstallFileSummaries(datasetIDs: List<DatasetID>) =
+    connection.use { it.selectInstallFileSummaries(datasetIDs) }
+
+  fun selectUploadFileCount(datasetID: DatasetID) =
+    connection.use { it.selectUploadFileCount(datasetID) }
+
+  fun selectUploadFileSummaries(datasetIDs: List<DatasetID>) =
+    connection.use { it.selectUploadFileSummaries(datasetIDs) }
+
   fun selectDatasetList(query: DatasetListQuery): List<DatasetRecord> {
     log.debug("selecting dataset list for user {}", query.userID)
     return connection.use { it.selectDatasetList(query) }
@@ -86,6 +108,11 @@ object CacheDB {
   fun selectSharesForDataset(datasetID: DatasetID): List<DatasetShare> {
     log.debug("selecting shares for dataset {}", datasetID)
     return connection.use { it.selectSharesFor(datasetID) }
+  }
+
+  fun selectSharesForDatasets(datasetIDs: List<DatasetID>): Map<DatasetID, List<DatasetShare>> {
+    log.debug("selecting shares for {} datasets", datasetIDs.size)
+    return connection.use { it.selectSharesFor(datasetIDs) }
   }
 
   fun selectImportControl(datasetID: DatasetID): DatasetImportStatus? {

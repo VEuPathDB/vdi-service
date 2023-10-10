@@ -28,7 +28,8 @@ This is the basic setup required to run the VDI stack locally.
 ** `USER_DB_PASS`: Your user db password
 ** Find and replace all instances of `someDBUser` with your app db username
 ** Find and replace all instances of `someDBPass` with your app db password
-. Run `make build` to build the stack components
+. Optionally run `make build` to build the stack components, if this step is
+  skipped, the latest image versions from Jenkins will be used.
 
 [#basic-setup-run]
 === Run the Stack

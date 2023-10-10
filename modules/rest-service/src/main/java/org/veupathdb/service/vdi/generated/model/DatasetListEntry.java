@@ -2,6 +2,7 @@ package org.veupathdb.service.vdi.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Date;
 import java.util.List;
 
 @JsonDeserialize(
@@ -73,4 +74,28 @@ public interface DatasetListEntry {
 
   @JsonProperty("status")
   void setStatus(DatasetStatusInfo status);
+
+  @JsonProperty("shares")
+  List<DatasetListShareUser> getShares();
+
+  @JsonProperty("shares")
+  void setShares(List<DatasetListShareUser> shares);
+
+  @JsonProperty("fileCount")
+  Integer getFileCount();
+
+  @JsonProperty("fileCount")
+  void setFileCount(Integer fileCount);
+
+  @JsonProperty("fileSizeTotal")
+  Long getFileSizeTotal();
+
+  @JsonProperty("fileSizeTotal")
+  void setFileSizeTotal(Long fileSizeTotal);
+
+  @JsonProperty("created")
+  Date getCreated();
+
+  @JsonProperty("created")
+  void setCreated(Date created);
 }

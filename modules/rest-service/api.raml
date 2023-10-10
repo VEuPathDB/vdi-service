@@ -166,6 +166,15 @@ uses:
                 - projectID: ToxoDB
                   metaStatus: complete
                   dataStatus: complete
+              shares:
+                - userID: 1234
+                  firstName: Billy
+                  lastName: Mays
+                  organization: OxiClean
+                  accepted: true
+              fileCount: 2
+              fileSizeTotal: 123456789
+              created: 2023-10-31T23:59:59.999Z
       400:
         description: |
           Bad Request.
@@ -727,6 +736,10 @@ uses:
               - projectID: ToxoDB
                 metaStatus: complete
                 dataStatus: complete
+            files:
+              - name: my-file.csv
+                size: 145325
+            created: 2023-10-31T11:59:59.999Z
       401:
         description: |
           Unauthorized.
@@ -911,15 +924,20 @@ uses:
           application/json:
             type: lib.ServerError
 
-  /upload/{file-name}:
+  /upload:
     displayName: Dataset Upload File
-    uriParameters:
-      file-name: string
     get:
-      displayName: Get Upload File
+      displayName: Get Upload Zip File
+      description: |
+        Returns a zip file containing the contents of the original upload to the
+        dataset importer.
       responses:
         200:
           description: Success
+          headers:
+            Content-Disposition:
+              type: string
+              example: attachment; filename="1234567-upload.zip"
           body:
             application/octet-stream:
               type: any
@@ -939,15 +957,21 @@ uses:
             application/json:
               type: lib.ServerError
 
-  /data/{file-name}:
+  /data:
     displayName: Dataset Data File
-    uriParameters:
-      file-name: string
+    description: |
+      Returns a zip file containing the processed files that were/would be
+      installed into the VEuPathDB project site on successful install
+      processing.
     get:
       displayName: Get Data File
       responses:
         200:
           description: Success
+          headers:
+            Content-Disposition:
+              type: string
+              example: attachment; filename="1234567-data.zip"
           body:
             application/octet-stream:
               type: any

@@ -89,6 +89,15 @@ types:
     properties:
       datasetID: VDI-ID
       projectID: ProjectID
+  DatasetListShareUser:
+    type: object
+    additionalProperties: false
+    properties:
+      userID: User-ID
+      firstName: string
+      lastName: string
+      organization: string
+      accepted: boolean
   DatasetListEntry:
     displayName: Dataset List Item
     description: Short entry with basic details about a dataset.
@@ -141,6 +150,23 @@ types:
       status:
         displayName: Status Info
         type: DatasetStatusInfo
+      shares:
+        displayName: Shared With
+        type: DatasetListShareUser[]
+      fileCount:
+        displayName: File Count
+        description: Number of files uploaded for this dataset.
+        type: integer
+      fileSizeTotal:
+        displayName: File Size Total
+        description: |
+          Sum of the sizes of all the files uploaded for this dataset.
+        type: integer
+        format: int64
+      created:
+        displayName: Creation Timestamp
+        description: Timestamp of the creation of this dataset.
+        type: datetime
   DatasetPostRequest:
     displayName: Dataset Post Request
     description: |
@@ -344,6 +370,25 @@ types:
         type: array
         required: false
         items: ShareOffer
+      files:
+        displayName: Files
+        description: |
+          List of files uploaded to the dataset import service.
+        type: array
+        items: FileSummary
+      created:
+        displayName: Creation Timestamp
+        description: Timestamp for when this dataset was created.
+        type: datetime
+  FileSummary:
+    displayName: File Summary
+    type: object
+    additionalProperties: false
+    properties:
+      name: string
+      size:
+        type: integer
+        format: int64
   ShareOffer:
     displayName: Share Offer
     type: object
