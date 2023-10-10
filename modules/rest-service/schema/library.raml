@@ -339,6 +339,21 @@ types:
         type: array
         required: false
         items: ShareOffer
+      files:
+        displayName: Files
+        description: |
+          List of files uploaded to the dataset import service.
+        type: array
+        items: FileSummary
+  FileSummary:
+    displayName: File Summary
+    type: object
+    additionalProperties: false
+    properties:
+      name: string
+      size:
+        type: integer
+        format: int64
   ShareOffer:
     displayName: Share Offer
     type: object

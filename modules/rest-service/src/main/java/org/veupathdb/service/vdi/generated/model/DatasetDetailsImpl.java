@@ -19,7 +19,8 @@ import java.util.List;
     "visibility",
     "importMessages",
     "status",
-    "shares"
+    "shares",
+    "files"
 })
 public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("datasetID")
@@ -65,6 +66,9 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty("shares")
   private List<ShareOffer> shares;
+
+  @JsonProperty("files")
+  private List<FileSummary> files;
 
   @JsonProperty("datasetID")
   public String getDatasetID() {
@@ -204,5 +208,15 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("shares")
   public void setShares(List<ShareOffer> shares) {
     this.shares = shares;
+  }
+
+  @JsonProperty("files")
+  public List<FileSummary> getFiles() {
+    return this.files;
+  }
+
+  @JsonProperty("files")
+  public void setFiles(List<FileSummary> files) {
+    this.files = files;
   }
 }
