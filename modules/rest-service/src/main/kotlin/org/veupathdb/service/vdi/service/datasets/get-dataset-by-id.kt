@@ -73,6 +73,8 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
+  val files = CacheDB.selectUploadFiles(datasetID)
+
   // return the dataset
   return DatasetDetailsImpl().also { out ->
     out.datasetID      = datasetID.toString()
@@ -87,6 +89,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.shares         = ArrayList(shares.size)
     out.visibility     = DatasetVisibility(dataset.visibility)
     out.sourceUrl      = dataset.sourceURL
+    out.files          = files.map(::FileSummary)
 
     shares.forEach { share ->
       out.shares.add(ShareOffer(
