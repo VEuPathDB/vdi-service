@@ -16,6 +16,10 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetFileSummary
 import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
   return fetchDatasetList(CacheDB.selectDatasetList(query))
@@ -123,4 +127,5 @@ private fun DatasetRecord.toListEntry(
   out.shares        = shares
   out.fileCount     = fileSummary.count.toInt()
   out.fileSizeTotal = fileSummary.size.toLong()
+  out.created       = Date.from(created.toInstant())
 }
