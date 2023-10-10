@@ -29,8 +29,18 @@ job "vdi" {
       driver = "docker"
 
       config {
-        image = "veupathdb/vdi-service:latest"
+        image = "veupathdb/vdi-service:branch-nomad"
         ports = ["public-http"]
+      }
+
+      env {
+        CACHE_DB_USERNAME = "someUser"
+        CACHE_DB_PASSWORD = "somePassword"
+        CACHE_DB_NAME     = "vdi"
+        CACHE_DB_HOST     = "localhost"
+        CACHE_DB_PORT     = 5432
+
+        KAFKA_SERVERS = "localhost:9092"
       }
     }
 
@@ -61,13 +71,7 @@ job "vdi" {
       }
 
       env {
-        CACHE_DB_USERNAME = "someUser"
-        CACHE_DB_PASSWORD = "somePassword"
-        CACHE_DB_NAME     = "vdi"
-        CACHE_DB_HOST     = "localhost"
-        CACHE_DB_PORT     = 5432
-
-        KAFKA_SERVERS = "localhost:9092"
+        SERVER_PORT = 81
       }
     }
   }
