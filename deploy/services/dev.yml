@@ -4,6 +4,7 @@ metadata:
   name: vdi
   namespace: vdi
 spec:
+  type: NodePort
   selector:
     stack: vdi
   ports:

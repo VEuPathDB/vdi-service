@@ -58,7 +58,6 @@ spec:
       labels:
         stack: vdi
     spec:
-      hostNetwork: true
       volumes:
         - name: user-dataset-mount
           hostPath:
