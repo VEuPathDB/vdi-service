@@ -1,0 +1,100 @@
+################################################################################
+#
+# Core HTTP service configuration.  These configuration values relate to only
+# the rest-service module of the VDI project.
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rest-service
+  namespace: vdi
+data:
+  # Quotas
+  MAX_UPLOAD_FILE_SIZE: "1073741824"
+  USER_UPLOAD_QUOTA: "10737418240"
+
+  # Container Core
+  SERVER_PORT: "80"
+  ACCT_DB_TNS_NAME: "acctdbn"
+  ACCT_DB_POOL_SIZE: "5"
+  USER_DB_TNS_NAME: "apicommn"
+  USER_DB_POOL_SIZE: "5"
+
+  # Cache DB Connection
+  CACHE_DB_NAME: "vdi"
+  CACHE_DB_HOST: "localhost"
+  CACHE_DB_PORT: "5432"
+  CACHE_DB_POOL_SIZE: "5"
+
+  # Rabbit Connection
+  GLOBAL_RABBIT_HOST: "localhost"
+  GLOBAL_RABBIT_VDI_EXCHANGE_NAME: "vdi-bucket-notifications"
+  GLOBAL_RABBIT_VDI_QUEUE_NAME: "vdi-bucket-notifications"
+  GLOBAL_RABBIT_VDI_ROUTING_KEY: "vdi-bucket-notifications"
+
+  # S3 Connection
+  S3_HOST: "localhost"
+  S3_PORT: "9000"
+  S3_USE_HTTPS: "false"
+  S3_BUCKET_NAME: "some-other-bucket"
+
+  # Kafka Connections
+  KAFKA_SERVERS: "localhost:9092"
+  KAFKA_CONSUMER_GROUP_ID: "vdi-kafka-consumers"
+  KAFKA_PRODUCER_CLIENT_ID: "vdi-event-router"
+
+  KAFKA_TOPIC_HARD_DELETE_TRIGGERS: "hard-delete-triggers"
+  KAFKA_TOPIC_IMPORT_TRIGGERS: "import-triggers"
+  KAFKA_TOPIC_INSTALL_TRIGGERS: "install-triggers"
+  KAFKA_TOPIC_SHARE_TRIGGERS: "share-triggers"
+  KAFKA_TOPIC_SOFT_DELETE_TRIGGERS: "soft-delete-triggers"
+  KAFKA_TOPIC_UPDATE_META_TRIGGERS: "update-meta-triggers"
+
+  KAFKA_MESSAGE_KEY_HARD_DELETE_TRIGGERS: "hard-delete-trigger"
+  KAFKA_MESSAGE_KEY_IMPORT_TRIGGERS: "import-trigger"
+  KAFKA_MESSAGE_KEY_INSTALL_TRIGGERS: "install-trigger"
+  KAFKA_MESSAGE_KEY_SHARE_TRIGGERS: "share-trigger"
+  KAFKA_MESSAGE_KEY_SOFT_DELETE_TRIGGERS: "soft-delete-trigger"
+  KAFKA_MESSAGE_KEY_UPDATE_META_TRIGGERS: "update-meta-trigger"
+
+  # Dataset Reinstaller
+  DATASET_REINSTALLER_RUN_INTERVAL: "1m"
+  DATASET_REINSTALLER_WAKE_INTERVAL: "10s"
+
+  # Hard Delete Module
+  HARD_DELETE_HANDLER_KAFKA_CONSUMER_CLIENT_ID: "hard-delete-handler"
+  HARD_DELETE_HANDLER_WORKER_POOL_SIZE: "1"
+  HARD_DELETE_HANDLER_WORK_QUEUE_SIZE: "100"
+
+  # Import Module
+  IMPORT_HANDLER_KAFKA_CONSUMER_CLIENT_ID: "import-handler"
+  IMPORT_HANDLER_WORKER_POOL_SIZE: "10"
+  IMPORT_HANDLER_WORK_QUEUE_SIZE: "5"
+
+  # Install Data Module
+  INSTALL_DATA_HANDLER_KAFKA_CONSUMER_CLIENT_ID: "install-data-handler"
+  INSTALL_DATA_HANDLER_WORKER_POOL_SIZE: "5"
+  INSTALL_DATA_WORK_QUEUE_SIZE: "5"
+
+  # Pruner Module
+  DATASET_PRUNING_DELETION_THRESHOLD: "2m"
+  DATASET_PRUNING_INTERVAL: "1m"
+  DATASET_PRUNING_WAKEUP_INTERVAL: "5s"
+
+  # Reconciler Module
+  RECONCILER_ENABLED: "false"
+
+  # Share Module
+  SHARE_HANDLER_KAFKA_CONSUMER_CLIENT_ID: "share-handler"
+  SHARE_HANDLER_WORKER_POOL_SIZE: "10"
+  SHARE_HANDLER_WORK_QUEUE_SIZE: "5"
+
+  # Soft Delete Module
+  SOFT_DELETE_HANDLER_KAFKA_CONSUMER_CLIENT_ID: "soft-delete-handler"
+  SOFT_DELETE_HANDLER_WORKER_POOL_SIZE: "10"
+  SOFT_DELETE_HANDLER_WORK_QUEUE_SIZE: "5"
+
+  # Update Meta Module
+  UPDATE_META_HANDLER_KAFKA_CONSUMER_CLIENT_ID: "update-meta-handler"
+  UPDATE_META_HANDLER_WORKER_POOL_SIZE: "10"
+  UPDATE_META_HANDLER_WORK_QUEUE_SIZE: "5"

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: globals
+  namespace: vdi
+data:
+  ORACLE_BASE_DN: "ou=applications,dc=apidb,dc=org"

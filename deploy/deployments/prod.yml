@@ -1,0 +1,281 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi
+  namespace: vdi
+  labels:
+    stack: vdi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      stack: vdi
+      network/vdi: "true"
+  template:
+    metadata:
+      labels:
+        stack: vdi
+    spec:
+      volumes:
+        - name: user-dataset-mount
+          hostPath:
+            path: /var/www/Common/userDatasets/vdi_datasets_feat_s
+
+      containers:
+        - name: cache-db
+          image: veupathdb/vdi-internal-db:1.5.0
+          ports:
+            - containerPort: 5432
+              name: cache-db
+          startupProbe:
+            exec:
+              command:
+                - "pg_isready"
+            initialDelaySeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - "pg_isready"
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: CACHE_DB_USERNAME
+                  name: cache-db
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: CACHE_DB_PASSWORD
+                  name: cache-db
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: CACHE_DB_NAME
+                  name: rest-service
+        - name: kafka
+          image: veupathdb/apache-kafka:3.4.0
+          ports:
+            - containerPort: 9092
+              name: kafka
+          startupProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 10
+          envFrom:
+            - configMapRef:
+                name: kafka
+        - name: rest-service
+          image: veupathdb/vdi-service:branch-k8s
+          ports:
+            - containerPort: 80
+              name: http-svc
+          startupProbe:
+            httpGet:
+              port: http-svc
+              path: /health
+            initialDelaySeconds: 30
+          readinessProbe:
+            httpGet:
+              port: http-svc
+              path: /health
+          envFrom:
+            # Load Secrets
+            - secretRef:
+                name: app-dbs
+            - secretRef:
+                name: globals
+            - secretRef:
+                name: rest-service
+            # Load Configurations
+            - configMapRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - configMapRef:
+                name: rest-service
+            - configMapRef:
+                name: plugin-registry
+        - name: plugin-example
+          image: veupathdb/vdi-plugin-example:latest
+          ports:
+            - containerPort: 81
+              name: plg-example
+          startupProbe:
+            httpGet:
+              port: plg-example
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-example
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "81"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
+            - configMapRef:
+                name: globals
+        - name: plugin-genelist
+          image: veupathdb/vdi-plugin-genelist:latest
+          ports:
+            - containerPort: 82
+              name: plg-genelist
+          startupProbe:
+            httpGet:
+              port: plg-genelist
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-genelist
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "82"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
+            - configMapRef:
+                name: globals
+        - name: plugin-isasimple
+          image: veupathdb/vdi-plugin-isasimple:latest
+          ports:
+            - containerPort: 83
+              name: plg-isasimple
+          startupProbe:
+            httpGet:
+              port: plg-isasimple
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-isasimple
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "83"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
+            - configMapRef:
+                name: globals
+        - name: plugin-bigwig
+          image: veupathdb/vdi-plugin-bigwig:latest
+          ports:
+            - containerPort: 84
+              name: plg-bigwig
+          startupProbe:
+            httpGet:
+              port: plg-bigwig
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-bigwig
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "84"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
+            - configMapRef:
+                name: globals
+        - name: plugin-biom
+          image: veupathdb/vdi-plugin-biom:latest
+          ports:
+            - containerPort: 85
+              name: plg-biom
+          startupProbe:
+            httpGet:
+              port: plg-biom
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-biom
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "85"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
+            - configMapRef:
+                name: globals
+        - name: plugin-rnaseq
+          image: veupathdb/vdi-plugin-rnaseq:latest
+          ports:
+            - containerPort: 86
+              name: plg-rnaseq
+          startupProbe:
+            httpGet:
+              port: plg-rnaseq
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-rnaseq
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "86"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals

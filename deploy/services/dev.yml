@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vdi
+  namespace: vdi
+spec:
+  selector:
+    stack: vdi
+  ports:
+    - name: rest-svc-http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: rest-svc-https
+      protocol: TCP
+      port: 443
+      targetPort: 80
+    - name: cache-db
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+    - name: rabbit-admin
+      protocol: TCP
+      port: 15672
+      targetPort: 15672

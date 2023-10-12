@@ -1,0 +1,13 @@
+################################################################################
+#
+# Global plugin configuration.  These configuration values are consumed only by
+# plugin containers, and by ALL plugin containers.
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plugin-globals
+  namespace: vdi
+data:
+  SITE_BUILD: "build-65"
+  DATASET_INSTALL_ROOT: "/user-datasets"

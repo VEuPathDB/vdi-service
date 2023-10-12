@@ -1,0 +1,12 @@
+################################################################################
+#
+# Kafka instance configuration map.  These entries are to configure the Apache
+# Kafka container only; they are not used by any other containers.
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka
+  namespace: vdi
+data:
+  KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"

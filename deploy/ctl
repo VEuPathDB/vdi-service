@@ -1,0 +1,424 @@
+#!/usr/bin/env bash
+
+CUR_DIR="$(dirname "$(readlink -f "$0")")"
+
+## NAMESPACE MANAGEMENT ########################################################
+
+function namespaceCreate() {
+  kubectl create namespace vdi
+}
+
+function namespaceDelete() {
+  kubectl delete namespace vdi
+}
+
+function namespaceHelp() {
+  echo "Usage:"
+  echo "  ctl namespace <command>"
+  echo ""
+  echo "Commands:"
+  echo "  create"
+  echo "      Creates the VDI namespace."
+  echo "  delete"
+  echo "      Deletes the VDI namespace."
+  echo ""
+}
+
+function namespaceMode() {
+  case "$1" in
+    "create")
+      namespaceCreate
+      ;;
+    "delete")
+      namespaceDelete
+      ;;
+    "help")
+      namespaceHelp
+      ;;
+    *)
+      namespaceHelp
+      exit 1
+      ;;
+  esac
+}
+
+## CONFIG MANAGEMENT ###########################################################
+
+function configInstall() {
+  for i in `find "$CUR_DIR/configmaps" -type f -name '*.yml'`; do
+    kubectl apply -f "$i"
+  done
+}
+
+function configDelete() {
+  for i in `find "$CUR_DIR/configmaps" -maxdepth 1 -type f -name '*.yml'`; do
+    secretName="$(grep '^  name: ' $i | cut -c9-)"
+    kubectl delete configmap "$secretName" --namespace=vdi
+  done
+}
+
+function configHelp() {
+  echo "Usage:"
+  echo "  ctl config <command>"
+  echo ""
+  echo "Commands:"
+  echo "  install"
+  echo "      Installs the VDI configuration files."
+  echo "  delete"
+  echo "      Deletes the VDI configurations."
+  echo ""
+}
+
+function configMode() {
+  case "$1" in
+    "install")
+      configInstall
+      ;;
+    "delete")
+      configDelete
+      ;;
+    "help")
+      configHelp
+      ;;
+    *)
+      configHelp
+      exit 1
+      ;;
+  esac
+}
+
+## SECRET MANAGEMENT ###########################################################
+
+function secretInit() {
+  for i in `find "$CUR_DIR/secrets" -type f -name '*.tpl.yml'`; do
+    NEW_PATH="$(sed 's/.tpl//g' <<< "$i")"
+
+    if [ ! -f "$NEW_PATH" ]; then
+      echo "Copying $i to $NEW_PATH"
+      cp "$i" "$NEW_PATH"
+    fi
+  done
+}
+
+function secretList() {
+  kubectl get secrets --namespace=vdi
+}
+
+function secretInstall() {
+  for i in `find "$CUR_DIR/secrets" -type f -name '*.yml'`; do
+    kubectl apply -f "$i"
+  done
+}
+
+function secretDelete() {
+  for i in `find "$CUR_DIR/secrets" -maxdepth 1 -type f -name '*.yml'`; do
+    secretName="$(grep '^  name: ' $i | cut -c9-)"
+    kubectl delete secret "$secretName" --namespace=vdi
+  done
+}
+
+function secretHelp() {
+  echo "Usage:"
+  echo "  ctl secrets <command>"
+  echo ""
+  echo "Commands:"
+  echo "  init"
+  echo "      Copies secret template files into the expected location.  These"
+  echo "      files must be edited with the real secret values before the VDI"
+  echo "      stack can be run."
+  echo "  install"
+  echo "      Applies the secrets to your local kubernetes instance."
+  echo "  delete"
+  echo "      Removes the secrets from your local kubernetes instance."
+  echo "  list"
+  echo "      Lists the VDI secrets currently registered with kubernetes."
+  echo ""
+}
+
+function secretMode() {
+  case "$1" in
+    "init")
+      secretInit
+      ;;
+    "list")
+      secretList
+      ;;
+    "install")
+      secretInstall
+      ;;
+    "delete")
+      secretDelete
+      ;;
+    "help")
+      secretHelp
+      ;;
+    *)
+      secretHelp
+      exit 1
+      ;;
+  esac
+}
+
+## DEPLOYMENT MANAGEMENT #######################################################
+
+function deploymentHelp() {
+  echo "Usage:"
+  echo "  ctl deploy <command>"
+  echo ""
+  echo "Commands:"
+  echo "  install <env>"
+  echo "      Installs the VDI deployment into the local Kubernetes instance."
+  echo "  delete"
+  echo "      Removes the VDI deployment from the local Kubernetes instance."
+  echo ""
+  echo "Environments:"
+  echo "  prod"
+  echo "  dev"
+}
+
+function deployInstall() {
+  case "$1" in
+    "prod")
+      ;;
+    "dev")
+      ;;
+    *)
+      deploymentHelp
+      exit 1
+      ;;
+  esac
+
+  kubectl apply -f "$CUR_DIR/deployments/$1.yml"
+}
+
+function deployDelete() {
+  kubectl delete deployment vdi --namespace=vdi
+}
+
+function deploymentMode() {
+  case "$1" in
+    "install")
+      deployInstall "$2"
+      ;;
+    "delete")
+      deployDelete
+      ;;
+    "help")
+      deploymentHelp
+      ;;
+    *)
+      deploymentHelp
+      exit 1
+      ;;
+  esac
+}
+
+## SERVICE MANAGEMENT ##########################################################
+
+function serviceHelp() {
+  echo "Usage:"
+  echo "  ctl service <command>"
+  echo ""
+  echo "Commands:"
+  echo "  install <env>"
+  echo "      Installs the VDI service into the local Kubernetes instance."
+  echo "  delete"
+  echo "      Deletes the VDI service from the local Kubernetes instance."
+  echo ""
+  echo "Environments:"
+  echo "  dev"
+  echo "  prod"
+}
+
+function serviceInstall() {
+  case "$1" in
+    "prod")
+      ;;
+    "dev")
+      ;;
+    *)
+      serviceHelp
+      exit 1
+      ;;
+  esac
+
+  kubectl apply -f "$CUR_DIR/services/$1.yml"
+}
+
+function serviceDelete() {
+  kubectl delete service vdi --namespace=vdi
+}
+
+function serviceMode() {
+  case "$1" in
+    "install")
+      serviceInstall "$2"
+      ;;
+    "delete")
+      serviceDelete
+      ;;
+    "help")
+      serviceHelp
+      ;;
+    *)
+      serviceHelp
+      exit 1
+      ;;
+  esac
+}
+
+## LOGS MANAGEMENT #############################################################
+
+function logsHelp() {
+  echo "Usage:"
+  echo "  ctl log <container>"
+  echo ""
+  echo "Containers:"
+  echo "  For a list of containers see the k8s/deploy/prod.yml or"
+  echo "  k8s/deploy/dev.yml file based on which env you are running."
+  echo ""
+}
+
+function logsMode() {
+  if [ -z "$1" ]; then
+    logsHelp
+    exit 1
+  elif [ "$1" == "help" ]; then
+    logsHelp
+  else
+    kubectl logs deployment.app/vdi --namespace=vdi -c "$1"
+  fi
+}
+
+## FULL CONTROL ################################################################
+
+function fullStart() {
+  case "$1" in
+    "prod")
+      ;;
+    "dev")
+      ;;
+    *)
+      exit 1
+      ;;
+  esac
+
+  namespaceCreate
+  configInstall
+  secretInstall
+  deployInstall "$1"
+  serviceInstall "$1"
+}
+
+function fullTeardown() {
+  serviceDelete
+  deployDelete
+  secretDelete
+  configDelete
+  namespaceDelete
+}
+
+function fullHelp() {
+  echo "Usage:"
+  echo "  ctl full <command>"
+  echo ""
+  echo "Commands:"
+  echo "  start <env>"
+  echo "      Creates all elements of the stack."
+  echo "  teardown"
+  echo "      Tears down the full stack."
+  echo ""
+  echo "Environments:"
+  echo "  prod"
+  echo "  dev"
+}
+
+function fullMode() {
+  case "$1" in
+    "start")
+      fullStart "$2"
+      ;;
+    "teardown")
+      fullTeardown
+      ;;
+    "help")
+      fullHelp
+      ;;
+    *)
+      fullHelp
+      exit 1
+      ;;
+  esac
+}
+
+## GLOBAL ######################################################################
+
+function globalHelp() {
+  echo "Usage:"
+  echo "  ctl <mode>"
+  echo ""
+  echo "Modes:"
+  echo "  config <command>"
+  echo "      Configuration management."
+  echo "  deploy <command>"
+  echo "      Deployment management."
+  echo "  full <command>"
+  echo "      Full stack management."
+  echo "  logs <container>"
+  echo "      Prints logs for the target container."
+  echo "  namespace <command>"
+  echo "      Namespace management."
+  echo "  service <command>"
+  echo "      Service management."
+  echo "  secrets <command>"
+  echo "      Secrets management."
+  echo ""
+}
+
+case "$1" in
+  "conf")
+    configMode "$2"
+    ;;
+  "config")
+    configMode "$2"
+    ;;
+
+  "deploy")
+    deploymentMode "$2" "$3"
+    ;;
+
+  "full")
+    fullMode "$2" "$3"
+    ;;
+
+  "log")
+    logsMode "$2"
+    ;;
+  "logs")
+    logsMode "$2"
+    ;;
+
+  "namespace")
+    namespaceMode "$2"
+    ;;
+
+  "secrets")
+    secretMode "$2"
+    ;;
+
+  "svc")
+    serviceMode "$2" "$3"
+    ;;
+  "service")
+    serviceMode "$2" "$3"
+    ;;
+
+  "help")
+    globalHelp
+    ;;
+
+  *)
+    globalHelp
+    exit 1
+    ;;
+esac

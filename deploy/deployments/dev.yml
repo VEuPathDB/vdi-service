@@ -1,0 +1,381 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-minio
+  namespace: vdi
+data:
+  MINIO_ROOT_USER: "someToken"
+  MINIO_ROOT_PASSWORD: "someSecretKey"
+  MINIO_NOTIFY_AMQP_ENABLE_RABBIT: "on"
+  MINIO_NOTIFY_AMQP_URL_RABBIT: "amqp://someUser:somePassword@localhost:5672"
+  MINIO_NOTIFY_AMQP_EXCHANGE_RABBIT: "vdi-bucket-notifications"
+  MINIO_NOTIFY_AMQP_EXCHANGE_TYPE_RABBIT: "direct"
+  MINIO_NOTIFY_AMQP_ROUTING_KEY_RABBIT: "vdi-bucket-notifications"
+  MINIO_NOTIFY_AMQP_DELIVERY_MODE_RABBIT: "2"
+  MINIO_NOTIFY_AMQP_DURABLE_RABBIT: "on"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-rabbit
+  namespace: vdi
+data:
+  RABBITMQ_DEFAULT_USER: "someUser"
+  RABBITMQ_DEFAULT_PASS: "somePassword"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vdi-ingress
+  namespace: vdi
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: vdi
+                port:
+                  number: 80
+            pathType: Prefix
+            path: /
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi
+  namespace: vdi
+  labels:
+    stack: vdi
+    network/vdi: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      stack: vdi
+  template:
+    metadata:
+      labels:
+        stack: vdi
+    spec:
+      hostNetwork: true
+      volumes:
+        - name: user-dataset-mount
+          hostPath:
+            path: /tmp/vdi
+            type: DirectoryOrCreate
+
+      containers:
+        # DEV-SPECIFIC CONTAINERS
+        - name: minio
+          image: minio/minio
+          ports:
+            - containerPort: 9000
+              name: minio-api
+            - containerPort: 9001
+              name: minio-admin
+          envFrom:
+            - configMapRef:
+                name: dev-minio
+          command:
+            - /bin/sh
+            - -c
+            - >
+              microdnf install nc;
+              while ! nc -zv localhost 5672; do sleep 3; done;
+              minio server --console-address ':9001' /data;
+
+        - name: minio-setup
+          image: minio/mc
+          env:
+            - name: S3_BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_BUCKET_NAME
+                  name: rest-service
+          envFrom:
+            - configMapRef:
+                name: dev-minio
+          command:
+            - /bin/sh
+            - -c
+            - >
+              microdnf install nc;
+              while ! nc -zv localhost 9000; do sleep 3; done;
+              mc alias set minioc http://localhost:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+              mc mb minioc/${S3_BUCKET_NAME:?};
+              mc policy set public minioc/${S3_BUCKET_NAME:?};
+              mc event add minioc/${S3_BUCKET_NAME:?} arn:minio:sqs::RABBIT:amqp --event put,delete;
+              exit 0;
+
+        - name: rabbit
+          image: rabbitmq:3.12.6-management-alpine
+          ports:
+            - containerPort: 5672
+              name: rabbit-api
+            - containerPort: 15672
+              name: rabbit-admin
+          envFrom:
+            - configMapRef:
+                name: dev-rabbit
+
+        # STANDARD CONTAINERS
+        - name: cache-db
+          image: veupathdb/vdi-internal-db:1.5.0
+          ports:
+            - containerPort: 5432
+              name: cache-db
+          startupProbe:
+            exec:
+              command:
+                - "pg_isready"
+            initialDelaySeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - "pg_isready"
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: CACHE_DB_USERNAME
+                  name: cache-db
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: CACHE_DB_PASSWORD
+                  name: cache-db
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: CACHE_DB_NAME
+                  name: rest-service
+        - name: kafka
+          image: veupathdb/apache-kafka:3.4.0
+          ports:
+            - containerPort: 9092
+              name: kafka
+          startupProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 10
+          envFrom:
+            - configMapRef:
+                name: kafka
+        - name: rest-service
+          image: veupathdb/vdi-service:branch-k8s
+          ports:
+            - containerPort: 80
+              name: http-svc
+          startupProbe:
+            httpGet:
+              port: http-svc
+              path: /health
+            initialDelaySeconds: 30
+          readinessProbe:
+            httpGet:
+              port: http-svc
+              path: /health
+          envFrom:
+            # Load Secrets
+            - secretRef:
+                name: app-dbs
+            - secretRef:
+                name: globals
+            - secretRef:
+                name: rest-service
+            - secretRef:
+                name: cache-db
+            # Load Configurations
+            - configMapRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - configMapRef:
+                name: rest-service
+            - configMapRef:
+                name: plugin-registry
+        - name: plugin-example
+          image: veupathdb/vdi-plugin-example:latest
+          ports:
+            - containerPort: 81
+              name: plg-example
+          startupProbe:
+            httpGet:
+              port: plg-example
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-example
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "81"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
+            - configMapRef:
+                name: globals
+        - name: plugin-genelist
+          image: veupathdb/vdi-plugin-genelist:latest
+          ports:
+            - containerPort: 82
+              name: plg-genelist
+          startupProbe:
+            httpGet:
+              port: plg-genelist
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-genelist
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "82"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
+            - configMapRef:
+                name: globals
+        - name: plugin-isasimple
+          image: veupathdb/vdi-plugin-isasimple:latest
+          ports:
+            - containerPort: 83
+              name: plg-isasimple
+          startupProbe:
+            httpGet:
+              port: plg-isasimple
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-isasimple
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "83"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
+            - configMapRef:
+                name: globals
+        - name: plugin-bigwig
+          image: veupathdb/vdi-plugin-bigwig:latest
+          ports:
+            - containerPort: 84
+              name: plg-bigwig
+          startupProbe:
+            httpGet:
+              port: plg-bigwig
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-bigwig
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "84"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
+            - configMapRef:
+                name: globals
+        - name: plugin-biom
+          image: veupathdb/vdi-plugin-biom:latest
+          ports:
+            - containerPort: 85
+              name: plg-biom
+          startupProbe:
+            httpGet:
+              port: plg-biom
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-biom
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "85"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
+            - configMapRef:
+                name: globals
+        - name: plugin-rnaseq
+          image: veupathdb/vdi-plugin-rnaseq:latest
+          ports:
+            - containerPort: 86
+              name: plg-rnaseq
+          startupProbe:
+            httpGet:
+              port: plg-rnaseq
+              path: /metrics
+          readinessProbe:
+            httpGet:
+              port: plg-rnaseq
+              path: /metrics
+          volumeMounts:
+            - mountPath: /user-datasets
+              name: user-dataset-mount
+          env:
+            - name: SERVER_PORT
+              value: "86"
+          envFrom:
+            - secretRef:
+                name: globals
+            - configMapRef:
+                name: globals
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: app-dbs
+            - configMapRef:
+                name: plugin-globals
