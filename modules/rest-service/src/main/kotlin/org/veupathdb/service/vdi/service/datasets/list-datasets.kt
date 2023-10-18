@@ -99,7 +99,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
           )
         }
         .toList(),
-      fileSummaries[it.datasetID]!!
+      fileSummaries[it.datasetID] ?: DatasetFileSummary(0u, 0u)
     ))
   }
 

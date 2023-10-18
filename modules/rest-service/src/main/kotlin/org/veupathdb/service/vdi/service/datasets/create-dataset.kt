@@ -189,8 +189,15 @@ private fun Path.repackZip(into: Path, using: Path): Map<String, Long> {
     .forEach { (entry, input) ->
 
       // If the zip entry contains a slash, we reject it (we don't presently allow subdirectories)
-      if (entry.name.contains('/') || entry.isDirectory)
+      if (entry.name.contains('/') || entry.isDirectory) {
+        // If the archive contains that awful __MACOSX directory, skip it
+        // silently.
+        if (entry.name.startsWith("__MACOSX")) {
+          return@forEach
+        }
+
         throw BadRequestException("uploaded zip file must not contain subdirectories")
+      }
 
       val tmpFile = using.resolve(entry.name)
 
