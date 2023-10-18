@@ -246,7 +246,7 @@ private fun Path.repackTar(into: Path, using: Path): Map<String, Long> {
 
 private fun Path.repackRaw(into: Path): Map<String, Long> {
   val sizes = HashMap<String, Long>(1)
-  Tar.compressWithGZip(into, listOf(this))
+  Zip.compress(into, listOf(this))
   sizes[this.name] = this.fileSize()
   return sizes
 }
