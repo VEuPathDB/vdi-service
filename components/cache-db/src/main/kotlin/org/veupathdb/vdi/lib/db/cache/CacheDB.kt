@@ -171,6 +171,11 @@ object CacheDB {
     return connection.selectAllSyncControl()
   }
 
+  fun selectBrokenDatasetImports(query: BrokenImportListQuery): List<BrokenImportRecord> {
+    log.debug("selecting broken dataset import records")
+    return connection.use { it.selectBrokenImports(query) }
+  }
+
 
   fun openTransaction() =
     CacheDBTransaction(connection.apply { autoCommit = false })

@@ -11,6 +11,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.BrokenDatasetListing;
+import org.veupathdb.service.vdi.generated.model.BrokenImportListing;
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest;
 import org.veupathdb.service.vdi.generated.model.DatasetPostResponse;
 import org.veupathdb.service.vdi.generated.model.ForbiddenError;
@@ -29,6 +30,17 @@ public interface VdiDatasetsAdmin {
   PostVdiDatasetsAdminProxyUploadResponse postVdiDatasetsAdminProxyUpload(
       @HeaderParam("Admin-Token") String adminToken, @HeaderParam("User-ID") Long userID,
       DatasetPostRequest entity);
+
+  @GET
+  @Path("/failed-imports")
+  @Produces("application/json")
+  GetVdiDatasetsAdminFailedImportsResponse getVdiDatasetsAdminFailedImports(
+      @QueryParam("user") Long user, @QueryParam("before") String before,
+      @QueryParam("after") String after, @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset,
+      @QueryParam("sort") @DefaultValue("date") String sort,
+      @QueryParam("order") @DefaultValue("desc") String order,
+      @HeaderParam("Admin-Token") String adminToken);
 
   @GET
   @Path("/list-broken")
@@ -99,6 +111,23 @@ public interface VdiDatasetsAdmin {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new PostVdiDatasetsAdminProxyUploadResponse(responseBuilder.build(), entity);
+    }
+  }
+
+  class GetVdiDatasetsAdminFailedImportsResponse extends ResponseDelegate {
+    private GetVdiDatasetsAdminFailedImportsResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private GetVdiDatasetsAdminFailedImportsResponse(Response response) {
+      super(response);
+    }
+
+    public static GetVdiDatasetsAdminFailedImportsResponse respond200WithApplicationJson(
+        BrokenImportListing entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetVdiDatasetsAdminFailedImportsResponse(responseBuilder.build(), entity);
     }
   }
 

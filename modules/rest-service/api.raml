@@ -113,13 +113,13 @@ uses:
           
           Valid options are:
           
-          - ascending
-          - descending
+          - asc
+          - desc
           
           By default, results are sorted by the `sort_field` value
-          `"creation_timestamp"` in `"descending"` order, however if the sort
+          `"creation_timestamp"` in `"desc"` order, however if the sort
           field is changed then the default value of this query parameter
-          becomes `"ascending"` by default.
+          becomes `"asc"` by default.
           
           This means that given the URI `{site}/vdi-datasets` the results will
           be returned in descending order by the creation timestamp of the
@@ -376,6 +376,94 @@ uses:
                 message: Dataset store is unreachable
                 requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
+  /failed-imports:
+    displayName: Failed Imports
+    get:
+      displayName: List
+      description: |
+        Lists datasets that failed to import.
+      headers:
+        Admin-Token:
+          displayName: Admin Auth Secret Key
+          description: Secret key used to authenticate admin endpoint requests.
+          type: string
+          required: true
+      queryParameters:
+        user:
+          type: lib.User-ID
+          required: false
+          default: null
+        before:
+          description: |
+            Filter results to only those records created before the given
+            date-time value.
+            
+            Examples:
+            
+            * 2023
+            * 2023-10
+            * 2023-10-02
+            * 2023-10-02T17:10
+            * 2023-10-02T17:10:00
+            * 2023-10-02T17:10:00.000
+            * 2023-10-02T17:10:00.000Z
+            
+            If no timezone is provided, the service will assume its local zone.
+          type: string
+          required: false
+          default: null
+        after:
+          description: |
+            Filter results to only those records created after the given
+            date-time value.
+            
+            Examples:
+            
+            * 2023
+            * 2023-10
+            * 2023-10-02
+            * 2023-10-02T17:10
+            * 2023-10-02T17:10:00
+            * 2023-10-02T17:10:00.000
+            * 2023-10-02T17:10:00.000Z
+            
+            If no timezone is provided, the service will assume its local zone.
+          type: string
+          required: false
+          default: null
+        limit:
+          type: integer
+          minimum: 0
+          maximum: 250
+          default: 100
+          required: false
+        offset:
+          type: integer
+          minimum: 0
+          default: 0
+          required: false
+        sort:
+          description: |
+            One of:
+            
+            * date
+          type: string
+          required: false
+          default: date
+        order:
+          description: |
+            One of:
+            
+            * asc
+            * desc
+          type: string
+          required: false
+          default: desc
+      responses:
+        200:
+          body:
+            application/json:
+              type: lib.BrokenImportListing
 
   /list-broken:
     displayName: Broken Installs
