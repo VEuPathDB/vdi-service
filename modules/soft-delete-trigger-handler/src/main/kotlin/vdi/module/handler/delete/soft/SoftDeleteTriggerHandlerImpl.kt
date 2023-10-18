@@ -88,6 +88,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
 
       if (!datasetIsInstalled(datasetID, projectID)) {
         log.info("skipping uninstall event for dataset {}/{} and project {} as it is not installed", userID, datasetID, projectID)
+        return@forEach
       }
 
       runJob(userID, datasetID, projectID, handler.client, meta)
