@@ -398,6 +398,7 @@ types:
       status: ShareOfferAction
     example:
       recipient:
+        userID: 123456
         firstName: Joe
         lastName: User
         email: juser@ujoe.edu
@@ -409,6 +410,10 @@ types:
     type: object
     additionalProperties: false
     properties:
+      userID:
+        displayName: User ID
+        type: integer
+        format: int64
       firstName:
         displayName: First Name
         type: string
@@ -426,6 +431,7 @@ types:
         type: string
         required: false
     example:
+      userID: 123456
       email: myusername@someuniversity.edu
   DatasetPatchRequest:
     displayName: Dataset Patch Request
