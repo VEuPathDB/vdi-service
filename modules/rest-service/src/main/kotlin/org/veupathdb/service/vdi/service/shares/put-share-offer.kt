@@ -14,6 +14,8 @@ import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.db.cache.model.DatasetShareOfferImpl
+import org.veupathdb.vdi.lib.db.cache.model.DatasetShareReceiptImpl
 
 internal fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareOffer) {
   val dataset = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
@@ -49,12 +51,20 @@ internal fun putShareOffer(datasetID: DatasetID, ownerID: UserID, recipientID: U
   if (dataset.importStatus != DatasetImportStatus.Complete)
     throw ForbiddenException("cannot share a dataset until after it has been processed")
 
-  // Write or overwrite the share offer object.
-  DatasetStore.putShareOffer(ownerID, datasetID, recipientID, entity.toInternal())
+  // Short circuit the normal flow from MinIO to the share handler for insertion
+  // to postgres on this campus.  This way the client can reflect the change
+  // immediately.
+  CacheDB.withTransaction {
+    // Write or overwrite the share offer object.
+    DatasetStore.putShareOffer(ownerID, datasetID, recipientID, entity.toInternal())
 
-  // We automatically accept share offers on behalf of the recipient user.  The
-  // recipient user can reject the share later if they so choose.
-  DatasetStore.putShareReceipt(ownerID, datasetID, recipientID, VDIDatasetShareReceipt(VDIShareReceiptAction.Accept))
+    // We automatically accept share offers on behalf of the recipient user.  The
+    // recipient user can reject the share later if they so choose.
+    DatasetStore.putShareReceipt(ownerID, datasetID, recipientID, VDIDatasetShareReceipt(VDIShareReceiptAction.Accept))
+
+    it.upsertDatasetShareOffer(DatasetShareOfferImpl(datasetID, recipientID, VDIShareOfferAction.Grant))
+    it.upsertDatasetShareReceipt(DatasetShareReceiptImpl(datasetID, recipientID, VDIShareReceiptAction.Accept))
+  }
 }
 
 private fun DatasetShareOffer.toInternal() =
