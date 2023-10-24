@@ -74,7 +74,6 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("files")
   private List<FileSummary> files;
 
-  @JsonProperty("created")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
@@ -82,6 +81,7 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonDeserialize(
       using = TimestampDeserializer.class
   )
+  @JsonProperty("created")
   private Date created;
 
   @JsonProperty("datasetID")

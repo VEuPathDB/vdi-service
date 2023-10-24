@@ -288,17 +288,26 @@ types:
     type: object
     additionalProperties: false
     properties:
-      uploadFiles: DatasetFileDetails[]
-      dataFiles: DatasetFileDetails[]
+      upload: DatasetZipDetails
+      install?: DatasetZipDetails
+  DatasetZipDetails:
+    displayName: Dataset Zip Details
+    type: object
+    additionalProperties: false
+    properties:
+      zipSize:
+        type: integer
+        format: int64
+      contents: DatasetFileDetails[]
   DatasetFileDetails:
     displayName: Dataset File Details
     type: object
     additionalProperties: false
     properties:
-      name:
+      fileName:
         displayName: File Name
         type: string
-      size:
+      fileSize:
         displayName: File Size
         description: Size of the file in bytes.
         type: integer

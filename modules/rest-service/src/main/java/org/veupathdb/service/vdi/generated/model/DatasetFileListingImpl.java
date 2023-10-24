@@ -3,37 +3,36 @@ package org.veupathdb.service.vdi.generated.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "uploadFiles",
-    "dataFiles"
+    "upload",
+    "install"
 })
 public class DatasetFileListingImpl implements DatasetFileListing {
-  @JsonProperty("uploadFiles")
-  private List<DatasetFileDetails> uploadFiles;
+  @JsonProperty("upload")
+  private DatasetZipDetails upload;
 
-  @JsonProperty("dataFiles")
-  private List<DatasetFileDetails> dataFiles;
+  @JsonProperty("install")
+  private DatasetZipDetails install;
 
-  @JsonProperty("uploadFiles")
-  public List<DatasetFileDetails> getUploadFiles() {
-    return this.uploadFiles;
+  @JsonProperty("upload")
+  public DatasetZipDetails getUpload() {
+    return this.upload;
   }
 
-  @JsonProperty("uploadFiles")
-  public void setUploadFiles(List<DatasetFileDetails> uploadFiles) {
-    this.uploadFiles = uploadFiles;
+  @JsonProperty("upload")
+  public void setUpload(DatasetZipDetails upload) {
+    this.upload = upload;
   }
 
-  @JsonProperty("dataFiles")
-  public List<DatasetFileDetails> getDataFiles() {
-    return this.dataFiles;
+  @JsonProperty("install")
+  public DatasetZipDetails getInstall() {
+    return this.install;
   }
 
-  @JsonProperty("dataFiles")
-  public void setDataFiles(List<DatasetFileDetails> dataFiles) {
-    this.dataFiles = dataFiles;
+  @JsonProperty("install")
+  public void setInstall(DatasetZipDetails install) {
+    this.install = install;
   }
 }
