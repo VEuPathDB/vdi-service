@@ -69,6 +69,7 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("fileSizeTotal")
   private Long fileSizeTotal;
 
+  @JsonProperty("created")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
@@ -76,7 +77,6 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonDeserialize(
       using = TimestampDeserializer.class
   )
-  @JsonProperty("created")
   private Date created;
 
   @JsonProperty("datasetID")
