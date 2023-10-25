@@ -1,6 +1,7 @@
 package org.veupathdb.service.vdi.util
 
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.TimeZone
 
@@ -13,6 +14,10 @@ private const val lenSecond = 19
 private const val lenMillis = 23
 private const val lenUTC    = 24
 private const val lenZoned  = 29
+
+fun OffsetDateTime.defaultZone(): OffsetDateTime {
+  return atZoneSameInstant(ZoneOffset.systemDefault()).toOffsetDateTime()
+}
 
 fun fixVariableDateString(date: String, fn: () -> Exception = ::Exception): OffsetDateTime {
   val sb = StringBuilder(32)
