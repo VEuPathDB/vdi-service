@@ -81,30 +81,11 @@ types:
         items:
           type: ShareOffer
         required: false
-      files:
-        displayName: Files
-        description: |
-          List of files uploaded to the dataset import service.
-        type: array
-        items:
-          type: FileSummary
-        required: true
       created:
         displayName: Creation Timestamp
         description: Timestamp for when this dataset was created.
         type: datetime
         required: true
-
-  FileSummary:
-    displayName: File Summary
-    type: object
-    additionalProperties: false
-    properties:
-      name:
-        type: string
-      size:
-        type: integer
-        format: int64
 
   ShareOffer:
     displayName: Share Offer

@@ -23,7 +23,6 @@ import java.util.List;
     "importMessages",
     "status",
     "shares",
-    "files",
     "created"
 })
 public class DatasetDetailsImpl implements DatasetDetails {
@@ -71,10 +70,6 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("shares")
   private List<ShareOffer> shares;
 
-  @JsonProperty("files")
-  private List<FileSummary> files;
-
-  @JsonProperty("created")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
@@ -82,6 +77,7 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonDeserialize(
       using = TimestampDeserializer.class
   )
+  @JsonProperty("created")
   private Date created;
 
   @JsonProperty("datasetID")
@@ -222,16 +218,6 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("shares")
   public void setShares(List<ShareOffer> shares) {
     this.shares = shares;
-  }
-
-  @JsonProperty("files")
-  public List<FileSummary> getFiles() {
-    return this.files;
-  }
-
-  @JsonProperty("files")
-  public void setFiles(List<FileSummary> files) {
-    this.files = files;
   }
 
   @JsonProperty("created")

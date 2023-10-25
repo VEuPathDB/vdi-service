@@ -40,7 +40,6 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
     out.status         = DatasetStatusInfo(dataset.importStatus, statuses)
     out.visibility     = DatasetVisibility(dataset.visibility)
     out.sourceUrl      = dataset.sourceURL
-    out.files          = files.map(::FileSummary)
     out.projectIDs     = dataset.projects.toList()
     out.created        = Date.from(dataset.created.toInstant())
   }
@@ -92,7 +91,6 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.shares         = ArrayList(shares.size)
     out.visibility     = DatasetVisibility(dataset.visibility)
     out.sourceUrl      = dataset.sourceURL
-    out.files          = files.map(::FileSummary)
     out.projectIDs     = dataset.projects.toList()
     out.created        = Date.from(dataset.created.toInstant())
 
