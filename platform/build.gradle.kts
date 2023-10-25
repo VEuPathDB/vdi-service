@@ -10,7 +10,7 @@ dependencies {
 
     // VDI
     api("org.veupathdb.vdi:vdi-component-common:6.4.0")
-    api("org.veupathdb.vdi:vdi-component-json:1.0.0")
+    api("org.veupathdb.vdi:vdi-component-json:1.0.1")
 
     // Database
     api("com.zaxxer:HikariCP:5.0.1")
