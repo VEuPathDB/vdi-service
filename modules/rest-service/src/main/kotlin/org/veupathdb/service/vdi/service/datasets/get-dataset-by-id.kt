@@ -27,8 +27,6 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
-  val files = CacheDB.selectUploadFiles(datasetID)
-
   return DatasetDetailsImpl().also { out ->
     out.datasetID      = datasetID.toString()
     out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
@@ -74,8 +72,6 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   val statuses = AppDB.getDatasetStatuses(datasetID, dataset.projects)
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
-
-  val files = CacheDB.selectUploadFiles(datasetID)
 
   // return the dataset
   return DatasetDetailsImpl().also { out ->
