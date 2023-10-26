@@ -28,6 +28,11 @@ internal fun deleteDataset(userID: UserID, datasetID: DatasetID) {
   if (ds.ownerID != userID)
     throw ForbiddenException()
 
-  // Put a delete flag in S3 for the target dataset.
-  DatasetStore.putDeleteFlag(userID, datasetID)
+  CacheDB.withTransaction {
+    // Update the deleted flag in the local pg.
+    it.updateDatasetDeleted(datasetID, true)
+
+    // Put a delete flag in S3 for the target dataset.
+    DatasetStore.putDeleteFlag(userID, datasetID)
+  }
 }
