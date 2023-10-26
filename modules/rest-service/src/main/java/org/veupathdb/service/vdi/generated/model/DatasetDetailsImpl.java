@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -75,14 +75,7 @@ public class DatasetDetailsImpl implements DatasetDetails {
   private List<FileSummary> files;
 
   @JsonProperty("created")
-  @JsonFormat(
-      shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-  )
-  @JsonDeserialize(
-      using = TimestampDeserializer.class
-  )
-  private Date created;
+  private OffsetDateTime created;
 
   @JsonProperty("datasetID")
   public String getDatasetID() {
@@ -235,12 +228,12 @@ public class DatasetDetailsImpl implements DatasetDetails {
   }
 
   @JsonProperty("created")
-  public Date getCreated() {
+  public OffsetDateTime getCreated() {
     return this.created;
   }
 
   @JsonProperty("created")
-  public void setCreated(Date created) {
+  public void setCreated(OffsetDateTime created) {
     this.created = created;
   }
 }
