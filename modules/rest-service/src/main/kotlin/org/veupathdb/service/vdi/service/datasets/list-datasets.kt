@@ -114,13 +114,13 @@ private fun DatasetRecord.toListEntry(
   shares: List<DatasetListShareUser>,
   fileSummary: DatasetFileSummary,
 ) = DatasetListEntryImpl().also { out ->
-  out.datasetID     = datasetID.toString()
+  out.datasetId     = datasetID.toString()
   out.owner         = DatasetOwner(owner)
   out.datasetType   = DatasetTypeInfo(this, pluginDisplayName)
   out.name          = name
   out.summary       = summary
   out.description   = description
-  out.projectIDs    = projects.toList()
+  out.projectIds    = projects.toList()
   out.visibility    = DatasetVisibility(visibility)
   out.status        = DatasetStatusInfo(importStatus, statuses)
   out.origin        = origin

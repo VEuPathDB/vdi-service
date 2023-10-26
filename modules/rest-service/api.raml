@@ -139,9 +139,9 @@ uses:
           application/json:
             type: lib.DatasetListEntry[]
             example:
-            - datasetID: zaZqAAGLGJhBgg
+            - datasetId: zaZqAAGLGJhBgg
               owner:
-                userID: 123456
+                userId: 123456
                 firstName: Joe
                 lastName: User
                 organization: University of Joe
@@ -153,21 +153,21 @@ uses:
               description: A longer description of my dataset.
               origin: "direct-upload"
               visibility: public
-              projectIDs:
+              projectIds:
               - PlasmoDB
               - ToxoDB
               status:
                 import: complete
                 install:
-                - projectID: PlasmoDB
+                - projectId: PlasmoDB
                   metaStatus: complete
                   dataStatus: failed-installation
                   dataMessage: Failed due to some reason.
-                - projectID: ToxoDB
+                - projectId: ToxoDB
                   metaStatus: complete
                   dataStatus: complete
               shares:
-                - userID: 1234
+                - userId: 1234
                   firstName: Billy
                   lastName: Mays
                   organization: OxiClean
@@ -242,7 +242,7 @@ uses:
         body:
           type: lib.DatasetPostResponse
           example:
-            datasetID: zaZqAAGLGJhBgg
+            datasetId: zaZqAAGLGJhBgg
       400:
         description: |
           Bad Request.
@@ -325,7 +325,7 @@ uses:
           body:
             type: lib.DatasetPostResponse
             example:
-              datasetID: zaZqAAGLGJhBgg
+              datasetId: zaZqAAGLGJhBgg
         400:
           description: |
             Bad Request.
@@ -549,8 +549,8 @@ uses:
               displayName: Target Example
               value:
                 targets:
-                - datasetID: zaZqAAGLGJhBgg
-                  projectID: PlasmoDB
+                - datasetId: zaZqAAGLGJhBgg
+                  projectId: PlasmoDB
       responses:
         204:
           description: |
@@ -706,9 +706,9 @@ uses:
         body:
           type: lib.DatasetDetails
           example:
-            datasetID: zaZqAAGLGJhBgg
+            datasetId: zaZqAAGLGJhBgg
             owner:
-              userID: 123456
+              userId: 123456
               firstName: Joe
               lastName: User
               organization: University of Joe
@@ -720,7 +720,7 @@ uses:
             description: A longer description of my dataset.
             origin: "direct-upload"
             visibility: public
-            projectIDs:
+            projectIds:
             - PlasmoDB
             - ToxoDB
             importMessages:
@@ -729,11 +729,11 @@ uses:
             status:
               import: complete
               install:
-              - projectID: PlasmoDB
+              - projectId: PlasmoDB
                 metaStatus: complete
                 dataStatus: failed-installation
                 dataMessage: Failed due to some reason.
-              - projectID: ToxoDB
+              - projectId: ToxoDB
                 metaStatus: complete
                 dataStatus: complete
             files:
@@ -1194,9 +1194,9 @@ uses:
           application/json:
             type: lib.ShareOfferEntry[]
             example:
-            - datasetID: zaZqAAGLGJhBgg
+            - datasetId: zaZqAAGLGJhBgg
               owner:
-                userID: 202203
+                userId: 202203
                 firstName: Joe
                 lastName: User
                 organization: University of Joe
@@ -1204,7 +1204,7 @@ uses:
               datasetType:
                 name: ISA
                 version: "1.0"
-              projectIDs:
+              projectIds:
               - PlasmoDB
               - VectorBase
               - ToxoDB

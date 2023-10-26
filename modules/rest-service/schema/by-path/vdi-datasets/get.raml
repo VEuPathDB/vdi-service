@@ -9,7 +9,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      userID: common.User-ID
+      userId: common.User-ID
       firstName: string
       lastName: string
       organization: string
@@ -21,7 +21,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID:
+      datasetId:
         displayName: Dataset ID
         type: common.VDI-ID
         required: true
@@ -65,7 +65,7 @@ types:
           `direct-upload`, `nephele`, or `galaxy`.
         type: string
         required: true
-      projectIDs:
+      projectIds:
         displayName: Project IDs
         description: |
           Project IDs for projects the dataset record was submitted to.

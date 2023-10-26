@@ -9,11 +9,11 @@ import java.util.List;
     as = DatasetDetailsImpl.class
 )
 public interface DatasetDetails {
-  @JsonProperty("datasetID")
-  String getDatasetID();
+  @JsonProperty("datasetId")
+  String getDatasetId();
 
-  @JsonProperty("datasetID")
-  void setDatasetID(String datasetID);
+  @JsonProperty("datasetId")
+  void setDatasetId(String datasetId);
 
   @JsonProperty("owner")
   DatasetOwner getOwner();
@@ -57,11 +57,11 @@ public interface DatasetDetails {
   @JsonProperty("origin")
   void setOrigin(String origin);
 
-  @JsonProperty("projectIDs")
-  List<String> getProjectIDs();
+  @JsonProperty("projectIds")
+  List<String> getProjectIds();
 
-  @JsonProperty("projectIDs")
-  void setProjectIDs(List<String> projectIDs);
+  @JsonProperty("projectIds")
+  void setProjectIds(List<String> projectIds);
 
   @JsonProperty("visibility")
   DatasetVisibility getVisibility();
