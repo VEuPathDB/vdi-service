@@ -2,7 +2,7 @@ package org.veupathdb.service.vdi.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonDeserialize(
@@ -104,8 +104,8 @@ public interface DatasetDetails {
   void setFiles(List<FileSummary> files);
 
   @JsonProperty("created")
-  Date getCreated();
+  OffsetDateTime getCreated();
 
   @JsonProperty("created")
-  void setCreated(Date created);
+  void setCreated(OffsetDateTime created);
 }

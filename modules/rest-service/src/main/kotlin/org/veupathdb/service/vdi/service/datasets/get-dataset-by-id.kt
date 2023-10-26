@@ -3,6 +3,7 @@ package org.veupathdb.service.vdi.service.datasets
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.*
+import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
@@ -42,7 +43,7 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
     out.sourceUrl      = dataset.sourceURL
     out.files          = files.map(::FileSummary)
     out.projectIDs     = dataset.projects.toList()
-    out.created        = Date.from(dataset.created.toInstant())
+    out.created        = dataset.created.defaultZone()
   }
 }
 
@@ -94,7 +95,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.sourceUrl      = dataset.sourceURL
     out.files          = files.map(::FileSummary)
     out.projectIDs     = dataset.projects.toList()
-    out.created        = Date.from(dataset.created.toInstant())
+    out.created        = dataset.created.defaultZone()
 
     shares.forEach { share ->
       out.shares.add(ShareOffer(
