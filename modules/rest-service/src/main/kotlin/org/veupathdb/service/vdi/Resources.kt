@@ -18,5 +18,6 @@ class Resources(opts: Options) : ContainerResources(opts) {
     VDIUsersController::class.java,
     VDIDatasetFilesController::class.java,
     VDICommunityDatasetsController::class.java,
+    PluginController::class.java,
   )
 }

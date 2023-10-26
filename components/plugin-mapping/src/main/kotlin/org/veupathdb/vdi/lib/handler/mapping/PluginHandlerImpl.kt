@@ -12,4 +12,8 @@ internal class PluginHandlerImpl(
   override fun appliesToProject(projectID: ProjectID): Boolean {
     return projects.isEmpty() || projects.contains(projectID)
   }
+
+  override fun projects(): List<String> {
+    return projects.toList()
+  }
 }

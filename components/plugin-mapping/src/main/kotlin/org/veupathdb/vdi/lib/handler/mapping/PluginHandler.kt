@@ -39,4 +39,6 @@ interface PluginHandler {
    * otherwise `false`.
    */
   fun appliesToProject(projectID: ProjectID): Boolean
+
+  fun projects(): List<String>
 }
