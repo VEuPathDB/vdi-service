@@ -8,11 +8,11 @@ import java.util.List;
     as = ShareOfferEntryImpl.class
 )
 public interface ShareOfferEntry {
-  @JsonProperty("datasetID")
-  String getDatasetID();
+  @JsonProperty("datasetId")
+  String getDatasetId();
 
-  @JsonProperty("datasetID")
-  void setDatasetID(String datasetID);
+  @JsonProperty("datasetId")
+  void setDatasetId(String datasetId);
 
   @JsonProperty("owner")
   DatasetOwner getOwner();
@@ -32,9 +32,9 @@ public interface ShareOfferEntry {
   @JsonProperty("datasetType")
   void setDatasetType(DatasetTypeInfo datasetType);
 
-  @JsonProperty("projectIDs")
-  List<String> getProjectIDs();
+  @JsonProperty("projectIds")
+  List<String> getProjectIds();
 
-  @JsonProperty("projectIDs")
-  void setProjectIDs(List<String> projectIDs);
+  @JsonProperty("projectIds")
+  void setProjectIds(List<String> projectIds);
 }

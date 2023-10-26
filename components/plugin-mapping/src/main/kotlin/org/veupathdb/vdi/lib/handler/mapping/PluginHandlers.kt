@@ -8,7 +8,7 @@ import org.veupathdb.vdi.lib.handler.client.PluginHandlerClientConfig
  * Collection of [PluginHandler] instances mapped by dataset type name.
  */
 object PluginHandlers {
-  private val mapping = HashMap<NameVersionPair, PluginHandler>(12)
+  private val mapping = HashMap<NameVersionPair, PluginHandler>(16)
 
   init {
     init(System.getenv())
@@ -37,6 +37,10 @@ object PluginHandlers {
    */
   operator fun get(type: String, version: String): PluginHandler? =
     mapping[NameVersionPair(type.lowercase(), version)]
+
+  fun sequence(): Sequence<Pair<NameVersionPair, PluginHandler>> {
+    return mapping.asSequence().map { (k, v) -> k to v }
+  }
 
   internal fun init(env: Environment) {
     // Only needed for testing, but doesn't hurt anything in general.
@@ -85,5 +89,5 @@ object PluginHandlers {
     )
   }
 
-  private data class NameVersionPair(val name: String, val version: String)
+  data class NameVersionPair(val name: String, val version: String)
 }

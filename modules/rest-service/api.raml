@@ -139,9 +139,9 @@ uses:
           application/json:
             type: lib.DatasetListEntry[]
             example:
-            - datasetID: zaZqAAGLGJhBgg
+            - datasetId: zaZqAAGLGJhBgg
               owner:
-                userID: 123456
+                userId: 123456
                 firstName: Joe
                 lastName: User
                 organization: University of Joe
@@ -153,21 +153,21 @@ uses:
               description: A longer description of my dataset.
               origin: "direct-upload"
               visibility: public
-              projectIDs:
+              projectIds:
               - PlasmoDB
               - ToxoDB
               status:
                 import: complete
                 install:
-                - projectID: PlasmoDB
+                - projectId: PlasmoDB
                   metaStatus: complete
                   dataStatus: failed-installation
                   dataMessage: Failed due to some reason.
-                - projectID: ToxoDB
+                - projectId: ToxoDB
                   metaStatus: complete
                   dataStatus: complete
               shares:
-                - userID: 1234
+                - userId: 1234
                   firstName: Billy
                   lastName: Mays
                   organization: OxiClean
@@ -242,7 +242,7 @@ uses:
         body:
           type: lib.DatasetPostResponse
           example:
-            datasetID: zaZqAAGLGJhBgg
+            datasetId: zaZqAAGLGJhBgg
       400:
         description: |
           Bad Request.
@@ -325,7 +325,7 @@ uses:
           body:
             type: lib.DatasetPostResponse
             example:
-              datasetID: zaZqAAGLGJhBgg
+              datasetId: zaZqAAGLGJhBgg
         400:
           description: |
             Bad Request.
@@ -549,8 +549,8 @@ uses:
               displayName: Target Example
               value:
                 targets:
-                - datasetID: zaZqAAGLGJhBgg
-                  projectID: PlasmoDB
+                - datasetId: zaZqAAGLGJhBgg
+                  projectId: PlasmoDB
       responses:
         204:
           description: |
@@ -706,9 +706,9 @@ uses:
         body:
           type: lib.DatasetDetails
           example:
-            datasetID: zaZqAAGLGJhBgg
+            datasetId: zaZqAAGLGJhBgg
             owner:
-              userID: 123456
+              userId: 123456
               firstName: Joe
               lastName: User
               organization: University of Joe
@@ -720,7 +720,7 @@ uses:
             description: A longer description of my dataset.
             origin: "direct-upload"
             visibility: public
-            projectIDs:
+            projectIds:
             - PlasmoDB
             - ToxoDB
             importMessages:
@@ -729,11 +729,11 @@ uses:
             status:
               import: complete
               install:
-              - projectID: PlasmoDB
+              - projectId: PlasmoDB
                 metaStatus: complete
                 dataStatus: failed-installation
                 dataMessage: Failed due to some reason.
-              - projectID: ToxoDB
+              - projectId: ToxoDB
                 metaStatus: complete
                 dataStatus: complete
             created: 2023-10-31T11:59:59.999Z
@@ -1191,9 +1191,9 @@ uses:
           application/json:
             type: lib.ShareOfferEntry[]
             example:
-            - datasetID: zaZqAAGLGJhBgg
+            - datasetId: zaZqAAGLGJhBgg
               owner:
-                userID: 202203
+                userId: 202203
                 firstName: Joe
                 lastName: User
                 organization: University of Joe
@@ -1201,7 +1201,7 @@ uses:
               datasetType:
                 name: ISA
                 version: "1.0"
-              projectIDs:
+              projectIds:
               - PlasmoDB
               - VectorBase
               - ToxoDB
@@ -1228,6 +1228,73 @@ uses:
           This response is returned when an unhandled or unexpected issue arises
           when attempting to process the request.
         body: lib.ServerError
+
+/vdi-plugins:
+  displayName: Plugins
+  get:
+    displayName: List
+    description: List the plugins currently registered with the VDI instance.
+    queryParameters:
+      project:
+        displayName: Project Filter
+        description: |
+          Optional parameter that may be used to filter the results of this
+          endpoint to only those that are allowed to be used with the target
+          project.
+          
+          Valid values (non-case-sensitive):
+          
+          - AmoebaDB
+          - ClinEpiDB
+          - CryptoDB
+          - FungiDB
+          - GiardiaDB
+          - HostDB
+          - MicrobiomeDB
+          - MicrosporidiaDB
+          - PiroplasmaDB
+          - PlasmoDB
+          - ToxoDB
+          - TrichDB
+          - TriTrypDB
+          - VectorBase
+          - VEuPathDB
+        type: string
+        required: false
+    responses:
+      200:
+        description: Success
+        body:
+          application/json:
+            type: lib.PluginListItem[]
+            example:
+            - displayName: Gene List
+              typeName: genelist
+              typeVersion: "1.0"
+              projects:
+              - AmoebaDB
+              - ClinEpiDB
+              - CryptoDB
+              - FungiDB
+              - GiardiaDB
+              - HostDB
+              - MicrosporidiaDB
+              - PiroplasmaDB
+              - PlasmoDB
+              - ToxoDB
+              - TrichDB
+              - TriTrypDB
+              - VectorBase
+      401:
+        description: Unauthorized
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+      500:
+        description: Internal Server Error
+        body:
+          application/json:
+            type: lib.ServerError
 
 /vdi-users:
   displayName: Users

@@ -55,7 +55,7 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
     if (entity.all == true) {
       InstallCleaner.cleanAll()
     } else if (entity.targets.isNullOrEmpty()) {
-      InstallCleaner.cleanTargets(entity.targets.map { ReinstallTarget(DatasetID(it.datasetID), it.projectID) })
+      InstallCleaner.cleanTargets(entity.targets.map { ReinstallTarget(DatasetID(it.datasetId), it.projectId) })
     }
 
     return VdiDatasetsAdmin.PostVdiDatasetsAdminInstallCleanupResponse.respond204()

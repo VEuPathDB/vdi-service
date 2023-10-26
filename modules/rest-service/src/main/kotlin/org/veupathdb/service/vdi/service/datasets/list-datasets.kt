@@ -3,6 +3,7 @@ package org.veupathdb.service.vdi.service.datasets
 import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.model.UserDetails
+import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.service.vdi.util.reduceTo
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -113,13 +114,13 @@ private fun DatasetRecord.toListEntry(
   shares: List<DatasetListShareUser>,
   fileSummary: DatasetFileSummary,
 ) = DatasetListEntryImpl().also { out ->
-  out.datasetID     = datasetID.toString()
+  out.datasetId     = datasetID.toString()
   out.owner         = DatasetOwner(owner)
   out.datasetType   = DatasetTypeInfo(this, pluginDisplayName)
   out.name          = name
   out.summary       = summary
   out.description   = description
-  out.projectIDs    = projects.toList()
+  out.projectIds    = projects.toList()
   out.visibility    = DatasetVisibility(visibility)
   out.status        = DatasetStatusInfo(importStatus, statuses)
   out.origin        = origin
@@ -127,5 +128,5 @@ private fun DatasetRecord.toListEntry(
   out.shares        = shares
   out.fileCount     = fileSummary.count.toInt()
   out.fileSizeTotal = fileSummary.size.toLong()
-  out.created       = Date.from(created.toInstant())
+  out.created       = created.defaultZone()
 }

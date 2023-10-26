@@ -3,6 +3,7 @@ package org.veupathdb.service.vdi.service.datasets
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.*
+import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
@@ -10,7 +11,6 @@ import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
-import java.util.Date
 
 /**
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
@@ -28,7 +28,7 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
   return DatasetDetailsImpl().also { out ->
-    out.datasetID      = datasetID.toString()
+    out.datasetId      = datasetID.toString()
     out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
     out.name           = dataset.name
     out.summary        = dataset.summary
@@ -38,8 +38,8 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
     out.status         = DatasetStatusInfo(dataset.importStatus, statuses)
     out.visibility     = DatasetVisibility(dataset.visibility)
     out.sourceUrl      = dataset.sourceURL
-    out.projectIDs     = dataset.projects.toList()
-    out.created        = Date.from(dataset.created.toInstant())
+    out.projectIds     = dataset.projects.toList()
+    out.created        = dataset.created.defaultZone()
   }
 }
 
@@ -75,7 +75,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 
   // return the dataset
   return DatasetDetailsImpl().also { out ->
-    out.datasetID      = datasetID.toString()
+    out.datasetId      = datasetID.toString()
     out.owner          = DatasetOwner(userDetails[dataset.ownerID] ?: throw IllegalStateException("no user details for dataset owner"))
     out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
     out.name           = dataset.name
@@ -87,8 +87,8 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.shares         = ArrayList(shares.size)
     out.visibility     = DatasetVisibility(dataset.visibility)
     out.sourceUrl      = dataset.sourceURL
-    out.projectIDs     = dataset.projects.toList()
-    out.created        = Date.from(dataset.created.toInstant())
+    out.projectIds     = dataset.projects.toList()
+    out.created        = dataset.created.defaultZone()
 
     shares.forEach { share ->
       out.shares.add(ShareOffer(

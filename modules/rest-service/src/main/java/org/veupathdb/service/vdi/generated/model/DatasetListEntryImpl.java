@@ -5,12 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "datasetID",
+    "datasetId",
     "owner",
     "datasetType",
     "visibility",
@@ -19,7 +19,7 @@ import java.util.List;
     "description",
     "sourceUrl",
     "origin",
-    "projectIDs",
+    "projectIds",
     "status",
     "shares",
     "fileCount",
@@ -27,8 +27,8 @@ import java.util.List;
     "created"
 })
 public class DatasetListEntryImpl implements DatasetListEntry {
-  @JsonProperty("datasetID")
-  private String datasetID;
+  @JsonProperty("datasetId")
+  private String datasetId;
 
   @JsonProperty("owner")
   private DatasetOwner owner;
@@ -54,8 +54,8 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("origin")
   private String origin;
 
-  @JsonProperty("projectIDs")
-  private List<String> projectIDs;
+  @JsonProperty("projectIds")
+  private List<String> projectIds;
 
   @JsonProperty("status")
   private DatasetStatusInfo status;
@@ -70,23 +70,16 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   private Long fileSizeTotal;
 
   @JsonProperty("created")
-  @JsonFormat(
-      shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-  )
-  @JsonDeserialize(
-      using = TimestampDeserializer.class
-  )
-  private Date created;
+  private OffsetDateTime created;
 
-  @JsonProperty("datasetID")
-  public String getDatasetID() {
-    return this.datasetID;
+  @JsonProperty("datasetId")
+  public String getDatasetId() {
+    return this.datasetId;
   }
 
-  @JsonProperty("datasetID")
-  public void setDatasetID(String datasetID) {
-    this.datasetID = datasetID;
+  @JsonProperty("datasetId")
+  public void setDatasetId(String datasetId) {
+    this.datasetId = datasetId;
   }
 
   @JsonProperty("owner")
@@ -169,14 +162,14 @@ public class DatasetListEntryImpl implements DatasetListEntry {
     this.origin = origin;
   }
 
-  @JsonProperty("projectIDs")
-  public List<String> getProjectIDs() {
-    return this.projectIDs;
+  @JsonProperty("projectIds")
+  public List<String> getProjectIds() {
+    return this.projectIds;
   }
 
-  @JsonProperty("projectIDs")
-  public void setProjectIDs(List<String> projectIDs) {
-    this.projectIDs = projectIDs;
+  @JsonProperty("projectIds")
+  public void setProjectIds(List<String> projectIds) {
+    this.projectIds = projectIds;
   }
 
   @JsonProperty("status")
@@ -220,12 +213,12 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   }
 
   @JsonProperty("created")
-  public Date getCreated() {
+  public OffsetDateTime getCreated() {
     return this.created;
   }
 
   @JsonProperty("created")
-  public void setCreated(Date created) {
+  public void setCreated(OffsetDateTime created) {
     this.created = created;
   }
 }

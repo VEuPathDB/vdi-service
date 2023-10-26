@@ -2,18 +2,18 @@ package org.veupathdb.service.vdi.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonDeserialize(
     as = DatasetListEntryImpl.class
 )
 public interface DatasetListEntry {
-  @JsonProperty("datasetID")
-  String getDatasetID();
+  @JsonProperty("datasetId")
+  String getDatasetId();
 
-  @JsonProperty("datasetID")
-  void setDatasetID(String datasetID);
+  @JsonProperty("datasetId")
+  void setDatasetId(String datasetId);
 
   @JsonProperty("owner")
   DatasetOwner getOwner();
@@ -63,11 +63,11 @@ public interface DatasetListEntry {
   @JsonProperty("origin")
   void setOrigin(String origin);
 
-  @JsonProperty("projectIDs")
-  List<String> getProjectIDs();
+  @JsonProperty("projectIds")
+  List<String> getProjectIds();
 
-  @JsonProperty("projectIDs")
-  void setProjectIDs(List<String> projectIDs);
+  @JsonProperty("projectIds")
+  void setProjectIds(List<String> projectIds);
 
   @JsonProperty("status")
   DatasetStatusInfo getStatus();
@@ -94,8 +94,8 @@ public interface DatasetListEntry {
   void setFileSizeTotal(Long fileSizeTotal);
 
   @JsonProperty("created")
-  Date getCreated();
+  OffsetDateTime getCreated();
 
   @JsonProperty("created")
-  void setCreated(Date created);
+  void setCreated(OffsetDateTime created);
 }
