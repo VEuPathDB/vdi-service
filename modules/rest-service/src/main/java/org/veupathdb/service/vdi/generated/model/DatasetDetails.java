@@ -97,12 +97,6 @@ public interface DatasetDetails {
   @JsonProperty("shares")
   void setShares(List<ShareOffer> shares);
 
-  @JsonProperty("files")
-  List<FileSummary> getFiles();
-
-  @JsonProperty("files")
-  void setFiles(List<FileSummary> files);
-
   @JsonProperty("created")
   OffsetDateTime getCreated();
 
