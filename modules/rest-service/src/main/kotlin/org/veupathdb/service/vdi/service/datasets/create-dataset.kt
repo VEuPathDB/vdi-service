@@ -19,6 +19,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.*
+import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
@@ -44,6 +45,9 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
   for (projectID in datasetMeta.projects) {
     if (!handler.appliesToProject(projectID))
       throw BadRequestException("target dataset type does not apply to project $projectID")
+
+    if (projectID !in AppDatabaseRegistry)
+      throw BadRequestException("unrecognized target project")
   }
 
   CacheDB.withTransaction {
