@@ -7,15 +7,15 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "datasetID",
+    "datasetId",
     "owner",
     "shareStatus",
     "datasetType",
-    "projectIDs"
+    "projectIds"
 })
 public class ShareOfferEntryImpl implements ShareOfferEntry {
-  @JsonProperty("datasetID")
-  private String datasetID;
+  @JsonProperty("datasetId")
+  private String datasetId;
 
   @JsonProperty("owner")
   private DatasetOwner owner;
@@ -26,17 +26,17 @@ public class ShareOfferEntryImpl implements ShareOfferEntry {
   @JsonProperty("datasetType")
   private DatasetTypeInfo datasetType;
 
-  @JsonProperty("projectIDs")
-  private List<String> projectIDs;
+  @JsonProperty("projectIds")
+  private List<String> projectIds;
 
-  @JsonProperty("datasetID")
-  public String getDatasetID() {
-    return this.datasetID;
+  @JsonProperty("datasetId")
+  public String getDatasetId() {
+    return this.datasetId;
   }
 
-  @JsonProperty("datasetID")
-  public void setDatasetID(String datasetID) {
-    this.datasetID = datasetID;
+  @JsonProperty("datasetId")
+  public void setDatasetId(String datasetId) {
+    this.datasetId = datasetId;
   }
 
   @JsonProperty("owner")
@@ -69,13 +69,13 @@ public class ShareOfferEntryImpl implements ShareOfferEntry {
     this.datasetType = datasetType;
   }
 
-  @JsonProperty("projectIDs")
-  public List<String> getProjectIDs() {
-    return this.projectIDs;
+  @JsonProperty("projectIds")
+  public List<String> getProjectIds() {
+    return this.projectIds;
   }
 
-  @JsonProperty("projectIDs")
-  public void setProjectIDs(List<String> projectIDs) {
-    this.projectIDs = projectIDs;
+  @JsonProperty("projectIds")
+  public void setProjectIds(List<String> projectIds) {
+    this.projectIds = projectIds;
   }
 }

@@ -19,10 +19,10 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID: VDI-ID
+      datasetId: VDI-ID
       owner: User-ID
       datasetType: DatasetTypeInfo
-      projectIDs: ProjectID[]
+      projectIds: ProjectID[]
       status: DatasetStatusInfo
   BrokenImportListing:
     displayName: Broken Import Listing
@@ -87,13 +87,13 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID: VDI-ID
-      projectID: ProjectID
+      datasetId: VDI-ID
+      projectId: ProjectID
   DatasetListShareUser:
     type: object
     additionalProperties: false
     properties:
-      userID: User-ID
+      userId: User-ID
       firstName: string
       lastName: string
       organization: string
@@ -104,7 +104,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID:
+      datasetId:
         displayName: Dataset ID
         type: VDI-ID
       owner:
@@ -142,7 +142,7 @@ types:
           String representing the origin of the dataset.  Examples include
           `direct-upload`, `nephele`, or `galaxy`.
         type: string
-      projectIDs:
+      projectIds:
         displayName: Project IDs
         description: |
           Project IDs for projects the dataset record was submitted to.
@@ -265,17 +265,17 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID: VDI-ID
+      datasetId: VDI-ID
   ShareOfferEntry:
     displayName: Share Offer
     type: object
     additionalProperties: false
     properties:
-      datasetID: VDI-ID
+      datasetId: VDI-ID
       owner: DatasetOwner
       shareStatus: ShareOfferStatus
       datasetType: DatasetTypeInfo
-      projectIDs: ProjectID[]
+      projectIds: ProjectID[]
   ShareOfferStatus:
     displayName: Share Offer Status
     type: string
@@ -319,7 +319,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID:
+      datasetId:
         displayName: Dataset ID
         type: VDI-ID
       owner:
@@ -351,7 +351,7 @@ types:
           String representing the origin of the dataset.  Examples include
           `direct-upload`, `nephele`, or `galaxy`.
         type: string
-      projectIDs:
+      projectIds:
         displayName: Project IDs
         description: |
           Project IDs for projects the user dataset record was submitted to.
@@ -379,25 +379,10 @@ types:
         type: array
         required: false
         items: ShareOffer
-      files:
-        displayName: Files
-        description: |
-          List of files uploaded to the dataset import service.
-        type: array
-        items: FileSummary
       created:
         displayName: Creation Timestamp
         description: Timestamp for when this dataset was created.
         type: datetime
-  FileSummary:
-    displayName: File Summary
-    type: object
-    additionalProperties: false
-    properties:
-      name: string
-      size:
-        type: integer
-        format: int64
   ShareOffer:
     displayName: Share Offer
     type: object
@@ -407,7 +392,7 @@ types:
       status: ShareOfferAction
     example:
       recipient:
-        userID: 123456
+        userId: 123456
         firstName: Joe
         lastName: User
         email: juser@ujoe.edu
@@ -419,7 +404,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      userID:
+      userId:
         displayName: User ID
         type: integer
         format: int64
@@ -440,7 +425,7 @@ types:
         type: string
         required: false
     example:
-      userID: 123456
+      userId: 123456
       email: myusername@someuniversity.edu
   DatasetPatchRequest:
     displayName: Dataset Patch Request
@@ -593,7 +578,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      userID:
+      userId:
         displayName: Owner User ID
         description: VEuPathDB user ID of the owner of the dataset.
         type: User-ID
@@ -694,7 +679,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      projectID: ProjectID
+      projectId: ProjectID
       metaStatus:
         type: DatasetInstallStatus
         required: false

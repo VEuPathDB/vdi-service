@@ -11,7 +11,6 @@ import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
-import java.util.Date
 
 /**
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
@@ -28,10 +27,8 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
-  val files = CacheDB.selectUploadFiles(datasetID)
-
   return DatasetDetailsImpl().also { out ->
-    out.datasetID      = datasetID.toString()
+    out.datasetId      = datasetID.toString()
     out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
     out.name           = dataset.name
     out.summary        = dataset.summary
@@ -41,8 +38,7 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
     out.status         = DatasetStatusInfo(dataset.importStatus, statuses)
     out.visibility     = DatasetVisibility(dataset.visibility)
     out.sourceUrl      = dataset.sourceURL
-    out.files          = files.map(::FileSummary)
-    out.projectIDs     = dataset.projects.toList()
+    out.projectIds     = dataset.projects.toList()
     out.created        = dataset.created.defaultZone()
   }
 }
@@ -77,11 +73,9 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
-  val files = CacheDB.selectUploadFiles(datasetID)
-
   // return the dataset
   return DatasetDetailsImpl().also { out ->
-    out.datasetID      = datasetID.toString()
+    out.datasetId      = datasetID.toString()
     out.owner          = DatasetOwner(userDetails[dataset.ownerID] ?: throw IllegalStateException("no user details for dataset owner"))
     out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
     out.name           = dataset.name
@@ -93,8 +87,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.shares         = ArrayList(shares.size)
     out.visibility     = DatasetVisibility(dataset.visibility)
     out.sourceUrl      = dataset.sourceURL
-    out.files          = files.map(::FileSummary)
-    out.projectIDs     = dataset.projects.toList()
+    out.projectIds     = dataset.projects.toList()
     out.created        = dataset.created.defaultZone()
 
     shares.forEach { share ->

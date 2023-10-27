@@ -5,7 +5,7 @@ import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 
 fun DatasetInstallStatusEntry(projectID: ProjectID, status: InstallStatuses): DatasetInstallStatusEntry =
   DatasetInstallStatusEntryImpl().also {
-    it.projectID = projectID
+    it.projectId = projectID
 
     it.metaStatus = status.meta?.let(::DatasetInstallStatus)
     it.metaMessage = status.metaMessage

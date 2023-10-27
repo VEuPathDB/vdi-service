@@ -12,7 +12,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID:
+      datasetId:
         displayName: Dataset ID
         type: common.VDI-ID
         required: true
@@ -49,7 +49,7 @@ types:
           `direct-upload`, `nephele`, or `galaxy`.
         type: string
         required: true
-      projectIDs:
+      projectIds:
         displayName: Project IDs
         description: |
           Project IDs for projects the user dataset record was submitted to.
@@ -81,30 +81,11 @@ types:
         items:
           type: ShareOffer
         required: false
-      files:
-        displayName: Files
-        description: |
-          List of files uploaded to the dataset import service.
-        type: array
-        items:
-          type: FileSummary
-        required: true
       created:
         displayName: Creation Timestamp
         description: Timestamp for when this dataset was created.
         type: datetime
         required: true
-
-  FileSummary:
-    displayName: File Summary
-    type: object
-    additionalProperties: false
-    properties:
-      name:
-        type: string
-      size:
-        type: integer
-        format: int64
 
   ShareOffer:
     displayName: Share Offer
@@ -119,7 +100,7 @@ types:
         required: true
     example:
       recipient:
-        userID: 123456
+        userId: 123456
         firstName: Joe
         lastName: User
         email: juser@ujoe.edu
@@ -132,7 +113,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      userID:
+      userId:
         displayName: User ID
         type: integer
         format: int64
@@ -154,5 +135,5 @@ types:
         type: string
         required: false
     example:
-      userID: 123456
+      userId: 123456
       email: myusername@someuniversity.edu

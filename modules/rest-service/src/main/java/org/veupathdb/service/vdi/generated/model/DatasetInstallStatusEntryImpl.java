@@ -6,15 +6,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "projectID",
+    "projectId",
     "metaStatus",
     "metaMessage",
     "dataStatus",
     "dataMessage"
 })
 public class DatasetInstallStatusEntryImpl implements DatasetInstallStatusEntry {
-  @JsonProperty("projectID")
-  private String projectID;
+  @JsonProperty("projectId")
+  private String projectId;
 
   @JsonProperty("metaStatus")
   private DatasetInstallStatus metaStatus;
@@ -28,14 +28,14 @@ public class DatasetInstallStatusEntryImpl implements DatasetInstallStatusEntry 
   @JsonProperty("dataMessage")
   private String dataMessage;
 
-  @JsonProperty("projectID")
-  public String getProjectID() {
-    return this.projectID;
+  @JsonProperty("projectId")
+  public String getProjectId() {
+    return this.projectId;
   }
 
-  @JsonProperty("projectID")
-  public void setProjectID(String projectID) {
-    this.projectID = projectID;
+  @JsonProperty("projectId")
+  public void setProjectId(String projectId) {
+    this.projectId = projectId;
   }
 
   @JsonProperty("metaStatus")

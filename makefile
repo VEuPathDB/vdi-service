@@ -22,8 +22,8 @@ build:
 .PHONY: raml-gen
 raml-gen:
 	@which node || (echo 'NodeJS not found on $$PATH'; exit 1)
-	@gradle generate-raml-docs --rerun-tasks
 	@gradle :modules:rest-service:generate-jaxrs --rerun-tasks
+	@gradle generate-raml-docs --rerun-tasks
 
 
 ####
@@ -62,6 +62,10 @@ log-plugin-noop:
 .PHONY: log-plugin-genelist
 log-plugin-genelist:
 	@docker logs -f vdi-service-plugin-genelist-1
+
+.PHONY: log-plugin-genelist
+log-plugin-rnaseq:
+	@docker logs -f vdi-service-plugin-rnaseq-1
 
 .PHONY: log-kafka
 log-kafka:
