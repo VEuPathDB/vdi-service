@@ -9,9 +9,20 @@ types:
     type: object
     additionalProperties: false
     properties:
-      uploadFiles:
-        type: DatasetFileDetails[]
-      dataFiles:
+      upload:
+        type: DatasetZipDetails
+      install?:
+        type: DatasetZipDetails
+
+  DatasetZipDetails:
+    displayName: Dataset Zip Details
+    type: object
+    additionalProperties: false
+    properties:
+      zipSize:
+        type: integer
+        format: int64
+      contents:
         type: DatasetFileDetails[]
 
   DatasetFileDetails:
@@ -19,10 +30,10 @@ types:
     type: object
     additionalProperties: false
     properties:
-      name:
+      fileName:
         displayName: File Name
         type: string
-      size:
+      fileSize:
         displayName: File Size
         description: Size of the file in bytes.
         type: integer

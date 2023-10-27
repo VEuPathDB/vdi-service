@@ -899,6 +899,13 @@ uses:
     vd-id: lib.VDI-ID
   get:
     displayName: List Files
+    description: |
+      Lists the dataset zip files for the original user upload as well as the
+      install files (when available).
+      
+      If this endpoint is hit before the dataset has been imported, the upload
+      zip size will be `-1` which may be used as an indicator to clients that
+      the zip size cannot yet be shown.
     responses:
       200:
         description: Success

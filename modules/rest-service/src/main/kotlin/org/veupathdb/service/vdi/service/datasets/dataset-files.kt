@@ -4,12 +4,15 @@ import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.service.vdi.generated.model.DatasetFileDetailsImpl
 import org.veupathdb.service.vdi.generated.model.DatasetFileListingImpl
+import org.veupathdb.service.vdi.generated.model.DatasetZipDetails
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
+import vdi.constants.InstallZipName
+import vdi.constants.UploadZipName
 
 // region Get Data File
 //
@@ -54,14 +57,38 @@ internal fun listDatasetFilesForUser(user: UserID, vdid: DatasetID) =
 
 private fun listDatasetFiles(owner: UserID, vdid: DatasetID) =
   DatasetFileListingImpl().apply {
-    uploadFiles = DatasetStore.listUploadFiles(owner, vdid)
-      .map { DatasetFileDetailsImpl().apply { name = it.name; size = it.size } }
+    upload = DatasetZipDetails(getUploadZipSize(owner, vdid), CacheDB.selectUploadFiles(vdid))
 
-    dataFiles = DatasetStore.listDataFiles(owner, vdid)
-      .map { DatasetFileDetailsImpl().apply { name = it.name; size = it.size } }
+    val tmp = getDataZipSize(owner, vdid)
+    if (tmp > -1)
+      install = DatasetZipDetails(tmp, CacheDB.selectInstallFiles(vdid))
   }
 
 // endregion List Files
+
+private fun getUploadZipSize(user: UserID, datasetID: DatasetID): Long {
+  val listing = DatasetStore.listUploadFiles(user, datasetID)
+  if (listing.isEmpty())
+    return -1
+
+  for (file in listing)
+    if (file.name == UploadZipName)
+      return file.size
+
+  return -1
+}
+
+private fun getDataZipSize(userID: UserID, datasetID: DatasetID): Long {
+  val listing = DatasetStore.listDataFiles(userID, datasetID)
+  if (listing.isEmpty())
+    return -1
+
+  for (file in listing)
+    if (file.name == InstallZipName)
+      return file.size
+
+  return -1
+}
 
 private fun requireDataset(userID: UserID, datasetID: DatasetID): DatasetRecord {
   var ds = CacheDB.selectDatasetForUser(userID, datasetID)
