@@ -18,6 +18,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.db.app.model.InstallStatus
+import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 
@@ -63,6 +65,11 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     val meta = dir.getMeta().load()
       ?: throw IllegalStateException("got an uninstall event for a dataset that has no meta file: dataset $datasetID, user $userID")
 
+    if (!datasetIsImported(datasetID)) {
+      log.info("received uninstall event for a dataset that was not imported or failed import: {}/{}", userID, datasetID)
+      return
+    }
+
     val timer = Metrics.uninstallationTimes
       .labels(meta.type.name, meta.type.version)
       .startTimer()
@@ -76,6 +83,11 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     meta.projects.forEach { projectID ->
       if (!handler.appliesToProject(projectID)) {
         log.warn("type handler for type {} does not apply to project {} (dataset {}, user {})", handler.type, projectID, datasetID, userID)
+        return@forEach
+      }
+
+      if (!datasetIsInstalled(datasetID, projectID)) {
+        log.info("skipping uninstall event for dataset {}/{} and project {} as it is not installed", userID, datasetID, projectID)
         return@forEach
       }
 
@@ -140,5 +152,21 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
   private fun handleUnexpectedErrorResponse(datasetID: DatasetID, projectID: ProjectID, res: UninstallUnexpectedErrorResponse) {
     log.error("dataset handler server reports 500 for uninstall on dataset {}, project {}", datasetID, projectID)
     throw IllegalStateException(res.message)
+  }
+
+  private fun datasetIsInstalled(datasetID: DatasetID, projectID: ProjectID): Boolean {
+    val appDB = AppDB.accessor(projectID)
+
+    for (message in appDB.selectDatasetInstallMessages(datasetID)) {
+      if (message.status == InstallStatus.Complete)
+        return true
+    }
+
+    return false
+  }
+
+  private fun datasetIsImported(datasetID: DatasetID): Boolean {
+    val status = CacheDB.selectImportControl(datasetID) ?: return false
+    return status == DatasetImportStatus.Complete
   }
 }
