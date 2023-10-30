@@ -7,6 +7,7 @@ import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
 import org.veupathdb.vdi.lib.common.model.*
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3DatasetPathFactory
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
+import vdi.constants.InstallZipName
 import java.io.InputStream
 import java.util.function.Function
 import java.util.stream.Collectors
@@ -133,19 +134,9 @@ internal class EagerlyLoadedDatasetDirectory(
     if (datasetDataFiles.isEmpty())
       return false
 
-    val manifest = manifest!!.load()!!
+    manifest!!.load()!!
 
-    if (datasetDataFiles.size < manifest.dataFiles.size)
-      return false
-
-    val s3FileNames = datasetDataFiles
-      .map { it.name }
-
-    for (fileName in manifest.dataFiles)
-      if (!s3FileNames.contains(fileName))
-        return false
-
-    return true
+    return datasetDataFiles.asSequence().filter { it.name == InstallZipName }.any()
   }
 
   override fun isUploadComplete(): Boolean {

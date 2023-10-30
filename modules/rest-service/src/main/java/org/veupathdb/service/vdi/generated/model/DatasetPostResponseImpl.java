@@ -5,18 +5,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder("datasetID")
+@JsonPropertyOrder("datasetId")
 public class DatasetPostResponseImpl implements DatasetPostResponse {
-  @JsonProperty("datasetID")
-  private String datasetID;
+  @JsonProperty("datasetId")
+  private String datasetId;
 
-  @JsonProperty("datasetID")
-  public String getDatasetID() {
-    return this.datasetID;
+  @JsonProperty("datasetId")
+  public String getDatasetId() {
+    return this.datasetId;
   }
 
-  @JsonProperty("datasetID")
-  public void setDatasetID(String datasetID) {
-    this.datasetID = datasetID;
+  @JsonProperty("datasetId")
+  public void setDatasetId(String datasetId) {
+    this.datasetId = datasetId;
   }
 }

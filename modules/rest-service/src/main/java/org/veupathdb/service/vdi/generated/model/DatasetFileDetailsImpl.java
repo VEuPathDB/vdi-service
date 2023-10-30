@@ -6,33 +6,33 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "name",
-    "size"
+    "fileName",
+    "fileSize"
 })
 public class DatasetFileDetailsImpl implements DatasetFileDetails {
-  @JsonProperty("name")
-  private String name;
+  @JsonProperty("fileName")
+  private String fileName;
 
-  @JsonProperty("size")
-  private Long size;
+  @JsonProperty("fileSize")
+  private Long fileSize;
 
-  @JsonProperty("name")
-  public String getName() {
-    return this.name;
+  @JsonProperty("fileName")
+  public String getFileName() {
+    return this.fileName;
   }
 
-  @JsonProperty("name")
-  public void setName(String name) {
-    this.name = name;
+  @JsonProperty("fileName")
+  public void setFileName(String fileName) {
+    this.fileName = fileName;
   }
 
-  @JsonProperty("size")
-  public Long getSize() {
-    return this.size;
+  @JsonProperty("fileSize")
+  public Long getFileSize() {
+    return this.fileSize;
   }
 
-  @JsonProperty("size")
-  public void setSize(Long size) {
-    this.size = size;
+  @JsonProperty("fileSize")
+  public void setFileSize(Long fileSize) {
+    this.fileSize = fileSize;
   }
 }

@@ -2,7 +2,7 @@ import org.veupathdb.lib.gradle.container.util.Logger.Level
 
 plugins {
   kotlin("jvm")
-  id("org.veupathdb.lib.gradle.container.container-utils") version "4.8.9"
+  id("org.veupathdb.lib.gradle.container.container-utils") version "5.0.0"
 }
 
 // configure VEupathDB container plugin
@@ -50,6 +50,7 @@ dependencies {
 
   implementation(project(":components:app-db"))
   implementation(project(":components:cache-db"))
+  implementation(project(":components:constants"))
   implementation(project(":components:install-cleanup"))
   implementation(project(":components:plugin-mapping"))
   implementation(project(":components:pruner"))

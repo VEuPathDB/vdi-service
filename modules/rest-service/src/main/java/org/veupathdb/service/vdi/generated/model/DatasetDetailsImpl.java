@@ -1,13 +1,16 @@
 package org.veupathdb.service.vdi.generated.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "datasetID",
+    "datasetId",
     "owner",
     "datasetType",
     "name",
@@ -15,15 +18,16 @@ import java.util.List;
     "description",
     "sourceUrl",
     "origin",
-    "projectIDs",
+    "projectIds",
     "visibility",
     "importMessages",
     "status",
-    "shares"
+    "shares",
+    "created"
 })
 public class DatasetDetailsImpl implements DatasetDetails {
-  @JsonProperty("datasetID")
-  private String datasetID;
+  @JsonProperty("datasetId")
+  private String datasetId;
 
   @JsonProperty("owner")
   private DatasetOwner owner;
@@ -46,8 +50,8 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("origin")
   private String origin;
 
-  @JsonProperty("projectIDs")
-  private List<String> projectIDs;
+  @JsonProperty("projectIds")
+  private List<String> projectIds;
 
   @JsonProperty("visibility")
   private DatasetVisibility visibility;
@@ -66,14 +70,17 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("shares")
   private List<ShareOffer> shares;
 
-  @JsonProperty("datasetID")
-  public String getDatasetID() {
-    return this.datasetID;
+  @JsonProperty("created")
+  private OffsetDateTime created;
+
+  @JsonProperty("datasetId")
+  public String getDatasetId() {
+    return this.datasetId;
   }
 
-  @JsonProperty("datasetID")
-  public void setDatasetID(String datasetID) {
-    this.datasetID = datasetID;
+  @JsonProperty("datasetId")
+  public void setDatasetId(String datasetId) {
+    this.datasetId = datasetId;
   }
 
   @JsonProperty("owner")
@@ -146,14 +153,14 @@ public class DatasetDetailsImpl implements DatasetDetails {
     this.origin = origin;
   }
 
-  @JsonProperty("projectIDs")
-  public List<String> getProjectIDs() {
-    return this.projectIDs;
+  @JsonProperty("projectIds")
+  public List<String> getProjectIds() {
+    return this.projectIds;
   }
 
-  @JsonProperty("projectIDs")
-  public void setProjectIDs(List<String> projectIDs) {
-    this.projectIDs = projectIDs;
+  @JsonProperty("projectIds")
+  public void setProjectIds(List<String> projectIds) {
+    this.projectIds = projectIds;
   }
 
   @JsonProperty("visibility")
@@ -204,5 +211,15 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("shares")
   public void setShares(List<ShareOffer> shares) {
     this.shares = shares;
+  }
+
+  @JsonProperty("created")
+  public OffsetDateTime getCreated() {
+    return this.created;
+  }
+
+  @JsonProperty("created")
+  public void setCreated(OffsetDateTime created) {
+    this.created = created;
   }
 }

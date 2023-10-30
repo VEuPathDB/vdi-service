@@ -8,11 +8,11 @@ import java.util.List;
     as = BrokenDatasetDetailsImpl.class
 )
 public interface BrokenDatasetDetails {
-  @JsonProperty("datasetID")
-  String getDatasetID();
+  @JsonProperty("datasetId")
+  String getDatasetId();
 
-  @JsonProperty("datasetID")
-  void setDatasetID(String datasetID);
+  @JsonProperty("datasetId")
+  void setDatasetId(String datasetId);
 
   @JsonProperty("owner")
   Long getOwner();
@@ -26,11 +26,11 @@ public interface BrokenDatasetDetails {
   @JsonProperty("datasetType")
   void setDatasetType(DatasetTypeInfo datasetType);
 
-  @JsonProperty("projectIDs")
-  List<String> getProjectIDs();
+  @JsonProperty("projectIds")
+  List<String> getProjectIds();
 
-  @JsonProperty("projectIDs")
-  void setProjectIDs(List<String> projectIDs);
+  @JsonProperty("projectIds")
+  void setProjectIds(List<String> projectIds);
 
   @JsonProperty("status")
   DatasetStatusInfo getStatus();

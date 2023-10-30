@@ -30,8 +30,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.apache.logging.log4j.kotlin.logger
+import org.veupathdb.vdi.lib.common.compression.Zip
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
+import vdi.constants.InstallZipName
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
 import vdi.module.handler.imports.triggers.model.WarningsFile
 import java.util.concurrent.locks.ReentrantLock
@@ -223,8 +225,16 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       // data files directory in S3
       val dataFiles = tempDirectory.listDirectoryEntries()
 
+      val sizes = HashMap<String, Long>(dataFiles.size)
+
       // For each data file, push to S3
-      dataFiles.forEach { dataFile -> dd.putDataFile(dataFile.name, dataFile::inputStream) }
+      dataFiles.forEach { dataFile -> sizes[dataFile.name] = dataFile.fileSize() }
+
+      TempFiles.withTempFile { tempFile ->
+        Zip.compress(tempFile, dataFiles)
+        dd.putDataFile(InstallZipName) { tempFile.inputStream() }
+      }
+
       dd.putManifest(manifest)
 
       // Record the status update to the cache DB
@@ -233,6 +243,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
           transaction.upsertImportMessages(datasetID, warnings.joinToString("\n"))
         }
 
+        transaction.tryInsertInstallFiles(datasetID, sizes)
         transaction.updateDataSyncControl(datasetID, dd.getLatestDataTimestamp(OffsetDateTime.now()))
         transaction.updateImportControl(datasetID, DatasetImportStatus.Complete)
       }

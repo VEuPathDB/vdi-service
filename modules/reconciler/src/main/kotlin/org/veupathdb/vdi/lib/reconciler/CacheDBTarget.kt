@@ -17,13 +17,15 @@ class CacheDBTarget : ReconcilerTarget {
     override fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID) {
         val transaction: CacheDBTransaction = CacheDB.openTransaction()
         // Delete dataset and all associated rows in a transaction.
+        transaction.deleteInstallFiles(datasetID)
+        transaction.deleteUpdateFiles(datasetID)
         transaction.deleteDatasetShareReceipts(datasetID)
         transaction.deleteDatasetShareOffers(datasetID)
         transaction.deleteDatasetMetadata(datasetID)
         transaction.deleteDatasetProjects(datasetID)
-        transaction.deleteDataset(datasetID)
         transaction.deleteSyncControl(datasetID)
         transaction.deleteImportControl(datasetID)
+        transaction.deleteDataset(datasetID)
         transaction.commit()
     }
 }

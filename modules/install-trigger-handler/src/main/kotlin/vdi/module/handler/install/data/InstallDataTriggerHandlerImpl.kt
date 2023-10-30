@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.veupathdb.vdi.lib.common.OriginTimestamp
+import org.veupathdb.vdi.lib.common.compression.Zip
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 
@@ -268,11 +269,16 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
       s3Dir.getDataFiles()
         .forEach { ddf ->
-          val df = tempDir.resolve(ddf.name)
-          files.add(df)
-
-          df.outputStream()
+          val zip = tempDir.resolve(ddf.name)
+          zip.outputStream()
             .use { out -> ddf.loadContents()!!.use { inp -> inp.transferTo(out) } }
+
+          Zip.zipEntries(zip).forEach { (entry, inp) ->
+            val file = tempDir.resolve(entry.name)
+            file.outputStream()
+              .use { out -> inp.transferTo(out) }
+            files.add(file)
+          }
         }
 
       Tar.compressWithGZip(tarFile, files)

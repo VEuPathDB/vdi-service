@@ -6,8 +6,6 @@ import org.veupathdb.vdi.lib.db.cache.util.*
 import java.sql.Connection
 import java.sql.Types
 
-// TODO: filter out is_deleted?  or not?  maybe downstream of here?
-
 // language=postgresql
 private fun sqlBody(
   prefix: String,
@@ -34,7 +32,9 @@ SELECT
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id) AS projects
 , ic.status
 FROM
-  vdi.datasets AS d
+  dataset_ids AS did
+  INNER JOIN vdi.datasets AS d
+    USING (dataset_id)
   INNER JOIN vdi.dataset_metadata AS md
     USING (dataset_id)
   LEFT JOIN vdi.import_control AS ic

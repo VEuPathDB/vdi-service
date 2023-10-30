@@ -11,8 +11,8 @@ waitFor() {
   done
 }
 
-waitFor kafka localhost 9092
-waitFor cache-db localhost 5432
+waitFor kafka kafka 9092
+waitFor cache-db cache-db 5432
 waitFor rabbit "$GLOBAL_RABBIT_HOST" "${GLOBAL_RABBIT_PORT:-5672}"
 waitFor minio "$S3_HOST" "$S3_PORT"
 

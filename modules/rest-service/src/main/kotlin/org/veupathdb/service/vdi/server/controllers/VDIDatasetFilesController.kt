@@ -5,6 +5,7 @@ import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.AllowAdminAuth
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
+import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdId
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdIdFiles
 import org.veupathdb.service.vdi.service.datasets.*
 import org.veupathdb.vdi.lib.common.field.toDatasetIDOrNull
@@ -27,37 +28,41 @@ class VDIDatasetFilesController(@Context request: ContainerRequest) : VdiDataset
   }
 
   @AllowAdminAuth
-  override fun getVdiDatasetsFilesUploadByVdIdAndFileName(
-    vdId: String,
-    fileName: String,
-  ): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesUploadByVdIdAndFileNameResponse {
+  override fun getVdiDatasetsFilesUploadByVdId(vdId: String): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesUploadByVdIdResponse {
     val datasetID = vdId.toDatasetIDOrNull() ?: throw NotFoundException()
 
     val obj = if (maybeUserID == null) {
-      getUploadFileForAdmin(datasetID, fileName)
+      getUploadFileForAdmin(datasetID)
     } else {
-      getUploadFileForUser(userID.toUserID(), datasetID, fileName)
+      getUploadFileForUser(userID.toUserID(), datasetID)
     }
 
-    return VdiDatasetsVdIdFiles.GetVdiDatasetsFilesUploadByVdIdAndFileNameResponse
-      .respond200WithApplicationOctetStream { obj.stream.use { inp -> inp.transferTo(it) } }
+    return VdiDatasetsVdIdFiles.GetVdiDatasetsFilesUploadByVdIdResponse
+      .respond200WithApplicationOctetStream(
+        { obj.stream.use { inp -> inp.transferTo(it) } },
+        VdiDatasetsVdIdFiles.GetVdiDatasetsFilesUploadByVdIdResponse
+          .headersFor200()
+          .withContentDisposition("attachment; filename=\"$datasetID-upload.zip\"")
+      )
+
   }
 
   @AllowAdminAuth
-  override fun getVdiDatasetsFilesDataByVdIdAndFileName(
-    vdId: String,
-    fileName: String,
-  ): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesDataByVdIdAndFileNameResponse {
+  override fun getVdiDatasetsFilesDataByVdId(vdId: String): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesDataByVdIdResponse {
     val datasetID = vdId.toDatasetIDOrNull() ?: throw NotFoundException()
 
     val obj = if (maybeUserID == null) {
-      getDataFileForAdmin(datasetID, fileName)
+      getDataFileForAdmin(datasetID)
     } else {
-      getDataFileForUser(userID.toUserID(), datasetID, fileName)
+      getDataFileForUser(userID.toUserID(), datasetID)
     }
 
-    return VdiDatasetsVdIdFiles.GetVdiDatasetsFilesDataByVdIdAndFileNameResponse
-      .respond200WithApplicationOctetStream { obj.stream.use { inp -> inp.transferTo(it) } }
+    return VdiDatasetsVdIdFiles.GetVdiDatasetsFilesDataByVdIdResponse
+      .respond200WithApplicationOctetStream(
+        { obj.stream.use { inp -> inp.transferTo(it) } },
+        VdiDatasetsVdIdFiles.GetVdiDatasetsFilesDataByVdIdResponse
+          .headersFor200()
+          .withContentDisposition("attachment; filename=\"$datasetID-data.zip\"")
+      )
   }
-
 }

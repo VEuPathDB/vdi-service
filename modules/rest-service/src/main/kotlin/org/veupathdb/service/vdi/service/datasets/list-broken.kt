@@ -102,10 +102,10 @@ private fun DatasetRecord.toDetails(
   statuses: Map<ProjectID, InstallStatuses>,
 ) =
   BrokenDatasetDetailsImpl().also { out ->
-    out.datasetID   = datasetID.toString()
+    out.datasetId   = datasetID.toString()
     out.owner       = owner.toLong()
     out.datasetType = getTypeInfo()
-    out.projectIDs  = projects.toList()
+    out.projectIds  = projects.toList()
     out.status      = DatasetStatusInfo(DatasetImportStatus.Complete, statuses)
   }
 

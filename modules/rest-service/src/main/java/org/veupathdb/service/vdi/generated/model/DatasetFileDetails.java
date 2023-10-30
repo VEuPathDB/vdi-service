@@ -7,15 +7,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetFileDetailsImpl.class
 )
 public interface DatasetFileDetails {
-  @JsonProperty("name")
-  String getName();
+  @JsonProperty("fileName")
+  String getFileName();
 
-  @JsonProperty("name")
-  void setName(String name);
+  @JsonProperty("fileName")
+  void setFileName(String fileName);
 
-  @JsonProperty("size")
-  Long getSize();
+  @JsonProperty("fileSize")
+  Long getFileSize();
 
-  @JsonProperty("size")
-  void setSize(Long size);
+  @JsonProperty("fileSize")
+  void setFileSize(Long fileSize);
 }

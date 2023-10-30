@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetInstallStatusEntryImpl.class
 )
 public interface DatasetInstallStatusEntry {
-  @JsonProperty("projectID")
-  String getProjectID();
+  @JsonProperty("projectId")
+  String getProjectId();
 
-  @JsonProperty("projectID")
-  void setProjectID(String projectID);
+  @JsonProperty("projectId")
+  void setProjectId(String projectId);
 
   @JsonProperty("metaStatus")
   DatasetInstallStatus getMetaStatus();

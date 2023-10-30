@@ -50,6 +50,7 @@ include(":platform")
 
 include(":components:app-db")
 include(":components:cache-db")
+include(":components:constants")
 include(":components:dataset-reinstaller")
 include(":components:handler-client")
 include(":components:install-cleanup")

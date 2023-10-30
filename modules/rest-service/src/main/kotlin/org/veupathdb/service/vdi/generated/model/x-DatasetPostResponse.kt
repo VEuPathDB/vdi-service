@@ -10,4 +10,4 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
  * @return A new [DatasetPostResponse] instance.
  */
 fun DatasetPostResponse(datasetID: DatasetID): DatasetPostResponse =
-  DatasetPostResponseImpl().also { it.datasetID = datasetID.toString() }
+  DatasetPostResponseImpl().also { it.datasetId = datasetID.toString() }

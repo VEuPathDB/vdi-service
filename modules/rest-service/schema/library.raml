@@ -19,11 +19,38 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID: VDI-ID
+      datasetId: VDI-ID
       owner: User-ID
       datasetType: DatasetTypeInfo
-      projectIDs: ProjectID[]
+      projectIds: ProjectID[]
       status: DatasetStatusInfo
+  BrokenImportListing:
+    displayName: Broken Import Listing
+    type: object
+    additionalProperties: false
+    properties:
+      meta: BrokenImportListingMeta
+      results: BrokenImportDetails[]
+  BrokenImportListingMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      count: integer
+      before?: string
+      after?: string
+      user?: User-ID
+      limit?: integer
+      offset?: integer
+  BrokenImportDetails:
+    displayName: Broken Import Details
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: VDI-ID
+      owner: User-ID
+      datasetType: DatasetTypeInfo
+      projectIds: ProjectID[]
+      messages: string[]
   AuthorizationKey:
     displayName: RPC Authorization Key
     description: |
@@ -60,13 +87,13 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID: VDI-ID
-      projectID: ProjectID
+      datasetId: VDI-ID
+      projectId: ProjectID
   DatasetListShareUser:
     type: object
     additionalProperties: false
     properties:
-      userID: User-ID
+      userId: User-ID
       firstName: string
       lastName: string
       organization: string
@@ -77,7 +104,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID:
+      datasetId:
         displayName: Dataset ID
         type: VDI-ID
       owner:
@@ -115,7 +142,7 @@ types:
           String representing the origin of the dataset.  Examples include
           `direct-upload`, `nephele`, or `galaxy`.
         type: string
-      projectIDs:
+      projectIds:
         displayName: Project IDs
         description: |
           Project IDs for projects the dataset record was submitted to.
@@ -126,6 +153,20 @@ types:
       shares:
         displayName: Shared With
         type: DatasetListShareUser[]
+      fileCount:
+        displayName: File Count
+        description: Number of files uploaded for this dataset.
+        type: integer
+      fileSizeTotal:
+        displayName: File Size Total
+        description: |
+          Sum of the sizes of all the files uploaded for this dataset.
+        type: integer
+        format: int64
+      created:
+        displayName: Creation Timestamp
+        description: Timestamp of the creation of this dataset.
+        type: datetime
   DatasetPostRequest:
     displayName: Dataset Post Request
     description: |
@@ -224,17 +265,17 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID: VDI-ID
+      datasetId: VDI-ID
   ShareOfferEntry:
     displayName: Share Offer
     type: object
     additionalProperties: false
     properties:
-      datasetID: VDI-ID
+      datasetId: VDI-ID
       owner: DatasetOwner
       shareStatus: ShareOfferStatus
       datasetType: DatasetTypeInfo
-      projectIDs: ProjectID[]
+      projectIds: ProjectID[]
   ShareOfferStatus:
     displayName: Share Offer Status
     type: string
@@ -247,17 +288,26 @@ types:
     type: object
     additionalProperties: false
     properties:
-      uploadFiles: DatasetFileDetails[]
-      dataFiles: DatasetFileDetails[]
+      upload: DatasetZipDetails
+      install?: DatasetZipDetails
+  DatasetZipDetails:
+    displayName: Dataset Zip Details
+    type: object
+    additionalProperties: false
+    properties:
+      zipSize:
+        type: integer
+        format: int64
+      contents: DatasetFileDetails[]
   DatasetFileDetails:
     displayName: Dataset File Details
     type: object
     additionalProperties: false
     properties:
-      name:
+      fileName:
         displayName: File Name
         type: string
-      size:
+      fileSize:
         displayName: File Size
         description: Size of the file in bytes.
         type: integer
@@ -269,7 +319,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetID:
+      datasetId:
         displayName: Dataset ID
         type: VDI-ID
       owner:
@@ -301,7 +351,7 @@ types:
           String representing the origin of the dataset.  Examples include
           `direct-upload`, `nephele`, or `galaxy`.
         type: string
-      projectIDs:
+      projectIds:
         displayName: Project IDs
         description: |
           Project IDs for projects the user dataset record was submitted to.
@@ -329,6 +379,10 @@ types:
         type: array
         required: false
         items: ShareOffer
+      created:
+        displayName: Creation Timestamp
+        description: Timestamp for when this dataset was created.
+        type: datetime
   ShareOffer:
     displayName: Share Offer
     type: object
@@ -338,6 +392,7 @@ types:
       status: ShareOfferAction
     example:
       recipient:
+        userId: 123456
         firstName: Joe
         lastName: User
         email: juser@ujoe.edu
@@ -349,6 +404,10 @@ types:
     type: object
     additionalProperties: false
     properties:
+      userId:
+        displayName: User ID
+        type: integer
+        format: int64
       firstName:
         displayName: First Name
         type: string
@@ -366,6 +425,7 @@ types:
         type: string
         required: false
     example:
+      userId: 123456
       email: myusername@someuniversity.edu
   DatasetPatchRequest:
     displayName: Dataset Patch Request
@@ -436,6 +496,28 @@ types:
           A value of `reject` means that the dataset that a share was
           offered for should become unavailable to the rejecting user.
         type: ShareReceiptAction
+  PluginListItem:
+    displayName: Plugin Listing Entry
+    type: object
+    additionalProperties: false
+    properties:
+      displayName:
+        displayName: Plugin Display Name
+        type: string
+      typeName:
+        displayName: Dataset Type Name
+        type: string
+      typeVersion:
+        displayName: Dataset Type Version
+        type: string
+      projects:
+        displayName: Relevant Projects
+        description: |
+          Projects that this plugin is restricted to.  An empty or absent list
+          indicates that the plugin has no project restrictions and may be used
+          on any site.
+        type: string[]
+        required: false
   UserMetadata:
     type: object
     additionalProperties: false
@@ -457,9 +539,9 @@ types:
     displayName: VDI ID
     description: Unique VDI Dataset identifier string.
     type: string
-    pattern: ^[0-9a-fA-F]{32}$
-    minLength: 32
-    maxLength: 32
+    pattern: ^[a-zA-Z0-9_-]{14}$
+    minLength: 14
+    maxLength: 14
   User-ID:
     displayName: VEuPathDB User ID
     description: Unique user identifier
@@ -475,10 +557,12 @@ types:
       Valid project IDs are:
 
       - AmoebaDB
+      - ClinEpiDB
       - CryptoDB
       - FungiDB
       - GiardiaDB
       - HostDB
+      - MicrobiomeDB
       - MicrosporidiaDB
       - PiroplasmaDB
       - PlasmoDB
@@ -494,7 +578,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      userID:
+      userId:
         displayName: Owner User ID
         description: VEuPathDB user ID of the owner of the dataset.
         type: User-ID
@@ -595,7 +679,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      projectID: ProjectID
+      projectId: ProjectID
       metaStatus:
         type: DatasetInstallStatus
         required: false

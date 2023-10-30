@@ -8,6 +8,7 @@ import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
 import org.veupathdb.vdi.lib.common.model.*
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3DatasetPathFactory
+import vdi.constants.InstallZipName
 import java.io.InputStream
 
 internal class DatasetDirectoryImpl(
@@ -145,27 +146,7 @@ internal class DatasetDirectoryImpl(
     if (dataFiles.isEmpty())
       return false
 
-    val manifest = getManifest().load()!!
-
-    // If the number of data files is less than the number of files recorded in
-    // the manifest, then the import is in progress
-    if (dataFiles.size < manifest.dataFiles.size)
-      return false
-
-    // If the number of data files in S3 is greater than the number of files
-    // recorded in the manifest, then something has gone wrong.
-    if (dataFiles.size != manifest.dataFiles.size)
-      log.warn("there more data files in the data directory than there are in the manifest for dataset {} (user {})", datasetID, ownerID)
-
-    val s3FileNames = dataFiles
-      .map { it.name }
-
-    for (fileName in manifest.dataFiles)
-      if (!s3FileNames.contains(fileName))
-        return false
-
-    // If we've made it here then we have a meta.json, we have a manifest.json,
-    // and all the files recorded in the manifest are present in S3.
-    return true
+    // If the install data zip file does not exist
+    return dataFiles.asSequence().filter { it.name == InstallZipName }.any()
   }
 }

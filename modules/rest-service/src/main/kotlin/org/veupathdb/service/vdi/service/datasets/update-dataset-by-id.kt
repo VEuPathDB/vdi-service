@@ -10,6 +10,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMetaImpl
 import org.veupathdb.vdi.lib.db.cache.CacheDB
+import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
 
 internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequest) {
   val dataset = CacheDB.selectDataset(datasetID)
@@ -29,22 +30,30 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
   val meta = DatasetStore.getDatasetMeta(userID, datasetID)
     ?: throw IllegalStateException("target dataset has no meta.json file")
 
-  DatasetStore.putDatasetMeta(
-    userID,
-    datasetID,
-    VDIDatasetMetaImpl(
-      type         = meta.type,
-      projects     = meta.projects,
-      visibility   = patch.visibility?.toInternalVisibility() ?: meta.visibility,
-      owner        = userID,
-      name         = patch.name ?: meta.name,
-      summary      = if (patch.summary?.isBlank() == true) null else patch.summary ?: meta.summary,
-      description  = if (patch.description?.isBlank() == true) null else patch.description ?: meta.description,
-      origin       = meta.origin,
-      dependencies = meta.dependencies,
-      sourceURL    = meta.sourceURL,
+  CacheDB.withTransaction {
+    val visibility = patch.visibility?.toInternalVisibility() ?: meta.visibility
+    val name = patch.name ?: meta.name
+    val summary = if (patch.summary?.isBlank() == true) null else patch.summary ?: meta.summary
+    val description = if (patch.description?.isBlank() == true) null else patch.description ?: meta.description
+
+    DatasetStore.putDatasetMeta(
+      userID,
+      datasetID,
+      VDIDatasetMetaImpl(
+        type         = meta.type,
+        projects     = meta.projects,
+        visibility   = visibility,
+        owner        = userID,
+        name         = name,
+        summary      = summary,
+        description  = description,
+        origin       = meta.origin,
+        dependencies = meta.dependencies,
+        sourceURL    = meta.sourceURL,
+      )
     )
-  )
+    it.updateDatasetMeta(DatasetMetaImpl(datasetID, visibility, name, summary, description, meta.sourceURL))
+  }
 }
 
 private fun DatasetPatchRequest.hasSomethingToUpdate(): Boolean =

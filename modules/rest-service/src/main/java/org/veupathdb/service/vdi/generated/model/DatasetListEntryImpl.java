@@ -1,13 +1,16 @@
 package org.veupathdb.service.vdi.generated.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "datasetID",
+    "datasetId",
     "owner",
     "datasetType",
     "visibility",
@@ -16,13 +19,16 @@ import java.util.List;
     "description",
     "sourceUrl",
     "origin",
-    "projectIDs",
+    "projectIds",
     "status",
-    "shares"
+    "shares",
+    "fileCount",
+    "fileSizeTotal",
+    "created"
 })
 public class DatasetListEntryImpl implements DatasetListEntry {
-  @JsonProperty("datasetID")
-  private String datasetID;
+  @JsonProperty("datasetId")
+  private String datasetId;
 
   @JsonProperty("owner")
   private DatasetOwner owner;
@@ -48,8 +54,8 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("origin")
   private String origin;
 
-  @JsonProperty("projectIDs")
-  private List<String> projectIDs;
+  @JsonProperty("projectIds")
+  private List<String> projectIds;
 
   @JsonProperty("status")
   private DatasetStatusInfo status;
@@ -57,14 +63,23 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("shares")
   private List<DatasetListShareUser> shares;
 
-  @JsonProperty("datasetID")
-  public String getDatasetID() {
-    return this.datasetID;
+  @JsonProperty("fileCount")
+  private Integer fileCount;
+
+  @JsonProperty("fileSizeTotal")
+  private Long fileSizeTotal;
+
+  @JsonProperty("created")
+  private OffsetDateTime created;
+
+  @JsonProperty("datasetId")
+  public String getDatasetId() {
+    return this.datasetId;
   }
 
-  @JsonProperty("datasetID")
-  public void setDatasetID(String datasetID) {
-    this.datasetID = datasetID;
+  @JsonProperty("datasetId")
+  public void setDatasetId(String datasetId) {
+    this.datasetId = datasetId;
   }
 
   @JsonProperty("owner")
@@ -147,14 +162,14 @@ public class DatasetListEntryImpl implements DatasetListEntry {
     this.origin = origin;
   }
 
-  @JsonProperty("projectIDs")
-  public List<String> getProjectIDs() {
-    return this.projectIDs;
+  @JsonProperty("projectIds")
+  public List<String> getProjectIds() {
+    return this.projectIds;
   }
 
-  @JsonProperty("projectIDs")
-  public void setProjectIDs(List<String> projectIDs) {
-    this.projectIDs = projectIDs;
+  @JsonProperty("projectIds")
+  public void setProjectIds(List<String> projectIds) {
+    this.projectIds = projectIds;
   }
 
   @JsonProperty("status")
@@ -175,5 +190,35 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty("shares")
   public void setShares(List<DatasetListShareUser> shares) {
     this.shares = shares;
+  }
+
+  @JsonProperty("fileCount")
+  public Integer getFileCount() {
+    return this.fileCount;
+  }
+
+  @JsonProperty("fileCount")
+  public void setFileCount(Integer fileCount) {
+    this.fileCount = fileCount;
+  }
+
+  @JsonProperty("fileSizeTotal")
+  public Long getFileSizeTotal() {
+    return this.fileSizeTotal;
+  }
+
+  @JsonProperty("fileSizeTotal")
+  public void setFileSizeTotal(Long fileSizeTotal) {
+    this.fileSizeTotal = fileSizeTotal;
+  }
+
+  @JsonProperty("created")
+  public OffsetDateTime getCreated() {
+    return this.created;
+  }
+
+  @JsonProperty("created")
+  public void setCreated(OffsetDateTime created) {
+    this.created = created;
   }
 }
