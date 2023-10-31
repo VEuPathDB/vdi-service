@@ -3,6 +3,7 @@ package org.veupathdb.service.vdi.service.datasets
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.*
+import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -27,6 +28,9 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
+  val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
+    ?: throw IllegalStateException("meta.json missing from S3 for dataset ${dataset.ownerID}/$datasetID")
+
   return DatasetDetailsImpl().also { out ->
     out.datasetId      = datasetID.toString()
     out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
@@ -40,6 +44,13 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
     out.sourceUrl      = dataset.sourceURL
     out.projectIds     = dataset.projects.toList()
     out.created        = dataset.created.defaultZone()
+    out.dependencies   = metaJson.dependencies.map {
+      DatasetDependencyImpl().apply {
+        resourceIdentifier = it.identifier
+        resourceDisplayName = it.displayName
+        resourceVersion = it.version
+      }
+    }
   }
 }
 
@@ -73,6 +84,9 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
+  val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
+    ?: throw IllegalStateException("meta.json missing from S3 for dataset ${dataset.ownerID}/$datasetID")
+
   // return the dataset
   return DatasetDetailsImpl().also { out ->
     out.datasetId      = datasetID.toString()
@@ -89,6 +103,13 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.sourceUrl      = dataset.sourceURL
     out.projectIds     = dataset.projects.toList()
     out.created        = dataset.created.defaultZone()
+    out.dependencies   = metaJson.dependencies.map {
+      DatasetDependencyImpl().apply {
+        resourceIdentifier = it.identifier
+        resourceDisplayName = it.displayName
+        resourceVersion = it.version
+      }
+    }
 
     shares.forEach { share ->
       out.shares.add(ShareOffer(
