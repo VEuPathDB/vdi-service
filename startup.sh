@@ -11,9 +11,9 @@ waitFor() {
   done
 }
 
-waitFor kafka kafka 9092
-waitFor cache-db cache-db 5432
-waitFor rabbit "$GLOBAL_RABBIT_HOST" "${GLOBAL_RABBIT_PORT:-5672}"
-waitFor minio "$S3_HOST" "$S3_PORT"
+waitFor kafka localhost 9092
+waitFor cache-db localhost 5432
+waitFor rabbit localhost 5672
+waitFor minio localhost 9000
 
 java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /service.jar
