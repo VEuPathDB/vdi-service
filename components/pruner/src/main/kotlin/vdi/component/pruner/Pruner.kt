@@ -144,6 +144,7 @@ object Pruner {
       it.deleteDatasetProjectLinks(datasetID)
       it.deleteSyncControl(datasetID)
       it.deleteInstallMessages(datasetID)
+      it.deleteDatasetMeta(datasetID)
       it.deleteDataset(datasetID)
     }
   }
