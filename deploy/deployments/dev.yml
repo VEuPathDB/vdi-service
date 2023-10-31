@@ -1,11 +1,10 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: dev-minio
   namespace: vdi
 data:
-  MINIO_ROOT_USER: "someToken"
-  MINIO_ROOT_PASSWORD: "someSecretKey"
   MINIO_NOTIFY_AMQP_ENABLE_RABBIT: "on"
   MINIO_NOTIFY_AMQP_URL_RABBIT: "amqp://someUser:somePassword@localhost:5672"
   MINIO_NOTIFY_AMQP_EXCHANGE_RABBIT: "vdi-bucket-notifications"
@@ -13,15 +12,6 @@ data:
   MINIO_NOTIFY_AMQP_ROUTING_KEY_RABBIT: "vdi-bucket-notifications"
   MINIO_NOTIFY_AMQP_DELIVERY_MODE_RABBIT: "2"
   MINIO_NOTIFY_AMQP_DURABLE_RABBIT: "on"
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: dev-rabbit
-  namespace: vdi
-data:
-  RABBITMQ_DEFAULT_USER: "someUser"
-  RABBITMQ_DEFAULT_PASS: "somePassword"
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -48,6 +38,87 @@ metadata:
   labels:
     stack: vdi
     network/vdi: "true"
+  annotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/role: "vdi"
+    # TODO: Separate this into individual files with only the env vars needed for each stack component
+    vault.hashicorp.com/agent-inject-template-secrets.env: |
+      # REST Service
+      export AUTH_SECRET_KEY={{ with secret "secrets/veupathdb/auth-secret-key" }}{{ .Data.data.value }}{{ end }}
+      export ADMIN_AUTH_TOKEN={{ with secret "secret/vdi/admin-token" }}{{ .Data.data.value }}{{ end }}
+      export LDAP_SERVER={{ with secret "secrets/veupathdb/ldap-servers" }}{{ .Data.data.value }}{{ end }}
+      export ACCT_DB_USER={{ with secret "secret/database/account" }}{{ .Data.data.username }}{{ end }}
+      export ACCT_DB_PASS={{ with secret "secret/database/account" }}{{ .Data.data.password }}{{ end }}
+      export USER_DB_USER={{ with secret "secret/database/user" }}{{ .Data.data.username }}{{ end }}
+      export USER_DB_PASS={{ with secret "secret/database/user" }}{{ .Data.data.password }}{{ end }}
+      
+      # Internal DB Service Side
+      export CACHE_DB_USERNAME={{ with secret "secret/vdi/cache-db" }}{{ .Data.data.username }}{{ end }}
+      export CACHE_DB_PASSWORD={{ with secret "secret/vdi/cache-db" }}{{ .Data.data.password }}{{ end }}
+      # Internal DB PG Side
+      export POSTGRES_USER={{ with secret "secret/vdi/cache-db" }}{{ .Data.data.username }}{{ end }}
+      export POSTGRES_PASSWORD={{ with secret "secret/vdi/cache-db" }}{{ .Data.data.password }}{{ end }}
+    
+      # RabbitMQ for Service
+      export GLOBAL_RABBIT_USERNAME={{ with secret "secret/global/rabbit" }}{{ .Data.data.username }}{{ end }}
+      export GLOBAL_RABBIT_PASSWORD={{ with secret "secret/global/rabbit" }}{{ .Data.data.password }}{{ end }}
+      # RabbitMQ for dev rabbit instance
+      export RABBITMQ_DEFAULT_USER={{ with secret "secret/global/rabbit" }}{{ .Data.data.username }}{{ end }}
+      export RABBITMQ_DEFAULT_PASS={{ with secret "secret/global/rabbit" }}{{ .Data.data.password }}{{ end }}
+
+      # Minio for Service
+      export S3_ACCESS_TOKEN={{ with secret "secret/global/minio" }}{{ .Data.data.accessToken }}{{ end }}
+      export S3_SECRET_KEY={{ with secret "secret/global/minio" }}{{ .Data.data.secretKey }}{{ end }}
+      # Minio for dev minio instance
+      export MINIO_ROOT_USER={{ with secret "secret/global/minio" }}{{ .Data.data.accessToken }}{{ end }}
+      export MINIO_ROOT_PASSWORD={{ with secret "secret/global/minio" }}{{ .Data.data.secretKey }}{{ end }}
+
+      # App Databases
+      export DB_CONNECTION_USER_AMOEBA={{ with secret "secret/database/app/amoeba" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_AMOEBA={{ with secret "secret/database/app/amoeba" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_CRYPTO={{ with secret "secret/database/app/crypto" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_CRYPTO={{ with secret "secret/database/app/crypto" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_FUNGI={{ with secret "secret/database/app/fungi" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_FUNGI={{ with secret "secret/database/app/fungi" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_GIARDIA={{ with secret "secret/database/app/giardia" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_GIARDIA={{ with secret "secret/database/app/giardia" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_HOST={{ with secret "secret/database/app/host" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_HOST={{ with secret "secret/database/app/host" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_MICROSPORIDIA={{ with secret "secret/database/app/microsporidia" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_MICROSPORIDIA={{ with secret "secret/database/app/microsporidia" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_PIROPLASMA={{ with secret "secret/database/app/piroplasma" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_PIROPLASMA={{ with secret "secret/database/app/piroplasma" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_PLASMO={{ with secret "secret/database/app/plasmo" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_PLASMO={{ with secret "secret/database/app/plasmo" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_TOXO={{ with secret "secret/database/app/toxo" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_TOXO={{ with secret "secret/database/app/toxo" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_TRICH={{ with secret "secret/database/app/trich" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_TRICH={{ with secret "secret/database/app/trich" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_TRITRYP={{ with secret "secret/database/app/tritryp" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_TRITRYP={{ with secret "secret/database/app/tritryp" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_VECTOR={{ with secret "secret/database/app/vector" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_VECTOR={{ with secret "secret/database/app/vector" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_ORTHO={{ with secret "secret/database/app/ortho" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_ORTHO={{ with secret "secret/database/app/ortho" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_CLINEPI={{ with secret "secret/database/app/clinepi" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_CLINEPI={{ with secret "secret/database/app/clinepi" }}{{ .Data.data.password }}{{ end }}
+    
+      export DB_CONNECTION_USER_MICROBIOME={{ with secret "secret/database/app/microbiome" }}{{ .Data.data.username }}{{ end }}
+      export DB_CONNECTION_PASS_MICROBIOME={{ with secret "secret/database/app/microbiome" }}{{ .Data.data.password }}{{ end }}
+
 spec:
   replicas: 1
   selector:
@@ -82,6 +153,7 @@ spec:
             - >
               microdnf install nc;
               while ! nc -zv localhost 5672; do sleep 3; done;
+              source /vault/secrets/secrets.env;
               minio server --console-address ':9001' /data;
 
         - name: minio-setup
@@ -108,19 +180,22 @@ spec:
               exit 0;
 
         - name: rabbit
-          image: rabbitmq:3.12.6-management-alpine
+          image: rabbitmq:3.12.7-management-alpine
           ports:
             - containerPort: 5672
               name: rabbit-api
             - containerPort: 15672
               name: rabbit-admin
-          envFrom:
-            - configMapRef:
-                name: dev-rabbit
+          command:
+            - /bin/sh
+            - -c
+            - >
+              source /vault/secrets/secrets.env;
+              /usr/local/bin/docker-entrypoint.sh;
 
         # STANDARD CONTAINERS
         - name: cache-db
-          image: veupathdb/vdi-internal-db:1.5.0
+          image: veupathdb/vdi-internal-db:1.7.2
           ports:
             - containerPort: 5432
               name: cache-db
@@ -134,21 +209,17 @@ spec:
               command:
                 - "pg_isready"
           env:
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  key: CACHE_DB_USERNAME
-                  name: cache-db
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: CACHE_DB_PASSWORD
-                  name: cache-db
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
                   key: CACHE_DB_NAME
                   name: rest-service
+          command:
+            - /bin/sh
+            - -c
+            - >
+              source /vault/secrets/secrets.env;
+              /usr/local/bin/docker-entrypoint.sh;
         - name: kafka
           image: veupathdb/apache-kafka:3.4.0
           ports:
@@ -180,16 +251,6 @@ spec:
               port: http-svc
               path: /health
           envFrom:
-            # Load Secrets
-            - secretRef:
-                name: app-dbs
-            - secretRef:
-                name: globals
-            - secretRef:
-                name: rest-service
-            - secretRef:
-                name: cache-db
-            # Load Configurations
             - configMapRef:
                 name: globals
             - configMapRef:
@@ -198,6 +259,12 @@ spec:
                 name: rest-service
             - configMapRef:
                 name: plugin-registry
+          command:
+            - /bin/sh
+            - -c
+            - >
+              source /vault/secrets/secrets.env;
+              /startup.sh;
         - name: plugin-example
           image: veupathdb/vdi-plugin-example:latest
           ports:
@@ -218,16 +285,18 @@ spec:
             - name: SERVER_PORT
               value: "81"
           envFrom:
-            - secretRef:
-                name: globals
             - configMapRef:
                 name: database-config
-            - secretRef:
-                name: app-dbs
             - configMapRef:
                 name: plugin-globals
             - configMapRef:
                 name: globals
+          command:
+            - /bin/sh
+            - -c
+            - >
+              source /vault/secrets/secrets.env;
+              /startup.sh;
         - name: plugin-genelist
           image: veupathdb/vdi-plugin-genelist:latest
           ports:
@@ -248,16 +317,18 @@ spec:
             - name: SERVER_PORT
               value: "82"
           envFrom:
-            - secretRef:
-                name: globals
             - configMapRef:
                 name: database-config
-            - secretRef:
-                name: app-dbs
             - configMapRef:
                 name: plugin-globals
             - configMapRef:
                 name: globals
+          command:
+            - /bin/sh
+            - -c
+            - >
+              source /vault/secrets/secrets.env;
+              /startup.sh;
         - name: plugin-isasimple
           image: veupathdb/vdi-plugin-isasimple:latest
           ports:
@@ -278,16 +349,18 @@ spec:
             - name: SERVER_PORT
               value: "83"
           envFrom:
-            - secretRef:
-                name: globals
             - configMapRef:
                 name: database-config
-            - secretRef:
-                name: app-dbs
             - configMapRef:
                 name: plugin-globals
             - configMapRef:
                 name: globals
+          command:
+            - /bin/sh
+            - -c
+            - >
+              source /vault/secrets/secrets.env;
+              /startup.sh;
         - name: plugin-bigwig
           image: veupathdb/vdi-plugin-bigwig:latest
           ports:
@@ -308,16 +381,18 @@ spec:
             - name: SERVER_PORT
               value: "84"
           envFrom:
-            - secretRef:
-                name: globals
             - configMapRef:
                 name: database-config
-            - secretRef:
-                name: app-dbs
             - configMapRef:
                 name: plugin-globals
             - configMapRef:
                 name: globals
+          command:
+            - /bin/sh
+            - -c
+            - >
+              source /vault/secrets/secrets.env;
+              /startup.sh;
         - name: plugin-biom
           image: veupathdb/vdi-plugin-biom:latest
           ports:
@@ -338,16 +413,18 @@ spec:
             - name: SERVER_PORT
               value: "85"
           envFrom:
-            - secretRef:
-                name: globals
             - configMapRef:
                 name: database-config
-            - secretRef:
-                name: app-dbs
             - configMapRef:
                 name: plugin-globals
             - configMapRef:
                 name: globals
+          command:
+            - /bin/sh
+            - -c
+            - >
+              source /vault/secrets/secrets.env;
+              /startup.sh;
         - name: plugin-rnaseq
           image: veupathdb/vdi-plugin-rnaseq:latest
           ports:
@@ -368,13 +445,15 @@ spec:
             - name: SERVER_PORT
               value: "86"
           envFrom:
-            - secretRef:
-                name: globals
             - configMapRef:
                 name: globals
             - configMapRef:
                 name: database-config
-            - secretRef:
-                name: app-dbs
             - configMapRef:
                 name: plugin-globals
+          command:
+            - /bin/sh
+            - -c
+            - >
+              source /vault/secrets/secrets.env;
+              /startup.sh;

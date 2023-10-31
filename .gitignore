@@ -30,3 +30,4 @@ local.properties
 
 # Secrets
 deploy/secrets/*.yml
+vault-init.sh

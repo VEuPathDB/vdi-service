@@ -48,6 +48,17 @@ stop: env-file-test
 
 
 ####
+##  Kubernetes
+####
+
+k8s-full-start:
+	@deploy/ctl full start dev
+
+k8s-full-stop:
+	@deploy/ctl full teardown
+
+
+####
 ##  Logging
 ####
 

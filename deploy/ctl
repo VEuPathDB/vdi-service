@@ -305,7 +305,7 @@ function fullStart() {
 
   namespaceCreate
   configInstall
-  secretInstall
+#  secretInstall
   deployInstall "$1"
   serviceInstall "$1"
 }
@@ -313,9 +313,9 @@ function fullStart() {
 function fullTeardown() {
   serviceDelete
   deployDelete
-  secretDelete
+#  secretDelete
   configDelete
-  namespaceDelete
+#  namespaceDelete
 }
 
 function fullHelp() {
