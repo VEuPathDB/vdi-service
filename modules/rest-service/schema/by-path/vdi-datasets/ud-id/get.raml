@@ -86,6 +86,10 @@ types:
         description: Timestamp for when this dataset was created.
         type: datetime
         required: true
+      dependencies:
+        displayName: Dataset Dependencies
+        type: common.DatasetDependency[]
+        required: true
 
   ShareOffer:
     displayName: Share Offer
