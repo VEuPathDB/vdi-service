@@ -132,6 +132,7 @@ spec:
 
     spec:
       serviceAccountName: vdi
+      hostNetwork: true
       volumes:
         - name: user-dataset-mount
           hostPath:
@@ -203,15 +204,6 @@ spec:
           ports:
             - containerPort: 5432
               name: cache-db
-          startupProbe:
-            exec:
-              command:
-                - "pg_isready"
-            initialDelaySeconds: 10
-          readinessProbe:
-            exec:
-              command:
-                - "pg_isready"
           env:
             - name: POSTGRES_DB
               valueFrom:
@@ -245,15 +237,6 @@ spec:
           ports:
             - containerPort: 80
               name: http-svc
-          startupProbe:
-            httpGet:
-              port: http-svc
-              path: /health
-            initialDelaySeconds: 30
-          readinessProbe:
-            httpGet:
-              port: http-svc
-              path: /health
           envFrom:
             - configMapRef:
                 name: globals

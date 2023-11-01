@@ -5,11 +5,11 @@ CUR_DIR="$(dirname "$(readlink -f "$0")")"
 ## NAMESPACE MANAGEMENT ########################################################
 
 function namespaceCreate() {
-  kubectl create namespace vdi
+  microk8s kubectl create namespace vdi
 }
 
 function namespaceDelete() {
-  kubectl delete namespace vdi
+  microk8s kubectl delete namespace vdi
 }
 
 function namespaceHelp() {
@@ -46,14 +46,14 @@ function namespaceMode() {
 
 function configInstall() {
   for i in `find "$CUR_DIR/configmaps" -type f -name '*.yml'`; do
-    kubectl apply -f "$i"
+    microk8s kubectl apply -f "$i"
   done
 }
 
 function configDelete() {
   for i in `find "$CUR_DIR/configmaps" -maxdepth 1 -type f -name '*.yml'`; do
     secretName="$(grep '^  name: ' $i | cut -c9-)"
-    kubectl delete configmap "$secretName" --namespace=vdi
+    microk8s kubectl delete configmap "$secretName" --namespace=vdi
   done
 }
 
@@ -101,19 +101,19 @@ function secretInit() {
 }
 
 function secretList() {
-  kubectl get secrets --namespace=vdi
+  microk8s kubectl get secrets --namespace=vdi
 }
 
 function secretInstall() {
   for i in `find "$CUR_DIR/secrets" -type f -name '*.yml'`; do
-    kubectl apply -f "$i"
+    microk8s kubectl apply -f "$i"
   done
 }
 
 function secretDelete() {
   for i in `find "$CUR_DIR/secrets" -maxdepth 1 -type f -name '*.yml'`; do
     secretName="$(grep '^  name: ' $i | cut -c9-)"
-    kubectl delete secret "$secretName" --namespace=vdi
+    microk8s kubectl delete secret "$secretName" --namespace=vdi
   done
 }
 
@@ -188,11 +188,11 @@ function deployInstall() {
       ;;
   esac
 
-  kubectl apply -f "$CUR_DIR/deployments/$1.yml"
+  microk8s kubectl apply -f "$CUR_DIR/deployments/$1.yml"
 }
 
 function deployDelete() {
-  kubectl delete deployment vdi --namespace=vdi
+  microk8s kubectl delete deployment vdi --namespace=vdi
 }
 
 function deploymentMode() {
@@ -242,11 +242,11 @@ function serviceInstall() {
       ;;
   esac
 
-  kubectl apply -f "$CUR_DIR/services/$1.yml"
+  microk8s kubectl apply -f "$CUR_DIR/services/$1.yml"
 }
 
 function serviceDelete() {
-  kubectl delete service vdi --namespace=vdi
+  microk8s kubectl delete service vdi --namespace=vdi
 }
 
 function serviceMode() {
@@ -286,7 +286,7 @@ function logsMode() {
   elif [ "$1" == "help" ]; then
     logsHelp
   else
-    kubectl logs deployment.app/vdi --namespace=vdi -c "$1"
+    microk8s kubectl logs deployment.app/vdi --namespace=vdi -c "$1"
   fi
 }
 
