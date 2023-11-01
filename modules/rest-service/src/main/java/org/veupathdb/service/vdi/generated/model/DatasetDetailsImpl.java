@@ -23,7 +23,8 @@ import java.util.List;
     "importMessages",
     "status",
     "shares",
-    "created"
+    "created",
+    "dependencies"
 })
 public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("datasetId")
@@ -72,6 +73,9 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty("created")
   private OffsetDateTime created;
+
+  @JsonProperty("dependencies")
+  private List<DatasetDependency> dependencies;
 
   @JsonProperty("datasetId")
   public String getDatasetId() {
@@ -221,5 +225,15 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("created")
   public void setCreated(OffsetDateTime created) {
     this.created = created;
+  }
+
+  @JsonProperty("dependencies")
+  public List<DatasetDependency> getDependencies() {
+    return this.dependencies;
+  }
+
+  @JsonProperty("dependencies")
+  public void setDependencies(List<DatasetDependency> dependencies) {
+    this.dependencies = dependencies;
   }
 }
