@@ -246,13 +246,6 @@ types:
     properties:
       name: string
       version: string
-  DatasetDependency:
-    type: object
-    additionalProperties: false
-    properties:
-      resourceIdentifier: string
-      resourceDisplayName: string
-      resourceVersion: string
   DatasetPostResponse:
     displayName: Dataset Upload Response
     description: |
@@ -383,6 +376,9 @@ types:
         displayName: Creation Timestamp
         description: Timestamp for when this dataset was created.
         type: datetime
+      dependencies:
+        displayName: Dataset Dependencies
+        type: DatasetDependency[]
   ShareOffer:
     displayName: Share Offer
     type: object
@@ -692,6 +688,13 @@ types:
       dataMessage:
         type: string
         required: false
+  DatasetDependency:
+    type: object
+    additionalProperties: false
+    properties:
+      resourceIdentifier: string
+      resourceDisplayName: string
+      resourceVersion: string
   Error:
     type: object
     additionalProperties: false

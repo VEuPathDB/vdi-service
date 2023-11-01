@@ -102,4 +102,10 @@ public interface DatasetDetails {
 
   @JsonProperty("created")
   void setCreated(OffsetDateTime created);
+
+  @JsonProperty("dependencies")
+  List<DatasetDependency> getDependencies();
+
+  @JsonProperty("dependencies")
+  void setDependencies(List<DatasetDependency> dependencies);
 }
