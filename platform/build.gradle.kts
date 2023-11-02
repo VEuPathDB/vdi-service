@@ -49,5 +49,6 @@ dependencies {
     // S3
     api("org.veupathdb.lib.s3:s34k-minio:0.6.0+s34k-0.10.0")
 
+    api("io.github.jopenlibs:vault-java-driver:6.2.0")
   }
 }
