@@ -31,3 +31,4 @@ local.properties
 # Secrets
 deploy/secrets/*.yml
 deploy/scripts/vault-write-secrets.sh
+keys/

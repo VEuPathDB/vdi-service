@@ -2,10 +2,13 @@
 
 set -m
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 # Make sure K8S is running
 sudo microk8s start
 
 # Enable the features we need
+sudo microk8s enable rbac
 sudo microk8s enable dashboard
 sudo microk8s enable dns
 
@@ -61,6 +64,7 @@ EOF
 
 # Start up vault
 vault server -dev -dev-root-token-id root -dev-listen-address 0.0.0.0:8200 &
+
 export VAULT_ADDR='http://0.0.0.0:8200'
 
 # Login to vault
@@ -70,7 +74,7 @@ vault login root
 vault auth enable kubernetes
 
 # Write the kv secrets to vault
-./vault-write-secrets.sh
+$SCRIPT_DIR/vault-write-secrets.sh
 
 # Fetch the details needed to set up the kubernetes auth config
 TOKEN_REVIEW_JWT=$(microk8s kubectl get secret vault-token-g955r -n vdi --output='go-template={{ .data.token }}' | base64 --decode)

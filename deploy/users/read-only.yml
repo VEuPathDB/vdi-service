@@ -1,0 +1,27 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vpdb-dev
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - configmaps
+  - deployments
+  verbs:
+  - get
+  - watch
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vpdb-developers
+subjects:
+  - kind: User
+    name: epharper
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vpdb-dev
