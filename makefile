@@ -63,7 +63,7 @@ log-plugin-noop:
 log-plugin-genelist:
 	@docker logs -f vdi-service-plugin-genelist-1
 
-.PHONY: log-plugin-genelist
+.PHONY: log-plugin-rnaseq
 log-plugin-rnaseq:
 	@docker logs -f vdi-service-plugin-rnaseq-1
 
