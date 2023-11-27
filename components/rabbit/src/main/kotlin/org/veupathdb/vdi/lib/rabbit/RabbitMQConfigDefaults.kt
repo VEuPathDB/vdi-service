@@ -12,6 +12,8 @@ internal object RabbitMQConfigDefaults {
 
   const val ExchangeAutoDelete = false
 
+  const val UseTLS = false
+
   inline val ExchangeArguments: Map<String, Any>
     get() = emptyMap()
 

@@ -19,6 +19,10 @@ class RabbitMQEventSource<T>(
       username = config.serverUsername
       password = config.serverPassword.unwrap()
       useNio()
+
+      if (config.serverUseTLS) {
+        useSslProtocol()
+      }
     }
     .let {
       if (config.serverConnectionName.isNullOrBlank()) {

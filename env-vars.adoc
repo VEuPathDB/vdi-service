@@ -922,6 +922,13 @@ connection.
 | Duration
 | Frequency that the global RabbitMQ instance will be polled for new messages
 from MinIO.
+
+|
+| GLOBAL_RABBIT_USE_TLS
+| boolean
+| Whether the connection to the target RabbitMQ instance should use TLS. +
+
+Defaults to `false`.
 |===
 
 ===== Exchange Config
