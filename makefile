@@ -67,6 +67,10 @@ log-plugin-genelist:
 log-plugin-rnaseq:
 	@docker logs -f vdi-service-plugin-rnaseq-1
 
+.PHONY: log-plugin-rnaseq
+log-plugin-bigwig:
+	@docker logs -f vdi-service-plugin-bigwig-1
+
 .PHONY: log-kafka
 log-kafka:
 	@docker logs -f vdi-service-kafka-1
