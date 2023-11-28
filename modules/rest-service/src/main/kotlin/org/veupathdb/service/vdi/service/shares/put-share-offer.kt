@@ -32,7 +32,12 @@ internal fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entit
 
   // We automatically accept share offers on behalf of the recipient user.  The
   // recipient user can reject the share later if they so choose.
-  DatasetStore.putShareReceipt(dataset.ownerID, datasetID, recipientID, VDIDatasetShareReceipt(VDIShareReceiptAction.Accept))
+  DatasetStore.putShareReceipt(
+    dataset.ownerID,
+    datasetID,
+    recipientID,
+    VDIDatasetShareReceipt(VDIShareReceiptAction.Accept)
+  )
 }
 
 internal fun putShareOffer(datasetID: DatasetID, ownerID: UserID, recipientID: UserID, entity: DatasetShareOffer) {
@@ -48,8 +53,15 @@ internal fun putShareOffer(datasetID: DatasetID, ownerID: UserID, recipientID: U
   if (dataset.isDeleted)
     throw ForbiddenException("cannot share a deleted dataset")
 
-  if (dataset.importStatus != DatasetImportStatus.Complete)
-    throw ForbiddenException("cannot share a dataset until after it has been processed")
+  when (dataset.importStatus) {
+    DatasetImportStatus.Queued, DatasetImportStatus.InProgress
+    -> throw ForbiddenException("cannot share a dataset until after it has been processed")
+
+    DatasetImportStatus.Invalid, DatasetImportStatus.Failed
+    -> throw ForbiddenException("cannot share a dataset whose import failed")
+
+    DatasetImportStatus.Complete -> { /* Do nothing */ }
+  }
 
   val existingShareReceipt = CacheDB.selectSharesForDataset(datasetID)
     .find { it.recipientID == recipientID }
@@ -80,9 +92,11 @@ internal fun putShareOffer(datasetID: DatasetID, ownerID: UserID, recipientID: U
 }
 
 private fun DatasetShareOffer.toInternal() =
-  VDIDatasetShareOffer(when (action) {
-    null                    -> throw BadRequestException("share action is required")
-    ShareOfferAction.GRANT  -> VDIShareOfferAction.Grant
-    ShareOfferAction.REVOKE -> VDIShareOfferAction.Revoke
-  })
+  VDIDatasetShareOffer(
+    when (action) {
+      null -> throw BadRequestException("share action is required")
+      ShareOfferAction.GRANT -> VDIShareOfferAction.Grant
+      ShareOfferAction.REVOKE -> VDIShareOfferAction.Revoke
+    }
+  )
 
