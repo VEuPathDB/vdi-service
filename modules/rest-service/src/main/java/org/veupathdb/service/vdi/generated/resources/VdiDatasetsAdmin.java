@@ -28,8 +28,7 @@ public interface VdiDatasetsAdmin {
   @Produces("application/json")
   @Consumes("multipart/form-data")
   PostVdiDatasetsAdminProxyUploadResponse postVdiDatasetsAdminProxyUpload(
-      @HeaderParam("Admin-Token") String adminToken, @HeaderParam("User-ID") Long userID,
-      DatasetPostRequest entity);
+      @HeaderParam("User-ID") Long userID, DatasetPostRequest entity);
 
   @GET
   @Path("/failed-imports")
@@ -39,28 +38,25 @@ public interface VdiDatasetsAdmin {
       @QueryParam("after") String after, @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset,
       @QueryParam("sort") @DefaultValue("date") String sort,
-      @QueryParam("order") @DefaultValue("desc") String order,
-      @HeaderParam("Admin-Token") String adminToken);
+      @QueryParam("order") @DefaultValue("desc") String order);
 
   @GET
   @Path("/list-broken")
   @Produces("application/json")
   GetVdiDatasetsAdminListBrokenResponse getVdiDatasetsAdminListBroken(
-      @QueryParam("expanded") @DefaultValue("true") Boolean expanded,
-      @HeaderParam("Admin-Token") String adminToken);
+      @QueryParam("expanded") @DefaultValue("true") Boolean expanded);
 
   @POST
   @Path("/install-cleanup")
   @Produces("application/json")
   @Consumes("application/json")
   PostVdiDatasetsAdminInstallCleanupResponse postVdiDatasetsAdminInstallCleanup(
-      @HeaderParam("Admin-Token") String adminToken, InstallCleanupRequest entity);
+      InstallCleanupRequest entity);
 
   @POST
   @Path("/delete-cleanup")
   @Produces("application/json")
-  PostVdiDatasetsAdminDeleteCleanupResponse postVdiDatasetsAdminDeleteCleanup(
-      @HeaderParam("Admin-Token") String adminToken);
+  PostVdiDatasetsAdminDeleteCleanupResponse postVdiDatasetsAdminDeleteCleanup();
 
   class PostVdiDatasetsAdminProxyUploadResponse extends ResponseDelegate {
     private PostVdiDatasetsAdminProxyUploadResponse(Response response, Object entity) {

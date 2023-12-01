@@ -298,11 +298,6 @@ uses:
       description: |
         Upload a dataset on behalf of another user.
       headers:
-        Admin-Token:
-          displayName: Admin Auth Secret Key
-          description: Secret key used to authenticate admin endpoint requests.
-          type: string
-          required: true
         User-ID:
           displayName: Target User ID
           description: |
@@ -383,11 +378,6 @@ uses:
       description: |
         Lists datasets that failed to import.
       headers:
-        Admin-Token:
-          displayName: Admin Auth Secret Key
-          description: Secret key used to authenticate admin endpoint requests.
-          type: string
-          required: true
       queryParameters:
         user:
           type: lib.User-ID
@@ -472,11 +462,6 @@ uses:
       description: |
         Lists datasets that failed installation due to non-user error.
       headers:
-        Admin-Token:
-          displayName: Admin Auth Secret Key
-          description: Secret key used to authenticate admin endpoint requests.
-          type: string
-          required: true
       queryParameters:
         expanded:
           displayName: Expanded Dataset List
@@ -532,11 +517,6 @@ uses:
         If the request specifies neither `all` or `targets` the endpoint will do
         nothing.
       headers:
-        Admin-Token:
-          displayName: Admin Auth Secret Key
-          description: Secret key used to authenticate admin endpoint requests.
-          type: string
-          required: true
       body:
         application/json:
           type: lib.InstallCleanupRequest
@@ -602,11 +582,6 @@ uses:
         Permanently delete jobs that were soft deleted more than 24 hours prior
         to the execution of this task.
       headers:
-        Admin-Token:
-          displayName: Admin Auth Secret Key
-          description: Secret key used to authenticate admin endpoint requests.
-          type: string
-          required: true
       responses:
         204:
           description: Action completed successfully.

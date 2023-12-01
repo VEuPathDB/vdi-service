@@ -2,7 +2,8 @@ package org.veupathdb.service.vdi.server.controllers
 
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.ForbiddenException
-import org.veupathdb.service.vdi.config.Options
+import org.veupathdb.lib.container.jaxrs.server.annotations.AllowAdminAuth
+import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.db.UserDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsAdmin
@@ -18,9 +19,6 @@ import org.veupathdb.vdi.lib.db.cache.model.SortOrder
 import vdi.component.install_cleanup.InstallCleaner
 import vdi.component.install_cleanup.ReinstallTarget
 import vdi.component.pruner.Pruner
-import java.time.OffsetDateTime
-import java.time.ZoneId
-import java.util.*
 
 // Broken Import Query Constants
 private const val biQueryLimitMinimum = 0
@@ -29,26 +27,20 @@ private const val biQueryLimitDefault = 100
 private const val biQueryOffsetMinimum = 0
 private const val biQueryOffsetDefault = 0
 
+@Authenticated
+@AllowAdminAuth(required = true)
 class VDIDatasetsAdminController : VdiDatasetsAdmin {
 
   override fun getVdiDatasetsAdminListBroken(
     expanded: Boolean?,
-    authKey: String?,
   ): VdiDatasetsAdmin.GetVdiDatasetsAdminListBrokenResponse {
-    if (authKey != Options.Admin.secretKey)
-      throw ForbiddenException()
-
     return VdiDatasetsAdmin.GetVdiDatasetsAdminListBrokenResponse
       .respond200WithApplicationJson(listBrokenDatasets(expanded ?: true))
   }
 
   override fun postVdiDatasetsAdminInstallCleanup(
-    authKey: String?,
     entity: InstallCleanupRequest?,
   ): VdiDatasetsAdmin.PostVdiDatasetsAdminInstallCleanupResponse {
-    if (authKey != Options.Admin.secretKey)
-      throw ForbiddenException()
-
     if (entity == null)
       throw BadRequestException()
 
@@ -61,25 +53,16 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
     return VdiDatasetsAdmin.PostVdiDatasetsAdminInstallCleanupResponse.respond204()
   }
 
-  override fun postVdiDatasetsAdminDeleteCleanup(
-    authKey: String?
-  ): VdiDatasetsAdmin.PostVdiDatasetsAdminDeleteCleanupResponse {
-    if (authKey != Options.Admin.secretKey)
-      throw ForbiddenException()
-
+  override fun postVdiDatasetsAdminDeleteCleanup(): VdiDatasetsAdmin.PostVdiDatasetsAdminDeleteCleanupResponse {
     Pruner.tryPruneDatasets()
 
     return VdiDatasetsAdmin.PostVdiDatasetsAdminDeleteCleanupResponse.respond204()
   }
 
   override fun postVdiDatasetsAdminProxyUpload(
-    authKey: String?,
     userID: Long?,
     entity: DatasetPostRequest?,
   ): VdiDatasetsAdmin.PostVdiDatasetsAdminProxyUploadResponse {
-    if (authKey != Options.Admin.secretKey)
-      throw ForbiddenException()
-
     if (userID == null)
       throw BadRequestException("no target user ID provided")
 
@@ -108,11 +91,7 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
     offset: Int?,
     sort: String?,
     order: String?,
-    adminToken: String?
   ): VdiDatasetsAdmin.GetVdiDatasetsAdminFailedImportsResponse {
-    if (adminToken != Options.Admin.secretKey)
-      throw ForbiddenException()
-
     if (limit != null && (limit < biQueryLimitMinimum || limit > biQueryLimitMaximum))
       throw BadRequestException("invalid limit value")
 

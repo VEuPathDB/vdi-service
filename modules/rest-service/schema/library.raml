@@ -51,6 +51,14 @@ types:
       datasetType: DatasetTypeInfo
       projectIds: ProjectID[]
       messages: string[]
+  OverallDatasetListItem:
+    displayName: Overall Dataset List Item
+    description: Entry in the overall dataset list.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: VDI-ID
+      owner: User-ID
   AuthorizationKey:
     displayName: RPC Authorization Key
     description: |
@@ -710,6 +718,8 @@ types:
       - forbidden
       - not-found
       - bad-method
+      - conflict
+      - gone
       - invalid-input
       - server-error
   BadRequestError:
@@ -767,13 +777,21 @@ types:
       state of the resource.
 
       If you submitted a resource, that resource may already exist.
-    type: string
+    type: Error
+    discriminatorValue: conflict
+    example:
+      status: conflict
+      message: Target resource already exists and cannot be overwritten.
   GoneError:
     displayName: Gone
     description: |
       The request could not be completed due to the requested resource or its
       underlying data no longer being present on the server.
-    type: string
+    type: Error
+    discriminatorValue: gone
+    example:
+      status: gone
+      message: The target resource or its dependencies no longer exists.
   UnprocessableEntityError:
     displayName: Unprocessable Entity
     description: |
