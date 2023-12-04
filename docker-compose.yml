@@ -2,8 +2,6 @@ version: "3.5"
 
 networks:
   internal:
-  rabbitmq:
-    external: true
   traefik:
     external: true
   monitoring-ext:
@@ -48,7 +46,6 @@ services:
     - kafka
     networks:
     - internal
-    - rabbitmq
     - traefik
     - monitoring-ext
     environment:
