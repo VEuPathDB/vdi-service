@@ -162,7 +162,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         log.warn("received an import event for a dataset with more than one upload file.  using file ${uploadFiles[0].name} for dataset $datasetID, user $userID")
       }
 
-      val handler = PluginHandlers.get(datasetMeta.type.name, datasetMeta.type.version) or {
+      val handler = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version] or {
         log.error("No plugin handler registered for dataset type ${datasetMeta.type.name}")
         throw IllegalStateException("No plugin handler registered for dataset type ${datasetMeta.type.name}")
       }
@@ -181,7 +181,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         )
         ImportResponseType.BadRequest      -> handleImportBadRequestResult(datasetID, result as ImportBadRequestResponse)
         ImportResponseType.ValidationError -> handleImportInvalidResult(datasetID, result as ImportValidationErrorResponse)
-        ImportResponseType.UnhandledError  -> handleImport500Result(datasetID, result as ImportUnhandledErrorResponse)
+        ImportResponseType.UnhandledError  -> handleImport500Result(userID, datasetID, result as ImportUnhandledErrorResponse)
       }
     } catch (e: Throwable) {
       log.debug("import request to handler server failed with exception:", e)
@@ -267,8 +267,8 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private fun handleImport500Result(datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
-    log.error("dataset handler server reports 500 for dataset $datasetID, message ${result.message}")
+  private fun handleImport500Result(userID: UserID, datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
+    log.error("dataset handler server reports 500 for dataset $userID/$datasetID, message ${result.message}")
     CacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
       it.upsertImportMessages(datasetID, result.message)
@@ -278,22 +278,22 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
     if (!exists()) {
-      log.warn("got an import event for a dataset directory that does not exist?  Dataset: $datasetID, User: $userID")
+      log.warn("got an import event for a dataset directory that does not exist?  $userID/$datasetID")
       return false
     }
 
     if (hasDeleteFlag()) {
-      log.info("got an import event for a dataset with a delete flag, ignoring it.  Dataset: $datasetID, User: $userID")
+      log.info("got an import event for a dataset with a delete flag, ignoring it.  $userID/$datasetID")
       return false
     }
 
     if (!hasMeta()) {
-      log.info("got an import event for a dataset that does not yet have a meta.json file, ignoring it.  Dataset: $datasetID, User: $userID")
+      log.info("got an import event for a dataset that does not yet have a meta.json file, ignoring it.  $userID/$datasetID")
       return false
     }
 
     if (!isUploadComplete()) {
-      log.info("got an import event for a dataset that does not yet have an upload tarball, ignoring it.  Dataset: $datasetID, User: $userID")
+      log.info("got an import event for a dataset that does not yet have an upload tarball, ignoring it.  $userID/$datasetID")
       return false
     }
 
