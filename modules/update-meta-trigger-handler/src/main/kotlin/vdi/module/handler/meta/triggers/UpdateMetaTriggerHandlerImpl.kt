@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
+import java.sql.SQLException
 
 internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTriggerHandlerConfig)
   : UpdateMetaTriggerHandler
@@ -121,7 +122,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     }
 
     // Do the "little" reconciliation
-    comparison(dir, syncControl)
+    comparison(dir, syncControl, userID, datasetID)
       .also {
         if (it.doDataSync) {
           log.info("Doing little reconciliation data sync")
@@ -155,10 +156,10 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       return
     }
 
-    val ph = PluginHandlers.get(datasetMeta.type.name, datasetMeta.type.version)!!
+    val ph = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version]!!
 
     datasetMeta.projects
-      .forEach { projectID -> executeJob(ph, datasetMeta, syncControl, metaTimestamp, datasetID, projectID) }
+      .forEach { projectID -> executeJob(ph, datasetMeta, syncControl, metaTimestamp, datasetID, projectID, userID) }
 
     timer.observeDuration()
   }
@@ -169,10 +170,11 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     syncControl:   VDISyncControlRecord,
     metaTimestamp: OffsetDateTime,
     datasetID:     DatasetID,
-    projectID:     ProjectID
+    projectID:     ProjectID,
+    userID:        UserID,
   ) {
     if (!ph.appliesToProject(projectID)) {
-      log.warn("dataset {} declares a project id of {} which is not applicable to dataset type {}", datasetID, projectID, meta.type.name)
+      log.warn("dataset {}/{} declares a project id of {} which is not applicable to dataset type {}", userID, datasetID, projectID, meta.type.name)
       return
     }
 
@@ -181,15 +183,15 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
 
     if (failed) {
-      log.info("dataset {}, project {} install-meta is being skipped due to previous failures", datasetID, projectID)
+      log.info("dataset {}/{}, project {} install-meta is being skipped due to previous failures", userID, datasetID, projectID)
       return
     }
 
     AppDB.withTransaction(projectID) {
       try {
-        log.debug("testing for existence of dataset {} in app db for project {}", datasetID, projectID)
+        log.debug("testing for existence of dataset {}/{} in app db for project {}", userID, datasetID, projectID)
         it.selectDataset(datasetID) or {
-          log.debug("inserting dataset record for dataset {} into app db for project {}", datasetID, projectID)
+          log.debug("inserting dataset record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
           it.insertDataset(DatasetRecord(
             datasetID   = datasetID,
             owner       = meta.owner,
@@ -200,31 +202,31 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
 
           it.insertDatasetVisibility(datasetID, meta.owner)
 
-          log.debug("inserting sync control record for dataset {} into app db for project {}", datasetID, projectID)
+          log.debug("inserting sync control record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
           it.insertSyncControl(VDISyncControlRecord(
             datasetID     = datasetID,
-            sharesUpdated = syncControl.sharesUpdated,
-            dataUpdated   = syncControl.dataUpdated,
+            sharesUpdated = OriginTimestamp,
+            dataUpdated   = OriginTimestamp,
             metaUpdated   = metaTimestamp
           ))
 
-          log.debug("inserting dataset project link for dataset {} into app db for project {}", datasetID, projectID)
+          log.debug("inserting dataset project link for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
           it.insertDatasetProjectLink(datasetID, projectID)
         }
 
-        log.debug("upserting dataset meta record for dataset {} into app db for project {}", datasetID, projectID)
+        log.debug("upserting dataset meta record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
         it.upsertDatasetMeta(datasetID, meta.name, meta.description)
 
         it.selectDatasetSyncControlRecord(datasetID) or {
           it.insertSyncControl(VDISyncControlRecord(
             datasetID     = datasetID,
-            sharesUpdated = syncControl.sharesUpdated,
-            dataUpdated   = syncControl.dataUpdated,
+            sharesUpdated = OriginTimestamp,
+            dataUpdated   = OriginTimestamp,
             metaUpdated   = metaTimestamp
           ))
         }
       } catch (e: Throwable) {
-        log.error("exception while attempting to getOrCreate app db records for dataset $datasetID", e)
+        log.error("exception while attempting to getOrCreate app db records for dataset $userID/$datasetID", e)
         it.rollback()
         throw e
       }
@@ -236,25 +238,38 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
 
     try {
       when (result.type) {
-        InstallMetaResponseType.Success -> handleSuccessResponse(datasetID, projectID)
+        InstallMetaResponseType.Success -> handleSuccessResponse(userID, datasetID, projectID)
         InstallMetaResponseType.BadRequest -> handleBadRequestResponse(datasetID, projectID, result as InstallMetaBadRequestResponse)
         InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(datasetID, projectID, result as InstallMetaUnexpectedErrorResponse)
       }
     } catch (e: Throwable) {
       log.debug("install-meta request to handler server failed with exception:", e)
       AppDB.withTransaction(projectID) {
-        it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.FailedInstallation, e.message))
+        try {
+          it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.FailedInstallation, e.message))
+        } catch (e: SQLException) {
+          if (e.errorCode == 1) {
+            log.info("unique key constraint violation on dataset {}/{} install meta, assuming race condition.", userID, datasetID)
+          } else {
+            throw e;
+          }
+        }
       }
       throw e
     }
-
   }
 
-  private fun handleSuccessResponse(datasetID: DatasetID, projectID: ProjectID) {
+  private fun handleSuccessResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID) {
     log.info("dataset handler server reports dataset {} meta installed successfully into project {}", datasetID, projectID)
 
     AppDB.withTransaction(projectID) {
-      it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.Complete, null))
+      try {
+        it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.Complete, null))
+      } catch (e: SQLException) {
+        if (e.errorCode == 1) {
+          log.info("unique key constraint violation on dataset {}/{} install meta, assuming race condition.", userID, datasetID)
+        }
+      }
     }
   }
 
@@ -292,8 +307,6 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
   }
 
   private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
-    val dataset = selectDataset(datasetID)
-
     openTransaction().use {
 
       // Insert a new dataset record
@@ -350,10 +363,39 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val doDataSync:  Boolean,
   )
 
-  private fun comparison(ds: DatasetDirectory, lu: VDISyncControlRecord): SyncActions {
-    return SyncActions(
-      doShareSync = lu.sharesUpdated.isBefore(ds.getLatestShareTimestamp(lu.sharesUpdated)),
-      doDataSync  = lu.dataUpdated.isBefore(ds.getLatestDataTimestamp(lu.dataUpdated)),
-    )
+  private fun comparison(
+    ds: DatasetDirectory,
+    cacheDbSyncControl: VDISyncControlRecord,
+    userID: UserID,
+    datasetID: DatasetID,
+  ): SyncActions {
+    val dataset = CacheDB.selectDataset(datasetID)!!
+
+    val latestShare = ds.getLatestShareTimestamp(cacheDbSyncControl.sharesUpdated)
+    val latestData = ds.getLatestDataTimestamp(cacheDbSyncControl.dataUpdated)
+
+    var doShareSync = cacheDbSyncControl.sharesUpdated.isBefore(latestShare)
+    var doDataSync = cacheDbSyncControl.dataUpdated.isBefore(latestData)
+
+    if (doShareSync && doDataSync)
+      return SyncActions(true, true)
+
+    for (project in dataset.projects) {
+      log.debug("checking project {} for dataset {}/{} to see if it is out of sync", project, userID, datasetID)
+
+      val sync = AppDB.accessor(project).selectDatasetSyncControlRecord(datasetID)
+        ?: return SyncActions(true, true)
+
+      if (!doShareSync && sync.sharesUpdated.isBefore(latestShare))
+        doShareSync = true
+
+      if (!doDataSync && sync.dataUpdated.isBefore(latestData))
+        doDataSync = true
+
+      if (doShareSync && doDataSync)
+        return SyncActions(true, true)
+    }
+
+    return SyncActions(doShareSync, doDataSync)
   }
 }

@@ -3,6 +3,7 @@ package vdi.component.reinstaller
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.vdi.lib.common.compression.Tar
+import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.db.app.AppDB
@@ -151,7 +152,6 @@ object DatasetReinstaller {
       -> handleInstallUnexpectedError(response as InstallDataUnexpectedErrorResponse, dataset, projectID)
     }
   }
-
   private fun <T> withDataTar(s3Dir: DatasetDirectory, fn: (Path) -> T): T {
     TempFiles.withTempDirectory { tempDir ->
       val tarFile      = tempDir.resolve("dataset.tar.gz")
@@ -167,11 +167,17 @@ object DatasetReinstaller {
 
       s3Dir.getDataFiles()
         .forEach { ddf ->
-          val df = tempDir.resolve(ddf.name)
-          files.add(df)
-
-          df.outputStream()
+          val zip = tempDir.resolve(ddf.name)
+          zip.outputStream()
             .use { out -> ddf.loadContents()!!.use { inp -> inp.transferTo(out) } }
+
+          Zip.zipEntries(zip).forEach { (entry, inp) ->
+            val file = tempDir.resolve(entry.name)
+            log.debug("repacking file {} into {}", file, tarFile)
+            file.outputStream()
+              .use { out -> inp.transferTo(out) }
+            files.add(file)
+          }
         }
 
       Tar.compressWithGZip(tarFile, files)

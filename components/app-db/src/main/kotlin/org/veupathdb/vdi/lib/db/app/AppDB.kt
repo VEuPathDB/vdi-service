@@ -5,6 +5,9 @@ import org.veupathdb.vdi.lib.db.app.sql.selectInstallStatuses
 import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 
 object AppDB {
@@ -76,7 +79,12 @@ object AppDB {
    *
    * @return The value returned by the given function [fn].
    */
+  @OptIn(ExperimentalContracts::class)
   fun <T> withTransaction(projectID: ProjectID, fn: (AppDBTransaction) -> T): T {
+    contract {
+      callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
+    }
+
     log.trace("withTransaction(projectID={}, fn=...)", projectID)
 
     val trans = transaction(projectID)

@@ -3,7 +3,6 @@ package org.veupathdb.vdi.lib.reconciler.config
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.env.*
-import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
 import org.veupathdb.vdi.lib.s3.datasets.util.S3Config
 import java.time.Duration
