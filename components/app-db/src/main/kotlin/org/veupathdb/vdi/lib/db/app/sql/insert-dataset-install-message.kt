@@ -2,6 +2,7 @@ package org.veupathdb.vdi.lib.db.app.sql
 
 import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import java.sql.Connection
+import java.time.OffsetDateTime
 
 private fun sql(schema: String) =
 // language=oracle
@@ -12,9 +13,10 @@ INSERT INTO
   , install_type
   , status
   , message
+  , updated
   )
 VALUES
-  (?, ?, ?, ?)
+  (?, ?, ?, ?, ?)
 """
 
 internal fun Connection.insertDatasetInstallMessage(schema: String, message: DatasetInstallMessage) {
@@ -24,6 +26,7 @@ internal fun Connection.insertDatasetInstallMessage(schema: String, message: Dat
       ps.setString(2, message.installType.value)
       ps.setString(3, message.status.value)
       ps.setString(4, message.message)
+      ps.setObject(5, message.updated)
       ps.executeUpdate()
     }
 }

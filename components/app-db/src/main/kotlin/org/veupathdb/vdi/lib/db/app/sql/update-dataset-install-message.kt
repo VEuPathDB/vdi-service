@@ -11,6 +11,7 @@ UPDATE
 SET
   status = ?
 , message = ?
+, updated = ?
 WHERE
   dataset_id = ?
   AND install_type = ?
@@ -21,8 +22,9 @@ internal fun Connection.updateDatasetInstallMessage(schema: String, message: Dat
     .use { ps ->
       ps.setString(1, message.status.value)
       ps.setString(2, message.message)
-      ps.setString(3, message.datasetID.toString())
-      ps.setString(4, message.installType.value)
+      ps.setObject(3, message.updated)
+      ps.setString(4, message.datasetID.toString())
+      ps.setString(5, message.installType.value)
       ps.executeUpdate()
     }
 }

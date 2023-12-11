@@ -1,6 +1,7 @@
 package org.veupathdb.vdi.lib.db.app.model
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import java.time.OffsetDateTime
 
 /**
  * Represents a single record in the `vdi.dataset_install_messages` table.
@@ -37,4 +38,9 @@ data class DatasetInstallMessage(
    * failure messages about the installation.
    */
   val message: String?,
+
+  /**
+   * Timestamp of the message and status.
+   */
+  val updated: OffsetDateTime = OffsetDateTime.now(),
 )
