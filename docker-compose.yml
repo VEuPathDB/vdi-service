@@ -360,7 +360,7 @@ services:
     labels:
     - "prometheus.scrape_enabled=true"
     - "com.centurylinklabs.watchtower.enable=${VDI_SERVICE_WATCHTOWER:-false}"
-    - "traefik.http.services.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.loadbalancer.server.port=${VDI_SERVICE_HTTP_PORT:-8080}"
+    - "traefik.http.services.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.loadbalancer.server.port=${VDI_SERVICE_HTTP_PORT:-80}"
     - "traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.rule=Host(`${TRAEFIK_VDI_HOST:-vdi-dev.local.apidb.org}`)"
     - "traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.tls=${USE_TRAEFIK_SSL:-true}"
     - "traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.entrypoints=${TRAEFIK_ENTRYPOINTS:-local}"
