@@ -76,7 +76,7 @@ object DatasetReinstaller {
 
   private fun processProject(projectID: ProjectID) {
     // locate datasets in the ready-for-reinstall status
-    val datasets = AppDB.accessor(projectID)
+    val datasets = AppDB.accessor(projectID)!!
       .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.ReadyForReinstall)
 
     log.info("found {} datasets in project {} that are ready for reinstall", datasets.size, projectID)

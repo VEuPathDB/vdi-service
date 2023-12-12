@@ -14,7 +14,7 @@ class AppDBTarget(
 ) : ReconcilerTarget {
 
     override fun streamSortedSyncControlRecords(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
-        return AppDB.accessor(projectID).streamAllSyncControlRecords()
+        return AppDB.accessor(projectID)!!.streamAllSyncControlRecords()
     }
 
     override fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID) {

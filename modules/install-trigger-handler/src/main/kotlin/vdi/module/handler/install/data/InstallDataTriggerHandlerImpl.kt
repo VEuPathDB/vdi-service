@@ -181,8 +181,12 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     log.trace("executeJob(userID={}, datasetID={}, projectID={}, s3Dir=..., handler=...)", userID, datasetID, projectID)
 
     val appDB   = AppDB.accessor(projectID)
-    val dataset = appDB.selectDataset(datasetID)
+    if (appDB == null) {
+      log.info("skipping install event for dataset {}/{} into project {} due to the target project being disabled.", userID, datasetID, projectID)
+      return
+    }
 
+    val dataset = appDB.selectDataset(datasetID)
     if (dataset == null) {
       log.info("skipping install event for dataset {}/{} into project {} due to no dataset record being present", userID, datasetID, projectID)
       return

@@ -20,6 +20,7 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import vdi.component.modules.VDIServiceModuleBase
 
 internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig)
@@ -87,10 +88,11 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     val meta = dir.getMeta().load()!!
 
     dir.getShares()
-      .forEach { (recipientID, share) -> processShare(datasetID, recipientID, meta.projects, share, shareTimestamp) }
+      .forEach { (recipientID, share) -> processShare(userID, datasetID, recipientID, meta.projects, share, shareTimestamp) }
   }
 
   private fun processShare(
+    userID:         UserID,
     datasetID:      DatasetID,
     recipientID:    UserID,
     projects:       Iterable<ProjectID>,
@@ -140,6 +142,11 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     if (offer != null && receipt != null) {
       if (offer.action == VDIShareOfferAction.Grant && receipt.action == VDIShareReceiptAction.Accept) {
         for (projectID in projects) {
+          if (projectID !in AppDatabaseRegistry) {
+            log.info("Skipping share update for dataset {}/{}, project {} due to target project config being disabled.", userID, datasetID, projectID)
+            continue
+          }
+
           AppDB.withTransaction(projectID) {
             it.updateSyncControlSharesTimestamp(datasetID, shareTimestamp)
             try {
@@ -165,6 +172,11 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     shareTimestamp: OffsetDateTime
   ) {
     for (project in projects) {
+      if (project !in AppDatabaseRegistry) {
+        log.info("Cannot clean up target app database for project {} as the target project config is disabled.", project)
+        continue
+      }
+
       AppDB.withTransaction(project) {
         it.updateSyncControlSharesTimestamp(datasetID, shareTimestamp)
         it.deleteDatasetVisibility(datasetID, recipientID)

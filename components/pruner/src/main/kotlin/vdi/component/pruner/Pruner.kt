@@ -5,6 +5,7 @@ import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.db.app.AppDB
+import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DeletedDataset
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
@@ -137,6 +138,11 @@ object Pruner {
   }
 
   private fun DeletedDataset.deleteFromAppDB(projectID: ProjectID) {
+    if (projectID !in AppDatabaseRegistry) {
+      log.info("Cannot delete dataset {}/{} from project {} due to target project config being disabled.", ownerID, datasetID, projectID)
+      return
+    }
+
     log.debug("deleting dataset {} from project {} app DB", datasetID, projectID)
 
     AppDB.withTransaction(projectID) {

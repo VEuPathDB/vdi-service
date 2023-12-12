@@ -178,7 +178,13 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       return
     }
 
-    val failed = AppDB.accessor(projectID)
+    val appDb = AppDB.accessor(projectID)
+    if (appDb == null) {
+      log.info("skipping dataset {}/{}, project {} update meta due to target being disabled", userID, datasetID, projectID)
+      return
+    }
+
+    val failed = appDb
       .selectDatasetInstallMessages(datasetID)
       .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
 
@@ -378,13 +384,19 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     var doDataSync = cacheDbSyncControl.dataUpdated.isBefore(latestData)
 
     if (doShareSync && doDataSync)
-      return SyncActions(true, true)
+      return SyncActions(doShareSync = true, doDataSync = true)
 
     for (project in dataset.projects) {
+      val appDB = AppDB.accessor(project)
+      if (appDB == null) {
+        log.info("Skipping dataset state comparison for dataset {}/{}, project {} due to the target project config being disabled.", userID, datasetID, project)
+        return SyncActions(doShareSync = false, doDataSync = false)
+      }
+
       log.debug("checking project {} for dataset {}/{} to see if it is out of sync", project, userID, datasetID)
 
-      val sync = AppDB.accessor(project).selectDatasetSyncControlRecord(datasetID)
-        ?: return SyncActions(true, true)
+      val sync = appDB.selectDatasetSyncControlRecord(datasetID)
+        ?: return SyncActions(doShareSync = true, doDataSync = true)
 
       if (!doShareSync && sync.sharesUpdated.isBefore(latestShare))
         doShareSync = true
@@ -393,7 +405,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
         doDataSync = true
 
       if (doShareSync && doDataSync)
-        return SyncActions(true, true)
+        return SyncActions(doShareSync = true, doDataSync = true)
     }
 
     return SyncActions(doShareSync, doDataSync)

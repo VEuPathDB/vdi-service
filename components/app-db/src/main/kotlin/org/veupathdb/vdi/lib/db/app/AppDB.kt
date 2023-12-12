@@ -47,13 +47,13 @@ object AppDB {
     return out
   }
 
-  fun accessor(key: ProjectID): AppDBAccessor =
-    AppDatabaseRegistry.require(key)
-      .let { AppDBAccessorImpl(it.ctlSchema, it.source) }
+  fun accessor(key: ProjectID): AppDBAccessor? =
+    AppDatabaseRegistry[key]
+      ?.let { AppDBAccessorImpl(it.ctlSchema, it.source) }
 
-  fun transaction(key: ProjectID): AppDBTransaction =
-    AppDatabaseRegistry.require(key)
-      .let { ds -> AppDBTransactionImpl(ds.ctlSchema, ds.source.connection.also { it.autoCommit = false }) }
+  fun transaction(key: ProjectID): AppDBTransaction? =
+    AppDatabaseRegistry[key]
+      ?.let { ds -> AppDBTransactionImpl(ds.ctlSchema, ds.source.connection.also { it.autoCommit = false }) }
 
   /**
    * Executes the given function ([fn]) in the context of a database
@@ -87,7 +87,7 @@ object AppDB {
 
     log.trace("withTransaction(projectID={}, fn=...)", projectID)
 
-    val trans = transaction(projectID)
+    val trans = transaction(projectID)!!
     val out: T
 
     try {
