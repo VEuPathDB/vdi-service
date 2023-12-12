@@ -21,7 +21,7 @@ endif::[]
 . The event router module translates the events and routes triggers to the
   relevant Kafka topic.
 . The "Install-Data" trigger handler picks up the triggers and...
-.. Using the `manifest.json` file determines whether all the data files yet
+.. Using the `vdi-manifest.json` file determines whether all the data files yet
    exist in MinIO.
 .. If all data files exist in MinIO...
 ... Updates the control tables in the internal Cache DB with the data timestamp

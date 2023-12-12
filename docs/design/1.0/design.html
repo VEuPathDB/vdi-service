@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.17">
+<meta name="generator" content="Asciidoctor 2.0.20">
 <title>VEuPathDB Dataset Installer System</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -84,10 +84,10 @@ code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;
 ul,ol,dl{line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
 ul,ol{margin-left:1.5em}
 ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0}
-ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
-ul.square{list-style-type:square}
 ul.circle{list-style-type:circle}
 ul.disc{list-style-type:disc}
+ul.square{list-style-type:square}
+ul.circle ul:not([class]),ul.disc ul:not([class]),ul.square ul:not([class]){list-style:inherit}
 ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
 dl dt{margin-bottom:.3125em;font-weight:bold}
 dl dd{margin-bottom:1.25em}
@@ -208,13 +208,10 @@ table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
 .admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6);word-wrap:anywhere}
 .admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
 .exampleblock>.content{border:1px solid #e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;border-radius:4px}
-.exampleblock>.content>:first-child{margin-top:0}
-.exampleblock>.content>:last-child{margin-bottom:0}
 .sidebarblock{border:1px solid #dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;border-radius:4px}
-.sidebarblock>:first-child{margin-top:0}
-.sidebarblock>:last-child{margin-bottom:0}
 .sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
-.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content>:first-child,.sidebarblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child,.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
 .literalblock pre,.listingblock>.content>pre{border-radius:4px;overflow-x:auto;padding:1em;font-size:.8125em}
 @media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
 @media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
@@ -393,7 +390,7 @@ b.conum *{color:inherit!important}
 dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
 h1,h2,p,td.content,span.alt,summary{letter-spacing:-.01em}
 p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
-p,blockquote,dt,td.content,span.alt,summary{font-size:1.0625rem}
+p,blockquote,dt,td.content,td.hdlist1,span.alt,summary{font-size:1.0625rem}
 p{margin-bottom:1.25rem}
 .sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
 .exampleblock>.content{background:#fffef7;border-color:#e0e0dc;box-shadow:0 1px 4px #e0e0dc}
@@ -490,6 +487,26 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>THIS DOCUMENT IS VERY OUTDATED.  Most of the core concepts still apply, however,
+during implementation, as requirements came into better focus, the design
+shifted significantly.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
 <div class="sect1">
 <h2 id="_queues">Queues</h2>
 <div class="sectionbody">
@@ -1640,9 +1657,9 @@ for import and eventual installation into one or more VEuPathDB sites.</p>
    How are files differentiated?</p></th>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <code>meta.json</code> file and <code>dataset.json</code> files are generated by the service and
-  will not be provided to the handler script, thus the handler script does not
-  need to know about them and no special contract is needed.<br>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The <code>vdi-meta.json</code> file and <code>vdi-manifest.json</code> files are generated by the
+  service and will not be provided to the handler script, thus the handler
+  script does not need to know about them and no special contract is needed.<br>
 <br>
   This means the contract is simply that some files will be put in the inputs
   directory and the script can figure out what they are and what they mean.</p></td>
@@ -1677,10 +1694,10 @@ import workspace</p>
 directories</p>
 </li>
 <li>
-<p>Generate a <code>manifest.json</code> file</p>
+<p>Generate a <code>vdi-manifest.json</code> file</p>
 </li>
 <li>
-<p>Generate a <code>meta.json</code> file</p>
+<p>Generate a <code>vdi-meta.json</code> file</p>
 </li>
 <li>
 <p>Bundle the files placed in the output directory</p>
@@ -1703,15 +1720,15 @@ directories</p>
 </colgroup>
 <tbody>
 <tr>
-<th class="tableblock halign-left valign-top"><p class="tableblock">Who generates the <code>manifest.json</code> file?</p></th>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Who generates the <code>vdi-manifest.json</code> file?</p></th>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>The <code>manifest.json</code> file will be simplified.  Instead of attempting to keep
-a mapping of input file name to output file name, which is both restrictive and
-forces the import script to generate the file, we will change the <code>"dataFiles"</code>
-array to be an array of output file names instead of a mapping of input to
-output file names.</p>
+<p>The <code>vdi-manifest.json</code> file will be simplified.  Instead of attempting to
+keep a mapping of input file name to output file name, which is both restrictive
+and forces the import script to generate the file, we will change the
+<code>"dataFiles"</code> array to be an array of output file names instead of a mapping of
+input to output file names.</p>
 </div>
 <div class="listingblock">
 <div class="title">Original Design</div>
@@ -2103,8 +2120,8 @@ dataset state to be uploaded to the Dataset Store</p>
   |   |   |   |   |- {recipient-id}/
   |   |   |   |   |   |- owner-state.json
   |   |   |   |   |   |- recipient-state.json
-  |   |   |   |- manifest.json
-  |   |   |   |- meta.json
+  |   |   |   |- vdi-manifest.json
+  |   |   |   |- vdi-meta.json
   |   |   |   |- deleted</code></pre>
 </div>
 </div>
@@ -2308,7 +2325,7 @@ comprise a user dataset.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>meta_update_time</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TIMESTAMPTZ</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp of the meta.json last_modified date for the user dataset.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp of the metadata JSON last_modified date for the user dataset.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2734,14 +2751,14 @@ One of "accept" | "reject"</p></td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-02-17 10:52:53 -0500
+Last updated 2023-12-12 14:02:19 -0500
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
 <script>
 if (!hljs.initHighlighting.called) {
   hljs.initHighlighting.called = true
-  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
 }
 </script>
 </body>

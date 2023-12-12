@@ -29,54 +29,54 @@ interface DatasetDirectory {
   fun exists(): Boolean
 
   /**
-   * Tests whether this [DatasetDirectory] currently contains a `meta.json`
+   * Tests whether this [DatasetDirectory] currently contains a metadata JSON
    * file.
    *
    * @return `true` if this dataset contains or, at the time of this method
-   * call, contained a `meta.json` file.
+   * call, contained a metadata JSON file.
    */
   fun hasMeta(): Boolean
 
   /**
-   * Returns a representation of this [DatasetDirectory]'s `meta.json` file.
+   * Returns a representation of this [DatasetDirectory]'s metadata JSON file.
    *
-   * This method will return a value regardless of whether the `meta.json` file
-   * exists or existed.  The existence of the file can be tested using the
+   * This method will return a value regardless of whether the metadata JSON
+   * file exists or existed.  The existence of the file can be tested using the
    * returned object's [DatasetMetaFile.exists] method.
    */
   fun getMeta(): DatasetMetaFile
 
   /**
-   * Puts a `meta.json` file into this [DatasetDirectory] overwriting any
-   * previously existing `meta.json` file.
+   * Puts a metadata JSON file into this [DatasetDirectory] overwriting any
+   * previously existing metadata JSON file.
    *
-   * @param meta Dataset metadata to write to the `meta.json` file.
+   * @param meta Dataset metadata to write to the metadata JSON file.
    */
   fun putMeta(meta: VDIDatasetMeta)
 
   /**
-   * Tests whether this [DatasetDirectory] currently contains a `manifest.json`
+   * Tests whether this [DatasetDirectory] currently contains a manifest JSON
    * file.
    *
    * @return `true` if this dataset contains, or at the time of this method
-   * call, contained a `manifest.json` file.
+   * call, contained a manifest JSON file.
    */
   fun hasManifest(): Boolean
 
   /**
-   * Returns a representation of this [DatasetDirectory]'s `manifest.json` file.
+   * Returns a representation of this [DatasetDirectory]'s manifest JSON file.
    *
-   * This method will return a value regardless of whether the `manifest.json`
+   * This method will return a value regardless of whether the manifest JSON
    * file exists or existed.  The existence of the file can be tested using the
    * returned object's [DatasetManifestFile.exists] method.
    */
   fun getManifest(): DatasetManifestFile
 
   /**
-   * Puts a `manifest.json` file into this [DatasetDirectory] overwriting any
-   * previously existing `manifest.json` file.
+   * Puts a manifest JSON file into this [DatasetDirectory] overwriting any
+   * previously existing manifest JSON file.
    *
-   * @param manifest Dataset manifest to write to the `manifest.json` file.
+   * @param manifest Dataset manifest to write to the manifest JSON file.
    */
   fun putManifest(manifest: VDIDatasetManifest)
 
