@@ -94,7 +94,7 @@ private fun listExpandedBrokenDatasets(): BrokenDatasetListing {
 }
 
 private fun getBrokenDatasets(projectID: ProjectID) =
-  AppDB.accessor(projectID)
+  AppDB.accessor(projectID)!!
     .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FailedInstallation)
 
 private fun DatasetRecord.toDetails(
