@@ -29,10 +29,10 @@ published to Kafka.
 
 A MinIO event is considered and routed as an Import Trigger if the source object
 that triggered the event has a path (object key) in S3 that aligns with the
-rules for paths to either dataset upload objects or `meta.json` objects.
+rules for paths to either dataset upload objects or `vdi-meta.json` objects.
 
 This means that when a raw user upload object is placed into the target S3
-bucket or when a dataset's `meta.json` object is created or overwritten an
+bucket or when a dataset's `vdi-meta.json` object is created or overwritten an
 Import Trigger message will be routed to Kafka.
 
 .Example Object Paths
@@ -42,7 +42,7 @@ Import Trigger message will be routed to Kafka.
 ----
 or
 ----
-{bucket-name}/vdi/{user-id}/{dataset-id}/dataset/meta.json
+{bucket-name}/vdi/{user-id}/{dataset-id}/dataset/vdi-meta.json
 ----
 --
 
@@ -50,15 +50,15 @@ or
 
 A MinIO event is considered and routed as an Install-Meta trigger if the source
 object that triggered the event has a path (object key) in S3 that aligns with
-the rules for `meta.json` object paths.
+the rules for `vdi-meta.json` object paths.
 
-This means when a dataset's `meta.json` file is created or overwritten an
+This means when a dataset's `vdi-meta.json` file is created or overwritten an
 Install-Meta (or sometimes called Update-Meta) message will be routed to Kafka.
 
 .Example Object Path
 --
 ----
-{bucket-name}/vdi/{user-id}/{dataset-id}/dataset/meta.json
+{bucket-name}/vdi/{user-id}/{dataset-id}/dataset/vdi-meta.json
 ----
 --
 
@@ -75,7 +75,7 @@ align with any other routing rules as defined in this document.
 ----
 or
 ----
-{bucket-name}/vdi/{user-id}/{dataset-id}/dataset/manifest.json
+{bucket-name}/vdi/{user-id}/{dataset-id}/dataset/vdi-manifest.json
 ----
 --
 

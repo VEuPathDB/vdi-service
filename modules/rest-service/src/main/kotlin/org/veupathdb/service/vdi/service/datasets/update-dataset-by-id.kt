@@ -6,6 +6,7 @@ import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
 import org.veupathdb.service.vdi.generated.model.toInternalVisibility
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.util.ValidationErrors
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMetaImpl
@@ -28,7 +29,7 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
   patch.validate()
 
   val meta = DatasetStore.getDatasetMeta(userID, datasetID)
-    ?: throw IllegalStateException("target dataset has no meta.json file")
+    ?: throw IllegalStateException("target dataset has no $DatasetMetaFilename file")
 
   CacheDB.withTransaction {
     val visibility = patch.visibility?.toInternalVisibility() ?: meta.visibility

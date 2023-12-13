@@ -18,13 +18,14 @@ import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.kafka.model.triggers.InstallTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.nio.file.Path
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.veupathdb.vdi.lib.common.DatasetManifestFilename
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.compression.Zip
 import vdi.component.metrics.Metrics
@@ -99,8 +100,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     val syncControl = CacheDB.selectSyncControl(datasetID)
 
     // If the sync control record was not found in postgres, then we are likely
-    // seeing this event due to a cross campus S3 sync, and the meta.json file
-    // hasn't landed yet.
+    // seeing this event due to a cross campus S3 sync, and the metadata JSON
+    // file hasn't landed yet.
     if (syncControl == null) {
       log.info("skipping install data event for dataset {}/{}: dataset does not yet have a sync control record in the cache DB", userID, datasetID)
       return
@@ -110,8 +111,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     val cdbDataset = CacheDB.selectDataset(datasetID)
 
     // If the dataset record doesn't yet exist in postgres DB then we caught
-    // this event _while_ the meta.json event was being handled due to a cross
-    // campus S3 sync, and we aren't yet ready for an install event.
+    // this event _while_ the metadata JSON event was being handled due to a
+    // cross campus S3 sync, and we aren't yet ready for an install event.
     if (cdbDataset == null) {
       log.info("skipping install data event for dataset {}/{}: dataset does not yet have a dataset record in the cache DB", userID, datasetID)
       return
@@ -231,16 +232,26 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         -> handleSuccessResponse(response as InstallDataSuccessResponse, userID, datasetID, projectID, s3Dir)
 
         InstallDataResponseType.BadRequest
-        -> handleBadRequestResponse(response as InstallDataBadRequestResponse, userID, datasetID, projectID, s3Dir)
+        -> handleBadRequestResponse(response as InstallDataBadRequestResponse, userID, datasetID, projectID)
 
         InstallDataResponseType.ValidationFailure
-        -> handleValidationFailureResponse(response as InstallDataValidationFailureResponse, userID, datasetID, projectID, s3Dir)
+        -> handleValidationFailureResponse(
+          response as InstallDataValidationFailureResponse,
+          userID,
+          datasetID,
+          projectID
+        )
 
         InstallDataResponseType.MissingDependencies
-        -> handleMissingDependenciesResponse(response as InstallDataMissingDependenciesResponse, userID, datasetID, projectID, s3Dir)
+        -> handleMissingDependenciesResponse(
+          response as InstallDataMissingDependenciesResponse,
+          userID,
+          datasetID,
+          projectID
+        )
 
         InstallDataResponseType.UnexpectedError
-        -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, userID, datasetID, projectID, s3Dir)
+        -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, userID, datasetID, projectID)
       }
     } finally {
       timer.observeDuration()
@@ -268,8 +279,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   private fun <T> withDataTar(s3Dir: DatasetDirectory, fn: (Path) -> T): T {
     TempFiles.withTempDirectory { tempDir ->
       val tarFile      = tempDir.resolve("dataset.tar.gz")
-      val metaFile     = tempDir.resolve(S3Paths.META_FILE_NAME)
-      val manifestFile = tempDir.resolve(S3Paths.MANIFEST_FILE_NAME)
+      val metaFile     = tempDir.resolve(DatasetMetaFilename)
+      val manifestFile = tempDir.resolve(DatasetManifestFilename)
       val files        = mutableListOf(metaFile, manifestFile)
 
       metaFile.outputStream()
@@ -324,7 +335,12 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
   }
 
-  private fun handleBadRequestResponse(res: InstallDataBadRequestResponse, userID: UserID, datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
+  private fun handleBadRequestResponse(
+    res: InstallDataBadRequestResponse,
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID
+  ) {
     log.error("dataset {}/{} install into {} failed due to bad request exception from handler server: {}", userID, datasetID, projectID, res.message)
 
     AppDB.withTransaction(projectID) {
@@ -339,7 +355,12 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     throw Exception(res.message)
   }
 
-  private fun handleValidationFailureResponse(res: InstallDataValidationFailureResponse, userID: UserID, datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
+  private fun handleValidationFailureResponse(
+    res: InstallDataValidationFailureResponse,
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID
+  ) {
     log.info("dataset {}/{} install into {} failed due to validation error", userID, datasetID, projectID)
 
     AppDB.withTransaction(projectID) {
@@ -352,7 +373,12 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
   }
 
-  private fun handleMissingDependenciesResponse(res: InstallDataMissingDependenciesResponse, userID: UserID, datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
+  private fun handleMissingDependenciesResponse(
+    res: InstallDataMissingDependenciesResponse,
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID
+  ) {
     log.info("dataset {}/{} install into {} was rejected for missing dependencies", userID, datasetID, projectID)
 
     AppDB.withTransaction(projectID) {
@@ -368,7 +394,12 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   /**
    * Handles an unexpected error response from the handler service.
    */
-  private fun handleUnexpectedErrorResponse(res: InstallDataUnexpectedErrorResponse, userID: UserID, datasetID: DatasetID, projectID: ProjectID, s3Dir: DatasetDirectory) {
+  private fun handleUnexpectedErrorResponse(
+    res: InstallDataUnexpectedErrorResponse,
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID
+  ) {
     log.error("dataset {}/{} install into {} failed with a 500 from the handler server", userID, datasetID, projectID)
 
     AppDB.withTransaction(projectID) {

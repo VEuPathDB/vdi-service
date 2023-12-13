@@ -30,7 +30,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.apache.logging.log4j.kotlin.logger
+import org.veupathdb.vdi.lib.common.DatasetManifestFilename
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.compression.Zip
+import org.veupathdb.vdi.lib.s3.datasets.DatasetManifestFile
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import vdi.constants.InstallZipName
@@ -214,15 +217,15 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         .warnings
 
       // Remove the meta file and delete it from the data directory.
-      tempDirectory.resolve("meta.json").deleteExisting()
+      tempDirectory.resolve(DatasetMetaFilename).deleteExisting()
 
       // Consume the manifest file and delete it from the data directory.
-      val manifest = tempDirectory.resolve("manifest.json")
+      val manifest = tempDirectory.resolve(DatasetManifestFilename)
         .consumeAsJSON<VDIDatasetManifest>()
 
-      // After deleting warnings.json, meta.json, and manifest.json the
-      // remaining files should be the ones we care about for importing into the
-      // data files directory in S3
+      // After deleting the warnings.json file, the metadata JSON file, and the
+      // manifest JSON file the remaining files should be the ones we care about
+      // for importing into the data files directory in S3
       val dataFiles = tempDirectory.listDirectoryEntries()
 
       val sizes = HashMap<String, Long>(dataFiles.size)
@@ -288,7 +291,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
 
     if (!hasMeta()) {
-      log.info("got an import event for a dataset that does not yet have a meta.json file, ignoring it.  $userID/$datasetID")
+      log.info("got an import event for a dataset that does not yet have a $DatasetMetaFilename file, ignoring it.  $userID/$datasetID")
       return false
     }
 
