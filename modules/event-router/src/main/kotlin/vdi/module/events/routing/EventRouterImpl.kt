@@ -2,6 +2,7 @@ package vdi.module.events.routing
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.model.triggers.*
@@ -105,8 +106,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
         }
 
         // If the meta file was updated...
-        path is VDDatasetFilePath && path.subPath == S3Paths.META_FILE_NAME -> {
-          log.debug("received an meta.json event for dataset {} owned by user {}", path.datasetID, path.userID)
+        path is VDDatasetFilePath && path.subPath == DatasetMetaFilename -> {
+          log.debug("received an metadata event for dataset {} owned by user {}", path.datasetID, path.userID)
 
           safeSend(UpdateMetaTrigger(path.userID, path.datasetID), kr::sendUpdateMetaTrigger)
           safeSend(ImportTrigger(path.userID, path.datasetID), kr::sendImportTrigger)

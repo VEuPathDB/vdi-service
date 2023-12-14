@@ -1,6 +1,8 @@
 package org.veupathdb.vdi.lib.s3.datasets.paths
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
+import org.veupathdb.vdi.lib.common.DatasetManifestFilename
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.s3.datasets.*
@@ -16,8 +18,7 @@ object S3Paths {
   const val SHARES_DIR_NAME = "shares"
 
   const val DELETE_FLAG_FILE_NAME = "delete-flag"
-  const val MANIFEST_FILE_NAME = "manifest.json"
-  const val META_FILE_NAME = "meta.json"
+
   const val SHARE_OFFER_FILE_NAME = "offer.json"
   const val SHARE_RECEIPT_FILE_NAME = "receipt.json"
 
@@ -43,16 +44,16 @@ object S3Paths {
     (datasetPath(userID, datasetID) / "").toString()
 
   /**
-   * `{root}/{user-id}/{dataset-id}/dataset/manifest.json`
+   * `{root}/{user-id}/{dataset-id}/dataset/vdi-manifest.json`
    */
   fun datasetManifestFile(userID: UserID, datasetID: DatasetID) =
-    (datasetContentPath(userID, datasetID) / MANIFEST_FILE_NAME).toString()
+    (datasetContentPath(userID, datasetID) / DatasetManifestFilename).toString()
 
   /**
-   * `{root}/{user-id}/{dataset-id}/dataset/meta.json`
+   * `{root}/{user-id}/{dataset-id}/dataset/vdi-meta.json`
    */
   fun datasetMetaFile(userID: UserID, datasetID: DatasetID) =
-    (datasetContentPath(userID, datasetID) / META_FILE_NAME).toString()
+    (datasetContentPath(userID, datasetID) / DatasetMetaFilename).toString()
 
   /**
    * `{root}/{user-id}/{dataset-id}/dataset/delete-flag`

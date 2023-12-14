@@ -2,6 +2,8 @@ package vdi.component.reinstaller
 
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
+import org.veupathdb.vdi.lib.common.DatasetManifestFilename
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -155,8 +157,8 @@ object DatasetReinstaller {
   private fun <T> withDataTar(s3Dir: DatasetDirectory, fn: (Path) -> T): T {
     TempFiles.withTempDirectory { tempDir ->
       val tarFile      = tempDir.resolve("dataset.tar.gz")
-      val metaFile     = tempDir.resolve(S3Paths.META_FILE_NAME)
-      val manifestFile = tempDir.resolve(S3Paths.MANIFEST_FILE_NAME)
+      val metaFile     = tempDir.resolve(DatasetMetaFilename)
+      val manifestFile = tempDir.resolve(DatasetManifestFilename)
       val files        = mutableListOf(metaFile, manifestFile)
 
       metaFile.outputStream()

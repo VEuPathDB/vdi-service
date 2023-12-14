@@ -33,6 +33,7 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import java.sql.SQLException
@@ -305,7 +306,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     }
 
     if (!hasMeta()) {
-      log.warn("got an update-meta event for a dataset that has no meta.json file?  Dataset: {}, User: {}", datasetID, userID)
+      log.warn("got an update-meta event for a dataset that has no {} file?  Dataset: {}, User: {}", DatasetMetaFilename, datasetID, userID)
       return false
     }
 

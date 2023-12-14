@@ -3,6 +3,7 @@ package org.veupathdb.vdi.lib.s3.datasets
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object
+import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
@@ -13,7 +14,7 @@ internal class DatasetManifestFileImpl(path: String,
                                        existsChecker: () -> Boolean,
                                        lastModifiedSupplier: () -> OffsetDateTime?,
                                        loadObjectStream: () -> InputStream?)
-: DatasetFileImpl(S3Paths.MANIFEST_FILE_NAME, path, existsChecker, lastModifiedSupplier, loadObjectStream)
+: DatasetFileImpl(DatasetManifestFilename, path, existsChecker, lastModifiedSupplier, loadObjectStream)
 , DatasetManifestFile
 {
   constructor(
@@ -33,9 +34,9 @@ internal class DatasetManifestFileImpl(path: String,
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
   ) {
-    if (s3Object.baseName != S3Paths.MANIFEST_FILE_NAME) {
+    if (s3Object.baseName != DatasetManifestFilename) {
       throw IllegalArgumentException("Can only construct a MetaFile from s3 object if object base name is "
-              + S3Paths.MANIFEST_FILE_NAME)
+              + DatasetManifestFilename)
     }
   }
 

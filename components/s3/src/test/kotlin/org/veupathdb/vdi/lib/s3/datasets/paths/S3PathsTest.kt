@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
+import org.veupathdb.vdi.lib.common.DatasetManifestFilename
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 
@@ -33,12 +35,12 @@ class S3PathsTest {
 
   @Test
   fun datasetManifestFile() {
-    assertEquals("vdi/1/912EC803B2CE49E4A541068D495AB570/dataset/manifest.json", S3Paths.datasetManifestFile(USER_ID, DATASET_ID))
+    assertEquals("vdi/1/912EC803B2CE49E4A541068D495AB570/dataset/$DatasetManifestFilename", S3Paths.datasetManifestFile(USER_ID, DATASET_ID))
   }
 
   @Test
   fun datasetMetaFile() {
-    assertEquals("vdi/1/912EC803B2CE49E4A541068D495AB570/dataset/meta.json", S3Paths.datasetMetaFile(USER_ID, DATASET_ID))
+    assertEquals("vdi/1/912EC803B2CE49E4A541068D495AB570/dataset/$DatasetMetaFilename", S3Paths.datasetMetaFile(USER_ID, DATASET_ID))
   }
 
   @Test
