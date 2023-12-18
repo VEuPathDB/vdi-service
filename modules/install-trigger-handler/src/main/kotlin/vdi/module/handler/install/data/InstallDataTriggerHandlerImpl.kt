@@ -210,6 +210,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
             it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Data, InstallStatus.Running, null))
           } catch (e: SQLException) {
             log.info("unique constraint violation when writing install data message for dataset {}/{}, assuming race condition and ignoring", userID, datasetID)
+            // For now, logging stack trace at debug until we can be certain we're specifically catching unique constraint violation.
+            log.debug("Stack trace for SQL Exception considered to be constraint violation: ", e)
             race = true
           }
         }
