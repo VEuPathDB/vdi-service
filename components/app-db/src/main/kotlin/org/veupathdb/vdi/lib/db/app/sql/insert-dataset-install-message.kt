@@ -12,9 +12,10 @@ INSERT INTO
   , install_type
   , status
   , message
+  , updated
   )
 VALUES
-  (?, ?, ?, ?)
+  (?, ?, ?, ?, CURRENT_TIMESTAMP)
 """
 
 internal fun Connection.insertDatasetInstallMessage(schema: String, message: DatasetInstallMessage) {
