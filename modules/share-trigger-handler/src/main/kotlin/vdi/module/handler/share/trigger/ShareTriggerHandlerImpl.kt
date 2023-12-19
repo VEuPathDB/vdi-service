@@ -1,5 +1,8 @@
 package vdi.module.handler.share.trigger
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -15,12 +18,9 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetShareReceiptImpl
 import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.DatasetShare
+import vdi.component.modules.VDIServiceModuleBase
 import java.sql.SQLException
 import java.time.OffsetDateTime
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import vdi.component.modules.VDIServiceModuleBase
 
 internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig)
   : ShareTriggerHandler

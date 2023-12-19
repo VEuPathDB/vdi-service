@@ -1,10 +1,16 @@
 package vdi.module.handler.imports.triggers
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.slf4j.LoggerFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.apache.logging.log4j.kotlin.logger
+import org.veupathdb.vdi.lib.common.DatasetManifestFilename
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.compression.Tar
+import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
@@ -15,32 +21,25 @@ import org.veupathdb.vdi.lib.common.util.isNull
 import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
-import org.veupathdb.vdi.lib.db.cache.model.*
+import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
+import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
 import org.veupathdb.vdi.lib.handler.client.response.imp.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.model.triggers.ImportTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import java.nio.file.Path
-import java.time.OffsetDateTime
-import kotlin.IllegalStateException
-import kotlin.io.path.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.apache.logging.log4j.kotlin.logger
-import org.veupathdb.vdi.lib.common.DatasetManifestFilename
-import org.veupathdb.vdi.lib.common.DatasetMetaFilename
-import org.veupathdb.vdi.lib.common.compression.Zip
-import org.veupathdb.vdi.lib.s3.datasets.DatasetManifestFile
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import vdi.constants.InstallZipName
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
 import vdi.module.handler.imports.triggers.model.WarningsFile
+import java.nio.file.Path
+import java.time.OffsetDateTime
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+import kotlin.io.path.*
 
 internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig)
   : ImportTriggerHandler

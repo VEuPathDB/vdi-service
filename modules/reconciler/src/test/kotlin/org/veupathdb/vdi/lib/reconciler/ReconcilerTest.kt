@@ -229,6 +229,8 @@ class ReconcilerTest {
         val kafkaRouter = mock<KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
 
+        `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
+
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
             closeableIterator(listOf(
                 Pair(

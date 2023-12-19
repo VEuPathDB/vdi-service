@@ -1,8 +1,15 @@
 package vdi.module.handler.install.data
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.DatasetManifestFilename
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
+import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.compression.Tar
+import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -18,19 +25,12 @@ import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.kafka.model.triggers.InstallTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import java.nio.file.Path
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.veupathdb.vdi.lib.common.DatasetManifestFilename
-import org.veupathdb.vdi.lib.common.DatasetMetaFilename
-import org.veupathdb.vdi.lib.common.OriginTimestamp
-import org.veupathdb.vdi.lib.common.compression.Zip
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
+import java.nio.file.Path
 import java.sql.SQLException
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 
 internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig)
   : InstallDataTriggerHandler
@@ -205,8 +205,16 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           try {
             it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Data, InstallStatus.Running, null))
           } catch (e: SQLException) {
-            log.info("unique constraint violation when writing install data message for dataset {}/{}, assuming race condition and ignoring", userID, datasetID)
-            race = true
+            if (e.errorCode == 1) {
+              log.info(
+                "unique constraint violation when writing install data message for dataset {}/{}, assuming race condition and ignoring",
+                userID,
+                datasetID
+              )
+              race = true
+            } else {
+              throw e
+            }
           }
         }
 

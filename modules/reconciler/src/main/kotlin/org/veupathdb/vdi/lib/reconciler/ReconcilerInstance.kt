@@ -48,7 +48,7 @@ class ReconcilerInstance(
         // Pop the next DatasetDirectory instance from the S3 stream.
         val sourceDatasetDir: DatasetDirectory = sourceIterator.next()
 
-        logger().info("Checking dataset $sourceDatasetDir for ${targetDB.name}")
+        logger().info("Checking dataset ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID} for ${targetDB.name}")
 
         // Target stream is exhausted, everything left in source stream is missing from the target database!
         // Check again if target stream is exhausted, consume source stream if so.
@@ -75,10 +75,10 @@ class ReconcilerInstance(
 
         if (sourceDatasetDir.datasetID.toString() < nextTargetDataset!!.second.datasetID.toString()) {
           // Dataset is in source, but not in target. Send an event.
-          sendSyncEvent(sourceDatasetDir)
+          sendSyncIfRelevant(sourceDatasetDir)
         } else {
           if (isOutOfSync(sourceDatasetDir, nextTargetDataset!!.second)) {
-            sendSyncEvent(sourceDatasetDir)
+            sendSyncIfRelevant(sourceDatasetDir)
           }
           // Advance next target dataset pointer, we're done with this one since it's in sync.
           nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
@@ -119,6 +119,18 @@ class ReconcilerInstance(
     return shareOos || dataOos || metaOos
   }
 
+  private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory) {
+    if (targetDB.type == ReconcilerTargetType.Install) {
+      val relevantProjects = sourceDatasetDir.getMeta().load()!!.projects
+      if (!relevantProjects.contains(targetDB.name)) {
+        logger().info("Skipping dataset ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID} as it is not relevant to ${targetDB.name}")
+        return
+      }
+    }
+
+    sendSyncEvent(sourceDatasetDir)
+  }
+
   private fun sendSyncEvent(sourceDatasetDir: DatasetDirectory) {
     logger().info("Sending sync event for ${sourceDatasetDir.datasetID}")
     // An update-meta event should trigger synchronization of all dataset components.
@@ -129,9 +141,9 @@ class ReconcilerInstance(
     sourceIterator: Iterator<DatasetDirectory>,
     sourceDatasetDir: DatasetDirectory
   ) {
-    sendSyncEvent(sourceDatasetDir)
+    sendSyncIfRelevant(sourceDatasetDir)
     while (sourceIterator.hasNext()) {
-      sendSyncEvent(sourceIterator.next())
+      sendSyncIfRelevant(sourceIterator.next())
     }
   }
 }

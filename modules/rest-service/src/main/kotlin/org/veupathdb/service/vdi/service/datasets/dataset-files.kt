@@ -2,7 +2,6 @@ package org.veupathdb.service.vdi.service.datasets
 
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
-import org.veupathdb.service.vdi.generated.model.DatasetFileDetailsImpl
 import org.veupathdb.service.vdi.generated.model.DatasetFileListingImpl
 import org.veupathdb.service.vdi.generated.model.DatasetZipDetails
 import org.veupathdb.service.vdi.s3.DatasetStore
