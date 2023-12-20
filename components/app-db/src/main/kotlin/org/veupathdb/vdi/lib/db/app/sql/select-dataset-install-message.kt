@@ -5,6 +5,7 @@ import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import java.sql.Connection
+import java.time.OffsetDateTime
 
 private fun sql(schema: String) =
 // language=oracle
@@ -12,6 +13,7 @@ private fun sql(schema: String) =
 SELECT
   status
 , message
+, updated
 FROM
   ${schema}.dataset_install_message
 WHERE
@@ -36,7 +38,8 @@ internal fun Connection.selectDatasetInstallMessage(
         datasetID   = datasetID,
         installType = installType,
         status      = InstallStatus.fromString(rs.getString("status")),
-        message     = rs.getString("message")
+        message     = rs.getString("message"),
+        updated     = rs.getObject("updated", OffsetDateTime::class.java),
       )
     }
   }

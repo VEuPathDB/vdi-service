@@ -85,8 +85,10 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
       val paths = entity.getDatasetFile()
 
       try {
+        log.debug("Verifying file sizes for dataset {}/{} to ensure the user quota is not exceeded.", userID, datasetID)
         verifyFileSize(paths.second, userID)
 
+        log.debug("Repacking input file for dataset {}/{}.", userID, datasetID)
         val sizes = paths.second.repack(into = archive, using = directory)
 
         log.debug("uploading raw user data to S3 for new dataset {} by user {}", datasetID, userID)

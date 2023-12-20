@@ -1,6 +1,10 @@
 package vdi.module.handler.meta.triggers
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -10,6 +14,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.app.AppDB
+import org.veupathdb.vdi.lib.db.app.AppDBTransaction
 import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
@@ -19,7 +24,9 @@ import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
-import org.veupathdb.vdi.lib.handler.client.response.inm.*
+import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaBadRequestResponse
+import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaResponseType
+import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaUnexpectedErrorResponse
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandler
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.kafka.model.triggers.InstallTrigger
@@ -29,14 +36,10 @@ import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import java.time.OffsetDateTime
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import java.sql.SQLException
+import java.time.OffsetDateTime
 
 internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTriggerHandlerConfig)
   : UpdateMetaTriggerHandler
@@ -57,7 +60,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
           kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey, UpdateMetaTrigger::class)
             // and for each of the trigger messages received
             .forEach { (userID, datasetID) ->
-              log.info("received install-meta job for dataset $datasetID, user $userID")
+              log.info("Received install-meta job for dataset {}/{}.", userID, datasetID)
               wp.submit { executeJob(dm, kr, userID, datasetID) }
             }
         }
@@ -74,7 +77,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
   private fun executeJob(dm: DatasetManager, kr: KafkaRouter, userID: UserID, datasetID: DatasetID) {
     log.trace("executeJob(dm=..., kr=..., userID={}, datasetID={})", userID, datasetID)
 
-    log.debug("looking up dataset directory for user {}, dataset {}", userID, datasetID)
+    log.debug("Looking up dataset directory for dataset {}/{}", userID, datasetID)
     // lookup the dataset directory for the given userID and datasetID
     val dir = dm.getDatasetDirectory(userID, datasetID)
 
@@ -175,7 +178,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     userID:        UserID,
   ) {
     if (!ph.appliesToProject(projectID)) {
-      log.warn("dataset {}/{} declares a project id of {} which is not applicable to dataset type {}", userID, datasetID, projectID, meta.type.name)
+      log.warn("Dataset {}/{} declares a project id of {} which is not applicable to dataset type {}", userID, datasetID, projectID, meta.type.name)
       return
     }
 
@@ -190,7 +193,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
 
     if (failed) {
-      log.info("dataset {}/{}, project {} install-meta is being skipped due to previous failures", userID, datasetID, projectID)
+      log.info("Skipping install-meta for dataset {}/{}, project {} due to previous failures", userID, datasetID, projectID)
       return
     }
 
@@ -214,7 +217,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
             datasetID     = datasetID,
             sharesUpdated = OriginTimestamp,
             dataUpdated   = OriginTimestamp,
-            metaUpdated   = metaTimestamp
+            metaUpdated   = OriginTimestamp,
           ))
 
           log.debug("inserting dataset project link for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
@@ -229,7 +232,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
             datasetID     = datasetID,
             sharesUpdated = OriginTimestamp,
             dataUpdated   = OriginTimestamp,
-            metaUpdated   = metaTimestamp
+            metaUpdated   = OriginTimestamp,
           ))
         }
       } catch (e: Throwable) {
@@ -237,6 +240,14 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
         it.rollback()
         throw e
       }
+    }
+
+    val sync = AppDB.accessor(projectID).selectDatasetSyncControlRecord(datasetID)!!
+
+    if (!sync.metaUpdated.isBefore(metaTimestamp)) {
+      log.warn("db: {} -> s3 {}", sync.metaUpdated, metaTimestamp)
+      log.info("Skipping install-meta for dataset {}/{}, project {} as nothing has changed.", userID, datasetID, projectID)
+      return
     }
 
     val result = ph.client.postInstallMeta(datasetID, projectID, meta)
@@ -267,15 +278,36 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
   }
 
   private fun handleSuccessResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID) {
-    log.info("dataset handler server reports dataset {} meta installed successfully into project {}", datasetID, projectID)
+    log.info("dataset handler server reports dataset {}/{} meta installed successfully into project {}", userID, datasetID, projectID)
+    AppDB.withTransaction(projectID) { it.insertMetaInstallSuccessMessage(datasetID) }
+  }
 
-    AppDB.withTransaction(projectID) {
+  private fun AppDBTransaction.insertMetaInstallSuccessMessage(datasetID: DatasetID) {
+    val old = selectDatasetInstallMessage(datasetID, InstallType.Meta)
+
+    // If there is no old record, then attempt to insert one.  There is a race
+    // condition here because multiple events may be being processed for the
+    // same dataset at the same time.  So we will check for unique constraint
+    // violations and attempt an update instead of an insert if one occurs.
+    if (old == null) {
       try {
-        it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.Complete, null))
-      } catch (e: SQLException) {
+        insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.Complete, null))
+      } catch(e: SQLException) {
+        // If it was a unique constraint violation then it was a race condition.
+        // recall this method to make sure that the states line up
         if (e.errorCode == 1) {
-          log.info("unique key constraint violation on dataset {}/{} install meta, assuming race condition.", userID, datasetID)
+          insertMetaInstallSuccessMessage(datasetID)
+        } else {
+          throw e;
         }
+      }
+    } else {
+      // If the status that reached the database before us is the same as the
+      // status that we are attempting to write, then there is no need to do the
+      // update as it will replace the updated timestamp without changing
+      // anything which will make things harder to manually trace
+      if (old.status != InstallStatus.Complete) {
+        updateDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.Complete, null))
       }
     }
   }

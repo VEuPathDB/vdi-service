@@ -15,7 +15,7 @@ INSERT INTO
   , updated
   )
 VALUES
-  (?, ?, ?, ?, CURRENT_TIMESTAMP)
+  (?, ?, ?, ?, ?)
 """
 
 internal fun Connection.insertDatasetInstallMessage(schema: String, message: DatasetInstallMessage) {
@@ -25,6 +25,7 @@ internal fun Connection.insertDatasetInstallMessage(schema: String, message: Dat
       ps.setString(2, message.installType.value)
       ps.setString(3, message.status.value)
       ps.setString(4, message.message)
+      ps.setObject(5, message.updated)
       ps.executeUpdate()
     }
 }

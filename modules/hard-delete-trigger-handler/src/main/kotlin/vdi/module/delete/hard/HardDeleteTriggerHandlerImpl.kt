@@ -1,11 +1,11 @@
 package vdi.module.delete.hard
 
-import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.async.WorkerPool
-import org.veupathdb.vdi.lib.kafka.model.triggers.HardDeleteTrigger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.async.WorkerPool
+import org.veupathdb.vdi.lib.kafka.model.triggers.HardDeleteTrigger
 import vdi.component.modules.VDIServiceModuleBase
 
 internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTriggerHandlerConfig)

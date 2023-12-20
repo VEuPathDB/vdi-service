@@ -10,6 +10,8 @@ import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
 class CacheDBTarget : ReconcilerTarget {
     override val name = "cache-db"
 
+    override val type = ReconcilerTargetType.Cache
+
     override fun streamSortedSyncControlRecords(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
         return CacheDB.selectAllSyncControlRecords()
     }

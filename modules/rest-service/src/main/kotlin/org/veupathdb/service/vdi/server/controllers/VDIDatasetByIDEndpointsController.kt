@@ -6,9 +6,9 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.AllowAdminAuth
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdId
+import org.veupathdb.service.vdi.service.datasets.adminGetDatasetByID
 import org.veupathdb.service.vdi.service.datasets.deleteDataset
 import org.veupathdb.service.vdi.service.datasets.getDatasetByID
-import org.veupathdb.service.vdi.service.datasets.adminGetDatasetByID
 import org.veupathdb.service.vdi.service.datasets.updateDatasetMeta
 import org.veupathdb.vdi.lib.common.field.toUserID
 

@@ -3,6 +3,8 @@ package org.veupathdb.service.vdi.db.userdb
 import org.veupathdb.vdi.lib.common.field.UserID
 import java.sql.Connection
 
+// FIXME: This schema should not be hardcoded
+
 // language=oracle
 private const val SQL = """
 SELECT

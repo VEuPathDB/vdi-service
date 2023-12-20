@@ -13,6 +13,8 @@ class AppDBTarget(
     private val projectID: String
 ) : ReconcilerTarget {
 
+    override val type = ReconcilerTargetType.Install
+
     override fun streamSortedSyncControlRecords(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
         return AppDB.accessor(projectID)!!.streamAllSyncControlRecords()
     }

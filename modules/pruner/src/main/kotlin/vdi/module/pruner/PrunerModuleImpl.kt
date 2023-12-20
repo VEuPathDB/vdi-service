@@ -1,13 +1,13 @@
 package vdi.module.pruner
 
-import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import vdi.component.metrics.Metrics
 import vdi.component.pruner.Pruner
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : PrunerModule {
 

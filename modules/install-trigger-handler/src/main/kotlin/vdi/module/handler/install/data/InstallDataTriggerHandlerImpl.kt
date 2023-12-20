@@ -1,8 +1,15 @@
 package vdi.module.handler.install.data
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.DatasetManifestFilename
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
+import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.compression.Tar
+import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -18,19 +25,12 @@ import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.kafka.model.triggers.InstallTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import java.nio.file.Path
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.veupathdb.vdi.lib.common.DatasetManifestFilename
-import org.veupathdb.vdi.lib.common.DatasetMetaFilename
-import org.veupathdb.vdi.lib.common.OriginTimestamp
-import org.veupathdb.vdi.lib.common.compression.Zip
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
+import java.nio.file.Path
 import java.sql.SQLException
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 
 internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig)
   : InstallDataTriggerHandler
@@ -209,10 +209,13 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           try {
             it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Data, InstallStatus.Running, null))
           } catch (e: SQLException) {
-            log.info("unique constraint violation when writing install data message for dataset {}/{}, assuming race condition and ignoring", userID, datasetID)
-            // For now, logging stack trace at debug until we can be certain we're specifically catching unique constraint violation.
-            log.debug("Stack trace for SQL Exception considered to be constraint violation: ", e)
-            race = true
+            // Error code 1 == unique constraint violation: https://docs.oracle.com/en/database/oracle/oracle-database/19/errmg/ORA-00000.html
+            if (e.errorCode == 1) {
+              log.info("Unique constraint violation when writing install data message for dataset {}/{}, assuming race condition and ignoring.", userID, datasetID)
+              race = true
+            } else {
+              throw e
+            }
           }
         }
 
@@ -221,7 +224,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         }
       } else {
         if (status.status != InstallStatus.ReadyForReinstall) {
-          log.info("skipping install event for dataset {}/{} into project {} due to the dataset status being {}", userID, datasetID, projectID, status.status)
+          log.info("Skipping install event for dataset {}/{} into project {} due to the dataset status being {}", userID, datasetID, projectID, status.status)
           return
         }
       }
@@ -347,7 +350,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     datasetID: DatasetID,
     projectID: ProjectID
   ) {
-    log.error("dataset {}/{} install into {} failed due to bad request exception from handler server: {}", userID, datasetID, projectID, res.message)
+    log.error("Dataset {}/{} install into {} failed due to bad request exception from handler server: {}", userID, datasetID, projectID, res.message)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -367,7 +370,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     datasetID: DatasetID,
     projectID: ProjectID
   ) {
-    log.info("dataset {}/{} install into {} failed due to validation error", userID, datasetID, projectID)
+    log.info("Dataset {}/{} install into {} failed due to validation error", userID, datasetID, projectID)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
