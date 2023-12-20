@@ -123,7 +123,7 @@ class ReconcilerInstance(
     if (targetDB.type == ReconcilerTargetType.Install) {
       val relevantProjects = sourceDatasetDir.getMeta().load()!!.projects
       if (!relevantProjects.contains(targetDB.name)) {
-        logger().info("Skipping dataset ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID} as it is not relevant to ${targetDB.name}")
+        logger().info("Skipping dataset ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID} as it does not target ${targetDB.name}")
         return
       }
     }
