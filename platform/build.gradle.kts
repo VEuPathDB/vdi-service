@@ -9,7 +9,7 @@ dependencies {
     api("org.veupathdb.lib:multipart-jackson-pojo:1.1.0")
 
     // VDI
-    api("org.veupathdb.vdi:vdi-component-common:6.6.0")
+    api("org.veupathdb.vdi:vdi-component-common:6.6.1")
     api("org.veupathdb.vdi:vdi-component-json:1.0.1")
 
     // Database

@@ -182,8 +182,12 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     log.trace("executeJob(userID={}, datasetID={}, projectID={}, s3Dir=..., handler=...)", userID, datasetID, projectID)
 
     val appDB   = AppDB.accessor(projectID)
-    val dataset = appDB.selectDataset(datasetID)
+    if (appDB == null) {
+      log.info("skipping install event for dataset {}/{} into project {} due to the target project being disabled.", userID, datasetID, projectID)
+      return
+    }
 
+    val dataset = appDB.selectDataset(datasetID)
     if (dataset == null) {
       log.info("skipping install event for dataset {}/{} into project {} due to no dataset record being present", userID, datasetID, projectID)
       return
@@ -205,12 +209,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           try {
             it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Data, InstallStatus.Running, null))
           } catch (e: SQLException) {
+            // Error code 1 == unique constraint violation: https://docs.oracle.com/en/database/oracle/oracle-database/19/errmg/ORA-00000.html
             if (e.errorCode == 1) {
-              log.info(
-                "unique constraint violation when writing install data message for dataset {}/{}, assuming race condition and ignoring",
-                userID,
-                datasetID
-              )
+              log.info("Unique constraint violation when writing install data message for dataset {}/{}, assuming race condition and ignoring.", userID, datasetID)
               race = true
             } else {
               throw e
@@ -223,7 +224,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         }
       } else {
         if (status.status != InstallStatus.ReadyForReinstall) {
-          log.info("skipping install event for dataset {}/{} into project {} due to the dataset status being {}", userID, datasetID, projectID, status.status)
+          log.info("Skipping install event for dataset {}/{} into project {} due to the dataset status being {}", userID, datasetID, projectID, status.status)
           return
         }
       }
@@ -349,7 +350,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     datasetID: DatasetID,
     projectID: ProjectID
   ) {
-    log.error("dataset {}/{} install into {} failed due to bad request exception from handler server: {}", userID, datasetID, projectID, res.message)
+    log.error("Dataset {}/{} install into {} failed due to bad request exception from handler server: {}", userID, datasetID, projectID, res.message)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -369,7 +370,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     datasetID: DatasetID,
     projectID: ProjectID
   ) {
-    log.info("dataset {}/{} install into {} failed due to validation error", userID, datasetID, projectID)
+    log.info("Dataset {}/{} install into {} failed due to validation error", userID, datasetID, projectID)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(

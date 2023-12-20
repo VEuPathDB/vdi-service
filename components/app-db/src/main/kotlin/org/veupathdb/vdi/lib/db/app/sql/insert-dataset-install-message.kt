@@ -2,7 +2,6 @@ package org.veupathdb.vdi.lib.db.app.sql
 
 import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import java.sql.Connection
-import java.time.OffsetDateTime
 
 private fun sql(schema: String) =
 // language=oracle

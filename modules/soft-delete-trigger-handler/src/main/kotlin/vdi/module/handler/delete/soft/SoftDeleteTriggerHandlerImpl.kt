@@ -86,8 +86,15 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
         return@forEach
       }
 
-      if (!datasetIsInstalled(datasetID, projectID)) {
-        log.info("skipping uninstall event for dataset {}/{} and project {} as it is not installed", userID, datasetID, projectID)
+      val datasetInstalled = datasetIsInstalled(datasetID, projectID)
+
+      if (datasetInstalled == DatasetInstallStatus.Unknown) {
+        log.info("skipping uninstall event for dataset {}/{}, project {} as the target is disabled", userID, datasetID, projectID)
+        return@forEach
+      }
+
+      if (datasetInstalled == DatasetInstallStatus.NotInstalled) {
+        log.info("skipping uninstall event for dataset {}/{}, project {} as it is not installed", userID, datasetID, projectID)
         return@forEach
       }
 
@@ -127,7 +134,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     log.info("dataset handler server reports dataset {} was successfully uninstalled from project {}", datasetID, projectID)
 
     val appDB = try {
-      AppDB.transaction(projectID)
+      AppDB.transaction(projectID)!!
     } catch (e: Throwable) {
       throw IllegalStateException("dataset $datasetID (user $userID) is linked to project $projectID which is currently unknown to the vdi service", e)
     }
@@ -154,15 +161,17 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     throw IllegalStateException(res.message)
   }
 
-  private fun datasetIsInstalled(datasetID: DatasetID, projectID: ProjectID): Boolean {
-    val appDB = AppDB.accessor(projectID)
+  private enum class DatasetInstallStatus { Installed, NotInstalled, Unknown }
+
+  private fun datasetIsInstalled(datasetID: DatasetID, projectID: ProjectID): DatasetInstallStatus {
+    val appDB = AppDB.accessor(projectID) ?: return DatasetInstallStatus.Unknown
 
     for (message in appDB.selectDatasetInstallMessages(datasetID)) {
       if (message.status == InstallStatus.Complete)
-        return true
+        return DatasetInstallStatus.Installed
     }
 
-    return false
+    return DatasetInstallStatus.NotInstalled
   }
 
   private fun datasetIsImported(datasetID: DatasetID): Boolean {

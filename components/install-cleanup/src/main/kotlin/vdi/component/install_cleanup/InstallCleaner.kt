@@ -29,7 +29,7 @@ object InstallCleaner {
     for ((projectID, _) in AppDatabaseRegistry) {
       try {
         // Fetch a list of datasets with broken installs
-        val targets = AppDB.accessor(projectID)
+        val targets = AppDB.accessor(projectID)!!
           .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FailedInstallation)
 
         log.info("found {} broken datasets for cleanup in project {}", targets.size, projectID)
@@ -76,8 +76,15 @@ object InstallCleaner {
    */
   private fun maybeCleanDatasetFromTargetDB(datasetID: DatasetID, projectID: ProjectID) {
     try {
+      val accessor = AppDB.accessor(projectID)
+
+      if (accessor == null) {
+        log.info("Skipping database clean for dataset {} project {} as the target project is not currently enabled.", datasetID, projectID)
+        return
+      }
+
       // Lookup the existing install message for the dataset
-      val message = AppDB.accessor(projectID).selectDatasetInstallMessage(datasetID, InstallType.Data)
+      val message = accessor.selectDatasetInstallMessage(datasetID, InstallType.Data)
 
       // If one does not exist, then the dataset was never installed in the
       // first place.
