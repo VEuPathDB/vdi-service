@@ -242,7 +242,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       }
     }
 
-    val sync = AppDB.accessor(projectID).selectDatasetSyncControlRecord(datasetID)!!
+    val sync = AppDB.accessor(projectID)!!.selectDatasetSyncControlRecord(datasetID)!!
 
     if (!sync.metaUpdated.isBefore(metaTimestamp)) {
       log.warn("db: {} -> s3 {}", sync.metaUpdated, metaTimestamp)
