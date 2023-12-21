@@ -6,10 +6,7 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.AllowAdminAuth
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdId
-import org.veupathdb.service.vdi.service.datasets.adminGetDatasetByID
-import org.veupathdb.service.vdi.service.datasets.deleteDataset
-import org.veupathdb.service.vdi.service.datasets.getDatasetByID
-import org.veupathdb.service.vdi.service.datasets.updateDatasetMeta
+import org.veupathdb.service.vdi.service.datasets.*
 import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated(allowGuests = false)
@@ -30,8 +27,16 @@ class VDIDatasetByIDEndpointsController(@Context request: ContainerRequest) : Vd
     return VdiDatasetsVdId.PatchVdiDatasetsByVdIdResponse.respond204()
   }
 
+  @AllowAdminAuth
   override fun deleteVdiDatasetsByVdId(vdID: String): VdiDatasetsVdId.DeleteVdiDatasetsByVdIdResponse {
-    deleteDataset(userID.toUserID(), vdID.asVDIID())
+    val userID = maybeUserID
+
+    if (userID == null) {
+      adminDeleteDataset(vdID.asVDIID())
+    } else {
+      userDeleteDataset(userID.toUserID(), vdID.asVDIID())
+    }
+
     return VdiDatasetsVdId.DeleteVdiDatasetsByVdIdResponse.respond204()
   }
 }

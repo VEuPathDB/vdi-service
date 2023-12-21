@@ -20,7 +20,7 @@ import org.veupathdb.vdi.lib.db.cache.CacheDB
  * @throws ForbiddenException If the target dataset is not owned by the
  * requesting user.
  */
-internal fun deleteDataset(userID: UserID, datasetID: DatasetID) {
+internal fun userDeleteDataset(userID: UserID, datasetID: DatasetID) {
   // Verify that the target dataset exists.
   val ds = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
 
@@ -28,6 +28,15 @@ internal fun deleteDataset(userID: UserID, datasetID: DatasetID) {
   if (ds.ownerID != userID)
     throw ForbiddenException()
 
+  deleteDataset(userID, datasetID)
+}
+
+internal fun adminDeleteDataset(datasetID: DatasetID) {
+  val ds = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
+  deleteDataset(ds.ownerID, datasetID)
+}
+
+private fun deleteDataset(userID: UserID, datasetID: DatasetID) {
   CacheDB.withTransaction {
     // Update the deleted flag in the local pg.
     it.updateDatasetDeleted(datasetID, true)
