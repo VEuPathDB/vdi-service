@@ -34,12 +34,17 @@ import kotlin.math.max
 private val log = LoggerFactory.getLogger("create-dataset.kt")
 
 @OptIn(ExperimentalPathApi::class)
-fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostRequest) {
+fun createDataset(
+  userID: UserID,
+  datasetID: DatasetID,
+  entity: DatasetPostRequest,
+  adminProxy: Boolean = false,
+) {
   log.trace("createDataset(userID={}, datasetID={}, entity={})", userID, datasetID, entity)
 
   val datasetMeta = entity.toDatasetMeta(userID)
 
-  val handler = PluginHandlers.get(datasetMeta.type.name, datasetMeta.type.version)
+  val handler = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version]
     ?: throw BadRequestException("target dataset type is unknown to the VDI service")
 
   for (projectID in datasetMeta.projects) {
@@ -50,6 +55,15 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
       throw BadRequestException("unrecognized target project")
   }
 
+  // If the dataset was created via the admin proxy and a creation date was
+  // provided, then use that date.  Otherwise, use the current timestamp as the
+  // creation date.
+  val creationDate = if (adminProxy) {
+    entity.meta.createdOn ?: OffsetDateTime.now()
+  } else {
+    OffsetDateTime.now()
+  }
+
   CacheDB.withTransaction {
     it.tryInsertDataset(DatasetImpl(
       datasetID,
@@ -57,7 +71,7 @@ fun createDataset(userID: UserID, datasetID: DatasetID, entity: DatasetPostReque
       datasetMeta.type.version,
       userID,
       false,
-      OffsetDateTime.now(),
+      creationDate,
       DatasetImportStatus.Queued,
       datasetMeta.origin
     ))

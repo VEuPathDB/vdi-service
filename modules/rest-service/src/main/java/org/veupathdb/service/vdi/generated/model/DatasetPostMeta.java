@@ -2,6 +2,7 @@ package org.veupathdb.service.vdi.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonDeserialize(
@@ -61,4 +62,10 @@ public interface DatasetPostMeta {
 
   @JsonProperty("dependencies")
   void setDependencies(List<DatasetDependency> dependencies);
+
+  @JsonProperty("createdOn")
+  OffsetDateTime getCreatedOn();
+
+  @JsonProperty("createdOn")
+  void setCreatedOn(OffsetDateTime createdOn);
 }

@@ -77,7 +77,7 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
 
     val datasetID = DatasetID()
 
-    createDataset(userID, datasetID, entity)
+    createDataset(userID, datasetID, entity, true)
 
     return VdiDatasetsAdmin.PostVdiDatasetsAdminProxyUploadResponse
       .respond200WithApplicationJson(DatasetPostResponse(datasetID))

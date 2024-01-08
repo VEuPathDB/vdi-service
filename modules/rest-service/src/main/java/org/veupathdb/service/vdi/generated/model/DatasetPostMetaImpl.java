@@ -1,8 +1,10 @@
 package org.veupathdb.service.vdi.generated.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,7 +16,8 @@ import java.util.List;
     "description",
     "origin",
     "projects",
-    "dependencies"
+    "dependencies",
+    "createdOn"
 })
 public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("datasetType")
@@ -43,6 +46,13 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
 
   @JsonProperty("dependencies")
   private List<DatasetDependency> dependencies;
+
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss"
+  )
+  @JsonProperty("createdOn")
+  private OffsetDateTime createdOn;
 
   @JsonProperty("datasetType")
   public DatasetPostType getDatasetType() {
@@ -128,5 +138,15 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("dependencies")
   public void setDependencies(List<DatasetDependency> dependencies) {
     this.dependencies = dependencies;
+  }
+
+  @JsonProperty("createdOn")
+  public OffsetDateTime getCreatedOn() {
+    return this.createdOn;
+  }
+
+  @JsonProperty("createdOn")
+  public void setCreatedOn(OffsetDateTime createdOn) {
+    this.createdOn = createdOn;
   }
 }
