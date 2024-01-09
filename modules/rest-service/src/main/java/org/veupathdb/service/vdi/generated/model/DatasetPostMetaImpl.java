@@ -47,10 +47,7 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("dependencies")
   private List<DatasetDependency> dependencies;
 
-  @JsonFormat(
-      shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'HH:mm:ss"
-  )
+
   @JsonProperty("createdOn")
   private OffsetDateTime createdOn;
 
