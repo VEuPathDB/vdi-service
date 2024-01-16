@@ -91,7 +91,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
         // remove everything.  This event should be one of many for this
         // specific dataset.
         event.eventType.action == MinIOEventAction.DELETE -> {
-          log.debug("received a hard delete event for dataset {} owned by user {}", path.datasetID.toString(), path.userID.toString())
+          log.debug("received a hard delete event for dataset {} owned by user {} for MinIO key {}", path.datasetID.toString(), path.userID.toString(), event.objectKey)
 
           safeSend(HardDeleteTrigger(path.userID, path.datasetID), kr::sendHardDeleteTrigger)
         }
