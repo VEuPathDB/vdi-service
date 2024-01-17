@@ -51,7 +51,7 @@ class ReconcilerImpl(private val config: ReconcilerConfig) :
               contextData = ThreadContextData( // Add log4j context to reconciler to distinguish targets in logs.
                 map = mapOf(
                   Pair(
-                    "reconciler",
+                    "workerID",
                     target.name
                   )
                 ), Stack()
