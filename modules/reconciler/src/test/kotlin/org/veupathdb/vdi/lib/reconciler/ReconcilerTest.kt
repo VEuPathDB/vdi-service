@@ -276,6 +276,42 @@ class ReconcilerTest {
         assertEquals(listOf("22345678123456781234567812345678", "32345678123456781234567812345678", "42345678123456781234567812345678"), deletedIDs)
     }
 
+    @Test
+    @DisplayName("Test case sensitivity")
+    fun test7() {
+        val cacheDb = mock<ReconcilerTarget>()
+        val datasetManager = mock<DatasetManager>()
+        val kafkaRouter = mock<KafkaRouter>()
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
+
+        `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
+
+        `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
+            closeableIterator(listOf(
+                Pair(
+                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+                        datasetID = DatasetID("Vbz2OgjnKsR"),
+                        sharesUpdated = UpdateTime,
+                        dataUpdated = UpdateTime,
+                        metaUpdated = UpdateTime
+                    )
+                ),
+            ).iterator())
+        )
+        doReturn(
+            listOf(
+                mockDatasetDirectory(111L, "eA1WkZhiGbE", UpdateTime.plusDays(1)),
+                mockDatasetDirectory(111L, "Vbz2OgjnKsR", UpdateTime.plusDays(1)),
+            ).stream()
+        ).`when`(datasetManager).streamAllDatasets()
+        recon.reconcile()
+        val deletedIDs = mockingDetails(cacheDb).invocations
+            .filter { it.method.name == "deleteDataset" }
+            .map { it.getArgument<DatasetID>(1).toString() }
+
+        assertEquals(listOf(), deletedIDs)
+    }
+
     private fun closeableIterator(iterator: Iterator<Pair<VDIDatasetType, VDISyncControlRecord>>): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
         return object: CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
             override fun close() {
