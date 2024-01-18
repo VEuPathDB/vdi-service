@@ -7,6 +7,7 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.db.UserDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsAdmin
+import org.veupathdb.service.vdi.service.admin.listAllDatasets
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.listBrokenDatasets
 import org.veupathdb.service.vdi.util.fixVariableDateString
@@ -125,5 +126,14 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
         }
         it.results = broken
       })
+  }
+
+  override fun getVdiDatasetsAdminListAllDatasets(
+    offset: Int?,
+    limit: Int?,
+    projectId: String?
+  ): VdiDatasetsAdmin.GetVdiDatasetsAdminListAllDatasetsResponse {
+    return VdiDatasetsAdmin.GetVdiDatasetsAdminListAllDatasetsResponse
+      .respond200WithApplicationJson(listAllDatasets(offset, limit, projectId))
   }
 }

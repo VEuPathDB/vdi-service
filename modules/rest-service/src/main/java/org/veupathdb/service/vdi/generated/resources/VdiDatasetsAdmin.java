@@ -9,6 +9,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
+import org.veupathdb.service.vdi.generated.model.AllDatasetsListResponse;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.BrokenDatasetListing;
 import org.veupathdb.service.vdi.generated.model.BrokenImportListing;
@@ -57,6 +58,14 @@ public interface VdiDatasetsAdmin {
   @Path("/delete-cleanup")
   @Produces("application/json")
   PostVdiDatasetsAdminDeleteCleanupResponse postVdiDatasetsAdminDeleteCleanup();
+
+  @GET
+  @Path("/list-all-datasets")
+  @Produces("application/json")
+  GetVdiDatasetsAdminListAllDatasetsResponse getVdiDatasetsAdminListAllDatasets(
+      @QueryParam("offset") @DefaultValue("0") Integer offset,
+      @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("projectId") String projectId);
 
   class PostVdiDatasetsAdminProxyUploadResponse extends ResponseDelegate {
     private PostVdiDatasetsAdminProxyUploadResponse(Response response, Object entity) {
@@ -227,6 +236,23 @@ public interface VdiDatasetsAdmin {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new PostVdiDatasetsAdminDeleteCleanupResponse(responseBuilder.build(), entity);
+    }
+  }
+
+  class GetVdiDatasetsAdminListAllDatasetsResponse extends ResponseDelegate {
+    private GetVdiDatasetsAdminListAllDatasetsResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private GetVdiDatasetsAdminListAllDatasetsResponse(Response response) {
+      super(response);
+    }
+
+    public static GetVdiDatasetsAdminListAllDatasetsResponse respond200WithApplicationJson(
+        AllDatasetsListResponse entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetVdiDatasetsAdminListAllDatasetsResponse(responseBuilder.build(), entity);
     }
   }
 }

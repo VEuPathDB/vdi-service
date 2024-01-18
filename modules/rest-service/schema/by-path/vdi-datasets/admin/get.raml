@@ -52,3 +52,37 @@ types:
       datasetType: common.DatasetTypeInfo
       projectIds: common.ProjectID[]
       messages: string[]
+
+  AllDatasetsListResponse:
+    displayName: All Datasets Listing Response
+    type: object
+    additionalProperties: false
+    properties:
+      meta: AllDatasetsListMeta
+      results: AllDatasetsListEntry[]
+
+  AllDatasetsListMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      count: integer
+      offset: integer
+      limit: integer
+      total: integer
+
+  AllDatasetsListEntry:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: common.VDI-ID
+      owner: common.User-ID
+      datasetType: common.DatasetTypeInfo
+      visibility: common.DatasetVisibility
+      name: string
+      summary?: string
+      description?: string
+      sourceUrl?: string
+      origin: string
+      projectIds: common.ProjectID[]
+      status: common.DatasetStatusInfo
+      created: datetime

@@ -51,6 +51,37 @@ types:
       datasetType: DatasetTypeInfo
       projectIds: ProjectID[]
       messages: string[]
+  AllDatasetsListResponse:
+    displayName: All Datasets Listing Response
+    type: object
+    additionalProperties: false
+    properties:
+      meta: AllDatasetsListMeta
+      results: AllDatasetsListEntry[]
+  AllDatasetsListMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      count: integer
+      offset: integer
+      limit: integer
+      total: integer
+  AllDatasetsListEntry:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: VDI-ID
+      owner: User-ID
+      datasetType: DatasetTypeInfo
+      visibility: DatasetVisibility
+      name: string
+      summary?: string
+      description?: string
+      sourceUrl?: string
+      origin: string
+      projectIds: ProjectID[]
+      status: DatasetStatusInfo
+      created: datetime
   AuthorizationKey:
     displayName: RPC Authorization Key
     description: |

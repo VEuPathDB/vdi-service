@@ -10,6 +10,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.cache.model.*
+import org.veupathdb.vdi.lib.db.cache.query.AdminAllDatasetsQuery
 import org.veupathdb.vdi.lib.db.cache.sql.select.*
 import org.veupathdb.vdi.lib.db.cache.sql.select.selectDataset
 import org.veupathdb.vdi.lib.db.cache.sql.select.selectImportMessages
@@ -72,6 +73,12 @@ object CacheDB {
     log.debug("selecting upload files for dataset {}", datasetID)
     return connection.use { it.selectUploadFiles(datasetID) }
   }
+
+  fun selectAdminAllDatasetCount(query: AdminAllDatasetsQuery) =
+    connection.use { it.selectAdminAllDatasetCount(query) }
+
+  fun selectAdminAllDatasets(query: AdminAllDatasetsQuery) =
+    connection.use { it.selectAdminAllDatasets(query) }
 
   fun selectInstallFileCount(datasetID: DatasetID) =
     connection.use { it.selectInstallFileCount(datasetID) }

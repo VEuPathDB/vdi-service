@@ -622,6 +622,30 @@ uses:
                 message: Dataset store is unreachable
                 requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
+  /list-all-datasets:
+    get:
+      queryParameters:
+        offset:
+          type: integer
+          default: 0
+          required: false
+        limit:
+          type: integer
+          default: 100
+          minimum: 1
+          required: false
+        projectId:
+          description: |
+            Optionally filter the results to only datasets that target the given
+            project ID.
+          type: string
+          required: false
+      responses:
+        200:
+          body:
+            application/json:
+              type: lib.AllDatasetsListResponse
+
 /vdi-datasets/community:
   displayName: Community Datasets
   get:
