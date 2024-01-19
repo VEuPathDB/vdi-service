@@ -25,6 +25,7 @@ class ReconcilerTest {
     @DisplayName("Test insert one, delete one at the end")
     fun test1() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
 
@@ -82,6 +83,7 @@ class ReconcilerTest {
     @DisplayName("Test single dataset out of sync")
     fun test2() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
@@ -116,6 +118,7 @@ class ReconcilerTest {
     @DisplayName("Test single dataset in sync")
     fun test3() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
@@ -145,6 +148,7 @@ class ReconcilerTest {
     @DisplayName("Test target DB missing all datasets")
     fun test4() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
@@ -167,6 +171,7 @@ class ReconcilerTest {
     @DisplayName("Test delete one in the middle")
     fun test5() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
 
@@ -225,6 +230,7 @@ class ReconcilerTest {
     @DisplayName("Test delete last datasets in target stream, then sync last source")
     fun test6() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
@@ -280,6 +286,7 @@ class ReconcilerTest {
     @DisplayName("Test case sensitivity")
     fun test7() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)

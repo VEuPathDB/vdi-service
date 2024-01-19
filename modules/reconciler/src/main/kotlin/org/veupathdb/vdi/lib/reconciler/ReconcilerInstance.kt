@@ -32,7 +32,7 @@ class ReconcilerInstance(
     } catch (e: Exception) {
       // Don't re-throw error, ensure exception is logged and soldier on for future reconciliation.
       logger().error("Failure running reconciler for " + targetDB.name, e)
-      Metrics.malformedDatasetFound.labels("target_name", targetDB.name).inc()
+      Metrics.failedReconciliation.labels(targetDB.name).inc()
     }
   }
 
@@ -56,7 +56,7 @@ class ReconcilerInstance(
         } catch (e: MalformedDatasetException) {
           // Skip the dataset if it's malformed for some reason. As things settle down, we may want to clean it up in MinIO?
           logger().error("Found a malformed dataset in S3. Skipping dataset and continuing on.", e)
-          Metrics.malformedDatasetFound.labels("target_name", targetDB.name).inc()
+          Metrics.malformedDatasetFound.labels(targetDB.name).inc()
           continue
         }
 
@@ -119,7 +119,7 @@ class ReconcilerInstance(
   private fun tryDeleteDataset(targetDB: ReconcilerTarget, datasetType: VDIDatasetType, datasetID: DatasetID) {
     try {
       logger().info("Trying to delete dataset $datasetID.")
-      Metrics.reconcilerDatasetDeleted.labels("target_name", targetDB.name).inc()
+      Metrics.reconcilerDatasetDeleted.labels(targetDB.name).inc()
       targetDB.deleteDataset(datasetID = datasetID, datasetType = datasetType)
     } catch (e: Exception) {
       // Swallow exception and alert if unable to delete. Reconciler can safely recover, but the dataset
@@ -154,7 +154,7 @@ class ReconcilerInstance(
     logger().info("Sending sync event for ${sourceDatasetDir.datasetID}")
     // An update-meta event should trigger synchronization of all dataset components.
     kafkaRouter.sendUpdateMetaTrigger(UpdateMetaTrigger(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID))
-    Metrics.reconcilerDatasetSynced.labels("target_name", targetDB.name).inc()
+    Metrics.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
 
   private fun consumeEntireSourceStream(
