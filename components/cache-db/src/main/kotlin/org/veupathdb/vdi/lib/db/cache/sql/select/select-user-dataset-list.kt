@@ -10,8 +10,6 @@ import java.sql.Types
 private fun sqlBody(
   prefix: String,
   projectFilter: String,
-  orderBy: String,
-  order: String,
 ) = """
 WITH dataset_ids AS (
 $prefix
@@ -43,11 +41,7 @@ WHERE
   d.is_deleted = FALSE
   $projectFilter
 ORDER BY
-  $orderBy $order
-OFFSET
-  ?
-LIMIT
-  ?
+  d.created DESC
 """
 
 // language=postgresql
@@ -85,14 +79,6 @@ private const val PROJECT_ID_FILTER = "AND EXISTS (SELECT 1 FROM vdi.dataset_pro
 
 private const val DUMMY_FILTER = "AND 1 = 1"
 
-private const val ORDER_BY_CREATED = "created"
-private const val ORDER_BY_NAME    = "name"
-
-private const val ORDER_ASC = "ASC"
-private const val ORDER_DESC = "DESC"
-
-
-@Suppress("UNCHECKED_CAST")
 fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> {
   // List of params that we will collect as we assemble the query.
   val params = ArrayList<Pair<Any, Int>>(12)
@@ -140,23 +126,10 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
     }
   }
 
-  val orderBy = when (query.sortField) {
-    DatasetListSortField.CREATION_TIMESTAMP -> ORDER_BY_CREATED
-    DatasetListSortField.NAME               -> ORDER_BY_NAME
-  }
-
-  val sortOrder = when(query.sortOrder) {
-    SortOrder.ASCENDING  -> ORDER_ASC
-    SortOrder.DESCENDING -> ORDER_DESC
-  }
-
-  return prepareStatement(sqlBody(prefix, projectFilter, orderBy, sortOrder)).use { ps ->
+  return prepareStatement(sqlBody(prefix, projectFilter)).use { ps ->
     var i = 0
     for ((param, type) in params)
       ps.setObject(++i, param, type)
-
-    ps.setInt(++i, query.offset)
-    ps.setInt(++i, query.limit)
 
     ps.withResults {
       map {
