@@ -120,7 +120,8 @@ class ReconcilerInstance(
     try {
       logger().info("Trying to delete dataset $datasetID.")
       Metrics.reconcilerDatasetDeleted.labels(targetDB.name).inc()
-      targetDB.deleteDataset(datasetID = datasetID, datasetType = datasetType)
+      // TODO re-enable deletes once we are confident in the logic.
+//      targetDB.deleteDataset(datasetID = datasetID, datasetType = datasetType)
     } catch (e: Exception) {
       // Swallow exception and alert if unable to delete. Reconciler can safely recover, but the dataset
       // may need a manual inspection.
