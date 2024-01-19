@@ -24,7 +24,7 @@ FROM
   ${schema}.sync_control s
   INNER JOIN ${schema}.dataset d
     ON d.dataset_id = s.dataset_id
-ORDER BY CONCAT(CONCAT(d.owner,'/'), s.dataset_id)
+ORDER BY UPPER(CONCAT(CONCAT(d.owner,'/'), s.dataset_id))
 """
 
 internal fun Connection.selectAllSyncControl(schema: String): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {

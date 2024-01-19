@@ -8,6 +8,8 @@ import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
+import org.veupathdb.vdi.lib.s3.datasets.exception.MalformedDatasetException
+import vdi.component.metrics.Metrics
 
 /**
  * Component for synchronizing the dataset object store (the source of truth for datasets) with a target database.
@@ -30,6 +32,7 @@ class ReconcilerInstance(
     } catch (e: Exception) {
       // Don't re-throw error, ensure exception is logged and soldier on for future reconciliation.
       logger().error("Failure running reconciler for " + targetDB.name, e)
+      Metrics.failedReconciliation.labels(targetDB.name).inc()
     }
   }
 
@@ -42,11 +45,20 @@ class ReconcilerInstance(
 
       nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
 
-      // Iterate through datasets in S3
+      // Iterate through datasets in S3.
       while (sourceIterator.hasNext()) {
 
-        // Pop the next DatasetDirectory instance from the S3 stream.
-        val sourceDatasetDir: DatasetDirectory = sourceIterator.next()
+        // Try to read a dataset from S3.
+        var sourceDatasetDir: DatasetDirectory
+        try {
+          // Pop the next DatasetDirectory instance from the S3 stream.
+          sourceDatasetDir = sourceIterator.next()
+        } catch (e: MalformedDatasetException) {
+          // Skip the dataset if it's malformed for some reason. As things settle down, we may want to clean it up in MinIO?
+          logger().error("Found a malformed dataset in S3. Skipping dataset and continuing on.", e)
+          Metrics.malformedDatasetFound.labels(targetDB.name).inc()
+          continue
+        }
 
         logger().info("Checking dataset ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID} for ${targetDB.name}")
 
@@ -60,8 +72,12 @@ class ReconcilerInstance(
         // If target dataset stream is "ahead" of source stream, delete
         // the datasets from the target stream until we are aligned
         // again (or the target stream is consumed).
-        if (sourceDatasetDir.datasetID.toString() > nextTargetDataset!!.second.datasetID.toString()) {
-          while (nextTargetDataset != null && sourceDatasetDir.datasetID.toString() > nextTargetDataset!!.second.datasetID.toString()) {
+        if (sourceDatasetDir.datasetID.toString().compareTo(nextTargetDataset!!.second.datasetID.toString(), true) > 0) {
+
+          // Delete datasets until and advance target iterator until streams are aligned.
+          while (nextTargetDataset != null && sourceDatasetDir.datasetID.toString().compareTo(nextTargetDataset!!.second.datasetID.toString(), true) > 0) {
+            logger().info("Attempting to delete dataset with owner ${sourceDatasetDir.ownerID} and ID ${sourceDatasetDir.datasetID} " +
+                    "because ${nextTargetDataset!!.second.datasetID} is lexigraphically greater than our ID.")
             tryDeleteDataset(targetDB, nextTargetDataset!!.first, nextTargetDataset!!.second.datasetID)
             nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
           }
@@ -77,6 +93,7 @@ class ReconcilerInstance(
           // Dataset is in source, but not in target. Send an event.
           sendSyncIfRelevant(sourceDatasetDir)
         } else {
+          // Dataset is in source and target. Check dates to see if sync is needed.
           if (isOutOfSync(sourceDatasetDir, nextTargetDataset!!.second)) {
             sendSyncIfRelevant(sourceDatasetDir)
           }
@@ -101,6 +118,8 @@ class ReconcilerInstance(
 
   private fun tryDeleteDataset(targetDB: ReconcilerTarget, datasetType: VDIDatasetType, datasetID: DatasetID) {
     try {
+      logger().info("Trying to delete dataset $datasetID.")
+      Metrics.reconcilerDatasetDeleted.labels(targetDB.name).inc()
       targetDB.deleteDataset(datasetID = datasetID, datasetType = datasetType)
     } catch (e: Exception) {
       // Swallow exception and alert if unable to delete. Reconciler can safely recover, but the dataset
@@ -135,6 +154,7 @@ class ReconcilerInstance(
     logger().info("Sending sync event for ${sourceDatasetDir.datasetID}")
     // An update-meta event should trigger synchronization of all dataset components.
     kafkaRouter.sendUpdateMetaTrigger(UpdateMetaTrigger(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID))
+    Metrics.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
 
   private fun consumeEntireSourceStream(

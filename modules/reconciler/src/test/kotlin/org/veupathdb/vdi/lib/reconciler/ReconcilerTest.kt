@@ -25,6 +25,7 @@ class ReconcilerTest {
     @DisplayName("Test insert one, delete one at the end")
     fun test1() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
 
@@ -82,6 +83,7 @@ class ReconcilerTest {
     @DisplayName("Test single dataset out of sync")
     fun test2() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
@@ -116,6 +118,7 @@ class ReconcilerTest {
     @DisplayName("Test single dataset in sync")
     fun test3() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
@@ -145,6 +148,7 @@ class ReconcilerTest {
     @DisplayName("Test target DB missing all datasets")
     fun test4() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
@@ -167,6 +171,7 @@ class ReconcilerTest {
     @DisplayName("Test delete one in the middle")
     fun test5() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
 
@@ -225,6 +230,7 @@ class ReconcilerTest {
     @DisplayName("Test delete last datasets in target stream, then sync last source")
     fun test6() {
         val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
@@ -274,6 +280,43 @@ class ReconcilerTest {
 
         assertEquals(listOf("12345678123456781234567812345678", "52345678123456781234567812345678"), syncedIDs)
         assertEquals(listOf("22345678123456781234567812345678", "32345678123456781234567812345678", "42345678123456781234567812345678"), deletedIDs)
+    }
+
+    @Test
+    @DisplayName("Test case sensitivity")
+    fun test7() {
+        val cacheDb = mock<ReconcilerTarget>()
+        `when`(cacheDb.name).thenReturn("CacheDB")
+        val datasetManager = mock<DatasetManager>()
+        val kafkaRouter = mock<KafkaRouter>()
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
+
+        `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
+
+        `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
+            closeableIterator(listOf(
+                Pair(
+                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+                        datasetID = DatasetID("Vbz2OgjnKsR"),
+                        sharesUpdated = UpdateTime,
+                        dataUpdated = UpdateTime,
+                        metaUpdated = UpdateTime
+                    )
+                ),
+            ).iterator())
+        )
+        doReturn(
+            listOf(
+                mockDatasetDirectory(111L, "eA1WkZhiGbE", UpdateTime.plusDays(1)),
+                mockDatasetDirectory(111L, "Vbz2OgjnKsR", UpdateTime.plusDays(1)),
+            ).stream()
+        ).`when`(datasetManager).streamAllDatasets()
+        recon.reconcile()
+        val deletedIDs = mockingDetails(cacheDb).invocations
+            .filter { it.method.name == "deleteDataset" }
+            .map { it.getArgument<DatasetID>(1).toString() }
+
+        assertEquals(listOf(), deletedIDs)
     }
 
     private fun closeableIterator(iterator: Iterator<Pair<VDIDatasetType, VDISyncControlRecord>>): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {

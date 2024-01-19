@@ -127,6 +127,30 @@ object Metrics {
     )
     .register()
 
+  val failedReconciliation: Counter = Counter.build()
+    .name("dataset_reconiler_failed")
+    .help("Count of failed reconciler runs.")
+    .labelNames("target_name")
+    .register()
+
+  val reconcilerDatasetDeleted: Counter = Counter.build()
+    .name("dataset_reconciler_deleted")
+    .help("Count of datasets deleted by reconciler.")
+    .labelNames("target_name")
+    .register()
+
+  val reconcilerDatasetSynced: Counter = Counter.build()
+    .name("dataset_reconciler_synced")
+    .help("Count of datasets synced by reconciler.")
+    .labelNames("target_name")
+    .register()
+
+  val malformedDatasetFound: Counter = Counter.build()
+    .name("malformed_dataset_found")
+    .help("A Malformed dataset was found during reconciliation.")
+    .labelNames("target_name")
+    .register()
+
   val reconcilerTimes: Histogram = Histogram.build()
     .name("dataset_reconciler_times")
     .help("Dataset reconciler run times.")

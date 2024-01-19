@@ -7,10 +7,6 @@ Configuration:
       target: SYSTEM_OUT
       PatternLayout:
         pattern: "%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} (wid:%X{workerID}) [rid:%5X{traceId}] %-5level %c - %m%n}"
-    - name: Reconciler_Appender
-      target: SYSTEM_OUT
-      PatternLayout:
-        pattern: "%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} [reconciler:%5X{reconciler}] %-5level %c - %m%n}"
 
   Loggers:
     Root:
@@ -33,8 +29,3 @@ Configuration:
       additivity: false
       AppenderRef:
         - ref: Console_Appender
-    - name: org.veupathdb.vdi.lib.reconciler
-      level: debug
-      additivity: false
-      AppenderRef:
-      - ref: Reconciler_Appender
