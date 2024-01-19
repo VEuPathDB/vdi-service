@@ -118,8 +118,9 @@ class ReconcilerInstance(
 
   private fun tryDeleteDataset(targetDB: ReconcilerTarget, datasetType: VDIDatasetType, datasetID: DatasetID) {
     try {
-      logger().info("Trying to delete dataset $datasetID.")
+//      logger().info("Trying to delete dataset $datasetID.")
       Metrics.reconcilerDatasetDeleted.labels(targetDB.name).inc()
+      logger().info("Would have deleted dataset $datasetID.")
       // TODO re-enable deletes once we are confident in the logic.
 //      targetDB.deleteDataset(datasetID = datasetID, datasetType = datasetType)
     } catch (e: Exception) {
