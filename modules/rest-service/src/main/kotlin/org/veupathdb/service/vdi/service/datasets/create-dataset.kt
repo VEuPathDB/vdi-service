@@ -235,7 +235,7 @@ private fun Path.repackZip(into: Path, using: Path): Map<String, Long> {
 
   log.info("Compressing file from {} into {}", unpacked, into)
   // recompress the files as a tgz file
-  Zip.compress(into, unpacked)
+  Zip.compress(into, unpacked, Zip.Level(0u))
 
   return files
 }
