@@ -72,10 +72,12 @@ class ReconcilerInstance(
 
           // Delete datasets until and advance target iterator until streams are aligned.
           while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId, true) > 0) {
-            logger().info("Attempting to delete dataset with owner ${sourceDatasetDir.ownerID} and ID ${sourceDatasetDir.datasetID} " +
-                    "because ${nextTargetDataset!!.syncControlRecord.datasetID} is lexigraphically greater than our ID.")
+
+            logger().info("Attempting to delete dataset with owner $comparableTargetId " +
+                    "because $comparableS3Id is lexigraphically greater than $comparableTargetId.")
             tryDeleteDataset(targetDB, nextTargetDataset!!.type, nextTargetDataset!!.syncControlRecord.datasetID)
             nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
+            comparableTargetId = nextTargetDataset!!.getComparableID()
           }
         }
 

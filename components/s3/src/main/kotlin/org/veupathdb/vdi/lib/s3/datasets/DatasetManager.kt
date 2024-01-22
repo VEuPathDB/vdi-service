@@ -162,7 +162,13 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
             // Stream is exhausted, construct a dataset out of remaining objects.
             val idsFromObject = datasetIdFromS3Object(stagedObjects.first())
             val pathFactory = S3DatasetPathFactory(idsFromObject.first, idsFromObject.second)
-            this.currentDataset = EagerlyLoadedDatasetDirectory(stagedObjects, idsFromObject.first, idsFromObject.second, pathFactory)
+            try {
+              this.currentDataset = EagerlyLoadedDatasetDirectory(stagedObjects, idsFromObject.first, idsFromObject.second, pathFactory)
+            } catch (e: MalformedDatasetException) {
+              Metrics.malformedDatasetFound.inc()
+              log.warn("Found a malformed dataset with ID $idsFromObject.")
+              return null
+            }
             stagedObjects = emptyList()
             return currentDataset
           }
