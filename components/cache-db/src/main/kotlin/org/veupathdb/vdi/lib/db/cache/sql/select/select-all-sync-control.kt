@@ -1,8 +1,10 @@
 package org.veupathdb.vdi.lib.db.cache.sql.select
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDIDatasetTypeImpl
+import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import java.sql.Connection
@@ -19,6 +21,7 @@ SELECT
 , s.dataset_id
 , d.type_name
 , d.type_version
+, d.owner
 FROM
   vdi.sync_control AS s
   INNER JOIN vdi.datasets AS d
@@ -26,24 +29,28 @@ FROM
 ORDER BY UPPER(CONCAT(d.owner_id,'/',s.dataset_id))
 """
 
-internal fun Connection.selectAllSyncControl(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
+internal fun Connection.selectAllSyncControl(): CloseableIterator<VDIReconcilerTargetRecord> {
   val ps = prepareStatement(SQL)
   val rs = ps.executeQuery()
   return RecordIterator(rs, this, ps)
 }
 
-class RecordIterator(val rs: ResultSet, val connection: Connection, val preparedStatement: PreparedStatement): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
+class RecordIterator(val rs: ResultSet,
+                     val connection: Connection,
+                     val preparedStatement: PreparedStatement): CloseableIterator<VDIReconcilerTargetRecord> {
 
   override fun hasNext(): Boolean {
     return rs.next();
   }
 
-  override fun next(): Pair<VDIDatasetType, VDISyncControlRecord> {
-    return Pair(
-      VDIDatasetTypeImpl(
+  override fun next(): VDIReconcilerTargetRecord {
+    return VDIReconcilerTargetRecord(
+      type = VDIDatasetTypeImpl(
         name = rs.getString("type_name"),
         version = rs.getString("type_version")
-      ), VDISyncControlRecord(
+      ),
+      owner = UserID(rs.getLong("owner")),
+      syncControlRecord = VDISyncControlRecord(
         datasetID = DatasetID(rs.getString("dataset_id")),
         sharesUpdated = rs.getObject("shares_update_time", OffsetDateTime::class.java),
         dataUpdated = rs.getObject("data_update_time", OffsetDateTime::class.java),

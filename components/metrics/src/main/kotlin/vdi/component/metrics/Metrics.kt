@@ -145,10 +145,15 @@ object Metrics {
     .labelNames("target_name")
     .register()
 
+  val missingInTarget: Counter = Counter.build()
+    .name("dataset_reconciler_missing_in_target")
+    .help("Count of datasets the reconciler finds are missing in the target DB.")
+    .labelNames("target_name")
+    .register()
+
   val malformedDatasetFound: Counter = Counter.build()
     .name("malformed_dataset_found")
     .help("A Malformed dataset was found during reconciliation.")
-    .labelNames("target_name")
     .register()
 
   val reconcilerTimes: Histogram = Histogram.build()

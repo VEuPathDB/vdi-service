@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetType
+import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.model.*
@@ -198,7 +198,7 @@ class AppDBTransactionImpl(
     return connection.selectDatasetProjectLinks(schema, datasetID)
   }
 
-  override fun streamAllSyncControlRecords(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
+  override fun streamAllSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord> {
     return connection.selectAllSyncControl(schema)
   }
 
