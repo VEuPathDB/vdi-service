@@ -33,7 +33,6 @@ import kotlin.math.max
 
 private val log = LoggerFactory.getLogger("create-dataset.kt")
 
-@OptIn(ExperimentalPathApi::class)
 fun createDataset(
   userID: UserID,
   datasetID: DatasetID,
@@ -93,6 +92,18 @@ fun createDataset(
     ))
   }
 
+  log.debug("forking thread to process posted dataset upload files for dataset {}/{}", userID, datasetID)
+  Thread { processDatasetUpload(userID, datasetID, entity, datasetMeta) }
+    .start()
+}
+
+@OptIn(ExperimentalPathApi::class)
+private fun processDatasetUpload(
+  userID: UserID,
+  datasetID: DatasetID,
+  entity: DatasetPostRequest,
+  datasetMeta: VDIDatasetMeta
+) {
   // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
   TempFiles.withTempDirectory { directory ->
     TempFiles.withTempPath { archive ->
@@ -116,7 +127,7 @@ fun createDataset(
     }
   }
 
-  log.debug("uploading dataset metadata to S3 for new dataset {} by user {}", datasetID, userID)
+  log.debug("uploading dataset metadata to S3 for new dataset {}/{}", userID, datasetID)
   DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
 }
 
