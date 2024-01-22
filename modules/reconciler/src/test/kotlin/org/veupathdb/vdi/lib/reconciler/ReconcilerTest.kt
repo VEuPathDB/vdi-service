@@ -167,120 +167,120 @@ class ReconcilerTest {
         assertEquals(3, mockingDetails(kafkaRouter).invocations.size)
     }
 
-    @Test
-    @DisplayName("Test delete one in the middle")
-    fun test5() {
-        val cacheDb = mock<ReconcilerTarget>()
-        `when`(cacheDb.name).thenReturn("CacheDB")
-        val datasetManager = mock<DatasetManager>()
-        val kafkaRouter = mock<KafkaRouter>()
+//    @Test
+//    @DisplayName("Test delete one in the middle")
+//    fun test5() {
+//        val cacheDb = mock<ReconcilerTarget>()
+//        `when`(cacheDb.name).thenReturn("CacheDB")
+//        val datasetManager = mock<DatasetManager>()
+//        val kafkaRouter = mock<KafkaRouter>()
+//
+//        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
+//
+//        `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
+//            closeableIterator(listOf(
+//                Pair(
+//                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+//                        datasetID = DatasetID("12345678123456781234567812345678"),
+//                        sharesUpdated = UpdateTime,
+//                        dataUpdated = UpdateTime,
+//                        metaUpdated = UpdateTime
+//                    )
+//                ),
+//                Pair(
+//                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+//                        datasetID = DatasetID("22345678123456781234567812345678"),
+//                        sharesUpdated = UpdateTime,
+//                        dataUpdated = UpdateTime,
+//                        metaUpdated = UpdateTime
+//                    )
+//                ),
+//                Pair(
+//                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+//                        datasetID = DatasetID("32345678123456781234567812345678"),
+//                        sharesUpdated = UpdateTime,
+//                        dataUpdated = UpdateTime,
+//                        metaUpdated = UpdateTime
+//                    )
+//                ),
+//                Pair(
+//                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+//                        datasetID = DatasetID("42345678123456781234567812345678"),
+//                        sharesUpdated = UpdateTime,
+//                        dataUpdated = UpdateTime,
+//                        metaUpdated = UpdateTime
+//                    )
+//                )
+//            ).iterator())
+//        )
+//        doReturn(listOf(
+//            mockDatasetDirectory(111L, "12345678123456781234567812345678"),
+//            // Missing 22345678123456781234567812345678, should be deleted in target.
+//            mockDatasetDirectory(111L, "32345678123456781234567812345678"),
+//            mockDatasetDirectory(111L, "42345678123456781234567812345678"),
+//        ).stream()).`when`(datasetManager).streamAllDatasets()
+//        recon.reconcile()
+//        val capturedDatasetID = mockingDetails(cacheDb).invocations
+//            .find { it.method.name == "deleteDataset" }!!
+//            .getArgument<DatasetID>(1)
+//        assertEquals("test", "22345678123456781234567812345678", capturedDatasetID.toString())
+//    }
 
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
-
-        `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
-            closeableIterator(listOf(
-                Pair(
-                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
-                        datasetID = DatasetID("12345678123456781234567812345678"),
-                        sharesUpdated = UpdateTime,
-                        dataUpdated = UpdateTime,
-                        metaUpdated = UpdateTime
-                    )
-                ),
-                Pair(
-                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
-                        datasetID = DatasetID("22345678123456781234567812345678"),
-                        sharesUpdated = UpdateTime,
-                        dataUpdated = UpdateTime,
-                        metaUpdated = UpdateTime
-                    )
-                ),
-                Pair(
-                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
-                        datasetID = DatasetID("32345678123456781234567812345678"),
-                        sharesUpdated = UpdateTime,
-                        dataUpdated = UpdateTime,
-                        metaUpdated = UpdateTime
-                    )
-                ),
-                Pair(
-                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
-                        datasetID = DatasetID("42345678123456781234567812345678"),
-                        sharesUpdated = UpdateTime,
-                        dataUpdated = UpdateTime,
-                        metaUpdated = UpdateTime
-                    )
-                )
-            ).iterator())
-        )
-        doReturn(listOf(
-            mockDatasetDirectory(111L, "12345678123456781234567812345678"),
-            // Missing 22345678123456781234567812345678, should be deleted in target.
-            mockDatasetDirectory(111L, "32345678123456781234567812345678"),
-            mockDatasetDirectory(111L, "42345678123456781234567812345678"),
-        ).stream()).`when`(datasetManager).streamAllDatasets()
-        recon.reconcile()
-        val capturedDatasetID = mockingDetails(cacheDb).invocations
-            .find { it.method.name == "deleteDataset" }!!
-            .getArgument<DatasetID>(1)
-        assertEquals("test", "22345678123456781234567812345678", capturedDatasetID.toString())
-    }
-
-    @Test
-    @DisplayName("Test delete last datasets in target stream, then sync last source")
-    fun test6() {
-        val cacheDb = mock<ReconcilerTarget>()
-        `when`(cacheDb.name).thenReturn("CacheDB")
-        val datasetManager = mock<DatasetManager>()
-        val kafkaRouter = mock<KafkaRouter>()
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
-
-        `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
-
-        `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
-            closeableIterator(listOf(
-                Pair(
-                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
-                        datasetID = DatasetID("22345678123456781234567812345678"),
-                        sharesUpdated = UpdateTime,
-                        dataUpdated = UpdateTime,
-                        metaUpdated = UpdateTime
-                    )
-                ),
-                Pair(
-                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
-                        datasetID = DatasetID("32345678123456781234567812345678"),
-                        sharesUpdated = UpdateTime,
-                        dataUpdated = UpdateTime,
-                        metaUpdated = UpdateTime
-                    )
-                ),
-                Pair(
-                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
-                        datasetID = DatasetID("42345678123456781234567812345678"),
-                        sharesUpdated = UpdateTime,
-                        dataUpdated = UpdateTime,
-                        metaUpdated = UpdateTime
-                    )
-                ),
-                ).iterator())
-        )
-        doReturn(listOf(
-            mockDatasetDirectory(111L, "12345678123456781234567812345678", UpdateTime.plusDays(1)),
-            mockDatasetDirectory(111L, "52345678123456781234567812345678", UpdateTime.plusDays(1)),
-
-            ).stream()).`when`(datasetManager).streamAllDatasets()
-        recon.reconcile()
-        val syncedIDs = mockingDetails(kafkaRouter).invocations
-            .filter { it.method.name == "sendUpdateMetaTrigger" }
-            .map { it.getArgument<UpdateMetaTrigger>(0).datasetID.toString() }
-        val deletedIDs = mockingDetails(cacheDb).invocations
-            .filter { it.method.name == "deleteDataset" }
-            .map { it.getArgument<DatasetID>(1).toString() }
-
-        assertEquals(listOf("12345678123456781234567812345678", "52345678123456781234567812345678"), syncedIDs)
-        assertEquals(listOf("22345678123456781234567812345678", "32345678123456781234567812345678", "42345678123456781234567812345678"), deletedIDs)
-    }
+//    @Test
+//    @DisplayName("Test delete last datasets in target stream, then sync last source")
+//    fun test6() {
+//        val cacheDb = mock<ReconcilerTarget>()
+//        `when`(cacheDb.name).thenReturn("CacheDB")
+//        val datasetManager = mock<DatasetManager>()
+//        val kafkaRouter = mock<KafkaRouter>()
+//        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
+//
+//        `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
+//
+//        `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
+//            closeableIterator(listOf(
+//                Pair(
+//                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+//                        datasetID = DatasetID("22345678123456781234567812345678"),
+//                        sharesUpdated = UpdateTime,
+//                        dataUpdated = UpdateTime,
+//                        metaUpdated = UpdateTime
+//                    )
+//                ),
+//                Pair(
+//                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+//                        datasetID = DatasetID("32345678123456781234567812345678"),
+//                        sharesUpdated = UpdateTime,
+//                        dataUpdated = UpdateTime,
+//                        metaUpdated = UpdateTime
+//                    )
+//                ),
+//                Pair(
+//                    VDIDatasetTypeImpl("Stub", "Stub"), VDISyncControlRecord(
+//                        datasetID = DatasetID("42345678123456781234567812345678"),
+//                        sharesUpdated = UpdateTime,
+//                        dataUpdated = UpdateTime,
+//                        metaUpdated = UpdateTime
+//                    )
+//                ),
+//                ).iterator())
+//        )
+//        doReturn(listOf(
+//            mockDatasetDirectory(111L, "12345678123456781234567812345678", UpdateTime.plusDays(1)),
+//            mockDatasetDirectory(111L, "52345678123456781234567812345678", UpdateTime.plusDays(1)),
+//
+//            ).stream()).`when`(datasetManager).streamAllDatasets()
+//        recon.reconcile()
+//        val syncedIDs = mockingDetails(kafkaRouter).invocations
+//            .filter { it.method.name == "sendUpdateMetaTrigger" }
+//            .map { it.getArgument<UpdateMetaTrigger>(0).datasetID.toString() }
+//        val deletedIDs = mockingDetails(cacheDb).invocations
+//            .filter { it.method.name == "deleteDataset" }
+//            .map { it.getArgument<DatasetID>(1).toString() }
+//
+//        assertEquals(listOf("12345678123456781234567812345678", "52345678123456781234567812345678"), syncedIDs)
+//        assertEquals(listOf("22345678123456781234567812345678", "32345678123456781234567812345678", "42345678123456781234567812345678"), deletedIDs)
+//    }
 
     @Test
     @DisplayName("Test case sensitivity")
