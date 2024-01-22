@@ -49,7 +49,7 @@ class RecordIterator(val rs: ResultSet,
         name = rs.getString("type_name"),
         version = rs.getString("type_version")
       ),
-      owner = UserID(rs.getLong("owner")),
+      owner = UserID(rs.getLong("owner_id")),
       syncControlRecord = VDISyncControlRecord(
         datasetID = DatasetID(rs.getString("dataset_id")),
         sharesUpdated = rs.getObject("shares_update_time", OffsetDateTime::class.java),
