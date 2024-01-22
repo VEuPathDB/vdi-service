@@ -63,21 +63,21 @@ class ReconcilerInstance(
 
         // Owner ID is included as part of sort, so it must be included when comparing streams.
         var comparableS3Id = "${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID}"
-        var comparableTargetId = nextTargetDataset!!.getComparableID()
+        var comparableTargetId: String? = nextTargetDataset!!.getComparableID()
 
         // If target dataset stream is "ahead" of source stream, delete
         // the datasets from the target stream until we are aligned
         // again (or the target stream is consumed).
-        if (comparableS3Id.compareTo(comparableTargetId, true) > 0) {
+        if (comparableS3Id.compareTo(comparableTargetId!!, true) > 0) {
 
           // Delete datasets until and advance target iterator until streams are aligned.
-          while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId, true) > 0) {
+          while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId!!, true) > 0) {
 
             logger().info("Attempting to delete dataset with owner $comparableTargetId " +
                     "because $comparableS3Id is lexigraphically greater than $comparableTargetId.")
             tryDeleteDataset(targetDB, nextTargetDataset!!.type, nextTargetDataset!!.syncControlRecord.datasetID)
             nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
-            comparableTargetId = nextTargetDataset!!.getComparableID()
+            comparableTargetId = nextTargetDataset?.getComparableID()
           }
         }
 

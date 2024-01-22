@@ -287,7 +287,6 @@ class ReconcilerTest {
         doReturn(listOf(
             mockDatasetDirectory(111L, "12345678123456781234567812345678", UpdateTime.plusDays(1)),
             mockDatasetDirectory(111L, "52345678123456781234567812345678", UpdateTime.plusDays(1)),
-
             ).stream()).`when`(datasetManager).streamAllDatasets()
         recon.reconcile()
         val syncedIDs = mockingDetails(kafkaRouter).invocations
