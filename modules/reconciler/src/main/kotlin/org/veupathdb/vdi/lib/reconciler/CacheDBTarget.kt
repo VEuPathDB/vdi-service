@@ -2,7 +2,7 @@ package org.veupathdb.vdi.lib.reconciler
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
-import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
@@ -12,7 +12,7 @@ class CacheDBTarget : ReconcilerTarget {
 
     override val type = ReconcilerTargetType.Cache
 
-    override fun streamSortedSyncControlRecords(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
+    override fun streamSortedSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord> {
         return CacheDB.selectAllSyncControlRecords()
     }
 

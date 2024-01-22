@@ -2,7 +2,7 @@ package org.veupathdb.vdi.lib.reconciler
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
-import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
@@ -15,7 +15,7 @@ class AppDBTarget(
 
     override val type = ReconcilerTargetType.Install
 
-    override fun streamSortedSyncControlRecords(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>> {
+    override fun streamSortedSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord> {
         return AppDB.accessor(projectID)!!.streamAllSyncControlRecords()
     }
 

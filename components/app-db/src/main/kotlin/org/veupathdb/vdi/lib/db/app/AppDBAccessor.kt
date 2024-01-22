@@ -3,7 +3,7 @@ package org.veupathdb.vdi.lib.db.app
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetType
+import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.model.*
@@ -84,7 +84,7 @@ interface AppDBAccessor {
    * @return Stream of dataset control records sorted by user ID and then dataset ID. The stream
    * must be closed to release the db connection.
    */
-  fun streamAllSyncControlRecords(): CloseableIterator<Pair<VDIDatasetType, VDISyncControlRecord>>
+  fun streamAllSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord>
 
   /**
    * Retrieves all datasets that have an install message record for the given

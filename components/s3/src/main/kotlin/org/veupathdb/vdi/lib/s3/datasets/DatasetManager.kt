@@ -1,13 +1,17 @@
 package org.veupathdb.vdi.lib.s3.datasets
 
+import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
+import org.veupathdb.vdi.lib.s3.datasets.exception.MalformedDatasetException
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3DatasetPathFactory
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3PathFactory
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
+import vdi.component.metrics.Metrics
+
 import java.util.*
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
@@ -75,6 +79,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
   private class DatasetDirIterator(
     private val objectStream: Iterator<S3Object>
   ) : Iterator<DatasetDirectory> {
+    private val log = LoggerFactory.getLogger(javaClass)
     private var stagedObjects: List<S3Object> = mutableListOf()
     private var currentDataset: DatasetDirectory? = initFirstDataset()
 
@@ -107,25 +112,35 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
         if (initialDatasetID != currDatasetID) {
           // We've found a new dataset, construct our currentDataset with objects seen so far and reset objects variable
           // to contain the new dataset's object.
-          currentDataset = EagerlyLoadedDatasetDirectory(
-            stagedObjects,
-            initialUserID,
-            initialDatasetID,
-            S3DatasetPathFactory(initialUserID, initialDatasetID)
-          )
+          try {
+            currentDataset = EagerlyLoadedDatasetDirectory(
+              stagedObjects,
+              initialUserID,
+              initialDatasetID,
+              S3DatasetPathFactory(initialUserID, initialDatasetID)
+            )
+          } catch (e: MalformedDatasetException) {
+            Metrics.malformedDatasetFound.inc()
+            log.warn("Found a malformed dataset with ID $initialDatasetID.")
+          }
           // Set staged objects to contain the object belonging to new dataset.
           stagedObjects = mutableListOf(s3Object)
           return currentDataset
         }
         stagedObjects = stagedObjects + s3Object
         if (!objectStream.hasNext()) {
-          // Special handling if there's a single directory in the stream.
-          currentDataset = EagerlyLoadedDatasetDirectory(
-            stagedObjects,
-            initialUserID,
-            initialDatasetID,
-            S3DatasetPathFactory(initialUserID, initialDatasetID)
-          )
+          try {
+            // Special handling if there's a single directory in the stream.
+            currentDataset = EagerlyLoadedDatasetDirectory(
+              stagedObjects,
+              initialUserID,
+              initialDatasetID,
+              S3DatasetPathFactory(initialUserID, initialDatasetID)
+            )
+          } catch (e: MalformedDatasetException) {
+            Metrics.malformedDatasetFound.inc()
+            log.warn("Found a malformed dataset with ID $initialDatasetID.")
+          }
           // Stream is exhausted. Indicate as much.
           stagedObjects = emptyList()
         }
