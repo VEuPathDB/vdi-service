@@ -21,7 +21,7 @@ SELECT
 , s.dataset_id
 , d.type_name
 , d.type_version
-, d.owner
+, d.owner_id
 FROM
   vdi.sync_control AS s
   INNER JOIN vdi.datasets AS d
