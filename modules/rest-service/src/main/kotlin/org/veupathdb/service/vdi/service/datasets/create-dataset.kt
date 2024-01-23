@@ -2,7 +2,6 @@ package org.veupathdb.service.vdi.service.datasets
 
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.InternalServerErrorException
-import org.apache.logging.log4j.core.util.ExecutorServices
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import org.veupathdb.service.vdi.config.Options
@@ -26,6 +25,7 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import vdi.component.metrics.Metrics
 import java.net.URL
 import java.nio.file.Path
 import java.time.OffsetDateTime
@@ -37,7 +37,6 @@ private val log = LoggerFactory.getLogger("create-dataset.kt")
 
 private val WorkPool = Executors.newFixedThreadPool(10)
 
-@OptIn(ExperimentalPathApi::class)
 fun createDataset(
   userID: UserID,
   datasetID: DatasetID,
@@ -97,6 +96,23 @@ fun createDataset(
     ))
   }
 
+  WorkPool.submit {
+    Metrics.uploadQueueSize.inc()
+    try {
+      uploadFiles(userID, datasetID, entity, datasetMeta)
+    } finally {
+      Metrics.uploadQueueSize.dec()
+    }
+  }
+}
+
+@OptIn(ExperimentalPathApi::class)
+private fun uploadFiles(
+  userID: UserID,
+  datasetID: DatasetID,
+  entity: DatasetPostRequest,
+  datasetMeta: VDIDatasetMeta,
+) {
   // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
   TempFiles.withTempDirectory { directory ->
     TempFiles.withTempPath { archive ->
@@ -113,6 +129,9 @@ fun createDataset(
         DatasetStore.putUserUpload(userID, datasetID, archive::inputStream)
 
         CacheDB.withTransaction { it.insertUploadFiles(datasetID, sizes) }
+      } catch (e: Throwable) {
+        CacheDB.withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+        throw e
       } finally {
         paths.second.deleteIfExists()
         paths.first?.deleteRecursively()
@@ -120,8 +139,13 @@ fun createDataset(
     }
   }
 
-  log.debug("uploading dataset metadata to S3 for new dataset {} by user {}", datasetID, userID)
-  DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
+  try {
+    log.debug("uploading dataset metadata to S3 for new dataset {} by user {}", datasetID, userID)
+    DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
+  } catch (e: Throwable) {
+    CacheDB.withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+    throw e
+  }
 }
 
 private fun verifyFileSize(file: Path, userID: UserID) {

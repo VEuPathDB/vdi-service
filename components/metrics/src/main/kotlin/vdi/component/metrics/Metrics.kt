@@ -1,6 +1,7 @@
 package vdi.component.metrics
 
 import io.prometheus.client.Counter
+import io.prometheus.client.Gauge
 import io.prometheus.client.Histogram
 
 object Metrics {
@@ -169,5 +170,10 @@ object Metrics {
       600.0, // 10 minutes
       900.0, // 15 minutes
     )
+    .register()
+
+  val uploadQueueSize: Gauge = Gauge.build()
+    .name("dataset_upload_queue_size")
+    .help("Number of dataset uploads currently queued to be processed.")
     .register()
 }
