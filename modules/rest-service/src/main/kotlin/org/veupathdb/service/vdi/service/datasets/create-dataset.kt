@@ -2,6 +2,7 @@ package org.veupathdb.service.vdi.service.datasets
 
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.InternalServerErrorException
+import org.apache.logging.log4j.core.util.ExecutorServices
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import org.veupathdb.service.vdi.config.Options
@@ -28,10 +29,13 @@ import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import java.net.URL
 import java.nio.file.Path
 import java.time.OffsetDateTime
+import java.util.concurrent.Executors
 import kotlin.io.path.*
 import kotlin.math.max
 
 private val log = LoggerFactory.getLogger("create-dataset.kt")
+
+private val WorkPool = Executors.newFixedThreadPool(10)
 
 @OptIn(ExperimentalPathApi::class)
 fun createDataset(
