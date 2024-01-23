@@ -108,6 +108,127 @@ class DatasetManagerTest {
         assertThat(datasets, Matchers.hasSize(1))
     }
 
+    @Test
+    @DisplayName("Test dataset with garbage.")
+    fun test5() {
+        val firstPathFactory = S3DatasetPathFactory(TestUserID1, DatasetID1)
+        val secondPathFactory = S3DatasetPathFactory(TestUserID1, DatasetID2)
+        val thirdPathFactory = S3DatasetPathFactory(TestUserID2, DatasetID3)
+
+        val mockedS3 = mockS3List(listOf(
+            // First dataset has just meta
+            firstPathFactory.datasetMetaFile(),
+
+            // Random garbage path should be skipped.
+            "$TestUserID1/Broken-path",
+
+            // Second dataset with just meta
+            secondPathFactory.datasetMetaFile(),
+
+            // Third dataset with meta and shares.
+            thirdPathFactory.datasetMetaFile(),
+            thirdPathFactory.datasetShareOfferFile(TestUserID1),
+            thirdPathFactory.datasetShareReceiptFile(TestUserID1)
+        ))
+        val datasetManager = DatasetManager(mockedS3)
+        val datasets = datasetManager.streamAllDatasets().toList()
+        assertThat(datasets, Matchers.hasSize(3))
+        assertThat(datasets.last().getShares().entries, Matchers.hasSize(1))
+    }
+
+    @Test
+    @DisplayName("Test dataset with good stuff and garbage.")
+    fun test6() {
+        val firstPathFactory = S3DatasetPathFactory(TestUserID1, DatasetID1)
+        val secondPathFactory = S3DatasetPathFactory(TestUserID1, DatasetID2)
+        val thirdPathFactory = S3DatasetPathFactory(TestUserID2, DatasetID3)
+
+        val mockedS3 = mockS3List(listOf(
+            // All part of the first dataset. The whole first ds should be discarded.
+            firstPathFactory.datasetMetaFile(),
+            "$TestUserID1/$DatasetID1/Broken-path1",
+            "$TestUserID1/$DatasetID1/Broken-path2",
+
+            // Second dataset with just meta.
+            secondPathFactory.datasetMetaFile(),
+            thirdPathFactory.datasetMetaFile(),
+
+            // Third dataset with just shares.
+            thirdPathFactory.datasetShareOfferFile(TestUserID1),
+            thirdPathFactory.datasetShareReceiptFile(TestUserID1)
+        ))
+        val datasetManager = DatasetManager(mockedS3)
+        val datasets = datasetManager.streamAllDatasets().toList()
+        assertThat(datasets, Matchers.hasSize(2))
+        assertThat(datasets.last().getShares().entries, Matchers.hasSize(1))
+    }
+
+    @Test
+    @DisplayName("First file is garbage.")
+    fun test7() {
+        val firstPathFactory = S3DatasetPathFactory(TestUserID1, DatasetID1)
+        val secondPathFactory = S3DatasetPathFactory(TestUserID1, DatasetID2)
+        val thirdPathFactory = S3DatasetPathFactory(TestUserID2, DatasetID3)
+
+        val mockedS3 = mockS3List(listOf(
+            // All part of the first dataset. The whole first ds should be discarded.
+            "$TestUserID1/$DatasetID1/Broken-path1",
+            "$TestUserID1/$DatasetID1/Broken-path2",
+            firstPathFactory.datasetMetaFile(),
+
+            // Second dataset with just meta.
+            secondPathFactory.datasetMetaFile(),
+
+            // Third dataset with meta and shares.
+            thirdPathFactory.datasetMetaFile(),
+            thirdPathFactory.datasetShareOfferFile(TestUserID1),
+            thirdPathFactory.datasetShareReceiptFile(TestUserID1)
+        ))
+        val datasetManager = DatasetManager(mockedS3)
+        val datasets = datasetManager.streamAllDatasets().toList()
+        assertThat(datasets, Matchers.hasSize(2))
+        assertThat(datasets.last().getShares().entries, Matchers.hasSize(1))
+    }
+
+    @Test
+    @DisplayName("Last dataset is garbage.")
+    fun test8() {
+        val firstPathFactory = S3DatasetPathFactory(TestUserID1, DatasetID1)
+        val secondPathFactory = S3DatasetPathFactory(TestUserID1, DatasetID2)
+        val thirdPathFactory = S3DatasetPathFactory(TestUserID2, DatasetID3)
+
+        val mockedS3 = mockS3List(listOf(
+            // First dataset with just meta
+            firstPathFactory.datasetMetaFile(),
+
+            // Second dataset with just meta.
+            secondPathFactory.datasetMetaFile(),
+
+            // Third dataset with meta and shares and broken paths.
+            thirdPathFactory.datasetMetaFile(),
+            thirdPathFactory.datasetShareOfferFile(TestUserID2),
+            thirdPathFactory.datasetShareReceiptFile(TestUserID2),
+
+            "$TestUserID1/$DatasetID3/Broken-path1",
+            "$TestUserID1/$DatasetID3/Broken-path2",
+        ))
+        val datasetManager = DatasetManager(mockedS3)
+        val datasets = datasetManager.streamAllDatasets().toList()
+        assertThat(datasets, Matchers.hasSize(2))
+    }
+
+    @Test
+    @DisplayName("Only one dataset and it's broken.")
+    fun test9() {
+        val mockedS3 = mockS3List(listOf(
+            "$TestUserID1/$DatasetID1/Broken-path1",
+            "$TestUserID1/$DatasetID1/Broken-path2",
+        ))
+        val datasetManager = DatasetManager(mockedS3)
+        val datasets = datasetManager.streamAllDatasets().toList()
+        assertThat(datasets, Matchers.hasSize(0))
+    }
+
     private fun mockS3List(objectPaths: List<String>): S3Bucket {
         val mockedS3 = mock<S3Bucket>()
         val mockedObjectContainer = mock<ObjectContainer>()

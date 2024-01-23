@@ -24,7 +24,7 @@ class IndexKtTest {
       assertEquals("bucket", path.bucketName)
       assertEquals("vdi", path.rootSegment)
       assertEquals("111", path.userID.toString())
-      assertEquals("AA41EFE0A1B3EEB9BF303E4561FF8392", path.datasetID.toString())
+      assertEquals("aa41efe0a1b3eeb9bf303e4561ff8392", path.datasetID.toString())
       assertEquals("foo.txt", path.subPath)
     }
 
@@ -38,7 +38,7 @@ class IndexKtTest {
       assertEquals("bucket", path.bucketName)
       assertEquals("vdi", path.rootSegment)
       assertEquals("111", path.userID.toString())
-      assertEquals("AA41EFE0A1B3EEB9BF303E4561FF8392", path.datasetID.toString())
+      assertEquals("aa41efe0a1b3eeb9bf303e4561ff8392", path.datasetID.toString())
       assertEquals("foo.txt", path.subPath)
     }
 
@@ -52,7 +52,7 @@ class IndexKtTest {
       assertEquals("bucket", path.bucketName)
       assertEquals("vdi", path.rootSegment)
       assertEquals("111", path.userID.toString())
-      assertEquals("AA41EFE0A1B3EEB9BF303E4561FF8392", path.datasetID.toString())
+      assertEquals("aa41efe0a1b3eeb9bf303e4561ff8392", path.datasetID.toString())
       assertEquals("222", path.recipientID.toString())
       assertEquals("offer.json", path.subPath)
     }
@@ -67,7 +67,7 @@ class IndexKtTest {
       assertEquals("bucket", path.bucketName)
       assertEquals("vdi", path.rootSegment)
       assertEquals("111", path.userID.toString())
-      assertEquals("AA41EFE0A1B3EEB9BF303E4561FF8392", path.datasetID.toString())
+      assertEquals("aa41efe0a1b3eeb9bf303e4561ff8392", path.datasetID.toString())
       assertEquals("butt.xml", path.subPath)
     }
   }
