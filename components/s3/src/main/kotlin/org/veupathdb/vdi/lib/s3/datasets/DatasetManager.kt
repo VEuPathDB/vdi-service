@@ -110,6 +110,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
         s3Object = objectStream.next()
         val (_, currDatasetID) = datasetIdFromS3Object(s3Object)
         if (initialDatasetID != currDatasetID) {
+
           // We've found a new dataset, construct our currentDataset with objects seen so far and reset objects variable
           // to contain the new dataset's object.
           try {
@@ -120,15 +121,21 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
               S3DatasetPathFactory(initialUserID, initialDatasetID)
             )
           } catch (e: MalformedDatasetException) {
+            // Dataset is broken. Everything in staged objects is part of a malformed dataset. Let's skip this dataset
+            // and find the next dataset.
             Metrics.malformedDatasetFound.inc()
             initialDatasetID = currDatasetID
+            stagedObjects = emptyList()
             log.warn("Found a malformed dataset with ID $initialDatasetID.")
             continue
           }
-          // Set staged objects to contain the object belonging to new dataset.
+
+          // Set staged objects to contain just the object belonging to new dataset.
           stagedObjects = mutableListOf(s3Object)
           return currentDataset
         }
+
+        // initialDatasetID == currDatasetID, add this object to the staged objects.
         stagedObjects = stagedObjects + s3Object
         if (!objectStream.hasNext()) {
           try {
@@ -142,6 +149,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
           } catch (e: MalformedDatasetException) {
             Metrics.malformedDatasetFound.inc()
             log.warn("Found a malformed dataset with ID $initialDatasetID.")
+            stagedObjects = emptyList()
             return null
           }
           // Stream is exhausted. Indicate as much.
@@ -158,26 +166,38 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
     private fun prepNext(): DatasetDirectory? {
       while (true) {
         if (!objectStream.hasNext()) {
+
+          // Stream is exhausted.
           if (stagedObjects.isNotEmpty()) {
-            // Stream is exhausted, construct a dataset out of remaining objects.
+
+            // Construct a dataset out of remaining staged objects.
             val idsFromObject = datasetIdFromS3Object(stagedObjects.first())
             val pathFactory = S3DatasetPathFactory(idsFromObject.first, idsFromObject.second)
             try {
               this.currentDataset = EagerlyLoadedDatasetDirectory(stagedObjects, idsFromObject.first, idsFromObject.second, pathFactory)
             } catch (e: MalformedDatasetException) {
+              // Dataset is malformed, note it and return null since our stream is exhausted.
               Metrics.malformedDatasetFound.inc()
               log.warn("Found a malformed dataset with ID $idsFromObject.")
+              this.currentDataset = null
               return null
             }
             stagedObjects = emptyList()
             return currentDataset
           }
+
+          // Nothing staged and stream is exhausted, we're done!
           this.currentDataset = null
           return null
         }
+
+        // Get the userID and datasetID of the staged objects.
         val (currUserID, currDatasetID) = datasetIdFromS3Object(stagedObjects.first())
+
+        // Get the next object and the userID/datasetID of the next object in the stream.
         val s3Object = objectStream.next()
         val (_, nextObjectDatasetID) = datasetIdFromS3Object(s3Object)
+
         // Check if the next object in the stream is in the same dataset as staged objects.
         if (currDatasetID == nextObjectDatasetID) {
           // If so, add to staged objects.
@@ -190,8 +210,11 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
             stagedObjects = mutableListOf(s3Object)
             return currentDataset
           } catch (e: MalformedDatasetException) {
+            // Dataset is malformed. Note it, and set staged objects to the next object in stream to start accumulating
+            // objects for the next dataset.
             Metrics.malformedDatasetFound.inc()
             log.warn("Found a malformed dataset with ID $currDatasetID.")
+            stagedObjects = mutableListOf(s3Object)
             continue
           }
         }

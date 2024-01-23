@@ -2,6 +2,10 @@ plugins {
   kotlin("jvm")
 }
 
+tasks.test {
+  useJUnitPlatform()
+}
+
 dependencies {
   implementation(platform(project(":platform")))
 
