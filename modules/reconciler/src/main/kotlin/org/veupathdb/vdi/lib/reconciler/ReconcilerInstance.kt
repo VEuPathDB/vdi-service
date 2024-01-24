@@ -74,7 +74,7 @@ class ReconcilerInstance(
           while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId!!, true) > 0) {
 
             logger().info("Attempting to delete dataset with owner $comparableTargetId " +
-                    "because $comparableS3Id is lexigraphically greater than $comparableTargetId.")
+                    "because $comparableS3Id is lexigraphically greater than $comparableTargetId. Presumably $comparableTargetId is not in MinIO.")
             tryDeleteDataset(targetDB, nextTargetDataset!!.type, nextTargetDataset!!.syncControlRecord.datasetID)
             nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
             comparableTargetId = nextTargetDataset?.getComparableID()
