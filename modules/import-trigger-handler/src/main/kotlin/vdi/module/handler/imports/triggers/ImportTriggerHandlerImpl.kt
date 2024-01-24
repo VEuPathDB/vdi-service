@@ -233,7 +233,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       dataFiles.forEach { dataFile -> sizes[dataFile.name] = dataFile.fileSize() }
 
       TempFiles.withTempFile { tempFile ->
-        Zip.compress(tempFile, dataFiles, Zip.Level(0u))
+        Zip.compress(tempFile, dataFiles)
         dd.putDataFile(InstallZipName) { tempFile.inputStream() }
       }
 
