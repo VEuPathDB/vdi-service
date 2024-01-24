@@ -68,10 +68,10 @@ class ReconcilerInstance(
         // If target dataset stream is "ahead" of source stream, delete
         // the datasets from the target stream until we are aligned
         // again (or the target stream is consumed).
-        if (comparableS3Id.compareTo(comparableTargetId!!, true) > 0) {
+        if (comparableS3Id.compareTo(comparableTargetId!!, false) > 0) {
 
           // Delete datasets until and advance target iterator until streams are aligned.
-          while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId!!, true) > 0) {
+          while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId!!, false) > 0) {
 
             logger().info("Attempting to delete dataset with owner $comparableTargetId " +
                     "because $comparableS3Id is lexigraphically greater than $comparableTargetId. Presumably $comparableTargetId is not in MinIO.")
@@ -91,7 +91,7 @@ class ReconcilerInstance(
         comparableS3Id = "${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID}"
         comparableTargetId = nextTargetDataset!!.getComparableID()
 
-        if (comparableS3Id.compareTo(comparableTargetId, true) < 0) {
+        if (comparableS3Id.compareTo(comparableTargetId, false) < 0) {
           // Dataset is in source, but not in target. Send an event.
           Metrics.missingInTarget.labels(targetDB.name).inc()
           sendSyncIfRelevant(sourceDatasetDir)
