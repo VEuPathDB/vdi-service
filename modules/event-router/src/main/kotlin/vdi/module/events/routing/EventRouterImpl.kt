@@ -91,7 +91,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
         // remove everything.  This event should be one of many for this
         // specific dataset.
         event.eventType.action == MinIOEventAction.DELETE -> {
-          log.debug("received a hard delete event for dataset {} owned by user {} for MinIO key {}", path.datasetID.toString(), path.userID.toString(), event.objectKey)
+          log.debug("received a hard delete event for dataset {}/{} for MinIO key {}", path.userID.toString(), path.datasetID.toString(), event.objectKey)
 
           safeSend(HardDeleteTrigger(path.userID, path.datasetID), kr::sendHardDeleteTrigger)
         }
@@ -100,14 +100,14 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
         // only ever put something in the upload directory when the dataset is
         // first uploaded by the client.
         path is VDUploadPath -> {
-          log.debug("received an import event for dataset {} owned by user {}", path.datasetID, path.userID)
+          log.debug("received an import event for dataset {}/{}", path.userID, path.datasetID)
 
           safeSend(ImportTrigger(path.userID, path.datasetID), kr::sendImportTrigger)
         }
 
         // If the meta file was updated...
         path is VDDatasetFilePath && path.subPath == DatasetMetaFilename -> {
-          log.debug("received an metadata event for dataset {} owned by user {}", path.datasetID, path.userID)
+          log.debug("received an metadata event for dataset {}/{}", path.userID, path.datasetID)
 
           safeSend(UpdateMetaTrigger(path.userID, path.datasetID), kr::sendUpdateMetaTrigger)
           safeSend(ImportTrigger(path.userID, path.datasetID), kr::sendImportTrigger)
@@ -116,21 +116,21 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
         // If the path was to a soft delete flag then we have a soft-delete
         // event.
         path is VDDatasetFilePath && path.subPath == S3Paths.DELETE_FLAG_FILE_NAME -> {
-          log.debug("received a soft delete event for dataset {} owned by user {}", path.datasetID, path.userID)
+          log.debug("received a soft delete event for dataset {}/{}", path.userID, path.datasetID)
 
           safeSend(SoftDeleteTrigger(path.userID, path.datasetID), kr::sendSoftDeleteTrigger)
         }
 
         // If the path is to a share file then we have a share event.
         path is VDDatasetShareFilePath -> {
-          log.debug("received a share event for dataset {} owned by user {}", path.datasetID, path.userID)
+          log.debug("received a share event for dataset {}/{}", path.userID, path.datasetID)
 
           safeSend(ShareTrigger(path.userID, path.datasetID), kr::sendShareTrigger)
         }
 
         // Else, we have an install event.
         else                                              -> {
-          log.debug("received an install event for dataset {} owned by user {}", path.datasetID, path.userID)
+          log.debug("received an install event for dataset {}/{}", path.userID, path.datasetID)
 
           safeSend(InstallTrigger(path.userID, path.datasetID), kr::sendInstallTrigger)
         }

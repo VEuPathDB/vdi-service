@@ -6,6 +6,6 @@ import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 
 data class DatasetShare(
   val recipientID: UserID,
-  val offerStatus: VDIShareOfferAction,
-  val receiptStatus: VDIShareReceiptAction,
+  val offerStatus: VDIShareOfferAction?,
+  val receiptStatus: VDIShareReceiptAction?,
 )

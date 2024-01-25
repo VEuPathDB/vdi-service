@@ -69,7 +69,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   }
 
   // Lookup user details for the dataset's owner and any share users
-  val userDetails = AccountDB.lookupUserDetails(HashSet<UserID>(shares.size + 1)
+  val userDetails = AccountDB.lookupUserDetails(HashSet<UserID>(shares.size + 2)
     .apply {
       add(userID)
       add(dataset.ownerID)
@@ -113,10 +113,11 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     }
 
     shares.forEach { share ->
-      out.shares.add(ShareOffer(
-        userDetails[share.recipientID] ?: throw IllegalStateException("no user details for share recipient"),
-        share.offerStatus
-      ))
+      if (share.offerStatus != null)
+        out.shares.add(ShareOffer(
+          userDetails[share.recipientID] ?: throw IllegalStateException("no user details for share recipient"),
+          share.offerStatus!!
+        ))
     }
   }
 }
