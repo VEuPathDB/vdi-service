@@ -195,7 +195,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       // Iterate through all the shares that appear in S3...
       shares.forEach { (shareRecipientUserID, shareDetails) ->
 
-        // Figure out what the state of the shares are in S3 (what file exist
+        // Figure out what the state of the shares are in S3 (what files exist
         // and what they say).
         val shareState = computeShareState(shareDetails)
 
@@ -315,17 +315,17 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
           log.debug("removing dataset {}/{} visibility from user {} as per S3 share state", dataset.ownerID, dataset.datasetID, shareRecipient)
           db.deleteDatasetVisibility(dataset.datasetID, shareRecipient)
         }
-
-        // All the visibility records remaining in the recipient ID set from the
-        // target app database are invalid as they have no matching records in
-        // S3.  Purge them from the target app database.
-        visibilityRecords.forEach { recipientUserID ->
-          log.debug("removing dataset {}/{} visibility from user {} as S3 contains no such share", dataset.ownerID, dataset.datasetID, shareRecipient)
-          db.deleteDatasetVisibility(dataset.datasetID, recipientUserID)
-        }
-
-        db.updateSyncControlSharesTimestamp(dataset.datasetID, latestShareTimestamp)
       }
+
+      // All the visibility records remaining in the recipient ID set from the
+      // target app database are invalid as they have no matching records in S3.
+      // Purge them from the target app database.
+      visibilityRecords.forEach { recipientUserID ->
+        log.debug("removing dataset {}/{} visibility from user {} as S3 contains no such share", dataset.ownerID, dataset.datasetID, shareRecipient)
+        db.deleteDatasetVisibility(dataset.datasetID, recipientUserID)
+      }
+
+      db.updateSyncControlSharesTimestamp(dataset.datasetID, latestShareTimestamp)
     }
   }
 
