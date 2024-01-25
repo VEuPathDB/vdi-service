@@ -321,7 +321,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       // target app database are invalid as they have no matching records in S3.
       // Purge them from the target app database.
       visibilityRecords.forEach { recipientUserID ->
-        log.debug("removing dataset {}/{} visibility from user {} as S3 contains no such share", dataset.ownerID, dataset.datasetID, shareRecipient)
+        log.debug("removing dataset {}/{} visibility from user {} as S3 contains no such share", dataset.ownerID, dataset.datasetID, recipientUserID)
         db.deleteDatasetVisibility(dataset.datasetID, recipientUserID)
       }
 
