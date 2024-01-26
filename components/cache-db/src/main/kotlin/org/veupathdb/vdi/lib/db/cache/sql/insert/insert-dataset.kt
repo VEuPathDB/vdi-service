@@ -37,7 +37,7 @@ internal fun Connection.tryInsertDatasetRecord(
 ) =
   preparedUpdate(SQL) {
     setDatasetID(1, datasetID)
-    setString(2, typeName)
+    setString(2, typeName.lowercase())
     setString(3, typeVersion)
     setUserID(4, ownerID)
     setBoolean(5, isDeleted)
