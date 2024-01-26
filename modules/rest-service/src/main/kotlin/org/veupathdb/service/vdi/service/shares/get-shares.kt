@@ -53,7 +53,7 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
     ShareOfferEntry(
       datasetID              = it.datasetID,
       shareStatus            = ShareFilterStatus.Open,
-      datasetTypeName        = it.typeName,
+      datasetTypeName        = it.typeName.lowercase(),
       datasetTypeVersion     = it.typeVersion,
       datasetTypeDisplayName = typeDisplayName,
       owner                  = owners[it.ownerID] ?: throw IllegalStateException("unknown dataset owner ${it.ownerID}"),

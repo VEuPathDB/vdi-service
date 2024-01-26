@@ -103,16 +103,7 @@ private fun DatasetRecord.toDetails(
   BrokenDatasetDetailsImpl().also { out ->
     out.datasetId   = datasetID.toString()
     out.owner       = owner.toLong()
-    out.datasetType = getTypeInfo()
+    out.datasetType = DatasetTypeInfo(typeName, typeVersion)
     out.projectIds  = projects.toList()
     out.status      = DatasetStatusInfo(DatasetImportStatus.Complete, statuses)
   }
-
-private fun DatasetRecord.getTypeInfo(): DatasetTypeInfo {
-  return DatasetTypeInfo(
-    typeName,
-    typeVersion,
-    PluginHandlers[typeName, typeVersion]?.displayName
-      ?: throw IllegalStateException("plugin type missing: ${typeName}:${typeVersion}")
-  )
-}

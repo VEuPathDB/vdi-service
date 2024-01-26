@@ -43,7 +43,6 @@ class VDIDatasetFilesController(@Context request: ContainerRequest) : VdiDataset
           .headersFor200()
           .withContentDisposition("attachment; filename=\"$datasetID-upload.zip\"")
       )
-
   }
 
   @AllowAdminAuth
