@@ -271,7 +271,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     shares: Map<UserID, S3Share>,
     latestShareTimestamp: OffsetDateTime,
   ) {
-    log.info("processing shares for dataset {}/{} in project {}", dataset.ownerID, dataset.datasetID, projectID)
+    log.info("synchronizing shares for dataset {}/{} in project {}", dataset.ownerID, dataset.datasetID, projectID)
 
     AppDB.withTransaction(projectID) { db ->
       // Get a set of the recipient user IDs for all the users that this
@@ -288,7 +288,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
 
       // For all the shares (complete or partial) that appear in S3...
       shares.forEach { (shareRecipient, shareDetails) ->
-        log.debug("examining share for dataset {}/{} to user {}", dataset.ownerID, dataset.datasetID, shareRecipient)
+        log.debug("examining share for dataset {}/{} to user {} in project {}", dataset.ownerID, dataset.datasetID, shareRecipient, projectID)
 
         // Figure out what's going on with the share, as in what share files
         // exist and what the files that do exist say.
@@ -304,26 +304,37 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
         // existed, or been created by a competing worker, unique constraint
         // violations will be ignored on insert.
         if (shareState.visibleInTarget) {
-          log.debug("ensuring dataset {}/{} is visible to user {}", dataset.ownerID, dataset.datasetID, shareRecipient)
-          db.tryInsertDatasetVisibility(dataset.ownerID, dataset.datasetID, shareRecipient)
+          log.debug("ensuring dataset {}/{} is visible to user {} in project {}", dataset.ownerID, dataset.datasetID, shareRecipient, projectID)
+          db.tryInsertDatasetVisibility(dataset.ownerID, dataset.datasetID, projectID, shareRecipient)
         }
 
         // If the dataset should not be visible to the recipient user as
         // determined by examining the S3 share state, attempt to remove any
         // existing visibility record.
         else {
-          log.debug("removing dataset {}/{} visibility from user {} as per S3 share state", dataset.ownerID, dataset.datasetID, shareRecipient)
+          log.info("removing dataset {}/{} visibility from user {} in project {} as per S3 share state", dataset.ownerID, dataset.datasetID, shareRecipient, projectID)
           db.deleteDatasetVisibility(dataset.datasetID, shareRecipient)
         }
       }
+
+      // Because the app DB visibility record is also used to indicate the
+      // visibility of a dataset to that dataset's owner, we need to remove the
+      // owner user ID from the visibility records to avoid the following loop
+      // from removing the dataset owner's visibility record.
+      visibilityRecords.remove(dataset.ownerID)
 
       // All the visibility records remaining in the recipient ID set from the
       // target app database are invalid as they have no matching records in S3.
       // Purge them from the target app database.
       visibilityRecords.forEach { recipientUserID ->
-        log.debug("removing dataset {}/{} visibility from user {} as S3 contains no such share", dataset.ownerID, dataset.datasetID, recipientUserID)
+        log.info("removing dataset {}/{} visibility from user {} in project {} as S3 contains no such share", dataset.ownerID, dataset.datasetID, recipientUserID, projectID)
         db.deleteDatasetVisibility(dataset.datasetID, recipientUserID)
       }
+
+      // In case the dataset owner's visibility record was accidentally deleted
+      // by a user, bug, or other process, ensure that the record exists in the
+      // target app db.
+      db.tryInsertDatasetVisibility(dataset.ownerID, dataset.datasetID, projectID, dataset.ownerID)
 
       db.updateSyncControlSharesTimestamp(dataset.datasetID, latestShareTimestamp)
     }
@@ -335,7 +346,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     dataset.projects.forEach { projectID ->
 
       if (projectID !in AppDatabaseRegistry) {
-        log.debug("cannot purge dataset visibility records for dataset {}/{} from project {} as that target is not currently enabled", dataset.ownerID, dataset.datasetID, projectID)
+        log.warn("cannot purge dataset visibility records for dataset {}/{} from project {} as that target is not currently enabled", dataset.ownerID, dataset.datasetID, projectID)
         return@forEach
       }
 
@@ -357,9 +368,17 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       },
     )
 
-  private fun AppDBTransaction.tryInsertDatasetVisibility(ownerID: UserID, datasetID: DatasetID, recipientID: UserID) {
+  private fun AppDBTransaction.tryInsertDatasetVisibility(
+    ownerID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    recipientID: UserID
+  ) {
     try {
       insertDatasetVisibility(datasetID, recipientID)
+      // This log is here because we only want an info level line for attempted
+      // actions that actually resulted in something happening.
+      log.info("created dataset visibility record from dataset {}/{} to recipient {} in project {}", ownerID, datasetID, recipientID, projectID)
     } catch (e: SQLException) {
       if (e.errorCode == UniqueConstraintViolation) {
         log.debug("share insert race condition: dataset {}/{} already shared with {}", ownerID, datasetID, recipientID)
