@@ -20,4 +20,4 @@ internal fun DatasetTypeInfo(name: String, version: String, displayName: String)
 
 internal fun DatasetTypeInfo(name: String, version: String): DatasetTypeInfo =
   DatasetTypeInfo(name, version, PluginHandlers[name, version]?.displayName
-      ?: throw IllegalStateException("missing dataset type name"))
+      ?: throw IllegalStateException("missing plugin handler for plugin $name $version"))
