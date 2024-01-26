@@ -49,7 +49,6 @@ object AppDatabaseRegistry {
   private fun hasEnvPrefix(key: String) =
     key.startsWith(EnvKey.AppDB.DBNamePrefix) ||
     key.startsWith(EnvKey.AppDB.DBLDAPPrefix) ||
-    key.startsWith(EnvKey.AppDB.DBUserPrefix) ||
     key.startsWith(EnvKey.AppDB.DBPassPrefix) ||
     key.startsWith(EnvKey.AppDB.DBPoolPrefix) ||
     key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix) ||
@@ -60,7 +59,6 @@ object AppDatabaseRegistry {
     when {
       key.startsWith(EnvKey.AppDB.DBNamePrefix)          -> getEnvName(EnvKey.AppDB.DBNamePrefix, key)
       key.startsWith(EnvKey.AppDB.DBLDAPPrefix)          -> getEnvName(EnvKey.AppDB.DBLDAPPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBUserPrefix)          -> getEnvName(EnvKey.AppDB.DBUserPrefix, key)
       key.startsWith(EnvKey.AppDB.DBPassPrefix)          -> getEnvName(EnvKey.AppDB.DBPassPrefix, key)
       key.startsWith(EnvKey.AppDB.DBPoolPrefix)          -> getEnvName(EnvKey.AppDB.DBPoolPrefix, key)
       key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix)    -> getEnvName(EnvKey.AppDB.DBDataSchemaPrefix, key)
@@ -81,13 +79,28 @@ object AppDatabaseRegistry {
       return
     }
 
-    val name    = env.require(EnvKey.AppDB.DBNamePrefix + key)
+    val name = env.require(EnvKey.AppDB.DBNamePrefix + key)
     val ldap = env.require(EnvKey.AppDB.DBLDAPPrefix + key)
-    val user = env.require(EnvKey.AppDB.DBUserPrefix + key)
+    val user = env.require(EnvKey.AppDB.DBControlSchemaPrefix + key)
     val pass = env.require(EnvKey.AppDB.DBPassPrefix + key)
     val pool = env.reqUByte(EnvKey.AppDB.DBPoolPrefix + key)
     val ctls = env.require(EnvKey.AppDB.DBControlSchemaPrefix + key)
     val data = env.require(EnvKey.AppDB.DBDataSchemaPrefix + key)
+
+    log.info(
+      """registering database {} with the following details:
+      Name: {}
+      TNS: {}
+      User: {}
+      Pool Size: {}
+      Schema: {}""",
+      name,
+      name,
+      ldap,
+      user,
+      pool,
+      ctls
+    )
 
     log.debug("looking up LDAP record for database {}", name)
 
