@@ -99,11 +99,3 @@ private fun AllDatasetsListEntry(
     it.status = DatasetStatusInfo(row.importStatus, statuses)
     it.created = row.created.defaultZone()
   }
-
-private fun DatasetTypeInfo(name: String, version: String): DatasetTypeInfo =
-  DatasetTypeInfoImpl().also {
-    it.name = name
-    it.version = version
-    it.displayName = PluginHandlers[name, version]?.displayName
-      ?: throw IllegalStateException("missing dataset type name")
-  }

@@ -2,25 +2,22 @@ package org.veupathdb.service.vdi.generated.model
 
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
+import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 
 internal fun DatasetTypeInfo(rec: DatasetRecord, typeName: String): DatasetTypeInfo =
-  DatasetTypeInfoImpl().also {
-    it.name = rec.typeName
-    it.version = rec.typeVersion
-    it.displayName = typeName
-  }
+  DatasetTypeInfo(rec.typeName, rec.typeVersion, typeName)
 
 internal fun DatasetTypeInfo(info: VDIDatasetType, displayName: String): DatasetTypeInfo =
-  DatasetTypeInfoImpl().also {
-    it.name = info.name
-    it.version = info.version
-    it.displayName = displayName
-  }
+  DatasetTypeInfo(info.name, info.version, displayName)
 
 internal fun DatasetTypeInfo(name: String, version: String, displayName: String): DatasetTypeInfo =
   DatasetTypeInfoImpl().also {
-    it.name = name
+    it.name = name.lowercase()
     it.version = version
     it.displayName = displayName
   }
+
+internal fun DatasetTypeInfo(name: String, version: String): DatasetTypeInfo =
+  DatasetTypeInfo(name, version, PluginHandlers[name, version]?.displayName
+      ?: throw IllegalStateException("missing dataset type name"))

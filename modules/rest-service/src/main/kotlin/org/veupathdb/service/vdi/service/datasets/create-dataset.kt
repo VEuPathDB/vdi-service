@@ -188,7 +188,7 @@ private fun verifyFileSize(file: Path, userID: UserID) {
 private fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
   VDIDatasetMetaImpl(
     type         = VDIDatasetTypeImpl(
-      name    = meta.datasetType.name,
+      name    = meta.datasetType.name.lowercase(),
       version = meta.datasetType.version,
     ),
     projects     = meta.projects.toSet(),

@@ -13,5 +13,4 @@ class VDIUsersController(@Context request: ContainerRequest) : VdiUsers, Control
   override fun getVdiUsersSelfMeta(): VdiUsers.GetVdiUsersSelfMetaResponse {
     return VdiUsers.GetVdiUsersSelfMetaResponse.respond200WithApplicationJson(getUserMetadata(userID.toUserID()))
   }
-
 }
