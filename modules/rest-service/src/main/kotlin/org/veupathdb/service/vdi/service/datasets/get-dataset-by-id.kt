@@ -29,8 +29,8 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
+  // This value will be null if the async dataset upload has not yet completed.
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
-    ?: throw IllegalStateException("$DatasetMetaFilename missing from S3 for dataset ${dataset.ownerID}/$datasetID")
 
   return DatasetDetailsImpl().also { out ->
     out.datasetId      = datasetID.toString()
@@ -45,7 +45,7 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
     out.sourceUrl      = dataset.sourceURL
     out.projectIds     = dataset.projects.toList()
     out.created        = dataset.created.defaultZone()
-    out.dependencies   = metaJson.dependencies.map {
+    out.dependencies   = (metaJson?.dependencies ?: emptyList()).map {
       DatasetDependencyImpl().apply {
         resourceIdentifier = it.identifier
         resourceDisplayName = it.displayName
@@ -85,8 +85,8 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 
   val importMessages = CacheDB.selectImportMessages(datasetID)
 
+  // This value will be null if the async dataset upload has not yet completed.
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
-    ?: throw IllegalStateException("$DatasetMetaFilename missing from S3 for dataset ${dataset.ownerID}/$datasetID")
 
   // return the dataset
   return DatasetDetailsImpl().also { out ->
@@ -104,7 +104,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.sourceUrl      = dataset.sourceURL
     out.projectIds     = dataset.projects.toList()
     out.created        = dataset.created.defaultZone()
-    out.dependencies   = metaJson.dependencies.map {
+    out.dependencies   = (metaJson?.dependencies ?: emptyList()).map {
       DatasetDependencyImpl().apply {
         resourceIdentifier = it.identifier
         resourceDisplayName = it.displayName
