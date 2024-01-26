@@ -129,12 +129,12 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     comparison(dir, syncControl, userID, datasetID)
       .also {
         if (it.doDataSync) {
-          log.info("Doing little reconciliation data sync")
+          log.info("doing little reconciliation data sync for dataset {}/{}", userID, datasetID)
           kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
         }
 
         if (it.doShareSync) {
-          log.info("Doing little reconciliation share sync")
+          log.info("doing little reconciliation share sync for dataset {}/{}", userID, datasetID)
           kr.sendShareTrigger(ShareTrigger(userID, datasetID))
         }
       }
@@ -422,8 +422,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     for (project in dataset.projects) {
       val appDB = AppDB.accessor(project)
       if (appDB == null) {
-        log.info("Skipping dataset state comparison for dataset {}/{}, project {} due to the target project config being disabled.", userID, datasetID, project)
-        return SyncActions(doShareSync = false, doDataSync = false)
+        log.info("skipping dataset state comparison for dataset {}/{}, project {} due to the target project config being disabled.", userID, datasetID, project)
+        continue
       }
 
       log.debug("checking project {} for dataset {}/{} to see if it is out of sync", project, userID, datasetID)

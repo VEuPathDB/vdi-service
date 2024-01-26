@@ -15,7 +15,7 @@ SELECT
 , dsr.status AS receipt_status
 FROM
   vdi.dataset_share_offers AS dso
-  LEFT JOIN vdi.dataset_share_receipts AS dsr
+  FULL OUTER JOIN vdi.dataset_share_receipts AS dsr
     USING (dataset_id, recipient_id)
 WHERE
   dataset_id = ?
@@ -28,8 +28,8 @@ internal fun Connection.selectSharesFor(datasetID: DatasetID) =
       map {
         DatasetShare(
           recipientID   = it.getUserID("recipient_id"),
-          offerStatus   = VDIShareOfferAction.fromString(it.getString("offer_status")),
-          receiptStatus = it.getString("receipt_status")?.let(VDIShareReceiptAction::fromString) ?: VDIShareReceiptAction.Accept
+          offerStatus   = it.getString("offer_status")?.let(VDIShareOfferAction::fromString),
+          receiptStatus = it.getString("receipt_status")?.let(VDIShareReceiptAction::fromString)
         )
       }
     }

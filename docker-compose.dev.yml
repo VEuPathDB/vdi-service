@@ -88,8 +88,6 @@ services:
     - minio-external
     - minio-create-buckets
     links:
-    - cache-db
-    - kafka
     - rabbit-external
     - minio-external
     networks:
