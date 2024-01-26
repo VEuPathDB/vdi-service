@@ -55,6 +55,7 @@ dependencies {
   implementation(project(":components:plugin-mapping"))
   implementation(project(":components:pruner"))
   implementation(project(":components:s3"))
+  implementation(project(":components:metrics"))
 
   implementation("org.veupathdb.vdi:vdi-component-json")
   implementation("org.veupathdb.vdi:vdi-component-common")
