@@ -81,6 +81,9 @@ object CacheDB {
   fun selectAdminAllDatasets(query: AdminAllDatasetsQuery) =
     connection.use { it.selectAdminAllDatasets(query) }
 
+  fun selectAdminDatasetDetails(datasetID: DatasetID) =
+    connection.use { it.selectAdminDatasetDetails(datasetID) }
+
   fun selectInstallFileCount(datasetID: DatasetID) =
     connection.use { it.selectInstallFileCount(datasetID) }
 

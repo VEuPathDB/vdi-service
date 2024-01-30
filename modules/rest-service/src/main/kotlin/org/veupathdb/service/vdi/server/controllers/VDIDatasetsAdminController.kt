@@ -7,6 +7,7 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.db.UserDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsAdmin
+import org.veupathdb.service.vdi.service.admin.getDatasetDetails
 import org.veupathdb.service.vdi.service.admin.listAllDatasets
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.listBrokenDatasets
@@ -58,6 +59,36 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
     Pruner.tryPruneDatasets()
 
     return VdiDatasetsAdmin.PostVdiDatasetsAdminDeleteCleanupResponse.respond204()
+  }
+
+  override fun getVdiDatasetsAdminDatasetDetails(datasetId: String?): VdiDatasetsAdmin.GetVdiDatasetsAdminDatasetDetailsResponse {
+    if (datasetId == null) {
+      throw BadRequestException("no target dataset ID provided")
+    }
+    val datasetDetails = getDatasetDetails(datasetID = DatasetID(datasetId))
+    val response = InternalDatasetDetailsImpl().also {
+      it.name = datasetDetails.name
+      it.created = datasetDetails.created
+      it.origin = datasetDetails.origin
+      it.projectIds = datasetDetails.projectIDs
+      it.description = datasetDetails.description
+      it.owner = datasetDetails.ownerID.toLong()
+      it.sourceUrl = datasetDetails.sourceURL
+      it.summary = datasetDetails.summary
+      it.status = datasetDetails.importStatus.toString()
+      it.visibility = DatasetVisibility(datasetDetails.visibility)
+      datasetDetails.syncControl?.let { queriedSyncControl ->
+        it.syncControl = SyncControlRecordImpl().also { syncControl ->
+          syncControl.dataUpdateTime = queriedSyncControl.dataUpdated
+          syncControl.metaUpdateTime = queriedSyncControl.metaUpdated
+          syncControl.sharesUpdateTime = queriedSyncControl.sharesUpdated
+        }
+      }
+      it.importMessages = datasetDetails.messages
+      it.installFiles = datasetDetails.installFiles
+      it.uploadFiles = datasetDetails.uploadFiles
+    }
+    return VdiDatasetsAdmin.GetVdiDatasetsAdminDatasetDetailsResponse.respond200WithApplicationJson(response)
   }
 
   override fun postVdiDatasetsAdminProxyUpload(

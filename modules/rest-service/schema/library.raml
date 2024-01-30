@@ -82,6 +82,33 @@ types:
       projectIds: ProjectID[]
       status: DatasetStatusInfo
       created: datetime
+  SyncControlRecord:
+    type: object
+    additionalProperties: false
+    properties:
+      sharesUpdateTime: datetime
+      dataUpdateTime: datetime
+      metaUpdateTime: datetime
+  InternalDatasetDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetType: DatasetTypeInfo
+      owner: User-ID
+      isDeleted: boolean
+      origin: string
+      created: datetime
+      name: string
+      summary?: string
+      description?: string
+      visibility: DatasetVisibility
+      sourceUrl?: string
+      projectIds: ProjectID[]
+      status: string
+      syncControl?: SyncControlRecord
+      uploadFiles?: string[]
+      installFiles?: string[]
+      importMessages: string[]
   AuthorizationKey:
     displayName: RPC Authorization Key
     description: |

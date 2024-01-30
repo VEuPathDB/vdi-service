@@ -17,6 +17,7 @@ import org.veupathdb.service.vdi.generated.model.DatasetPostRequest;
 import org.veupathdb.service.vdi.generated.model.DatasetPostResponse;
 import org.veupathdb.service.vdi.generated.model.ForbiddenError;
 import org.veupathdb.service.vdi.generated.model.InstallCleanupRequest;
+import org.veupathdb.service.vdi.generated.model.InternalDatasetDetails;
 import org.veupathdb.service.vdi.generated.model.ServerError;
 import org.veupathdb.service.vdi.generated.model.UnauthorizedError;
 import org.veupathdb.service.vdi.generated.model.UnprocessableEntityError;
@@ -58,6 +59,12 @@ public interface VdiDatasetsAdmin {
   @Path("/delete-cleanup")
   @Produces("application/json")
   PostVdiDatasetsAdminDeleteCleanupResponse postVdiDatasetsAdminDeleteCleanup();
+
+  @GET
+  @Path("/dataset-details")
+  @Produces("application/json")
+  GetVdiDatasetsAdminDatasetDetailsResponse getVdiDatasetsAdminDatasetDetails(
+      @QueryParam("datasetId") String datasetId);
 
   @GET
   @Path("/list-all-datasets")
@@ -236,6 +243,23 @@ public interface VdiDatasetsAdmin {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new PostVdiDatasetsAdminDeleteCleanupResponse(responseBuilder.build(), entity);
+    }
+  }
+
+  class GetVdiDatasetsAdminDatasetDetailsResponse extends ResponseDelegate {
+    private GetVdiDatasetsAdminDatasetDetailsResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private GetVdiDatasetsAdminDatasetDetailsResponse(Response response) {
+      super(response);
+    }
+
+    public static GetVdiDatasetsAdminDatasetDetailsResponse respond200WithApplicationJson(
+        InternalDatasetDetails entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetVdiDatasetsAdminDatasetDetailsResponse(responseBuilder.build(), entity);
     }
   }
 

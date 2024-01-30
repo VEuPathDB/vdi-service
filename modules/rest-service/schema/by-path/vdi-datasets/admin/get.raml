@@ -86,3 +86,34 @@ types:
       projectIds: common.ProjectID[]
       status: common.DatasetStatusInfo
       created: datetime
+
+  SyncControlRecord:
+    type: object
+    additionalProperties: false
+    properties:
+      sharesUpdateTime: datetime
+      dataUpdateTime: datetime
+      metaUpdateTime: datetime
+
+  InternalDatasetDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetType: common.DatasetTypeInfo
+      owner: common.User-ID
+      isDeleted: boolean
+      origin: string
+      created: datetime
+      name: string
+      summary?: string
+      description?: string
+      visibility: common.DatasetVisibility
+      sourceUrl?: string
+      projectIds: common.ProjectID[]
+      status: string
+      syncControl?: SyncControlRecord
+      uploadFiles?: string[]
+      installFiles?: string[]
+      importMessages: string[]
+
+
