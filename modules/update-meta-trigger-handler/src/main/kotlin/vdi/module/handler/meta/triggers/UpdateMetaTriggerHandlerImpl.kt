@@ -51,7 +51,9 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
     val kc = requireKafkaConsumer(config.kafkaRouterConfig.updateMetaTriggerTopic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter()
-    val wp = WorkerPool("update-meta-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt())
+    val wp = WorkerPool("update-meta-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
+      Metrics.updateMetaQueueSize.inc(it.toDouble())
+    }
 
     runBlocking(Dispatchers.IO) {
       launch {

@@ -14,12 +14,15 @@ SELECT
 , dso.recipient_id
 , dso.status AS offer_status
 , dsr.status AS receipt_status
+, ds.
 FROM
   unnest(?) AS ids(dataset_id)
   INNER JOIN vdi.dataset_share_offers AS dso
     USING (dataset_id)
   LEFT JOIN vdi.dataset_share_receipts AS dsr
     USING (dataset_id, recipient_id)
+  LEFT JOIN vdi.datasets AS ds
+    USING (dataset_id)
 """
 
 internal fun Connection.selectSharesFor(datasetIDs: List<DatasetID>): Map<DatasetID, List<DatasetShare>> {

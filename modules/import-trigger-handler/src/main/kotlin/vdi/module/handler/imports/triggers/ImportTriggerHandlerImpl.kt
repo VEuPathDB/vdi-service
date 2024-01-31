@@ -56,7 +56,9 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
     val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
     val kc = requireKafkaConsumer(config.kafkaConfig.importTriggerTopic, config.kafkaConfig.consumerConfig)
-    val wp = WorkerPool("import-trigger-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt())
+    val wp = WorkerPool("import-trigger-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
+      Metrics.importQueueSize.inc(it.toDouble())
+    }
 
     runBlocking(Dispatchers.IO) {
       launch {

@@ -21,6 +21,7 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetShareReceiptImpl
 import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.DatasetShare
+import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import java.sql.SQLException
 import java.time.OffsetDateTime
@@ -53,7 +54,9 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.shareTriggerTopic, config.kafkaConsumerConfig)
     val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
-    val wp = WorkerPool("share-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt())
+    val wp = WorkerPool("share-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
+      Metrics.shareQueueSize.inc(it.toDouble())
+    }
 
     runBlocking {
       launch(Dispatchers.IO) {
