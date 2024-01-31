@@ -3,6 +3,7 @@ package org.veupathdb.vdi.lib.db.app.sql
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
+import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import java.sql.Connection
@@ -46,7 +47,7 @@ internal fun Connection.selectDatasetsByInstallStatus(
           owner       = UserID(rs.getLong("owner")),
           typeName    = rs.getString("type_name"),
           typeVersion = rs.getString("type_version"),
-          isDeleted   = rs.getBoolean("is_deleted"),
+          isDeleted   = DeleteFlag.fromInt(rs.getInt("is_deleted")),
         ))
       } while (rs.next())
 
