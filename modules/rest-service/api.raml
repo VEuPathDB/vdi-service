@@ -555,6 +555,19 @@ uses:
                 message: Dataset store is unreachable
                 requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
+  /dataset-details:
+    get:
+      queryParameters:
+        datasetId:
+          type: string
+          required: true
+      responses:
+        200:
+          body:
+            application/json:
+              type: lib.InternalDatasetDetails
+
+
   /list-all-datasets:
     get:
       queryParameters:
