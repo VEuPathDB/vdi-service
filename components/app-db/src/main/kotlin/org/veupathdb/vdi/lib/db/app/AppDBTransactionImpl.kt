@@ -111,9 +111,9 @@ class AppDBTransactionImpl(
     connection.updateDataset(schema, dataset)
   }
 
-  override fun updateDatasetDeletedFlag(datasetID: DatasetID, deleted: Boolean) {
-    log.debug("updating dataset record deleted flag for dataset {} to {}", datasetID, deleted)
-    connection.updateDatasetDeletedFlag(schema, datasetID, deleted)
+  override fun updateDatasetDeletedFlag(datasetID: DatasetID, deleteFlag: DeleteFlag) {
+    log.debug("updating dataset record deleted flag for dataset {} to {}", datasetID, deleteFlag)
+    connection.updateDatasetDeletedFlag(schema, datasetID, deleteFlag)
   }
 
   override fun updateSyncControlDataTimestamp(datasetID: DatasetID, timestamp: OffsetDateTime) {

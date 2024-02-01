@@ -15,10 +15,7 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDBTransaction
-import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
-import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
-import org.veupathdb.vdi.lib.db.app.model.InstallStatus
-import org.veupathdb.vdi.lib.db.app.model.InstallType
+import org.veupathdb.vdi.lib.db.app.model.*
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
@@ -207,7 +204,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
             owner       = meta.owner,
             typeName    = meta.type.name,
             typeVersion = meta.type.version,
-            isDeleted   = false
+            isDeleted   = DeleteFlag.NotDeleted,
           ))
 
           it.insertDatasetVisibility(datasetID, meta.owner)

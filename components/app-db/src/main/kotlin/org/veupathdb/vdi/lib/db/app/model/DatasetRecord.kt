@@ -31,5 +31,5 @@ data class DatasetRecord(
   /**
    * Whether the dataset has been marked as deleted.
    */
-  val isDeleted: Boolean,
+  val isDeleted: DeleteFlag,
 )

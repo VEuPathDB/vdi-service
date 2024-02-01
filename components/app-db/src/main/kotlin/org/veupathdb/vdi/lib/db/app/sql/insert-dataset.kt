@@ -25,7 +25,7 @@ internal fun Connection.insertDataset(schema: String, dataset: DatasetRecord) {
       ps.setLong(2, dataset.owner.toLong())
       ps.setString(3, dataset.typeName.lowercase())
       ps.setString(4, dataset.typeVersion)
-      ps.setBoolean(5, dataset.isDeleted)
+      ps.setInt(5, dataset.isDeleted.value)
       ps.executeUpdate()
     }
 }

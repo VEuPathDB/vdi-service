@@ -108,7 +108,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
 
     try {
-      processImportJob(dm, userID, datasetID, datasetDir)
+      processImportJob(userID, datasetID, datasetDir)
     } finally {
       lock.withLock {
         activeIDs.remove(datasetID)
@@ -116,7 +116,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private fun processImportJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID, datasetDir: DatasetDirectory) {
+  private fun processImportJob(userID: UserID, datasetID: DatasetID, datasetDir: DatasetDirectory) {
     // Load the dataset metadata from S3
     val datasetMeta = datasetDir.getMeta().load()!!
 

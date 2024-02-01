@@ -3,6 +3,7 @@ package org.veupathdb.vdi.lib.db.cache.sql.select
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.cache.model.DeletedDataset
+import org.veupathdb.vdi.lib.db.cache.util.getProjectIDList
 import org.veupathdb.vdi.lib.db.cache.util.map
 import java.sql.Connection
 
@@ -11,8 +12,9 @@ private const val SQL = """
 SELECT
   dataset_id
 , owner_id
+, array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = vd.dataset_id) AS projects
 FROM
-  vdi.datasets
+  vdi.datasets AS vd
 WHERE
   is_deleted = TRUE
 """
@@ -22,7 +24,8 @@ internal fun Connection.selectDeletedDatasets(): List<DeletedDataset> =
     stmt.executeQuery(SQL).use { rs ->
       rs.map { DeletedDataset(
         DatasetID(it.getString("dataset_id")),
-        UserID(it.getString("owner_id"))
+        UserID(it.getString("owner_id")),
+        it.getProjectIDList("projects"),
       ) }
     }
   }

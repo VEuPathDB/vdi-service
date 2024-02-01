@@ -6,15 +6,14 @@ import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
+import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DeletedDataset
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
-import java.util.LinkedList
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 /**
  * Dataset Pruner
@@ -85,6 +84,9 @@ object Pruner {
 
     val dsm = DatasetManager(s3Bucket)
 
+    // Get a list of datasets that have been marked as deleted in the internal
+    // postgres database, then filter that list down to only those datasets that
+    // were deleted long enough ago to be eligible for pruning.
     val deletable = with(CacheDB.selectDeletedDatasets()) {
       val threshold = OffsetDateTime.now().minus(config.pruneAge.inWholeSeconds, ChronoUnit.SECONDS)
       filter { it.wasDeletedLongEnoughAgoToPrune(dsm, threshold) }
@@ -93,13 +95,56 @@ object Pruner {
     log.info("found {} candidates for pruning", deletable.size)
 
     deletable.forEach {
+      if (!it.hasBeenUninstalled())
+        return@forEach
+
       try {
-        runDelete(dsm, s3Bucket, it)
+        runDelete(s3Bucket, it)
       } catch (e: Throwable) {
         log.error("failed to delete dataset ${it.ownerID}/${it.datasetID} due to exception:", e)
       }
     }
+  }
 
+  /**
+   * Iterates through all the dataset's install target app databases to ensure
+   * that the dataset was successfully uninstalled from all of them before
+   * allowing the dataset to be removed from MinIO.
+   *
+   * This is necessary to prevent the reconciler from removing the control
+   * records for the dataset from target app databases that still contain traces
+   * of the dataset.
+   *
+   * @receiver Record representing the dataset for which the install targets
+   * should be tested.
+   *
+   * @return `true` if the dataset has been successfully uninstalled from all
+   * install targets, `false` if one or more install targets still contain
+   * traces of the dataset.
+   */
+  private fun DeletedDataset.hasBeenUninstalled(): Boolean {
+    projects.forEach { projectID ->
+      val appDB = AppDB.accessor(projectID)
+
+      if (appDB == null) {
+        log.warn("cannot prune dataset {}/{} as the dataset's install target {} is currently disabled", ownerID, datasetID, projectID)
+        return false
+      }
+
+      val installRecord = appDB.selectDataset(datasetID)
+
+      if (installRecord == null) {
+        log.warn("dataset {}/{} does not have a control record in install target {}, this will not prevent pruning", ownerID, datasetID, projectID)
+        return@forEach
+      }
+
+      if (installRecord.isDeleted != DeleteFlag.DeletedAndUninstalled) {
+        log.warn("cannot prune dataset {}/{} as it has not been successfully uninstalled from target {}", ownerID, datasetID, projectID)
+        return false
+      }
+    }
+
+    return true
   }
 
   private fun DeletedDataset.wasDeletedLongEnoughAgoToPrune(dsm: DatasetManager, threshold: OffsetDateTime): Boolean {
@@ -107,7 +152,7 @@ object Pruner {
 
     // If the directory doesn't exist, then it has already been deleted.
     if (!dir.exists()) {
-      log.warn("dataset {}/{} still has a record in the cache db even though it has been deleted from S3", ownerID, datasetID)
+      log.error("dataset {}/{} still has a record in the cache db even though it has been deleted from S3", ownerID, datasetID)
       return false
     }
 
@@ -121,14 +166,11 @@ object Pruner {
       .isBefore(threshold)
   }
 
-  private fun runDelete(dsm: DatasetManager, bucket: S3Bucket, ds: DeletedDataset) {
+  private fun runDelete(bucket: S3Bucket, ds: DeletedDataset) {
     log.info("hard-deleting dataset {}/{}", ds.ownerID, ds.datasetID)
 
-    val dir  = dsm.getDatasetDirectory(ds.ownerID, ds.datasetID)
-    val meta = dir.getMeta().load()!!
-
     // Delete records from app databases
-    meta.projects.forEach { projectID -> ds.deleteFromAppDB(projectID) }
+    ds.projects.forEach { projectID -> ds.deleteFromAppDB(projectID) }
 
     // Delete records from cache DB
     ds.deleteFromCacheDB()
@@ -143,7 +185,7 @@ object Pruner {
       return
     }
 
-    log.debug("deleting dataset {} from project {} app DB", datasetID, projectID)
+    log.debug("deleting dataset {}/{} from project {} app DB", ownerID, datasetID, projectID)
 
     AppDB.withTransaction(projectID) {
       it.deleteDatasetVisibilities(datasetID)
@@ -156,7 +198,7 @@ object Pruner {
   }
 
   private fun DeletedDataset.deleteFromCacheDB() {
-    log.debug("deleting dataset {} from cache DB", datasetID)
+    log.debug("deleting dataset {}/{} from cache DB", ownerID, datasetID)
 
     CacheDB.withTransaction {
       it.deleteInstallFiles(datasetID)

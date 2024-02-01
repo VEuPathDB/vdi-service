@@ -16,6 +16,7 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
+import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import org.veupathdb.vdi.lib.db.cache.CacheDB
@@ -193,7 +194,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       return
     }
 
-    if (dataset.isDeleted) {
+    if (dataset.isDeleted != DeleteFlag.NotDeleted) {
       log.info("skipping install event for dataset {}/{} into project {} due to the dataset being marked as deleted", userID, datasetID, projectID)
       return
     }

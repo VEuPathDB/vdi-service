@@ -1,6 +1,7 @@
 package org.veupathdb.vdi.lib.db.app.sql
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -14,10 +15,10 @@ WHERE
   dataset_id = ?
 """
 
-internal fun Connection.updateDatasetDeletedFlag(schema: String, datasetID: DatasetID, isDeleted: Boolean) {
+internal fun Connection.updateDatasetDeletedFlag(schema: String, datasetID: DatasetID, deleteFlag: DeleteFlag) {
   prepareStatement(sql(schema))
     .use { ps ->
-      ps.setBoolean(1, isDeleted)
+      ps.setInt(1, deleteFlag.value)
       ps.setString(2, datasetID.toString())
       ps.executeUpdate()
     }
