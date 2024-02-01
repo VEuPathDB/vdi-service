@@ -7,6 +7,7 @@ import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
@@ -22,7 +23,6 @@ import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallUnexpectedErro
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.nio.file.Path
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.io.path.inputStream
@@ -88,16 +88,16 @@ object DatasetReinstaller {
       try {
         processDataset(dataset, projectID)
       } catch (e: Throwable) {
-        log.error("failed to process dataset ${dataset.datasetID} reinstallation for project $projectID", e)
+        log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID", e)
       }
     }
   }
 
   private fun processDataset(dataset: DatasetRecord, projectID: ProjectID) {
-    log.info("reinstall processing dataset {} for project {}", dataset.datasetID, projectID)
+    log.info("reinstall processing dataset {}/{} for project {}", dataset.owner, dataset.datasetID, projectID)
 
     // Get a plugin handler for the target dataset type
-    val handler = PluginHandlers.get(dataset.typeName, dataset.typeVersion)
+    val handler = PluginHandlers[dataset.typeName, dataset.typeVersion]
       ?: throw IllegalStateException("no plugin handler registered for dataset type ${dataset.typeName}")
 
     // If the handler doesn't apply to the current project then something has
@@ -111,6 +111,7 @@ object DatasetReinstaller {
   }
 
   private fun uninstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: PluginHandlerClient) {
+    log.debug("attempting to uninstall dataset {}/{} from project {}", dataset.owner, dataset.datasetID, projectID)
 
     val uninstallResult = client.postUninstall(dataset.datasetID, projectID)
 
@@ -127,9 +128,11 @@ object DatasetReinstaller {
   }
 
   private fun reinstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: PluginHandlerClient) {
-    val s3        = S3Api.newClient(config.s3Config)
-    val bucket    = s3.buckets[config.s3Bucket]!!
-    val manager   = DatasetManager(bucket)
+    log.debug("attempting to reinstall dataset {}/{} into project {}", dataset.owner, dataset.datasetID, projectID)
+
+    val s3 = S3Api.newClient(config.s3Config)
+    val bucket = s3.buckets[config.s3Bucket]!!
+    val manager = DatasetManager(bucket)
     val directory = manager.getDatasetDirectory(dataset.owner, dataset.datasetID)
 
     val response =  withDataTar(directory) { dataTar ->

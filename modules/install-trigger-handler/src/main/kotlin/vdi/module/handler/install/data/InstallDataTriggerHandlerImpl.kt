@@ -16,6 +16,7 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
+import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import org.veupathdb.vdi.lib.db.cache.CacheDB
@@ -29,6 +30,7 @@ import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import java.nio.file.Path
 import java.sql.SQLException
+import java.time.OffsetDateTime
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
@@ -195,7 +197,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       return
     }
 
-    if (dataset.isDeleted) {
+    if (dataset.isDeleted != DeleteFlag.NotDeleted) {
       log.info("skipping install event for dataset {}/{} into project {} due to the dataset being marked as deleted", userID, datasetID, projectID)
       return
     }
@@ -238,19 +240,22 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
       Metrics.installations.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
 
+      val updatedTimestamp = s3Dir.getLatestDataTimestamp(OriginTimestamp)
+
       when (response.type) {
         InstallDataResponseType.Success
-        -> handleSuccessResponse(response as InstallDataSuccessResponse, userID, datasetID, projectID, s3Dir)
+        -> handleSuccessResponse(response as InstallDataSuccessResponse, userID, datasetID, projectID, updatedTimestamp)
 
         InstallDataResponseType.BadRequest
-        -> handleBadRequestResponse(response as InstallDataBadRequestResponse, userID, datasetID, projectID)
+        -> handleBadRequestResponse(response as InstallDataBadRequestResponse, userID, datasetID, projectID, updatedTimestamp)
 
         InstallDataResponseType.ValidationFailure
         -> handleValidationFailureResponse(
           response as InstallDataValidationFailureResponse,
           userID,
           datasetID,
-          projectID
+          projectID,
+          updatedTimestamp
         )
 
         InstallDataResponseType.MissingDependencies
@@ -258,11 +263,12 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           response as InstallDataMissingDependenciesResponse,
           userID,
           datasetID,
-          projectID
+          projectID,
+          updatedTimestamp
         )
 
         InstallDataResponseType.UnexpectedError
-        -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, userID, datasetID, projectID)
+        -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, userID, datasetID, projectID, updatedTimestamp)
       }
     } finally {
       timer.observeDuration()
@@ -326,11 +332,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     userID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
-    s3Dir: DatasetDirectory
+    updatedTimestamp: OffsetDateTime,
   ) {
     log.info("dataset {}/{} data was installed successfully into project {}", userID, datasetID, projectID)
-
-    val updatedTimestamp = s3Dir.getLatestDataTimestamp(OriginTimestamp)
 
     CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
@@ -350,11 +354,16 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     res: InstallDataBadRequestResponse,
     userID: UserID,
     datasetID: DatasetID,
-    projectID: ProjectID
+    projectID: ProjectID,
+    updatedTimestamp: OffsetDateTime,
   ) {
-    log.error("Dataset {}/{} install into {} failed due to bad request exception from handler server: {}", userID, datasetID, projectID, res.message)
+    log.error("dataset {}/{} install into {} failed due to bad request exception from handler server: {}", userID, datasetID, projectID, res.message)
+
+    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
     AppDB.withTransaction(projectID) {
+      it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
+
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,
@@ -370,11 +379,16 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     res: InstallDataValidationFailureResponse,
     userID: UserID,
     datasetID: DatasetID,
-    projectID: ProjectID
+    projectID: ProjectID,
+    updatedTimestamp: OffsetDateTime,
   ) {
-    log.info("Dataset {}/{} install into {} failed due to validation error", userID, datasetID, projectID)
+    log.info("dataset {}/{} install into {} failed due to validation error", userID, datasetID, projectID)
+
+    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
     AppDB.withTransaction(projectID) {
+      it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
+
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,
@@ -388,11 +402,16 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     res: InstallDataMissingDependenciesResponse,
     userID: UserID,
     datasetID: DatasetID,
-    projectID: ProjectID
+    projectID: ProjectID,
+    updatedTimestamp: OffsetDateTime,
   ) {
     log.info("dataset {}/{} install into {} was rejected for missing dependencies", userID, datasetID, projectID)
 
+    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
+
     AppDB.withTransaction(projectID) {
+      it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
+
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,
@@ -409,11 +428,16 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     res: InstallDataUnexpectedErrorResponse,
     userID: UserID,
     datasetID: DatasetID,
-    projectID: ProjectID
+    projectID: ProjectID,
+    updatedTimestamp: OffsetDateTime,
   ) {
     log.error("dataset {}/{} install into {} failed with a 500 from the handler server", userID, datasetID, projectID)
 
+    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
+
     AppDB.withTransaction(projectID) {
+      it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
+
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,

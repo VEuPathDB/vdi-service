@@ -23,7 +23,7 @@ internal fun Connection.updateDataset(schema: String, dataset: DatasetRecord) {
       ps.setLong(1, dataset.owner.toLong())
       ps.setString(2, dataset.typeName)
       ps.setString(3, dataset.typeVersion)
-      ps.setBoolean(4, dataset.isDeleted)
+      ps.setInt(4, dataset.isDeleted.value)
       ps.setString(5, dataset.datasetID.toString())
       ps.executeUpdate()
     }

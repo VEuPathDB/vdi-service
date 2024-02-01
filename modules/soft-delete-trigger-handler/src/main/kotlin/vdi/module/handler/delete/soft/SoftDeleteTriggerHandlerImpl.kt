@@ -8,18 +8,18 @@ import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.db.app.AppDB
-import org.veupathdb.vdi.lib.db.app.model.InstallStatus
+import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
+import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallBadRequestResponse
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallResponseType
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallUnexpectedErrorResponse
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.kafka.model.triggers.SoftDeleteTrigger
-import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 
@@ -42,7 +42,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
           kc.fetchMessages(config.softDeleteTriggerMessageKey, SoftDeleteTrigger::class)
             .forEach { (userID, datasetID) ->
               log.info("received uninstall job for dataset $datasetID, user $userID")
-              wp.submit { runJob(userID, datasetID, dm) }
+              wp.submit { runJob(userID, datasetID) }
             }
         }
 
@@ -55,125 +55,112 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     confirmShutdown()
   }
 
-  private fun runJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
-    // Fetch the dataset directory from S3
-    val dir = dm.getDatasetDirectory(userID, datasetID)
+  private fun runJob(userID: UserID, datasetID: DatasetID) {
+    val internalDBRecord = CacheDB.selectDataset(datasetID)
+      ?: throw IllegalStateException("received uninstall event for a dataset that does not exist in the internal database")
 
-    // If the directory doesn't exist, then something has gone terribly wrong.
-    if (!dir.exists())
-      throw IllegalStateException("got an uninstall event for non-existent dataset $datasetID (user $userID)")
+    // Mark the dataset is deleted in the internal postgres database regardless
+    // of whether the uninstalls from the dataset's install targets succeed.
+    CacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
 
-    // Load the dataset metadata from S3
-    val meta = dir.getMeta().load()
-      ?: throw IllegalStateException("got an uninstall event for a dataset that has no meta file: dataset $datasetID, user $userID")
-
+    // If the dataset failed import, then nothing was installed into the
+    // dataset's install targets.
     if (!datasetIsImported(datasetID)) {
-      log.info("received uninstall event for a dataset that was not imported or failed import: {}/{}", userID, datasetID)
+      log.info("dataset {}/{} was not imported, no uninstalls necessary", userID, datasetID)
       return
     }
 
     val timer = Metrics.uninstallationTimes
-      .labels(meta.type.name, meta.type.version)
+      .labels(internalDBRecord.typeName, internalDBRecord.typeVersion)
       .startTimer()
 
-    // Grab a handler instance for this dataset type.
-    val handler = PluginHandlers.get(meta.type.name, meta.type.version)
-      ?: throw IllegalStateException("got an uninstall event for a dataset type that has no associated handler.  dataset $datasetID, user $userID")
+    // Grab a plugin handler instance for this dataset type.
+    val handler = PluginHandlers[internalDBRecord.typeName, internalDBRecord.typeVersion]
 
-    // Iterate through the projects that the metadata is targeting and call
-    // the uninstall path on each.
-    meta.projects.forEach { projectID ->
-      if (!handler.appliesToProject(projectID)) {
-        log.warn("type handler for type {} does not apply to project {} (dataset {}, user {})", handler.type, projectID, datasetID, userID)
-        return@forEach
-      }
-
-      val datasetInstalled = datasetIsInstalled(datasetID, projectID)
-
-      if (datasetInstalled == DatasetInstallStatus.Unknown) {
-        log.info("skipping uninstall event for dataset {}/{}, project {} as the target is disabled", userID, datasetID, projectID)
-        return@forEach
-      }
-
-      if (datasetInstalled == DatasetInstallStatus.NotInstalled) {
-        log.info("skipping uninstall event for dataset {}/{}, project {} as it is not installed", userID, datasetID, projectID)
-        return@forEach
-      }
-
-      runJob(userID, datasetID, projectID, handler.client, meta)
+    if (handler == null) {
+      log.error("no plugin handler found for dataset {}/{} type {}:{}", userID, datasetID, internalDBRecord.typeName, internalDBRecord.typeVersion)
+      return
     }
 
-    // Mark the dataset as deleted in the cache DB
-    CacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
+    // Iterate through the install targets for the dataset and attempt an
+    // uninstall on each.
+    internalDBRecord.projects.forEach { projectID ->
+      if (!handler.appliesToProject(projectID)) {
+        log.warn("type handler for dataset type {}:{} does not apply to project {} (dataset {}/{})", internalDBRecord.typeName, internalDBRecord.typeVersion, projectID, userID, datasetID)
+        return@forEach
+      }
+
+      if (projectID !in AppDatabaseRegistry) {
+        log.warn("dataset {}/{} cannot be uninstalled from target project {} as the project is disabled", userID, datasetID, projectID)
+        return@forEach
+      }
+
+      if (datasetShouldBeUninstalled(userID, datasetID, projectID)) {
+        try {
+          tryUninstallDataset(userID, datasetID, projectID, handler.client, internalDBRecord)
+        } catch (e: Throwable) {
+          log.error("dataset ${userID}/${projectID} uninstall from project $projectID failed: ", e)
+        }
+      }
+    }
 
     timer.observeDuration()
   }
 
-  private fun runJob(
-    userID:    UserID,
+  private fun tryUninstallDataset(
+    userID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
-    handler:   PluginHandlerClient,
-    meta:      VDIDatasetMeta,
+    handler: PluginHandlerClient,
+    record: DatasetRecord
   ) {
+    AppDB.withTransaction(projectID) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedNotUninstalled) }
+
     val response = handler.postUninstall(datasetID, projectID)
 
-    Metrics.uninstallations.labels(meta.type.name, meta.type.version, response.responseCode.toString()).inc()
+    Metrics.uninstallations.labels(record.typeName, record.typeVersion, response.responseCode.toString()).inc()
 
     when (response.type) {
       UninstallResponseType.Success
       -> handleSuccessResponse(userID, datasetID, projectID)
 
       UninstallResponseType.BadRequest
-      -> handleBadRequestResponse(datasetID, projectID, response as UninstallBadRequestResponse)
+      -> handleBadRequestResponse(userID, datasetID, projectID, response as UninstallBadRequestResponse)
 
       UninstallResponseType.UnexpectedError
-      -> handleUnexpectedErrorResponse(datasetID, projectID, response as UninstallUnexpectedErrorResponse)
+      -> handleUnexpectedErrorResponse(userID, datasetID, projectID, response as UninstallUnexpectedErrorResponse)
     }
+  }
+
+  private fun datasetShouldBeUninstalled(userID: UserID, datasetID: DatasetID, projectID: ProjectID): Boolean {
+    val dataset = AppDB.accessor(projectID)!!.selectDataset(datasetID)
+
+    if (dataset == null) {
+      log.warn("dataset {}/{} does not appear in target project {}, cannot run uninstall", userID, datasetID, projectID)
+      return false
+    }
+
+    if (dataset.isDeleted == DeleteFlag.DeletedAndUninstalled) {
+      log.info("dataset {}/{} has already been successfully uninstalled from target project {}", userID, datasetID, projectID)
+      return false
+    }
+
+    return true
   }
 
   private fun handleSuccessResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID) {
-    log.info("dataset handler server reports dataset {} was successfully uninstalled from project {}", datasetID, projectID)
-
-    val appDB = try {
-      AppDB.transaction(projectID)!!
-    } catch (e: Throwable) {
-      throw IllegalStateException("dataset $datasetID (user $userID) is linked to project $projectID which is currently unknown to the vdi service", e)
-    }
-
-    try {
-      appDB.updateDatasetDeletedFlag(datasetID, true)
-      appDB.commit()
-    } catch (e: Throwable) {
-      log.error("failed to update dataset deleted flag for dataset $datasetID (user $userID)", e)
-      appDB.rollback()
-      return
-    } finally {
-      appDB.close()
-    }
+    log.info("dataset handler server reports dataset {}/{} was successfully uninstalled from project {}", userID, datasetID, projectID)
+    AppDB.withTransaction(projectID) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedAndUninstalled) }
   }
 
-  private fun handleBadRequestResponse(datasetID: DatasetID, projectID: ProjectID, res: UninstallBadRequestResponse) {
-    log.error("dataset handler server reports 400 error for uninstall on dataset {}, project {}", datasetID, projectID)
+  private fun handleBadRequestResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: UninstallBadRequestResponse) {
+    log.error("dataset handler server reports 400 error for uninstall on dataset {}/{}, project {}", userID, datasetID, projectID)
     throw IllegalStateException(res.message)
   }
 
-  private fun handleUnexpectedErrorResponse(datasetID: DatasetID, projectID: ProjectID, res: UninstallUnexpectedErrorResponse) {
-    log.error("dataset handler server reports 500 for uninstall on dataset {}, project {}", datasetID, projectID)
+  private fun handleUnexpectedErrorResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: UninstallUnexpectedErrorResponse) {
+    log.error("dataset handler server reports 500 for uninstall on dataset {}/{}, project {}", userID, datasetID, projectID)
     throw IllegalStateException(res.message)
-  }
-
-  private enum class DatasetInstallStatus { Installed, NotInstalled, Unknown }
-
-  private fun datasetIsInstalled(datasetID: DatasetID, projectID: ProjectID): DatasetInstallStatus {
-    val appDB = AppDB.accessor(projectID) ?: return DatasetInstallStatus.Unknown
-
-    for (message in appDB.selectDatasetInstallMessages(datasetID)) {
-      if (message.status == InstallStatus.Complete)
-        return DatasetInstallStatus.Installed
-    }
-
-    return DatasetInstallStatus.NotInstalled
   }
 
   private fun datasetIsImported(datasetID: DatasetID): Boolean {

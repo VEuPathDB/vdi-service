@@ -7,6 +7,7 @@ import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
+import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import java.time.OffsetDateTime
 
@@ -210,7 +211,7 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    *
    * @param deleted The new value for the deleted flag.
    */
-  fun updateDatasetDeletedFlag(datasetID: DatasetID, deleted: Boolean)
+  fun updateDatasetDeletedFlag(datasetID: DatasetID, deleteFlag: DeleteFlag)
 
   /**
    * Updates the "data" last updated field on a target dataset sync control
