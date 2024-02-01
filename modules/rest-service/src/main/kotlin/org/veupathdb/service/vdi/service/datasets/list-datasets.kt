@@ -14,6 +14,7 @@ import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetFileSummary
+import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
@@ -50,6 +51,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
 
   // for each dataset the original search returned
   datasetList.forEach { ds ->
+
     // add the owner id to the set of user ids
     userIDs.add(ds.ownerID)
 
@@ -121,7 +123,10 @@ private fun DatasetRecord.toListEntry(
   out.status        = DatasetStatusInfo(importStatus, statuses)
   out.origin        = origin
   out.sourceUrl     = sourceURL
-  out.shares        = shares
+  if (importStatus !== DatasetImportStatus.Invalid && importStatus !== DatasetImportStatus.Failed) {
+    // Don't set shares if import status is failed since dataset will never be usable by others.
+    out.shares = shares
+  }
   out.fileCount     = fileSummary.count.toInt()
   out.fileSizeTotal = fileSummary.size.toLong()
   out.created       = created.defaultZone()

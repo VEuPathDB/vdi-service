@@ -176,4 +176,31 @@ object Metrics {
     .name("dataset_upload_queue_size")
     .help("Number of dataset uploads currently queued to be processed.")
     .register()
+
+  val importQueueSize: Gauge = Gauge.build()
+    .name("import_queue_size")
+    .help("Number of imports currently queued to be processed.")
+    .register()
+
+  val installQueueSize: Gauge = Gauge.build()
+    .name("install_queue_size")
+    .help("Number of installs currently queued to be processed.")
+    .register()
+
+  val shareQueueSize: Gauge = Gauge.build()
+    .name("share_queue_size")
+    .help("Number of shares currently queued to be processed.")
+    .register()
+
+  val updateMetaQueueSize: Gauge = Gauge.build()
+    .name("update_meta_queue_size")
+    .help("Number of meta updates currently queued to be processed.")
+    .register()
+
+  val softDeleteQueueSize: Gauge = Gauge.build()
+    .name("soft_delete_queue_size")
+    .help("Number of soft deletes currently queued to be processed.")
+    .register()
+
+
 }

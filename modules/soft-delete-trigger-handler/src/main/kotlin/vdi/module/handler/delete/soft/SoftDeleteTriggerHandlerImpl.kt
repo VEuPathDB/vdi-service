@@ -31,7 +31,10 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.softDeleteTriggerTopic, config.kafkaConsumerConfig)
-    val wp = WorkerPool("soft-delete-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt())
+    val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
+    val wp = WorkerPool("soft-delete-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
+      Metrics.softDeleteQueueSize.inc(it.toDouble())
+    }
 
     runBlocking {
       launch(Dispatchers.IO) {
