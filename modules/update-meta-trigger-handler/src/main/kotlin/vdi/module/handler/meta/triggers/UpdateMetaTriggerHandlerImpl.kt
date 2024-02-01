@@ -72,17 +72,15 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
   }
 
   private fun executeJob(dm: DatasetManager, kr: KafkaRouter, userID: UserID, datasetID: DatasetID) {
-    log.trace("executeJob(dm=..., kr=..., userID={}, datasetID={})", userID, datasetID)
-
     log.debug("Looking up dataset directory for dataset {}/{}", userID, datasetID)
+
     // lookup the dataset directory for the given userID and datasetID
     val dir = dm.getDatasetDirectory(userID, datasetID)
 
     // If the dataset directory is not usable, bail out.
     //
-    // Don't worry about logging here, the `isUsable` method performs
-    // logging specific to the reason that the dataset directory is
-    // not usable.
+    // Don't worry about logging here, the `isUsable` method performs logging
+    // specific to the reason that the dataset directory is not usable.
     if (!dir.isUsable(userID, datasetID))
       return
 
@@ -160,19 +158,18 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val ph = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version]!!
 
     datasetMeta.projects
-      .forEach { projectID -> executeJob(ph, datasetMeta, syncControl, metaTimestamp, datasetID, projectID, userID) }
+      .forEach { projectID -> executeJob(ph, datasetMeta, metaTimestamp, datasetID, projectID, userID) }
 
     timer.observeDuration()
   }
 
   private fun executeJob(
-    ph:            PluginHandler,
-    meta:          VDIDatasetMeta,
-    syncControl:   VDISyncControlRecord,
+    ph: PluginHandler,
+    meta: VDIDatasetMeta,
     metaTimestamp: OffsetDateTime,
-    datasetID:     DatasetID,
-    projectID:     ProjectID,
-    userID:        UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    userID: UserID,
   ) {
     if (!ph.appliesToProject(projectID)) {
       log.warn("dataset {}/{} declares a project id of {} which is not applicable to dataset type {}", userID, datasetID, projectID, meta.type.name)
@@ -270,6 +267,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
         }
       }
       throw e
+    } finally {
+      AppDB.withTransaction(projectID) { it.updateSyncControlMetaTimestamp(datasetID, metaTimestamp) }
     }
   }
 
