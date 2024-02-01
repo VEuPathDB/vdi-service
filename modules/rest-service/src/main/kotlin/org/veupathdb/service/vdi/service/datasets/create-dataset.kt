@@ -119,8 +119,8 @@ fun createDataset(
   //       being uploaded to MinIO (also in that forked thread).
   val (tempDirectory, uploadFile) = entity.getDatasetFile()
 
+  Metrics.uploadQueueSize.inc()
   WorkPool.submit {
-    Metrics.uploadQueueSize.inc()
     try {
       uploadFiles(userID, datasetID, tempDirectory, uploadFile, datasetMeta)
     } finally {
