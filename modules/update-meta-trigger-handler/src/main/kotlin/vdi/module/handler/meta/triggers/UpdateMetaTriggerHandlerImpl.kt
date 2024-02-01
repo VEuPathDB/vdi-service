@@ -101,7 +101,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     // If no dataset record was found in the cache DB then this is (likely) the
     // first event for the dataset coming through the pipeline.
     if (cachedDataset == null) {
-      log.debug("dataset details were not found for dataset {}, creating them", datasetID)
+      log.debug("dataset details were not found for dataset {}/{}, creating them", userID, datasetID)
       // If they were not found, construct them
       CacheDB.initializeDataset(datasetID, datasetMeta)
     }
@@ -153,7 +153,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       }
 
     if (!PluginHandlers.contains(datasetMeta.type.name, datasetMeta.type.version)) {
-      log.error("dataset {} declares a type of {} which is unknown to the vdi service", datasetID, datasetMeta.type.name)
+      log.error("dataset {}/{} declares a type of {} which is unknown to the vdi service", userID, datasetID, datasetMeta.type.name)
       return
     }
 
@@ -175,7 +175,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     userID:        UserID,
   ) {
     if (!ph.appliesToProject(projectID)) {
-      log.warn("Dataset {}/{} declares a project id of {} which is not applicable to dataset type {}", userID, datasetID, projectID, meta.type.name)
+      log.warn("dataset {}/{} declares a project id of {} which is not applicable to dataset type {}", userID, datasetID, projectID, meta.type.name)
       return
     }
 
@@ -190,7 +190,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
 
     if (failed) {
-      log.info("Skipping install-meta for dataset {}/{}, project {} due to previous failures", userID, datasetID, projectID)
+      log.info("skipping install-meta for dataset {}/{}, project {} due to previous failures", userID, datasetID, projectID)
       return
     }
 
@@ -242,8 +242,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val sync = AppDB.accessor(projectID)!!.selectDatasetSyncControlRecord(datasetID)!!
 
     if (!sync.metaUpdated.isBefore(metaTimestamp)) {
-      log.warn("db: {} -> s3 {}", sync.metaUpdated, metaTimestamp)
-      log.info("Skipping install-meta for dataset {}/{}, project {} as nothing has changed.", userID, datasetID, projectID)
+      log.info("skipping install-meta for dataset {}/{}, project {} as nothing has changed.", userID, datasetID, projectID)
       return
     }
 
@@ -258,7 +257,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
         InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(datasetID, projectID, result as InstallMetaUnexpectedErrorResponse)
       }
     } catch (e: Throwable) {
-      log.debug("install-meta request to handler server failed with exception:", e)
+      log.info("install-meta request to handler server failed with exception:", e)
       AppDB.withTransaction(projectID) {
         try {
           it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.FailedInstallation, e.message))

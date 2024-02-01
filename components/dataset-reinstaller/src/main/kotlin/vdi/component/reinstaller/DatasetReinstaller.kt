@@ -22,7 +22,6 @@ import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallUnexpectedErro
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.nio.file.Path
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.io.path.inputStream
