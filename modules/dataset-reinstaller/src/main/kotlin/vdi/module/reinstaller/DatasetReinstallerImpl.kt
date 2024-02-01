@@ -33,7 +33,7 @@ internal class DatasetReinstallerImpl(private val config: DatasetReinstallerConf
   }
 
   private suspend fun run() {
-    var lastRun = now()
+    var lastRun = 0.milliseconds
 
     runBlocking {
       while (!shutdownTrigger.isTriggered()) {
