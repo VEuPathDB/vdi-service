@@ -166,7 +166,7 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
    */
   fun tryInsertDataset(row: Dataset) {
     log.debug("inserting dataset record for dataset {}", row.datasetID)
-    con.tryInsertDatasetRecord(row.datasetID, row.typeName, row.typeVersion, row.ownerID, row.isDeleted, row.origin, row.created)
+    con.tryInsertDatasetRecord(row.datasetID, row.typeName, row.typeVersion, row.ownerID, row.isDeleted, row.origin, row.created, row.inserted)
   }
 
   fun tryInsertInstallFiles(datasetID: DatasetID, files: Map<String, Long>) {

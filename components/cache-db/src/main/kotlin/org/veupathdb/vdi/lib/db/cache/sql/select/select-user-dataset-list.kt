@@ -22,6 +22,7 @@ SELECT
 , d.is_deleted
 , d.origin
 , d.created
+, d.inserted
 , md.name
 , md.summary
 , md.description
@@ -148,6 +149,7 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
           description  = it.getString("description"),
           sourceURL    = it.getString("source_url"),
           projects     = it.getProjectIDList("projects"),
+          inserted     = it.getDateTime("inserted"),
         )
       }
     }

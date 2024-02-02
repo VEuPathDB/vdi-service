@@ -325,9 +325,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
           typeVersion  = meta.type.version,
           ownerID      = meta.owner,
           isDeleted    = false,
-          created      = OffsetDateTime.now(),
+          created      = meta.created,
           origin       = meta.origin,
-          importStatus = DatasetImportStatus.Queued
+          importStatus = DatasetImportStatus.Queued,
+          inserted     = OffsetDateTime.now(),
         ))
 
         // insert metadata for the dataset

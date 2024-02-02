@@ -1,6 +1,5 @@
 package org.veupathdb.vdi.lib.db.cache.sql.select
 
-import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
@@ -18,6 +17,7 @@ SELECT
 , d.is_deleted
 , d.origin
 , d.created
+, d.inserted
 , md.name
 , md.summary
 , md.description
@@ -53,7 +53,8 @@ internal fun Connection.selectNonPrivateDatasets(): List<DatasetRecord> {
           summary      = getString("summary"),
           description  = getString("description"),
           sourceURL    = getString("source_url"),
-          projects     = getProjectIDList("projects")
+          projects     = getProjectIDList("projects"),
+          inserted     = getDateTime("inserted")
         )
       }
     }
