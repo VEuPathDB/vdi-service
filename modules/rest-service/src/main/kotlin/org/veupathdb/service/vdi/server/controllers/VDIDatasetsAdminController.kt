@@ -49,7 +49,7 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
 
     if (entity.all == true) {
       InstallCleaner.cleanAll()
-    } else if (entity.targets.isNullOrEmpty()) {
+    } else if (!entity.targets.isNullOrEmpty()) {
       InstallCleaner.cleanTargets(entity.targets.map { ReinstallTarget(DatasetID(it.datasetId), it.projectId) })
     }
 
