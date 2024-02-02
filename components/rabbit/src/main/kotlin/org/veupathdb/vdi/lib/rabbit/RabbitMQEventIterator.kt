@@ -1,10 +1,10 @@
 package org.veupathdb.vdi.lib.rabbit
 
+import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.common.async.SuspendingIterator
 import kotlin.time.Duration
-import kotlinx.coroutines.delay
 import com.rabbitmq.client.Channel as RChannel
 
 private const val MAX_LOGGABLE_MESSAGE_SIZE_BYTES = 1024 * 16

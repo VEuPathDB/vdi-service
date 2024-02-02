@@ -1,10 +1,10 @@
 package org.veupathdb.vdi.lib.db.app
 
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.db.app.sql.selectInstallStatuses
-import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
+import org.veupathdb.vdi.lib.db.app.sql.selectInstallStatuses
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

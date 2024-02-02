@@ -3,10 +3,6 @@ package org.veupathdb.vdi.lib.db.cache.sql.select
 import org.veupathdb.vdi.lib.db.cache.model.BrokenImportListQuery
 import org.veupathdb.vdi.lib.db.cache.model.BrokenImportRecord
 import org.veupathdb.vdi.lib.db.cache.util.*
-import org.veupathdb.vdi.lib.db.cache.util.getDatasetID
-import org.veupathdb.vdi.lib.db.cache.util.getUserID
-import org.veupathdb.vdi.lib.db.cache.util.withPreparedStatement
-import org.veupathdb.vdi.lib.db.cache.util.withResults
 import java.sql.Connection
 import java.sql.Types
 

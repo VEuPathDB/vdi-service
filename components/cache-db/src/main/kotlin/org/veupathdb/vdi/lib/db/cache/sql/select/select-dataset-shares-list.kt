@@ -4,7 +4,10 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShare
-import org.veupathdb.vdi.lib.db.cache.util.*
+import org.veupathdb.vdi.lib.db.cache.util.getDatasetID
+import org.veupathdb.vdi.lib.db.cache.util.getUserID
+import org.veupathdb.vdi.lib.db.cache.util.withPreparedStatement
+import org.veupathdb.vdi.lib.db.cache.util.withResults
 import java.sql.Connection
 
 // language=postgresql

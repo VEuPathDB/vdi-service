@@ -11,11 +11,9 @@ import org.veupathdb.vdi.lib.s3.datasets.paths.S3DatasetPathFactory
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3PathFactory
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import vdi.component.metrics.Metrics
-
 import java.util.*
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
-import kotlin.NoSuchElementException
 
 class DatasetManager(private val s3Bucket: S3Bucket) {
   private val pathFactory = S3PathFactory()

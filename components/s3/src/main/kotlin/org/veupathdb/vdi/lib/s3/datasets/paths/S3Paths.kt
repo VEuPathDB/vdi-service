@@ -5,7 +5,8 @@ import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.s3.datasets.*
+import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
+import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectoryImpl
 import org.veupathdb.vdi.lib.s3.datasets.util.PathBuilder
 
 @Suppress("NOTHING_TO_INLINE")

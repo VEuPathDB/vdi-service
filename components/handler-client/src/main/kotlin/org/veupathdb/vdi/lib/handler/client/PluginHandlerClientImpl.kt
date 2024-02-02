@@ -8,17 +8,9 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.handler.client.model.*
 import org.veupathdb.vdi.lib.handler.client.response.imp.*
-import org.veupathdb.vdi.lib.handler.client.response.imp.ImportBadRequestResponseImpl
-import org.veupathdb.vdi.lib.handler.client.response.imp.ImportSuccessResponseImpl
 import org.veupathdb.vdi.lib.handler.client.response.ind.*
-import org.veupathdb.vdi.lib.handler.client.response.ind.InstallDataBadRequestResponseImpl
-import org.veupathdb.vdi.lib.handler.client.response.ind.InstallDataSuccessResponseImpl
 import org.veupathdb.vdi.lib.handler.client.response.inm.*
-import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaBadRequestResponseImpl
-import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaSuccessResponseImpl
 import org.veupathdb.vdi.lib.handler.client.response.uni.*
-import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallBadRequestResponseImpl
-import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallSuccessResponseImpl
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
 import java.io.InputStream

@@ -5,7 +5,7 @@ plugins {
 dependencies {
   constraints {
     api("org.gusdb:fgputil-db:2.12.11")
-    api("org.veupathdb.lib:jaxrs-container-core:6.20.1")
+    api("org.veupathdb.lib:jaxrs-container-core:6.21.1")
     api("org.veupathdb.lib:multipart-jackson-pojo:1.1.3")
 
     // VDI

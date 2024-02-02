@@ -1,8 +1,9 @@
 package org.veupathdb.vdi.lib.s3.datasets.paths
 
-import org.hamcrest.MatcherAssert.*
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
@@ -10,7 +11,10 @@ import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.core.fields.BasicHeaders
 import org.veupathdb.lib.s3.s34k.core.objects.AbstractS3Object
 import org.veupathdb.lib.s3.s34k.fields.Headers
-import org.veupathdb.lib.s3.s34k.objects.*
+import org.veupathdb.lib.s3.s34k.objects.ObjectContainer
+import org.veupathdb.lib.s3.s34k.objects.ObjectMeta
+import org.veupathdb.lib.s3.s34k.objects.ObjectStream
+import org.veupathdb.lib.s3.s34k.objects.ObjectTagContainer
 import org.veupathdb.lib.s3.s34k.params.DeleteParams
 import org.veupathdb.lib.s3.s34k.params.`object`.ObjectExistsParams
 import org.veupathdb.lib.s3.s34k.params.`object`.ObjectStatParams

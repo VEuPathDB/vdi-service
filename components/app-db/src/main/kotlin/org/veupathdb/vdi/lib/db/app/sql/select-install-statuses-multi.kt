@@ -1,8 +1,8 @@
 package org.veupathdb.vdi.lib.db.app.sql
 
+import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
-import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import java.sql.Connection
 import kotlin.math.max

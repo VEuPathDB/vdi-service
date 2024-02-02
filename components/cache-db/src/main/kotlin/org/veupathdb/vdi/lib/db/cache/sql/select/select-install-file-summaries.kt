@@ -2,7 +2,9 @@ package org.veupathdb.vdi.lib.db.cache.sql.select
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.db.cache.model.DatasetFileSummary
-import org.veupathdb.vdi.lib.db.cache.util.*
+import org.veupathdb.vdi.lib.db.cache.util.getDatasetID
+import org.veupathdb.vdi.lib.db.cache.util.withPreparedStatement
+import org.veupathdb.vdi.lib.db.cache.util.withResults
 import java.sql.Connection
 
 // language=postgresql

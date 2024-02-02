@@ -4,7 +4,8 @@ import org.veupathdb.lib.s3.s34k.objects.S3Object
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
-import org.veupathdb.vdi.lib.common.model.*
+import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.s3.datasets.exception.MalformedDatasetException
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3DatasetPathFactory
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
