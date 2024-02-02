@@ -5,7 +5,6 @@ import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.util.defaultZone
-import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility

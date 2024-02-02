@@ -1,20 +1,8 @@
 package org.veupathdb.service.vdi.generated.resources;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
-import org.veupathdb.service.vdi.generated.model.BadRequestError;
-import org.veupathdb.service.vdi.generated.model.DatasetDetails;
-import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest;
-import org.veupathdb.service.vdi.generated.model.ForbiddenError;
-import org.veupathdb.service.vdi.generated.model.NotFoundError;
-import org.veupathdb.service.vdi.generated.model.ServerError;
-import org.veupathdb.service.vdi.generated.model.UnauthorizedError;
-import org.veupathdb.service.vdi.generated.model.UnprocessableEntityError;
+import org.veupathdb.service.vdi.generated.model.*;
 import org.veupathdb.service.vdi.generated.support.PATCH;
 import org.veupathdb.service.vdi.generated.support.ResponseDelegate;
 

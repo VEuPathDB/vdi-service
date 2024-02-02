@@ -2,9 +2,9 @@ package org.veupathdb.vdi.lib.db.cache.sql.insert
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.db.cache.util.preparedUpdate
 import org.veupathdb.vdi.lib.db.cache.util.setDatasetID
 import org.veupathdb.vdi.lib.db.cache.util.setUserID
-import org.veupathdb.vdi.lib.db.cache.util.preparedUpdate
 import java.sql.Connection
 import java.time.OffsetDateTime
 

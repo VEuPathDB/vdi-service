@@ -1,10 +1,10 @@
 package vdi.bootstrap
 
-import org.slf4j.LoggerFactory
-import org.veupathdb.service.vdi.RestService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
+import org.veupathdb.service.vdi.RestService
 import org.veupathdb.vdi.lib.reconciler.Reconciler
 import vdi.module.delete.hard.HardDeleteTriggerHandler
 import vdi.module.events.routing.EventRouter

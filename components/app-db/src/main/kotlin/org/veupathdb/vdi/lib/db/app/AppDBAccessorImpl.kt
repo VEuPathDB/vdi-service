@@ -9,10 +9,6 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.model.*
 import org.veupathdb.vdi.lib.db.app.sql.*
-import org.veupathdb.vdi.lib.db.app.sql.selectDataset
-import org.veupathdb.vdi.lib.db.app.sql.selectDatasetInstallMessage
-import org.veupathdb.vdi.lib.db.app.sql.selectDatasetVisibilityRecords
-import org.veupathdb.vdi.lib.db.app.sql.selectSyncControl
 import javax.sql.DataSource
 
 internal class AppDBAccessorImpl(

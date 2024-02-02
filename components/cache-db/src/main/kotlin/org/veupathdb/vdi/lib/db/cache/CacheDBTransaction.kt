@@ -9,7 +9,10 @@ import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.sql.delete.*
 import org.veupathdb.vdi.lib.db.cache.sql.insert.*
 import org.veupathdb.vdi.lib.db.cache.sql.update.*
-import org.veupathdb.vdi.lib.db.cache.sql.upsert.*
+import org.veupathdb.vdi.lib.db.cache.sql.upsert.upsertDatasetShareOffer
+import org.veupathdb.vdi.lib.db.cache.sql.upsert.upsertDatasetShareReceipt
+import org.veupathdb.vdi.lib.db.cache.sql.upsert.upsertImportControl
+import org.veupathdb.vdi.lib.db.cache.sql.upsert.upsertImportMessages
 import java.sql.Connection
 import java.time.OffsetDateTime
 

@@ -6,7 +6,6 @@ import org.veupathdb.lib.s3.s34k.objects.S3Object
 import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.json.JSON
-import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.io.InputStream
 import java.time.OffsetDateTime
 

@@ -4,9 +4,9 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
+import java.util.*
 import org.apache.kafka.clients.consumer.KafkaConsumer as KConsumer
 import org.apache.kafka.clients.producer.KafkaProducer as KProducer
-import java.util.Properties
 
 fun KafkaConsumer(topic: String, config: KafkaConsumerConfig): KafkaConsumer {
   val props = Properties()

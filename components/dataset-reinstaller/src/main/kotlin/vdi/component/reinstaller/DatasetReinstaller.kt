@@ -7,7 +7,6 @@ import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry

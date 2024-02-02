@@ -1,6 +1,5 @@
 package org.veupathdb.service.vdi.generated.resources;
 
-import java.util.List;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -10,6 +9,8 @@ import org.veupathdb.service.vdi.generated.model.DatasetListEntry;
 import org.veupathdb.service.vdi.generated.model.ServerError;
 import org.veupathdb.service.vdi.generated.model.UnauthorizedError;
 import org.veupathdb.service.vdi.generated.support.ResponseDelegate;
+
+import java.util.List;
 
 @Path("/vdi-datasets/community")
 public interface VdiDatasetsCommunity {

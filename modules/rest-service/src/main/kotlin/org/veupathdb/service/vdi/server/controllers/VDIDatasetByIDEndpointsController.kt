@@ -3,7 +3,7 @@ package org.veupathdb.service.vdi.server.controllers
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
-import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.*
+import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdId
 import org.veupathdb.service.vdi.service.datasets.*

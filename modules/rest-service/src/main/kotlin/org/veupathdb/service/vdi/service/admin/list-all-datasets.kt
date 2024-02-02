@@ -9,7 +9,6 @@ import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.AdminAllDatasetsRow
 import org.veupathdb.vdi.lib.db.cache.query.AdminAllDatasetsQuery
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 private const val MAX_RESULT_LIMIT = 250u
 

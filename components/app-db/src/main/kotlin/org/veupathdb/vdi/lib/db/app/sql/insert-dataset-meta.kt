@@ -1,7 +1,6 @@
 package org.veupathdb.vdi.lib.db.app.sql
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
 import java.sql.Connection
 
 private fun sql(schema: String) =
