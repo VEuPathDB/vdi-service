@@ -58,7 +58,9 @@ allprojects {
 dependencies {
   implementation(platform(project(":platform")))
 
-  implementation(project(":components:s3"))
+  // FIXME: REMOVE THIS LINE AFTER DB MIGRATION TO ADD INSERTED COLUMN TO CACHE
+  //        DB
+  implementation(project(":components:cache-db"))
 
   implementation("org.veupathdb.vdi:vdi-component-common")
 

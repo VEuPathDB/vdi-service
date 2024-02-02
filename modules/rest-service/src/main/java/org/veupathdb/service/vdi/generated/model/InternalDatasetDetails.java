@@ -39,6 +39,12 @@ public interface InternalDatasetDetails {
   @JsonProperty("created")
   void setCreated(OffsetDateTime created);
 
+  @JsonProperty("inserted")
+  OffsetDateTime getInserted();
+
+  @JsonProperty("inserted")
+  void setInserted(OffsetDateTime inserted);
+
   @JsonProperty("name")
   String getName();
 

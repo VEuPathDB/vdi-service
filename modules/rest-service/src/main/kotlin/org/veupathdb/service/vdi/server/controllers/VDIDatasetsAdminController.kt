@@ -69,6 +69,7 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
     val response = InternalDatasetDetailsImpl().also {
       it.name = datasetDetails.name
       it.created = datasetDetails.created
+      it.inserted = datasetDetails.inserted
       it.origin = datasetDetails.origin
       it.projectIds = datasetDetails.projectIDs
       it.description = datasetDetails.description

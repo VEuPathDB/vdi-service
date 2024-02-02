@@ -5,6 +5,7 @@ import org.veupathdb.service.vdi.RestService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.reconciler.Reconciler
 import vdi.module.delete.hard.HardDeleteTriggerHandler
 import vdi.module.events.routing.EventRouter
@@ -22,6 +23,10 @@ object Main {
 
   @JvmStatic
   fun main(args: Array<String>) {
+    // FIXME: REMOVE THIS AFTER THE MIGRATION IS COMPLETE
+    log.info("migrating postgres database to add 'inserted' column to vdi.datasets")
+    CacheDB.tempMigrateDB()
+
     log.info("initializing modules")
     val modules = listOf(
       DatasetReinstaller(),
