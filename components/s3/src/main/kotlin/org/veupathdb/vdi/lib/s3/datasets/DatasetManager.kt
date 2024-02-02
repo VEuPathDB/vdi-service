@@ -124,7 +124,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
             Metrics.malformedDatasetFound.inc()
             initialDatasetID = currDatasetID
             stagedObjects = emptyList()
-            log.warn("Found a malformed dataset with ID $initialDatasetID.")
+            log.warn("Found a malformed dataset with ID $initialDatasetID.", e)
             continue
           }
 
