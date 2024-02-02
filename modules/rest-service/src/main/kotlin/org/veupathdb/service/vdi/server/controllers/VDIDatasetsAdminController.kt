@@ -2,7 +2,7 @@ package org.veupathdb.service.vdi.server.controllers
 
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.ForbiddenException
-import org.veupathdb.lib.container.jaxrs.server.annotations.AllowAdminAuth
+import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.db.UserDB
 import org.veupathdb.service.vdi.generated.model.*
@@ -29,8 +29,8 @@ private const val biQueryLimitDefault = 100
 private const val biQueryOffsetMinimum = 0
 private const val biQueryOffsetDefault = 0
 
-@Authenticated
-@AllowAdminAuth(required = true)
+@Authenticated(adminOverride = Authenticated.AdminOverrideOption.ALLOW_ALWAYS)
+@AdminRequired
 class VDIDatasetsAdminController : VdiDatasetsAdmin {
 
   override fun getVdiDatasetsAdminListBroken(

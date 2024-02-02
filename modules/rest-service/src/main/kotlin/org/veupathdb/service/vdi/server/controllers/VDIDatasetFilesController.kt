@@ -3,17 +3,15 @@ package org.veupathdb.service.vdi.server.controllers
 import jakarta.ws.rs.NotFoundException
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
-import org.veupathdb.lib.container.jaxrs.server.annotations.AllowAdminAuth
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdIdFiles
 import org.veupathdb.service.vdi.service.datasets.*
 import org.veupathdb.vdi.lib.common.field.toDatasetIDOrNull
 import org.veupathdb.vdi.lib.common.field.toUserID
 
-@Authenticated(allowGuests = false)
+@Authenticated(allowGuests = false, adminOverride = Authenticated.AdminOverrideOption.ALLOW_ALWAYS)
 class VDIDatasetFilesController(@Context request: ContainerRequest) : VdiDatasetsVdIdFiles, ControllerBase(request) {
 
-  @AllowAdminAuth
   override fun getVdiDatasetsFilesByVdId(vdId: String): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesByVdIdResponse {
     val datasetID = vdId.toDatasetIDOrNull() ?: throw NotFoundException()
 
@@ -26,7 +24,6 @@ class VDIDatasetFilesController(@Context request: ContainerRequest) : VdiDataset
     )
   }
 
-  @AllowAdminAuth
   override fun getVdiDatasetsFilesUploadByVdId(vdId: String): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesUploadByVdIdResponse {
     val datasetID = vdId.toDatasetIDOrNull() ?: throw NotFoundException()
 
@@ -45,7 +42,6 @@ class VDIDatasetFilesController(@Context request: ContainerRequest) : VdiDataset
       )
   }
 
-  @AllowAdminAuth
   override fun getVdiDatasetsFilesDataByVdId(vdId: String): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesDataByVdIdResponse {
     val datasetID = vdId.toDatasetIDOrNull() ?: throw NotFoundException()
 

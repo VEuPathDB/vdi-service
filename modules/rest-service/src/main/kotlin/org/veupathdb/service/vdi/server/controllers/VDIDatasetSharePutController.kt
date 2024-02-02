@@ -3,7 +3,6 @@ package org.veupathdb.service.vdi.server.controllers
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
-import org.veupathdb.lib.container.jaxrs.server.annotations.AllowAdminAuth
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.generated.model.DatasetShareOffer
 import org.veupathdb.service.vdi.generated.model.DatasetShareReceipt
@@ -22,7 +21,7 @@ class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiData
   @Path("/offer")
   @Produces("application/json")
   @Consumes("application/json")
-  @AllowAdminAuth
+  @Authenticated(allowGuests = false, adminOverride = Authenticated.AdminOverrideOption.ALLOW_ALWAYS)
   override fun putVdiDatasetsSharesOfferByVdIdAndRecipientUserId(
     @PathParam("vd-id") vdId: String,
     @PathParam("recipient-user-id") recipientUserId: Long,
@@ -46,7 +45,7 @@ class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiData
   @Path("/receipt")
   @Produces("application/json")
   @Consumes("application/json")
-  @AllowAdminAuth
+  @Authenticated(allowGuests = false, adminOverride = Authenticated.AdminOverrideOption.ALLOW_ALWAYS)
   override fun putVdiDatasetsSharesReceiptByVdIdAndRecipientUserId(
     @PathParam("vd-id") vdId: String,
     @PathParam("recipient-user-id") recipientUserId: Long,
