@@ -4,6 +4,7 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
+import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.service.vdi.generated.model.DatasetShareOffer
 import org.veupathdb.service.vdi.generated.model.DatasetShareReceipt
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdIdSharesRecipientUserId
@@ -13,7 +14,7 @@ import org.veupathdb.service.vdi.service.shares.putShareReceipt
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserID
 
-@Authenticated(allowGuests = false)
+@Authenticated
 @Path("/vdi-datasets/{vd-id}/shares/{recipient-user-id}")
 class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiDatasetsVdIdSharesRecipientUserId, ControllerBase(request) {
 
@@ -21,7 +22,7 @@ class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiData
   @Path("/offer")
   @Produces("application/json")
   @Consumes("application/json")
-  @Authenticated(allowGuests = false, adminOverride = Authenticated.AdminOverrideOption.ALLOW_ALWAYS)
+  @Authenticated(adminOverride = ALLOW_ALWAYS)
   override fun putVdiDatasetsSharesOfferByVdIdAndRecipientUserId(
     @PathParam("vd-id") vdId: String,
     @PathParam("recipient-user-id") recipientUserId: Long,
@@ -45,7 +46,7 @@ class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiData
   @Path("/receipt")
   @Produces("application/json")
   @Consumes("application/json")
-  @Authenticated(allowGuests = false, adminOverride = Authenticated.AdminOverrideOption.ALLOW_ALWAYS)
+  @Authenticated(adminOverride = ALLOW_ALWAYS)
   override fun putVdiDatasetsSharesReceiptByVdIdAndRecipientUserId(
     @PathParam("vd-id") vdId: String,
     @PathParam("recipient-user-id") recipientUserId: Long,
