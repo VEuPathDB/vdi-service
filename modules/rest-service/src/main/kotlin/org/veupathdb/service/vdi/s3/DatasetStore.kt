@@ -46,11 +46,18 @@ object DatasetStore {
 
   fun listDatasetImportReadyZipSizes(userID: UserID): Map<DatasetID, Long> {
     log.debug("fetching upload size totals across all datasets for user {}", userID)
+
     val out = HashMap<DatasetID, Long>()
+
     bucket.objects.list(S3Paths.userDir(userID))
-      .asSequence()
-      .filter { it.path.endsWith(S3Paths.ImportReadyZipName) }
-      .forEach { out[it.path.getDatasetIDFromPath()] = it.size }
+      .forEach {
+        val datasetID = it.path.getDatasetIDFromPath()
+
+        out.computeIfAbsent(datasetID) { 0 }
+
+        if (it.path.endsWith(S3Paths.ImportReadyZipName))
+          out[datasetID] = it.size
+      }
 
     return out
   }
