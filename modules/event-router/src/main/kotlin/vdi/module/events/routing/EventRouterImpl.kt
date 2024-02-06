@@ -89,13 +89,15 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
       // remove everything.  This event should be one of many for this
       // specific dataset.
       if (event.eventType.action == MinIOEventAction.DELETE) {
-        log.debug("received a hard delete event for dataset {}/{} for MinIO key {}", path.userID.toString(), path.datasetID.toString(), event.objectKey)
+        log.debug("received a hard delete event for dataset {}/{} for MinIO key {}", path.userID, path.datasetID, event.objectKey)
         safeSend(HardDeleteTrigger(path.userID, path.datasetID), kr::sendHardDeleteTrigger)
+        continue
       }
 
       if (path is VDDatasetShareFilePath) {
         log.debug("received a share event for dataset {}/{}", path.userID, path.datasetID)
         safeSend(ShareTrigger(path.userID, path.datasetID), kr::sendShareTrigger)
+        continue
       }
 
       if (path !is VDDatasetFilePath) {
