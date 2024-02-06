@@ -49,13 +49,6 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
       .map(::DatasetID)
   }
 
-  /**
-   * Returns a list of dataset IDs from the target user path.
-   *
-   * If the user does not have any datasets, the returned list will be empty.
-   *
-   * @param ownerID WDK user ID of the user who owns or will own the dataset.
-   */
   fun streamAllDatasets(): Stream<DatasetDirectory> {
     val objectIterator = s3Bucket.objects.stream().stream().iterator()
     val datasetDirStream: Iterator<DatasetDirectory> = DatasetDirIterator(objectIterator)
@@ -75,7 +68,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
    */
   private class DatasetDirIterator(private val objectStream: Iterator<S3Object>) : Iterator<DatasetDirectory> {
     private val log = LoggerFactory.getLogger(javaClass)
-    private var stagedObjects: MutableList<S3Object> = mutableListOf()
+    private val stagedObjects: MutableList<S3Object> = mutableListOf()
     private var currentDataset: DatasetDirectory? = initFirstDataset()
 
     override fun hasNext(): Boolean {
@@ -100,7 +93,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
       var s3Object = objectStream.next()
       // Get our initial dataset ID, this will be used to detect when we've hit a new dataset.
       var (initialUserID, initialDatasetID) = datasetIdFromS3Object(s3Object)
-      stagedObjects = mutableListOf(s3Object)
+      stagedObjects.add(s3Object)
       while (objectStream.hasNext()) {
         s3Object = objectStream.next()
         val (_, currDatasetID) = datasetIdFromS3Object(s3Object)
@@ -120,13 +113,14 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
             // and find the next dataset.
             Metrics.malformedDatasetFound.inc()
             initialDatasetID = currDatasetID
-            stagedObjects = mutableListOf()
+            stagedObjects.clear()
             log.warn("Found a malformed dataset with ID $initialDatasetID.", e)
             continue
           }
 
           // Set staged objects to contain just the object belonging to new dataset.
-          stagedObjects = mutableListOf(s3Object)
+          stagedObjects.clear()
+          stagedObjects.add(s3Object)
           return currentDataset
         }
 
@@ -144,11 +138,11 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
           } catch (e: MalformedDatasetException) {
             Metrics.malformedDatasetFound.inc()
             log.warn("Found a malformed dataset with ID $initialDatasetID.")
-            stagedObjects = mutableListOf()
+            stagedObjects.clear()
             return null
           }
           // Stream is exhausted. Indicate as much.
-          stagedObjects = mutableListOf()
+          stagedObjects.clear()
         }
       }
       return currentDataset
@@ -177,7 +171,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
               this.currentDataset = null
               return null
             }
-            stagedObjects = mutableListOf()
+            stagedObjects.clear()
             return currentDataset
           }
 
@@ -202,14 +196,16 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
             // Otherwise, create the dataset directory and reset staged objects.
             val pathFactory = S3DatasetPathFactory(currUserID, currDatasetID)
             currentDataset = EagerlyLoadedDatasetDirectory(stagedObjects, currUserID, currDatasetID, pathFactory)
-            stagedObjects = mutableListOf(s3Object)
+            stagedObjects.clear()
+            stagedObjects.add(s3Object)
             return currentDataset
           } catch (e: MalformedDatasetException) {
             // Dataset is malformed. Note it, and set staged objects to the next object in stream to start accumulating
             // objects for the next dataset.
             Metrics.malformedDatasetFound.inc()
             log.warn("Found a malformed dataset with ID $currDatasetID.")
-            stagedObjects = mutableListOf(s3Object)
+            stagedObjects.clear()
+            stagedObjects.add(s3Object)
             continue
           }
         }
