@@ -61,7 +61,7 @@ internal class DatasetDirectoryImpl(
     pathFactory.datasetUploadZip() in bucket.objects
 
   override fun getUploadFile() =
-    DatasetRawUploadFileImpl(bucket, pathFactory.datasetDeleteFlagFile())
+    DatasetRawUploadFileImpl(bucket, pathFactory.datasetUploadZip())
 
   override fun putUploadFile(fn: () -> InputStream) {
     fn().use { bucket.objects[pathFactory.datasetUploadZip()] = it.buffered() }
