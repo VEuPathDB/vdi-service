@@ -15,7 +15,7 @@ internal class DatasetShareReceiptFileImpl(
   lastModifiedSupplier: () -> OffsetDateTime? = { null },
   loadObjectStream: () -> InputStream? = { null }
 )
-  : DatasetFileImpl(S3Paths.ShareReceiptFileName, path, existsChecker, lastModifiedSupplier, loadObjectStream)
+  : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream)
   , DatasetShareReceiptFile
 {
   /**
@@ -40,8 +40,8 @@ internal class DatasetShareReceiptFileImpl(
   ) {
     if (s3Object.baseName != S3Paths.ShareReceiptFileName) {
       throw IllegalArgumentException(
-        "Can only construct a MetaFile from s3 object if object base name is "
-          + S3Paths.ShareReceiptFileName
+        "Can only construct a share receipt from s3 object if object base name is "
+          + S3Paths.ShareReceiptFileName + ". Given path: " + s3Object.path
       )
     }
   }

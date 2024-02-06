@@ -171,7 +171,7 @@ object DatasetReinstaller {
 
       s3Dir.getInstallReadyFile()
         .also { ddf ->
-          val zip = tempDir.resolve(ddf.name)
+          val zip = tempDir.resolve(ddf.baseName)
           zip.outputStream()
             .use { out -> ddf.loadContents()!!.use { inp -> inp.transferTo(out) } }
 

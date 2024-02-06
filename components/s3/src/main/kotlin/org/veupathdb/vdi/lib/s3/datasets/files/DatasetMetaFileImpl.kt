@@ -15,7 +15,7 @@ internal class DatasetMetaFileImpl(
   lastModifiedSupplier: () -> OffsetDateTime? = { null },
   loadObjectStream: () -> InputStream? = { null }
 )
-  : DatasetFileImpl(S3Paths.MetadataFileName, path, existsChecker, lastModifiedSupplier, loadObjectStream)
+  : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream)
   , DatasetMetaFile
 {
   /**
@@ -42,8 +42,8 @@ internal class DatasetMetaFileImpl(
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
   ) {
     if (s3Object.baseName != S3Paths.MetadataFileName) {
-      throw IllegalArgumentException("Can only construct a MetaFile from s3 object if object base name is "
-        + S3Paths.MetadataFileName)
+      throw IllegalArgumentException("Can only construct a meta file from s3 object if object base name is "
+        + S3Paths.MetadataFileName + ". Given path: " + s3Object.path)
     }
   }
 

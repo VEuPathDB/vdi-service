@@ -15,7 +15,7 @@ internal class DatasetShareOfferFileImpl(
   lastModifiedSupplier: () -> OffsetDateTime? = { null },
   loadObjectStream: () -> InputStream? = { null }
 )
-  : DatasetFileImpl(S3Paths.ShareOfferFileName, path, existsChecker, lastModifiedSupplier, loadObjectStream)
+  : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream)
   , DatasetShareOfferFile
 {
 
@@ -41,8 +41,8 @@ internal class DatasetShareOfferFileImpl(
   ) {
     if (s3Object.baseName != S3Paths.ShareOfferFileName) {
       throw IllegalArgumentException(
-        "Can only construct a MetaFile from s3 object if object base name is "
-          + S3Paths.ShareOfferFileName
+        "Can only construct a share offer from s3 object if object base name is "
+          + S3Paths.ShareOfferFileName + ". Given path: " + s3Object.path
       )
     }
   }

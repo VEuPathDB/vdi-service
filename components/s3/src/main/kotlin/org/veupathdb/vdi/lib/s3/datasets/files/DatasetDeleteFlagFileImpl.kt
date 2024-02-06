@@ -8,11 +8,11 @@ import java.time.OffsetDateTime
 
 internal class DatasetDeleteFlagFileImpl(
   path: String,
-  private val existsChecker: () -> Boolean = { false },
-  private val lastModifiedSupplier: () -> OffsetDateTime? = { null },
-  private val loadObjectStream: () -> InputStream? = { null },
+  existsChecker: () -> Boolean = { false },
+  lastModifiedSupplier: () -> OffsetDateTime? = { null },
+  loadObjectStream: () -> InputStream? = { null },
 )
-  : DatasetFileImpl(S3Paths.DeleteFlagFileName, path, existsChecker, lastModifiedSupplier, loadObjectStream)
+  : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream)
   , DatasetDeleteFlagFile
 {
 
@@ -36,7 +36,7 @@ internal class DatasetDeleteFlagFileImpl(
     if (s3Object.baseName != S3Paths.DeleteFlagFileName) {
       throw IllegalArgumentException(
         "Can only construct a delete flag from s3 object if object base name is "
-          + S3Paths.DeleteFlagFileName + ". Actual name: " + s3Object.baseName
+          + S3Paths.DeleteFlagFileName + ". Given path: " + s3Object.path
       )
     }
   }

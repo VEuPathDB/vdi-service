@@ -8,14 +8,14 @@ import java.time.OffsetDateTime
 
 internal class DatasetImportableFileImpl(
   path: String,
-  private val existsChecker: () -> Boolean = { false },
-  private val lastModifiedSupplier: () -> OffsetDateTime? = { null },
-  private val loadObjectStream: () -> InputStream? = { null }
+  existsChecker: () -> Boolean = { false },
+  lastModifiedSupplier: () -> OffsetDateTime? = { null },
+  loadObjectStream: () -> InputStream? = { null }
 )
-  : DatasetFileImpl(S3Paths.ImportReadyZipName, path, existsChecker, lastModifiedSupplier, loadObjectStream)
+  : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream)
   , DatasetImportableFile
 {
-  override fun open() = loadObjectStream()
+  override fun open() = loadContents()
 
   constructor(
     bucket: S3Bucket,
@@ -33,5 +33,10 @@ internal class DatasetImportableFileImpl(
     lastModifiedSupplier = s3Object::lastModified,
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
-  )
+  ) {
+    if (s3Object.baseName != S3Paths.ImportReadyZipName) {
+      throw IllegalArgumentException("Can only construct a import-ready file from s3 object if object base name is "
+        + S3Paths.ImportReadyZipName + ". Given path: " + s3Object.path)
+    }
+  }
 }

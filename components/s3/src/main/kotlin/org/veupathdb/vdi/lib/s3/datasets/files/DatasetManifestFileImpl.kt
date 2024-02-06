@@ -15,7 +15,7 @@ internal class DatasetManifestFileImpl(
   lastModifiedSupplier: () -> OffsetDateTime? = { null },
   loadObjectStream: () -> InputStream? = { null }
 )
-  : DatasetFileImpl(S3Paths.ManifestFileName, path, existsChecker, lastModifiedSupplier, loadObjectStream)
+  : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream)
   , DatasetManifestFile
 {
   constructor(
@@ -37,7 +37,7 @@ internal class DatasetManifestFileImpl(
   ) {
     if (s3Object.baseName != S3Paths.ManifestFileName) {
       throw IllegalArgumentException("Can only construct a manifest file from s3 object if object base name is "
-        + S3Paths.ManifestFileName)
+        + S3Paths.ManifestFileName + ". Given path: " + s3Object.path)
     }
   }
 

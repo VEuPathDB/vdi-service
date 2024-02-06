@@ -6,7 +6,6 @@ import java.io.InputStream
 import java.time.OffsetDateTime
 
 internal sealed class DatasetFileImpl(
-  override val name: String,
   override val path: String,
   private val existsChecker: () -> Boolean,
   private val lastModifiedSupplier: () -> OffsetDateTime?,
@@ -18,19 +17,16 @@ internal sealed class DatasetFileImpl(
   override fun loadContents() = loadObjectStream.invoke()
 
   constructor(s3Object: S3Object) : this(
-    name = s3Object.baseName,
     path = s3Object.path,
-    lastModifiedSupplier = { s3Object.lastModified },
+    lastModifiedSupplier = s3Object::lastModified,
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
   )
 
   constructor(
-    name: String,
     bucket: S3Bucket,
     path: String,
   ) : this(
-    name = name,
     path = path,
     // This looks weird, but we use list instead of stat since stat only returns seconds resolution, not milliseconds.
     lastModifiedSupplier = { bucket.objects.list(path).stream().findFirst().map { o -> o.lastModified }.orElse(null) },
