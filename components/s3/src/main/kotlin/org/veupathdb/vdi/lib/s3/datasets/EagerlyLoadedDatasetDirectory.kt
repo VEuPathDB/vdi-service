@@ -40,14 +40,16 @@ internal class EagerlyLoadedDatasetDirectory(
       val subPath = it.path.trimIDPrefix()
 
       if (subPath.startsWith(S3Paths.SharesDirName)) {
-        val recipient = subPath.getRecipientID()
+        subPath.splitSharePath()?.also { (recipient, file) ->
+          val ref = shareRefs.computeIfAbsent(recipient) { ShareRef(recipient) }
 
-        if (recipient != null) {
-          val ok = shareRefs.computeIfAbsent(recipient) { ShareRef(recipient) }
-            .set(it)
+          when (file) {
+            S3Paths.ShareOfferFileName -> ref.offer = it
+            S3Paths.ShareReceiptFileName -> ref.receipt = it
+            else -> return@also // Fall through to the when block
+          }
 
-          if (ok)
-            return@forEach
+          return@forEach // Continue to the next s3 object
         }
       }
 
@@ -118,26 +120,17 @@ internal class EagerlyLoadedDatasetDirectory(
 
 private data class ShareRef(
   val recipientID: UserID,
-  var offer: DatasetShareOfferFile? = null,
-  var receipt: DatasetShareReceiptFile? = null,
+  var offer: S3Object? = null,
+  var receipt: S3Object? = null,
 ) {
-  fun set(unknown: S3Object): Boolean {
-    when (unknown.baseName) {
-      S3Paths.ShareOfferFileName -> offer = DatasetShareOfferFileImpl(unknown)
-      S3Paths.ShareReceiptFileName -> receipt = DatasetShareReceiptFileImpl(unknown)
-      else -> return false
-    }
-
-    return true
-  }
-
-  fun toDatasetShare(pathFactory: S3DatasetPathFactory): DatasetShare {
-    return DatasetShareImpl(
+  fun toDatasetShare(pathFactory: S3DatasetPathFactory) =
+    DatasetShareImpl(
       recipientID,
-      offer ?: DatasetShareOfferFileImpl(pathFactory.datasetShareOfferFile(recipientID)),
-      receipt ?: DatasetShareReceiptFileImpl(pathFactory.datasetShareReceiptFile(recipientID))
+      offer?.let(::DatasetShareOfferFileImpl)
+        ?: DatasetShareOfferFileImpl(pathFactory.datasetShareOfferFile(recipientID)),
+      receipt?.let(::DatasetShareReceiptFileImpl)
+        ?: DatasetShareReceiptFileImpl(pathFactory.datasetShareReceiptFile(recipientID))
     )
-  }
 }
 
 /**
@@ -148,6 +141,30 @@ private fun String.trimIDPrefix() =
     -1   -> ""
     else -> substring(i+1)
   }
+
+/**
+ * Attempts to split the given share object path into the component recipient
+ * user id and share object name.
+ *
+ * Expected object path format: `share/{user-id}/{file-name}`
+ *
+ * If the path cannot be parsed as the expected form, this method will return
+ * `null`.
+ */
+private fun String.splitSharePath(): Pair<UserID, String>? {
+  val a = indexOf('/')
+  if (a == -1)
+    return null
+
+  val b = indexOf('/', a + 1)
+  if (b == -1)
+    return null
+
+  val recipientID = substring(a + 1, b).toUserIDOrNull()
+    ?: return null
+
+  return recipientID to substring(b + 1)
+}
 
 /**
  * Parses the recipient user ID out of a share file path string.
