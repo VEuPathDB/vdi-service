@@ -4,6 +4,8 @@ plugins {
 
 tasks.test {
   useJUnitPlatform()
+
+  testLogging.showStandardStreams = true
 }
 
 dependencies {
@@ -23,4 +25,5 @@ dependencies {
   testImplementation("org.mockito:mockito-core:5.2.0")
   testImplementation("org.hamcrest:hamcrest:2.2")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+  testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
 }

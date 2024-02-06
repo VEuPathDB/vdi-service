@@ -81,7 +81,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
      */
     override fun next(): DatasetDirectory {
       val toReturn = currentDataset ?: throw NoSuchElementException()
-      prepNext()
+      currentDataset = prepNext()
       return toReturn
     }
 
@@ -90,93 +90,43 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
         // Stream was empty to start
         return null
       }
-      var s3Object = objectStream.next()
-      // Get our initial dataset ID, this will be used to detect when we've hit a new dataset.
-      var (initialUserID, initialDatasetID) = datasetIdFromS3Object(s3Object)
-      stagedObjects.add(s3Object)
-      while (objectStream.hasNext()) {
-        s3Object = objectStream.next()
-        val (_, currDatasetID) = datasetIdFromS3Object(s3Object)
-        if (initialDatasetID != currDatasetID) {
 
-          // We've found a new dataset, construct our currentDataset with objects seen so far and reset objects variable
-          // to contain the new dataset's object.
-          try {
-            currentDataset = EagerlyLoadedDatasetDirectory(
-              stagedObjects,
-              initialUserID,
-              initialDatasetID,
-              S3DatasetPathFactory(initialUserID, initialDatasetID)
-            )
-          } catch (e: MalformedDatasetException) {
-            // Dataset is broken. Everything in staged objects is part of a malformed dataset. Let's skip this dataset
-            // and find the next dataset.
-            Metrics.malformedDatasetFound.inc()
-            initialDatasetID = currDatasetID
-            stagedObjects.clear()
-            log.warn("Found a malformed dataset with ID $initialDatasetID.", e)
-            continue
-          }
+      stagedObjects.add(objectStream.next())
 
-          // Set staged objects to contain just the object belonging to new dataset.
-          stagedObjects.clear()
-          stagedObjects.add(s3Object)
-          return currentDataset
-        }
-
-        // initialDatasetID == currDatasetID, add this object to the staged objects.
-        stagedObjects.add(s3Object)
-        if (!objectStream.hasNext()) {
-          try {
-            // Special handling if there's a single directory in the stream.
-            currentDataset = EagerlyLoadedDatasetDirectory(
-              stagedObjects,
-              initialUserID,
-              initialDatasetID,
-              S3DatasetPathFactory(initialUserID, initialDatasetID)
-            )
-          } catch (e: MalformedDatasetException) {
-            Metrics.malformedDatasetFound.inc()
-            log.warn("Found a malformed dataset with ID $initialDatasetID.")
-            stagedObjects.clear()
-            return null
-          }
-          // Stream is exhausted. Indicate as much.
-          stagedObjects.clear()
-        }
-      }
-      return currentDataset
+      return prepNext()
     }
 
     /**
-     * Get the next dataset ready to be returned by Iterator. We must look ahead by one dataset to ensure the one we
-     * are vending contains all of its files.
+     * Get the next dataset ready to be returned by Iterator. We must look ahead
+     * by one dataset to ensure the one we are vending contains all of its
+     * files.
      */
     private fun prepNext(): DatasetDirectory? {
       while (true) {
+
+        // If the source object stream has been exhausted
         if (!objectStream.hasNext()) {
 
-          // Stream is exhausted.
+          // and we have staged objects
           if (stagedObjects.isNotEmpty()) {
 
             // Construct a dataset out of remaining staged objects.
-            val idsFromObject = datasetIdFromS3Object(stagedObjects.first())
-            val pathFactory = S3DatasetPathFactory(idsFromObject.first, idsFromObject.second)
+            val (userID, datasetID) = datasetIdFromS3Object(stagedObjects.first())
+            val pathFactory = S3DatasetPathFactory(userID, datasetID)
+
             try {
-              this.currentDataset = EagerlyLoadedDatasetDirectory(stagedObjects, idsFromObject.first, idsFromObject.second, pathFactory)
+              return EagerlyLoadedDatasetDirectory(stagedObjects, userID, datasetID, pathFactory)
             } catch (e: MalformedDatasetException) {
               // Dataset is malformed, note it and return null since our stream is exhausted.
               Metrics.malformedDatasetFound.inc()
-              log.warn("Found a malformed dataset with ID $idsFromObject.")
-              this.currentDataset = null
+              log.warn("found malformed dataset $userID/$datasetID", e)
               return null
+            } finally {
+              stagedObjects.clear()
             }
-            stagedObjects.clear()
-            return currentDataset
           }
 
           // Nothing staged and stream is exhausted, we're done!
-          this.currentDataset = null
           return null
         }
 
@@ -195,18 +145,16 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
           try {
             // Otherwise, create the dataset directory and reset staged objects.
             val pathFactory = S3DatasetPathFactory(currUserID, currDatasetID)
-            currentDataset = EagerlyLoadedDatasetDirectory(stagedObjects, currUserID, currDatasetID, pathFactory)
-            stagedObjects.clear()
-            stagedObjects.add(s3Object)
-            return currentDataset
+            return EagerlyLoadedDatasetDirectory(stagedObjects, currUserID, currDatasetID, pathFactory)
           } catch (e: MalformedDatasetException) {
             // Dataset is malformed. Note it, and set staged objects to the next object in stream to start accumulating
             // objects for the next dataset.
             Metrics.malformedDatasetFound.inc()
-            log.warn("Found a malformed dataset with ID $currDatasetID.")
+            log.warn("found malformed dataset $currUserID/$currDatasetID", e)
+            continue
+          } finally {
             stagedObjects.clear()
             stagedObjects.add(s3Object)
-            continue
           }
         }
       }

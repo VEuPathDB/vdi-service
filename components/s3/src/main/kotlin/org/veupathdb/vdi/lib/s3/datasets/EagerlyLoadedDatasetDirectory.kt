@@ -37,7 +37,7 @@ internal class EagerlyLoadedDatasetDirectory(
     val shareRefs = HashMap<UserID, ShareRef>(4)
 
     objects.forEach {
-      val subPath = it.path.cutIDPrefix()
+      val subPath = it.path.trimIDPrefix()
 
       if (subPath.startsWith(S3Paths.SharesDirName)) {
         val recipient = subPath.getRecipientID()
@@ -112,6 +112,8 @@ internal class EagerlyLoadedDatasetDirectory(
   override fun getShares(): Map<UserID, DatasetShare> = shares
 
   override fun putShare(recipientID: UserID) = throw UnsupportedOperationException("${javaClass.name} is read-only")
+
+  override fun toString() = "EagerDatasetDir($ownerID/$datasetID)"
 }
 
 private data class ShareRef(
@@ -138,10 +140,16 @@ private data class ShareRef(
   }
 }
 
-private fun String.cutIDPrefix() =
+/**
+ * Removes the "{user-id}/{dataset-id}/" prefix from the given path string.
+ */
+private fun String.trimIDPrefix() =
   when (val i = indexOf('/', indexOf('/')+1)) {
     -1   -> ""
     else -> substring(i+1)
   }
 
-private fun String.getRecipientID() = substring(lastIndexOf('/')+1).toUserIDOrNull()
+/**
+ * Parses the recipient user ID out of a share file path string.
+ */
+private fun String.getRecipientID() = substring(indexOf('/') + 1, lastIndexOf('/')).toUserIDOrNull()
