@@ -147,7 +147,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       return
     }
 
-    if (datasetDir.hasImportReadyFile()) {
+    if (!datasetDir.hasImportReadyFile()) {
       log.info("received an import event for dataset $userID/$datasetID where the import-ready file doesn't exist yet")
       return
     }
