@@ -165,8 +165,3 @@ private fun String.splitSharePath(): Pair<UserID, String>? {
 
   return recipientID to substring(b + 1)
 }
-
-/**
- * Parses the recipient user ID out of a share file path string.
- */
-private fun String.getRecipientID() = substring(indexOf('/') + 1, lastIndexOf('/')).toUserIDOrNull()
