@@ -72,7 +72,7 @@ internal class DatasetDirectoryImpl(
     pathFactory.datasetImportReadyZip() in bucket.objects
 
   override fun getImportReadyFile() =
-    DatasetImportableFileImpl(bucket, pathFactory.datasetUploadZip())
+    DatasetImportableFileImpl(bucket, pathFactory.datasetImportReadyZip())
 
   override fun putImportReadyFile(fn: () -> InputStream) {
     fn().use { bucket.objects[pathFactory.datasetImportReadyZip()] = it.buffered() }
