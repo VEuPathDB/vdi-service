@@ -20,7 +20,7 @@ import org.veupathdb.vdi.lib.s3.datasets.util.PathBuilder
  *        |- delete-flag
  *        |- import-ready.zip
  *        |- install-ready.zip
- *        |- upload.zip
+ *        |- raw-upload.zip
  *        |- vdi-manifest.json
  *        |- vdi-meta.json
  * ```
