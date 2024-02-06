@@ -129,7 +129,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     // exists, initializing the dataset if it doesn't yet exist.
     with(CacheDB.selectDataset(datasetID)) {
       if (isNull()) {
-        log.info("initializing dataset $datasetID for user $userID")
+        log.info("initializing dataset $userID/$datasetID")
         CacheDB.initializeDataset(datasetID, datasetMeta)
       } else {
         if (isDeleted) {
@@ -147,20 +147,20 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       return
     }
 
-    CacheDB.withTransaction {
-      log.info("attempting to insert import control record (if one does not exist)")
-      it.upsertImportControl(datasetID, DatasetImportStatus.InProgress)
+    if (datasetDir.hasImportReadyFile()) {
+      log.info("received an import event for dataset $userID/$datasetID where the import-ready file doesn't exist yet")
+      return
     }
 
     try {
-      if (datasetDir.hasImportReadyFile()) {
-        log.info("received an import event for dataset $userID/$datasetID where the import-ready file doesn't exist yet")
-        return
-      }
-
       val handler = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version] or {
         log.error("No plugin handler registered for dataset type ${datasetMeta.type.name}")
         throw IllegalStateException("No plugin handler registered for dataset type ${datasetMeta.type.name}")
+      }
+
+      CacheDB.withTransaction {
+        log.info("attempting to insert import control record (if one does not exist)")
+        it.upsertImportControl(datasetID, DatasetImportStatus.InProgress)
       }
 
       val result = datasetDir.getImportReadyFile()
