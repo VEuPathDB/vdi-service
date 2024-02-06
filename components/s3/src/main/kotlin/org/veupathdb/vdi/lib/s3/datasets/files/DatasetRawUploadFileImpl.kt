@@ -15,9 +15,6 @@ internal class DatasetRawUploadFileImpl(
   : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream)
   , DatasetRawUploadFile
 {
-
-  override fun open() = loadContents()
-
   constructor(
     bucket: S3Bucket,
     path: String,

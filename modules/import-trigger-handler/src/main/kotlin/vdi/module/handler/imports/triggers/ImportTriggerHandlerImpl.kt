@@ -164,7 +164,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       }
 
       val result = datasetDir.getImportReadyFile()
-        .open()!!
+        .loadContents()!!
         .use { handler.client.postImport(datasetID, datasetMeta, it) }
 
       Metrics.imports.labels(datasetMeta.type.name, datasetMeta.type.version, result.responseCode.toString()).inc()

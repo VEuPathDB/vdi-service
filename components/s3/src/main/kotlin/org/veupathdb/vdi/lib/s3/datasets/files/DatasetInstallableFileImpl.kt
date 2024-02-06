@@ -15,8 +15,6 @@ internal class DatasetInstallableFileImpl(
   : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream)
   , DatasetInstallableFile
 {
-  override fun open() = loadContents()
-
   constructor(
     bucket: S3Bucket,
     path: String,
