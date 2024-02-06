@@ -90,7 +90,7 @@ internal class DatasetDirectoryImpl(
   }
 
   override fun getShares(): Map<UserID, DatasetShare> {
-    log.debug("looking up shares for dataset {} owned by user {}", datasetID, ownerID)
+    log.debug("looking up shares for dataset {}/{}", ownerID, datasetID)
 
     val pathPrefix = pathFactory.datasetSharesDir()
     val subPaths   = bucket.objects.listSubPaths(pathPrefix).commonPrefixes()
@@ -113,7 +113,7 @@ internal class DatasetDirectoryImpl(
   }
 
   override fun putShare(recipientID: UserID) {
-    log.debug("putting a new share for user {} into dataset {} owned by user {}", recipientID, datasetID, ownerID)
+    log.debug("putting a new share for user {} into dataset {}/{}", recipientID, ownerID, datasetID)
 
     val offer   = VDIDatasetShareOffer(VDIShareOfferAction.Grant)
     val receipt = VDIDatasetShareReceipt(VDIShareReceiptAction.Accept)
