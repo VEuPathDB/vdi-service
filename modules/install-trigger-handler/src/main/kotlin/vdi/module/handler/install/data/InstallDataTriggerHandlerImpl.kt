@@ -86,7 +86,11 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       return
     }
 
-    executeJob(userID, datasetID, dm)
+    try {
+      executeJob(userID, datasetID, dm)
+    } finally {
+      inProgressLock.withLock { datasetsInProgress.remove(datasetID) }
+    }
   }
 
   /**
