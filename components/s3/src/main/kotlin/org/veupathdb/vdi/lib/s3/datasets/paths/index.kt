@@ -35,8 +35,6 @@ fun String.toVDPathOrNull(): VDPath? {
   // The next segment should either be the name of an expected file, or the name
   // of the dataset shares directory.
   val segment = it.next()
-  if (!it.hasNext() || segment.isBlank())
-    return null
 
   return if (segment == S3Paths.SharesDirName)
     it.toDatasetSharePathOrNull(bucket, userID, datasetID)
