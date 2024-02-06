@@ -5,99 +5,99 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toDatasetIDOrNull
 import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
 
-
-@Suppress("DuplicatedCode")
+/**
+ * Parses an object key from MinIO into a VDI dataset file path.
+ *
+ * Expected valid input paths:
+ *
+ * * `{bucket-name}/{user-id}/{dataset-id}/{file-name}`
+ * * `{bucket-name}/{user-id}/{dataset-id}/shares/{recipient-id}/{file-name}`
+ */
 fun String.toVDPathOrNull(): VDPath? {
   val it = splitToSequence('/')
     .iterator()
 
+  // The first segment in the path should always be the bucket name.
   val bucket = it.next()
   if (!it.hasNext() || bucket.isBlank())
     return null
 
-  val root = it.next()
-  if (!it.hasNext() || root.isBlank())
-    return null
-
+  // The second segment is the dataset owner's user id
   val userID = it.next().toUserIDOrNull()
   if (!it.hasNext() || userID == null)
     return null
 
+  // The third segment is the id of the dataset
   val datasetID = it.next().toDatasetIDOrNull()
   if (!it.hasNext() || datasetID == null)
     return null
 
+  // The next segment should either be the name of an expected file, or the name
+  // of the dataset shares directory.
   val segment = it.next()
   if (!it.hasNext() || segment.isBlank())
     return null
 
-  return when (segment) {
-    S3Paths.UPLOAD_DIR_NAME  -> toVDUploadPathOrNull(it, bucket, root, userID, datasetID)
-    S3Paths.DATASET_DIR_NAME -> toDatasetPathOrNull(it, bucket, root, userID, datasetID)
-    else                     -> null
-  }
+  return if (segment == S3Paths.SharesDirName)
+    it.toDatasetSharePathOrNull(bucket, userID, datasetID)
+  else
+    it.toDatasetFilePathOrNull(bucket, userID, datasetID, segment)
 }
 
-private fun toVDUploadPathOrNull(
-  it: Iterator<String>,
+private fun Iterator<String>.toDatasetSharePathOrNull(
   bucket: String,
-  root: String,
   userID: UserID,
   datasetID: DatasetID,
-): VDUploadPath =
-  VDUploadPathImpl(bucket, root, userID, datasetID, it.collectToString())
+): VDDatasetShareFilePath? {
+  // If we've gotten here, then the previous segment in the iterator was the
+  // shares directory.  The remainder of the iterator should be 2 segments, the
+  // recipient user id and the name of the file which must be one of
+  // "offer.json" or "receipt.json"
 
-private fun toDatasetPathOrNull(
-  it: Iterator<String>,
-  bucket: String,
-  root: String,
-  userID: UserID,
-  datasetID: DatasetID,
-): VDPath? {
-  val seg1 = it.next()
-  if (seg1.isBlank())
+  // Ensure there is another segment in the iterator.
+  if (!hasNext())
     return null
 
-  if (!it.hasNext())
-    return VDDatasetFilePathImpl(bucket, root, userID, datasetID, seg1)
+  // Ensure the next segment is a valid user ID.
+  val recipientID = next().toUserIDOrNull()
+  if (!hasNext() || recipientID == null)
+    return null
 
-  return when (seg1) {
-    S3Paths.SHARES_DIR_NAME -> toDatasetSharesPathOrNull(it, bucket, root, userID, datasetID)
-    S3Paths.DATA_DIR_NAME -> toDatasetDataPathOrNull(it, bucket, root, userID, datasetID)
+  // Ensure the next segment is one of the valid file names.
+  return when (val it = next()) {
+    S3Paths.ShareOfferFileName,
+    S3Paths.ShareReceiptFileName,
+    -> VDDatasetShareFilePathImpl(bucket, userID, datasetID, recipientID, it)
+
     else -> null
   }
 }
 
-private fun toDatasetSharesPathOrNull(
-  it: Iterator<String>,
+private fun Iterator<String>.toDatasetFilePathOrNull(
   bucket: String,
-  root: String,
   userID: UserID,
   datasetID: DatasetID,
-): VDDatasetShareFilePath? {
-  val recipientID = it.next().toUserIDOrNull()
-  return if (!it.hasNext() || recipientID == null)
-    null
-  else
-    VDDatasetShareFilePathImpl(bucket, root, userID, datasetID, recipientID, it.collectToString())
-}
+  segment: String,
+): VDDatasetFilePath? {
+  // If we've gotten here, then we have hit a path segment that is not the
+  // shares directory.  At this point the iterator should now contain no more
+  // path segments, and the given path segment argument must be one of the known
+  // file names.
 
-private fun toDatasetDataPathOrNull(
-  it: Iterator<String>,
-  bucket: String,
-  root: String,
-  userID: UserID,
-  datasetID: DatasetID,
-): VDDatasetDataFilePath =
-  VDDatasetDataFilePathImpl(bucket, root, userID, datasetID, it.collectToString())
+  // Ensure there are no more segments in the iterator.
+  if (hasNext())
+    return null
 
+  // Ensure the given path segment is one of the expected file names.
+  return when (segment) {
+    S3Paths.MetadataFileName,
+    S3Paths.ManifestFileName,
+    S3Paths.RawUploadZipName,
+    S3Paths.ImportReadyZipName,
+    S3Paths.InstallReadyZipName,
+    S3Paths.DeleteFlagFileName,
+    -> VDDatasetFilePathImpl(bucket, userID, datasetID, segment)
 
-private fun Iterator<String>.collectToString(): String {
-  val out = StringBuilder(1024)
-    .append(next())
-
-  while (hasNext())
-    out.append('/').append(next())
-
-  return out.toString()
+    else -> null
+  }
 }

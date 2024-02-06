@@ -10,8 +10,6 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
-import vdi.constants.InstallZipName
-import vdi.constants.UploadZipName
 
 // region Get Data File
 //
@@ -25,7 +23,7 @@ internal fun getDataFileForUser(user: UserID, vdid: DatasetID) =
   with(requireDataset(user, vdid)) { getDataFile(ownerID, vdid) }
 
 private fun getDataFile(owner: UserID, vdid: DatasetID) =
-  DatasetStore.getDataFile(owner, vdid) ?: throw NotFoundException()
+  DatasetStore.getInstallReadyZip(owner, vdid) ?: throw NotFoundException()
 
 // endregion Get Data File
 
@@ -40,7 +38,7 @@ internal fun getUploadFileForUser(user: UserID, vdid: DatasetID) =
   with(requireDataset(user, vdid)) { getUploadFile(ownerID, vdid) }
 
 private fun getUploadFile(owner: UserID, vdid: DatasetID) =
-  DatasetStore.getUploadFile(owner, vdid) ?: throw NotFoundException()
+  DatasetStore.getImportReadyZip(owner, vdid) ?: throw NotFoundException()
 
 // endregion Get Upload File
 
@@ -56,38 +54,14 @@ internal fun listDatasetFilesForUser(user: UserID, vdid: DatasetID) =
 
 private fun listDatasetFiles(owner: UserID, vdid: DatasetID) =
   DatasetFileListingImpl().apply {
-    upload = DatasetZipDetails(getUploadZipSize(owner, vdid), CacheDB.selectUploadFiles(vdid))
+    upload = DatasetZipDetails(DatasetStore.getImportReadyZipSize(owner, vdid), CacheDB.selectUploadFiles(vdid))
 
-    val tmp = getDataZipSize(owner, vdid)
+    val tmp = DatasetStore.getInstallReadyZipSize(owner, vdid)
     if (tmp > -1)
       install = DatasetZipDetails(tmp, CacheDB.selectInstallFiles(vdid))
   }
 
 // endregion List Files
-
-private fun getUploadZipSize(user: UserID, datasetID: DatasetID): Long {
-  val listing = DatasetStore.listUploadFiles(user, datasetID)
-  if (listing.isEmpty())
-    return -1
-
-  for (file in listing)
-    if (file.name == UploadZipName)
-      return file.size
-
-  return -1
-}
-
-private fun getDataZipSize(userID: UserID, datasetID: DatasetID): Long {
-  val listing = DatasetStore.listDataFiles(userID, datasetID)
-  if (listing.isEmpty())
-    return -1
-
-  for (file in listing)
-    if (file.name == InstallZipName)
-      return file.size
-
-  return -1
-}
 
 private fun requireDataset(userID: UserID, datasetID: DatasetID): DatasetRecord {
   var ds = CacheDB.selectDatasetForUser(userID, datasetID)

@@ -1,4 +1,4 @@
-package org.veupathdb.vdi.lib.s3.datasets
+package org.veupathdb.vdi.lib.s3.datasets.files
 
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 

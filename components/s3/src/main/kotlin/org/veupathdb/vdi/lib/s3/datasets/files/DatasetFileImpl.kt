@@ -1,4 +1,4 @@
-package org.veupathdb.vdi.lib.s3.datasets
+package org.veupathdb.vdi.lib.s3.datasets.files
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object

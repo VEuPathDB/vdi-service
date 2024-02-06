@@ -1,4 +1,4 @@
-package org.veupathdb.vdi.lib.s3.datasets
+package org.veupathdb.vdi.lib.s3.datasets.files
 
 import java.io.InputStream
 import java.time.OffsetDateTime

@@ -408,7 +408,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val dataset = CacheDB.selectDataset(datasetID)!!
 
     val latestShare = ds.getLatestShareTimestamp(cacheDbSyncControl.sharesUpdated)
-    val latestData = ds.getLatestDataTimestamp(cacheDbSyncControl.dataUpdated)
+    val latestData = ds.getInstallReadyTimestamp() ?: cacheDbSyncControl.dataUpdated
 
     var doShareSync = cacheDbSyncControl.sharesUpdated.isBefore(latestShare)
     var doDataSync = cacheDbSyncControl.dataUpdated.isBefore(latestData)

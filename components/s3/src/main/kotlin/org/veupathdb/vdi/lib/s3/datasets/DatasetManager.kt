@@ -8,15 +8,14 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
 import org.veupathdb.vdi.lib.s3.datasets.exception.MalformedDatasetException
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3DatasetPathFactory
-import org.veupathdb.vdi.lib.s3.datasets.paths.S3PathFactory
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import vdi.component.metrics.Metrics
-import java.util.*
+import java.util.Spliterators
+import java.util.Spliterator
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
 
 class DatasetManager(private val s3Bucket: S3Bucket) {
-  private val pathFactory = S3PathFactory()
 
   /**
    * Returns a [DatasetDirectory] instance representing the S3 "directory" for
@@ -45,7 +44,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
    * @param ownerID WDK user ID of the user who owns or will own the dataset.
    */
   fun listDatasets(ownerID: UserID): List<DatasetID> {
-    return s3Bucket.objects.listSubPaths(pathFactory.userDir(ownerID))
+    return s3Bucket.objects.listSubPaths(S3Paths.userDir(ownerID))
       .commonPrefixes()
       .map(::DatasetID)
   }
@@ -58,13 +57,13 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
    * @param ownerID WDK user ID of the user who owns or will own the dataset.
    */
   fun streamAllDatasets(): Stream<DatasetDirectory> {
-    val objectIterator = s3Bucket.objects.stream(pathFactory.rootDir()).stream().iterator()
-    val datsetDirStream: Iterator<DatasetDirectory> = DatasetDirIterator(objectIterator)
-    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(datsetDirStream, Spliterator.ORDERED), false)
+    val objectIterator = s3Bucket.objects.stream().stream().iterator()
+    val datasetDirStream: Iterator<DatasetDirectory> = DatasetDirIterator(objectIterator)
+    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(datasetDirStream, Spliterator.ORDERED), false)
   }
 
   fun listUsers(): List<UserID> {
-    return s3Bucket.objects.listSubPaths(pathFactory.rootDir())
+    return s3Bucket.objects.listSubPaths()
       .commonPrefixes()
       .map { it.toUserIDOrNull() ?: throw IllegalStateException("invalid user ID: $it") }
   }
@@ -74,11 +73,9 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
    *
    * All objects must be grouped by dataset for the iterator to function properly.
    */
-  private class DatasetDirIterator(
-    private val objectStream: Iterator<S3Object>
-  ) : Iterator<DatasetDirectory> {
+  private class DatasetDirIterator(private val objectStream: Iterator<S3Object>) : Iterator<DatasetDirectory> {
     private val log = LoggerFactory.getLogger(javaClass)
-    private var stagedObjects: List<S3Object> = mutableListOf()
+    private var stagedObjects: MutableList<S3Object> = mutableListOf()
     private var currentDataset: DatasetDirectory? = initFirstDataset()
 
     override fun hasNext(): Boolean {
@@ -123,7 +120,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
             // and find the next dataset.
             Metrics.malformedDatasetFound.inc()
             initialDatasetID = currDatasetID
-            stagedObjects = emptyList()
+            stagedObjects = mutableListOf()
             log.warn("Found a malformed dataset with ID $initialDatasetID.", e)
             continue
           }
@@ -134,7 +131,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
         }
 
         // initialDatasetID == currDatasetID, add this object to the staged objects.
-        stagedObjects = stagedObjects + s3Object
+        stagedObjects.add(s3Object)
         if (!objectStream.hasNext()) {
           try {
             // Special handling if there's a single directory in the stream.
@@ -147,11 +144,11 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
           } catch (e: MalformedDatasetException) {
             Metrics.malformedDatasetFound.inc()
             log.warn("Found a malformed dataset with ID $initialDatasetID.")
-            stagedObjects = emptyList()
+            stagedObjects = mutableListOf()
             return null
           }
           // Stream is exhausted. Indicate as much.
-          stagedObjects = emptyList()
+          stagedObjects = mutableListOf()
         }
       }
       return currentDataset
@@ -180,7 +177,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
               this.currentDataset = null
               return null
             }
-            stagedObjects = emptyList()
+            stagedObjects = mutableListOf()
             return currentDataset
           }
 
@@ -199,7 +196,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
         // Check if the next object in the stream is in the same dataset as staged objects.
         if (currDatasetID == nextObjectDatasetID) {
           // If so, add to staged objects.
-          stagedObjects = stagedObjects + s3Object
+          stagedObjects.add(s3Object)
         } else {
           try {
             // Otherwise, create the dataset directory and reset staged objects.
@@ -220,8 +217,7 @@ class DatasetManager(private val s3Bucket: S3Bucket) {
     }
 
     private fun datasetIdFromS3Object(s3Object: S3Object): Pair<UserID, DatasetID> {
-      val pathWithoutRoot = s3Object.path.removePrefix(S3Paths.rootDir())
-      val pathTokens = pathWithoutRoot.split("/")
+      val pathTokens = s3Object.path.split("/")
       return Pair(UserID(pathTokens[0]), DatasetID(pathTokens[1]))
     }
   }

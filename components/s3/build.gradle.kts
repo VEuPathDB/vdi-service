@@ -10,7 +10,6 @@ dependencies {
   implementation(platform(project(":platform")))
 
   implementation(project(":components:metrics"))
-  implementation(project(":components:constants"))
 
   implementation("org.veupathdb.vdi:vdi-component-common")
   implementation("org.veupathdb.vdi:vdi-component-json")

@@ -20,12 +20,12 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetShareOfferImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShareReceiptImpl
 import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import org.veupathdb.vdi.lib.s3.datasets.DatasetShare
+import org.veupathdb.vdi.lib.s3.datasets.files.DatasetShare
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import java.sql.SQLException
 import java.time.OffsetDateTime
-import org.veupathdb.vdi.lib.s3.datasets.DatasetShare as S3Share
+import org.veupathdb.vdi.lib.s3.datasets.files.DatasetShare as S3Share
 
 private const val UniqueConstraintViolation = 1
 
@@ -106,8 +106,8 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       return
     }
 
-    if (!dir.isImportComplete()) {
-      log.info("skipping share event for dataset {}/{}: dataset is not import complete", userID, datasetID)
+    if (!dir.hasInstallReadyFile()) {
+      log.info("skipping share event for dataset {}/{}: dataset hasn't yet been imported", userID, datasetID)
       return
     }
 

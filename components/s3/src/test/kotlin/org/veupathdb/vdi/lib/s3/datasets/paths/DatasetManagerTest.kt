@@ -50,7 +50,9 @@ class DatasetManagerTest {
             assertTrue(it.getManifest().exists())
             assertTrue(it.getMeta().exists())
             assertFalse(it.hasDeleteFlag())
-            assertThat(it.getDataFiles(), Matchers.empty())
+            assertFalse(it.hasUploadFile())
+            assertFalse(it.hasImportReadyFile())
+            assertFalse(it.hasInstallReadyFile())
         }
     }
 

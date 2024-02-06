@@ -32,7 +32,6 @@ import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
-import vdi.constants.InstallZipName
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
 import vdi.module.handler.imports.triggers.model.WarningsFile
 import java.nio.file.Path
@@ -154,16 +153,9 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
 
     try {
-      log.debug("fetching upload files for dataset $datasetID (user $userID)")
-      val uploadFiles = datasetDir.getUploadFiles()
-
-      if (uploadFiles.isEmpty()) {
-        log.info("received an import event where the upload file doesn't yet exist. Dataset: $datasetID, User: $userID")
+      if (datasetDir.hasImportReadyFile()) {
+        log.info("received an import event for dataset $userID/$datasetID where the import-ready file doesn't exist yet")
         return
-      }
-
-      if (uploadFiles.size > 1) {
-        log.warn("received an import event for a dataset with more than one upload file.  using file ${uploadFiles[0].name} for dataset $datasetID, user $userID")
       }
 
       val handler = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version] or {
@@ -171,7 +163,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         throw IllegalStateException("No plugin handler registered for dataset type ${datasetMeta.type.name}")
       }
 
-      val result = uploadFiles[0]
+      val result = datasetDir.getImportReadyFile()
         .open()!!
         .use { handler.client.postImport(datasetID, datasetMeta, it) }
 
@@ -236,7 +228,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
       TempFiles.withTempFile { tempFile ->
         Zip.compress(tempFile, dataFiles)
-        dd.putDataFile(InstallZipName) { tempFile.inputStream() }
+        dd.putInstallReadyFile { tempFile.inputStream() }
       }
 
       dd.putManifest(manifest)
@@ -248,7 +240,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         }
 
         transaction.tryInsertInstallFiles(datasetID, sizes)
-        transaction.updateDataSyncControl(datasetID, dd.getLatestDataTimestamp(OffsetDateTime.now()))
+        transaction.updateDataSyncControl(datasetID, dd.getInstallReadyTimestamp() ?: OffsetDateTime.now())
         transaction.updateImportControl(datasetID, DatasetImportStatus.Complete)
       }
     }
@@ -282,22 +274,22 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
     if (!exists()) {
-      log.warn("got an import event for a dataset directory that does not exist?  $userID/$datasetID")
+      log.warn("got an import event for dataset $userID/$datasetID which no longer has a directory")
       return false
     }
 
     if (hasDeleteFlag()) {
-      log.info("got an import event for a dataset with a delete flag, ignoring it.  $userID/$datasetID")
+      log.info("got an import event for dataset $userID/$datasetID which has a delete flag, ignoring it")
       return false
     }
 
     if (!hasMeta()) {
-      log.info("got an import event for a dataset that does not yet have a $DatasetMetaFilename file, ignoring it.  $userID/$datasetID")
+      log.info("got an import event for dataset $userID/$datasetID which does not yet have a $DatasetMetaFilename file, ignoring it")
       return false
     }
 
-    if (!isUploadComplete()) {
-      log.info("got an import event for a dataset that does not yet have an upload tarball, ignoring it.  $userID/$datasetID")
+    if (!hasImportReadyFile()) {
+      log.info("got an import event for dataset $userID/$datasetID which does not yet have a processed upload, ignoring it")
       return false
     }
 

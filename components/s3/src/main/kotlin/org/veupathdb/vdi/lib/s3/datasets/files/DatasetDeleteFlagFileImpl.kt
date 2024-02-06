@@ -1,26 +1,25 @@
-package org.veupathdb.vdi.lib.s3.datasets
+package org.veupathdb.vdi.lib.s3.datasets.files
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object
+import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.io.InputStream
 import java.time.OffsetDateTime
 
-internal class DatasetUploadFileImpl(
+internal class DatasetDeleteFlagFileImpl(
   path: String,
-  private val existsChecker: () -> Boolean,
-  private val lastModifiedSupplier: () -> OffsetDateTime?,
-  private val loadObjectStream: () -> InputStream?
+  private val existsChecker: () -> Boolean = { false },
+  private val lastModifiedSupplier: () -> OffsetDateTime? = { null },
+  private val loadObjectStream: () -> InputStream? = { null },
 )
-  : DatasetFileImpl(path.substring(path.lastIndexOf('/') + 1), path, existsChecker, lastModifiedSupplier, loadObjectStream)
-  , DatasetUploadFile
+  : DatasetFileImpl(S3Paths.DeleteFlagFileName, path, existsChecker, lastModifiedSupplier, loadObjectStream)
+  , DatasetDeleteFlagFile
 {
-
-  override fun open() = loadObjectStream()
 
   constructor(
     bucket: S3Bucket,
     path: String,
-  ): this(
+  ) : this(
     path = path,
     // This looks weird, but we use list instead of stat since stat only returns seconds resolution, not milliseconds.
     lastModifiedSupplier = { bucket.objects.list(path).stream().findFirst().map { o -> o.lastModified }.orElse(null) },
@@ -30,8 +29,15 @@ internal class DatasetUploadFileImpl(
 
   constructor(s3Object: S3Object) : this(
     path = s3Object.path,
-    lastModifiedSupplier = { s3Object.lastModified },
+    lastModifiedSupplier = s3Object::lastModified,
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
-  )
+  ) {
+    if (s3Object.baseName != S3Paths.DeleteFlagFileName) {
+      throw IllegalArgumentException(
+        "Can only construct a delete flag from s3 object if object base name is "
+          + S3Paths.DeleteFlagFileName + ". Actual name: " + s3Object.baseName
+      )
+    }
+  }
 }

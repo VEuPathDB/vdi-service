@@ -15,8 +15,6 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
-import vdi.constants.InstallZipName
-import vdi.constants.UploadZipName
 import java.io.InputStream
 
 object DatasetStore {
@@ -43,50 +41,31 @@ object DatasetStore {
       ?.use { JSON.readValue<VDIDatasetMeta>(it.stream) }
   }
 
-  fun listUploadFiles(userID: UserID, datasetID: DatasetID): List<FileEntry> {
-    log.debug("fetching upload file list for dataset {}/{}", userID, datasetID)
-    return bucket.objects.list(S3Paths.datasetUploadsDir(userID, datasetID))
-      .map { FileEntry(it) }
-  }
+  fun getImportReadyZipSize(userID: UserID, datasetID: DatasetID) =
+    bucket.objects[S3Paths.datasetImportReadyFile(userID, datasetID)]?.size ?: -1L
 
-  fun listUserUploadFilesSizeTotals(userID: UserID): Map<DatasetID, Long> {
+  fun listDatasetImportReadyZipSizes(userID: UserID): Map<DatasetID, Long> {
     log.debug("fetching upload size totals across all datasets for user {}", userID)
     val out = HashMap<DatasetID, Long>()
-    bucket.objects.list(S3Paths.userDir(UserID(221741260L)))
+    bucket.objects.list(S3Paths.userDir(userID))
       .asSequence()
-      .filter { it.path.contains(S3Paths.UPLOAD_DIR_NAME) }
-      .forEach {
-        val key = it.path.getDatasetIDFromPath()
-        out[key] = it.size + (out[key] ?: 0L)
-      }
+      .filter { it.path.endsWith(S3Paths.ImportReadyZipName) }
+      .forEach { out[it.path.getDatasetIDFromPath()] = it.size }
+
     return out
   }
 
-  fun getUploadFile(userID: UserID, datasetID: DatasetID): StreamObject? {
+  fun getImportReadyZip(userID: UserID, datasetID: DatasetID): StreamObject? {
     log.debug("fetching upload zip for dataset {}/{}", userID, datasetID)
-    return bucket.objects.open(S3Paths.datasetUploadFile(userID, datasetID, UploadZipName))
+    return bucket.objects.open(S3Paths.datasetImportReadyFile(userID, datasetID))
   }
 
-  fun listDataFiles(userID: UserID, datasetID: DatasetID): List<FileEntry> {
-    log.debug("fetching data file list for dataset {}/{}", userID, datasetID)
-    return bucket.objects.list(S3Paths.datasetDataDir(userID, datasetID))
-      .map { FileEntry(it) }
-  }
+  fun getInstallReadyZipSize(userID: UserID, datasetID: DatasetID) =
+    bucket.objects[S3Paths.datasetInstallReadyFile(userID, datasetID)]?.size ?: -1L
 
-  fun getDataFile(userID: UserID, datasetID: DatasetID): StreamObject? {
-    log.debug("fetching data zip for dataset {}/{}", userID, datasetID)
-    return bucket.objects.open(S3Paths.datasetDataFile(userID, datasetID, InstallZipName))
-  }
-
-  fun getUploadsSize(userID: UserID, datasetID: DatasetID): ULong {
-    log.debug("fetching user dataset upload files size total for dataset {}/{}", userID, datasetID)
-    return bucket.objects.list(prefix = S3Paths.datasetUploadsDir(userID, datasetID))
-      .asSequence()
-      .map { it.stat() }
-      .filterNotNull()
-      .map { it.size }
-      .sum()
-      .toULong()
+  fun getInstallReadyZip(userID: UserID, datasetID: DatasetID): StreamObject? {
+    log.debug("fetching install-ready zip for dataset {}/{}", userID, datasetID)
+    return bucket.objects.open(S3Paths.datasetInstallReadyFile(userID, datasetID))
   }
 
   fun putDatasetMeta(userID: UserID, datasetID: DatasetID, meta: VDIDatasetMeta) {
@@ -94,9 +73,9 @@ object DatasetStore {
     bucket.objects.put(S3Paths.datasetMetaFile(userID, datasetID), meta.toJSONString().byteInputStream())
   }
 
-  fun putUserUpload(userID: UserID, datasetID: DatasetID, fn: () -> InputStream) {
-    log.debug("uploading dataset user upload for dataset {}/{}", userID, datasetID)
-    fn().use { bucket.objects.put(S3Paths.datasetUploadFile(userID, datasetID, UploadZipName), it) }
+  fun putImportReadyZip(userID: UserID, datasetID: DatasetID, fn: () -> InputStream) {
+    log.debug("uploading import-ready zip for dataset {}/{}", userID, datasetID)
+    fn().use { bucket.objects[S3Paths.datasetImportReadyFile(userID, datasetID)] = it }
   }
 
   fun putShareOffer(userID: UserID, datasetID: DatasetID, recipientID: UserID, offer: VDIDatasetShareOffer) {
@@ -116,7 +95,6 @@ object DatasetStore {
 
   private fun String.getDatasetIDFromPath(): DatasetID {
     val it = splitToSequence('/').iterator()
-    it.next() // vdi/
     it.next() // {user-id}/
     return DatasetID(it.next())
   }

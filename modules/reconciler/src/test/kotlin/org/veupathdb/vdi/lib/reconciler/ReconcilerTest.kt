@@ -13,7 +13,7 @@ import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import org.veupathdb.vdi.lib.s3.datasets.DatasetMetaFile
+import org.veupathdb.vdi.lib.s3.datasets.files.DatasetMetaFile
 import java.time.OffsetDateTime
 import kotlin.test.DefaultAsserter.assertEquals
 import kotlin.test.assertEquals

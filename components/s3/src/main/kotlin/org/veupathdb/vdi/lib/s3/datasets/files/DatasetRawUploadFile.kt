@@ -1,12 +1,12 @@
-package org.veupathdb.vdi.lib.s3.datasets
+package org.veupathdb.vdi.lib.s3.datasets.files
 
 import java.io.InputStream
 
 /**
  * Represents a possible dataset upload file object that may exist in a target
- * [DatasetDirectory].
+ * DatasetDirectory.
  */
-interface DatasetUploadFile : DatasetFile {
+interface DatasetRawUploadFile : DatasetFile {
 
   /**
    * Attempts to open a stream over the contents of the target dataset upload

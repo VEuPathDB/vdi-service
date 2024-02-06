@@ -4,6 +4,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.s3.datasets.files.*
 import java.io.InputStream
 import java.time.OffsetDateTime
 
@@ -104,44 +105,78 @@ interface DatasetDirectory {
   fun putDeleteFlag()
 
   /**
-   * Fetches a list of files under this [DatasetDirectory]'s upload file
-   * path/key prefix.
+   * Tests whether this [DatasetDirectory] currently contains a `raw-upload.zip`
+   * file.
    *
-   * If no upload files have been put into this [DatasetDirectory], the returned
-   * list will be empty.
+   * @return `true` if this dataset contains, or at the time of this method
+   * call, contained a `raw-upload.zip` file.
    */
-  fun getUploadFiles(): List<DatasetUploadFile>
+  fun hasUploadFile(): Boolean
 
   /**
-   * Puts a file under this [DatasetDirectory]'s upload file path/key prefix,
-   * overwriting any previously existing object with the given [name].
+   * Returns a representation of this [DatasetDirectory]'s `raw-upload.zip`
+   * file.
    *
-   * @param name Name of the file to upload.
-   *
-   * @param fn Provider of an input stream over the contents of the file to
-   * upload.
+   * This method will return a value regardless of whether the `raw-upload.zip`
+   * file exists or existed.  The existence of the file can be tested using the
+   * returned object's [DatasetDeleteFlagFile.exists] method.
    */
-  fun putUploadFile(name: String, fn: () -> InputStream)
+  fun getUploadFile(): DatasetRawUploadFile
 
   /**
-   * Fetches a list of files under t his [DatasetDirectory]'s data file path/key
-   * prefix.
-   *
-   * If no data files have been put into this [DatasetDirectory], the returned
-   * list will be empty.
+   * Puts a `raw-upload.zip` file into this [DatasetDirectory].
    */
-  fun getDataFiles(): List<DatasetDataFile>
+  fun putUploadFile(fn: () -> InputStream)
 
   /**
-   * Puts a file under this [DatasetDirectory]'s data file path/key prefix,
-   * overwriting any previously existing object with the given [name].
+   * Tests whether this [DatasetDirectory] currently contains an
+   * `import-ready.zip` file.
    *
-   * @param name Name of the file to upload.
-   *
-   * @param fn Provider of an input stream over the contents of the file to
-   * upload.
+   * @return `true` if this dataset contains, or at the time of this method
+   * call, contained a `import-ready.zip` file.
    */
-  fun putDataFile(name: String, fn: () -> InputStream)
+  fun hasImportReadyFile(): Boolean
+
+  /**
+   * Returns a representation of this [DatasetDirectory]'s `import-ready.zip`
+   * file.
+   *
+   * This method will return a value regardless of whether the
+   * `import-ready.zip` file exists or existed.  The existence of the file can
+   * be tested using the returned object's [DatasetDeleteFlagFile.exists]
+   * method.
+   */
+  fun getImportReadyFile(): DatasetImportableFile
+
+  /**
+   * Puts an `import-ready.zip` file into this [DatasetDirectory].
+   */
+  fun putImportReadyFile(fn: () -> InputStream)
+
+  /**
+   * Tests whether this [DatasetDirectory] currently contains an
+   * `install-ready.zip` file.
+   *
+   * @return `true` if this dataset contains, or at the time of this method
+   * call, contained a `install-ready.zip` file.
+   */
+  fun hasInstallReadyFile(): Boolean
+
+  /**
+   * Returns a representation of this [DatasetDirectory]'s `install-ready.zip`
+   * file.
+   *
+   * This method will return a value regardless of whether the
+   * `install-ready.zip` file exists or existed.  The existence of the file can
+   * be tested using the returned object's [DatasetDeleteFlagFile.exists]
+   * method.
+   */
+  fun getInstallReadyFile(): DatasetInstallableFile
+
+  /**
+   * Puts an `install-ready.zip` file into this [DatasetDirectory].
+   */
+  fun putInstallReadyFile(fn: () -> InputStream)
 
   /**
    * Fetches a map of [DatasetShare]s from this [DatasetDirectory].
@@ -162,38 +197,105 @@ interface DatasetDirectory {
   fun putShare(recipientID: UserID)
 
   /**
-   * Tests the dataset directory to see if it appears that the user dataset
-   * upload process is completed.
+   * Returns the last modified timestamp of the dataset metadata file in this
+   * dataset directory.
    *
-   * If this method returns true, it is safe to perform actions dependent on the
-   * user dataset being uploaded.
+   * If this dataset directory does not contain a metadata file at the time of
+   * this method call, this method will return `null`.
    *
-   * @return `true` if the dataset directory has a completed upload, otherwise
-   * `false`.
+   * @return The last modified timestamp of the dataset metadata file if it
+   * exists, otherwise `null`.
    */
-  fun isUploadComplete(): Boolean
+  fun getMetaTimestamp() =
+    if (hasMeta())
+      getMeta().lastModified()
+    else
+      null
 
   /**
-   * Tests the dataset directory to see if it appears that the dataset import
-   * process is completed.
+   * Returns the last modified timestamp of the dataset manifest file in this
+   * dataset directory.
    *
-   * If this method returns true, it is safe to perform actions dependent on the
-   * user dataset being imported.
+   * If this dataset directory does not contain a manifest file at the time of
+   * this method call, this method will return `null`.
    *
-   * @return `true` if the dataset directory has a completed import, otherwise
-   * `false`.
+   * @return The last modified timestamp of the dataset manifest file if it
+   * exists, otherwise `null`.
    */
-  fun isImportComplete(): Boolean
+  fun getManifestTimestamp() =
+    if (hasManifest())
+      getManifest().lastModified()
+    else
+      null
 
-  fun getLatestDataTimestamp(fallback: OffsetDateTime): OffsetDateTime {
-    var latest = fallback
+  /**
+   * Returns the last modified timestamp of the raw user upload file in this
+   * dataset directory.
+   *
+   * If this dataset directory does not contain a raw user upload file at the
+   * time of this method call, this method will return `null`.
+   *
+   * @return The last modified timestamp of the raw user upload file if it
+   * exists, otherwise `null`.
+   */
+  fun getUploadTimestamp() =
+    if (hasUploadFile())
+      getUploadFile().lastModified()
+    else
+      null
 
-    getDataFiles()
-      .forEach { df -> df.lastModified()?.also { if (it.isAfter(latest)) latest = it } }
+  /**
+   * Returns the last modified timestamp of the import-ready data file in this
+   * dataset directory.
+   *
+   * If this dataset directory does not contain an import-ready file at the time
+   * of this method call, this method will return `null`.
+   *
+   * @return The last modified timestamp of the import-ready data file if it
+   * exists, otherwise `null`.
+   */
+  fun getImportReadyTimestamp() =
+    if (hasImportReadyFile())
+      getImportReadyFile().lastModified()
+    else
+      null
 
-    return latest
-  }
+  /**
+   * Returns the last modified timestamp of the install-ready data file in this
+   * dataset directory.
+   *
+   * If this dataset directory does not contain an install-ready file at the
+   * time of this method call, this method will return `null`.
+   *
+   * @return The last modified timestamp of the install-ready data file if it
+   * exists, otherwise `null`.
+   */
+  fun getInstallReadyTimestamp() =
+    if (hasInstallReadyFile())
+      getInstallReadyFile().lastModified()
+    else
+      null
 
+  /**
+   * Returns the last modified timestamp of the delete-flag file in this dataset
+   * directory.
+   *
+   * If this dataset directory does not contain an delete-flag file at the time
+   * of this method call, this method will return `null`.
+   *
+   * @return The last modified timestamp of the delete-flag file if it
+   * exists, otherwise `null`.
+   */
+  fun getDeleteFlagTimestamp() =
+    if (hasDeleteFlag())
+      getDeleteFlag().lastModified()
+    else
+      null
+
+  /**
+   * Returns the most recent file last modified timestamp out of all the dataset
+   * share offer or receipt files that appear in MinIO.
+   */
   fun getLatestShareTimestamp(fallback: OffsetDateTime): OffsetDateTime {
     var latest = fallback
 
@@ -205,4 +307,3 @@ interface DatasetDirectory {
     return latest
   }
 }
-

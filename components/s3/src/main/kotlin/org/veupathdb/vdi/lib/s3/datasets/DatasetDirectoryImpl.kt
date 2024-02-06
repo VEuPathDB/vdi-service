@@ -7,8 +7,8 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
 import org.veupathdb.vdi.lib.common.model.*
 import org.veupathdb.vdi.lib.json.JSON
+import org.veupathdb.vdi.lib.s3.datasets.files.*
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3DatasetPathFactory
-import vdi.constants.InstallZipName
 import java.io.InputStream
 
 internal class DatasetDirectoryImpl(
@@ -23,6 +23,7 @@ internal class DatasetDirectoryImpl(
   override fun exists(): Boolean =
     bucket.objects.listSubPaths(pathFactory.datasetDir()).count > 0
 
+
   override fun hasMeta() =
     pathFactory.datasetMetaFile() in bucket.objects
 
@@ -30,7 +31,7 @@ internal class DatasetDirectoryImpl(
     DatasetMetaFileImpl(bucket, pathFactory.datasetMetaFile())
 
   override fun putMeta(meta: VDIDatasetMeta) {
-    bucket.objects.put(pathFactory.datasetMetaFile(), JSON.writeValueAsBytes(meta).inputStream())
+    bucket.objects[pathFactory.datasetMetaFile()] = JSON.writeValueAsBytes(meta).inputStream()
   }
 
 
@@ -41,7 +42,7 @@ internal class DatasetDirectoryImpl(
     DatasetManifestFileImpl(bucket, pathFactory.datasetManifestFile())
 
   override fun putManifest(manifest: VDIDatasetManifest) {
-    bucket.objects.put(pathFactory.datasetManifestFile(), JSON.writeValueAsBytes(manifest).inputStream())
+    bucket.objects[pathFactory.datasetManifestFile()] = JSON.writeValueAsBytes(manifest).inputStream()
   }
 
 
@@ -56,21 +57,36 @@ internal class DatasetDirectoryImpl(
   }
 
 
-  override fun getUploadFiles() =
-    bucket.objects.list(pathFactory.datasetUploadsDir())
-      .map { DatasetUploadFileImpl(bucket, it.path) }
+  override fun hasUploadFile() =
+    pathFactory.datasetUploadZip() in bucket.objects
 
-  override fun putUploadFile(name: String, fn: () -> InputStream) {
-    fn().use { bucket.objects.put(pathFactory.datasetUploadFile(name), it) }
+  override fun getUploadFile() =
+    DatasetRawUploadFileImpl(bucket, pathFactory.datasetDeleteFlagFile())
+
+  override fun putUploadFile(fn: () -> InputStream) {
+    fn().use { bucket.objects[pathFactory.datasetUploadZip()] = it.buffered() }
   }
 
 
-  override fun getDataFiles() =
-    bucket.objects.list(pathFactory.datasetDataDir())
-      .map { DatasetDataFileImpl(bucket, it.path) }
+  override fun hasImportReadyFile() =
+    pathFactory.datasetImportReadyZip() in bucket.objects
 
-  override fun putDataFile(name: String, fn: () -> InputStream) {
-    fn().use { bucket.objects.put(pathFactory.datasetDataFile(name), it) }
+  override fun getImportReadyFile() =
+    DatasetImportableFileImpl(bucket, pathFactory.datasetUploadZip())
+
+  override fun putImportReadyFile(fn: () -> InputStream) {
+    fn().use { bucket.objects[pathFactory.datasetImportReadyZip()] = it.buffered() }
+  }
+
+
+  override fun hasInstallReadyFile() =
+    pathFactory.datasetInstallReadyZip() in bucket.objects
+
+  override fun getInstallReadyFile() =
+    DatasetInstallableFileImpl(bucket, pathFactory.datasetInstallReadyZip())
+
+  override fun putInstallReadyFile(fn: () -> InputStream) {
+    fn().use { bucket.objects[pathFactory.datasetInstallReadyZip()] = it.buffered() }
   }
 
   override fun getShares(): Map<UserID, DatasetShare> {
@@ -104,49 +120,5 @@ internal class DatasetDirectoryImpl(
 
     bucket.objects.put(pathFactory.datasetShareOfferFile(recipientID), JSON.writeValueAsBytes(offer).inputStream())
     bucket.objects.put(pathFactory.datasetShareReceiptFile(recipientID), JSON.writeValueAsBytes(receipt).inputStream())
-  }
-
-
-  override fun isUploadComplete(): Boolean {
-    log.debug("testing whether dataset {} (user {}) upload is complete", datasetID, ownerID)
-
-    // If there is no meta file then there is no upload.
-    if (!hasMeta())
-      return false
-
-    val uploadFiles = getUploadFiles()
-
-    // If there are no uploaded files, then the upload is still in progress.
-    if (uploadFiles.isEmpty())
-      return false
-
-    if (uploadFiles.size != 1)
-      log.warn("dataset {} owned by user {} has more than one upload file present", datasetID, ownerID)
-
-    // If we made it here, then the meta file exists, and there is at least one
-    // upload file
-    return true
-  }
-
-  override fun isImportComplete(): Boolean {
-    log.debug("testing whether dataset {} (user {}) upload is complete", datasetID, ownerID)
-
-    // If there is no meta file, then the dataset hasn't even been uploaded yet
-    if (!hasMeta())
-      return false
-
-    // If there is no manifest file, then the dataset hasn't yet been imported,
-    // or is currently in the process of being imported.
-    if (!hasManifest())
-      return false
-
-    val dataFiles = getDataFiles()
-
-    // If there are no data files, then the import is in progress.
-    if (dataFiles.isEmpty())
-      return false
-
-    // If the install data zip file does not exist
-    return dataFiles.asSequence().filter { it.name == InstallZipName }.any()
   }
 }
