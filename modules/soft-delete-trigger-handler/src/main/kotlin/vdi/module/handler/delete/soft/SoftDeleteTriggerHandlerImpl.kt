@@ -62,13 +62,6 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     // of whether the uninstalls from the dataset's install targets succeed.
     CacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
 
-    // If the dataset failed import, then nothing was installed into the
-    // dataset's install targets.
-    if (!datasetIsImported(datasetID)) {
-      log.info("dataset {}/{} was not imported, no uninstalls necessary", userID, datasetID)
-      return
-    }
-
     val timer = Metrics.uninstallationTimes
       .labels(internalDBRecord.typeName, internalDBRecord.typeVersion)
       .startTimer()
@@ -160,10 +153,5 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
   private fun handleUnexpectedErrorResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: UninstallUnexpectedErrorResponse) {
     log.error("dataset handler server reports 500 for uninstall on dataset {}/{}, project {}", userID, datasetID, projectID)
     throw IllegalStateException(res.message)
-  }
-
-  private fun datasetIsImported(datasetID: DatasetID): Boolean {
-    val status = CacheDB.selectImportControl(datasetID) ?: return false
-    return status == DatasetImportStatus.Complete
   }
 }

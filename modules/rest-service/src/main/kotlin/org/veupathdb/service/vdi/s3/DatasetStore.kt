@@ -111,7 +111,7 @@ object DatasetStore {
 
   fun putDeleteFlag(userID: UserID, datasetID: DatasetID) {
     log.debug("uploading soft-delete flag for dataset {}/{}", userID, datasetID)
-    bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID))
+    bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID)) { overwrite = true }
   }
 
   private fun String.getDatasetIDFromPath(): DatasetID {
