@@ -8,6 +8,7 @@ import org.veupathdb.vdi.lib.common.env.optDuration
 import org.veupathdb.vdi.lib.common.env.require
 import org.veupathdb.vdi.lib.s3.datasets.util.S3Config
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 data class PrunerConfig(
   val s3Config: S3Config,
@@ -19,7 +20,9 @@ data class PrunerConfig(
   constructor(env: Environment) : this (
     s3Config   = S3Config(env),
     bucketName = BucketName(env.require(EnvKey.S3.BucketName)),
-    pruneAge   = env.optDuration(EnvKey.Pruner.DeletionThreshold)
-      ?: PrunerConfigDefaults.DeletionThreshold
+//    pruneAge   = env.optDuration(EnvKey.Pruner.DeletionThreshold)
+//      ?: PrunerConfigDefaults.DeletionThreshold
+    // FIXME: REMOVE THIS AFTER MINIO WIPE
+    pruneAge = 5.minutes
   )
 }
