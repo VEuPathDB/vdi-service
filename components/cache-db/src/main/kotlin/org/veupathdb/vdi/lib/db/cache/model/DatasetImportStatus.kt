@@ -11,7 +11,7 @@ enum class DatasetImportStatus(val value: String) {
   companion object {
     @JvmStatic
     fun fromString(value: String): DatasetImportStatus {
-      for (enum in values())
+      for (enum in entries)
         if (enum.value == value)
           return enum
 
