@@ -18,6 +18,7 @@ SELECT
 , d.created
 , d.type_name
 , d.type_version
+, d.is_deleted
 , m.name
 , m.summary
 , m.description
@@ -39,7 +40,11 @@ FROM
   LEFT JOIN vdi.import_messages AS s
     USING (dataset_id)
 WHERE
-  d.is_deleted = FALSE
+  1 = 1
+"""
+
+private const val DELETED_FILTER = """
+  AND d.is_deleted = FALSE
 """
 
 private const val PROJECT_ID_FILTER = """
@@ -75,6 +80,9 @@ internal fun Connection.selectAdminAllDatasets(query: AdminAllDatasetsQuery): Li
 
   var sql = SQL_BASE
 
+  if (!query.includeDeleted)
+    sql += DELETED_FILTER
+
   if (query.projectID != null) {
     sql += PROJECT_ID_FILTER
     params.add(Types.VARCHAR to query.projectID)
@@ -100,6 +108,7 @@ internal fun Connection.selectAdminAllDatasets(query: AdminAllDatasetsQuery): Li
           ownerID       = it.getUserID("owner_id"),
           origin        = it.getString("origin"),
           created       = it.getObject("created", OffsetDateTime::class.java),
+          isDeleted     = it.getBoolean("is_deleted"),
           typeName      = it.getString("type_name"),
           typeVersion   = it.getString("type_version"),
           name          = it.getString("name"),

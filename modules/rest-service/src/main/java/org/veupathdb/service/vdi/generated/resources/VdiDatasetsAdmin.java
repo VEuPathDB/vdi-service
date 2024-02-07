@@ -54,7 +54,8 @@ public interface VdiDatasetsAdmin {
   GetVdiDatasetsAdminListAllDatasetsResponse getVdiDatasetsAdminListAllDatasets(
       @QueryParam("offset") @DefaultValue("0") Integer offset,
       @QueryParam("limit") @DefaultValue("100") Integer limit,
-      @QueryParam("projectId") String projectId);
+      @QueryParam("project_id") String projectId,
+      @QueryParam("include_deleted") @DefaultValue("false") Boolean includeDeleted);
 
   class PostVdiDatasetsAdminProxyUploadResponse extends ResponseDelegate {
     private PostVdiDatasetsAdminProxyUploadResponse(Response response, Object entity) {

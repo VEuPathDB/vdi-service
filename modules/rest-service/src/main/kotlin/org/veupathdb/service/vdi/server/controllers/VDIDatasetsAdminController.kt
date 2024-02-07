@@ -163,9 +163,10 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
   override fun getVdiDatasetsAdminListAllDatasets(
     offset: Int?,
     limit: Int?,
-    projectId: String?
+    projectId: String?,
+    includeDeleted: Boolean?,
   ): VdiDatasetsAdmin.GetVdiDatasetsAdminListAllDatasetsResponse {
     return VdiDatasetsAdmin.GetVdiDatasetsAdminListAllDatasetsResponse
-      .respond200WithApplicationJson(listAllDatasets(offset, limit, projectId))
+      .respond200WithApplicationJson(listAllDatasets(offset, limit, projectId, includeDeleted))
   }
 }

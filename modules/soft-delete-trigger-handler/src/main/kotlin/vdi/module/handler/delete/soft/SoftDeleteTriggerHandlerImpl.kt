@@ -12,7 +12,6 @@ import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallBadRequestResponse

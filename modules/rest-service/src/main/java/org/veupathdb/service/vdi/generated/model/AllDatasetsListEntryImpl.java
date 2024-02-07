@@ -20,7 +20,8 @@ import java.util.List;
     "origin",
     "projectIds",
     "status",
-    "created"
+    "created",
+    "isDeleted"
 })
 public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty("datasetId")
@@ -58,6 +59,9 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
 
   @JsonProperty("created")
   private OffsetDateTime created;
+
+  @JsonProperty("isDeleted")
+  private Boolean isDeleted;
 
   @JsonProperty("datasetId")
   public String getDatasetId() {
@@ -177,5 +181,15 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty("created")
   public void setCreated(OffsetDateTime created) {
     this.created = created;
+  }
+
+  @JsonProperty("isDeleted")
+  public Boolean getIsDeleted() {
+    return this.isDeleted;
+  }
+
+  @JsonProperty("isDeleted")
+  public void setIsDeleted(Boolean isDeleted) {
+    this.isDeleted = isDeleted;
   }
 }

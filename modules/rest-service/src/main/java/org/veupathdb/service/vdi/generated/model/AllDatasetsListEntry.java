@@ -81,4 +81,10 @@ public interface AllDatasetsListEntry {
 
   @JsonProperty("created")
   void setCreated(OffsetDateTime created);
+
+  @JsonProperty("isDeleted")
+  Boolean getIsDeleted();
+
+  @JsonProperty("isDeleted")
+  void setIsDeleted(Boolean isDeleted);
 }
