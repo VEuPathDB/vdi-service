@@ -149,7 +149,7 @@ private fun uploadFiles(
         val sizes = uploadFile.repack(into = archive, using = directory)
 
         log.debug("uploading raw user data to S3 for new dataset {}/{}", userID, datasetID)
-        DatasetStore.putUserUpload(userID, datasetID, archive::inputStream)
+        DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
 
         CacheDB.withTransaction { it.insertUploadFiles(datasetID, sizes) }
       } catch (e: Throwable) {

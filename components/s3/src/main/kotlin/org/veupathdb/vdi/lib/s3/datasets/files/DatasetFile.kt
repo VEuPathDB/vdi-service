@@ -1,4 +1,4 @@
-package org.veupathdb.vdi.lib.s3.datasets
+package org.veupathdb.vdi.lib.s3.datasets.files
 
 import java.io.InputStream
 import java.time.OffsetDateTime
@@ -6,11 +6,15 @@ import java.time.OffsetDateTime
 interface DatasetFile {
 
   /**
+   * Full path to the dataset file.
+   */
+  val path: String
+
+  /**
    * Name of the dataset file.
    */
-  val name: String
-
-  val path: String
+  val baseName
+    get() = path.substring(path.lastIndexOf('/') + 1)
 
   /**
    * Tests whether this [DatasetFile] currently exists.

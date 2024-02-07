@@ -89,7 +89,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     // Load the dataset metadata from S3
     val datasetMeta   = dir.getMeta().load()!!
     val metaTimestamp = dir.getMeta().lastModified()!!
-    log.info("Meta timestamp is {}", metaTimestamp)
+    log.info("dataset {}/{} meta timestamp is {}", userID, datasetID, metaTimestamp)
 
     val timer = Metrics.metaUpdateTimes
       .labels(datasetMeta.type.name, datasetMeta.type.version)
@@ -126,12 +126,12 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     comparison(dir, syncControl, userID, datasetID)
       .also {
         if (it.doDataSync) {
-          log.info("doing little reconciliation data sync for dataset {}/{}", userID, datasetID)
+          log.info("little reconciler determined install data is out of sync for dataset {}/{}", userID, datasetID)
           kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
         }
 
         if (it.doShareSync) {
-          log.info("doing little reconciliation share sync for dataset {}/{}", userID, datasetID)
+          log.info("little reconciler determined shares are out of sync for dataset {}/{}", userID, datasetID)
           kr.sendShareTrigger(ShareTrigger(userID, datasetID))
         }
       }
@@ -408,7 +408,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val dataset = CacheDB.selectDataset(datasetID)!!
 
     val latestShare = ds.getLatestShareTimestamp(cacheDbSyncControl.sharesUpdated)
-    val latestData = ds.getLatestDataTimestamp(cacheDbSyncControl.dataUpdated)
+    val latestData = ds.getInstallReadyTimestamp() ?: cacheDbSyncControl.dataUpdated
 
     var doShareSync = cacheDbSyncControl.sharesUpdated.isBefore(latestShare)
     var doDataSync = cacheDbSyncControl.dataUpdated.isBefore(latestData)
@@ -426,6 +426,10 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       log.debug("checking project {} for dataset {}/{} to see if it is out of sync", project, userID, datasetID)
 
       val sync = appDB.selectDatasetSyncControlRecord(datasetID)
+        // If the dataset sync record does not exist at all, then fire a sync
+        // action for shares and install.  The share sync is most likely going
+        // to be processed before the install, so the shares probably won't make
+        // it to the install target until the next big reconciler run.
         ?: return SyncActions(doShareSync = true, doDataSync = true)
 
       if (!doShareSync && sync.sharesUpdated.isBefore(latestShare))

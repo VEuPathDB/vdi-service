@@ -169,9 +169,9 @@ object DatasetReinstaller {
       manifestFile.outputStream()
         .use { out -> s3Dir.getManifest().loadContents()!!.use { inp -> inp.transferTo(out) } }
 
-      s3Dir.getDataFiles()
-        .forEach { ddf ->
-          val zip = tempDir.resolve(ddf.name)
+      s3Dir.getInstallReadyFile()
+        .also { ddf ->
+          val zip = tempDir.resolve(ddf.baseName)
           zip.outputStream()
             .use { out -> ddf.loadContents()!!.use { inp -> inp.transferTo(out) } }
 
@@ -191,7 +191,7 @@ object DatasetReinstaller {
   }
 
   private fun handleInstallSuccess(res: InstallDataSuccessResponse, dataset: DatasetRecord, projectID: ProjectID) {
-    log.info("dataset {} was reinstalled successfully into project {}", dataset.datasetID, projectID)
+    log.info("dataset {}/{} was reinstalled successfully into project {}", dataset.owner, dataset.datasetID, projectID)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -208,7 +208,7 @@ object DatasetReinstaller {
     dataset:   DatasetRecord,
     projectID: ProjectID
   ) {
-    log.error("dataset {} reinstall into {} failed due to bad request exception from handler server: {}", dataset.datasetID, projectID, response.message)
+    log.error("dataset {}/{} reinstall into {} failed due to bad request exception from handler server: {}", dataset.owner, dataset.datasetID, projectID, response.message)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -227,7 +227,7 @@ object DatasetReinstaller {
     dataset:   DatasetRecord,
     projectID: ProjectID
   ) {
-    log.info("dataset {} reinstall into {} failed due to validation error", dataset.datasetID, projectID)
+    log.info("dataset {}/{} reinstall into {} failed due to validation error", dataset.owner, dataset.datasetID, projectID)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -244,7 +244,7 @@ object DatasetReinstaller {
     dataset:   DatasetRecord,
     projectID: ProjectID,
   ) {
-    log.info("dataset {} reinstall into {} was rejected for missing dependencies", dataset.datasetID, projectID)
+    log.info("dataset {}/{} reinstall into {} was rejected for missing dependencies", dataset.owner, dataset.datasetID, projectID)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -261,7 +261,7 @@ object DatasetReinstaller {
     dataset:   DatasetRecord,
     projectID: ProjectID,
   ) {
-    log.error("dataset {} reinstall into {} failed with a 500 from the handler server", dataset.datasetID, projectID)
+    log.error("dataset {}/{} reinstall into {} failed with a 500 from the handler server", dataset.owner, dataset.datasetID, projectID)
 
     AppDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(

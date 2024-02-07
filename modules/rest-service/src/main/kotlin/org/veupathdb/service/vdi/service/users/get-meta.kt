@@ -21,7 +21,7 @@ private fun getUserQuotaInfo(userID: UserID): UserQuotaDetails =
   }
 
 internal fun getCurrentQuotaUsage(userID: UserID): Long {
-  val sizes = DatasetStore.listUserUploadFilesSizeTotals(userID)
+  val sizes = DatasetStore.listDatasetImportReadyZipSizes(userID)
 
   return CacheDB.selectDatasetsForUser(userID)
     .asSequence()

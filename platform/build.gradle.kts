@@ -47,7 +47,7 @@ dependencies {
     api("io.prometheus:simpleclient_common:0.16.0")
 
     // S3
-    api("org.veupathdb.lib.s3:s34k-minio:0.6.0+s34k-0.10.0")
+    api("org.veupathdb.lib.s3:s34k-minio:0.7.1+s34k-0.11.0")
 
   }
 }

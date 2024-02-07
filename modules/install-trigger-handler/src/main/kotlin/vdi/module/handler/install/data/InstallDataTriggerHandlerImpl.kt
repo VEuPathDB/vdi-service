@@ -131,7 +131,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
     // If the dataset is not yet import complete then we caught this event due
     // to the import process actively happening, bail out here.
-    if (!dir.isImportComplete()) {
+    if (!dir.hasInstallReadyFile()) {
       log.info("skipping install data event for dataset {}/{}: dataset is not yet import complete", userID, datasetID)
       return
     }
@@ -240,7 +240,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
       Metrics.installations.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
 
-      val updatedTimestamp = s3Dir.getLatestDataTimestamp(OriginTimestamp)
+      val updatedTimestamp = s3Dir.getInstallReadyTimestamp() ?: OriginTimestamp
 
       when (response.type) {
         InstallDataResponseType.Success
@@ -306,9 +306,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       manifestFile.outputStream()
         .use { out -> s3Dir.getManifest().loadContents()!!.use { inp -> inp.transferTo(out) } }
 
-      s3Dir.getDataFiles()
-        .forEach { ddf ->
-          val zip = tempDir.resolve(ddf.name)
+      s3Dir.getInstallReadyFile()
+        .also { ddf ->
+          val zip = tempDir.resolve(ddf.baseName)
           zip.outputStream()
             .use { out -> ddf.loadContents()!!.use { inp -> inp.transferTo(out) } }
 

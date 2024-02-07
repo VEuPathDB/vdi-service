@@ -142,7 +142,7 @@ class ReconcilerInstance(
    */
   private fun isOutOfSync(ds: DatasetDirectory, targetLastUpdated: VDISyncControlRecord): Boolean {
     val shareOos = targetLastUpdated.sharesUpdated.isBefore(ds.getLatestShareTimestamp(targetLastUpdated.sharesUpdated))
-    val dataOos = targetLastUpdated.dataUpdated.isBefore(ds.getLatestDataTimestamp(targetLastUpdated.dataUpdated))
+    val dataOos = targetLastUpdated.dataUpdated.isBefore(ds.getInstallReadyTimestamp() ?: targetLastUpdated.dataUpdated)
     val metaOos = targetLastUpdated.metaUpdated.isBefore(ds.getMeta().lastModified())
     return shareOos || dataOos || metaOos
   }

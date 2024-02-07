@@ -1,18 +1,19 @@
-package org.veupathdb.vdi.lib.s3.datasets
+package org.veupathdb.vdi.lib.s3.datasets.files
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object
+import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.io.InputStream
 import java.time.OffsetDateTime
 
-internal class DatasetDataFileImpl(
+internal class DatasetInstallableFileImpl(
   path: String,
-  private val existsChecker: () -> Boolean,
-  private val lastModifiedSupplier: () -> OffsetDateTime?,
-  private val loadObjectStream: () -> InputStream?
+  existsChecker: () -> Boolean = { false },
+  lastModifiedSupplier: () -> OffsetDateTime? = { null },
+  loadObjectStream: () -> InputStream? = { null }
 )
-  : DatasetFileImpl(path.substring(path.lastIndexOf('/') + 1), path, existsChecker, lastModifiedSupplier, loadObjectStream)
-  , DatasetDataFile
+  : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream)
+  , DatasetInstallableFile
 {
   constructor(
     bucket: S3Bucket,
@@ -25,11 +26,15 @@ internal class DatasetDataFileImpl(
     loadObjectStream = { bucket.objects.open(path)?.stream }
   )
 
-  constructor(s3Object: S3Object): this(
+  constructor(s3Object: S3Object) : this(
     path = s3Object.path,
-    lastModifiedSupplier = { s3Object.lastModified },
+    lastModifiedSupplier = s3Object::lastModified,
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
-  )
-  override fun open() = loadContents()
+  ) {
+    if (s3Object.baseName != S3Paths.InstallReadyZipName) {
+      throw IllegalArgumentException("Can only construct an install-ready file from s3 object if object base name is "
+        + S3Paths.InstallReadyZipName + ". Given path: " + s3Object.path)
+    }
+  }
 }

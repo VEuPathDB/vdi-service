@@ -13,7 +13,7 @@ import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import org.veupathdb.vdi.lib.s3.datasets.DatasetMetaFile
+import org.veupathdb.vdi.lib.s3.datasets.files.DatasetMetaFile
 import java.time.OffsetDateTime
 import kotlin.test.DefaultAsserter.assertEquals
 import kotlin.test.assertEquals
@@ -409,7 +409,7 @@ class ReconcilerTest {
         val dsMock = mock<DatasetDirectory>()
         `when`(dsMock.datasetID).thenReturn(DatasetID(datasetID))
         `when`(dsMock.ownerID).thenReturn(UserID(userID))
-        `when`(dsMock.getLatestDataTimestamp(UpdateTime)).thenReturn(UpdateTime)
+        `when`(dsMock.getInstallReadyTimestamp() ?: UpdateTime).thenReturn(UpdateTime)
         `when`(dsMock.getLatestShareTimestamp(UpdateTime)).thenReturn(UpdateTime)
         val meta = mock<DatasetMetaFile>()
         `when`(meta.lastModified()).thenReturn(UpdateTime)
@@ -421,7 +421,7 @@ class ReconcilerTest {
         val dsMock = mock<DatasetDirectory>()
         `when`(dsMock.datasetID).thenReturn(DatasetID(datasetID))
         `when`(dsMock.ownerID).thenReturn(UserID(userID))
-        `when`(dsMock.getLatestDataTimestamp(UpdateTime)).thenReturn(syncTime)
+        `when`(dsMock.getInstallReadyTimestamp() ?: UpdateTime).thenReturn(syncTime)
         `when`(dsMock.getLatestShareTimestamp(UpdateTime)).thenReturn(syncTime)
         val meta = mock<DatasetMetaFile>()
         `when`(meta.lastModified()).thenReturn(syncTime)
