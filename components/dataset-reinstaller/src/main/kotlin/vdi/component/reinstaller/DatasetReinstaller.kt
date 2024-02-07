@@ -63,10 +63,14 @@ object DatasetReinstaller {
   private fun run() {
     log.info("starting dataset reinstaller run {}", ++runCounter)
 
+    val s3 = S3Api.newClient(config.s3Config)
+    val bucket = s3.buckets[config.s3Bucket]!!
+    val manager = DatasetManager(bucket)
+
     // For each project registered with the service...
     for ((projectID, _) in AppDatabaseRegistry.iterator()) {
       try {
-        processProject(projectID)
+        processProject(projectID, manager)
       } catch (e: Throwable) {
         log.error("failed to process dataset reinstallations for project $projectID", e)
       }
@@ -75,7 +79,7 @@ object DatasetReinstaller {
     log.info("dataset reinstaller run {} complete", runCounter)
   }
 
-  private fun processProject(projectID: ProjectID) {
+  private fun processProject(projectID: ProjectID, manager: DatasetManager) {
     // locate datasets in the ready-for-reinstall status
     val datasets = AppDB.accessor(projectID)!!
       .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.ReadyForReinstall)
@@ -85,14 +89,14 @@ object DatasetReinstaller {
     // for each located dataset for the target project...
     for (dataset in datasets) {
       try {
-        processDataset(dataset, projectID)
+        processDataset(dataset, projectID, manager)
       } catch (e: Throwable) {
         log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID", e)
       }
     }
   }
 
-  private fun processDataset(dataset: DatasetRecord, projectID: ProjectID) {
+  private fun processDataset(dataset: DatasetRecord, projectID: ProjectID, manager: DatasetManager) {
     log.info("reinstall processing dataset {}/{} for project {}", dataset.owner, dataset.datasetID, projectID)
 
     // Get a plugin handler for the target dataset type
@@ -106,7 +110,7 @@ object DatasetReinstaller {
       throw IllegalStateException("dataset type ${dataset.typeName} does not apply to project $projectID")
 
     uninstallDataset(dataset, projectID, handler.client)
-    reinstallDataset(dataset, projectID, handler.client)
+    reinstallDataset(dataset, projectID, handler.client, manager)
   }
 
   private fun uninstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: PluginHandlerClient) {
@@ -126,12 +130,14 @@ object DatasetReinstaller {
     }
   }
 
-  private fun reinstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: PluginHandlerClient) {
+  private fun reinstallDataset(
+    dataset: DatasetRecord,
+    projectID: ProjectID,
+    client: PluginHandlerClient,
+    manager: DatasetManager,
+  ) {
     log.debug("attempting to reinstall dataset {}/{} into project {}", dataset.owner, dataset.datasetID, projectID)
 
-    val s3 = S3Api.newClient(config.s3Config)
-    val bucket = s3.buckets[config.s3Bucket]!!
-    val manager = DatasetManager(bucket)
     val directory = manager.getDatasetDirectory(dataset.owner, dataset.datasetID)
 
     val response =  withDataTar(directory) { dataTar ->

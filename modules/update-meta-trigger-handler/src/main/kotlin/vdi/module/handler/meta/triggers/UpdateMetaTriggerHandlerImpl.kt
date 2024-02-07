@@ -252,8 +252,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     try {
       when (result.type) {
         InstallMetaResponseType.Success -> handleSuccessResponse(userID, datasetID, projectID)
-        InstallMetaResponseType.BadRequest -> handleBadRequestResponse(datasetID, projectID, result as InstallMetaBadRequestResponse)
-        InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(datasetID, projectID, result as InstallMetaUnexpectedErrorResponse)
+        InstallMetaResponseType.BadRequest -> handleBadRequestResponse(userID, datasetID, projectID, result as InstallMetaBadRequestResponse)
+        InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(userID, datasetID, projectID, result as InstallMetaUnexpectedErrorResponse)
       }
     } catch (e: Throwable) {
       log.info("install-meta request to handler server failed with exception:", e)
@@ -309,13 +309,13 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     }
   }
 
-  private fun handleBadRequestResponse(datasetID: DatasetID, projectID: ProjectID, res: InstallMetaBadRequestResponse) {
-    log.error("dataset handler server reports 400 error for meta-install on dataset {}, project {}", datasetID, projectID)
+  private fun handleBadRequestResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: InstallMetaBadRequestResponse) {
+    log.error("dataset handler server reports 400 error for meta-install on dataset {}/{}, project {}", userID, datasetID, projectID)
     throw IllegalStateException(res.message)
   }
 
-  private fun handleUnexpectedErrorResponse(datasetID: DatasetID, projectID: ProjectID, res: InstallMetaUnexpectedErrorResponse) {
-    log.error("dataset handler server reports 500 error for meta-install on dataset {}, project {}", datasetID, projectID)
+  private fun handleUnexpectedErrorResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: InstallMetaUnexpectedErrorResponse) {
+    log.error("dataset handler server reports 500 error for meta-install on dataset {}/{}, project {}", userID, datasetID, projectID)
     throw IllegalStateException(res.message)
   }
 
@@ -325,17 +325,17 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
 
   private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
     if (!exists()) {
-      log.warn("got an update-meta event for a dataset directory that does not exist?  Dataset: {}, User: {}", datasetID, userID)
+      log.warn("got an update-meta event for dataset {}/{} which has no directory?", userID, datasetID)
       return false
     }
 
     if (hasDeleteFlag()) {
-      log.info("got an update-meta event for a dataset with a delete flag, ignoring it.  Dataset: {}, User: {}", datasetID, userID)
+      log.info("got an update-meta event for dataset {}/{} which has a delete flag, ignoring it.", userID, datasetID)
       return false
     }
 
     if (!hasMeta()) {
-      log.warn("got an update-meta event for a dataset that has no {} file?  Dataset: {}, User: {}", DatasetMetaFilename, datasetID, userID)
+      log.warn("got an update-meta event for dataset {}/{} which has no {} file?", userID, datasetID, DatasetMetaFilename)
       return false
     }
 
@@ -353,8 +353,9 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
         ownerID      = meta.owner,
         isDeleted    = false,
         origin       = meta.origin,
-        created      = OffsetDateTime.now(),
-        importStatus = DatasetImportStatus.Queued
+        created      = meta.created,
+        importStatus = DatasetImportStatus.Queued,
+        inserted     = OffsetDateTime.now(),
       ))
 
       // insert metadata for the dataset

@@ -19,9 +19,10 @@ INSERT INTO
   , is_deleted
   , origin
   , created
+  , inserted
   )
 VALUES
-  (?, ?, ?, ?, ?, ?, ?)
+  (?, ?, ?, ?, ?, ?, ?, ?)
 ON CONFLICT (dataset_id)
   DO NOTHING
 """
@@ -34,6 +35,7 @@ internal fun Connection.tryInsertDatasetRecord(
   isDeleted:   Boolean,
   origin:      String,
   created:     OffsetDateTime,
+  inserted:    OffsetDateTime,
 ) =
   preparedUpdate(SQL) {
     setDatasetID(1, datasetID)
@@ -43,4 +45,5 @@ internal fun Connection.tryInsertDatasetRecord(
     setBoolean(5, isDeleted)
     setString(6, origin)
     setObject(7, created)
+    setObject(8, inserted)
   }

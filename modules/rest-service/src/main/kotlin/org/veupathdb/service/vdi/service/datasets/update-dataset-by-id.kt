@@ -51,6 +51,7 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
         origin       = meta.origin,
         dependencies = meta.dependencies,
         sourceURL    = meta.sourceURL,
+        created      = meta.created
       )
     )
     it.updateDatasetMeta(DatasetMetaImpl(datasetID, visibility, name, summary, description, meta.sourceURL))

@@ -53,6 +53,11 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
 
     log.info("issuing dataset ID {}", datasetID)
 
+    // The dataset creation date may only be provided via the user-proxy admin
+    // dataset upload endpoint.  Clear any value passed by the client on this
+    // endpoint.
+    entity.meta.createdOn = null
+
     createDataset(userID.toUserID(), datasetID, entity)
 
     return VdiDatasets.PostVdiDatasetsResponse

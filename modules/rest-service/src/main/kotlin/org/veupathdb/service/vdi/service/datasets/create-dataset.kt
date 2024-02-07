@@ -42,7 +42,6 @@ fun createDataset(
   userID: UserID,
   datasetID: DatasetID,
   entity: DatasetPostRequest,
-  adminProxy: Boolean = false,
 ) {
   log.trace("createDataset(userID={}, datasetID={}, entity={})", userID, datasetID, entity)
 
@@ -59,25 +58,17 @@ fun createDataset(
       throw BadRequestException("unrecognized target project")
   }
 
-  // If the dataset was created via the admin proxy and a creation date was
-  // provided, then use that date.  Otherwise, use the current timestamp as the
-  // creation date.
-  val creationDate = if (adminProxy) {
-    entity.meta.createdOn ?: OffsetDateTime.now()
-  } else {
-    OffsetDateTime.now()
-  }
-
   CacheDB.withTransaction {
     it.tryInsertDataset(DatasetImpl(
-      datasetID,
-      datasetMeta.type.name,
-      datasetMeta.type.version,
-      userID,
-      false,
-      creationDate,
-      DatasetImportStatus.Queued,
-      datasetMeta.origin
+      datasetID    = datasetID,
+      typeName     = datasetMeta.type.name,
+      typeVersion  = datasetMeta.type.version,
+      ownerID      = userID,
+      isDeleted    = false,
+      created      = datasetMeta.created,
+      importStatus = DatasetImportStatus.Queued,
+      origin       = datasetMeta.origin,
+      inserted     = OffsetDateTime.now(),
     ))
     it.tryInsertDatasetMeta(DatasetMetaImpl(
       datasetID   = datasetID,
@@ -199,6 +190,7 @@ private fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
     visibility   = meta.visibility?.toInternalVisibility() ?: VDIDatasetVisibility.Private,
     origin       = meta.origin,
     sourceURL    = url,
+    created      = meta.createdOn ?: OffsetDateTime.now(),
     dependencies = (meta.dependencies ?: emptyList()).map {
       VDIDatasetDependencyImpl(
         identifier  = it.resourceIdentifier,
