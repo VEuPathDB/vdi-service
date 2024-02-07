@@ -14,6 +14,8 @@ object AppDB {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
+  const val UniqueConstraintViolation = 1
+
   fun getDatasetStatuses(targets: Map<ProjectID, Collection<DatasetID>>): Map<DatasetID, Map<ProjectID, InstallStatuses>> {
     log.trace("getDatasetStatuses(targets={})", targets)
 

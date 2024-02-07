@@ -220,6 +220,9 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
           it.insertDatasetProjectLink(datasetID, projectID)
         }
 
+        log.debug("upserting install-meta message for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
+        it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
+
         log.debug("upserting dataset meta record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
         it.upsertDatasetMeta(datasetID, meta.name, meta.description)
 
@@ -259,7 +262,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       log.info("install-meta request to handler server failed with exception:", e)
       AppDB.withTransaction(projectID) {
         try {
-          it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.FailedInstallation, e.message))
+          it.upsertInstallMetaMessage(datasetID, InstallStatus.FailedInstallation)
         } catch (e: SQLException) {
           if (e.errorCode == 1) {
             log.info("unique key constraint violation on dataset {}/{} install meta, assuming race condition.", userID, datasetID)
@@ -276,36 +279,19 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
 
   private fun handleSuccessResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID) {
     log.info("dataset handler server reports dataset {}/{} meta installed successfully into project {}", userID, datasetID, projectID)
-    AppDB.withTransaction(projectID) { it.insertMetaInstallSuccessMessage(datasetID) }
+    AppDB.withTransaction(projectID) { it.upsertInstallMetaMessage(datasetID, InstallStatus.Complete) }
   }
 
-  private fun AppDBTransaction.insertMetaInstallSuccessMessage(datasetID: DatasetID) {
-    val old = selectDatasetInstallMessage(datasetID, InstallType.Meta)
+  private fun AppDBTransaction.upsertInstallMetaMessage(datasetID: DatasetID, status: InstallStatus) {
+    val message = DatasetInstallMessage(datasetID, InstallType.Meta, status, null)
 
-    // If there is no old record, then attempt to insert one.  There is a race
-    // condition here because multiple events may be being processed for the
-    // same dataset at the same time.  So we will check for unique constraint
-    // violations and attempt an update instead of an insert if one occurs.
-    if (old == null) {
-      try {
-        insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.Complete, null))
-      } catch(e: SQLException) {
-        // If it was a unique constraint violation then it was a race condition.
-        // recall this method to make sure that the states line up
-        if (e.errorCode == 1) {
-          insertMetaInstallSuccessMessage(datasetID)
-        } else {
-          throw e;
-        }
-      }
-    } else {
-      // If the status that reached the database before us is the same as the
-      // status that we are attempting to write, then there is no need to do the
-      // update as it will replace the updated timestamp without changing
-      // anything which will make things harder to manually trace
-      if (old.status != InstallStatus.Complete) {
-        updateDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.Complete, null))
-      }
+    try {
+      insertDatasetInstallMessage(message)
+    } catch (e: SQLException) {
+      if (e.errorCode == AppDB.UniqueConstraintViolation)
+        updateDatasetInstallMessage(message)
+      else
+        throw e
     }
   }
 
