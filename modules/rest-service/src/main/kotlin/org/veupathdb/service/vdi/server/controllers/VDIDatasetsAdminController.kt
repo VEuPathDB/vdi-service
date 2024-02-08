@@ -2,6 +2,7 @@ package org.veupathdb.service.vdi.server.controllers
 
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.ForbiddenException
+import jakarta.ws.rs.core.StreamingOutput
 import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
@@ -10,6 +11,7 @@ import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsAdmin
 import org.veupathdb.service.vdi.service.admin.getDatasetDetails
 import org.veupathdb.service.vdi.service.admin.listAllDatasets
+import org.veupathdb.service.vdi.service.admin.listAllS3Objects
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.listBrokenDatasets
 import org.veupathdb.service.vdi.util.fixVariableDateString
@@ -168,5 +170,10 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
   ): VdiDatasetsAdmin.GetVdiDatasetsAdminListAllDatasetsResponse {
     return VdiDatasetsAdmin.GetVdiDatasetsAdminListAllDatasetsResponse
       .respond200WithApplicationJson(listAllDatasets(offset, limit, projectId, includeDeleted))
+  }
+
+  override fun getVdiDatasetsAdminListS3Objects(): VdiDatasetsAdmin.GetVdiDatasetsAdminListS3ObjectsResponse {
+    return VdiDatasetsAdmin.GetVdiDatasetsAdminListS3ObjectsResponse
+      .respond200WithTextPlain(StreamingOutput { out -> out.use { listAllS3Objects().transferTo(it) } })
   }
 }

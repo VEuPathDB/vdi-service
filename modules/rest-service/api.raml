@@ -567,6 +567,13 @@ uses:
             application/json:
               type: lib.InternalDatasetDetails
 
+  /list-s3-objects:
+    get:
+      responses:
+        200:
+          body:
+            text/plain:
+              type: any
 
   /list-all-datasets:
     get:
