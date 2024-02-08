@@ -1,9 +1,9 @@
 package org.veupathdb.service.vdi.generated.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -47,8 +47,8 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("dependencies")
   private List<DatasetDependency> dependencies;
 
-  @JsonProperty("createdOn")
 
+  @JsonProperty("createdOn")
   private OffsetDateTime createdOn;
 
   @JsonProperty("datasetType")

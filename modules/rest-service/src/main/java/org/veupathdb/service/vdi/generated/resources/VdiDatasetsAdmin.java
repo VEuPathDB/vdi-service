@@ -1,8 +1,26 @@
 package org.veupathdb.service.vdi.generated.resources;
 
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
-import org.veupathdb.service.vdi.generated.model.*;
+import org.veupathdb.service.vdi.generated.model.AllDatasetsListResponse;
+import org.veupathdb.service.vdi.generated.model.BadRequestError;
+import org.veupathdb.service.vdi.generated.model.BrokenDatasetListing;
+import org.veupathdb.service.vdi.generated.model.BrokenImportListing;
+import org.veupathdb.service.vdi.generated.model.DatasetPostRequest;
+import org.veupathdb.service.vdi.generated.model.DatasetPostResponse;
+import org.veupathdb.service.vdi.generated.model.ForbiddenError;
+import org.veupathdb.service.vdi.generated.model.InstallCleanupRequest;
+import org.veupathdb.service.vdi.generated.model.InternalDatasetDetails;
+import org.veupathdb.service.vdi.generated.model.ServerError;
+import org.veupathdb.service.vdi.generated.model.UnauthorizedError;
+import org.veupathdb.service.vdi.generated.model.UnprocessableEntityError;
 import org.veupathdb.service.vdi.generated.support.ResponseDelegate;
 
 @Path("/vdi-datasets/admin")
@@ -49,12 +67,18 @@ public interface VdiDatasetsAdmin {
       @QueryParam("datasetId") String datasetId);
 
   @GET
+  @Path("/list-s3-objects")
+  @Produces("text/plain")
+  GetVdiDatasetsAdminListS3ObjectsResponse getVdiDatasetsAdminListS3Objects();
+
+  @GET
   @Path("/list-all-datasets")
   @Produces("application/json")
   GetVdiDatasetsAdminListAllDatasetsResponse getVdiDatasetsAdminListAllDatasets(
       @QueryParam("offset") @DefaultValue("0") Integer offset,
       @QueryParam("limit") @DefaultValue("100") Integer limit,
-      @QueryParam("projectId") String projectId);
+      @QueryParam("project_id") String projectId,
+      @QueryParam("include_deleted") @DefaultValue("false") Boolean includeDeleted);
 
   class PostVdiDatasetsAdminProxyUploadResponse extends ResponseDelegate {
     private PostVdiDatasetsAdminProxyUploadResponse(Response response, Object entity) {
@@ -242,6 +266,22 @@ public interface VdiDatasetsAdmin {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetVdiDatasetsAdminDatasetDetailsResponse(responseBuilder.build(), entity);
+    }
+  }
+
+  class GetVdiDatasetsAdminListS3ObjectsResponse extends ResponseDelegate {
+    private GetVdiDatasetsAdminListS3ObjectsResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private GetVdiDatasetsAdminListS3ObjectsResponse(Response response) {
+      super(response);
+    }
+
+    public static GetVdiDatasetsAdminListS3ObjectsResponse respond200WithTextPlain(Object entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "text/plain");
+      responseBuilder.entity(entity);
+      return new GetVdiDatasetsAdminListS3ObjectsResponse(responseBuilder.build(), entity);
     }
   }
 

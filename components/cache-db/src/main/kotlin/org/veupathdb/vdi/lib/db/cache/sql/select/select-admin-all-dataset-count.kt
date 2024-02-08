@@ -13,7 +13,11 @@ SELECT
 FROM
   vdi.datasets AS d
 WHERE
-  d.is_deleted = FALSE
+  1 = 1
+"""
+
+private const val DELETED_FILTER = """
+  AND d.is_deleted = FALSE
 """
 
 private const val PROJECT_ID_FILTER = """
@@ -36,6 +40,10 @@ internal fun Connection.selectAdminAllDatasetCount(query: AdminAllDatasetsQuery)
   val params = ArrayList<Pair<Int, Any>>(1)
 
   var sql = SQL_BASE
+
+  if (!query.includeDeleted) {
+    sql += DELETED_FILTER
+  }
 
   if (query.projectID != null) {
     sql += PROJECT_ID_FILTER

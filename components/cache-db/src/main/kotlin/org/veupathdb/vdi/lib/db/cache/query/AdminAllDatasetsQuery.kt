@@ -19,5 +19,11 @@ data class AdminAllDatasetsQuery(
   /**
    * Project ID filter, null = no filter.
    */
-  val projectID: String?
+  val projectID: String?,
+
+  /**
+   * Whether datasets that have been marked as deleted should be included in the
+   * query results.
+   */
+  val includeDeleted: Boolean,
 )
