@@ -567,6 +567,13 @@ uses:
             application/json:
               type: lib.InternalDatasetDetails
 
+  /list-s3-objects:
+    get:
+      responses:
+        200:
+          body:
+            text/plain:
+              type: any
 
   /list-all-datasets:
     get:
@@ -580,11 +587,15 @@ uses:
           default: 100
           minimum: 1
           required: false
-        projectId:
+        project_id:
           description: |
             Optionally filter the results to only datasets that target the given
             project ID.
           type: string
+          required: false
+        include_deleted:
+          type: boolean
+          default: false
           required: false
       responses:
         200:

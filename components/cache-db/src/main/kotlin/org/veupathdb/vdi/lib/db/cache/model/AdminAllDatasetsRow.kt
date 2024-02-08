@@ -13,6 +13,7 @@ data class AdminAllDatasetsRow(
   val created: OffsetDateTime,
   val typeName: String,
   val typeVersion: String,
+  val isDeleted: Boolean,
   val name: String,
   val summary: String?,
   val description: String?,

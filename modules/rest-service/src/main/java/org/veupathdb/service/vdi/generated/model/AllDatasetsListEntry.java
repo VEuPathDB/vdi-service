@@ -2,7 +2,6 @@ package org.veupathdb.service.vdi.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -81,4 +80,10 @@ public interface AllDatasetsListEntry {
 
   @JsonProperty("created")
   void setCreated(OffsetDateTime created);
+
+  @JsonProperty("isDeleted")
+  Boolean getIsDeleted();
+
+  @JsonProperty("isDeleted")
+  void setIsDeleted(Boolean isDeleted);
 }

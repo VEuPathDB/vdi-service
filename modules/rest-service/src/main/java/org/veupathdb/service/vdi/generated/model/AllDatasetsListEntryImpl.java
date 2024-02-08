@@ -1,9 +1,10 @@
 package org.veupathdb.service.vdi.generated.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -20,7 +21,8 @@ import java.util.List;
     "origin",
     "projectIds",
     "status",
-    "created"
+    "created",
+    "isDeleted"
 })
 public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty("datasetId")
@@ -58,6 +60,9 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
 
   @JsonProperty("created")
   private OffsetDateTime created;
+
+  @JsonProperty("isDeleted")
+  private Boolean isDeleted;
 
   @JsonProperty("datasetId")
   public String getDatasetId() {
@@ -177,5 +182,15 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty("created")
   public void setCreated(OffsetDateTime created) {
     this.created = created;
+  }
+
+  @JsonProperty("isDeleted")
+  public Boolean getIsDeleted() {
+    return this.isDeleted;
+  }
+
+  @JsonProperty("isDeleted")
+  public void setIsDeleted(Boolean isDeleted) {
+    this.isDeleted = isDeleted;
   }
 }

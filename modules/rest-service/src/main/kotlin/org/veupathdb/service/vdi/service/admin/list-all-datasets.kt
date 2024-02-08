@@ -16,13 +16,15 @@ internal fun listAllDatasets(
   offset: Int?,
   limit: Int?,
   projectID: String?,
+  includeDeleted: Boolean?,
 ): AllDatasetsListResponse {
 
   val query = AdminAllDatasetsQuery(
     offset    = if (offset == null || offset < 0) 0u else offset.toUInt(),
     limit     = if (limit == null || limit < 0) MAX_RESULT_LIMIT
                 else (if (limit > MAX_RESULT_LIMIT.toInt()) MAX_RESULT_LIMIT else limit.toUInt()),
-    projectID = projectID
+    projectID = projectID,
+    includeDeleted ?: false,
   )
 
   val totalCount = CacheDB.selectAdminAllDatasetCount(query)
@@ -97,4 +99,5 @@ private fun AllDatasetsListEntry(
     it.projectIds = row.projectIDs
     it.status = DatasetStatusInfo(row.importStatus, statuses)
     it.created = row.created.defaultZone()
+    it.isDeleted = row.isDeleted
   }

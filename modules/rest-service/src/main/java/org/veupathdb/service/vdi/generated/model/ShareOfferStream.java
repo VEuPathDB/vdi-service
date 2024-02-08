@@ -1,12 +1,12 @@
 
 package org.veupathdb.service.vdi.generated.model;
 
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.StreamingOutput;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.function.Consumer;
+
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.StreamingOutput;
 
 public class ShareOfferStream extends ShareOfferImpl implements StreamingOutput {
 

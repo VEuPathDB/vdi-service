@@ -16,6 +16,7 @@ import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.io.InputStream
+import java.util.stream.Stream
 
 object DatasetStore {
 
@@ -97,7 +98,11 @@ object DatasetStore {
 
   fun putDeleteFlag(userID: UserID, datasetID: DatasetID) {
     log.debug("uploading soft-delete flag for dataset {}/{}", userID, datasetID)
-    bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID))
+    bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID)) { overwrite = true }
+  }
+
+  fun streamAllPaths(): Stream<String> {
+    return bucket.objects.stream().stream().map { it.path }
   }
 
   private fun String.getDatasetIDFromPath(): DatasetID {
