@@ -21,7 +21,7 @@ class ReconcilerInstance(
   private val targetDB: ReconcilerTarget,
   private val datasetManager: DatasetManager,
   private val kafkaRouter: KafkaRouter,
-  private val deleteDryMode: Boolean = true
+  private val deleteDryMode: Boolean = false
 ) {
   private var nextTargetDataset: VDIReconcilerTargetRecord? = null
 
