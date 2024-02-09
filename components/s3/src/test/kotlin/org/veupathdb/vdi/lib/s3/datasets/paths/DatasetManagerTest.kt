@@ -10,7 +10,6 @@ import org.mockito.Mockito.*
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.core.fields.BasicHeaders
 import org.veupathdb.lib.s3.s34k.core.objects.AbstractS3Object
-import org.veupathdb.lib.s3.s34k.fields.Headers
 import org.veupathdb.lib.s3.s34k.objects.ObjectContainer
 import org.veupathdb.lib.s3.s34k.objects.ObjectMeta
 import org.veupathdb.lib.s3.s34k.objects.ObjectStream
@@ -49,8 +48,8 @@ class DatasetManagerTest {
     val datasets = datasetManager.streamAllDatasets().toList()
     assertThat(datasets, Matchers.hasSize(2))
     datasets.forEach {
-      assertTrue(it.getManifest().exists())
-      assertTrue(it.getMeta().exists())
+      assertTrue(it.getManifestFile().exists())
+      assertTrue(it.getMetaFile().exists())
       assertFalse(it.hasDeleteFlag())
       assertFalse(it.hasUploadFile())
       assertFalse(it.hasImportReadyFile())
@@ -75,9 +74,9 @@ class DatasetManagerTest {
     val datasets = datasetManager.streamAllDatasets().toList()
     assertThat(datasets, Matchers.hasSize(2))
     datasets.forEach {
-      assertTrue(it.getMeta().exists())
+      assertTrue(it.getMetaFile().exists())
     }
-    assertFalse(datasets.last().hasManifest())
+    assertFalse(datasets.last().hasManifestFile())
   }
 
   @Test

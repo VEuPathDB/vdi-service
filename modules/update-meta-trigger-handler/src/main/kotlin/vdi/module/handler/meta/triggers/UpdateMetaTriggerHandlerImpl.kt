@@ -26,8 +26,6 @@ import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaResponseType
 import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaUnexpectedErrorResponse
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandler
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
-import org.veupathdb.vdi.lib.kafka.model.triggers.InstallTrigger
-import org.veupathdb.vdi.lib.kafka.model.triggers.ShareTrigger
 import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
@@ -87,8 +85,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       return
 
     // Load the dataset metadata from S3
-    val datasetMeta   = dir.getMeta().load()!!
-    val metaTimestamp = dir.getMeta().lastModified()!!
+    val datasetMeta   = dir.getMetaFile().load()!!
+    val metaTimestamp = dir.getMetaFile().lastModified()!!
     log.info("dataset {}/{} meta timestamp is {}", userID, datasetID, metaTimestamp)
 
     val timer = Metrics.metaUpdateTimes
@@ -114,27 +112,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       }
     }
 
-    // Attempt to look up the sync control record for the dataset in
-    // the cache DB.
-    val syncControl = CacheDB.selectSyncControl(datasetID) or {
-      // If the sync control record was not found for some reason
-      CacheDB.initSyncControl(datasetID)
-      CacheDB.selectSyncControl(datasetID)!!
-    }
-
-    // Do the "little" reconciliation
-    comparison(dir, syncControl, userID, datasetID)
-      .also {
-        if (it.doDataSync) {
-          log.info("little reconciler determined install data is out of sync for dataset {}/{}", userID, datasetID)
-          kr.sendInstallTrigger(InstallTrigger(userID, datasetID))
-        }
-
-        if (it.doShareSync) {
-          log.info("little reconciler determined shares are out of sync for dataset {}/{}", userID, datasetID)
-          kr.sendShareTrigger(ShareTrigger(userID, datasetID))
-        }
-      }
+    DatasetReconciler.reconcile(userID, datasetID, datasetMeta, metaTimestamp, dir, kr)
 
     CacheDB.openTransaction()
       .use { db ->
@@ -153,7 +131,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       }
 
     if (!PluginHandlers.contains(datasetMeta.type.name, datasetMeta.type.version)) {
-      log.error("dataset {}/{} declares a type of {} which is unknown to the vdi service", userID, datasetID, datasetMeta.type.name)
+      log.error("dataset {}/{} declares a type of {}:{} which is unknown to the vdi service", userID, datasetID, datasetMeta.type.name, datasetMeta.type.version)
       return
     }
 
@@ -174,7 +152,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     userID: UserID,
   ) {
     if (!ph.appliesToProject(projectID)) {
-      log.warn("dataset {}/{} declares a project id of {} which is not applicable to dataset type {}", userID, datasetID, projectID, meta.type.name)
+      log.warn("dataset {}/{} declares a project id of {} which is not applicable to dataset type {}:{}", userID, datasetID, projectID, meta.type.name, meta.type.version)
       return
     }
 
@@ -334,7 +312,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       return false
     }
 
-    if (!hasMeta()) {
+    if (!hasMetaFile()) {
       log.warn("got an update-meta event for dataset {}/{} which has no {} file?", userID, datasetID, DatasetMetaFilename)
       return false
     }
@@ -389,60 +367,5 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
         metaUpdated   = OriginTimestamp
       )
     )
-  }
-
-  private fun CacheDB.initSyncControl(datasetID: DatasetID) {
-    openTransaction().use { it.initSyncControl(datasetID) }
-  }
-
-  private data class SyncActions(
-    val doShareSync: Boolean,
-    val doDataSync:  Boolean,
-  )
-
-  private fun comparison(
-    ds: DatasetDirectory,
-    cacheDbSyncControl: VDISyncControlRecord,
-    userID: UserID,
-    datasetID: DatasetID,
-  ): SyncActions {
-    val dataset = CacheDB.selectDataset(datasetID)!!
-
-    val latestShare = ds.getLatestShareTimestamp(cacheDbSyncControl.sharesUpdated)
-    val latestData = ds.getInstallReadyTimestamp() ?: cacheDbSyncControl.dataUpdated
-
-    var doShareSync = cacheDbSyncControl.sharesUpdated.isBefore(latestShare)
-    var doDataSync = cacheDbSyncControl.dataUpdated.isBefore(latestData)
-
-    if (doShareSync && doDataSync)
-      return SyncActions(doShareSync = true, doDataSync = true)
-
-    for (project in dataset.projects) {
-      val appDB = AppDB.accessor(project)
-      if (appDB == null) {
-        log.info("skipping dataset state comparison for dataset {}/{}, project {} due to the target project config being disabled.", userID, datasetID, project)
-        continue
-      }
-
-      log.debug("checking project {} for dataset {}/{} to see if it is out of sync", project, userID, datasetID)
-
-      val sync = appDB.selectDatasetSyncControlRecord(datasetID)
-        // If the dataset sync record does not exist at all, then fire a sync
-        // action for shares and install.  The share sync is most likely going
-        // to be processed before the install, so the shares probably won't make
-        // it to the install target until the next big reconciler run.
-        ?: return SyncActions(doShareSync = true, doDataSync = true)
-
-      if (!doShareSync && sync.sharesUpdated.isBefore(latestShare))
-        doShareSync = true
-
-      if (!doDataSync && sync.dataUpdated.isBefore(latestData))
-        doDataSync = true
-
-      if (doShareSync && doDataSync)
-        return SyncActions(doShareSync = true, doDataSync = true)
-    }
-
-    return SyncActions(doShareSync, doDataSync)
   }
 }

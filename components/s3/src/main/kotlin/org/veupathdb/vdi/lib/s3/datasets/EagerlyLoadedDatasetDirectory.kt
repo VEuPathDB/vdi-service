@@ -69,18 +69,23 @@ internal class EagerlyLoadedDatasetDirectory(
 
   override fun exists(): Boolean = true // Eagerly loaded dataset directory must exist by definition of being constructed.
 
-  override fun hasMeta() = metaFile != null
 
-  override fun getMeta() = metaFile ?: DatasetMetaFileImpl(pathFactory.datasetMetaFile())
+  override fun hasMetaFile() = metaFile != null
 
-  override fun putMeta(meta: VDIDatasetMeta) = throw UnsupportedOperationException("${javaClass.name} is read-only")
+  override fun getMetaFile() = metaFile ?: DatasetMetaFileImpl(pathFactory.datasetMetaFile())
+
+  override fun putMetaFile(meta: VDIDatasetMeta) = throw UnsupportedOperationException("${javaClass.name} is read-only")
+
+  override fun deleteMetaFile() = throw UnsupportedOperationException("${javaClass.name} is read-only")
 
 
-  override fun hasManifest() = manifest != null
+  override fun hasManifestFile() = manifest != null
 
-  override fun getManifest() = manifest ?: DatasetManifestFileImpl(pathFactory.datasetManifestFile())
+  override fun getManifestFile() = manifest ?: DatasetManifestFileImpl(pathFactory.datasetManifestFile())
 
-  override fun putManifest(manifest: VDIDatasetManifest) = throw UnsupportedOperationException("${javaClass.name} is read-only")
+  override fun putManifestFile(manifest: VDIDatasetManifest) = throw UnsupportedOperationException("${javaClass.name} is read-only")
+
+  override fun deleteManifestFile() = throw UnsupportedOperationException("${javaClass.name} is read-only")
 
 
   override fun hasDeleteFlag() = deleteFlag != null
@@ -89,12 +94,16 @@ internal class EagerlyLoadedDatasetDirectory(
 
   override fun putDeleteFlag() = throw UnsupportedOperationException("${javaClass.name} is read-only")
 
+  override fun deleteDeleteFlag() = throw UnsupportedOperationException("${javaClass.name} is read-only")
+
 
   override fun hasUploadFile() = uploadFile != null
 
   override fun getUploadFile() = uploadFile ?: DatasetRawUploadFileImpl(pathFactory.datasetUploadZip())
 
   override fun putUploadFile(fn: () -> InputStream) = throw UnsupportedOperationException("${javaClass.name} is read-only")
+
+  override fun deleteUploadFile() = throw UnsupportedOperationException("${javaClass.name} is read-only")
 
 
   override fun hasImportReadyFile() = importableFile != null
@@ -103,12 +112,16 @@ internal class EagerlyLoadedDatasetDirectory(
 
   override fun putImportReadyFile(fn: () -> InputStream) = throw UnsupportedOperationException("${javaClass.name} is read-only")
 
+  override fun deleteImportReadyFile() = throw UnsupportedOperationException("${javaClass.name} is read-only")
+
 
   override fun hasInstallReadyFile() = installableFile != null
 
   override fun getInstallReadyFile() = installableFile ?: DatasetInstallableFileImpl(pathFactory.datasetInstallReadyZip())
 
   override fun putInstallReadyFile(fn: () -> InputStream) = throw UnsupportedOperationException("${javaClass.name} is read-only")
+
+  override fun deleteInstallReadyFile() = throw UnsupportedOperationException("${javaClass.name} is read-only")
 
 
   override fun getShares(): Map<UserID, DatasetShare> = shares

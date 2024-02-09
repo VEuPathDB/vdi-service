@@ -36,7 +36,7 @@ interface DatasetDirectory {
    * @return `true` if this dataset contains or, at the time of this method
    * call, contained a metadata JSON file.
    */
-  fun hasMeta(): Boolean
+  fun hasMetaFile(): Boolean
 
   /**
    * Returns a representation of this [DatasetDirectory]'s metadata JSON file.
@@ -45,7 +45,7 @@ interface DatasetDirectory {
    * file exists or existed.  The existence of the file can be tested using the
    * returned object's [DatasetMetaFile.exists] method.
    */
-  fun getMeta(): DatasetMetaFile
+  fun getMetaFile(): DatasetMetaFile
 
   /**
    * Puts a metadata JSON file into this [DatasetDirectory] overwriting any
@@ -53,7 +53,12 @@ interface DatasetDirectory {
    *
    * @param meta Dataset metadata to write to the metadata JSON file.
    */
-  fun putMeta(meta: VDIDatasetMeta)
+  fun putMetaFile(meta: VDIDatasetMeta)
+
+  /**
+   * Deletes the metadata JSON file from this [DatasetDirectory].
+   */
+  fun deleteMetaFile()
 
   /**
    * Tests whether this [DatasetDirectory] currently contains a manifest JSON
@@ -62,7 +67,7 @@ interface DatasetDirectory {
    * @return `true` if this dataset contains, or at the time of this method
    * call, contained a manifest JSON file.
    */
-  fun hasManifest(): Boolean
+  fun hasManifestFile(): Boolean
 
   /**
    * Returns a representation of this [DatasetDirectory]'s manifest JSON file.
@@ -71,7 +76,7 @@ interface DatasetDirectory {
    * file exists or existed.  The existence of the file can be tested using the
    * returned object's [DatasetManifestFile.exists] method.
    */
-  fun getManifest(): DatasetManifestFile
+  fun getManifestFile(): DatasetManifestFile
 
   /**
    * Puts a manifest JSON file into this [DatasetDirectory] overwriting any
@@ -79,7 +84,12 @@ interface DatasetDirectory {
    *
    * @param manifest Dataset manifest to write to the manifest JSON file.
    */
-  fun putManifest(manifest: VDIDatasetManifest)
+  fun putManifestFile(manifest: VDIDatasetManifest)
+
+  /**
+   * Deletes the manifest JSON file from this [DatasetDirectory].
+   */
+  fun deleteManifestFile()
 
   /**
    * Tests whether this [DatasetDirectory] currently contains a `delete-flag`
@@ -105,6 +115,11 @@ interface DatasetDirectory {
   fun putDeleteFlag()
 
   /**
+   * Deletes the delete-flag file from this [DatasetDirectory].
+   */
+  fun deleteDeleteFlag()
+
+  /**
    * Tests whether this [DatasetDirectory] currently contains a `raw-upload.zip`
    * file.
    *
@@ -127,6 +142,11 @@ interface DatasetDirectory {
    * Puts a `raw-upload.zip` file into this [DatasetDirectory].
    */
   fun putUploadFile(fn: () -> InputStream)
+
+  /**
+   * Deletes the `raw-upload.zip` file from this [DatasetDirectory].
+   */
+  fun deleteUploadFile()
 
   /**
    * Tests whether this [DatasetDirectory] currently contains an
@@ -154,6 +174,11 @@ interface DatasetDirectory {
   fun putImportReadyFile(fn: () -> InputStream)
 
   /**
+   * Deletes the `import-ready.zip` file from this [DatasetDirectory].
+   */
+  fun deleteImportReadyFile()
+
+  /**
    * Tests whether this [DatasetDirectory] currently contains an
    * `install-ready.zip` file.
    *
@@ -177,6 +202,11 @@ interface DatasetDirectory {
    * Puts an `install-ready.zip` file into this [DatasetDirectory].
    */
   fun putInstallReadyFile(fn: () -> InputStream)
+
+  /**
+   * Deletes the `install-ready.zip` file from this [DatasetDirectory].
+   */
+  fun deleteInstallReadyFile()
 
   /**
    * Fetches a map of [DatasetShare]s from this [DatasetDirectory].
@@ -207,8 +237,8 @@ interface DatasetDirectory {
    * exists, otherwise `null`.
    */
   fun getMetaTimestamp() =
-    if (hasMeta())
-      getMeta().lastModified()
+    if (hasMetaFile())
+      getMetaFile().lastModified()
     else
       null
 
@@ -223,8 +253,8 @@ interface DatasetDirectory {
    * exists, otherwise `null`.
    */
   fun getManifestTimestamp() =
-    if (hasManifest())
-      getManifest().lastModified()
+    if (hasManifestFile())
+      getManifestFile().lastModified()
     else
       null
 

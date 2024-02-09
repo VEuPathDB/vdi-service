@@ -24,25 +24,33 @@ internal class DatasetDirectoryImpl(
     bucket.objects.listSubPaths(pathFactory.datasetDir()).count > 0
 
 
-  override fun hasMeta() =
+  override fun hasMetaFile() =
     pathFactory.datasetMetaFile() in bucket.objects
 
-  override fun getMeta() =
+  override fun getMetaFile() =
     DatasetMetaFileImpl(bucket, pathFactory.datasetMetaFile())
 
-  override fun putMeta(meta: VDIDatasetMeta) {
+  override fun putMetaFile(meta: VDIDatasetMeta) {
     bucket.objects[pathFactory.datasetMetaFile()] = JSON.writeValueAsBytes(meta).inputStream()
   }
 
+  override fun deleteMetaFile() {
+    bucket.objects.delete(pathFactory.datasetMetaFile())
+  }
 
-  override fun hasManifest() =
+
+  override fun hasManifestFile() =
     pathFactory.datasetManifestFile() in bucket.objects
 
-  override fun getManifest() =
+  override fun getManifestFile() =
     DatasetManifestFileImpl(bucket, pathFactory.datasetManifestFile())
 
-  override fun putManifest(manifest: VDIDatasetManifest) {
+  override fun putManifestFile(manifest: VDIDatasetManifest) {
     bucket.objects[pathFactory.datasetManifestFile()] = JSON.writeValueAsBytes(manifest).inputStream()
+  }
+
+  override fun deleteManifestFile() {
+    bucket.objects[pathFactory.datasetManifestFile()]
   }
 
 
@@ -56,6 +64,10 @@ internal class DatasetDirectoryImpl(
     bucket.objects.touch(pathFactory.datasetDeleteFlagFile())
   }
 
+  override fun deleteDeleteFlag() {
+    bucket.objects.delete(pathFactory.datasetDeleteFlagFile())
+  }
+
 
   override fun hasUploadFile() =
     pathFactory.datasetUploadZip() in bucket.objects
@@ -65,6 +77,10 @@ internal class DatasetDirectoryImpl(
 
   override fun putUploadFile(fn: () -> InputStream) {
     fn().use { bucket.objects[pathFactory.datasetUploadZip()] = it.buffered() }
+  }
+
+  override fun deleteUploadFile() {
+    bucket.objects.delete(pathFactory.datasetUploadZip())
   }
 
 
@@ -78,6 +94,10 @@ internal class DatasetDirectoryImpl(
     fn().use { bucket.objects[pathFactory.datasetImportReadyZip()] = it.buffered() }
   }
 
+  override fun deleteImportReadyFile() {
+    bucket.objects.delete(pathFactory.datasetImportReadyZip())
+  }
+
 
   override fun hasInstallReadyFile() =
     pathFactory.datasetInstallReadyZip() in bucket.objects
@@ -88,6 +108,11 @@ internal class DatasetDirectoryImpl(
   override fun putInstallReadyFile(fn: () -> InputStream) {
     fn().use { bucket.objects[pathFactory.datasetInstallReadyZip()] = it.buffered() }
   }
+
+  override fun deleteInstallReadyFile() {
+    bucket.objects.delete(pathFactory.datasetInstallReadyZip())
+  }
+
 
   override fun getShares(): Map<UserID, DatasetShare> {
     log.debug("looking up shares for dataset {}/{}", ownerID, datasetID)

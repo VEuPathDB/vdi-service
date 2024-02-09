@@ -33,13 +33,10 @@ data class KafkaConfig(
    */
   val importTriggerTopic: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
 ) {
-  constructor() : this(System.getenv())
+  constructor(clientID: String) : this(System.getenv(), clientID)
 
-  constructor(env: Environment) : this(
-    consumerConfig          = KafkaConsumerConfig(
-      env.require(EnvKey.ImportTriggerHandler.KafkaConsumerClientID),
-      env
-    ),
+  constructor(env: Environment, clientID: String) : this(
+    consumerConfig          = KafkaConsumerConfig(clientID, env),
     importTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.ImportTriggers)
       ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
     importTriggerTopic      = env.optional(EnvKey.Kafka.Topic.ImportTriggers)

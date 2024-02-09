@@ -170,10 +170,10 @@ object DatasetReinstaller {
       val files        = mutableListOf(metaFile, manifestFile)
 
       metaFile.outputStream()
-        .use { out -> s3Dir.getMeta().loadContents()!!.use { inp -> inp.transferTo(out) } }
+        .use { out -> s3Dir.getMetaFile().loadContents()!!.use { inp -> inp.transferTo(out) } }
 
       manifestFile.outputStream()
-        .use { out -> s3Dir.getManifest().loadContents()!!.use { inp -> inp.transferTo(out) } }
+        .use { out -> s3Dir.getManifestFile().loadContents()!!.use { inp -> inp.transferTo(out) } }
 
       s3Dir.getInstallReadyFile()
         .also { ddf ->

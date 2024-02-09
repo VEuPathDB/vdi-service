@@ -26,7 +26,7 @@ data class SoftDeleteTriggerHandlerConfig(
       ?: Defaults.WorkQueueSize,
 
     kafkaConsumerConfig = KafkaConsumerConfig(
-      env.require(EnvKey.SoftDeleteTriggerHandler.KafkaConsumerClientID),
+      env.optional(EnvKey.SoftDeleteTriggerHandler.KafkaConsumerClientID) ?: "soft-delete-handler",
       env
     ),
 

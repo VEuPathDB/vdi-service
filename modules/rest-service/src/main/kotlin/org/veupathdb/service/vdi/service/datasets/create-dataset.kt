@@ -211,7 +211,7 @@ private fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
  *
  * @return A map of upload files and their sizes.
  */
-private fun Path.repack(into: Path, using: Path): Map<String, Long> {
+private fun Path.repack(into: Path, using: Path): List<VDIDatasetFileInfo> {
   // If it resembles a zip file
   return if (name.endsWith(".zip")) {
     repackZip(into, using)
@@ -239,11 +239,11 @@ private fun Path.repack(into: Path, using: Path): Map<String, Long> {
  *
  * @return A map of upload files and their sizes.
  */
-private fun Path.repackZip(into: Path, using: Path): Map<String, Long> {
+private fun Path.repackZip(into: Path, using: Path): List<VDIDatasetFileInfo> {
   log.trace("repacking zip file {} into {}", this, into)
 
   // Map of file names to sizes that will be stored in the postgres database.
-  val files = HashMap<String, Long>(12)
+  val files = ArrayList<VDIDatasetFileInfo>(12)
 
   // Validate that the zip appears usable.
   validateZip()
@@ -271,7 +271,7 @@ private fun Path.repackZip(into: Path, using: Path): Map<String, Long> {
       tmpFile.createFile()
       tmpFile.outputStream().use { out -> input.transferTo(out) }
 
-      files[entry.name] = tmpFile.fileSize()
+      files.add(VDIDatasetFileInfoImpl(entry.name, tmpFile.fileSize()))
 
       unpacked.add(tmpFile)
     }
@@ -299,11 +299,11 @@ private fun Path.repackZip(into: Path, using: Path): Map<String, Long> {
  *
  * @return A map of upload files and their sizes.
  */
-private fun Path.repackTar(into: Path, using: Path): Map<String, Long> {
+private fun Path.repackTar(into: Path, using: Path): List<VDIDatasetFileInfo> {
   log.trace("repacking tar {} into {}", this, into)
 
   // Output map of files to sizes that will be written to the postgres DB.
-  val sizes = HashMap<String, Long>(12)
+  val sizes = ArrayList<VDIDatasetFileInfo>(12)
 
   Tar.decompressWithGZip(this, using)
 
@@ -313,19 +313,17 @@ private fun Path.repackTar(into: Path, using: Path): Map<String, Long> {
     throw BadRequestException("uploaded tar file contains no files")
 
   for (file in files)
-    sizes[file.name] = file.fileSize()
+    sizes.add(VDIDatasetFileInfoImpl(file.name, file.fileSize()))
 
   Zip.compress(into, files)
 
   return sizes
 }
 
-private fun Path.repackRaw(into: Path): Map<String, Long> {
+private fun Path.repackRaw(into: Path): List<VDIDatasetFileInfo> {
   log.trace("repacking raw file {} into {}", this, into)
-  val sizes = HashMap<String, Long>(1)
   Zip.compress(into, listOf(this))
-  sizes[this.name] = this.fileSize()
-  return sizes
+  return listOf(VDIDatasetFileInfoImpl(name, fileSize()))
 }
 
 /**

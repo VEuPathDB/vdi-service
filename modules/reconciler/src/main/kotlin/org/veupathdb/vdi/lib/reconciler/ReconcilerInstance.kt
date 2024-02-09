@@ -143,13 +143,13 @@ class ReconcilerInstance(
   private fun isOutOfSync(ds: DatasetDirectory, targetLastUpdated: VDISyncControlRecord): Boolean {
     val shareOos = targetLastUpdated.sharesUpdated.isBefore(ds.getLatestShareTimestamp(targetLastUpdated.sharesUpdated))
     val dataOos = targetLastUpdated.dataUpdated.isBefore(ds.getInstallReadyTimestamp() ?: targetLastUpdated.dataUpdated)
-    val metaOos = targetLastUpdated.metaUpdated.isBefore(ds.getMeta().lastModified())
+    val metaOos = targetLastUpdated.metaUpdated.isBefore(ds.getMetaFile().lastModified())
     return shareOos || dataOos || metaOos
   }
 
   private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory) {
     if (targetDB.type == ReconcilerTargetType.Install) {
-      val relevantProjects = sourceDatasetDir.getMeta().load()!!.projects
+      val relevantProjects = sourceDatasetDir.getMetaFile().load()!!.projects
       if (!relevantProjects.contains(targetDB.name)) {
         logger().info("Skipping dataset ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID} as it does not target ${targetDB.name}")
         return

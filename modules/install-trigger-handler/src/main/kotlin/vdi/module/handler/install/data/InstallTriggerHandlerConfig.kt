@@ -26,7 +26,7 @@ data class InstallTriggerHandlerConfig(
       ?: Defaults.JobQueueSize,
 
     kafkaConsumerConfig = KafkaConsumerConfig(
-      env.require(EnvKey.InstallDataTriggerHandler.KafkaConsumerClientID),
+      env.optional(EnvKey.InstallDataTriggerHandler.KafkaConsumerClientID) ?: "install-data-handler",
       env
     ),
 

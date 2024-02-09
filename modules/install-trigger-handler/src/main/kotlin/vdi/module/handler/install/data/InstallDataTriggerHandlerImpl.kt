@@ -137,7 +137,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
 
     // Load the metadata so that we can iterate through the target projects.
-    val meta = dir.getMeta().load()!!
+    val meta = dir.getMetaFile().load()!!
 
     // Get a handler instance for the target dataset type.
     val handler = PluginHandlers[meta.type.name, meta.type.version]
@@ -301,10 +301,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       val files        = mutableListOf(metaFile, manifestFile)
 
       metaFile.outputStream()
-        .use { out -> s3Dir.getMeta().loadContents()!!.use { inp -> inp.transferTo(out) } }
+        .use { out -> s3Dir.getMetaFile().loadContents()!!.use { inp -> inp.transferTo(out) } }
 
       manifestFile.outputStream()
-        .use { out -> s3Dir.getManifest().loadContents()!!.use { inp -> inp.transferTo(out) } }
+        .use { out -> s3Dir.getManifestFile().loadContents()!!.use { inp -> inp.transferTo(out) } }
 
       s3Dir.getInstallReadyFile()
         .also { ddf ->

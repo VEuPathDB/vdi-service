@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.sql.delete.*
@@ -152,7 +153,7 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
 
   // region Insert
 
-  fun insertUploadFiles(datasetID: DatasetID, files: Map<String, Long>) {
+  fun insertUploadFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) {
     log.debug("inserting dataset upload files for dataset {}", datasetID)
     con.insertUploadFiles(datasetID, files)
   }
@@ -172,7 +173,7 @@ class CacheDBTransaction(private val connection: Connection) : AutoCloseable {
     con.tryInsertDatasetRecord(row.datasetID, row.typeName, row.typeVersion, row.ownerID, row.isDeleted, row.origin, row.created, row.inserted)
   }
 
-  fun tryInsertInstallFiles(datasetID: DatasetID, files: Map<String, Long>) {
+  fun tryInsertInstallFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) {
     log.debug("inserting dataset install files for dataset {}", datasetID)
     con.tryInsertInstallFiles(datasetID, files)
   }

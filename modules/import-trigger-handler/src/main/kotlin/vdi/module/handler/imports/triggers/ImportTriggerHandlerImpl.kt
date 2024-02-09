@@ -119,7 +119,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private fun processImportJob(userID: UserID, datasetID: DatasetID, datasetDir: DatasetDirectory) {
     // Load the dataset metadata from S3
-    val datasetMeta = datasetDir.getMeta().load()!!
+    val datasetMeta = datasetDir.getMetaFile().load()!!
 
     val timer = Metrics.importTimes
       .labels(datasetMeta.type.name, datasetMeta.type.version)
@@ -221,17 +221,14 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       // for importing into the data files directory in S3
       val dataFiles = tempDirectory.listDirectoryEntries()
 
-      val sizes = HashMap<String, Long>(dataFiles.size)
-
       // For each data file, push to S3
-      dataFiles.forEach { dataFile -> sizes[dataFile.name] = dataFile.fileSize() }
 
       TempFiles.withTempFile { tempFile ->
         Zip.compress(tempFile, dataFiles)
         dd.putInstallReadyFile { tempFile.inputStream() }
       }
 
-      dd.putManifest(manifest)
+      dd.putManifestFile(manifest)
 
       // Record the status update to the cache DB
       CacheDB.withTransaction { transaction ->
@@ -239,7 +236,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
           transaction.upsertImportMessages(datasetID, warnings.joinToString("\n"))
         }
 
-        transaction.tryInsertInstallFiles(datasetID, sizes)
+        transaction.tryInsertInstallFiles(datasetID, manifest.dataFiles)
         transaction.updateDataSyncControl(datasetID, dd.getInstallReadyTimestamp() ?: OffsetDateTime.now())
         transaction.updateImportControl(datasetID, DatasetImportStatus.Complete)
       }
@@ -283,7 +280,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       return false
     }
 
-    if (!hasMeta()) {
+    if (!hasMetaFile()) {
       log.info("got an import event for dataset $userID/$datasetID which does not yet have a $DatasetMetaFilename file, ignoring it")
       return false
     }

@@ -52,6 +52,13 @@ class KafkaRouter(
     )
   }
 
+  fun sendReconciliationTrigger(trigger: ReconciliationTrigger) {
+    producer.send(
+      config.reconciliationTriggerTopic,
+      KafkaMessage(config.reconciliationTriggerMessageKey, JSON.writeValueAsString(trigger))
+    )
+  }
+
   fun close() {
     producer.close()
   }

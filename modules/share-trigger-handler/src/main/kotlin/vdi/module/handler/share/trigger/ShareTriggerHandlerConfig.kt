@@ -26,7 +26,7 @@ data class ShareTriggerHandlerConfig(
       ?: Defaults.WorkQueueSize,
 
     kafkaConsumerConfig = KafkaConsumerConfig(
-      env.require(EnvKey.ShareTriggerHandler.KafkaConsumerClientID),
+      env.optional(EnvKey.ShareTriggerHandler.KafkaConsumerClientID) ?: "share-handler",
       env
     ),
 

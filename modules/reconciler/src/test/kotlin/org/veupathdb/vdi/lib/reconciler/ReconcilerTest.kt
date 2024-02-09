@@ -413,7 +413,7 @@ class ReconcilerTest {
         `when`(dsMock.getLatestShareTimestamp(UpdateTime)).thenReturn(UpdateTime)
         val meta = mock<DatasetMetaFile>()
         `when`(meta.lastModified()).thenReturn(UpdateTime)
-        `when`(dsMock.getMeta()).thenReturn(meta)
+        `when`(dsMock.getMetaFile()).thenReturn(meta)
         return dsMock
     }
 
@@ -425,7 +425,7 @@ class ReconcilerTest {
         `when`(dsMock.getLatestShareTimestamp(UpdateTime)).thenReturn(syncTime)
         val meta = mock<DatasetMetaFile>()
         `when`(meta.lastModified()).thenReturn(syncTime)
-        `when`(dsMock.getMeta()).thenReturn(meta)
+        `when`(dsMock.getMetaFile()).thenReturn(meta)
         return dsMock
     }
 
