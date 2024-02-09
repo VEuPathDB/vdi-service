@@ -16,7 +16,6 @@ internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTrigge
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.hardDeleteTopic, config.kafkaConsumerConfig)
-    val wp = WorkerPool("hard-delete-workers", config.jobQueueSize.toInt(), config.workerPoolSize.toInt())
 
     runBlocking {
       launch(Dispatchers.IO) {
@@ -26,11 +25,7 @@ internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTrigge
               log.info("received hard-delete event for dataset {}/{}", userID, datasetID)
             }
         }
-
-        wp.stop()
       }
-
-      wp.start()
     }
 
     confirmShutdown()

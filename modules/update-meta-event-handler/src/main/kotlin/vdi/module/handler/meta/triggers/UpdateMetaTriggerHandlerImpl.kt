@@ -26,9 +26,9 @@ import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaResponseType
 import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaUnexpectedErrorResponse
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandler
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import org.veupathdb.vdi.lib.kafka.model.triggers.ReconciliationTrigger
 import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
@@ -45,7 +45,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
   override suspend fun run() {
     val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
     val kc = requireKafkaConsumer(config.kafkaRouterConfig.updateMetaTriggerTopic, config.kafkaConsumerConfig)
-    val kr = requireKafkaRouter()
+    val kr = requireKafkaRouter(config.kafkaRouterConfig)
     val wp = WorkerPool("update-meta-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
       Metrics.updateMetaQueueSize.inc(it.toDouble())
     }
@@ -58,7 +58,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
             // and for each of the trigger messages received
             .forEach { (userID, datasetID) ->
               log.info("Received install-meta job for dataset {}/{}.", userID, datasetID)
-              wp.submit { executeJob(dm, kr, userID, datasetID) }
+              wp.submit { updateMeta(dm, kr, userID, datasetID) }
             }
         }
 
@@ -71,7 +71,15 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     confirmShutdown()
   }
 
-  private fun executeJob(dm: DatasetManager, kr: KafkaRouter, userID: UserID, datasetID: DatasetID) {
+  private fun updateMeta(dm: DatasetManager, kr: KafkaRouter, userID: UserID, datasetID: DatasetID) {
+    try {
+      updateMeta(dm, userID, datasetID)
+    } finally {
+      kr.sendReconciliationTrigger(ReconciliationTrigger(userID, datasetID))
+    }
+  }
+
+  private fun updateMeta(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
     log.debug("Looking up dataset directory for dataset {}/{}", userID, datasetID)
 
     // lookup the dataset directory for the given userID and datasetID
@@ -112,8 +120,6 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       }
     }
 
-    DatasetReconciler.reconcile(userID, datasetID, datasetMeta, metaTimestamp, dir, kr)
-
     CacheDB.openTransaction()
       .use { db ->
         // 1. Update meta info
@@ -138,12 +144,12 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val ph = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version]!!
 
     datasetMeta.projects
-      .forEach { projectID -> executeJob(ph, datasetMeta, metaTimestamp, datasetID, projectID, userID) }
+      .forEach { projectID -> updateTargetMeta(ph, datasetMeta, metaTimestamp, datasetID, projectID, userID) }
 
     timer.observeDuration()
   }
 
-  private fun executeJob(
+  private fun updateTargetMeta(
     ph: PluginHandler,
     meta: VDIDatasetMeta,
     metaTimestamp: OffsetDateTime,
@@ -295,10 +301,6 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
   private fun handleUnexpectedErrorResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: InstallMetaUnexpectedErrorResponse) {
     log.error("dataset handler server reports 500 error for meta-install on dataset {}/{}, project {}", userID, datasetID, projectID)
     throw IllegalStateException(res.message)
-  }
-
-  private suspend fun requireKafkaRouter() = safeExec("failed to create KafkaRouter instance") {
-    KafkaRouterFactory(config.kafkaRouterConfig).newKafkaRouter()
   }
 
   private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {

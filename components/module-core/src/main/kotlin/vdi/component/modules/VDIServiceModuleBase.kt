@@ -9,6 +9,8 @@ import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import kotlin.reflect.KClass
 
 /**
@@ -174,4 +176,6 @@ abstract class VDIServiceModuleBase(
       }
       .filterNotNull()
 
+  protected suspend fun requireKafkaRouter(config: KafkaRouterConfig) =
+    safeExec("failed to create KafkaRouter instance") { KafkaRouterFactory(config).newKafkaRouter() }
 }
