@@ -94,7 +94,7 @@ modules.
 * link:modules/rest-service/[Rest API Service]
 * link:modules/share-trigger-handler/[Share Event Handler]
 * link:modules/soft-delete-trigger-handler/[Soft Delete Event Handler]
-* link:modules/update-meta-trigger-handler/[Update Meta Event Handler]
+* link:modules/update-meta-event-handler/[Update Meta Event Handler]
 
 === Bootstrapper
 
