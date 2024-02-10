@@ -23,7 +23,7 @@ private fun getUserQuotaInfo(userID: UserID): UserQuotaDetails =
 internal fun getCurrentQuotaUsage(userID: UserID): Long {
   val sizes = DatasetStore.listDatasetImportReadyZipSizes(userID)
 
-  return CacheDB.selectDatasetsForUser(userID)
+  return CacheDB().selectDatasetsForUser(userID)
     .asSequence()
     .filter { !it.isDeleted }
     .map { sizes[it.datasetID] ?: 0L }

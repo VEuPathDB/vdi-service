@@ -1,9 +1,5 @@
 package org.veupathdb.vdi.lib.db.cache
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
-import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.env.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
@@ -11,165 +7,62 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.query.AdminAllDatasetsQuery
-import org.veupathdb.vdi.lib.db.cache.sql.migrateDatabase
-import org.veupathdb.vdi.lib.db.cache.sql.select.*
-import org.veupathdb.vdi.lib.db.cache.sql.update.updateDatasetImportStatus
-import javax.sql.DataSource
-import org.postgresql.Driver as PostgresDriver
 
-object CacheDB {
-  lateinit var details: CacheDBConnectionDetails
-    private set
+fun CacheDB(): CacheDB = CacheDBImpl
 
-  lateinit var dataSource: DataSource
-    private set
+interface CacheDB {
 
-  private val log = LoggerFactory.getLogger(javaClass)
+  fun tempMigrateDB()
 
-  private val connection
-    get() = dataSource.connection
+  fun selectDataset(datasetID: DatasetID): DatasetRecord?
 
-  init {
-    init(System.getenv())
-  }
+  fun selectInstallFiles(datasetID: DatasetID): List<DatasetFile>
 
-  internal fun init(env: Environment) {
-    val host     = env.require(EnvKey.CacheDB.Host)
-    val port     = env.optUShort(EnvKey.CacheDB.Port) ?: CacheDBConfigDefaults.Port
-    val name     = env.require(EnvKey.CacheDB.Name)
-    val username = env.require(EnvKey.CacheDB.Username)
-    val password = env.require(EnvKey.CacheDB.Password)
-    val poolSize = env.optUByte(EnvKey.CacheDB.PoolSize) ?: CacheDBConfigDefaults.PoolSize
+  fun selectUploadFiles(datasetID: DatasetID): List<DatasetFile>
 
-    log.info("initializing datasource for cache-db")
+  fun selectAdminAllDatasetCount(query: AdminAllDatasetsQuery): UInt
 
-    val config = HikariConfig()
-      .also {
-        it.jdbcUrl = makeJDBCPostgresConnectionString(host, port, name)
-        it.username = username
-        it.password = password
-        it.maximumPoolSize = poolSize.toInt()
-        it.driverClassName = PostgresDriver::class.java.name
-      }
+  fun selectAdminAllDatasets(query: AdminAllDatasetsQuery): List<AdminAllDatasetsRow>
 
-    dataSource = HikariDataSource(config)
-    details    = CacheDBConnectionDetails(host, port, name)
-  }
+  fun selectAdminDatasetDetails(datasetID: DatasetID): AdminDatasetDetailsRecord?
 
-  fun tempMigrateDB() {
-    connection.use { it.migrateDatabase() }
-  }
+  fun selectInstallFileCount(datasetID: DatasetID): Int
 
-  fun selectDataset(datasetID: DatasetID): DatasetRecord? {
-    log.debug("selecting dataset {}", datasetID)
-    return connection.use { it.selectDataset(datasetID) }
-  }
+  fun selectInstallFileSummaries(datasetIDs: List<DatasetID>): Map<DatasetID, DatasetFileSummary>
 
-  fun selectInstallFiles(datasetID: DatasetID): List<DatasetFile> {
-    log.debug("selecting install files for dataset {}", datasetID)
-    return connection.use { it.selectInstallFiles(datasetID) }
-  }
+  fun selectUploadFileCount(datasetID: DatasetID): Int
 
-  fun selectUploadFiles(datasetID: DatasetID): List<DatasetFile> {
-    log.debug("selecting upload files for dataset {}", datasetID)
-    return connection.use { it.selectUploadFiles(datasetID) }
-  }
+  fun selectUploadFileSummaries(datasetIDs: List<DatasetID>): Map<DatasetID, DatasetFileSummary>
 
-  fun selectAdminAllDatasetCount(query: AdminAllDatasetsQuery) =
-    connection.use { it.selectAdminAllDatasetCount(query) }
+  fun selectDatasetList(query: DatasetListQuery): List<DatasetRecord>
 
-  fun selectAdminAllDatasets(query: AdminAllDatasetsQuery) =
-    connection.use { it.selectAdminAllDatasets(query) }
+  fun selectDatasetForUser(userID: UserID, datasetID: DatasetID): DatasetRecord?
 
-  fun selectAdminDatasetDetails(datasetID: DatasetID) =
-    connection.use { it.selectAdminDatasetDetails(datasetID) }
+  fun selectDatasetsForUser(userID: UserID): List<DatasetRecord>
 
-  fun selectInstallFileCount(datasetID: DatasetID) =
-    connection.use { it.selectInstallFileCount(datasetID) }
+  fun selectNonPrivateDatasets(): List<DatasetRecord>
 
-  fun selectInstallFileSummaries(datasetIDs: List<DatasetID>) =
-    connection.use { it.selectInstallFileSummaries(datasetIDs) }
+  fun selectSharesForDataset(datasetID: DatasetID): List<DatasetShare>
 
-  fun selectUploadFileCount(datasetID: DatasetID) =
-    connection.use { it.selectUploadFileCount(datasetID) }
+  fun selectSharesForDatasets(datasetIDs: List<DatasetID>): Map<DatasetID, List<DatasetShare>>
 
-  fun selectUploadFileSummaries(datasetIDs: List<DatasetID>) =
-    connection.use { it.selectUploadFileSummaries(datasetIDs) }
+  fun selectImportControl(datasetID: DatasetID): DatasetImportStatus?
 
-  fun selectDatasetList(query: DatasetListQuery): List<DatasetRecord> {
-    log.debug("selecting dataset list for user {}", query.userID)
-    return connection.use { it.selectDatasetList(query) }
-  }
+  fun selectImportMessages(datasetID: DatasetID): List<String>
 
-  fun selectDatasetForUser(userID: UserID, datasetID: DatasetID): DatasetRecord? {
-    log.debug("selecting dataset {} for user {}", datasetID, userID)
-    return connection.use { it.selectDatasetForUser(userID, datasetID) }
-  }
+  fun selectSyncControl(datasetID: DatasetID): VDISyncControlRecord?
 
-  fun selectDatasetsForUser(userID: UserID): List<DatasetRecord> {
-    log.debug("selecting dataset list for user {}", userID)
-    return connection.use { it.selectDatasetsForUser(userID) }
-  }
+  fun selectDeletedDatasets(): List<DeletedDataset>
 
-  fun selectNonPrivateDatasets(): List<DatasetRecord> {
-    log.debug("selecting list of non-private datasets")
-    return connection.use { it.selectNonPrivateDatasets() }
-  }
+  fun updateImportStatus(datasetID: DatasetID, status: DatasetImportStatus)
 
-  fun selectSharesForDataset(datasetID: DatasetID): List<DatasetShare> {
-    log.debug("selecting shares for dataset {}", datasetID)
-    return connection.use { it.selectSharesFor(datasetID) }
-  }
+  fun selectOpenSharesForUser(recipientID: UserID): List<DatasetShareListEntry>
 
-  fun selectSharesForDatasets(datasetIDs: List<DatasetID>): Map<DatasetID, List<DatasetShare>> {
-    log.debug("selecting shares for {} datasets", datasetIDs.size)
-    return connection.use { it.selectSharesFor(datasetIDs) }
-  }
+  fun selectAcceptedSharesForUser(recipientID: UserID): List<DatasetShareListEntry>
 
-  fun selectImportControl(datasetID: DatasetID): DatasetImportStatus? {
-    log.debug("selecting import control record for dataset {}", datasetID)
-    return connection.use { it.selectImportControl(datasetID) }
-  }
+  fun selectRejectedSharesForUser(recipientID: UserID): List<DatasetShareListEntry>
 
-  fun selectImportMessages(datasetID: DatasetID): List<String> {
-    log.debug("selecting import messages for dataset {}", datasetID)
-    return connection.use { it.selectImportMessages(datasetID) }
-  }
-
-  fun selectSyncControl(datasetID: DatasetID): VDISyncControlRecord? {
-    log.debug("selecting sync control record for dataset {}", datasetID)
-    return connection.use { it.selectSyncControl(datasetID) }
-  }
-
-  fun selectDeletedDatasets(): List<DeletedDataset> {
-    log.debug("selecting deleted datasets")
-    return connection.use { it.selectDeletedDatasets() }
-  }
-
-  fun updateImportStatus(datasetID: DatasetID, status: DatasetImportStatus) {
-    log.debug("updating import status for dataset {} to status {}", datasetID, status)
-    return connection.use { it.updateDatasetImportStatus(datasetID, status) }
-  }
-
-  fun selectOpenSharesForUser(recipientID: UserID): List<DatasetShareListEntry> {
-    log.debug("selecting open shares for recipient {}", recipientID)
-    return connection.use { it.selectOpenSharesFor(recipientID) }
-  }
-
-  fun selectAcceptedSharesForUser(recipientID: UserID): List<DatasetShareListEntry> {
-    log.debug("selecting accepted shares for recipient {}", recipientID)
-    return connection.use { it.selectAcceptedSharesFor(recipientID) }
-  }
-
-  fun selectRejectedSharesForUser(recipientID: UserID): List<DatasetShareListEntry> {
-    log.debug("selecting rejected shares for recipient {}", recipientID)
-    return connection.use { it.selectRejectedSharesFor(recipientID) }
-  }
-
-  fun selectAllSharesForUser(recipientID: UserID): List<DatasetShareListEntry> {
-    log.debug("selecting all shares for recipient {}", recipientID)
-    return connection.use { it.selectAllSharesFor(recipientID) }
-  }
+  fun selectAllSharesForUser(recipientID: UserID): List<DatasetShareListEntry>
 
   /**
    * Streams sorted stream of all dataset control records.
@@ -177,24 +70,19 @@ object CacheDB {
    * @return Stream of dataset control records sorted by user ID and then dataset ID. The stream
    * must be closed to release the db connection.
    */
-  fun selectAllSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord> {
-    log.debug("selecting all sync control records")
-    return connection.selectAllSyncControl()
-  }
+  fun selectAllSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord>
 
-  fun selectBrokenDatasetImports(query: BrokenImportListQuery): List<BrokenImportRecord> {
-    log.debug("selecting broken dataset import records")
-    return connection.use { it.selectBrokenImports(query) }
-  }
+  fun selectBrokenDatasetImports(query: BrokenImportListQuery): List<BrokenImportRecord>
 
-
-  fun openTransaction() =
-    CacheDBTransaction(connection.apply { autoCommit = false })
-
-  fun withTransaction(fn: (CacheDBTransaction) -> Unit) =
-    openTransaction().use(fn)
-
-  private fun makeJDBCPostgresConnectionString(host: String, port: UShort, name: String) =
-    "jdbc:postgresql://$host:$port/$name"
+  fun openTransaction(): CacheDBTransaction
 }
+
+inline fun CacheDB.withTransaction(fn: (CacheDBTransaction) -> Unit) =
+  openTransaction().use {
+    try {
+      fn(it)
+    } catch (e: Throwable) {
+      it.rollback()
+    }
+  }
 

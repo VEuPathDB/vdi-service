@@ -24,6 +24,7 @@ import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 import org.veupathdb.vdi.lib.handler.client.response.imp.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.json.JSON
@@ -48,6 +49,8 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   private val lock = ReentrantLock()
 
   private val activeIDs = HashSet<DatasetID>(24)
+
+  private val cacheDB = CacheDB()
 
   override suspend fun run() {
     log.trace("run()")
@@ -126,10 +129,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
     // lookup the target dataset in the cache database to ensure it
     // exists, initializing the dataset if it doesn't yet exist.
-    with(CacheDB.selectDataset(datasetID)) {
+    with(cacheDB.selectDataset(datasetID)) {
       if (isNull()) {
         log.info("initializing dataset $userID/$datasetID")
-        CacheDB.initializeDataset(datasetID, datasetMeta)
+        cacheDB.initializeDataset(datasetID, datasetMeta)
       } else {
         if (isDeleted) {
           log.info("skipping import event for dataset $userID/$datasetID as it is marked as deleted in the cache db")
@@ -139,7 +142,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       }
     }
 
-    val impStatus = CacheDB.selectImportControl(datasetID)!!
+    val impStatus = cacheDB.selectImportControl(datasetID)!!
 
     if (impStatus != DatasetImportStatus.Queued) {
       log.info("skipping import event for dataset $userID/$datasetID as it is already in status $impStatus")
@@ -157,7 +160,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         throw IllegalStateException("No plugin handler registered for dataset type ${datasetMeta.type.name}")
       }
 
-      CacheDB.withTransaction {
+      cacheDB.withTransaction {
         log.info("attempting to insert import control record (if one does not exist)")
         it.upsertImportControl(datasetID, DatasetImportStatus.InProgress)
       }
@@ -180,7 +183,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       }
     } catch (e: Throwable) {
       log.debug("import request to handler server failed with exception:", e)
-      CacheDB.withTransaction { tran ->
+      cacheDB.withTransaction { tran ->
         tran.updateImportControl(datasetID, DatasetImportStatus.Invalid)
         tran.tryInsertImportMessages(datasetID, "Process error: ${e.message}")
       }
@@ -230,7 +233,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       dd.putManifestFile(manifest)
 
       // Record the status update to the cache DB
-      CacheDB.withTransaction { transaction ->
+      cacheDB.withTransaction { transaction ->
         if (warnings.isNotEmpty()) {
           transaction.upsertImportMessages(datasetID, warnings.joinToString("\n"))
         }
@@ -244,7 +247,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private fun handleImportBadRequestResult(datasetID: DatasetID, result: ImportBadRequestResponse) {
     log.error("dataset handler server reports 400 error for dataset $datasetID, message: ${result.message}")
-    CacheDB.withTransaction {
+    cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
       it.upsertImportMessages(datasetID, result.message)
     }
@@ -253,7 +256,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private fun handleImportInvalidResult(datasetID: DatasetID, result: ImportValidationErrorResponse) {
     log.info("dataset handler server reports dataset $datasetID failed validation")
-    CacheDB.withTransaction {
+    cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
       it.upsertImportMessages(datasetID, result.warnings.joinToString("\n"))
     }
@@ -261,7 +264,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private fun handleImport500Result(userID: UserID, datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
     log.error("dataset handler server reports 500 for dataset $userID/$datasetID, message ${result.message}")
-    CacheDB.withTransaction {
+    cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
       it.upsertImportMessages(datasetID, result.message)
     }

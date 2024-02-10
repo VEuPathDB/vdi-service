@@ -20,4 +20,14 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
   implementation("org.slf4j:slf4j-api")
   implementation(kotlin("stdlib-jdk8"))
+
+  testImplementation(kotlin("test"))
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+  testImplementation("org.mockito:mockito-core:5.2.0")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+  testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
+}
+
+tasks.test {
+  useJUnitPlatform()
 }

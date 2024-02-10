@@ -76,7 +76,7 @@ private fun listExpandedBrokenDatasets(): BrokenDatasetListing {
   }
 
   // Lookup the statuses for all the target datasets in bulk.
-  val datasetInstallStatusMap = AppDB.getDatasetStatuses(projectToDatasetIDs)
+  val datasetInstallStatusMap = AppDB().getDatasetStatuses(projectToDatasetIDs)
   projectToDatasetIDs.clear()
 
   val results = ArrayList<BrokenDatasetDetails>(cache.size)
@@ -92,7 +92,7 @@ private fun listExpandedBrokenDatasets(): BrokenDatasetListing {
 }
 
 private fun getBrokenDatasets(projectID: ProjectID) =
-  AppDB.accessor(projectID)!!
+  AppDB().accessor(projectID)!!
     .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FailedInstallation)
 
 private fun DatasetRecord.toDetails(

@@ -16,11 +16,13 @@ import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDBTransaction
 import org.veupathdb.vdi.lib.db.app.model.*
+import org.veupathdb.vdi.lib.db.app.withTransaction
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaBadRequestResponse
 import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaResponseType
 import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaUnexpectedErrorResponse
@@ -39,6 +41,10 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
   , VDIServiceModuleBase("update-meta-trigger-handler")
 {
   private val log = LoggerFactory.getLogger(javaClass)
+
+  private val cacheDB = CacheDB()
+
+  private val appDB = AppDB()
 
   override suspend fun run() {
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
@@ -100,14 +106,14 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       .startTimer()
 
     // Attempt to select the dataset details from the cache DB
-    val cachedDataset = CacheDB.selectDataset(datasetID)
+    val cachedDataset = cacheDB.selectDataset(datasetID)
 
     // If no dataset record was found in the cache DB then this is (likely) the
     // first event for the dataset coming through the pipeline.
     if (cachedDataset == null) {
       log.debug("dataset details were not found for dataset {}/{}, creating them", userID, datasetID)
       // If they were not found, construct them
-      CacheDB.initializeDataset(datasetID, datasetMeta)
+      cacheDB.initializeDataset(datasetID, datasetMeta)
     }
 
     // Else if the dataset is marked as deleted already, then bail here.
@@ -118,8 +124,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       }
     }
 
-    CacheDB.openTransaction()
-      .use { db ->
+    cacheDB.withTransaction { db ->
         // 1. Update meta info
         db.updateDatasetMeta(DatasetMetaImpl(
           datasetID   = datasetID,
@@ -160,7 +165,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       return
     }
 
-    val appDb = AppDB.accessor(projectID)
+    val appDb = appDB.accessor(projectID)
     if (appDb == null) {
       log.info("skipping dataset {}/{}, project {} update meta due to target being disabled", userID, datasetID, projectID)
       return
@@ -175,7 +180,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       return
     }
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       try {
         log.debug("testing for existence of dataset {}/{} in app db for project {}", userID, datasetID, projectID)
         it.selectDataset(datasetID) or {
@@ -220,7 +225,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       }
     }
 
-    val sync = AppDB.accessor(projectID)!!.selectDatasetSyncControlRecord(datasetID)!!
+    val sync = appDB.accessor(projectID)!!.selectDatasetSyncControlRecord(datasetID)!!
 
     if (!sync.metaUpdated.isBefore(metaTimestamp)) {
       log.info("skipping install-meta for dataset {}/{}, project {} as nothing has changed.", userID, datasetID, projectID)
@@ -239,7 +244,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       }
     } catch (e: Throwable) {
       log.info("install-meta request to handler server failed with exception:", e)
-      AppDB.withTransaction(projectID) {
+      appDB.withTransaction(projectID) {
         try {
           it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Meta, InstallStatus.FailedInstallation, e.message))
         } catch (e: SQLException) {
@@ -252,13 +257,13 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       }
       throw e
     } finally {
-      AppDB.withTransaction(projectID) { it.updateSyncControlMetaTimestamp(datasetID, metaTimestamp) }
+      appDB.withTransaction(projectID) { it.updateSyncControlMetaTimestamp(datasetID, metaTimestamp) }
     }
   }
 
   private fun handleSuccessResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID) {
     log.info("dataset handler server reports dataset {}/{} meta installed successfully into project {}", userID, datasetID, projectID)
-    AppDB.withTransaction(projectID) { it.insertMetaInstallSuccessMessage(datasetID) }
+    appDB.withTransaction(projectID) { it.insertMetaInstallSuccessMessage(datasetID) }
   }
 
   private fun AppDBTransaction.insertMetaInstallSuccessMessage(datasetID: DatasetID) {

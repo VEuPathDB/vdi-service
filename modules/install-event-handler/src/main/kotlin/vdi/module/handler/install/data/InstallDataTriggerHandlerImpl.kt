@@ -19,7 +19,9 @@ import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
+import org.veupathdb.vdi.lib.db.app.withTransaction
 import org.veupathdb.vdi.lib.db.cache.CacheDB
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
 import org.veupathdb.vdi.lib.handler.client.response.ind.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
@@ -38,6 +40,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   , VDIServiceModuleBase("install-data-trigger-handler")
 {
   private val log = LoggerFactory.getLogger(javaClass)
+
+  private val cacheDB = CacheDB()
+
+  private val appDB = AppDB()
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
@@ -100,7 +106,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
 
     // Lookup the sync control record in the postgres DB
-    val syncControl = CacheDB.selectSyncControl(datasetID)
+    val syncControl = cacheDB.selectSyncControl(datasetID)
 
     // If the sync control record was not found in postgres, then we are likely
     // seeing this event due to a cross campus S3 sync, and the metadata JSON
@@ -111,7 +117,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
 
     // Lookup the dataset record in the postgres DB
-    val cdbDataset = CacheDB.selectDataset(datasetID)
+    val cdbDataset = cacheDB.selectDataset(datasetID)
 
     // If the dataset record doesn't yet exist in postgres DB then we caught
     // this event _while_ the metadata JSON event was being handled due to a
@@ -182,9 +188,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     s3Dir:     DatasetDirectory,
     handler:   PluginHandlerClient
   ) {
-    log.trace("executeJob(userID={}, datasetID={}, projectID={}, s3Dir=..., handler=...)", userID, datasetID, projectID)
-
-    val appDB   = AppDB.accessor(projectID)
+    val appDB   = appDB.accessor(projectID)
     if (appDB == null) {
       log.info("skipping install event for dataset {}/{} into project {} due to the target project being disabled.", userID, datasetID, projectID)
       return
@@ -208,7 +212,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
       if (status == null) {
         var race = false
-        AppDB.withTransaction(projectID) {
+        this.appDB.withTransaction(projectID) {
           try {
             it.insertDatasetInstallMessage(DatasetInstallMessage(datasetID, InstallType.Data, InstallStatus.Running, null))
           } catch (e: SQLException) {
@@ -335,9 +339,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   ) {
     log.info("dataset {}/{} data was installed successfully into project {}", userID, datasetID, projectID)
 
-    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
+    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -358,9 +362,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   ) {
     log.error("dataset {}/{} install into {} failed due to bad request exception from handler server: {}", userID, datasetID, projectID, res.message)
 
-    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
+    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -383,9 +387,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   ) {
     log.info("dataset {}/{} install into {} failed due to validation error", userID, datasetID, projectID)
 
-    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
+    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -406,9 +410,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   ) {
     log.info("dataset {}/{} install into {} was rejected for missing dependencies", userID, datasetID, projectID)
 
-    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
+    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -432,9 +436,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   ) {
     log.error("dataset {}/{} install into {} failed with a 500 from the handler server", userID, datasetID, projectID)
 
-    CacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
+    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(

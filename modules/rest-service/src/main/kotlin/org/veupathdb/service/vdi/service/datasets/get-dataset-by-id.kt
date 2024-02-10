@@ -18,15 +18,15 @@ import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
  * return user information.
  */
 fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
-  val dataset = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
+  val dataset = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
 
   val typeDisplayName = PluginHandlers[dataset.typeName, dataset.typeVersion]?.displayName
     ?: throw IllegalStateException("plugin missing: ${dataset.typeName}:${dataset.typeVersion}")
 
   // Lookup status information for the dataset
-  val statuses = AppDB.getDatasetStatuses(datasetID, dataset.projects)
+  val statuses = AppDB().getDatasetStatuses(datasetID, dataset.projects)
 
-  val importMessages = CacheDB.selectImportMessages(datasetID)
+  val importMessages = CacheDB().selectImportMessages(datasetID)
 
   // This value will be null if the async dataset upload has not yet completed.
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
@@ -62,7 +62,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     throw NotFoundException()
 
   val shares = if (dataset.ownerID == userID) {
-    CacheDB.selectSharesForDataset(datasetID)
+    CacheDB().selectSharesForDataset(datasetID)
   } else {
     emptyList()
   }
@@ -80,9 +80,9 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     ?: throw IllegalStateException("plugin missing: ${dataset.typeName}:${dataset.typeVersion}")
 
   // Lookup status information for the dataset
-  val statuses = AppDB.getDatasetStatuses(datasetID, dataset.projects)
+  val statuses = AppDB().getDatasetStatuses(datasetID, dataset.projects)
 
-  val importMessages = CacheDB.selectImportMessages(datasetID)
+  val importMessages = CacheDB().selectImportMessages(datasetID)
 
   // This value will be null if the async dataset upload has not yet completed.
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
@@ -122,10 +122,10 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 }
 
 private fun requireDataset(userID: UserID, datasetID: DatasetID): DatasetRecord {
-  var ds = CacheDB.selectDatasetForUser(userID, datasetID)
+  var ds = CacheDB().selectDatasetForUser(userID, datasetID)
 
   if (ds == null) {
-    ds = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
+    ds = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
 
     if (ds.visibility == VDIDatasetVisibility.Private)
       throw NotFoundException()

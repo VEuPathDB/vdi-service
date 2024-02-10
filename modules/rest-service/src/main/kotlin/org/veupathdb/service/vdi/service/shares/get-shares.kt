@@ -28,16 +28,16 @@ internal fun lookupShares(userID: UserID, status: ShareFilterStatus): List<Share
   }
 
 private fun lookupOpenShares(userID: UserID): List<ShareOfferEntry> =
-  convertToOutType(CacheDB.selectOpenSharesForUser(userID))
+  convertToOutType(CacheDB().selectOpenSharesForUser(userID))
 
 private fun lookupAcceptedShares(userID: UserID): List<ShareOfferEntry> =
-  convertToOutType(CacheDB.selectAcceptedSharesForUser(userID))
+  convertToOutType(CacheDB().selectAcceptedSharesForUser(userID))
 
 private fun lookupRejectedShares(userID: UserID): List<ShareOfferEntry> =
-  convertToOutType(CacheDB.selectRejectedSharesForUser(userID))
+  convertToOutType(CacheDB().selectRejectedSharesForUser(userID))
 
 private fun lookupAllShares(userID: UserID): List<ShareOfferEntry> =
-  convertToOutType(CacheDB.selectAllSharesForUser(userID))
+  convertToOutType(CacheDB().selectAllSharesForUser(userID))
 
 private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<ShareOfferEntry> {
   val ownerIDs = shares.asSequence()

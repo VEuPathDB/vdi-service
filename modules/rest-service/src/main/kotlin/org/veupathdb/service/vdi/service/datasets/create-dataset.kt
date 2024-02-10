@@ -24,6 +24,7 @@ import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import vdi.component.metrics.Metrics
 import java.net.URL
@@ -58,7 +59,7 @@ fun createDataset(
       throw BadRequestException("unrecognized target project")
   }
 
-  CacheDB.withTransaction {
+  CacheDB().withTransaction {
     it.tryInsertDataset(DatasetImpl(
       datasetID    = datasetID,
       typeName     = datasetMeta.type.name,
@@ -129,6 +130,8 @@ private fun uploadFiles(
   uploadFile: Path,
   datasetMeta: VDIDatasetMeta,
 ) {
+  val cacheDB = CacheDB()
+
   // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
   TempFiles.withTempDirectory { directory ->
     TempFiles.withTempPath { archive ->
@@ -142,10 +145,10 @@ private fun uploadFiles(
         log.debug("uploading raw user data to S3 for new dataset {}/{}", userID, datasetID)
         DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
 
-        CacheDB.withTransaction { it.insertUploadFiles(datasetID, sizes) }
+        cacheDB.withTransaction { it.insertUploadFiles(datasetID, sizes) }
       } catch (e: Throwable) {
         log.error("user dataset upload to minio failed: ", e)
-        CacheDB.withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+        cacheDB.withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
         throw e
       } finally {
         uploadFile.deleteIfExists()
@@ -159,7 +162,7 @@ private fun uploadFiles(
     DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
   } catch (e: Throwable) {
     log.error("user dataset meta file upload to minio failed: ", e)
-    CacheDB.withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+    cacheDB.withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     throw e
   }
 }

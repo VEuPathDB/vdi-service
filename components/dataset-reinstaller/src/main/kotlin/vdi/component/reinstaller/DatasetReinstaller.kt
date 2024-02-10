@@ -14,6 +14,7 @@ import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
+import org.veupathdb.vdi.lib.db.app.withTransaction
 import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
 import org.veupathdb.vdi.lib.handler.client.response.ind.*
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallBadRequestResponse
@@ -36,6 +37,8 @@ object DatasetReinstaller {
   private val config = DatasetReinstallerConfig()
 
   private var runCounter = 0uL
+
+  private val appDB = AppDB()
 
   /**
    * Tries to run the [DatasetReinstaller] if an instance of the reinstaller is
@@ -81,7 +84,7 @@ object DatasetReinstaller {
 
   private fun processProject(projectID: ProjectID, manager: DatasetManager) {
     // locate datasets in the ready-for-reinstall status
-    val datasets = AppDB.accessor(projectID)!!
+    val datasets = appDB.accessor(projectID)!!
       .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.ReadyForReinstall)
 
     log.info("found {} datasets in project {} that are ready for reinstall", datasets.size, projectID)
@@ -199,7 +202,7 @@ object DatasetReinstaller {
   private fun handleInstallSuccess(res: InstallDataSuccessResponse, dataset: DatasetRecord, projectID: ProjectID) {
     log.info("dataset {}/{} was reinstalled successfully into project {}", dataset.owner, dataset.datasetID, projectID)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -216,7 +219,7 @@ object DatasetReinstaller {
   ) {
     log.error("dataset {}/{} reinstall into {} failed due to bad request exception from handler server: {}", dataset.owner, dataset.datasetID, projectID, response.message)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -235,7 +238,7 @@ object DatasetReinstaller {
   ) {
     log.info("dataset {}/{} reinstall into {} failed due to validation error", dataset.owner, dataset.datasetID, projectID)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -252,7 +255,7 @@ object DatasetReinstaller {
   ) {
     log.info("dataset {}/{} reinstall into {} was rejected for missing dependencies", dataset.owner, dataset.datasetID, projectID)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -269,7 +272,7 @@ object DatasetReinstaller {
   ) {
     log.error("dataset {}/{} reinstall into {} failed with a 500 from the handler server", dataset.owner, dataset.datasetID, projectID)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,

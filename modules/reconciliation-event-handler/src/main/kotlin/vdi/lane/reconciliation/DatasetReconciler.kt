@@ -14,23 +14,27 @@ import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
+import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
 
-object DatasetReconciler {
+internal class DatasetReconciler(
+  private val cacheDB: CacheDB = CacheDB(),
+  private val appDB: AppDB = AppDB(),
+  private val eventRouter: KafkaRouter,
+  private val datasetManager: DatasetManager,
+) {
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  @JvmStatic
-  fun reconcile(
-    userID: UserID,
-    datasetID: DatasetID,
-    datasetDirectory: DatasetDirectory,
-    eventRouter: KafkaRouter,
-  ) {
+  // TODO: What if import-ready file is newer than install-ready or manifest files?
+  // TODO: What if raw upload file is newer than import-ready file?
+
+  fun reconcile(userID: UserID, datasetID: DatasetID) {
     logger.info("beginning reconciliation for dataset {}/{}", userID, datasetID)
     try {
-      ReconciliationState(userID, datasetID, datasetDirectory, eventRouter).reconcile()
+      ReconciliationState(datasetManager.getDatasetDirectory(userID, datasetID)).reconcile()
     } finally {
       logger.info("reconciliation completed for dataset {}/{}", userID, datasetID)
     }
@@ -66,10 +70,10 @@ object DatasetReconciler {
   }
 
   private fun ReconciliationState.handleDeleted(projects: Iterable<ProjectID>) {
-    CacheDB.selectDataset(datasetID)?.also {
+    cacheDB.selectDataset(datasetID)?.also {
       if (!it.isDeleted) {
         try {
-          CacheDB.withTransaction { db -> db.updateDatasetDeleted(datasetID, true) }
+          cacheDB.withTransaction { db -> db.updateDatasetDeleted(datasetID, true) }
         } catch (e: Throwable) {
           logError("failed to mark dataset $userID/$datasetID as deleted in cache db", e)
         }
@@ -133,7 +137,7 @@ object DatasetReconciler {
     // more to do.  If the import is not marked as failed in the import
     // control table, then fire an import event to re-attempt the import.
     else {
-      if (CacheDB.selectImportControl(datasetID) != DatasetImportStatus.Failed) {
+      if (cacheDB.selectImportControl(datasetID) != DatasetImportStatus.Failed) {
         tryFireImportEvent()
       }
     }
@@ -190,14 +194,14 @@ object DatasetReconciler {
   }
 
   private fun ReconciliationState.checkSyncStatus(projects: Iterable<ProjectID>): SyncIndicator {
-    val cachedDatasetRecord = CacheDB.selectDataset(datasetID)
+    val cachedDatasetRecord = cacheDB.selectDataset(datasetID)
 
     if (cachedDatasetRecord == null) {
       logError("dataset $userID/$datasetID could not be found in the cache database, cannot perform sync check")
       return SyncIndicator(metaOutOfSync = false, sharesOutOfSync = false, installOutOfSync = false)
     }
 
-    val cacheDBSyncControl = getOrCreateCacheDBSyncControl()
+    val cacheDBSyncControl = getOrCreatecacheDBSyncControl()
       ?: return SyncIndicator(metaOutOfSync = false, sharesOutOfSync = false, installOutOfSync = false)
 
     val metaTimestamp = datasetDirectory.getMetaTimestamp() ?: cacheDBSyncControl.metaUpdated
@@ -212,7 +216,7 @@ object DatasetReconciler {
       return SyncIndicator(metaOutOfSync = true, sharesOutOfSync = true, installOutOfSync = true)
 
     projects.forEach { projectID ->
-      val appDB = AppDB.accessor(projectID)
+      val appDB = appDB.accessor(projectID)
 
       if (appDB == null) {
         logWarning("skipping dataset state comparison for dataset {}/{}, project {} due to the target project being disabled", userID, datasetID, projectID)
@@ -242,11 +246,11 @@ object DatasetReconciler {
     return SyncIndicator(metaOutOfSync, sharesOutOfSync, installOutOfSync)
   }
 
-  private fun ReconciliationState.getOrCreateCacheDBSyncControl() =
+  private fun ReconciliationState.getOrCreatecacheDBSyncControl() =
     try {
-      CacheDB.selectSyncControl(datasetID) or {
+      cacheDB.selectSyncControl(datasetID) or {
         VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp)
-          .also { CacheDB.withTransaction { db -> db.tryInsertSyncControl(it) } }
+          .also { cacheDB.withTransaction { db -> db.tryInsertSyncControl(it) } }
       }
     } catch (e: Throwable) {
       logError("failed attempt to get or create cache db sync control record for dataset $userID/$datasetID", e)
@@ -255,7 +259,7 @@ object DatasetReconciler {
 
   private fun ReconciliationState.updateCacheDBImportStatus(status: DatasetImportStatus) {
     try {
-      CacheDB.withTransaction { it.updateImportControl(datasetID, status) }
+      cacheDB.withTransaction { it.updateImportControl(datasetID, status) }
     } catch (e: Throwable) {
       logError("failed to update dataset import status to $status for dataset $userID/$datasetID", e)
     }
@@ -283,7 +287,7 @@ object DatasetReconciler {
     }
 
     try {
-      CacheDB.withTransaction {
+      cacheDB.withTransaction {
         it.insertUploadFiles(datasetID, manifest.inputFiles)
         it.tryInsertInstallFiles(datasetID, manifest.dataFiles)
       }
@@ -344,7 +348,7 @@ object DatasetReconciler {
 
   private fun ReconciliationState.isFullyUninstalled(projects: Iterable<ProjectID>): Boolean {
     projects.forEach { projectID ->
-      val appDB = AppDB.accessor(projectID)
+      val appDB = appDB.accessor(projectID)
 
       if (appDB == null) {
         logWarning("cannot check installation status of dataset {}/{} in project {} due to the target being disabled in the service config", userID, datasetID, projectID)
@@ -394,7 +398,7 @@ object DatasetReconciler {
       logError("received a reconciliation event for dataset $userID/$datasetID which has no meta file")
     }
 
-    val tmp = CacheDB.selectDataset(datasetID)
+    val tmp = cacheDB.selectDataset(datasetID)
 
     if (tmp.isNull()) {
       logError("dataset $userID/$datasetID cannot be reconciled, it has no meta file or cache db record")
@@ -430,12 +434,11 @@ private class SyncIndicator(
   val installOutOfSync: Boolean,
 )
 
-private class ReconciliationState(
-  val userID: UserID,
-  val datasetID: DatasetID,
-  val datasetDirectory: DatasetDirectory,
-  val eventRouter: KafkaRouter,
-) {
+private class ReconciliationState(val datasetDirectory: DatasetDirectory) {
+  inline val userID get() = datasetDirectory.ownerID
+
+  inline val datasetID get() = datasetDirectory.datasetID
+
   val hasMetaFile by lazy { datasetDirectory.hasMetaFile() }
 
   val hasDeletedFlag by lazy { datasetDirectory.hasDeleteFlag() }

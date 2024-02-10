@@ -8,6 +8,7 @@ import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
+import org.veupathdb.vdi.lib.db.app.withTransaction
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 
 object InstallCleaner {
@@ -29,7 +30,7 @@ object InstallCleaner {
     for ((projectID, _) in AppDatabaseRegistry) {
       try {
         // Fetch a list of datasets with broken installs
-        val targets = AppDB.accessor(projectID)!!
+        val targets = AppDB().accessor(projectID)!!
           .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FailedInstallation)
 
         log.info("found {} broken datasets for cleanup in project {}", targets.size, projectID)
@@ -76,7 +77,7 @@ object InstallCleaner {
    */
   private fun maybeCleanDatasetFromTargetDB(datasetID: DatasetID, projectID: ProjectID) {
     try {
-      val accessor = AppDB.accessor(projectID)
+      val accessor = AppDB().accessor(projectID)
 
       if (accessor == null) {
         log.info("Skipping database clean for dataset {} project {} as the target project is not currently enabled.", datasetID, projectID)
@@ -111,7 +112,7 @@ object InstallCleaner {
    * status.
    */
   private fun maybeCleanDatasetFromAllDBs(datasetID: DatasetID) {
-    val cacheDBRecord = CacheDB.selectDataset(datasetID)
+    val cacheDBRecord = CacheDB().selectDataset(datasetID)
       ?: throw IllegalStateException("target dataset $datasetID is not in the internal cache database")
 
     for (project in cacheDBRecord.projects) {
@@ -124,7 +125,7 @@ object InstallCleaner {
     log.debug("marking dataset {} as ready-for-reinstall in project {}", datasetID, projectID)
 
     // Update the dataset install message in the database.
-    AppDB.withTransaction(projectID) {
+    AppDB().withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,

@@ -11,8 +11,10 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
+import org.veupathdb.vdi.lib.db.app.withTransaction
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallBadRequestResponse
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallResponseType
@@ -26,6 +28,10 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
   , VDIServiceModuleBase("soft-delete-trigger-handler")
 {
   private val log = LoggerFactory.getLogger(javaClass)
+
+  private val cacheDB = CacheDB()
+
+  private val appDB = AppDB()
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.softDeleteTriggerTopic, config.kafkaConsumerConfig)
@@ -53,12 +59,12 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
   }
 
   private fun runJob(userID: UserID, datasetID: DatasetID) {
-    val internalDBRecord = CacheDB.selectDataset(datasetID)
+    val internalDBRecord = cacheDB.selectDataset(datasetID)
       ?: throw IllegalStateException("received uninstall event for a dataset that does not exist in the internal database")
 
     // Mark the dataset is deleted in the internal postgres database regardless
     // of whether the uninstalls from the dataset's install targets succeed.
-    CacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
+    cacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
 
     val timer = Metrics.uninstallationTimes
       .labels(internalDBRecord.typeName, internalDBRecord.typeVersion)
@@ -104,7 +110,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     handler: PluginHandlerClient,
     record: DatasetRecord
   ) {
-    AppDB.withTransaction(projectID) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedNotUninstalled) }
+    appDB.withTransaction(projectID) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedNotUninstalled) }
 
     val response = handler.postUninstall(datasetID, projectID)
 
@@ -123,7 +129,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
   }
 
   private fun datasetShouldBeUninstalled(userID: UserID, datasetID: DatasetID, projectID: ProjectID): Boolean {
-    val dataset = AppDB.accessor(projectID)!!.selectDataset(datasetID)
+    val dataset = appDB.accessor(projectID)!!.selectDataset(datasetID)
 
     if (dataset == null) {
       log.warn("dataset {}/{} does not appear in target project {}, cannot run uninstall", userID, datasetID, projectID)
@@ -140,7 +146,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
 
   private fun handleSuccessResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID) {
     log.info("dataset handler server reports dataset {}/{} was successfully uninstalled from project {}", userID, datasetID, projectID)
-    AppDB.withTransaction(projectID) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedAndUninstalled) }
+    appDB.withTransaction(projectID) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedAndUninstalled) }
   }
 
   private fun handleBadRequestResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: UninstallBadRequestResponse) {

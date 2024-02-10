@@ -14,10 +14,12 @@ import org.veupathdb.vdi.lib.common.util.isNull
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDBTransaction
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
+import org.veupathdb.vdi.lib.db.app.withTransaction
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShareOfferImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShareReceiptImpl
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.files.DatasetShare
 import vdi.component.metrics.Metrics
@@ -50,6 +52,10 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
 
   private val log = LoggerFactory.getLogger(javaClass)
 
+  private val cacheDB = CacheDB()
+
+  private val appDB = AppDB()
+
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.shareTriggerTopic, config.kafkaConsumerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
@@ -79,7 +85,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
     log.info("processing share trigger for dataset {}/{}", userID, datasetID)
 
-    val dataset = CacheDB.selectDataset(datasetID)
+    val dataset = cacheDB.selectDataset(datasetID)
 
     // If the dataset record is null, then no such dataset exists in the cache
     // database, which is weird because the dataset record is written to the
@@ -98,7 +104,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     log.debug("looking up dataset directory for dataset {}/{}", userID, datasetID)
     val dir = dm.getDatasetDirectory(userID, datasetID)
 
-    val cacheDBSyncControl = CacheDB.selectSyncControl(datasetID)
+    val cacheDBSyncControl = cacheDB.selectSyncControl(datasetID)
 
     if (cacheDBSyncControl == null) {
       log.info("skipping share event for dataset {}/{}: dataset does not yet have a sync control record", userID, datasetID)
@@ -151,7 +157,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     latestShareTimestamp: OffsetDateTime
   ) {
     dataset.projects.forEach {
-      val targetDB = AppDB.accessor(it)
+      val targetDB = appDB.accessor(it)
 
       if (targetDB == null) {
         log.info("dataset {}/{} target {} is not currently enabled, skipping share sync", dataset.ownerID, dataset.datasetID, it)
@@ -187,12 +193,12 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     // internal cache DB that do not appear in S3.  Records will be removed from
     // this set as shares from S3 are processed, leaving only those share
     // records that no longer appear in S3.
-    val cachedShares = CacheDB.selectSharesForDataset(dataset.datasetID)
+    val cachedShares = cacheDB.selectSharesForDataset(dataset.datasetID)
       .asSequence()
       .map { it.recipientID }
       .toMutableSet()
 
-    CacheDB.withTransaction { db ->
+    cacheDB.withTransaction { db ->
 
       // Iterate through all the shares that appear in S3...
       shares.forEach { (shareRecipientUserID, shareDetails) ->
@@ -275,7 +281,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   ) {
     log.info("synchronizing shares for dataset {}/{} in project {}", dataset.ownerID, dataset.datasetID, projectID)
 
-    AppDB.withTransaction(projectID) { db ->
+    appDB.withTransaction(projectID) { db ->
       // Get a set of the recipient user IDs for all the users that this
       // dataset has been shared with in the target database.
       //
@@ -352,7 +358,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
         return@forEach
       }
 
-      AppDB.withTransaction(projectID) { db -> db.deleteDatasetVisibilities(dataset.datasetID) }
+      appDB.withTransaction(projectID) { db -> db.deleteDatasetVisibilities(dataset.datasetID) }
     }
   }
 

@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.async.WorkerPool
+import org.veupathdb.vdi.lib.db.cache.CacheDB
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 
@@ -19,8 +20,11 @@ internal class ReconciliationEventHandlerImpl(private val config: Reconciliation
     val wp = WorkerPool("reconciliation-workers", config.jobQueueSize.toInt(), config.workerPoolSize.toInt()) {
       Metrics.ReconciliationHandler.queueSize.inc(it.toDouble())
     }
-    val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val kr = requireKafkaRouter(config.kafkaRouterConfig)
+
+    val reconciler = DatasetReconciler(
+      eventRouter = requireKafkaRouter(config.kafkaRouterConfig),
+      datasetManager = requireDatasetManager(config.s3Config, config.s3Bucket)
+    )
 
     runBlocking {
       launch(Dispatchers.IO) {
@@ -28,7 +32,7 @@ internal class ReconciliationEventHandlerImpl(private val config: Reconciliation
           kc.fetchMessages(config.kafkaMessageKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received reconciliation event for dataset {}/{} from source {}", userID, datasetID, source)
-              wp.submit { DatasetReconciler.reconcile(userID, datasetID, dm.getDatasetDirectory(userID, datasetID), kr) }
+              wp.submit { reconciler.reconcile(userID, datasetID) }
             }
         }
 

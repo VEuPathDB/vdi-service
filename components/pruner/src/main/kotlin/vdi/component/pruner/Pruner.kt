@@ -7,8 +7,10 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
+import org.veupathdb.vdi.lib.db.app.withTransaction
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DeletedDataset
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import java.time.OffsetDateTime
@@ -39,6 +41,10 @@ object Pruner {
   private val lock = ReentrantLock()
 
   private val config = PrunerConfig()
+
+  private val cacheDB = CacheDB()
+
+  private val appDB = AppDB()
 
   /**
    * Tries to lock the pruner to prune old/dead datasets.
@@ -87,7 +93,7 @@ object Pruner {
     // Get a list of datasets that have been marked as deleted in the internal
     // postgres database, then filter that list down to only those datasets that
     // were deleted long enough ago to be eligible for pruning.
-    val deletable = with(CacheDB.selectDeletedDatasets()) {
+    val deletable = with(cacheDB.selectDeletedDatasets()) {
       val threshold = OffsetDateTime.now().minus(config.pruneAge.inWholeSeconds, ChronoUnit.SECONDS)
       filter { it.wasDeletedLongEnoughAgoToPrune(dsm, threshold) }
     }
@@ -124,7 +130,7 @@ object Pruner {
    */
   private fun DeletedDataset.hasBeenUninstalled(): Boolean {
     projects.forEach { projectID ->
-      val appDB = AppDB.accessor(projectID)
+      val appDB = appDB.accessor(projectID)
 
       if (appDB == null) {
         log.warn("cannot prune dataset {}/{} as the dataset's install target {} is currently disabled", ownerID, datasetID, projectID)
@@ -187,7 +193,7 @@ object Pruner {
 
     log.debug("deleting dataset {}/{} from project {} app DB", ownerID, datasetID, projectID)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.deleteDatasetVisibilities(datasetID)
       it.deleteDatasetProjectLinks(datasetID)
       it.deleteSyncControl(datasetID)
@@ -200,7 +206,7 @@ object Pruner {
   private fun DeletedDataset.deleteFromCacheDB() {
     log.debug("deleting dataset {}/{} from cache DB", ownerID, datasetID)
 
-    CacheDB.withTransaction {
+    cacheDB.withTransaction {
       it.deleteInstallFiles(datasetID)
       it.deleteUpdateFiles(datasetID)
       it.deleteDatasetMetadata(datasetID)
