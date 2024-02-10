@@ -4,9 +4,12 @@ import org.veupathdb.vdi.lib.common.env.EnvKey
 import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.env.optional
 import org.veupathdb.vdi.lib.kafka.KafkaProducerConfig
+import org.veupathdb.vdi.lib.kafka.EventSource
 
 data class KafkaRouterConfig(
   val producerConfig: KafkaProducerConfig,
+
+  val eventSource: EventSource,
 
   val importTriggerMessageKey: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
   val importTriggerTopic: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
@@ -29,8 +32,10 @@ data class KafkaRouterConfig(
   val reconciliationTriggerMessageKey: String = KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_MESSAGE_KEY,
   val reconciliationTriggerTopic: String = KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_TOPIC,
 ) {
-  constructor(env: Environment, clientID: String) : this(
+  constructor(env: Environment, clientID: String, source: EventSource) : this(
     producerConfig = KafkaProducerConfig(env, clientID),
+
+    eventSource = source,
 
     importTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.ImportTriggers)
       ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,

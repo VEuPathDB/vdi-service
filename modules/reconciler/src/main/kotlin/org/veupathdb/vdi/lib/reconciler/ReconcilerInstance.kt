@@ -5,7 +5,6 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
@@ -160,9 +159,8 @@ class ReconcilerInstance(
   }
 
   private fun sendSyncEvent(sourceDatasetDir: DatasetDirectory) {
-    logger().info("Sending sync event for ${sourceDatasetDir.datasetID}")
-    // An update-meta event should trigger synchronization of all dataset components.
-    kafkaRouter.sendUpdateMetaTrigger(UpdateMetaTrigger(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID))
+    logger().info("sending reconciliation event for ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID}")
+    kafkaRouter.sendReconciliationTrigger(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID)
     Metrics.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
 

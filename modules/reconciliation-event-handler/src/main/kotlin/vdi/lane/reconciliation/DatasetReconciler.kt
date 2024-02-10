@@ -11,9 +11,9 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.isNull
 import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.app.AppDB
+import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
-import org.veupathdb.vdi.lib.kafka.model.triggers.*
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import vdi.component.metrics.Metrics
@@ -74,7 +74,7 @@ object DatasetReconciler {
           logError("failed to mark dataset $userID/$datasetID as deleted in cache db", e)
         }
       }
-    }
+    } ?: logWarning("dataset {}/{} does not have a record in the cache db", userID, datasetID)
 
     if (!isFullyUninstalled(projects))
       fireUninstallEvent()
@@ -295,7 +295,7 @@ object DatasetReconciler {
   private fun ReconciliationState.fireImportEvent() {
     try {
       logger.info("firing import event for dataset {}/{}", userID, datasetID)
-      eventRouter.sendImportTrigger(ImportTrigger(userID, datasetID))
+      eventRouter.sendImportTrigger(userID, datasetID)
       haveFiredImportEvent = true
     } catch (e: Throwable) {
       logError("failed to fire import trigger for dataset $userID/$datasetID", e)
@@ -305,7 +305,7 @@ object DatasetReconciler {
   private fun ReconciliationState.fireUpdateMetaEvent() {
     try {
       logger.info("firing update meta event for dataset {}/{}", userID, datasetID)
-      eventRouter.sendUpdateMetaTrigger(UpdateMetaTrigger(userID, datasetID))
+      eventRouter.sendUpdateMetaTrigger(userID, datasetID)
       haveFiredMetaEvent = true
     } catch (e: Throwable) {
       logError("failed to send update-meta trigger for dataset $userID/$datasetID", e)
@@ -315,7 +315,7 @@ object DatasetReconciler {
   private fun ReconciliationState.fireShareEvent() {
     try {
       logger.info("firing share event for dataset {}/{}", userID, datasetID)
-      eventRouter.sendShareTrigger(ShareTrigger(userID, datasetID))
+      eventRouter.sendShareTrigger(userID, datasetID)
       haveFiredShareEvent = true
     } catch (e: Throwable) {
       logError("failed to send share trigger for dataset $userID/$datasetID", e)
@@ -325,7 +325,7 @@ object DatasetReconciler {
   private fun ReconciliationState.fireInstallEvent() {
     try {
       logger.info("firing data install event for dataset {}/{}", userID, datasetID)
-      eventRouter.sendInstallTrigger(InstallTrigger(userID, datasetID))
+      eventRouter.sendInstallTrigger(userID, datasetID)
       haveFiredInstallEvent = true
     } catch (e: Throwable) {
       logError("failed to send install-data trigger for dataset $userID/$datasetID", e)
@@ -335,7 +335,7 @@ object DatasetReconciler {
   private fun ReconciliationState.fireUninstallEvent() {
     try {
       logger.info("firing soft-delete/uninstall event for dataset {}/{}", userID, datasetID)
-      eventRouter.sendSoftDeleteTrigger(SoftDeleteTrigger(userID, datasetID))
+      eventRouter.sendSoftDeleteTrigger(userID, datasetID)
       haveFiredUninstallEvent = true
     } catch (e: Throwable) {
       logError("failed to send soft-delete/uninstall trigger for dataset $userID/$datasetID", e)
@@ -358,7 +358,7 @@ object DatasetReconciler {
         return false
       }
 
-      if (targetRecord.isDeleted != org.veupathdb.vdi.lib.db.app.model.DeleteFlag.DeletedAndUninstalled) {
+      if (targetRecord.isDeleted != DeleteFlag.DeletedAndUninstalled) {
         return false
       }
     }

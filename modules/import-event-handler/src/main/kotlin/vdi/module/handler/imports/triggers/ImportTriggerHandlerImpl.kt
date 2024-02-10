@@ -27,7 +27,6 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
 import org.veupathdb.vdi.lib.handler.client.response.imp.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.json.JSON
-import org.veupathdb.vdi.lib.kafka.model.triggers.ImportTrigger
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
@@ -53,7 +52,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   override suspend fun run() {
     log.trace("run()")
 
-    val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
+    val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.kafkaConfig.importTriggerTopic, config.kafkaConfig.consumerConfig)
     val wp = WorkerPool("import-trigger-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
       Metrics.importQueueSize.inc(it.toDouble())
@@ -64,9 +63,9 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         // While the shutdown trigger has not yet been triggered
         while (!isShutDown()) {
           // Read messages from the kafka consumer
-          kc.fetchMessages(config.kafkaConfig.importTriggerMessageKey, ImportTrigger::class)
-            .forEach { (userID, datasetID) ->
-              log.info("received import job for dataset $datasetID, user $userID")
+          kc.fetchMessages(config.kafkaConfig.importTriggerMessageKey)
+            .forEach { (userID, datasetID, source) ->
+              log.info("received import job for dataset $userID/$datasetID from source $source")
               wp.submit { importJob(dm, userID, datasetID) }
             }
         }

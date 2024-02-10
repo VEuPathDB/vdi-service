@@ -18,7 +18,6 @@ import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallBadRequestResp
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallResponseType
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallUnexpectedErrorResponse
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
-import org.veupathdb.vdi.lib.kafka.model.triggers.SoftDeleteTrigger
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 
@@ -37,9 +36,9 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     runBlocking {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
-          kc.fetchMessages(config.softDeleteTriggerMessageKey, SoftDeleteTrigger::class)
-            .forEach { (userID, datasetID) ->
-              log.info("received uninstall job for dataset $datasetID, user $userID")
+          kc.fetchMessages(config.softDeleteTriggerMessageKey)
+            .forEach { (userID, datasetID, source) ->
+              log.info("received uninstall job for dataset $userID/$datasetID from source $source")
               wp.submit { runJob(userID, datasetID) }
             }
         }

@@ -26,8 +26,6 @@ import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaResponseType
 import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaUnexpectedErrorResponse
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandler
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
-import org.veupathdb.vdi.lib.kafka.model.triggers.ReconciliationTrigger
-import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
@@ -43,7 +41,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
   private val log = LoggerFactory.getLogger(javaClass)
 
   override suspend fun run() {
-    val dm = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
+    val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.kafkaRouterConfig.updateMetaTriggerTopic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter(config.kafkaRouterConfig)
     val wp = WorkerPool("update-meta-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
@@ -54,10 +52,10 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       launch {
         while (!isShutDown()) {
           // Select meta trigger messages from Kafka
-          kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey, UpdateMetaTrigger::class)
+          kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey)
             // and for each of the trigger messages received
-            .forEach { (userID, datasetID) ->
-              log.info("Received install-meta job for dataset {}/{}.", userID, datasetID)
+            .forEach { (userID, datasetID, source) ->
+              log.info("Received install-meta job for dataset {}/{} from source {}", userID, datasetID, source)
               wp.submit { updateMeta(dm, kr, userID, datasetID) }
             }
         }
@@ -75,7 +73,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     try {
       updateMeta(dm, userID, datasetID)
     } finally {
-      kr.sendReconciliationTrigger(ReconciliationTrigger(userID, datasetID))
+      kr.sendReconciliationTrigger(userID, datasetID)
     }
   }
 

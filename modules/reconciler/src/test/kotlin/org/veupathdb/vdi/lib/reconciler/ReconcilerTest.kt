@@ -9,7 +9,6 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetTypeImpl
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import org.veupathdb.vdi.lib.kafka.model.triggers.UpdateMetaTrigger
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
@@ -76,9 +75,9 @@ class ReconcilerTest {
         ).stream()).`when`(datasetManager).streamAllDatasets()
         recon.reconcile()
         val capturedDatasetID = mockingDetails(kafkaRouter).invocations
-            .find { it.method.name == "sendUpdateMetaTrigger" }!!
-            .getArgument<UpdateMetaTrigger>(0)
-            .datasetID.toString()
+            .find { it.method.name == "sendReconciliationTrigger" }!!
+            .getArgument<DatasetID>(1)
+            .toString()
         assertEquals("Expected x but found y", "22345678123456781234567812345678", capturedDatasetID)
     }
 
@@ -112,9 +111,9 @@ class ReconcilerTest {
         ).stream()).`when`(datasetManager).streamAllDatasets()
         recon.reconcile()
         val capturedDatasetID = mockingDetails(kafkaRouter).invocations
-            .find { it.method.name == "sendUpdateMetaTrigger" }!!
-            .getArgument<UpdateMetaTrigger>(0)
-            .datasetID.toString()
+            .find { it.method.name == "sendReconciliationTrigger" }!!
+            .getArgument<DatasetID>(1)
+            .toString()
         assertEquals("Expected x but found y", "12345678123456781234567812345678", capturedDatasetID)
     }
 
@@ -290,8 +289,8 @@ class ReconcilerTest {
             ).stream()).`when`(datasetManager).streamAllDatasets()
         recon.reconcile()
         val syncedIDs = mockingDetails(kafkaRouter).invocations
-            .filter { it.method.name == "sendUpdateMetaTrigger" }
-            .map { it.getArgument<UpdateMetaTrigger>(0).datasetID.toString() }
+            .filter { it.method.name == "sendReconciliationTrigger" }
+            .map { it.getArgument<DatasetID>(1).toString() }
         val deletedIDs = mockingDetails(cacheDb).invocations
             .filter { it.method.name == "deleteDataset" }
             .map { it.getArgument<DatasetID>(1).toString() }

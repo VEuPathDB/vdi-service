@@ -3,6 +3,7 @@ package vdi.lane.reconciliation
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.env.*
+import org.veupathdb.vdi.lib.kafka.EventSource
 import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
@@ -17,7 +18,7 @@ data class ReconciliationEventHandlerConfig(
   val kafkaMessageKey: String,
   val s3Config: S3Config,
   val s3Bucket: BucketName,
-  ) {
+) {
   constructor() : this(System.getenv())
 
   constructor(env: Environment) : this(
@@ -29,7 +30,7 @@ data class ReconciliationEventHandlerConfig(
 
     kafkaConsumerConfig = KafkaConsumerConfig(env.optional(EnvKey.ReconciliationTriggerHandler.KafkaConsumerClientID) ?: "reconciliation-handler", env),
 
-    kafkaRouterConfig = KafkaRouterConfig(env, "reconciliation-event-handler"),
+    kafkaRouterConfig = KafkaRouterConfig(env, "reconciliation-event-handler", EventSource.Reconciler),
 
     kafkaTopic = env.optional(EnvKey.Kafka.Topic.ReconciliationTriggers)
       ?: Defaults.ReconciliationTopic,

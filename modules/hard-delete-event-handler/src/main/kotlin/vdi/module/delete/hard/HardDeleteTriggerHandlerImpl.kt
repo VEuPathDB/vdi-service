@@ -4,8 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.async.WorkerPool
-import org.veupathdb.vdi.lib.kafka.model.triggers.HardDeleteTrigger
 import vdi.component.modules.VDIServiceModuleBase
 
 internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTriggerHandlerConfig)
@@ -20,9 +18,9 @@ internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTrigge
     runBlocking {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
-          kc.fetchMessages(config.hardDeleteMessageKey, HardDeleteTrigger::class)
-            .forEach { (userID, datasetID) ->
-              log.info("received hard-delete event for dataset {}/{}", userID, datasetID)
+          kc.fetchMessages(config.hardDeleteMessageKey)
+            .forEach { (userID, datasetID, source) ->
+              log.info("received hard-delete event for dataset {}/{} from {}", userID, datasetID, source)
             }
         }
       }
