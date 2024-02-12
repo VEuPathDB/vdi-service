@@ -88,7 +88,7 @@ internal class CacheDBTransactionImpl(private val connection: Connection) : Cach
     con.deleteInstallFiles(datasetID)
   }
 
-  override fun deleteUpdateFiles(datasetID: DatasetID) {
+  override fun deleteUploadFiles(datasetID: DatasetID) {
     log.debug("deleting upload files for dataset {}", datasetID)
     con.deleteUploadFiles(datasetID)
   }
@@ -97,7 +97,7 @@ internal class CacheDBTransactionImpl(private val connection: Connection) : Cach
 
   // region Insert
 
-  override fun insertUploadFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) {
+  override fun tryInsertUploadFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) {
     log.debug("inserting dataset upload files for dataset {}", datasetID)
     con.insertUploadFiles(datasetID, files)
   }

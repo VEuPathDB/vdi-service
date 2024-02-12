@@ -11,6 +11,7 @@ INSERT INTO
   vdi.upload_files (dataset_id, file_name, file_size)
 VALUES
   (?, ?, ?)
+ON CONFLICT DO NOTHING
 """
 
 internal fun Connection.insertUploadFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) {

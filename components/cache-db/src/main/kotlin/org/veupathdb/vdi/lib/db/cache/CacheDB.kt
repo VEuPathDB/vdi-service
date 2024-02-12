@@ -54,8 +54,6 @@ interface CacheDB {
 
   fun selectDeletedDatasets(): List<DeletedDataset>
 
-  fun updateImportStatus(datasetID: DatasetID, status: DatasetImportStatus)
-
   fun selectOpenSharesForUser(recipientID: UserID): List<DatasetShareListEntry>
 
   fun selectAcceptedSharesForUser(recipientID: UserID): List<DatasetShareListEntry>

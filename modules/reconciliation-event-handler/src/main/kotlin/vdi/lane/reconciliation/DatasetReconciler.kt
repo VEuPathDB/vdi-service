@@ -48,6 +48,8 @@ internal class DatasetReconciler(
       return
     }
 
+    // TODO: ensure the meta file exists?
+
     // The upload file should only exist before an attempt has been made to
     // process the raw upload into an import-ready form.
     if (hasRawUpload)
@@ -70,6 +72,8 @@ internal class DatasetReconciler(
   }
 
   private fun ReconciliationState.handleDeleted(projects: Iterable<ProjectID>) {
+    // Make sure it's marked as deleted in the cache database to hide it from
+    // the UI
     cacheDB.selectDataset(datasetID)?.also {
       if (!it.isDeleted) {
         try {
@@ -173,6 +177,9 @@ internal class DatasetReconciler(
     // missing install-ready file.
     else
       tryFireImportEvent()
+
+    // Either way sync the cache db file list tables?
+    syncCacheDBFileTables()
   }
 
   private fun ReconciliationState.runSync(projects: Iterable<ProjectID>) {
@@ -274,12 +281,7 @@ internal class DatasetReconciler(
   }
 
   private fun ReconciliationState.syncCacheDBFileTables() {
-    val manifest = try {
-      datasetDirectory.getManifestFile().load()
-    } catch (e: Throwable) {
-      logError("failed to load manifest file for dataset $userID/$datasetID, cannot sync file list with cache-db", e)
-      return
-    }
+    val manifest = loadManifest()
 
     if (manifest == null) {
       logError("manifest file no longer exists for dataset $userID/$datasetID, cannot sync file list with cache-db")
@@ -288,7 +290,7 @@ internal class DatasetReconciler(
 
     try {
       cacheDB.withTransaction {
-        it.insertUploadFiles(datasetID, manifest.inputFiles)
+        it.tryInsertUploadFiles(datasetID, manifest.inputFiles)
         it.tryInsertInstallFiles(datasetID, manifest.dataFiles)
       }
     } catch (e: Throwable) {

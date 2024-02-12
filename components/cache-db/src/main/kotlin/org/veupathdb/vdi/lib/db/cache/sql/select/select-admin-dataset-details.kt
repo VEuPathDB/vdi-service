@@ -9,6 +9,8 @@ import org.veupathdb.vdi.lib.db.cache.util.*
 import java.sql.Connection
 import java.time.OffsetDateTime
 
+// TODO: This query selects import_messages as a left join as well as an array agg.  Remove one of them.
+
 // language=postgresql
 private const val SQL_BASE = """
 SELECT
@@ -91,7 +93,8 @@ internal fun Connection.selectAdminDatasetDetails(datasetID: DatasetID): AdminDa
           ),
           messages = getStringList("messages"),
           installFiles = getStringList("install_files"),
-          uploadFiles = getStringList("upload_files")
+          uploadFiles = getStringList("upload_files"),
+          isDeleted = false,
         )
     }
   }

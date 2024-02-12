@@ -143,11 +143,6 @@ internal object CacheDBImpl: CacheDB {
     return connection.use { it.selectDeletedDatasets() }
   }
 
-  override fun updateImportStatus(datasetID: DatasetID, status: DatasetImportStatus) {
-    log.debug("updating import status for dataset {} to status {}", datasetID, status)
-    return connection.use { it.updateDatasetImportStatus(datasetID, status) }
-  }
-
   override fun selectOpenSharesForUser(recipientID: UserID): List<DatasetShareListEntry> {
     log.debug("selecting open shares for recipient {}", recipientID)
     return connection.use { it.selectOpenSharesFor(recipientID) }

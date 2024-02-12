@@ -61,6 +61,7 @@ include(":components:module-core")
 include(":components:pruner")
 include(":components:rabbit")
 include(":components:s3")
+include(":components:test-utils")
 
 include(":modules:dataset-reinstaller")
 include(":modules:event-router")

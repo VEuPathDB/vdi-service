@@ -22,7 +22,7 @@ class CacheDBTarget : ReconcilerTarget {
     cacheDB.withTransaction {
       // Delete dataset and all associated rows in a transaction.
       it.deleteInstallFiles(datasetID)
-      it.deleteUpdateFiles(datasetID)
+      it.deleteUploadFiles(datasetID)
       it.deleteDatasetShareReceipts(datasetID)
       it.deleteDatasetShareOffers(datasetID)
       it.deleteDatasetMetadata(datasetID)

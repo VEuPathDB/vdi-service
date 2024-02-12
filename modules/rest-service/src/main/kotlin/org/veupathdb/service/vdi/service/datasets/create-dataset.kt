@@ -145,7 +145,7 @@ private fun uploadFiles(
         log.debug("uploading raw user data to S3 for new dataset {}/{}", userID, datasetID)
         DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
 
-        cacheDB.withTransaction { it.insertUploadFiles(datasetID, sizes) }
+        cacheDB.withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
       } catch (e: Throwable) {
         log.error("user dataset upload to minio failed: ", e)
         cacheDB.withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }

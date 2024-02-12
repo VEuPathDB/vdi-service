@@ -88,10 +88,10 @@ interface CacheDBTransaction : AutoCloseable {
 
   fun deleteInstallFiles(datasetID: DatasetID)
 
-  fun deleteUpdateFiles(datasetID: DatasetID)
+  fun deleteUploadFiles(datasetID: DatasetID)
 
 
-  fun insertUploadFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>)
+  fun tryInsertUploadFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>)
 
 
   /**

@@ -208,7 +208,7 @@ object Pruner {
 
     cacheDB.withTransaction {
       it.deleteInstallFiles(datasetID)
-      it.deleteUpdateFiles(datasetID)
+      it.deleteUploadFiles(datasetID)
       it.deleteDatasetMetadata(datasetID)
       it.deleteDatasetProjects(datasetID)
       it.deleteDatasetShareOffers(datasetID)
