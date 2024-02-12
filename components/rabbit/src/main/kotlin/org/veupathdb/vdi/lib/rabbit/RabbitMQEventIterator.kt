@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.common.async.SuspendingIterator
+import vdi.component.metrics.Metrics
 import kotlin.time.Duration
 import com.rabbitmq.client.Channel as RChannel
 
@@ -35,14 +36,15 @@ class RabbitMQEventIterator<T>(
            try {
             nextValue = mappingFunction(res.body)
             return true
-          } catch (e: Throwable) {
+           } catch (e: Throwable) {
+             Metrics.unparseableRabbitMessage.inc()
              log.error("message from RabbitMQ could not be parsed as a MinIO event", e)
 
              if (res.body.size <= MAX_LOGGABLE_MESSAGE_SIZE_BYTES)
                log.error("message was: {}", res.body.decodeToString())
              else
                log.error("message was too large to print")
-          }
+           }
         } else {
           if (i == 5) {
             i = 0

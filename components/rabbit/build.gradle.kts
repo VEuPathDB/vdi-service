@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
   implementation(platform(project(":platform")))
+  implementation(project(":components:metrics"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:")
   implementation("org.veupathdb.vdi:vdi-component-common")

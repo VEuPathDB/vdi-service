@@ -9,6 +9,7 @@ dependencies {
   implementation(project(":components:handler-client"))
   implementation(project(":components:plugin-mapping"))
   implementation(project(":components:s3"))
+  implementation(project(":components:metrics"))
 
   implementation("org.veupathdb.vdi:vdi-component-common")
   implementation("org.veupathdb.lib.s3:s34k-minio")
