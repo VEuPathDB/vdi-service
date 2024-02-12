@@ -11,6 +11,7 @@ import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DeletedDataset
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
+import vdi.component.metrics.Metrics
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.locks.ReentrantLock
@@ -100,7 +101,9 @@ object Pruner {
 
       try {
         runDelete(s3Bucket, it)
+        Metrics.pruneSuccessful.inc()
       } catch (e: Throwable) {
+        Metrics.pruneFailed.inc()
         log.error("failed to delete dataset ${it.ownerID}/${it.datasetID} due to exception:", e)
       }
     }
@@ -152,11 +155,13 @@ object Pruner {
 
     // If the directory doesn't exist, then it has already been deleted.
     if (!dir.exists()) {
+      Metrics.pruneConflict.inc()
       log.error("dataset {}/{} still has a record in the cache db even though it has been deleted from S3", ownerID, datasetID)
       return false
     }
 
     if (!dir.hasDeleteFlag()) {
+      Metrics.pruneConflict.inc()
       log.error("dataset {}/{} is marked as deleted in the cache db but has no delete flag in S3", ownerID, datasetID)
       return false
     }
