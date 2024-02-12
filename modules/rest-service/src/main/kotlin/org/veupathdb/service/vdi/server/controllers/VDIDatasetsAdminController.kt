@@ -3,10 +3,10 @@ package org.veupathdb.service.vdi.server.controllers
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.core.StreamingOutput
+import org.veupathdb.lib.container.jaxrs.repo.UserRepo
 import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
-import org.veupathdb.service.vdi.db.UserDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsAdmin
 import org.veupathdb.service.vdi.service.admin.getDatasetDetails
@@ -107,7 +107,7 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
 
     val userID = UserID(userID)
 
-    if (UserDB.userIsGuest(userID) != false)
+    if (UserRepo.Select.registeredUserById(userID.toLong()).isEmpty)
       throw ForbiddenException("target user does not exist or is a guest user")
 
     val datasetID = DatasetID()
