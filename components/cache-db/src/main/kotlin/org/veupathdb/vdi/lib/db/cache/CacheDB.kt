@@ -7,10 +7,15 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.query.AdminAllDatasetsQuery
+import javax.sql.DataSource
 
 fun CacheDB(): CacheDB = CacheDBImpl
 
 interface CacheDB {
+
+  val details: CacheDBConnectionDetails
+
+  val dataSource: DataSource
 
   fun tempMigrateDB()
 

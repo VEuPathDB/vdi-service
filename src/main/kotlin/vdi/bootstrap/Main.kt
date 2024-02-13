@@ -25,7 +25,7 @@ object Main {
   fun main(args: Array<String>) {
     // FIXME: REMOVE THIS AFTER THE MIGRATION IS COMPLETE
     log.info("migrating postgres database to add 'inserted' column to vdi.datasets")
-    CacheDB.tempMigrateDB()
+    CacheDB().tempMigrateDB()
 
     log.info("initializing modules")
     val modules = listOf(

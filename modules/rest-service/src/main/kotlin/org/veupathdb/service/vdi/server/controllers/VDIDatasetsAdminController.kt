@@ -146,7 +146,7 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
         ?: throw BadRequestException("invalid sort order value")
     }
 
-    val broken = CacheDB.selectBrokenDatasetImports(query)
+    val broken = CacheDB().selectBrokenDatasetImports(query)
       .map(::BrokenImportDetails)
 
     return VdiDatasetsAdmin.GetVdiDatasetsAdminFailedImportsResponse

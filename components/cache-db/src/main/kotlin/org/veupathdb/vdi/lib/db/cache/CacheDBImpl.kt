@@ -19,9 +19,9 @@ import org.postgresql.Driver as PostgresDriver
 
 internal object CacheDBImpl: CacheDB {
 
-  private val details: CacheDBConnectionDetails
+  override val details: CacheDBConnectionDetails
 
-  private val dataSource: DataSource
+  override val dataSource: DataSource
 
   private val log = LoggerFactory.getLogger(javaClass)
 
