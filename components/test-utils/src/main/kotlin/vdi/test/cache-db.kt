@@ -66,6 +66,7 @@ fun mockCacheDB(
     on { selectAllSharesForUser(any()) } doAnswer { onSelectAllSharesFor(it.getArgument(0)) }
     on { selectAllSyncControlRecords() } doAnswer { ReconcilerStream(onSelectAllSyncControlRecords()) }
     on { selectBrokenDatasetImports(any()) } doAnswer { onSelectBrokenImports(it.getArgument(0)) }
+    on { selectSyncControl(any()) } doAnswer { onSelectSyncControl(it.getArgument(0)) }
     on { openTransaction() } doAnswer { onOpenTransaction() }
   }
 

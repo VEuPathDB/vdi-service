@@ -191,30 +191,6 @@ internal class DatasetReconciler(
     haveFiredImportEvent = true
   }
 
-  private fun ReconciliationState.isFullyUninstalled(projects: Iterable<ProjectID>): Boolean {
-    projects.forEach { projectID ->
-      val appDB = appDB.accessor(projectID)
-
-      if (appDB == null) {
-        logWarning("cannot check installation status of dataset {}/{} in project {} due to the target being disabled in the service config", userID, datasetID, projectID)
-        return false
-      }
-
-      val targetRecord = appDB.selectAppDatasetRecord()
-
-      if (targetRecord == null) {
-        logWarning("attempted to check install status for dataset {}/{} in project {} but no such dataset record could be found", userID, datasetID, projectID)
-        return false
-      }
-
-      if (targetRecord.isDeleted != DeleteFlag.DeletedAndUninstalled) {
-        return false
-      }
-    }
-
-    return true
-  }
-
   /**
    * Dataset reimport is needed in the following cases:
    *
@@ -348,6 +324,36 @@ internal class DatasetReconciler(
   private fun AppDBAccessor.selectAppDatasetRecord() =
     safeExec({ "failed to fetch dataset record from $project" }) { selectDataset(datasetID) }
 
+  private fun ReconciliationState.isFullyUninstalled(projects: Iterable<ProjectID>): Boolean {
+    projects.forEach { projectID ->
+      val appDB = appDB.accessor(projectID)
+
+      if (appDB == null) {
+        logWarning("cannot check installation status of dataset {}/{} in project {} due to the target being disabled in the service config", userID, datasetID, projectID)
+        return false
+      }
+
+      appDB.isUninstalled() || return false
+    }
+
+    return true
+  }
+
+  context (ReconciliationState)
+  private fun AppDBAccessor.isUninstalled(): Boolean {
+    val targetRecord = selectAppDatasetRecord()
+
+    if (targetRecord == null) {
+      logWarning("attempted to check install status for dataset {}/{} in project {} but no such dataset record could be found", userID, datasetID, project)
+      return false
+    }
+
+    if (targetRecord.isDeleted != DeleteFlag.DeletedAndUninstalled) {
+      return false
+    }
+
+    return true
+  }
 
   // region CacheDB
   // // // // // // // // // // // // // // // // // // // // // // // // // //
@@ -364,17 +370,6 @@ internal class DatasetReconciler(
 
   private fun ReconciliationState.getCacheImportControl() =
     safeExec("failed to fetch import control from cache db") { cacheDB.selectImportControl(datasetID) }
-
-  private fun ReconciliationState.syncCacheDBFileTables(manifest: VDIDatasetManifest) {
-    try {
-      cacheDB.withTransaction {
-        it.tryInsertUploadFiles(datasetID, manifest.inputFiles)
-        it.tryInsertInstallFiles(datasetID, manifest.dataFiles)
-      }
-    } catch (e: Throwable) {
-      logError("failed to write file listing to cache db for dataset $userID/$datasetID", e)
-    }
-  }
 
   private fun ReconciliationState.updateCacheDBImportStatus(status: DatasetImportStatus) {
     try {

@@ -574,7 +574,10 @@ class DatasetReconcilerTest {
               exists = true,
               lastModified = OriginTimestamp,
             ),
-            installableFile = ,
+            installableFile = mockInstallableFile(
+              exists = true,
+              lastModified = OriginTimestamp,
+            ),
             manifest = mockManifestFile(manifest = mockDatasetManifest())
           ) }
         )
@@ -582,16 +585,248 @@ class DatasetReconcilerTest {
         val cacheDB = mockCacheDB(
           onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
         )
+
+        val appDB = mockAppDB()
+
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(router, times(1)).sendUpdateMetaTrigger(userID, datasetID)
+        verifyNoMoreInteractions(router)
       }
     }
 
     @Nested
     @DisplayName("due to out of date shares")
-    inner class BadShares
+    inner class BadShares {
+
+      @Test
+      @DisplayName("then an update-meta event should be fired")
+      fun test0() {
+        val dsMan = mockDatasetManager(
+          onGetDatasetDirectory = { _, _ -> mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(
+              meta = generalMetaMock(),
+              lastModified = OriginTimestamp,
+            ),
+            importableFile = mockImportableFile(
+              exists = true,
+              lastModified = OriginTimestamp,
+            ),
+            installableFile = mockInstallableFile(
+              exists = true,
+              lastModified = OriginTimestamp,
+            ),
+            manifest = mockManifestFile(manifest = mockDatasetManifest()),
+            onGetLatestShareTimestamp = { OffsetDateTime.now() }
+          ) }
+        )
+
+        val cacheDB = mockCacheDB(
+          onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+        )
+
+        val appDB = mockAppDB()
+
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(router, times(1)).sendShareTrigger(userID, datasetID)
+        verifyNoMoreInteractions(router)
+      }
+    }
 
     @Nested
     @DisplayName("due to out of date install data")
-    inner class BadData
+    inner class BadData {
+
+
+      @Test
+      @DisplayName("then an update-meta event should be fired")
+      fun test0() {
+        val dsMan = mockDatasetManager(
+          onGetDatasetDirectory = { _, _ -> mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(
+              meta = generalMetaMock(),
+              lastModified = OriginTimestamp,
+            ),
+            importableFile = mockImportableFile(
+              exists = true,
+              lastModified = OriginTimestamp,
+            ),
+            installableFile = mockInstallableFile(
+              exists = true,
+              lastModified = OffsetDateTime.now(),
+            ),
+            manifest = mockManifestFile(manifest = mockDatasetManifest()),
+          ) }
+        )
+
+        val cacheDB = mockCacheDB(
+          onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+        )
+
+        val appDB = mockAppDB()
+
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(router, times(1)).sendInstallTrigger(userID, datasetID)
+        verifyNoMoreInteractions(router)
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("app db records are out of sync")
+  inner class AppDBSync {
+
+    @Nested
+    @DisplayName("due to out of date metadata")
+    inner class BadMeta {
+
+      @Test
+      @DisplayName("then an update-meta event should be fired")
+      fun test0() {
+        val now = OffsetDateTime.now()
+
+        val dsMan = mockDatasetManager(
+          onGetDatasetDirectory = { _, _ -> mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(
+              meta = generalMetaMock(),
+              lastModified = now,
+            ),
+            importableFile = mockImportableFile(
+              exists = true,
+              lastModified = OriginTimestamp,
+            ),
+            installableFile = mockInstallableFile(
+              exists = true,
+              lastModified = OriginTimestamp,
+            ),
+            manifest = mockManifestFile(manifest = mockDatasetManifest())
+          ) }
+        )
+
+        val cacheDB = mockCacheDB(
+          onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, now) }
+        )
+
+        val appDB = mockAppDB(accessor = { mockAppDBAccessor(
+          syncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+        ) })
+
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(router, times(1)).sendUpdateMetaTrigger(userID, datasetID)
+        verifyNoMoreInteractions(router)
+      }
+    }
+
+    @Nested
+    @DisplayName("due to out of date shares")
+    inner class BadShares {
+
+      @Test
+      @DisplayName("then an update-meta event should be fired")
+      fun test0() {
+        val now = OffsetDateTime.now()
+
+        val dsMan = mockDatasetManager(
+          onGetDatasetDirectory = { _, _ -> mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(
+              meta = generalMetaMock(),
+              lastModified = OriginTimestamp,
+            ),
+            importableFile = mockImportableFile(
+              exists = true,
+              lastModified = OriginTimestamp,
+            ),
+            installableFile = mockInstallableFile(
+              exists = true,
+              lastModified = OriginTimestamp,
+            ),
+            manifest = mockManifestFile(manifest = mockDatasetManifest()),
+            onGetLatestShareTimestamp = { now }
+          ) }
+        )
+
+        val cacheDB = mockCacheDB(
+          onSelectSyncControl = { VDISyncControlRecord(datasetID, now, OriginTimestamp, OriginTimestamp) }
+        )
+
+        val appDB = mockAppDB(accessor = { mockAppDBAccessor(
+          syncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+        ) })
+
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(router, times(1)).sendShareTrigger(userID, datasetID)
+        verifyNoMoreInteractions(router)
+      }
+    }
+
+    @Nested
+    @DisplayName("due to out of date install data")
+    inner class BadData {
+
+
+      @Test
+      @DisplayName("then an update-meta event should be fired")
+      fun test0() {
+        val now = OffsetDateTime.now()
+
+        val dsMan = mockDatasetManager(
+          onGetDatasetDirectory = { _, _ -> mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(
+              meta = generalMetaMock(),
+              lastModified = OriginTimestamp,
+            ),
+            importableFile = mockImportableFile(
+              exists = true,
+              lastModified = OriginTimestamp,
+            ),
+            installableFile = mockInstallableFile(
+              exists = true,
+              lastModified = now,
+            ),
+            manifest = mockManifestFile(manifest = mockDatasetManifest()),
+          ) }
+        )
+
+        val cacheDB = mockCacheDB(
+          onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, now, OriginTimestamp) }
+        )
+
+        val appDB = mockAppDB(accessor = { mockAppDBAccessor(
+          syncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+        ) })
+
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(router, times(1)).sendInstallTrigger(userID, datasetID)
+        verifyNoMoreInteractions(router)
+      }
+    }
   }
 }
 
