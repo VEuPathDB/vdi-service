@@ -384,9 +384,7 @@ internal class DatasetReconciler(
   }
 
   private fun ReconciliationState.getCacheDatasetRecord() =
-    cCacheDBDatasetRecord.computeIfAbsent {
-      safeExec("failed to query cache db for dataset record") { cacheDB.selectDataset(datasetID) }
-    }
+    safeExec("failed to query cache db for dataset record") { cacheDB.selectDataset(datasetID) }
 
   private fun ReconciliationState.requireCacheDatasetRecord() =
     getCacheDatasetRecord().require("could not find dataset record in cache db")
@@ -397,7 +395,6 @@ internal class DatasetReconciler(
     }.require("could not find dataset sync control record")
 
   private fun ReconciliationState.tryInitCacheDB() {
-    val needRoot = getCacheDatasetRecord() == null
     val meta = loadMeta()
     val manifest = loadManifest()
 
@@ -414,18 +411,17 @@ internal class DatasetReconciler(
 
     safeExec("failed to soft-initialize cache db records") {
       cacheDB.withTransaction { db ->
-        if (needRoot)
-          db.tryInsertDataset(DatasetImpl(
-            datasetID = datasetID,
-            typeName = meta.type.name,
-            typeVersion = meta.type.version,
-            ownerID = userID,
-            isDeleted = haveDeleteFlag(),
-            created = meta.created,
-            importStatus = DatasetImportStatus.Queued, // this value is not used for inserts
-            origin = meta.origin,
-            inserted = OffsetDateTime.now(),
-          ))
+        db.tryInsertDataset(DatasetImpl(
+          datasetID = datasetID,
+          typeName = meta.type.name,
+          typeVersion = meta.type.version,
+          ownerID = userID,
+          isDeleted = haveDeleteFlag(),
+          created = meta.created,
+          importStatus = DatasetImportStatus.Queued, // this value is not used for inserts
+          origin = meta.origin,
+          inserted = OffsetDateTime.now(),
+        ))
 
         db.tryInsertDatasetMeta(
           DatasetMetaImpl(
@@ -459,10 +455,6 @@ internal class DatasetReconciler(
           db.tryInsertInstallFiles(datasetID, it.dataFiles)
         }
       }
-    }
-
-    safeExec("failed to select dataset record from cache db") {
-      cCacheDBDatasetRecord.value = cacheDB.selectDataset(datasetID)
     }
   }
 
@@ -544,8 +536,6 @@ private class ReconciliationState(val datasetDirectory: DatasetDirectory) {
   val cHasInstallable = ComputedFlag()
 
   var haveFiredImportEvent = false
-
-  val cCacheDBDatasetRecord = ComputedValue<CacheDatasetRecord>()
 }
 
 class ComputedFlag {
