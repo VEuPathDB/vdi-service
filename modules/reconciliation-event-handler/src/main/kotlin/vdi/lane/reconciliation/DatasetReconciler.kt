@@ -162,7 +162,7 @@ internal class DatasetReconciler(
         return@forEach
       }
 
-      val sync = appDB.selectDatasetSyncControlRecord(datasetID)
+      val sync = appDB.selectSyncControl()
         // If the dataset sync record does not exist at all, then fire a sync
         // action for shares and install.  The share sync is most likely going
         // to be processed before the install, so the shares probably won't make
@@ -323,6 +323,10 @@ internal class DatasetReconciler(
   context (ReconciliationState)
   private fun AppDBAccessor.selectAppDatasetRecord() =
     safeExec({ "failed to fetch dataset record from $project" }) { selectDataset(datasetID) }
+
+  context (ReconciliationState)
+  private fun AppDBAccessor.selectSyncControl() =
+    safeExec({ "failed to fetch dataset sync control record from $project" }) { selectDatasetSyncControlRecord(datasetID) }
 
   private fun ReconciliationState.isFullyUninstalled(projects: Iterable<ProjectID>): Boolean {
     projects.forEach { projectID ->
