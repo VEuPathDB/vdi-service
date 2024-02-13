@@ -19,9 +19,7 @@ data class PrunerConfig(
   constructor(env: Environment) : this (
     s3Config   = S3Config(env),
     bucketName = BucketName(env.require(EnvKey.S3.BucketName)),
-//    pruneAge   = env.optDuration(EnvKey.Pruner.DeletionThreshold)
-//      ?: PrunerConfigDefaults.DeletionThreshold
-    // FIXME: REMOVE THIS AFTER MINIO WIPE
-    pruneAge = 5.minutes
+    pruneAge   = env.optDuration(EnvKey.Pruner.DeletionThreshold)
+      ?: PrunerConfigDefaults.DeletionThreshold
   )
 }
