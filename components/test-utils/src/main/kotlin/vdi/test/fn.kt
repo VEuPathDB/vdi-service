@@ -3,21 +3,21 @@ package vdi.test
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import java.time.OffsetDateTime
 
-typealias DSGetter<T> = (DatasetID) -> T
+internal typealias DSGetter<T> = (DatasetID) -> T
 
-typealias DSConsumer = (DatasetID) -> Unit
+internal typealias DSConsumer = (DatasetID) -> Unit
 
-typealias DSSync = (DatasetID, OffsetDateTime) -> Unit
+internal typealias DSSync = (DatasetID, OffsetDateTime) -> Unit
 
-typealias Runnable = () -> Unit
+internal typealias Runnable = () -> Unit
 
-typealias Con<T> = (T) -> Unit
+internal typealias Con<T> = (T) -> Unit
 
-typealias Pro<T> = () -> T
+internal typealias Pro<T> = () -> T
 
-typealias Fn<I, O> = (I) -> O
+internal typealias Fn<I, O> = (I) -> O
 
-typealias BiFn<I1, I2, O> = (I1, I2) -> O
+internal typealias BiFn<I1, I2, O> = (I1, I2) -> O
 
 internal fun runnable() = Unit
 
