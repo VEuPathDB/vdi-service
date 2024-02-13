@@ -14,10 +14,8 @@ data class PrunerModuleConfig(
   constructor() : this(System.getenv())
 
   constructor(env: Environment) : this(
-    // FIXME: Remove this after MinIO wipe!
-    pruningInterval = 1.hours,
-//    pruningInterval = env.optDuration(EnvKey.Pruner.PruningInterval)
-//      ?: Defaults.PruningInterval,
+    pruningInterval = env.optDuration(EnvKey.Pruner.PruningInterval)
+      ?: Defaults.PruningInterval,
     wakeupInterval = env.optDuration(EnvKey.Pruner.PruningWakeupInterval)
       ?: Defaults.WakeupInterval
   )
