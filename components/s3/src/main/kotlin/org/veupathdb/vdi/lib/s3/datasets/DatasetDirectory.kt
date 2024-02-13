@@ -236,11 +236,7 @@ interface DatasetDirectory {
    * @return The last modified timestamp of the dataset metadata file if it
    * exists, otherwise `null`.
    */
-  fun getMetaTimestamp() =
-    if (hasMetaFile())
-      getMetaFile().lastModified()
-    else
-      null
+  fun getMetaTimestamp() = getMetaFile().lastModified()
 
   /**
    * Returns the last modified timestamp of the dataset manifest file in this
@@ -252,11 +248,7 @@ interface DatasetDirectory {
    * @return The last modified timestamp of the dataset manifest file if it
    * exists, otherwise `null`.
    */
-  fun getManifestTimestamp() =
-    if (hasManifestFile())
-      getManifestFile().lastModified()
-    else
-      null
+  fun getManifestTimestamp() = getManifestFile().lastModified()
 
   /**
    * Returns the last modified timestamp of the raw user upload file in this
@@ -268,11 +260,7 @@ interface DatasetDirectory {
    * @return The last modified timestamp of the raw user upload file if it
    * exists, otherwise `null`.
    */
-  fun getUploadTimestamp() =
-    if (hasUploadFile())
-      getUploadFile().lastModified()
-    else
-      null
+  fun getUploadTimestamp() = getUploadFile().lastModified()
 
   /**
    * Returns the last modified timestamp of the import-ready data file in this
@@ -284,11 +272,7 @@ interface DatasetDirectory {
    * @return The last modified timestamp of the import-ready data file if it
    * exists, otherwise `null`.
    */
-  fun getImportReadyTimestamp() =
-    if (hasImportReadyFile())
-      getImportReadyFile().lastModified()
-    else
-      null
+  fun getImportReadyTimestamp() = getImportReadyFile().lastModified()
 
   /**
    * Returns the last modified timestamp of the install-ready data file in this
@@ -300,11 +284,7 @@ interface DatasetDirectory {
    * @return The last modified timestamp of the install-ready data file if it
    * exists, otherwise `null`.
    */
-  fun getInstallReadyTimestamp() =
-    if (hasInstallReadyFile())
-      getInstallReadyFile().lastModified()
-    else
-      null
+  fun getInstallReadyTimestamp() = getInstallReadyFile().lastModified()
 
   /**
    * Returns the last modified timestamp of the delete-flag file in this dataset
@@ -316,11 +296,7 @@ interface DatasetDirectory {
    * @return The last modified timestamp of the delete-flag file if it
    * exists, otherwise `null`.
    */
-  fun getDeleteFlagTimestamp() =
-    if (hasDeleteFlag())
-      getDeleteFlag().lastModified()
-    else
-      null
+  fun getDeleteFlagTimestamp() = getDeleteFlag().lastModified()
 
   /**
    * Returns the most recent file last modified timestamp out of all the dataset
