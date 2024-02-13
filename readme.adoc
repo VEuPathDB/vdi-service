@@ -47,7 +47,6 @@
 ===== Examples
 
 * https://github.com/VEuPathDB/vdi-handler-plugin-example[Example Plugin]
-* https://github.com/VEuPathDB/vdi-handler-no-op-plugin[No-Op Plugin]
 
 
 == Repo Structure
@@ -81,19 +80,21 @@ modules.
 * link:components/pruner[Dataset Pruner]
 * link:components/rabbit[Rabbit Client]
 * link:components/s3[S3 Utilities]
+* link:components/test-utils[Unit Test Utilities]
 
 === Modules
 
 * link:modules/dataset-reinstaller/[Dataset Reinstaller]
 * link:modules/event-router/[Event Router]
-* link:modules/hard-delete-trigger-handler/[Hard Delete Event Handler]
-* link:modules/import-trigger-handler/[Import Event Handler]
-* link:modules/install-trigger-handler/[Install Data Event Handler]
+* link:modules/hard-delete-event-handler/[Hard Delete Event Handler]
+* link:modules/import-event-handler/[Import Event Handler]
+* link:modules/install-event-handler/[Install Data Event Handler]
 * link:modules/pruner/[Pruner]
 * link:modules/reconciler/[Reconciler]
+* link:modules/reconciliation-event-handler/[Reconciliation Event Handler]
 * link:modules/rest-service/[Rest API Service]
-* link:modules/share-trigger-handler/[Share Event Handler]
-* link:modules/soft-delete-trigger-handler/[Soft Delete Event Handler]
+* link:modules/share-event-handler/[Share Event Handler]
+* link:modules/soft-delete-event-handler/[Soft Delete Event Handler]
 * link:modules/update-meta-event-handler/[Update Meta Event Handler]
 
 === Bootstrapper
