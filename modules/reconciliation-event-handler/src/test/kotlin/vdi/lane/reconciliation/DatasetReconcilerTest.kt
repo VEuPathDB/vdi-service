@@ -4,470 +4,599 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.mockito.internal.matchers.CapturingMatcher
 import org.mockito.kotlin.*
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.*
 import org.veupathdb.vdi.lib.db.app.AppDB
-import org.veupathdb.vdi.lib.db.app.AppDBAccessor
 import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
-import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import org.veupathdb.vdi.lib.s3.datasets.files.*
+import vdi.test.*
 import java.time.OffsetDateTime
 import java.util.UUID
 import kotlin.random.Random
-import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord as CacheDatasetRecord
-import org.veupathdb.vdi.lib.db.app.model.DatasetRecord as AppDatasetRecord
 
 private val userID = UserID(123456)
 
 private val datasetID = DatasetID()
 
+@DisplayName("when dataset")
 class DatasetReconcilerTest {
 
-  // has delete flag and is not fully uninstalled -> fire soft-delete event
-  // has delete flag and is fully uninstalled     -> do nothing
+  private val dsType = VDIDatasetTypeImpl("foo", "bar")
+
+  private val projects = setOf("foo")
+
+  private fun generalMetaMock() =
+    mockDatasetMeta(
+      type = dsType,
+      projects = projects,
+      visibility = VDIDatasetVisibility.Protected,
+      owner = userID,
+      name = "fizz",
+      summary = "buzz",
+      description = "something",
+      origin = "origin",
+      sourceURL = "source url",
+      dependencies = emptyList(),
+      created = OriginTimestamp,
+    )
+
   @Nested
-  @DisplayName("delete flag is present")
-  inner class HasDeleteFlag {
+  @DisplayName("has no meta file in the data store")
+  inner class NoMetaFile {
 
     @Test
-    @DisplayName("has no cache-db record")
+    @DisplayName("then reconciliation does nothing")
     fun test0() {
-      val projects = listOf("foo")
+      // test that the process did not proceed past the meta load call by making
+      // sure the [tryInitCacheDB] method is not called.  The first thing that
+      // method does is call out to the cache db, so if the cache db is not used
+      // then we didn't get there.
+      val dsMan = mockDatasetManager()
       val cacheDB = mockCacheDB()
-      val accessor = mockAppDBAccessor(datasetRecord = makeAppDatasetRecord())
-      val appDB = mockAppDB(accessors = mapOf(projects[0] to accessor))
-      val router = mockEventRouter()
-      val datasetManager = mockDatasetManager(mockDatasetDirectory(
-        hasDeleteFlag = true,
-        hasMetaFile = true,
-        metaFile = mockMetaFile(mockMeta(projects))
-      ))
+      val appDB = mockAppDB()
+      val router = mockKafkaRouter()
 
-      makeReconciler(cacheDB, appDB, router, datasetManager).reconcile(userID, datasetID)
+      DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
 
-      // The deletion path should attempt to load the dataset from the cache
-      // db, if the dataset is not found in the cache db then no further
-      // operations should be performed on it.
-      verify(cacheDB, times(1)).selectDataset(datasetID)
-      verifyNoMoreInteractions(cacheDB)
-
-      // The deletion path should attempt to get an accessor for the dataset's
-      // target app db.
-      verify(appDB, times(1)).accessor(projects[0])
-      verifyNoMoreInteractions(appDB)
-
-      // The deletion path should attempt to load the dataset from the target
-      // app db to check its deletion status.
-      verify(accessor, times(1)).selectDataset(datasetID)
-      verifyNoMoreInteractions(accessor)
-
-      // Because the target db dataset record is not marked as deleted, the
-      // deletion path should fire an uninstall/soft-delete event.
-      verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
-      verifyNoMoreInteractions(router)
+      verifyNoInteractions(cacheDB)
+      verifyNoInteractions(appDB)
+      verifyNoInteractions(router)
     }
+  }
+
+  @Nested
+  @DisplayName("has no dataset record in the cache db")
+  inner class NoCacheRecord {
 
     @Test
-    @DisplayName("has cache-db record, not marked as deleted")
-    fun test1() {
-      val projects = listOf("foo")
-      val cacheTransaction = mockCacheTransaction()
-      val cacheDB = mockCacheDB(
-        datasetRecord = mockCacheDatasetRecord(projects = projects, isDeleted = false),
-        transaction = cacheTransaction,
+    @DisplayName("then reconciliation inserts a dataset record")
+    fun test0() {
+
+      val inputFiles = listOf(generateFileInfo())
+      val outputFiles = listOf(generateFileInfo())
+
+      val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+        mockDatasetDirectory(
+          ownerID = userID,
+          datasetID = datasetID,
+          metaFile = mockMetaFile(meta = generalMetaMock()),
+          manifest = mockManifestFile(manifest = mockDatasetManifest(inputFiles = inputFiles, dataFiles = outputFiles)),
+        )
+      })
+
+      val transaction = mockCacheDBTransaction(
+        onInsertDataset = {
+          assertEquals(datasetID, it.datasetID)
+          assertEquals(dsType.name, it.typeName)
+          assertEquals(dsType.version, it.typeVersion)
+          assertEquals(userID, it.ownerID)
+          assertFalse(it.isDeleted) // This should be false because we didn't mock a delete flag
+          assertEquals(OriginTimestamp, it.created)
+          // We don't care about import status as it isn't used in the insert
+          assertEquals("origin", it.origin)
+          // We can't really check the inserted timestamp reliably
+        },
+        onInsertMeta = {
+          assertEquals(datasetID, it.datasetID)
+          assertEquals(VDIDatasetVisibility.Protected, it.visibility)
+          assertEquals("fizz", it.name)
+          assertEquals("buzz", it.summary)
+          assertEquals("something", it.description)
+          assertEquals("source url", it.sourceURL)
+        },
+        onInsertSyncControl = {
+          assertEquals(datasetID, it.datasetID)
+          assertEquals(OriginTimestamp, it.sharesUpdated)
+          assertEquals(OriginTimestamp, it.dataUpdated)
+          assertEquals(OriginTimestamp, it.metaUpdated)
+        },
+        onClose = { throw Exception("throwing to end dataset reconciliation process") }
       )
-      val accessor = mockAppDBAccessor(datasetRecord = makeAppDatasetRecord())
-      val appDB = mockAppDB(accessors = mapOf(projects[0] to accessor))
-      val router = mockEventRouter()
-      val datasetManager = mockDatasetManager(mockDatasetDirectory(
-        hasDeleteFlag = true,
-        hasMetaFile = true,
-        metaFile = mockMetaFile(mockMeta(projects))
-      ))
+      val cacheDB = mockCacheDB(onOpenTransaction = { transaction })
 
-      makeReconciler(cacheDB, appDB, router, datasetManager).reconcile(userID, datasetID)
+      val appDB = mockAppDB()
 
-      // The deletion process should attempt to load the dataset record from the
-      // cache db to test whether it is already marked as deleted.  Since our
-      // test record has `isDeleted` set to false, the process should then
-      // attempt to mark the record as deleted in the cache db.
+      val router = mockKafkaRouter()
+
+      DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
       verify(cacheDB, times(1)).selectDataset(datasetID)
       verify(cacheDB, times(1)).openTransaction()
       verifyNoMoreInteractions(cacheDB)
-      verify(cacheTransaction, times(1)).updateDatasetDeleted(datasetID, true)
-      verify(cacheTransaction, times(1)).commit()
-      verify(cacheTransaction, times(1)).close()
-      verifyNoMoreInteractions(cacheTransaction)
 
-      // The deletion path should attempt to get an accessor for the dataset's
-      // target app db.
-      verify(appDB, times(1)).accessor(projects[0])
-      verifyNoMoreInteractions(appDB)
+      verify(transaction, times(1)).tryInsertDataset(any())
+      verify(transaction, times(1)).tryInsertDatasetMeta(any())
+      verify(transaction, times(1)).tryInsertDatasetProjects(datasetID, projects)
+      // Because we didn't mock an import-ready file or an install-ready file,
+      // the process should attempt to set the status to failed for invalid
+      // state.
+      verify(transaction, times(1)).tryInsertImportControl(datasetID, DatasetImportStatus.Failed)
+      verify(transaction, times(1)).tryInsertImportMessages(eq(datasetID), any())
+      verify(transaction, times(1)).tryInsertSyncControl(any())
+      verify(transaction, times(1)).tryInsertUploadFiles(datasetID, inputFiles)
+      verify(transaction, times(1)).tryInsertInstallFiles(datasetID, outputFiles)
+      verify(transaction, times(1)).commit()
+      verify(transaction, times(1)).close()
+      verifyNoMoreInteractions(transaction)
 
-      // The deletion path should attempt to load the dataset from the target
-      // app db to check its deletion status.
-      verify(accessor, times(1)).selectDataset(datasetID)
-      verifyNoMoreInteractions(accessor)
-
-      // Because the target db dataset record is not marked as deleted, the
-      // deletion path should fire an uninstall/soft-delete event.
-      verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
-      verifyNoMoreInteractions(router)
-    }
-
-    @Test
-    @DisplayName("has cache-db record, marked as deleted")
-    fun test2() {
-      val projects = listOf("foo")
-      val cacheDB = mockCacheDB(
-        datasetRecord = mockCacheDatasetRecord(projects = projects, isDeleted = true),
-      )
-      val accessor = mockAppDBAccessor(datasetRecord = makeAppDatasetRecord())
-      val appDB = mockAppDB(accessors = mapOf(projects[0] to accessor))
-      val router = mockEventRouter()
-      val datasetManager = mockDatasetManager(mockDatasetDirectory(
-        hasDeleteFlag = true,
-        hasMetaFile = true,
-        metaFile = mockMetaFile(mockMeta(projects))
-      ))
-
-      makeReconciler(cacheDB, appDB, router, datasetManager).reconcile(userID, datasetID)
-
-      // The deletion process should attempt to load the dataset record from the
-      // cache db to test whether it is already marked as deleted.  Since our
-      // test record has `isDeleted` set to true, the process should take no
-      // further action in the cache DB.
-      verify(cacheDB, times(1)).selectDataset(datasetID)
-      verifyNoMoreInteractions(cacheDB)
-
-      // The deletion path should attempt to get an accessor for the dataset's
-      // target app db.
-      verify(appDB, times(1)).accessor(projects[0])
-      verifyNoMoreInteractions(appDB)
-
-      // The deletion path should attempt to load the dataset from the target
-      // app db to check its deletion status.
-      verify(accessor, times(1)).selectDataset(datasetID)
-      verifyNoMoreInteractions(accessor)
-
-      // Because the target db dataset record is not marked as deleted, the
-      // deletion path should fire an uninstall/soft-delete event.
-      verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
-      verifyNoMoreInteractions(router)
-    }
-
-    @Test
-    @DisplayName("targets a project that is disabled")
-    fun test3() {
-      val router = mockEventRouter()
-      val datasetManager = mockDatasetManager(mockDatasetDirectory(
-        hasDeleteFlag = true,
-        hasMetaFile = true,
-        metaFile = mockMetaFile(mockMeta(projects = listOf("foo")))
-      ))
-
-      makeReconciler(router = router, datasetManager = datasetManager).reconcile(userID, datasetID)
-
-      // Because the target db dataset record is not marked as deleted, the
-      // deletion path should fire an uninstall/soft-delete event.
-      verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
-      verifyNoMoreInteractions(router)
-    }
-
-    @Test
-    @DisplayName("has no record in target app database")
-    fun test4() {
-      val projects = listOf("foo")
-      val appDB = mockAppDB(accessors = mapOf(projects[0] to mockAppDBAccessor()))
-      val router = mockEventRouter()
-      val datasetManager = mockDatasetManager(mockDatasetDirectory(
-        hasDeleteFlag = true,
-        hasMetaFile = true,
-        metaFile = mockMetaFile(mockMeta(projects))
-      ))
-
-      makeReconciler(appDB = appDB, router = router, datasetManager = datasetManager).reconcile(userID, datasetID)
-
-      // The deletion path should attempt to get an accessor for the dataset's
-      // target app db.
-      verify(appDB, times(1)).accessor(projects[0])
-      verifyNoMoreInteractions(appDB)
-
-      // Because the target db dataset record is not marked as deleted, the
-      // deletion path should fire an uninstall/soft-delete event.
-      verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
-      verifyNoMoreInteractions(router)
-    }
-
-    @Test
-    @DisplayName("has record in target db marked as deleted and uninstalled")
-    fun test5() {
-      val projects = listOf("foo")
-      val accessor = mockAppDBAccessor(
-        datasetRecord = makeAppDatasetRecord(deleteFlag = DeleteFlag.DeletedAndUninstalled)
-      )
-      val appDB = mockAppDB(accessors = mapOf(projects[0] to accessor))
-      val router = mockEventRouter()
-      val datasetManager = mockDatasetManager(mockDatasetDirectory(
-        hasDeleteFlag = true,
-        hasMetaFile = true,
-        metaFile = mockMetaFile(mockMeta(projects))
-      ))
-
-      makeReconciler(appDB = appDB, router = router, datasetManager = datasetManager).reconcile(userID, datasetID)
-
-      // The deletion path should attempt to get an accessor for the dataset's
-      // target app db.
-      verify(appDB, times(1)).accessor(projects[0])
-      verifyNoMoreInteractions(appDB)
-
-      // The deletion path should attempt to load the dataset from the target
-      // app db to check its deletion status.
-      verify(accessor, times(1)).selectDataset(datasetID)
-      verifyNoMoreInteractions(accessor)
-
-      // Because the target db dataset record is marked as deleted and
-      // uninstalled no events should be fired.
+      verifyNoInteractions(appDB)
       verifyNoInteractions(router)
     }
+  }
 
-    // Has target record not marked as deleted and uninstalled
-    @Test
-    @DisplayName("is not marked as deleted and uninstalled in target database")
-    fun test6() {
-      val projects = listOf("foo")
-      val accessor = mockAppDBAccessor(
-        datasetRecord = makeAppDatasetRecord(deleteFlag = DeleteFlag.DeletedNotUninstalled)
-      )
-      val appDB = mockAppDB(accessors = mapOf(projects[0] to accessor))
-      val router = mockEventRouter()
-      val datasetManager = mockDatasetManager(mockDatasetDirectory(
-        hasDeleteFlag = true,
-        hasMetaFile = true,
-        metaFile = mockMetaFile(mockMeta(projects))
-      ))
+  @Nested
+  @DisplayName("has a delete flag in the data store")
+  inner class HasDeleteFlag {
 
-      makeReconciler(appDB = appDB, router = router, datasetManager = datasetManager).reconcile(userID, datasetID)
+    @Nested
+    @DisplayName("and does not exist in the cache db")
+    inner class NotInCacheDB {
+      @Test
+      @DisplayName("then reconciliation inserts a deleted dataset into the cache db")
+      fun test0() {
+        val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+          mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(meta = generalMetaMock()),
+            hasDeleteFlag = true,
+          )
+        })
 
-      // The deletion path should attempt to get an accessor for the dataset's
-      // target app db.
-      verify(appDB, times(1)).accessor(projects[0])
-      verifyNoMoreInteractions(appDB)
+        val transaction = mockCacheDBTransaction(
+          onInsertDataset = { assertTrue(it.isDeleted) },
+          onClose = { throw Exception("throwing to end dataset reconciliation process") }
+        )
+        val cacheDB = mockCacheDB(onOpenTransaction = { transaction })
 
-      // The deletion path should attempt to load the dataset from the target
-      // app db to check its deletion status.
-      verify(accessor, times(1)).selectDataset(datasetID)
-      verifyNoMoreInteractions(accessor)
+        val appDB = mockAppDB()
 
-      // Because the target db dataset record is not marked as uninstalled, the
-      // deletion path should fire an uninstall/soft-delete event.
-      verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
-      verifyNoMoreInteractions(router)
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(transaction, times(1)).tryInsertDataset(any())
+
+        // Because we throw an exception when closing the cache-db transaction,
+        // nothing else should happen
+        verifyNoInteractions(appDB)
+        verifyNoInteractions(router)
+      }
+    }
+
+    @Nested
+    @DisplayName("and exists in the cache db")
+    inner class InCacheDB {
+
+      @Test
+      @DisplayName("then reconciliation updates the deleted flag")
+      fun test0() {
+        val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+          mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(meta = generalMetaMock()),
+            hasDeleteFlag = true,
+          )
+        })
+
+        val transaction = mockCacheDBTransaction(
+          onUpdateDatasetDeleted = { _, _ -> throw Exception("throwing to end dataset reconciliation process") }
+        )
+        val cacheDB = mockCacheDB(
+          onSelectDataset = { mockCacheDatasetRecord(isDeleted = false) },
+          onOpenTransaction = { transaction }
+        )
+
+        val appDB = mockAppDB()
+
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(transaction, times(0)).tryInsertDataset(any())
+        verify(transaction, times(1)).updateDatasetDeleted(datasetID, true)
+
+        verifyNoInteractions(appDB)
+        verifyNoInteractions(router)
+      }
+    }
+
+    @Nested
+    @DisplayName("and is uninstalled from all targets")
+    inner class IsUninstalled {
+
+      @Test
+      @DisplayName("then no action should be taken")
+      fun test0() {
+        val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+          mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(meta = generalMetaMock()),
+            hasDeleteFlag = true,
+          )
+        })
+
+        val cacheDB = mockCacheDB(onSelectDataset = { mockCacheDatasetRecord(isDeleted = true) })
+
+        val accessor = mockAppDBAccessor(
+          dataset = { mockAppDatasetRecord(isDeleted = DeleteFlag.DeletedAndUninstalled) }
+        )
+
+        val appDB = mockAppDB(accessor = { accessor })
+
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(appDB, times(1)).accessor(projects.first())
+        verify(accessor, times(1)).selectDataset(datasetID)
+
+        verifyNoInteractions(router)
+      }
+    }
+
+    @Nested
+    @DisplayName("and is not uninstalled from all targets")
+    inner class IsNotUninstalled {
+
+      @Test
+      @DisplayName("then an uninstall event should be fired")
+      fun test0() {
+        val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+          mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(meta = generalMetaMock()),
+            hasDeleteFlag = true,
+          )
+        })
+
+        val cacheDB = mockCacheDB(onSelectDataset = { mockCacheDatasetRecord(isDeleted = true) })
+
+        val accessor = mockAppDBAccessor(
+          dataset = { mockAppDatasetRecord(isDeleted = DeleteFlag.DeletedNotUninstalled) }
+        )
+
+        val appDB = mockAppDB(accessor = { accessor })
+
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(appDB, times(1)).accessor(projects.first())
+        verify(accessor, times(1)).selectDataset(datasetID)
+
+        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
+        verifyNoMoreInteractions(router)
+      }
+    }
+
+    @Nested
+    @DisplayName("and install target is disabled")
+    inner class TargetIsDisabled {
+
+      @Test
+      @DisplayName("then an uninstall event should be fired")
+      fun test0() {
+        val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+          mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(meta = generalMetaMock()),
+            hasDeleteFlag = true,
+          )
+        })
+
+        val cacheDB = mockCacheDB(onSelectDataset = { mockCacheDatasetRecord(isDeleted = true) })
+        val appDB = mockAppDB()
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(appDB, times(1)).accessor(projects.first())
+
+        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
+        verifyNoMoreInteractions(router)
+      }
+    }
+
+    @Nested
+    @DisplayName("and is not present in install target")
+    inner class NotInTarget {
+
+      @Test
+      @DisplayName("then an uninstall event should be fired")
+      fun test0() {
+        val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+          mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(meta = generalMetaMock()),
+            hasDeleteFlag = true,
+          )
+        })
+
+        val cacheDB = mockCacheDB(onSelectDataset = { mockCacheDatasetRecord(isDeleted = true) })
+
+        val accessor = mockAppDBAccessor()
+
+        val appDB = mockAppDB(accessor = { accessor })
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(appDB, times(1)).accessor(projects.first())
+        verify(accessor, times(1)).selectDataset(datasetID)
+
+        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
+        verifyNoMoreInteractions(router)
+      }
     }
   }
 
   @Nested
-  @DisplayName("has raw upload file")
-  inner class HasRawUpload {
-    // TODO: has upload file and import ready file    -> delete upload file
-    // TODO: has upload file and no import ready file -> fire upload event
-  }
-
-  @Nested
-  @DisplayName("has import-ready zip")
+  @DisplayName("has import-ready file in the data store")
   inner class HasImportReady {
-    // has import ready zip
-    //   has install ready AND manifest              -> update import status, sync cache db file tables
-    //   has install ready OR manifest               -> fire import event
-    //   has neither and import status is failed     -> do nothing
-    //   has neither and import status is not failed -> fire import event
 
-    @Test
-    @DisplayName("has install-ready AND manifest")
-    fun test0() {
-      val projects = listOf("foo")
-      val inputFiles = listOf(generateFileInfo())
-      val outputFiles = listOf(generateFileInfo())
-      val dsDir = mockDatasetDirectory(
-        hasMetaFile = true,
-        metaFile = mockMetaFile(meta = mockMeta(projects = projects)),
-        metaFileTimestamp = OriginTimestamp,
-        hasManifest = true,
-        manifest = mockManifestFile(manifest = mockManifest(inputFiles = inputFiles, dataFiles = outputFiles)),
-        manifestTimestamp = OriginTimestamp,
-        hasInstallReadyFile = true,
+    @Nested
+    @DisplayName("and has already failed import")
+    inner class FailedImport {
 
-      )
+      @Nested
+      @DisplayName("but has no import messages")
+      inner class NoMessages {
+
+        @Test
+        @DisplayName("then an import event should be fired")
+        fun test0() {
+          val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+            mockDatasetDirectory(
+              ownerID = userID,
+              datasetID = datasetID,
+              metaFile = mockMetaFile(meta = generalMetaMock()),
+              hasImportableFile = true,
+            )
+          })
+
+          val transaction = mockCacheDBTransaction()
+
+          val cacheDB = mockCacheDB(
+            onSelectImportControl = { DatasetImportStatus.Failed },
+            onSelectImportMessages = { emptyList() },
+            onOpenTransaction = { transaction }
+          )
+
+          val router = mockKafkaRouter(
+            onSendImport = { _, _ -> throw Exception("exception to halt dataset reconciler") }
+          )
+
+          DatasetReconciler(cacheDB, mockAppDB(), router, dsMan).reconcile(userID, datasetID)
+
+          verify(cacheDB, times(2)).selectImportControl(datasetID)
+          verify(cacheDB, times(2)).selectImportMessages(datasetID)
+          verify(transaction, times(1)).upsertImportControl(datasetID, DatasetImportStatus.Queued)
+          verify(router, times(1)).sendImportTrigger(userID, datasetID)
+          verifyNoMoreInteractions(router)
+        }
+      }
+
+      @Nested
+      @DisplayName("and has import messages")
+      inner class HasMessages {
+
+        @Test
+        @DisplayName("then no import event should be fired")
+        fun test0() {
+          val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+            mockDatasetDirectory(
+              ownerID = userID,
+              datasetID = datasetID,
+              metaFile = mockMetaFile(meta = generalMetaMock()),
+              hasImportableFile = true,
+            )
+          })
+
+          val cacheDB = mockCacheDB(
+            onSelectImportControl = { DatasetImportStatus.Failed },
+            onSelectImportMessages = { listOf("beep") },
+          )
+
+          val appDB = mockAppDB()
+
+          val router = mockKafkaRouter()
+
+          DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+          // Called in tryInitCacheDB and main reconciliation path
+          verify(cacheDB, times(2)).selectImportControl(datasetID)
+          verify(cacheDB, times(2)).selectImportMessages(datasetID)
+
+          verifyNoInteractions(appDB)
+          verifyNoInteractions(router)
+        }
+      }
     }
 
+    @Nested
+    @DisplayName("and has an install-ready file in the data store")
+    inner class InstallReady {
+
+      @Nested
+      @DisplayName("but has no manifest file")
+      inner class NoManifest {
+
+        @Test
+        @DisplayName("then an import event should be fired")
+        fun test0() {
+          val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+            mockDatasetDirectory(
+              ownerID = userID,
+              datasetID = datasetID,
+              metaFile = mockMetaFile(meta = generalMetaMock()),
+              hasImportableFile = true,
+              hasInstallableFile = true,
+            )
+          })
+
+          val transaction = mockCacheDBTransaction()
+          val cacheDB = mockCacheDB(onOpenTransaction = { transaction })
+          val appDB = mockAppDB()
+          val router = mockKafkaRouter()
+
+          DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+          verify(transaction, times(1)).upsertImportControl(datasetID, DatasetImportStatus.Queued)
+
+          verifyNoInteractions(appDB)
+
+          verify(router, times(1)).sendImportTrigger(userID, datasetID)
+          verifyNoMoreInteractions(router)
+        }
+      }
+
+      @Nested
+      @DisplayName("and has a manifest file")
+      inner class WithManifest {
+
+        @Test
+        @DisplayName("then no import event should be fired")
+        fun test0() {
+          val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+            mockDatasetDirectory(
+              ownerID = userID,
+              datasetID = datasetID,
+              metaFile = mockMetaFile(meta = generalMetaMock()),
+              hasImportableFile = true,
+              hasInstallableFile = true,
+              manifest = mockManifestFile(manifest = mockDatasetManifest()),
+            )
+          })
+
+          val cacheDB = mockCacheDB()
+          val appDB = mockAppDB()
+          val router = mockKafkaRouter()
+
+          DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+          verifyNoInteractions(appDB)
+          verifyNoInteractions(router)
+        }
+      }
+    }
   }
 
+  @Nested
+  @DisplayName("has no import-ready file in the data store")
+  inner class NoImportReady {
 
-  // has install ready zip
-  //   has no import ready zip but has manifest      -> do nothing
-  //   has no import ready zip and has no manifest   -> do nothing
-  //   has import ready zip and has fired import event -> do nothing
-  //   has import ready zip and has not fired import event -> fire import event
+    @Nested
+    @DisplayName("but has install-ready file and manifest")
+    inner class IsImported {
 
-  // has only manifest
-  //   has no import ready zip -> sync cache db tables
-  //   has import ready zip    -> fire import event, sync cache db tables
+      @Test
+      @DisplayName("then the dataset import status should be set to complete in the cache db")
+      fun test0() {
+        val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
+          mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(meta = generalMetaMock()),
+            hasInstallableFile = true,
+            manifest = mockManifestFile(manifest = mockDatasetManifest()),
+          )
+        })
 
+        val transaction = mockCacheDBTransaction(
+          onClose = { throw Exception("exception to halt dataset reconciler") }
+        )
+        val cacheDB = mockCacheDB(onOpenTransaction = { transaction })
+        val appDB = mockAppDB()
+        val router = mockKafkaRouter()
+
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+
+        verify(transaction, times(1)).tryInsertImportControl(datasetID, DatasetImportStatus.Complete)
+
+        verifyNoInteractions(appDB)
+        verifyNoInteractions(router)
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("cache db records are out of sync")
+  inner class CacheDBSync {
+
+    @Nested
+    @DisplayName("due to out of date metadata")
+    inner class BadMeta {
+
+      @Test
+      @DisplayName("then an update-meta event should be fired")
+      fun test0() {
+        val dsMan = mockDatasetManager(
+          onGetDatasetDirectory = { _, _ -> mockDatasetDirectory(
+            ownerID = userID,
+            datasetID = datasetID,
+            metaFile = mockMetaFile(
+              meta = generalMetaMock(),
+              lastModified = OffsetDateTime.now(),
+            ),
+            importableFile = mockImportableFile(
+              exists = true,
+              lastModified = OriginTimestamp,
+            ),
+            installableFile = ,
+            manifest = mockManifestFile(manifest = mockDatasetManifest())
+          ) }
+        )
+
+        val cacheDB = mockCacheDB(
+          onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+        )
+      }
+    }
+
+    @Nested
+    @DisplayName("due to out of date shares")
+    inner class BadShares
+
+    @Nested
+    @DisplayName("due to out of date install data")
+    inner class BadData
+  }
 }
-
-private fun makeReconciler(
-  cacheDB: CacheDB = mockCacheDB(),
-  appDB: AppDB = mockAppDB(),
-  router: KafkaRouter = mockEventRouter(),
-  datasetManager: DatasetManager,
-) = DatasetReconciler(cacheDB, appDB, router, datasetManager)
 
 private fun generateFileInfo(): VDIDatasetFileInfo =
   VDIDatasetFileInfoImpl(
     filename = UUID.randomUUID().toString(),
     fileSize = Random.nextLong(),
   )
-
-private fun mockMeta(
-  projects: Iterable<ProjectID> = emptyList()
-): VDIDatasetMeta =
-  mock {
-    on { this.owner } doReturn userID
-    on { this.projects } doReturn projects.toSet()
-  }
-
-private fun mockManifest(
-  inputFiles: Collection<VDIDatasetFileInfo> = emptyList(),
-  dataFiles: Collection<VDIDatasetFileInfo> = emptyList(),
-): VDIDatasetManifest =
-  mock {
-    on { this.inputFiles } doReturn inputFiles
-    on { this.dataFiles } doReturn dataFiles
-  }
-
-private fun mockMetaFile(meta: VDIDatasetMeta? = null): DatasetMetaFile =
-  mock { on { load() } doReturn meta }
-
-private fun mockManifestFile(manifest: VDIDatasetManifest? = null): DatasetManifestFile =
-  mock { on { load() } doReturn manifest }
-
-private fun makeAppDatasetRecord(deleteFlag: DeleteFlag = DeleteFlag.NotDeleted) =
-  AppDatasetRecord(
-    datasetID = datasetID,
-    owner = userID,
-    typeName = "",
-    typeVersion = "",
-    isDeleted = deleteFlag
-  )
-
-private fun mockCacheDatasetRecord(
-  projects: Collection<ProjectID> = emptyList(),
-  isDeleted: Boolean = false,
-): CacheDatasetRecord =
-  mock {
-    on { this.datasetID } doReturn datasetID
-    on { this.ownerID } doReturn userID
-    on { this.isDeleted } doReturn isDeleted
-    on { this.projects } doReturn projects
-  }
-
-private fun mockEventRouter(): KafkaRouter = mock()
-
-private fun mockAppDBAccessor(
-  datasetRecord: AppDatasetRecord? = null,
-  syncControl: VDISyncControlRecord? = null,
-): AppDBAccessor =
-  mock {
-    on { selectDataset(datasetID) } doReturn datasetRecord
-    on { selectDatasetSyncControlRecord(datasetID) } doReturn syncControl
-  }
-
-private fun mockAppDB(
-  accessors: Map<ProjectID, AppDBAccessor> = emptyMap(),
-): AppDB =
-  mock {
-    on { accessor(any()) } doAnswer { accessors[it.getArgument(0)] }
-  }
-
-private fun mockCacheTransaction(): CacheDBTransaction = mock()
-
-private fun mockCacheDB(
-  datasetRecord: CacheDatasetRecord? = null,
-  importControl: DatasetImportStatus? = null,
-  syncControl: VDISyncControlRecord? = null,
-  transaction: CacheDBTransaction? = null,
-): CacheDB =
-  mock {
-    on { selectDataset(datasetID) } doReturn datasetRecord
-    on { selectImportControl(datasetID) } doReturn importControl
-    on { selectSyncControl(datasetID) } doReturn syncControl
-    transaction?.also { on { openTransaction() } doReturn it }
-  }
-
-private fun mockDatasetDirectory(
-  exists: Boolean = true,
-  hasMetaFile: Boolean = false,
-  metaFile: DatasetMetaFile? = null,
-  metaFileTimestamp: OffsetDateTime? = null,
-  hasManifest: Boolean = false,
-  manifest: DatasetManifestFile? = null,
-  manifestTimestamp: OffsetDateTime? = null,
-  hasDeleteFlag: Boolean = false,
-  deleteFlag: DatasetDeleteFlagFile? = null,
-  deleteFlagTimestamp: OffsetDateTime? = null,
-  hasUploadFile: Boolean = false,
-  uploadFile: DatasetRawUploadFile? = null,
-  uploadTimestamp: OffsetDateTime? = null,
-  hasImportReadyFile: Boolean = false,
-  importReadyFile: DatasetImportableFile? = null,
-  importReadyTimestamp: OffsetDateTime? = null,
-  hasInstallReadyFile: Boolean = false,
-  installReadyFile: DatasetInstallableFile? = null,
-  installReadyTimestamp: OffsetDateTime? = null,
-  latestShareTimestamp: OffsetDateTime? = null,
-): DatasetDirectory =
-  mock {
-    on { ownerID } doReturn userID
-    on { datasetID } doReturn datasetID
-
-    on { exists() } doReturn exists
-
-    on { hasMetaFile() } doReturn hasMetaFile
-    metaFile?.also { on { getMetaFile() } doReturn it }
-    metaFileTimestamp?.also { on { getMetaTimestamp() } doReturn it }
-
-    on { hasManifestFile() } doReturn hasManifest
-    manifest?.also { on { getManifestFile() } doReturn it }
-    manifestTimestamp?.also { on { getManifestTimestamp() } doReturn  it }
-
-    on { hasDeleteFlag() } doReturn hasDeleteFlag
-    deleteFlag?.also { on { getDeleteFlag() } doReturn it }
-    deleteFlagTimestamp?.also { on { getDeleteFlagTimestamp() } doReturn it }
-
-    on { hasUploadFile() } doReturn hasUploadFile
-    uploadFile?.also { on { getUploadFile() } doReturn it }
-    uploadTimestamp?.also { on { getUploadTimestamp() } doReturn it }
-
-    on { hasImportReadyFile() } doReturn hasImportReadyFile
-    importReadyFile?.also { on { getImportReadyFile() } doReturn it }
-    importReadyTimestamp?.also { on { getImportReadyTimestamp() } doReturn it }
-
-    on { hasInstallReadyFile() } doReturn hasInstallReadyFile
-    installReadyFile?.also { on { getInstallReadyFile() } doReturn it }
-    installReadyTimestamp?.also { on { getInstallReadyTimestamp() } doReturn it }
-
-    latestShareTimestamp?.also { on { getLatestShareTimestamp(any()) } doReturn it }
-  }
-
-private fun mockDatasetManager(dir: DatasetDirectory = mockDatasetDirectory()): DatasetManager =
-  mock { on { getDatasetDirectory(userID, datasetID) } doReturn dir }

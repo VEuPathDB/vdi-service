@@ -11,6 +11,14 @@ typealias DSSync = (DatasetID, OffsetDateTime) -> Unit
 
 typealias Runnable = () -> Unit
 
+typealias Con<T> = (T) -> Unit
+
+typealias Pro<T> = () -> T
+
+typealias Fn<I, O> = (I) -> O
+
+typealias BiFn<I1, I2, O> = (I1, I2) -> O
+
 internal fun runnable() = Unit
 
 internal fun <I> consumer(i: I) = Unit

@@ -8,17 +8,24 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import org.veupathdb.vdi.lib.common.util.isNull
-import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.db.app.AppDB
+import org.veupathdb.vdi.lib.db.app.AppDBAccessor
 import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.cache.CacheDB
+import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
 import org.veupathdb.vdi.lib.db.cache.withTransaction
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
+import java.time.OffsetDateTime
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
+import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord as CacheDatasetRecord
 
 internal class DatasetReconciler(
   private val cacheDB: CacheDB = CacheDB(),
@@ -28,63 +35,70 @@ internal class DatasetReconciler(
 ) {
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  // TODO: What if import-ready file is newer than install-ready or manifest files?
-  // TODO: What if raw upload file is newer than import-ready file?
+  // TODO: If the import-ready file is newer than the install-ready or manifest
+  //       files then we should fire an import event.
+  // TODO: If the raw upload file is newer than the import-ready file then we
+  //       should fire an upload processing event.
 
   fun reconcile(userID: UserID, datasetID: DatasetID) {
     logger.info("beginning reconciliation for dataset {}/{}", userID, datasetID)
     try {
       ReconciliationState(datasetManager.getDatasetDirectory(userID, datasetID)).reconcile()
-    } finally {
       logger.info("reconciliation completed for dataset {}/{}", userID, datasetID)
+    } catch (e: CriticalReconciliationError) {
+      logger.error("reconciliation failed for dataset {}/{}", userID, datasetID)
+    } catch (e: Throwable) {
+      Metrics.ReconciliationHandler.errors.inc()
+      logger.error("reconciliation failed for dataset $userID/$datasetID", e)
     }
   }
 
   private fun ReconciliationState.reconcile() {
-    val projects = loadProjects() ?: return
+    // Ensure we have a meta json file.  This method will throw an exception if
+    // no meta file exists.
+    loadMeta()
 
-    if (hasDeletedFlag) {
-      handleDeleted(projects)
+    // Make sure the cache db has at least the base records for this dataset.
+    tryInitCacheDB()
+
+    if (haveDeleteFlag()) {
+      handleDeleted()
       return
     }
 
-    // TODO: ensure the meta file exists?
-
     // The upload file should only exist before an attempt has been made to
     // process the raw upload into an import-ready form.
-    if (hasRawUpload)
+    if (haveRawUpload())
       handleHasUpload()
 
-    if (hasImportReadyZip)
-      handleHasImportable()
+    if (shouldReimport() == ReimportIndicator.NeedReimport) {
+      tryReimport()
+      return
+    }
 
-    if (hasInstallReadyZip)
-      handleHasInstallable()
+    if (!haveImportableFile())
+      logError("$userID/$datasetID: missing import-ready file")
 
-    // If we have no install-ready zip, but for some reason we _do_ have a
-    // manifest file.  This is likely due to a failed deletion in the pruner,
-    // but manual investigation should be performed to confirm.
-    else if (hasManifestFile)
-      handleMissingInstallableWithManifest()
+    if (!haveInstallableFile())
+      logError("$userID/$datasetID: missing install-ready file")
 
-    if (hasMetaFile && hasInstallReadyZip)
-      runSync(projects)
+    if (!haveManifestFile())
+      logError("$userID/$datasetID: missing manifest file")
+
+    if (haveInstallableFile())
+      runSync(getProjects())
   }
 
-  private fun ReconciliationState.handleDeleted(projects: Iterable<ProjectID>) {
-    // Make sure it's marked as deleted in the cache database to hide it from
-    // the UI
-    cacheDB.selectDataset(datasetID)?.also {
-      if (!it.isDeleted) {
-        try {
-          cacheDB.withTransaction { db -> db.updateDatasetDeleted(datasetID, true) }
-        } catch (e: Throwable) {
-          logError("failed to mark dataset $userID/$datasetID as deleted in cache db", e)
-        }
-      }
-    } ?: logWarning("dataset {}/{} does not have a record in the cache db", userID, datasetID)
+  private fun ReconciliationState.handleDeleted() {
+    val dataset = requireCacheDatasetRecord()
 
-    if (!isFullyUninstalled(projects))
+    if (!dataset.isDeleted) {
+      safeExec("failed to mark dataset as deleted in cache db") {
+        cacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
+      }
+    }
+
+    if (!isFullyUninstalled(getProjects()))
       fireUninstallEvent()
   }
 
@@ -92,12 +106,8 @@ internal class DatasetReconciler(
     // If an import-ready.zip file exists for the dataset then we can delete
     // the raw upload file and ensure that the upload control table in the
     // cache db indicates that the upload was successfully processed.
-    if (hasImportReadyZip) {
-      try { datasetDirectory.deleteUploadFile() }
-      catch (e: Exception) {
-        logError("failed to delete raw upload file from dataset $userID/$datasetID", e)
-      }
-
+    if (haveImportableFile()) {
+      safeExec("failed to delete raw upload file") { datasetDirectory.deleteUploadFile() }
       // TODO: Write completed status to upload control table in cache db
     }
 
@@ -114,83 +124,13 @@ internal class DatasetReconciler(
     }
   }
 
-  private fun ReconciliationState.handleHasImportable() {
-    // If an install-ready.zip file and manifest file exist for the dataset
-    // then ensure the import control table indicates that the import for the
-    // dataset was successful.
-    if (hasInstallReadyZip && hasManifestFile) {
-      updateCacheDBImportStatus(DatasetImportStatus.Complete)
-      syncCacheDBFileTables()
-    }
-
-    // If one of the install-ready.zip file or manifest file are missing then
-    // the import process was interrupted.  Reset the import control table in
-    // the cache db to queued and fire an import event.
-    else if (hasInstallReadyZip || hasManifestFile) {
-      if (hasInstallReadyZip)
-        logWarning("dataset {}/{} is missing its manifest file", userID, datasetID)
-      else
-        logWarning("dataset {}/{} is missing its install-ready file", userID, datasetID)
-
-      tryFireImportEvent()
-    }
-
-    // If both the install-ready.zip and manifest file are missing for the
-    // dataset, check the import control table in the cache database.  If the
-    // import is marked as failed in the control table then there is nothing
-    // more to do.  If the import is not marked as failed in the import
-    // control table, then fire an import event to re-attempt the import.
-    else {
-      if (cacheDB.selectImportControl(datasetID) != DatasetImportStatus.Failed) {
-        tryFireImportEvent()
-      }
-    }
-  }
-
-  private fun ReconciliationState.handleHasInstallable() {
-    if (!hasImportReadyZip) {
-      logError("dataset $userID/$datasetID has an install-ready zip but no import-ready zip, reimporting is not possible for this dataset")
-
-      // If no import-ready file exists, then we would not have checked for
-      // the existence of the manifest file yet.
-      if (!hasManifestFile)
-        logError("dataset $userID/$datasetID has an install-ready zip but is missing its import-ready zip and manifest file; it will not be possible to populate the dataset files tables in the cache db")
-    }
-
-    // We have an import-ready file and an install-ready file
-    else {
-      // If we fired an import event in this reconciliation then don't
-      // override the status here.
-      if (!haveFiredImportEvent)
-        updateCacheDBImportStatus(DatasetImportStatus.Complete)
-    }
-  }
-
-  private fun ReconciliationState.handleMissingInstallableWithManifest() {
-    if (!hasImportReadyZip)
-      logError("dataset $userID/$datasetID has a manifest file but no install-ready or import-ready files, reimporting and (re)installing are impossible for this dataset")
-
-    // We have an import-ready file and no install-ready file.
-    //
-    // There is no need to log anything extra here as the primary
-    // `hasImportReadyZip` if-block above will have logged an error for the
-    // missing install-ready file.
-    else
-      tryFireImportEvent()
-
-    // Either way sync the cache db file list tables?
-    syncCacheDBFileTables()
-  }
-
   private fun ReconciliationState.runSync(projects: Iterable<ProjectID>) {
     val syncStatus = checkSyncStatus(projects)
 
     if (syncStatus.metaOutOfSync)
       fireUpdateMetaEvent()
 
-    // If we have an install-ready zip, then the dataset imported successfully
-    // which means it is safe to push shares to the install targets.
-    if (hasInstallReadyZip && syncStatus.sharesOutOfSync)
+    if (syncStatus.sharesOutOfSync)
       fireShareEvent()
 
     // If we've already fired an import event, then an install event will be
@@ -201,15 +141,7 @@ internal class DatasetReconciler(
   }
 
   private fun ReconciliationState.checkSyncStatus(projects: Iterable<ProjectID>): SyncIndicator {
-    val cachedDatasetRecord = cacheDB.selectDataset(datasetID)
-
-    if (cachedDatasetRecord == null) {
-      logError("dataset $userID/$datasetID could not be found in the cache database, cannot perform sync check")
-      return SyncIndicator(metaOutOfSync = false, sharesOutOfSync = false, installOutOfSync = false)
-    }
-
-    val cacheDBSyncControl = getOrCreatecacheDBSyncControl()
-      ?: return SyncIndicator(metaOutOfSync = false, sharesOutOfSync = false, installOutOfSync = false)
+    val cacheDBSyncControl = requireCacheDBSyncControl()
 
     val metaTimestamp = datasetDirectory.getMetaTimestamp() ?: cacheDBSyncControl.metaUpdated
     val latestShareTimestamp = datasetDirectory.getLatestShareTimestamp(cacheDBSyncControl.sharesUpdated)
@@ -253,99 +185,10 @@ internal class DatasetReconciler(
     return SyncIndicator(metaOutOfSync, sharesOutOfSync, installOutOfSync)
   }
 
-  private fun ReconciliationState.getOrCreatecacheDBSyncControl() =
-    try {
-      cacheDB.selectSyncControl(datasetID) or {
-        VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp)
-          .also { cacheDB.withTransaction { db -> db.tryInsertSyncControl(it) } }
-      }
-    } catch (e: Throwable) {
-      logError("failed attempt to get or create cache db sync control record for dataset $userID/$datasetID", e)
-      null
-    }
-
-  private fun ReconciliationState.updateCacheDBImportStatus(status: DatasetImportStatus) {
-    try {
-      cacheDB.withTransaction { it.updateImportControl(datasetID, status) }
-    } catch (e: Throwable) {
-      logError("failed to update dataset import status to $status for dataset $userID/$datasetID", e)
-    }
-  }
-
-  private fun ReconciliationState.tryFireImportEvent() {
-    if (haveFiredImportEvent)
-      return
-
+  private fun ReconciliationState.tryReimport() {
     updateCacheDBImportStatus(DatasetImportStatus.Queued)
     fireImportEvent()
-  }
-
-  private fun ReconciliationState.syncCacheDBFileTables() {
-    val manifest = loadManifest()
-
-    if (manifest == null) {
-      logError("manifest file no longer exists for dataset $userID/$datasetID, cannot sync file list with cache-db")
-      return
-    }
-
-    try {
-      cacheDB.withTransaction {
-        it.tryInsertUploadFiles(datasetID, manifest.inputFiles)
-        it.tryInsertInstallFiles(datasetID, manifest.dataFiles)
-      }
-    } catch (e: Throwable) {
-      logError("failed to write file listing to cache db for dataset $userID/$datasetID", e)
-    }
-  }
-
-  private fun ReconciliationState.fireImportEvent() {
-    try {
-      logger.info("firing import event for dataset {}/{}", userID, datasetID)
-      eventRouter.sendImportTrigger(userID, datasetID)
-      haveFiredImportEvent = true
-    } catch (e: Throwable) {
-      logError("failed to fire import trigger for dataset $userID/$datasetID", e)
-    }
-  }
-
-  private fun ReconciliationState.fireUpdateMetaEvent() {
-    try {
-      logger.info("firing update meta event for dataset {}/{}", userID, datasetID)
-      eventRouter.sendUpdateMetaTrigger(userID, datasetID)
-      haveFiredMetaEvent = true
-    } catch (e: Throwable) {
-      logError("failed to send update-meta trigger for dataset $userID/$datasetID", e)
-    }
-  }
-
-  private fun ReconciliationState.fireShareEvent() {
-    try {
-      logger.info("firing share event for dataset {}/{}", userID, datasetID)
-      eventRouter.sendShareTrigger(userID, datasetID)
-      haveFiredShareEvent = true
-    } catch (e: Throwable) {
-      logError("failed to send share trigger for dataset $userID/$datasetID", e)
-    }
-  }
-
-  private fun ReconciliationState.fireInstallEvent() {
-    try {
-      logger.info("firing data install event for dataset {}/{}", userID, datasetID)
-      eventRouter.sendInstallTrigger(userID, datasetID)
-      haveFiredInstallEvent = true
-    } catch (e: Throwable) {
-      logError("failed to send install-data trigger for dataset $userID/$datasetID", e)
-    }
-  }
-
-  private fun ReconciliationState.fireUninstallEvent() {
-    try {
-      logger.info("firing soft-delete/uninstall event for dataset {}/{}", userID, datasetID)
-      eventRouter.sendSoftDeleteTrigger(userID, datasetID)
-      haveFiredUninstallEvent = true
-    } catch (e: Throwable) {
-      logError("failed to send soft-delete/uninstall trigger for dataset $userID/$datasetID", e)
-    }
+    haveFiredImportEvent = true
   }
 
   private fun ReconciliationState.isFullyUninstalled(projects: Iterable<ProjectID>): Boolean {
@@ -357,7 +200,7 @@ internal class DatasetReconciler(
         return false
       }
 
-      val targetRecord = appDB.selectDataset(datasetID)
+      val targetRecord = appDB.selectAppDatasetRecord()
 
       if (targetRecord == null) {
         logWarning("attempted to check install status for dataset {}/{} in project {} but no such dataset record could be found", userID, datasetID, projectID)
@@ -372,48 +215,300 @@ internal class DatasetReconciler(
     return true
   }
 
-  private fun ReconciliationState.loadMeta(): VDIDatasetMeta? =
-    try {
-      datasetDirectory.getMetaFile().load()
-    } catch (e: Throwable) {
-      logError("failed to load metadata for dataset $userID/$datasetID", e)
-      null
+  /**
+   * Dataset reimport is needed in the following cases:
+   *
+   * 1. Install-ready and/or manifest files are missing AND import has not
+   *    already failed
+   * 2. Import has failed but there are no import messages.
+   * 3. TODO: import-ready file is newer than installable and/or manifest files
+   */
+  private fun ReconciliationState.shouldReimport() =
+    when {
+      // If we don't have an import-ready file, we can't rerun the import
+      // process
+      !haveImportableFile() -> ReimportIndicator.ReimportNotPossible
+
+      // If we failed the last import attempt, then only rerun the import if we
+      // have no import messages so that we can repopulate that table to
+      // indicate to the user what happened.
+      failedImport() -> if (missingImportMessage()) ReimportIndicator.NeedReimport else ReimportIndicator.ReimportNotNeeded
+
+      // If we are missing the install-ready file and/or the manifest file then
+      // we need to rerun the import to get those files back.
+      !(haveInstallableFile() && haveManifestFile()) -> ReimportIndicator.NeedReimport
+
+      // We have an import-ready file, we have no failed import record, we have
+      // both the install-ready and manifest files.  There is no need to rerun
+      // the import process.
+      else -> ReimportIndicator.ReimportNotNeeded
     }
 
-  private fun ReconciliationState.loadManifest(): VDIDatasetManifest? =
-    try {
-      datasetDirectory.getManifestFile().load()
-    } catch (e: Throwable) {
-      logError("failed to load manifest for dataset $userID/$datasetID", e)
-      null
+  private enum class ReimportIndicator {
+    ReimportNotPossible,
+    NeedReimport,
+    ReimportNotNeeded,
+  }
+
+  // region S3
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+  //
+  //     S3 Operations
+  //
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+
+  private fun ReconciliationState.loadMeta() =
+    cMeta.computeIfAbsent {
+      safeExec("failed to load metadata") { datasetDirectory.getMetaFile().load() }
+    }.require("missing meta json file")
+
+  private fun ReconciliationState.haveManifestFile() =
+    loadManifest() != null
+
+  private fun ReconciliationState.loadManifest() =
+    cManifest.computeIfAbsent {
+      safeExec("failed to load manifest") { datasetDirectory.getManifestFile().load() }
     }
 
-  private fun ReconciliationState.loadProjects(): Iterable<ProjectID>? {
-    if (hasMetaFile) {
-      return loadMeta()?.projects?.let {
-        it.ifEmpty {
-          logError("dataset $userID/$datasetID cannot be reconciled, it has no projects listed in its meta file")
-          null
+  private fun ReconciliationState.haveDeleteFlag() =
+    cHasDeleteFlag.computeIfAbsent {
+      safeExec("failed to check for deleted flag") { datasetDirectory.hasDeleteFlag() }
+    }
+
+  private fun ReconciliationState.haveImportableFile() =
+    cHasImportable.computeIfAbsent {
+      safeExec("failed to check for import-ready file") { datasetDirectory.hasImportReadyFile() }
+    }
+
+  private fun ReconciliationState.haveInstallableFile() =
+    cHasInstallable.computeIfAbsent {
+      safeExec("failed to check for install-ready file") { datasetDirectory.hasInstallReadyFile() }
+    }
+
+  private fun ReconciliationState.haveRawUpload() =
+    cHasRawUpload.computeIfAbsent {
+      safeExec("failed to check for raw upload file") { datasetDirectory.hasUploadFile() }
+    }
+
+  private fun ReconciliationState.getProjects() = loadMeta().projects
+
+  // endregion S3
+
+  // region Kafka
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+  //
+  //     Kafka Operations
+  //
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+
+  private fun ReconciliationState.fireImportEvent() {
+    logger.info("firing import event for dataset {}/{}", userID, datasetID)
+    safeExec("failed to fire import trigger") {
+      eventRouter.sendImportTrigger(userID, datasetID)
+    }
+  }
+
+  private fun ReconciliationState.fireUpdateMetaEvent() {
+    logger.info("firing update meta event for dataset {}/{}", userID, datasetID)
+    safeExec("failed to fire update-meta trigger") {
+      eventRouter.sendUpdateMetaTrigger(userID, datasetID)
+    }
+  }
+
+  private fun ReconciliationState.fireShareEvent() {
+    logger.info("firing share event for dataset {}/{}", userID, datasetID)
+    safeExec("failed to send share trigger") {
+      eventRouter.sendShareTrigger(userID, datasetID)
+    }
+  }
+
+  private fun ReconciliationState.fireInstallEvent() {
+    logger.info("firing data install event for dataset {}/{}", userID, datasetID)
+    safeExec("failed to send install-data trigger") {
+      eventRouter.sendInstallTrigger(userID, datasetID)
+    }
+  }
+
+  private fun ReconciliationState.fireUninstallEvent() {
+    logger.info("firing soft-delete/uninstall event for dataset {}/{}", userID, datasetID)
+    safeExec("failed to send soft-delete trigger") {
+      eventRouter.sendSoftDeleteTrigger(userID, datasetID)
+    }
+  }
+
+  // endregion Kafka
+
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+  //
+  //     App DB Operations
+  //
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+
+  context (ReconciliationState)
+  private fun AppDBAccessor.selectAppDatasetRecord() =
+    safeExec({ "failed to fetch dataset record from $project" }) { selectDataset(datasetID) }
+
+
+  // region CacheDB
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+  //
+  //     Cache DB Operations
+  //
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+
+  private fun ReconciliationState.failedImport() =
+    getCacheImportControl() == DatasetImportStatus.Failed
+
+  private fun ReconciliationState.missingImportMessage() =
+    safeExec("failed to fetch import messages from cache db") { cacheDB.selectImportMessages(datasetID).isEmpty() }
+
+  private fun ReconciliationState.getCacheImportControl() =
+    safeExec("failed to fetch import control from cache db") { cacheDB.selectImportControl(datasetID) }
+
+  private fun ReconciliationState.syncCacheDBFileTables(manifest: VDIDatasetManifest) {
+    try {
+      cacheDB.withTransaction {
+        it.tryInsertUploadFiles(datasetID, manifest.inputFiles)
+        it.tryInsertInstallFiles(datasetID, manifest.dataFiles)
+      }
+    } catch (e: Throwable) {
+      logError("failed to write file listing to cache db for dataset $userID/$datasetID", e)
+    }
+  }
+
+  private fun ReconciliationState.updateCacheDBImportStatus(status: DatasetImportStatus) {
+    try {
+      cacheDB.withTransaction { it.upsertImportControl(datasetID, status) }
+    } catch (e: Throwable) {
+      logError("failed to update dataset import status to $status for dataset $userID/$datasetID", e)
+    }
+  }
+
+  private fun ReconciliationState.getCacheDatasetRecord() =
+    cCacheDBDatasetRecord.computeIfAbsent {
+      safeExec("failed to query cache db for dataset record") { cacheDB.selectDataset(datasetID) }
+    }
+
+  private fun ReconciliationState.requireCacheDatasetRecord() =
+    getCacheDatasetRecord().require("could not find dataset record in cache db")
+
+  private fun ReconciliationState.requireCacheDBSyncControl() =
+    safeExec("failed to load sync control record from cache db") {
+      cacheDB.selectSyncControl(datasetID)
+    }.require("could not find dataset sync control record")
+
+  private fun ReconciliationState.tryInitCacheDB() {
+    val needRoot = getCacheDatasetRecord() == null
+    val meta = loadMeta()
+    val manifest = loadManifest()
+
+    val importStatus = when (shouldReimport()) {
+      ReimportIndicator.ReimportNotNeeded -> DatasetImportStatus.Complete
+      ReimportIndicator.NeedReimport -> DatasetImportStatus.Queued
+      ReimportIndicator.ReimportNotPossible -> {
+        if (haveInstallableFile() && haveManifestFile())
+          DatasetImportStatus.Complete
+        else
+          DatasetImportStatus.Failed
+      }
+    }
+
+    safeExec("failed to soft-initialize cache db records") {
+      cacheDB.withTransaction { db ->
+        if (needRoot)
+          db.tryInsertDataset(DatasetImpl(
+            datasetID = datasetID,
+            typeName = meta.type.name,
+            typeVersion = meta.type.version,
+            ownerID = userID,
+            isDeleted = haveDeleteFlag(),
+            created = meta.created,
+            importStatus = DatasetImportStatus.Queued, // this value is not used for inserts
+            origin = meta.origin,
+            inserted = OffsetDateTime.now(),
+          ))
+
+        db.tryInsertDatasetMeta(
+          DatasetMetaImpl(
+            datasetID = datasetID,
+            visibility = meta.visibility,
+            name = meta.name,
+            summary = meta.summary,
+            description = meta.description,
+            sourceURL = meta.sourceURL,
+          )
+        )
+
+        db.tryInsertDatasetProjects(datasetID, meta.projects)
+
+        db.tryInsertImportControl(datasetID, importStatus)
+
+        if (importStatus == DatasetImportStatus.Failed)
+          db.tryInsertImportMessages(datasetID, "dataset has no import-ready file and is in an incomplete state due to the absence of the install-ready data and/or manifest")
+
+        db.tryInsertSyncControl(
+          VDISyncControlRecord(
+            datasetID = datasetID,
+            sharesUpdated = OriginTimestamp,
+            dataUpdated = OriginTimestamp,
+            metaUpdated = OriginTimestamp,
+          )
+        )
+
+        manifest.ifNotNull {
+          db.tryInsertUploadFiles(datasetID, it.inputFiles)
+          db.tryInsertInstallFiles(datasetID, it.dataFiles)
         }
       }
-    } else {
-      logError("received a reconciliation event for dataset $userID/$datasetID which has no meta file")
     }
 
-    val tmp = cacheDB.selectDataset(datasetID)
-
-    if (tmp.isNull()) {
-      logError("dataset $userID/$datasetID cannot be reconciled, it has no meta file or cache db record")
-      return null
+    safeExec("failed to select dataset record from cache db") {
+      cCacheDBDatasetRecord.value = cacheDB.selectDataset(datasetID)
     }
-
-    if (tmp.projects.isEmpty()) {
-      logError("dataset $userID/$datasetID cannot be reconciled, it has no meta file and no projects listed in the cache db")
-      return null
-    }
-
-    return tmp.projects
   }
+
+  // endregion CacheDB
+
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+  //
+  //     Enforcement
+  //
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+
+  private inline fun <T> ReconciliationState.safeExec(msg: () -> String, fn: () -> T) =
+    try {
+      fn()
+    } catch (e: CriticalReconciliationError) {
+      throw e
+    } catch (e: Throwable) {
+      logError("$userID/$datasetID: " + msg(), e)
+      throw CriticalReconciliationError()
+    }
+
+  private inline fun <T> ReconciliationState.safeExec(msg: String, fn: () -> T) =
+    try {
+      fn()
+    } catch (e: CriticalReconciliationError) {
+      throw e
+    } catch (e: Throwable) {
+      logError("$userID/$datasetID: $msg", e)
+      throw CriticalReconciliationError()
+    }
+
+  context (ReconciliationState)
+  private fun <T> T?.require(msg: String): T =
+    if (this == null) {
+      logError("$userID/$datasetID: $msg")
+      throw CriticalReconciliationError()
+    } else {
+      this
+    }
+
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
+  //
+  //     Logging Helpers
+  //
+  // // // // // // // // // // // // // // // // // // // // // // // // // //
 
   private fun logWarning(message: String, vararg objects: Any?) {
     Metrics.ReconciliationHandler.warnings.inc()
@@ -429,6 +524,7 @@ internal class DatasetReconciler(
   }
 }
 
+private class CriticalReconciliationError : Exception()
 
 private class SyncIndicator(
   val metaOutOfSync: Boolean,
@@ -438,30 +534,88 @@ private class SyncIndicator(
 
 private class ReconciliationState(val datasetDirectory: DatasetDirectory) {
   inline val userID get() = datasetDirectory.ownerID
-
   inline val datasetID get() = datasetDirectory.datasetID
 
-  val hasMetaFile by lazy { datasetDirectory.hasMetaFile() }
+  var cMeta = ComputedValue<VDIDatasetMeta>()
+  val cManifest = ComputedValue<VDIDatasetManifest>()
 
-  val hasDeletedFlag by lazy { datasetDirectory.hasDeleteFlag() }
-
-  val hasRawUpload by lazy { datasetDirectory.hasUploadFile() }
-
-  val hasImportReadyZip by lazy { datasetDirectory.hasImportReadyFile() }
-
-  val hasInstallReadyZip by lazy { datasetDirectory.hasInstallReadyFile() }
-
-  val hasManifestFile by lazy { datasetDirectory.hasManifestFile() }
-
-  var haveFiredMetaEvent = false
-
-  var haveFiredUploadEvent = false
+  val cHasDeleteFlag = ComputedFlag()
+  val cHasRawUpload = ComputedFlag()
+  val cHasImportable = ComputedFlag()
+  val cHasInstallable = ComputedFlag()
 
   var haveFiredImportEvent = false
 
-  var haveFiredInstallEvent = false
+  val cCacheDBDatasetRecord = ComputedValue<CacheDatasetRecord>()
+}
 
-  var haveFiredShareEvent = false
+class ComputedFlag {
+  private var actual = false
 
-  var haveFiredUninstallEvent = false
+  var value: Boolean
+    get() {
+      if (!hasBeenComputed)
+        throw IllegalStateException("attempted to access computed flag before it was computed")
+      return actual
+    }
+    set(value) {
+      actual = value
+      hasBeenComputed = true
+    }
+
+  var hasBeenComputed = false
+    private set
+
+  inline fun computeIfAbsent(fn: () -> Boolean): Boolean {
+    if (!hasBeenComputed)
+      value = fn()
+
+    return value
+  }
+}
+
+class ComputedValue<T> {
+  private var actual: T? = null
+
+  var value: T?
+    get() {
+      if (!hasBeenComputed)
+        throw IllegalStateException("attempted to access computed value before it was computed")
+      return actual
+    }
+    set(value) {
+      actual = value
+      hasBeenComputed = true
+    }
+
+  var hasBeenComputed = false
+    private set
+
+  inline fun computeIfAbsent(fn: () -> T?): T? {
+    if (!hasBeenComputed)
+      value = fn()
+
+    return value
+  }
+}
+
+// TODO: Move this to commons
+@OptIn(ExperimentalContracts::class)
+private inline fun <T> T?.ifNull(fn: () -> Unit): T? {
+  contract { callsInPlace(fn, InvocationKind.AT_MOST_ONCE) }
+
+  if (this == null)
+    fn()
+
+  return this
+}
+
+@OptIn(ExperimentalContracts::class)
+private inline fun <T> T?.ifNotNull(fn: (T) -> Unit): T? {
+  contract { callsInPlace(fn, InvocationKind.AT_MOST_ONCE) }
+
+  if (this != null)
+    fn(this)
+
+  return this
 }

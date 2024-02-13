@@ -9,7 +9,6 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDBAccessor
 import org.veupathdb.vdi.lib.db.app.AppDBTransaction
@@ -25,8 +24,8 @@ fun mockAppDB(
   mock {
     on { getDatasetStatuses(any()) } doAnswer { bulkStatuses(it.getArgument(0)) }
     on { getDatasetStatuses(any(), any()) } doAnswer { datasetStatuses(it.getArgument(0), it.getArgument(1)) }
-    on { accessor(any()) } doAnswer { accessor(it.getArgument(0)) }
-    on { transaction(any()) } doAnswer { transaction(it.getArgument(0)) }
+    on { this.accessor(any()) } doAnswer { accessor(it.getArgument(0)) }
+    on { this.transaction(any()) } doAnswer { transaction(it.getArgument(0)) }
   }
 
 fun mockAppDBAccessor(

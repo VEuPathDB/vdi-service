@@ -14,6 +14,7 @@ import java.sql.SQLException
 import java.time.OffsetDateTime
 
 class AppDBTransactionImpl(
+  override val project: ProjectID,
   private val schema: String,
   private val connection: Connection
 ) : AppDBTransaction {

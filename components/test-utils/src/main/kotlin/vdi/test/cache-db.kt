@@ -30,6 +30,7 @@ fun mockCacheDB(
   onSelectSharesForDatasets: (List<DatasetID>) -> Map<DatasetID, List<DatasetShare>> = ::oneParamMap,
   onSelectImportControl: DSGetter<DatasetImportStatus?> = ::oneParamNull,
   onSelectImportMessages: DSGetter<List<String>> = ::oneParamList,
+  onSelectSyncControl: DSGetter<VDISyncControlRecord?> = ::oneParamNull,
   onSelectDeletedDatasets: () -> List<DeletedDataset> = ::noParamList,
   onSelectOpenSharesFor: (UserID) -> List<DatasetShareListEntry> = ::oneParamList,
   onSelectAcceptedSharesFor: (UserID) -> List<DatasetShareListEntry> = ::oneParamList,
@@ -99,6 +100,9 @@ fun mockCacheDBTransaction(
   onUpsertImportControl: (DatasetID, DatasetImportStatus) -> Unit = ::biConsumer,
   onUpsertImportMessage: (DatasetID, String) -> Unit = ::biConsumer,
   onUpdateDatasetDeleted: (DatasetID, Boolean) -> Unit = ::biConsumer,
+  onCommit: Runnable = ::runnable,
+  onRollback: Runnable = ::runnable,
+  onClose: Runnable = ::runnable,
 ): CacheDBTransaction =
   mock {
     on { deleteDataset(any()) } doAnswer { onDeleteDataset(it.getArgument(0)) }
@@ -130,7 +134,10 @@ fun mockCacheDBTransaction(
     on { upsertDatasetShareReceipt(any()) } doAnswer { onUpsertShareReceipt(it.getArgument(0)) }
     on { upsertImportControl(any(), any()) } doAnswer { onUpsertImportControl(it.getArgument(0), it.getArgument(1)) }
     on { upsertImportMessages(any(), any()) } doAnswer { onUpsertImportMessage(it.getArgument(0), it.getArgument(1)) }
-    on { updateDatasetMeta(any()) } doAnswer { onUpdateDatasetDeleted(it.getArgument(0), it.getArgument(1)) }
+    on { updateDatasetDeleted(any(), any()) } doAnswer { onUpdateDatasetDeleted(it.getArgument(0), it.getArgument(1)) }
+    on { rollback() } doAnswer { onRollback() }
+    on { commit() } doAnswer { onCommit() }
+    on { close() } doAnswer { onClose() }
   }
 
 fun mockAdminAllDatasetsRow(
@@ -291,7 +298,7 @@ fun mockDatasetProjectLinks(
     projects?.also { on { this.projects } doReturn it }
   }
 
-fun mockDatasetRecord(
+fun mockCacheDatasetRecord(
   datasetID: DatasetID? = null,
   typeName: String? = null,
   typeVersion: String? = null,

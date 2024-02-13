@@ -79,8 +79,10 @@ inline fun CacheDB.withTransaction(fn: (CacheDBTransaction) -> Unit) =
   openTransaction().use {
     try {
       fn(it)
+      it.commit()
     } catch (e: Throwable) {
       it.rollback()
+      throw e
     }
   }
 
