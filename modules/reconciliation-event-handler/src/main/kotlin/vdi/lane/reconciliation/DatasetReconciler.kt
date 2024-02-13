@@ -450,9 +450,9 @@ internal class DatasetReconciler(
           )
         )
 
-        manifest.ifNotNull {
-          db.tryInsertUploadFiles(datasetID, it.inputFiles)
-          db.tryInsertInstallFiles(datasetID, it.dataFiles)
+        if (manifest != null) {
+          db.tryInsertUploadFiles(datasetID, manifest.inputFiles)
+          db.tryInsertInstallFiles(datasetID, manifest.dataFiles)
         }
       }
     }
@@ -586,25 +586,4 @@ class ComputedValue<T> {
 
     return value
   }
-}
-
-// TODO: Move this to commons
-@OptIn(ExperimentalContracts::class)
-private inline fun <T> T?.ifNull(fn: () -> Unit): T? {
-  contract { callsInPlace(fn, InvocationKind.AT_MOST_ONCE) }
-
-  if (this == null)
-    fn()
-
-  return this
-}
-
-@OptIn(ExperimentalContracts::class)
-private inline fun <T> T?.ifNotNull(fn: (T) -> Unit): T? {
-  contract { callsInPlace(fn, InvocationKind.AT_MOST_ONCE) }
-
-  if (this != null)
-    fn(this)
-
-  return this
 }
