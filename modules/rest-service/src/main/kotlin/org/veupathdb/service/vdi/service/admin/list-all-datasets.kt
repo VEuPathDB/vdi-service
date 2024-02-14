@@ -27,7 +27,7 @@ internal fun listAllDatasets(
     includeDeleted ?: false,
   )
 
-  val totalCount = CacheDB.selectAdminAllDatasetCount(query)
+  val totalCount = CacheDB().selectAdminAllDatasetCount(query)
 
   if (totalCount == 0u) {
     return AllDatasetsListResponse(
@@ -36,7 +36,7 @@ internal fun listAllDatasets(
     )
   }
 
-  val cacheDBResults = CacheDB.selectAdminAllDatasets(query)
+  val cacheDBResults = CacheDB().selectAdminAllDatasets(query)
   val appDBResults = getAppDBStatuses(cacheDBResults)
 
   return AllDatasetsListResponse(
@@ -57,7 +57,7 @@ private fun getAppDBStatuses(datasets: Collection<AdminAllDatasetsRow>): Map<Dat
     }
   }
 
-  return AppDB.getDatasetStatuses(projectToDatasetID)
+  return AppDB().getDatasetStatuses(projectToDatasetID)
 }
 
 private fun AllDatasetsListResponse(

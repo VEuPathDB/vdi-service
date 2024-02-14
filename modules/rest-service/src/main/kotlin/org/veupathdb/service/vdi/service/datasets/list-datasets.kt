@@ -20,18 +20,20 @@ import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
-  return fetchDatasetList(CacheDB.selectDatasetList(query))
+  return fetchDatasetList(CacheDB().selectDatasetList(query))
 }
 
 fun fetchCommunityUserDatasetList(): List<DatasetListEntry> {
-  return fetchDatasetList(CacheDB.selectNonPrivateDatasets())
+  return fetchDatasetList(CacheDB().selectNonPrivateDatasets())
 }
 
 private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetListEntry> {
+  val cacheDB = CacheDB()
+
   val datasetIDs = datasetList.map(DatasetRecord::datasetID)
 
   // Get the shares data for the list of results.
-  val shares = CacheDB.selectSharesForDatasets(datasetIDs)
+  val shares = cacheDB.selectSharesForDatasets(datasetIDs)
   val shareCount = shares.reduceTo(0) { _, _, v -> v.size }
 
   // build a set for collecting user IDs to use when querying for user details
@@ -47,7 +49,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
   val projectToDatasetID = HashMap<String, MutableSet<DatasetID>>(12)
 
   // Get file counts and sizes for the datasets.
-  val fileSummaries = CacheDB.selectUploadFileSummaries(datasetIDs)
+  val fileSummaries = cacheDB.selectUploadFileSummaries(datasetIDs)
 
   // for each dataset the original search returned
   datasetList.forEach { ds ->
@@ -69,7 +71,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
   // The returned map will be indexed on dataset ID and will contain values that
   // are themselves maps of project ID to installation status details for that
   // dataset/project id combination
-  val datasetInstallStatusMap = AppDB.getDatasetStatuses(projectToDatasetID)
+  val datasetInstallStatusMap = AppDB().getDatasetStatuses(projectToDatasetID)
   projectToDatasetID.clear()
 
   // Get the user details for all the distinct user IDs seen in the dataset

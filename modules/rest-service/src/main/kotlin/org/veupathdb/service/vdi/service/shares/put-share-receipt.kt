@@ -13,10 +13,13 @@ import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShareReceiptImpl
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 
 internal fun putShareReceipt(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareReceipt) {
+  val cacheDB = CacheDB()
+
   // lookup the target dataset or throw a 404 if it doesn't exist
-  val dataset = CacheDB.selectDataset(datasetID)
+  val dataset = cacheDB.selectDataset(datasetID)
     ?: throw NotFoundException()
 
   // If the dataset is deleted, throw a 403
@@ -34,7 +37,7 @@ internal fun putShareReceipt(datasetID: DatasetID, recipientID: UserID, entity: 
   }
 
   val internal = entity.toInternal()
-  CacheDB.withTransaction {
+  cacheDB.withTransaction {
     // Put a share receipt object into S3
     DatasetStore.putShareReceipt(dataset.ownerID, datasetID, recipientID, internal)
     it.upsertDatasetShareReceipt(DatasetShareReceiptImpl(datasetID, recipientID, internal.action))

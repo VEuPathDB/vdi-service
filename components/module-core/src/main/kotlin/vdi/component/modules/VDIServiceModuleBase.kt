@@ -7,8 +7,12 @@ import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.json.JSON
+import org.veupathdb.vdi.lib.kafka.EventMessage
 import org.veupathdb.vdi.lib.kafka.KafkaConsumer
 import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
+import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
+import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import kotlin.reflect.KClass
 
 /**
@@ -137,6 +141,9 @@ abstract class VDIServiceModuleBase(
         ?: throw IllegalStateException("S3 bucket $bucketName does not exist!")
     }
 
+  protected suspend fun requireDatasetManager(s3Config: S3Config, bucketName: BucketName) =
+    DatasetManager(requireS3Bucket(requireS3Client(s3Config), bucketName))
+
   /**
    * Fetches messages from Kafka matching the given [key] and converts them into
    * a stream of values of type [T].
@@ -153,7 +160,7 @@ abstract class VDIServiceModuleBase(
    *
    * @return A stream of values of type [T]
    */
-  protected fun <T : Any> KafkaConsumer.fetchMessages(key: String, type: KClass<T>): Sequence<T> =
+  protected fun KafkaConsumer.fetchMessages(key: String): Sequence<EventMessage> =
     receive()
       .asSequence()
       .filter {
@@ -166,7 +173,7 @@ abstract class VDIServiceModuleBase(
       }
       .map {
         try {
-          JSON.readValue(it.value, type.java)
+          JSON.readValue(it.value, EventMessage::class.java)
         } catch (e: Throwable) {
           log.error("received invalid message body from Kafka: {}", it.value)
           null
@@ -174,4 +181,6 @@ abstract class VDIServiceModuleBase(
       }
       .filterNotNull()
 
+  protected suspend fun requireKafkaRouter(config: KafkaRouterConfig) =
+    safeExec("failed to create KafkaRouter instance") { KafkaRouterFactory(config).newKafkaRouter() }
 }

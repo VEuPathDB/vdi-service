@@ -5,6 +5,7 @@ import io.prometheus.client.Gauge
 import io.prometheus.client.Histogram
 
 object Metrics {
+
   val imports: Counter = Counter.build()
     .name("dataset_imports")
     .help("Dataset import results.")
@@ -232,4 +233,21 @@ object Metrics {
     .name("unparseable_rabbit_message")
     .help("A rabbit message is unparseable.")
     .register()
+
+  object ReconciliationHandler {
+    val queueSize: Gauge = Gauge.build()
+      .name("reconciliation_handler_queue_size")
+      .help("Number of dataset reconciliations currently queued to be processed.")
+      .register()
+
+    val warnings: Counter = Counter.build()
+      .name("reconciliation_handler_warning_counter")
+      .help("Number of warnings encountered by the dataset reconciler.")
+      .register()
+
+    val errors: Counter = Counter.build()
+      .name("reconciliation_handler_error_counter")
+      .help("Number of errors encountered by the dataset reconciler.")
+      .register()
+  }
 }

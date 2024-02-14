@@ -18,4 +18,7 @@ object KafkaRouterConfigDefaults {
 
   const val SHARE_TRIGGER_MESSAGE_KEY = "share-trigger"
   const val SHARE_TRIGGER_TOPIC = "share-triggers"
+
+  const val RECONCILIATION_TRIGGER_MESSAGE_KEY = "reconciliation-trigger"
+  const val RECONCILIATION_TRIGGER_TOPIC = "reconciliation-triggers"
 }

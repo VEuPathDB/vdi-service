@@ -16,9 +16,10 @@ import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShareOfferImpl
 import org.veupathdb.vdi.lib.db.cache.model.DatasetShareReceiptImpl
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 
 internal fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareOffer) {
-  val dataset = CacheDB.selectDataset(datasetID) ?: throw NotFoundException()
+  val dataset = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
 
   // If the dataset has been deleted, then it isn't sharable, throw a 403.
   if (dataset.isDeleted)
@@ -42,7 +43,7 @@ internal fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entit
 
 internal fun putShareOffer(datasetID: DatasetID, ownerID: UserID, recipientID: UserID, entity: DatasetShareOffer) {
   // Lookup the target dataset or throw a 404 if it doesn't exist.
-  val dataset = CacheDB.selectDataset(datasetID)
+  val dataset = CacheDB().selectDataset(datasetID)
     ?: throw NotFoundException("no such dataset")
 
   // If the dataset is not owned by the requesting user, throw a 403
@@ -63,13 +64,13 @@ internal fun putShareOffer(datasetID: DatasetID, ownerID: UserID, recipientID: U
     DatasetImportStatus.Complete -> { /* Do nothing */ }
   }
 
-  val existingShareReceipt = CacheDB.selectSharesForDataset(datasetID)
+  val existingShareReceipt = CacheDB().selectSharesForDataset(datasetID)
     .find { it.recipientID == recipientID }
 
   // Short circuit the normal flow from MinIO to the share handler for insertion
   // to postgres on this campus.  This way the client can reflect the change
   // immediately.
-  CacheDB.withTransaction {
+  CacheDB().withTransaction {
     val internal = entity.toInternal()
 
     // Write or overwrite the share offer object.

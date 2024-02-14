@@ -15,7 +15,9 @@ fun initDatabaseDependencies(): Array<Dependency> {
     out.add(dd)
   }
 
-  out.add(DatabaseDependency(CacheDB.details.name, CacheDB.details.host, CacheDB.details.port.toInt(), CacheDB.dataSource))
+  val cacheDB = CacheDB()
+
+  out.add(DatabaseDependency(cacheDB.details.name, cacheDB.details.host, cacheDB.details.port.toInt(), cacheDB.dataSource))
 
   return out.toTypedArray()
 }

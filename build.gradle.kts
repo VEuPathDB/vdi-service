@@ -58,7 +58,9 @@ allprojects {
 dependencies {
   implementation(platform(project(":platform")))
 
-  implementation(project(":components:s3"))
+  // FIXME: REMOVE THIS LINE AFTER DB MIGRATION TO ADD INSERTED COLUMN TO CACHE
+  //        DB
+  implementation(project(":components:cache-db"))
 
   implementation("org.veupathdb.vdi:vdi-component-common")
 
@@ -67,14 +69,16 @@ dependencies {
   implementation(project(":modules:dataset-reinstaller"))
   implementation(project(":modules:event-router"))
   implementation(project(":modules:reconciler"))
-  implementation(project(":modules:hard-delete-trigger-handler"))
-  implementation(project(":modules:import-trigger-handler"))
-  implementation(project(":modules:install-trigger-handler"))
   implementation(project(":modules:pruner"))
   implementation(project(":modules:rest-service"))
-  implementation(project(":modules:share-trigger-handler"))
-  implementation(project(":modules:soft-delete-trigger-handler"))
-  implementation(project(":modules:update-meta-trigger-handler"))
+
+  implementation(project(":modules:hard-delete-event-handler"))
+  implementation(project(":modules:import-event-handler"))
+  implementation(project(":modules:install-event-handler"))
+  implementation(project(":modules:reconciliation-event-handler"))
+  implementation(project(":modules:share-event-handler"))
+  implementation(project(":modules:soft-delete-event-handler"))
+  implementation(project(":modules:update-meta-event-handler"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
   implementation("org.veupathdb.lib:jaxrs-container-core")

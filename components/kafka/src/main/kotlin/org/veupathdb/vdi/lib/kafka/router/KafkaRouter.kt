@@ -1,58 +1,39 @@
 package org.veupathdb.vdi.lib.kafka.router
 
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
+import org.veupathdb.vdi.lib.kafka.EventMessage
 import org.veupathdb.vdi.lib.kafka.KafkaMessage
 import org.veupathdb.vdi.lib.kafka.KafkaProducer
-import org.veupathdb.vdi.lib.kafka.model.triggers.*
-
 
 class KafkaRouter(
   private val config: KafkaRouterConfig,
   private val producer: KafkaProducer,
 ) {
-  fun sendImportTrigger(trigger: ImportTrigger) {
-    producer.send(
-      config.importTriggerTopic,
-      KafkaMessage(config.importTriggerMessageKey, JSON.writeValueAsString(trigger))
-    )
-  }
+  fun sendImportTrigger(userID: UserID, datasetID: DatasetID) =
+    send(config.importTriggerTopic, config.importTriggerMessageKey, userID, datasetID)
 
-  fun sendInstallTrigger(trigger: InstallTrigger) {
-    producer.send(
-      config.installTriggerTopic,
-      KafkaMessage(config.installTriggerMessageKey, JSON.writeValueAsString(trigger))
-    )
-  }
+  fun sendInstallTrigger(userID: UserID, datasetID: DatasetID) =
+    send(config.installTriggerTopic, config.installTriggerMessageKey, userID, datasetID)
 
-  fun sendUpdateMetaTrigger(trigger: UpdateMetaTrigger) {
-    producer.send(
-      config.updateMetaTriggerTopic,
-      KafkaMessage(config.updateMetaTriggerMessageKey, JSON.writeValueAsString(trigger))
-    )
-  }
+  fun sendUpdateMetaTrigger(userID: UserID, datasetID: DatasetID) =
+    send(config.updateMetaTriggerTopic, config.updateMetaTriggerMessageKey, userID, datasetID)
 
-  fun sendSoftDeleteTrigger(trigger: SoftDeleteTrigger) {
-    producer.send(
-      config.softDeleteTriggerTopic,
-      KafkaMessage(config.softDeleteTriggerMessageKey, JSON.writeValueAsString(trigger))
-    )
-  }
+  fun sendSoftDeleteTrigger(userID: UserID, datasetID: DatasetID) =
+    send(config.softDeleteTriggerTopic, config.softDeleteTriggerMessageKey, userID, datasetID)
 
-  fun sendHardDeleteTrigger(trigger: HardDeleteTrigger) {
-    producer.send(
-      config.hardDeleteTriggerTopic,
-      KafkaMessage(config.hardDeleteTriggerMessageKey, JSON.writeValueAsString(trigger))
-    )
-  }
+  fun sendHardDeleteTrigger(userID: UserID, datasetID: DatasetID) =
+    send(config.hardDeleteTriggerTopic, config.hardDeleteTriggerMessageKey, userID, datasetID)
 
-  fun sendShareTrigger(trigger: ShareTrigger) {
-    producer.send(
-      config.shareTriggerTopic,
-      KafkaMessage(config.shareTriggerMessageKey, JSON.writeValueAsString(trigger))
-    )
-  }
+  fun sendShareTrigger(userID: UserID, datasetID: DatasetID) =
+    send(config.shareTriggerTopic, config.shareTriggerMessageKey, userID, datasetID)
 
-  fun close() {
-    producer.close()
-  }
+  fun sendReconciliationTrigger(userID: UserID, datasetID: DatasetID) =
+    send(config.reconciliationTriggerTopic, config.reconciliationTriggerMessageKey, userID, datasetID)
+
+  fun close() = producer.close()
+
+  private fun send(topic: String, key: String, userID: UserID, datasetID: DatasetID) =
+    producer.send(topic, KafkaMessage(key, JSON.writeValueAsString(EventMessage(userID, datasetID, config.eventSource))))
 }

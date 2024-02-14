@@ -12,9 +12,12 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMetaImpl
 import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 
 internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequest) {
-  val dataset = CacheDB.selectDataset(datasetID)
+  val cacheDB = CacheDB()
+
+  val dataset = cacheDB.selectDataset(datasetID)
     ?: throw NotFoundException()
 
   if (dataset.isDeleted)
@@ -31,7 +34,7 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
   val meta = DatasetStore.getDatasetMeta(userID, datasetID)
     ?: throw IllegalStateException("target dataset has no $DatasetMetaFilename file")
 
-  CacheDB.withTransaction {
+  cacheDB.withTransaction {
     val visibility = patch.visibility?.toInternalVisibility() ?: meta.visibility
     val name = patch.name ?: meta.name
     val summary = if (patch.summary?.isBlank() == true) null else patch.summary ?: meta.summary
@@ -51,6 +54,7 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
         origin       = meta.origin,
         dependencies = meta.dependencies,
         sourceURL    = meta.sourceURL,
+        created      = meta.created
       )
     )
     it.updateDatasetMeta(DatasetMetaImpl(datasetID, visibility, name, summary, description, meta.sourceURL))

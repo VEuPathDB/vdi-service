@@ -2,10 +2,10 @@ package vdi.module.events.routing
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.async.ShutdownSignal
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
-import org.veupathdb.vdi.lib.kafka.model.triggers.*
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.rabbit.RabbitMQEventIterator
 import org.veupathdb.vdi.lib.rabbit.RabbitMQEventSource
@@ -85,54 +85,67 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
         continue
       }
 
+      // If the event action was a deletion of an object, then it was a hard
+      // delete regardless of the file.  We only remove anything when we
+      // remove everything.  This event should be one of many for this
+      // specific dataset.
+      if (event.eventType.action == MinIOEventAction.DELETE) {
+        log.debug("received a hard delete event for dataset {}/{} for MinIO key {}", path.userID, path.datasetID, event.objectKey)
+        safeSend(path.userID, path.datasetID, kr::sendHardDeleteTrigger)
+        continue
+      }
+
+      if (path is VDDatasetShareFilePath) {
+        log.debug("received a share event for dataset {}/{}", path.userID, path.datasetID)
+        safeSend(path.userID, path.datasetID, kr::sendShareTrigger)
+        continue
+      }
+
+      if (path !is VDDatasetFilePath) {
+        log.error("unrecognized VDPath implementation type {}, someone forgot to update the event router", path::class.qualifiedName)
+        continue
+      }
+
       when {
-        // If the event action was a deletion of an object, then it was a hard
-        // delete regardless of the file.  We only remove anything when we
-        // remove everything.  This event should be one of many for this
-        // specific dataset.
-        event.eventType.action == MinIOEventAction.DELETE -> {
-          log.debug("received a hard delete event for dataset {}/{} for MinIO key {}", path.userID.toString(), path.datasetID.toString(), event.objectKey)
-
-          safeSend(HardDeleteTrigger(path.userID, path.datasetID), kr::sendHardDeleteTrigger)
-        }
-
-        // If the path was for an upload file or the meta file then it's an import trigger as we
-        // only ever put something in the upload directory when the dataset is
-        // first uploaded by the client.
-        path is VDUploadPath -> {
-          log.debug("received an import event for dataset {}/{}", path.userID, path.datasetID)
-
-          safeSend(ImportTrigger(path.userID, path.datasetID), kr::sendImportTrigger)
-        }
-
-        // If the meta file was updated...
-        path is VDDatasetFilePath && path.subPath == DatasetMetaFilename -> {
+        path.isMetaFile -> {
           log.debug("received an metadata event for dataset {}/{}", path.userID, path.datasetID)
 
-          safeSend(UpdateMetaTrigger(path.userID, path.datasetID), kr::sendUpdateMetaTrigger)
-          safeSend(ImportTrigger(path.userID, path.datasetID), kr::sendImportTrigger)
+          safeSend(path.userID, path.datasetID, kr::sendUpdateMetaTrigger)
+
+          // Trigger an import event here in case the files synced from the
+          // opposite campus out of order.  This is needed as both the metadata
+          // file and the import-ready zip file are needed to run the import.
+          safeSend(path.userID, path.datasetID, kr::sendImportTrigger)
         }
 
-        // If the path was to a soft delete flag then we have a soft-delete
-        // event.
-        path is VDDatasetFilePath && path.subPath == S3Paths.DELETE_FLAG_FILE_NAME -> {
-          log.debug("received a soft delete event for dataset {}/{}", path.userID, path.datasetID)
-
-          safeSend(SoftDeleteTrigger(path.userID, path.datasetID), kr::sendSoftDeleteTrigger)
+        path.isManifestFile -> {
+          // We don't care about this event.  The manifest file exists only to
+          // allow us to repopulate the internal postgres database's file
+          // listing table.
         }
 
-        // If the path is to a share file then we have a share event.
-        path is VDDatasetShareFilePath -> {
-          log.debug("received a share event for dataset {}/{}", path.userID, path.datasetID)
-
-          safeSend(ShareTrigger(path.userID, path.datasetID), kr::sendShareTrigger)
+        path.isRawUploadFile -> {
+          log.debug("received a raw upload event for dataset {}/{}", path.userID, path.datasetID)
+          // TODO: this is a placeholder for when the "robust" async user upload
+          //       process is implemented.
         }
 
-        // Else, we have an install event.
-        else                                              -> {
+        path.isImportReadyFile -> {
+          log.debug("received an import event for dataset {}/{}", path.userID, path.datasetID)
+
+          safeSend(path.userID, path.datasetID, kr::sendImportTrigger)
+        }
+
+        path.isInstallReadyFile -> {
           log.debug("received an install event for dataset {}/{}", path.userID, path.datasetID)
 
-          safeSend(InstallTrigger(path.userID, path.datasetID), kr::sendInstallTrigger)
+          safeSend(path.userID, path.datasetID, kr::sendInstallTrigger)
+        }
+
+        path.isDeleteFlagFile -> {
+          log.debug("received a soft delete event for dataset {}/{}", path.userID, path.datasetID)
+
+          safeSend(path.userID, path.datasetID, kr::sendSoftDeleteTrigger)
         }
       }
     }
@@ -144,18 +157,9 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     shutdownConfirm.trigger()
   }
 
-  /**
-   * Attempts to send a new event message on a Kafka topic controlled by the
-   * given publishing function ([fn]), shutting down the process if sending the
-   * event fails.
-   *
-   * @param event Event message to send.
-   *
-   * @param fn Kafka publishing function.
-   */
-  private suspend fun <T> safeSend(event: T, fn: (T) -> Unit) {
+  private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: (UserID, DatasetID) -> Unit) {
     try {
-      fn(event)
+      fn(userID, datasetID)
     } catch (e: Throwable) {
       shutdownTrigger.trigger()
       log.error("failed to send event message to Kafka", e)

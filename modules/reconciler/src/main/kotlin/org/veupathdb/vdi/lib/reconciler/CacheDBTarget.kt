@@ -5,21 +5,24 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.cache.CacheDB
+import org.veupathdb.vdi.lib.db.cache.withTransaction
 
 class CacheDBTarget : ReconcilerTarget {
+  private val cacheDB = CacheDB()
+
   override val name = "cache-db"
 
   override val type = ReconcilerTargetType.Cache
 
   override fun streamSortedSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord> {
-    return CacheDB.selectAllSyncControlRecords()
+    return cacheDB.selectAllSyncControlRecords()
   }
 
   override fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID) {
-    CacheDB.withTransaction {
+    cacheDB.withTransaction {
       // Delete dataset and all associated rows in a transaction.
       it.deleteInstallFiles(datasetID)
-      it.deleteUpdateFiles(datasetID)
+      it.deleteUploadFiles(datasetID)
       it.deleteDatasetShareReceipts(datasetID)
       it.deleteDatasetShareOffers(datasetID)
       it.deleteDatasetMetadata(datasetID)

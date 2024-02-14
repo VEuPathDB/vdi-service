@@ -64,20 +64,21 @@ internal fun Connection.selectDatasetForUser(userID: UserID, datasetID: DatasetI
         null
       else
         DatasetRecordImpl(
-          datasetID,
-          getString("type_name"),
-          getString("type_version"),
-          getUserID("owner_id"),
-          getBoolean("is_deleted"),
-          getDateTime("created"),
-          getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
-          getString("origin"),
-          VDIDatasetVisibility.fromString(getString("visibility")),
-          getString("name"),
-          getString("summary"),
-          getString("description"),
-          getString("source_url"),
-          getProjectIDList("projects"),
+          datasetID    = datasetID,
+          typeName     = getString("type_name"),
+          typeVersion  = getString("type_version"),
+          ownerID      = getUserID("owner_id"),
+          isDeleted    = getBoolean("is_deleted"),
+          created      = getDateTime("created"),
+          importStatus = getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
+          origin       = getString("origin"),
+          visibility   = VDIDatasetVisibility.fromString(getString("visibility")),
+          name         = getString("name"),
+          summary      = getString("summary"),
+          description  = getString("description"),
+          sourceURL    = getString("source_url"),
+          projects     = getProjectIDList("projects"),
+          inserted     = getDateTime("inserted")
         )
     }
   }

@@ -28,8 +28,6 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
   private fun resolve(ep: String) = baseUri.resolve(ep)
 
   override fun postImport(datasetID: DatasetID, meta: VDIDatasetMeta, upload: InputStream): ImportResponse {
-    log.trace("postImport(datasetID={}, meta=..., upload=...)", datasetID)
-
     val multipart = MultiPart.createBody {
       withPart {
         fieldName = FieldName.Details
@@ -45,7 +43,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
 
     val uri = resolve(EP.Import)
 
-    log.debug("submitting import POST request to {}", uri)
+    log.debug("submitting import POST request to {} for dataset {}", uri, datasetID)
 
     val response = config.client.send(
       HttpRequest.newBuilder(uri)
@@ -76,11 +74,9 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
   }
 
   override fun postInstallMeta(datasetID: DatasetID, projectID: ProjectID, meta: VDIDatasetMeta): InstallMetaResponse {
-    log.trace("postInstallMeta(datasetID={}, projectID={}, meta=...)", datasetID, projectID)
-
     val uri = resolve(EP.InstallMeta)
 
-    log.debug("submitting install-meta POST request to {}", uri)
+    log.debug("submitting install-meta POST request to {} for project {} for dataset {}", uri, projectID, datasetID)
 
     val response = config.client.send(
       HttpRequest.newBuilder(uri)
@@ -103,8 +99,6 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
   }
 
   override fun postInstallData(datasetID: DatasetID, projectID: ProjectID, payload: InputStream): InstallDataResponse {
-    log.trace("postInstallData(datasetID={}, projectID={}, payload=...)", datasetID, projectID)
-
     val multipart = MultiPart.createBody {
       withPart {
         fieldName = FieldName.Details
@@ -120,7 +114,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
 
     val uri = resolve(EP.InstallData)
 
-    log.debug("submitting install-data POST request to {}", uri)
+    log.debug("submitting install-data POST request to {} for project {} for dataset {}", uri, projectID, datasetID)
 
     val response = config.client.send(
       HttpRequest.newBuilder(uri)
@@ -149,11 +143,9 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
   }
 
   override fun postUninstall(datasetID: DatasetID, projectID: ProjectID): UninstallResponse {
-    log.trace("postUninstall(datasetID={}, projectID={})", datasetID, projectID)
-
     val uri = resolve(EP.Uninstall)
 
-    log.debug("submitting uninstall POST request to {}", uri)
+    log.debug("submitting uninstall POST request to {} for project {} for dataset {}", uri, projectID, datasetID)
 
     val response = config.client.send(
       HttpRequest.newBuilder(uri)

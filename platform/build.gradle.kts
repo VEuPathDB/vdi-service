@@ -9,7 +9,7 @@ dependencies {
     api("org.veupathdb.lib:multipart-jackson-pojo:1.1.3")
 
     // VDI
-    api("org.veupathdb.vdi:vdi-component-common:6.7.1")
+    api("org.veupathdb.vdi:vdi-component-common:8.3.0")
     api("org.veupathdb.vdi:vdi-component-json:1.0.1")
 
     // Database
@@ -47,7 +47,7 @@ dependencies {
     api("io.prometheus:simpleclient_common:0.16.0")
 
     // S3
-    api("org.veupathdb.lib.s3:s34k-minio:0.6.0+s34k-0.10.0")
+    api("org.veupathdb.lib.s3:s34k-minio:0.7.1+s34k-0.11.0")
 
   }
 }

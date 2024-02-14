@@ -12,6 +12,7 @@ import org.veupathdb.vdi.lib.db.app.sql.*
 import javax.sql.DataSource
 
 internal class AppDBAccessorImpl(
+  override val project: ProjectID,
   private val schema: String,
   private val dataSource: DataSource
 ) : AppDBAccessor {

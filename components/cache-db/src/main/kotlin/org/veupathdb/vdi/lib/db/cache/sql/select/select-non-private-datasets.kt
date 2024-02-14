@@ -17,6 +17,7 @@ SELECT
 , d.is_deleted
 , d.origin
 , d.created
+, d.inserted
 , md.name
 , md.summary
 , md.description
@@ -52,7 +53,8 @@ internal fun Connection.selectNonPrivateDatasets(): List<DatasetRecord> {
           summary      = getString("summary"),
           description  = getString("description"),
           sourceURL    = getString("source_url"),
-          projects     = getProjectIDList("projects")
+          projects     = getProjectIDList("projects"),
+          inserted     = getDateTime("inserted")
         )
       }
     }

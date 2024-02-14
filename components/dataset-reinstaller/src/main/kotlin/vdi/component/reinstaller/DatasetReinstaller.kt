@@ -14,6 +14,7 @@ import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
+import org.veupathdb.vdi.lib.db.app.withTransaction
 import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
 import org.veupathdb.vdi.lib.handler.client.response.ind.*
 import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallBadRequestResponse
@@ -37,6 +38,8 @@ object DatasetReinstaller {
   private val config = DatasetReinstallerConfig()
 
   private var runCounter = 0uL
+
+  private val appDB = AppDB()
 
   /**
    * Tries to run the [DatasetReinstaller] if an instance of the reinstaller is
@@ -64,10 +67,14 @@ object DatasetReinstaller {
   private fun run() {
     log.info("starting dataset reinstaller run {}", ++runCounter)
 
+    val s3 = S3Api.newClient(config.s3Config)
+    val bucket = s3.buckets[config.s3Bucket]!!
+    val manager = DatasetManager(bucket)
+
     // For each project registered with the service...
     for ((projectID, _) in AppDatabaseRegistry.iterator()) {
       try {
-        processProject(projectID)
+        processProject(projectID, manager)
       } catch (e: Throwable) {
         Metrics.failedReinstallProcessForProject.labels(projectID).inc()
         log.error("failed to process dataset reinstallations for project $projectID", e)
@@ -77,9 +84,9 @@ object DatasetReinstaller {
     log.info("dataset reinstaller run {} complete", runCounter)
   }
 
-  private fun processProject(projectID: ProjectID) {
+  private fun processProject(projectID: ProjectID, manager: DatasetManager) {
     // locate datasets in the ready-for-reinstall status
-    val datasets = AppDB.accessor(projectID)!!
+    val datasets = appDB.accessor(projectID)!!
       .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.ReadyForReinstall)
 
     log.info("found {} datasets in project {} that are ready for reinstall", datasets.size, projectID)
@@ -87,7 +94,7 @@ object DatasetReinstaller {
     // for each located dataset for the target project...
     for (dataset in datasets) {
       try {
-        processDataset(dataset, projectID)
+        processDataset(dataset, projectID, manager)
       } catch (e: Throwable) {
         Metrics.failedDatasetReinstall.inc()
         log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID", e)
@@ -95,7 +102,7 @@ object DatasetReinstaller {
     }
   }
 
-  private fun processDataset(dataset: DatasetRecord, projectID: ProjectID) {
+  private fun processDataset(dataset: DatasetRecord, projectID: ProjectID, manager: DatasetManager) {
     log.info("reinstall processing dataset {}/{} for project {}", dataset.owner, dataset.datasetID, projectID)
 
     // Get a plugin handler for the target dataset type
@@ -109,7 +116,7 @@ object DatasetReinstaller {
       throw IllegalStateException("dataset type ${dataset.typeName} does not apply to project $projectID")
 
     uninstallDataset(dataset, projectID, handler.client)
-    reinstallDataset(dataset, projectID, handler.client)
+    reinstallDataset(dataset, projectID, handler.client, manager)
   }
 
   private fun uninstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: PluginHandlerClient) {
@@ -129,12 +136,14 @@ object DatasetReinstaller {
     }
   }
 
-  private fun reinstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: PluginHandlerClient) {
+  private fun reinstallDataset(
+    dataset: DatasetRecord,
+    projectID: ProjectID,
+    client: PluginHandlerClient,
+    manager: DatasetManager,
+  ) {
     log.debug("attempting to reinstall dataset {}/{} into project {}", dataset.owner, dataset.datasetID, projectID)
 
-    val s3 = S3Api.newClient(config.s3Config)
-    val bucket = s3.buckets[config.s3Bucket]!!
-    val manager = DatasetManager(bucket)
     val directory = manager.getDatasetDirectory(dataset.owner, dataset.datasetID)
 
     val response =  withDataTar(directory) { dataTar ->
@@ -167,14 +176,14 @@ object DatasetReinstaller {
       val files        = mutableListOf(metaFile, manifestFile)
 
       metaFile.outputStream()
-        .use { out -> s3Dir.getMeta().loadContents()!!.use { inp -> inp.transferTo(out) } }
+        .use { out -> s3Dir.getMetaFile().loadContents()!!.use { inp -> inp.transferTo(out) } }
 
       manifestFile.outputStream()
-        .use { out -> s3Dir.getManifest().loadContents()!!.use { inp -> inp.transferTo(out) } }
+        .use { out -> s3Dir.getManifestFile().loadContents()!!.use { inp -> inp.transferTo(out) } }
 
-      s3Dir.getDataFiles()
-        .forEach { ddf ->
-          val zip = tempDir.resolve(ddf.name)
+      s3Dir.getInstallReadyFile()
+        .also { ddf ->
+          val zip = tempDir.resolve(ddf.baseName)
           zip.outputStream()
             .use { out -> ddf.loadContents()!!.use { inp -> inp.transferTo(out) } }
 
@@ -194,9 +203,9 @@ object DatasetReinstaller {
   }
 
   private fun handleInstallSuccess(res: InstallDataSuccessResponse, dataset: DatasetRecord, projectID: ProjectID) {
-    log.info("dataset {} was reinstalled successfully into project {}", dataset.datasetID, projectID)
+    log.info("dataset {}/{} was reinstalled successfully into project {}", dataset.owner, dataset.datasetID, projectID)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -211,9 +220,9 @@ object DatasetReinstaller {
     dataset:   DatasetRecord,
     projectID: ProjectID
   ) {
-    log.error("dataset {} reinstall into {} failed due to bad request exception from handler server: {}", dataset.datasetID, projectID, response.message)
+    log.error("dataset {}/{} reinstall into {} failed due to bad request exception from handler server: {}", dataset.owner, dataset.datasetID, projectID, response.message)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -230,9 +239,9 @@ object DatasetReinstaller {
     dataset:   DatasetRecord,
     projectID: ProjectID
   ) {
-    log.info("dataset {} reinstall into {} failed due to validation error", dataset.datasetID, projectID)
+    log.info("dataset {}/{} reinstall into {} failed due to validation error", dataset.owner, dataset.datasetID, projectID)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -247,9 +256,9 @@ object DatasetReinstaller {
     dataset:   DatasetRecord,
     projectID: ProjectID,
   ) {
-    log.info("dataset {} reinstall into {} was rejected for missing dependencies", dataset.datasetID, projectID)
+    log.info("dataset {}/{} reinstall into {} was rejected for missing dependencies", dataset.owner, dataset.datasetID, projectID)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -264,9 +273,9 @@ object DatasetReinstaller {
     dataset:   DatasetRecord,
     projectID: ProjectID,
   ) {
-    log.error("dataset {} reinstall into {} failed with a 500 from the handler server", dataset.datasetID, projectID)
+    log.error("dataset {}/{} reinstall into {} failed with a 500 from the handler server", dataset.owner, dataset.datasetID, projectID)
 
-    AppDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,

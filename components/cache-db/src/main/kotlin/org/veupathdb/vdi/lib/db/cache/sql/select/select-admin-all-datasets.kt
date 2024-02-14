@@ -19,6 +19,7 @@ SELECT
 , d.type_name
 , d.type_version
 , d.is_deleted
+, d.inserted
 , m.name
 , m.summary
 , m.description
@@ -118,7 +119,8 @@ internal fun Connection.selectAdminAllDatasets(query: AdminAllDatasetsQuery): Li
           visibility    = VDIDatasetVisibility.fromString(it.getString("visibility")),
           projectIDs    = it.getProjectIDList("projects"),
           importStatus  = it.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
-          importMessage = it.getString("message")
+          importMessage = it.getString("message"),
+          inserted      = it.getDateTime("inserted"),
         )
       }
     }

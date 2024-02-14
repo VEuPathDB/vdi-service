@@ -6,6 +6,9 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetTypeImpl
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
+import org.veupathdb.vdi.lib.db.cache.util.getDatasetID
+import org.veupathdb.vdi.lib.db.cache.util.getDateTime
+import org.veupathdb.vdi.lib.db.cache.util.getUserID
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -21,6 +24,7 @@ SELECT
 , d.type_name
 , d.type_version
 , d.owner_id
+, d.is_deleted
 FROM
   vdi.sync_control AS s
   INNER JOIN vdi.datasets AS d
@@ -44,17 +48,16 @@ class RecordIterator(val rs: ResultSet,
 
   override fun next(): VDIReconcilerTargetRecord {
     return VDIReconcilerTargetRecord(
+      ownerID = rs.getUserID("owner_id"),
+      datasetID = rs.getDatasetID("dataset_id"),
+      sharesUpdated = rs.getDateTime("shares_update_time"),
+      dataUpdated = rs.getDateTime("data_update_time"),
+      metaUpdated = rs.getDateTime("meta_update_time"),
       type = VDIDatasetTypeImpl(
         name = rs.getString("type_name"),
         version = rs.getString("type_version")
       ),
-      owner = UserID(rs.getLong("owner_id")),
-      syncControlRecord = VDISyncControlRecord(
-        datasetID = DatasetID(rs.getString("dataset_id")),
-        sharesUpdated = rs.getObject("shares_update_time", OffsetDateTime::class.java),
-        dataUpdated = rs.getObject("data_update_time", OffsetDateTime::class.java),
-        metaUpdated = rs.getObject("meta_update_time", OffsetDateTime::class.java)
-      )
+      isUninstalled = rs.getBoolean("is_deleted"),
     )
   }
 

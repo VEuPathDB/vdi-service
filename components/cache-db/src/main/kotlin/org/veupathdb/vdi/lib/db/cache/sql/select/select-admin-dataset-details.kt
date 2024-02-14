@@ -9,6 +9,8 @@ import org.veupathdb.vdi.lib.db.cache.util.*
 import java.sql.Connection
 import java.time.OffsetDateTime
 
+// TODO: This query selects import_messages as a left join as well as an array agg.  Remove one of them.
+
 // language=postgresql
 private const val SQL_BASE = """
 SELECT
@@ -18,6 +20,7 @@ SELECT
 , d.created
 , d.type_name
 , d.type_version
+, d.inserted
 , m.name
 , m.summary
 , m.description
@@ -71,6 +74,7 @@ internal fun Connection.selectAdminDatasetDetails(datasetID: DatasetID): AdminDa
           ownerID       = getUserID("owner_id"),
           origin        = getString("origin"),
           created       = getObject("created", OffsetDateTime::class.java),
+          inserted      = getDateTime("inserted"),
           typeName      = getString("type_name"),
           typeVersion   = getString("type_version"),
           name          = getString("name"),
@@ -83,13 +87,14 @@ internal fun Connection.selectAdminDatasetDetails(datasetID: DatasetID): AdminDa
           importMessage = getString("message"),
           syncControl = VDISyncControlRecord(
             datasetID = getDatasetID("dataset_id"),
-            sharesUpdated = getObject("shares_update_time", OffsetDateTime::class.java),
-            dataUpdated = getObject("data_update_time", OffsetDateTime::class.java),
-            metaUpdated = getObject("meta_update_time", OffsetDateTime::class.java)
+            sharesUpdated = getDateTime("shares_update_time"),
+            dataUpdated = getDateTime("data_update_time"),
+            metaUpdated = getDateTime("meta_update_time")
           ),
           messages = getStringList("messages"),
           installFiles = getStringList("install_files"),
-          uploadFiles = getStringList("upload_files")
+          uploadFiles = getStringList("upload_files"),
+          isDeleted = false,
         )
     }
   }

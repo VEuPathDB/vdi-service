@@ -15,6 +15,7 @@ import java.util.List;
     "isDeleted",
     "origin",
     "created",
+    "inserted",
     "name",
     "summary",
     "description",
@@ -42,6 +43,9 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
 
   @JsonProperty("created")
   private OffsetDateTime created;
+
+  @JsonProperty("inserted")
+  private OffsetDateTime inserted;
 
   @JsonProperty("name")
   private String name;
@@ -124,6 +128,16 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   @JsonProperty("created")
   public void setCreated(OffsetDateTime created) {
     this.created = created;
+  }
+
+  @JsonProperty("inserted")
+  public OffsetDateTime getInserted() {
+    return this.inserted;
+  }
+
+  @JsonProperty("inserted")
+  public void setInserted(OffsetDateTime inserted) {
+    this.inserted = inserted;
   }
 
   @JsonProperty("name")

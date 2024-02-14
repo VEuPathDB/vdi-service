@@ -13,4 +13,5 @@ interface Dataset {
   val created: OffsetDateTime
   val importStatus: DatasetImportStatus
   val origin: String
+  val inserted: OffsetDateTime
 }

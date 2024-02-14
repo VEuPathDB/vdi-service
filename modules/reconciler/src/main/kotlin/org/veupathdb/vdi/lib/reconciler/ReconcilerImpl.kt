@@ -9,7 +9,6 @@ import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.reconciler.config.ReconcilerConfig
-import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import java.util.*
@@ -25,7 +24,7 @@ class ReconcilerImpl(private val config: ReconcilerConfig) :
 
     logger().info("Running ReconcilerImpl module")
 
-    val datasetManager = DatasetManager(requireS3Bucket(requireS3Client(config.s3Config), config.s3Bucket))
+    val datasetManager = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kafkaRouter = requireKafkaRouter()
 
     val targets: MutableList<ReconcilerInstance> = AppDatabaseRegistry.iterator().asSequence()

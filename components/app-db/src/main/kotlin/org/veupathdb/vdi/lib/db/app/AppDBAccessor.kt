@@ -10,6 +10,8 @@ import org.veupathdb.vdi.lib.db.app.model.*
 
 interface AppDBAccessor {
 
+  val project: ProjectID
+
   /**
    * Looks up a dataset record for the target dataset.
    *

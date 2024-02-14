@@ -19,5 +19,6 @@ data class DatasetRecordImpl(
   override val summary: String?,
   override val description: String?,
   override val sourceURL: String?,
-  override val projects: Collection<String>
+  override val projects: Collection<String>,
+  override val inserted: OffsetDateTime,
 ) : DatasetRecord
