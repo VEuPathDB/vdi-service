@@ -202,5 +202,34 @@ object Metrics {
     .help("Number of soft deletes currently queued to be processed.")
     .register()
 
+  val pruneFailed: Counter = Counter.build()
+    .name("prune_failed")
+    .help("A dataset fails to be pruned.")
+    .register()
 
+  val pruneSuccessful: Counter = Counter.build()
+    .name("prune_successful")
+    .help("A dataset is successfully pruneds.")
+    .register()
+
+  val pruneConflict: Counter = Counter.build()
+    .name("prune_conflict")
+    .help("Two or more data stores disagree on whether a dataset is marked as deleted.")
+    .register()
+
+  val failedReinstallProcessForProject: Counter = Counter.build()
+    .name("failed_reinstall_process")
+    .labelNames("project")
+    .help("The re-install process fails at project level")
+    .register()
+
+  val failedDatasetReinstall: Counter = Counter.build()
+    .name("failed_dataset_reinstall")
+    .help("A dataset fails to be re-installed.")
+    .register()
+
+  val unparseableRabbitMessage: Counter = Counter.build()
+    .name("unparseable_rabbit_message")
+    .help("A rabbit message is unparseable.")
+    .register()
 }
