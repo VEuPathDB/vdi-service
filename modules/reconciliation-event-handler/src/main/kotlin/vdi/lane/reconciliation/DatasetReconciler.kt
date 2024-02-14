@@ -538,7 +538,7 @@ private class ReconciliationState(val datasetDirectory: DatasetDirectory) {
   var haveFiredImportEvent = false
 }
 
-class ComputedFlag {
+private class ComputedFlag {
   private var actual = false
 
   var value: Boolean
@@ -563,7 +563,7 @@ class ComputedFlag {
   }
 }
 
-class ComputedValue<T> {
+private class ComputedValue<T> {
   private var actual: T? = null
 
   var value: T?
