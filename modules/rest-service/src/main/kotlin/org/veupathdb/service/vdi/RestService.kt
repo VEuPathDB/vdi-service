@@ -14,7 +14,6 @@ object RestService : Server() {
   fun main(args: Array<String>) {
     log.info("starting rest-service module")
     enableAccountDB()
-    enableUserDB()
     start(args)
   }
 

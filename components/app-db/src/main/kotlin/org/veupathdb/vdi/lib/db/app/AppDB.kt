@@ -9,6 +9,8 @@ import kotlin.contracts.contract
 
 fun AppDB(): AppDB = AppDBImpl
 
+const val UniqueConstraintViolation = 1
+
 interface AppDB {
   fun getDatasetStatuses(targets: Map<ProjectID, Collection<DatasetID>>): Map<DatasetID, Map<ProjectID, InstallStatuses>>
 

@@ -23,6 +23,7 @@ import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallUnexpectedErro
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
+import vdi.component.metrics.Metrics
 import java.nio.file.Path
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.io.path.inputStream
@@ -75,6 +76,7 @@ object DatasetReinstaller {
       try {
         processProject(projectID, manager)
       } catch (e: Throwable) {
+        Metrics.failedReinstallProcessForProject.labels(projectID).inc()
         log.error("failed to process dataset reinstallations for project $projectID", e)
       }
     }
@@ -94,6 +96,7 @@ object DatasetReinstaller {
       try {
         processDataset(dataset, projectID, manager)
       } catch (e: Throwable) {
+        Metrics.failedDatasetReinstall.inc()
         log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID", e)
       }
     }

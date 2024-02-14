@@ -32,6 +32,7 @@ import vdi.component.modules.VDIServiceModuleBase
 import java.nio.file.Path
 import java.sql.SQLException
 import java.time.OffsetDateTime
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
@@ -40,6 +41,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   , VDIServiceModuleBase("install-data-trigger-handler")
 {
   private val log = LoggerFactory.getLogger(javaClass)
+
+  private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
   private val cacheDB = CacheDB()
 
@@ -58,7 +61,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           kc.fetchMessages(config.installDataTriggerMessageKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received install job for dataset $userID/$datasetID from source $source")
-              wp.submit { executeJob(userID, datasetID, dm) }
+              wp.submit { tryExecute(userID, datasetID, dm) }
             }
         }
 
@@ -69,6 +72,18 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     }
 
     confirmShutdown()
+  }
+
+  private fun tryExecute(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
+    if (datasetsInProgress.add(datasetID)) {
+      try {
+        executeJob(userID, datasetID, dm)
+      } finally {
+        datasetsInProgress.remove(datasetID)
+      }
+    } else {
+      log.info("data installation already in progress for dataset {}/{}, skipping install job", userID, datasetID)
+    }
   }
 
   /**
