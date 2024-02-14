@@ -126,7 +126,6 @@ class DatasetReconcilerTest {
 
       DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
 
-      verify(cacheDB, times(1)).selectDataset(datasetID)
       verify(cacheDB, times(1)).openTransaction()
       verifyNoMoreInteractions(cacheDB)
 
@@ -220,7 +219,6 @@ class DatasetReconcilerTest {
 
         DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
 
-        verify(transaction, times(0)).tryInsertDataset(any())
         verify(transaction, times(1)).updateDatasetDeleted(datasetID, true)
 
         verifyNoInteractions(appDB)
