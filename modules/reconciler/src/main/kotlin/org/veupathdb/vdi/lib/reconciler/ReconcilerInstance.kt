@@ -107,10 +107,12 @@ class ReconcilerInstance(
         }
       }
 
+      // If nextTargetDataset is not null at this point, then S3 was empty.
+      nextTargetDataset?.also { tryDeleteDataset(targetDB, it.type, it.syncControlRecord.datasetID) }
+
       // Consume target stream, deleting all remaining datasets.
       while (targetIterator.hasNext()) {
         val targetDatasetControl = targetIterator.next()
-        logger().info("Attempting to delete " + targetDatasetControl.syncControlRecord.datasetID)
         tryDeleteDataset(
           targetDB,
           datasetType = targetDatasetControl.type,
@@ -122,6 +124,8 @@ class ReconcilerInstance(
   }
 
   private fun tryDeleteDataset(targetDB: ReconcilerTarget, datasetType: VDIDatasetType, datasetID: DatasetID) {
+    logger().info("Attempting to delete $datasetID")
+
     try {
       Metrics.reconcilerDatasetDeleted.labels(targetDB.name).inc()
       if (!deleteDryMode) {
