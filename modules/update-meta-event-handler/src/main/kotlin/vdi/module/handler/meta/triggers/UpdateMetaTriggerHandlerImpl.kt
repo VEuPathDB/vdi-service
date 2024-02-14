@@ -29,6 +29,8 @@ import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaResponseType
 import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaUnexpectedErrorResponse
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandler
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import org.veupathdb.vdi.lib.kafka.EventMessage
+import org.veupathdb.vdi.lib.kafka.EventSource
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
@@ -61,9 +63,9 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
           // Select meta trigger messages from Kafka
           kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey)
             // and for each of the trigger messages received
-            .forEach { (userID, datasetID, source) ->
-              log.info("Received install-meta job for dataset {}/{} from source {}", userID, datasetID, source)
-              wp.submit { updateMeta(dm, kr, userID, datasetID) }
+            .forEach {
+              log.info("Received install-meta job for dataset {}/{} from source {}", it.userID, it.datasetID, it.eventSource)
+              wp.submit { updateMeta(dm, kr, it) }
             }
         }
 
@@ -76,11 +78,12 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     confirmShutdown()
   }
 
-  private fun updateMeta(dm: DatasetManager, kr: KafkaRouter, userID: UserID, datasetID: DatasetID) {
+  private fun updateMeta(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
     try {
-      updateMeta(dm, userID, datasetID)
+      updateMeta(dm, msg.userID, msg.datasetID)
     } finally {
-      kr.sendReconciliationTrigger(userID, datasetID)
+      if (msg.eventSource != EventSource.Reconciler)
+        kr.sendReconciliationTrigger(msg.userID, msg.datasetID)
     }
   }
 

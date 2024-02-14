@@ -2,7 +2,7 @@ package org.veupathdb.vdi.lib.reconciler
 
 import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetType
+import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
@@ -74,7 +74,7 @@ class ReconcilerInstance(
 
             logger().info("Attempting to delete dataset with owner $comparableTargetId " +
                     "because $comparableS3Id is lexigraphically greater than $comparableTargetId. Presumably $comparableTargetId is not in MinIO.")
-            tryDeleteDataset(targetDB, nextTargetDataset!!.type, nextTargetDataset!!.syncControlRecord.datasetID)
+            tryDeleteDataset(targetDB, nextTargetDataset!!)
             nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
             comparableTargetId = nextTargetDataset?.getComparableID()
           }
@@ -96,8 +96,14 @@ class ReconcilerInstance(
           sendSyncIfRelevant(sourceDatasetDir)
         } else {
 
+          // If dataset has a delete flag present and the dataset is not marked
+          // as uninstalled from the target, then send a sync event.
+          if (sourceDatasetDir.hasDeleteFlag() && !nextTargetDataset!!.isUninstalled) {
+            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID)
+          }
+
           // Dataset is in source and target. Check dates to see if sync is needed.
-          if (isOutOfSync(sourceDatasetDir, nextTargetDataset!!.syncControlRecord)) {
+          else if (isOutOfSync(sourceDatasetDir, nextTargetDataset!!)) {
             sendSyncIfRelevant(sourceDatasetDir)
           }
 
@@ -107,36 +113,32 @@ class ReconcilerInstance(
       }
 
       // If nextTargetDataset is not null at this point, then S3 was empty.
-      nextTargetDataset?.also { tryDeleteDataset(targetDB, it.type, it.syncControlRecord.datasetID) }
+      nextTargetDataset?.also { tryDeleteDataset(targetDB, it) }
 
       // Consume target stream, deleting all remaining datasets.
       while (targetIterator.hasNext()) {
-        val targetDatasetControl = targetIterator.next()
-        tryDeleteDataset(
-          targetDB,
-          datasetType = targetDatasetControl.type,
-          datasetID = targetDatasetControl.syncControlRecord.datasetID
-        )
+        tryDeleteDataset(targetDB, targetIterator.next())
       }
+
       logger().info("Completed reconciliation")
     }
   }
 
-  private fun tryDeleteDataset(targetDB: ReconcilerTarget, datasetType: VDIDatasetType, datasetID: DatasetID) {
-    logger().info("Attempting to delete $datasetID")
+  private fun tryDeleteDataset(targetDB: ReconcilerTarget, record: VDIReconcilerTargetRecord) {
+    logger().info("attempting to delete ${record.ownerID}/${record.datasetID}")
 
     try {
       Metrics.reconcilerDatasetDeleted.labels(targetDB.name).inc()
       if (!deleteDryMode) {
-        logger().info("Trying to delete dataset $datasetID.")
-        targetDB.deleteDataset(datasetID = datasetID, datasetType = datasetType)
+        logger().info("Trying to delete dataset ${record.ownerID}/${record.datasetID}")
+        targetDB.deleteDataset(datasetID = record.datasetID, datasetType = record.type)
       } else {
-        logger().info("Would have deleted dataset $datasetID.")
+        logger().info("Would have deleted dataset ${record.ownerID}/${record.datasetID}")
       }
     } catch (e: Exception) {
       // Swallow exception and alert if unable to delete. Reconciler can safely recover, but the dataset
       // may need a manual inspection.
-      logger().error("Failed to delete dataset $datasetID of type $datasetType from db ${targetDB.name}", e)
+      logger().error("Failed to delete dataset ${record.ownerID}/${record.datasetID} of type ${record.type.name}:${record.type.version} from db ${targetDB.name}", e)
     }
   }
 
@@ -159,12 +161,12 @@ class ReconcilerInstance(
       }
     }
 
-    sendSyncEvent(sourceDatasetDir)
+    sendSyncEvent(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID)
   }
 
-  private fun sendSyncEvent(sourceDatasetDir: DatasetDirectory) {
-    logger().info("sending reconciliation event for ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID}")
-    kafkaRouter.sendReconciliationTrigger(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID)
+  private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID) {
+    logger().info("sending reconciliation event for $ownerID/$datasetID")
+    kafkaRouter.sendReconciliationTrigger(ownerID, datasetID)
     Metrics.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
 

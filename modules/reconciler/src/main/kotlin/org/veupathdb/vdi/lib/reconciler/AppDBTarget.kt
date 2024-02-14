@@ -27,7 +27,7 @@ class AppDBTarget(
             throw UnsupportedTypeException("Unable to delete unknown dataset type $datasetType from target database " +
                     "for project $projectID")
         }
-        PluginHandlers.get(datasetType.name, datasetType.version)!!.client.postUninstall(datasetID, projectID)
+        PluginHandlers[datasetType.name, datasetType.version]!!.client.postUninstall(datasetID, projectID)
         appDB.withTransaction(projectID) {
             it.deleteDatasetVisibilities(datasetID)
             it.deleteDatasetProjectLinks(datasetID)

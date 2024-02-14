@@ -98,21 +98,20 @@ fun mockSyncControlRecord(
   }
 
 fun mockReconcilerTargetRecord(
-  syncControl: VDISyncControlRecord? = null,
-  owner: UserID? = null,
+  ownerID: UserID? = null,
+  datasetID: DatasetID? = null,
   type: VDIDatasetType? = null,
-  comparableID: String? = null,
+  sharesUpdated: OffsetDateTime? = null,
+  dataUpdated: OffsetDateTime? = null,
+  metaUpdated: OffsetDateTime? = null,
+  comparableID: String? = if (ownerID != null && datasetID != null) "$ownerID/$datasetID" else null,
 ): VDIReconcilerTargetRecord =
   mock {
-    syncControl?.also { on { this.syncControlRecord } doReturn it }
-    owner?.also { on { this.owner } doReturn it }
+    ownerID?.also { on { this.ownerID } doReturn it }
+    datasetID?.also { on { this.datasetID } doReturn it }
     type?.also { on { this.type } doReturn it }
+    sharesUpdated?.also { on { this.sharesUpdated } doReturn it }
+    dataUpdated?.also { on { this.dataUpdated } doReturn it }
+    metaUpdated?.also { on { this.metaUpdated } doReturn it }
     comparableID?.also { on { this.getComparableID() } doReturn it }
-
-    if (comparableID == null && owner != null && syncControl != null)
-      try {
-        on { this.getComparableID() } doReturn "$owner/${syncControl.datasetID}"
-      } catch (e: Throwable) {
-        // Disregard
-      }
   }
