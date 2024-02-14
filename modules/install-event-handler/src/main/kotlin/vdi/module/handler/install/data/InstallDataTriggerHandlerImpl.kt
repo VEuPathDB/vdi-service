@@ -165,9 +165,17 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     // If there is no handler for the target type, we shouldn't have gotten
     // here, but we can bail now to prevent issues.
     if (handler == null) {
-      log.error("skipping install data event for dataset {}/{}: no handler configured for dataset type {}", userID, datasetID, meta.type.name)
+      log.error("skipping install data event for dataset {}/{}: no handler configured for dataset type {}:{}", userID, datasetID, meta.type.name, meta.type.version)
       return
     }
+
+    val installableFileTimestamp = dir.getInstallReadyTimestamp()
+    if (installableFileTimestamp == null) {
+      log.error("could not fetch last modified timestamp for installable file for dataset {}/{}", userID, datasetID)
+      return
+    }
+
+    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, installableFileTimestamp) }
 
     // For each target project
     meta.projects
@@ -175,11 +183,11 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         // If the handler doesn't apply to the target project, again we
         // shouldn't be here, but we can bail out now with a warning.
         if (!handler.appliesToProject(projectID)) {
-          log.warn("skipping install data event for dataset {}/{}: handler for type {} does not apply to project {}", userID, datasetID, meta.type.name, projectID)
+          log.warn("skipping install data event for dataset {}/{}: handler for type {}:{} does not apply to project {}", userID, datasetID, meta.type.name, meta.type.version, projectID)
           return@forEach
         }
 
-        executeJob(userID, datasetID, projectID, dir, handler.client)
+        executeJob(userID, datasetID, projectID, dir, handler.client, installableFileTimestamp)
       }
   }
 
@@ -201,7 +209,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     datasetID: DatasetID,
     projectID: ProjectID,
     s3Dir:     DatasetDirectory,
-    handler:   PluginHandlerClient
+    handler:   PluginHandlerClient,
+    installableFileTimestamp: OffsetDateTime,
   ) {
     val appDB   = appDB.accessor(projectID)
     if (appDB == null) {
@@ -251,6 +260,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         }
       }
 
+      // FIXME: MOVE THIS OUTSIDE OF THIS FUNCTION, THIS JUST REDOWNLOADS THE
+      //        FILE FOR EVERY TARGET PROJECT!
       val response = withDataTar(s3Dir) { dataTar ->
         dataTar.inputStream()
           .use { inp -> handler.postInstallData(datasetID, projectID, inp) }
@@ -258,14 +269,12 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
       Metrics.installations.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
 
-      val updatedTimestamp = s3Dir.getInstallReadyTimestamp() ?: OriginTimestamp
-
       when (response.type) {
         InstallDataResponseType.Success
-        -> handleSuccessResponse(response as InstallDataSuccessResponse, userID, datasetID, projectID, updatedTimestamp)
+        -> handleSuccessResponse(response as InstallDataSuccessResponse, userID, datasetID, projectID, installableFileTimestamp)
 
         InstallDataResponseType.BadRequest
-        -> handleBadRequestResponse(response as InstallDataBadRequestResponse, userID, datasetID, projectID, updatedTimestamp)
+        -> handleBadRequestResponse(response as InstallDataBadRequestResponse, userID, datasetID, projectID, installableFileTimestamp)
 
         InstallDataResponseType.ValidationFailure
         -> handleValidationFailureResponse(
@@ -273,7 +282,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           userID,
           datasetID,
           projectID,
-          updatedTimestamp
+          installableFileTimestamp
         )
 
         InstallDataResponseType.MissingDependencies
@@ -282,11 +291,11 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           userID,
           datasetID,
           projectID,
-          updatedTimestamp
+          installableFileTimestamp
         )
 
         InstallDataResponseType.UnexpectedError
-        -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, userID, datasetID, projectID, updatedTimestamp)
+        -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, userID, datasetID, projectID, installableFileTimestamp)
       }
     } finally {
       timer.observeDuration()
@@ -354,8 +363,6 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   ) {
     log.info("dataset {}/{} data was installed successfully into project {}", userID, datasetID, projectID)
 
-    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
-
     appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
@@ -376,8 +383,6 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     updatedTimestamp: OffsetDateTime,
   ) {
     log.error("dataset {}/{} install into {} failed due to bad request exception from handler server: {}", userID, datasetID, projectID, res.message)
-
-    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
     appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
@@ -402,8 +407,6 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   ) {
     log.info("dataset {}/{} install into {} failed due to validation error", userID, datasetID, projectID)
 
-    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
-
     appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
@@ -424,8 +427,6 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     updatedTimestamp: OffsetDateTime,
   ) {
     log.info("dataset {}/{} install into {} was rejected for missing dependencies", userID, datasetID, projectID)
-
-    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
     appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
@@ -450,8 +451,6 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     updatedTimestamp: OffsetDateTime,
   ) {
     log.error("dataset {}/{} install into {} failed with a 500 from the handler server", userID, datasetID, projectID)
-
-    cacheDB.withTransaction { it.updateDataSyncControl(datasetID, updatedTimestamp) }
 
     appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
