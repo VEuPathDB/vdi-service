@@ -236,14 +236,14 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       return
     }
 
-    val result = ph.client.postInstallMeta(datasetID, projectID, meta)
-
-    Metrics.metaUpdates.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
-
     appDB.withTransaction(projectID) {
       log.debug("upserting install-meta message for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
       it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
     }
+
+    val result = ph.client.postInstallMeta(datasetID, projectID, meta)
+
+    Metrics.metaUpdates.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
 
     try {
       when (result.type) {
