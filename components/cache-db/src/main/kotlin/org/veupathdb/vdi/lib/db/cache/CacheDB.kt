@@ -17,8 +17,6 @@ interface CacheDB {
 
   val dataSource: DataSource
 
-  fun tempMigrateDB()
-
   fun selectDataset(datasetID: DatasetID): DatasetRecord?
 
   fun selectInstallFiles(datasetID: DatasetID): List<DatasetFile>

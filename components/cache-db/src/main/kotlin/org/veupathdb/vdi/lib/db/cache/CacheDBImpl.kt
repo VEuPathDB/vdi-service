@@ -11,9 +11,7 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import org.veupathdb.vdi.lib.db.cache.model.*
 import org.veupathdb.vdi.lib.db.cache.query.AdminAllDatasetsQuery
-import org.veupathdb.vdi.lib.db.cache.sql.migrateDatabase
 import org.veupathdb.vdi.lib.db.cache.sql.select.*
-import org.veupathdb.vdi.lib.db.cache.sql.update.updateDatasetImportStatus
 import javax.sql.DataSource
 import org.postgresql.Driver as PostgresDriver
 
@@ -51,10 +49,6 @@ internal object CacheDBImpl: CacheDB {
 
     dataSource = HikariDataSource(config)
     details    = CacheDBConnectionDetails(host, port, name)
-  }
-
-  override fun tempMigrateDB() {
-    connection.use { it.migrateDatabase() }
   }
 
   override fun selectDataset(datasetID: DatasetID): DatasetRecord? {

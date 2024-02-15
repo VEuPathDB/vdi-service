@@ -3,7 +3,6 @@ package vdi.bootstrap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.veupathdb.vdi.lib.db.cache.CacheDB
 import org.slf4j.LoggerFactory
 import org.veupathdb.service.vdi.RestService
 import org.veupathdb.vdi.lib.reconciler.Reconciler
@@ -24,10 +23,6 @@ object Main {
 
   @JvmStatic
   fun main(args: Array<String>) {
-    // FIXME: REMOVE THIS AFTER THE MIGRATION IS COMPLETE
-    log.info("migrating postgres database to add 'inserted' column to vdi.datasets")
-    CacheDB().tempMigrateDB()
-
     log.info("initializing modules")
     val modules = listOf(
       DatasetReinstaller(),

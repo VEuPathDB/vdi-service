@@ -71,6 +71,10 @@ object AppDatabaseRegistry {
   private inline fun getEnvName(prefix: String, key: String) =
     key.substring(prefix.length)
 
+  // FIXME: Hack to run migrations while databases are unstable
+  val allowedDatabases = setOf("AmoebaDB", "CryptoDB", "ToxoDB", "TriTrypDB", "TrichDB")
+  private inline fun String.dbAllowed() = allowedDatabases.contains(this)
+
   private fun parseEnvironmentChunk(env: Environment, key: String) {
     val enabled = env.reqBool(EnvKey.AppDB.DBEnabledPrefix + key)
 
@@ -86,6 +90,19 @@ object AppDatabaseRegistry {
     val pool = env.reqUByte(EnvKey.AppDB.DBPoolPrefix + key)
     val ctls = env.require(EnvKey.AppDB.DBControlSchemaPrefix + key)
     val data = env.require(EnvKey.AppDB.DBDataSchemaPrefix + key)
+
+    // FIXME: Hack to run migrations while databases are unstable
+    if (!name.dbAllowed()) {
+      log.warn("""
+        TEMPORARY HACK =========================================================
+        
+        Database {} is manually disabled to run test migrations while -inc
+        databases are unstable.
+        
+        TEMPORARY HACK =========================================================
+      """.trimIndent(), name)
+      return
+    }
 
     log.info(
       """registering database {} with the following details:
