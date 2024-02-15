@@ -13,6 +13,10 @@ object AppDatabaseRegistry {
 
   private val dataSources = HashMap<String, AppDBRegistryEntry>(12)
 
+  // FIXME: Hack to run migrations while databases are unstable
+  val allowedDatabases = setOf("AmoebaDB", "CryptoDB", "ToxoDB", "TriTrypDB", "TrichDB")
+  private inline fun String.dbAllowed() = allowedDatabases.contains(this)
+
   init {
     init(System.getenv())
   }
@@ -70,10 +74,6 @@ object AppDatabaseRegistry {
   @Suppress("NOTHING_TO_INLINE")
   private inline fun getEnvName(prefix: String, key: String) =
     key.substring(prefix.length)
-
-  // FIXME: Hack to run migrations while databases are unstable
-  val allowedDatabases = setOf("AmoebaDB", "CryptoDB", "ToxoDB", "TriTrypDB", "TrichDB")
-  private inline fun String.dbAllowed() = allowedDatabases.contains(this)
 
   private fun parseEnvironmentChunk(env: Environment, key: String) {
     val enabled = env.reqBool(EnvKey.AppDB.DBEnabledPrefix + key)
