@@ -146,6 +146,11 @@ object DatasetReinstaller {
 
     val directory = manager.getDatasetDirectory(dataset.owner, dataset.datasetID)
 
+    if (!directory.isReinstallable()) {
+      log.warn("skipping reinstall of dataset {}/{} into project {} due to the dataset directory being in an invalid state in the data store", dataset.owner, dataset.datasetID, projectID)
+      return
+    }
+
     val response =  withDataTar(directory) { dataTar ->
       dataTar.inputStream()
         .use { inp -> client.postInstallData(dataset.datasetID, projectID, inp) }
@@ -168,6 +173,28 @@ object DatasetReinstaller {
       -> handleInstallUnexpectedError(response as InstallDataUnexpectedErrorResponse, dataset, projectID)
     }
   }
+
+  private fun DatasetDirectory.isReinstallable(): Boolean {
+    var ok = true
+
+    if (!hasMetaFile()) {
+      log.warn("dataset {}/{} has no meta file present in the data store", ownerID, datasetID)
+      ok = false
+    }
+
+    if (!hasManifestFile()) {
+      log.warn("dataset {}/{} has no manifest file present in the data store", ownerID, datasetID)
+      ok = false
+    }
+
+    if (!hasInstallReadyFile()) {
+      log.warn("dataset {}/{} has no install-ready file present in the data store", ownerID, datasetID)
+      ok = false
+    }
+
+    return ok
+  }
+
   private fun <T> withDataTar(s3Dir: DatasetDirectory, fn: (Path) -> T): T {
     TempFiles.withTempDirectory { tempDir ->
       val tarFile      = tempDir.resolve("dataset.tar.gz")

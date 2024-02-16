@@ -46,7 +46,7 @@ enum class InstallStatus(val value: String) {
   companion object {
     @JvmStatic
     fun fromString(value: String): InstallStatus {
-      for (enum in values())
+      for (enum in entries)
         if (enum.value == value)
           return enum
 
