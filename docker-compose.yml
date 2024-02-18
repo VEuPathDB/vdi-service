@@ -7,6 +7,9 @@ networks:
   monitoring-ext:
     external: true
 
+volumes:
+  cache-db-data:
+
 services:
   cache-db:
     image: veupathdb/vdi-internal-db:${VDI_CACHE_DB_TAG:-latest}
@@ -21,6 +24,8 @@ services:
       retries: 5
     networks:
     - internal
+    volumes:
+    - cache-db-data:/var/lib/postgresql/data
 
   kafka:
     image: veupathdb/apache-kafka:${VDI_KAFKA_TAG:-latest}
