@@ -13,10 +13,6 @@ object AppDatabaseRegistry {
 
   private val dataSources = HashMap<String, AppDBRegistryEntry>(12)
 
-  // FIXME: Hack to run migrations while databases are unstable
-  val allowedDatabases = setOf("AmoebaDB", "CryptoDB", "ToxoDB", "TriTrypDB", "TrichDB")
-  private inline fun String.dbAllowed() = allowedDatabases.contains(this)
-
   init {
     init(System.getenv())
   }
@@ -85,36 +81,20 @@ object AppDatabaseRegistry {
 
     val name = env.require(EnvKey.AppDB.DBNamePrefix + key)
     val ldap = env.require(EnvKey.AppDB.DBLDAPPrefix + key)
-    val user = env.require(EnvKey.AppDB.DBControlSchemaPrefix + key)
     val pass = env.require(EnvKey.AppDB.DBPassPrefix + key)
     val pool = env.reqUByte(EnvKey.AppDB.DBPoolPrefix + key)
     val ctls = env.require(EnvKey.AppDB.DBControlSchemaPrefix + key)
     val data = env.require(EnvKey.AppDB.DBDataSchemaPrefix + key)
 
-    // FIXME: Hack to run migrations while databases are unstable
-    if (!name.dbAllowed()) {
-      log.warn("""
-        TEMPORARY HACK =========================================================
-        
-        Database {} is manually disabled to run test migrations while -inc
-        databases are unstable.
-        
-        TEMPORARY HACK =========================================================
-      """.trimIndent(), name)
-      return
-    }
-
     log.info(
       """registering database {} with the following details:
       Name: {}
       TNS: {}
-      User: {}
       Pool Size: {}
-      Schema: {}""",
+      User/Schema: {}""",
       name,
       name,
       ldap,
-      user,
       pool,
       ctls
     )
@@ -129,7 +109,7 @@ object AppDatabaseRegistry {
       HikariConfig()
         .apply {
           jdbcUrl = makeJDBCOracleConnectionString(desc.host, desc.port, desc.serviceName)
-          username = user
+          username = ctls
           password = pass
           maximumPoolSize = pool.toInt()
           driverClassName = OracleDriver::class.java.name
