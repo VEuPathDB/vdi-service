@@ -26,6 +26,9 @@ services:
     - internal
     volumes:
     - cache-db-data:/var/lib/postgresql/data
+    labels:
+    - "com.centurylinklabs.watchtower.enable=${VDI_POSTGRES_WATCHTOWER:-false}"
+
 
   kafka:
     image: veupathdb/apache-kafka:${VDI_KAFKA_TAG:-latest}
