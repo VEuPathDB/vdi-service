@@ -20,6 +20,7 @@ SELECT
 , vd.is_deleted
 , vd.origin
 , vd.created
+, vd.inserted
 , dm.name
 , dm.summary
 , dm.description
