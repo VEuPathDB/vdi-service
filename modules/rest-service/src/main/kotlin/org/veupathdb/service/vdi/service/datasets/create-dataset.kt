@@ -111,12 +111,12 @@ fun createDataset(
   //       being uploaded to MinIO (also in that forked thread).
   val (tempDirectory, uploadFile) = entity.getDatasetFile()
 
-  Metrics.uploadQueueSize.inc()
+  Metrics.Upload.queueSize.inc()
   WorkPool.submit {
     try {
       uploadFiles(userID, datasetID, tempDirectory, uploadFile, datasetMeta)
     } finally {
-      Metrics.uploadQueueSize.dec()
+      Metrics.Upload.queueSize.dec()
       tempDirectory.deleteRecursively()
     }
   }
@@ -148,6 +148,7 @@ private fun uploadFiles(
         cacheDB.withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
       } catch (e: Throwable) {
         log.error("user dataset upload to minio failed: ", e)
+        Metrics.Upload.failed.inc();
         cacheDB.withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
         throw e
       } finally {

@@ -173,11 +173,6 @@ object Metrics {
     )
     .register()
 
-  val uploadQueueSize: Gauge = Gauge.build()
-    .name("dataset_upload_queue_size")
-    .help("Number of dataset uploads currently queued to be processed.")
-    .register()
-
   val importQueueSize: Gauge = Gauge.build()
     .name("import_queue_size")
     .help("Number of imports currently queued to be processed.")
@@ -233,6 +228,18 @@ object Metrics {
     .name("unparseable_rabbit_message")
     .help("A rabbit message is unparseable.")
     .register()
+
+  object Upload {
+    val failed: Counter = Counter.build()
+      .name("upload_failed")
+      .help("An upload failed with an unexpected exception.")
+      .register()
+
+    val queueSize: Gauge = Gauge.build()
+      .name("dataset_upload_queue_size")
+      .help("Number of dataset uploads currently queued to be processed.")
+      .register()
+  }
 
   object ReconciliationHandler {
     val queueSize: Gauge = Gauge.build()
