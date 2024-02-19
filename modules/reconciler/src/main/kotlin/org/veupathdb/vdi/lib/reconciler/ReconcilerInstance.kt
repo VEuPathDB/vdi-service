@@ -5,10 +5,13 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import org.veupathdb.vdi.lib.db.cache.sql.select.TempHackCacheDBReconcilerTargetRecord
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
+import java.time.OffsetDateTime
 
 /**
  * Component for synchronizing the dataset object store (the source of truth for datasets) with a target database.
@@ -124,8 +127,23 @@ class ReconcilerInstance(
     }
   }
 
+  // FIXME: part of the temp hack to be removed when the target db deletes are
+  //        moved to the hard-delete lane.
+  private val tempYesterday = OffsetDateTime.now().minusDays(1)
+
   private fun tryDeleteDataset(targetDB: ReconcilerTarget, record: VDIReconcilerTargetRecord) {
     logger().info("attempting to delete ${record.ownerID}/${record.datasetID}")
+
+    // FIXME: temporary hack to be removed when target db deletes are moved to
+    //        the hard-delete lane.
+    if (targetDB.type == ReconcilerTargetType.Cache) {
+      record as TempHackCacheDBReconcilerTargetRecord
+
+      if (record.importStatus == DatasetImportStatus.Queued && record.inserted.isAfter(tempYesterday)) {
+        logger().info("skipping delete of dataset ${record.ownerID}/${record.datasetID} as it is import-queued and less than 1 day old")
+        return
+      }
+    }
 
     try {
       Metrics.reconcilerDatasetDeleted.labels(targetDB.name).inc()

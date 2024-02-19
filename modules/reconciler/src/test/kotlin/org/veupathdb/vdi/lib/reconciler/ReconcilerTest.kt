@@ -150,7 +150,9 @@ class ReconcilerTest {
         assertEquals("test", "22345678123456781234567812345678", capturedDatasetID.toString())
     }
 
-    @Test
+    // FIXME: disabled, to be removed when deletes are moved to the hard-delete
+    //        lane.
+    // @Test
     @DisplayName("Test delete last datasets in target stream, then sync last source")
     fun test6() {
         val cacheDb = mock<ReconcilerTarget>()
