@@ -2,12 +2,7 @@ package vdi.component.reinstaller
 
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
-import org.veupathdb.vdi.lib.common.DatasetManifestFilename
-import org.veupathdb.vdi.lib.common.DatasetMetaFilename
-import org.veupathdb.vdi.lib.common.compression.Tar
-import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
@@ -24,10 +19,7 @@ import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
-import java.nio.file.Path
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
 
 object DatasetReinstaller {
 
@@ -151,10 +143,10 @@ object DatasetReinstaller {
       return
     }
 
-    val response =  withDataTar(directory) { dataTar ->
-      dataTar.inputStream()
-        .use { inp -> client.postInstallData(dataset.datasetID, projectID, inp) }
-    }
+    val response = directory.getInstallReadyFile()
+      .loadContents()!!
+      .buffered()
+      .use { client.postInstallData(dataset.datasetID, projectID, it) }
 
     when (response.type) {
       InstallDataResponseType.Success
@@ -193,40 +185,6 @@ object DatasetReinstaller {
     }
 
     return ok
-  }
-
-  private fun <T> withDataTar(s3Dir: DatasetDirectory, fn: (Path) -> T): T {
-    TempFiles.withTempDirectory { tempDir ->
-      val tarFile      = tempDir.resolve("dataset.tar.gz")
-      val metaFile     = tempDir.resolve(DatasetMetaFilename)
-      val manifestFile = tempDir.resolve(DatasetManifestFilename)
-      val files        = mutableListOf(metaFile, manifestFile)
-
-      metaFile.outputStream()
-        .use { out -> s3Dir.getMetaFile().loadContents()!!.use { inp -> inp.transferTo(out) } }
-
-      manifestFile.outputStream()
-        .use { out -> s3Dir.getManifestFile().loadContents()!!.use { inp -> inp.transferTo(out) } }
-
-      s3Dir.getInstallReadyFile()
-        .also { ddf ->
-          val zip = tempDir.resolve(ddf.baseName)
-          zip.outputStream()
-            .use { out -> ddf.loadContents()!!.use { inp -> inp.transferTo(out) } }
-
-          Zip.zipEntries(zip).forEach { (entry, inp) ->
-            val file = tempDir.resolve(entry.name)
-            log.debug("repacking file {} into {}", file, tarFile)
-            file.outputStream()
-              .use { out -> inp.transferTo(out) }
-            files.add(file)
-          }
-        }
-
-      Tar.compressWithGZip(tarFile, files)
-
-      return fn(tarFile)
-    }
   }
 
   private fun handleInstallSuccess(res: InstallDataSuccessResponse, dataset: DatasetRecord, projectID: ProjectID) {

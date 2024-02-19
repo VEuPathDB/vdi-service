@@ -9,7 +9,6 @@ import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.async.WorkerPool
-import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -199,11 +198,18 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     // Create a temp directory to use as a workspace for the following process
     TempFiles.withTempDirectory { tempDirectory ->
 
-      // Write the tar file result to a temp file that we can immediately unpack
-      // into our temp directory
       TempFiles.withTempPath { tempArchive ->
-        result.resultArchive.use { input -> tempArchive.outputStream().use { output -> input.transferTo(output) } }
-        Tar.decompressWithGZip(tempArchive, tempDirectory)
+        result.resultArchive
+          .buffered()
+          .use { input -> tempArchive.outputStream().buffered().use { output -> input.transferTo(output) } }
+
+        Zip.zipEntries(tempArchive).forEach { (entry, stream) ->
+          tempDirectory.resolve(entry.name)
+            .createFile()
+            .outputStream()
+            .buffered()
+            .use { stream.transferTo(it) }
+        }
       }
 
       // Consume the warnings file and delete it from the data directory.
