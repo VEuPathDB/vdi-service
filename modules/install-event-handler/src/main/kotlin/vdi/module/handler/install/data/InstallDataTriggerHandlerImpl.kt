@@ -4,11 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.DatasetManifestFilename
-import org.veupathdb.vdi.lib.common.DatasetMetaFilename
-import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.async.WorkerPool
-import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -27,12 +23,15 @@ import org.veupathdb.vdi.lib.handler.client.response.ind.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
+import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
+import java.io.InputStream
 import java.nio.file.Path
 import java.sql.SQLException
 import java.time.OffsetDateTime
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
@@ -260,12 +259,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         }
       }
 
-      // FIXME: MOVE THIS OUTSIDE OF THIS FUNCTION, THIS JUST REDOWNLOADS THE
-      //        FILE FOR EVERY TARGET PROJECT!
-      val response = withDataTar(s3Dir) { dataTar ->
-        dataTar.inputStream()
-          .use { inp -> handler.postInstallData(datasetID, projectID, inp) }
-      }
+      // FIXME: MOVE THE ZIP CREATION OUTSIDE OF THE PROJECT LOOP TO AVOID
+      //        RECREATING IT FOR EACH TARGET.
+      val response = withInstallBundle(s3Dir) { handler.postInstallData(datasetID, projectID, it) }
 
       Metrics.Install.count.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
 
@@ -299,58 +295,6 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       }
     } finally {
       timer.observeDuration()
-    }
-  }
-
-  /**
-   * Executes the given function in the context of a temporary directory with a
-   * `tar.gz` containing the necessary files for a dataset installation passed
-   * to the function.
-   *
-   * On completion of this function call, the temporary directory and tar file
-   * will be deleted.
-   *
-   * @param s3Dir `DatasetDirectory` instance used to download the data files
-   * for the target dataset into the temp directory to be packaged into the tar
-   * file that will be passed to the given function.
-   *
-   * @param fn Function that will be called and passed the packaged tar file.
-   *
-   * @param T The return type for the value returned by the given function.
-   *
-   * @return The value returned by the given function.
-   */
-  private fun <T> withDataTar(s3Dir: DatasetDirectory, fn: (Path) -> T): T {
-    TempFiles.withTempDirectory { tempDir ->
-      val tarFile      = tempDir.resolve("dataset.tar.gz")
-      val metaFile     = tempDir.resolve(DatasetMetaFilename)
-      val manifestFile = tempDir.resolve(DatasetManifestFilename)
-      val files        = mutableListOf(metaFile, manifestFile)
-
-      metaFile.outputStream()
-        .use { out -> s3Dir.getMetaFile().loadContents()!!.use { inp -> inp.transferTo(out) } }
-
-      manifestFile.outputStream()
-        .use { out -> s3Dir.getManifestFile().loadContents()!!.use { inp -> inp.transferTo(out) } }
-
-      s3Dir.getInstallReadyFile()
-        .also { ddf ->
-          val zip = tempDir.resolve(ddf.baseName)
-          zip.outputStream()
-            .use { out -> ddf.loadContents()!!.use { inp -> inp.transferTo(out) } }
-
-          Zip.zipEntries(zip).forEach { (entry, inp) ->
-            val file = tempDir.resolve(entry.name)
-            log.debug("repacking file {} into {}", file, tarFile)
-            file.outputStream()
-              .use { out -> inp.transferTo(out) }
-            files.add(file)
-          }
-        }
-
-      Tar.compressWithGZip(tarFile, files)
-
-      return fn(tarFile)
     }
   }
 
@@ -465,4 +409,44 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
     throw Exception(res.message)
   }
+
+  private fun <T> withInstallBundle(s3Dir: DatasetDirectory, fn: (upload: InputStream) -> T) =
+    TempFiles.withTempDirectory { tmpDir ->
+      val files = ArrayList<Path>(8)
+
+      TempFiles.withTempFile { zipFile ->
+        zipFile.outputStream()
+          .buffered()
+          .use { out -> s3Dir.getInstallReadyFile().loadContents()!!.buffered().use { inp -> inp.transferTo(out) } }
+
+        Zip.zipEntries(zipFile)
+          .forEach { (entry, stream) ->
+            tmpDir.resolve(entry.name)
+              .also(files::add)
+              .outputStream()
+              .buffered()
+              .use { stream.buffered().transferTo(it) }
+          }
+      }
+
+      tmpDir.resolve(S3Paths.MetadataFileName)
+        .also(files::add)
+        .outputStream()
+        .buffered()
+        .use { out -> s3Dir.getMetaFile().loadContents()!!.use { input -> input.transferTo(out) } }
+
+      tmpDir.resolve(S3Paths.ManifestFileName)
+        .also(files::add)
+        .outputStream()
+        .buffered()
+        .use { out -> s3Dir.getManifestFile().loadContents()!!.use { input -> input.transferTo(out) } }
+
+      val zip = tmpDir.resolve("install-bundle.zip")
+        .also { Zip.compress(it, files, Zip.Level(0u)) }
+
+      files.forEach { it.deleteIfExists() }
+      files.clear()
+
+      zip.inputStream().buffered().use(fn)
+    }
 }

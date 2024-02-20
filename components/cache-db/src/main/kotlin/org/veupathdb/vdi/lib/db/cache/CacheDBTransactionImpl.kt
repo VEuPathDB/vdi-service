@@ -179,7 +179,7 @@ internal class CacheDBTransactionImpl(private val connection: Connection) : Cach
   }
 
   override fun upsertImportControl(datasetID: DatasetID, status: DatasetImportStatus) {
-    log.debug("upserting share import control record for dataset {} for status {}", datasetID, status)
+    log.debug("upserting import control record for dataset {} for status {}", datasetID, status)
     con.upsertImportControl(datasetID, status)
   }
 

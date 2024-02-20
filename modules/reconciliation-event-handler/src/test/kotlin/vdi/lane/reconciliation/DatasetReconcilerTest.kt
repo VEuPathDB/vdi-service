@@ -398,8 +398,8 @@ class DatasetReconcilerTest {
 
           DatasetReconciler(cacheDB, mockAppDB(), router, dsMan).reconcile(userID, datasetID)
 
-          verify(cacheDB, times(2)).selectImportControl(datasetID)
-          verify(cacheDB, times(2)).selectImportMessages(datasetID)
+          verify(cacheDB, times(1)).selectImportControl(datasetID)
+          verify(cacheDB, times(1)).selectImportMessages(datasetID)
           verify(transaction, times(1)).upsertImportControl(datasetID, DatasetImportStatus.Queued)
           verify(router, times(1)).sendImportTrigger(userID, datasetID)
           verifyNoMoreInteractions(router)
@@ -434,8 +434,8 @@ class DatasetReconcilerTest {
           DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
 
           // Called in tryInitCacheDB and main reconciliation path
-          verify(cacheDB, times(2)).selectImportControl(datasetID)
-          verify(cacheDB, times(2)).selectImportMessages(datasetID)
+          verify(cacheDB, times(1)).selectImportControl(datasetID)
+          verify(cacheDB, times(1)).selectImportMessages(datasetID)
 
           verifyNoInteractions(appDB)
           verifyNoInteractions(router)
