@@ -43,7 +43,7 @@ class ReconcilerImpl(private val config: ReconcilerConfig) :
       while (!isShutDown()) {
         logger().info("Scheduling reconciler for ${targets.size} targets.")
 
-        val timer = Metrics.reconcilerTimes.startTimer()
+        val timer = Metrics.Reconciler.reconcilerTimes.startTimer()
 
         // Schedule the reconciler for each target database.
         targets.forEach { target ->

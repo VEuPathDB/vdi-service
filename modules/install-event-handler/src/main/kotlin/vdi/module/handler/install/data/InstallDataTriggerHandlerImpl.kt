@@ -52,7 +52,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     val kc = requireKafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val wp = WorkerPool("install-data-workers", config.jobQueueSize.toInt(), config.workerPoolSize.toInt()) {
-      Metrics.installQueueSize.inc(it.toDouble())
+      Metrics.Install.queueSize.inc(it.toDouble())
     }
 
     runBlocking {
@@ -229,7 +229,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       return
     }
 
-    val timer = Metrics.installationTimes.labels(dataset.typeName, dataset.typeVersion).startTimer()
+    val timer = Metrics.Install.duration.labels(dataset.typeName, dataset.typeVersion).startTimer()
 
     try {
       val status = appDB.selectDatasetInstallMessage(datasetID, InstallType.Data)
@@ -267,7 +267,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           .use { inp -> handler.postInstallData(datasetID, projectID, inp) }
       }
 
-      Metrics.installations.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
+      Metrics.Install.count.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
 
       when (response.type) {
         InstallDataResponseType.Success

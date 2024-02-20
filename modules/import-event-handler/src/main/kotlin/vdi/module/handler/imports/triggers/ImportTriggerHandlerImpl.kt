@@ -58,7 +58,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.kafkaConfig.importTriggerTopic, config.kafkaConfig.consumerConfig)
     val wp = WorkerPool("import-trigger-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
-      Metrics.importQueueSize.inc(it.toDouble())
+      Metrics.Import.queueSize.inc(it.toDouble())
     }
 
     runBlocking(Dispatchers.IO) {
@@ -123,7 +123,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     // Load the dataset metadata from S3
     val datasetMeta = datasetDir.getMetaFile().load()!!
 
-    val timer = Metrics.importTimes
+    val timer = Metrics.Import.duration
       .labels(datasetMeta.type.name, datasetMeta.type.version)
       .startTimer()
 
@@ -169,7 +169,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         .loadContents()!!
         .use { handler.client.postImport(datasetID, datasetMeta, it) }
 
-      Metrics.imports.labels(datasetMeta.type.name, datasetMeta.type.version, result.responseCode.toString()).inc()
+      Metrics.Import.count.labels(datasetMeta.type.name, datasetMeta.type.version, result.responseCode.toString()).inc()
 
       when (result.type) {
         ImportResponseType.Success         -> handleImportSuccessResult(

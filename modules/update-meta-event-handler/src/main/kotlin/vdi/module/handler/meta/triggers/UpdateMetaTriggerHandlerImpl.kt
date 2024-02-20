@@ -105,7 +105,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val metaTimestamp = dir.getMetaFile().lastModified()!!
     log.info("dataset {}/{} meta timestamp is {}", userID, datasetID, metaTimestamp)
 
-    val timer = Metrics.metaUpdateTimes
+    val timer = Metrics.MetaUpdates.duration
       .labels(datasetMeta.type.name, datasetMeta.type.version)
       .startTimer()
 
@@ -243,7 +243,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
 
     val result = ph.client.postInstallMeta(datasetID, projectID, meta)
 
-    Metrics.metaUpdates.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
+    Metrics.MetaUpdates.count.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
 
     try {
       when (result.type) {

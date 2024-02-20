@@ -76,7 +76,7 @@ object DatasetReinstaller {
       try {
         processProject(projectID, manager)
       } catch (e: Throwable) {
-        Metrics.failedReinstallProcessForProject.labels(projectID).inc()
+        Metrics.Reinstaller.failedReinstallProcessForProject.labels(projectID).inc()
         log.error("failed to process dataset reinstallations for project $projectID", e)
       }
     }
@@ -96,7 +96,7 @@ object DatasetReinstaller {
       try {
         processDataset(dataset, projectID, manager)
       } catch (e: Throwable) {
-        Metrics.failedDatasetReinstall.inc()
+        Metrics.Reinstaller.failedDatasetReinstall.inc()
         log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID", e)
       }
     }

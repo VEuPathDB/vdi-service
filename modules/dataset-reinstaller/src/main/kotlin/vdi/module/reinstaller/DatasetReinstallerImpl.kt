@@ -47,7 +47,7 @@ internal class DatasetReinstallerImpl(private val config: DatasetReinstallerConf
         if (lastRun + config.runInterval < now) {
           log.info("attempting to start automatic dataset reinstaller run")
 
-          val timer = Metrics.reinstallationTimes.startTimer()
+          val timer = Metrics.Reinstaller.reinstallationTimes.startTimer()
 
           if (Reinstaller.tryRun()) {
             val end = now()
