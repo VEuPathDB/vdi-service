@@ -66,7 +66,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     // of whether the uninstalls from the dataset's install targets succeed.
     cacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
 
-    val timer = Metrics.uninstallationTimes
+    val timer = Metrics.Uninstall.duration
       .labels(internalDBRecord.typeName, internalDBRecord.typeVersion)
       .startTimer()
 
@@ -114,7 +114,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
 
     val response = handler.postUninstall(datasetID, projectID)
 
-    Metrics.uninstallations.labels(record.typeName, record.typeVersion, response.responseCode.toString()).inc()
+    Metrics.Uninstall.count.labels(record.typeName, record.typeVersion, response.responseCode.toString()).inc()
 
     when (response.type) {
       UninstallResponseType.Success

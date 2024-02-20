@@ -107,9 +107,9 @@ object Pruner {
 
       try {
         runDelete(s3Bucket, it)
-        Metrics.pruneSuccessful.inc()
+        Metrics.Pruner.count.inc()
       } catch (e: Throwable) {
-        Metrics.pruneFailed.inc()
+        Metrics.Pruner.failed.inc()
         log.error("failed to delete dataset ${it.ownerID}/${it.datasetID} due to exception:", e)
       }
     }
@@ -161,13 +161,13 @@ object Pruner {
 
     // If the directory doesn't exist, then it has already been deleted.
     if (!dir.exists()) {
-      Metrics.pruneConflict.inc()
+      Metrics.Pruner.conflict.inc()
       log.error("dataset {}/{} still has a record in the cache db even though it has been deleted from S3", ownerID, datasetID)
       return false
     }
 
     if (!dir.hasDeleteFlag()) {
-      Metrics.pruneConflict.inc()
+      Metrics.Pruner.conflict.inc()
       log.error("dataset {}/{} is marked as deleted in the cache db but has no delete flag in S3", ownerID, datasetID)
       return false
     }

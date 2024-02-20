@@ -61,7 +61,7 @@ internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : Pruner
 
           val end: Duration
 
-          val timer = Metrics.pruneTimes.startTimer()
+          val timer = Metrics.Pruner.duration.startTimer()
 
           // Attempt to start a pruning job.  If the pruning job executed, this
           // function call will return true after pruning completion.  If a

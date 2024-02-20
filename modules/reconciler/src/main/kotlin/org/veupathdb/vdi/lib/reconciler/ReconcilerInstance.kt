@@ -47,10 +47,11 @@ class ReconcilerInstance(
   fun reconcile() {
     try {
       tryReconcile()
+      Metrics.Reconciler.failedReconciliation.labels(targetDB.name).inc(0.0) // Initialize failures to zero.
     } catch (e: Exception) {
       // Don't re-throw error, ensure exception is logged and soldier on for future reconciliation.
       logger().error("Failure running reconciler for " + targetDB.name, e)
-      Metrics.failedReconciliation.labels(targetDB.name).inc()
+      Metrics.Reconciler.failedReconciliation.labels(targetDB.name).inc()
     }
   }
 
@@ -110,7 +111,7 @@ class ReconcilerInstance(
 
         if (comparableS3Id.compareTo(comparableTargetId, false) < 0) {
           // Dataset is in source, but not in target. Send an event.
-          Metrics.missingInTarget.labels(targetDB.name).inc()
+          Metrics.Reconciler.missingInTarget.labels(targetDB.name).inc()
           sendSyncIfRelevant(sourceDatasetDir, Reason.MissingInTargetDB)
         } else {
 
@@ -161,7 +162,7 @@ class ReconcilerInstance(
     }
 
     try {
-      Metrics.reconcilerDatasetDeleted.labels(targetDB.name).inc()
+      Metrics.Reconciler.reconcilerDatasetDeleted.labels(targetDB.name).inc()
       if (!deleteDryMode) {
         logger().info("Trying to delete dataset ${record.ownerID}/${record.datasetID}")
         targetDB.deleteDataset(datasetID = record.datasetID, datasetType = record.type)
@@ -200,7 +201,7 @@ class ReconcilerInstance(
   private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: Reason) {
     logger().info("sending reconciliation event for $ownerID/$datasetID for reason: $reason")
     kafkaRouter.sendReconciliationTrigger(ownerID, datasetID)
-    Metrics.reconcilerDatasetSynced.labels(targetDB.name).inc()
+    Metrics.Reconciler.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
 
   private fun consumeEntireSourceStream(
