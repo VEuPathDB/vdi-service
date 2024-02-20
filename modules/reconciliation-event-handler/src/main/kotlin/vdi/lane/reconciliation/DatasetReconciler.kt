@@ -21,11 +21,6 @@ import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
 import java.time.OffsetDateTime
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-
-import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord as CacheDatasetRecord
 
 internal class DatasetReconciler(
   private val cacheDB: CacheDB = CacheDB(),
@@ -187,6 +182,7 @@ internal class DatasetReconciler(
 
   private fun ReconciliationState.tryReimport() {
     updateCacheDBImportStatus(DatasetImportStatus.Queued)
+    dropImportMessages()
     fireImportEvent()
     haveFiredImportEvent = true
   }
@@ -204,6 +200,10 @@ internal class DatasetReconciler(
       // If we don't have an import-ready file, we can't rerun the import
       // process
       !haveImportableFile() -> ReimportIndicator.ReimportNotPossible
+
+      // If the import was found to be invalid, then it's a data problem and
+      // no amount of reimport attempts will help.
+      invalidImport() -> ReimportIndicator.ReimportNotPossible
 
       // If we failed the last import attempt, then only rerun the import if we
       // have no import messages so that we can repopulate that table to
@@ -314,6 +314,7 @@ internal class DatasetReconciler(
 
   // endregion Kafka
 
+  // region AppDB
   // // // // // // // // // // // // // // // // // // // // // // // // // //
   //
   //     App DB Operations
@@ -359,6 +360,8 @@ internal class DatasetReconciler(
     return true
   }
 
+  // endregion AppDB
+
   // region CacheDB
   // // // // // // // // // // // // // // // // // // // // // // // // // //
   //
@@ -366,14 +369,25 @@ internal class DatasetReconciler(
   //
   // // // // // // // // // // // // // // // // // // // // // // // // // //
 
-  private fun ReconciliationState.failedImport() =
-    getCacheImportControl() == DatasetImportStatus.Failed
+  private fun ReconciliationState.failedImport(refresh: Boolean = false) =
+    getCacheImportControl(refresh) == DatasetImportStatus.Failed
 
-  private fun ReconciliationState.missingImportMessage() =
-    safeExec("failed to fetch import messages from cache db") { cacheDB.selectImportMessages(datasetID).isEmpty() }
+  private fun ReconciliationState.invalidImport(refresh: Boolean = false) =
+    getCacheImportControl(refresh) == DatasetImportStatus.Invalid
 
-  private fun ReconciliationState.getCacheImportControl() =
-    safeExec("failed to fetch import control from cache db") { cacheDB.selectImportControl(datasetID) }
+  private fun ReconciliationState.missingImportMessage(refresh: Boolean = false) =
+    safeExec("failed to fetch import messages from cache db") {
+      if (refresh || !cImportMessages.hasBeenComputed)
+        cImportMessages.value = cacheDB.selectImportMessages(datasetID).isEmpty()
+      cImportMessages.value
+    }
+
+  private fun ReconciliationState.getCacheImportControl(refresh: Boolean = false) =
+    safeExec("failed to fetch import control from cache db") {
+      if (refresh || !cImportControl.hasBeenComputed)
+        cImportControl.value = cacheDB.selectImportControl(datasetID)
+      cImportControl.value
+    }
 
   private fun ReconciliationState.updateCacheDBImportStatus(status: DatasetImportStatus) {
     try {
@@ -393,6 +407,9 @@ internal class DatasetReconciler(
     safeExec("failed to load sync control record from cache db") {
       cacheDB.selectSyncControl(datasetID)
     }.require("could not find dataset sync control record")
+
+  private fun ReconciliationState.dropImportMessages() =
+    safeExec("failed to delete import messages") { cacheDB.withTransaction { it.deleteImportMessages(datasetID) } }
 
   private fun ReconciliationState.tryInitCacheDB() {
     val meta = loadMeta()
@@ -534,6 +551,9 @@ private class ReconciliationState(val datasetDirectory: DatasetDirectory) {
   val cHasRawUpload = ComputedFlag()
   val cHasImportable = ComputedFlag()
   val cHasInstallable = ComputedFlag()
+
+  val cImportControl = ComputedValue<DatasetImportStatus>()
+  val cImportMessages = ComputedFlag()
 
   var haveFiredImportEvent = false
 }

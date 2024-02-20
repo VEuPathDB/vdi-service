@@ -13,6 +13,21 @@ import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
 import java.time.OffsetDateTime
 
+private enum class Reason {
+  MissingInTargetDB {
+    override fun toString() = "missing in target database"
+  },
+  MissingInSource {
+    override fun toString() = "missing in data store"
+  },
+  OutOfSync {
+    override fun toString() = "out of sync"
+  },
+  NeedsUninstallation {
+    override fun toString() = "needs uninstallation"
+  }
+}
+
 /**
  * Component for synchronizing the dataset object store (the source of truth for datasets) with a target database.
  *
@@ -96,18 +111,18 @@ class ReconcilerInstance(
         if (comparableS3Id.compareTo(comparableTargetId, false) < 0) {
           // Dataset is in source, but not in target. Send an event.
           Metrics.missingInTarget.labels(targetDB.name).inc()
-          sendSyncIfRelevant(sourceDatasetDir)
+          sendSyncIfRelevant(sourceDatasetDir, Reason.MissingInTargetDB)
         } else {
 
           // If dataset has a delete flag present and the dataset is not marked
           // as uninstalled from the target, then send a sync event.
           if (sourceDatasetDir.hasDeleteFlag() && !nextTargetDataset!!.isUninstalled) {
-            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID)
+            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID, Reason.NeedsUninstallation)
           }
 
           // Dataset is in source and target. Check dates to see if sync is needed.
           else if (isOutOfSync(sourceDatasetDir, nextTargetDataset!!)) {
-            sendSyncIfRelevant(sourceDatasetDir)
+            sendSyncIfRelevant(sourceDatasetDir, Reason.OutOfSync)
           }
 
           // Advance next target dataset pointer, we're done with this one since it's in sync.
@@ -170,7 +185,7 @@ class ReconcilerInstance(
     return shareOos || dataOos || metaOos
   }
 
-  private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory) {
+  private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory, reason: Reason) {
     if (targetDB.type == ReconcilerTargetType.Install) {
       val relevantProjects = sourceDatasetDir.getMetaFile().load()!!.projects
       if (!relevantProjects.contains(targetDB.name)) {
@@ -179,11 +194,11 @@ class ReconcilerInstance(
       }
     }
 
-    sendSyncEvent(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID)
+    sendSyncEvent(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID, reason)
   }
 
-  private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID) {
-    logger().info("sending reconciliation event for $ownerID/$datasetID")
+  private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: Reason) {
+    logger().info("sending reconciliation event for $ownerID/$datasetID for reason: $reason")
     kafkaRouter.sendReconciliationTrigger(ownerID, datasetID)
     Metrics.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
@@ -192,9 +207,9 @@ class ReconcilerInstance(
     sourceIterator: Iterator<DatasetDirectory>,
     sourceDatasetDir: DatasetDirectory
   ) {
-    sendSyncIfRelevant(sourceDatasetDir)
+    sendSyncIfRelevant(sourceDatasetDir, Reason.MissingInTargetDB)
     while (sourceIterator.hasNext()) {
-      sendSyncIfRelevant(sourceIterator.next())
+      sendSyncIfRelevant(sourceIterator.next(), Reason.MissingInTargetDB)
     }
   }
 }
