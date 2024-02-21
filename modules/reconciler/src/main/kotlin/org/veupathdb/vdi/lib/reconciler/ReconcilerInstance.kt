@@ -13,21 +13,6 @@ import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.metrics.Metrics
 import java.time.OffsetDateTime
 
-private enum class Reason {
-  MissingInTargetDB {
-    override fun toString() = "missing in target database"
-  },
-  MissingInSource {
-    override fun toString() = "missing in data store"
-  },
-  OutOfSync {
-    override fun toString() = "out of sync"
-  },
-  NeedsUninstallation {
-    override fun toString() = "needs uninstallation"
-  }
-}
-
 /**
  * Component for synchronizing the dataset object store (the source of truth for datasets) with a target database.
  *
@@ -112,22 +97,24 @@ class ReconcilerInstance(
         if (comparableS3Id.compareTo(comparableTargetId, false) < 0) {
           // Dataset is in source, but not in target. Send an event.
           Metrics.Reconciler.missingInTarget.labels(targetDB.name).inc()
-          sendSyncIfRelevant(sourceDatasetDir, Reason.MissingInTargetDB)
+          sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB))
         } else {
 
           // If dataset has a delete flag present and the dataset is not marked
           // as uninstalled from the target, then send a sync event.
           if (sourceDatasetDir.hasDeleteFlag() && !nextTargetDataset!!.isUninstalled) {
-            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID, Reason.NeedsUninstallation)
-          }
+            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID, SyncReason.NeedsUninstall(targetDB))
+          } else {
+            val syncStatus = isOutOfSync(sourceDatasetDir, nextTargetDataset!!)
 
-          // Dataset is in source and target. Check dates to see if sync is needed.
-          else if (isOutOfSync(sourceDatasetDir, nextTargetDataset!!)) {
-            sendSyncIfRelevant(sourceDatasetDir, Reason.OutOfSync)
+            // Dataset is in source and target. Check dates to see if sync is needed.
+            if (syncStatus.isOutOfSync) {
+              sendSyncIfRelevant(sourceDatasetDir, syncStatus.asSyncReason())
+            } else {
+              // Advance next target dataset pointer, we're done with this one since it's in sync.
+              nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
+            }
           }
-
-          // Advance next target dataset pointer, we're done with this one since it's in sync.
-          nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
         }
       }
 
@@ -179,14 +166,15 @@ class ReconcilerInstance(
   /**
    * Returns true if any of our scopes are out of sync.
    */
-  private fun isOutOfSync(ds: DatasetDirectory, targetLastUpdated: VDISyncControlRecord): Boolean {
-    val shareOos = targetLastUpdated.sharesUpdated.isBefore(ds.getLatestShareTimestamp(targetLastUpdated.sharesUpdated))
-    val dataOos = targetLastUpdated.dataUpdated.isBefore(ds.getInstallReadyTimestamp() ?: targetLastUpdated.dataUpdated)
-    val metaOos = targetLastUpdated.metaUpdated.isBefore(ds.getMetaFile().lastModified())
-    return shareOos || dataOos || metaOos
+  private fun isOutOfSync(ds: DatasetDirectory, targetLastUpdated: VDISyncControlRecord): SyncStatus {
+    return SyncStatus(
+      metaIsOOS = targetLastUpdated.metaUpdated.isBefore(ds.getMetaFile().lastModified()),
+      sharesAreOOS = targetLastUpdated.sharesUpdated.isBefore(ds.getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
+      installIsOOS = targetLastUpdated.dataUpdated.isBefore(ds.getInstallReadyTimestamp() ?: targetLastUpdated.dataUpdated),
+    )
   }
 
-  private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory, reason: Reason) {
+  private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory, reason: SyncReason) {
     if (targetDB.type == ReconcilerTargetType.Install) {
       val relevantProjects = sourceDatasetDir.getMetaFile().load()!!.projects
       if (!relevantProjects.contains(targetDB.name)) {
@@ -198,7 +186,7 @@ class ReconcilerInstance(
     sendSyncEvent(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID, reason)
   }
 
-  private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: Reason) {
+  private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
     logger().info("sending reconciliation event for $ownerID/$datasetID for reason: $reason")
     kafkaRouter.sendReconciliationTrigger(ownerID, datasetID)
     Metrics.Reconciler.reconcilerDatasetSynced.labels(targetDB.name).inc()
@@ -208,9 +196,34 @@ class ReconcilerInstance(
     sourceIterator: Iterator<DatasetDirectory>,
     sourceDatasetDir: DatasetDirectory
   ) {
-    sendSyncIfRelevant(sourceDatasetDir, Reason.MissingInTargetDB)
+    sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB))
     while (sourceIterator.hasNext()) {
-      sendSyncIfRelevant(sourceIterator.next(), Reason.MissingInTargetDB)
+      sendSyncIfRelevant(sourceIterator.next(), SyncReason.MissingInTarget(targetDB))
+    }
+  }
+
+  private inner class SyncStatus(val metaIsOOS: Boolean, val sharesAreOOS: Boolean, val installIsOOS: Boolean) {
+    inline val isOutOfSync get() = metaIsOOS || sharesAreOOS || installIsOOS
+    fun asSyncReason() =
+      SyncReason.OutOfSync(metaIsOOS, sharesAreOOS, installIsOOS, targetDB)
+  }
+
+  private interface SyncReason {
+    class OutOfSync(val meta: Boolean, val shares: Boolean, val install: Boolean, val target: ReconcilerTarget) : SyncReason {
+      override fun toString() =
+        "out of sync:" +
+          (if (meta) " meta" else "") +
+          (if (shares) " shares" else "") +
+          (if (install) " install" else "") +
+          " in target " + target.name
+    }
+
+    class MissingInTarget(val target: ReconcilerTarget) : SyncReason {
+      override fun toString() = "missing from install target ${target.name}"
+    }
+
+    class NeedsUninstall(val target: ReconcilerTarget) : SyncReason {
+      override fun toString() = "needs uninstallation from target ${target.name}"
     }
   }
 }
