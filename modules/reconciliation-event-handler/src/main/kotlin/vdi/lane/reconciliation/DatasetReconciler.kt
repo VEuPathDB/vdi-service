@@ -66,22 +66,28 @@ internal class DatasetReconciler(
     if (haveRawUpload())
       handleHasUpload()
 
-    if (shouldReimport() == ReimportIndicator.NeedReimport) {
+    val reimport = shouldReimport()
+
+    if (reimport == ReimportIndicator.NeedReimport) {
       tryReimport()
       return
     }
 
     if (!haveImportableFile())
-      logError("$userID/$datasetID: missing import-ready file")
+      logError("missing import-ready file")
 
-    if (!haveInstallableFile())
-      logError("$userID/$datasetID: missing install-ready file")
+    if (reimport != ReimportIndicator.ReimportNotPossible) {
+      if (!haveInstallableFile())
+        logError("missing install-ready file")
 
-    if (!haveManifestFile())
-      logError("$userID/$datasetID: missing manifest file")
+      if (!haveManifestFile())
+        logError("missing manifest file")
+    }
 
-    if (haveInstallableFile())
-      runSync(getProjects())
+    runSync()
+
+    if (!haveFiredAnyEvents)
+      logInfo("no events fired")
   }
 
   private fun ReconciliationState.handleDeleted() {
@@ -119,8 +125,8 @@ internal class DatasetReconciler(
     }
   }
 
-  private fun ReconciliationState.runSync(projects: Iterable<ProjectID>) {
-    val syncStatus = checkSyncStatus(projects)
+  private fun ReconciliationState.runSync() {
+    val syncStatus = checkSyncStatus()
 
     if (syncStatus.metaOutOfSync)
       fireUpdateMetaEvent()
@@ -135,7 +141,7 @@ internal class DatasetReconciler(
       fireInstallEvent()
   }
 
-  private fun ReconciliationState.checkSyncStatus(projects: Iterable<ProjectID>): SyncIndicator {
+  private fun ReconciliationState.checkSyncStatus(): SyncIndicator {
     val cacheDBSyncControl = requireCacheDBSyncControl()
 
     val metaTimestamp = datasetDirectory.getMetaTimestamp() ?: cacheDBSyncControl.metaUpdated
@@ -149,7 +155,7 @@ internal class DatasetReconciler(
     if (metaOutOfSync && sharesOutOfSync && installOutOfSync)
       return SyncIndicator(metaOutOfSync = true, sharesOutOfSync = true, installOutOfSync = true)
 
-    projects.forEach { projectID ->
+    getProjects().forEach { projectID ->
       val appDB = appDB.accessor(projectID)
 
       if (appDB == null) {
@@ -184,7 +190,6 @@ internal class DatasetReconciler(
     updateCacheDBImportStatus(DatasetImportStatus.Queued)
     dropImportMessages()
     fireImportEvent()
-    haveFiredImportEvent = true
   }
 
   /**
@@ -281,6 +286,7 @@ internal class DatasetReconciler(
     logger.info("firing import event for dataset {}/{}", userID, datasetID)
     safeExec("failed to fire import trigger") {
       eventRouter.sendImportTrigger(userID, datasetID)
+      haveFiredImportEvent = true
     }
   }
 
@@ -288,6 +294,7 @@ internal class DatasetReconciler(
     logger.info("firing update meta event for dataset {}/{}", userID, datasetID)
     safeExec("failed to fire update-meta trigger") {
       eventRouter.sendUpdateMetaTrigger(userID, datasetID)
+      haveFiredMetaUpdateEvent = true
     }
   }
 
@@ -295,6 +302,7 @@ internal class DatasetReconciler(
     logger.info("firing share event for dataset {}/{}", userID, datasetID)
     safeExec("failed to send share trigger") {
       eventRouter.sendShareTrigger(userID, datasetID)
+      haveFiredShareEvent = true
     }
   }
 
@@ -302,6 +310,7 @@ internal class DatasetReconciler(
     logger.info("firing data install event for dataset {}/{}", userID, datasetID)
     safeExec("failed to send install-data trigger") {
       eventRouter.sendInstallTrigger(userID, datasetID)
+      haveFiredInstallEvent = true
     }
   }
 
@@ -309,6 +318,7 @@ internal class DatasetReconciler(
     logger.info("firing soft-delete/uninstall event for dataset {}/{}", userID, datasetID)
     safeExec("failed to send soft-delete trigger") {
       eventRouter.sendSoftDeleteTrigger(userID, datasetID)
+      haveFiredUninstallEvent = true
     }
   }
 
@@ -393,7 +403,7 @@ internal class DatasetReconciler(
     try {
       cacheDB.withTransaction { it.upsertImportControl(datasetID, status) }
     } catch (e: Throwable) {
-      logError("failed to update dataset import status to $status for dataset $userID/$datasetID", e)
+      logError("$userID/$datasetID: failed to update dataset import status to $status", e)
     }
   }
 
@@ -518,17 +528,24 @@ internal class DatasetReconciler(
   //
   // // // // // // // // // // // // // // // // // // // // // // // // // //
 
-  private fun logWarning(message: String, vararg objects: Any?) {
+  private inline val ReconciliationState.datasetRef
+    get() = "$userID/$datasetID"
+
+
+  private fun ReconciliationState.logInfo(message: String, vararg objects: Any?) =
+    logger.info("$datasetRef: $message", *objects)
+
+  private fun ReconciliationState.logWarning(message: String, vararg objects: Any?) {
     Metrics.ReconciliationHandler.warnings.inc()
-    logger.warn(message, *objects)
+    logger.warn("$datasetRef: $message", *objects)
   }
 
-  private fun logError(message: String, error: Throwable? = null) {
+  private fun ReconciliationState.logError(message: String, error: Throwable? = null) {
     Metrics.ReconciliationHandler.errors.inc()
     if (error == null)
-      logger.error(message)
+      logger.error("$datasetRef: $message")
     else
-      logger.error(message, error)
+      logger.error("$datasetRef: $message", error)
   }
 }
 
@@ -555,7 +572,18 @@ private class ReconciliationState(val datasetDirectory: DatasetDirectory) {
   val cImportControl = ComputedValue<DatasetImportStatus>()
   val cImportMessages = ComputedFlag()
 
+  var haveFiredMetaUpdateEvent = false
   var haveFiredImportEvent = false
+  var haveFiredInstallEvent = false
+  var haveFiredShareEvent = false
+  var haveFiredUninstallEvent = false
+
+  inline val haveFiredAnyEvents
+    get() = haveFiredMetaUpdateEvent
+      || haveFiredImportEvent
+      || haveFiredInstallEvent
+      || haveFiredShareEvent
+      || haveFiredUninstallEvent
 }
 
 private class ComputedFlag {
