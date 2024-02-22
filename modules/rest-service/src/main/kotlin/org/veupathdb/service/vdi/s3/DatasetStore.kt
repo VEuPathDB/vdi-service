@@ -101,9 +101,7 @@ object DatasetStore {
     bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID)) { overwrite = true }
   }
 
-  fun streamAllPaths(): Stream<String> {
-    return bucket.objects.stream().stream().map { it.path }
-  }
+  fun streamAll() = bucket.objects.streamAll().stream()
 
   private fun String.getDatasetIDFromPath(): DatasetID {
     val it = splitToSequence('/').iterator()

@@ -65,6 +65,8 @@ dependencies {
 
   implementation("org.veupathdb.lib.s3:s34k-minio")
 
+  implementation(kotlin("stdlib-jdk8"))
+
   // Jersey
   implementation("org.glassfish.jersey.core:jersey-server")
 
@@ -83,8 +85,9 @@ dependencies {
   implementation("io.prometheus:simpleclient_common")
 
   // Unit Testing
+  testImplementation(kotlin("test"))
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
   testImplementation("org.mockito:mockito-core:5.2.0")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.0")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-  implementation(kotlin("stdlib-jdk8"))
 }
