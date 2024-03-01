@@ -67,7 +67,15 @@ log-plugin-genelist:
 log-plugin-rnaseq:
 	@docker logs -f vdi-service-plugin-rnaseq-1
 
-.PHONY: log-plugin-rnaseq
+.PHONY: log-plugin-isasimple
+log-plugin-isasimple:
+	@docker logs -f vdi-service-plugin-isasimple-1
+
+.PHONY: log-plugin-biom
+log-plugin-biom:
+	@docker logs -f vdi-service-plugin-biom-1
+
+.PHONY: log-plugin-bigwig
 log-plugin-bigwig:
 	@docker logs -f vdi-service-plugin-bigwig-1
 

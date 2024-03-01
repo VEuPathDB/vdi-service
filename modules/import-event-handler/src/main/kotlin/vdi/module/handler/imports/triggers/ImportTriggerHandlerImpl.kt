@@ -183,7 +183,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     } catch (e: Throwable) {
       log.debug("import request to handler server failed with exception:", e)
       cacheDB.withTransaction { tran ->
-        tran.updateImportControl(datasetID, DatasetImportStatus.Invalid)
+        tran.updateImportControl(datasetID, DatasetImportStatus.Failed)
         tran.tryInsertImportMessages(datasetID, "Process error: ${e.message}")
       }
       throw e

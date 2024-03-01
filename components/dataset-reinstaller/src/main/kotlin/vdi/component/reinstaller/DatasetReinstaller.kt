@@ -2,7 +2,9 @@ package vdi.component.reinstaller
 
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
+import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
@@ -18,8 +20,14 @@ import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallUnexpectedErro
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
+import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
 import vdi.component.metrics.Metrics
+import java.io.InputStream
+import java.nio.file.Path
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 
 object DatasetReinstaller {
 
@@ -143,10 +151,7 @@ object DatasetReinstaller {
       return
     }
 
-    val response = directory.getInstallReadyFile()
-      .loadContents()!!
-      .buffered()
-      .use { client.postInstallData(dataset.datasetID, projectID, it) }
+    val response = withInstallBundle(directory) { client.postInstallData(dataset.datasetID, projectID, it) }
 
     when (response.type) {
       InstallDataResponseType.Success
@@ -271,4 +276,44 @@ object DatasetReinstaller {
 
     throw Exception(response.message)
   }
+
+  private fun <T> withInstallBundle(s3Dir: DatasetDirectory, fn: (upload: InputStream) -> T) =
+    TempFiles.withTempDirectory { tmpDir ->
+      val files = ArrayList<Path>(8)
+
+      TempFiles.withTempFile { zipFile ->
+        zipFile.outputStream()
+          .buffered()
+          .use { out -> s3Dir.getInstallReadyFile().loadContents()!!.buffered().use { inp -> inp.transferTo(out) } }
+
+        Zip.zipEntries(zipFile)
+          .forEach { (entry, stream) ->
+            tmpDir.resolve(entry.name)
+              .also(files::add)
+              .outputStream()
+              .buffered()
+              .use { stream.buffered().transferTo(it) }
+          }
+      }
+
+      tmpDir.resolve(S3Paths.MetadataFileName)
+        .also(files::add)
+        .outputStream()
+        .buffered()
+        .use { out -> s3Dir.getMetaFile().loadContents()!!.use { input -> input.transferTo(out) } }
+
+      tmpDir.resolve(S3Paths.ManifestFileName)
+        .also(files::add)
+        .outputStream()
+        .buffered()
+        .use { out -> s3Dir.getManifestFile().loadContents()!!.use { input -> input.transferTo(out) } }
+
+      val zip = tmpDir.resolve("install-bundle.zip")
+        .also { Zip.compress(it, files, Zip.Level(0u)) }
+
+      files.forEach { it.deleteIfExists() }
+      files.clear()
+
+      zip.inputStream().buffered().use(fn)
+    }
 }
