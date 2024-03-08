@@ -28,7 +28,7 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
 
     // HTTP
-    api("io.foxcapades.lib:k-multipart:1.2.0")
+    api("io.foxcapades.lib:k-multipart:1.2.1")
     api("org.glassfish.jersey.core:jersey-server:3.1.3")
 
     // JSON

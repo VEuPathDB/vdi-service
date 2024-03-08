@@ -31,7 +31,10 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val multipart = MultiPart.createBody {
       withPart {
         fieldName = FieldName.Details
-        withBody(ImportRequestDetails(datasetID, meta).toJSONString())
+        contentType("application/json; charset=utf-8")
+        val body = ImportRequestDetails(datasetID, meta).toJSONString()
+        withBody(body)
+        log.error(body)
       }
 
       withPart {
@@ -102,6 +105,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val multipart = MultiPart.createBody {
       withPart {
         fieldName = FieldName.Details
+        contentType("application/json; charset=utf-8")
         withBody(InstallDataRequestDetails(datasetID, projectID).toJSONString())
       }
 
