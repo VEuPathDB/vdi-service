@@ -32,9 +32,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       withPart {
         fieldName = FieldName.Details
         contentType("application/json; charset=utf-8")
-        val body = ImportRequestDetails(datasetID, meta).toJSONString()
-        withBody(body)
-        log.error(body)
+        withBody(ImportRequestDetails(datasetID, meta).toJSONString())
       }
 
       withPart {
