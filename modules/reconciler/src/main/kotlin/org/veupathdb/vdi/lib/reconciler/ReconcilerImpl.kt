@@ -66,6 +66,8 @@ class ReconcilerImpl(private val config: ReconcilerConfig) :
         delay(config.runInterval.toMillis())
       }
     }
+
+    confirmShutdown()
   }
 
   private suspend fun requireKafkaRouter() = safeExec("failed to create KafkaRouter instance") {
