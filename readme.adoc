@@ -51,14 +51,17 @@
 
 == Repo Structure
 
-The VDI service repository is divided into 3 categories: components, modules,
-and the core bootstrapper.
+The VDI service repository is divided into 4 categories: components, daemons,
+lanes, and the core bootstrapper.
 
-Components are small shared libraries that contain code specific to a target
-purpose that is not the core focus of the VDI service.
+Components are small shared libraries that contain code specific to a purpose
+that is not the core focus of the VDI service.
 
-Modules are essentially separate services that are bootstrapped into a single
-service by the bootstrapper.
+Daemons are background processes that perform maintenance tasks such as dataset
+reconciliation or pruning old, soft-deleted datasets from S3.
+
+Lanes are event handlers that are tailored to individual event types, performing
+some process or processes on a dataset specified in the subscribed events.
 
 The bootstrapper is the core of the service, and the root level Gradle project.
 This piece is responsible for starting up and shutting down the various project
@@ -82,20 +85,23 @@ modules.
 * link:components/s3[S3 Utilities]
 * link:components/test-utils[Unit Test Utilities]
 
-=== Modules
+=== Daemons
 
-* link:modules/dataset-reinstaller/[Dataset Reinstaller]
-* link:modules/event-router/[Event Router]
-* link:modules/hard-delete-event-handler/[Hard Delete Event Handler]
-* link:modules/import-event-handler/[Import Event Handler]
-* link:modules/install-event-handler/[Install Data Event Handler]
-* link:modules/pruner/[Pruner]
-* link:modules/reconciler/[Reconciler]
-* link:modules/reconciliation-event-handler/[Reconciliation Event Handler]
-* link:modules/rest-service/[Rest API Service]
-* link:modules/share-event-handler/[Share Event Handler]
-* link:modules/soft-delete-event-handler/[Soft Delete Event Handler]
-* link:modules/update-meta-event-handler/[Update Meta Event Handler]
+* link:daemons/dataset-reinstaller/[Dataset Reinstaller]
+* link:daemons/event-router/[Event Router]
+* link:daemons/pruner/[Pruner]
+* link:daemons/reconciler/[Reconciler]
+* link:daemons/rest-service/[Rest API Service]
+
+=== Lanes
+
+* link:lanes/hard-delete/[Hard Delete Event Handler]
+* link:lanes/import/[Import Event Handler]
+* link:lanes/install/[Install Data Event Handler]
+* link:lanes/reconciliation/[Reconciliation Event Handler]
+* link:lanes/sharing/[Share Event Handler]
+* link:lanes/soft-delete/[Soft Delete Event Handler]
+* link:lanes/update-meta/[Update Meta Event Handler]
 
 === Bootstrapper
 
