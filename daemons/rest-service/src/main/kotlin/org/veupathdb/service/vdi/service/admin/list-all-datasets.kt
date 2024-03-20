@@ -4,8 +4,8 @@ import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import org.veupathdb.vdi.lib.db.app.AppDB
-import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
+import vdi.component.db.app.AppDB
+import vdi.component.db.app.model.InstallStatuses
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.AdminAllDatasetsRow
 import vdi.component.db.cache.query.AdminAllDatasetsQuery

@@ -3,11 +3,11 @@ package vdi.lane.reconciliation
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.env.*
-import org.veupathdb.vdi.lib.kafka.EventSource
-import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfigDefaults
-import org.veupathdb.vdi.lib.s3.datasets.util.S3Config
+import vdi.component.kafka.EventSource
+import vdi.component.kafka.KafkaConsumerConfig
+import vdi.component.kafka.router.KafkaRouterConfig
+import vdi.component.kafka.router.KafkaRouterConfigDefaults
+import vdi.component.s3.util.S3Config
 
 data class ReconciliationEventHandlerConfig(
   val jobQueueSize: UInt,

@@ -3,13 +3,12 @@ package vdi.component.install_cleanup
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import org.veupathdb.vdi.lib.db.app.AppDB
-import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
-import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
-import org.veupathdb.vdi.lib.db.app.model.InstallStatus
-import org.veupathdb.vdi.lib.db.app.model.InstallType
-import org.veupathdb.vdi.lib.db.app.withTransaction
-import vdi.component.db.cache.CacheDB
+import vdi.component.db.app.AppDB
+import vdi.component.db.app.AppDatabaseRegistry
+import vdi.component.db.app.model.DatasetInstallMessage
+import vdi.component.db.app.model.InstallStatus
+import vdi.component.db.app.model.InstallType
+import vdi.component.db.app.withTransaction
 
 object InstallCleaner {
 

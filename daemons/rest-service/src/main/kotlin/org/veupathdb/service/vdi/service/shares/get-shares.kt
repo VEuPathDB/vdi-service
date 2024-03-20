@@ -6,7 +6,7 @@ import org.veupathdb.service.vdi.model.ShareFilterStatus
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetShareListEntry
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import vdi.component.plugin.mapping.PluginHandlers
 
 /**
  * Looks up share information for the target recipient user where the share

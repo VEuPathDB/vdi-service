@@ -2,8 +2,8 @@ package org.veupathdb.service.vdi.service.plugins
 
 import org.veupathdb.service.vdi.generated.model.PluginListItem
 import org.veupathdb.service.vdi.generated.model.PluginListItemImpl
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandler
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import vdi.component.plugin.mapping.PluginHandler
+import vdi.component.plugin.mapping.PluginHandlers
 
 internal fun listPlugins(project: String?): List<PluginListItem> {
   var seq = PluginHandlers.sequence()

@@ -6,9 +6,9 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.kafka.*
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
+import vdi.component.kafka.*
+import vdi.component.kafka.router.KafkaRouter
+import vdi.component.kafka.router.KafkaRouterFactory
 import kotlin.time.Duration
 
 fun mockEventMessage(

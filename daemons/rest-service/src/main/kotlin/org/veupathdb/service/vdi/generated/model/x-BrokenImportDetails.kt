@@ -1,7 +1,7 @@
 package org.veupathdb.service.vdi.generated.model
 
 import vdi.component.db.cache.model.BrokenImportRecord
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import vdi.component.plugin.mapping.PluginHandlers
 
 fun BrokenImportDetails(record: BrokenImportRecord): BrokenImportDetails =
   BrokenImportDetailsImpl().apply {

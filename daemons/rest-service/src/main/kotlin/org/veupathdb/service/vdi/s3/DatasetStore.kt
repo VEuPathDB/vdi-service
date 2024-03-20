@@ -14,7 +14,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
-import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
+import vdi.component.s3.paths.S3Paths
 import java.io.InputStream
 import java.util.stream.Stream
 

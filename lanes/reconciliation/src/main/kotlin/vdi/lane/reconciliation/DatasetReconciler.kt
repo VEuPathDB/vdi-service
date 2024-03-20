@@ -8,18 +8,16 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import org.veupathdb.vdi.lib.db.app.AppDB
-import org.veupathdb.vdi.lib.db.app.AppDBAccessor
-import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
-import vdi.component.db.cache.CacheDB
+import vdi.component.db.app.AppDB
+import vdi.component.db.app.AppDBAccessor
+import vdi.component.db.app.model.DeleteFlag
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
-import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
-import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
+import vdi.component.kafka.router.KafkaRouter
 import vdi.component.metrics.Metrics
+import vdi.component.s3.DatasetManager
 import java.time.OffsetDateTime
 
 internal class DatasetReconciler(
@@ -557,7 +555,7 @@ private class SyncIndicator(
   val installOutOfSync: Boolean,
 )
 
-private class ReconciliationState(val datasetDirectory: DatasetDirectory) {
+private class ReconciliationState(val datasetDirectory: vdi.component.s3.DatasetDirectory) {
   inline val userID get() = datasetDirectory.ownerID
   inline val datasetID get() = datasetDirectory.datasetID
 

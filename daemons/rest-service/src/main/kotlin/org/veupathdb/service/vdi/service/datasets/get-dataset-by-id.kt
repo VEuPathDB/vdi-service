@@ -8,10 +8,10 @@ import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
-import org.veupathdb.vdi.lib.db.app.AppDB
+import vdi.component.db.app.AppDB
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetRecord
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import vdi.component.plugin.mapping.PluginHandlers
 
 /**
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't

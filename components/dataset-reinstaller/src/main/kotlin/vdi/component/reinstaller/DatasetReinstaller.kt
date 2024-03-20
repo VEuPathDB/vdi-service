@@ -5,23 +5,21 @@ import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
-import org.veupathdb.vdi.lib.db.app.AppDB
-import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
-import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
-import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
-import org.veupathdb.vdi.lib.db.app.model.InstallStatus
-import org.veupathdb.vdi.lib.db.app.model.InstallType
-import org.veupathdb.vdi.lib.db.app.withTransaction
-import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
-import org.veupathdb.vdi.lib.handler.client.response.ind.*
-import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallBadRequestResponse
-import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallResponseType
-import org.veupathdb.vdi.lib.handler.client.response.uni.UninstallUnexpectedErrorResponse
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
-import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
-import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
+import vdi.component.db.app.AppDB
+import vdi.component.db.app.AppDatabaseRegistry
+import vdi.component.db.app.model.DatasetInstallMessage
+import vdi.component.db.app.model.DatasetRecord
+import vdi.component.db.app.model.InstallStatus
+import vdi.component.db.app.model.InstallType
+import vdi.component.db.app.withTransaction
 import vdi.component.metrics.Metrics
+import vdi.component.plugin.client.response.ind.*
+import vdi.component.plugin.client.response.uni.UninstallBadRequestResponse
+import vdi.component.plugin.client.response.uni.UninstallResponseType
+import vdi.component.plugin.client.response.uni.UninstallUnexpectedErrorResponse
+import vdi.component.plugin.mapping.PluginHandlers
+import vdi.component.s3.DatasetManager
+import vdi.component.s3.paths.S3Paths
 import java.io.InputStream
 import java.nio.file.Path
 import java.util.concurrent.locks.ReentrantLock
@@ -119,7 +117,7 @@ object DatasetReinstaller {
     reinstallDataset(dataset, projectID, handler.client, manager)
   }
 
-  private fun uninstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: PluginHandlerClient) {
+  private fun uninstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: vdi.component.plugin.client.PluginHandlerClient) {
     log.debug("attempting to uninstall dataset {}/{} from project {}", dataset.owner, dataset.datasetID, projectID)
 
     val uninstallResult = client.postUninstall(dataset.datasetID, projectID)
@@ -139,7 +137,7 @@ object DatasetReinstaller {
   private fun reinstallDataset(
     dataset: DatasetRecord,
     projectID: ProjectID,
-    client: PluginHandlerClient,
+    client: vdi.component.plugin.client.PluginHandlerClient,
     manager: DatasetManager,
   ) {
     log.debug("attempting to reinstall dataset {}/{} into project {}", dataset.owner, dataset.datasetID, projectID)
@@ -171,7 +169,7 @@ object DatasetReinstaller {
     }
   }
 
-  private fun DatasetDirectory.isReinstallable(): Boolean {
+  private fun vdi.component.s3.DatasetDirectory.isReinstallable(): Boolean {
     var ok = true
 
     if (!hasMetaFile()) {
@@ -277,7 +275,7 @@ object DatasetReinstaller {
     throw Exception(response.message)
   }
 
-  private fun <T> withInstallBundle(s3Dir: DatasetDirectory, fn: (upload: InputStream) -> T) =
+  private fun <T> withInstallBundle(s3Dir: vdi.component.s3.DatasetDirectory, fn: (upload: InputStream) -> T) =
     TempFiles.withTempDirectory { tmpDir ->
       val files = ArrayList<Path>(8)
 

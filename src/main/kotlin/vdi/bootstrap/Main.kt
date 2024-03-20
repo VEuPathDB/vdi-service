@@ -5,17 +5,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.service.vdi.RestService
-import org.veupathdb.vdi.lib.reconciler.Reconciler
+import vdi.daemon.events.routing.EventRouter
+import vdi.daemon.pruner.PrunerModule
+import vdi.daemon.reconciler.Reconciler
+import vdi.daemon.reinstaller.DatasetReinstaller
+import vdi.lane.delete.hard.HardDeleteTriggerHandler
+import vdi.lane.delete.soft.SoftDeleteTriggerHandler
+import vdi.lane.imports.ImportTriggerHandler
+import vdi.lane.install.InstallDataTriggerHandler
+import vdi.lane.meta.UpdateMetaTriggerHandler
 import vdi.lane.reconciliation.ReconciliationEventHandler
-import vdi.module.delete.hard.HardDeleteTriggerHandler
-import vdi.module.events.routing.EventRouter
-import vdi.module.handler.delete.soft.SoftDeleteTriggerHandler
-import vdi.module.handler.imports.triggers.ImportTriggerHandler
-import vdi.module.handler.install.data.InstallDataTriggerHandler
-import vdi.module.handler.meta.triggers.UpdateMetaTriggerHandler
-import vdi.module.handler.share.trigger.ShareTriggerHandler
-import vdi.module.pruner.PrunerModule
-import vdi.module.reinstaller.DatasetReinstaller
+import vdi.lane.sharing.ShareTriggerHandler
 import kotlin.concurrent.thread
 
 object Main {

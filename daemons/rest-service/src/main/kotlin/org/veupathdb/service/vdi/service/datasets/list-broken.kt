@@ -3,12 +3,12 @@ package org.veupathdb.service.vdi.service.datasets
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import org.veupathdb.vdi.lib.db.app.AppDB
-import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
-import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
-import org.veupathdb.vdi.lib.db.app.model.InstallStatus
-import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
-import org.veupathdb.vdi.lib.db.app.model.InstallType
+import vdi.component.db.app.AppDB
+import vdi.component.db.app.AppDatabaseRegistry
+import vdi.component.db.app.model.DatasetRecord
+import vdi.component.db.app.model.InstallStatus
+import vdi.component.db.app.model.InstallStatuses
+import vdi.component.db.app.model.InstallType
 import vdi.component.db.cache.model.DatasetImportStatus
 
 /**

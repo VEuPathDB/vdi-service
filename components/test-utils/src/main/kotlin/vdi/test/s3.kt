@@ -7,9 +7,8 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
-import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
-import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import org.veupathdb.vdi.lib.s3.datasets.files.*
+import vdi.component.s3.DatasetManager
+import vdi.component.s3.files.*
 import java.io.InputStream
 import java.time.OffsetDateTime
 import java.util.stream.Stream
@@ -83,7 +82,7 @@ fun mockDatasetDirectory(
   onPutShare: Con<UserID> = ::consumer,
 
   onGetLatestShareTimestamp: (OffsetDateTime) -> OffsetDateTime = { it },
-): DatasetDirectory =
+): vdi.component.s3.DatasetDirectory =
   mock {
     ownerID?.also { on { this.ownerID } doReturn it }
     datasetID?.also { on { this.datasetID } doReturn it }
@@ -133,9 +132,9 @@ fun mockDatasetDirectory(
   }
 
 fun mockDatasetManager(
-  onGetDatasetDirectory: BiFn<UserID, DatasetID, DatasetDirectory> = { u, d -> mockDatasetDirectory(ownerID = u, datasetID = d) },
+  onGetDatasetDirectory: BiFn<UserID, DatasetID, vdi.component.s3.DatasetDirectory> = { u, d -> mockDatasetDirectory(ownerID = u, datasetID = d) },
   onListDatasets: Fn<UserID, List<DatasetID>> = ::oneParamList,
-  onStreamAllDatasets: Pro<Stream<DatasetDirectory>> = { Stream.empty() },
+  onStreamAllDatasets: Pro<Stream<vdi.component.s3.DatasetDirectory>> = { Stream.empty() },
   onListUsers: Pro<List<UserID>> = ::noParamList,
 ): DatasetManager =
   mock {

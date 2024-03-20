@@ -2,7 +2,7 @@ package org.veupathdb.service.vdi.generated.model
 
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import vdi.component.db.cache.model.DatasetRecord
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import vdi.component.plugin.mapping.PluginHandlers
 
 
 internal fun DatasetTypeInfo(rec: DatasetRecord, typeName: String): DatasetTypeInfo =

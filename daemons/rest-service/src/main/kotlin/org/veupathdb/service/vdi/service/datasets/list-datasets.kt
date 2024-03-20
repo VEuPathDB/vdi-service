@@ -10,14 +10,14 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
-import org.veupathdb.vdi.lib.db.app.AppDB
-import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
+import vdi.component.db.app.AppDB
+import vdi.component.db.app.model.InstallStatuses
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetFileSummary
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.model.DatasetRecord
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import vdi.component.plugin.mapping.PluginHandlers
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
   return fetchDatasetList(vdi.component.db.cache.CacheDB().selectDatasetList(query))

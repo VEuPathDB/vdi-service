@@ -19,13 +19,13 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.*
-import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
+import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
-import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
+import vdi.component.plugin.mapping.PluginHandlers
 import vdi.component.metrics.Metrics
 import java.net.URL
 import java.nio.file.Path

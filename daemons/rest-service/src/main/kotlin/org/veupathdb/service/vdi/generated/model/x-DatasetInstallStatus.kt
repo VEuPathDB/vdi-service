@@ -1,6 +1,6 @@
 package org.veupathdb.service.vdi.generated.model
 
-import org.veupathdb.vdi.lib.db.app.model.InstallStatus
+import vdi.component.db.app.model.InstallStatus
 
 fun DatasetInstallStatus(status: InstallStatus): DatasetInstallStatus =
   when (status) {

@@ -6,13 +6,13 @@ import org.veupathdb.lib.s3.s34k.S3Client
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.json.JSON
-import org.veupathdb.vdi.lib.kafka.EventMessage
-import org.veupathdb.vdi.lib.kafka.KafkaConsumer
-import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
-import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
-import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import vdi.component.async.ShutdownSignal
+import vdi.component.kafka.EventMessage
+import vdi.component.kafka.KafkaConsumer
+import vdi.component.kafka.KafkaConsumerConfig
+import vdi.component.kafka.router.KafkaRouterConfig
+import vdi.component.kafka.router.KafkaRouterFactory
+import vdi.component.s3.DatasetManager
 
 /**
  * VDI Service Module Abstract Base
@@ -174,7 +174,7 @@ abstract class VDIServiceModuleBase(
       }
       .map {
         try {
-          JSON.readValue(it.value, EventMessage::class.java)
+          JSON.readValue(it.value, vdi.component.kafka.EventMessage::class.java)
         } catch (e: Throwable) {
           log.error("received invalid message body from Kafka: {}", it.value)
           null
