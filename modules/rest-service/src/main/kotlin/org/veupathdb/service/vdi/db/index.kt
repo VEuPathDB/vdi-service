@@ -3,7 +3,7 @@ package org.veupathdb.service.vdi.db
 import org.veupathdb.lib.container.jaxrs.health.DatabaseDependency
 import org.veupathdb.lib.container.jaxrs.health.Dependency
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
-import org.veupathdb.vdi.lib.db.cache.CacheDB
+import vdi.component.db.cache.CacheDB
 
 
 fun initDatabaseDependencies(): Array<Dependency> {
@@ -15,7 +15,7 @@ fun initDatabaseDependencies(): Array<Dependency> {
     out.add(dd)
   }
 
-  val cacheDB = CacheDB()
+  val cacheDB = vdi.component.db.cache.CacheDB()
 
   out.add(DatabaseDependency(cacheDB.details.name, cacheDB.details.host, cacheDB.details.port.toInt(), cacheDB.dataSource))
 

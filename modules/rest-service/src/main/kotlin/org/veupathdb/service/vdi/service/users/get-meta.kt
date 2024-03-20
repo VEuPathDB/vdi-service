@@ -7,7 +7,7 @@ import org.veupathdb.service.vdi.generated.model.UserQuotaDetails
 import org.veupathdb.service.vdi.generated.model.UserQuotaDetailsImpl
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.db.cache.CacheDB
+import vdi.component.db.cache.CacheDB
 
 internal fun getUserMetadata(userID: UserID): UserMetadata =
   UserMetadataImpl().apply {
@@ -23,7 +23,7 @@ private fun getUserQuotaInfo(userID: UserID): UserQuotaDetails =
 internal fun getCurrentQuotaUsage(userID: UserID): Long {
   val sizes = DatasetStore.listDatasetImportReadyZipSizes(userID)
 
-  return CacheDB().selectDatasetsForUser(userID)
+  return vdi.component.db.cache.CacheDB().selectDatasetsForUser(userID)
     .asSequence()
     .filter { !it.isDeleted }
     .map { sizes[it.datasetID] ?: 0L }

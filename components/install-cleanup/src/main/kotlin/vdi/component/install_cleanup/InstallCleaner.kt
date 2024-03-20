@@ -9,7 +9,7 @@ import org.veupathdb.vdi.lib.db.app.model.DatasetInstallMessage
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import org.veupathdb.vdi.lib.db.app.withTransaction
-import org.veupathdb.vdi.lib.db.cache.CacheDB
+import vdi.component.db.cache.CacheDB
 
 object InstallCleaner {
 
@@ -112,7 +112,7 @@ object InstallCleaner {
    * status.
    */
   private fun maybeCleanDatasetFromAllDBs(datasetID: DatasetID) {
-    val cacheDBRecord = CacheDB().selectDataset(datasetID)
+    val cacheDBRecord = vdi.component.db.cache.CacheDB().selectDataset(datasetID)
       ?: throw IllegalStateException("target dataset $datasetID is not in the internal cache database")
 
     for (project in cacheDBRecord.projects) {

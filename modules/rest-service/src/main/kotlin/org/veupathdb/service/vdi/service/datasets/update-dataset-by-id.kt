@@ -10,12 +10,12 @@ import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMetaImpl
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
-import org.veupathdb.vdi.lib.db.cache.withTransaction
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.model.DatasetMetaImpl
+import vdi.component.db.cache.withTransaction
 
 internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequest) {
-  val cacheDB = CacheDB()
+  val cacheDB = vdi.component.db.cache.CacheDB()
 
   val dataset = cacheDB.selectDataset(datasetID)
     ?: throw NotFoundException()

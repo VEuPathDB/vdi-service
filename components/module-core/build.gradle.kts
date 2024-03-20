@@ -5,6 +5,7 @@ plugins {
 dependencies {
   implementation(platform(project(":platform")))
 
+  api(project(":components:async"))
   implementation(project(":components:kafka"))
   implementation(project(":components:s3"))
 

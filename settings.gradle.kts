@@ -49,6 +49,7 @@ rootProject.name = "vdi"
 include(":platform")
 
 include(":components:app-db")
+include(":components:async")
 include(":components:cache-db")
 include(":components:dataset-reinstaller")
 include(":components:handler-client")

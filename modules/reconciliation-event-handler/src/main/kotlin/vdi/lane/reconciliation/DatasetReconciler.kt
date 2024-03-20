@@ -11,11 +11,11 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDBAccessor
 import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
-import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
-import org.veupathdb.vdi.lib.db.cache.withTransaction
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.model.DatasetImpl
+import vdi.component.db.cache.model.DatasetImportStatus
+import vdi.component.db.cache.model.DatasetMetaImpl
+import vdi.component.db.cache.withTransaction
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
@@ -23,7 +23,7 @@ import vdi.component.metrics.Metrics
 import java.time.OffsetDateTime
 
 internal class DatasetReconciler(
-  private val cacheDB: CacheDB = CacheDB(),
+  private val cacheDB: vdi.component.db.cache.CacheDB = vdi.component.db.cache.CacheDB(),
   private val appDB: AppDB = AppDB(),
   private val eventRouter: KafkaRouter,
   private val datasetManager: DatasetManager,

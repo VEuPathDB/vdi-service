@@ -3,7 +3,7 @@ package vdi.module.reinstaller
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
+import vdi.component.async.ShutdownSignal
 import vdi.component.metrics.Metrics
 import kotlin.time.Duration.Companion.milliseconds
 import vdi.component.reinstaller.DatasetReinstaller as Reinstaller
@@ -16,6 +16,8 @@ internal class DatasetReinstallerImpl(private val config: DatasetReinstallerConf
   private val shutdownConfirm = ShutdownSignal()
 
   private var started = false
+
+  override val name = "dataset-reinstaller"
 
   override suspend fun start() {
     if (!started) {
@@ -30,6 +32,7 @@ internal class DatasetReinstallerImpl(private val config: DatasetReinstallerConf
     log.info("triggering dataset-reinstaller module shutdown")
     shutdownTrigger.trigger()
     shutdownConfirm.await()
+    log.info("dataset-reinstaller shutdown confirmed")
   }
 
   private suspend fun run() {
@@ -61,6 +64,8 @@ internal class DatasetReinstallerImpl(private val config: DatasetReinstallerConf
         }
       }
     }
+
+    shutdownConfirm.trigger()
   }
 
   @Suppress("NOTHING_TO_INLINE")

@@ -6,9 +6,9 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.AdminAllDatasetsRow
-import org.veupathdb.vdi.lib.db.cache.query.AdminAllDatasetsQuery
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.model.AdminAllDatasetsRow
+import vdi.component.db.cache.query.AdminAllDatasetsQuery
 
 private const val MAX_RESULT_LIMIT = 250u
 
@@ -27,7 +27,7 @@ internal fun listAllDatasets(
     includeDeleted ?: false,
   )
 
-  val totalCount = CacheDB().selectAdminAllDatasetCount(query)
+  val totalCount = vdi.component.db.cache.CacheDB().selectAdminAllDatasetCount(query)
 
   if (totalCount == 0u) {
     return AllDatasetsListResponse(
@@ -36,7 +36,7 @@ internal fun listAllDatasets(
     )
   }
 
-  val cacheDBResults = CacheDB().selectAdminAllDatasets(query)
+  val cacheDBResults = vdi.component.db.cache.CacheDB().selectAdminAllDatasets(query)
   val appDBResults = getAppDBStatuses(cacheDBResults)
 
   return AllDatasetsListResponse(

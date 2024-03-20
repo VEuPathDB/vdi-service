@@ -6,7 +6,6 @@ import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
-import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -18,12 +17,12 @@ import org.veupathdb.vdi.lib.db.app.AppDBTransaction
 import org.veupathdb.vdi.lib.db.app.UniqueConstraintViolation
 import org.veupathdb.vdi.lib.db.app.model.*
 import org.veupathdb.vdi.lib.db.app.withTransaction
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
-import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
-import org.veupathdb.vdi.lib.db.cache.withTransaction
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.CacheDBTransaction
+import vdi.component.db.cache.model.DatasetImpl
+import vdi.component.db.cache.model.DatasetImportStatus
+import vdi.component.db.cache.model.DatasetMetaImpl
+import vdi.component.db.cache.withTransaction
 import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaBadRequestResponse
 import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaResponseType
 import org.veupathdb.vdi.lib.handler.client.response.inm.InstallMetaUnexpectedErrorResponse
@@ -34,6 +33,7 @@ import org.veupathdb.vdi.lib.kafka.EventSource
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouter
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
+import vdi.component.async.WorkerPool
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import java.sql.SQLException
@@ -45,9 +45,11 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val cacheDB = CacheDB()
+  private val cacheDB = vdi.component.db.cache.CacheDB()
 
   private val appDB = AppDB()
+
+  override val name = "update-meta lane"
 
   override suspend fun run() {
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
@@ -75,6 +77,10 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       wp.start()
     }
 
+    log.info("closing kafka client and router")
+    kc.close()
+    kr.close()
+    log.info("kafka client and router closed")
     confirmShutdown()
   }
 
@@ -317,7 +323,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     return true
   }
 
-  private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
+  private fun vdi.component.db.cache.CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
     openTransaction().use {
 
       // Insert a new dataset record

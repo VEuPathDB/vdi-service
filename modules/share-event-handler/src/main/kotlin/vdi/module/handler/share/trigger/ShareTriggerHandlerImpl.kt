@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -15,13 +14,14 @@ import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.AppDBTransaction
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
 import org.veupathdb.vdi.lib.db.app.withTransaction
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
-import org.veupathdb.vdi.lib.db.cache.model.DatasetShareOfferImpl
-import org.veupathdb.vdi.lib.db.cache.model.DatasetShareReceiptImpl
-import org.veupathdb.vdi.lib.db.cache.withTransaction
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.model.DatasetRecord
+import vdi.component.db.cache.model.DatasetShareOfferImpl
+import vdi.component.db.cache.model.DatasetShareReceiptImpl
+import vdi.component.db.cache.withTransaction
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.files.DatasetShare
+import vdi.component.async.WorkerPool
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import java.sql.SQLException
@@ -52,9 +52,11 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val cacheDB = CacheDB()
+  private val cacheDB = vdi.component.db.cache.CacheDB()
 
   private val appDB = AppDB()
+
+  override val name = "sharing lane"
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.shareTriggerTopic, config.kafkaConsumerConfig)
@@ -79,6 +81,9 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       wp.start()
     }
 
+    log.info("closing kafka client")
+    kc.close()
+    log.info("kafka client closed")
     confirmShutdown()
   }
 

@@ -8,7 +8,6 @@ import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
-import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -18,17 +17,18 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.isNull
 import org.veupathdb.vdi.lib.common.util.or
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.CacheDBTransaction
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
-import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
-import org.veupathdb.vdi.lib.db.cache.withTransaction
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.CacheDBTransaction
+import vdi.component.db.cache.model.DatasetImpl
+import vdi.component.db.cache.model.DatasetImportStatus
+import vdi.component.db.cache.model.DatasetMetaImpl
+import vdi.component.db.cache.withTransaction
 import org.veupathdb.vdi.lib.handler.client.response.imp.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
+import vdi.component.async.WorkerPool
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import vdi.module.handler.imports.triggers.config.ImportTriggerHandlerConfig
@@ -49,7 +49,9 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private val activeIDs = HashSet<DatasetID>(24)
 
-  private val cacheDB = CacheDB()
+  private val cacheDB = vdi.component.db.cache.CacheDB()
+
+  override val name = "import lane"
 
   override suspend fun run() {
     log.trace("run()")
@@ -80,7 +82,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       wp.start()
     }
 
-     confirmShutdown()
+    log.info("closing kafka client")
+    kc.close()
+    log.info("kafka client closed")
+    confirmShutdown()
   }
 
   private fun importJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
@@ -311,7 +316,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     ))
   }
 
-  private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
+  private fun vdi.component.db.cache.CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.trace("CacheDB.initializeDataset(datasetID: $datasetID, meta: $meta)")
     openTransaction().use {
       try {

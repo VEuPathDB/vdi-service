@@ -25,6 +25,6 @@ data class DatasetReinstallerConfig(
       get() = 6.hours
 
     inline val WakeInterval
-      get() = 10.seconds
+      get() = 2.seconds
   }
 }

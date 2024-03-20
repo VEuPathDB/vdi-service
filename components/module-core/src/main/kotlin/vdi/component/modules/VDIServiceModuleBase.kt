@@ -5,7 +5,6 @@ import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Client
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.kafka.EventMessage
 import org.veupathdb.vdi.lib.kafka.KafkaConsumer
@@ -13,7 +12,7 @@ import org.veupathdb.vdi.lib.kafka.KafkaConsumerConfig
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterConfig
 import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
-import kotlin.reflect.KClass
+import vdi.component.async.ShutdownSignal
 
 /**
  * VDI Service Module Abstract Base
@@ -26,7 +25,7 @@ import kotlin.reflect.KClass
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
 abstract class VDIServiceModuleBase(
-  protected val moduleName: String,
+  override val name: String,
 ) : VDIServiceModule {
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -38,7 +37,7 @@ abstract class VDIServiceModuleBase(
 
   override suspend fun start() {
     if (!started) {
-      log.info("starting module {}", moduleName)
+      log.info("starting module {}", name)
 
       started = true
       run()
@@ -46,10 +45,12 @@ abstract class VDIServiceModuleBase(
   }
 
   override suspend fun stop() {
-    log.info("shutting down module {}", moduleName)
+    log.info("shutting down module {}", name)
 
     shutdownTrigger.trigger()
     shutdownConfirm.await()
+
+    log.info("module {} shutdown confirmed", name)
   }
 
   /**

@@ -25,6 +25,6 @@ data class PrunerModuleConfig(
       get() = 6.hours
 
     inline val WakeupInterval
-      get() = 5.seconds
+      get() = 2.seconds
   }
 }

@@ -1,7 +1,7 @@
 package org.veupathdb.service.vdi.generated.model
 
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
-import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
+import vdi.component.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 

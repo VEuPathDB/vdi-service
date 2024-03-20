@@ -56,6 +56,7 @@ services:
     - internal
     - traefik
     - monitoring-ext
+    stop_grace_period: 1m
     environment:
 
       # Rest Service
@@ -654,6 +655,8 @@ services:
       CUSTOM_PATH: ${PLUGIN_HANDLER_ISASIMPLE_CUSTOM_PATH}
       SITE_BUILD: ${SITE_BUILD:?}
       DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
+
+      IMPORT_SCRIPT_MAX_DURATION: 6h
 
       DB_CONNECTION_ENABLED_AMOEBA: ${DB_CONNECTION_ENABLED_AMOEBA:?}
       DB_CONNECTION_NAME_AMOEBA: ${DB_CONNECTION_NAME_AMOEBA:?}

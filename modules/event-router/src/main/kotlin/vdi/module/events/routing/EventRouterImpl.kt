@@ -2,7 +2,6 @@ package vdi.module.events.routing
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
@@ -10,6 +9,7 @@ import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.rabbit.RabbitMQEventIterator
 import org.veupathdb.vdi.lib.rabbit.RabbitMQEventSource
 import org.veupathdb.vdi.lib.s3.datasets.paths.*
+import vdi.component.async.ShutdownSignal
 import vdi.module.events.routing.model.MinIOEvent
 import vdi.module.events.routing.model.MinIOEventAction
 
@@ -22,6 +22,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
 
   @Volatile
   private var started = false
+
+  override val name = "dataset-reinstaller"
 
   override suspend fun start() {
     if (!started) {
@@ -36,6 +38,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     log.info("triggering event-router shutdown")
     shutdownTrigger.trigger()
     shutdownConfirm.await()
+    log.info("event-router shutdown confirmed")
   }
 
   private suspend fun run() {

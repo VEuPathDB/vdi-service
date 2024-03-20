@@ -18,9 +18,9 @@ import org.veupathdb.service.vdi.util.fixVariableDateString
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserID
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.BrokenImportListQuery
-import org.veupathdb.vdi.lib.db.cache.model.SortOrder
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.model.BrokenImportListQuery
+import vdi.component.db.cache.model.SortOrder
 import vdi.component.install_cleanup.InstallCleaner
 import vdi.component.install_cleanup.ReinstallTarget
 import vdi.component.pruner.Pruner
@@ -146,7 +146,7 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
         ?: throw BadRequestException("invalid sort order value")
     }
 
-    val broken = CacheDB().selectBrokenDatasetImports(query)
+    val broken = vdi.component.db.cache.CacheDB().selectBrokenDatasetImports(query)
       .map(::BrokenImportDetails)
 
     return VdiDatasetsAdmin.GetVdiDatasetsAdminFailedImportsResponse

@@ -1,6 +1,6 @@
 package org.veupathdb.service.vdi.generated.model
 
-import org.veupathdb.vdi.lib.db.cache.model.DatasetFile
+import vdi.component.db.cache.model.DatasetFile
 
 fun DatasetZipDetails(zipSize: Long, files: List<DatasetFile>): DatasetZipDetails =
   DatasetZipDetailsImpl().also {

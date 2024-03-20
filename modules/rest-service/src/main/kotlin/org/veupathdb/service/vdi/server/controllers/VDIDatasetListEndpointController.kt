@@ -13,8 +13,8 @@ import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.fetchUserDatasetList
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.toUserID
-import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
-import org.veupathdb.vdi.lib.db.cache.model.DatasetOwnershipFilter
+import vdi.component.db.cache.model.DatasetListQuery
+import vdi.component.db.cache.model.DatasetOwnershipFilter
 
 @Authenticated(allowGuests = false)
 class VDIDatasetListEndpointController(@Context request: ContainerRequest) : VdiDatasets, ControllerBase(request) {

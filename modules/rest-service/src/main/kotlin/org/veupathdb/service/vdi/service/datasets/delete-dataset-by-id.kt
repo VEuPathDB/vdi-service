@@ -5,11 +5,11 @@ import jakarta.ws.rs.NotFoundException
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.withTransaction
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.withTransaction
 
 internal fun adminDeleteDataset(datasetID: DatasetID) {
-  val ds = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
+  val ds = vdi.component.db.cache.CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
   deleteUserDataset(ds.ownerID, datasetID)
 }
 
@@ -28,7 +28,7 @@ internal fun adminDeleteDataset(datasetID: DatasetID) {
  */
 internal fun userDeleteDataset(userID: UserID, datasetID: DatasetID) {
   // Verify that the target dataset exists.
-  val ds = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
+  val ds = vdi.component.db.cache.CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
 
   // Verify the dataset is owned by the requesting user.
   if (ds.ownerID != userID)
@@ -38,7 +38,7 @@ internal fun userDeleteDataset(userID: UserID, datasetID: DatasetID) {
 }
 
 private fun deleteUserDataset(userID: UserID, datasetID: DatasetID) {
-  CacheDB().withTransaction {
+  vdi.component.db.cache.CacheDB().withTransaction {
     // Update the deleted flag in the local pg.
     it.updateDatasetDeleted(datasetID, true)
 

@@ -16,6 +16,7 @@ import vdi.module.handler.meta.triggers.UpdateMetaTriggerHandler
 import vdi.module.handler.share.trigger.ShareTriggerHandler
 import vdi.module.pruner.PrunerModule
 import vdi.module.reinstaller.DatasetReinstaller
+import kotlin.concurrent.thread
 
 object Main {
 
@@ -42,16 +43,19 @@ object Main {
       log.info("shutting down modules")
       runBlocking {
         for (module in modules)
-          launch { module.stop() }
+          launch {
+            module.stop()
+          }
       }
+      log.info("modules shut down")
     })
+
+    thread { RestService.main(args) }
 
     log.info("starting modules")
     runBlocking(Dispatchers.Unconfined) {
       for (module in modules)
         launch { module.start() }
-
-      RestService.main(args)
     }
   }
 }

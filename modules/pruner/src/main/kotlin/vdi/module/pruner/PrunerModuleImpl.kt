@@ -3,7 +3,7 @@ package vdi.module.pruner
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
+import vdi.component.async.ShutdownSignal
 import vdi.component.metrics.Metrics
 import vdi.component.pruner.Pruner
 import kotlin.time.Duration
@@ -19,6 +19,8 @@ internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : Pruner
   @Volatile
   private var started = false
 
+  override val name = "pruner"
+
   override suspend fun start() {
     if (!started) {
       log.info("starting S3 pruning module")
@@ -32,6 +34,7 @@ internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : Pruner
     log.info("triggering S3 pruning module shutdown")
     shutdownTrigger.trigger()
     shutdownConfirm.await()
+    log.info("S3 pruner shutdown confirmed")
   }
 
   private suspend fun run() {
@@ -85,6 +88,8 @@ internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : Pruner
         }
       }
     }
+
+    shutdownConfirm.trigger()
   }
 
   @Suppress("NOTHING_TO_INLINE")

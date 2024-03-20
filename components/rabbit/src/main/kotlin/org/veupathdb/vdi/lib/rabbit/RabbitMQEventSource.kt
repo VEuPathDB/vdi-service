@@ -2,8 +2,8 @@ package org.veupathdb.vdi.lib.rabbit
 
 import com.rabbitmq.client.ConnectionFactory
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
-import org.veupathdb.vdi.lib.common.async.SuspendingSequence
+import vdi.component.async.ShutdownSignal
+import vdi.component.async.SuspendingSequence
 
 class RabbitMQEventSource<T>(
   private val config: RabbitMQConfig,

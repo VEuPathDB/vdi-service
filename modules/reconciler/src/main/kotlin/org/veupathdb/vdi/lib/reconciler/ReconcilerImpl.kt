@@ -11,10 +11,14 @@ import org.veupathdb.vdi.lib.kafka.router.KafkaRouterFactory
 import org.veupathdb.vdi.lib.reconciler.config.ReconcilerConfig
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
+import java.time.OffsetDateTime
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
-class ReconcilerImpl(private val config: ReconcilerConfig) :
-  Reconciler, VDIServiceModuleBase("reconciler") {
+class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, VDIServiceModuleBase("reconciler") {
+
+  private val wakeInterval = 2.seconds
 
   override suspend fun run() {
     if (!config.reconcilerEnabled) {
@@ -40,7 +44,25 @@ class ReconcilerImpl(private val config: ReconcilerConfig) :
     targets.add(ReconcilerInstance(CacheDBTarget(), datasetManager, kafkaRouter))
 
     runBlocking {
+      // Last run to zero to perform a reconciliation on service startup.
+      var lastRun = 0L
+
       while (!isShutDown()) {
+        // Wake up on a short interval to catch shutdown signals.
+        delay(wakeInterval)
+
+        val now = System.currentTimeMillis()
+
+        // If we haven't yet reached the configured amount of time for the run
+        // interval, skip to the next iteration, sleep, and test again.
+        if ((now - lastRun).milliseconds < config.runInterval) {
+          continue
+        }
+
+        lastRun = now
+
+        // If we've reached this point, we've waited for the configured interval
+        // duration.  We can now run the reconciliation process.
         logger().info("Scheduling reconciler for ${targets.size} targets.")
 
         val timer = Metrics.Reconciler.reconcilerTimes.startTimer()
@@ -62,11 +84,12 @@ class ReconcilerImpl(private val config: ReconcilerConfig) :
         }
 
         timer.observeDuration()
-
-        delay(config.runInterval.toMillis())
       }
     }
 
+    logger().info("closing kafka router")
+    kafkaRouter.close()
+    logger().info("kafka router closed")
     confirmShutdown()
   }
 

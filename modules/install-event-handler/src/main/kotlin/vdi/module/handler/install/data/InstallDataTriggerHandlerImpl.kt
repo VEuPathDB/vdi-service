@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.async.WorkerPool
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -16,14 +15,15 @@ import org.veupathdb.vdi.lib.db.app.model.DeleteFlag
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallType
 import org.veupathdb.vdi.lib.db.app.withTransaction
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.withTransaction
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.withTransaction
 import org.veupathdb.vdi.lib.handler.client.PluginHandlerClient
 import org.veupathdb.vdi.lib.handler.client.response.ind.*
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import org.veupathdb.vdi.lib.s3.datasets.DatasetDirectory
 import org.veupathdb.vdi.lib.s3.datasets.DatasetManager
 import org.veupathdb.vdi.lib.s3.datasets.paths.S3Paths
+import vdi.component.async.WorkerPool
 import vdi.component.metrics.Metrics
 import vdi.component.modules.VDIServiceModuleBase
 import java.io.InputStream
@@ -43,9 +43,11 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
-  private val cacheDB = CacheDB()
+  private val cacheDB = vdi.component.db.cache.CacheDB()
 
   private val appDB = AppDB()
+
+  override val name = "install-data lane"
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
@@ -70,6 +72,9 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       wp.start()
     }
 
+    log.info("closing kafka client")
+    kc.close()
+    log.info("kafka client closed")
     confirmShutdown()
   }
 

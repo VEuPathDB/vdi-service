@@ -4,8 +4,8 @@ import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.ShareOfferEntry
 import org.veupathdb.service.vdi.model.ShareFilterStatus
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetShareListEntry
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.model.DatasetShareListEntry
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 /**
@@ -28,16 +28,16 @@ internal fun lookupShares(userID: UserID, status: ShareFilterStatus): List<Share
   }
 
 private fun lookupOpenShares(userID: UserID): List<ShareOfferEntry> =
-  convertToOutType(CacheDB().selectOpenSharesForUser(userID))
+  convertToOutType(vdi.component.db.cache.CacheDB().selectOpenSharesForUser(userID))
 
 private fun lookupAcceptedShares(userID: UserID): List<ShareOfferEntry> =
-  convertToOutType(CacheDB().selectAcceptedSharesForUser(userID))
+  convertToOutType(vdi.component.db.cache.CacheDB().selectAcceptedSharesForUser(userID))
 
 private fun lookupRejectedShares(userID: UserID): List<ShareOfferEntry> =
-  convertToOutType(CacheDB().selectRejectedSharesForUser(userID))
+  convertToOutType(vdi.component.db.cache.CacheDB().selectRejectedSharesForUser(userID))
 
 private fun lookupAllShares(userID: UserID): List<ShareOfferEntry> =
-  convertToOutType(CacheDB().selectAllSharesForUser(userID))
+  convertToOutType(vdi.component.db.cache.CacheDB().selectAllSharesForUser(userID))
 
 private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<ShareOfferEntry> {
   val ownerIDs = shares.asSequence()

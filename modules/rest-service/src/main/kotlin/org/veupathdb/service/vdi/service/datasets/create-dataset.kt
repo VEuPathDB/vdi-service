@@ -20,11 +20,11 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.*
 import org.veupathdb.vdi.lib.db.app.AppDatabaseRegistry
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImpl
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
-import org.veupathdb.vdi.lib.db.cache.model.DatasetMetaImpl
-import org.veupathdb.vdi.lib.db.cache.withTransaction
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.model.DatasetImpl
+import vdi.component.db.cache.model.DatasetImportStatus
+import vdi.component.db.cache.model.DatasetMetaImpl
+import vdi.component.db.cache.withTransaction
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 import vdi.component.metrics.Metrics
 import java.net.URL
@@ -59,7 +59,7 @@ fun createDataset(
       throw BadRequestException("unrecognized target project")
   }
 
-  CacheDB().withTransaction {
+  vdi.component.db.cache.CacheDB().withTransaction {
     it.tryInsertDataset(DatasetImpl(
       datasetID    = datasetID,
       typeName     = datasetMeta.type.name,
@@ -130,7 +130,7 @@ private fun uploadFiles(
   uploadFile: Path,
   datasetMeta: VDIDatasetMeta,
 ) {
-  val cacheDB = CacheDB()
+  val cacheDB = vdi.component.db.cache.CacheDB()
 
   // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
   TempFiles.withTempDirectory { directory ->

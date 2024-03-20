@@ -2,8 +2,8 @@ package org.veupathdb.vdi.lib.rabbit
 
 import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.async.ShutdownSignal
-import org.veupathdb.vdi.lib.common.async.SuspendingIterator
+import vdi.component.async.ShutdownSignal
+import vdi.component.async.SuspendingIterator
 import vdi.component.metrics.Metrics
 import kotlin.time.Duration
 import com.rabbitmq.client.Channel as RChannel

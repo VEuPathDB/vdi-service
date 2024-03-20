@@ -26,6 +26,9 @@ internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTrigge
       }
     }
 
+    log.info("closing kafka client")
+    kc.close()
+    log.info("kafka client closed")
     confirmShutdown()
   }
 }

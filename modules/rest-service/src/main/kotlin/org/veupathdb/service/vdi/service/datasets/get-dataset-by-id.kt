@@ -9,8 +9,8 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.db.app.AppDB
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 /**
@@ -18,7 +18,7 @@ import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
  * return user information.
  */
 fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
-  val dataset = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
+  val dataset = vdi.component.db.cache.CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
 
   val typeDisplayName = PluginHandlers[dataset.typeName, dataset.typeVersion]?.displayName
     ?: throw IllegalStateException("plugin missing: ${dataset.typeName}:${dataset.typeVersion}")
@@ -26,7 +26,7 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
   // Lookup status information for the dataset
   val statuses = AppDB().getDatasetStatuses(datasetID, dataset.projects)
 
-  val importMessages = CacheDB().selectImportMessages(datasetID)
+  val importMessages = vdi.component.db.cache.CacheDB().selectImportMessages(datasetID)
 
   // This value will be null if the async dataset upload has not yet completed.
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
@@ -62,7 +62,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     throw NotFoundException()
 
   val shares = if (dataset.ownerID == userID) {
-    CacheDB().selectSharesForDataset(datasetID)
+    vdi.component.db.cache.CacheDB().selectSharesForDataset(datasetID)
   } else {
     emptyList()
   }
@@ -82,7 +82,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // Lookup status information for the dataset
   val statuses = AppDB().getDatasetStatuses(datasetID, dataset.projects)
 
-  val importMessages = CacheDB().selectImportMessages(datasetID)
+  val importMessages = vdi.component.db.cache.CacheDB().selectImportMessages(datasetID)
 
   // This value will be null if the async dataset upload has not yet completed.
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
@@ -122,10 +122,10 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 }
 
 private fun requireDataset(userID: UserID, datasetID: DatasetID): DatasetRecord {
-  var ds = CacheDB().selectDatasetForUser(userID, datasetID)
+  var ds = vdi.component.db.cache.CacheDB().selectDatasetForUser(userID, datasetID)
 
   if (ds == null) {
-    ds = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
+    ds = vdi.component.db.cache.CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
 
     if (ds.visibility == VDIDatasetVisibility.Private)
       throw NotFoundException()

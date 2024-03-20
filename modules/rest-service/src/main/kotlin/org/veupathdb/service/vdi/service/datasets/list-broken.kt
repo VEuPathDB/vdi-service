@@ -9,7 +9,7 @@ import org.veupathdb.vdi.lib.db.app.model.DatasetRecord
 import org.veupathdb.vdi.lib.db.app.model.InstallStatus
 import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
 import org.veupathdb.vdi.lib.db.app.model.InstallType
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.component.db.cache.model.DatasetImportStatus
 
 /**
  * Lists datasets across all registered projects that are in the broken install

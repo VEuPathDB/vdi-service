@@ -12,23 +12,23 @@ import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.db.app.AppDB
 import org.veupathdb.vdi.lib.db.app.model.InstallStatuses
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetFileSummary
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
-import org.veupathdb.vdi.lib.db.cache.model.DatasetListQuery
-import org.veupathdb.vdi.lib.db.cache.model.DatasetRecord
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.model.DatasetFileSummary
+import vdi.component.db.cache.model.DatasetImportStatus
+import vdi.component.db.cache.model.DatasetListQuery
+import vdi.component.db.cache.model.DatasetRecord
 import org.veupathdb.vdi.lib.handler.mapping.PluginHandlers
 
 fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
-  return fetchDatasetList(CacheDB().selectDatasetList(query))
+  return fetchDatasetList(vdi.component.db.cache.CacheDB().selectDatasetList(query))
 }
 
 fun fetchCommunityUserDatasetList(): List<DatasetListEntry> {
-  return fetchDatasetList(CacheDB().selectNonPrivateDatasets())
+  return fetchDatasetList(vdi.component.db.cache.CacheDB().selectNonPrivateDatasets())
 }
 
 private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetListEntry> {
-  val cacheDB = CacheDB()
+  val cacheDB = vdi.component.db.cache.CacheDB()
 
   val datasetIDs = datasetList.map(DatasetRecord::datasetID)
 

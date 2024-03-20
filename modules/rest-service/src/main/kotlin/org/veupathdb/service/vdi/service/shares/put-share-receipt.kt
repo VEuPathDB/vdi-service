@@ -10,13 +10,13 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
-import org.veupathdb.vdi.lib.db.cache.CacheDB
-import org.veupathdb.vdi.lib.db.cache.model.DatasetImportStatus
-import org.veupathdb.vdi.lib.db.cache.model.DatasetShareReceiptImpl
-import org.veupathdb.vdi.lib.db.cache.withTransaction
+import vdi.component.db.cache.CacheDB
+import vdi.component.db.cache.model.DatasetImportStatus
+import vdi.component.db.cache.model.DatasetShareReceiptImpl
+import vdi.component.db.cache.withTransaction
 
 internal fun putShareReceipt(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareReceipt) {
-  val cacheDB = CacheDB()
+  val cacheDB = vdi.component.db.cache.CacheDB()
 
   // lookup the target dataset or throw a 404 if it doesn't exist
   val dataset = cacheDB.selectDataset(datasetID)
