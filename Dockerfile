@@ -14,7 +14,8 @@ WORKDIR /workspace
 COPY settings.gradle.kts settings.gradle.kts
 COPY build.gradle.kts build.gradle.kts
 COPY platform platform
-COPY modules modules
+COPY daemons daemons
+COPY lanes lanes
 COPY components components
 COPY src src
 
