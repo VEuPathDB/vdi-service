@@ -48,6 +48,9 @@ internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : Pruner
         // if a module shutdown has been requested.
         delay(config.wakeupInterval)
 
+        if (shutdownTrigger.isTriggered())
+          break
+
         val start = now()
 
         log.trace("testing whether we should be pruning S3")

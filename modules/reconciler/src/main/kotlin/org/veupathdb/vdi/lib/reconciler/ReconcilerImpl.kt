@@ -51,6 +51,9 @@ class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, VDIServ
         // Wake up on a short interval to catch shutdown signals.
         delay(wakeInterval)
 
+        if (isShutDown())
+          break
+
         val now = System.currentTimeMillis()
 
         // If we haven't yet reached the configured amount of time for the run
