@@ -1,6 +1,6 @@
 package vdi.lane.install
 
-import vdi.component.modules.VDIServiceModule
+import vdi.component.modules.VDIModule
 
 /**
  * Install Data Trigger Handler
@@ -13,4 +13,4 @@ import vdi.component.modules.VDIServiceModule
  *
  * @author Elizabeth Paige Harper - https://github.com/Foxcapades
  */
-sealed interface InstallDataTriggerHandler : VDIServiceModule
+sealed interface InstallDataTriggerHandler : VDIModule

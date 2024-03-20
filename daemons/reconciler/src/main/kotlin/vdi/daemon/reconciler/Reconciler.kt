@@ -1,6 +1,6 @@
 package vdi.daemon.reconciler
 
-import vdi.component.modules.VDIServiceModule
+import vdi.component.modules.VDIModule
 
 /**
  * Reconciler module
@@ -10,4 +10,4 @@ import vdi.component.modules.VDIServiceModule
  *
  * @since 1.0.0
  */
-sealed interface Reconciler : VDIServiceModule
+sealed interface Reconciler : VDIModule

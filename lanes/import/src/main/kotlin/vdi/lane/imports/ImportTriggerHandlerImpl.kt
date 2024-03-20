@@ -2,8 +2,8 @@ package vdi.lane.imports
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
@@ -25,7 +25,7 @@ import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
-import vdi.component.modules.VDIServiceModuleBase
+import vdi.component.modules.AbstractVDIModule
 import vdi.component.plugin.client.response.imp.*
 import vdi.component.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetManager
@@ -39,7 +39,7 @@ import kotlin.io.path.*
 
 internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig)
   : ImportTriggerHandler
-  , VDIServiceModuleBase("import-trigger-handler")
+  , AbstractVDIModule("import-trigger-handler")
 {
   private val log = logger()
 
@@ -60,8 +60,8 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       Metrics.Import.queueSize.inc(it.toDouble())
     }
 
-    runBlocking(Dispatchers.IO) {
-      launch {
+    coroutineScope {
+      launch(Dispatchers.IO) {
         // While the shutdown trigger has not yet been triggered
         while (!isShutDown()) {
           // Read messages from the kafka consumer
@@ -80,9 +80,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       wp.start()
     }
 
-    log.info("closing kafka client")
     kc.close()
-    log.info("kafka client closed")
     confirmShutdown()
   }
 

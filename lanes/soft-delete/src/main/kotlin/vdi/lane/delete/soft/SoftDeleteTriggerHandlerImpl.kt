@@ -1,8 +1,8 @@
 package vdi.lane.delete.soft
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -15,7 +15,7 @@ import vdi.component.db.app.withTransaction
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
-import vdi.component.modules.VDIServiceModuleBase
+import vdi.component.modules.AbstractVDIModule
 import vdi.component.plugin.client.response.uni.UninstallBadRequestResponse
 import vdi.component.plugin.client.response.uni.UninstallResponseType
 import vdi.component.plugin.client.response.uni.UninstallUnexpectedErrorResponse
@@ -23,7 +23,7 @@ import vdi.component.plugin.mapping.PluginHandlers
 
 internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTriggerHandlerConfig)
   : SoftDeleteTriggerHandler
-  , VDIServiceModuleBase("soft-delete-trigger-handler")
+  , AbstractVDIModule("soft-delete-trigger-handler")
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -31,15 +31,13 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
 
   private val appDB = AppDB()
 
-  override val name = "soft-delete lane"
-
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.softDeleteTriggerTopic, config.kafkaConsumerConfig)
     val wp = WorkerPool("soft-delete-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
       Metrics.softDeleteQueueSize.inc(it.toDouble())
     }
 
-    runBlocking {
+    coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
           kc.fetchMessages(config.softDeleteTriggerMessageKey)
@@ -55,9 +53,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
       wp.start()
     }
 
-    log.info("closing kafka client")
     kc.close()
-    log.info("kafka client closed")
     confirmShutdown()
   }
 

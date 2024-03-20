@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
-import vdi.component.async.ShutdownSignal
 import vdi.component.kafka.router.KafkaRouterFactory
+import vdi.component.modules.AbstractVDIModule
 import vdi.component.rabbit.RabbitMQEventIterator
 import vdi.component.rabbit.RabbitMQEventSource
 import vdi.component.s3.paths.VDDatasetFilePath
@@ -15,35 +15,11 @@ import vdi.component.s3.paths.toVDPathOrNull
 import vdi.daemon.events.routing.model.MinIOEvent
 import vdi.daemon.events.routing.model.MinIOEventAction
 
-internal class EventRouterImpl(private val config: EventRouterConfig) : EventRouter {
+internal class EventRouterImpl(private val config: EventRouterConfig) : EventRouter, AbstractVDIModule("event-router") {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val shutdownTrigger = ShutdownSignal()
-  private val shutdownConfirm = ShutdownSignal()
-
-  @Volatile
-  private var started = false
-
-  override val name = "dataset-reinstaller"
-
-  override suspend fun start() {
-    if (!started) {
-      log.info("starting event-router module")
-
-      started = true
-      run()
-    }
-  }
-
-  override suspend fun stop() {
-    log.info("triggering event-router shutdown")
-    shutdownTrigger.trigger()
-    shutdownConfirm.await()
-    log.info("event-router shutdown confirmed")
-  }
-
-  private suspend fun run() {
+  override suspend fun run() {
 
     // Get a RabbitMQ Event Source which we will use to get an event stream
     // later.
@@ -51,8 +27,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
       log.debug("Connecting to RabbitMQ: {}", config.rabbitConfig.serverAddress)
       RabbitMQEventSource(config.rabbitConfig, shutdownTrigger) { JSON.readValue<MinIOEvent>(it) }
     } catch (e: Throwable) {
-      shutdownTrigger.trigger()
-      shutdownConfirm.trigger()
+      triggerShutdown()
+      confirmShutdown()
       log.error("failed to create a RabbitMQEventSource", e)
       throw e
     }
@@ -62,8 +38,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     val kr = try {
       KafkaRouterFactory(config.kafkaConfig).newKafkaRouter()
     } catch (e: Throwable) {
-      shutdownTrigger.trigger()
-      shutdownConfirm.trigger()
+      triggerShutdown()
+      confirmShutdown()
       log.error("failed to create a KafkaRouterFactory", e)
       throw e
     }
@@ -73,7 +49,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
 
     // While we haven't been told to shut down, and the stream hasn't yet been
     // closed:
-    while (!shutdownTrigger.isTriggered() && stream.safeHasNext()) {
+    while (!isShutDown() && stream.safeHasNext()) {
 
       // Get the next event from the RabbitMQ stream.
       val event = stream.next()
@@ -159,14 +135,14 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
 
     kr.close()
     es.close()
-    shutdownConfirm.trigger()
+    confirmShutdown()
   }
 
   private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: (UserID, DatasetID) -> Unit) {
     try {
       fn(userID, datasetID)
     } catch (e: Throwable) {
-      shutdownTrigger.trigger()
+      triggerShutdown()
       log.error("failed to send event message to Kafka", e)
       throw e
     }
@@ -176,7 +152,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     try {
       hasNext()
     } catch (e: Throwable) {
-      shutdownTrigger.trigger()
+      triggerShutdown()
       log.error("failed to poll RabbitMQ for next message", e)
       throw e
     }

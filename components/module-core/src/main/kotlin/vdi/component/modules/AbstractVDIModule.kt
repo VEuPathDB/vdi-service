@@ -18,24 +18,21 @@ import vdi.component.s3.DatasetManager
  * VDI Service Module Abstract Base
  *
  * Provides common functionality used by most implementations of the
- * [VDIServiceModule] interface.
- *
- * @since 1.0.0
+ * [VDIModule] interface.
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-abstract class VDIServiceModuleBase(
-  override val name: String,
-) : VDIServiceModule {
+abstract class AbstractVDIModule(override val name: String) : VDIModule {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val shutdownTrigger = ShutdownSignal()
-  private val shutdownConfirm = ShutdownSignal()
+  protected val shutdownTrigger = ShutdownSignal()
+
+  protected val shutdownConfirm = ShutdownSignal()
 
   @Volatile
   private var started = false
 
-  override suspend fun start() {
+  final override suspend fun start() {
     if (!started) {
       log.info("starting module {}", name)
 
@@ -44,7 +41,7 @@ abstract class VDIServiceModuleBase(
     }
   }
 
-  override suspend fun stop() {
+  final override suspend fun stop() {
     log.info("shutting down module {}", name)
 
     shutdownTrigger.trigger()
@@ -68,9 +65,6 @@ abstract class VDIServiceModuleBase(
    */
   protected suspend fun confirmShutdown() = shutdownConfirm.trigger()
 
-  /**
-   * Executes the module's core loop.
-   */
   protected abstract suspend fun run()
 
   /**

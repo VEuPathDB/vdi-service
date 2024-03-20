@@ -1,21 +1,21 @@
 package vdi.lane.delete.hard
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import vdi.component.modules.VDIServiceModuleBase
+import vdi.component.modules.AbstractVDIModule
 
 internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTriggerHandlerConfig)
   : HardDeleteTriggerHandler
-  , VDIServiceModuleBase("hard-delete-trigger-handler")
+  , AbstractVDIModule("hard-delete-trigger-handler")
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.hardDeleteTopic, config.kafkaConsumerConfig)
 
-    runBlocking {
+    coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
           kc.fetchMessages(config.hardDeleteMessageKey)

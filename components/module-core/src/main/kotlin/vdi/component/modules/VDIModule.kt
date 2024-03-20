@@ -8,7 +8,7 @@ package vdi.component.modules
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-interface VDIServiceModule {
+interface VDIModule {
 
   val name: String
 

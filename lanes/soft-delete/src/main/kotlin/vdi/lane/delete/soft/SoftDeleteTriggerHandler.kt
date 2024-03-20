@@ -1,6 +1,6 @@
 package vdi.lane.delete.soft
 
-import vdi.component.modules.VDIServiceModule
+import vdi.component.modules.VDIModule
 
 /**
  * Soft Delete Trigger Handling Module
@@ -13,4 +13,4 @@ import vdi.component.modules.VDIServiceModule
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-sealed interface SoftDeleteTriggerHandler : VDIServiceModule
+sealed interface SoftDeleteTriggerHandler : VDIModule

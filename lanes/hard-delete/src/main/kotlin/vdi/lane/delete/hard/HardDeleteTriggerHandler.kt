@@ -1,6 +1,6 @@
 package vdi.lane.delete.hard
 
-import vdi.component.modules.VDIServiceModule
+import vdi.component.modules.VDIModule
 
 /**
  * Hard Delete Trigger Handler
@@ -15,4 +15,4 @@ import vdi.component.modules.VDIServiceModule
  *
  * @author Elizabeth Paige Harper - https://github.com/Foxcapades
  */
-sealed interface HardDeleteTriggerHandler : VDIServiceModule
+sealed interface HardDeleteTriggerHandler : VDIModule

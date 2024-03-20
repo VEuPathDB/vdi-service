@@ -1,6 +1,6 @@
 package vdi.lane.reconciliation
 
-import vdi.component.modules.VDIServiceModule
+import vdi.component.modules.VDIModule
 
 /**
  * Reconciliation Event Handler
@@ -12,4 +12,4 @@ import vdi.component.modules.VDIServiceModule
  *
  * @author Elizabeth Paige Harper - https://github.com/Foxcapades
  */
-sealed interface ReconciliationEventHandler : VDIServiceModule
+sealed interface ReconciliationEventHandler : VDIModule

@@ -1,8 +1,8 @@
 package vdi.lane.install
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -18,7 +18,7 @@ import vdi.component.db.app.model.InstallType
 import vdi.component.db.app.withTransaction
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
-import vdi.component.modules.VDIServiceModuleBase
+import vdi.component.modules.AbstractVDIModule
 import vdi.component.plugin.client.response.ind.*
 import vdi.component.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetManager
@@ -34,7 +34,7 @@ import kotlin.io.path.outputStream
 
 internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig)
   : InstallDataTriggerHandler
-  , VDIServiceModuleBase("install-data-trigger-handler")
+  , AbstractVDIModule("install-data-trigger-handler")
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -44,8 +44,6 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
   private val appDB = AppDB()
 
-  override val name = "install-data lane"
-
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
@@ -53,7 +51,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       Metrics.Install.queueSize.inc(it.toDouble())
     }
 
-    runBlocking {
+    coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
           kc.fetchMessages(config.installDataTriggerMessageKey)
@@ -69,9 +67,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       wp.start()
     }
 
-    log.info("closing kafka client")
     kc.close()
-    log.info("kafka client closed")
     confirmShutdown()
   }
 

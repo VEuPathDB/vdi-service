@@ -1,6 +1,6 @@
 package vdi.daemon.reinstaller
 
-import vdi.component.modules.VDIServiceModule
+import vdi.component.modules.VDIModule
 
 /**
  * Dataset Reinstaller
@@ -13,4 +13,4 @@ import vdi.component.modules.VDIServiceModule
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-sealed interface DatasetReinstaller : VDIServiceModule
+sealed interface DatasetReinstaller : VDIModule

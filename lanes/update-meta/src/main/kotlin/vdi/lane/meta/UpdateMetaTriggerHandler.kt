@@ -1,6 +1,6 @@
 package vdi.lane.meta
 
-import vdi.component.modules.VDIServiceModule
+import vdi.component.modules.VDIModule
 
 /**
  * Update Meta Trigger Handling Module
@@ -13,4 +13,4 @@ import vdi.component.modules.VDIServiceModule
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-sealed interface UpdateMetaTriggerHandler : VDIServiceModule
+sealed interface UpdateMetaTriggerHandler : VDIModule

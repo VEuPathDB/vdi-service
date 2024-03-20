@@ -1,8 +1,8 @@
 package vdi.lane.meta
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
@@ -27,7 +27,7 @@ import vdi.component.kafka.EventMessage
 import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
 import vdi.component.metrics.Metrics
-import vdi.component.modules.VDIServiceModuleBase
+import vdi.component.modules.AbstractVDIModule
 import vdi.component.plugin.client.response.inm.InstallMetaBadRequestResponse
 import vdi.component.plugin.client.response.inm.InstallMetaResponseType
 import vdi.component.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
@@ -39,15 +39,13 @@ import java.time.OffsetDateTime
 
 internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTriggerHandlerConfig)
   : UpdateMetaTriggerHandler
-  , VDIServiceModuleBase("update-meta-trigger-handler")
+  , AbstractVDIModule("update-meta-trigger-handler")
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
   private val cacheDB = vdi.component.db.cache.CacheDB()
 
   private val appDB = AppDB()
-
-  override val name = "update-meta lane"
 
   override suspend fun run() {
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
@@ -57,8 +55,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       Metrics.updateMetaQueueSize.inc(it.toDouble())
     }
 
-    runBlocking(Dispatchers.IO) {
-      launch {
+    coroutineScope {
+      launch(Dispatchers.IO) {
         while (!isShutDown()) {
           // Select meta trigger messages from Kafka
           kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey)
@@ -75,10 +73,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
       wp.start()
     }
 
-    log.info("closing kafka client and router")
     kc.close()
     kr.close()
-    log.info("kafka client and router closed")
     confirmShutdown()
   }
 

@@ -1,8 +1,8 @@
 package vdi.lane.sharing
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -20,7 +20,7 @@ import vdi.component.db.cache.model.DatasetShareOfferImpl
 import vdi.component.db.cache.model.DatasetShareReceiptImpl
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
-import vdi.component.modules.VDIServiceModuleBase
+import vdi.component.modules.AbstractVDIModule
 import vdi.component.s3.DatasetManager
 import vdi.component.s3.files.DatasetShare
 import java.sql.SQLException
@@ -47,15 +47,13 @@ private data class ShareInfo(
  */
 internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig)
 : ShareTriggerHandler
-, VDIServiceModuleBase("share-trigger-handler") {
+, AbstractVDIModule("share-trigger-handler") {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
   private val cacheDB = vdi.component.db.cache.CacheDB()
 
   private val appDB = AppDB()
-
-  override val name = "sharing lane"
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.shareTriggerTopic, config.kafkaConsumerConfig)
@@ -64,7 +62,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       Metrics.shareQueueSize.inc(it.toDouble())
     }
 
-    runBlocking {
+    coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
           kc.fetchMessages(config.shareTriggerMessageKey)
@@ -80,9 +78,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       wp.start()
     }
 
-    log.info("closing kafka client")
     kc.close()
-    log.info("kafka client closed")
     confirmShutdown()
   }
 

@@ -1,6 +1,6 @@
 package vdi.lane.sharing
 
-import vdi.component.modules.VDIServiceModule
+import vdi.component.modules.VDIModule
 
 /**
  * Share Trigger Handling Module
@@ -12,4 +12,4 @@ import vdi.component.modules.VDIServiceModule
  *
  * @author Elizabeth Paige Harper - https://github.com/Foxcapades
  */
-sealed interface ShareTriggerHandler : VDIServiceModule
+sealed interface ShareTriggerHandler : VDIModule

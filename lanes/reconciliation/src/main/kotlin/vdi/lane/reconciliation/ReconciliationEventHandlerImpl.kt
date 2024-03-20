@@ -1,19 +1,19 @@
 package vdi.lane.reconciliation
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.async.WorkerPool
 import vdi.component.metrics.Metrics
-import vdi.component.modules.VDIServiceModuleBase
+import vdi.component.modules.AbstractVDIModule
 import java.util.concurrent.ConcurrentHashMap
 
 internal class ReconciliationEventHandlerImpl(private val config: ReconciliationEventHandlerConfig)
   : ReconciliationEventHandler
-  , VDIServiceModuleBase("reconciliation-event-handler")
+  , AbstractVDIModule("reconciliation-event-handler")
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -32,7 +32,7 @@ internal class ReconciliationEventHandlerImpl(private val config: Reconciliation
       datasetManager = requireDatasetManager(config.s3Config, config.s3Bucket)
     )
 
-    runBlocking {
+    coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
           kc.fetchMessages(config.kafkaMessageKey)

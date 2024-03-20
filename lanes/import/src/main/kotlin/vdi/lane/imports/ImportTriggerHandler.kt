@@ -1,6 +1,6 @@
 package vdi.lane.imports
 
-import vdi.component.modules.VDIServiceModule
+import vdi.component.modules.VDIModule
 
 /**
  * Import Trigger Handling Module
@@ -12,5 +12,5 @@ import vdi.component.modules.VDIServiceModule
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-interface ImportTriggerHandler : VDIServiceModule
+interface ImportTriggerHandler : VDIModule
 

@@ -1,36 +1,37 @@
 package vdi.daemon.reconciler
 
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.apache.logging.log4j.kotlin.CoroutineThreadContext
 import org.apache.logging.log4j.kotlin.ThreadContextData
 import org.apache.logging.log4j.kotlin.logger
 import vdi.component.db.app.AppDatabaseRegistry
+import vdi.component.kafka.router.KafkaRouter
 import vdi.component.kafka.router.KafkaRouterFactory
 import vdi.component.metrics.Metrics
-import vdi.component.modules.VDIServiceModuleBase
+import vdi.component.modules.AbstractJobExecutor
+import vdi.component.s3.DatasetManager
 import vdi.daemon.reconciler.config.ReconcilerConfig
 import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
-class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, VDIServiceModuleBase("reconciler") {
+class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, AbstractJobExecutor("reconciler") {
+  private var datasetManager: DatasetManager
 
-  private val wakeInterval = 2.seconds
+  private var kafkaRouter: KafkaRouter
 
-  override suspend fun run() {
-    if (!config.reconcilerEnabled) {
-      logger().warn("Reconciler is disabled. Skipping run")
-      return
+  private val targets: List<ReconcilerInstance>
+
+  private var lastRun = 0L
+
+  init {
+    runBlocking {
+      datasetManager = requireDatasetManager(config.s3Config, config.s3Bucket)
+      kafkaRouter = requireKafkaRouter()
     }
 
-    logger().info("Running ReconcilerImpl module")
-
-    val datasetManager = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val kafkaRouter = requireKafkaRouter()
-
-    val targets: MutableList<ReconcilerInstance> = AppDatabaseRegistry.iterator().asSequence()
+    targets = AppDatabaseRegistry.iterator().asSequence()
       .map { (project, _) ->
         ReconcilerInstance(
           AppDBTarget(project, project),
@@ -41,58 +42,49 @@ class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, VDIServ
       .toMutableList()
 
     targets.add(ReconcilerInstance(CacheDBTarget(), datasetManager, kafkaRouter))
+  }
 
-    runBlocking {
-      // Last run to zero to perform a reconciliation on service startup.
-      var lastRun = 0L
+  override suspend fun runJob() {
+    if (!config.reconcilerEnabled) {
+      logger().warn("Reconciler is disabled. Skipping run")
+      return
+    }
 
-      while (!isShutDown()) {
-        // Wake up on a short interval to catch shutdown signals.
-        delay(wakeInterval)
+    val now = System.currentTimeMillis()
 
-        if (isShutDown())
-          break
+    // If we haven't yet reached the configured amount of time for the run
+    // interval, skip to the next iteration, sleep, and test again.
+    if ((now - lastRun).milliseconds < config.runInterval) {
+      return
+    }
 
-        val now = System.currentTimeMillis()
+    lastRun = now
 
-        // If we haven't yet reached the configured amount of time for the run
-        // interval, skip to the next iteration, sleep, and test again.
-        if ((now - lastRun).milliseconds < config.runInterval) {
-          continue
-        }
+    // If we've reached this point, we've waited for the configured interval
+    // duration.  We can now run the reconciliation process.
+    logger().info("Scheduling reconciler for ${targets.size} targets.")
 
-        lastRun = now
+    val timer = Metrics.Reconciler.reconcilerTimes.startTimer()
 
-        // If we've reached this point, we've waited for the configured interval
-        // duration.  We can now run the reconciliation process.
-        logger().info("Scheduling reconciler for ${targets.size} targets.")
-
-        val timer = Metrics.Reconciler.reconcilerTimes.startTimer()
-
-        // Schedule the reconciler for each target database.
-        targets.forEach { target ->
-          launch(
-            CoroutineThreadContext(
-              contextData = ThreadContextData( // Add log4j context to reconciler to distinguish targets in logs.
-                map = mapOf(
-                  Pair(
-                    "workerID",
-                    target.name
-                  )
-                ), Stack()
-              )
+    // Schedule the reconciler for each target database.
+    coroutineScope {
+      targets.forEach { target ->
+        launch(
+          CoroutineThreadContext(
+            contextData = ThreadContextData( // Add log4j context to reconciler to distinguish targets in logs.
+              map = mapOf(
+                Pair(
+                  "workerID",
+                  target.name
+                )
+              ), Stack()
             )
-          ) { target.reconcile() }
-        }
-
-        timer.observeDuration()
+          )
+        ) { target.reconcile() }
       }
     }
 
-    logger().info("closing kafka router")
-    kafkaRouter.close()
-    logger().info("kafka router closed")
-    confirmShutdown()
+    timer.observeDuration()
   }
 
   private suspend fun requireKafkaRouter() = safeExec("failed to create KafkaRouter instance") {

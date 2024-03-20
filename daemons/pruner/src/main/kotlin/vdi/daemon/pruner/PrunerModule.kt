@@ -1,6 +1,6 @@
 package vdi.daemon.pruner
 
-import vdi.component.modules.VDIServiceModule
+import vdi.component.modules.VDIModule
 
 /**
  * Pruning Module
@@ -12,5 +12,5 @@ import vdi.component.modules.VDIServiceModule
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-sealed interface PrunerModule : VDIServiceModule
+sealed interface PrunerModule : VDIModule
 
