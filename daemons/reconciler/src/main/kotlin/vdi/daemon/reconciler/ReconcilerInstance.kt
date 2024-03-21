@@ -101,9 +101,7 @@ class ReconcilerInstance(
           // If dataset has a delete flag present and the dataset is not marked
           // as uninstalled from the target, then send a sync event.
           if (sourceDatasetDir.hasDeleteFlag() && !nextTargetDataset!!.isUninstalled) {
-            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID,
-              SyncReason.NeedsUninstall(targetDB)
-            )
+            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID, SyncReason.NeedsUninstall(targetDB))
           } else {
             val syncStatus = isOutOfSync(sourceDatasetDir, nextTargetDataset!!)
 
