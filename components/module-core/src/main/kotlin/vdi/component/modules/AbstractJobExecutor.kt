@@ -28,7 +28,7 @@ abstract class AbstractJobExecutor(name: String, private val wakeInterval: Durat
         if (isShutDown())
           break
 
-        run()
+        runJob()
       }
     }
 
