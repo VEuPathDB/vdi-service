@@ -84,7 +84,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     confirmShutdown()
   }
 
-  private fun importJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
+  private suspend fun importJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
     log.trace("importJob(dm=..., userID=$userID, datasetID=$datasetID")
 
     // lookup the dataset in S3
@@ -119,7 +119,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private fun processImportJob(userID: UserID, datasetID: DatasetID, datasetDir: vdi.component.s3.DatasetDirectory) {
+  private suspend fun processImportJob(userID: UserID, datasetID: DatasetID, datasetDir: vdi.component.s3.DatasetDirectory) {
     // Load the dataset metadata from S3
     val datasetMeta = datasetDir.getMetaFile().load()!!
 

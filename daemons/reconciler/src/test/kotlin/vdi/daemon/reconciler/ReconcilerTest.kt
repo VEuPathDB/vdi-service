@@ -2,6 +2,7 @@
 
 package vdi.daemon.reconciler
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
@@ -47,7 +48,7 @@ class ReconcilerTest {
             mockDatasetDirectory(111L, "32345678123456781234567812345678"),
             // Missing 42345678123456781234567812345678, should be deleted in target.
         ).stream()).`when`(datasetManager).streamAllDatasets()
-        recon.reconcile()
+        runBlocking { recon.reconcile() }
         val capturedDatasetID = mockingDetails(kafkaRouter).invocations
             .find { it.method.name == "sendReconciliationTrigger" }!!
             .getArgument<DatasetID>(1)
@@ -69,7 +70,7 @@ class ReconcilerTest {
         doReturn(listOf(
             mockDatasetDirectory(111L, "12345678123456781234567812345678", UpdateTime.plusDays(1)),
         ).stream()).`when`(datasetManager).streamAllDatasets()
-        recon.reconcile()
+        runBlocking { recon.reconcile() }
         val capturedDatasetID = mockingDetails(kafkaRouter).invocations
             .find { it.method.name == "sendReconciliationTrigger" }!!
             .getArgument<DatasetID>(1)
@@ -91,7 +92,7 @@ class ReconcilerTest {
         doReturn(listOf(
             mockDatasetDirectory(111L, "12345678123456781234567812345678", UpdateTime),
         ).stream()).`when`(datasetManager).streamAllDatasets()
-        recon.reconcile()
+        runBlocking { recon.reconcile() }
         assertEquals(0, mockingDetails(kafkaRouter).invocations.size)
     }
 
@@ -114,7 +115,7 @@ class ReconcilerTest {
                 mockDatasetDirectory(111L, "32345678123456781234567812345678", UpdateTime),
             ).stream()
         ).`when`(datasetManager).streamAllDatasets()
-        recon.reconcile()
+        runBlocking { recon.reconcile() }
         assertEquals(3, mockingDetails(kafkaRouter).invocations.size)
     }
 
@@ -141,7 +142,7 @@ class ReconcilerTest {
             mockDatasetDirectory(111L, "32345678123456781234567812345678"),
             mockDatasetDirectory(111L, "42345678123456781234567812345678"),
         ).stream()).`when`(datasetManager).streamAllDatasets()
-        recon.reconcile()
+        runBlocking { recon.reconcile() }
         val capturedDatasetID = mockingDetails(cacheDb).invocations
             .find { it.method.name == "deleteDataset" }!!
             .getArgument<DatasetID>(1)
@@ -172,7 +173,7 @@ class ReconcilerTest {
             mockDatasetDirectory(111L, "12345678123456781234567812345678", UpdateTime.plusDays(1)),
             mockDatasetDirectory(111L, "52345678123456781234567812345678", UpdateTime.plusDays(1)),
             ).stream()).`when`(datasetManager).streamAllDatasets()
-        recon.reconcile()
+        runBlocking { recon.reconcile() }
         val syncedIDs = mockingDetails(kafkaRouter).invocations
             .filter { it.method.name == "sendReconciliationTrigger" }
             .map { it.getArgument<DatasetID>(1).toString() }
@@ -208,7 +209,7 @@ class ReconcilerTest {
                 mockDatasetDirectory(333L, "aaa", UpdateTime),
             ).stream()
         ).`when`(datasetManager).streamAllDatasets()
-        recon.reconcile()
+        runBlocking { recon.reconcile() }
         val deletedIDs = mockingDetails(cacheDb).invocations
             .filter { it.method.name == "deleteDataset" }
             .map { it.getArgument<DatasetID>(1).toString() }
@@ -238,7 +239,7 @@ class ReconcilerTest {
                 mockDatasetDirectory(111L, "Vbz2OgjnKsR", UpdateTime.plusDays(1)),
             ).stream()
         ).`when`(datasetManager).streamAllDatasets()
-        recon.reconcile()
+        runBlocking { recon.reconcile() }
         val deletedIDs = mockingDetails(cacheDb).invocations
             .filter { it.method.name == "deleteDataset" }
             .map { it.getArgument<DatasetID>(1).toString() }

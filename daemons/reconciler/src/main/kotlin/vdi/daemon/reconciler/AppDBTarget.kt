@@ -24,7 +24,7 @@ class AppDBTarget(
     return appDB.accessor(projectID)!!.streamAllSyncControlRecords()
   }
 
-  override fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID) {
+  override suspend fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID) {
     if (!PluginHandlers.contains(datasetType.name, datasetType.version)) {
       throw UnsupportedTypeException(
         "Unable to delete unknown dataset type $datasetType from target database " +

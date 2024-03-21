@@ -28,6 +28,6 @@ interface ReconcilerTarget {
    */
   fun streamSortedSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord>
 
-  fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID)
+  suspend fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID)
 }
 

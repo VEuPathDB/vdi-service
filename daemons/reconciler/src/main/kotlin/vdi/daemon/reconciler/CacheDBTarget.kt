@@ -17,7 +17,7 @@ class CacheDBTarget : ReconcilerTarget {
     return cacheDB.selectAllSyncControlRecords()
   }
 
-  override fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID) {
+  override suspend fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID) {
     cacheDB.withTransaction {
       // Delete dataset and all associated rows in a transaction.
       it.deleteInstallFiles(datasetID)

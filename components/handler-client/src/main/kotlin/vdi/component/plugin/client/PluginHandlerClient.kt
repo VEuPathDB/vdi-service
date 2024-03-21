@@ -24,7 +24,7 @@ interface PluginHandlerClient {
    * @return An [ImportResponse] instance wrapping the raw response from the
    * plugin handler server.
    */
-  fun postImport(datasetID: DatasetID, meta: VDIDatasetMeta, upload: InputStream): ImportResponse
+  suspend fun postImport(datasetID: DatasetID, meta: VDIDatasetMeta, upload: InputStream): ImportResponse
 
   /**
    * `POST`s an install-meta request to the configured plugin handler server
@@ -39,7 +39,7 @@ interface PluginHandlerClient {
    * @return An [InstallMetaResponse] instance wrapping the raw response from
    * the plugin handler server.
    */
-  fun postInstallMeta(datasetID: DatasetID, projectID: ProjectID, meta: VDIDatasetMeta): InstallMetaResponse
+  suspend fun postInstallMeta(datasetID: DatasetID, projectID: ProjectID, meta: VDIDatasetMeta): InstallMetaResponse
 
   /**
    * `POST`s an install-data request to the configured plugin handler server
@@ -54,7 +54,7 @@ interface PluginHandlerClient {
    * @return An [InstallDataResponse] instance wrapping the raw response from
    * the plugin handler server.
    */
-  fun postInstallData(datasetID: DatasetID, projectID: ProjectID, payload: InputStream): InstallDataResponse
+  suspend fun postInstallData(datasetID: DatasetID, projectID: ProjectID, payload: InputStream): InstallDataResponse
 
   /**
    * `POST`s an uninstall request to the configured plugin handler server.
@@ -66,5 +66,5 @@ interface PluginHandlerClient {
    * @return An [UninstallResponse] instance wrapping the raw response from the
    * plugin handler server.
    */
-  fun postUninstall(datasetID: DatasetID, projectID: ProjectID): UninstallResponse
+  suspend fun postUninstall(datasetID: DatasetID, projectID: ProjectID): UninstallResponse
 }

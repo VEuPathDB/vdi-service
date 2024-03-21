@@ -78,7 +78,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     confirmShutdown()
   }
 
-  private fun updateMeta(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
+  private suspend fun updateMeta(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
     try {
       updateMeta(dm, msg.userID, msg.datasetID)
     } finally {
@@ -87,7 +87,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     }
   }
 
-  private fun updateMeta(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
+  private suspend fun updateMeta(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
     log.debug("Looking up dataset directory for dataset {}/{}", userID, datasetID)
 
     // lookup the dataset directory for the given userID and datasetID
@@ -156,7 +156,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     timer.observeDuration()
   }
 
-  private fun updateTargetMeta(
+  private suspend fun updateTargetMeta(
     ph: PluginHandler,
     meta: VDIDatasetMeta,
     metaTimestamp: OffsetDateTime,

@@ -28,7 +28,7 @@ class ReconcilerInstance(
 
   val name = targetDB.name
 
-  fun reconcile() {
+  suspend fun reconcile() {
     try {
       tryReconcile()
       Metrics.Reconciler.failedReconciliation.labels(targetDB.name).inc(0.0) // Initialize failures to zero.
@@ -39,7 +39,7 @@ class ReconcilerInstance(
     }
   }
 
-  private fun tryReconcile() {
+  private suspend fun tryReconcile() {
     logger().info("Beginning reconciliation of ${targetDB.name}")
     targetDB.streamSortedSyncControlRecords().use { targetDBStream ->
 
@@ -51,7 +51,7 @@ class ReconcilerInstance(
       // Iterate through datasets in S3.
       while (sourceIterator.hasNext()) {
 
-          // Pop the next DatasetDirectory instance from the S3 stream.
+        // Pop the next DatasetDirectory instance from the S3 stream.
         val sourceDatasetDir = sourceIterator.next()
 
         logger().info("Checking dataset ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID} for ${targetDB.name}")
@@ -70,12 +70,11 @@ class ReconcilerInstance(
         // If target dataset stream is "ahead" of source stream, delete
         // the datasets from the target stream until we are aligned
         // again (or the target stream is consumed).
-        if (comparableS3Id.compareTo(comparableTargetId!!, false) > 0) {
-
+        if (comparableS3Id > comparableTargetId!!) {
           // Delete datasets until and advance target iterator until streams are aligned.
           while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId!!, false) > 0) {
 
-            logger().info("Attempting to delete dataset with owner $comparableTargetId " +
+            logger().info("Attempting to delete dataset $comparableTargetId " +
                     "because $comparableS3Id is lexigraphically greater than $comparableTargetId. Presumably $comparableTargetId is not in MinIO.")
             tryDeleteDataset(targetDB, nextTargetDataset!!)
             nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
@@ -93,7 +92,7 @@ class ReconcilerInstance(
         comparableS3Id = "${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID}"
         comparableTargetId = nextTargetDataset!!.getComparableID()
 
-        if (comparableS3Id.compareTo(comparableTargetId, false) < 0) {
+        if (comparableS3Id < comparableTargetId) {
           // Dataset is in source, but not in target. Send an event.
           Metrics.Reconciler.missingInTarget.labels(targetDB.name).inc()
           sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB))
@@ -111,10 +110,10 @@ class ReconcilerInstance(
             // Dataset is in source and target. Check dates to see if sync is needed.
             if (syncStatus.isOutOfSync) {
               sendSyncIfRelevant(sourceDatasetDir, syncStatus.asSyncReason())
-            } else {
-              // Advance next target dataset pointer, we're done with this one since it's in sync.
-              nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
             }
+
+            // Advance next target dataset pointer, we're done with this one
+            nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
           }
         }
       }
@@ -135,7 +134,7 @@ class ReconcilerInstance(
   //        moved to the hard-delete lane.
   private val tempYesterday = OffsetDateTime.now().minusDays(1)
 
-  private fun tryDeleteDataset(targetDB: ReconcilerTarget, record: VDIReconcilerTargetRecord) {
+  private suspend fun tryDeleteDataset(targetDB: ReconcilerTarget, record: VDIReconcilerTargetRecord) {
     logger().info("attempting to delete ${record.ownerID}/${record.datasetID}")
 
     // FIXME: temporary hack to be removed when target db deletes are moved to

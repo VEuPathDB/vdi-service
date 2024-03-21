@@ -18,6 +18,7 @@ import vdi.component.plugin.client.response.uni.UninstallBadRequestResponse
 import vdi.component.plugin.client.response.uni.UninstallResponseType
 import vdi.component.plugin.client.response.uni.UninstallUnexpectedErrorResponse
 import vdi.component.plugin.mapping.PluginHandlers
+import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import vdi.component.s3.paths.S3Paths
 import java.io.InputStream
@@ -49,7 +50,7 @@ object DatasetReinstaller {
    * If a run of the `DatasetReinstaller` is _not_ already in progress, this
    * method will return `true` after the process has completed.
    */
-  fun tryRun(): Boolean {
+  suspend fun tryRun(): Boolean {
     return if (lock.tryLock()) {
       try {
         run()
@@ -62,7 +63,7 @@ object DatasetReinstaller {
     }
   }
 
-  private fun run() {
+  private suspend fun run() {
     log.info("starting dataset reinstaller run {}", ++runCounter)
 
     val s3 = S3Api.newClient(config.s3Config)
@@ -82,7 +83,7 @@ object DatasetReinstaller {
     log.info("dataset reinstaller run {} complete", runCounter)
   }
 
-  private fun processProject(projectID: ProjectID, manager: DatasetManager) {
+  private suspend fun processProject(projectID: ProjectID, manager: DatasetManager) {
     // locate datasets in the ready-for-reinstall status
     val datasets = appDB.accessor(projectID)!!
       .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.ReadyForReinstall)
@@ -100,7 +101,7 @@ object DatasetReinstaller {
     }
   }
 
-  private fun processDataset(dataset: DatasetRecord, projectID: ProjectID, manager: DatasetManager) {
+  private suspend fun processDataset(dataset: DatasetRecord, projectID: ProjectID, manager: DatasetManager) {
     log.info("reinstall processing dataset {}/{} for project {}", dataset.owner, dataset.datasetID, projectID)
 
     // Get a plugin handler for the target dataset type
@@ -117,7 +118,7 @@ object DatasetReinstaller {
     reinstallDataset(dataset, projectID, handler.client, manager)
   }
 
-  private fun uninstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: vdi.component.plugin.client.PluginHandlerClient) {
+  private suspend fun uninstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: vdi.component.plugin.client.PluginHandlerClient) {
     log.debug("attempting to uninstall dataset {}/{} from project {}", dataset.owner, dataset.datasetID, projectID)
 
     val uninstallResult = client.postUninstall(dataset.datasetID, projectID)
@@ -134,7 +135,7 @@ object DatasetReinstaller {
     }
   }
 
-  private fun reinstallDataset(
+  private suspend fun reinstallDataset(
     dataset: DatasetRecord,
     projectID: ProjectID,
     client: vdi.component.plugin.client.PluginHandlerClient,
@@ -169,7 +170,7 @@ object DatasetReinstaller {
     }
   }
 
-  private fun vdi.component.s3.DatasetDirectory.isReinstallable(): Boolean {
+  private fun DatasetDirectory.isReinstallable(): Boolean {
     var ok = true
 
     if (!hasMetaFile()) {
@@ -275,7 +276,7 @@ object DatasetReinstaller {
     throw Exception(response.message)
   }
 
-  private fun <T> withInstallBundle(s3Dir: vdi.component.s3.DatasetDirectory, fn: (upload: InputStream) -> T) =
+  private suspend fun <T> withInstallBundle(s3Dir: DatasetDirectory, fn: suspend (upload: InputStream) -> T) =
     TempFiles.withTempDirectory { tmpDir ->
       val files = ArrayList<Path>(8)
 
@@ -312,6 +313,6 @@ object DatasetReinstaller {
       files.forEach { it.deleteIfExists() }
       files.clear()
 
-      zip.inputStream().buffered().use(fn)
+      zip.inputStream().buffered().use { fn(it) }
     }
 }

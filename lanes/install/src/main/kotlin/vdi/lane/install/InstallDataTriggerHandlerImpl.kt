@@ -71,7 +71,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     confirmShutdown()
   }
 
-  private fun tryExecute(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
+  private suspend fun tryExecute(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
     if (datasetsInProgress.add(datasetID)) {
       try {
         executeJob(userID, datasetID, dm)
@@ -105,7 +105,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
    * @param dm `DatasetManager` instance that will be used to look up the
    * dataset's files in S3.
    */
-  private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
+  private suspend fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
     log.trace("executeJob(userID={}, datasetID={}, dm=...)", userID, datasetID)
 
     log.debug("looking up dataset directory for user {}, dataset {}", userID, datasetID)
@@ -201,7 +201,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
    * This method calls out to the handler server and deals with the response
    * status that it gets in reply.
    */
-  private fun executeJob(
+  private suspend fun executeJob(
     userID:    UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
@@ -408,7 +408,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     throw Exception(res.message)
   }
 
-  private fun <T> withInstallBundle(s3Dir: vdi.component.s3.DatasetDirectory, fn: (upload: InputStream) -> T) =
+  private suspend fun <T> withInstallBundle(s3Dir: vdi.component.s3.DatasetDirectory, fn: suspend (upload: InputStream) -> T) =
     TempFiles.withTempDirectory { tmpDir ->
       val files = ArrayList<Path>(8)
 
@@ -445,6 +445,6 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       files.forEach { it.deleteIfExists() }
       files.clear()
 
-      zip.inputStream().buffered().use(fn)
+      zip.inputStream().buffered().use { fn(it) }
     }
 }

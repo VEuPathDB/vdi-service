@@ -57,7 +57,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     confirmShutdown()
   }
 
-  private fun runJob(userID: UserID, datasetID: DatasetID) {
+  private suspend fun runJob(userID: UserID, datasetID: DatasetID) {
     val internalDBRecord = cacheDB.selectDataset(datasetID)
       ?: throw IllegalStateException("received uninstall event for a dataset that does not exist in the internal database")
 
@@ -102,7 +102,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     timer.observeDuration()
   }
 
-  private fun tryUninstallDataset(
+  private suspend fun tryUninstallDataset(
     userID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,

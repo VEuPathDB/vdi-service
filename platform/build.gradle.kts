@@ -25,7 +25,7 @@ dependencies {
     api("org.apache.logging.log4j:log4j-slf4j-impl:2.21.1")
 
     // Kotlin Extensions
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 
     // HTTP
     api("io.foxcapades.lib:k-multipart:1.2.1")
