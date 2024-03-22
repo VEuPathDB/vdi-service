@@ -4,10 +4,8 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
-import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import vdi.component.db.app.model.*
+import vdi.component.db.app.model.InstallStatus
+import vdi.component.db.app.model.InstallType
 import vdi.component.db.app.sql.*
 import javax.sql.DataSource
 
@@ -22,56 +20,31 @@ internal class AppDBAccessorImpl(
   private inline val con
     get() = dataSource.connection
 
-  override fun selectDataset(datasetID: DatasetID): DatasetRecord? {
-    log.debug("selecting dataset record for dataset {}", datasetID)
-    return con.use { it.selectDataset(schema, datasetID) }
-  }
+  override fun selectDataset(datasetID: DatasetID) = con.use { it.selectDataset(schema, datasetID) }
 
-  override fun selectDatasetInstallMessage(datasetID: DatasetID, installType: InstallType): DatasetInstallMessage? {
-    log.debug("selecting dataset install message for dataset {} and install type {}", datasetID, installType)
-    return con.use { it.selectDatasetInstallMessage(schema, datasetID, installType) }
-  }
+  override fun selectDatasetInstallMessage(datasetID: DatasetID, installType: InstallType) =
+    con.use { it.selectDatasetInstallMessage(schema, datasetID, installType) }
 
-  override fun selectDatasetInstallMessages(datasetID: DatasetID): List<DatasetInstallMessage> {
-    log.debug("selecting dataset install messages for dataset {}", datasetID)
-    return con.use { it.selectDatasetInstallMessages(schema, datasetID) }
-  }
+  override fun selectDatasetInstallMessages(datasetID: DatasetID) =
+    con.use { it.selectDatasetInstallMessages(schema, datasetID) }
 
-  override fun selectDatasetSyncControlRecord(datasetID: DatasetID): VDISyncControlRecord? {
-    log.debug("selecting dataset sync control record for dataset {}", datasetID)
-    return con.use { it.selectSyncControl(schema, datasetID) }
-  }
+  override fun selectDatasetSyncControlRecord(datasetID: DatasetID) =
+    con.use { it.selectSyncControl(schema, datasetID) }
 
-  override fun selectDatasetVisibilityRecords(datasetID: DatasetID): List<DatasetVisibilityRecord> {
-    log.debug("selecting dataset visibility records for dataset {}", datasetID)
-    return con.use { it.selectDatasetVisibilityRecords(schema, datasetID) }
-  }
+  override fun selectDatasetVisibilityRecords(datasetID: DatasetID) =
+    con.use { it.selectDatasetVisibilityRecords(schema, datasetID) }
 
-  override fun selectDatasetProjectLinks(datasetID: DatasetID): List<DatasetProjectLinkRecord> {
-    log.debug("selecting dataset project links for dataset {}", datasetID)
-    return con.use { it.selectDatasetProjectLinks(schema, datasetID) }
-  }
+  override fun selectDatasetProjectLinks(datasetID: DatasetID) =
+    con.use { it.selectDatasetProjectLinks(schema, datasetID) }
 
-  override fun streamAllSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord> {
-    log.debug("Streaming all sync control records")
-    return con.selectAllSyncControl(schema)
-  }
+  override fun streamAllSyncControlRecords() = con.selectAllSyncControl(schema)
 
-  override fun testDatasetVisibilityExists(datasetID: DatasetID, userID: UserID): Boolean {
-    log.debug("testing dataset visibility for dataset {} and user {}", datasetID, userID)
-    return con.use { it.testDatasetVisibilityExists(schema, datasetID, userID) }
-  }
+  override fun testDatasetVisibilityExists(datasetID: DatasetID, userID: UserID) =
+    con.use { it.testDatasetVisibilityExists(schema, datasetID, userID) }
 
-  override fun testDatasetProjectLinkExists(datasetID: DatasetID, projectID: ProjectID): Boolean {
-    log.debug("testing dataset project link for dataset {} and project {}", datasetID, projectID)
-    return con.use { it.testDatasetProjectLinkExists(schema, datasetID, projectID) }
-  }
+  override fun testDatasetProjectLinkExists(datasetID: DatasetID, projectID: ProjectID) =
+    con.use { it.testDatasetProjectLinkExists(schema, datasetID, projectID) }
 
-  override fun selectDatasetsByInstallStatus(
-    installType: InstallType,
-    installStatus: InstallStatus
-  ): List<DatasetRecord> {
-    log.debug("selecting datasets with install type {} in the status {}", installType, installStatus)
-    return con.use { it.selectDatasetsByInstallStatus(schema, installType, installStatus) }
-  }
+  override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
+    con.use { it.selectDatasetsByInstallStatus(schema, installType, installStatus) }
 }

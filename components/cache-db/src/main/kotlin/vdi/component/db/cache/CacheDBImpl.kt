@@ -9,10 +9,8 @@ import org.veupathdb.vdi.lib.common.env.optUShort
 import org.veupathdb.vdi.lib.common.env.require
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
-import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import vdi.component.db.cache.model.*
+import vdi.component.db.cache.model.BrokenImportListQuery
+import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.query.AdminAllDatasetsQuery
 import vdi.component.db.cache.sql.select.*
 import javax.sql.DataSource
@@ -54,20 +52,11 @@ internal object CacheDBImpl: vdi.component.db.cache.CacheDB {
     details    = CacheDBConnectionDetails(host, port, name)
   }
 
-  override fun selectDataset(datasetID: DatasetID): DatasetRecord? {
-    log.debug("selecting dataset {}", datasetID)
-    return connection.use { it.selectDataset(datasetID) }
-  }
+  override fun selectDataset(datasetID: DatasetID) = connection.use { it.selectDataset(datasetID) }
 
-  override fun selectInstallFiles(datasetID: DatasetID): List<DatasetFile> {
-    log.debug("selecting install files for dataset {}", datasetID)
-    return connection.use { it.selectInstallFiles(datasetID) }
-  }
+  override fun selectInstallFiles(datasetID: DatasetID) = connection.use { it.selectInstallFiles(datasetID) }
 
-  override fun selectUploadFiles(datasetID: DatasetID): List<DatasetFile> {
-    log.debug("selecting upload files for dataset {}", datasetID)
-    return connection.use { it.selectUploadFiles(datasetID) }
-  }
+  override fun selectUploadFiles(datasetID: DatasetID) = connection.use { it.selectUploadFiles(datasetID) }
 
   override fun selectAdminAllDatasetCount(query: AdminAllDatasetsQuery) =
     connection.use { it.selectAdminAllDatasetCount(query) }
@@ -90,86 +79,40 @@ internal object CacheDBImpl: vdi.component.db.cache.CacheDB {
   override fun selectUploadFileSummaries(datasetIDs: List<DatasetID>) =
     connection.use { it.selectUploadFileSummaries(datasetIDs) }
 
-  override fun selectDatasetList(query: DatasetListQuery): List<DatasetRecord> {
-    log.debug("selecting dataset list for user {}", query.userID)
-    return connection.use { it.selectDatasetList(query) }
-  }
+  override fun selectDatasetList(query: DatasetListQuery) = connection.use { it.selectDatasetList(query) }
 
-  override fun selectDatasetForUser(userID: UserID, datasetID: DatasetID): DatasetRecord? {
-    log.debug("selecting dataset {} for user {}", datasetID, userID)
-    return connection.use { it.selectDatasetForUser(userID, datasetID) }
-  }
+  override fun selectDatasetForUser(userID: UserID, datasetID: DatasetID) =
+    connection.use { it.selectDatasetForUser(userID, datasetID) }
 
-  override fun selectDatasetsForUser(userID: UserID): List<DatasetRecord> {
-    log.debug("selecting dataset list for user {}", userID)
-    return connection.use { it.selectDatasetsForUser(userID) }
-  }
+  override fun selectDatasetsForUser(userID: UserID) = connection.use { it.selectDatasetsForUser(userID) }
 
-  override fun selectNonPrivateDatasets(): List<DatasetRecord> {
-    log.debug("selecting list of non-private datasets")
-    return connection.use { it.selectNonPrivateDatasets() }
-  }
+  override fun selectNonPrivateDatasets() = connection.use { it.selectNonPrivateDatasets() }
 
-  override fun selectSharesForDataset(datasetID: DatasetID): List<DatasetShare> {
-    log.debug("selecting shares for dataset {}", datasetID)
-    return connection.use { it.selectSharesFor(datasetID) }
-  }
+  override fun selectSharesForDataset(datasetID: DatasetID) = connection.use { it.selectSharesFor(datasetID) }
 
-  override fun selectSharesForDatasets(datasetIDs: List<DatasetID>): Map<DatasetID, List<DatasetShare>> {
-    log.debug("selecting shares for {} datasets", datasetIDs.size)
-    return connection.use { it.selectSharesFor(datasetIDs) }
-  }
+  override fun selectSharesForDatasets(datasetIDs: List<DatasetID>) = connection.use { it.selectSharesFor(datasetIDs) }
 
-  override fun selectImportControl(datasetID: DatasetID): DatasetImportStatus? {
-    log.debug("selecting import control record for dataset {}", datasetID)
-    return connection.use { it.selectImportControl(datasetID) }
-  }
+  override fun selectImportControl(datasetID: DatasetID) = connection.use { it.selectImportControl(datasetID) }
 
-  override fun selectImportMessages(datasetID: DatasetID): List<String> {
-    log.debug("selecting import messages for dataset {}", datasetID)
-    return connection.use { it.selectImportMessages(datasetID) }
-  }
+  override fun selectImportMessages(datasetID: DatasetID) = connection.use { it.selectImportMessages(datasetID) }
 
-  override fun selectSyncControl(datasetID: DatasetID): VDISyncControlRecord? {
-    log.debug("selecting sync control record for dataset {}", datasetID)
-    return connection.use { it.selectSyncControl(datasetID) }
-  }
+  override fun selectSyncControl(datasetID: DatasetID) = connection.use { it.selectSyncControl(datasetID) }
 
-  override fun selectDeletedDatasets(): List<DeletedDataset> {
-    log.debug("selecting deleted datasets")
-    return connection.use { it.selectDeletedDatasets() }
-  }
+  override fun selectDeletedDatasets() = connection.use { it.selectDeletedDatasets() }
 
-  override fun selectOpenSharesForUser(recipientID: UserID): List<DatasetShareListEntry> {
-    log.debug("selecting open shares for recipient {}", recipientID)
-    return connection.use { it.selectOpenSharesFor(recipientID) }
-  }
+  override fun selectOpenSharesForUser(recipientID: UserID) = connection.use { it.selectOpenSharesFor(recipientID) }
 
-  override fun selectAcceptedSharesForUser(recipientID: UserID): List<DatasetShareListEntry> {
-    log.debug("selecting accepted shares for recipient {}", recipientID)
-    return connection.use { it.selectAcceptedSharesFor(recipientID) }
-  }
+  override fun selectAcceptedSharesForUser(recipientID: UserID) =
+    connection.use { it.selectAcceptedSharesFor(recipientID) }
 
-  override fun selectRejectedSharesForUser(recipientID: UserID): List<DatasetShareListEntry> {
-    log.debug("selecting rejected shares for recipient {}", recipientID)
-    return connection.use { it.selectRejectedSharesFor(recipientID) }
-  }
+  override fun selectRejectedSharesForUser(recipientID: UserID) =
+    connection.use { it.selectRejectedSharesFor(recipientID) }
 
-  override fun selectAllSharesForUser(recipientID: UserID): List<DatasetShareListEntry> {
-    log.debug("selecting all shares for recipient {}", recipientID)
-    return connection.use { it.selectAllSharesFor(recipientID) }
-  }
+  override fun selectAllSharesForUser(recipientID: UserID) = connection.use { it.selectAllSharesFor(recipientID) }
 
-  override fun selectAllSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord> {
-    log.debug("selecting all sync control records")
-    return connection.selectAllSyncControl()
-  }
+  override fun selectAllSyncControlRecords() = connection.selectAllSyncControl()
 
-  override fun selectBrokenDatasetImports(query: BrokenImportListQuery): List<BrokenImportRecord> {
-    log.debug("selecting broken dataset import records")
-    return connection.use { it.selectBrokenImports(query) }
-  }
-
+  override fun selectBrokenDatasetImports(query: BrokenImportListQuery) = connection.use { it.selectBrokenImports(query) }
 
   override fun openTransaction() =
     CacheDBTransactionImpl(connection.apply { autoCommit = false })

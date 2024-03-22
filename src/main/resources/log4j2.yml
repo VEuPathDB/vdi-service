@@ -19,6 +19,11 @@ Configuration:
       additivity: false
       AppenderRef:
       - ref: Console_Appender
+    - name: org.veupathdb.lib.jaxrs.raml.multipart
+      level: info
+      additivity: false
+      AppenderRef:
+        - ref: Console_Appender
     - name: com.zaxxer
       level: info
       additivity: false
