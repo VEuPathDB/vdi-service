@@ -17,27 +17,25 @@ class WorkerPool(
   private val workerCount: Int = 5,
   private val reportQueueSizeChange: (Int) -> Unit = { }
 ) {
-  private val log = logger()
-
+  private val log      = logger()
   private val shutdown = ShutdownSignal()
   private val queue    = Channel<Job>(jobQueueSize)
   private val count    = CountdownLatch(workerCount)
-  private var jobs     = 0uL
+  private val jobs     = AtomicULong()
 
   @OptIn(ExperimentalCoroutinesApi::class)
   fun start() {
     log.info("starting worker pool $name with queue size $jobQueueSize and worker count $workerCount")
 
-    var i = 0
     runBlocking {
-      repeat(workerCount) {
-        val j = ++i
+      repeat(workerCount) { i ->
+        val j = i + 1
         launch (CoroutineThreadContext(contextData = ThreadContextData(map = mapOf("workerID" to "$name-$j"), Stack()))) {
           log.debug("worker pool $name starting worker $j")
 
           while (!shutdown.isTriggered()) {
             if (!queue.isEmpty) {
-              log.debug("worker $name-$j executing job ${++jobs}")
+              log.debug("worker $name-$j executing job ${jobs.incAndGet()}")
               val job = queue.receive()
               reportQueueSizeChange(-1) // Report one less job in queue.
 
