@@ -1,8 +1,5 @@
 package vdi.lane.delete.hard
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import vdi.component.modules.AbstractVDIModule
 
@@ -15,20 +12,14 @@ internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTrigge
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.hardDeleteTopic, config.kafkaConsumerConfig)
 
-    coroutineScope {
-      launch(Dispatchers.IO) {
-        while (!isShutDown()) {
-          kc.fetchMessages(config.hardDeleteMessageKey)
-            .forEach { (userID, datasetID, source) ->
-              log.info("received hard-delete event for dataset {}/{} from {}", userID, datasetID, source)
-            }
+    while (!isShutDown()) {
+      kc.fetchMessages(config.hardDeleteMessageKey)
+        .forEach { (userID, datasetID, source) ->
+          log.info("received hard-delete event for dataset {}/{} from {}", userID, datasetID, source)
         }
-      }
     }
 
-    log.info("closing kafka client")
     kc.close()
-    log.info("kafka client closed")
     confirmShutdown()
   }
 }

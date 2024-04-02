@@ -6,7 +6,7 @@ import org.veupathdb.lib.s3.s34k.S3Client
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.json.JSON
-import vdi.component.async.ShutdownSignal
+import vdi.component.async.Signal
 import vdi.component.kafka.EventMessage
 import vdi.component.kafka.KafkaConsumer
 import vdi.component.kafka.KafkaConsumerConfig
@@ -25,9 +25,9 @@ import vdi.component.s3.DatasetManager
 abstract class AbstractVDIModule(override val name: String) : VDIModule {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  protected val shutdownTrigger = ShutdownSignal()
+  protected val shutdownTrigger = Signal()
 
-  protected val shutdownConfirm = ShutdownSignal()
+  protected val shutdownConfirm = Signal()
 
   @Volatile
   private var started = false
@@ -155,7 +155,7 @@ abstract class AbstractVDIModule(override val name: String) : VDIModule {
    *
    * @return A stream of values of type [T]
    */
-  protected fun KafkaConsumer.fetchMessages(key: String): Sequence<EventMessage> =
+  protected suspend fun KafkaConsumer.fetchMessages(key: String): Sequence<EventMessage> =
     receive()
       .asSequence()
       .filter {

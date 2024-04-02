@@ -30,16 +30,15 @@ interface KafkaConsumer {
   /**
    * Polls Kafka for messages.
    *
-   * This method will wait for the configured
-   * [poll duration][pollDuration] before returning a list
-   * of messages that were available in Kafka under the configured topic after
-   * that duration.
+   * This method will wait for up to the configured
+   * [poll duration][pollDuration] before returning a list of messages that were
+   * available in Kafka under the configured topic after that duration.
    *
    * If no messages are available in Kafka, the returned list will be empty.
    *
    * @return A list of zero or more messages that were available in Kafka.
    */
-  fun receive(): List<KafkaMessage>
+  suspend fun receive(): List<KafkaMessage>
 
   /**
    * Closes the Kafka consumer connection.

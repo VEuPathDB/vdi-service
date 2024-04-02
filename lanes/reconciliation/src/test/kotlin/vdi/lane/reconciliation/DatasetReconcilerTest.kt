@@ -1,5 +1,6 @@
 package vdi.lane.reconciliation
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -58,7 +59,7 @@ class DatasetReconcilerTest {
       val appDB = mockAppDB()
       val router = mockKafkaRouter()
 
-      DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+      runBlocking { DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID) }
 
       verifyNoInteractions(cacheDB)
       verifyNoInteractions(appDB)
@@ -120,7 +121,7 @@ class DatasetReconcilerTest {
 
       val router = mockKafkaRouter()
 
-      DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+      runBlocking { DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID) }
 
       verify(cacheDB, times(1)).openTransaction()
       verifyNoMoreInteractions(cacheDB)
@@ -174,7 +175,7 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+        runBlocking { DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID) }
 
         verify(transaction, times(1)).tryInsertDataset(any())
 
@@ -213,7 +214,7 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+        runBlocking { DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID) }
 
         verify(transaction, times(1)).updateDatasetDeleted(datasetID, true)
 
@@ -248,7 +249,7 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+        runBlocking { DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID) }
 
         verify(appDB, times(1)).accessor(projects.first())
         verify(accessor, times(1)).selectDataset(datasetID)
@@ -283,12 +284,12 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+        runBlocking { DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID) }
 
         verify(appDB, times(1)).accessor(projects.first())
         verify(accessor, times(1)).selectDataset(datasetID)
 
-        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
+        runBlocking { verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID) }
         verifyNoMoreInteractions(router)
       }
     }
@@ -313,11 +314,11 @@ class DatasetReconcilerTest {
         val appDB = mockAppDB()
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID)
+        runBlocking { DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID) }
 
         verify(appDB, times(1)).accessor(projects.first())
 
-        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID)
+        runBlocking { verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID) }
         verifyNoMoreInteractions(router)
       }
     }
@@ -328,7 +329,7 @@ class DatasetReconcilerTest {
 
       @Test
       @DisplayName("then an uninstall event should be fired")
-      fun test0() {
+      fun test0() = runBlocking {
         val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
           mockDatasetDirectory(
             ownerID = userID,
@@ -370,7 +371,7 @@ class DatasetReconcilerTest {
 
         @Test
         @DisplayName("then an import event should be fired")
-        fun test0() {
+        fun test0() = runBlocking {
           val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
             mockDatasetDirectory(
               ownerID = userID,
@@ -408,7 +409,7 @@ class DatasetReconcilerTest {
 
         @Test
         @DisplayName("then no import event should be fired")
-        fun test0() {
+        fun test0() = runBlocking {
           val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
             mockDatasetDirectory(
               ownerID = userID,
@@ -449,7 +450,7 @@ class DatasetReconcilerTest {
 
         @Test
         @DisplayName("then an import event should be fired")
-        fun test0() {
+        fun test0() = runBlocking {
           val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
             mockDatasetDirectory(
               ownerID = userID,
@@ -482,7 +483,7 @@ class DatasetReconcilerTest {
 
         @Test
         @DisplayName("then no import event should be fired")
-        fun test0() {
+        fun test0() = runBlocking {
           val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
             mockDatasetDirectory(
               ownerID = userID,
@@ -517,7 +518,7 @@ class DatasetReconcilerTest {
 
       @Test
       @DisplayName("then the dataset import status should be set to complete in the cache db")
-      fun test0() {
+      fun test0() = runBlocking {
         val dsMan = mockDatasetManager(onGetDatasetDirectory = { userID, datasetID ->
           mockDatasetDirectory(
             ownerID = userID,
@@ -555,7 +556,7 @@ class DatasetReconcilerTest {
 
       @Test
       @DisplayName("then an update-meta event should be fired")
-      fun test0() {
+      fun test0() = runBlocking {
         val dsMan = mockDatasetManager(
           onGetDatasetDirectory = { _, _ -> mockDatasetDirectory(
             ownerID = userID,
@@ -597,7 +598,7 @@ class DatasetReconcilerTest {
 
       @Test
       @DisplayName("then an update-meta event should be fired")
-      fun test0() {
+      fun test0() = runBlocking {
         val dsMan = mockDatasetManager(
           onGetDatasetDirectory = { _, _ -> mockDatasetDirectory(
             ownerID = userID,
@@ -641,7 +642,7 @@ class DatasetReconcilerTest {
 
       @Test
       @DisplayName("then an update-meta event should be fired")
-      fun test0() {
+      fun test0() = runBlocking {
         val dsMan = mockDatasetManager(
           onGetDatasetDirectory = { _, _ -> mockDatasetDirectory(
             ownerID = userID,
@@ -688,7 +689,7 @@ class DatasetReconcilerTest {
 
       @Test
       @DisplayName("then an update-meta event should be fired")
-      fun test0() {
+      fun test0() = runBlocking {
         val now = OffsetDateTime.now()
 
         val dsMan = mockDatasetManager(
@@ -734,7 +735,7 @@ class DatasetReconcilerTest {
 
       @Test
       @DisplayName("then an update-meta event should be fired")
-      fun test0() {
+      fun test0() = runBlocking {
         val now = OffsetDateTime.now()
 
         val dsMan = mockDatasetManager(
@@ -782,7 +783,7 @@ class DatasetReconcilerTest {
 
       @Test
       @DisplayName("then an update-meta event should be fired")
-      fun test0() {
+      fun test0() = runBlocking {
         val now = OffsetDateTime.now()
 
         val dsMan = mockDatasetManager(

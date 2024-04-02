@@ -1,8 +1,5 @@
 package vdi.lane.sharing
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -15,6 +12,7 @@ import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDBTransaction
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.app.withTransaction
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.model.DatasetShareOfferImpl
 import vdi.component.db.cache.model.DatasetShareReceiptImpl
@@ -46,38 +44,32 @@ private data class ShareInfo(
  * created or removed.
  */
 internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig)
-: ShareTriggerHandler
-, AbstractVDIModule("share-trigger-handler") {
+  : ShareTriggerHandler
+  , AbstractVDIModule("share-trigger-handler")
+{
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val cacheDB = vdi.component.db.cache.CacheDB()
+  private val cacheDB = CacheDB()
 
   private val appDB = AppDB()
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.shareTriggerTopic, config.kafkaConsumerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("share-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
-      Metrics.shareQueueSize.inc(it.toDouble())
-    }
+    val wp = WorkerPool("share-workers", config.workQueueSize, config.workerPoolSize)
 
-    coroutineScope {
-      launch(Dispatchers.IO) {
-        while (!isShutDown()) {
-          kc.fetchMessages(config.shareTriggerMessageKey)
-            .forEach { (userID, datasetID, source) ->
-              log.debug("submitting job to share worker pool for dataset {}/{} from source {}", datasetID, userID, source)
-              wp.submit { executeJob(userID, datasetID, dm) }
-            }
+    wp.queueSize.subscribe { Metrics.shareQueueSize.set(it.toDouble()) }
+
+    while (!isShutDown()) {
+      kc.fetchMessages(config.shareTriggerMessageKey)
+        .forEach { (userID, datasetID, source) ->
+          log.debug("submitting job to share worker pool for dataset {}/{} from source {}", datasetID, userID, source)
+          wp.submit { executeJob(userID, datasetID, dm) }
         }
-
-        wp.stop()
-      }
-
-      wp.start()
     }
 
+    wp.stop()
     kc.close()
     confirmShutdown()
   }

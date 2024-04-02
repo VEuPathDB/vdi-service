@@ -1,72 +1,96 @@
 package vdi.component.async
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.apache.logging.log4j.kotlin.CoroutineThreadContext
-import org.apache.logging.log4j.kotlin.ThreadContextData
 import org.apache.logging.log4j.kotlin.logger
-import java.util.*
-import kotlin.time.Duration.Companion.milliseconds
 
+import kotlinx.coroutines.Job as Coroutine
+
+@OptIn(DelicateCoroutinesApi::class)
 class WorkerPool(
   private val name: String,
-  private val jobQueueSize: Int,
-  private val workerCount: Int = 5,
-  private val reportQueueSizeChange: (Int) -> Unit = { }
+  queueSize: UInt,
+  workerCount: UInt,
+  dispatch: CoroutineDispatcher = CachedDispatcher,
 ) {
-  private val log      = logger()
-  private val shutdown = ShutdownSignal()
-  private val queue    = Channel<Job>(jobQueueSize)
-  private val count    = CountdownLatch(workerCount)
-  private val jobs     = AtomicULong()
+  private val jobCount = AtomicULong()
 
-  @OptIn(ExperimentalCoroutinesApi::class)
-  fun start() {
-    log.info("starting worker pool $name with queue size $jobQueueSize and worker count $workerCount")
+  private val queueCount = ObservableIntImpl()
 
-    runBlocking {
-      repeat(workerCount) { i ->
-        val j = i + 1
-        launch (CoroutineThreadContext(contextData = ThreadContextData(map = mapOf("workerID" to "$name-$j"), Stack()))) {
-          log.debug("worker pool $name starting worker $j")
+  private val signal = Signal()
 
-          while (!shutdown.isTriggered()) {
-            if (!queue.isEmpty) {
-              log.debug("worker $name-$j executing job ${jobs.incAndGet()}")
-              val job = queue.receive()
-              reportQueueSizeChange(-1) // Report one less job in queue.
+  private val workers: List<Coroutine>
 
-              try {
-                job()
-              } catch (e: Throwable) {
-                log.error("job $jobs failed with exception:", e)
-              }
+  private val queue: Channel<Job>
 
-            } else {
-              delay(100.milliseconds)
-            }
-          }
+  private val pool: Coroutine
 
-          log.debug("worker pool $name shutting down worker $j")
-          count.decrement()
-        }
-      }
+  val queueSize: ObservableInt
+    get() = queueCount
+
+  init {
+    if (queueSize < 1u)
+      throw IllegalArgumentException("attempted to create an WorkerPool instance with a queue size of $queueSize")
+    if (workerCount < 1u)
+      throw IllegalArgumentException("attempted to create an WorkerPool instance with a worker count of $workerCount")
+
+
+    logger().delegate.info(
+      "starting worker pool {} with queue size {} and worker count {}",
+      name,
+      queueSize,
+      workerCount,
+    )
+
+    queue = Channel(queueSize.toInt())
+    workers = ArrayList(workerCount.toInt())
+
+    pool = GlobalScope.launch(CachedDispatcher) {
+      repeat(workerCount.toInt()) { i -> workers.add(launch(dispatch) { Worker("$name-${i+1}") }) }
     }
   }
 
   suspend fun submit(job: Job) {
+    queueCount.inc()
     queue.send(job)
-    reportQueueSizeChange(1) // Report one more job in queue.
   }
 
   suspend fun stop() {
-    log.debug("worker pool $name received shutdown signal")
-    shutdown.trigger()
-    count.await()
-    log.debug("$workerCount workers halted; worker pool $name shutdown complete")
+    val log = logger().delegate
+    log.info("stopping worker pool {}", name)
+
+    signal.trigger()
+
+    queue.close()
+
+    for (worker in workers)
+      worker.join()
+
+    pool.join()
+
+    log.info("worker pool {} stopped", name)
+  }
+
+  inner class Worker(private val name: String) {
+    private val log = logger()
+
+    suspend operator fun invoke() {
+      log.delegate.debug("starting worker {}", name)
+
+      for (job in queue) {
+        log.delegate.debug("worker {} executing job {}", name, jobCount.incAndGet())
+        queueCount.dec()
+
+        if (signal.isTriggered())
+          break
+
+        job()
+
+        if (signal.isTriggered())
+          break
+      }
+
+      log.delegate.debug("worker {} stopping", name)
+    }
   }
 }
-

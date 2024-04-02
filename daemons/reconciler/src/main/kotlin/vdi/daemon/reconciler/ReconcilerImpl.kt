@@ -3,9 +3,11 @@ package vdi.daemon.reconciler
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.apache.logging.log4j.kotlin.CoroutineThreadContext
 import org.apache.logging.log4j.kotlin.ThreadContextData
 import org.apache.logging.log4j.kotlin.logger
+import vdi.component.async.CachedDispatcher
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.kafka.router.KafkaRouter
 import vdi.component.kafka.router.KafkaRouterFactory
@@ -68,19 +70,22 @@ class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, Abstrac
 
     // Schedule the reconciler for each target database.
     coroutineScope {
-      targets.forEach { target ->
-        launch(
-          CoroutineThreadContext(
-            contextData = ThreadContextData( // Add log4j context to reconciler to distinguish targets in logs.
-              map = mapOf(
-                Pair(
-                  "workerID",
-                  target.name
-                )
-              ), Stack()
+      withContext(CachedDispatcher) {
+        targets.forEach { target ->
+          launch(
+            CoroutineThreadContext(
+              contextData = ThreadContextData( // Add log4j context to reconciler to distinguish targets in logs.
+                map = mapOf(
+                  Pair(
+                    "workerID",
+                    target.name
+                  )
+                ),
+                stack = Stack()
+              )
             )
-          )
-        ) { target.reconcile() }
+          ) { target.reconcile() }
+        }
       }
     }
 

@@ -2,7 +2,7 @@ package vdi.component.rabbit
 
 import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
-import vdi.component.async.ShutdownSignal
+import vdi.component.async.Signal
 import vdi.component.async.SuspendingIterator
 import vdi.component.metrics.Metrics
 import kotlin.time.Duration
@@ -14,7 +14,7 @@ class RabbitMQEventIterator<T>(
   private val queue: String,
   private val rChan: RChannel,
   private val pollingInterval: Duration,
-  private val shutdownSignal: ShutdownSignal,
+  private val shutdownSignal: Signal,
   private val mappingFunction: (ByteArray) -> T
 ) : SuspendingIterator<T> {
 

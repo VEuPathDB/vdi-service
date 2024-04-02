@@ -12,5 +12,4 @@ dependencies {
   implementation("org.veupathdb.vdi:vdi-component-common")
 
   implementation("org.slf4j:slf4j-api")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 }

@@ -1,8 +1,5 @@
 package vdi.lane.delete.soft
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -12,6 +9,7 @@ import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.app.model.DeleteFlag
 import vdi.component.db.app.withTransaction
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
@@ -27,32 +25,25 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val cacheDB = vdi.component.db.cache.CacheDB()
+  private val cacheDB = CacheDB()
 
   private val appDB = AppDB()
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.softDeleteTriggerTopic, config.kafkaConsumerConfig)
-    val wp = WorkerPool("soft-delete-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
-      Metrics.softDeleteQueueSize.inc(it.toDouble())
-    }
+    val wp = WorkerPool("soft-delete-workers", config.workQueueSize, config.workerPoolSize)
 
-    coroutineScope {
-      launch(Dispatchers.IO) {
-        while (!isShutDown()) {
-          kc.fetchMessages(config.softDeleteTriggerMessageKey)
-            .forEach { (userID, datasetID, source) ->
-              log.info("received uninstall job for dataset $userID/$datasetID from source $source")
-              wp.submit { runJob(userID, datasetID) }
-            }
+    wp.queueSize.subscribe { Metrics.softDeleteQueueSize.set(it.toDouble()) }
+
+    while (!isShutDown()) {
+      kc.fetchMessages(config.softDeleteTriggerMessageKey)
+        .forEach { (userID, datasetID, source) ->
+          log.info("received uninstall job for dataset $userID/$datasetID from source $source")
+          wp.submit { runJob(userID, datasetID) }
         }
-
-        wp.stop()
-      }
-
-      wp.start()
     }
 
+    wp.stop()
     kc.close()
     confirmShutdown()
   }

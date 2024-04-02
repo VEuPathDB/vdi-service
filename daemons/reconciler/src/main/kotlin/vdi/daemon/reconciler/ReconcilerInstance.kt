@@ -172,7 +172,7 @@ class ReconcilerInstance(
     )
   }
 
-  private fun sendSyncIfRelevant(sourceDatasetDir: vdi.component.s3.DatasetDirectory, reason: SyncReason) {
+  private suspend fun sendSyncIfRelevant(sourceDatasetDir: vdi.component.s3.DatasetDirectory, reason: SyncReason) {
     if (targetDB.type == ReconcilerTargetType.Install) {
       val relevantProjects = sourceDatasetDir.getMetaFile().load()!!.projects
       if (!relevantProjects.contains(targetDB.name)) {
@@ -184,13 +184,13 @@ class ReconcilerInstance(
     sendSyncEvent(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID, reason)
   }
 
-  private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
+  private suspend fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
     logger().info("sending reconciliation event for $ownerID/$datasetID for reason: $reason")
     kafkaRouter.sendReconciliationTrigger(ownerID, datasetID)
     Metrics.Reconciler.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
 
-  private fun consumeEntireSourceStream(
+  private suspend fun consumeEntireSourceStream(
     sourceIterator: Iterator<vdi.component.s3.DatasetDirectory>,
     sourceDatasetDir: vdi.component.s3.DatasetDirectory
   ) {

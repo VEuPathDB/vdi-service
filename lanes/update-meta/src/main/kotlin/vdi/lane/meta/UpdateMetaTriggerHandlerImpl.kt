@@ -1,8 +1,5 @@
 package vdi.lane.meta
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
@@ -51,28 +48,21 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.kafkaRouterConfig.updateMetaTriggerTopic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter(config.kafkaRouterConfig)
-    val wp = WorkerPool("update-meta-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
-      Metrics.updateMetaQueueSize.inc(it.toDouble())
-    }
+    val wp = WorkerPool("update-meta-workers", config.workQueueSize, config.workerPoolSize)
 
-    coroutineScope {
-      launch(Dispatchers.IO) {
-        while (!isShutDown()) {
-          // Select meta trigger messages from Kafka
-          kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey)
-            // and for each of the trigger messages received
-            .forEach {
-              log.info("Received install-meta job for dataset {}/{} from source {}", it.userID, it.datasetID, it.eventSource)
-              wp.submit { updateMeta(dm, kr, it) }
-            }
+    wp.queueSize.subscribe { Metrics.updateMetaQueueSize.set(it.toDouble()) }
+
+    while (!isShutDown()) {
+      // Select meta trigger messages from Kafka
+      kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey)
+        // and for each of the trigger messages received
+        .forEach {
+          log.info("Received install-meta job for dataset {}/{} from source {}", it.userID, it.datasetID, it.eventSource)
+          wp.submit { updateMeta(dm, kr, it) }
         }
-
-        wp.stop()
-      }
-
-      wp.start()
     }
 
+    wp.stop()
     kc.close()
     kr.close()
     confirmShutdown()
@@ -129,19 +119,19 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     }
 
     cacheDB.withTransaction { db ->
-        // 1. Update meta info
-        db.updateDatasetMeta(DatasetMetaImpl(
-          datasetID   = datasetID,
-          visibility  = datasetMeta.visibility,
-          name        = datasetMeta.name,
-          summary     = datasetMeta.summary,
-          description = datasetMeta.description,
-          sourceURL   = datasetMeta.sourceURL,
-        ))
+      // 1. Update meta info
+      db.updateDatasetMeta(DatasetMetaImpl(
+        datasetID   = datasetID,
+        visibility  = datasetMeta.visibility,
+        name        = datasetMeta.name,
+        summary     = datasetMeta.summary,
+        description = datasetMeta.description,
+        sourceURL   = datasetMeta.sourceURL,
+      ))
 
-        // 2. Update meta timestamp
-        db.updateMetaSyncControl(datasetID, metaTimestamp)
-      }
+      // 2. Update meta timestamp
+      db.updateMetaSyncControl(datasetID, metaTimestamp)
+    }
 
     if (!PluginHandlers.contains(datasetMeta.type.name, datasetMeta.type.version)) {
       log.error("dataset {}/{} declares a type of {}:{} which is unknown to the vdi service", userID, datasetID, datasetMeta.type.name, datasetMeta.type.version)

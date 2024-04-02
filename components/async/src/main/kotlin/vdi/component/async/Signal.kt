@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 
-class ShutdownSignal {
+class Signal {
   private val channel = Channel<Unit>(1, BufferOverflow.DROP_OLDEST)
 
   @Volatile

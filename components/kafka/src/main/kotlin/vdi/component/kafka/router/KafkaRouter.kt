@@ -11,29 +11,29 @@ class KafkaRouter(
   private val config: KafkaRouterConfig,
   private val producer: KafkaProducer,
 ) {
-  fun sendImportTrigger(userID: UserID, datasetID: DatasetID) =
+  suspend fun sendImportTrigger(userID: UserID, datasetID: DatasetID) =
     send(config.importTriggerTopic, config.importTriggerMessageKey, userID, datasetID)
 
-  fun sendInstallTrigger(userID: UserID, datasetID: DatasetID) =
+  suspend fun sendInstallTrigger(userID: UserID, datasetID: DatasetID) =
     send(config.installTriggerTopic, config.installTriggerMessageKey, userID, datasetID)
 
-  fun sendUpdateMetaTrigger(userID: UserID, datasetID: DatasetID) =
+  suspend fun sendUpdateMetaTrigger(userID: UserID, datasetID: DatasetID) =
     send(config.updateMetaTriggerTopic, config.updateMetaTriggerMessageKey, userID, datasetID)
 
-  fun sendSoftDeleteTrigger(userID: UserID, datasetID: DatasetID) =
+  suspend fun sendSoftDeleteTrigger(userID: UserID, datasetID: DatasetID) =
     send(config.softDeleteTriggerTopic, config.softDeleteTriggerMessageKey, userID, datasetID)
 
-  fun sendHardDeleteTrigger(userID: UserID, datasetID: DatasetID) =
+  suspend fun sendHardDeleteTrigger(userID: UserID, datasetID: DatasetID) =
     send(config.hardDeleteTriggerTopic, config.hardDeleteTriggerMessageKey, userID, datasetID)
 
-  fun sendShareTrigger(userID: UserID, datasetID: DatasetID) =
+  suspend fun sendShareTrigger(userID: UserID, datasetID: DatasetID) =
     send(config.shareTriggerTopic, config.shareTriggerMessageKey, userID, datasetID)
 
-  fun sendReconciliationTrigger(userID: UserID, datasetID: DatasetID) =
+  suspend fun sendReconciliationTrigger(userID: UserID, datasetID: DatasetID) =
     send(config.reconciliationTriggerTopic, config.reconciliationTriggerMessageKey, userID, datasetID)
 
   fun close() = producer.close()
 
-  private fun send(topic: String, key: String, userID: UserID, datasetID: DatasetID) =
+  private suspend fun send(topic: String, key: String, userID: UserID, datasetID: DatasetID) =
     producer.send(topic, KafkaMessage(key, JSON.writeValueAsString(EventMessage(userID, datasetID, config.eventSource))))
 }

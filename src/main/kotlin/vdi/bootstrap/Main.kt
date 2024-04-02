@@ -53,7 +53,7 @@ object Main {
     thread { RestService.main(args) }
 
     log.info("starting modules")
-    runBlocking(Dispatchers.Unconfined) {
+    runBlocking {
       for (module in modules)
         launch { module.start() }
     }

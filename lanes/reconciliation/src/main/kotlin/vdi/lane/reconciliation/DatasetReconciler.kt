@@ -33,7 +33,7 @@ internal class DatasetReconciler(
   // TODO: If the raw upload file is newer than the import-ready file then we
   //       should fire an upload processing event.
 
-  fun reconcile(userID: UserID, datasetID: DatasetID) {
+  suspend fun reconcile(userID: UserID, datasetID: DatasetID) {
     logger.info("beginning reconciliation for dataset {}/{}", userID, datasetID)
     try {
       ReconciliationState(datasetManager.getDatasetDirectory(userID, datasetID)).reconcile()
@@ -46,7 +46,7 @@ internal class DatasetReconciler(
     }
   }
 
-  private fun ReconciliationState.reconcile() {
+  private suspend fun ReconciliationState.reconcile() {
     // Ensure we have a meta json file.  This method will throw an exception if
     // no meta file exists.
     loadMeta()
@@ -88,7 +88,7 @@ internal class DatasetReconciler(
       logInfo("no events fired")
   }
 
-  private fun ReconciliationState.handleDeleted() {
+  private suspend fun ReconciliationState.handleDeleted() {
     val dataset = requireCacheDatasetRecord()
 
     if (!dataset.isDeleted) {
@@ -123,7 +123,7 @@ internal class DatasetReconciler(
     }
   }
 
-  private fun ReconciliationState.runSync() {
+  private suspend fun ReconciliationState.runSync() {
     val syncStatus = checkSyncStatus()
 
     if (syncStatus.metaOutOfSync)
@@ -184,7 +184,7 @@ internal class DatasetReconciler(
     return SyncIndicator(metaOutOfSync, sharesOutOfSync, installOutOfSync)
   }
 
-  private fun ReconciliationState.tryReimport() {
+  private suspend fun ReconciliationState.tryReimport() {
     updateCacheDBImportStatus(DatasetImportStatus.Queued)
     dropImportMessages()
     fireImportEvent()
@@ -280,7 +280,7 @@ internal class DatasetReconciler(
   //
   // // // // // // // // // // // // // // // // // // // // // // // // // //
 
-  private fun ReconciliationState.fireImportEvent() {
+  private suspend fun ReconciliationState.fireImportEvent() {
     logger.info("firing import event for dataset {}/{}", userID, datasetID)
     safeExec("failed to fire import trigger") {
       eventRouter.sendImportTrigger(userID, datasetID)
@@ -288,7 +288,7 @@ internal class DatasetReconciler(
     }
   }
 
-  private fun ReconciliationState.fireUpdateMetaEvent() {
+  private suspend fun ReconciliationState.fireUpdateMetaEvent() {
     logger.info("firing update meta event for dataset {}/{}", userID, datasetID)
     safeExec("failed to fire update-meta trigger") {
       eventRouter.sendUpdateMetaTrigger(userID, datasetID)
@@ -296,7 +296,7 @@ internal class DatasetReconciler(
     }
   }
 
-  private fun ReconciliationState.fireShareEvent() {
+  private suspend fun ReconciliationState.fireShareEvent() {
     logger.info("firing share event for dataset {}/{}", userID, datasetID)
     safeExec("failed to send share trigger") {
       eventRouter.sendShareTrigger(userID, datasetID)
@@ -304,7 +304,7 @@ internal class DatasetReconciler(
     }
   }
 
-  private fun ReconciliationState.fireInstallEvent() {
+  private suspend fun ReconciliationState.fireInstallEvent() {
     logger.info("firing data install event for dataset {}/{}", userID, datasetID)
     safeExec("failed to send install-data trigger") {
       eventRouter.sendInstallTrigger(userID, datasetID)
@@ -312,7 +312,7 @@ internal class DatasetReconciler(
     }
   }
 
-  private fun ReconciliationState.fireUninstallEvent() {
+  private suspend fun ReconciliationState.fireUninstallEvent() {
     logger.info("firing soft-delete/uninstall event for dataset {}/{}", userID, datasetID)
     safeExec("failed to send soft-delete trigger") {
       eventRouter.sendSoftDeleteTrigger(userID, datasetID)

@@ -12,5 +12,5 @@ dependencies {
 
   implementation("org.apache.kafka:kafka-clients")
 
-  testImplementation(kotlin("test"))
+  api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 }

@@ -138,7 +138,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     confirmShutdown()
   }
 
-  private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: (UserID, DatasetID) -> Unit) {
+  private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: suspend (UserID, DatasetID) -> Unit) {
     try {
       fn(userID, datasetID)
     } catch (e: Throwable) {

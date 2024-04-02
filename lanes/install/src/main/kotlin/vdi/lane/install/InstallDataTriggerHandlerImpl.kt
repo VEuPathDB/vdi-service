@@ -1,8 +1,5 @@
 package vdi.lane.install
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -16,11 +13,14 @@ import vdi.component.db.app.model.DeleteFlag
 import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallType
 import vdi.component.db.app.withTransaction
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbstractVDIModule
+import vdi.component.plugin.client.PluginHandlerClient
 import vdi.component.plugin.client.response.ind.*
 import vdi.component.plugin.mapping.PluginHandlers
+import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import vdi.component.s3.paths.S3Paths
 import java.io.InputStream
@@ -40,33 +40,26 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
-  private val cacheDB = vdi.component.db.cache.CacheDB()
+  private val cacheDB = CacheDB()
 
   private val appDB = AppDB()
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("install-data-workers", config.jobQueueSize.toInt(), config.workerPoolSize.toInt()) {
-      Metrics.Install.queueSize.inc(it.toDouble())
-    }
+    val wp = WorkerPool("install-data-workers", config.jobQueueSize, config.workerPoolSize)
 
-    coroutineScope {
-      launch(Dispatchers.IO) {
-        while (!isShutDown()) {
-          kc.fetchMessages(config.installDataTriggerMessageKey)
-            .forEach { (userID, datasetID, source) ->
-              log.info("received install job for dataset $userID/$datasetID from source $source")
-              wp.submit { tryExecute(userID, datasetID, dm) }
-            }
+    wp.queueSize.subscribe { Metrics.Install.queueSize.set(it.toDouble()) }
+
+    while (!isShutDown()) {
+      kc.fetchMessages(config.installDataTriggerMessageKey)
+        .forEach { (userID, datasetID, source) ->
+          log.info("received install job for dataset $userID/$datasetID from source $source")
+          wp.submit { tryExecute(userID, datasetID, dm) }
         }
-
-        wp.stop()
-      }
-
-      wp.start()
     }
 
+    wp.stop()
     kc.close()
     confirmShutdown()
   }
@@ -205,8 +198,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     userID:    UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
-    s3Dir: vdi.component.s3.DatasetDirectory,
-    handler: vdi.component.plugin.client.PluginHandlerClient,
+    s3Dir: DatasetDirectory,
+    handler: PluginHandlerClient,
     installableFileTimestamp: OffsetDateTime,
   ) {
     val appDB   = appDB.accessor(projectID)
@@ -408,7 +401,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     throw Exception(res.message)
   }
 
-  private suspend fun <T> withInstallBundle(s3Dir: vdi.component.s3.DatasetDirectory, fn: suspend (upload: InputStream) -> T) =
+  private suspend fun <T> withInstallBundle(s3Dir: DatasetDirectory, fn: suspend (upload: InputStream) -> T) =
     TempFiles.withTempDirectory { tmpDir ->
       val files = ArrayList<Path>(8)
 

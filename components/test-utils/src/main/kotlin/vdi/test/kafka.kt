@@ -31,7 +31,7 @@ fun mockKafkaConsumer(
   mock {
     pollDuration?.also { on { this.pollDuration } doReturn it }
     topic?.also { on { this.topic } doReturn it }
-    on { receive() } doAnswer { onReceive() }
+    onBlocking { receive() } doAnswer { onReceive() }
     on { close() } doAnswer { onClose() }
   }
 
@@ -47,8 +47,8 @@ fun mockKafkaProducer(
   onClose: Runnable = ::runnable,
 ): KafkaProducer =
   mock {
-    on { send(any(), any() as KafkaMessage, any()) } doAnswer { onSendMessage(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
-    on { send(any(), any() as KafkaSerializable, any()) } doAnswer { onSendSerial(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
+    onBlocking { send(any(), any() as KafkaMessage, any()) } doAnswer { onSendMessage(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
+    onBlocking { send(any(), any() as KafkaSerializable, any()) } doAnswer { onSendSerial(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
     on { close() } doAnswer { onClose() }
   }
 
@@ -63,13 +63,13 @@ fun mockKafkaRouter(
   onClose: Runnable = ::runnable,
 ): KafkaRouter =
   mock {
-    on { sendImportTrigger(any(), any()) } doAnswer { onSendImport(it.getArgument(0), it.getArgument(1)) }
-    on { sendInstallTrigger(any(), any()) } doAnswer { onSendInstall(it.getArgument(0), it.getArgument(1)) }
-    on { sendUpdateMetaTrigger(any(), any()) } doAnswer { onSendMeta(it.getArgument(0), it.getArgument(1)) }
-    on { sendSoftDeleteTrigger(any(), any()) } doAnswer { onSendUninstall(it.getArgument(0), it.getArgument(1)) }
-    on { sendHardDeleteTrigger(any(), any()) } doAnswer { onSendDelete(it.getArgument(0), it.getArgument(1)) }
-    on { sendShareTrigger(any(), any()) } doAnswer { onSendShare(it.getArgument(0), it.getArgument(1)) }
-    on { sendReconciliationTrigger(any(), any()) } doAnswer { onSendReconcile(it.getArgument(0), it.getArgument(1)) }
+    onBlocking { sendImportTrigger(any(), any()) } doAnswer { onSendImport(it.getArgument(0), it.getArgument(1)) }
+    onBlocking { sendInstallTrigger(any(), any()) } doAnswer { onSendInstall(it.getArgument(0), it.getArgument(1)) }
+    onBlocking { sendUpdateMetaTrigger(any(), any()) } doAnswer { onSendMeta(it.getArgument(0), it.getArgument(1)) }
+    onBlocking { sendSoftDeleteTrigger(any(), any()) } doAnswer { onSendUninstall(it.getArgument(0), it.getArgument(1)) }
+    onBlocking { sendHardDeleteTrigger(any(), any()) } doAnswer { onSendDelete(it.getArgument(0), it.getArgument(1)) }
+    onBlocking { sendShareTrigger(any(), any()) } doAnswer { onSendShare(it.getArgument(0), it.getArgument(1)) }
+    onBlocking { sendReconciliationTrigger(any(), any()) } doAnswer { onSendReconcile(it.getArgument(0), it.getArgument(1)) }
     on { close() } doAnswer { onClose() }
   }
 

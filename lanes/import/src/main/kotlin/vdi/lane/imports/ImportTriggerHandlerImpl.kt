@@ -1,9 +1,6 @@
 package vdi.lane.imports
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
@@ -19,6 +16,7 @@ import org.veupathdb.vdi.lib.common.util.isNull
 import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.json.JSON
 import vdi.component.async.WorkerPool
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.CacheDBTransaction
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
@@ -28,6 +26,7 @@ import vdi.component.metrics.Metrics
 import vdi.component.modules.AbstractVDIModule
 import vdi.component.plugin.client.response.imp.*
 import vdi.component.plugin.mapping.PluginHandlers
+import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import vdi.lane.imports.config.ImportTriggerHandlerConfig
 import vdi.lane.imports.model.WarningsFile
@@ -47,39 +46,28 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private val activeIDs = HashSet<DatasetID>(24)
 
-  private val cacheDB = vdi.component.db.cache.CacheDB()
-
-  override val name = "import lane"
+  private val cacheDB = CacheDB()
 
   override suspend fun run() {
     log.trace("run()")
 
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.kafkaConfig.importTriggerTopic, config.kafkaConfig.consumerConfig)
-    val wp = WorkerPool("import-trigger-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
-      Metrics.Import.queueSize.inc(it.toDouble())
-    }
+    val wp = WorkerPool("import-trigger-workers", config.workQueueSize, config.workerPoolSize)
 
-    coroutineScope {
-      launch(Dispatchers.IO) {
-        // While the shutdown trigger has not yet been triggered
-        while (!isShutDown()) {
-          // Read messages from the kafka consumer
-          kc.fetchMessages(config.kafkaConfig.importTriggerMessageKey)
-            .forEach { (userID, datasetID, source) ->
-              log.info("received import job for dataset $userID/$datasetID from source $source")
-              wp.submit { importJob(dm, userID, datasetID) }
-            }
+    wp.queueSize.subscribe { Metrics.Import.queueSize.set(it.toDouble()) }
+
+    while (!isShutDown()) {
+      // Read messages from the kafka consumer
+      kc.fetchMessages(config.kafkaConfig.importTriggerMessageKey)
+        .forEach { (userID, datasetID, source) ->
+          log.info("received import job for dataset $userID/$datasetID from source $source")
+          wp.submit { importJob(dm, userID, datasetID) }
         }
-
-        log.info("shutting down worker pool")
-        wp.stop()
-      }
-
-      // Spin up the worker pool (in the background)
-      wp.start()
     }
 
+    log.info("shutting down worker pool")
+    wp.stop()
     kc.close()
     confirmShutdown()
   }
@@ -119,7 +107,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private suspend fun processImportJob(userID: UserID, datasetID: DatasetID, datasetDir: vdi.component.s3.DatasetDirectory) {
+  private suspend fun processImportJob(userID: UserID, datasetID: DatasetID, datasetDir: DatasetDirectory) {
     // Load the dataset metadata from S3
     val datasetMeta = datasetDir.getMetaFile().load()!!
 
@@ -193,7 +181,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private fun handleImportSuccessResult(datasetID: DatasetID, result: ImportSuccessResponse, dd: vdi.component.s3.DatasetDirectory) {
+  private fun handleImportSuccessResult(datasetID: DatasetID, result: ImportSuccessResponse, dd: DatasetDirectory) {
     log.info("dataset handler server reports dataset $datasetID imported successfully")
 
     // Create a temp directory to use as a workspace for the following process
@@ -278,7 +266,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     throw IllegalStateException(result.message)
   }
 
-  private fun vdi.component.s3.DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
+  private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
     if (!exists()) {
       log.warn("got an import event for dataset $userID/$datasetID which no longer has a directory")
       return false
@@ -312,7 +300,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     ))
   }
 
-  private fun vdi.component.db.cache.CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
+  private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.trace("CacheDB.initializeDataset(datasetID: $datasetID, meta: $meta)")
     openTransaction().use {
       try {

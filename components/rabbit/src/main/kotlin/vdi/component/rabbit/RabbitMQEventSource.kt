@@ -2,12 +2,12 @@ package vdi.component.rabbit
 
 import com.rabbitmq.client.ConnectionFactory
 import org.slf4j.LoggerFactory
-import vdi.component.async.ShutdownSignal
+import vdi.component.async.Signal
 import vdi.component.async.SuspendingSequence
 
 class RabbitMQEventSource<T>(
   private val config: RabbitMQConfig,
-  private val shutdownSignal: ShutdownSignal,
+  private val shutdownSignal: Signal,
   private val mappingFunction: (ByteArray) -> T
 ) : SuspendingSequence<T> {
   private val log = LoggerFactory.getLogger(javaClass)

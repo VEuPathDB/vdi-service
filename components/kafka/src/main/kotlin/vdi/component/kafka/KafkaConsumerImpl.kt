@@ -1,6 +1,7 @@
 package vdi.component.kafka
 
-import org.slf4j.LoggerFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 import org.apache.kafka.clients.consumer.Consumer as KConsumer
@@ -10,15 +11,9 @@ internal class KafkaConsumerImpl(
   override val pollDuration: Duration,
   private  val kafka:        KConsumer<String, String>
 ) : KafkaConsumer {
-  private val log = LoggerFactory.getLogger(javaClass)
-
-  override fun receive(): List<KafkaMessage> {
-    log.trace("receive()")
-
-    log.trace("polling kafka for messages on topic {}", topic)
-    return kafka.poll(pollDuration.toJavaDuration())
+  override suspend fun receive(): List<KafkaMessage> =
+    withContext(Dispatchers.IO) { kafka.poll(pollDuration.toJavaDuration()) }
       .map { KafkaMessage(it.key(), it.value()) }
-  }
 
   override fun close() {
     kafka.close()
