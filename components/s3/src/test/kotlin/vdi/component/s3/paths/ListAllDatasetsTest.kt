@@ -29,7 +29,6 @@ class ListAllDatasetsTest {
 
         val startTime = Instant.now()
         datasetManager.streamAllDatasets()
-            .peek { println("First record read after: " + Duration.between(startTime, Instant.now())) }
             .forEach { println(it.datasetID) }
         println("Finished after: " + Duration.between(startTime, Instant.now()))
     }
