@@ -15,8 +15,8 @@ class ListAllDatasetsTest {
 
     @Test
     @Tag("ListAllDatasets")
-    fun findAll() {
-        val config: S3Config = S3Config(
+    fun listAll() {
+        val config = S3Config(
             url       = System.getenv(EnvKey.S3.Host),
             port      = System.getenv(EnvKey.S3.Port).toUShort(),
             secure    = true,
@@ -29,14 +29,14 @@ class ListAllDatasetsTest {
 
         val startTime = Instant.now()
         datasetManager.streamAllDatasets()
-            .forEach { } // Do nothing
+            .forEach { } // Do nothing with the results but consume teh stream
         println("Finished after: " + Duration.between(startTime, Instant.now()))
     }
 
     @Test
     @Tag("ListAllDatasets")
     fun findFirst() {
-        val config: S3Config = S3Config(
+        val config = S3Config(
             url       = System.getenv(EnvKey.S3.Host),
             port      = System.getenv(EnvKey.S3.Port).toUShort(),
             secure    = true,
