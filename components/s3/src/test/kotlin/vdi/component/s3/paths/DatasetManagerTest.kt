@@ -8,9 +8,12 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.veupathdb.lib.s3.s34k.S3Api
+import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.core.fields.BasicHeaders
 import org.veupathdb.lib.s3.s34k.core.objects.AbstractS3Object
+import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.lib.s3.s34k.objects.ObjectContainer
 import org.veupathdb.lib.s3.s34k.objects.ObjectMeta
 import org.veupathdb.lib.s3.s34k.objects.ObjectStream
@@ -18,9 +21,16 @@ import org.veupathdb.lib.s3.s34k.objects.ObjectTagContainer
 import org.veupathdb.lib.s3.s34k.params.DeleteParams
 import org.veupathdb.lib.s3.s34k.params.`object`.ObjectExistsParams
 import org.veupathdb.lib.s3.s34k.params.`object`.ObjectStatParams
+import org.veupathdb.vdi.lib.common.env.EnvKey
+import org.veupathdb.vdi.lib.common.env.reqBool
+import org.veupathdb.vdi.lib.common.env.reqUShort
+import org.veupathdb.vdi.lib.common.env.require
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.s3.DatasetManager
+import vdi.component.s3.util.S3Config
+import java.time.Duration
+import java.time.Instant
 import java.time.OffsetDateTime
 
 class DatasetManagerTest {
@@ -30,6 +40,7 @@ class DatasetManagerTest {
   private val DatasetID1 = DatasetID("dataset-id-1")
   private val DatasetID2 = DatasetID("dataset-id-2")
   private val DatasetID3 = DatasetID("dataset-id-3")
+
 
   @Test
   @DisplayName("Test two identical datasets with meta/manifest")

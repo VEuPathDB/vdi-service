@@ -3,7 +3,17 @@ plugins {
 }
 
 tasks.test {
-  useJUnitPlatform()
+  useJUnitPlatform {
+    excludeTags = mutableSetOf("ListAllDatasets")
+  }
+
+  testLogging.showStandardStreams = true
+}
+
+tasks.register<Test>("list-all-datasets") {
+  useJUnitPlatform {
+    includeTags = mutableSetOf("ListAllDatasets")
+  }
 
   testLogging.showStandardStreams = true
 }
