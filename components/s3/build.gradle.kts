@@ -11,6 +11,14 @@ tasks.test {
 }
 
 tasks.register<Test>("list-all-datasets") {
+  environment(
+    mapOf(
+      "S3_HOST" to System.getenv("S3_HOST"),
+      "S3_PORT" to System.getenv("S3_PORT"),
+      "S3_ACCESS_TOKEN" to System.getenv("S3_ACCESS_TOKEN"),
+      "S3_SECRET_KEY" to System.getenv("S3_SECRET_KEY")
+    )
+  )
   useJUnitPlatform {
     includeTags = mutableSetOf("ListAllDatasets")
   }
