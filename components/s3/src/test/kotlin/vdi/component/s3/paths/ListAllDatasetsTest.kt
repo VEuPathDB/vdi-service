@@ -29,7 +29,7 @@ class ListAllDatasetsTest {
 
         val startTime = Instant.now()
         datasetManager.streamAllDatasets()
-            .forEach { println(it.datasetID) }
+            .forEach { } // Do nothing
         println("Finished after: " + Duration.between(startTime, Instant.now()))
     }
 
