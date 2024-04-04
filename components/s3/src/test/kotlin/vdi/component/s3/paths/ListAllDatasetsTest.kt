@@ -15,7 +15,7 @@ class ListAllDatasetsTest {
 
     @Test
     @Tag("ListAllDatasets")
-    fun integ() {
+    fun findAll() {
         val config: S3Config = S3Config(
             url       = System.getenv(EnvKey.S3.Host),
             port      = System.getenv(EnvKey.S3.Port).toUShort(),
@@ -32,5 +32,26 @@ class ListAllDatasetsTest {
             .forEach { } // Do nothing
         println("Finished after: " + Duration.between(startTime, Instant.now()))
     }
+
+    @Test
+    @Tag("ListAllDatasets")
+    fun findFirst() {
+        val config: S3Config = S3Config(
+            url       = System.getenv(EnvKey.S3.Host),
+            port      = System.getenv(EnvKey.S3.Port).toUShort(),
+            secure    = true,
+            accessKey = System.getenv(EnvKey.S3.AccessToken),
+            secretKey = System.getenv(EnvKey.S3.SecretKey),
+        )
+        val s3 = S3Api.newClient(config)
+        val bucket = s3.buckets[BucketName("vdi-dev")]!!
+        val datasetManager = DatasetManager(bucket)
+
+        val startTime = Instant.now()
+        datasetManager.streamAllDatasets()
+            .findFirst() // Do nothing
+        println("Finished after: " + Duration.between(startTime, Instant.now()))
+    }
+
 
 }
