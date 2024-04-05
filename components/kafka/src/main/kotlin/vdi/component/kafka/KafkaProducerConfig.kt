@@ -2,7 +2,7 @@ package vdi.component.kafka
 
 import org.veupathdb.vdi.lib.common.env.*
 import org.veupathdb.vdi.lib.common.util.HostAddress
-import vdi.component.kafka.KafkaCompressionType
+import vdi.component.env.EnvKey
 import kotlin.time.Duration
 
 data class KafkaProducerConfig(

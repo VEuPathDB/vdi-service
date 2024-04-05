@@ -1,8 +1,8 @@
 package vdi.daemon.pruner
 
-import org.veupathdb.vdi.lib.common.env.EnvKey
-import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.env.optDuration
+import vdi.component.env.EnvKey
+import vdi.component.env.Environment
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds

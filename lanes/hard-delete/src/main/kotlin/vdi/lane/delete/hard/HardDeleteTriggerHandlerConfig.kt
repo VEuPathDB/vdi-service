@@ -1,9 +1,9 @@
 package vdi.lane.delete.hard
 
-import org.veupathdb.vdi.lib.common.env.EnvKey
-import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.env.optUInt
 import org.veupathdb.vdi.lib.common.env.optional
+import vdi.component.env.EnvKey
+import vdi.component.env.Environment
 import vdi.component.kafka.KafkaConsumerConfig
 import vdi.component.kafka.router.KafkaRouterConfigDefaults
 

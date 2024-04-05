@@ -5,6 +5,7 @@ plugins {
 dependencies {
   implementation(platform(project(":platform")))
 
+  implementation(project(":components:env"))
   implementation(project(":components:metrics"))
   implementation(project(":components:module-core"))
   implementation(project(":components:pruner"))

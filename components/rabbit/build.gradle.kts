@@ -4,7 +4,9 @@ plugins {
 
 dependencies {
   implementation(platform(project(":platform")))
+
   implementation(project(":components:async"))
+  implementation(project(":components:env"))
   implementation(project(":components:metrics"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")

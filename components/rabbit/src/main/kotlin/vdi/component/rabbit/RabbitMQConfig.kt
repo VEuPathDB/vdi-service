@@ -3,6 +3,7 @@ package vdi.component.rabbit
 import org.veupathdb.vdi.lib.common.env.*
 import org.veupathdb.vdi.lib.common.field.SecretString
 import org.veupathdb.vdi.lib.common.util.HostAddress
+import vdi.component.env.EnvKey
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 

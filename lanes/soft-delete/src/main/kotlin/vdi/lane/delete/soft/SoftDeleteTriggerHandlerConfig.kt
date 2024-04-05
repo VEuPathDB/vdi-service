@@ -2,7 +2,11 @@ package vdi.lane.delete.soft
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import org.veupathdb.vdi.lib.common.env.*
+import org.veupathdb.vdi.lib.common.env.optUInt
+import org.veupathdb.vdi.lib.common.env.optional
+import org.veupathdb.vdi.lib.common.env.require
+import vdi.component.env.EnvKey
+import vdi.component.env.Environment
 import vdi.component.kafka.KafkaConsumerConfig
 import vdi.component.kafka.router.KafkaRouterConfigDefaults
 import vdi.component.s3.util.S3Config

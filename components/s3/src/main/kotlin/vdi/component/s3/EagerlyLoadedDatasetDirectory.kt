@@ -23,7 +23,7 @@ internal class EagerlyLoadedDatasetDirectory(
   override val ownerID: UserID,
   override val datasetID: DatasetID,
   private val pathFactory: S3DatasetPathFactory
-) : vdi.component.s3.DatasetDirectory {
+) : DatasetDirectory {
 
   private var metaFile: DatasetMetaFile? = null
   private var manifest: DatasetManifestFile? = null

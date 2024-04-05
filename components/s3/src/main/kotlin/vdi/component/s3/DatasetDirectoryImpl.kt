@@ -16,7 +16,7 @@ internal class DatasetDirectoryImpl(
   override val datasetID: DatasetID,
   private val bucket: S3Bucket,
   private val pathFactory: S3DatasetPathFactory,
-) : vdi.component.s3.DatasetDirectory {
+) : DatasetDirectory {
 
   private val log = LoggerFactory.getLogger(javaClass)
 

@@ -10,9 +10,11 @@ import vdi.component.metrics.Metrics
 import vdi.component.s3.exception.MalformedDatasetException
 import vdi.component.s3.paths.S3DatasetPathFactory
 import vdi.component.s3.paths.S3Paths
-import java.util.*
+import java.util.Spliterator
+import java.util.Spliterators
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
+import kotlin.NoSuchElementException
 
 fun DatasetManager(s3Bucket: S3Bucket): DatasetManager = DatasetManagerImpl(s3Bucket)
 
@@ -27,7 +29,8 @@ internal class DatasetManagerImpl(private val s3Bucket: S3Bucket) : DatasetManag
       .map(::DatasetID)
 
   override fun streamAllDatasets(): Stream<DatasetDirectory> =
-    StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+    StreamSupport.stream(
+      Spliterators.spliteratorUnknownSize(
       DatasetDirIterator(s3Bucket.objects.stream().stream().iterator()),
       Spliterator.ORDERED
     ), false)

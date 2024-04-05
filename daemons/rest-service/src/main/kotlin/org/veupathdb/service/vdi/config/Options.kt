@@ -1,7 +1,7 @@
 package org.veupathdb.service.vdi.config
 
 import org.veupathdb.lib.container.jaxrs.config.Options
-import org.veupathdb.vdi.lib.common.env.EnvKey
+import vdi.component.env.EnvKey
 import java.math.BigInteger
 
 object Options : Options() {

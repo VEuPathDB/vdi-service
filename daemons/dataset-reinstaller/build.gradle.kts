@@ -6,6 +6,7 @@ dependencies {
   implementation(platform(project(":platform")))
 
   implementation(project(":components:dataset-reinstaller"))
+  implementation(project(":components:env"))
   implementation(project(":components:metrics"))
   implementation(project(":components:module-core"))
 

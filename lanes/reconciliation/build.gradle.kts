@@ -9,6 +9,7 @@ dependencies {
 
   implementation(project(":components:app-db"))
   implementation(project(":components:cache-db"))
+  implementation(project(":components:env"))
   implementation(project(":components:kafka"))
   implementation(project(":components:metrics"))
   implementation(project(":components:module-core"))
