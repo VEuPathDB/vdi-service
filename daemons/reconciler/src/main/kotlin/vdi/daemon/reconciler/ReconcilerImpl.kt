@@ -12,18 +12,18 @@ import vdi.component.kafka.router.KafkaRouterFactory
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbstractJobExecutor
 import vdi.component.s3.DatasetManager
-import vdi.daemon.reconciler.config.ReconcilerConfig
-import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
 
-class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, AbstractJobExecutor("reconciler") {
+internal class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, AbstractJobExecutor("reconciler") {
   private var datasetManager: DatasetManager
 
   private var kafkaRouter: KafkaRouter
 
-  private val targets: List<ReconcilerInstance>
+  private val targets: List<ReconcilerTarget>
 
   private var lastRun = 0L
+
+  private val cacheDBTarget: ReconcilerTarget
 
   init {
     runBlocking {
@@ -31,17 +31,15 @@ class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, Abstrac
       kafkaRouter = requireKafkaRouter()
     }
 
-    targets = AppDatabaseRegistry.iterator().asSequence()
-      .map { (project, _) ->
-        ReconcilerInstance(
-          AppDBTarget(project, project),
-          datasetManager,
-          kafkaRouter
-        )
-      }
-      .toMutableList()
+    targets = ArrayList(AppDatabaseRegistry.size() + 1)
 
-    targets.add(ReconcilerInstance(CacheDBTarget(), datasetManager, kafkaRouter))
+    AppDatabaseRegistry.iterator().asSequence()
+      .map { (project, _) -> AppDBTarget(project, project) }
+      .forEach { targets.add(it) }
+
+    cacheDBTarget = CacheDBTarget()
+
+    targets.add(cacheDBTarget)
   }
 
   override suspend fun runJob() {
@@ -52,40 +50,53 @@ class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, Abstrac
 
     val now = System.currentTimeMillis()
 
-    // If we haven't yet reached the configured amount of time for the run
-    // interval, skip to the next iteration, sleep, and test again.
-    if ((now - lastRun).milliseconds < config.runInterval) {
-      return
+    val delta = (now - lastRun).milliseconds
+
+    when {
+      delta >= config.fullRunInterval -> {
+        lastRun = now
+        runFull()
+      }
+
+      delta >= config.slimRunInterval -> {
+        lastRun = now
+        runSlim()
+      }
     }
+  }
 
-    lastRun = now
+  private suspend fun runSlim() {
+    logger().info("Scheduling slim reconciler.")
 
-    // If we've reached this point, we've waited for the configured interval
-    // duration.  We can now run the reconciliation process.
-    logger().info("Scheduling reconciler for ${targets.size} targets.")
+    val timer = Metrics.Reconciler.Slim.executionTime.startTimer()
 
-    val timer = Metrics.Reconciler.reconcilerTimes.startTimer()
-
-    // Schedule the reconciler for each target database.
     coroutineScope {
-      targets.forEach { target ->
-        launch(
-          CoroutineThreadContext(
-            contextData = ThreadContextData( // Add log4j context to reconciler to distinguish targets in logs.
-              map = mapOf(
-                Pair(
-                  "workerID",
-                  target.name
-                )
-              ), Stack()
-            )
-          )
-        ) { target.reconcile() }
+      launch(CoroutineThreadContext(ThreadContextData(mapOf("workerID" to workerName(true, cacheDBTarget))))) {
+        ReconcilerInstance(cacheDBTarget, datasetManager, kafkaRouter, true).reconcile()
       }
     }
 
     timer.observeDuration()
   }
+
+  private suspend fun runFull() {
+    logger().info("Scheduling reconciler for ${targets.size} targets.")
+
+    val timer = Metrics.Reconciler.Full.reconcilerTimes.startTimer()
+
+    // Schedule the reconciler for each target database.
+    coroutineScope {
+      targets.forEach {
+        launch(CoroutineThreadContext(ThreadContextData(mapOf("workerID" to workerName(false, it))))) {
+          ReconcilerInstance(it, datasetManager, kafkaRouter, false).reconcile()
+        }
+      }
+    }
+
+    timer.observeDuration()
+  }
+
+  private fun workerName(slim: Boolean, tgt: ReconcilerTarget) = if (slim) "slim-${tgt.name}" else "full-${tgt.name}"
 
   private suspend fun requireKafkaRouter() = safeExec("failed to create KafkaRouter instance") {
     KafkaRouterFactory(config.kafkaRouterConfig).newKafkaRouter()

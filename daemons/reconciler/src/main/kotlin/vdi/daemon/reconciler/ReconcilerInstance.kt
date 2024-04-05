@@ -9,21 +9,27 @@ import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.sql.select.TempHackCacheDBReconcilerTargetRecord
 import vdi.component.kafka.router.KafkaRouter
 import vdi.component.metrics.Metrics
+import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import java.time.OffsetDateTime
 
 /**
- * Component for synchronizing the dataset object store (the source of truth for datasets) with a target database.
+ * Component for synchronizing the dataset object store (the source of truth for
+ * datasets) with a target database.
  *
- * This includes both our internal "cache DB", used to answer questions about user dataset metadata/status and
- * our application databases in which the contents of datasets are installed.
+ * This includes both our internal "cache DB", used to answer questions about
+ * user dataset metadata/status and our application databases in which the
+ * contents of datasets are installed.
  */
 class ReconcilerInstance(
   private val targetDB: ReconcilerTarget,
   private val datasetManager: DatasetManager,
   private val kafkaRouter: KafkaRouter,
+  private val slim: Boolean,
   private val deleteDryMode: Boolean = false
 ) {
+  private val log = logger().delegate
+
   private var nextTargetDataset: VDIReconcilerTargetRecord? = null
 
   val name = targetDB.name
@@ -31,100 +37,123 @@ class ReconcilerInstance(
   suspend fun reconcile() {
     try {
       tryReconcile()
-      Metrics.Reconciler.failedReconciliation.labels(targetDB.name).inc(0.0) // Initialize failures to zero.
+
+      // Initialize failures to zero.
+      if (slim) {
+        Metrics.Reconciler.Slim.failures.inc(0.0)
+      } else {
+        Metrics.Reconciler.Full.failedReconciliation.labels(targetDB.name).inc(0.0)
+      }
     } catch (e: Exception) {
-      // Don't re-throw error, ensure exception is logged and soldier on for future reconciliation.
-      logger().error("Failure running reconciler for " + targetDB.name, e)
-      Metrics.Reconciler.failedReconciliation.labels(targetDB.name).inc()
+      // Don't re-throw error, ensure exception is logged and soldier on for
+      // future reconciliation.
+      log.error("failure running reconciler for " + targetDB.name, e)
+
+      if (slim) {
+        Metrics.Reconciler.Slim.failures.inc()
+      } else {
+        Metrics.Reconciler.Full.failedReconciliation.labels(targetDB.name).inc()
+      }
     }
   }
 
   private suspend fun tryReconcile() {
-    logger().info("Beginning reconciliation of ${targetDB.name}")
-    targetDB.streamSortedSyncControlRecords().use { targetDBStream ->
+    log.info("beginning reconciliation")
 
-      val sourceIterator = datasetManager.streamAllDatasets().iterator()
-      val targetIterator = targetDBStream.iterator()
+    targetDB.streamSortedSyncControlRecords().use { tryReconcile(datasetManager.streamAllDatasets().iterator(), it) }
 
-      nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
+    log.info("completed reconciliation")
+  }
 
-      // Iterate through datasets in S3.
-      while (sourceIterator.hasNext()) {
+  private suspend fun tryReconcile(
+    sourceIterator: Iterator<DatasetDirectory>,
+    targetIterator: Iterator<VDIReconcilerTargetRecord>,
+  ) {
+    nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
 
-        // Pop the next DatasetDirectory instance from the S3 stream.
-        val sourceDatasetDir = sourceIterator.next()
+    // Iterate through datasets in S3.
+    while (sourceIterator.hasNext()) {
 
-        logger().info("Checking dataset ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID} for ${targetDB.name}")
+      // Pop the next DatasetDirectory instance from the S3 stream.
+      val sourceDatasetDir = sourceIterator.next()
 
-        // Target stream is exhausted, everything left in source stream is missing from the target database!
-        // Check again if target stream is exhausted, consume source stream if so.
-        if (nextTargetDataset == null) {
-          consumeEntireSourceStream(sourceIterator, sourceDatasetDir)
-          return@use
+      log.info("Checking dataset {}/{} for {}", sourceDatasetDir.ownerID, sourceDatasetDir.datasetID, targetDB.name)
+
+      // Target stream is exhausted, everything left in source stream is missing from the target database!
+      // Check again if target stream is exhausted, consume source stream if so.
+      if (nextTargetDataset == null) {
+        consumeEntireSourceStream(sourceIterator, sourceDatasetDir)
+        return
+      }
+
+      // Owner ID is included as part of sort, so it must be included when comparing streams.
+      var comparableS3Id = "${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID}"
+      var comparableTargetId: String? = nextTargetDataset!!.getComparableID()
+
+      // If target dataset stream is "ahead" of source stream, delete
+      // the datasets from the target stream until we are aligned
+      // again (or the target stream is consumed).
+      if (comparableS3Id > comparableTargetId!!) {
+
+        // Delete datasets until and advance target iterator until streams are aligned.
+        while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId!!, false) > 0) {
+          log.info("Attempting to delete dataset {} because {} is lexicographically greater than {}. Presumably {} is not in MinIO.", comparableTargetId, comparableS3Id, comparableTargetId, comparableTargetId)
+
+          tryDeleteDataset(targetDB, nextTargetDataset!!)
+          nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
+          comparableTargetId = nextTargetDataset?.getComparableID()
         }
+      }
 
-        // Owner ID is included as part of sort, so it must be included when comparing streams.
-        var comparableS3Id = "${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID}"
-        var comparableTargetId: String? = nextTargetDataset!!.getComparableID()
+      // Check again if target stream is exhausted, consume source stream if so.
+      if (nextTargetDataset == null) {
+        consumeEntireSourceStream(sourceIterator, sourceDatasetDir)
+        return
+      }
 
-        // If target dataset stream is "ahead" of source stream, delete
-        // the datasets from the target stream until we are aligned
-        // again (or the target stream is consumed).
-        if (comparableS3Id > comparableTargetId!!) {
-          // Delete datasets until and advance target iterator until streams are aligned.
-          while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId!!, false) > 0) {
+      // Owner ID is included as part of sort, so it must be included when comparing streams.
+      comparableS3Id = "${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID}"
+      comparableTargetId = nextTargetDataset!!.getComparableID()
 
-            logger().info("Attempting to delete dataset $comparableTargetId " +
-                    "because $comparableS3Id is lexigraphically greater than $comparableTargetId. Presumably $comparableTargetId is not in MinIO.")
-            tryDeleteDataset(targetDB, nextTargetDataset!!)
-            nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
-            comparableTargetId = nextTargetDataset?.getComparableID()
-          }
-        }
+      if (comparableS3Id < comparableTargetId) {
+        // Dataset is in source, but not in target. Send an event.
+        if (!slim)
+          Metrics.Reconciler.Full.missingInTarget.labels(targetDB.name).inc()
 
-        // Check again if target stream is exhausted, consume source stream if so.
-        if (nextTargetDataset == null) {
-          consumeEntireSourceStream(sourceIterator, sourceDatasetDir)
-          return@use
-        }
+        sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB))
+      } else {
 
-        // Owner ID is included as part of sort, so it must be included when comparing streams.
-        comparableS3Id = "${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID}"
-        comparableTargetId = nextTargetDataset!!.getComparableID()
-
-        if (comparableS3Id < comparableTargetId) {
-          // Dataset is in source, but not in target. Send an event.
-          Metrics.Reconciler.missingInTarget.labels(targetDB.name).inc()
-          sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB))
+        // If dataset has a delete flag present and the dataset is not marked
+        // as uninstalled from the target, then send a sync event.
+        if (sourceDatasetDir.hasDeleteFlag() && !nextTargetDataset!!.isUninstalled) {
+          sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID, SyncReason.NeedsUninstall(targetDB))
         } else {
+          val syncStatus = isOutOfSync(sourceDatasetDir, nextTargetDataset!!)
 
-          // If dataset has a delete flag present and the dataset is not marked
-          // as uninstalled from the target, then send a sync event.
-          if (sourceDatasetDir.hasDeleteFlag() && !nextTargetDataset!!.isUninstalled) {
-            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID, SyncReason.NeedsUninstall(targetDB))
-          } else {
-            val syncStatus = isOutOfSync(sourceDatasetDir, nextTargetDataset!!)
-
-            // Dataset is in source and target. Check dates to see if sync is needed.
-            if (syncStatus.isOutOfSync) {
-              sendSyncIfRelevant(sourceDatasetDir, syncStatus.asSyncReason())
-            }
-
-            // Advance next target dataset pointer, we're done with this one
-            nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
+          // Dataset is in source and target. Check dates to see if sync is needed.
+          if (syncStatus.isOutOfSync) {
+            sendSyncIfRelevant(sourceDatasetDir, syncStatus.asSyncReason())
           }
+
+          // Advance next target dataset pointer, we're done with this one
+          nextTargetDataset = if (targetIterator.hasNext()) targetIterator.next() else null
         }
       }
+    }
 
-      // If nextTargetDataset is not null at this point, then S3 was empty.
-      nextTargetDataset?.also { tryDeleteDataset(targetDB, it) }
+    // If we are doing a "slim" reconciliation, we just want to fire sync events
+    // for things we think we may have missed, no deletes should be performed,
+    // so we end here.  Full reconciliations will continue on to the deletion
+    // calls.
+    if (slim)
+      return
 
-      // Consume target stream, deleting all remaining datasets.
-      while (targetIterator.hasNext()) {
-        tryDeleteDataset(targetDB, targetIterator.next())
-      }
+    // If nextTargetDataset is not null at this point, then S3 was empty.
+    nextTargetDataset?.also { tryDeleteDataset(targetDB, it) }
 
-      logger().info("Completed reconciliation")
+    // Consume target stream, deleting all remaining datasets.
+    while (targetIterator.hasNext()) {
+      tryDeleteDataset(targetDB, targetIterator.next())
     }
   }
 
@@ -133,7 +162,7 @@ class ReconcilerInstance(
   private val tempYesterday = OffsetDateTime.now().minusDays(1)
 
   private suspend fun tryDeleteDataset(targetDB: ReconcilerTarget, record: VDIReconcilerTargetRecord) {
-    logger().info("attempting to delete ${record.ownerID}/${record.datasetID}")
+    log.info("attempting to delete {}/{}", record.ownerID, record.datasetID)
 
     // FIXME: temporary hack to be removed when target db deletes are moved to
     //        the hard-delete lane.
@@ -141,30 +170,30 @@ class ReconcilerInstance(
       record as TempHackCacheDBReconcilerTargetRecord
 
       if (record.importStatus == DatasetImportStatus.Queued && record.inserted.isAfter(tempYesterday)) {
-        logger().info("skipping delete of dataset ${record.ownerID}/${record.datasetID} as it is import-queued and less than 1 day old")
+        log.info("skipping delete of dataset {}/{} as it is import-queued and less than 1 day old", record.ownerID, record.datasetID)
         return
       }
     }
 
     try {
-      Metrics.Reconciler.reconcilerDatasetDeleted.labels(targetDB.name).inc()
+      Metrics.Reconciler.Full.reconcilerDatasetDeleted.labels(targetDB.name).inc()
       if (!deleteDryMode) {
-        logger().info("Trying to delete dataset ${record.ownerID}/${record.datasetID}")
+        log.info("Trying to delete dataset {}/{}", record.ownerID, record.datasetID)
         targetDB.deleteDataset(datasetID = record.datasetID, datasetType = record.type)
       } else {
-        logger().info("Would have deleted dataset ${record.ownerID}/${record.datasetID}")
+        log.info("Would have deleted dataset {}/{}", record.ownerID, record.datasetID)
       }
     } catch (e: Exception) {
       // Swallow exception and alert if unable to delete. Reconciler can safely recover, but the dataset
       // may need a manual inspection.
-      logger().error("Failed to delete dataset ${record.ownerID}/${record.datasetID} of type ${record.type.name}:${record.type.version} from db ${targetDB.name}", e)
+      log.error("Failed to delete dataset ${record.ownerID}/${record.datasetID} of type ${record.type.name}:${record.type.version} from db ${targetDB.name}", e)
     }
   }
 
   /**
    * Returns true if any of our scopes are out of sync.
    */
-  private fun isOutOfSync(ds: vdi.component.s3.DatasetDirectory, targetLastUpdated: VDISyncControlRecord): SyncStatus {
+  private fun isOutOfSync(ds: DatasetDirectory, targetLastUpdated: VDISyncControlRecord): SyncStatus {
     return SyncStatus(
       metaIsOOS = targetLastUpdated.metaUpdated.isBefore(ds.getMetaFile().lastModified()),
       sharesAreOOS = targetLastUpdated.sharesUpdated.isBefore(ds.getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
@@ -172,11 +201,20 @@ class ReconcilerInstance(
     )
   }
 
-  private fun sendSyncIfRelevant(sourceDatasetDir: vdi.component.s3.DatasetDirectory, reason: SyncReason) {
+  private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory, reason: SyncReason) {
     if (targetDB.type == ReconcilerTargetType.Install) {
+
+      // Ensure the meta json file exists in S3 to protect against NPEs being
+      // thrown on broken dataset directories.
+      if (!sourceDatasetDir.hasMetaFile()) {
+        log.warn("skipping dataset {}/{} as it has no meta json file", sourceDatasetDir.ownerID, sourceDatasetDir.datasetID)
+        return
+      }
+
       val relevantProjects = sourceDatasetDir.getMetaFile().load()!!.projects
+
       if (!relevantProjects.contains(targetDB.name)) {
-        logger().info("Skipping dataset ${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID} as it does not target ${targetDB.name}")
+        log.info("Skipping dataset {}/{} as it does not target {}", sourceDatasetDir.ownerID, sourceDatasetDir.datasetID, targetDB.name)
         return
       }
     }
@@ -185,14 +223,18 @@ class ReconcilerInstance(
   }
 
   private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
-    logger().info("sending reconciliation event for $ownerID/$datasetID for reason: $reason")
+    log.info("sending reconciliation event for {}/{} for reason: {}", ownerID, datasetID, reason)
     kafkaRouter.sendReconciliationTrigger(ownerID, datasetID)
-    Metrics.Reconciler.reconcilerDatasetSynced.labels(targetDB.name).inc()
+
+    if (slim)
+      Metrics.Reconciler.Slim.datasetsSynced.inc()
+    else
+      Metrics.Reconciler.Full.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
 
   private fun consumeEntireSourceStream(
-    sourceIterator: Iterator<vdi.component.s3.DatasetDirectory>,
-    sourceDatasetDir: vdi.component.s3.DatasetDirectory
+    sourceIterator: Iterator<DatasetDirectory>,
+    sourceDatasetDir: DatasetDirectory
   ) {
     sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB))
     while (sourceIterator.hasNext()) {
@@ -207,8 +249,7 @@ class ReconcilerInstance(
   }
 
   private interface SyncReason {
-    class OutOfSync(val meta: Boolean, val shares: Boolean, val install: Boolean, val target: ReconcilerTarget) :
-      SyncReason {
+    class OutOfSync(val meta: Boolean, val shares: Boolean, val install: Boolean, val target: ReconcilerTarget) : SyncReason {
       override fun toString() =
         "out of sync:" +
           (if (meta) " meta" else "") +

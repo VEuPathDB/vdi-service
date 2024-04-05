@@ -7,14 +7,15 @@ dependencies {
 
   implementation("org.veupathdb.vdi:vdi-component-common")
 
-  implementation(project(":components:module-core"))
-  implementation(project(":components:s3"))
-  implementation(project(":components:kafka"))
-  implementation(project(":components:cache-db"))
   implementation(project(":components:app-db"))
+  implementation(project(":components:cache-db"))
+  implementation(project(":components:env"))
   implementation(project(":components:handler-client"))
-  implementation(project(":components:plugin-mapping"))
+  implementation(project(":components:kafka"))
   implementation(project(":components:metrics"))
+  implementation(project(":components:module-core"))
+  implementation(project(":components:plugin-mapping"))
+  implementation(project(":components:s3"))
 
   implementation("org.veupathdb.lib.s3:s34k-minio")
 

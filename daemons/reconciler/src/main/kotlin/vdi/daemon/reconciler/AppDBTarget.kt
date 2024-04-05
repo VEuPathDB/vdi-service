@@ -9,7 +9,6 @@ import vdi.component.db.app.withTransaction
 import vdi.component.plugin.client.response.uni.UninstallBadRequestResponse
 import vdi.component.plugin.client.response.uni.UninstallUnexpectedErrorResponse
 import vdi.component.plugin.mapping.PluginHandlers
-import vdi.daemon.reconciler.exception.UnsupportedTypeException
 
 class AppDBTarget(
   override val name: String,

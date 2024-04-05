@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.env.*
 import vdi.component.ldap.LDAP
 
+@Suppress("NOTHING_TO_INLINE")
 object AppDatabaseRegistry {
 
   private val log = LoggerFactory.getLogger(javaClass)
@@ -27,64 +28,35 @@ object AppDatabaseRegistry {
       .map { (key, value) -> key to value }
       .iterator()
 
+  fun size() = dataSources.size
+
   fun require(key: String): AppDBRegistryEntry =
     get(key) ?: throw IllegalStateException("required AppDB connection $key was not registered with AppDatabases")
 
   internal fun init(env: Environment) {
     dataSources.clear()
 
-    val seen = HashSet<String>(32)
-
-    env.keys.asSequence()
-      .filter { hasEnvPrefix(it) }
-      .map { getEnvName(it) }
-      .filterNotNull()
-      .filter { it !in seen }
-      .forEach {
-        parseEnvironmentChunk(env, it)
-        seen.add(it)
-      }
+    DBEnvGroup.fromEnvironment(env)
+      .onEach { requireFullChunk(it) }
+      .forEach { parseChunk(it) }
   }
 
-  private fun hasEnvPrefix(key: String) =
-    key.startsWith(EnvKey.AppDB.DBNamePrefix) ||
-    key.startsWith(EnvKey.AppDB.DBLDAPPrefix) ||
-    key.startsWith(EnvKey.AppDB.DBPassPrefix) ||
-    key.startsWith(EnvKey.AppDB.DBPoolPrefix) ||
-    key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix) ||
-    key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix) ||
-    key.startsWith(EnvKey.AppDB.DBEnabledPrefix)
+  private inline fun throwForMissingVar(envVar: String): Nothing =
+    throw IllegalStateException("one or more app database definition blocks in the service environment is missing its '$envVar' value")
 
-  private fun getEnvName(key: String) =
-    when {
-      key.startsWith(EnvKey.AppDB.DBNamePrefix)          -> getEnvName(EnvKey.AppDB.DBNamePrefix, key)
-      key.startsWith(EnvKey.AppDB.DBLDAPPrefix)          -> getEnvName(EnvKey.AppDB.DBLDAPPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBPassPrefix)          -> getEnvName(EnvKey.AppDB.DBPassPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBPoolPrefix)          -> getEnvName(EnvKey.AppDB.DBPoolPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBDataSchemaPrefix)    -> getEnvName(EnvKey.AppDB.DBDataSchemaPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBControlSchemaPrefix) -> getEnvName(EnvKey.AppDB.DBControlSchemaPrefix, key)
-      key.startsWith(EnvKey.AppDB.DBEnabledPrefix)       -> getEnvName(EnvKey.AppDB.DBEnabledPrefix, key)
-      else                                               -> null
-    }
+  private fun requireFullChunk(db: DBEnvGroup) {
+    db.name          ?: throwForMissingVar(EnvKey.AppDB.DBNamePrefix)
+    db.ldap          ?: throwForMissingVar(EnvKey.AppDB.DBLDAPPrefix)
+    db.pass          ?: throwForMissingVar(EnvKey.AppDB.DBPassPrefix)
+    db.controlSchema ?: throwForMissingVar(EnvKey.AppDB.DBControlSchemaPrefix)
+    db.dataSchema    ?: throwForMissingVar(EnvKey.AppDB.DBDataSchemaPrefix)
+  }
 
-  @Suppress("NOTHING_TO_INLINE")
-  private inline fun getEnvName(prefix: String, key: String) =
-    key.substring(prefix.length)
-
-  private fun parseEnvironmentChunk(env: Environment, key: String) {
-    val enabled = env.reqBool(EnvKey.AppDB.DBEnabledPrefix + key)
-
-    if (!enabled) {
-      log.info("Database {} is marked as disabled, skipping.", key)
+  private fun parseChunk(env: DBEnvGroup) {
+    if (env.enabled != true) {
+      log.info("Database {} is marked as disabled, skipping.", env.name)
       return
     }
-
-    val name = env.require(EnvKey.AppDB.DBNamePrefix + key)
-    val ldap = env.require(EnvKey.AppDB.DBLDAPPrefix + key)
-    val pass = env.require(EnvKey.AppDB.DBPassPrefix + key)
-    val pool = env.reqUByte(EnvKey.AppDB.DBPoolPrefix + key)
-    val ctls = env.require(EnvKey.AppDB.DBControlSchemaPrefix + key)
-    val data = env.require(EnvKey.AppDB.DBDataSchemaPrefix + key)
 
     log.info(
       """registering database {} with the following details:
@@ -92,26 +64,26 @@ object AppDatabaseRegistry {
       TNS: {}
       Pool Size: {}
       User/Schema: {}""",
-      name,
-      name,
-      ldap,
-      pool,
-      ctls
+      env.name,
+      env.name,
+      env.ldap,
+      env.poolSize,
+      env.controlSchema
     )
 
-    log.debug("looking up LDAP record for database {}", name)
+    log.debug("looking up LDAP record for database {}", env.name)
 
-    val desc = LDAP.requireSingularOracleNetDesc(ldap)
+    val desc = LDAP.requireSingularOracleNetDesc(env.ldap!!)
 
-    log.info("constructing a DataSource for database {}", name)
+    log.info("constructing a DataSource for database {}", env.name)
 
     val ds = try {
       HikariConfig()
         .apply {
           jdbcUrl = makeJDBCOracleConnectionString(desc.host, desc.port, desc.serviceName)
-          username = ctls
-          password = pass
-          maximumPoolSize = pool.toInt()
+          username = env.controlSchema
+          password = env.pass!!.unwrap()
+          maximumPoolSize = env.poolSize!!.toInt()
           driverClassName = OracleDriver::class.java.name
         }
         .let(::HikariDataSource)
@@ -119,7 +91,7 @@ object AppDatabaseRegistry {
       throw IllegalStateException("error encountered while attempting to create a JDBC connection to ${desc.serviceName}", e)
     }
 
-    dataSources[name] = AppDBRegistryEntry(name, desc.host, desc.port, ds, data, ctls)
+    dataSources[env.name!!] = AppDBRegistryEntry(env.name!!, desc.host, desc.port, ds, env.dataSchema!!, env.controlSchema!!)
   }
 
   private fun makeJDBCOracleConnectionString(host: String, port: UShort, name: String) =

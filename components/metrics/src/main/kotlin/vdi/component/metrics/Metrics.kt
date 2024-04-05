@@ -226,44 +226,64 @@ object Metrics {
   }
 
   object Reconciler {
-    val reconcilerDatasetDeleted: Counter = Counter.build()
-      .name("dataset_reconciler_deleted")
-      .help("Count of datasets deleted by reconciler.")
-      .labelNames("target_name")
-      .register()
 
-    val reconcilerDatasetSynced: Counter = Counter.build()
-      .name("dataset_reconciler_synced")
-      .help("Count of datasets synced by reconciler.")
-      .labelNames("target_name")
-      .register()
+    object Slim {
+      val datasetsSynced: Counter = Counter.build()
+        .name("slim_reconciler_synced")
+        .help("Number of sync events fired by the slim reconciliation process.")
+        .register()
 
-    val failedReconciliation: Counter = Counter.build()
-      .name("dataset_reconiler_failed")
-      .help("Count of failed reconciler runs.")
-      .labelNames("target_name")
-      .register()
+      val executionTime: Histogram = Histogram.build()
+        .name("slim_reconciler_times")
+        .help("Slim reconciler execution times.")
+        .register()
 
-    val missingInTarget: Counter = Counter.build()
-      .name("dataset_reconciler_missing_in_target")
-      .help("Count of datasets the reconciler finds are missing in the target DB.")
-      .labelNames("target_name")
-      .register()
+      val failures: Counter = Counter.build()
+        .name("slim_reconciler_failures")
+        .help("Slim reconciler execution failures.")
+        .register()
+    }
 
-    val reconcilerTimes: Histogram = Histogram.build()
-      .name("dataset_reconciler_times")
-      .help("Dataset reconciler run times.")
-      .buckets(
-        5.0,
-        15.0,
-        30.0,
-        60.0,  // 1 minute
-        150.0, // 2.5 minutes
-        300.0, // 5 minutes
-        600.0, // 10 minutes
-        900.0, // 15 minutes
-      )
-      .register()
+    object Full {
+      val reconcilerDatasetDeleted: Counter = Counter.build()
+        .name("dataset_reconciler_deleted")
+        .help("Count of datasets deleted by reconciler.")
+        .labelNames("target_name")
+        .register()
+
+      val reconcilerDatasetSynced: Counter = Counter.build()
+        .name("dataset_reconciler_synced")
+        .help("Count of datasets synced by reconciler.")
+        .labelNames("target_name")
+        .register()
+
+      val failedReconciliation: Counter = Counter.build()
+        .name("dataset_reconciler_failed")
+        .help("Count of failed reconciler runs.")
+        .labelNames("target_name")
+        .register()
+
+      val missingInTarget: Counter = Counter.build()
+        .name("dataset_reconciler_missing_in_target")
+        .help("Count of datasets the reconciler finds are missing in the target DB.")
+        .labelNames("target_name")
+        .register()
+
+      val reconcilerTimes: Histogram = Histogram.build()
+        .name("dataset_reconciler_times")
+        .help("Dataset reconciler run times.")
+        .buckets(
+          5.0,
+          15.0,
+          30.0,
+          60.0,  // 1 minute
+          150.0, // 2.5 minutes
+          300.0, // 5 minutes
+          600.0, // 10 minutes
+          900.0, // 15 minutes
+        )
+        .register()
+    }
   }
 
   object ReconciliationHandler {

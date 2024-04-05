@@ -3,7 +3,6 @@ package vdi.component.db.cache
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.env.EnvKey
 import org.veupathdb.vdi.lib.common.env.optUByte
 import org.veupathdb.vdi.lib.common.env.optUShort
 import org.veupathdb.vdi.lib.common.env.require
@@ -13,10 +12,11 @@ import vdi.component.db.cache.model.BrokenImportListQuery
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.query.AdminAllDatasetsQuery
 import vdi.component.db.cache.sql.select.*
+import vdi.component.env.EnvKey
 import javax.sql.DataSource
 import org.postgresql.Driver as PostgresDriver
 
-internal object CacheDBImpl: vdi.component.db.cache.CacheDB {
+internal object CacheDBImpl: CacheDB {
 
   override val details: CacheDBConnectionDetails
 
