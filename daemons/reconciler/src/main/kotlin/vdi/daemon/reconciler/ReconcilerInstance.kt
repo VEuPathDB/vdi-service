@@ -77,8 +77,6 @@ class ReconcilerInstance(
       // Pop the next DatasetDirectory instance from the S3 stream.
       val sourceDatasetDir = sourceIterator.next()
 
-      log.info("Checking dataset {}/{} for {}", sourceDatasetDir.ownerID, sourceDatasetDir.datasetID, targetDB.name)
-
       // Target stream is exhausted, everything left in source stream is missing from the target database!
       // Check again if target stream is exhausted, consume source stream if so.
       if (nextTargetDataset == null) {
