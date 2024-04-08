@@ -2,6 +2,7 @@ package vdi.component.s3.util
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.vdi.lib.common.env.*
+import vdi.component.env.EnvKey
 
 /**
  * Constructs a new [S3Config] instance from the given environment map using the

@@ -11,6 +11,7 @@ tasks.test {
 dependencies {
   implementation(platform(project(":platform")))
 
+  implementation(project(":components:env"))
   implementation(project(":components:metrics"))
 
   implementation("org.veupathdb.vdi:vdi-component-common")

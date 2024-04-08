@@ -13,6 +13,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetTypeImpl
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.component.kafka.router.KafkaRouter
+import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import vdi.component.s3.files.DatasetMetaFile
 import java.time.OffsetDateTime
@@ -224,7 +225,7 @@ class ReconcilerTest {
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter)
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false)
 
         `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
 
@@ -263,8 +264,8 @@ class ReconcilerTest {
         }
     }
 
-    private fun mockDatasetDirectory(userID: Long, datasetID: String): vdi.component.s3.DatasetDirectory {
-        val dsMock = mock<vdi.component.s3.DatasetDirectory>()
+    private fun mockDatasetDirectory(userID: Long, datasetID: String): DatasetDirectory {
+        val dsMock = mock<DatasetDirectory>()
         `when`(dsMock.datasetID).thenReturn(DatasetID(datasetID))
         `when`(dsMock.ownerID).thenReturn(UserID(userID))
         `when`(dsMock.getInstallReadyTimestamp() ?: UpdateTime).thenReturn(UpdateTime)
@@ -275,8 +276,8 @@ class ReconcilerTest {
         return dsMock
     }
 
-    private fun mockDatasetDirectory(userID: Long, datasetID: String, syncTime: OffsetDateTime): vdi.component.s3.DatasetDirectory {
-        val dsMock = mock<vdi.component.s3.DatasetDirectory>()
+    private fun mockDatasetDirectory(userID: Long, datasetID: String, syncTime: OffsetDateTime): DatasetDirectory {
+        val dsMock = mock<DatasetDirectory>()
         `when`(dsMock.datasetID).thenReturn(DatasetID(datasetID))
         `when`(dsMock.ownerID).thenReturn(UserID(userID))
         `when`(dsMock.getInstallReadyTimestamp() ?: UpdateTime).thenReturn(syncTime)
