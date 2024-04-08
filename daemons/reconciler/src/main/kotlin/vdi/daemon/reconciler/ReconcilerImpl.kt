@@ -43,17 +43,12 @@ internal class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler
   }
 
   override suspend fun runJob() {
-    if (!config.reconcilerEnabled) {
-      logger().warn("Reconciler is disabled. Skipping run")
-      return
-    }
-
     val now = System.currentTimeMillis()
 
     val delta = (now - lastRun).milliseconds
 
     when {
-      delta >= config.fullRunInterval -> {
+      config.reconcilerEnabled && delta >= config.fullRunInterval -> {
         lastRun = now
         runFull()
       }
