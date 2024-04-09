@@ -11,26 +11,26 @@ data class KafkaRouterConfig(
 
   val eventSource: EventSource,
 
-  val importTriggerMessageKey: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
-  val importTriggerTopic: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
+  val importTriggerMessageKey: String,
+  val importTriggerTopic: String,
 
-  val installTriggerMessageKey: String = KafkaRouterConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY,
-  val installTriggerTopic: String = KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC,
+  val installTriggerMessageKey: String,
+  val installTriggerTopic: String,
 
-  val updateMetaTriggerMessageKey: String = KafkaRouterConfigDefaults.UPDATE_META_TRIGGER_MESSAGE_KEY,
-  val updateMetaTriggerTopic: String = KafkaRouterConfigDefaults.UPDATE_META_TRIGGER_TOPIC,
+  val updateMetaTriggerMessageKey: String,
+  val updateMetaTriggerTopic: String,
 
-  val softDeleteTriggerMessageKey: String = KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_MESSAGE_KEY,
-  val softDeleteTriggerTopic: String = KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_TOPIC,
+  val softDeleteTriggerMessageKey: String,
+  val softDeleteTriggerTopic: String,
 
-  val hardDeleteTriggerMessageKey: String = KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY,
-  val hardDeleteTriggerTopic: String = KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC,
+  val hardDeleteTriggerMessageKey: String,
+  val hardDeleteTriggerTopic: String,
 
-  val shareTriggerMessageKey: String = KafkaRouterConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY,
-  val shareTriggerTopic: String = KafkaRouterConfigDefaults.SHARE_TRIGGER_TOPIC,
+  val shareTriggerMessageKey: String,
+  val shareTriggerTopic: String,
 
-  val reconciliationTriggerMessageKey: String = KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_MESSAGE_KEY,
-  val reconciliationTriggerTopic: String = KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_TOPIC,
+  val reconciliationTriggerMessageKey: String,
+  val reconciliationTriggerTopic: String,
 ) {
   constructor(env: Environment, clientID: String, source: EventSource) : this(
     producerConfig = KafkaProducerConfig(env, clientID),

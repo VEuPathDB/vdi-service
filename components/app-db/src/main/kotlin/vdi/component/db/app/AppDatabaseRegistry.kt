@@ -58,6 +58,8 @@ object AppDatabaseRegistry {
       return
     }
 
+    val poolSize = (env.poolSize ?: DefaultPoolSize).toInt()
+
     log.info(
       """registering database {} with the following details:
       Name: {}
@@ -67,7 +69,7 @@ object AppDatabaseRegistry {
       env.name,
       env.name,
       env.ldap,
-      env.poolSize,
+      poolSize,
       env.controlSchema
     )
 
@@ -83,7 +85,7 @@ object AppDatabaseRegistry {
           jdbcUrl = makeJDBCOracleConnectionString(desc.host, desc.port, desc.serviceName)
           username = env.controlSchema
           password = env.pass!!.unwrap()
-          maximumPoolSize = env.poolSize!!.toInt()
+          maximumPoolSize = poolSize
           driverClassName = OracleDriver::class.java.name
         }
         .let(::HikariDataSource)

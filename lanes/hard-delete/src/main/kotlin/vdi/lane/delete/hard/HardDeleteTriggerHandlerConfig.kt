@@ -23,7 +23,10 @@ data class HardDeleteTriggerHandlerConfig(
     workerPoolSize = env.optUInt(EnvKey.HardDeleteTriggerHandler.WorkerPoolSize)
       ?: Defaults.WorkerPoolSize,
 
-    kafkaConsumerConfig = KafkaConsumerConfig(env.optional(EnvKey.HardDeleteTriggerHandler.KafkaConsumerClientID) ?: "hard-delete-handler", env),
+    kafkaConsumerConfig = KafkaConsumerConfig(env.optional(
+      EnvKey.HardDeleteTriggerHandler.KafkaConsumerClientID) ?: Defaults.KafkaConsumerClientID,
+      env
+    ),
 
     hardDeleteTopic = env.optional(EnvKey.Kafka.Topic.HardDeleteTriggers)
       ?: Defaults.HardDeleteTopic,
@@ -35,6 +38,7 @@ data class HardDeleteTriggerHandlerConfig(
   object Defaults {
     const val JobQueueSize   = 10u
     const val WorkerPoolSize = 10u
+    const val KafkaConsumerClientID = "hard-delete-handler"
 
     inline val HardDeleteTopic
       get() = KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC
