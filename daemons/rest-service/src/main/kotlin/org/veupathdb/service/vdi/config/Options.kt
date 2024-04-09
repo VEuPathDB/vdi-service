@@ -15,10 +15,6 @@ object Options : Options() {
     val bucketName  = requireEnv(EnvKey.S3.BucketName)
   }
 
-  object Admin {
-    val secretKey = requireEnv(EnvKey.Admin.SecretKey)
-  }
-
   object Quota {
     val maxUploadSize = uLongOr(EnvKey.Quotas.MaxUploadFileSize, 1073741824uL)
     val quotaLimit    = uLongOr(EnvKey.Quotas.UserUploadQuota, 10737418240uL)
@@ -30,7 +26,9 @@ private fun requireEnv(key: String): String =
     .also { if (it.isNullOrBlank()) throw IllegalStateException("missing required environment variable $key") }
 
 private fun uLongOr(key: String, other: ULong): ULong {
-  val value = System.getenv(key)?.toBigInteger() ?: return other
+  val value = System.getenv(key)?.takeIf { it.isNotBlank() }
+    ?.toBigInteger()
+    ?: return other
 
   if (value < BigInteger.ZERO || value > BigInteger(ULong.MAX_VALUE.toString()))
     throw IllegalStateException("value $key must be an unsigned uint64 value")
