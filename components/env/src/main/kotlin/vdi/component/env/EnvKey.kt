@@ -651,12 +651,12 @@ object EnvKey {
 
   object Reconciler {
     /**
-     * Whether the reconciler should be enabled at all.
+     * Whether the full dataset reconciliation daemon should be enabled at all.
      *
      * Type: Boolean
      * Required: no
      */
-    const val Enabled = "RECONCILER_ENABLED"
+    const val Enabled = "RECONCILER_FULL_ENABLED"
 
     /**
      * Run interval for the full reconciliation process.
