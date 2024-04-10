@@ -28,6 +28,7 @@ class CacheDBTarget : ReconcilerTarget {
       it.deleteDatasetProjects(datasetID)
       it.deleteSyncControl(datasetID)
       it.deleteImportControl(datasetID)
+      it.deleteImportMessages(datasetID)
       it.deleteDataset(datasetID)
     }
   }
