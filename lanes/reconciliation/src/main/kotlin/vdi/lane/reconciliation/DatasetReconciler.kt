@@ -11,6 +11,7 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDBAccessor
 import vdi.component.db.app.model.DeleteFlag
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetMetaImpl
@@ -21,7 +22,7 @@ import vdi.component.s3.DatasetManager
 import java.time.OffsetDateTime
 
 internal class DatasetReconciler(
-  private val cacheDB: vdi.component.db.cache.CacheDB = vdi.component.db.cache.CacheDB(),
+  private val cacheDB: CacheDB = CacheDB(),
   private val appDB: AppDB = AppDB(),
   private val eventRouter: KafkaRouter,
   private val datasetManager: DatasetManager,
@@ -102,22 +103,21 @@ internal class DatasetReconciler(
   }
 
   private fun ReconciliationState.handleHasUpload() {
-    // If an import-ready.zip file exists for the dataset then we can delete
-    // the raw upload file and ensure that the upload control table in the
-    // cache db indicates that the upload was successfully processed.
+    // If an import-ready.zip file exists for the dataset then we can delete the
+    // raw upload file and ensure that the upload control table in the cache db
+    // indicates that the upload was successfully processed.
     if (haveImportableFile()) {
       safeExec("failed to delete raw upload file") { datasetDirectory.deleteUploadFile() }
       // TODO: Write completed status to upload control table in cache db
     }
 
-    // If no import-ready.zip file exists for the dataset, then check the
-    // cache db upload control table.  If the control table indicates that the
-    // upload processing failed then delete the raw upload file.  If the
-    // control table indicates that the upload processing is queued or
-    // in progress then fire an upload event to make sure the upload is
-    // processed.  Best case, the upload is already being processed and the
-    // upload handler will reject the job, worst case we caught an interrupted
-    // upload job.
+    // If no import-ready.zip file exists for the dataset, then check the cache
+    // db upload control table.  If the control table indicates that the upload
+    // processing failed then delete the raw upload file.  If the control table
+    // indicates that the upload processing is queued or in progress then fire
+    // an upload event to make sure the upload is processed.  Best case, the
+    // upload is already being processed and the upload handler will reject the
+    // job, worst case we caught an interrupted upload job.
     else {
       // TODO: Implement with robust async upload
     }
@@ -204,8 +204,8 @@ internal class DatasetReconciler(
       // process
       !haveImportableFile() -> ReimportIndicator.ReimportNotPossible
 
-      // If the import was found to be invalid, then it's a data problem and
-      // no amount of reimport attempts will help.
+      // If the import was found to be invalid, then it's a data problem and no
+      // amount of reimport attempts will help.
       invalidImport() -> ReimportIndicator.ReimportNotPossible
 
       // If we failed the last import attempt, then only rerun the import if we
@@ -397,13 +397,12 @@ internal class DatasetReconciler(
       cImportControl.value
     }
 
-  private fun ReconciliationState.updateCacheDBImportStatus(status: DatasetImportStatus) {
+  private fun ReconciliationState.updateCacheDBImportStatus(status: DatasetImportStatus) =
     try {
       cacheDB.withTransaction { it.upsertImportControl(datasetID, status) }
     } catch (e: Throwable) {
       logError("$userID/$datasetID: failed to update dataset import status to $status", e)
     }
-  }
 
   private fun ReconciliationState.getCacheDatasetRecord() =
     safeExec("failed to query cache db for dataset record") { cacheDB.selectDataset(datasetID) }
@@ -412,9 +411,8 @@ internal class DatasetReconciler(
     getCacheDatasetRecord().require("could not find dataset record in cache db")
 
   private fun ReconciliationState.requireCacheDBSyncControl() =
-    safeExec("failed to load sync control record from cache db") {
-      cacheDB.selectSyncControl(datasetID)
-    }.require("could not find dataset sync control record")
+    safeExec("failed to load sync control record from cache db") { cacheDB.selectSyncControl(datasetID) }
+      .require("could not find dataset sync control record")
 
   private fun ReconciliationState.dropImportMessages() =
     safeExec("failed to delete import messages") { cacheDB.withTransaction { it.deleteImportMessages(datasetID) } }
@@ -528,7 +526,6 @@ internal class DatasetReconciler(
 
   private inline val ReconciliationState.datasetRef
     get() = "$userID/$datasetID"
-
 
   private fun ReconciliationState.logInfo(message: String, vararg objects: Any?) =
     logger.info("$datasetRef: $message", *objects)

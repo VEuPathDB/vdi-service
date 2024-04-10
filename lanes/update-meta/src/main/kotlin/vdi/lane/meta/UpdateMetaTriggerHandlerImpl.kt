@@ -18,6 +18,7 @@ import vdi.component.db.app.AppDBTransaction
 import vdi.component.db.app.UniqueConstraintViolation
 import vdi.component.db.app.model.*
 import vdi.component.db.app.withTransaction
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.CacheDBTransaction
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
@@ -43,7 +44,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val cacheDB = vdi.component.db.cache.CacheDB()
+  private val cacheDB = CacheDB()
 
   private val appDB = AppDB()
 
@@ -317,7 +318,7 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     return true
   }
 
-  private fun vdi.component.db.cache.CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
+  private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
     openTransaction().use {
 
       // Insert a new dataset record

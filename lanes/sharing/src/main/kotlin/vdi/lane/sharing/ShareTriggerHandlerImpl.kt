@@ -15,6 +15,7 @@ import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDBTransaction
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.app.withTransaction
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.model.DatasetShareOfferImpl
 import vdi.component.db.cache.model.DatasetShareReceiptImpl
@@ -51,7 +52,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val cacheDB = vdi.component.db.cache.CacheDB()
+  private val cacheDB = CacheDB()
 
   private val appDB = AppDB()
 
