@@ -46,5 +46,5 @@ internal class AppDBAccessorImpl(
     con.use { it.testDatasetProjectLinkExists(schema, datasetID, projectID) }
 
   override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
-    con.use { it.selectDatasetsByInstallStatus(schema, installType, installStatus) }
+    con.use { it.selectDatasetsByInstallStatus(schema, installType, installStatus, project) }
 }
