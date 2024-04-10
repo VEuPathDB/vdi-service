@@ -12,10 +12,12 @@ import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.app.model.DeleteFlag
 import vdi.component.db.app.withTransaction
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbstractVDIModule
+import vdi.component.plugin.client.PluginHandlerClient
 import vdi.component.plugin.client.response.uni.UninstallBadRequestResponse
 import vdi.component.plugin.client.response.uni.UninstallResponseType
 import vdi.component.plugin.client.response.uni.UninstallUnexpectedErrorResponse
@@ -27,7 +29,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val cacheDB = vdi.component.db.cache.CacheDB()
+  private val cacheDB = CacheDB()
 
   private val appDB = AppDB()
 
@@ -106,7 +108,7 @@ internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTrigge
     userID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
-    handler: vdi.component.plugin.client.PluginHandlerClient,
+    handler: PluginHandlerClient,
     record: DatasetRecord
   ) {
     appDB.withTransaction(projectID) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedNotUninstalled) }
