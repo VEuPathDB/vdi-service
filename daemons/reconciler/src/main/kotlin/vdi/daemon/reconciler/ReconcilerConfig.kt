@@ -4,7 +4,6 @@ import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.env.*
 import vdi.component.env.EnvKey
-import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouterConfig
 import vdi.component.s3.util.S3Config
 import kotlin.time.Duration
@@ -22,7 +21,7 @@ data class ReconcilerConfig(
   constructor() : this(System.getenv())
 
   constructor(env: Environment) : this(
-    kafkaRouterConfig = KafkaRouterConfig(env, "reconciler", EventSource.Reconciler),
+    kafkaRouterConfig = KafkaRouterConfig(env, "reconciler"),
     s3Config          = S3Config(env),
     s3Bucket          = BucketName(env.require(EnvKey.S3.BucketName)),
     reconcilerEnabled = env.optBool(EnvKey.Reconciler.Enabled) ?: DefaultEnabledValue,

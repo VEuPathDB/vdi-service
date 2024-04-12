@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.async.WorkerPool
+import vdi.component.kafka.EventSource
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbstractVDIModule
 import java.util.concurrent.ConcurrentHashMap
@@ -38,7 +39,7 @@ internal class ReconciliationEventHandlerImpl(private val config: Reconciliation
           kc.fetchMessages(config.kafkaMessageKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received reconciliation event for dataset {}/{} from source {}", userID, datasetID, source)
-              wp.submit { reconcile(userID, datasetID) }
+              wp.submit { reconcile(userID, datasetID, source) }
             }
         }
 
@@ -52,10 +53,10 @@ internal class ReconciliationEventHandlerImpl(private val config: Reconciliation
     confirmShutdown()
   }
 
-  private fun reconcile(userID: UserID, datasetID: DatasetID) {
+  private fun reconcile(userID: UserID, datasetID: DatasetID, source: EventSource) {
     if (datasetsInProgress.add(datasetID)) {
       try {
-        reconciler.reconcile(userID, datasetID)
+        reconciler.reconcile(userID, datasetID, source)
       } finally {
         datasetsInProgress.remove(datasetID)
       }

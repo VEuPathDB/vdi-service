@@ -32,19 +32,19 @@ raml-gen:
 
 .PHONY: up
 up: env-file-test
-	@docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml up -d
 
 .PHONY: down
 down: env-file-test
-	@docker compose -f docker-compose.yml -f docker-compose.dev.yml down -v
+	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml down -v
 
 .PHONY: start
 start: env-file-test
-	@docker compose -f docker-compose.yml -f docker-compose.dev.yml start
+	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml start
 
 .PHONY: stop
 stop: env-file-test
-	@docker compose -f docker-compose.yml -f docker-compose.dev.yml stop
+	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml stop
 
 
 ####

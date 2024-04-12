@@ -53,23 +53,23 @@ fun mockKafkaProducer(
   }
 
 fun mockKafkaRouter(
-  onSendImport: (UserID, DatasetID) -> Unit = ::biConsumer,
-  onSendInstall: (UserID, DatasetID) -> Unit = ::biConsumer,
-  onSendMeta: (UserID, DatasetID) -> Unit = ::biConsumer,
-  onSendUninstall: (UserID, DatasetID) -> Unit = ::biConsumer,
-  onSendDelete: (UserID, DatasetID) -> Unit = ::biConsumer,
-  onSendShare: (UserID, DatasetID) -> Unit = ::biConsumer,
-  onSendReconcile: (UserID, DatasetID) -> Unit = ::biConsumer,
+  onSendImport: (UserID, DatasetID, EventSource) -> Unit = ::triConsumer,
+  onSendInstall: (UserID, DatasetID, EventSource) -> Unit = ::triConsumer,
+  onSendMeta: (UserID, DatasetID, EventSource) -> Unit = ::triConsumer,
+  onSendUninstall: (UserID, DatasetID, EventSource) -> Unit = ::triConsumer,
+  onSendDelete: (UserID, DatasetID, EventSource) -> Unit = ::triConsumer,
+  onSendShare: (UserID, DatasetID, EventSource) -> Unit = ::triConsumer,
+  onSendReconcile: (UserID, DatasetID, EventSource) -> Unit = ::triConsumer,
   onClose: Runnable = ::runnable,
 ): KafkaRouter =
   mock {
-    on { sendImportTrigger(any(), any()) } doAnswer { onSendImport(it.getArgument(0), it.getArgument(1)) }
-    on { sendInstallTrigger(any(), any()) } doAnswer { onSendInstall(it.getArgument(0), it.getArgument(1)) }
-    on { sendUpdateMetaTrigger(any(), any()) } doAnswer { onSendMeta(it.getArgument(0), it.getArgument(1)) }
-    on { sendSoftDeleteTrigger(any(), any()) } doAnswer { onSendUninstall(it.getArgument(0), it.getArgument(1)) }
-    on { sendHardDeleteTrigger(any(), any()) } doAnswer { onSendDelete(it.getArgument(0), it.getArgument(1)) }
-    on { sendShareTrigger(any(), any()) } doAnswer { onSendShare(it.getArgument(0), it.getArgument(1)) }
-    on { sendReconciliationTrigger(any(), any()) } doAnswer { onSendReconcile(it.getArgument(0), it.getArgument(1)) }
+    on { sendImportTrigger(any(), any(), any()) } doAnswer { onSendImport(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
+    on { sendInstallTrigger(any(), any(), any()) } doAnswer { onSendInstall(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
+    on { sendUpdateMetaTrigger(any(), any(), any()) } doAnswer { onSendMeta(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
+    on { sendSoftDeleteTrigger(any(), any(), any()) } doAnswer { onSendUninstall(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
+    on { sendHardDeleteTrigger(any(), any(), any()) } doAnswer { onSendDelete(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
+    on { sendShareTrigger(any(), any(), any()) } doAnswer { onSendShare(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
+    on { sendReconciliationTrigger(any(), any(), any()) } doAnswer { onSendReconcile(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
     on { close() } doAnswer { onClose() }
   }
 

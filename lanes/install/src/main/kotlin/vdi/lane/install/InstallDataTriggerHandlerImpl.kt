@@ -19,8 +19,10 @@ import vdi.component.db.app.withTransaction
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbstractVDIModule
+import vdi.component.plugin.client.PluginHandlerClient
 import vdi.component.plugin.client.response.ind.*
 import vdi.component.plugin.mapping.PluginHandlers
+import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import vdi.component.s3.paths.S3Paths
 import java.io.InputStream
@@ -205,8 +207,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     userID:    UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
-    s3Dir: vdi.component.s3.DatasetDirectory,
-    handler: vdi.component.plugin.client.PluginHandlerClient,
+    s3Dir: DatasetDirectory,
+    handler: PluginHandlerClient,
     installableFileTimestamp: OffsetDateTime,
   ) {
     val appDB   = appDB.accessor(projectID)
@@ -408,7 +410,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     throw Exception(res.message)
   }
 
-  private suspend fun <T> withInstallBundle(s3Dir: vdi.component.s3.DatasetDirectory, fn: suspend (upload: InputStream) -> T) =
+  private suspend fun <T> withInstallBundle(s3Dir: DatasetDirectory, fn: suspend (upload: InputStream) -> T) =
     TempFiles.withTempDirectory { tmpDir ->
       val files = ArrayList<Path>(8)
 

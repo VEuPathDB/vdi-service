@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
+import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouterFactory
 import vdi.component.modules.AbstractVDIModule
 import vdi.component.rabbit.RabbitMQEventIterator
@@ -138,9 +139,9 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     confirmShutdown()
   }
 
-  private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: (UserID, DatasetID) -> Unit) {
+  private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: (UserID, DatasetID, EventSource) -> Unit) {
     try {
-      fn(userID, datasetID)
+      fn(userID, datasetID, EventSource.ObjectStore)
     } catch (e: Throwable) {
       triggerShutdown()
       log.error("failed to send event message to Kafka", e)

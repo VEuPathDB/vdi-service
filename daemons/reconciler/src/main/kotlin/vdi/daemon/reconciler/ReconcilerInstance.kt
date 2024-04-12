@@ -7,6 +7,7 @@ import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.sql.select.TempHackCacheDBReconcilerTargetRecord
+import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
 import vdi.component.metrics.Metrics
 import vdi.component.s3.DatasetDirectory
@@ -222,7 +223,7 @@ class ReconcilerInstance(
 
   private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
     log.info("sending reconciliation event for {}/{} for reason: {}", ownerID, datasetID, reason)
-    kafkaRouter.sendReconciliationTrigger(ownerID, datasetID)
+    kafkaRouter.sendReconciliationTrigger(ownerID, datasetID, if (slim) EventSource.SlimReconciler else EventSource.FullReconciler)
 
     if (slim)
       Metrics.Reconciler.Slim.datasetsSynced.inc()

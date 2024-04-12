@@ -83,8 +83,8 @@ internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTrigge
     try {
       updateMeta(dm, msg.userID, msg.datasetID)
     } finally {
-      if (msg.eventSource != EventSource.Reconciler)
-        kr.sendReconciliationTrigger(msg.userID, msg.datasetID)
+      if (msg.eventSource != EventSource.FullReconciler)
+        kr.sendReconciliationTrigger(msg.userID, msg.datasetID, msg.eventSource)
     }
   }
 

@@ -7,7 +7,6 @@ import org.veupathdb.vdi.lib.common.env.optional
 import org.veupathdb.vdi.lib.common.env.require
 import vdi.component.env.EnvKey
 import vdi.component.env.Environment
-import vdi.component.kafka.EventSource
 import vdi.component.kafka.KafkaConsumerConfig
 import vdi.component.kafka.router.KafkaRouterConfig
 import vdi.component.s3.util.S3Config
@@ -34,7 +33,7 @@ data class UpdateMetaTriggerHandlerConfig(
       env
     ),
 
-    kafkaRouterConfig = KafkaRouterConfig(env, "update-meta", EventSource.ObjectStore),
+    kafkaRouterConfig = KafkaRouterConfig(env, "update-meta"),
 
     s3Config = S3Config(env),
 

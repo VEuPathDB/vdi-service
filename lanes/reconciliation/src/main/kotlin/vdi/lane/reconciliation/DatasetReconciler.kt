@@ -16,8 +16,10 @@ import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
+import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
 import vdi.component.metrics.Metrics
+import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import java.time.OffsetDateTime
 
@@ -34,10 +36,10 @@ internal class DatasetReconciler(
   // TODO: If the raw upload file is newer than the import-ready file then we
   //       should fire an upload processing event.
 
-  fun reconcile(userID: UserID, datasetID: DatasetID) {
+  fun reconcile(userID: UserID, datasetID: DatasetID, source: EventSource) {
     logger.info("beginning reconciliation for dataset {}/{}", userID, datasetID)
     try {
-      ReconciliationState(datasetManager.getDatasetDirectory(userID, datasetID)).reconcile()
+      ReconciliationState(datasetManager.getDatasetDirectory(userID, datasetID), source).reconcile()
       logger.info("reconciliation completed for dataset {}/{}", userID, datasetID)
     } catch (e: CriticalReconciliationError) {
       logger.error("reconciliation failed for dataset {}/{}", userID, datasetID)
@@ -283,7 +285,7 @@ internal class DatasetReconciler(
   private fun ReconciliationState.fireImportEvent() {
     logger.info("firing import event for dataset {}/{}", userID, datasetID)
     safeExec("failed to fire import trigger") {
-      eventRouter.sendImportTrigger(userID, datasetID)
+      eventRouter.sendImportTrigger(userID, datasetID, source)
       haveFiredImportEvent = true
     }
   }
@@ -291,7 +293,7 @@ internal class DatasetReconciler(
   private fun ReconciliationState.fireUpdateMetaEvent() {
     logger.info("firing update meta event for dataset {}/{}", userID, datasetID)
     safeExec("failed to fire update-meta trigger") {
-      eventRouter.sendUpdateMetaTrigger(userID, datasetID)
+      eventRouter.sendUpdateMetaTrigger(userID, datasetID, source)
       haveFiredMetaUpdateEvent = true
     }
   }
@@ -299,7 +301,7 @@ internal class DatasetReconciler(
   private fun ReconciliationState.fireShareEvent() {
     logger.info("firing share event for dataset {}/{}", userID, datasetID)
     safeExec("failed to send share trigger") {
-      eventRouter.sendShareTrigger(userID, datasetID)
+      eventRouter.sendShareTrigger(userID, datasetID, source)
       haveFiredShareEvent = true
     }
   }
@@ -307,7 +309,7 @@ internal class DatasetReconciler(
   private fun ReconciliationState.fireInstallEvent() {
     logger.info("firing data install event for dataset {}/{}", userID, datasetID)
     safeExec("failed to send install-data trigger") {
-      eventRouter.sendInstallTrigger(userID, datasetID)
+      eventRouter.sendInstallTrigger(userID, datasetID, source)
       haveFiredInstallEvent = true
     }
   }
@@ -315,7 +317,7 @@ internal class DatasetReconciler(
   private fun ReconciliationState.fireUninstallEvent() {
     logger.info("firing soft-delete/uninstall event for dataset {}/{}", userID, datasetID)
     safeExec("failed to send soft-delete trigger") {
-      eventRouter.sendSoftDeleteTrigger(userID, datasetID)
+      eventRouter.sendSoftDeleteTrigger(userID, datasetID, source)
       haveFiredUninstallEvent = true
     }
   }
@@ -552,7 +554,10 @@ private class SyncIndicator(
   val installOutOfSync: Boolean,
 )
 
-private class ReconciliationState(val datasetDirectory: vdi.component.s3.DatasetDirectory) {
+private class ReconciliationState(
+  val datasetDirectory: DatasetDirectory,
+  val source: EventSource,
+) {
   inline val userID get() = datasetDirectory.ownerID
   inline val datasetID get() = datasetDirectory.datasetID
 

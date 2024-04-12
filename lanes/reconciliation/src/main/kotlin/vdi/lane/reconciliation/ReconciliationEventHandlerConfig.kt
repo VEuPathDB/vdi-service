@@ -7,7 +7,6 @@ import org.veupathdb.vdi.lib.common.env.optional
 import org.veupathdb.vdi.lib.common.env.require
 import vdi.component.env.EnvKey
 import vdi.component.env.Environment
-import vdi.component.kafka.EventSource
 import vdi.component.kafka.KafkaConsumerConfig
 import vdi.component.kafka.router.KafkaRouterConfig
 import vdi.component.kafka.router.KafkaRouterConfigDefaults
@@ -34,7 +33,7 @@ data class ReconciliationEventHandlerConfig(
 
     kafkaConsumerConfig = KafkaConsumerConfig(env.optional(EnvKey.ReconciliationTriggerHandler.KafkaConsumerClientID) ?: "reconciliation-handler", env),
 
-    kafkaRouterConfig = KafkaRouterConfig(env, "reconciliation-event-handler", EventSource.Reconciler),
+    kafkaRouterConfig = KafkaRouterConfig(env, "reconciliation-event-handler"),
 
     kafkaTopic = env.optional(EnvKey.Kafka.Topic.ReconciliationTriggers)
       ?: Defaults.ReconciliationTopic,

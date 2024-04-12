@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator
 
 enum class EventSource {
   ObjectStore,
-  Reconciler,
+  FullReconciler,
+  SlimReconciler,
   ;
 
   companion object {
