@@ -9,6 +9,8 @@ build/
 .settings/
 .envrc
 
+/*ssh*
+
 *.tmp
 *.bak
 *.swp
