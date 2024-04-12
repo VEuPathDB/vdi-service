@@ -358,9 +358,19 @@ internal class DatasetReconciler(
   private fun AppDBAccessor.isUninstalled(): Boolean {
     val targetRecord = selectAppDatasetRecord()
 
+    // If the target record does not exist, then either VDI has been configured
+    // to point at a clean database, the target database has been wiped, or
+    // something has gone terribly wrong.  We'll assume it was intentional here
+    // though and consider the dataset to be already uninstalled.
     if (targetRecord == null) {
-      logWarning("attempted to check install status for dataset {}/{} in project {} but no such dataset record could be found", userID, datasetID, project)
-      return false
+      logWarning(
+        "attempted to check install status for dataset {}/{} in project {} but no such dataset record could be found;" +
+          " assuming clean database and treating dataset as if it has been successfully uninstalled",
+        userID,
+        datasetID,
+        project
+      )
+      return true
     }
 
     if (targetRecord.isDeleted != DeleteFlag.DeletedAndUninstalled) {
