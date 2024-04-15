@@ -13,6 +13,7 @@ import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallType
 import vdi.component.db.app.withTransaction
 import vdi.component.metrics.Metrics
+import vdi.component.plugin.client.PluginHandlerClient
 import vdi.component.plugin.client.response.ind.*
 import vdi.component.plugin.client.response.uni.UninstallBadRequestResponse
 import vdi.component.plugin.client.response.uni.UninstallResponseType
@@ -118,7 +119,7 @@ object DatasetReinstaller {
     reinstallDataset(dataset, projectID, handler.client, manager)
   }
 
-  private suspend fun uninstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: vdi.component.plugin.client.PluginHandlerClient) {
+  private suspend fun uninstallDataset(dataset: DatasetRecord, projectID: ProjectID, client: PluginHandlerClient) {
     log.debug("attempting to uninstall dataset {}/{} from project {}", dataset.owner, dataset.datasetID, projectID)
 
     val uninstallResult = client.postUninstall(dataset.datasetID, projectID)
@@ -138,7 +139,7 @@ object DatasetReinstaller {
   private suspend fun reinstallDataset(
     dataset: DatasetRecord,
     projectID: ProjectID,
-    client: vdi.component.plugin.client.PluginHandlerClient,
+    client: PluginHandlerClient,
     manager: DatasetManager,
   ) {
     log.debug("attempting to reinstall dataset {}/{} into project {}", dataset.owner, dataset.datasetID, projectID)
