@@ -20,28 +20,28 @@ import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
+private val requestCounter = AtomicULong()
+
+private fun incRequestCounter(): ULong {
+  requestCounter += 1uL
+  return requestCounter.get()
+}
+
 internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig) : PluginHandlerClient {
 
   private val log = LoggerFactory.getLogger(javaClass)
-
-  private val counter = AtomicULong()
 
   private inline val baseUri
     get() = URI.create("http://${config.address.host}:${config.address.port}")
 
   private fun resolve(ep: String) = baseUri.resolve(ep)
 
-  private fun incCounter(): ULong {
-    counter += 1uL
-    return counter.get()
-  }
-
   override suspend fun postImport(datasetID: DatasetID, meta: VDIDatasetMeta, upload: InputStream): ImportResponse {
     val multipart = MultiPart.createBody {
       withPart {
         fieldName = FieldName.Details
         contentType("application/json; charset=utf-8")
-        withBody(ImportRequest(datasetID, incCounter(), meta).toJSONString())
+        withBody(ImportRequest(datasetID, incRequestCounter(), meta).toJSONString())
       }
 
       withPart {
@@ -91,7 +91,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(InstallMetaRequest(datasetID, incCounter(), projectID, meta).toJSONString()))
+        .POST(HttpRequest.BodyPublishers.ofString(InstallMetaRequest(datasetID, incRequestCounter(), projectID, meta).toJSONString()))
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()
@@ -113,7 +113,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       withPart {
         fieldName = FieldName.Details
         contentType("application/json; charset=utf-8")
-        withBody(InstallDataRequest(datasetID, incCounter(), projectID).toJSONString())
+        withBody(InstallDataRequest(datasetID, incRequestCounter(), projectID).toJSONString())
       }
 
       withPart {
@@ -161,7 +161,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(UninstallRequest(datasetID, incCounter(), projectID).toJSONString()))
+        .POST(HttpRequest.BodyPublishers.ofString(UninstallRequest(datasetID, incRequestCounter(), projectID).toJSONString()))
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()
