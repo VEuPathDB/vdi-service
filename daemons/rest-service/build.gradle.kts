@@ -71,15 +71,10 @@ dependencies {
   // Jersey
   implementation("org.glassfish.jersey.core:jersey-server")
 
-  // Jackson
-  implementation("com.fasterxml.jackson.core:jackson-databind")
-  implementation("com.fasterxml.jackson.core:jackson-annotations")
-
   // Log4J
   implementation("org.slf4j:slf4j-api")
   implementation("org.apache.logging.log4j:log4j-core")
   implementation("org.apache.logging.log4j:log4j-slf4j-impl")
-
 
   // Metrics (can remove if not adding custom service metrics over those provided by container core)
   implementation("io.prometheus:simpleclient")

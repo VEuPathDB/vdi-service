@@ -6,7 +6,6 @@ import org.veupathdb.service.vdi.db.accountdb.selectUserDetails
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.UserID
 
-
 object AccountDB {
   private val log = LoggerFactory.getLogger(javaClass)
 

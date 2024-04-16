@@ -6,10 +6,11 @@ import kotlinx.coroutines.future.await
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.common.intra.*
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.util.AtomicULong
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
-import vdi.component.plugin.client.model.*
 import vdi.component.plugin.client.response.imp.*
 import vdi.component.plugin.client.response.ind.*
 import vdi.component.plugin.client.response.inm.*
@@ -18,6 +19,13 @@ import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+
+private val requestCounter = AtomicULong()
+
+private fun incRequestCounter(): ULong {
+  requestCounter += 1uL
+  return requestCounter.get()
+}
 
 internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig) : PluginHandlerClient {
 
@@ -33,7 +41,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       withPart {
         fieldName = FieldName.Details
         contentType("application/json; charset=utf-8")
-        withBody(ImportRequestDetails(datasetID, meta).toJSONString())
+        withBody(ImportRequest(datasetID, incRequestCounter(), meta).toJSONString())
       }
 
       withPart {
@@ -61,15 +69,15 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
         -> ImportSuccessResponseImpl(body)
 
         ImportResponseType.BadRequest
-        -> ImportBadRequestResponseImpl(JSON.readValue<SimpleError>(body).message)
+        -> ImportBadRequestResponseImpl(JSON.readValue<SimpleErrorResponse>(body).message)
           .also { body.close() }
 
         ImportResponseType.ValidationError
-        -> ImportValidationErrorResponseImpl(JSON.readValue<WarningsResponse>(body).warnings)
+        -> ImportValidationErrorResponseImpl(JSON.readValue<WarningResponse>(body).warnings)
           .also { body.close() }
 
         ImportResponseType.UnhandledError
-        -> ImportUnhandledErrorResponseImpl(JSON.readValue<SimpleError>(body).message)
+        -> ImportUnhandledErrorResponseImpl(JSON.readValue<SimpleErrorResponse>(body).message)
           .also { body.close() }
       }
     }
@@ -83,7 +91,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(InstallMetaRequest(datasetID, projectID, meta).toJSONString()))
+        .POST(HttpRequest.BodyPublishers.ofString(InstallMetaRequest(datasetID, incRequestCounter(), projectID, meta).toJSONString()))
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()
@@ -93,10 +101,10 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       -> InstallMetaSuccessResponseImpl
 
       InstallMetaResponseType.BadRequest
-      -> InstallMetaBadRequestResponseImpl(JSON.readValue<SimpleError>(response.body()).message)
+      -> InstallMetaBadRequestResponseImpl(JSON.readValue<SimpleErrorResponse>(response.body()).message)
 
       InstallMetaResponseType.UnexpectedError
-      -> InstallMetaUnexpectedErrorResponseImpl(JSON.readValue<SimpleError>(response.body()).message)
+      -> InstallMetaUnexpectedErrorResponseImpl(JSON.readValue<SimpleErrorResponse>(response.body()).message)
     }
   }
 
@@ -105,7 +113,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       withPart {
         fieldName = FieldName.Details
         contentType("application/json; charset=utf-8")
-        withBody(InstallDataRequestDetails(datasetID, projectID).toJSONString())
+        withBody(InstallDataRequest(datasetID, incRequestCounter(), projectID).toJSONString())
       }
 
       withPart {
@@ -129,19 +137,19 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
 
     return when(InstallDataResponseType.fromCode(response.statusCode())) {
       InstallDataResponseType.Success
-      -> InstallDataSuccessResponseImpl(JSON.readValue<WarningsResponse>(response.body()).warnings)
+      -> InstallDataSuccessResponseImpl(JSON.readValue<WarningResponse>(response.body()).warnings)
 
       InstallDataResponseType.BadRequest
-      -> InstallDataBadRequestResponseImpl(JSON.readValue<SimpleError>(response.body()).message)
+      -> InstallDataBadRequestResponseImpl(JSON.readValue<SimpleErrorResponse>(response.body()).message)
 
       InstallDataResponseType.ValidationFailure
-      -> InstallDataValidationFailureResponseImpl(JSON.readValue<WarningsResponse>(response.body()).warnings)
+      -> InstallDataValidationFailureResponseImpl(JSON.readValue<WarningResponse>(response.body()).warnings)
 
       InstallDataResponseType.MissingDependencies
-      -> InstallDataMissingDependenciesResponseImpl(JSON.readValue<WarningsResponse>(response.body()).warnings)
+      -> InstallDataMissingDependenciesResponseImpl(JSON.readValue<WarningResponse>(response.body()).warnings)
 
       InstallDataResponseType.UnexpectedError
-      -> InstallDataUnexpectedErrorResponseImpl(JSON.readValue<SimpleError>(response.body()).message)
+      -> InstallDataUnexpectedErrorResponseImpl(JSON.readValue<SimpleErrorResponse>(response.body()).message)
     }
   }
 
@@ -153,7 +161,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(UninstallDataRequest(datasetID, projectID).toJSONString()))
+        .POST(HttpRequest.BodyPublishers.ofString(UninstallRequest(datasetID, incRequestCounter(), projectID).toJSONString()))
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()
@@ -163,10 +171,10 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       -> UninstallSuccessResponseImpl
 
       UninstallResponseType.BadRequest
-      -> UninstallBadRequestResponseImpl(JSON.readValue<SimpleError>(response.body()).message)
+      -> UninstallBadRequestResponseImpl(JSON.readValue<SimpleErrorResponse>(response.body()).message)
 
       UninstallResponseType.UnexpectedError
-      -> UninstallUnexpectedErrorResponseImpl(JSON.readValue<SimpleError>(response.body()).message)
+      -> UninstallUnexpectedErrorResponseImpl(JSON.readValue<SimpleErrorResponse>(response.body()).message)
     }
   }
 }

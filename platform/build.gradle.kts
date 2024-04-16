@@ -6,11 +6,11 @@ dependencies {
   constraints {
     api("org.gusdb:fgputil-db:2.13.1")
     api("org.veupathdb.lib:jaxrs-container-core:7.0.4")
-    api("org.veupathdb.lib:multipart-jackson-pojo:1.1.3")
+    api("org.veupathdb.lib:multipart-jackson-pojo:1.1.7")
 
     // VDI
-    api("org.veupathdb.vdi:vdi-component-common:10.0.1")
-    api("org.veupathdb.vdi:vdi-component-json:1.0.1")
+    api("org.veupathdb.vdi:vdi-component-common:10.2.0")
+    api("org.veupathdb.vdi:vdi-component-json:1.0.2")
 
     // Database
     api("com.zaxxer:HikariCP:5.1.0")
