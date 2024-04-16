@@ -4,5 +4,5 @@ sealed interface InstallDataSuccessResponse : InstallDataResponse {
   override val type: InstallDataResponseType
     get() = InstallDataResponseType.Success
 
-  val warnings: List<String>
+  val warnings: Collection<String>
 }

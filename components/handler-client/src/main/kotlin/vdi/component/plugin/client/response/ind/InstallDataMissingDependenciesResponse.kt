@@ -4,5 +4,5 @@ sealed interface InstallDataMissingDependenciesResponse : InstallDataResponse {
   override val type: InstallDataResponseType
     get() = InstallDataResponseType.MissingDependencies
 
-  val warnings: List<String>
+  val warnings: Collection<String>
 }

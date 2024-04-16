@@ -4,5 +4,5 @@ sealed interface ImportValidationErrorResponse : ImportResponse {
   override val type: ImportResponseType
     get() = ImportResponseType.ValidationError
 
-  val warnings: List<String>
+  val warnings: Collection<String>
 }
