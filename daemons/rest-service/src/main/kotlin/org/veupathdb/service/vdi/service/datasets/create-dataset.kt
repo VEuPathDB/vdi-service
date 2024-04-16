@@ -59,7 +59,7 @@ fun createDataset(
       throw BadRequestException("unrecognized target project")
   }
 
-  vdi.component.db.cache.CacheDB().withTransaction {
+  CacheDB().withTransaction {
     it.tryInsertDataset(DatasetImpl(
       datasetID    = datasetID,
       typeName     = datasetMeta.type.name,
@@ -130,7 +130,7 @@ private fun uploadFiles(
   uploadFile: Path,
   datasetMeta: VDIDatasetMeta,
 ) {
-  val cacheDB = vdi.component.db.cache.CacheDB()
+  val cacheDB = CacheDB()
 
   // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
   TempFiles.withTempDirectory { directory ->
