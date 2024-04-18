@@ -7,4 +7,5 @@ package vdi.daemon.events.routing
  *
  * @return a new [EventRouter] instance.
  */
-fun EventRouter(config: EventRouterConfig = EventRouterConfig()): EventRouter = EventRouterImpl(config)
+fun EventRouter(abortCB: (String?) -> Nothing, config: EventRouterConfig = EventRouterConfig()): EventRouter =
+  EventRouterImpl(config, abortCB)

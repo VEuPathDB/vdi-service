@@ -34,9 +34,12 @@ import kotlin.io.path.deleteIfExists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
-internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig)
+internal class InstallDataTriggerHandlerImpl(
+  private val config: InstallTriggerHandlerConfig,
+  abortCB: (String?) -> Nothing
+)
   : InstallDataTriggerHandler
-  , AbstractVDIModule("install-data-trigger-handler")
+  , AbstractVDIModule("install-data-trigger-handler", abortCB)
 {
   private val log = LoggerFactory.getLogger(javaClass)
 

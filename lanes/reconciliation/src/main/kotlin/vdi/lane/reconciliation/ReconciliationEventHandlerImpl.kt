@@ -12,9 +12,12 @@ import vdi.component.metrics.Metrics
 import vdi.component.modules.AbstractVDIModule
 import java.util.concurrent.ConcurrentHashMap
 
-internal class ReconciliationEventHandlerImpl(private val config: ReconciliationEventHandlerConfig)
+internal class ReconciliationEventHandlerImpl(
+  private val config: ReconciliationEventHandlerConfig,
+  abortCB: (String?) -> Nothing
+)
   : ReconciliationEventHandler
-  , AbstractVDIModule("reconciliation-event-handler")
+  , AbstractVDIModule("reconciliation-event-handler", abortCB)
 {
   private val log = LoggerFactory.getLogger(javaClass)
 

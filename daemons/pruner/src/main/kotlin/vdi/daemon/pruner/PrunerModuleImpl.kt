@@ -7,8 +7,8 @@ import vdi.component.pruner.Pruner
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-internal class PrunerModuleImpl(private val config: PrunerModuleConfig) : PrunerModule,
-  AbstractJobExecutor("pruner", config.wakeupInterval) {
+internal class PrunerModuleImpl(private val config: PrunerModuleConfig, abortCB: (String?) -> Nothing) : PrunerModule,
+  AbstractJobExecutor("pruner", abortCB, config.wakeupInterval) {
 
   private val log = LoggerFactory.getLogger(javaClass)
 

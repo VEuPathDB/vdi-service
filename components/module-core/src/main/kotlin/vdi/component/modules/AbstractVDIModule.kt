@@ -22,7 +22,7 @@ import vdi.component.s3.DatasetManager
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-abstract class AbstractVDIModule(override val name: String) : VDIModule {
+abstract class AbstractVDIModule(override val name: String, protected val abortCB: (String?) -> Nothing) : VDIModule {
   private val log = LoggerFactory.getLogger(javaClass)
 
   protected val shutdownTrigger = ShutdownSignal()
@@ -37,7 +37,12 @@ abstract class AbstractVDIModule(override val name: String) : VDIModule {
       log.info("starting module {}", name)
 
       started = true
-      run()
+      try {
+        run()
+      } catch (e: Throwable) {
+        log.error("module $name execution failed", e)
+        abortCB(e.message)
+      }
     }
   }
 

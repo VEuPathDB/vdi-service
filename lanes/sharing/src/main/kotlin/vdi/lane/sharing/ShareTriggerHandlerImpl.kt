@@ -46,9 +46,10 @@ private data class ShareInfo(
  * This trigger handler processes trigger events for dataset shares being
  * created or removed.
  */
-internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig)
-: ShareTriggerHandler
-, AbstractVDIModule("share-trigger-handler") {
+internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig, abortCB: (String?) -> Nothing)
+  : ShareTriggerHandler
+  , AbstractVDIModule("share-trigger-handler", abortCB)
+{
 
   private val log = LoggerFactory.getLogger(javaClass)
 

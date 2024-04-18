@@ -37,9 +37,9 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.io.path.*
 
-internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig)
+internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig, abortCB: (String?) -> Nothing)
   : ImportTriggerHandler
-  , AbstractVDIModule("import-trigger-handler")
+  , AbstractVDIModule("import-trigger-handler", abortCB)
 {
   private val log = logger()
 
@@ -48,8 +48,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   private val activeIDs = HashSet<DatasetID>(24)
 
   private val cacheDB = vdi.component.db.cache.CacheDB()
-
-  override val name = "import lane"
 
   override suspend fun run() {
     log.trace("run()")

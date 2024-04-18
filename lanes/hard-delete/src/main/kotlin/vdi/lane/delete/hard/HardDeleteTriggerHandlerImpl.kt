@@ -6,9 +6,9 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import vdi.component.modules.AbstractVDIModule
 
-internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTriggerHandlerConfig)
+internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTriggerHandlerConfig, abortCB: (String?) -> Nothing)
   : HardDeleteTriggerHandler
-  , AbstractVDIModule("hard-delete-trigger-handler")
+  , AbstractVDIModule("hard-delete-trigger-handler", abortCB)
 {
   private val log = LoggerFactory.getLogger(javaClass)
 

@@ -6,9 +6,13 @@ import org.slf4j.LoggerFactory
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-abstract class AbstractJobExecutor(name: String, private val wakeInterval: Duration = 2.seconds)
+abstract class AbstractJobExecutor(
+  name: String,
+  abortCB: (String?) -> Nothing,
+  private val wakeInterval: Duration = 2.seconds
+)
   : VDIModule
-  , AbstractVDIModule(name)
+  , AbstractVDIModule(name, abortCB)
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -28,7 +32,12 @@ abstract class AbstractJobExecutor(name: String, private val wakeInterval: Durat
         if (isShutDown())
           break
 
-        runJob()
+        try {
+          runJob()
+        } catch (e: Throwable) {
+          log.error("executor $name run failed with exception", e)
+          abortCB(e.message)
+        }
       }
     }
 

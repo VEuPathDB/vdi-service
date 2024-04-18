@@ -23,9 +23,12 @@ import vdi.component.plugin.client.response.uni.UninstallResponseType
 import vdi.component.plugin.client.response.uni.UninstallUnexpectedErrorResponse
 import vdi.component.plugin.mapping.PluginHandlers
 
-internal class SoftDeleteTriggerHandlerImpl(private val config: SoftDeleteTriggerHandlerConfig)
+internal class SoftDeleteTriggerHandlerImpl(
+  private val config: SoftDeleteTriggerHandlerConfig,
+  abortCB: (String?) -> Nothing
+)
   : SoftDeleteTriggerHandler
-  , AbstractVDIModule("soft-delete-trigger-handler")
+  , AbstractVDIModule("soft-delete-trigger-handler", abortCB)
 {
   private val log = LoggerFactory.getLogger(javaClass)
 

@@ -1,4 +1,7 @@
 package vdi.lane.reconciliation
 
-fun ReconciliationEventHandler(config: ReconciliationEventHandlerConfig = ReconciliationEventHandlerConfig()): ReconciliationEventHandler =
-  ReconciliationEventHandlerImpl(config)
+fun ReconciliationEventHandler(
+  abortCB: (String?) -> Nothing,
+  config: ReconciliationEventHandlerConfig = ReconciliationEventHandlerConfig()
+): ReconciliationEventHandler =
+  ReconciliationEventHandlerImpl(config, abortCB)

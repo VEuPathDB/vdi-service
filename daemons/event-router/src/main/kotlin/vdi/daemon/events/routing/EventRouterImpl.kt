@@ -1,6 +1,7 @@
 package vdi.daemon.events.routing
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -15,8 +16,15 @@ import vdi.component.s3.paths.VDDatasetShareFilePath
 import vdi.component.s3.paths.toVDPathOrNull
 import vdi.daemon.events.routing.model.MinIOEvent
 import vdi.daemon.events.routing.model.MinIOEventAction
+import kotlin.time.Duration.Companion.milliseconds
 
-internal class EventRouterImpl(private val config: EventRouterConfig) : EventRouter, AbstractVDIModule("event-router") {
+private const val MaxPollingRetries = 5
+private const val PollingRetryDelayMS = 500
+
+internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: (String?) -> Nothing)
+  : EventRouter
+  , AbstractVDIModule("event-router", abortCB)
+{
 
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -149,12 +157,17 @@ internal class EventRouterImpl(private val config: EventRouterConfig) : EventRou
     }
   }
 
-  private suspend fun RabbitMQEventIterator<*>.safeHasNext() =
+  private suspend fun RabbitMQEventIterator<*>.safeHasNext(currentTry: Int = 1): Boolean =
     try {
       hasNext()
     } catch (e: Throwable) {
-      triggerShutdown()
-      log.error("failed to poll RabbitMQ for next message", e)
-      throw e
+      if (currentTry <= MaxPollingRetries) {
+        log.error("failed to poll RabbitMQ for next message, trying again in ${PollingRetryDelayMS}ms (attempt $currentTry/$MaxPollingRetries)", e)
+        delay(PollingRetryDelayMS.milliseconds)
+        safeHasNext(currentTry+1)
+      } else {
+        log.error("failed to poll RabbitMQ for next message $MaxPollingRetries times", e)
+        abortCB(e.message)
+      }
     }
 }

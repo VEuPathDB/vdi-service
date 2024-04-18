@@ -14,7 +14,10 @@ import vdi.component.modules.AbstractJobExecutor
 import vdi.component.s3.DatasetManager
 import kotlin.time.Duration.Companion.milliseconds
 
-internal class ReconcilerImpl(private val config: ReconcilerConfig) : Reconciler, AbstractJobExecutor("reconciler") {
+internal class ReconcilerImpl(private val config: ReconcilerConfig, abortCB: (String?) -> Nothing)
+  : Reconciler
+  , AbstractJobExecutor("reconciler", abortCB)
+{
   private var datasetManager: DatasetManager
 
   private var kafkaRouter: KafkaRouter

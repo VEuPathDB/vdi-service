@@ -1,4 +1,7 @@
 package vdi.lane.meta
 
-fun UpdateMetaTriggerHandler(config: UpdateMetaTriggerHandlerConfig = UpdateMetaTriggerHandlerConfig()): UpdateMetaTriggerHandler =
-  UpdateMetaTriggerHandlerImpl(config)
+fun UpdateMetaTriggerHandler(
+  abortCB: (String?) -> Nothing,
+  config: UpdateMetaTriggerHandlerConfig = UpdateMetaTriggerHandlerConfig()
+): UpdateMetaTriggerHandler =
+  UpdateMetaTriggerHandlerImpl(config, abortCB)

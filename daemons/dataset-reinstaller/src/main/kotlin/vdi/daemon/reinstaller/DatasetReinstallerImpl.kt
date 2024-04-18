@@ -6,9 +6,9 @@ import vdi.component.modules.AbstractJobExecutor
 import kotlin.time.Duration.Companion.milliseconds
 import vdi.component.reinstaller.DatasetReinstaller as Reinstaller
 
-internal class DatasetReinstallerImpl(private val config: DatasetReinstallerConfig)
+internal class DatasetReinstallerImpl(private val config: DatasetReinstallerConfig, abortCB: (String?) -> Nothing)
   : DatasetReinstaller
-  , AbstractJobExecutor("dataset-reinstaller", config.wakeInterval)
+  , AbstractJobExecutor("dataset-reinstaller", abortCB, config.wakeInterval)
 {
   private val log = LoggerFactory.getLogger(javaClass)
 

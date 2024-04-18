@@ -38,9 +38,12 @@ import vdi.component.s3.DatasetManager
 import java.sql.SQLException
 import java.time.OffsetDateTime
 
-internal class UpdateMetaTriggerHandlerImpl(private val config: UpdateMetaTriggerHandlerConfig)
+internal class UpdateMetaTriggerHandlerImpl(
+  private val config: UpdateMetaTriggerHandlerConfig,
+  abortCB: (String?) -> Nothing,
+)
   : UpdateMetaTriggerHandler
-  , AbstractVDIModule("update-meta-trigger-handler")
+  , AbstractVDIModule("update-meta-trigger-handler", abortCB)
 {
   private val log = LoggerFactory.getLogger(javaClass)
 

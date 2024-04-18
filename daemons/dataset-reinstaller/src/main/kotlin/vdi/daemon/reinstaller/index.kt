@@ -1,4 +1,7 @@
 package vdi.daemon.reinstaller
 
-fun DatasetReinstaller(config: DatasetReinstallerConfig = DatasetReinstallerConfig()): DatasetReinstaller =
-  DatasetReinstallerImpl(config)
+fun DatasetReinstaller(
+  abortCB: (String?) -> Nothing,
+  config: DatasetReinstallerConfig = DatasetReinstallerConfig(),
+): DatasetReinstaller =
+  DatasetReinstallerImpl(config, abortCB)
