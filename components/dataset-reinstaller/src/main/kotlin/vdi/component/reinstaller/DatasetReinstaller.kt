@@ -1,5 +1,6 @@
 package vdi.component.reinstaller
 
+import kotlinx.coroutines.sync.Mutex
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.vdi.lib.common.compression.Zip
@@ -24,7 +25,6 @@ import vdi.component.s3.DatasetManager
 import vdi.component.s3.paths.S3Paths
 import java.io.InputStream
 import java.nio.file.Path
-import java.util.concurrent.locks.ReentrantLock
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
@@ -33,7 +33,7 @@ object DatasetReinstaller {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val lock = ReentrantLock()
+  private val lock = Mutex()
 
   private val config = DatasetReinstallerConfig()
 

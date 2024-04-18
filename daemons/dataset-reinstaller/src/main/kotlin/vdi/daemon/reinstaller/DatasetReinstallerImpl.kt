@@ -15,7 +15,7 @@ internal class DatasetReinstallerImpl(private val config: DatasetReinstallerConf
   private var lastRun = 0.milliseconds
 
   override suspend fun runJob() {
-    val now = now()
+    val now = 0.milliseconds
 
     if (lastRun + config.runInterval < now) {
       log.info("attempting to start automatic dataset reinstaller run")

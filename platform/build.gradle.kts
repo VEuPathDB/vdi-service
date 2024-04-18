@@ -19,6 +19,7 @@ dependencies {
 
     // Logging
     api("org.slf4j:slf4j-api:1.7.36")
+    api("org.slf4j:jul-to-slf4j:1.7.36")
     api("org.apache.logging.log4j:log4j-api-kotlin:1.4.0")
     api("org.apache.logging.log4j:log4j-api:2.23.1")
     api("org.apache.logging.log4j:log4j-core:2.23.1")

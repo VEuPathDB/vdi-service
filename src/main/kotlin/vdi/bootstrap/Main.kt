@@ -5,6 +5,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import vdi.component.modules.VDIModule
+import org.slf4j.bridge.SLF4JBridgeHandler
+import org.veupathdb.service.vdi.RestService
 import vdi.daemon.events.routing.EventRouter
 import vdi.daemon.pruner.PrunerModule
 import vdi.daemon.reconciler.Reconciler
@@ -16,6 +18,7 @@ import vdi.lane.install.InstallDataTriggerHandler
 import vdi.lane.meta.UpdateMetaTriggerHandler
 import vdi.lane.reconciliation.ReconciliationEventHandler
 import vdi.lane.sharing.ShareTriggerHandler
+import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 object Main {
@@ -24,6 +27,10 @@ object Main {
 
   @JvmStatic
   fun main(args: Array<String>) {
+    // JUL -> SLF4J
+    SLF4JBridgeHandler.removeHandlersForRootLogger()
+    SLF4JBridgeHandler.install()
+
     log.info("initializing modules")
     val modules = listOf(
       DatasetReinstaller(::fatality),
@@ -40,6 +47,8 @@ object Main {
     )
 
     Runtime.getRuntime().addShutdownHook(Thread { shutdownModules(modules) })
+
+    thread { RestService.main(args) }
 
     log.info("starting modules")
     runBlocking(Dispatchers.Unconfined) { modules.forEach { launch { it.start() } } }

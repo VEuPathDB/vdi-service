@@ -1,5 +1,6 @@
 package vdi.component.async
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -19,6 +20,8 @@ class AtomicULong(initialValue: ULong = 0uL) {
     }
   }
 
+  suspend fun get() = mtx.withLock { atm }
+
   suspend operator fun dec(): AtomicULong {
     mtx.withLock { atm-- }
     return this
@@ -31,4 +34,10 @@ class AtomicULong(initialValue: ULong = 0uL) {
   suspend operator fun minusAssign(value: ULong) {
     mtx.withLock { atm -= value }
   }
+
+  override fun toString() = runBlocking { mtx.withLock { atm.toString() } }
+
+  override fun hashCode() = runBlocking { mtx.withLock { atm.hashCode() } }
+
+  override fun equals(other: Any?) = other is AtomicULong && runBlocking { mtx.withLock { atm } == other.get() }
 }

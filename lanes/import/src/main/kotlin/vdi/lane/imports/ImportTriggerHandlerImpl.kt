@@ -4,6 +4,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
@@ -19,6 +21,7 @@ import org.veupathdb.vdi.lib.common.util.isNull
 import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.json.JSON
 import vdi.component.async.WorkerPool
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.CacheDBTransaction
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
@@ -33,8 +36,6 @@ import vdi.lane.imports.config.ImportTriggerHandlerConfig
 import vdi.lane.imports.model.WarningsFile
 import java.nio.file.Path
 import java.time.OffsetDateTime
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 import kotlin.io.path.*
 
 internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig, abortCB: (String?) -> Nothing)
@@ -43,11 +44,11 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 {
   private val log = logger()
 
-  private val lock = ReentrantLock()
+  private val lock = Mutex()
 
   private val activeIDs = HashSet<DatasetID>(24)
 
-  private val cacheDB = vdi.component.db.cache.CacheDB()
+  private val cacheDB = CacheDB()
 
   override suspend fun run() {
     log.trace("run()")
@@ -159,7 +160,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       }
 
       cacheDB.withTransaction {
-        log.info("attempting to insert import control record (if one does not exist)")
+        log.info("attempting to insert import control record (if one does not exist) for dataset $datasetID")
         it.upsertImportControl(datasetID, DatasetImportStatus.InProgress)
       }
 
@@ -180,7 +181,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         ImportResponseType.UnhandledError  -> handleImport500Result(userID, datasetID, result as ImportUnhandledErrorResponse)
       }
     } catch (e: Throwable) {
-      log.debug("import request to handler server failed with exception:", e)
+      log.error("import request to handler server for dataset $datasetID failed with exception:", e)
       cacheDB.withTransaction { tran ->
         tran.updateImportControl(datasetID, DatasetImportStatus.Failed)
         tran.tryInsertImportMessages(datasetID, "Process error: ${e.message}")
@@ -310,7 +311,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     ))
   }
 
-  private fun vdi.component.db.cache.CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
+  private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.trace("CacheDB.initializeDataset(datasetID: $datasetID, meta: $meta)")
     openTransaction().use {
       try {
