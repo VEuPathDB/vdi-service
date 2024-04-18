@@ -1,10 +1,7 @@
 package vdi.component.async
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.apache.logging.log4j.kotlin.CoroutineThreadContext
 import org.apache.logging.log4j.kotlin.ThreadContextData
 import org.apache.logging.log4j.kotlin.logger
@@ -27,7 +24,7 @@ class WorkerPool(
   fun start() {
     log.info("starting worker pool $name with queue size $jobQueueSize and worker count $workerCount")
 
-    runBlocking {
+    runBlocking(Dispatchers.IO) {
       repeat(workerCount) { i ->
         val j = i + 1
         launch (CoroutineThreadContext(contextData = ThreadContextData(map = mapOf("workerID" to "$name-$j"), Stack()))) {

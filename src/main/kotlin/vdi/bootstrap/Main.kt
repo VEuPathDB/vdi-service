@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
+import org.slf4j.bridge.SLF4JBridgeHandler
 import org.veupathdb.service.vdi.RestService
 import vdi.daemon.events.routing.EventRouter
 import vdi.daemon.pruner.PrunerModule
@@ -24,6 +25,10 @@ object Main {
 
   @JvmStatic
   fun main(args: Array<String>) {
+    // JUL -> SLF4J
+    SLF4JBridgeHandler.removeHandlersForRootLogger()
+    SLF4JBridgeHandler.install()
+
     log.info("initializing modules")
     val modules = listOf(
       DatasetReinstaller(),
