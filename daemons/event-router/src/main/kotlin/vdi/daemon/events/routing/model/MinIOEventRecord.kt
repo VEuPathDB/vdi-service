@@ -23,7 +23,7 @@ data class MinIOEventRecord(
   val userIdentity: MinIOEventUserIdentity,
 
   @JsonProperty("requestParameters")
-  val requestParameters: Map<String, String>,
+  val requestParameters: Map<String, String>?,
 
   @JsonProperty("responseElements")
   val responseElements: Map<String, String>,
