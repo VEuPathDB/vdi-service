@@ -80,6 +80,11 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: (
       // remove everything.  This event should be one of many for this
       // specific dataset.
       if (event.eventType.action == MinIOEventAction.DELETE) {
+        // Ignore deletes of old versions done by the MinIO internal expiration
+        // policy.
+        if (event.records.any { it.source.userAgent == "Internal: [ILM-Expiry]" })
+          continue
+
         log.debug("received a hard delete event for dataset {}/{} for MinIO key {}", path.userID, path.datasetID, event.objectKey)
         safeSend(path.userID, path.datasetID, kr::sendHardDeleteTrigger)
         continue
