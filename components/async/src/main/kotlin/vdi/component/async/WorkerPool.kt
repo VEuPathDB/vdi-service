@@ -24,8 +24,7 @@ class WorkerPool(
   fun start() {
     log.info("starting worker pool $name with queue size $jobQueueSize and worker count $workerCount")
 
-//    runBlocking(Dispatchers.IO) {
-    runBlocking {
+    runBlocking(Dispatchers.IO) {
       repeat(workerCount) { i ->
         val j = i + 1
         launch (CoroutineThreadContext(contextData = ThreadContextData(map = mapOf("workerID" to "$name-$j"), Stack()))) {
