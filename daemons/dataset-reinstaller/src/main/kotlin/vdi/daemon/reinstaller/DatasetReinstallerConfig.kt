@@ -5,6 +5,7 @@ import vdi.component.env.EnvKey
 import vdi.component.env.Environment
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 data class DatasetReinstallerConfig(
@@ -22,7 +23,8 @@ data class DatasetReinstallerConfig(
 
   object Defaults {
     inline val RunInterval
-      get() = 6.hours
+//      get() = 6.hours
+      get() = 30.minutes
 
     inline val WakeInterval
       get() = 2.seconds
