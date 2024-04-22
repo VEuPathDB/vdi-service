@@ -10,7 +10,7 @@ class Resources(opts: Options) : ContainerResources(opts) {
   }
 
   override fun resources() = arrayOf<Any>(
-    VDIDatasetsAdminController::class.java,
+    AdminRPC::class.java,
     VDIDatasetByIDEndpointsController::class.java,
     VDIDatasetListEndpointController::class.java,
     VDIDatasetShareGetController::class.java,

@@ -49,11 +49,11 @@ public interface VdiDatasetsAdmin {
       @QueryParam("expanded") @DefaultValue("true") Boolean expanded);
 
   @POST
-  @Path("/install-cleanup")
+  @Path("/fix-broken-installs")
   @Produces("application/json")
   @Consumes("application/json")
-  PostVdiDatasetsAdminInstallCleanupResponse postVdiDatasetsAdminInstallCleanup(
-      InstallCleanupRequest entity);
+  PostVdiDatasetsAdminFixBrokenInstallsResponse postVdiDatasetsAdminFixBrokenInstalls(
+      @QueryParam("skip-run") @DefaultValue("false") Boolean skipRun, InstallCleanupRequest entity);
 
   @POST
   @Path("/delete-cleanup")
@@ -180,39 +180,39 @@ public interface VdiDatasetsAdmin {
     }
   }
 
-  class PostVdiDatasetsAdminInstallCleanupResponse extends ResponseDelegate {
-    private PostVdiDatasetsAdminInstallCleanupResponse(Response response, Object entity) {
+  class PostVdiDatasetsAdminFixBrokenInstallsResponse extends ResponseDelegate {
+    private PostVdiDatasetsAdminFixBrokenInstallsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostVdiDatasetsAdminInstallCleanupResponse(Response response) {
+    private PostVdiDatasetsAdminFixBrokenInstallsResponse(Response response) {
       super(response);
     }
 
-    public static PostVdiDatasetsAdminInstallCleanupResponse respond204() {
+    public static PostVdiDatasetsAdminFixBrokenInstallsResponse respond204() {
       Response.ResponseBuilder responseBuilder = Response.status(204);
-      return new PostVdiDatasetsAdminInstallCleanupResponse(responseBuilder.build());
+      return new PostVdiDatasetsAdminFixBrokenInstallsResponse(responseBuilder.build());
     }
 
-    public static PostVdiDatasetsAdminInstallCleanupResponse respond400WithApplicationJson(
+    public static PostVdiDatasetsAdminFixBrokenInstallsResponse respond400WithApplicationJson(
         BadRequestError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(400).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PostVdiDatasetsAdminInstallCleanupResponse(responseBuilder.build(), entity);
+      return new PostVdiDatasetsAdminFixBrokenInstallsResponse(responseBuilder.build(), entity);
     }
 
-    public static PostVdiDatasetsAdminInstallCleanupResponse respond401WithApplicationJson(
+    public static PostVdiDatasetsAdminFixBrokenInstallsResponse respond401WithApplicationJson(
         UnauthorizedError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PostVdiDatasetsAdminInstallCleanupResponse(responseBuilder.build(), entity);
+      return new PostVdiDatasetsAdminFixBrokenInstallsResponse(responseBuilder.build(), entity);
     }
 
-    public static PostVdiDatasetsAdminInstallCleanupResponse respond500WithApplicationJson(
+    public static PostVdiDatasetsAdminFixBrokenInstallsResponse respond500WithApplicationJson(
         ServerError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PostVdiDatasetsAdminInstallCleanupResponse(responseBuilder.build(), entity);
+      return new PostVdiDatasetsAdminFixBrokenInstallsResponse(responseBuilder.build(), entity);
     }
   }
 

@@ -3,6 +3,7 @@ package org.veupathdb.service.vdi.server.controllers
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.core.StreamingOutput
+import kotlinx.coroutines.runBlocking
 import org.veupathdb.lib.container.jaxrs.repo.UserRepo
 import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
@@ -24,6 +25,7 @@ import vdi.component.db.cache.model.SortOrder
 import vdi.component.install_cleanup.InstallCleaner
 import vdi.component.install_cleanup.ReinstallTarget
 import vdi.component.pruner.Pruner
+import vdi.component.reinstaller.DatasetReinstaller
 
 // Broken Import Query Constants
 private const val biQueryLimitMinimum = 0
@@ -34,7 +36,7 @@ private const val biQueryOffsetDefault = 0
 
 @Authenticated(adminOverride = ALLOW_ALWAYS)
 @AdminRequired
-class VDIDatasetsAdminController : VdiDatasetsAdmin {
+class AdminRPC : VdiDatasetsAdmin {
 
   override fun getVdiDatasetsAdminListBroken(
     expanded: Boolean?,
@@ -43,9 +45,10 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
       .respond200WithApplicationJson(listBrokenDatasets(expanded ?: true))
   }
 
-  override fun postVdiDatasetsAdminInstallCleanup(
-    entity: InstallCleanupRequest?,
-  ): VdiDatasetsAdmin.PostVdiDatasetsAdminInstallCleanupResponse {
+  override fun postVdiDatasetsAdminFixBrokenInstalls(
+    skipRun: Boolean,
+    entity: InstallCleanupRequest?
+  ): VdiDatasetsAdmin.PostVdiDatasetsAdminFixBrokenInstallsResponse {
     if (entity == null)
       throw BadRequestException()
 
@@ -55,7 +58,9 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
       InstallCleaner.cleanTargets(entity.targets.map { ReinstallTarget(DatasetID(it.datasetId), it.projectId) })
     }
 
-    return VdiDatasetsAdmin.PostVdiDatasetsAdminInstallCleanupResponse.respond204()
+    runBlocking { DatasetReinstaller.tryRun() }
+
+    return VdiDatasetsAdmin.PostVdiDatasetsAdminFixBrokenInstallsResponse.respond204()
   }
 
   override fun postVdiDatasetsAdminDeleteCleanup(): VdiDatasetsAdmin.PostVdiDatasetsAdminDeleteCleanupResponse {
@@ -146,7 +151,7 @@ class VDIDatasetsAdminController : VdiDatasetsAdmin {
         ?: throw BadRequestException("invalid sort order value")
     }
 
-    val broken = vdi.component.db.cache.CacheDB().selectBrokenDatasetImports(query)
+    val broken = CacheDB().selectBrokenDatasetImports(query)
       .map(::BrokenImportDetails)
 
     return VdiDatasetsAdmin.GetVdiDatasetsAdminFailedImportsResponse

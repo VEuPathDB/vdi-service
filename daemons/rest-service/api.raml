@@ -442,50 +442,15 @@ uses:
                 message: Dataset store is unreachable
                 requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
 
-  /run-reinstaller:
-    displayName: Execute Dataset Reinstaller
-    post: |
-      Runs dataset reinstaller process which will scan all target application
-      databases for datasets in the `ready-for-reinstall` status and attempts to
-      uninstall and then reinstall them.
-      
-      This endpoint executes the dataset reinstaller process synchronously,
-      meaning calls to this endpoint through Apache will timeout.
-    headers:
-      Admin-Token: string
-    responses:
-      204:
-        description: |
-          Success.
-          
-          Dataset reinstall process completed.  This status does not relate in
-          any way to the success or failure of any or all attempted reinstalls.
-      401:
-        description: Unauthorized.
-        body:
-          application/json:
-            type: lib.UnauthorizedError
-            example:
-              status: unauthorized
-              message: Users must be logged in to access this resource.
-      500:
-        description: Internal Server Error.
-        body:
-          application/json:
-            type: lib.ServerError
-            example:
-              status: server-error
-              message: Dataset store is unreachable
-              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
-
-
-  /install-cleanup:
+  /fix-broken-installs:
     displayName: Install Cleanup
     post:
       displayName: Run Install Cleanup
       description: |
         Marks all or target datasets that are in a status of installation
-        failure into a ready-for-reinstall status.
+        failure into a `ready-for-reinstall` status then runs the dataset
+        reinstallation process which attempts to uninstall and reinstall all
+        datasets in that status.
 
         The request body should specify exactly one of `all` or `targets` to
         select whether install cleanup should target all failed datasets across
@@ -494,7 +459,17 @@ uses:
 
         If the request specifies neither `all` or `targets` the endpoint will do
         nothing.
-      headers:
+        
+        Optionally the query param `skip-run` may be provided to skip the
+        execution of the dataset reinstallation process.  This may be used in
+        situations where multiple batches of datasets are being marked as
+        `ready-for-reinstall`.
+      queryParameters:
+        skip-run:
+          type: boolean
+          required: false
+          default: false
+
       body:
         application/json:
           type: lib.InstallCleanupRequest

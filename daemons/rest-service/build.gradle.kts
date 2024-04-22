@@ -50,6 +50,7 @@ dependencies {
 
   implementation(project(":components:app-db"))
   implementation(project(":components:cache-db"))
+  implementation(project(":components:dataset-reinstaller"))
   implementation(project(":components:env"))
   implementation(project(":components:install-cleanup"))
   implementation(project(":components:plugin-mapping"))
@@ -67,6 +68,8 @@ dependencies {
   implementation("org.veupathdb.lib.s3:s34k-minio")
 
   implementation(kotlin("stdlib-jdk8"))
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+
 
   // Jersey
   implementation("org.glassfish.jersey.core:jersey-server")
