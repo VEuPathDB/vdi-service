@@ -49,24 +49,6 @@ object EnvKey {
   }
 
   /**
-   * Environment variables for configuring the Dataset Reinstaller component of VDI.
-   */
-  object DatasetReinstaller {
-
-    /**
-     * Type: Duration
-     * Required: no
-     */
-    const val RunInterval = "DATASET_REINSTALLER_RUN_INTERVAL"
-
-    /**
-     * Type: Duration
-     * Required: no
-     */
-    const val WakeInterval = "DATASET_REINSTALLER_WAKE_INTERVAL"
-  }
-
-  /**
    * Handler Environment Key Components.
    *
    * ```
