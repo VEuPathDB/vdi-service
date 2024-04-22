@@ -55,36 +55,6 @@ allprojects {
   }
 }
 
-dependencies {
-  implementation(platform(project(":platform")))
-
-  implementation("org.veupathdb.vdi:vdi-component-common")
-
-  implementation(project(":components:module-core"))
-
-  implementation(project(":daemons:event-router"))
-  implementation(project(":daemons:reconciler"))
-  implementation(project(":daemons:pruner"))
-  implementation(project(":daemons:rest-service"))
-
-  implementation(project(":lanes:hard-delete"))
-  implementation(project(":lanes:import"))
-  implementation(project(":lanes:install"))
-  implementation(project(":lanes:reconciliation"))
-  implementation(project(":lanes:sharing"))
-  implementation(project(":lanes:soft-delete"))
-  implementation(project(":lanes:update-meta"))
-
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-  implementation("org.veupathdb.lib:jaxrs-container-core")
-
-  implementation("org.slf4j:slf4j-api")
-  implementation("org.slf4j:jul-to-slf4j")
-  implementation("org.apache.logging.log4j:log4j-api")
-  implementation("org.apache.logging.log4j:log4j-core")
-  implementation("org.apache.logging.log4j:log4j-slf4j-impl")
-  implementation(kotlin("stdlib-jdk8"))
-}
 
 tasks.shadowJar {
   exclude("**/Log4j2Plugins.dat")
@@ -94,8 +64,6 @@ tasks.shadowJar {
     attributes["Main-Class"] = "vdi.bootstrap.Main"
   }
 }
-
-// region Custom Tasks
 
 tasks.create("compile-design-doc") {
   doLast {
@@ -119,10 +87,10 @@ tasks.create("compile-design-doc") {
 }
 
 tasks.create("generate-raml-docs") {
-  dependsOn(":daemons:rest-service:generate-raml-docs")
+  dependsOn(":service:daemon:rest-service:generate-raml-docs")
 
   doLast {
-    val restModule = project(":daemons:rest-service")
+    val restModule = project(":service:daemon:rest-service")
     val docsDir = file("docs")
     docsDir.mkdir()
 
@@ -139,4 +107,6 @@ tasks.create("generate-raml-docs") {
   }
 }
 
-// endregion Custom Tasks
+dependencies {
+  implementation(project(":service:bootstrap"))
+}

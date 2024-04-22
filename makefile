@@ -22,7 +22,7 @@ build:
 .PHONY: raml-gen
 raml-gen:
 	@which node || (echo 'NodeJS not found on $$PATH'; exit 1)
-	@gradle :daemons:rest-service:generate-jaxrs --rerun-tasks
+	@gradle :service:daemon:rest-service:generate-jaxrs --rerun-tasks
 	@gradle generate-raml-docs --rerun-tasks
 
 

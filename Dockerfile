@@ -14,10 +14,8 @@ WORKDIR /workspace
 COPY settings.gradle.kts settings.gradle.kts
 COPY build.gradle.kts build.gradle.kts
 COPY platform platform
-COPY daemons daemons
-COPY lanes lanes
-COPY components components
-COPY src src
+COPY service service
+COPY lib lib
 
 RUN gradle --no-daemon test shadowJar --info
 
@@ -38,6 +36,6 @@ ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
     JVM_ARGS=""
 
 COPY --from=prep /workspace/build/libs/service.jar /service.jar
-COPY startup.sh startup.sh
+COPY service/startup.sh startup.sh
 
 CMD /startup.sh

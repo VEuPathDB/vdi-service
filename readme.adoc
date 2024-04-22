@@ -71,39 +71,39 @@ modules.
 
 === Components
 
-* link:components/app-db/[App DB Client]
-* link:components/cache-db/[Cache DB Client]
+* link:lib/app-db/[App DB Client]
+* link:lib/cache-db/[Cache DB Client]
 * link:https://github.com/VEuPathDB/vdi-component-common[Commons]
-* link:components/dataset-reinstaller/[Dataset Reinstaller]
-* link:components/install-cleanup/[Broken Install Cleanup]
+* link:lib/dataset-reinstaller/[Dataset Reinstaller]
+* link:lib/install-cleanup/[Broken Install Cleanup]
 * link:https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
-* link:components/kafka[Kafka Client]
-* link:components/ldap[LDAP Utilities]
-* link:components/module-core/[Module Core]
-* link:components/plugin-mapping[Plugin Mapping]
-* link:components/handler-client[Plugin Server Client]
-* link:components/pruner[Dataset Pruner]
-* link:components/rabbit[Rabbit Client]
-* link:components/s3[S3 Utilities]
-* link:components/test-utils[Unit Test Utilities]
+* link:lib/kafka[Kafka Client]
+* link:lib/ldap[LDAP Utilities]
+* link:lib/module-core/[Module Core]
+* link:lib/plugin-mapping[Plugin Mapping]
+* link:lib/handler-client[Plugin Server Client]
+* link:lib/pruner[Dataset Pruner]
+* link:lib/rabbit[Rabbit Client]
+* link:lib/s3[S3 Utilities]
+* link:lib/test-utils[Unit Test Utilities]
 
 === Daemons
 
-* link:daemons/dataset-reinstaller/[Dataset Reinstaller]
-* link:daemons/event-router/[Event Router]
-* link:daemons/pruner/[Pruner]
-* link:daemons/reconciler/[Reconciler]
-* link:daemons/rest-service/[Rest API Service]
+* link:service:daemon/dataset-reinstaller/[Dataset Reinstaller]
+* link:service:daemon/event-router/[Event Router]
+* link:service:daemon/pruner/[Pruner]
+* link:service:daemon/reconciler/[Reconciler]
+* link:service:daemon/rest-service/[Rest API Service]
 
 === Lanes
 
-* link:lanes/hard-delete/[Hard Delete Event Handler]
-* link:lanes/import/[Import Event Handler]
-* link:lanes/install/[Install Data Event Handler]
-* link:lanes/reconciliation/[Reconciliation Event Handler]
-* link:lanes/sharing/[Share Event Handler]
-* link:lanes/soft-delete/[Soft Delete Event Handler]
-* link:lanes/update-meta/[Update Meta Event Handler]
+* link:service:lane/hard-delete/[Hard Delete Event Handler]
+* link:service:lane/import/[Import Event Handler]
+* link:service:lane/install/[Install Data Event Handler]
+* link:service:lane/reconciliation/[Reconciliation Event Handler]
+* link:service:lane/sharing/[Share Event Handler]
+* link:service:lane/soft-delete/[Soft Delete Event Handler]
+* link:service:lane/update-meta/[Update Meta Event Handler]
 
 === Bootstrapper
 
