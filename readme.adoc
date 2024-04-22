@@ -9,6 +9,8 @@
 * link:https://veupathdb.github.io/vdi-service/vdi-api.html[VDI Service API Doc]
 * link:https://veupathdb.github.io/vdi-service/design/1.0/design.html[Service Design Doc]
 * link:https://veupathdb.atlassian.net/wiki/spaces/UI/pages/36438144/VDI+User+Datasets+Design[Original Design Doc]
+* link:docs/env-vars.adoc[Environment Config Doc]
+* link:docs/local-dev-readme.adoc[Local Development Doc]
 
 === VDI Project Index
 
