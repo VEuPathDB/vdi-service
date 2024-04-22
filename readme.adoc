@@ -89,21 +89,21 @@ modules.
 
 === Daemons
 
-* link:service:daemon/dataset-reinstaller/[Dataset Reinstaller]
-* link:service:daemon/event-router/[Event Router]
-* link:service:daemon/pruner/[Pruner]
-* link:service:daemon/reconciler/[Reconciler]
-* link:service:daemon/rest-service/[Rest API Service]
+* link:service/daemon/dataset-reinstaller/[Dataset Reinstaller]
+* link:service/daemon/event-router/[Event Router]
+* link:service/daemon/pruner/[Pruner]
+* link:service/daemon/reconciler/[Reconciler]
+* link:service/daemon/rest-service/[Rest API Service]
 
 === Lanes
 
-* link:service:lane/hard-delete/[Hard Delete Event Handler]
-* link:service:lane/import/[Import Event Handler]
-* link:service:lane/install/[Install Data Event Handler]
-* link:service:lane/reconciliation/[Reconciliation Event Handler]
-* link:service:lane/sharing/[Share Event Handler]
-* link:service:lane/soft-delete/[Soft Delete Event Handler]
-* link:service:lane/update-meta/[Update Meta Event Handler]
+* link:service/lane/hard-delete/[Hard Delete Event Handler]
+* link:service/lane/import/[Import Event Handler]
+* link:service/lane/install/[Install Data Event Handler]
+* link:service/lane/reconciliation/[Reconciliation Event Handler]
+* link:service/lane/sharing/[Share Event Handler]
+* link:service/lane/soft-delete/[Soft Delete Event Handler]
+* link:service/lane/update-meta/[Update Meta Event Handler]
 
 === Bootstrapper
 
