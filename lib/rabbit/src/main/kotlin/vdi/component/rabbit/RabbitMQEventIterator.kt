@@ -66,8 +66,4 @@ class RabbitMQEventIterator<T>(
     log.trace("next()")
     return nextValue.also { nextValue = null } ?: throw NoSuchElementException()
   }
-
-  private fun RChannel.getMessage() {
-
-  }
 }
