@@ -56,7 +56,6 @@ include(":components:rabbit")
 include(":components:s3")
 include(":components:test-utils")
 
-include(":daemons:dataset-reinstaller")
 include(":daemons:event-router")
 include(":daemons:pruner")
 include(":daemons:rest-service")

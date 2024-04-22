@@ -10,7 +10,6 @@ import org.veupathdb.service.vdi.RestService
 import vdi.daemon.events.routing.EventRouter
 import vdi.daemon.pruner.PrunerModule
 import vdi.daemon.reconciler.Reconciler
-import vdi.daemon.reinstaller.DatasetReinstaller
 import vdi.lane.delete.hard.HardDeleteTriggerHandler
 import vdi.lane.delete.soft.SoftDeleteTriggerHandler
 import vdi.lane.imports.ImportTriggerHandler
@@ -33,7 +32,6 @@ object Main {
 
     log.info("initializing modules")
     val modules = listOf(
-      DatasetReinstaller(::fatality),
       EventRouter(::fatality),
       HardDeleteTriggerHandler(::fatality),
       ImportTriggerHandler(::fatality),

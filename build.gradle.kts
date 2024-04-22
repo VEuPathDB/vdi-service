@@ -62,7 +62,6 @@ dependencies {
 
   implementation(project(":components:module-core"))
 
-  implementation(project(":daemons:dataset-reinstaller"))
   implementation(project(":daemons:event-router"))
   implementation(project(":daemons:reconciler"))
   implementation(project(":daemons:pruner"))

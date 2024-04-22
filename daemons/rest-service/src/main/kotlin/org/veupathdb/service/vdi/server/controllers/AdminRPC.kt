@@ -58,7 +58,8 @@ class AdminRPC : VdiDatasetsAdmin {
       InstallCleaner.cleanTargets(entity.targets.map { ReinstallTarget(DatasetID(it.datasetId), it.projectId) })
     }
 
-    runBlocking { DatasetReinstaller.tryRun() }
+    if (!skipRun)
+      runBlocking { DatasetReinstaller.tryRun() }
 
     return VdiDatasetsAdmin.PostVdiDatasetsAdminFixBrokenInstallsResponse.respond204()
   }
