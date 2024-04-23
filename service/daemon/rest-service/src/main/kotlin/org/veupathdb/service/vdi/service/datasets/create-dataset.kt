@@ -31,6 +31,7 @@ import java.net.URL
 import java.nio.file.Path
 import java.time.OffsetDateTime
 import java.util.concurrent.Executors
+import java.util.zip.ZipException
 import kotlin.io.path.*
 import kotlin.math.max
 
@@ -282,7 +283,7 @@ private fun Path.repackZip(into: Path, using: Path): List<VDIDatasetFileInfo> {
 
   // ensure that the zip actually contained some files
   if (unpacked.isEmpty())
-    throw BadRequestException("uploaded zip file contains no files")
+    throw BadRequestException("uploaded file was empty or was not a valid zip")
 
   log.info("Compressing file from {} into {}", unpacked, into)
   // recompress the files as a tgz file
@@ -309,12 +310,16 @@ private fun Path.repackTar(into: Path, using: Path): List<VDIDatasetFileInfo> {
   // Output map of files to sizes that will be written to the postgres DB.
   val sizes = ArrayList<VDIDatasetFileInfo>(12)
 
-  Tar.decompressWithGZip(this, using)
+  try {
+    Tar.decompressWithGZip(this, using)
+  } catch (e: ZipException) {
+    throw BadRequestException("input file had gzipped tar extension but could not be packed as a gzipped tar")
+  }
 
   val files = using.listDirectoryEntries()
 
   if (files.isEmpty())
-    throw BadRequestException("uploaded tar file contains no files")
+    throw BadRequestException("uploaded file contained no files or was not a valid tar archive")
 
   for (file in files)
     sizes.add(VDIDatasetFileInfoImpl(file.name, file.fileSize()))
