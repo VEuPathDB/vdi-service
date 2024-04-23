@@ -12,18 +12,13 @@ default:
 
 .PHONY: build
 build:
-	@docker compose \
-	  -f docker-compose.yml \
-	  -f docker-compose.dev.yml \
-	  build \
-	  --build-arg=GITHUB_USERNAME=${GITHUB_USERNAME} \
-	  --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}
+	@./gradlew -q compose -Pcompose-target=build
 
 .PHONY: raml-gen
 raml-gen:
 	@which node || (echo 'NodeJS not found on $$PATH'; exit 1)
-	@gradle :service:daemon:rest-service:generate-jaxrs --rerun-tasks
-	@gradle generate-raml-docs --rerun-tasks
+	@./gradlew -q :service:daemon:rest-service:generate-jaxrs --rerun-tasks
+	@./gradlew -q generate-raml-docs --rerun-tasks
 
 
 ####
@@ -32,19 +27,19 @@ raml-gen:
 
 .PHONY: up
 up: env-file-test
-	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml up -d
+	@./gradlew -q compose -Pcompose-target=up
 
 .PHONY: down
 down: env-file-test
-	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml down -v
+	@./gradlew -q compose -Pcompose-target=down
 
 .PHONY: start
 start: env-file-test
-	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml start
+	@./gradlew -q compose -Pcompose-target=start
 
 .PHONY: stop
 stop: env-file-test
-	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml stop
+	@./gradlew -q compose -Pcompose-target=stop
 
 
 ####
@@ -86,6 +81,10 @@ log-kafka:
 .PHONY: log-minio
 log-minio:
 	@docker logs -f vdi-service-minio-external-1
+
+.PHONY: log-rabbit
+log-rabbit:
+	@docker logs -f vdi-service-rabbit-external-1
 
 
 ####

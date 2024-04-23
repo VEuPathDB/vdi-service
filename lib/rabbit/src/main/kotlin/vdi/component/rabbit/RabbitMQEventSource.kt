@@ -68,7 +68,9 @@ class RabbitMQEventSource<T>(
     RabbitMQEventIterator(config.queueName, rChan, config.messagePollingInterval, shutdownSignal, mappingFunction)
 
   override fun close() {
-    rChan.close()
-    rCon.close()
+    try { rChan.close() }
+    catch(e: Throwable) { log.error("error encountered while attempting to shut down rabbitmq channel", e)}
+    try { rCon.close() }
+    catch(e: Throwable) { log.error("error encountered while attempting to shut down rabbitmq connection", e)}
   }
 }
