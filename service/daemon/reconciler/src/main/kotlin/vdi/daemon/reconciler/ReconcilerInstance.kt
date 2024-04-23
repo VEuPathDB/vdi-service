@@ -123,11 +123,23 @@ class ReconcilerInstance(
         sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB))
       } else {
 
-        // If dataset has a delete flag present and the dataset is not marked
-        // as uninstalled from the target, then send a sync event.
-        if (sourceDatasetDir.hasDeleteFlag() && !nextTargetDataset!!.isUninstalled) {
-          sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID, SyncReason.NeedsUninstall(targetDB))
+        // If dataset has a delete flag present
+        if (sourceDatasetDir.hasDeleteFlag()) {
+          // but the dataset has not been marked as uninstalled in this target
+          // database
+          if (!nextTargetDataset!!.isUninstalled)
+            // then fire a sync event
+            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID, SyncReason.NeedsUninstall(targetDB))
         } else {
+          // The dataset does not have a delete flag present in MinIO
+
+          // If for some reason it is marked as uninstalled in the target
+          // database, log an error and skip
+          if (nextTargetDataset!!.isUninstalled) {
+            log.error("dataset $comparableS3Id is marked as uninstalled in target ${targetDB.name} but has no deletion flag present in MinIO")
+            continue
+          }
+
           val syncStatus = isOutOfSync(sourceDatasetDir, nextTargetDataset!!)
 
           // Dataset is in source and target. Check dates to see if sync is needed.
