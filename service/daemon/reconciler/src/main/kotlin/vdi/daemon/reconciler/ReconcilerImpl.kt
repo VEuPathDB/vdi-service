@@ -10,14 +10,17 @@ import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.kafka.router.KafkaRouter
 import vdi.component.kafka.router.KafkaRouterFactory
 import vdi.component.metrics.Metrics
+import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractJobExecutor
 import vdi.component.s3.DatasetManager
 import kotlin.time.Duration.Companion.milliseconds
 
-internal class ReconcilerImpl(private val config: ReconcilerConfig, abortCB: (String?) -> Nothing)
+internal class ReconcilerImpl(private val config: ReconcilerConfig, abortCB: AbortCB)
   : Reconciler
   , AbstractJobExecutor("reconciler", abortCB)
 {
+  private val log = logger().delegate
+
   private var datasetManager: DatasetManager
 
   private var kafkaRouter: KafkaRouter
@@ -64,7 +67,7 @@ internal class ReconcilerImpl(private val config: ReconcilerConfig, abortCB: (St
   }
 
   private suspend fun runSlim() {
-    logger().info("Scheduling slim reconciler.")
+    log.info("scheduling slim reconciler")
 
     val timer = Metrics.Reconciler.Slim.executionTime.startTimer()
 
@@ -78,7 +81,7 @@ internal class ReconcilerImpl(private val config: ReconcilerConfig, abortCB: (St
   }
 
   private suspend fun runFull() {
-    logger().info("Scheduling reconciler for ${targets.size} targets.")
+    log.info("scheduling reconciler for {} targets", targets.size)
 
     val timer = Metrics.Reconciler.Full.reconcilerTimes.startTimer()
 

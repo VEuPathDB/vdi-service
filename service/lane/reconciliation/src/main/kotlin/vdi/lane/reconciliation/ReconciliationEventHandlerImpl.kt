@@ -27,7 +27,7 @@ internal class ReconciliationEventHandlerImpl(
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.kafkaTopic, config.kafkaConsumerConfig)
-    val wp = WorkerPool("reconciliation-workers", config.jobQueueSize.toInt(), config.workerPoolSize.toInt()) {
+    val wp = WorkerPool("reconciliation-workers", config.jobQueueSize, config.workerPoolSize) {
       Metrics.ReconciliationHandler.queueSize.inc(it.toDouble())
     }
 
@@ -45,13 +45,10 @@ internal class ReconciliationEventHandlerImpl(
               wp.submit { reconcile(userID, datasetID, source) }
             }
         }
-
-        wp.stop()
       }
-
-      wp.start()
     }
 
+    wp.stop()
     kc.close()
     confirmShutdown()
   }

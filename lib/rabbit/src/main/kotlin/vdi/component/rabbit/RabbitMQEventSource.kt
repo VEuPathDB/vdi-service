@@ -1,76 +1,101 @@
 package vdi.component.rabbit
 
-import com.rabbitmq.client.ConnectionFactory
+import com.rabbitmq.client.Channel
+import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
-import vdi.component.async.ShutdownSignal
 import vdi.component.async.SuspendingSequence
+import kotlin.time.Duration.Companion.seconds
 
-class RabbitMQEventSource<T>(
-  private val config: RabbitMQConfig,
-  private val shutdownSignal: ShutdownSignal,
-  private val mappingFunction: (ByteArray) -> T
-) : SuspendingSequence<T> {
+private const val MaxConnectionRetries = 5
+private val RetryDelay = 1.seconds
+
+class RabbitMQEventSource<T : Any>(private val config: RabbitMQConfig, mappingFunction: (ByteArray) -> T)
+  : SuspendingSequence<T>
+{
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val rCon = ConnectionFactory()
-    .apply {
-      host = config.serverAddress.host
-      port = config.serverAddress.port.toInt()
-      username = config.serverUsername
-      password = config.serverPassword.unwrap()
-      useNio()
+  private val fac = RabbitInstanceFactory(config)
 
-      if (config.serverUseTLS) {
-        useSslProtocol()
-      }
-    }
-    .let {
-      if (config.serverConnectionName.isNullOrBlank()) {
-        log.info("creating new unnamed RabbitMQ connection to ${it.host}:${it.port}")
-        it.newConnection()
-      } else {
-        log.info("creating new RabbitMQ connection named ${config.serverConnectionName} to ${it.host}:${it.port}")
-        it.newConnection(config.serverConnectionName)
-      }
-    }!!
+  private var rabbit = runBlocking { fac.newInstance() }
 
-  private val rChan = rCon.createChannel()
+  private var closed = false
+
+  private val iterator = RabbitMQEventIterator(
+    config.queueName,
+    ::channelProvider,
+    config.messagePollingInterval,
+    mappingFunction
+  )
 
   init {
-    log.debug("declaring RabbitMQ exchange ${config.exchangeName}")
-    rChan.exchangeDeclare(
-      config.exchangeName,
-      config.exchangeType,
-      config.exchangeDurable,
-      config.exchangeAutoDelete,
-      config.exchangeArguments
-    )
-
-    log.debug("declaring RabbitMQ queue ${config.queueName}")
-    rChan.queueDeclare(
-      config.queueName,
-      config.queueDurable,
-      config.queueExclusive,
-      config.queueAutoDelete,
-      config.queueArguments,
-    )
-
-    log.debug("binding RabbitMQ queue ${config.queueName} to exchange ${config.exchangeName} with routing key ${config.routingKey}")
-    rChan.queueBind(
-      config.queueName,
-      config.exchangeName,
-      config.routingKey,
-      config.routingArguments
-    )
+    runBlocking { initChannel() }
   }
 
-  override fun iterator() =
-    RabbitMQEventIterator(config.queueName, rChan, config.messagePollingInterval, shutdownSignal, mappingFunction)
+  override fun iterator() = iterator
 
   override fun close() {
-    try { rChan.close() }
-    catch(e: Throwable) { log.error("error encountered while attempting to shut down rabbitmq channel", e)}
-    try { rCon.close() }
-    catch(e: Throwable) { log.error("error encountered while attempting to shut down rabbitmq connection", e)}
+    closed = true
+    rabbit.close()
+    runBlocking { iterator.close() }
+  }
+
+  private suspend fun channelProvider(): Channel {
+    if (closed)
+      throw IllegalStateException("attempted to get a rabbitmq channel after the event source was closed")
+
+    return try {
+      rabbit.getChannel()
+    } catch (e: RabbitConnectionClosedError) {
+      log.warn(e.message)
+      reconnect()
+      rabbit.getChannel()
+    }
+  }
+
+  private suspend fun reconnect(attempt: Int = 1) {
+    if (attempt > MaxConnectionRetries)
+      throw IllegalStateException("failed to re-establish connection after $MaxConnectionRetries retries")
+    else
+      log.info("attempt $attempt/$MaxConnectionRetries to reconnect to rabbitmq")
+      try {
+        rabbit = fac.newInstance()
+        initChannel()
+      } catch (e: Throwable) {
+        log.warn("reconnect attempt $attempt/$MaxConnectionRetries failed, retrying in $RetryDelay", e)
+        delay(RetryDelay)
+        reconnect(attempt + 1)
+      }
+  }
+
+  private suspend fun initChannel() {
+    coroutineScope {
+      withContext(Dispatchers.IO) {
+        log.debug("declaring RabbitMQ exchange ${config.exchangeName}")
+        rabbit.getChannel().exchangeDeclare(
+          config.exchangeName,
+          config.exchangeType,
+          config.exchangeDurable,
+          config.exchangeAutoDelete,
+          config.exchangeArguments
+        )
+
+        log.debug("declaring RabbitMQ queue ${config.queueName}")
+        rabbit.getChannel().queueDeclare(
+          config.queueName,
+          config.queueDurable,
+          config.queueExclusive,
+          config.queueAutoDelete,
+          config.queueArguments,
+        )
+
+        log.debug("binding RabbitMQ queue ${config.queueName} to exchange ${config.exchangeName} with routing key ${config.routingKey}")
+        rabbit.getChannel().queueBind(
+          config.queueName,
+          config.exchangeName,
+          config.routingKey,
+          config.routingArguments
+        )
+      }
+    }
   }
 }

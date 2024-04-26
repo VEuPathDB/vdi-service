@@ -4,11 +4,14 @@ import kotlinx.coroutines.runBlocking
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import vdi.Compose
 
 plugins {
   kotlin("jvm") version "1.9.23"
   id("com.github.johnrengelman.shadow") version "7.1.2"
 }
+
+apply<Compose>()
 
 allprojects {
 
@@ -106,41 +109,6 @@ tasks.create("generate-raml-docs") {
       target.delete()
       source.copyTo(target)
       source.delete()
-    }
-  }
-}
-
-tasks.create("compose") {
-  doLast {
-    val base = arrayOf(
-      "docker", "compose",
-      "-f", "docker-compose.yml",
-      "-f", "docker-compose.dev.yml",
-      "-f", "docker-compose.ssh.yml",
-    )
-
-    val command = when (findProperty("compose-target") as String?) {
-      "up" -> arrayOf(*base, "up", "-d")
-      "down" -> arrayOf(*base, "down", "-v")
-      "start" -> arrayOf(*base, "start")
-      "stop" -> arrayOf(*base, "stop")
-      else -> arrayOf(*base,
-        "build",
-        "--build-arg=GITHUB_USERNAME=${extra["github-user"]}",
-        "--build-arg=GITHUB_TOKEN=${extra["github-pass"]}"
-      )
-    }
-
-    with(ProcessBuilder(*command).start()) {
-      runBlocking(Dispatchers.IO) {
-        launch { inputStream.bufferedReader().use { it.lines().forEach(logger::quiet) } }
-        launch { errorStream.bufferedReader().use {
-          it.lineSequence().filter { !it.contains("level=warning") }
-            .forEach(logger::quiet)
-        } }
-      }
-      if (waitFor() != 0)
-        throw RuntimeException("docker compose command failed")
     }
   }
 }

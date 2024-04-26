@@ -1,5 +1,6 @@
 package org.veupathdb.service.vdi.util
 
+import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -14,6 +15,8 @@ private const val lenSecond = 19
 private const val lenMillis = 23
 private const val lenUTC    = 24
 private const val lenZoned  = 29
+
+val DateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
 
 fun OffsetDateTime.defaultZone(): OffsetDateTime {
   return atZoneSameInstant(ZoneOffset.systemDefault()).toOffsetDateTime()

@@ -19,9 +19,7 @@ internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTrigge
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
           kc.fetchMessages(config.hardDeleteMessageKey)
-            .forEach { (userID, datasetID, source) ->
-              log.info("received hard-delete event for dataset {}/{} from {}", userID, datasetID, source)
-            }
+            .forEach { log.info("received hard-delete event for dataset {}/{} from {}", it.userID, it.datasetID, it.eventSource) }
         }
       }
     }

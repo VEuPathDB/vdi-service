@@ -21,6 +21,7 @@ import vdi.component.db.cache.model.DatasetShareOfferImpl
 import vdi.component.db.cache.model.DatasetShareReceiptImpl
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
+import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
 import vdi.component.s3.DatasetManager
 import vdi.component.s3.files.DatasetShare
@@ -46,11 +47,10 @@ private data class ShareInfo(
  * This trigger handler processes trigger events for dataset shares being
  * created or removed.
  */
-internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig, abortCB: (String?) -> Nothing)
+internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig, abortCB: AbortCB)
   : ShareTriggerHandler
   , AbstractVDIModule("share-trigger-handler", abortCB)
 {
-
   private val log = LoggerFactory.getLogger(javaClass)
 
   private val cacheDB = CacheDB()
@@ -60,26 +60,22 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.shareTriggerTopic, config.kafkaConsumerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("share-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
+    val wp = WorkerPool("share-workers", config.workQueueSize, config.workerPoolSize) {
       Metrics.shareQueueSize.inc(it.toDouble())
     }
 
     coroutineScope {
       launch(Dispatchers.IO) {
-        while (!isShutDown()) {
+        while (!isShutDown())
           kc.fetchMessages(config.shareTriggerMessageKey)
             .forEach { (userID, datasetID, source) ->
               log.debug("submitting job to share worker pool for dataset {}/{} from source {}", datasetID, userID, source)
               wp.submit { executeJob(userID, datasetID, dm) }
             }
-        }
-
-        wp.stop()
       }
-
-      wp.start()
     }
 
+    wp.stop()
     kc.close()
     confirmShutdown()
   }

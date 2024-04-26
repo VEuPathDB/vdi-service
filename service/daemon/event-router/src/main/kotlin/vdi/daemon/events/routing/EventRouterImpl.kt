@@ -1,13 +1,17 @@
 package vdi.daemon.events.routing
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
 import vdi.component.kafka.EventSource
+import vdi.component.kafka.router.KafkaRouter
 import vdi.component.kafka.router.KafkaRouterFactory
+import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
 import vdi.component.rabbit.RabbitMQEventIterator
 import vdi.component.rabbit.RabbitMQEventSource
@@ -16,35 +20,27 @@ import vdi.component.s3.paths.VDDatasetShareFilePath
 import vdi.component.s3.paths.toVDPathOrNull
 import vdi.daemon.events.routing.model.MinIOEvent
 import vdi.daemon.events.routing.model.MinIOEventAction
-import kotlin.time.Duration.Companion.milliseconds
 
-private const val MaxPollingRetries = 5
-private const val PollingRetryDelayMS = 500
-
-internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: (String?) -> Nothing)
+internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: AbortCB)
   : EventRouter
   , AbstractVDIModule("event-router", abortCB)
 {
-
   private val log = LoggerFactory.getLogger(javaClass)
 
-  override suspend fun run() {
-
-    // Get a RabbitMQ Event Source which we will use to get an event stream
-    // later.
-    val es = try {
+  private val es: RabbitMQEventSource<MinIOEvent> = runBlocking {
+    try {
       log.debug("Connecting to RabbitMQ: {}", config.rabbitConfig.serverAddress)
-      RabbitMQEventSource(config.rabbitConfig, shutdownTrigger) { JSON.readValue<MinIOEvent>(it) }
+      RabbitMQEventSource(config.rabbitConfig) { JSON.readValue<MinIOEvent>(it) }
     } catch (e: Throwable) {
       triggerShutdown()
       confirmShutdown()
       log.error("failed to create a RabbitMQEventSource", e)
       throw e
     }
+  }
 
-    // Get a Kafka Router which we will use to publish messages to the
-    // appropriate Kafka topics as messages come in from RabbitMQ.
-    val kr = try {
+  private val kr: KafkaRouter = runBlocking {
+    try {
       KafkaRouterFactory(config.kafkaConfig).newKafkaRouter()
     } catch (e: Throwable) {
       triggerShutdown()
@@ -52,10 +48,26 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: (
       log.error("failed to create a KafkaRouterFactory", e)
       throw e
     }
+  }
 
-    // Get a handle on the stream of messages from RabbitMQ.
-    val stream = es.iterator()
+  override suspend fun run() {
+    coroutineScope {
+      try {
+        runRouter(es.iterator())
+      } catch (e: Throwable) {
+        launch { abortCB(e.message) }
+      }
 
+      confirmShutdown()
+    }
+  }
+
+  override suspend fun onShutdown() {
+    es.close()
+    kr.close()
+  }
+
+  private suspend fun runRouter(stream: RabbitMQEventIterator<MinIOEvent>) {
     // While we haven't been told to shut down, and the stream hasn't yet been
     // closed:
     while (!isShutDown() && stream.safeHasNext()) {
@@ -144,12 +156,6 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: (
         }
       }
     }
-
-    log.info("shutting down event-router")
-
-    kr.close()
-    es.close()
-    confirmShutdown()
   }
 
   private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: (UserID, DatasetID, EventSource) -> Unit) {
@@ -162,17 +168,11 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: (
     }
   }
 
-  private suspend fun RabbitMQEventIterator<*>.safeHasNext(currentTry: Int = 1): Boolean =
+  private suspend fun RabbitMQEventIterator<*>.safeHasNext() =
     try {
       hasNext()
     } catch (e: Throwable) {
-      if (currentTry <= MaxPollingRetries) {
-        log.error("failed to poll RabbitMQ for next message, trying again in ${PollingRetryDelayMS}ms (attempt $currentTry/$MaxPollingRetries)", e)
-        delay(PollingRetryDelayMS.milliseconds)
-        safeHasNext(currentTry+1)
-      } else {
-        log.error("failed to poll RabbitMQ for next message $MaxPollingRetries times", e)
-        abortCB(e.message)
-      }
+      log.error("failed to poll RabbitMQ for next message", e)
+      throw e
     }
 }

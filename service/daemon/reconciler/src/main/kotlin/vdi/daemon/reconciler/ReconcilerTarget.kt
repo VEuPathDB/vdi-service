@@ -8,7 +8,7 @@ import org.veupathdb.vdi.lib.common.util.CloseableIterator
 /**
  * Facade over a target database that provides APIs necessary for synchronization reconciliation.
  */
-interface ReconcilerTarget {
+internal interface ReconcilerTarget {
 
   /**
    * Name of the reconciler target.

@@ -11,10 +11,11 @@ INSERT INTO
   vdi.install_files (dataset_id, file_name, file_size)
 VALUES
   (?, ?, ?)
-ON CONFLICT DO NOTHING
+ON CONFLICT
+  DO NOTHING
 """
 
-internal fun Connection.tryInsertInstallFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) {
+internal fun Connection.tryInsertInstallFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) =
   withPreparedStatement(SQL) {
     setString(1, datasetID.toString())
 
@@ -26,4 +27,4 @@ internal fun Connection.tryInsertInstallFiles(datasetID: DatasetID, files: Itera
 
     executeBatch()
   }
-}
+    .reduce { a, b -> a + b }

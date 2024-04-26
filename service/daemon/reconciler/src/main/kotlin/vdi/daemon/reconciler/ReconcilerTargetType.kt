@@ -1,3 +1,3 @@
 package vdi.daemon.reconciler
 
-enum class ReconcilerTargetType { Cache, Install }
+internal enum class ReconcilerTargetType { Cache, Install }

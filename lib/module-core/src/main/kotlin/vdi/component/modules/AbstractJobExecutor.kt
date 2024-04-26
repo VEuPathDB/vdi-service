@@ -2,15 +2,12 @@ package vdi.component.modules
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-abstract class AbstractJobExecutor(
-  name: String,
-  abortCB: (String?) -> Nothing,
-  private val wakeInterval: Duration = 2.seconds
-)
+abstract class AbstractJobExecutor(name: String, abortCB: AbortCB, private val wakeInterval: Duration = 2.seconds)
   : VDIModule
   , AbstractVDIModule(name, abortCB)
 {
@@ -27,6 +24,7 @@ abstract class AbstractJobExecutor(
 
     coroutineScope {
       while (!isShutDown()) {
+        log.info("pruner")
         delay(wakeInterval)
 
         if (isShutDown())
@@ -39,12 +37,11 @@ abstract class AbstractJobExecutor(
           abortCB(e.message)
         }
       }
+
+      log.info("stopping module {}", name)
+
+      close()
+      confirmShutdown()
     }
-
-    log.info("stopping module {}", name)
-
-    close()
-
-    confirmShutdown()
   }
 }

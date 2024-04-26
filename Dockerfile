@@ -4,20 +4,21 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-FROM veupathdb/alpine-dev-base:jdk-18-gradle-7.6 AS prep
+FROM veupathdb/alpine-dev-base:jdk-22-gradle-8.7 AS prep
 
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
 
 WORKDIR /workspace
 
+COPY buildSrc buildSrc
 COPY settings.gradle.kts settings.gradle.kts
 COPY build.gradle.kts build.gradle.kts
 COPY platform platform
 COPY service service
 COPY lib lib
 
-RUN gradle --no-daemon test shadowJar --info
+RUN gradle --no-daemon test shadowJar
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

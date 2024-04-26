@@ -9,7 +9,7 @@ dependencies {
     api("org.veupathdb.lib:multipart-jackson-pojo:1.1.7")
 
     // VDI
-    api("org.veupathdb.vdi:vdi-component-common:10.2.0")
+    api("org.veupathdb.vdi:vdi-component-common:10.3.0")
     api("org.veupathdb.vdi:vdi-component-json:1.0.2")
 
     // Database
@@ -19,7 +19,6 @@ dependencies {
 
     // Logging
     api("org.slf4j:slf4j-api:1.7.36")
-    api("org.slf4j:jul-to-slf4j:1.7.36")
     api("org.apache.logging.log4j:log4j-api-kotlin:1.4.0")
     api("org.apache.logging.log4j:log4j-api:2.23.1")
     api("org.apache.logging.log4j:log4j-core:2.23.1")

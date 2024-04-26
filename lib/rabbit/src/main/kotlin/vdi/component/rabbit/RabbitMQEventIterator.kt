@@ -1,61 +1,50 @@
 package vdi.component.rabbit
 
+import com.rabbitmq.client.Channel
 import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
-import vdi.component.async.ShutdownSignal
+import vdi.component.async.Trigger
 import vdi.component.async.SuspendingIterator
 import vdi.component.metrics.Metrics
 import kotlin.time.Duration
-import com.rabbitmq.client.Channel as RChannel
 
 private const val MAX_LOGGABLE_MESSAGE_SIZE_BYTES = 1024 * 16
 
 class RabbitMQEventIterator<T>(
   private val queue: String,
-  private val rChan: RChannel,
+  private val channelProvider: suspend () -> Channel,
   private val pollingInterval: Duration,
-  private val shutdownSignal: ShutdownSignal,
   private val mappingFunction: (ByteArray) -> T
 ) : SuspendingIterator<T> {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
+  private val abort = Trigger()
+
   private var nextValue: T? = null
 
+  /**
+   * Suspends until a next value is available or an exception occurs.
+   */
   override suspend fun hasNext(): Boolean {
-    log.trace("hasNext()")
-    var i = 0
+    while (!abort.isTriggered()) {
+      val res = channelProvider().basicGet(queue, true)
 
-    while (!shutdownSignal.isTriggered()) {
-      if (rChan.isOpen) {
-        val res = rChan.basicGet(queue, true)
+      if (res != null) {
+         try {
+          nextValue = mappingFunction(res.body)
+          return true
+         } catch (e: Throwable) {
+           Metrics.unparseableRabbitMessage.inc()
+           log.error("message from RabbitMQ could not be parsed as a MinIO event", e)
 
-        if (res != null) {
-          log.debug("received a message from RabbitMQ, attempting to parse the message as a MinIO event.")
-
-           try {
-            nextValue = mappingFunction(res.body)
-            return true
-           } catch (e: Throwable) {
-             Metrics.unparseableRabbitMessage.inc()
-             log.error("message from RabbitMQ could not be parsed as a MinIO event", e)
-
-             if (res.body.size <= MAX_LOGGABLE_MESSAGE_SIZE_BYTES)
-               log.error("message was: {}", res.body.decodeToString())
-             else
-               log.error("message was too large to print")
-           }
-        } else {
-          if (i == 5) {
-            i = 0
-            log.trace("polled RabbitMQ 5x")
-          } else {
-            i++
-          }
-          delay(pollingInterval)
-        }
+           if (res.body.size <= MAX_LOGGABLE_MESSAGE_SIZE_BYTES)
+             log.error("message was: {}", res.body.decodeToString())
+           else
+             log.error("message was too large to print")
+         }
       } else {
-        return false
+        delay(pollingInterval)
       }
     }
 
@@ -63,7 +52,10 @@ class RabbitMQEventIterator<T>(
   }
 
   override suspend fun next(): T {
-    log.trace("next()")
     return nextValue.also { nextValue = null } ?: throw NoSuchElementException()
+  }
+
+  internal suspend fun close() {
+    abort.trigger()
   }
 }

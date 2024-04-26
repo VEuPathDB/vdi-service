@@ -6,22 +6,23 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
-import kotlin.math.max
 
-class CountdownLatch(initial: Int) {
-  private var count = initial
+class Trigger {
   private val mutex = Mutex()
   private val queue = mutableSetOf<Continuation<Unit>>()
+  private var triggered = false
 
-  suspend fun decrement() {
-    mutex.withLock { count = max(0, count - 1) }
+  suspend fun trigger() {
+    mutex.withLock(this) { triggered = true }
     tryRelease()
   }
 
+  suspend fun isTriggered() = mutex.withLock(this) { triggered }
+
   suspend fun await() {
-    mutex.withLock {
-      if (count == 0)
-        return
+    mutex.withLock(this) {
+      if (triggered)
+        return release()
     }
 
     suspendCancellableCoroutine { queue.add(it); blockingTryRelease() }
@@ -32,8 +33,8 @@ class CountdownLatch(initial: Int) {
   }
 
   private suspend fun tryRelease() {
-    mutex.withLock {
-      if (count == 0)
+    mutex.withLock(this) {
+      if (triggered)
         release()
     }
   }

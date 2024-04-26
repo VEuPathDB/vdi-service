@@ -27,18 +27,22 @@ import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
+import vdi.component.kafka.KafkaConsumer
 import vdi.component.metrics.Metrics
+import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
 import vdi.component.plugin.client.response.imp.*
 import vdi.component.plugin.mapping.PluginHandlers
+import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import vdi.lane.imports.config.ImportTriggerHandlerConfig
+import vdi.lane.imports.config.KafkaConfig
 import vdi.lane.imports.model.WarningsFile
 import java.nio.file.Path
 import java.time.OffsetDateTime
 import kotlin.io.path.*
 
-internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig, abortCB: (String?) -> Nothing)
+internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig, abortCB: AbortCB)
   : ImportTriggerHandler
   , AbstractVDIModule("import-trigger-handler", abortCB)
 {
@@ -55,32 +59,28 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.kafkaConfig.importTriggerTopic, config.kafkaConfig.consumerConfig)
-    val wp = WorkerPool("import-trigger-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
+    val wp = WorkerPool("import-trigger-workers", config.workQueueSize, config.workerPoolSize) {
       Metrics.Import.queueSize.inc(it.toDouble())
     }
 
     coroutineScope {
       launch(Dispatchers.IO) {
-        // While the shutdown trigger has not yet been triggered
-        while (!isShutDown()) {
-          // Read messages from the kafka consumer
+        while (!isShutDown())
           kc.fetchMessages(config.kafkaConfig.importTriggerMessageKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received import job for dataset $userID/$datasetID from source $source")
               wp.submit { importJob(dm, userID, datasetID) }
             }
-        }
-
-        log.info("shutting down worker pool")
-        wp.stop()
       }
-
-      // Spin up the worker pool (in the background)
-      wp.start()
     }
 
+    log.info("shutting down worker pool")
+    wp.stop()
     kc.close()
     confirmShutdown()
+  }
+
+  private suspend fun runLoop(dm: DatasetManager, kc: KafkaConsumer, wp: WorkerPool) {
   }
 
   private suspend fun importJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
@@ -118,7 +118,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private suspend fun processImportJob(userID: UserID, datasetID: DatasetID, datasetDir: vdi.component.s3.DatasetDirectory) {
+  private suspend fun processImportJob(userID: UserID, datasetID: DatasetID, datasetDir: DatasetDirectory) {
     // Load the dataset metadata from S3
     val datasetMeta = datasetDir.getMetaFile().load()!!
 
@@ -192,7 +192,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private fun handleImportSuccessResult(datasetID: DatasetID, result: ImportSuccessResponse, dd: vdi.component.s3.DatasetDirectory) {
+  private fun handleImportSuccessResult(datasetID: DatasetID, result: ImportSuccessResponse, dd: DatasetDirectory) {
     log.info("dataset handler server reports dataset $datasetID imported successfully")
 
     // Create a temp directory to use as a workspace for the following process
@@ -277,7 +277,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     throw IllegalStateException(result.message)
   }
 
-  private fun vdi.component.s3.DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
+  private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
     if (!exists()) {
       log.warn("got an import event for dataset $userID/$datasetID which no longer has a directory")
       return false

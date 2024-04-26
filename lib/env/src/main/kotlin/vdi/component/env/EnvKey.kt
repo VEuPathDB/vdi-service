@@ -601,13 +601,14 @@ object EnvKey {
   }
 
   object Rabbit {
-    const val ConnectionName  = "GLOBAL_RABBIT_CONNECTION_NAME"
-    const val Host            = "GLOBAL_RABBIT_HOST"
-    const val Password        = "GLOBAL_RABBIT_PASSWORD"
-    const val PollingInterval = "GLOBAL_RABBIT_VDI_POLLING_INTERVAL"
-    const val Port            = "GLOBAL_RABBIT_PORT"
-    const val Username        = "GLOBAL_RABBIT_USERNAME"
-    const val UseTLS          = "GLOBAL_RABBIT_USE_TLS"
+    const val ConnectionName    = "GLOBAL_RABBIT_CONNECTION_NAME"
+    const val Host              = "GLOBAL_RABBIT_HOST"
+    const val Password          = "GLOBAL_RABBIT_PASSWORD"
+    const val PollingInterval   = "GLOBAL_RABBIT_VDI_POLLING_INTERVAL"
+    const val Port              = "GLOBAL_RABBIT_PORT"
+    const val Username          = "GLOBAL_RABBIT_USERNAME"
+    const val UseTLS            = "GLOBAL_RABBIT_USE_TLS"
+    const val ConnectionTimeout = "GLOBAL_RABBIT_CONNECTION_TIMEOUT"
 
     object Exchange {
       const val Arguments  = "GLOBAL_RABBIT_VDI_EXCHANGE_ARGUMENTS"

@@ -2,56 +2,28 @@ package vdi.component.async
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import org.apache.logging.log4j.kotlin.CoroutineThreadContext
 import org.apache.logging.log4j.kotlin.ThreadContextData
 import org.apache.logging.log4j.kotlin.logger
-import java.util.*
+import org.veupathdb.vdi.lib.common.util.AtomicULong
+import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.milliseconds
 
 class WorkerPool(
   private val name: String,
-  private val jobQueueSize: Int,
-  private val workerCount: Int = 5,
+  private val jobQueueSize: UInt,
+  private val workerCount: UInt = 5u,
   private val reportQueueSizeChange: (Int) -> Unit = { }
 ) {
-  private val log      = logger()
-  private val shutdown = ShutdownSignal()
-  private val queue    = Channel<Job>(jobQueueSize)
-  private val count    = CountdownLatch(workerCount)
+  private val log      = logger().delegate
+  private val shutdown = Trigger()
+  private val queue    = Channel<Job>(jobQueueSize.toInt())
+  private val count    = CountdownLatch(workerCount.toInt())
   private val jobs     = AtomicULong()
 
-  @OptIn(ExperimentalCoroutinesApi::class)
-  fun start() {
-    log.info("starting worker pool $name with queue size $jobQueueSize and worker count $workerCount")
-
-    runBlocking(Dispatchers.IO) {
-      repeat(workerCount) { i ->
-        val j = i + 1
-        launch (CoroutineThreadContext(contextData = ThreadContextData(map = mapOf("workerID" to "$name-$j"), Stack()))) {
-          log.debug("worker pool $name starting worker $j")
-
-          while (!shutdown.isTriggered()) {
-            if (!queue.isEmpty) {
-              log.debug("worker $name-$j executing job ${jobs.incAndGet()}")
-              val job = queue.receive()
-              reportQueueSizeChange(-1) // Report one less job in queue.
-
-              try {
-                job()
-              } catch (e: Throwable) {
-                log.error("job $jobs failed with exception:", e)
-              }
-
-            } else {
-              delay(100.milliseconds)
-            }
-          }
-
-          log.debug("worker pool $name shutting down worker $j")
-          count.decrement()
-        }
-      }
-    }
+  init {
+    start()
   }
 
   suspend fun submit(job: Job) {
@@ -60,10 +32,50 @@ class WorkerPool(
   }
 
   suspend fun stop() {
-    log.debug("worker pool $name received shutdown signal")
+    log.debug("worker pool {} received shutdown signal", name)
+    queue.close()
     shutdown.trigger()
     count.await()
-    log.debug("$workerCount workers halted; worker pool $name shutdown complete")
+    log.debug("{} workers halted; worker pool {} shutdown complete", workerCount, name)
   }
+
+  @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
+  private fun start() {
+    log.info("starting worker pool {} with queue size {} and worker count {}", name, jobQueueSize, workerCount)
+
+    thread {
+      runBlocking {
+        repeat(workerCount.toInt()) { i ->
+          val j = i + 1
+          launch (CoroutineThreadContext(ThreadContextData(mapOf("workerID" to "$name-$j")))) {
+            while (!shutdown.isTriggered()) {
+              if (!queue.isEmpty) {
+                log.debug("executing job {}", jobs.inc())
+                val job = safeReceive() ?: break
+                reportQueueSizeChange(-1) // Report one less job in queue.
+
+                try {
+                  job()
+                } catch (e: Throwable) {
+                  log.error("job $jobs failed with exception:", e)
+                }
+              } else {
+                delay(100.milliseconds)
+              }
+            }
+
+            count.decrement()
+          }
+        }
+      }
+    }
+  }
+
+  private suspend fun safeReceive() =
+    try {
+      queue.receive()
+    } catch (e: ClosedReceiveChannelException) {
+      null
+    }
 }
 

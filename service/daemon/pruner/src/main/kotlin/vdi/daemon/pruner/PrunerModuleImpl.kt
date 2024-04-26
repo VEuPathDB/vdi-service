@@ -2,12 +2,13 @@ package vdi.daemon.pruner
 
 import org.slf4j.LoggerFactory
 import vdi.component.metrics.Metrics
+import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractJobExecutor
 import vdi.component.pruner.Pruner
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-internal class PrunerModuleImpl(private val config: PrunerModuleConfig, abortCB: (String?) -> Nothing) : PrunerModule,
+internal class PrunerModuleImpl(private val config: PrunerModuleConfig, abortCB: AbortCB) : PrunerModule,
   AbstractJobExecutor("pruner", abortCB, config.wakeupInterval) {
 
   private val log = LoggerFactory.getLogger(javaClass)

@@ -28,6 +28,7 @@ import vdi.component.kafka.EventMessage
 import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
 import vdi.component.metrics.Metrics
+import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
 import vdi.component.plugin.client.response.inm.InstallMetaBadRequestResponse
 import vdi.component.plugin.client.response.inm.InstallMetaResponseType
@@ -40,7 +41,7 @@ import java.time.OffsetDateTime
 
 internal class UpdateMetaTriggerHandlerImpl(
   private val config: UpdateMetaTriggerHandlerConfig,
-  abortCB: (String?) -> Nothing,
+  abortCB: AbortCB,
 )
   : UpdateMetaTriggerHandler
   , AbstractVDIModule("update-meta-trigger-handler", abortCB)
@@ -55,28 +56,23 @@ internal class UpdateMetaTriggerHandlerImpl(
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.kafkaRouterConfig.updateMetaTriggerTopic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter(config.kafkaRouterConfig)
-    val wp = WorkerPool("update-meta-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
+    val wp = WorkerPool("update-meta-workers", config.workQueueSize, config.workerPoolSize) {
       Metrics.updateMetaQueueSize.inc(it.toDouble())
     }
 
     coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
-          // Select meta trigger messages from Kafka
           kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey)
-            // and for each of the trigger messages received
             .forEach {
               log.info("Received install-meta job for dataset {}/{} from source {}", it.userID, it.datasetID, it.eventSource)
               wp.submit { updateMeta(dm, kr, it) }
             }
         }
-
-        wp.stop()
       }
-
-      wp.start()
     }
 
+    wp.stop()
     kc.close()
     kr.close()
     confirmShutdown()

@@ -2,6 +2,7 @@ package vdi.component.db.cache.sql.insert
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import vdi.component.db.cache.model.Dataset
 import vdi.component.db.cache.util.preparedUpdate
 import vdi.component.db.cache.util.setDatasetID
 import vdi.component.db.cache.util.setUserID
@@ -27,23 +28,14 @@ ON CONFLICT (dataset_id)
   DO NOTHING
 """
 
-internal fun Connection.tryInsertDatasetRecord(
-  datasetID:   DatasetID,
-  typeName:    String,
-  typeVersion: String,
-  ownerID:     UserID,
-  isDeleted:   Boolean,
-  origin:      String,
-  created:     OffsetDateTime,
-  inserted:    OffsetDateTime,
-) =
+internal fun Connection.tryInsertDatasetRecord(row: Dataset) =
   preparedUpdate(SQL) {
-    setDatasetID(1, datasetID)
-    setString(2, typeName.lowercase())
-    setString(3, typeVersion)
-    setUserID(4, ownerID)
-    setBoolean(5, isDeleted)
-    setString(6, origin)
-    setObject(7, created)
-    setObject(8, inserted)
+    setDatasetID(1, row.datasetID)
+    setString(2, row.typeName.lowercase())
+    setString(3, row.typeVersion)
+    setUserID(4, row.ownerID)
+    setBoolean(5, row.isDeleted)
+    setString(6, row.origin)
+    setObject(7, row.created)
+    setObject(8, row.inserted)
   }

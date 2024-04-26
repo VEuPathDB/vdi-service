@@ -16,6 +16,7 @@ import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
+import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
 import vdi.component.plugin.client.PluginHandlerClient
 import vdi.component.plugin.client.response.uni.UninstallBadRequestResponse
@@ -25,7 +26,7 @@ import vdi.component.plugin.mapping.PluginHandlers
 
 internal class SoftDeleteTriggerHandlerImpl(
   private val config: SoftDeleteTriggerHandlerConfig,
-  abortCB: (String?) -> Nothing
+  abortCB: AbortCB
 )
   : SoftDeleteTriggerHandler
   , AbstractVDIModule("soft-delete-trigger-handler", abortCB)
@@ -38,7 +39,7 @@ internal class SoftDeleteTriggerHandlerImpl(
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.softDeleteTriggerTopic, config.kafkaConsumerConfig)
-    val wp = WorkerPool("soft-delete-workers", config.workQueueSize.toInt(), config.workerPoolSize.toInt()) {
+    val wp = WorkerPool("soft-delete-workers", config.workQueueSize, config.workerPoolSize) {
       Metrics.softDeleteQueueSize.inc(it.toDouble())
     }
 
@@ -51,13 +52,10 @@ internal class SoftDeleteTriggerHandlerImpl(
               wp.submit { runJob(userID, datasetID) }
             }
         }
-
-        wp.stop()
       }
-
-      wp.start()
     }
 
+    wp.stop()
     kc.close()
     confirmShutdown()
   }

@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.veupathdb.lib.s3.s34k.objects.S3Object
+import org.veupathdb.service.vdi.util.DateFormat
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.util.*
@@ -33,12 +33,11 @@ class ObjectDetailsStreamTest {
     assertNull(stream.readLine())
   }
 
-  private fun S3Object.testString() = "$path\t$size\t$lastModified"
+  private fun S3Object.testString() = "$path\t$size\t${lastModified!!.format(DateFormat)}"
 
   private fun mockS3(path: String, size: Long, date: OffsetDateTime): S3Object = mock {
     on { this.path } doReturn path
     on { this.size } doReturn size
     on { this.lastModified } doReturn date
   }
-
 }

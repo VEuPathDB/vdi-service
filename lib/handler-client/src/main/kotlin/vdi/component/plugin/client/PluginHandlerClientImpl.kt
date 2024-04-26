@@ -3,6 +3,7 @@ package vdi.component.plugin.client
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.foxcapades.lib.k.multipart.MultiPart
 import kotlinx.coroutines.future.await
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -22,7 +23,7 @@ import java.net.http.HttpResponse
 
 private val requestCounter = AtomicULong()
 
-private fun incRequestCounter(): ULong {
+private suspend fun incRequestCounter(): ULong {
   requestCounter += 1uL
   return requestCounter.get()
 }
@@ -41,7 +42,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       withPart {
         fieldName = FieldName.Details
         contentType("application/json; charset=utf-8")
-        withBody(ImportRequest(datasetID, incRequestCounter(), meta).toJSONString())
+        withBody(ImportRequest(datasetID, runBlocking { incRequestCounter() }, meta).toJSONString())
       }
 
       withPart {
@@ -113,7 +114,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       withPart {
         fieldName = FieldName.Details
         contentType("application/json; charset=utf-8")
-        withBody(InstallDataRequest(datasetID, incRequestCounter(), projectID).toJSONString())
+        withBody(InstallDataRequest(datasetID, runBlocking { incRequestCounter() }, projectID).toJSONString())
       }
 
       withPart {

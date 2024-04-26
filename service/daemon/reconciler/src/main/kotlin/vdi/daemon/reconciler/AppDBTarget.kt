@@ -10,11 +10,7 @@ import vdi.component.plugin.client.response.uni.UninstallBadRequestResponse
 import vdi.component.plugin.client.response.uni.UninstallUnexpectedErrorResponse
 import vdi.component.plugin.mapping.PluginHandlers
 
-class AppDBTarget(
-  override val name: String,
-  private val projectID: String
-) : ReconcilerTarget {
-
+internal class AppDBTarget(override val name: String, private val projectID: String) : ReconcilerTarget {
   private val appDB = AppDB()
 
   override val type = ReconcilerTargetType.Install

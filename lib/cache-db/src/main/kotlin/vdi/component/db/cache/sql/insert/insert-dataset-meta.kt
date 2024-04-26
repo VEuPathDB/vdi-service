@@ -2,6 +2,7 @@ package vdi.component.db.cache.sql.insert
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
+import vdi.component.db.cache.model.DatasetMeta
 import vdi.component.db.cache.util.preparedUpdate
 import vdi.component.db.cache.util.setDatasetID
 import java.sql.Connection
@@ -23,19 +24,12 @@ ON CONFLICT (dataset_id)
   DO NOTHING
 """
 
-internal fun Connection.tryInsertDatasetMeta(
-  datasetID:   DatasetID,
-  visibility:  VDIDatasetVisibility,
-  name:        String,
-  summary:     String?,
-  description: String?,
-  sourceURL:   String?,
-) =
+internal fun Connection.tryInsertDatasetMeta(row: DatasetMeta) =
   preparedUpdate(SQL) {
-    setDatasetID(1, datasetID)
-    setString(2, visibility.value)
-    setString(3, name)
-    setString(4, summary)
-    setString(5, description)
-    setString(6, sourceURL)
+    setDatasetID(1, row.datasetID)
+    setString(2, row.visibility.value)
+    setString(3, row.name)
+    setString(4, row.summary)
+    setString(5, row.description)
+    setString(6, row.sourceURL)
   }

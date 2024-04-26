@@ -22,7 +22,7 @@ import java.time.OffsetDateTime
  * user dataset metadata/status and our application databases in which the
  * contents of datasets are installed.
  */
-class ReconcilerInstance(
+internal class ReconcilerInstance(
   private val targetDB: ReconcilerTarget,
   private val datasetManager: DatasetManager,
   private val kafkaRouter: KafkaRouter,
@@ -96,7 +96,14 @@ class ReconcilerInstance(
 
         // Delete datasets until and advance target iterator until streams are aligned.
         while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId!!, false) > 0) {
-          log.info("Attempting to delete dataset {} because {} is lexicographically greater than {}. Presumably {} is not in MinIO.", comparableTargetId, comparableS3Id, comparableTargetId, comparableTargetId)
+          log.info(
+            "attempting to delete dataset {} because {} is lexicographically greater than {}. Presumably {} is not " +
+              "in MinIO",
+            comparableTargetId,
+            comparableS3Id,
+            comparableTargetId,
+            comparableTargetId
+          )
 
           if (!slim)
             tryDeleteDataset(targetDB, nextTargetDataset!!)
@@ -136,7 +143,11 @@ class ReconcilerInstance(
           // If for some reason it is marked as uninstalled in the target
           // database, log an error and skip
           if (nextTargetDataset!!.isUninstalled) {
-            log.error("dataset $comparableS3Id is marked as uninstalled in target ${targetDB.name} but has no deletion flag present in MinIO")
+            log.error(
+              "dataset {} is marked as uninstalled in target {} but has no deletion flag present in MinIO",
+              comparableS3Id,
+              targetDB.name
+            )
             continue
           }
 
@@ -190,15 +201,15 @@ class ReconcilerInstance(
     try {
       Metrics.Reconciler.Full.reconcilerDatasetDeleted.labels(targetDB.name).inc()
       if (!deleteDryMode) {
-        log.info("Trying to delete dataset {}/{}", record.ownerID, record.datasetID)
+        log.info("trying to delete dataset {}/{}", record.ownerID, record.datasetID)
         targetDB.deleteDataset(datasetID = record.datasetID, datasetType = record.type)
       } else {
-        log.info("Would have deleted dataset {}/{}", record.ownerID, record.datasetID)
+        log.info("would have deleted dataset {}/{}", record.ownerID, record.datasetID)
       }
     } catch (e: Exception) {
       // Swallow exception and alert if unable to delete. Reconciler can safely recover, but the dataset
       // may need a manual inspection.
-      log.error("Failed to delete dataset ${record.ownerID}/${record.datasetID} of type ${record.type.name}:${record.type.version} from db ${targetDB.name}", e)
+      log.error("failed to delete dataset ${record.ownerID}/${record.datasetID} of type ${record.type.name}:${record.type.version} from db ${targetDB.name}", e)
     }
   }
 
@@ -243,20 +254,15 @@ class ReconcilerInstance(
       Metrics.Reconciler.Full.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
 
-  private fun consumeEntireSourceStream(
-    sourceIterator: Iterator<DatasetDirectory>,
-    sourceDatasetDir: DatasetDirectory
-  ) {
-    sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB))
-    while (sourceIterator.hasNext()) {
+  private fun consumeEntireSourceStream(sourceIterator: Iterator<DatasetDirectory>, sourceDir: DatasetDirectory) {
+    sendSyncIfRelevant(sourceDir, SyncReason.MissingInTarget(targetDB))
+    while (sourceIterator.hasNext())
       sendSyncIfRelevant(sourceIterator.next(), SyncReason.MissingInTarget(targetDB))
-    }
   }
 
   private inner class SyncStatus(val metaIsOOS: Boolean, val sharesAreOOS: Boolean, val installIsOOS: Boolean) {
     inline val isOutOfSync get() = metaIsOOS || sharesAreOOS || installIsOOS
-    fun asSyncReason() =
-      SyncReason.OutOfSync(metaIsOOS, sharesAreOOS, installIsOOS, targetDB)
+    fun asSyncReason() = SyncReason.OutOfSync(metaIsOOS, sharesAreOOS, installIsOOS, targetDB)
   }
 
   private interface SyncReason {

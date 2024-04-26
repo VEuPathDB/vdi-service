@@ -18,6 +18,7 @@ import vdi.component.db.app.model.InstallType
 import vdi.component.db.app.withTransaction
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
+import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
 import vdi.component.plugin.client.PluginHandlerClient
 import vdi.component.plugin.client.response.ind.*
@@ -34,10 +35,7 @@ import kotlin.io.path.deleteIfExists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
-internal class InstallDataTriggerHandlerImpl(
-  private val config: InstallTriggerHandlerConfig,
-  abortCB: (String?) -> Nothing
-)
+internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig, abortCB: AbortCB)
   : InstallDataTriggerHandler
   , AbstractVDIModule("install-data-trigger-handler", abortCB)
 {
@@ -52,26 +50,22 @@ internal class InstallDataTriggerHandlerImpl(
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("install-data-workers", config.jobQueueSize.toInt(), config.workerPoolSize.toInt()) {
+    val wp = WorkerPool("install-data-workers", config.jobQueueSize, config.workerPoolSize) {
       Metrics.Install.queueSize.inc(it.toDouble())
     }
 
     coroutineScope {
       launch(Dispatchers.IO) {
-        while (!isShutDown()) {
+        while (!isShutDown())
           kc.fetchMessages(config.installDataTriggerMessageKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received install job for dataset $userID/$datasetID from source $source")
               wp.submit { tryExecute(userID, datasetID, dm) }
             }
-        }
-
-        wp.stop()
       }
-
-      wp.start()
     }
 
+    wp.stop()
     kc.close()
     confirmShutdown()
   }

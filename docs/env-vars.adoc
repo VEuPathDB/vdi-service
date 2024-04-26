@@ -952,6 +952,11 @@ from MinIO.
 | Whether the connection to the target RabbitMQ instance should use TLS. +
 
 Defaults to `false`.
+
+|
+| GLOBAL_RABBIT_CONNECTION_TIMEOUT
+| Duration
+| TCP connection timeout.
 |===
 
 ===== Exchange Config

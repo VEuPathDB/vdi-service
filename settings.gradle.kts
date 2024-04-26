@@ -20,9 +20,6 @@ pluginManagement {
       }
     }
 
-  extra["github-user"] = requireNonBlankGitHubCred("gpr.user", "GITHUB_USERNAME")
-  extra["github-pass"] = requireNonBlankGitHubCred("gpr.key", "GITHUB_TOKEN")
-
   repositories {
     mavenLocal()
     mavenCentral()
@@ -31,8 +28,8 @@ pluginManagement {
       name = "GitHubPackages"
       url  = uri("https://maven.pkg.github.com/veupathdb/maven-packages")
       credentials {
-        username = extra["github-user"] as String
-        password = extra["github-pass"] as String
+        username = requireNonBlankGitHubCred("gpr.user", "GITHUB_USERNAME")
+        password = requireNonBlankGitHubCred("gpr.key", "GITHUB_TOKEN")
       }
     }
   }

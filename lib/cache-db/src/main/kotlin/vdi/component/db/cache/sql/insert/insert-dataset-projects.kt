@@ -2,6 +2,7 @@ package vdi.component.db.cache.sql.insert
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.cache.util.setDatasetID
+import vdi.component.db.cache.util.withPreparedStatement
 import java.sql.Connection
 
 // language=postgresql
@@ -17,14 +18,13 @@ ON CONFLICT (dataset_id, project_id)
   DO NOTHING
 """
 
-internal fun Connection.tryInsertDatasetProjects(datasetID: DatasetID, projects: Iterable<String>) {
-  prepareStatement(SQL).use { ps ->
+internal fun Connection.tryInsertDatasetProjects(datasetID: DatasetID, projects: Iterable<String>) =
+  withPreparedStatement(SQL) {
     for (project in projects) {
-      ps.setDatasetID(1, datasetID)
-      ps.setString(2, project)
-      ps.addBatch()
+      setDatasetID(1, datasetID)
+      setString(2, project)
+      addBatch()
     }
 
-    ps.executeBatch()
+    executeBatch().reduce(Int::plus)
   }
-}

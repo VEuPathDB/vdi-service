@@ -14,8 +14,11 @@ internal object RabbitMQConfigDefaults {
 
   const val UseTLS = false
 
-  inline val ExchangeArguments: Map<String, Any>
-    get() = emptyMap()
+  inline val ConnectionTimeout
+    get() = 10.seconds
+
+  inline val ExchangeArguments
+    get() = emptyMap<String, Any>()
 
   const val QueueDurable = true
 
@@ -23,13 +26,13 @@ internal object RabbitMQConfigDefaults {
 
   const val QueueAutoDelete = false
 
-  inline val QueueArguments: Map<String, Any>
-    get() = emptyMap()
+  inline val QueueArguments
+    get() = emptyMap<String, Any>()
 
   const val RoutingKey = ""
 
-  inline val RoutingArguments: Map<String, Any>
-    get() = emptyMap()
+  inline val RoutingArguments
+    get() = emptyMap<String, Any>()
 
   inline val MessagePollingInterval: Duration
     get() = 1.seconds

@@ -97,48 +97,48 @@ internal class CacheDBTransactionImpl(private val connection: Connection) : Cach
 
   // region Insert
 
-  override fun tryInsertUploadFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) {
-    log.debug("inserting dataset upload files for dataset {}", datasetID)
-    con.insertUploadFiles(datasetID, files)
-  }
-
   // endregion Insert
 
   // region Try-Insert
 
   override fun tryInsertDataset(row: Dataset) {
-    log.debug("inserting dataset record for dataset {}", row.datasetID)
-    con.tryInsertDatasetRecord(row.datasetID, row.typeName, row.typeVersion, row.ownerID, row.isDeleted, row.origin, row.created, row.inserted)
+    if (con.tryInsertDatasetRecord(row) > 0)
+      log.debug("inserted dataset record for dataset {}", row.datasetID)
   }
 
   override fun tryInsertInstallFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) {
-    log.debug("inserting dataset install files for dataset {}", datasetID)
-    con.tryInsertInstallFiles(datasetID, files)
+    if (con.tryInsertInstallFiles(datasetID, files) > 0)
+      log.debug("inserted dataset install files for dataset {}", datasetID)
+  }
+
+  override fun tryInsertUploadFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) {
+    if (con.tryInsertUploadFiles(datasetID, files) > 0)
+      log.debug("inserted dataset upload files for dataset {}", datasetID)
   }
 
   override fun tryInsertDatasetMeta(row: DatasetMeta) {
-    log.debug("inserting metadata for dataset {}", row.datasetID)
-    con.tryInsertDatasetMeta(row.datasetID, row.visibility, row.name, row.summary, row.description, row.sourceURL)
+    if (con.tryInsertDatasetMeta(row) > 0)
+      log.debug("inserted metadata for dataset {}", row.datasetID)
   }
 
   override fun tryInsertDatasetProjects(datasetID: DatasetID, projects: Collection<ProjectID>) {
-    log.debug("inserting project links for dataset {}", datasetID)
-    con.tryInsertDatasetProjects(datasetID, projects)
+    if (con.tryInsertDatasetProjects(datasetID, projects) > 0)
+      log.debug("inserted project links for dataset {}", datasetID)
   }
 
   override fun tryInsertImportControl(datasetID: DatasetID, status: DatasetImportStatus) {
-    log.debug("inserting import control record for dataset {}", datasetID)
-    con.tryInsertImportControl(datasetID, status)
+    if (con.tryInsertImportControl(datasetID, status) > 0)
+      log.debug("inserted import control record for dataset {}", datasetID)
   }
 
   override fun tryInsertSyncControl(record: VDISyncControlRecord) {
-    log.debug("trying to insert a sync control record for dataset {}", record.datasetID)
-    con.tryInsertSyncControl(record)
+    if (con.tryInsertSyncControl(record) > 0)
+      log.debug("inserted sync control record for dataset {}", record.datasetID)
   }
 
   override fun tryInsertImportMessages(datasetID: DatasetID, messages: String) {
-    log.debug("soft-inserting import messages for dataset {}", datasetID)
-    con.tryInsertImportMessages(datasetID, messages)
+    if (con.tryInsertImportMessages(datasetID, messages) > 0)
+      log.debug("inserted import messages for dataset {}", datasetID)
   }
 
   // endregion Try-Insert

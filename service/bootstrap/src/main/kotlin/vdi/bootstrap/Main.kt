@@ -26,10 +26,6 @@ object Main {
 
   @JvmStatic
   fun main(args: Array<String>) {
-    // JUL -> SLF4J
-    SLF4JBridgeHandler.removeHandlersForRootLogger()
-    SLF4JBridgeHandler.install()
-
     log.info("initializing modules")
     val modules = listOf(
       EventRouter(::fatality),
@@ -49,7 +45,7 @@ object Main {
     thread { RestService.main(args) }
 
     log.info("starting modules")
-    runBlocking(Dispatchers.Unconfined) { modules.forEach { launch { it.start() } } }
+    runBlocking(Dispatchers.IO) { modules.forEach { launch { it.start() } } }
   }
 
   /**
@@ -65,7 +61,11 @@ object Main {
 
   private fun shutdownModules(modules: List<VDIModule>) {
     log.info("shutting down modules")
-    runBlocking { modules.forEach { it.stop() } }
+    runBlocking { modules.forEach {
+      launch {
+        it.stop()
+      }
+    } }
     log.info("modules shut down")
   }
 }

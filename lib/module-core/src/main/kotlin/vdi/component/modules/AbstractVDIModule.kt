@@ -5,8 +5,9 @@ import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Client
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
+import org.veupathdb.vdi.lib.common.util.AtomicBool
 import org.veupathdb.vdi.lib.json.JSON
-import vdi.component.async.ShutdownSignal
+import vdi.component.async.Trigger
 import vdi.component.kafka.EventMessage
 import vdi.component.kafka.KafkaConsumer
 import vdi.component.kafka.KafkaConsumerConfig
@@ -22,21 +23,20 @@ import vdi.component.s3.DatasetManager
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-abstract class AbstractVDIModule(override val name: String, protected val abortCB: (String?) -> Nothing) : VDIModule {
+abstract class AbstractVDIModule(override val name: String, protected val abortCB: AbortCB) : VDIModule {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  protected val shutdownTrigger = ShutdownSignal()
+  private val shutdownTrigger = Trigger()
 
-  protected val shutdownConfirm = ShutdownSignal()
+  private val shutdownConfirm = Trigger()
 
-  @Volatile
-  private var started = false
+  private val started = AtomicBool(false)
 
   final override suspend fun start() {
     if (!started) {
       log.info("starting module {}", name)
 
-      started = true
+      started.set(true)
       try {
         run()
       } catch (e: Throwable) {
@@ -49,7 +49,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
   final override suspend fun stop() {
     log.info("shutting down module {}", name)
 
-    shutdownTrigger.trigger()
+    triggerShutdown()
     shutdownConfirm.await()
 
     log.info("module {} shutdown confirmed", name)
@@ -63,7 +63,12 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
   /**
    * Request the module shut down.
    */
-  protected suspend fun triggerShutdown() = shutdownTrigger.trigger()
+  protected suspend fun triggerShutdown() {
+    shutdownTrigger.trigger()
+    onShutdown()
+  }
+
+  protected open suspend fun onShutdown() {}
 
   /**
    * Confirm that the module is now shut down.

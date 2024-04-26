@@ -13,6 +13,7 @@ data class RabbitMQConfig(
   val serverPassword: SecretString,
   val serverConnectionName: String? = null,
   val serverUseTLS: Boolean,
+  val connectionTimeout: Duration,
 
   val exchangeName: String,
   val exchangeType: String = "direct",
@@ -40,6 +41,7 @@ data class RabbitMQConfig(
     serverPassword       = SecretString(env.require(EnvKey.Rabbit.Password)),
     serverConnectionName = env.optional(EnvKey.Rabbit.ConnectionName),
     serverUseTLS         = env.optBool(EnvKey.Rabbit.UseTLS) ?: RabbitMQConfigDefaults.UseTLS,
+    connectionTimeout    = env.optDuration(EnvKey.Rabbit.ConnectionTimeout) ?: RabbitMQConfigDefaults.ConnectionTimeout,
 
     exchangeName       = env.require(EnvKey.Rabbit.Exchange.Name),
     exchangeType       = env.optional(EnvKey.Rabbit.Exchange.Type) ?: RabbitMQConfigDefaults.ExchangeType,
