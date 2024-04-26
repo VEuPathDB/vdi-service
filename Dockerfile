@@ -1,9 +1,3 @@
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#
-#   Build Service & Dependencies
-#
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
 FROM veupathdb/alpine-dev-base:jdk-22-gradle-8.7 AS prep
 
 ARG GITHUB_USERNAME
@@ -21,11 +15,7 @@ COPY lib lib
 RUN gradle --no-daemon test shadowJar
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#
-#   Run the service
-#
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 FROM amazoncorretto:19-alpine3.17
 
