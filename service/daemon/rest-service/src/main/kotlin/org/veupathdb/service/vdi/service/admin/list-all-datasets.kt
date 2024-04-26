@@ -27,7 +27,7 @@ internal fun listAllDatasets(
     includeDeleted ?: false,
   )
 
-  val totalCount = vdi.component.db.cache.CacheDB().selectAdminAllDatasetCount(query)
+  val totalCount = CacheDB().selectAdminAllDatasetCount(query)
 
   if (totalCount == 0u) {
     return AllDatasetsListResponse(
@@ -36,7 +36,7 @@ internal fun listAllDatasets(
     )
   }
 
-  val cacheDBResults = vdi.component.db.cache.CacheDB().selectAdminAllDatasets(query)
+  val cacheDBResults = CacheDB().selectAdminAllDatasets(query)
   val appDBResults = getAppDBStatuses(cacheDBResults)
 
   return AllDatasetsListResponse(

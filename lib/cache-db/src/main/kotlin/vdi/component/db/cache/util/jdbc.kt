@@ -3,6 +3,8 @@ package vdi.component.db.cache.util
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
+import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfoImpl
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -76,6 +78,23 @@ internal inline fun ResultSet.getUserID(column: String) = UserID(getString(colum
 internal inline fun ResultSet.getDateTime(column: String) = getObject(column, OffsetDateTime::class.java)
 
 /**
+ * Parses a postgres array containing 2-value sub-arrays that contain a file
+ * name and file size.
+ *
+ * Expected format:
+ * ```json
+ * [
+ *   ["some_file.txt", 12345],
+ *   ["other_file.tsv", 34244]
+ * ]
+ * ```
+ */
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun ResultSet.getFileDetailList(column: String): List<VDIDatasetFileInfo> =
+  arrayMap(column) { it.getArray(2).resultSet.map { VDIDatasetFileInfoImpl(it.getString(2), it.getLong(3)) } }
+    .reduce { a, b -> (a as MutableList).addAll(b); a }
+
+/**
  * Iterates over the results in the result set, calling the given function on
  * each row in the [ResultSet].
  *
@@ -104,5 +123,8 @@ internal inline fun ResultSet.forEach(fn: (rs: ResultSet) -> Unit) {
  */
 internal inline fun <T> ResultSet.map(fn: (rs: ResultSet) -> T): List<T> =
   with(ArrayList<T>(16)) { this@map.forEach { add(fn(it)) }; this }
+
+internal inline fun <T> ResultSet.arrayMap(column: String, fn: (rs: ResultSet) -> T): List<T> =
+  with(ArrayList<T>(16)) { this@arrayMap.forEach { getArray(column).resultSet.forEach { add(fn(it)) } }; this }
 
 // endregion ResultSet

@@ -3,6 +3,7 @@ package vdi.component.db.cache.model
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import java.time.OffsetDateTime
 
@@ -23,4 +24,6 @@ data class AdminAllDatasetsRow(
   override val importStatus: DatasetImportStatus,
   val importMessage: String?,
   override val inserted: OffsetDateTime,
+  val uploadFiles: List<VDIDatasetFileInfo>,
+  val installFiles: List<VDIDatasetFileInfo>,
 ) : Dataset, DatasetMeta

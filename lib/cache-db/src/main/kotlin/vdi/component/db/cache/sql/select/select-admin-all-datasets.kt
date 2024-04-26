@@ -32,6 +32,16 @@ SELECT
   ) AS projects
 , i.status
 , s.message
+, array(
+    SELECT array[f.file_name, f.file_size]
+    FROM vdi.upload_files AS f
+    WHERE f.dataset_id = d.dataset_id
+  ) AS upload_files
+, array(
+    SELECT array[f.file_name, f.file_size]
+    FROM vdi.install_files AS f
+    WHERE f.dataset_id = d.dataset_id
+  ) AS install_files
 FROM
   vdi.datasets AS d
   INNER JOIN vdi.dataset_metadata AS m
@@ -121,6 +131,8 @@ internal fun Connection.selectAdminAllDatasets(query: AdminAllDatasetsQuery): Li
           importStatus  = it.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
           importMessage = it.getString("message"),
           inserted      = it.getDateTime("inserted"),
+          uploadFiles   = it.getFileDetailList("upload_files"),
+          installFiles  = it.getFileDetailList("install_files"),
         )
       }
     }

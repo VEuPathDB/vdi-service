@@ -1,6 +1,3 @@
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -34,13 +31,13 @@ allprojects {
 
   tasks.withType<KotlinCompile> {
     compilerOptions {
-      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_18)
+      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
     }
   }
 
   tasks.withType<JavaCompile> {
-    sourceCompatibility = "18"
-    targetCompatibility = "18"
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
   }
 
   tasks.withType<Test> {
