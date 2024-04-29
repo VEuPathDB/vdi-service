@@ -16,7 +16,6 @@ import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
 import vdi.component.s3.paths.S3Paths
 import java.io.InputStream
-import java.util.stream.Stream
 
 object DatasetStore {
 

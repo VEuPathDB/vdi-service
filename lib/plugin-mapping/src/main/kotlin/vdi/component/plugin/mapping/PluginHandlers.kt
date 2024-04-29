@@ -1,6 +1,9 @@
 package vdi.component.plugin.mapping
 
-import org.veupathdb.vdi.lib.common.env.*
+import org.veupathdb.vdi.lib.common.env.Environment
+import org.veupathdb.vdi.lib.common.env.optSet
+import org.veupathdb.vdi.lib.common.env.reqHostAddress
+import org.veupathdb.vdi.lib.common.env.require
 import vdi.component.env.EnvKey
 import vdi.component.plugin.client.PluginHandlerClient
 import vdi.component.plugin.client.PluginHandlerClientConfig

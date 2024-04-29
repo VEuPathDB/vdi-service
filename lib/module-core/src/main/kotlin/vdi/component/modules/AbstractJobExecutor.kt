@@ -2,7 +2,6 @@ package vdi.component.modules
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -24,7 +23,6 @@ abstract class AbstractJobExecutor(name: String, abortCB: AbortCB, private val w
 
     coroutineScope {
       while (!isShutDown()) {
-        log.info("pruner")
         delay(wakeInterval)
 
         if (isShutDown())

@@ -8,7 +8,6 @@ import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
-import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetRecord
 
 // region Get Data File

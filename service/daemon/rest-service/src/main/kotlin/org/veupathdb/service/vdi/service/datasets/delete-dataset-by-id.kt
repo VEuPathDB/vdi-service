@@ -5,7 +5,6 @@ import jakarta.ws.rs.NotFoundException
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.withTransaction
 
 internal fun adminDeleteDataset(datasetID: DatasetID) {

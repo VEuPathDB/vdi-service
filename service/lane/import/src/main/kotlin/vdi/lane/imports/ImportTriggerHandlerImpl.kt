@@ -36,7 +36,6 @@ import vdi.component.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import vdi.lane.imports.config.ImportTriggerHandlerConfig
-import vdi.lane.imports.config.KafkaConfig
 import vdi.lane.imports.model.WarningsFile
 import java.nio.file.Path
 import java.time.OffsetDateTime

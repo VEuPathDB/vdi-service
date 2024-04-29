@@ -14,7 +14,6 @@ import java.util.Spliterator
 import java.util.Spliterators
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
-import kotlin.NoSuchElementException
 
 fun DatasetManager(s3Bucket: S3Bucket): DatasetManager = DatasetManagerImpl(s3Bucket)
 

@@ -1,13 +1,10 @@
 package vdi.component.db.cache.sql.insert
 
-import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.cache.model.Dataset
 import vdi.component.db.cache.util.preparedUpdate
 import vdi.component.db.cache.util.setDatasetID
 import vdi.component.db.cache.util.setUserID
 import java.sql.Connection
-import java.time.OffsetDateTime
 
 // language=postgresql
 private const val SQL = """

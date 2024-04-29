@@ -3,13 +3,11 @@ package vdi.component.plugin.client
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.foxcapades.lib.k.multipart.MultiPart
 import kotlinx.coroutines.future.await
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.intra.*
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
-import org.veupathdb.vdi.lib.common.util.AtomicULong
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
 import vdi.component.plugin.client.response.imp.*
@@ -20,13 +18,6 @@ import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-
-private val requestCounter = AtomicULong()
-
-private suspend fun incRequestCounter(): ULong {
-  requestCounter += 1uL
-  return requestCounter.get()
-}
 
 internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig) : PluginHandlerClient {
 
@@ -42,7 +33,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       withPart {
         fieldName = FieldName.Details
         contentType("application/json; charset=utf-8")
-        withBody(ImportRequest(datasetID, runBlocking { incRequestCounter() }, meta).toJSONString())
+        withBody(ImportRequest(datasetID, ImportCounter.nextIndex(), meta).toJSONString())
       }
 
       withPart {
@@ -92,7 +83,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(InstallMetaRequest(datasetID, incRequestCounter(), projectID, meta).toJSONString()))
+        .POST(HttpRequest.BodyPublishers.ofString(InstallMetaRequest(datasetID, projectID, meta).toJSONString()))
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()
@@ -114,7 +105,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       withPart {
         fieldName = FieldName.Details
         contentType("application/json; charset=utf-8")
-        withBody(InstallDataRequest(datasetID, runBlocking { incRequestCounter() }, projectID).toJSONString())
+        withBody(InstallDataRequest(datasetID, projectID).toJSONString())
       }
 
       withPart {
@@ -162,7 +153,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(UninstallRequest(datasetID, incRequestCounter(), projectID).toJSONString()))
+        .POST(HttpRequest.BodyPublishers.ofString(UninstallRequest(datasetID, projectID).toJSONString()))
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()

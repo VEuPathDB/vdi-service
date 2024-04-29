@@ -4,7 +4,6 @@ import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.ShareOfferEntry
 import org.veupathdb.service.vdi.model.ShareFilterStatus
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetShareListEntry
 import vdi.component.plugin.mapping.PluginHandlers
 

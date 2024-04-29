@@ -1,7 +1,10 @@
 package vdi.component.s3.util
 
 import org.veupathdb.lib.s3.s34k.S3Config
-import org.veupathdb.vdi.lib.common.env.*
+import org.veupathdb.vdi.lib.common.env.Environment
+import org.veupathdb.vdi.lib.common.env.reqBool
+import org.veupathdb.vdi.lib.common.env.reqUShort
+import org.veupathdb.vdi.lib.common.env.require
 import vdi.component.env.EnvKey
 
 /**

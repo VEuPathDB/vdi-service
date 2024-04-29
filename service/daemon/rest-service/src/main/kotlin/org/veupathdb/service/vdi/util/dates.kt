@@ -1,6 +1,5 @@
 package org.veupathdb.service.vdi.util
 
-import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter

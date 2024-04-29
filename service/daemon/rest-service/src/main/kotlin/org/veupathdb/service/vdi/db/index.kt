@@ -3,7 +3,6 @@ package org.veupathdb.service.vdi.db
 import org.veupathdb.lib.container.jaxrs.health.DatabaseDependency
 import org.veupathdb.lib.container.jaxrs.health.Dependency
 import vdi.component.db.app.AppDatabaseRegistry
-import vdi.component.db.cache.CacheDB
 
 
 fun initDatabaseDependencies(): Array<Dependency> {

@@ -3,8 +3,8 @@ package vdi.component.rabbit
 import com.rabbitmq.client.Channel
 import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
-import vdi.component.async.Trigger
 import vdi.component.async.SuspendingIterator
+import vdi.component.async.Trigger
 import vdi.component.metrics.Metrics
 import kotlin.time.Duration
 

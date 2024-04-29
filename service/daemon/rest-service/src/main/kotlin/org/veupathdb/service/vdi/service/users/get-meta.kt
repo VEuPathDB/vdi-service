@@ -7,7 +7,6 @@ import org.veupathdb.service.vdi.generated.model.UserQuotaDetails
 import org.veupathdb.service.vdi.generated.model.UserQuotaDetailsImpl
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.CacheDB
 
 internal fun getUserMetadata(userID: UserID): UserMetadata =
   UserMetadataImpl().apply {

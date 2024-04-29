@@ -46,11 +46,21 @@ services:
     depends_on:
     - cache-db
     - kafka
+    - plugin-bigwig
+    - plugin-biom
     - plugin-example
+    - plugin-genelist
+    - plugin-isasimple
+    - plugin-rnaseq
     links:
-    - plugin-example
     - cache-db
     - kafka
+    - plugin-bigwig
+    - plugin-biom
+    - plugin-example
+    - plugin-genelist
+    - plugin-isasimple
+    - plugin-rnaseq
     networks:
       internal: {}
       traefik: {}

@@ -4,7 +4,9 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import oracle.jdbc.OracleDriver
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.env.*
+import org.veupathdb.vdi.lib.common.env.DBEnvGroup
+import org.veupathdb.vdi.lib.common.env.EnvKey
+import org.veupathdb.vdi.lib.common.env.Environment
 import vdi.component.ldap.LDAP
 
 @Suppress("NOTHING_TO_INLINE")

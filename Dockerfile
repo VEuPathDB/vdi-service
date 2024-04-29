@@ -1,4 +1,4 @@
-FROM veupathdb/alpine-dev-base:jdk-22-gradle-8.7 AS prep
+FROM veupathdb/alpine-dev-base:jdk-21-gradle-8.7 AS prep
 
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
@@ -17,7 +17,7 @@ RUN gradle --no-daemon test shadowJar
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-FROM amazoncorretto:19-alpine3.17
+FROM amazoncorretto:21-alpine3.19
 
 RUN apk add --no-cache tzdata \
     && cp /usr/share/zoneinfo/America/New_York /etc/localtime \

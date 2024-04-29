@@ -12,7 +12,6 @@ import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.model.InstallStatuses
-import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetFileSummary
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetListQuery
