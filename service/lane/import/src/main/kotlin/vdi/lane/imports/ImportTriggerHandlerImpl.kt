@@ -27,7 +27,6 @@ import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
-import vdi.component.kafka.KafkaConsumer
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
@@ -54,8 +53,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   private val cacheDB = CacheDB()
 
   override suspend fun run() {
-    log.trace("run()")
-
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.kafkaConfig.importTriggerTopic, config.kafkaConfig.consumerConfig)
     val wp = WorkerPool("import-trigger-workers", config.workQueueSize, config.workerPoolSize) {
@@ -77,9 +74,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     wp.stop()
     kc.close()
     confirmShutdown()
-  }
-
-  private suspend fun runLoop(dm: DatasetManager, kc: KafkaConsumer, wp: WorkerPool) {
   }
 
   private suspend fun importJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
@@ -196,7 +190,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
     // Create a temp directory to use as a workspace for the following process
     TempFiles.withTempDirectory { tempDirectory ->
-
       TempFiles.withTempPath { tempArchive ->
         result.resultArchive
           .buffered()
