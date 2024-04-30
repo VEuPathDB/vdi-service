@@ -44,7 +44,7 @@ class WorkerPool(
     log.info("starting worker pool {} with queue size {} and worker count {}", name, jobQueueSize, workerCount)
 
     thread {
-      runBlocking {
+      runBlocking(Dispatchers.IO) {
         repeat(workerCount.toInt()) { i ->
           val j = i + 1
           launch (CoroutineThreadContext(ThreadContextData(mapOf("workerID" to "$name-$j")))) {
