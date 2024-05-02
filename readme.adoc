@@ -2,6 +2,91 @@
 :source-highlighter: highlightjs
 :toc:
 
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+ifndef::env-github[]
+:icons: font
+endif::[]
+
+== Tagging, Deployment, and Branch Rules
+
+=== Branch Rules
+
+
+==== `qa`
+
+The `qa` branch is to reflect what is currently on QA.  Code may only be pushed
+to this branch via pull request which depends on both approval and a successful
+workflow build of the code.
+
+
+==== `production`
+
+The `production` branch should always reflect what is on production.  This
+branch is to remain locked until we are ready to move code from QA to
+production, at which point the following steps will be performed:
+
+. The `production` branch will be unlocked via the repository settings (the
+  read-only setting in branch rules).
+. The `qa` branch will be merged into `production`
+. The `production` branch will be re-locked via the repository settings.
+
+[IMPORTANT]
+--
+These steps are *_not_* the service deployment steps, they are simply an outline
+of steps strictly related to getting the `production` branch up to date with the
+`qa` branch.  For deployment procedure steps see the <<Deployment>> section
+below.
+--
+
+
+==== `main`
+
+The `main` branch is for active development.  It is strongly advised that fixes
+and features be developed on branches forked from `main` and then merged back
+into `main` when complete to avoid conflict problems with other active
+development.
+
+
+=== Tagging
+
+Release tags `v*` are only to be made on the `production` branch.
+
+Other tags should be avoided.
+
+
+=== Deployment
+
+The following is a full list of steps necessary to perform a deployment of the
+QA VDI service code onto production.
+
+. Unlock the `production` branch via the repository settings.  This setting can
+  be found in the "Branches" menu under the "production" branch rule.  The
+  specific setting to uncheck is "Lock Branch".
+. Merge the `qa` branch into `production`.
+. Re-lock the `production` branch via the setting described in step 1.
+. Wait for the `production` branch to build in Jenkins.
+. Create a new release tag on the merge commit from `qa` to `production`.
+. Wait for the new tag to build in Jenkins.
+. Create a PR on the https://github.com/VEuPathDB/tagger[Tagger] repository,
+  forked from and targeting the `prod` branch, updating the `vdi-service` tag
+  to the new tag created in step 5.
+. Assign the PR to systems and notify them of the PR.
+
+[WARNING]
+--
+Steps 4 and 6 are necessary to avoid known issues with our current Jenkins build
+setup for containerized services.
+--
+
+
+
 == Links
 
 === Documentation
@@ -11,6 +96,7 @@
 * link:https://veupathdb.atlassian.net/wiki/spaces/UI/pages/36438144/VDI+User+Datasets+Design[Original Design Doc]
 * link:docs/env-vars.adoc[Environment Config Doc]
 * link:docs/local-dev-readme.adoc[Local Development Doc]
+
 
 === VDI Project Index
 
