@@ -3,7 +3,7 @@ on:
     branches:
     - main
     paths:
-    - '**.raml'
+    - 'docs/vdi-api.html'
 
 jobs:
   publish-api-docs:
