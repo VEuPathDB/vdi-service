@@ -33,10 +33,7 @@ private const val UniqueConstraintViolation = 1
 
 private enum class ShareState { Yes, No, Absent }
 
-private data class ShareInfo(
-  val offer: ShareState,
-  val receipt: ShareState,
-) {
+private data class ShareInfo(val offer: ShareState, val receipt: ShareState) {
   inline val visibleInTarget
     get() = offer == ShareState.Yes && receipt == ShareState.Yes
 }
