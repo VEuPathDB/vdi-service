@@ -9,7 +9,7 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.service.vdi.generated.model.*
-import org.veupathdb.service.vdi.generated.resources.VdiDatasetsAdmin
+import org.veupathdb.service.vdi.generated.resources.Admin
 import org.veupathdb.service.vdi.service.admin.getDatasetDetails
 import org.veupathdb.service.vdi.service.admin.listAllDatasets
 import org.veupathdb.service.vdi.service.admin.listAllS3Objects
@@ -36,19 +36,19 @@ private const val biQueryOffsetDefault = 0
 
 @Authenticated(adminOverride = ALLOW_ALWAYS)
 @AdminRequired
-class AdminRPC : VdiDatasetsAdmin {
+class AdminRPC : Admin {
 
-  override fun getVdiDatasetsAdminListBroken(
+  override fun getAdminListBroken(
     expanded: Boolean?,
-  ): VdiDatasetsAdmin.GetVdiDatasetsAdminListBrokenResponse {
-    return VdiDatasetsAdmin.GetVdiDatasetsAdminListBrokenResponse
+  ): Admin.GetAdminListBrokenResponse {
+    return Admin.GetAdminListBrokenResponse
       .respond200WithApplicationJson(listBrokenDatasets(expanded ?: true))
   }
 
-  override fun postVdiDatasetsAdminFixBrokenInstalls(
+  override fun postAdminFixBrokenInstalls(
     skipRun: Boolean,
     entity: InstallCleanupRequest?
-  ): VdiDatasetsAdmin.PostVdiDatasetsAdminFixBrokenInstallsResponse {
+  ): Admin.PostAdminFixBrokenInstallsResponse {
     if (entity == null)
       throw BadRequestException()
 
@@ -61,16 +61,16 @@ class AdminRPC : VdiDatasetsAdmin {
     if (!skipRun)
       runBlocking { DatasetReinstaller.tryRun() }
 
-    return VdiDatasetsAdmin.PostVdiDatasetsAdminFixBrokenInstallsResponse.respond204()
+    return Admin.PostAdminFixBrokenInstallsResponse.respond204()
   }
 
-  override fun postVdiDatasetsAdminDeleteCleanup(): VdiDatasetsAdmin.PostVdiDatasetsAdminDeleteCleanupResponse {
+  override fun postAdminDeleteCleanup(): Admin.PostAdminDeleteCleanupResponse {
     Pruner.tryPruneDatasets()
 
-    return VdiDatasetsAdmin.PostVdiDatasetsAdminDeleteCleanupResponse.respond204()
+    return Admin.PostAdminDeleteCleanupResponse.respond204()
   }
 
-  override fun getVdiDatasetsAdminDatasetDetails(datasetId: String?): VdiDatasetsAdmin.GetVdiDatasetsAdminDatasetDetailsResponse {
+  override fun getAdminDatasetDetails(datasetId: String?): Admin.GetAdminDatasetDetailsResponse {
     if (datasetId == null) {
       throw BadRequestException("no target dataset ID provided")
     }
@@ -98,13 +98,13 @@ class AdminRPC : VdiDatasetsAdmin {
       it.installFiles = datasetDetails.installFiles
       it.uploadFiles = datasetDetails.uploadFiles
     }
-    return VdiDatasetsAdmin.GetVdiDatasetsAdminDatasetDetailsResponse.respond200WithApplicationJson(response)
+    return Admin.GetAdminDatasetDetailsResponse.respond200WithApplicationJson(response)
   }
 
-  override fun postVdiDatasetsAdminProxyUpload(
+  override fun postAdminProxyUpload(
     userID: Long?,
     entity: DatasetPostRequest?,
-  ): VdiDatasetsAdmin.PostVdiDatasetsAdminProxyUploadResponse {
+  ): Admin.PostAdminProxyUploadResponse {
     if (userID == null)
       throw BadRequestException("no target user ID provided")
 
@@ -121,11 +121,11 @@ class AdminRPC : VdiDatasetsAdmin {
 
     createDataset(userID, datasetID, entity)
 
-    return VdiDatasetsAdmin.PostVdiDatasetsAdminProxyUploadResponse
+    return Admin.PostAdminProxyUploadResponse
       .respond200WithApplicationJson(DatasetPostResponse(datasetID))
   }
 
-  override fun getVdiDatasetsAdminFailedImports(
+  override fun getAdminFailedImports(
     user: Long?,
     before: String?,
     after: String?,
@@ -133,7 +133,7 @@ class AdminRPC : VdiDatasetsAdmin {
     offset: Int?,
     sort: String?,
     order: String?,
-  ): VdiDatasetsAdmin.GetVdiDatasetsAdminFailedImportsResponse {
+  ): Admin.GetAdminFailedImportsResponse {
     if (limit != null && (limit < biQueryLimitMinimum || limit > biQueryLimitMaximum))
       throw BadRequestException("invalid limit value")
 
@@ -155,7 +155,7 @@ class AdminRPC : VdiDatasetsAdmin {
     val broken = CacheDB().selectBrokenDatasetImports(query)
       .map(::BrokenImportDetails)
 
-    return VdiDatasetsAdmin.GetVdiDatasetsAdminFailedImportsResponse
+    return Admin.GetAdminFailedImportsResponse
       .respond200WithApplicationJson(BrokenImportListingImpl().also {
         it.meta = BrokenImportListingMetaImpl().also { meta ->
           meta.count = broken.size
@@ -169,18 +169,18 @@ class AdminRPC : VdiDatasetsAdmin {
       })
   }
 
-  override fun getVdiDatasetsAdminListAllDatasets(
+  override fun getAdminListAllDatasets(
     offset: Int?,
     limit: Int?,
     projectId: String?,
     includeDeleted: Boolean?,
-  ): VdiDatasetsAdmin.GetVdiDatasetsAdminListAllDatasetsResponse {
-    return VdiDatasetsAdmin.GetVdiDatasetsAdminListAllDatasetsResponse
+  ): Admin.GetAdminListAllDatasetsResponse {
+    return Admin.GetAdminListAllDatasetsResponse
       .respond200WithApplicationJson(listAllDatasets(offset, limit, projectId, includeDeleted))
   }
 
-  override fun getVdiDatasetsAdminListS3Objects(): VdiDatasetsAdmin.GetVdiDatasetsAdminListS3ObjectsResponse {
-    return VdiDatasetsAdmin.GetVdiDatasetsAdminListS3ObjectsResponse
+  override fun getAdminListS3Objects(): Admin.GetAdminListS3ObjectsResponse {
+    return Admin.GetAdminListS3ObjectsResponse
       .respond200WithTextPlain(StreamingOutput { out -> out.use { listAllS3Objects().transferTo(it) } })
   }
 }

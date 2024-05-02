@@ -90,10 +90,10 @@ tasks.create("compile-design-doc") {
 }
 
 tasks.create("generate-raml-docs") {
-  dependsOn(":service:daemon:rest-service:generate-raml-docs")
+  dependsOn(":service:rest-service:generate-raml-docs")
 
   doLast {
-    val restModule = project(":service:daemon:rest-service")
+    val restModule = project(":service:rest-service")
     val docsDir = file("docs")
     docsDir.mkdir()
 
