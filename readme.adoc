@@ -32,8 +32,7 @@ The `production` branch should always reflect what is on production.  This
 branch is to remain locked until we are ready to move code from QA to
 production, at which point the following steps will be performed:
 
-. The `production` branch will be unlocked via the repository settings (the
-  read-only setting in branch rules).
+. The `production` branch will be unlocked via the repository settings.
 . The `qa` branch will be merged into `production`
 . The `production` branch will be re-locked via the repository settings.
 
