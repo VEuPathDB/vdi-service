@@ -1,0 +1,18 @@
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - '**.raml'
+
+jobs:
+  publish-api-docs:
+    name: Publish API Docs
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Upload
+      uses: actions/upload-pages-artifact@v3
+    - name: Deploy
+      uses: actions/deploy-pages@v4
