@@ -57,10 +57,10 @@ include(":lib:s3")
 include(":lib:test-utils")
 
 include(":service:bootstrap")
+include(":service:rest-service")
 
 include(":service:daemon:event-router")
 include(":service:daemon:pruner")
-include(":service:daemon:rest-service")
 include(":service:daemon:reconciler")
 
 include(":service:lane:hard-delete")

@@ -9,10 +9,11 @@ dependencies {
 
   implementation(project(":lib:module-core"))
 
+  implementation(project(":service:rest-service"))
+
   implementation(project(":service:daemon:event-router"))
   implementation(project(":service:daemon:reconciler"))
   implementation(project(":service:daemon:pruner"))
-  implementation(project(":service:daemon:rest-service"))
 
   implementation(project(":service:lane:hard-delete"))
   implementation(project(":service:lane:import"))

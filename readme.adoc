@@ -69,19 +69,24 @@ The bootstrapper is the core of the service, and the root level Gradle project.
 This piece is responsible for starting up and shutting down the various project
 modules.
 
-=== Components
+=== Internal Libs
+
+Shared library components used by one or more VDI daemons, lanes, the rest
+service, and/or the bootstrapper.
 
 * link:lib/app-db/[App DB Client]
+* link:lib/async/[Async Utilities]
 * link:lib/cache-db/[Cache DB Client]
 * link:https://github.com/VEuPathDB/vdi-component-common[Commons]
 * link:lib/dataset-reinstaller/[Dataset Reinstaller]
+* link:lib/env/[Shared Env Constants & Utilities]
+* link:lib/handler-client[Plugin Server Client]
 * link:lib/install-cleanup/[Broken Install Cleanup]
 * link:https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
 * link:lib/kafka[Kafka Client]
 * link:lib/ldap[LDAP Utilities]
 * link:lib/module-core/[Module Core]
 * link:lib/plugin-mapping[Plugin Mapping]
-* link:lib/handler-client[Plugin Server Client]
 * link:lib/pruner[Dataset Pruner]
 * link:lib/rabbit[Rabbit Client]
 * link:lib/s3[S3 Utilities]
@@ -89,13 +94,18 @@ modules.
 
 === Daemons
 
+Background tasks that run unsupervised.
+
 * link:service/daemon/dataset-reinstaller/[Dataset Reinstaller]
 * link:service/daemon/event-router/[Event Router]
 * link:service/daemon/pruner/[Pruner]
 * link:service/daemon/reconciler/[Reconciler]
-* link:service/daemon/rest-service/[Rest API Service]
 
 === Lanes
+
+Dataset event handlers.  Each lane is a separate process that subscribes to a
+Kafka channel and operates on datasets whose information is provided in the
+incoming events.
 
 * link:service/lane/hard-delete/[Hard Delete Event Handler]
 * link:service/lane/import/[Import Event Handler]
@@ -105,16 +115,30 @@ modules.
 * link:service/lane/soft-delete/[Soft Delete Event Handler]
 * link:service/lane/update-meta/[Update Meta Event Handler]
 
+
+=== Rest Service
+
+The rest service is the public API through which users and administrators
+communicate with and operate on the VDI system.
+
+* link:service/rest-service/[Rest API Service]
+
 === Bootstrapper
 
 The bootstrapper is the core of the service, and the root level Gradle project.
 This piece is responsible for starting up and shutting down the various project
 modules.
 
+* link:service/bootstrap/[Bootstrapper]
+
 == Development
 
 === Running the Stack
 
 . `make build` +
+  Builds the VDI service docker image.
 . `make up` +
+  Spins up the service.
 . `make down` +
+  Shuts down the service and removes all the vdi-specific containers, volumes,
+  and networks.
