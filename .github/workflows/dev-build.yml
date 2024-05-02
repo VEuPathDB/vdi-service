@@ -10,4 +10,4 @@ jobs:
       uses: veupathdb/vdi-service/.github/workflows/gradle-build.yml@main
       with:
         name: Scheduled Development Build
-        branch: development
+        branch: main
