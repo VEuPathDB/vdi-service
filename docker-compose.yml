@@ -7,7 +7,11 @@ networks:
   monitoring-ext:
     external: true
   rabbitmq:
-    external: ${RABBITMQ_EXTERNAL:-false}
+    # Rabbit is local then the network is defined externally (set this to true)
+    #
+    # If rabbit is not local then the network is not defined externally and we
+    # need to define it ourselves (set this to false)
+    external: ${RABBITMQ_IS_LOCAL:-false}
 
 volumes:
   cache-db-data:
