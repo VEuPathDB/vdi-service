@@ -6,6 +6,8 @@ networks:
     external: true
   monitoring-ext:
     external: true
+  rabbitmq:
+    external: ${RABBITMQ_EXTERNAL:-true}
 
 volumes:
   cache-db-data:
@@ -62,9 +64,10 @@ services:
     - plugin-isasimple
     - plugin-rnaseq
     networks:
-      internal: {}
-      traefik: {}
-      monitoring-ext: {}
+    - internal
+    - traefik
+    - monitoring-ext
+    - rabbitmq
 
     stop_grace_period: 1m
     environment:
