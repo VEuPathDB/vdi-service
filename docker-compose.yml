@@ -7,7 +7,7 @@ networks:
   monitoring-ext:
     external: true
   rabbitmq:
-    external: ${RABBITMQ_EXTERNAL:-true}
+    external: ${RABBITMQ_EXTERNAL:-false}
 
 volumes:
   cache-db-data:
