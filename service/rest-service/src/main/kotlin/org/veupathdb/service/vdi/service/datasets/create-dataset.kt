@@ -110,7 +110,11 @@ fun createDataset(
   //       starting the new thread.  Then the new thread will be forked and the
   //       target file downloaded into a temp directory in that thread before
   //       being uploaded to MinIO (also in that forked thread).
-  val (tempDirectory, uploadFile) = entity.getDatasetFile()
+  val (tempDirectory, uploadFile) = try { entity.getDatasetFile() }
+  catch (e: Throwable) {
+    CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+    throw e
+  }
 
   Metrics.Upload.queueSize.inc()
   WorkPool.submit {
@@ -374,8 +378,12 @@ private fun DatasetPostRequest.getDatasetFile(): Pair<Path, Path> =
 
     // Try to establish a connection to the URL target (validating that the
     // target is reachable)
-    val connection = try { url.openConnection() }
-    catch (e: Throwable) { throw BadRequestException("given source file URL was unreachable") }
+    val connection = try {
+      url.openConnection()
+    } catch (e: Throwable) {
+      paths.first.deleteRecursively()
+      throw BadRequestException("given source file URL was unreachable")
+    }
 
     // Try to download the file from the source URL.
     try {
