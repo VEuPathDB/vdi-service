@@ -623,6 +623,41 @@ uses:
             application/json:
               type: lib.AllDatasetsListResponse
 
+  /system-purge:
+    displayName: System Purge
+    get:
+      displayName: Generate Purge Token
+      description: |
+        Generates a temporary system purge token which will be required by a
+        `POST` request to this endpoint to execute the system purge.
+        
+        Having this process be 2 steps is to help avoid accidental calls to the
+        endpoint resulting in an unwanted system wipe.
+        
+        Any scripts wrapping or automating system purges should include a prompt
+        confirming the user actually intends to perform this action.
+      responses:
+        200:
+          body:
+            text/plain:
+              type: string
+              example: ccdc1583ae814b4da99f689ad88f0394303c2ec49a264dc28fa5262bcd7f9091
+    post:
+      displayName: Execute Purge
+      description: |
+        Executes a full system purge, uninstalling all datasets known to VDI.
+        
+        This endpoint does not perform the uninstallation synchronously, instead
+        it marks all datasets
+      body:
+        text/plain:
+          type: string
+          example: ccdc1583ae814b4da99f689ad88f0394303c2ec49a264dc28fa5262bcd7f9091
+      responses:
+        204:
+          description: Success
+
+
 /vdi-datasets/community:
   displayName: Community Datasets
   get:
@@ -661,7 +696,6 @@ uses:
               status: server-error
               message: Dataset store is unreachable
               requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
-
 
 /vdi-datasets/{vd-id}:
   displayName: Dataset by ID
@@ -975,7 +1009,6 @@ uses:
           body:
             application/json:
               type: lib.ServerError
-
 
 /vdi-datasets/{vd-id}/shares/{recipient-user-id}:
   displayName: Dataset Sharing

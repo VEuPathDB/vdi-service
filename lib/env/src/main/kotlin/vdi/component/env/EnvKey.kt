@@ -3,7 +3,11 @@ package vdi.component.env
 import org.veupathdb.vdi.lib.common.env.EnvKey
 
 object EnvKey {
-  inline val Admin get() = EnvKey.Admin
+  object Admin {
+    inline val SecretKey get() = EnvKey.Admin.SecretKey
+
+    const val EnablePurgeEndpoint = "ENABLE_USER_DATASET_PURGE_ENDPOINT"
+  }
 
   inline val AppDB get() = EnvKey.AppDB
 

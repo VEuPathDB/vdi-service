@@ -79,6 +79,16 @@ public interface Admin {
       @QueryParam("project_id") String projectId,
       @QueryParam("include_deleted") @DefaultValue("false") Boolean includeDeleted);
 
+  @GET
+  @Path("/system-purge")
+  @Produces("text/plain")
+  GetAdminSystemPurgeResponse getAdminSystemPurge();
+
+  @POST
+  @Path("/system-purge")
+  @Consumes("text/plain")
+  PostAdminSystemPurgeResponse postAdminSystemPurge(String entity);
+
   class PostAdminProxyUploadResponse extends ResponseDelegate {
     private PostAdminProxyUploadResponse(Response response, Object entity) {
       super(response, entity);
@@ -295,6 +305,37 @@ public interface Admin {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetAdminListAllDatasetsResponse(responseBuilder.build(), entity);
+    }
+  }
+
+  class GetAdminSystemPurgeResponse extends ResponseDelegate {
+    private GetAdminSystemPurgeResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private GetAdminSystemPurgeResponse(Response response) {
+      super(response);
+    }
+
+    public static GetAdminSystemPurgeResponse respond200WithTextPlain(String entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "text/plain");
+      responseBuilder.entity(entity);
+      return new GetAdminSystemPurgeResponse(responseBuilder.build(), entity);
+    }
+  }
+
+  class PostAdminSystemPurgeResponse extends ResponseDelegate {
+    private PostAdminSystemPurgeResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private PostAdminSystemPurgeResponse(Response response) {
+      super(response);
+    }
+
+    public static PostAdminSystemPurgeResponse respond204() {
+      Response.ResponseBuilder responseBuilder = Response.status(204);
+      return new PostAdminSystemPurgeResponse(responseBuilder.build());
     }
   }
 }

@@ -65,12 +65,12 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public Response.StatusType getStatusInfo() {
-    return this.delegate.getStatusInfo();
+  public <T> T readEntity(Class<T> p0, Annotation[] p1) {
+    return this.delegate.readEntity(p0,p1);
   }
 
   @Override
-  public <T> T readEntity(Class<T> p0, Annotation[] p1) {
+  public <T> T readEntity(GenericType<T> p0, Annotation[] p1) {
     return this.delegate.readEntity(p0,p1);
   }
 
@@ -80,13 +80,13 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public <T> T readEntity(GenericType<T> p0, Annotation[] p1) {
-    return this.delegate.readEntity(p0,p1);
+  public <T> T readEntity(Class<T> p0) {
+    return this.delegate.readEntity(p0);
   }
 
   @Override
-  public <T> T readEntity(Class<T> p0) {
-    return this.delegate.readEntity(p0);
+  public Response.StatusType getStatusInfo() {
+    return this.delegate.getStatusInfo();
   }
 
   @Override
