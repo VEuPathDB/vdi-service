@@ -358,19 +358,19 @@ private fun DatasetPostRequest.getDatasetFile(): Pair<Path, Path> =
 
     tempDir to tempFile
   } else {
+    // Try to construct a URL instance (validating that the URL is sane)
+    val url = try { URL(url) }
+    catch (e: Throwable) { throw BadRequestException("invalid source file URL given") }
+
     // If the user gave us a URL then we have to download the contents of that
     // URL to a local file to be uploaded.   This is done to catch errors with
     // the URL or transfer before we start uploading to the dataset store.
-    val fileName = url.substring(url.lastIndexOf('/') + 1)
+    val fileName = url.safeFilename()
 
     if (fileName.isBlank())
       throw BadRequestException("could not determine file name or type from the given URL")
 
     val paths = TempFiles.makeTempPath(fileName)
-
-    // Try to construct a URL instance (validating that the URL is sane)
-    val url = try { URL(url) }
-    catch (e: Throwable) { throw BadRequestException("invalid source file URL given") }
 
     // Try to establish a connection to the URL target (validating that the
     // target is reachable)
@@ -400,4 +400,32 @@ private fun Path.validateZip() {
     ZipType.Spanned  -> throw BadRequestException("uploaded zip file is part of a spanned archive")
     ZipType.Invalid  -> throw BadRequestException("uploaded zip file is invalid")
   }
+}
+
+private fun URL.safeFilename(): String {
+  val filename = path.trim('/')
+    .let { it.substring(it.lastIndexOf('/') + 1) }
+
+  // If the filename portion is not empty and is at most 128 characters, return
+  // it.
+  if (filename.length in 1..128)
+    return filename
+
+  // Since the filename is too long, attempt to construct a hostname based file
+  // so the user has some clue as to what this file is when viewing the dataset
+  // details.
+  //
+  // According to RFC-1035, domain name parts (labels) can be at most 63
+  // characters, so we should be safe to just append '_download' to the domain
+  // name label.
+  return host.let {
+    val idx2 = when (val i = it.lastIndexOf('.')) {
+      -1   -> it.length
+      else -> i
+    }
+
+    val idx1 = it.lastIndexOf('.', idx2-1)
+
+    it.substring(idx1+1, idx2)
+  } + "_download"
 }
