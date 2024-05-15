@@ -60,11 +60,7 @@ object Main {
 
   private fun shutdownModules(modules: List<VDIModule>) {
     log.info("shutting down modules")
-    runBlocking { modules.forEach {
-      launch {
-        it.stop()
-      }
-    } }
+    runBlocking { modules.forEach { launch { it.stop() } } }
     log.info("modules shut down")
   }
 }
