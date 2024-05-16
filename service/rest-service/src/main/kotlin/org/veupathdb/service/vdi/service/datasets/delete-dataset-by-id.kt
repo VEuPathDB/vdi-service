@@ -38,10 +38,10 @@ internal fun userDeleteDataset(userID: UserID, datasetID: DatasetID) {
 
 private fun deleteUserDataset(userID: UserID, datasetID: DatasetID) {
   vdi.component.db.cache.CacheDB().withTransaction {
-    // Update the deleted flag in the local pg.
-    it.updateDatasetDeleted(datasetID, true)
-
     // Put a delete flag in S3 for the target dataset.
     DatasetStore.putDeleteFlag(userID, datasetID)
+
+    // Update the deleted flag in the local pg.
+    it.updateDatasetDeleted(datasetID, true)
   }
 }
