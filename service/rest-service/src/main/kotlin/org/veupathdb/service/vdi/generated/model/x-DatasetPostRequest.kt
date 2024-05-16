@@ -8,6 +8,11 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetTypeImpl
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import java.time.OffsetDateTime
 
+internal fun DatasetPostRequest.cleanup() {
+  meta?.cleanup()
+  url = url?.takeIf { it.isNotBlank() } ?.trim()
+}
+
 internal fun DatasetPostRequest.validate(): ValidationErrors {
   val validationErrors = ValidationErrors()
 

@@ -777,6 +777,7 @@ types:
       - conflict
       - gone
       - invalid-input
+      - failed-dependency
       - server-error
   BadRequestError:
     displayName: Bad Request
@@ -872,6 +873,16 @@ types:
         general: []
         byKey:
           id: [Given ID value does not point to an existing record.]
+  FailedDependencyError:
+    displayName: Failed Dependency Error
+    type: Error
+    discriminatorValue: failed-dependency
+    properties:
+      dependency: string
+    example:
+      status: failed-dependency
+      dependency: google.com
+      message: unexpected status code 403 from google.com
   ServerError:
     displayName: Internal Server Error
     type: Error

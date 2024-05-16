@@ -1,15 +1,18 @@
 package org.veupathdb.service.vdi.service.datasets
 
 import jakarta.ws.rs.BadRequestException
-import jakarta.ws.rs.InternalServerErrorException
 import org.slf4j.LoggerFactory
+import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.generated.model.toDatasetMeta
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.service.users.getCurrentQuotaUsage
-import org.veupathdb.service.vdi.util.BoundedInputStream
+import org.veupathdb.service.vdi.util.*
+import org.veupathdb.service.vdi.util.URLFetchException
+import org.veupathdb.service.vdi.util.fetchContent
+import org.veupathdb.service.vdi.util.toJavaURL
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
@@ -27,7 +30,7 @@ import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
 import vdi.component.plugin.mapping.PluginHandlers
-import java.net.HttpURLConnection
+import java.net.MalformedURLException
 import java.net.URL
 import java.nio.file.Path
 import java.time.OffsetDateTime
@@ -111,7 +114,7 @@ fun createDataset(
   //       starting the new thread.  Then the new thread will be forked and the
   //       target file downloaded into a temp directory in that thread before
   //       being uploaded to MinIO (also in that forked thread).
-  val (tempDirectory, uploadFile) = try { entity.getDatasetFile() }
+  val (tempDirectory, uploadFile) = try { entity.fetchDatasetFile() }
   catch (e: Throwable) {
     CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     throw e
@@ -319,6 +322,8 @@ private fun Path.repackRaw(into: Path): List<VDIDatasetFileInfo> {
   return listOf(VDIDatasetFileInfoImpl(name, fileSize()))
 }
 
+private data class FileReference(val tempDirectory: Path, val tempFile: Path)
+
 /**
  * Resolves the upload dataset file and places it in a new temp directory.
  *
@@ -332,93 +337,67 @@ private fun Path.repackRaw(into: Path): List<VDIDatasetFileInfo> {
  * @return A [Pair] containing the temp directory path first and the temp file
  * path second.
  */
+private fun DatasetPostRequest.fetchDatasetFile(): FileReference =
+  file?.let {
+    TempFiles.makeTempPath(it.name)
+      .also { (_, tmpFile) -> it.copyTo(tmpFile.toFile(), true) }
+      .let { (tmpDir, tmpFile) -> FileReference(tmpDir, tmpFile) }
+  } ?: downloadRemoteFile()
+
 @OptIn(ExperimentalPathApi::class)
-private fun DatasetPostRequest.getDatasetFile(): Pair<Path, Path> =
-  if (file != null) {
-    // If the user uploaded a file, then use that
-    val (tempDir, tempFile) = TempFiles.makeTempPath(file.name)
+private fun DatasetPostRequest.downloadRemoteFile(): FileReference {
+  val url = try { url.toJavaURL() }
+  catch (e: MalformedURLException) { throw BadRequestException("invalid file source: ${e.message}") }
 
-    file.copyTo(tempFile.toFile(), true)
+  // If the user gave us a URL then we have to download the contents of that
+  // URL to a local file to be uploaded.   This is done to catch errors with
+  // the URL or transfer before we start uploading to the dataset store.
+  val fileName = url.safeFilename()
 
-    tempDir to tempFile
-  } else {
-    // Try to construct a URL instance (validating that the URL is sane)
-    val url = url.toJavaURL()
+  if (fileName.isBlank())
+    throw BadRequestException("could not determine file name or type from the given URL")
 
-    // If the user gave us a URL then we have to download the contents of that
-    // URL to a local file to be uploaded.   This is done to catch errors with
-    // the URL or transfer before we start uploading to the dataset store.
-    val fileName = url.safeFilename()
+  val response = try { url.fetchContent() }
+  catch (e: URLFetchException) { throw FailedDependencyException(this.url, e.message, e) }
 
-    if (fileName.isBlank())
-      throw BadRequestException("could not determine file name or type from the given URL")
+  // If the remote server "successfully" returned an error code or some other
+  // non-2xx code.
+  if (!response.isSuccess)
+    throw FailedDependencyException(this.url, "unexpected status code ${response.status}")
 
-    val paths = TempFiles.makeTempPath(fileName)
+  // If for some reason the server returned nothing.
+  if (!response.hasBody)
+    throw FailedDependencyException(this.url, "remote server returned code ${response.status} with no content")
 
-    // Try to establish a connection to the URL target (validating that the
-    // target is reachable)
-    val connection = try {
-      url.openConnection() as HttpURLConnection
-    } catch (e: Throwable) {
-      paths.first.deleteRecursively()
-      throw BadRequestException("given source file URL was unreachable")
+  val (tmpDir, tmpFile) = TempFiles.makeTempPath(fileName)
+
+  // Try to download the file from the source URL.
+  try {
+    BoundedInputStream(JaxRSMultipartUpload.maxFileUploadSize, response.body!!) {
+      BadRequestException("given source file URL pointed to a file that exceeded the max allowed upload size of " +
+        "${JaxRSMultipartUpload.maxFileUploadSize} bytes.")
     }
-
-    // Wrap the response code check as it will open and begin reading the input
-    // stream from the request target.
-    try {
-      val statusCode = connection.responseCode
-      if (statusCode !in 200 .. 299)
-        throw BadRequestException("target server for file download responded with status code $statusCode")
-    } catch (e: Throwable) {
-      paths.first.deleteRecursively()
-
-      throw if (e is BadRequestException)
-        e
-      else
-        BadRequestException("encountered error while attempting to communicate with the target server for file " +
-          "download: ${e.message}")
-    }
-
-    // Try to download the file from the source URL.
-    try {
-      BoundedInputStream(JaxRSMultipartUpload.maxFileUploadSize, connection.inputStream) {
-        BadRequestException("given source file URL pointed to a file that exceeded the max allowed upload size of " +
-          "${JaxRSMultipartUpload.maxFileUploadSize} bytes.")
-      }
-        .use { inp -> paths.second.outputStream().use { out -> inp.transferTo(out) } }
-    } catch (e: Throwable) {
-      log.error("failed to download file from target URL", e)
-      paths.second.deleteIfExists()
-      paths.first.deleteRecursively()
-      throw InternalServerErrorException("error occurred while attempting to download source file from the given URL")
-    }
-
-    paths
+      .use { inp -> tmpFile.outputStream().use { out -> inp.transferTo(out) } }
+  } catch (e: Throwable) {
+    log.error("content transfer from ${url.shortForm}", e)
+    tmpFile.deleteIfExists()
+    tmpDir.deleteRecursively()
+    throw FailedDependencyException(
+      this.url,
+      "error occurred while attempting to download source file from ${url.shortForm}",
+    )
   }
+
+  return FileReference(tmpDir, tmpFile)
+}
 
 private fun Path.validateZip() {
   when (getZipType()) {
-    ZipType.Empty    -> throw BadRequestException("uploaded zip file is empty")
+    ZipType.Empty -> throw BadRequestException("uploaded zip file is empty")
     ZipType.Standard -> { /* OK */ }
-    ZipType.Spanned  -> throw BadRequestException("uploaded zip file is part of a spanned archive")
-    ZipType.Invalid  -> throw BadRequestException("uploaded zip file is invalid")
+    ZipType.Spanned -> throw BadRequestException("uploaded zip file is part of a spanned archive")
+    ZipType.Invalid -> throw BadRequestException("uploaded zip file is invalid")
   }
-}
-
-private fun String.toJavaURL(): URL {
-  val dividerIndex = indexOf("://")
-
-  if (dividerIndex < 1)
-    throw BadRequestException("given url does not specify a protocol, must be http or https")
-
-  with(substring(0, dividerIndex)) {
-    if (this != "http" && this != "https")
-      throw BadRequestException("given url has an invalid protocol, must be http or https")
-  }
-
-  return try { URL(this) }
-  catch (e: Throwable) { throw BadRequestException("given url is invalid: ${e.message}")}
 }
 
 private fun URL.safeFilename(): String {
