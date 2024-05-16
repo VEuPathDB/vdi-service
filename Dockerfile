@@ -5,7 +5,6 @@ ARG GITHUB_TOKEN
 
 WORKDIR /workspace
 
-COPY buildSrc buildSrc
 COPY settings.gradle.kts settings.gradle.kts
 COPY build.gradle.kts build.gradle.kts
 COPY platform platform

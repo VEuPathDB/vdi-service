@@ -12,7 +12,12 @@ default:
 
 .PHONY: build
 build:
-	@./gradlew -q compose -Pcompose-target=build
+	@docker compose \
+      -f docker-compose.yml \
+      -f docker-compose.dev.yml \
+      build \
+      --build-arg=GITHUB_USERNAME=${GITHUB_USERNAME} \
+      --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}
 
 .PHONY: raml-gen
 raml-gen:
@@ -27,19 +32,19 @@ raml-gen:
 
 .PHONY: up
 up: env-file-test
-	@./gradlew -q compose -Pcompose-target=up
+	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml up -d
 
 .PHONY: down
 down: env-file-test
-	@./gradlew -q compose -Pcompose-target=down
+	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml down -v
 
 .PHONY: start
 start: env-file-test
-	@./gradlew -q compose -Pcompose-target=start
+	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml start
 
 .PHONY: stop
 stop: env-file-test
-	@./gradlew -q compose -Pcompose-target=stop
+	@docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml stop
 
 
 ####
