@@ -20,8 +20,29 @@ types:
       datasetId: common.VDI-ID
       owner: common.User-ID
       datasetType: common.DatasetTypeInfo
-      projectIds: common.ProjectID[]
-      status: common.DatasetStatusInfo
+      statuses: common.BrokenDatasetStatusEntry[]
+
+  BrokenDatasetStatusEntry:
+    displayName: Dataset Install Status Entry
+    description: Entry in a list of install statuses for a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      projectId:
+        type: ProjectID
+        required: true
+      metaStatus:
+        type: DatasetInstallStatus
+        required: false
+      metaMessage:
+        type: string
+        required: false
+      dataStatus:
+        type: DatasetInstallStatus
+        required: false
+      dataMessage:
+        type: string
+        required: false
 
   BrokenImportListing:
     displayName: Broken Import Listing

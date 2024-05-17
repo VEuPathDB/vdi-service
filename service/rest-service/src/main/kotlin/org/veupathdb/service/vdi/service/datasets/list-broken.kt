@@ -5,10 +5,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
-import vdi.component.db.app.model.DatasetRecord
-import vdi.component.db.app.model.InstallStatus
-import vdi.component.db.app.model.InstallStatuses
-import vdi.component.db.app.model.InstallType
+import vdi.component.db.app.model.*
 import vdi.component.db.cache.model.DatasetImportStatus
 
 /**
@@ -46,63 +43,77 @@ private fun listSimpleBrokenDatasets(): BrokenDatasetListing {
  * broken install status [InstallStatus.FailedInstallation].
  */
 private fun listExpandedBrokenDatasets(): BrokenDatasetListing {
-  // Collect the datasets that are in a broken status into a map to unique the
-  // results on dataset ID.
-  val cache = HashMap<DatasetID, DatasetRecord>()
-
   // Map of project IDs to the datasets that are registered to that project ID.
   // A dataset ID may appear under multiple project IDs.
   val projectToDatasetIDs = HashMap<String, MutableSet<DatasetID>>(12)
 
-  // Map of datasets to projects
-  val datasetIDToProjects = HashMap<DatasetID, MutableSet<ProjectID>>()
+  // Map of datasets to install statuses for any failed installs into any of
+  // each dataset's target projects.
+  val datasetInstallStatuses = HashMap<DatasetID, MutableMap<ProjectID, MutableList<FailedInstallRecord>>>()
 
   // For each project registered with the VDI service...
   for ((project, _) in AppDatabaseRegistry.iterator()) {
 
     // Lookup datasets that are in the broken install status and...
     getBrokenDatasets(project).forEach {
-      // Record a project to dataset link
       projectToDatasetIDs.computeIfAbsent(project) { HashSet(1) }
         .add(it.datasetID)
 
-      // Record a dataset to project link
-      datasetIDToProjects.computeIfAbsent(it.datasetID) { HashSet(1) }
-        .add(project)
-
-      // Put the dataset in the cache
-      cache[it.datasetID] = it
+      datasetInstallStatuses.computeIfAbsent(it.datasetID) { HashMap(1) }
+        .computeIfAbsent(project) { ArrayList(1) }
+        .add(it)
     }
   }
 
-  // Lookup the statuses for all the target datasets in bulk.
-  val datasetInstallStatusMap = AppDB().getDatasetStatuses(projectToDatasetIDs)
-  projectToDatasetIDs.clear()
+  val results = ArrayList<BrokenDatasetDetails>(datasetInstallStatuses.size)
 
-  val results = ArrayList<BrokenDatasetDetails>(cache.size)
+  for ((datasetID, byProject) in datasetInstallStatuses)
+    results.add(BrokenDatasetDetailsImpl().also {
+      it.datasetId = datasetID.toString()
 
-  cache.values.forEach {
-    results.add(it.toDetails(
-      datasetIDToProjects[it.datasetID] ?: emptyList(),
-      datasetInstallStatusMap[it.datasetID] ?: emptyMap(),
-    ))
-  }
+      val entries = byProject.toList()
+
+      it.datasetType = with(entries[0].second[0]) { DatasetTypeInfo(typeName, typeVersion) }
+      it.statuses = ArrayList(entries.size)
+
+      for ((project, failures) in entries)
+        it.statuses.add(failures.toStatusEntry(project))
+    })
 
   return BrokenDatasetListingImpl().apply { details = results }
 }
 
 private fun getBrokenDatasets(projectID: ProjectID) =
-  AppDB().accessor(projectID)!!
-    .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FailedInstallation)
+  AppDB().accessor(projectID)!!.selectFailedInstalls()
 
-private fun DatasetRecord.toDetails(
-  projects: Collection<ProjectID>,
-  statuses: Map<ProjectID, InstallStatuses>,
-) =
-  BrokenDatasetDetailsImpl().also { out ->
-    out.datasetId   = datasetID.toString()
-    out.owner       = owner.toLong()
-    out.datasetType = DatasetTypeInfo(typeName, typeVersion)
-    out.projectIds  = projects.toList()
-    out.status      = DatasetStatusInfo(DatasetImportStatus.Complete, statuses)
+private fun List<FailedInstallRecord>.toStatusEntry(projectID: ProjectID) =
+  BrokenDatasetStatusEntryImpl().also {
+    it.projectId = projectID
+
+    if (size == 1) {
+      if (get(0).installType == InstallType.Data) {
+        it.dataStatus = DatasetInstallStatus(InstallStatus.FailedInstallation)
+        it.dataMessage = get(0).installMessage
+      } else {
+        it.metaStatus = DatasetInstallStatus(InstallStatus.FailedInstallation)
+        it.metaMessage = get(0).installMessage
+      }
+    } else {
+      val data: FailedInstallRecord
+      val meta: FailedInstallRecord
+
+      if (get(0).installType == InstallType.Data) {
+        data = get(0)
+        meta = get(1)
+      } else {
+        data = get(1)
+        meta = get(0)
+      }
+
+      it.dataStatus = DatasetInstallStatus(InstallStatus.FailedInstallation)
+      it.dataMessage = data.installMessage
+
+      it.metaStatus = DatasetInstallStatus(InstallStatus.FailedInstallation)
+      it.metaMessage = meta.installMessage
+    }
   }

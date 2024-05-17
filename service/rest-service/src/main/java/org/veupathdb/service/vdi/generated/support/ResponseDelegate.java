@@ -60,6 +60,11 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
+  public MultivaluedMap<String, Object> getHeaders() {
+    return this.delegate.getHeaders();
+  }
+
+  @Override
   public int getStatus() {
     return this.delegate.getStatus();
   }
@@ -67,11 +72,6 @@ public class ResponseDelegate extends Response {
   @Override
   public Response.StatusType getStatusInfo() {
     return this.delegate.getStatusInfo();
-  }
-
-  @Override
-  public <T> T readEntity(Class<T> p0, Annotation[] p1) {
-    return this.delegate.readEntity(p0,p1);
   }
 
   @Override
@@ -87,6 +87,11 @@ public class ResponseDelegate extends Response {
   @Override
   public <T> T readEntity(Class<T> p0) {
     return this.delegate.readEntity(p0);
+  }
+
+  @Override
+  public <T> T readEntity(Class<T> p0, Annotation[] p1) {
+    return this.delegate.readEntity(p0,p1);
   }
 
   @Override
@@ -145,22 +150,17 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public Object getEntity() {
-    return this.entity;}
-
-  @Override
   public MultivaluedMap<String, String> getStringHeaders() {
     return this.delegate.getStringHeaders();
   }
 
   @Override
-  public String getHeaderString(String p0) {
-    return this.delegate.getHeaderString(p0);
-  }
+  public Object getEntity() {
+    return this.entity;}
 
   @Override
-  public MultivaluedMap<String, Object> getHeaders() {
-    return this.delegate.getHeaders();
+  public String getHeaderString(String p0) {
+    return this.delegate.getHeaderString(p0);
   }
 
   public static class HeaderBuilderBase {

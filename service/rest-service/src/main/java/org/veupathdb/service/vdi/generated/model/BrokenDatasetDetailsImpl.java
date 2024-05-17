@@ -10,8 +10,7 @@ import java.util.List;
     "datasetId",
     "owner",
     "datasetType",
-    "projectIds",
-    "status"
+    "statuses"
 })
 public class BrokenDatasetDetailsImpl implements BrokenDatasetDetails {
   @JsonProperty("datasetId")
@@ -23,11 +22,8 @@ public class BrokenDatasetDetailsImpl implements BrokenDatasetDetails {
   @JsonProperty("datasetType")
   private DatasetTypeInfo datasetType;
 
-  @JsonProperty("projectIds")
-  private List<String> projectIds;
-
-  @JsonProperty("status")
-  private DatasetStatusInfo status;
+  @JsonProperty("statuses")
+  private List<BrokenDatasetStatusEntry> statuses;
 
   @JsonProperty("datasetId")
   public String getDatasetId() {
@@ -59,23 +55,13 @@ public class BrokenDatasetDetailsImpl implements BrokenDatasetDetails {
     this.datasetType = datasetType;
   }
 
-  @JsonProperty("projectIds")
-  public List<String> getProjectIds() {
-    return this.projectIds;
+  @JsonProperty("statuses")
+  public List<BrokenDatasetStatusEntry> getStatuses() {
+    return this.statuses;
   }
 
-  @JsonProperty("projectIds")
-  public void setProjectIds(List<String> projectIds) {
-    this.projectIds = projectIds;
-  }
-
-  @JsonProperty("status")
-  public DatasetStatusInfo getStatus() {
-    return this.status;
-  }
-
-  @JsonProperty("status")
-  public void setStatus(DatasetStatusInfo status) {
-    this.status = status;
+  @JsonProperty("statuses")
+  public void setStatuses(List<BrokenDatasetStatusEntry> statuses) {
+    this.statuses = statuses;
   }
 }

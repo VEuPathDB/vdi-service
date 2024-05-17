@@ -81,6 +81,15 @@ interface AppDBAccessor {
   fun selectDatasetProjectLinks(datasetID: DatasetID): List<DatasetProjectLinkRecord>
 
   /**
+   * Retrieves details about all datasets in a target project with a failed
+   * install record of any install type.
+   *
+   * @return A list of zero or more [FailedInstallRecord] instances representing
+   * datasets with failed installs.
+   */
+  fun selectFailedInstalls(): List<FailedInstallRecord>
+
+  /**
    * Streams sorted stream of all dataset control records.
    *
    * @return Stream of dataset control records sorted by user ID and then dataset ID. The stream

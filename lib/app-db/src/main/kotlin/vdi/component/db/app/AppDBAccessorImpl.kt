@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import vdi.component.db.app.model.FailedInstallRecord
 import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallType
 import vdi.component.db.app.sql.*
@@ -47,4 +48,7 @@ internal class AppDBAccessorImpl(
 
   override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
     con.use { it.selectDatasetsByInstallStatus(schema, installType, installStatus, project) }
+
+  override fun selectFailedInstalls(): List<FailedInstallRecord> =
+    con.use { it.selectFailedInstalls(schema, project) }
 }

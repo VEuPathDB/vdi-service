@@ -194,4 +194,7 @@ class AppDBTransactionImpl(
 
   override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
     connection.selectDatasetsByInstallStatus(schema, installType, installStatus, project)
+
+  override fun selectFailedInstalls(): List<FailedInstallRecord> =
+    connection.use { it.selectFailedInstalls(schema, project) }
 }
