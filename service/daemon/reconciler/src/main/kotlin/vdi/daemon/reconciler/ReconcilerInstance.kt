@@ -124,10 +124,8 @@ internal class ReconcilerInstance(
 
       if (comparableS3Id < comparableTargetId) {
         // Dataset is in source, but not in target. Send an event.
-        if (!slim)
+        if (sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB)) && !slim)
           Metrics.Reconciler.Full.missingInTarget.labels(targetDB.name).inc()
-
-        sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB))
       } else {
 
         // If dataset has a delete flag present
@@ -224,24 +222,37 @@ internal class ReconcilerInstance(
     )
   }
 
-  private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory, reason: SyncReason) {
+  /**
+   * Calls [sendSyncEvent] if the dataset represented by [sourceDatasetDir] is
+   * relevant to the current target application DB.
+   *
+   * @param sourceDatasetDir MinIO dataset directory representation for the
+   * dataset in question.
+   *
+   * @param reason Reason a sync event should be fired.
+   *
+   * @return A boolean value indicating whether the dataset was relevant to the
+   * current target project and a reconciliation event was fired.
+   */
+  private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory, reason: SyncReason): Boolean {
     if (targetDB.type == ReconcilerTargetType.Install) {
 
       // Ensure the meta json file exists in S3 to protect against NPEs being
       // thrown on broken dataset directories.
       if (!sourceDatasetDir.hasMetaFile()) {
         log.warn("skipping dataset {}/{} as it has no meta json file", sourceDatasetDir.ownerID, sourceDatasetDir.datasetID)
-        return
+        return false
       }
 
       val relevantProjects = sourceDatasetDir.getMetaFile().load()!!.projects
 
       if (!relevantProjects.contains(targetDB.name)) {
-        return
+        return false
       }
     }
 
     sendSyncEvent(sourceDatasetDir.ownerID, sourceDatasetDir.datasetID, reason)
+    return true
   }
 
   private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
