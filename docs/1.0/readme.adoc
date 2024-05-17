@@ -184,7 +184,7 @@ The dataset-reinstaller component exposes an API for reinstalling datasets that
 have been marked as "ready-for-reinstall".
 
 Handler Client::
-The handler-client component exposes an API for interacting with the VDI plugin
+The plugin-client component exposes an API for interacting with the VDI plugin
 services over HTTP.
 
 Install Cleanup::

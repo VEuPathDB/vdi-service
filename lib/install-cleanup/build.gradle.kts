@@ -7,7 +7,7 @@ dependencies {
 
   implementation(project(":lib:app-db"))
   implementation(project(":lib:cache-db"))
-  implementation(project(":lib:handler-client"))
+  implementation(project(":lib:plugin-client"))
   implementation(project(":lib:plugin-mapping"))
 
   implementation("org.veupathdb.vdi:vdi-component-common")

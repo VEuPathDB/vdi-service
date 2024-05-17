@@ -6,7 +6,7 @@ dependencies {
   implementation(platform(project(":platform")))
 
   implementation(project(":lib:env"))
-  implementation(project(":lib:handler-client"))
+  implementation(project(":lib:plugin-client"))
 
   implementation("org.veupathdb.vdi:vdi-component-common")
 

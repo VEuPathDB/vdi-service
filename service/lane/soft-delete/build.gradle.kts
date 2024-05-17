@@ -8,7 +8,7 @@ dependencies {
   implementation(project(":lib:app-db"))
   implementation(project(":lib:cache-db"))
   implementation(project(":lib:env"))
-  implementation(project(":lib:handler-client"))
+  implementation(project(":lib:plugin-client"))
   implementation(project(":lib:kafka"))
   implementation(project(":lib:metrics"))
   implementation(project(":lib:module-core"))
