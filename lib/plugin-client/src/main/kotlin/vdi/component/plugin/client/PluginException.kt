@@ -1,38 +1,28 @@
 package vdi.component.plugin.client
 
+import org.slf4j.Logger
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 
-class PluginException : Exception {
+open class PluginException : Exception {
   val action: String
   val plugin: String
   val projectID: ProjectID
   val userID: UserID
   val datasetID: DatasetID
 
-  constructor(
-    action: String,
-    plugin: String,
-    projectID: ProjectID,
-    userID: UserID,
-    datasetID: DatasetID,
-  ) : super(makeMessage(action, plugin, projectID, userID, datasetID)) {
-    this.action = action
-    this.plugin = plugin
-    this.projectID = projectID
-    this.userID = userID
-    this.datasetID = datasetID
-  }
+  override val message: String
+    get() = super.message!!
 
-  constructor(
+  protected constructor(
     action: String,
     plugin: String,
     projectID: ProjectID,
     userID: UserID,
     datasetID: DatasetID,
     message: String,
-  ) : super(makeMessage(action, plugin, projectID, userID, datasetID, message)) {
+  ) : super(message) {
     this.action = action
     this.plugin = plugin
     this.projectID = projectID
@@ -40,22 +30,7 @@ class PluginException : Exception {
     this.datasetID = datasetID
   }
 
-  constructor(
-    action: String,
-    plugin: String,
-    projectID: ProjectID,
-    userID: UserID,
-    datasetID: DatasetID,
-    cause: Throwable,
-  ) : super(makeMessage(action, plugin, projectID, userID, datasetID, null, cause), cause) {
-    this.action = action
-    this.plugin = plugin
-    this.projectID = projectID
-    this.userID = userID
-    this.datasetID = datasetID
-  }
-
-  constructor(
+  protected constructor(
     action: String,
     plugin: String,
     projectID: ProjectID,
@@ -63,12 +38,16 @@ class PluginException : Exception {
     datasetID: DatasetID,
     message: String,
     cause: Throwable,
-  ) : super(makeMessage(action, plugin, projectID, userID, datasetID, message), cause) {
+  ) : super(message, cause) {
     this.action = action
     this.plugin = plugin
     this.projectID = projectID
     this.userID = userID
     this.datasetID = datasetID
+  }
+
+  fun log(logFn: (String, Throwable) -> Unit) {
+    logFn(message, this)
   }
 
   companion object {
@@ -119,12 +98,14 @@ class PluginException : Exception {
       datasetID: DatasetID,
       message: String?,
       cause: Throwable?,
-    ) = when {
-      message != null && cause != null -> PluginException(action, plugin, projectID, userID, datasetID, message, cause)
-      message != null -> PluginException(action, plugin, projectID, userID, datasetID, message)
-      cause != null -> PluginException(action, plugin, projectID, userID, datasetID, cause)
-      else -> PluginException(action, plugin, projectID, userID, datasetID)
-    }
+    ) =
+      makeMessage(action, plugin, projectID, userID, datasetID, message, cause)
+        .let {
+          if (cause == null)
+            PluginException(action, plugin, projectID, userID, datasetID, it)
+          else
+            PluginException(action, plugin, projectID, userID, datasetID, it, cause)
+        }
 
     private fun makeMessage(
       action: String,

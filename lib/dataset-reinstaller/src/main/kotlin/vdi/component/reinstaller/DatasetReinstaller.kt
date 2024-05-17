@@ -98,6 +98,12 @@ object DatasetReinstaller {
     for (dataset in datasets) {
       try {
         processDataset(dataset, projectID, manager)
+      } catch (e: PluginRequestException) {
+        Metrics.Reinstaller.failedDatasetReinstall.inc()
+        log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID via plugin ${e.plugin}", e)
+      } catch (e: PluginException) {
+        Metrics.Reinstaller.failedDatasetReinstall.inc()
+        log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID via plugin ${e.plugin}", e)
       } catch (e: Throwable) {
         Metrics.Reinstaller.failedDatasetReinstall.inc()
         log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID", e)
@@ -128,7 +134,7 @@ object DatasetReinstaller {
     val uninstallResult = try {
       handler.client.postUninstall(dataset.datasetID, projectID)
     } catch (e: Throwable) {
-      throw PluginRequestException("uninstall", handler.displayName, projectID, dataset.datasetID, e)
+      throw PluginRequestException("uninstall", handler.displayName, projectID, dataset.owner, dataset.datasetID, e)
     }
 
     when (uninstallResult.type) {
@@ -170,7 +176,7 @@ object DatasetReinstaller {
     val response = try {
       withInstallBundle(directory) { handler.client.postInstallData(dataset.datasetID, projectID, it) }
     } catch (e: Throwable) {
-      throw PluginRequestException("install-data", handler.displayName, projectID, dataset.datasetID, e)
+      throw PluginRequestException("install-data", handler.displayName, projectID, dataset.owner, dataset.datasetID, e)
     }
 
     when (response.type) {

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.util.or
 import vdi.component.async.WorkerPool
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
@@ -51,7 +52,7 @@ internal class SoftDeleteTriggerHandlerImpl(
           kc.fetchMessages(config.softDeleteTriggerMessageKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received uninstall job for dataset $userID/$datasetID from source $source")
-              wp.submit { runJob(userID, datasetID) }
+              wp.submit { tryHandleUninstall(userID, datasetID) }
             }
         }
       }
@@ -62,7 +63,17 @@ internal class SoftDeleteTriggerHandlerImpl(
     confirmShutdown()
   }
 
-  private suspend fun runJob(userID: UserID, datasetID: DatasetID) {
+  private suspend fun tryHandleUninstall(userID: UserID, datasetID: DatasetID) {
+    try {
+      handleUninstall(userID, datasetID)
+    } catch (e: PluginException) {
+      e.log(log::error)
+    } catch (e: Throwable) {
+      PluginException.uninstall("N/A", "N/A", userID, datasetID, cause = e).log(log::error)
+    }
+  }
+
+  private suspend fun handleUninstall(userID: UserID, datasetID: DatasetID) {
     val internalDBRecord = cacheDB.selectDataset(datasetID)
       ?: throw IllegalStateException("received uninstall event for a dataset that does not exist in the internal database")
 
@@ -75,9 +86,7 @@ internal class SoftDeleteTriggerHandlerImpl(
       .startTimer()
 
     // Grab a plugin handler instance for this dataset type.
-    val handler = PluginHandlers[internalDBRecord.typeName, internalDBRecord.typeVersion]
-
-    if (handler == null) {
+    val handler = PluginHandlers[internalDBRecord.typeName, internalDBRecord.typeVersion] or {
       log.error("no plugin handler found for dataset {}/{} type {}:{}", userID, datasetID, internalDBRecord.typeName, internalDBRecord.typeVersion)
       return
     }
@@ -97,9 +106,11 @@ internal class SoftDeleteTriggerHandlerImpl(
 
       if (datasetShouldBeUninstalled(userID, datasetID, projectID)) {
         try {
-          tryUninstallDataset(userID, datasetID, projectID, handler, internalDBRecord)
+          uninstallDataset(userID, datasetID, projectID, handler, internalDBRecord)
+        } catch (e: PluginException) {
+          throw e
         } catch (e: Throwable) {
-          log.error("dataset ${userID}/${projectID} uninstall from project $projectID failed: ", e)
+          throw PluginException.uninstall(handler.displayName, projectID, userID, datasetID, cause = e)
         }
       }
     }
@@ -114,12 +125,28 @@ internal class SoftDeleteTriggerHandlerImpl(
     handler: PluginHandler,
     record: DatasetRecord
   ) {
+    try {
+      uninstallDataset(userID, datasetID, projectID, handler, record)
+    } catch (e: PluginException) {
+      throw e
+    } catch (e: Throwable) {
+      throw PluginException.uninstall(handler.displayName, projectID, userID, datasetID, cause = e)
+    }
+  }
+
+  private suspend fun uninstallDataset(
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    handler: PluginHandler,
+    record: DatasetRecord
+  ) {
     appDB.withTransaction(projectID) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedNotUninstalled) }
 
     val response = try {
       handler.client.postUninstall(datasetID, projectID)
     } catch (e: Throwable) {
-      throw PluginRequestException("uninstall", handler.displayName, projectID, datasetID, e)
+      throw PluginRequestException.uninstall(handler.displayName, projectID, userID, datasetID, cause = e)
     }
 
     Metrics.Uninstall.count.labels(record.typeName, record.typeVersion, response.responseCode.toString()).inc()

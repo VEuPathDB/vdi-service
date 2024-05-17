@@ -32,7 +32,7 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
     val res = try {
       handler.client.postUninstall(dataset.datasetID, projectID)
     } catch (e: Throwable) {
-      throw PluginRequestException("uninstall", handler.displayName, projectID, dataset.datasetID, e)
+      throw PluginRequestException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID, cause = e)
     }
 
     if (!res.isSuccessResponse)

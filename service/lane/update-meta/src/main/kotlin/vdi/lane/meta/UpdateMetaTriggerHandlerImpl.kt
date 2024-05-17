@@ -247,7 +247,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     val result = try {
       ph.client.postInstallMeta(datasetID, projectID, meta)
     } catch (e: Throwable){
-      throw PluginRequestException("install-meta", ph.displayName, projectID, datasetID, e)
+      throw PluginRequestException("install-meta", ph.displayName, projectID, userID, datasetID, e)
     }
 
     Metrics.MetaUpdates.count.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
