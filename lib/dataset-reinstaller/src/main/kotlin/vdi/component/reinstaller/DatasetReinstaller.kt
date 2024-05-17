@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
@@ -98,9 +97,6 @@ object DatasetReinstaller {
     for (dataset in datasets) {
       try {
         processDataset(dataset, projectID, manager)
-      } catch (e: PluginRequestException) {
-        Metrics.Reinstaller.failedDatasetReinstall.inc()
-        log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID via plugin ${e.plugin}", e)
       } catch (e: PluginException) {
         Metrics.Reinstaller.failedDatasetReinstall.inc()
         log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID via plugin ${e.plugin}", e)
@@ -134,7 +130,7 @@ object DatasetReinstaller {
     val uninstallResult = try {
       handler.client.postUninstall(dataset.datasetID, projectID)
     } catch (e: Throwable) {
-      throw PluginRequestException("uninstall", handler.displayName, projectID, dataset.owner, dataset.datasetID, e)
+      throw PluginRequestException.uninstall(handler.displayName, projectID, dataset.owner, dataset.datasetID, cause = e)
     }
 
     when (uninstallResult.type) {
@@ -176,7 +172,7 @@ object DatasetReinstaller {
     val response = try {
       withInstallBundle(directory) { handler.client.postInstallData(dataset.datasetID, projectID, it) }
     } catch (e: Throwable) {
-      throw PluginRequestException("install-data", handler.displayName, projectID, dataset.owner, dataset.datasetID, e)
+      throw PluginRequestException.installData(handler.displayName, projectID, dataset.owner, dataset.datasetID, cause = e)
     }
 
     when (response.type) {
