@@ -12,6 +12,7 @@ import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
@@ -30,7 +31,10 @@ import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
+import vdi.component.plugin.client.PluginException
+import vdi.component.plugin.client.PluginRequestException
 import vdi.component.plugin.client.response.imp.*
+import vdi.component.plugin.mapping.PluginHandler
 import vdi.component.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
@@ -157,21 +161,45 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         it.upsertImportControl(datasetID, DatasetImportStatus.InProgress)
       }
 
-      val result = datasetDir.getImportReadyFile()
-        .loadContents()!!
-        .use { handler.client.postImport(datasetID, datasetMeta, it) }
+      val result = try {
+        datasetDir.getImportReadyFile()
+          .loadContents()!!
+          .use { handler.client.postImport(datasetID, datasetMeta, it) }
+      } catch (e: Throwable) {
+        throw PluginRequestException("import", handler.displayName, "*", datasetID, e)
+      }
 
       Metrics.Import.count.labels(datasetMeta.type.name, datasetMeta.type.version, result.responseCode.toString()).inc()
 
       when (result.type) {
-        ImportResponseType.Success         -> handleImportSuccessResult(
+        ImportResponseType.Success -> handleImportSuccessResult(
+          handler,
+          userID,
           datasetID,
           result as ImportSuccessResponse,
           datasetDir
         )
-        ImportResponseType.BadRequest      -> handleImportBadRequestResult(datasetID, result as ImportBadRequestResponse)
-        ImportResponseType.ValidationError -> handleImportInvalidResult(datasetID, result as ImportValidationErrorResponse)
-        ImportResponseType.UnhandledError  -> handleImport500Result(userID, datasetID, result as ImportUnhandledErrorResponse)
+
+        ImportResponseType.BadRequest -> handleImportBadRequestResult(
+          handler,
+          userID,
+          datasetID,
+          result as ImportBadRequestResponse
+        )
+
+        ImportResponseType.ValidationError -> handleImportInvalidResult(
+          handler,
+          userID,
+          datasetID,
+          result as ImportValidationErrorResponse
+        )
+
+        ImportResponseType.UnhandledError  -> handleImport500Result(
+          handler,
+          userID,
+          datasetID,
+          result as ImportUnhandledErrorResponse,
+        )
       }
     } catch (e: Throwable) {
       log.error("import request to handler server for dataset $datasetID failed with exception:", e)
@@ -185,8 +213,15 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private fun handleImportSuccessResult(datasetID: DatasetID, result: ImportSuccessResponse, dd: DatasetDirectory) {
-    log.info("dataset handler server reports dataset $datasetID imported successfully")
+  private fun handleImportSuccessResult(
+    handler: PluginHandler,
+    userID: UserID,
+    datasetID: DatasetID,
+    result: ImportSuccessResponse,
+    dd: DatasetDirectory
+  ) {
+    log.info("dataset handler server reports dataset $userID/$datasetID imported successfully in plugin " +
+      handler.displayName)
 
     // Create a temp directory to use as a workspace for the following process
     TempFiles.withTempDirectory { tempDirectory ->
@@ -243,30 +278,48 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private fun handleImportBadRequestResult(datasetID: DatasetID, result: ImportBadRequestResponse) {
-    log.error("dataset handler server reports 400 error for dataset $datasetID, message: ${result.message}")
+  private fun handleImportBadRequestResult(
+    handler: PluginHandler,
+    userID: UserID,
+    datasetID: DatasetID,
+    result: ImportBadRequestResponse
+  ) {
+    log.error("dataset handler server reports 400 error for dataset $userID/$datasetID in plugin " +
+      "${handler.displayName}: ${result.message}")
+
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
       it.upsertImportMessages(datasetID, result.message)
     }
-    throw IllegalStateException(result.message)
+
+    throw PluginException.import(handler.displayName, userID, datasetID, result.message)
   }
 
-  private fun handleImportInvalidResult(datasetID: DatasetID, result: ImportValidationErrorResponse) {
-    log.info("dataset handler server reports dataset $datasetID failed validation")
+  private fun handleImportInvalidResult(
+    handler: PluginHandler,
+    userID: UserID,
+    datasetID: DatasetID,
+    result: ImportValidationErrorResponse
+  ) {
+    log.info("dataset handler server reports dataset $userID/$datasetID failed validation in plugin " +
+      handler.displayName)
+
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
       it.upsertImportMessages(datasetID, result.warnings.joinToString("\n"))
     }
   }
 
-  private fun handleImport500Result(userID: UserID, datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
-    log.error("dataset handler server reports 500 for dataset $userID/$datasetID, message ${result.message}")
+  private fun handleImport500Result(handler: PluginHandler, userID: UserID, datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
+    log.error("dataset handler server reports 500 for dataset $userID/$datasetID in plugin ${handler.displayName}: " +
+      result.message)
+
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
       it.upsertImportMessages(datasetID, result.message)
     }
-    throw IllegalStateException(result.message)
+
+    throw PluginException.import(handler.displayName, userID, datasetID, result.message)
   }
 
   private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {

@@ -20,8 +20,11 @@ import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
+import vdi.component.plugin.client.PluginException
 import vdi.component.plugin.client.PluginHandlerClient
+import vdi.component.plugin.client.PluginRequestException
 import vdi.component.plugin.client.response.ind.*
+import vdi.component.plugin.mapping.PluginHandler
 import vdi.component.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
@@ -183,7 +186,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           return@forEach
         }
 
-        executeJob(userID, datasetID, projectID, dir, handler.client, installableFileTimestamp)
+        executeJob(userID, datasetID, projectID, dir, handler, installableFileTimestamp)
       }
   }
 
@@ -205,7 +208,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     datasetID: DatasetID,
     projectID: ProjectID,
     s3Dir: DatasetDirectory,
-    handler: PluginHandlerClient,
+    handler: PluginHandler,
     installableFileTimestamp: OffsetDateTime,
   ) {
     val appDB   = appDB.accessor(projectID)
@@ -258,19 +261,38 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
       // FIXME: MOVE THE ZIP CREATION OUTSIDE OF THE PROJECT LOOP TO AVOID
       //        RECREATING IT FOR EACH TARGET.
-      val response = withInstallBundle(s3Dir) { handler.postInstallData(datasetID, projectID, it) }
+      val response = try {
+        withInstallBundle(s3Dir) { handler.client.postInstallData(datasetID, projectID, it) }
+      } catch (e: Throwable) {
+        throw PluginRequestException("install-data", handler.displayName, projectID, datasetID, e)
+      }
 
       Metrics.Install.count.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
 
       when (response.type) {
         InstallDataResponseType.Success
-        -> handleSuccessResponse(response as InstallDataSuccessResponse, userID, datasetID, projectID, installableFileTimestamp)
+        -> handleSuccessResponse(
+          handler,
+          response as InstallDataSuccessResponse,
+          userID,
+          datasetID,
+          projectID,
+          installableFileTimestamp,
+        )
 
         InstallDataResponseType.BadRequest
-        -> handleBadRequestResponse(response as InstallDataBadRequestResponse, userID, datasetID, projectID, installableFileTimestamp)
+        -> handleBadRequestResponse(
+          handler,
+          response as InstallDataBadRequestResponse,
+          userID,
+          datasetID,
+          projectID,
+          installableFileTimestamp,
+        )
 
         InstallDataResponseType.ValidationFailure
         -> handleValidationFailureResponse(
+          handler,
           response as InstallDataValidationFailureResponse,
           userID,
           datasetID,
@@ -280,6 +302,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
         InstallDataResponseType.MissingDependencies
         -> handleMissingDependenciesResponse(
+          handler,
           response as InstallDataMissingDependenciesResponse,
           userID,
           datasetID,
@@ -288,7 +311,14 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         )
 
         InstallDataResponseType.UnexpectedError
-        -> handleUnexpectedErrorResponse(response as InstallDataUnexpectedErrorResponse, userID, datasetID, projectID, installableFileTimestamp)
+        -> handleUnexpectedErrorResponse(
+          handler,
+          response as InstallDataUnexpectedErrorResponse,
+          userID,
+          datasetID,
+          projectID,
+          installableFileTimestamp
+        )
       }
     } finally {
       timer.observeDuration()
@@ -296,13 +326,20 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   }
 
   private fun handleSuccessResponse(
+    handler: PluginHandler,
     res: InstallDataSuccessResponse,
     userID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
     updatedTimestamp: OffsetDateTime,
   ) {
-    log.info("dataset {}/{} data was installed successfully into project {}", userID, datasetID, projectID)
+    log.info(
+      "dataset {}/{} data was installed successfully into project {} via plugin {}",
+      userID,
+      datasetID,
+      projectID,
+      handler.displayName,
+    )
 
     appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
@@ -317,13 +354,21 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   }
 
   private fun handleBadRequestResponse(
+    handler: PluginHandler,
     res: InstallDataBadRequestResponse,
     userID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
     updatedTimestamp: OffsetDateTime,
   ) {
-    log.error("dataset {}/{} install into {} failed due to bad request exception from handler server: {}", userID, datasetID, projectID, res.message)
+    log.error(
+      "dataset {}/{} install into {} failed due to bad request exception from plugin {}: {}",
+      userID,
+      datasetID,
+      projectID,
+      handler.displayName,
+      res.message,
+    )
 
     appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
@@ -336,17 +381,24 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       ))
     }
 
-    throw Exception(res.message)
+    throw PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private fun handleValidationFailureResponse(
+    handler: PluginHandler,
     res: InstallDataValidationFailureResponse,
     userID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
     updatedTimestamp: OffsetDateTime,
   ) {
-    log.info("dataset {}/{} install into {} failed due to validation error", userID, datasetID, projectID)
+    log.info(
+      "dataset {}/{} install into {} via plugin {} failed due to validation error",
+      userID,
+      datasetID,
+      projectID,
+      handler,
+    )
 
     appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
@@ -361,13 +413,20 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   }
 
   private fun handleMissingDependenciesResponse(
+    handler: PluginHandler,
     res: InstallDataMissingDependenciesResponse,
     userID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
     updatedTimestamp: OffsetDateTime,
   ) {
-    log.info("dataset {}/{} install into {} was rejected for missing dependencies", userID, datasetID, projectID)
+    log.info(
+      "dataset {}/{} install into {} was rejected by plugin {} for missing dependencies",
+      userID,
+      datasetID,
+      projectID,
+      handler.displayName,
+    )
 
     appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
@@ -385,13 +444,20 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
    * Handles an unexpected error response from the handler service.
    */
   private fun handleUnexpectedErrorResponse(
+    handler: PluginHandler,
     res: InstallDataUnexpectedErrorResponse,
     userID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
     updatedTimestamp: OffsetDateTime,
   ) {
-    log.error("dataset {}/{} install into {} failed with a 500 from the handler server", userID, datasetID, projectID)
+    log.error(
+      "dataset {}/{} install into {} failed with a 500 from plugin {}",
+      userID,
+      datasetID,
+      projectID,
+      handler.displayName,
+    )
 
     appDB.withTransaction(projectID) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
@@ -404,7 +470,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       ))
     }
 
-    throw Exception(res.message)
+    throw PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private suspend fun <T> withInstallBundle(s3Dir: DatasetDirectory, fn: suspend (upload: InputStream) -> T) =

@@ -1,7 +1,5 @@
 package vdi.daemon.reconciler
 
-import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 
@@ -28,6 +26,6 @@ internal interface ReconcilerTarget {
    */
   fun streamSortedSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord>
 
-  suspend fun deleteDataset(datasetType: VDIDatasetType, datasetID: DatasetID)
+  suspend fun deleteDataset(dataset: VDIReconcilerTargetRecord)
 }
 

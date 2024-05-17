@@ -30,11 +30,14 @@ import vdi.component.kafka.router.KafkaRouter
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
+import vdi.component.plugin.client.PluginException
+import vdi.component.plugin.client.PluginRequestException
 import vdi.component.plugin.client.response.inm.InstallMetaBadRequestResponse
 import vdi.component.plugin.client.response.inm.InstallMetaResponseType
 import vdi.component.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
 import vdi.component.plugin.mapping.PluginHandler
 import vdi.component.plugin.mapping.PluginHandlers
+import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import java.sql.SQLException
 import java.time.OffsetDateTime
@@ -241,15 +244,33 @@ internal class UpdateMetaTriggerHandlerImpl(
       it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
     }
 
-    val result = ph.client.postInstallMeta(datasetID, projectID, meta)
+    val result = try {
+      ph.client.postInstallMeta(datasetID, projectID, meta)
+    } catch (e: Throwable){
+      throw PluginRequestException("install-meta", ph.displayName, projectID, datasetID, e)
+    }
 
     Metrics.MetaUpdates.count.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
 
     try {
       when (result.type) {
-        InstallMetaResponseType.Success -> handleSuccessResponse(userID, datasetID, projectID)
-        InstallMetaResponseType.BadRequest -> handleBadRequestResponse(userID, datasetID, projectID, result as InstallMetaBadRequestResponse)
-        InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(userID, datasetID, projectID, result as InstallMetaUnexpectedErrorResponse)
+        InstallMetaResponseType.Success -> handleSuccessResponse(ph, userID, datasetID, projectID)
+
+        InstallMetaResponseType.BadRequest -> handleBadRequestResponse(
+          ph,
+          userID,
+          datasetID,
+          projectID,
+          result as InstallMetaBadRequestResponse,
+        )
+
+        InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(
+          ph,
+          userID,
+          datasetID,
+          projectID,
+          result as InstallMetaUnexpectedErrorResponse,
+        )
       }
     } catch (e: Throwable) {
       log.info("install-meta request to handler server failed with exception:", e)
@@ -270,8 +291,15 @@ internal class UpdateMetaTriggerHandlerImpl(
     }
   }
 
-  private fun handleSuccessResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID) {
-    log.info("dataset handler server reports dataset {}/{} meta installed successfully into project {}", userID, datasetID, projectID)
+  private fun handleSuccessResponse(handler: PluginHandler, userID: UserID, datasetID: DatasetID, projectID: ProjectID) {
+    log.info(
+      "dataset handler server reports dataset {}/{} meta installed successfully into project {} via plugin {}",
+      userID,
+      datasetID,
+      projectID,
+      handler,
+    )
+
     appDB.withTransaction(projectID) { it.upsertInstallMetaMessage(datasetID, InstallStatus.Complete) }
   }
 
@@ -288,17 +316,43 @@ internal class UpdateMetaTriggerHandlerImpl(
     }
   }
 
-  private fun handleBadRequestResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: InstallMetaBadRequestResponse) {
-    log.error("dataset handler server reports 400 error for meta-install on dataset {}/{}, project {}", userID, datasetID, projectID)
-    throw IllegalStateException(res.message)
+  private fun handleBadRequestResponse(
+    handler: PluginHandler,
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    res: InstallMetaBadRequestResponse
+  ) {
+    log.error(
+      "dataset handler server reports 400 error for meta-install on dataset {}/{}, project {} via plugin {}",
+      userID,
+      datasetID,
+      projectID,
+      handler.displayName,
+    )
+
+    throw PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
-  private fun handleUnexpectedErrorResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: InstallMetaUnexpectedErrorResponse) {
-    log.error("dataset handler server reports 500 error for meta-install on dataset {}/{}, project {}", userID, datasetID, projectID)
-    throw IllegalStateException(res.message)
+  private fun handleUnexpectedErrorResponse(
+    handler: PluginHandler,
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    res: InstallMetaUnexpectedErrorResponse,
+  ) {
+    log.error(
+      "dataset handler server reports 500 error for meta-install on dataset {}/{}, project {} via plugin {}",
+      userID,
+      datasetID,
+      projectID,
+      handler.displayName
+    )
+
+    throw PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
-  private fun vdi.component.s3.DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
+  private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
     if (!exists()) {
       log.warn("got an update-meta event for dataset {}/{} which has no directory?", userID, datasetID)
       return false
