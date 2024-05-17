@@ -79,12 +79,9 @@ internal class UpdateMetaTriggerHandlerImpl(
   }
 
   private suspend fun updateMeta(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
-    try {
-      updateMeta(dm, msg.userID, msg.datasetID)
-    } finally {
-      if (msg.eventSource != EventSource.FullReconciler)
-        kr.sendReconciliationTrigger(msg.userID, msg.datasetID, msg.eventSource)
-    }
+    updateMeta(dm, msg.userID, msg.datasetID)
+    if (msg.eventSource != EventSource.FullReconciler)
+      kr.sendReconciliationTrigger(msg.userID, msg.datasetID, msg.eventSource)
   }
 
   private suspend fun updateMeta(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
