@@ -3,6 +3,7 @@ package vdi.component.reinstaller
 import kotlinx.coroutines.sync.Mutex
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
+import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
@@ -171,6 +172,8 @@ object DatasetReinstaller {
 
     val response = try {
       withInstallBundle(directory) { handler.client.postInstallData(dataset.datasetID, projectID, it) }
+    } catch (e: S34KError) { // don't mix up minio errors with request errors
+      throw PluginException.installData(handler.displayName, projectID, dataset.owner, dataset.datasetID, cause = e)
     } catch (e: Throwable) {
       throw PluginRequestException.installData(handler.displayName, projectID, dataset.owner, dataset.datasetID, cause = e)
     }

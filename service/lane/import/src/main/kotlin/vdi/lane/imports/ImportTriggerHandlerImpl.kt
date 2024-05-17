@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.apache.logging.log4j.kotlin.logger
+import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
@@ -193,6 +194,8 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         datasetDir.getImportReadyFile()
           .loadContents()!!
           .use { handler.client.postImport(datasetID, meta, it) }
+      } catch (e: S34KError) { // don't mix up minio errors with request errors
+        throw PluginException.import(handler.displayName, userID, datasetID, cause = e)
       } catch (e: Throwable) {
         throw PluginRequestException.import(handler.displayName, userID, datasetID, cause = e)
       }

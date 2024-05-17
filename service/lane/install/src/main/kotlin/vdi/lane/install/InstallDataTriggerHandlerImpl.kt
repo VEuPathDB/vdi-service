@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
+import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -301,6 +302,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       //        RECREATING IT FOR EACH TARGET.
       val response = try {
         withInstallBundle(s3Dir) { handler.client.postInstallData(datasetID, projectID, it) }
+      } catch (e: S34KError) { // Don't mix up minio errors with request errors.
+        throw PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
       } catch (e: Throwable) {
         throw PluginRequestException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
       }
