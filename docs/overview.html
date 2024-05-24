@@ -455,21 +455,30 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#events">Events</a>
 <ul class="sectlevel2">
-<li><a href="#event-ordering">Event Ordering</a></li>
+<li><a href="#_event_types">Event Types</a>
+<ul class="sectlevel3">
+<li><a href="#_import">Import</a></li>
+<li><a href="#_install">Install</a></li>
+<li><a href="#_update_meta">Update-Meta</a></li>
+<li><a href="#_uninstall">Uninstall</a></li>
+<li><a href="#_hard_delete">Hard-Delete</a></li>
+<li><a href="#_share">Share</a></li>
+<li><a href="#_reconciliation">Reconciliation</a></li>
+</ul>
+</li>
+<li><a href="#event-ordering">Event Ordering</a>
+<ul class="sectlevel3">
+<li><a href="#_import_2">Import</a></li>
+<li><a href="#_install_meta">Install Meta</a></li>
+<li><a href="#_install_data">Install Data</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#plugins">Plugins</a>
 <ul class="sectlevel2">
 <li><a href="#_the_plugin_server">The Plugin Server</a></li>
-<li><a href="#_plugin_scripts">Plugin Scripts</a>
-<ul class="sectlevel3">
-<li><a href="#_import">Import</a></li>
-<li><a href="#_update_meta">Update Meta</a></li>
-<li><a href="#_check_compatibility">Check Compatibility</a></li>
-<li><a href="#_install_data">Install Data</a></li>
-<li><a href="#_uninstall">Uninstall</a></li>
-</ul>
-</li>
+<li><a href="#_plugin_scripts">Plugin Scripts</a></li>
 </ul>
 </li>
 <li><a href="#_datasets">Datasets</a>
@@ -503,14 +512,18 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#dataset-manifest">Dataset Manifest</a></li>
 </ul>
 </li>
-<li><a href="#_shares">Shares</a></li>
+<li><a href="#_shares">Shares</a>
+<ul class="sectlevel3">
+<li><a href="#_share_offer">Share Offer</a></li>
+<li><a href="#_share_receipt">Share Receipt</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_complications_and_gotchas">Complications and Gotchas</a>
 <ul class="sectlevel2">
 <li><a href="#_minio_and_event_replication">MinIO and Event Replication</a></li>
 <li><a href="#_terminology">Terminology</a></li>
-<li><a href="#_event_ordering">Event Ordering</a></li>
 <li><a href="#_unexpected_hiccups_and_outages">Unexpected Hiccups and Outages</a></li>
 <li><a href="#_bug_recovery">Bug Recovery</a></li>
 </ul>
@@ -705,6 +718,24 @@ users.  When</p>
 <p>A dataset&#8217;s actual data cannot be installed into a target system without the
 meta or 'control' records first being present.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>As a special case, because the meta/control records are required to be present
+in a target system for an install to happen, on successful completion, the
+update-meta lane fires a dataset reconciliation event to try and avoid the
+possibility of a long wait for a dataset to be installed if the install event
+hits before the update-meta event.  See <a href="#event-ordering">Event Ordering</a> for more information.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="install-data-lane">Install Data: Dataset Content Installation</h3>
@@ -749,47 +780,286 @@ currently lives in the <a href="#reconciliation-scheduler">Reconciler</a> and
 </div>
 <div class="sect2">
 <h3 id="reconciler-lane">Dataset Reconciliation</h3>
-
+<div class="paragraph">
+<p>The dataset reconciliation lane is responsible for examining the state of a
+dataset in the object store and ensuring that state is accurately reflected in
+the internals of VDI as well as in all relevant installation targets. The
+dataset reconciliation lane attempts corrections or updates to target system
+state by firing events for the other lanes to pick up and process.</p>
+</div>
+<div class="paragraph">
+<p>For example, if the dataset reconciler receives a reconciliation event for a
+dataset that is marked as deleted in the object store, but is not yet
+uninstalled from an installation target, the dataset reconciler will fire an
+uninstallation event for the dataset for the
+<a href="#uninstall-lane">uninstallation lane</a> to process.</p>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="events">Events</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>VDI-internal events are 3-field JSON messages containing only the identifiers
+for the relevant dataset and an event source indicator which informs whether the
+event originated from an object store bucket event, or if a reconciliation
+process fired the event.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="overview-img/github.svg" alt="github" width="18"></span> <a href="https://github.com/VEuPathDB/vdi-service/blob/main/lib/kafka/src/main/kotlin/vdi/component/kafka/EventMessage.kt">Event Type Definition</a></p>
+</div>
+<details>
+<summary class="title">Example Event</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "userID": 123456,
+  "datasetID": "VNY9UUYo8ZA",
+  "source": "ObjectStore"
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>These events do not contain any additional information as the state of the
+dataset or object store may have changed by the time the event is processed.
+When an event is eventually processed by the relevant lane, that lane is
+responsible for validating the status of the dataset before operating on that
+dataset.</p>
+</div>
+<div class="sect2">
+<h3 id="_event_types">Event Types</h3>
+<div class="paragraph">
+<p>Events themselves are not actually 'typed', the type is determined by which
+Kafka topic the event message is submitted to.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="overview-img/github.svg" alt="github" width="18"></span> <a href="https://github.com/VEuPathDB/vdi-service/blob/main/lib/env/src/main/kotlin/vdi/component/env/EnvKey.kt#L457-L500">Event Topic Definitions</a></p>
+</div>
+<div class="sect3">
+<h4 id="_import">Import</h4>
+<div class="paragraph">
+<p>When a dataset is initially uploaded, events are submitted to the import topic
+when an <a href="#import-ready">import ready</a> file or a
+<a href="#metadata-json">dataset meta file</a> are put into the object store.  This means
+that for every upload, 2 import events will be fired.</p>
+</div>
+<div class="paragraph">
+<p>The <a href="#reconciler-lane">dataset reconciliation lane</a> may also fire import events
+if it finds that import-ready files are present in the object store, but install
+ready files are not.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_install">Install</h4>
+<div class="paragraph">
+<p>An install event is fired when a <a href="#install-ready">install-ready files</a> are put
+into the object store.</p>
+</div>
+<div class="paragraph">
+<p>Install events may also be fired by the <a href="#reconciler-lane">dataset reconciliation
+lane</a> if it finds that install-ready files are present in the object store but
+the dataset is not yet installed into all of its target systems.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_update_meta">Update-Meta</h4>
+<div class="paragraph">
+<p>The update meta event is fired when a <a href="#metadata-json">dataset meta file</a> is put
+into the object store.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_uninstall">Uninstall</h4>
+<div class="paragraph">
+<p>Uninstall events are fired when a <a href="#delete-flag">delete flag</a> is put into the
+object store for a dataset.</p>
+</div>
+<div class="paragraph">
+<p>The uninstall event may also be fired by the <a href="#reconciler-lane">dataset
+reconciliation lane</a> if the dataset is found to have a delete flag in the
+object store, but is not yet uninstalled from one or more of the dataset&#8217;s
+install targets.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_hard_delete">Hard-Delete</h4>
+<div class="paragraph">
+<p>Hard delete events are fired when objects are actually removed from the object
+store by the <a href="#dataset-pruner">dataset pruner</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_share">Share</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_reconciliation">Reconciliation</h4>
+
+</div>
+</div>
 <div class="sect2">
 <h3 id="event-ordering">Event Ordering</h3>
-
+<div class="paragraph">
+<p>If given a single, isolated VDI instance under no load, events would happen in a
+predictable order:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Install Meta</p>
+</li>
+<li>
+<p>Import</p>
+</li>
+<li>
+<p>Install</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>In practice, however, multiple VDI instances are running simultaneously which
+leads to datasets being replicated over from other instances, and load is
+unpredictable, which means events may happen in an unpredictable order.</p>
+</div>
+<div class="paragraph">
+<p>To illustrate this: imagine a replicated dataset&#8217;s install-ready data is made
+available before any other dataset files, in this case, the install-dataset
+event may fire before update meta, resulting in the event being rejected due to
+missing control records in the install target.  Then, when the metadata is
+replicated over, the update-meta event will fire <em>after</em> the install was already
+attempted.</p>
+</div>
+<div class="paragraph">
+<p>To account for the fact that event ordering is unpredictable in practice there
+are a few rules in place to prevent unnecessary processing as well as make sure
+the few events that are dependent on one another happen in the correct order
+relative to one another.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, lane operations are idempotent to ensure that if/when events are
+processed unnecessarily, the end result is the same.</p>
+</div>
+<div class="sect3">
+<h4 id="_import_2">Import</h4>
+<div class="paragraph">
+<p>The import event is one of the first events fired for a newly uploaded dataset.
+For replicated datasets, however, this event may not be necessary at all.</p>
+</div>
+<div class="paragraph">
+<p>To try and avoid doing extra work the import process will be skipped if the
+dataset 'directory' in the object store already contains
+<a href="#install-ready">install ready files</a> and a
+<a href="#dataset-manifest">dataset manifest file</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_install_meta">Install Meta</h4>
+<div class="paragraph">
+<p>Along with the import event, the install/update meta event is one of the first
+events fired for a new dataset.</p>
+</div>
+<div class="paragraph">
+<p>This event being processed is a prerequisite of a dataset being installed into
+any target systems.  To account for the likelihood that this event will be fired
+after an install is attempted in the case of dataset replication, the
+<a href="#update-meta-lane">update-meta lane</a> fires an additional dataset reconciliation
+event to make sure an install event is fired again if one had already been
+rejected for the dataset.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_install_data">Install Data</h4>
+<div class="paragraph">
+<p>For an install-data event to be processed, an <a href="#update-meta-lane">update meta</a>
+event must have already been processed to create the control records in the
+relevant target systems.</p>
+</div>
+<div class="paragraph">
+<p>import &#8594; install-meta &#8594; install-data &#8594;</p>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="plugins">Plugins</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>VDI plugins are implemented as a collection of scripts in any language executed
+by separate service instances that are wrapped by a standard HTTP API.  Plugin
+services are registered with the primary VDI instance via environment variables.</p>
+</div>
 <div class="sect2">
 <h3 id="_the_plugin_server">The Plugin Server</h3>
-
+<div class="paragraph">
+<p><span class="image"><img src="overview-img/github.svg" alt="github" width="18"></span> <a href="https://github.com/VEuPathDB/vdi-plugin-handler-server">VDI Plugin Server</a></p>
+</div>
+<div class="paragraph">
+<p>The plugin server is a small HTTP server exposing 4 RPC-style endpoints that
+trigger the execution of one or more scripts that are registered with the plugin
+server instance.</p>
+</div>
+<div class="paragraph">
+<p>Depending on the endpoint, data may be posted to the plugin to be used by the
+plugin script, and data may be returned to VDI to be put into the object store.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_plugin_scripts">Plugin Scripts</h3>
-<div class="sect3">
-<h4 id="_import">Import</h4>
-
+<div id="import-script" class="dlist">
+<dl>
+<dt class="hdlist1">Import</dt>
+<dd>
+<p>The import script accepts the raw upload data and performs syntactic validation
+as well as any reformatting necessary to prepare the data for installation.</p>
+</dd>
+</dl>
 </div>
-<div class="sect3">
-<h4 id="_update_meta">Update Meta</h4>
-
+<div id="meta-script" class="dlist">
+<dl>
+<dt class="hdlist1">Update Meta</dt>
+<dd>
+<p>The update meta script is handed the full metadata for a dataset and may be used
+to perform custom metadata installation steps beyond those performed by the
+VDI service itself.</p>
+</dd>
+</dl>
 </div>
-<div class="sect3">
-<h4 id="_check_compatibility">Check Compatibility</h4>
-
+<div id="check-compat-script" class="dlist">
+<dl>
+<dt class="hdlist1">Check Compatibility</dt>
+<dd>
+<p>The check compatibility script is a pre-install step executed to ensure that the
+data in the dataset is compatible with the target system.</p>
+<div class="paragraph">
+<p>This script is run as part of the install step immediately before the install
+data script itself is run.  It has access to the <a href="#install-ready">install ready</a>
+set of files.</p>
 </div>
-<div class="sect3">
-<h4 id="_install_data">Install Data</h4>
-
+</dd>
+</dl>
 </div>
-<div class="sect3">
-<h4 id="_uninstall">Uninstall</h4>
-
+<div id="install-script" class="dlist">
+<dl>
+<dt class="hdlist1">Install Data</dt>
+<dd>
+<p>The install-data script takes the install-ready data and performs the
+installation of that data into a target system.</p>
+</dd>
+</dl>
+</div>
+<div id="uninstall-script" class="dlist">
+<dl>
+<dt class="hdlist1">Uninstall</dt>
+<dd>
+<p>The uninstall script is responsible for removing all data for a dataset from a
+target system.</p>
+</dd>
+</dl>
 </div>
 </div>
 </div>
@@ -931,7 +1201,8 @@ dataset is considered ready to be <a href="#import-lane">preprocessed</a> into a
 <div class="paragraph">
 <p>In future versions of VDI the raw user upload would be in a separate file
 <code>raw-upload.zip</code> which would be replaced by <code>import-ready.zip</code> once the upload
-had been sanity and security checked.</p>
+has been sanity and security checked (a process which is currently in-line in
+the REST service).</p>
 </div>
 </td>
 </tr>
@@ -957,7 +1228,8 @@ are required for a dataset to be installed into any target systems.</p>
 from the user and the initial upload process.</p>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/VEuPathDB/vdi-component-common/blob/main/src/main/kotlin/org/veupathdb/vdi/lib/common/model/VDIDatasetMeta.kt">Type Definition &#xf09b;</a></p>
+<p><span class="image"><img src="overview-img/github.svg" alt="github" width="18"></span>
+<a href="https://github.com/VEuPathDB/vdi-component-common/blob/main/src/main/kotlin/org/veupathdb/vdi/lib/common/model/VDIDatasetMeta.kt">Type Definition</a></p>
 </div>
 <div class="openblock">
 <div class="title">Metadata Contents</div>
@@ -1028,7 +1300,7 @@ dataset uploader.</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Visibility</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/VEuPathDB/vdi-component-common/blob/main/src/main/kotlin/org/veupathdb/vdi/lib/common/model/VDIDatasetVisibility.kt">Enum[String]</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="overview-img/github.svg" alt="github" width="18"></span> <a href="https://github.com/VEuPathDB/vdi-component-common/blob/main/src/main/kotlin/org/veupathdb/vdi/lib/common/model/VDIDatasetVisibility.kt">Enum[String]</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A visibility indicator for a dataset that controls who can see the dataset by
 default, once installed.</p></td>
 </tr>
@@ -1153,15 +1425,303 @@ default, once installed.</p></td>
 </div>
 </div>
 </details>
+<details>
+<summary class="title"><code>vdi-meta.json</code> Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "created": "2024-05-23T16:25:44-04:00",
+  "dependencies": [
+    {
+      "resourceDisplayName": "Some Data",
+      "resourceIdentifier": "some_data",
+      "resourceVersion": "20160416"
+    }
+  ],
+  "description": "The description of some dataset that I uploaded.",
+  "name": "My Dataset",
+  "origin": "direct-upload",
+  "owner": 123456789,
+  "projects": [
+    "PlasmoDB",
+    "ClinEpiDB"
+  ],
+  "sourceUrl": "https://my.datafile.hosting.site/files/my-data.zip",
+  "summary": "A short summary.",
+  "type": {
+    "name": "genelist",
+    "version": "1.0"
+  },
+  "visibility": "private"
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
 </div>
 <div class="sect3">
 <h4 id="dataset-manifest">Dataset Manifest</h4>
-
+<div class="paragraph">
+<p>The <code>vdi-manifest.json</code> file contains a manifest of the input and output files
+of the <a href="#import-lane">dataset import process</a>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="overview-img/github.svg" alt="github" width="18"></span>
+<a href="https://github.com/VEuPathDB/vdi-component-common/blob/main/src/main/kotlin/org/veupathdb/vdi/lib/common/model/VDIDatasetManifest.kt">Type Definition</a></p>
+</div>
+<div class="openblock">
+<div class="title">Manifest Contents</div>
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Input Files</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Array of File Info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Array containing the name and size of each of the files that were present in
+the <code>import-ready.zip</code> file.</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Output Files</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Array of File Info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Array containing the name and size of each of the files that was produced by
+the relevant <a href="#plugins">plugin&#8217;s</a> <a href="#import-script">import script</a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<details>
+<summary class="title"><code>vdi-manifest.json</code> Schema</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "type": "object",
+  "definitions": {
+    "file-info": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string"
+        },
+        "fileSize": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "filename",
+        "fileSize"
+      ]
+    }
+  },
+  "properties": {
+    "inputFiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/file-info"
+      },
+      "additionalItems": false
+    },
+    "outputFiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/file-info"
+      },
+      "additionalItems": false
+    }
+  },
+  "required": [
+    "inputFiles",
+    "outputFiles"
+  ]
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title"><code>vdi-manifest.json</code> Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "inputFiles": [
+    {
+      "filename": "my-upload.biom",
+      "fileSize": 123124
+    }
+  ],
+  "outputFiles": [
+    {
+      "filename": "meta.json",
+      "fileSize": 10276
+    },
+    {
+      "filename": "data.tsv",
+      "fileSize": 75021
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_shares">Shares</h3>
-
+<div class="paragraph">
+<p>Shares of datasets from a dataset&#8217;s owner to other target users are represented
+in the object store as a directory structure.  Within an individual dataset&#8217;s
+'directory' in the object store, if a dataset has at least one share, there will
+be a subdirectory named "shares".  The contents of this "shares" directory is
+one or more additional subdirectories, each named with the user ID of the share
+recipient.  Inside each recipient directory is 2 flag files.  One indicates the
+status of the offer from the dataset owner and the other indicates the status
+of the receipt from the share recipient.</p>
+</div>
+<div class="paragraph">
+<p>This 2-flag system allows the dataset owner to revoke a share after it has been
+created, and also allows the share recipient to accept or reject share offers.</p>
+</div>
+<div class="sect3">
+<h4 id="_share_offer">Share Offer</h4>
+<div class="paragraph">
+<p><span class="image"><img src="overview-img/github.svg" alt="github" width="18"></span>
+<a href="https://github.com/VEuPathDB/vdi-component-common/blob/main/src/main/kotlin/org/veupathdb/vdi/lib/common/model/VDIDatasetShareOffer.kt">Type Definition</a></p>
+</div>
+<div class="openblock">
+<div class="title">Offer Contents</div>
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 10%;">
+<col style="width: 20%;">
+<col style="width: 70%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Action</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="overview-img/github.svg" alt="github" width="18"></span> <a href="https://github.com/VEuPathDB/vdi-component-common/blob/main/src/main/kotlin/org/veupathdb/vdi/lib/common/model/VDIShareOfferAction.kt">Enum[String]</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A string value of "grant" or "revoke" indicating the status of the share
+offer.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<details>
+<summary class="title"><code>offer.json</code> Schema</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "grant",
+        "revoke"
+      ]
+    }
+  },
+  "required": [
+    "action"
+  ],
+  "additionalProperties": false
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title"><code>offer.json</code> Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "action": "grant"
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
+</div>
+<div class="sect3">
+<h4 id="_share_receipt">Share Receipt</h4>
+<div class="paragraph">
+<p><span class="image"><img src="overview-img/github.svg" alt="github" width="18"></span>
+<a href="https://github.com/VEuPathDB/vdi-component-common/blob/main/src/main/kotlin/org/veupathdb/vdi/lib/common/model/VDIDatasetShareReceipt.kt">Type Definition</a></p>
+</div>
+<div class="openblock">
+<div class="title">Receipt Contents</div>
+<div class="content">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 10%;">
+<col style="width: 20%;">
+<col style="width: 70%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Action</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="overview-img/github.svg" alt="github" width="18"></span> <a href="https://github.com/VEuPathDB/vdi-component-common/blob/main/src/main/kotlin/org/veupathdb/vdi/lib/common/model/VDIShareReceiptAction.kt">Enum[String]</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A string value of "accept" or "reject" indicating the status of the share
+receipt.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<details>
+<summary class="title"><code>receipt.json</code> Schema</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "accept",
+        "reject"
+      ]
+    }
+  },
+  "required": [
+    "action"
+  ],
+  "additionalProperties": false
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title"><code>receipt.json</code> Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "action": "reject"
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
+</div>
 </div>
 </div>
 </div>
@@ -1171,8 +1731,20 @@ default, once installed.</p></td>
 <div class="sect2">
 <h3 id="_minio_and_event_replication">MinIO and Event Replication</h3>
 <div class="paragraph">
-<p>TODO: minio doesn&#8217;t fire events on data replication in spite of their promise of
-      s3 compatibility.</p>
+<p>TODO: rephrase this</p>
+</div>
+<div class="paragraph">
+<p>While <a href="https://min.io/">MinIO</a> repeatedly promises "unyielding" compatibility with
+AWS S3, it unfortunately does not follow through on that promise.  MinIO&#8217;s
+implementers made the decision to disable object events on replication, which
+means that VDI&#8217;s core driver is non-functional for datasets replicated in from
+an external MinIO instance.</p>
+</div>
+<div class="paragraph">
+<p>When this change to MinIO was discovered, a new 'slim' mode was added to the
+<a href="#reconciliation-scheduler">Reconciliation Scheduler</a> that runs every few minutes to attempt to catch
+replicated data and fire events to keep the local system up to date without
+needing to wait for the full reconciliation run which runs much less frequently.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1192,12 +1764,6 @@ default, once installed.</p></td>
 <p>update/install meta</p>
 </li>
 </ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_event_ordering">Event Ordering</h3>
-<div class="paragraph">
-<p>import &#8594; install-meta &#8594; install-data &#8594;</p>
 </div>
 </div>
 <div class="sect2">
@@ -1231,7 +1797,7 @@ default, once installed.</p></td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-05-23 16:43:50 -0400
+Last updated 2024-05-24 12:43:08 -0400
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
