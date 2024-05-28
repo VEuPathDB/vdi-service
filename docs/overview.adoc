@@ -4,6 +4,7 @@
 :icons: font
 :source-highlighter: highlightjs
 :gh-icon: image:overview-img/github.svg[width=18]
+:todo: image:overview-img/todo.png[width=64]
 
 The VEuPathDB Dataset Installer system (VDI) is an asynchronous, event driven,
 pluggable, data ingestion platform built to transform and publish data from an
@@ -12,7 +13,6 @@ S3 compatible object store into any number of target systems.
 .System Overview
 image::overview-img/outline.svg[align=center]
 
-
 '''
 
 
@@ -20,6 +20,8 @@ The core of VDI's design is the object store.  For VDI, this object store is the
 absolute point of truth from which all system state is derived. From this origin
 point, VDI can start from a blank slate and rebuild a state identical to any
 other VDI instance attached to that object store or a replica.
+
+{todo} There should be some bridge between these 2 paragraphs.
 
 VDI's goal as a platform is to be able to take data of any number of varying
 types from the source object store and publish that data to any number of
@@ -84,8 +86,8 @@ received in any order, how or when they are acted on is discussed in the
 [#import-lane]
 === Import: Data Preprocessing
 
-// TODO: flow chart showing import-ready zip going to plugin and install-ready
-//       zip returning to minio
+{todo} flow chart showing import-ready zip going to plugin and install-ready zip
+returning to minio
 
 After raw data is uploaded into the object store, the 'first' step (called the
 "import" step) is to perform data validation and optionally reformatting.
@@ -154,8 +156,8 @@ relevant target systems.
 
 The
 
-// TODO: the plugin has install meta in it
-// TODO: the plugin has check compatibility in it
+{todo} the plugin has install meta in it +
+{todo} the plugin has check compatibility in it
 
 
 [#sharing-lane]
@@ -997,5 +999,3 @@ needing to wait for the full reconciliation run which runs much less frequently.
 == Document TODOs
 
 * VDI's direct (non-plugin) communication with target systems (oracle)
-* meta.json contents
-* manifest.json contents
