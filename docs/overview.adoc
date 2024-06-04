@@ -163,6 +163,8 @@ The
 [#sharing-lane]
 === Sharing
 
+{todo} describe the sharing lane process
+
 
 [#uninstall-lane]
 === Soft-Delete: Uninstallation
@@ -234,12 +236,14 @@ When an event is eventually processed by the relevant lane, that lane is
 responsible for validating the status of the dataset before operating on that
 dataset.
 
+
 === Event Types
 
 Events themselves are not actually 'typed', the type is determined by which
 Kafka topic the event message is submitted to.
 
 {gh-icon} https://github.com/VEuPathDB/vdi-service/blob/main/lib/env/src/main/kotlin/vdi/component/env/EnvKey.kt#L457-L500[Event Topic Definitions]
+
 
 ==== Import
 
@@ -285,9 +289,16 @@ install targets.
 Hard delete events are fired when objects are actually removed from the object
 store by the <<dataset-pruner,dataset pruner>>.
 
+
 ==== Share
 
+{todo} Fill this in.
+
+
 ==== Reconciliation
+
+{todo} Fill this in.
+
 
 [#event-ordering]
 === Event Ordering
@@ -361,6 +372,7 @@ VDI plugins are implemented as a collection of scripts in any language executed
 by separate service instances that are wrapped by a standard HTTP API.  Plugin
 services are registered with the primary VDI instance via environment variables.
 
+
 === The Plugin Server
 
 {gh-icon} https://github.com/VEuPathDB/vdi-plugin-handler-server[VDI Plugin Server]
@@ -371,6 +383,7 @@ server instance.
 
 Depending on the endpoint, data may be posted to the plugin to be used by the
 plugin script, and data may be returned to VDI to be put into the object store.
+
 
 === Plugin Scripts
 
@@ -409,14 +422,22 @@ Uninstall::
 The uninstall script is responsible for removing all data for a dataset from a
 target system.
 
+
 == Datasets
+
+{todo} what is even the point of this section?
+
 
 [#dataset-types]
 === Dataset Type
 
+{todo} Describe dataset types.
+
 
 [#dataset-dependencies]
 === Dataset Dependencies
+
+{todo} Describe dataset dependencies.
 
 
 [#dataset-meta]
@@ -842,6 +863,7 @@ the relevant <<plugins,plugin's>> <<import-script,import script>>.
 ----
 ====
 
+
 === Shares
 
 Shares of datasets from a dataset's owner to other target users are represented
@@ -857,6 +879,22 @@ This 2-flag system allows the dataset owner to revoke a share after it has been
 created, and also allows the share recipient to accept or reject share offers.
 
 
+.Share Objects
+[source]
+----
+/
+└─ {user-id}/
+   └─ {dataset-id}/
+      └─ shares/
+         └─ {recipient-id}/
+            ├─ offer.json <1>
+            └─ receipt.json <2>
+----
+<1> `offer.json` -> <<share-offer-json>>
+<2> `receipt.json` -> <<share-receipt-json>>
+
+
+[#share-offer-json]
 ==== Share Offer
 
 {gh-icon}
@@ -910,6 +948,7 @@ offer.
 ====
 
 
+[#share-receipt-json]
 ==== Share Receipt
 
 {gh-icon}
@@ -966,9 +1005,10 @@ receipt.
 == Complications and Gotchas
 
 
+[#minio-shortcomings]
 === MinIO and Event Replication
 
-TODO: rephrase this
+{todo} rephrase this
 
 While https://min.io/[MinIO] repeatedly promises "unyielding" compatibility with
 AWS S3, it unfortunately does not follow through on that promise.  MinIO's
@@ -992,9 +1032,40 @@ needing to wait for the full reconciliation run which runs much less frequently.
 
 === Unexpected Hiccups and Outages
 
+{todo} What happens or has happened when things go and have gone wrong in
+various dependent systems.
+
+
+==== MinIO Replication
+
+In the event of network or communication issues preventing the replication of
+data between MinIO instances, an isolated VDI instance will continue processing
+local events as normal.
+
+Eventually when replication between instances recommences there is a difference
+in actual behavior versus the expected behavior due to issues outlined in the
+<<minio-shortcomings>> section.
+
+===== Expected Behavior
+
+{todo} What we expected the replication recovery to look like if MinIO behaved
+according to S3.
+
+===== Actual Behavior
+
+{todo} What we had to do due to MinIO's actual behavior.
+
+
+
 === Bug Recovery
 
+{todo} What built in and established tools and processes have been developed to
+help in recovering or handling situations caused by bugs uncovered in the
+process.
+
+
 '''
+
 
 == Document TODOs
 
