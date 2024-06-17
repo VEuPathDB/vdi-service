@@ -13,6 +13,7 @@ SET
 , type_name = ?
 , type_version = ?
 , is_deleted = ?
+, is_public = ?
 WHERE
   dataset_id = ?
 """
@@ -24,7 +25,8 @@ internal fun Connection.updateDataset(schema: String, dataset: DatasetRecord) {
       ps.setString(2, dataset.typeName)
       ps.setString(3, dataset.typeVersion)
       ps.setInt(4, dataset.isDeleted.value)
-      ps.setString(5, dataset.datasetID.toString())
+      ps.setBoolean(5, dataset.isPublic)
+      ps.setString(6, dataset.datasetID.toString())
       ps.executeUpdate()
     }
 }

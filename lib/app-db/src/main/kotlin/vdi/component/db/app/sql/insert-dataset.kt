@@ -13,9 +13,10 @@ INSERT INTO
   , type_name
   , type_version
   , is_deleted
+  , is_public
   )
 VALUES
-  (?, ?, ?, ?, ?)
+  (?, ?, ?, ?, ?, ?)
 """
 
 internal fun Connection.insertDataset(schema: String, dataset: DatasetRecord) {
@@ -26,6 +27,7 @@ internal fun Connection.insertDataset(schema: String, dataset: DatasetRecord) {
       ps.setString(3, dataset.typeName.lowercase())
       ps.setString(4, dataset.typeVersion)
       ps.setInt(5, dataset.isDeleted.value)
+      ps.setBoolean(6, dataset.isPublic)
       ps.executeUpdate()
     }
 }
