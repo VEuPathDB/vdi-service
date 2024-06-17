@@ -32,4 +32,9 @@ data class DatasetRecord(
    * Whether the dataset has been marked as deleted.
    */
   val isDeleted: DeleteFlag,
+
+  /**
+   * Indicates whether the dataset is marked as public.
+   */
+  val isPublic: Boolean,
 )

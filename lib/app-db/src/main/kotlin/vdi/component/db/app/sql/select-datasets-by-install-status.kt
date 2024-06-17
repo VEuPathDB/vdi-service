@@ -18,6 +18,7 @@ SELECT
 , ds.type_name
 , ds.type_version
 , ds.is_deleted
+, ds.is_public
 FROM
   ${schema}.dataset ds
   INNER JOIN ${schema}.dataset_install_message dsim
@@ -54,6 +55,7 @@ internal fun Connection.selectDatasetsByInstallStatus(
           typeName    = rs.getString("type_name"),
           typeVersion = rs.getString("type_version"),
           isDeleted   = DeleteFlag.fromInt(rs.getInt("is_deleted")),
+          isPublic    = rs.getBoolean("is_public"),
         ))
       } while (rs.next())
 
