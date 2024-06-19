@@ -13,14 +13,14 @@ class Trigger {
   private var triggered = false
 
   suspend fun trigger() {
-    mutex.withLock(this) { triggered = true }
+    mutex.withLock { triggered = true }
     tryRelease()
   }
 
-  suspend fun isTriggered() = mutex.withLock(this) { triggered }
+  suspend fun isTriggered() = mutex.withLock { triggered }
 
   suspend fun await() {
-    mutex.withLock(this) {
+    mutex.withLock {
       if (triggered)
         return release()
     }
@@ -33,7 +33,7 @@ class Trigger {
   }
 
   private suspend fun tryRelease() {
-    mutex.withLock(this) {
+    mutex.withLock {
       if (triggered)
         release()
     }

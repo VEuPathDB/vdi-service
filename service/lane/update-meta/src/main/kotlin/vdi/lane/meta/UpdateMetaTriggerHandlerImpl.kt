@@ -214,7 +214,7 @@ internal class UpdateMetaTriggerHandlerImpl(
           record
         }
 
-        // If the record in the app db has an isPublic flag value different than
+        // If the record in the app db has an isPublic flag value different from
         // what we expect, update the app db record.
         if (record.isPublic != (meta.visibility == VDIDatasetVisibility.Public)) {
           it.updateDataset(record.copy(isPublic = meta.visibility == VDIDatasetVisibility.Public))
