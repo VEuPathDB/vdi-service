@@ -91,8 +91,14 @@ internal inline fun ResultSet.getDateTime(column: String) = getObject(column, Of
  */
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun ResultSet.getFileDetailList(column: String): List<VDIDatasetFileInfo> =
-  arrayMap(column) { it.getArray(2).resultSet.map { VDIDatasetFileInfoImpl(it.getString(2), it.getLong(3)) } }
-    .reduce { a, b -> (a as MutableList).addAll(b); a }
+  arrayMap(column) {
+    it.getString(2)
+      .let { it.trim('(', ')') }
+      .let {
+        val c = it.lastIndexOf(',')
+        VDIDatasetFileInfoImpl(it.substring(0, c).trim('"'), it.substring(c + 1).toLong())
+      }
+  }
 
 /**
  * Iterates over the results in the result set, calling the given function on

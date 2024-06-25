@@ -39,7 +39,7 @@ class WorkerPool(
     log.debug("{} workers halted; worker pool {} shutdown complete", workerCount, name)
   }
 
-  @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
+  @OptIn(ExperimentalCoroutinesApi::class)
   private fun start() {
     log.info("starting worker pool {} with queue size {} and worker count {}", name, jobQueueSize, workerCount)
 
