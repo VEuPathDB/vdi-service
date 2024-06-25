@@ -131,6 +131,6 @@ internal inline fun <T> ResultSet.map(fn: (rs: ResultSet) -> T): List<T> =
   with(ArrayList<T>(16)) { this@map.forEach { add(fn(it)) }; this }
 
 internal inline fun <T> ResultSet.arrayMap(column: String, fn: (rs: ResultSet) -> T): List<T> =
-  with(ArrayList<T>(16)) { this@arrayMap.forEach { getArray(column).resultSet.forEach { add(fn(it)) } }; this }
+  ArrayList<T>(16).apply { getArray(column).resultSet.forEach { add(fn(it)) } }
 
 // endregion ResultSet
