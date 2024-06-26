@@ -49,15 +49,17 @@ class WorkerPool(
           val j = i + 1
           launch (CoroutineThreadContext(ThreadContextData(mapOf("workerID" to "$name-$j")))) {
             while (!shutdown.isTriggered()) {
+              val jobNumber = jobs.incAndGet()
+
               if (!queue.isEmpty) {
-                log.debug("executing job {}", jobs.inc())
+                log.debug("executing job {}", jobNumber)
                 val job = safeReceive() ?: break
                 reportQueueSizeChange(-1) // Report one less job in queue.
 
                 try {
                   job()
                 } catch (e: Throwable) {
-                  log.error("job $jobs failed with exception:", e)
+                  log.error("job $jobNumber failed with exception:", e)
                 }
               } else {
                 delay(100.milliseconds)
