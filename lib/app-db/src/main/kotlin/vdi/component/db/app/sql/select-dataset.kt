@@ -15,6 +15,7 @@ SELECT
 , type_name
 , type_version
 , is_deleted
+, is_public
 FROM
   ${schema}.dataset
 WHERE
@@ -34,6 +35,7 @@ internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): Dat
         typeName    = rs.getString("type_name"),
         typeVersion = rs.getString("type_version"),
         isDeleted   = DeleteFlag.fromInt(rs.getInt("is_deleted")),
+        isPublic    = rs.getBoolean("is_public")
       )
     }
   }

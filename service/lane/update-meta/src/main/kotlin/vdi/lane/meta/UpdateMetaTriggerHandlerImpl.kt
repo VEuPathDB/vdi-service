@@ -10,6 +10,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.or
 import vdi.component.async.WorkerPool
@@ -84,6 +85,8 @@ internal class UpdateMetaTriggerHandlerImpl(
   private suspend fun tryUpdateMeta(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
     try {
       updateMeta(dm, msg.userID, msg.datasetID)
+      if (msg.eventSource != EventSource.FullReconciler)
+        kr.sendReconciliationTrigger(msg.userID, msg.datasetID, msg.eventSource)
     } catch (e: PluginException) {
       e.log(log::error)
     } catch (e: Throwable) {
@@ -210,16 +213,19 @@ internal class UpdateMetaTriggerHandlerImpl(
     appDB.withTransaction(projectID) {
       try {
         log.debug("testing for existence of dataset {}/{} in app db for project {}", userID, datasetID, projectID)
-        it.selectDataset(datasetID) or {
+        val record = it.selectDataset(datasetID) or {
           log.debug("inserting dataset record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
-          it.insertDataset(DatasetRecord(
+
+          val record = DatasetRecord(
             datasetID   = datasetID,
             owner       = meta.owner,
             typeName    = meta.type.name,
             typeVersion = meta.type.version,
             isDeleted   = DeleteFlag.NotDeleted,
-          ))
+            isPublic    = meta.visibility == VDIDatasetVisibility.Public
+          )
 
+          it.insertDataset(record)
           it.insertDatasetVisibility(datasetID, meta.owner)
 
           log.debug("inserting sync control record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
@@ -232,6 +238,14 @@ internal class UpdateMetaTriggerHandlerImpl(
 
           log.debug("inserting dataset project link for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
           it.insertDatasetProjectLink(datasetID, projectID)
+
+          record
+        }
+
+        // If the record in the app db has an isPublic flag value different from
+        // what we expect, update the app db record.
+        if (record.isPublic != (meta.visibility == VDIDatasetVisibility.Public)) {
+          it.updateDataset(record.copy(isPublic = meta.visibility == VDIDatasetVisibility.Public))
         }
 
         log.debug("upserting dataset meta record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)

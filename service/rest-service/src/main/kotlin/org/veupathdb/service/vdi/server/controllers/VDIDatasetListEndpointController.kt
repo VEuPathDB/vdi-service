@@ -36,7 +36,7 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
       ?: DatasetOwnershipFilter.ANY
 
     return VdiDatasets.GetVdiDatasetsResponse.respond200WithApplicationJson(
-      fetchUserDatasetList(DatasetListQuery(userID, projectId, parsedOwnership))
+      fetchUserDatasetList(DatasetListQuery(userID, projectId, parsedOwnership), userID.toUserID())
     )
   }
 

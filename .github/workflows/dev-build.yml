@@ -4,10 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Run Gradle Build
-      uses: veupathdb/vdi-service/.github/workflows/gradle-build.yml@main
-      with:
-        name: Scheduled Development Build
-        branch: main
+    uses: veupathdb/vdi-service/.github/workflows/gradle-build.yml@main
+    with:
+      name: Scheduled Development Build
+      branch: main

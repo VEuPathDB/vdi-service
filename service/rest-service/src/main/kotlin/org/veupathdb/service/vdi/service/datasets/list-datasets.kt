@@ -12,22 +12,23 @@ import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.model.InstallStatuses
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetFileSummary
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.plugin.mapping.PluginHandlers
 
-fun fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
-  return fetchDatasetList(vdi.component.db.cache.CacheDB().selectDatasetList(query))
+fun fetchUserDatasetList(query: DatasetListQuery, userID: UserID): List<DatasetListEntry> {
+  return fetchDatasetList(CacheDB().selectDatasetList(query), userID)
 }
 
 fun fetchCommunityUserDatasetList(): List<DatasetListEntry> {
-  return fetchDatasetList(vdi.component.db.cache.CacheDB().selectNonPrivateDatasets())
+  return fetchDatasetList(CacheDB().selectNonPrivateDatasets(), null)
 }
 
-private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetListEntry> {
-  val cacheDB = vdi.component.db.cache.CacheDB()
+private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: UserID?): List<DatasetListEntry> {
+  val cacheDB = CacheDB()
 
   val datasetIDs = datasetList.map(DatasetRecord::datasetID)
 
@@ -86,10 +87,10 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
     // Convert the found dataset into the expected output type
     // (DatasetListEntry) and add it to the result list.
     results.add(it.toListEntry(
-      userDetails[it.ownerID] ?: throw IllegalStateException("missing user details for user id ${it.ownerID}"),
-      PluginHandlers[it.typeName, it.typeVersion]?.displayName ?: throw IllegalStateException("missing plugin ${it.typeName}:${it.typeVersion}"),
-      datasetInstallStatusMap[it.datasetID] ?: emptyMap(),
-      (shares[it.datasetID] ?: emptyList())
+      owner = userDetails[it.ownerID] ?: throw IllegalStateException("missing user details for user id ${it.ownerID}"),
+      pluginDisplayName = PluginHandlers[it.typeName, it.typeVersion]?.displayName ?: throw IllegalStateException("missing plugin ${it.typeName}:${it.typeVersion}"),
+      statuses = datasetInstallStatusMap[it.datasetID] ?: emptyMap(),
+      shares = (if (it.ownerID == requesterID) shares[it.datasetID] ?: emptyList() else emptyList())
         .asSequence()
         .filter { it.offerStatus == VDIShareOfferAction.Grant }
         .map { sh ->
@@ -99,7 +100,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>): List<DatasetList
           )
         }
         .toList(),
-      fileSummaries[it.datasetID] ?: DatasetFileSummary(0u, 0u)
+      fileSummary = fileSummaries[it.datasetID] ?: DatasetFileSummary(0u, 0u),
     ))
   }
 
