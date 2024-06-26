@@ -31,11 +31,14 @@ import vdi.component.kafka.router.KafkaRouter
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
+import vdi.component.plugin.client.PluginException
+import vdi.component.plugin.client.PluginRequestException
 import vdi.component.plugin.client.response.inm.InstallMetaBadRequestResponse
 import vdi.component.plugin.client.response.inm.InstallMetaResponseType
 import vdi.component.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
 import vdi.component.plugin.mapping.PluginHandler
 import vdi.component.plugin.mapping.PluginHandlers
+import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import java.sql.SQLException
 import java.time.OffsetDateTime
@@ -67,7 +70,7 @@ internal class UpdateMetaTriggerHandlerImpl(
           kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey)
             .forEach {
               log.info("Received install-meta job for dataset {}/{} from source {}", it.userID, it.datasetID, it.eventSource)
-              wp.submit { updateMeta(dm, kr, it) }
+              wp.submit { tryUpdateMeta(dm, kr, it) }
             }
         }
       }
@@ -79,10 +82,19 @@ internal class UpdateMetaTriggerHandlerImpl(
     confirmShutdown()
   }
 
-  private suspend fun updateMeta(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
-    updateMeta(dm, msg.userID, msg.datasetID)
-    if (msg.eventSource != EventSource.FullReconciler)
-      kr.sendReconciliationTrigger(msg.userID, msg.datasetID, msg.eventSource)
+  private suspend fun tryUpdateMeta(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
+    try {
+      updateMeta(dm, msg.userID, msg.datasetID)
+      if (msg.eventSource != EventSource.FullReconciler)
+        kr.sendReconciliationTrigger(msg.userID, msg.datasetID, msg.eventSource)
+    } catch (e: PluginException) {
+      e.log(log::error)
+    } catch (e: Throwable) {
+      PluginException.installMeta("N/A", "N/A", msg.userID, msg.datasetID, cause = e).log(log::error)
+    } finally {
+      if (msg.eventSource != EventSource.FullReconciler)
+        kr.sendReconciliationTrigger(msg.userID, msg.datasetID, msg.eventSource)
+    }
   }
 
   private suspend fun updateMeta(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
@@ -149,9 +161,26 @@ internal class UpdateMetaTriggerHandlerImpl(
     val ph = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version]!!
 
     datasetMeta.projects
-      .forEach { projectID -> updateTargetMeta(ph, datasetMeta, metaTimestamp, datasetID, projectID, userID) }
+      .forEach { projectID -> tryUpdateTargetMeta(ph, datasetMeta, metaTimestamp, datasetID, projectID, userID) }
 
     timer.observeDuration()
+  }
+  
+  private suspend fun tryUpdateTargetMeta(
+    ph: PluginHandler,
+    meta: VDIDatasetMeta,
+    metaTimestamp: OffsetDateTime,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    userID: UserID,
+  ) {
+    try {
+      updateTargetMeta(ph, meta, metaTimestamp, datasetID, projectID, userID)
+    } catch (e: PluginException) {
+      throw e
+    } catch (e: Throwable) {
+      throw PluginException.installMeta(ph.displayName, projectID, userID, datasetID, cause = e)
+    }
   }
 
   private suspend fun updateTargetMeta(
@@ -167,8 +196,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       return
     }
 
-    val appDb = appDB.accessor(projectID)
-    if (appDb == null) {
+    val appDb = appDB.accessor(projectID) or {
       log.info("skipping dataset {}/{}, project {} update meta due to target being disabled", userID, datasetID, projectID)
       return
     }
@@ -250,15 +278,33 @@ internal class UpdateMetaTriggerHandlerImpl(
       it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
     }
 
-    val result = ph.client.postInstallMeta(datasetID, projectID, meta)
+    val result = try {
+      ph.client.postInstallMeta(datasetID, projectID, meta)
+    } catch (e: Throwable){
+      throw PluginRequestException.installMeta(ph.displayName, projectID, userID, datasetID, cause = e)
+    }
 
     Metrics.MetaUpdates.count.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
 
     try {
       when (result.type) {
-        InstallMetaResponseType.Success -> handleSuccessResponse(userID, datasetID, projectID)
-        InstallMetaResponseType.BadRequest -> handleBadRequestResponse(userID, datasetID, projectID, result as InstallMetaBadRequestResponse)
-        InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(userID, datasetID, projectID, result as InstallMetaUnexpectedErrorResponse)
+        InstallMetaResponseType.Success -> handleSuccessResponse(ph, userID, datasetID, projectID)
+
+        InstallMetaResponseType.BadRequest -> handleBadRequestResponse(
+          ph,
+          userID,
+          datasetID,
+          projectID,
+          result as InstallMetaBadRequestResponse,
+        )
+
+        InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(
+          ph,
+          userID,
+          datasetID,
+          projectID,
+          result as InstallMetaUnexpectedErrorResponse,
+        )
       }
     } catch (e: Throwable) {
       log.info("install-meta request to handler server failed with exception:", e)
@@ -279,8 +325,15 @@ internal class UpdateMetaTriggerHandlerImpl(
     }
   }
 
-  private fun handleSuccessResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID) {
-    log.info("dataset handler server reports dataset {}/{} meta installed successfully into project {}", userID, datasetID, projectID)
+  private fun handleSuccessResponse(handler: PluginHandler, userID: UserID, datasetID: DatasetID, projectID: ProjectID) {
+    log.info(
+      "dataset handler server reports dataset {}/{} meta installed successfully into project {} via plugin {}",
+      userID,
+      datasetID,
+      projectID,
+      handler,
+    )
+
     appDB.withTransaction(projectID) { it.upsertInstallMetaMessage(datasetID, InstallStatus.Complete) }
   }
 
@@ -297,17 +350,43 @@ internal class UpdateMetaTriggerHandlerImpl(
     }
   }
 
-  private fun handleBadRequestResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: InstallMetaBadRequestResponse) {
-    log.error("dataset handler server reports 400 error for meta-install on dataset {}/{}, project {}", userID, datasetID, projectID)
-    throw IllegalStateException(res.message)
+  private fun handleBadRequestResponse(
+    handler: PluginHandler,
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    res: InstallMetaBadRequestResponse
+  ) {
+    log.error(
+      "dataset handler server reports 400 error for meta-install on dataset {}/{}, project {} via plugin {}",
+      userID,
+      datasetID,
+      projectID,
+      handler.displayName,
+    )
+
+    throw PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
-  private fun handleUnexpectedErrorResponse(userID: UserID, datasetID: DatasetID, projectID: ProjectID, res: InstallMetaUnexpectedErrorResponse) {
-    log.error("dataset handler server reports 500 error for meta-install on dataset {}/{}, project {}", userID, datasetID, projectID)
-    throw IllegalStateException(res.message)
+  private fun handleUnexpectedErrorResponse(
+    handler: PluginHandler,
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    res: InstallMetaUnexpectedErrorResponse,
+  ) {
+    log.error(
+      "dataset handler server reports 500 error for meta-install on dataset {}/{}, project {} via plugin {}",
+      userID,
+      datasetID,
+      projectID,
+      handler.displayName
+    )
+
+    throw PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
-  private fun vdi.component.s3.DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
+  private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
     if (!exists()) {
       log.warn("got an update-meta event for dataset {}/{} which has no directory?", userID, datasetID)
       return false

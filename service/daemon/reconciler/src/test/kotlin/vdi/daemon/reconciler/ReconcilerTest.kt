@@ -146,7 +146,8 @@ class ReconcilerTest {
         runBlocking { recon.reconcile() }
         val capturedDatasetID = mockingDetails(cacheDb).invocations
             .find { it.method.name == "deleteDataset" }!!
-            .getArgument<DatasetID>(1)
+            .getArgument<VDIReconcilerTargetRecord>(0)
+            .datasetID
         assertEquals("test", "22345678123456781234567812345678", capturedDatasetID.toString())
     }
 

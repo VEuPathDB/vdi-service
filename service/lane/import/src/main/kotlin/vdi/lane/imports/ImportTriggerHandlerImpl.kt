@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.apache.logging.log4j.kotlin.logger
+import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
@@ -30,7 +31,10 @@ import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
+import vdi.component.plugin.client.PluginException
+import vdi.component.plugin.client.PluginRequestException
 import vdi.component.plugin.client.response.imp.*
+import vdi.component.plugin.mapping.PluginHandler
 import vdi.component.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
@@ -44,7 +48,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   : ImportTriggerHandler
   , AbstractVDIModule("import-trigger-handler", abortCB)
 {
-  private val log = logger()
+  private val log = logger().delegate
 
   private val lock = Mutex()
 
@@ -65,7 +69,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
           kc.fetchMessages(config.kafkaConfig.importTriggerMessageKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received import job for dataset $userID/$datasetID from source $source")
-              wp.submit { importJob(dm, userID, datasetID) }
+              wp.submit { tryHandleImportEvent(dm, userID, datasetID) }
             }
       }
     }
@@ -76,16 +80,24 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     confirmShutdown()
   }
 
-  private suspend fun importJob(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
-    log.trace("importJob(dm=..., userID=$userID, datasetID=$datasetID")
+  private suspend fun tryHandleImportEvent(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
+    try {
+      handleImportEvent(dm, userID, datasetID)
+    } catch (e: PluginException) {
+      e.log(log::error)
+    } catch (e: Throwable) {
+      PluginException.import("N/A", userID, datasetID, cause = e).log(log::error)
+    }
+  }
 
+  private suspend fun handleImportEvent(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
     // lookup the dataset in S3
     val datasetDir = dm.getDatasetDirectory(userID, datasetID)
 
     // If the dataset directory doesn't have all the necessary components, then
     // bail here.
     if (!datasetDir.isUsable(datasetID, userID)) {
-      log.debug("dataset dir for dataset $datasetID (user $userID) is not usable")
+      log.debug("dataset dir for dataset {}/{} is not usable", userID, datasetID)
       return
     }
 
@@ -95,7 +107,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     // as in progress (add it to our set of active imports) and proceed.
     lock.withLock {
       if (datasetID in activeIDs) {
-        log.info("skipping import event for dataset $userID/$datasetID as it is already being processed")
+        log.info("skipping import event for dataset {}/{} as it is already being processed", userID, datasetID)
         return
       }
 
@@ -123,11 +135,11 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     // exists, initializing the dataset if it doesn't yet exist.
     with(cacheDB.selectDataset(datasetID)) {
       if (isNull()) {
-        log.info("initializing dataset $userID/$datasetID")
+        log.info("initializing dataset {}/{}", userID, datasetID)
         cacheDB.initializeDataset(datasetID, datasetMeta)
       } else {
         if (isDeleted) {
-          log.info("skipping import event for dataset $userID/$datasetID as it is marked as deleted in the cache db")
+          log.info("skipping import event for dataset {}/{} as it is marked as deleted in the cache db", userID, datasetID)
           return
         }
         log.info("Dataset already initialized. Handling import event.")
@@ -137,56 +149,104 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     val impStatus = cacheDB.selectImportControl(datasetID)!!
 
     if (impStatus != DatasetImportStatus.Queued) {
-      log.info("skipping import event for dataset $userID/$datasetID as it is already in status $impStatus")
+      log.info("skipping import event for dataset {}/{} as it is already in status {}", userID, datasetID, impStatus)
       return
     }
 
     if (!datasetDir.hasImportReadyFile()) {
-      log.info("received an import event for dataset $userID/$datasetID where the import-ready file doesn't exist yet")
+      log.info("skipping import event for dataset {}/{} as the import-ready file doesn't exist yet", userID, datasetID)
       return
     }
 
     try {
       val handler = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version] or {
-        log.error("No plugin handler registered for dataset type ${datasetMeta.type.name}")
-        throw IllegalStateException("No plugin handler registered for dataset type ${datasetMeta.type.name}")
+        log.warn("attempted to import dataset {}/{} but no plugin is currently enabled for dataset type {}", userID, datasetID, datasetMeta.type)
+        return
       }
 
-      cacheDB.withTransaction {
-        log.info("attempting to insert import control record (if one does not exist) for dataset $datasetID")
-        it.upsertImportControl(datasetID, DatasetImportStatus.InProgress)
-      }
-
-      val result = datasetDir.getImportReadyFile()
-        .loadContents()!!
-        .use { handler.client.postImport(datasetID, datasetMeta, it) }
-
-      Metrics.Import.count.labels(datasetMeta.type.name, datasetMeta.type.version, result.responseCode.toString()).inc()
-
-      when (result.type) {
-        ImportResponseType.Success         -> handleImportSuccessResult(
-          datasetID,
-          result as ImportSuccessResponse,
-          datasetDir
-        )
-        ImportResponseType.BadRequest      -> handleImportBadRequestResult(datasetID, result as ImportBadRequestResponse)
-        ImportResponseType.ValidationError -> handleImportInvalidResult(datasetID, result as ImportValidationErrorResponse)
-        ImportResponseType.UnhandledError  -> handleImport500Result(userID, datasetID, result as ImportUnhandledErrorResponse)
-      }
+      processImportJob(handler, datasetMeta, userID, datasetID, datasetDir)
     } catch (e: Throwable) {
-      log.error("import request to handler server for dataset $datasetID failed with exception:", e)
       cacheDB.withTransaction { tran ->
         tran.updateImportControl(datasetID, DatasetImportStatus.Failed)
         tran.tryInsertImportMessages(datasetID, "Process error: ${e.message}")
       }
-      throw e
+
+      throw if (e is PluginException) e else PluginException.import("N/A", userID, datasetID, cause = e)
     } finally {
       timer.observeDuration()
     }
   }
 
-  private fun handleImportSuccessResult(datasetID: DatasetID, result: ImportSuccessResponse, dd: DatasetDirectory) {
-    log.info("dataset handler server reports dataset $datasetID imported successfully")
+  private suspend fun processImportJob(
+    handler: PluginHandler,
+    meta: VDIDatasetMeta,
+    userID: UserID,
+    datasetID: DatasetID,
+    datasetDir: DatasetDirectory
+  ) {
+    try {
+      cacheDB.withTransaction {
+        log.info("attempting to insert import control record (if one does not exist) for dataset {}/{}", userID, datasetID)
+        it.upsertImportControl(datasetID, DatasetImportStatus.InProgress)
+      }
+
+      val result = try {
+        datasetDir.getImportReadyFile()
+          .loadContents()!!
+          .use { handler.client.postImport(datasetID, meta, it) }
+      } catch (e: S34KError) { // don't mix up minio errors with request errors
+        throw PluginException.import(handler.displayName, userID, datasetID, cause = e)
+      } catch (e: Throwable) {
+        throw PluginRequestException.import(handler.displayName, userID, datasetID, cause = e)
+      }
+
+      Metrics.Import.count.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
+
+      when (result.type) {
+        ImportResponseType.Success -> handleImportSuccessResult(
+          handler,
+          userID,
+          datasetID,
+          result as ImportSuccessResponse,
+          datasetDir
+        )
+
+        ImportResponseType.BadRequest -> handleImportBadRequestResult(
+          handler,
+          userID,
+          datasetID,
+          result as ImportBadRequestResponse
+        )
+
+        ImportResponseType.ValidationError -> handleImportInvalidResult(
+          handler,
+          userID,
+          datasetID,
+          result as ImportValidationErrorResponse
+        )
+
+        ImportResponseType.UnhandledError -> handleImport500Result(
+          handler,
+          userID,
+          datasetID,
+          result as ImportUnhandledErrorResponse,
+        )
+      }
+    } catch (e: PluginException) {
+      throw e
+    } catch (e: Throwable) {
+      throw PluginException.import(handler.displayName, userID, datasetID, cause = e)
+    }
+  }
+
+  private fun handleImportSuccessResult(
+    handler: PluginHandler,
+    userID: UserID,
+    datasetID: DatasetID,
+    result: ImportSuccessResponse,
+    dd: DatasetDirectory
+  ) {
+    log.info("dataset handler server reports dataset {}/{} imported successfully in plugin {}", userID, datasetID, handler.displayName)
 
     // Create a temp directory to use as a workspace for the following process
     TempFiles.withTempDirectory { tempDirectory ->
@@ -243,50 +303,65 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private fun handleImportBadRequestResult(datasetID: DatasetID, result: ImportBadRequestResponse) {
-    log.error("dataset handler server reports 400 error for dataset $datasetID, message: ${result.message}")
+  private fun handleImportBadRequestResult(
+    handler: PluginHandler,
+    userID: UserID,
+    datasetID: DatasetID,
+    result: ImportBadRequestResponse
+  ) {
+    log.error("plugin reports 400 error for dataset {}/{} in plugin {}: {}", userID, datasetID, handler.displayName, result.message)
+
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
       it.upsertImportMessages(datasetID, result.message)
     }
-    throw IllegalStateException(result.message)
+
+    throw PluginException.import(handler.displayName, userID, datasetID, result.message)
   }
 
-  private fun handleImportInvalidResult(datasetID: DatasetID, result: ImportValidationErrorResponse) {
-    log.info("dataset handler server reports dataset $datasetID failed validation")
+  private fun handleImportInvalidResult(
+    handler: PluginHandler,
+    userID: UserID,
+    datasetID: DatasetID,
+    result: ImportValidationErrorResponse
+  ) {
+    log.info("plugin reports dataset {}/{} failed validation in plugin {}", userID, datasetID, handler.displayName)
+
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
       it.upsertImportMessages(datasetID, result.warnings.joinToString("\n"))
     }
   }
 
-  private fun handleImport500Result(userID: UserID, datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
-    log.error("dataset handler server reports 500 for dataset $userID/$datasetID, message ${result.message}")
+  private fun handleImport500Result(handler: PluginHandler, userID: UserID, datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
+    log.error("plugin reports 500 for dataset {}/{} in plugin {}: {}", userID, datasetID, handler.displayName, result.message)
+
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
       it.upsertImportMessages(datasetID, result.message)
     }
-    throw IllegalStateException(result.message)
+
+    throw PluginException.import(handler.displayName, userID, datasetID, result.message)
   }
 
   private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
     if (!exists()) {
-      log.warn("got an import event for dataset $userID/$datasetID which no longer has a directory")
+      log.warn("got an import event for dataset {}/{} which no longer has a directory", userID, datasetID)
       return false
     }
 
     if (hasDeleteFlag()) {
-      log.info("got an import event for dataset $userID/$datasetID which has a delete flag, ignoring it")
+      log.info("got an import event for dataset {}/{} which has a delete flag, ignoring it", userID, datasetID)
       return false
     }
 
     if (!hasMetaFile()) {
-      log.info("got an import event for dataset $userID/$datasetID which does not yet have a $DatasetMetaFilename file, ignoring it")
+      log.info("got an import event for dataset {}/{} which does not yet have a {} file, ignoring it", userID, datasetID, DatasetMetaFilename)
       return false
     }
 
     if (!hasImportReadyFile()) {
-      log.info("got an import event for dataset $userID/$datasetID which does not yet have a processed upload, ignoring it")
+      log.info("got an import event for dataset {}/{} which does not yet have a processed upload, ignoring it", userID, datasetID)
       return false
     }
 
@@ -294,7 +369,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   }
 
   private fun CacheDBTransaction.initSyncControl(datasetID: DatasetID) {
-    log.trace("CacheDBTransaction.initSyncControl(datasetID: $datasetID)")
     tryInsertSyncControl(VDISyncControlRecord(
       datasetID     = datasetID,
       sharesUpdated = OriginTimestamp,
@@ -304,7 +378,6 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   }
 
   private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: VDIDatasetMeta) {
-    log.trace("CacheDB.initializeDataset(datasetID: $datasetID, meta: $meta)")
     openTransaction().use {
       try {
         // Insert a new dataset record
