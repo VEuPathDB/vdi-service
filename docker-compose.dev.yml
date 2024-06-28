@@ -6,9 +6,6 @@ networks:
   rabbitmq:
     external: false
 
-volumes:
-  minio:
-
 services:
   minio-external:
     image: veupathdb/minio
@@ -17,17 +14,15 @@ services:
     links:
     - rabbit-external
     ports:
-    - "9500:9000"
-    - "9501:9001" # Avoid port conflicts with other applications
+    - "9000:9000"
+    - "9001:9001"
     networks:
     - internal
     - rabbitmq
-    volumes:
-    - minio:/data
-
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_TOKEN:?}
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:?}
+
       MINIO_NOTIFY_AMQP_ENABLE_RABBIT: "on"
       MINIO_NOTIFY_AMQP_URL_RABBIT: amqp://${GLOBAL_RABBIT_USERNAME:?}:${GLOBAL_RABBIT_PASSWORD:?}@${GLOBAL_RABBIT_HOST:?}:${GLOBAL_RABBIT_PORT:-5672}
       MINIO_NOTIFY_AMQP_EXCHANGE_RABBIT: ${GLOBAL_RABBIT_VDI_EXCHANGE_NAME:?}
@@ -62,11 +57,10 @@ services:
   rabbit-external:
     image: rabbitmq:3.11.13-management-alpine
     ports:
-    - "25672:5672"
-    - "35672:15672"
+    - "5672:5672"
+    - "9002:15672"
     networks:
     - rabbitmq
-    - internal
     environment:
       RABBITMQ_DEFAULT_USER: ${GLOBAL_RABBIT_USERNAME:?}
       RABBITMQ_DEFAULT_PASS: ${GLOBAL_RABBIT_PASSWORD:?}
@@ -78,7 +72,7 @@ services:
 
   cache-db:
     ports:
-    - ${CACHE_DB_PORT}:${CACHE_DB_PORT}
+    - "5432:5432"
 
   kafka:
     ports:
