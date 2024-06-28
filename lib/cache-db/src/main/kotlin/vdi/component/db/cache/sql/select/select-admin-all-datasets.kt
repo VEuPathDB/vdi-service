@@ -33,12 +33,12 @@ SELECT
 , i.status
 , s.message
 , array(
-    SELECT array[f.file_name, f.file_size]
+    SELECT (f.file_name, f.file_size)
     FROM vdi.upload_files AS f
     WHERE f.dataset_id = d.dataset_id
   ) AS upload_files
 , array(
-    SELECT array[f.file_name, f.file_size]
+    SELECT (f.file_name, f.file_size)
     FROM vdi.install_files AS f
     WHERE f.dataset_id = d.dataset_id
   ) AS install_files

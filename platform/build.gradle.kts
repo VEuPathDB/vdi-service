@@ -5,11 +5,11 @@ plugins {
 dependencies {
   constraints {
     api("org.gusdb:fgputil-db:2.13.1")
-    api("org.veupathdb.lib:jaxrs-container-core:7.0.9")
+    api("org.veupathdb.lib:jaxrs-container-core:7.1.0")
     api("org.veupathdb.lib:multipart-jackson-pojo:1.1.7")
 
     // VDI
-    api("org.veupathdb.vdi:vdi-component-common:11.1.0")
+    api("org.veupathdb.vdi:vdi-component-common:11.1.1")
     api("org.veupathdb.vdi:vdi-component-json:1.0.2")
 
     // Database
@@ -29,11 +29,7 @@ dependencies {
 
     // HTTP
     api("io.foxcapades.lib:k-multipart:1.2.1")
-    api("org.glassfish.jersey.core:jersey-server:3.1.5")
-
-    // JSON
-    api("com.fasterxml.jackson.core:jackson-databind:2.17.0")
-    api("com.fasterxml.jackson.core:jackson-annotations:2.17.0")
+    api("org.glassfish.jersey.core:jersey-server")
 
     // Messaging
     api("org.apache.kafka:kafka-clients:3.7.0")

@@ -1,2 +1,2 @@
-*.html linguist-generated
-modules/rest-service/schema/library.raml linguist-generated
+*.html linguist-generated=true
+modules/rest-service/schema/library.raml linguist-generated=true

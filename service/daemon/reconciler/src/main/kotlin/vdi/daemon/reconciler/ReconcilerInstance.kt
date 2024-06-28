@@ -202,7 +202,7 @@ internal class ReconcilerInstance(
       Metrics.Reconciler.Full.reconcilerDatasetDeleted.labels(targetDB.name).inc()
       if (!deleteDryMode) {
         log.info("trying to delete dataset {}/{}", record.ownerID, record.datasetID)
-        targetDB.deleteDataset(datasetID = record.datasetID, datasetType = record.type)
+        targetDB.deleteDataset(record)
       } else {
         log.info("would have deleted dataset {}/{}", record.ownerID, record.datasetID)
       }

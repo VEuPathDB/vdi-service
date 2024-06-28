@@ -10,8 +10,6 @@ import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.AdminAllDatasetsRow
 import vdi.component.db.cache.query.AdminAllDatasetsQuery
 
-private const val MAX_RESULT_LIMIT = 250u
-
 internal fun listAllDatasets(
   offset: Int?,
   limit: Int?,
@@ -21,8 +19,7 @@ internal fun listAllDatasets(
 
   val query = AdminAllDatasetsQuery(
     offset    = if (offset == null || offset < 0) 0u else offset.toUInt(),
-    limit     = if (limit == null || limit < 0) MAX_RESULT_LIMIT
-                else (if (limit > MAX_RESULT_LIMIT.toInt()) MAX_RESULT_LIMIT else limit.toUInt()),
+    limit     = limit?.takeIf { it > 0 }?.toUInt() ?: 100u,
     projectID = projectID,
     includeDeleted ?: false,
   )

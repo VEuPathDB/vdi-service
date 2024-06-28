@@ -27,6 +27,9 @@ public enum ErrorType {
   @JsonProperty("invalid-input")
   INVALIDINPUT("invalid-input"),
 
+  @JsonProperty("failed-dependency")
+  FAILEDDEPENDENCY("failed-dependency"),
+
   @JsonProperty("server-error")
   SERVERERROR("server-error");
 

@@ -2,6 +2,25 @@ package org.veupathdb.service.vdi.generated.model
 
 import org.veupathdb.service.vdi.util.ValidationErrors
 
+internal fun DatasetPostMeta.cleanup() {
+  datasetType?.cleanup()
+
+  name = name?.trim()
+  summary = summary?.takeIf { it.isNotBlank() }
+    ?.trim()
+  description = description?.takeIf { it.isNotBlank() }
+    ?.trim()
+  origin = origin?.trim()
+
+  projects?.forEachIndexed { i, s -> projects[i] = s?.takeIf { it.isNotBlank() } ?.trim() }
+
+  dependencies?.forEach {
+    it.resourceVersion = it.resourceVersion?.takeIf { it.isNotBlank() } ?.trim()
+    it.resourceIdentifier = it.resourceIdentifier?.takeIf { it.isNotBlank() } ?.trim()
+    it.resourceDisplayName = it.resourceDisplayName?.takeIf { it.isNotBlank() } ?.trim()
+  }
+}
+
 internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
   if (datasetType == null)
     validationErrors.add("meta.type", "field is required")

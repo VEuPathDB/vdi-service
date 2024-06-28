@@ -3,7 +3,7 @@
 extends: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.2.0/libraries/base-service.raml
 
 title: VEuPathDB Dataset Installer
-version: 2.0.0
+version: 2.1.0
 mediaType: application/json
 
 traits:
@@ -216,6 +216,17 @@ uses:
         body:
           application/json:
             type: lib.UnprocessableEntityError
+      424:
+        description: |
+          Failed Dependency.
+          
+          Returned when the dataset data source was a URL and the VDI service
+          encountered a non-success HTTP status code from the target URL.  This
+          could be, for example, a 403 error from an expired AWS S3 URL, or a
+          404 for a file that no longer exists on the remote server.
+        body:
+          application/json:
+            type: lib.FailedDependencyError
       500:
         description: |
           Internal Server Error.
