@@ -4,7 +4,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import java.sql.Connection
 
 private fun sql(schema: String) =
-// language=oracle
+// language=psql
 """
 INSERT INTO
   ${schema}.dataset_meta (

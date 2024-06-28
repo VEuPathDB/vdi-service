@@ -15,7 +15,7 @@ class AppDBTransactionImpl(
   override val project: ProjectID,
   private val schema: String,
   private val connection: Connection,
-  private val platform: String,
+  private val platform: AppDBPlatform,
 ) : AppDBTransaction {
 
   private val log = LoggerFactory.getLogger(javaClass)
@@ -81,7 +81,7 @@ class AppDBTransactionImpl(
 
   override fun upsertDatasetInstallMessage(message: DatasetInstallMessage) {
     log.debug("upserting dataset install message for dataset {}, install type {}", message.datasetID, message.installType)
-    if (platform === "postgresql") {
+    if (platform === AppDBPlatform.Postgres) {
       connection.upsertDatasetInstallMessage(schema, message)
     } else {
       try {
@@ -122,7 +122,7 @@ class AppDBTransactionImpl(
 
   override fun upsertDatasetMeta(datasetID: DatasetID, name: String, description: String?) {
     log.debug("upserting dataset meta record for dataset {}", datasetID)
-    if (platform === "postgresdb") {
+    if (platform === AppDBPlatform.Postgres) {
       connection.upsertDatasetMeta(schema, datasetID, name, description)
     } else {
       try {

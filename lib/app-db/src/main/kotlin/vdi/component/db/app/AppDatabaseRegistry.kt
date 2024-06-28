@@ -95,14 +95,14 @@ object AppDatabaseRegistry {
 
     val connectDetails: DbConnectDetails = try {
       when (env.platform) {
-        "oracle" -> OracleConnectDetails(
+        AppDBPlatform.Oracle.platformString -> OracleConnectDetails(
           name = env.name!!,
           user = env.controlSchema!!,
           pw = env.pass!!,
           ldap = env.ldap!!,
           poolSize = poolSize
         )
-        "postgresql" -> PostgresConnectDetails(
+        AppDBPlatform.Postgres.platformString -> PostgresConnectDetails(
           name = env.name!!,
           user = env.controlSchema!!,
           pw = env.pass!!,
@@ -130,7 +130,7 @@ object AppDatabaseRegistry {
           connectDetails.makeDataSource(),
           env.dataSchema!!,
           env.controlSchema!!,
-          env.platform ?: "oracle"
+        env.platform?.let { AppDBPlatform.fromPlatformString(it) } ?: AppDBPlatform.Oracle
       )
   }
 

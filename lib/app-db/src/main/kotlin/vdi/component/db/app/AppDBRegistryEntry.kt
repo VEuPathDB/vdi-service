@@ -9,5 +9,5 @@ data class AppDBRegistryEntry(
   val source: DataSource,
   val dataSchema: String,
   val ctlSchema: String,
-  val platform: String,
+  val platform: AppDBPlatform,
 )
