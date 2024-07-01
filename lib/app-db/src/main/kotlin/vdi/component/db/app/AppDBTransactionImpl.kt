@@ -14,7 +14,8 @@ import java.time.OffsetDateTime
 class AppDBTransactionImpl(
   override val project: ProjectID,
   private val schema: String,
-  private val connection: Connection
+  private val connection: Connection,
+  private val platform: AppDBPlatform,
 ) : AppDBTransaction {
 
   private val log = LoggerFactory.getLogger(javaClass)
@@ -68,7 +69,6 @@ class AppDBTransactionImpl(
     connection.deleteDatasetMeta(schema, datasetID)
   }
 
-
   override fun insertDataset(dataset: DatasetRecord) {
     log.debug("inserting dataset record for dataset {}", dataset.datasetID)
     connection.insertDataset(schema, dataset)
@@ -77,6 +77,22 @@ class AppDBTransactionImpl(
   override fun insertDatasetInstallMessage(message: DatasetInstallMessage) {
     log.debug("inserting dataset install message for dataset {}, install type {}", message.datasetID, message.installType)
     connection.insertDatasetInstallMessage(schema, message)
+  }
+
+  override fun upsertDatasetInstallMessage(message: DatasetInstallMessage) {
+    log.debug("upserting dataset install message for dataset {}, install type {}", message.datasetID, message.installType)
+    if (platform === AppDBPlatform.Postgres) {
+      connection.upsertDatasetInstallMessage(schema, message)
+    } else {
+      try {
+        insertDatasetInstallMessage(message)
+      } catch (e: SQLException) {
+        if (e.errorCode == UniqueConstraintViolation)
+          updateDatasetInstallMessage(message)
+        else
+          throw e
+      }
+    }
   }
 
   override fun insertDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID) {
@@ -104,6 +120,23 @@ class AppDBTransactionImpl(
     connection.insertDatasetMeta(schema, datasetID, name, description)
   }
 
+  override fun upsertDatasetMeta(datasetID: DatasetID, name: String, description: String?) {
+    log.debug("upserting dataset meta record for dataset {}", datasetID)
+    if (platform === AppDBPlatform.Postgres) {
+      connection.upsertDatasetMeta(schema, datasetID, name, description)
+    } else {
+      try {
+        insertDatasetMeta(datasetID, name, description)
+      } catch (e: SQLException) {
+        if (e.errorCode == 1) {
+          log.debug("dataset meta record already exists for dataset {}", datasetID)
+          updateDatasetMeta(datasetID, name, description)
+        } else {
+          throw e
+        }
+      }
+    }
+  }
 
   override fun updateDataset(dataset: DatasetRecord) {
     log.debug("updating dataset record for dataset {}", dataset.datasetID)
@@ -139,21 +172,6 @@ class AppDBTransactionImpl(
     log.debug("updating dataset meta record for dataset {}", datasetID)
     connection.updateDatasetMeta(schema, datasetID, name, description)
   }
-
-
-  override fun upsertDatasetMeta(datasetID: DatasetID, name: String, description: String?) {
-    try {
-      insertDatasetMeta(datasetID, name, description)
-    } catch (e: SQLException) {
-      if (e.errorCode == 1) {
-        log.debug("dataset meta record already exists for dataset {}", datasetID)
-        updateDatasetMeta(datasetID, name, description)
-      } else {
-        throw e
-      }
-    }
-  }
-
 
   override fun rollback() {
     connection.rollback()

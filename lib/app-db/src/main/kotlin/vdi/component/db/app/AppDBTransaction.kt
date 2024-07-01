@@ -130,6 +130,8 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun insertDatasetInstallMessage(message: DatasetInstallMessage)
 
+  fun upsertDatasetInstallMessage(message: DatasetInstallMessage)
+
   /**
    * Inserts a new project link for a dataset.
    *

@@ -49,6 +49,6 @@ internal object AppDBImpl : AppDB {
 
   override fun transaction(key: ProjectID): AppDBTransaction? =
     AppDatabaseRegistry[key]
-      ?.let { ds -> AppDBTransactionImpl(key, ds.ctlSchema, ds.source.connection.also { it.autoCommit = false }) }
+      ?.let { ds -> AppDBTransactionImpl(key, ds.ctlSchema, ds.source.connection.also { it.autoCommit = false }, ds.platform) }
 }
 

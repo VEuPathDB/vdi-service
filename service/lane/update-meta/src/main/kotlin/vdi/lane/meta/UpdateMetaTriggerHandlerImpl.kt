@@ -25,6 +25,7 @@ import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
+import vdi.component.env.Environment
 import vdi.component.kafka.EventMessage
 import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
@@ -339,15 +340,7 @@ internal class UpdateMetaTriggerHandlerImpl(
 
   private fun AppDBTransaction.upsertInstallMetaMessage(datasetID: DatasetID, status: InstallStatus) {
     val message = DatasetInstallMessage(datasetID, InstallType.Meta, status, null)
-
-    try {
-      insertDatasetInstallMessage(message)
-    } catch (e: SQLException) {
-      if (e.errorCode == UniqueConstraintViolation)
-        updateDatasetInstallMessage(message)
-      else
-        throw e
-    }
+    upsertDatasetInstallMessage(message)
   }
 
   private fun handleBadRequestResponse(
