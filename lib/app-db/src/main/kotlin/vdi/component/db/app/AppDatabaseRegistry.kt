@@ -91,18 +91,20 @@ object AppDatabaseRegistry {
       env.controlSchema
     )
 
+    val platform = env.platform?.let { AppDBPlatform.fromPlatformString(it) } ?: AppDBPlatform.Oracle
+
     log.info("constructing a DataSource for database {} with platform {}", env.name, env.platform)
 
     val connectDetails: DbConnectDetails = try {
-      when (env.platform) {
-        AppDBPlatform.Oracle.platformString -> OracleConnectDetails(
+      when (platform) {
+        AppDBPlatform.Oracle -> OracleConnectDetails(
           name = env.name!!,
           user = env.controlSchema!!,
           pw = env.pass!!,
           ldap = env.ldap!!,
           poolSize = poolSize
         )
-        AppDBPlatform.Postgres.platformString -> PostgresConnectDetails(
+        AppDBPlatform.Postgres -> PostgresConnectDetails(
           name = env.name!!,
           user = env.controlSchema!!,
           pw = env.pass!!,
@@ -110,13 +112,6 @@ object AppDatabaseRegistry {
           port = postgresPort,
           poolSize = poolSize,
           pgDbName = env.pgDbName!!
-        )
-        else -> OracleConnectDetails(
-          name = env.name!!,
-          user = env.controlSchema!!,
-          pw = env.pass!!,
-          ldap = env.ldap!!,
-          poolSize = poolSize
         )
       }
     } catch (e: Throwable) {
@@ -130,7 +125,7 @@ object AppDatabaseRegistry {
           connectDetails.makeDataSource(),
           env.dataSchema!!,
           env.controlSchema!!,
-        env.platform?.let { AppDBPlatform.fromPlatformString(it) } ?: AppDBPlatform.Oracle
+          platform
       )
   }
 

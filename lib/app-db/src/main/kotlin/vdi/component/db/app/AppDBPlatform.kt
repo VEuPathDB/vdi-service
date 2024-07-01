@@ -6,7 +6,7 @@ enum class AppDBPlatform(val platformString: String) {
 
   companion object {
     fun fromPlatformString(platformString: String): AppDBPlatform? {
-      return entries.find { it.platformString === platformString }
+      return entries.find { it.platformString == platformString }
     }
   }
 }
