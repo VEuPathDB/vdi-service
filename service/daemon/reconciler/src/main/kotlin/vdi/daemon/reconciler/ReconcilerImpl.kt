@@ -24,7 +24,9 @@ internal class ReconcilerImpl(private val config: ReconcilerConfig, abortCB: (St
 
   private val targets: List<ReconcilerTarget>
 
-  private var lastRun = 0L
+  private var lastSlimRun = 0L
+
+  private var lastFullRun = 0L
 
   private val cacheDBTarget: ReconcilerTarget
 
@@ -48,16 +50,18 @@ internal class ReconcilerImpl(private val config: ReconcilerConfig, abortCB: (St
   override suspend fun runJob() {
     val now = System.currentTimeMillis()
 
-    val delta = (now - lastRun).milliseconds
-
     when {
-      config.reconcilerEnabled && delta >= config.fullRunInterval -> {
-        lastRun = now
+      // delta between last full run and now is greater than or equal to the
+      // full reconciler run interval
+      (now - lastFullRun).milliseconds >= config.fullRunInterval -> {
+        lastFullRun = now
         runFull()
       }
 
-      delta >= config.slimRunInterval -> {
-        lastRun = now
+      // delta between last slim run and now is greater than or equal to the
+      // slim reconciler run interval
+      (now - lastSlimRun).milliseconds >= config.slimRunInterval -> {
+        lastSlimRun = now
         runSlim()
       }
     }
