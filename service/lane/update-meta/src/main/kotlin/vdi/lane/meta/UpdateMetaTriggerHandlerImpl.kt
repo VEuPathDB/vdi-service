@@ -85,16 +85,16 @@ internal class UpdateMetaTriggerHandlerImpl(
 
   private suspend fun tryUpdateMeta(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
     try {
-      updateMeta(dm, msg.userID, msg.datasetID)
-      if (msg.eventSource != EventSource.FullReconciler)
-        kr.sendReconciliationTrigger(msg.userID, msg.datasetID, msg.eventSource)
+      if (msg.eventSource == EventSource.UpdateMetaLane) {
+        log.warn("attempted to recurse update meta on dataset ${msg.userID}/${msg.datasetID}")
+      } else {
+        updateMeta(dm, msg.userID, msg.datasetID)
+        kr.sendReconciliationTrigger(msg.userID, msg.datasetID, EventSource.UpdateMetaLane)
+      }
     } catch (e: PluginException) {
       e.log(log::error)
     } catch (e: Throwable) {
       PluginException.installMeta("N/A", "N/A", msg.userID, msg.datasetID, cause = e).log(log::error)
-    } finally {
-      if (msg.eventSource != EventSource.FullReconciler)
-        kr.sendReconciliationTrigger(msg.userID, msg.datasetID, msg.eventSource)
     }
   }
 
@@ -166,7 +166,7 @@ internal class UpdateMetaTriggerHandlerImpl(
 
     timer.observeDuration()
   }
-  
+
   private suspend fun tryUpdateTargetMeta(
     ph: PluginHandler,
     meta: VDIDatasetMeta,
