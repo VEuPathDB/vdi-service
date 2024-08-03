@@ -1,8 +1,9 @@
 package org.veupathdb.service.vdi.service.shares
 
-import org.veupathdb.service.vdi.db.AccountDB
+import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.service.vdi.generated.model.ShareOfferEntry
 import org.veupathdb.service.vdi.model.ShareFilterStatus
+import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.cache.model.DatasetShareListEntry
 import vdi.component.plugin.mapping.PluginHandlers
@@ -43,7 +44,14 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
     .map { it.ownerID }
     .toSet()
 
-  val owners = AccountDB.lookupUserDetails(ownerIDs)
+  val owners = mutableMapOf<UserID, UserDetails>()
+  UserProvider.getUsersById(ownerIDs.toList().map { it.toLong() })
+    .map {
+      val userId = UserID(it.key)
+      val user = it.value
+      val userDetail = UserDetails(userId, user.firstName, user.lastName, user.email, user.organization)
+      owners.put(userId, userDetail)
+    }
 
   return shares.map {
     val typeDisplayName = PluginHandlers[it.typeName, it.typeVersion]?.displayName

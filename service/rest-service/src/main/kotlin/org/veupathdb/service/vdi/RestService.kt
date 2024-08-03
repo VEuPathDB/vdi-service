@@ -13,7 +13,6 @@ object RestService : Server() {
   @JvmStatic
   fun main(args: Array<String>) {
     log.info("starting rest-service module")
-    enableAccountDB()
     start(args)
   }
 

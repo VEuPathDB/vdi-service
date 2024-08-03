@@ -1,6 +1,5 @@
 package org.veupathdb.service.vdi.service.datasets
 
-import org.veupathdb.service.vdi.db.AccountDB
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.service.vdi.util.defaultZone
@@ -18,6 +17,7 @@ import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.plugin.mapping.PluginHandlers
+import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 
 fun fetchUserDatasetList(query: DatasetListQuery, userID: UserID): List<DatasetListEntry> {
   return fetchDatasetList(CacheDB().selectDatasetList(query), userID)
@@ -76,7 +76,14 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
 
   // Get the user details for all the distinct user IDs seen in the dataset
   // listing returned by the original query.
-  val userDetails = AccountDB.lookupUserDetails(userIDs)
+  val userDetails = mutableMapOf<UserID, UserDetails>()
+  UserProvider.getUsersById(userIDs.toList().map { it.toLong() })
+    .map {
+      val userId = UserID(it.key)
+      val user = it.value
+      val userDetail = UserDetails(userId, user.firstName, user.lastName, user.email, user.organization)
+      userDetails.put(userId, userDetail)
+    }
   userIDs.clear()
 
   // Build a list for the results we will be returning.
