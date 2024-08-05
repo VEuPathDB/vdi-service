@@ -1,7 +1,5 @@
 package vdi.daemon.reconciler
 
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import org.apache.logging.log4j.kotlin.logger
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractJobExecutor
@@ -23,16 +21,6 @@ internal class ReconcilerImpl(private val config: ReconcilerDaemonConfig, abortC
   }
 
   override suspend fun runJob() {
-    // If the reconciler thread is disabled, just log a reminder every once in a
-    // while.
-    if (!config.reconcilerEnabled) {
-      coroutineScope {
-        logger.info("reconciler disabled by config")
-        delay(config.fullRunInterval)
-      }
-      return
-    }
-
     val now = System.currentTimeMillis()
 
     when {
@@ -40,7 +28,13 @@ internal class ReconcilerImpl(private val config: ReconcilerDaemonConfig, abortC
       // full reconciler run interval
       (now - lastFullRun).milliseconds >= config.fullRunInterval -> {
         lastFullRun = now
-        Recon.runFull()
+
+        // If the reconciler thread is disabled, just log a reminder.
+        if (!config.reconcilerEnabled) {
+          logger.info("reconciler disabled by config")
+        } else {
+          Recon.runFull()
+        }
       }
 
       // delta between last slim run and now is greater than or equal to the
