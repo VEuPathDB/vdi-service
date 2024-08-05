@@ -279,8 +279,7 @@ internal class ReconcilerInstance(
   }
 
   private interface SyncReason {
-    class OutOfSync(val meta: Boolean, val shares: Boolean, val install: Boolean, val target: ReconcilerTarget) :
-      SyncReason {
+    class OutOfSync(val meta: Boolean, val shares: Boolean, val install: Boolean, val target: ReconcilerTarget) : SyncReason {
       override fun toString() =
         "out of sync:" +
           (if (meta) " meta" else "") +
