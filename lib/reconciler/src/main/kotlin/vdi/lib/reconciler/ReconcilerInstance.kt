@@ -136,9 +136,7 @@ internal class ReconcilerInstance(
           // database
           if (!nextTargetDataset!!.isUninstalled)
             // then fire a sync event
-            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID,
-              SyncReason.NeedsUninstall(targetDB)
-            )
+            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID, SyncReason.NeedsUninstall(targetDB))
         } else {
           // The dataset does not have a delete flag present in MinIO
 
