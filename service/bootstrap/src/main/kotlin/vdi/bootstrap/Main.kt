@@ -35,7 +35,7 @@ object Main {
       ShareTriggerHandler(::fatality),
       SoftDeleteTriggerHandler(::fatality),
       UpdateMetaTriggerHandler(::fatality),
-      Reconciler(::fatality),
+      Reconciler(abortCB = ::fatality),
       ReconciliationEventHandler(::fatality),
     )
 

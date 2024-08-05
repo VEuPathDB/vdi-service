@@ -244,6 +244,18 @@ uses:
 /admin:
   displayName: Admin RPC
 
+  /reconciler:
+    displayName: Reconciler
+    post:
+      displayName: Execute Reconciler
+      description: |
+        Triggers a full reconciliation run if one is not already in progress.
+      responses:
+        204:
+          description: Success
+        409:
+          description: Reconciler already running.
+
   /proxy-upload:
     displayName: Proxy Upload
     post:
@@ -329,7 +341,6 @@ uses:
       displayName: List
       description: |
         Lists datasets that failed to import.
-      headers:
       queryParameters:
         user:
           type: lib.User-ID

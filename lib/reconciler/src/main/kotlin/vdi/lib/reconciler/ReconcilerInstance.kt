@@ -1,4 +1,4 @@
-package vdi.daemon.reconciler
+package vdi.lib.reconciler
 
 import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -27,7 +27,7 @@ internal class ReconcilerInstance(
   private val datasetManager: DatasetManager,
   private val kafkaRouter: KafkaRouter,
   private val slim: Boolean,
-  private val deleteDryMode: Boolean = false
+  private val deletesEnabled: Boolean
 ) {
   private val log = logger().delegate
 
@@ -35,7 +35,7 @@ internal class ReconcilerInstance(
 
   val name = targetDB.name
 
-  suspend fun reconcile() {
+  internal suspend fun reconcile() {
     try {
       tryReconcile()
 
@@ -136,7 +136,9 @@ internal class ReconcilerInstance(
           // database
           if (!nextTargetDataset!!.isUninstalled)
             // then fire a sync event
-            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID, SyncReason.NeedsUninstall(targetDB))
+            sendSyncEvent(nextTargetDataset!!.ownerID, nextTargetDataset!!.datasetID,
+              SyncReason.NeedsUninstall(targetDB)
+            )
         } else {
           // The dataset does not have a delete flag present in MinIO
 
@@ -200,7 +202,7 @@ internal class ReconcilerInstance(
 
     try {
       Metrics.Reconciler.Full.reconcilerDatasetDeleted.labels(targetDB.name).inc()
-      if (!deleteDryMode) {
+      if (deletesEnabled) {
         log.info("trying to delete dataset {}/{}", record.ownerID, record.datasetID)
         targetDB.deleteDataset(record)
       } else {
@@ -279,7 +281,8 @@ internal class ReconcilerInstance(
   }
 
   private interface SyncReason {
-    class OutOfSync(val meta: Boolean, val shares: Boolean, val install: Boolean, val target: ReconcilerTarget) : SyncReason {
+    class OutOfSync(val meta: Boolean, val shares: Boolean, val install: Boolean, val target: ReconcilerTarget) :
+      SyncReason {
       override fun toString() =
         "out of sync:" +
           (if (meta) " meta" else "") +

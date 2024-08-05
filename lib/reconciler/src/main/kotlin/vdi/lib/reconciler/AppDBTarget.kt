@@ -1,4 +1,4 @@
-package vdi.daemon.reconciler
+package vdi.lib.reconciler
 
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator

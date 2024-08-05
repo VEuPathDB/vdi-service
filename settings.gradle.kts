@@ -53,6 +53,7 @@ include(":lib:metrics")
 include(":lib:module-core")
 include(":lib:pruner")
 include(":lib:rabbit")
+include(":lib:reconciler")
 include(":lib:s3")
 include(":lib:test-utils")
 
