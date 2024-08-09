@@ -19,6 +19,7 @@ import vdi.component.db.app.model.DeleteFlag
 import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallType
 import vdi.component.db.app.withTransaction
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbortCB
@@ -48,7 +49,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
-  private val cacheDB = vdi.component.db.cache.CacheDB()
+  private val cacheDB = CacheDB()
 
   private val appDB = AppDB()
 
