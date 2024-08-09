@@ -5,11 +5,20 @@ plugins {
 dependencies {
   implementation(platform(project(":platform")))
 
+
+  implementation(project(":lib:app-db"))
+  implementation(project(":lib:cache-db"))
+  implementation(project(":lib:env"))
+  implementation(project(":lib:plugin-client"))
+  implementation(project(":lib:kafka"))
+  implementation(project(":lib:metrics"))
+  implementation(project(":lib:module-core"))
+  implementation(project(":lib:plugin-mapping"))
+  implementation(project(":lib:s3"))
+
   implementation("org.veupathdb.vdi:vdi-component-common")
 
-  implementation(project(":lib:env"))
-  implementation(project(":lib:module-core"))
-  implementation(project(":lib:reconciler"))
+  implementation("org.veupathdb.lib.s3:s34k-minio")
 
   implementation("org.apache.logging.log4j:log4j-api-kotlin")
 

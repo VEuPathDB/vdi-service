@@ -656,6 +656,16 @@ object EnvKey {
      * Required: no
      */
     const val SlimRunInterval = "RECONCILER_SLIM_RUN_INTERVAL"
+
+    /**
+     * Whether the reconciler should perform delete operations.  If set to
+     * `false`, the reconciler will only log when a delete would have taken
+     * place.
+     *
+     * Type: Boolean
+     * Required: no
+     */
+    const val DeletesEnabled = "RECONCILER_DELETES_ENABLED"
   }
 
   object ReconciliationTriggerHandler {

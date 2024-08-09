@@ -26,6 +26,7 @@ import vdi.component.install_cleanup.InstallCleaner
 import vdi.component.install_cleanup.ReinstallTarget
 import vdi.component.pruner.Pruner
 import vdi.component.reinstaller.DatasetReinstaller
+import vdi.lib.reconciler.Reconciler
 
 // Broken Import Query Constants
 private const val biQueryLimitMinimum = 0
@@ -43,6 +44,16 @@ class AdminRPC : Admin {
   ): Admin.GetAdminListBrokenResponse {
     return Admin.GetAdminListBrokenResponse
       .respond200WithApplicationJson(listBrokenDatasets(expanded ?: true))
+  }
+
+  override fun postAdminReconciler(): Admin.PostAdminReconcilerResponse {
+    return runBlocking {
+      if (Reconciler.runFull()) {
+        Admin.PostAdminReconcilerResponse.respond204()
+      } else {
+        Admin.PostAdminReconcilerResponse.respond409()
+      }
+    }
   }
 
   override fun postAdminFixBrokenInstalls(

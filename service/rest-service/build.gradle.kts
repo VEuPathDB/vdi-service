@@ -55,6 +55,7 @@ dependencies {
   implementation(project(":lib:install-cleanup"))
   implementation(project(":lib:plugin-mapping"))
   implementation(project(":lib:pruner"))
+  implementation(project(":lib:reconciler"))
   implementation(project(":lib:s3"))
   implementation(project(":lib:metrics"))
 

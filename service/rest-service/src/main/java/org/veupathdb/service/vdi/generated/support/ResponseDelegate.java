@@ -145,13 +145,13 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public Object getEntity() {
-    return this.entity;}
-
-  @Override
   public MultivaluedMap<String, String> getStringHeaders() {
     return this.delegate.getStringHeaders();
   }
+
+  @Override
+  public Object getEntity() {
+    return this.entity;}
 
   @Override
   public String getHeaderString(String p0) {

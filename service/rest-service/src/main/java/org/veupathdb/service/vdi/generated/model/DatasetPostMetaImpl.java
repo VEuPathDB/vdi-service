@@ -47,8 +47,8 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("dependencies")
   private List<DatasetDependency> dependencies;
 
-  @JsonProperty("createdOn")
 
+  @JsonProperty("createdOn")
   private OffsetDateTime createdOn;
 
   @JsonProperty("datasetType")
