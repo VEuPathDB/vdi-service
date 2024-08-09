@@ -16,7 +16,6 @@ import org.veupathdb.vdi.lib.common.util.or
 import vdi.component.async.WorkerPool
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDBTransaction
-import vdi.component.db.app.UniqueConstraintViolation
 import vdi.component.db.app.model.*
 import vdi.component.db.app.withTransaction
 import vdi.component.db.cache.CacheDB
@@ -25,7 +24,6 @@ import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
-import vdi.component.env.Environment
 import vdi.component.kafka.EventMessage
 import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
@@ -43,6 +41,7 @@ import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import java.sql.SQLException
 import java.time.OffsetDateTime
+import java.util.concurrent.ConcurrentHashMap
 
 internal class UpdateMetaTriggerHandlerImpl(
   private val config: UpdateMetaTriggerHandlerConfig,
@@ -52,6 +51,8 @@ internal class UpdateMetaTriggerHandlerImpl(
   , AbstractVDIModule("update-meta-trigger-handler", abortCB)
 {
   private val log = LoggerFactory.getLogger(javaClass)
+
+  private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
   private val cacheDB = CacheDB()
 
@@ -71,7 +72,7 @@ internal class UpdateMetaTriggerHandlerImpl(
           kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey)
             .forEach {
               log.info("Received install-meta job for dataset {}/{} from source {}", it.userID, it.datasetID, it.eventSource)
-              wp.submit { tryUpdateMeta(dm, kr, it) }
+              wp.submit { updateMetaIfNotInProgress(dm, kr, it) }
             }
         }
       }
@@ -81,6 +82,18 @@ internal class UpdateMetaTriggerHandlerImpl(
     kc.close()
     kr.close()
     confirmShutdown()
+  }
+
+  private suspend fun updateMetaIfNotInProgress(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
+    if (datasetsInProgress.add(msg.datasetID)) {
+      try {
+        tryUpdateMeta(dm, kr, msg)
+      } finally {
+        datasetsInProgress.remove(msg.datasetID)
+      }
+    } else {
+      log.info("meta update already in progress for dataset {}/{}, ignoring meta event", msg.userID, msg.datasetID)
+    }
   }
 
   private suspend fun tryUpdateMeta(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
