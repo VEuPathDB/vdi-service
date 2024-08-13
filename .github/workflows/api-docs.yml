@@ -6,8 +6,8 @@ on:
     - 'docs/vdi-api.html'
 
 jobs:
-  publish-api-docs:
-    name: Publish API Docs
+  build:
+    name: Build API Docs
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -16,5 +16,12 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with:
         path: docs/
+  deploy:
+    name: Deploy API Docs
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
     - name: Deploy
       uses: actions/deploy-pages@v4
