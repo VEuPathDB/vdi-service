@@ -67,26 +67,36 @@ internal class DatasetReconciler(
     if (haveRawUpload())
       handleHasUpload()
 
+    // Determine whether the dataset should be preprocessed again to get an
+    // install-ready file.
     val reimport = shouldReimport()
 
+    // If we determined that a reimport is possible and required (the
+    // import-ready.zip file exists but no install-ready.zip file exists) then
+    // perform the reimport and halt here.
     if (reimport == ReimportIndicator.NeedReimport) {
       tryReimport()
       return
     }
 
+    // If we have no import-ready file, then something is wrong, but we may have
+    // install-ready files we can process?
     if (!haveImportableFile())
       logError("missing import-ready file")
 
+    // If we determined that a reimport is not needed by the existence and age
+    // of the install-ready files, ensure that the import status for the dataset
+    // is correct.
     if (reimport == ReimportIndicator.ReimportNotNeeded)
       if (getCacheImportControl() == DatasetImportStatus.Queued)
         updateCacheDBImportStatus(DatasetImportStatus.Complete)
 
     if (reimport != ReimportIndicator.ReimportNotPossible) {
       if (!haveInstallableFile())
-        logError("missing install-ready file")
+        logWarning("missing install-ready file")
 
       if (!haveManifestFile())
-        logError("missing manifest file")
+        logWarning("missing manifest file")
     }
 
     runSync()
@@ -217,7 +227,13 @@ internal class DatasetReconciler(
       // If we failed the last import attempt, then only rerun the import if we
       // have no import messages so that we can repopulate that table to
       // indicate to the user what happened.
-      failedImport() -> if (missingImportMessage()) ReimportIndicator.NeedReimport else ReimportIndicator.ReimportNotNeeded
+      failedImport() -> if (missingImportMessage()) {
+        logInfo("import failed, but we have no error message; marking dataset as needing a reimport to populate the error message")
+        ReimportIndicator.NeedReimport
+      } else {
+        logInfo("import failed, reimport attempt not necessary")
+        ReimportIndicator.ReimportNotNeeded
+      }
 
       // If we are missing the install-ready file and/or the manifest file then
       // we need to rerun the import to get those files back.
@@ -241,14 +257,14 @@ internal class DatasetReconciler(
      * * A previous import attempt failed, but the cache-db does not have a
      *   message recorded.  In this case we re-run to provide an error message
      *   for the user.
-     * * The import is not marked as failed but we do not have both an
+     * * The import is not marked as failed, but we do not have both an
      *   install-ready.zip file and vdi-manifest.json file
      */
     NeedReimport,
 
     /**
      * We already have an import-ready.zip and vdi-manifest.json or the import
-     * previously failed and we have an error message for the user.
+     * previously failed, and we have an error message for the user.
      */
     ReimportNotNeeded,
   }
