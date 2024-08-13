@@ -39,9 +39,7 @@ private const val biQueryOffsetDefault = 0
 @AdminRequired
 class AdminRPC : Admin {
 
-  override fun getAdminListBroken(
-    expanded: Boolean?,
-  ): Admin.GetAdminListBrokenResponse {
+  override fun getAdminListBroken(expanded: Boolean?): Admin.GetAdminListBrokenResponse {
     return Admin.GetAdminListBrokenResponse
       .respond200WithApplicationJson(listBrokenDatasets(expanded ?: true))
   }
