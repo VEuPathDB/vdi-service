@@ -1,4 +1,4 @@
-package vdi.daemon.reconciler
+package vdi.lib.reconciler
 
 import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -27,7 +27,7 @@ internal class ReconcilerInstance(
   private val datasetManager: DatasetManager,
   private val kafkaRouter: KafkaRouter,
   private val slim: Boolean,
-  private val deleteDryMode: Boolean = false
+  private val deletesEnabled: Boolean
 ) {
   private val log = logger().delegate
 
@@ -35,7 +35,7 @@ internal class ReconcilerInstance(
 
   val name = targetDB.name
 
-  suspend fun reconcile() {
+  internal suspend fun reconcile() {
     try {
       tryReconcile()
 
@@ -200,7 +200,7 @@ internal class ReconcilerInstance(
 
     try {
       Metrics.Reconciler.Full.reconcilerDatasetDeleted.labels(targetDB.name).inc()
-      if (!deleteDryMode) {
+      if (deletesEnabled) {
         log.info("trying to delete dataset {}/{}", record.ownerID, record.datasetID)
         targetDB.deleteDataset(record)
       } else {

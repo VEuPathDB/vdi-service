@@ -27,13 +27,14 @@ object AppDatabaseRegistry {
 
   operator fun get(key: String): AppDBRegistryEntry? = dataSources[key]
 
-  operator fun iterator() =
+  operator fun iterator() = asSequence().iterator()
+
+  fun size() = dataSources.size
+
+  fun asSequence() =
     dataSources.entries
       .asSequence()
       .map { (key, value) -> key to value }
-      .iterator()
-
-  fun size() = dataSources.size
 
   fun require(key: String): AppDBRegistryEntry =
     get(key) ?: throw IllegalStateException("required AppDB connection $key was not registered with AppDatabases")
@@ -80,7 +81,7 @@ object AppDatabaseRegistry {
       TNS: {}
       Pool Size: {}
       Port: {}
-      DBNamme: {}
+      DBName: {}
       User/Schema: {}""",
       env.name,
       env.name,

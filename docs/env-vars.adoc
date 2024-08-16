@@ -244,6 +244,11 @@ VDI system
 | RECONCILER_SLIM_RUN_INTERVAL
 | Duration
 | Interval at which the slim reconciliation process will run.
+
+|
+| RECONCILER_DELETES_ENABLED
+| boolean
+| Whether the reconciler should perform delete operations.
 |===
 
 

@@ -26,6 +26,10 @@ import org.veupathdb.service.vdi.generated.support.ResponseDelegate;
 @Path("/admin")
 public interface Admin {
   @POST
+  @Path("/reconciler")
+  PostAdminReconcilerResponse postAdminReconciler();
+
+  @POST
   @Path("/proxy-upload")
   @Produces("application/json")
   @Consumes("multipart/form-data")
@@ -78,6 +82,26 @@ public interface Admin {
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("project_id") String projectId,
       @QueryParam("include_deleted") @DefaultValue("false") Boolean includeDeleted);
+
+  class PostAdminReconcilerResponse extends ResponseDelegate {
+    private PostAdminReconcilerResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private PostAdminReconcilerResponse(Response response) {
+      super(response);
+    }
+
+    public static PostAdminReconcilerResponse respond204() {
+      Response.ResponseBuilder responseBuilder = Response.status(204);
+      return new PostAdminReconcilerResponse(responseBuilder.build());
+    }
+
+    public static PostAdminReconcilerResponse respond409() {
+      Response.ResponseBuilder responseBuilder = Response.status(409);
+      return new PostAdminReconcilerResponse(responseBuilder.build());
+    }
+  }
 
   class PostAdminProxyUploadResponse extends ResponseDelegate {
     private PostAdminProxyUploadResponse(Response response, Object entity) {

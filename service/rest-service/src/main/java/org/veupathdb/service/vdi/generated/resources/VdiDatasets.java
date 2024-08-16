@@ -14,6 +14,7 @@ import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.DatasetListEntry;
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest;
 import org.veupathdb.service.vdi.generated.model.DatasetPostResponse;
+import org.veupathdb.service.vdi.generated.model.FailedDependencyError;
 import org.veupathdb.service.vdi.generated.model.ServerError;
 import org.veupathdb.service.vdi.generated.model.UnauthorizedError;
 import org.veupathdb.service.vdi.generated.model.UnprocessableEntityError;
@@ -98,6 +99,13 @@ public interface VdiDatasets {
     public static PostVdiDatasetsResponse respond422WithApplicationJson(
         UnprocessableEntityError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(422).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostVdiDatasetsResponse(responseBuilder.build(), entity);
+    }
+
+    public static PostVdiDatasetsResponse respond424WithApplicationJson(
+        FailedDependencyError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(424).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new PostVdiDatasetsResponse(responseBuilder.build(), entity);
     }

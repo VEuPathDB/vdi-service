@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package vdi.daemon.reconciler
+package vdi.lib.reconciler
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
@@ -31,7 +31,7 @@ class ReconcilerTest {
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
 
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false)
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, true)
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
             closeableIterator(
@@ -64,7 +64,7 @@ class ReconcilerTest {
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false)
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, false)
 
         `when`(cacheDb.streamSortedSyncControlRecords())
             .thenReturn(closeableIterator(listOf(makeTargetRecord(111, "12345678123456781234567812345678")).iterator()))
@@ -86,7 +86,7 @@ class ReconcilerTest {
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false)
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, false)
 
         `when`(cacheDb.streamSortedSyncControlRecords())
             .thenReturn(closeableIterator(listOf(makeTargetRecord(111, "12345678123456781234567812345678")).iterator()))
@@ -104,7 +104,7 @@ class ReconcilerTest {
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false)
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, false)
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
             closeableIterator(emptyList<VDIReconcilerTargetRecord>().iterator())
@@ -127,7 +127,7 @@ class ReconcilerTest {
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false)
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, true)
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
             closeableIterator(listOf(
@@ -160,7 +160,7 @@ class ReconcilerTest {
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false)
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, true)
 
         `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
 
@@ -194,7 +194,7 @@ class ReconcilerTest {
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false)
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, false)
 
         `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
 
@@ -226,7 +226,7 @@ class ReconcilerTest {
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetManager>()
         val kafkaRouter = mock<KafkaRouter>()
-        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false)
+        val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, false)
 
         `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
 

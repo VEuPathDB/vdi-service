@@ -244,6 +244,18 @@ uses:
 /admin:
   displayName: Admin RPC
 
+  /reconciler:
+    displayName: Reconciler
+    post:
+      displayName: Execute Reconciler
+      description: |
+        Triggers a full reconciliation run if one is not already in progress.
+      responses:
+        204:
+          description: Success
+        409:
+          description: Reconciler already running.
+
   /proxy-upload:
     displayName: Proxy Upload
     post:
@@ -329,7 +341,10 @@ uses:
       displayName: List
       description: |
         Lists datasets that failed to import.
-      headers:
+        
+        **Note**: A failed import is different from an invalid import.  Failed
+        imports are caused by process bugs or errors, invalid imports are caused
+        by bad user input.
       queryParameters:
         user:
           type: lib.User-ID
@@ -600,14 +615,28 @@ uses:
 
   /list-s3-objects:
     get:
+      description: |
+        Lists all the objects currently in the S3 object store backing VDI.
+        
+        This endpoint returns the data in TSV format with the following columns
+        for each object in the store:
+        
+        * Key/path
+        * Size (in bytes)
+        * Last modified date
       responses:
         200:
           body:
             text/plain:
               type: any
+              example: |
+                /foo/bar/fizz	342345	2023-08-13T15:34:04.0342Z
+                /foo/bar/buzz	32125	2023-08-13T15:34:06.1254Z
 
   /list-all-datasets:
     get:
+      description: |
+        Lists all datasets known to VDI via the internal cache database.
       queryParameters:
         offset:
           type: integer
