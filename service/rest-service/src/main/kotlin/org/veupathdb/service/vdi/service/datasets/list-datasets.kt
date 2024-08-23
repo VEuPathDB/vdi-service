@@ -76,14 +76,13 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
 
   // Get the user details for all the distinct user IDs seen in the dataset
   // listing returned by the original query.
-  val userDetails = mutableMapOf<UserID, UserDetails>()
-  UserProvider.getUsersById(userIDs.toList().map { it.toLong() })
-    .map {
-      val userId = UserID(it.key)
-      val user = it.value
-      val userDetail = UserDetails(userId, user.firstName, user.lastName, user.email, user.organization)
-      userDetails.put(userId, userDetail)
+  val userDetails = UserProvider.getUsersById(idsIncludingShares.map { it.toLong() })
+    .asSequence()
+    .map { (userIdLong, user) ->
+      val userId = UserID(userIdLong)
+      userId to UserDetails(userId, user.firstName, user.lastName, user.email, user.organization)
     }
+    .toMap()
   userIDs.clear()
 
   // Build a list for the results we will be returning.

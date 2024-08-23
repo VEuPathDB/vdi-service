@@ -74,14 +74,14 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
       add(dataset.ownerID)
       shares.forEach { add(it.recipientID) }
     }
-  val userDetails = mutableMapOf<UserID, UserDetails>()
-  UserProvider.getUsersById(idsIncludingShares.toList().map { it.toLong() })
-    .map {
-      val userId = UserID(it.key)
-      val user = it.value
-      val userDetail = UserDetails(userId, user.firstName, user.lastName, user.email, user.organization)
-      userDetails.put(userId, userDetail)
+
+  val userDetails = UserProvider.getUsersById(idsIncludingShares.map { it.toLong() })
+    .asSequence()
+    .map { (userIdLong, user) ->
+      val userId = UserID(userIdLong)
+      userId to UserDetails(userId, user.firstName, user.lastName, user.email, user.organization)
     }
+    .toMap()
 
   // Lookup the display name for the plugin type for the dataset
   val typeDisplayName = PluginHandlers[dataset.typeName, dataset.typeVersion]?.displayName

@@ -44,14 +44,13 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
     .map { it.ownerID }
     .toSet()
 
-  val owners = mutableMapOf<UserID, UserDetails>()
-  UserProvider.getUsersById(ownerIDs.toList().map { it.toLong() })
-    .map {
-      val userId = UserID(it.key)
-      val user = it.value
-      val userDetail = UserDetails(userId, user.firstName, user.lastName, user.email, user.organization)
-      owners.put(userId, userDetail)
+  val owners= UserProvider.getUsersById(idsIncludingShares.map { it.toLong() })
+    .asSequence()
+    .map { (userIdLong, user) ->
+      val userId = UserID(userIdLong)
+      userId to UserDetails(userId, user.firstName, user.lastName, user.email, user.organization)
     }
+    .toMap()
 
   return shares.map {
     val typeDisplayName = PluginHandlers[it.typeName, it.typeVersion]?.displayName
