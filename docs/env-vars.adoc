@@ -122,7 +122,7 @@ authentication.
 | USER_UPLOAD_QUOTA
 | uint64
 | Quota cap for an individual user's total uploads in bytes.
-|
+
 |===
 
 ==== Hard Delete Trigger Handler
