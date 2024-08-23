@@ -22,8 +22,6 @@ This is the basic setup required to run the VDI stack locally.
 ** `AUTH_SECRET_KEY`: Must be a valid value.
 ** `ADMIN_AUTH_TOKEN`: May be any value, just can't be blank.
 ** `LDAP_SERVER`: Must be a valid value (or comma separated list of values)
-** `ACCT_DB_USER`: Your account db username
-** `ACCT_DB_PASS`: Your account db password
 ** `USER_DB_USER`: Your user db username
 ** `USER_DB_PASS`: Your user db password
 ** Find and replace all instances of `someDBUser` with your app db username

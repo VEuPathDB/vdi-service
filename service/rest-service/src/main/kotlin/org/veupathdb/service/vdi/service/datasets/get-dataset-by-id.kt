@@ -1,8 +1,9 @@
 package org.veupathdb.service.vdi.service.datasets
 
 import jakarta.ws.rs.NotFoundException
-import org.veupathdb.service.vdi.db.AccountDB
+import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.service.vdi.generated.model.*
+import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -67,12 +68,20 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   }
 
   // Lookup user details for the dataset's owner and any share users
-  val userDetails = AccountDB.lookupUserDetails(HashSet<UserID>(shares.size + 2)
+  val idsIncludingShares = HashSet<UserID>(shares.size + 2)
     .apply {
       add(userID)
       add(dataset.ownerID)
       shares.forEach { add(it.recipientID) }
-    })
+    }
+
+  val userDetails = UserProvider.getUsersById(idsIncludingShares.map { it.toLong() })
+    .asSequence()
+    .map { (userIdLong, user) ->
+      val userId = UserID(userIdLong)
+      userId to UserDetails(userId, user.firstName, user.lastName, user.email, user.organization)
+    }
+    .toMap()
 
   // Lookup the display name for the plugin type for the dataset
   val typeDisplayName = PluginHandlers[dataset.typeName, dataset.typeVersion]?.displayName

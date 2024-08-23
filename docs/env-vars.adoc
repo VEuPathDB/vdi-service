@@ -30,11 +30,6 @@ ADMIN_AUTH_TOKEN=
 LDAP_SERVER=
 ORACLE_BASE_DN=ou=applications,dc=apidb,dc=org
 
-ACCT_DB_TNS_NAME=acctdbn
-ACCT_DB_USER=
-ACCT_DB_PASS=
-ACCT_DB_POOL_SIZE=5
-
 USER_DB_TNS_NAME=apicommn
 USER_DB_USER=
 USER_DB_PASS=
@@ -128,25 +123,6 @@ authentication.
 | uint64
 | Quota cap for an individual user's total uploads in bytes.
 
-| :exclamation:
-| ACCT_DB_TNS_NAME
-| String
-| Oracle TNS name of the account database.
-
-| :exclamation:
-| ACCT_DB_USER
-| String
-|
-
-| :exclamation:
-| ACCT_DB_PASS
-| String
-|
-
-|
-| ACCT_DB_POOL_SIZE
-| uint8
-|
 |===
 
 ==== Hard Delete Trigger Handler
