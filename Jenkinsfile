@@ -1,6 +1,6 @@
 #!groovy
 
-@Library('pipelib@fixes')
+@Library('pipelib')
 import org.veupathdb.lib.Builder
 
 node('centos8') {
