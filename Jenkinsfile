@@ -8,7 +8,7 @@ node('centos8') {
 
   builder.gitClone()
   
-builder.buildContainers([
+  builder.buildContainers([
     [ name: 'vdi-service' ],
   ])
 }
