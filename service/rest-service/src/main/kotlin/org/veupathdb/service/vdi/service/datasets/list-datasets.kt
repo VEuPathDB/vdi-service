@@ -76,7 +76,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
 
   // Get the user details for all the distinct user IDs seen in the dataset
   // listing returned by the original query.
-  val userDetails = UserProvider.getUsersById(idsIncludingShares.map { it.toLong() })
+  val userDetails = UserProvider.getUsersById(userIDs.map { it.toLong() })
     .asSequence()
     .map { (userIdLong, user) ->
       val userId = UserID(userIdLong)

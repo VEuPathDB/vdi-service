@@ -44,7 +44,7 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
     .map { it.ownerID }
     .toSet()
 
-  val owners= UserProvider.getUsersById(idsIncludingShares.map { it.toLong() })
+  val owners= UserProvider.getUsersById(ownerIDs.map { it.toLong() })
     .asSequence()
     .map { (userIdLong, user) ->
       val userId = UserID(userIdLong)
