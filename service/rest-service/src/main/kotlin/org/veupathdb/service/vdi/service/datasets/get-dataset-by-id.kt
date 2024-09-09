@@ -42,10 +42,13 @@ private fun generalGetDataset(dataset: DatasetRecord): DatasetDetails {
   // This value will be null if the async dataset upload has not yet completed.
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, dataset.datasetID)
 
+  val userDetails = AccountDB.lookupUserDetails(listOf(dataset.ownerID))
+
   return DatasetDetailsImpl().also { out ->
     out.datasetId      = dataset.datasetID.toString()
     out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
     out.name           = dataset.name
+    out.owner          = userDetails[dataset.ownerID]?.let(::DatasetOwner)
     out.summary        = dataset.summary
     out.description    = dataset.description
     out.importMessages = importMessages

@@ -85,6 +85,11 @@ internal class ReconcilerImpl(private val config: ReconcilerConfig, abortCB: Abo
   }
 
   private suspend fun runFull() {
+    if (!config.reconcilerEnabled) {
+      log.info("reconciler disabled, skipping full reconciler run")
+      return
+    }
+
     log.info("scheduling reconciler for {} targets", targets.size)
 
     val timer = Metrics.Reconciler.Full.reconcilerTimes.startTimer()
