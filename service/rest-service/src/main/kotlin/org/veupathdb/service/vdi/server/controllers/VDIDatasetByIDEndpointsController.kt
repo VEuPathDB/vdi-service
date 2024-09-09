@@ -9,19 +9,25 @@ import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdId
 import org.veupathdb.service.vdi.service.datasets.*
 import org.veupathdb.vdi.lib.common.field.toUserID
 
-@Authenticated
 class VDIDatasetByIDEndpointsController(@Context request: ContainerRequest) : VdiDatasetsVdId, ControllerBase(request) {
-
-  @Authenticated(adminOverride = ALLOW_ALWAYS)
+  @Authenticated(allowGuests = true, adminOverride = ALLOW_ALWAYS)
   override fun getVdiDatasetsByVdId(vdID: String): VdiDatasetsVdId.GetVdiDatasetsByVdIdResponse {
-    val userID = maybeUserID
+    // We're trusting that we couldn't have gotten here with a null user unless
+    // the admin token validation succeeded.
+    val user = maybeUser
       ?: return VdiDatasetsVdId.GetVdiDatasetsByVdIdResponse
-        .respond200WithApplicationJson(adminGetDatasetByID(vdID.asVDIID()))
+        .respond200WithApplicationJson(generalGetDatasetByID(vdID.asVDIID()))
+
+    if (user.isGuest) {
+      return VdiDatasetsVdId.GetVdiDatasetsByVdIdResponse
+        .respond200WithApplicationJson(getCommunityDataset(vdID.asVDIID()))
+    }
 
     return VdiDatasetsVdId.GetVdiDatasetsByVdIdResponse
       .respond200WithApplicationJson(getDatasetByID(userID.toUserID(), vdID.asVDIID()))
   }
 
+  @Authenticated
   override fun patchVdiDatasetsByVdId(vdID: String, entity: DatasetPatchRequest): VdiDatasetsVdId.PatchVdiDatasetsByVdIdResponse {
     updateDatasetMeta(userID.toUserID(), vdID.asVDIID(), entity)
     return VdiDatasetsVdId.PatchVdiDatasetsByVdIdResponse.respond204()

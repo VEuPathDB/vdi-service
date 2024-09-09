@@ -1,5 +1,6 @@
 package org.veupathdb.service.vdi.service.datasets
 
+import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.service.vdi.generated.model.*
@@ -10,23 +11,34 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import vdi.component.db.app.AppDB
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.plugin.mapping.PluginHandlers
 
-/**
- * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
- * return user information.
- */
-fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
-  val dataset = vdi.component.db.cache.CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
+fun getCommunityDataset(datasetID: DatasetID) =
+  CacheDB().selectDataset(datasetID)
+    .let { it ?: throw NotFoundException() }
+    // TODO: document somewhere that "community" means "anything but `private`"
+    .takeIf { it.visibility != VDIDatasetVisibility.Private }
+    .let { it ?: throw ForbiddenException() }
+    .let(::generalGetDataset)
 
+/**
+ * Lookup endpoint for looking up a dataset by ID from a non-owning user.
+ *
+ * The result will not contain user details.
+ */
+fun generalGetDatasetByID(datasetID: DatasetID) =
+  generalGetDataset(CacheDB().selectDataset(datasetID) ?: throw NotFoundException())
+
+private fun generalGetDataset(dataset: DatasetRecord): DatasetDetails {
   val typeDisplayName = PluginHandlers[dataset.typeName, dataset.typeVersion]?.displayName
     ?: throw IllegalStateException("plugin missing: ${dataset.typeName}:${dataset.typeVersion}")
 
   // Lookup status information for the dataset
   val statuses = AppDB().getDatasetStatuses(datasetID, dataset.projects)
 
-  val importMessages = vdi.component.db.cache.CacheDB().selectImportMessages(datasetID)
+  val importMessages = CacheDB().selectImportMessages(datasetID)
 
   // This value will be null if the async dataset upload has not yet completed.
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
@@ -54,6 +66,7 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
   }
 }
 
+
 fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // Lookup dataset that is owned by or shared with the current user
   val dataset = requireDataset(userID, datasetID)
@@ -62,7 +75,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     throw NotFoundException()
 
   val shares = if (dataset.ownerID == userID) {
-    vdi.component.db.cache.CacheDB().selectSharesForDataset(datasetID)
+    CacheDB().selectSharesForDataset(datasetID)
   } else {
     emptyList()
   }
@@ -90,7 +103,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // Lookup status information for the dataset
   val statuses = AppDB().getDatasetStatuses(datasetID, dataset.projects)
 
-  val importMessages = vdi.component.db.cache.CacheDB().selectImportMessages(datasetID)
+  val importMessages = CacheDB().selectImportMessages(datasetID)
 
   // This value will be null if the async dataset upload has not yet completed.
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
@@ -130,10 +143,10 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 }
 
 private fun requireDataset(userID: UserID, datasetID: DatasetID): DatasetRecord {
-  var ds = vdi.component.db.cache.CacheDB().selectDatasetForUser(userID, datasetID)
+  var ds = CacheDB().selectDatasetForUser(userID, datasetID)
 
   if (ds == null) {
-    ds = vdi.component.db.cache.CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
+    ds = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
 
     if (ds.visibility == VDIDatasetVisibility.Private)
       throw NotFoundException()
