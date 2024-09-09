@@ -35,15 +35,15 @@ private fun generalGetDataset(dataset: DatasetRecord): DatasetDetails {
     ?: throw IllegalStateException("plugin missing: ${dataset.typeName}:${dataset.typeVersion}")
 
   // Lookup status information for the dataset
-  val statuses = AppDB().getDatasetStatuses(datasetID, dataset.projects)
+  val statuses = AppDB().getDatasetStatuses(dataset.datasetID, dataset.projects)
 
-  val importMessages = CacheDB().selectImportMessages(datasetID)
+  val importMessages = CacheDB().selectImportMessages(dataset.datasetID)
 
   // This value will be null if the async dataset upload has not yet completed.
-  val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
+  val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, dataset.datasetID)
 
   return DatasetDetailsImpl().also { out ->
-    out.datasetId      = datasetID.toString()
+    out.datasetId      = dataset.datasetID.toString()
     out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
     out.name           = dataset.name
     out.summary        = dataset.summary
