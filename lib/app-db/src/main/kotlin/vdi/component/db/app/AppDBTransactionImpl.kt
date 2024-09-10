@@ -115,22 +115,22 @@ class AppDBTransactionImpl(
     connection.insertDatasetSyncControl(schema, sync)
   }
 
-  override fun insertDatasetMeta(datasetID: DatasetID, name: String, description: String?) {
+  override fun insertDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?) {
     log.debug("inserting dataset meta record for dataset {}", datasetID)
-    connection.insertDatasetMeta(schema, datasetID, name, description)
+    connection.insertDatasetMeta(schema, datasetID, name, summary, description)
   }
 
-  override fun upsertDatasetMeta(datasetID: DatasetID, name: String, description: String?) {
+  override fun upsertDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?) {
     log.debug("upserting dataset meta record for dataset {}", datasetID)
     if (platform === AppDBPlatform.Postgres) {
-      connection.upsertDatasetMeta(schema, datasetID, name, description)
+      connection.upsertDatasetMeta(schema, datasetID, name, summary, description)
     } else {
       try {
-        insertDatasetMeta(datasetID, name, description)
+        insertDatasetMeta(datasetID, name, summary, description)
       } catch (e: SQLException) {
         if (e.errorCode == 1) {
           log.debug("dataset meta record already exists for dataset {}", datasetID)
-          updateDatasetMeta(datasetID, name, description)
+          updateDatasetMeta(datasetID, name, summary, description)
         } else {
           throw e
         }
@@ -168,9 +168,9 @@ class AppDBTransactionImpl(
     connection.updateDatasetInstallMessage(schema, message)
   }
 
-  override fun updateDatasetMeta(datasetID: DatasetID, name: String, description: String?) {
+  override fun updateDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?) {
     log.debug("updating dataset meta record for dataset {}", datasetID)
-    connection.updateDatasetMeta(schema, datasetID, name, description)
+    connection.updateDatasetMeta(schema, datasetID, name, summary, description)
   }
 
   override fun rollback() {
