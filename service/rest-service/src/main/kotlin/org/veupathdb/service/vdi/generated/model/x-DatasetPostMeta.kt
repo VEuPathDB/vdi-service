@@ -28,8 +28,10 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
   if (name.isNullOrBlank())
     validationErrors.add("meta.name", "field is required")
 
-  if (summary != null && summary.isBlank())
-    summary = null
+  if (summary != null) {
+    if (summary.length > 4000) validationErrors.add("meta.summary", "must be 4000 characters or less")
+    if (summary.isBlank()) summary = null
+  }
 
   if (description != null && description.isBlank())
     description = null
