@@ -1,6 +1,7 @@
 package vdi.component.db.app.sql
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import vdi.component.db.app.MaxSummaryFieldLength
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -19,7 +20,7 @@ VALUES
 
 internal fun Connection.insertDatasetMeta(schema: String, datasetID: DatasetID, name: String, summary: String?, description: String?) {
   // limit to fit into varchar(4000)
-  val summTrunc = if (summary != null && summary.length > 4000) summary.substring(0, 4000) else summary
+  val summTrunc = if (summary != null && summary.length > MaxSummaryFieldLength) summary.substring(0, 4000) else summary
   prepareStatement(sql(schema))
     .use { ps ->
       ps.setString(1, datasetID.toString())
