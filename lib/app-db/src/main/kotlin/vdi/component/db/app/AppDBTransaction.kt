@@ -190,7 +190,7 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    *
    * @param description Optional description of the dataset.
    */
-  fun insertDatasetMeta(datasetID: DatasetID, name: String, description: String?)
+  fun insertDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?)
 
   // endregion Insert Operations
 
@@ -266,7 +266,7 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    *
    * @param description Optional description of the dataset.
    */
-  fun updateDatasetMeta(datasetID: DatasetID, name: String, description: String?)
+  fun updateDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?)
 
   // endregion Update Operations
 
@@ -283,7 +283,7 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    *
    * @param description Optional description of the dataset.
    */
-  fun upsertDatasetMeta(datasetID: DatasetID, name: String, description: String?)
+  fun upsertDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?)
 
   // endregion Upsert Operations
 

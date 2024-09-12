@@ -263,7 +263,7 @@ internal class UpdateMetaTriggerHandlerImpl(
         }
 
         log.debug("upserting dataset meta record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
-        it.upsertDatasetMeta(datasetID, meta.name, meta.description)
+        it.upsertDatasetMeta(datasetID, meta.name, meta.summary, meta.description)
 
         it.selectDatasetSyncControlRecord(datasetID) or {
           it.insertSyncControl(VDISyncControlRecord(

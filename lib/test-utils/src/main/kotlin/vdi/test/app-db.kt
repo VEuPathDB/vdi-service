@@ -117,15 +117,15 @@ fun mockAppDBTransaction(
     on { insertDatasetProjectLinks(any(), any()) } doAnswer { onInsertProjectLinks(it.getArgument(0), it.getArgument(1)) }
     on { insertDatasetVisibility(any(), any()) } doAnswer { onInsertVisibility(it.getArgument(0), it.getArgument(1)) }
     on { insertSyncControl(any()) } doAnswer { onInsertSyncControl(it.getArgument(0)) }
-    on { insertDatasetMeta(any(), any(), any()) } doAnswer { onInsertMeta(it.getArgument(0), it.getArgument(1), it.getArgument(3)) }
+    on { insertDatasetMeta(any(), any(), any(), any()) } doAnswer { onInsertMeta(it.getArgument(0), it.getArgument(1), it.getArgument(3)) }
     on { updateDataset(any()) } doAnswer { onUpdateDataset(it.getArgument(0)) }
     on { updateDatasetDeletedFlag(any(), any()) } doAnswer { onUpdateDeleteFlag(it.getArgument(0), it.getArgument(1)) }
     on { updateSyncControlDataTimestamp(any(), any()) } doAnswer { onUpdateSyncControlData(it.getArgument(0), it.getArgument(1)) }
     on { updateSyncControlMetaTimestamp(any(), any()) } doAnswer { onUpdateSyncControlMeta(it.getArgument(0), it.getArgument(1)) }
     on { updateSyncControlSharesTimestamp(any(), any()) } doAnswer { onUpdateSyncControlShares(it.getArgument(0), it.getArgument(1)) }
     on { updateDatasetInstallMessage(any()) } doAnswer { onUpdateInstallMessage(it.getArgument(0)) }
-    on { updateDatasetMeta(any(), any(), any()) } doAnswer { onUpdateMeta(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
-    on { upsertDatasetMeta(any(), any(), any()) } doAnswer { onUpsertMeta(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
+    on { updateDatasetMeta(any(), any(), any(), any()) } doAnswer { onUpdateMeta(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
+    on { upsertDatasetMeta(any(), any(), any(), any()) } doAnswer { onUpsertMeta(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
     on { rollback() } doAnswer { onRollback() }
     on { commit() } doAnswer { onCommit() }
   }
