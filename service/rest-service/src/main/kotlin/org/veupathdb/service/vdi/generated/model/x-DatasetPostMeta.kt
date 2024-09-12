@@ -1,6 +1,7 @@
 package org.veupathdb.service.vdi.generated.model
 
 import org.veupathdb.service.vdi.util.ValidationErrors
+import vdi.component.db.app.MaxSummaryFieldLength
 
 internal fun DatasetPostMeta.cleanup() {
   datasetType?.cleanup()
@@ -29,7 +30,7 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
     validationErrors.add("meta.name", "field is required")
 
   if (summary != null) {
-    if (summary.length > 4000) validationErrors.add("meta.summary", "must be 4000 characters or less")
+    if (summary.length > MaxSummaryFieldLength) validationErrors.add("meta.summary", "must be $MaxSummaryFieldLength characters or less")
     if (summary.isBlank()) summary = null
   }
 
