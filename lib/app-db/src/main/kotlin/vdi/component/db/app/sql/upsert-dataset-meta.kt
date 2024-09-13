@@ -27,10 +27,10 @@ internal fun Connection.upsertDatasetMeta(schema: String, datasetID: DatasetID, 
     .use { ps ->
       ps.setString(1, datasetID.toString())
       ps.setString(2, name)
-      ps.setString(3, summary.take(MaxSummaryFieldLength))
+      ps.setString(3, summary?.take(MaxSummaryFieldLength))
       ps.setString(4, description)
       ps.setString(5, name)
-      ps.setString(6, summary.take(MaxSummaryFieldLength))
+      ps.setString(6, summary?.take(MaxSummaryFieldLength))
       ps.setString(7, description)
       ps.executeUpdate()
     }

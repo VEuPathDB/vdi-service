@@ -24,7 +24,7 @@ internal fun Connection.insertDatasetMeta(schema: String, datasetID: DatasetID, 
     .use { ps ->
       ps.setString(1, datasetID.toString())
       ps.setString(2, name)
-      ps.setString(3, summary.take(MaxSummaryFieldLength))
+      ps.setString(3, summary?.take(MaxSummaryFieldLength))
       ps.setString(4, description)
       ps.executeUpdate()
     }
