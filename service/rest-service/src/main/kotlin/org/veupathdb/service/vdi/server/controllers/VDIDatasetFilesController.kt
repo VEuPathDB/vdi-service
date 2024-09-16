@@ -10,7 +10,7 @@ import org.veupathdb.service.vdi.service.datasets.*
 import org.veupathdb.vdi.lib.common.field.toDatasetIDOrNull
 import org.veupathdb.vdi.lib.common.field.toUserID
 
-@Authenticated(adminOverride = ALLOW_ALWAYS)
+@Authenticated(adminOverride = ALLOW_ALWAYS, allowGuests = true)
 class VDIDatasetFilesController(@Context request: ContainerRequest) : VdiDatasetsVdIdFiles, ControllerBase(request) {
 
   override fun getVdiDatasetsFilesByVdId(vdId: String): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesByVdIdResponse {

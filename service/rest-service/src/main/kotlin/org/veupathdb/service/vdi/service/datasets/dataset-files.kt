@@ -68,7 +68,7 @@ private fun requireDataset(userID: UserID, datasetID: DatasetID): DatasetRecord 
   if (ds == null) {
     ds = vdi.component.db.cache.CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
 
-    if (ds.visibility != VDIDatasetVisibility.Public)
+    if (ds.visibility == VDIDatasetVisibility.Private)
       throw ForbiddenException()
   }
 
