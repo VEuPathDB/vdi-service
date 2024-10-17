@@ -43,7 +43,7 @@ object AppDatabaseRegistry {
     dataSources.clear()
 
     DBEnvGroup.fromEnvironment(env)
-      .onEach { requireFullChunk(it) }
+      .onEach { if (it.enabled == true) requireFullChunk(it) }
       .forEach { parseChunk(it) }
   }
 
@@ -51,83 +51,93 @@ object AppDatabaseRegistry {
     throw IllegalStateException("one or more app database definition blocks in the service environment is missing its '$envVar' value")
 
   private fun requireFullChunk(db: DBEnvGroup) {
-    db.name          ?: throwForMissingVar(EnvKey.AppDB.DBNamePrefix)
-    db.pass          ?: throwForMissingVar(EnvKey.AppDB.DBPassPrefix)
-    db.controlSchema ?: throwForMissingVar(EnvKey.AppDB.DBControlSchemaPrefix)
-    db.dataSchema    ?: throwForMissingVar(EnvKey.AppDB.DBDataSchemaPrefix)
+    db.connectionName ?: throwForMissingVar(EnvKey.AppDB.DBConnectionNamePrefix)
+    db.pass           ?: throwForMissingVar(EnvKey.AppDB.DBPassPrefix)
+    db.controlSchema  ?: throwForMissingVar(EnvKey.AppDB.DBControlSchemaPrefix)
+    db.dataSchema     ?: throwForMissingVar(EnvKey.AppDB.DBDataSchemaPrefix)
 
-    if (db.platform === "postgresql") {
-      db.pgDbName    ?: throwForMissingVar(EnvKey.AppDB.DBPGNamePrefix)
-      db.host        ?: throwForMissingVar(EnvKey.AppDB.DBHostPrefix)
-      db.port        ?: throwForMissingVar(EnvKey.AppDB.DBPortPrefix)
-    } else {
-      db.ldap        ?: throwForMissingVar(EnvKey.AppDB.DBLDAPPrefix)
+    if (db.ldap == null) {
+      db.dbName ?: throwForMissingVar(EnvKey.AppDB.DBNamePrefix)
+      db.host   ?: throwForMissingVar(EnvKey.AppDB.DBHostPrefix)
+      db.port   ?: throwForMissingVar(EnvKey.AppDB.DBPortPrefix)
+    } else if (db.platform != null && AppDBPlatform.fromString(db.platform!!) == AppDBPlatform.Postgres) {
+      throw IllegalStateException("LDAP lookup is currently unsupported for postgres app databases")
     }
   }
 
   private fun parseChunk(env: DBEnvGroup) {
     if (env.enabled != true) {
-      log.info("Database {} is marked as disabled, skipping.", env.name)
+      log.info("Database {} is marked as disabled, skipping.", env.connectionName)
       return
     }
 
-    val defaultPostgresPort: UShort = 5432u
-    val poolSize = (env.poolSize ?: DefaultPoolSize).toInt()
-    val postgresPort: UShort = (env.port ?: defaultPostgresPort)
-
     log.info(
       """registering database {} with the following details:
-      Name: {}
+      Connection Name: {}
       TNS: {}
-      Pool Size: {}
+      Host: {}
       Port: {}
-      DBName: {}
-      User/Schema: {}""",
-      env.name,
-      env.name,
+      DB Name: {}
+      User/Schema: {}
+      Pool Size: {}""",
+      env.connectionName,
+      env.connectionName,
       env.ldap,
-      poolSize,
+      env.host,
       env.port,
-      env.pgDbName,
-      env.controlSchema
+      env.dbName,
+      env.controlSchema,
+      env.poolSize ?: DefaultPoolSize,
     )
 
-    val platform = env.platform?.let { AppDBPlatform.fromPlatformString(it) } ?: AppDBPlatform.Oracle
+    val platform = env.platform?.let { AppDBPlatform.fromString(it) } ?: AppDBPlatform.Oracle
 
-    log.info("constructing a DataSource for database {} with platform {}", env.name, env.platform)
+    log.info("constructing a DataSource for database {} with platform {}", env.connectionName, env.platform)
 
     val connectDetails: DbConnectDetails = try {
       when (platform) {
-        AppDBPlatform.Oracle -> OracleConnectDetails(
-          name = env.name!!,
-          user = env.controlSchema!!,
-          pw = env.pass!!,
-          ldap = env.ldap!!,
-          poolSize = poolSize
-        )
-        AppDBPlatform.Postgres -> PostgresConnectDetails(
-          name = env.name!!,
-          user = env.controlSchema!!,
-          pw = env.pass!!,
-          host = env.host!!,
-          port = postgresPort,
-          poolSize = poolSize,
-          pgDbName = env.pgDbName!!
+        AppDBPlatform.Oracle ->
+          if (env.ldap == null)
+            ManualConnectDetails(
+              name     = env.connectionName!!,
+              user     = env.controlSchema!!,
+              pw       = env.pass!!,
+              host     = env.host!!,
+              port     = env.port!!,
+              dbName   = env.dbName!!,
+              poolSize = env.poolSize!!.toInt(),
+            )
+          else
+            LDAPConnectDetails(
+              name     = env.connectionName!!,
+              user     = env.controlSchema!!,
+              pw       = env.pass!!,
+              ldap     = env.ldap!!,
+              poolSize = env.poolSize!!.toInt(),
+            )
+        AppDBPlatform.Postgres -> ManualConnectDetails(
+          name     = env.connectionName!!,
+          user     = env.controlSchema!!,
+          pw       = env.pass!!,
+          host     = env.host!!,
+          port     = env.port!!,
+          dbName   = env.dbName!!,
+          poolSize = env.poolSize!!.toInt(),
         )
       }
     } catch (e: Throwable) {
-      throw IllegalStateException("error encountered while attempting to create a JDBC connection to ${env.name}", e)
+      throw IllegalStateException("error encountered while attempting to create a JDBC connection for ${env.connectionName}", e)
     }
 
-      dataSources[env.name!!] = AppDBRegistryEntry(
-          env.name!!,
-          connectDetails.findHost(),
-          connectDetails.findPort(),
-          connectDetails.makeDataSource(),
-          env.dataSchema!!,
-          env.controlSchema!!,
-          platform
-      )
+    dataSources[env.connectionName!!] = AppDBRegistryEntry(
+      env.connectionName!!,
+      connectDetails.findHost(),
+      connectDetails.findPort(),
+      connectDetails.makeDataSource(),
+      env.dataSchema!!,
+      env.controlSchema!!,
+      platform
+    )
   }
 
   interface DbConnectDetails {
@@ -136,7 +146,7 @@ object AppDatabaseRegistry {
       fun findPort(): UShort
   }
 
-  class OracleConnectDetails(
+  class LDAPConnectDetails(
     val name: String,
     val user: String,
     val pw: SecretString,
@@ -167,21 +177,21 @@ object AppDatabaseRegistry {
     }
   }
 
-  class PostgresConnectDetails(
+  class ManualConnectDetails(
     val name: String,
     val user: String,
     val pw: SecretString,
     val host: String,
     val port: UShort,
+    val dbName: String,
     val poolSize: Int,
-    val pgDbName: String
   ) : DbConnectDetails {
 
     override fun makeDataSource(): DataSource {
-      log.info("Making data source with connection string {}", makeJDBCPostgresConnectionString(host, port, pgDbName))
+      log.info("Making data source with connection string {}", makeJDBCPostgresConnectionString(host, port, dbName))
       return HikariConfig()
         .apply {
-          jdbcUrl = makeJDBCPostgresConnectionString(host, port, pgDbName)
+          jdbcUrl = makeJDBCPostgresConnectionString(host, port, dbName)
           username = user
           password = pw.unwrap()
           maximumPoolSize = poolSize

@@ -5,8 +5,11 @@ enum class AppDBPlatform(val platformString: String) {
   Oracle("oracle");
 
   companion object {
-    fun fromPlatformString(platformString: String): AppDBPlatform? {
-      return entries.find { it.platformString == platformString }
-    }
+    fun fromString(value: String) =
+      when (value.lowercase()) {
+        "oracle"                 -> Oracle
+        "postgres", "postgresql" -> Postgres
+        else                     -> throw IllegalStateException("unrecognized AppDBPlatform value: $value")
+      }
   }
 }
