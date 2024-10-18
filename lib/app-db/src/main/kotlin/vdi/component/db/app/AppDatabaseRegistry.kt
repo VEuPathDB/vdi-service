@@ -141,9 +141,9 @@ object AppDatabaseRegistry {
   }
 
   interface DbConnectDetails {
-      fun makeDataSource(): DataSource
-      fun findHost(): String
-      fun findPort(): UShort
+    fun makeDataSource(): DataSource
+    fun findHost(): String
+    fun findPort(): UShort
   }
 
   class LDAPConnectDetails(
