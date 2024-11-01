@@ -24,7 +24,6 @@ data class AdminDatasetDetailsRecord(
   val projectIDs: List<ProjectID>,
   val syncControl: VDISyncControlRecord?,
   override val importStatus: DatasetImportStatus,
-  val importMessage: String?,
   val messages: List<String>,
   val installFiles: List<String>,
   val uploadFiles: List<String>
