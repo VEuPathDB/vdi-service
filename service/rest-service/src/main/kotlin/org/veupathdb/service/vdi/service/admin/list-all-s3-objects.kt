@@ -206,6 +206,23 @@ internal class ObjectDetailsStream(private val stream: Stream<S3Object>): InputS
     return this
   }
 
+  /**
+   * Writes the given `Int` value to the target [ByteBuffer] starting from the
+   * given start position and working backward.
+   *
+   * **WARNING**: The [startingPosition] value is the position where this method
+   * will start when writing the stringified int value, it is **NOT** the
+   * starting position of the int from a left-to-right reading perspective.
+   *
+   * @receiver The `ByteBuffer` into which the string should be written.
+   *
+   * @param value Value to be written to the buffer.
+   *
+   * @param startingPosition The position where this method will start when
+   * writing to the buffer.  This method will work backwards from this position.
+   *
+   * @return The receiver instance.
+   */
   private fun ByteBuffer.writeInt(value: Int, startingPosition: Int): ByteBuffer {
     var i = value
     var p = startingPosition
