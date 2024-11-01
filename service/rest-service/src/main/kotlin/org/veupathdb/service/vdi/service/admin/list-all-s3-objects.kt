@@ -7,6 +7,7 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 import java.time.OffsetDateTime
 import java.util.stream.Stream
+import kotlin.math.max
 
 internal fun listAllS3Objects(): InputStream = ObjectDetailsStream(DatasetStore.streamAll()).buffered()
 
@@ -21,7 +22,21 @@ private const val Colon: Byte = 58
 private const val UpperT: Byte = 84
 private const val UpperZ: Byte = 90
 
+/**
+ * ObjectDetailsStream implements an [InputStream] and produces a TSV whose rows
+ * each represent an object present in the S3 bucket VDI is connected to.
+ *
+ * The columns for the output TSV are:
+ * 1. Object path/key
+ * 2. Object size in bytes
+ * 3. Object last-modified timestamp (rfc3339)
+ */
 internal class ObjectDetailsStream(private val stream: Stream<S3Object>): InputStream() {
+  /**
+   * A cache of ASCII digit pairs that represent the numbers 0-99.  These are
+   * pre-calculated to reduce the number of iterations necessary to decompose
+   * large integer values and stringify them by one order of magnitude.
+   */
   private val digitPairs = ByteBuffer.allocate(200)
     .apply {
       for (i in Zero .. Nine) {
@@ -32,7 +47,16 @@ internal class ObjectDetailsStream(private val stream: Stream<S3Object>): InputS
       flip()
     }
 
-  private val iterator = stream.iterator()
+  /**
+   * Iterator over S3 objects to render for consumption by users of this
+   * `InputStream` implementation.
+   */
+  private val s3Objects = stream.iterator()
+
+  /**
+   * Temporary buffer for holding the next row to be rendered for consumption
+   * by users of this `InputStream`.
+   */
   private val buffer = ByteBuffer.allocate(1024).flip()
 
   override fun read(): Int =
@@ -44,14 +68,26 @@ internal class ObjectDetailsStream(private val stream: Stream<S3Object>): InputS
 
   override fun close() = stream.close()
 
+  /**
+   * Attempts to prepare the [buffer] with another row representing the next S3
+   * object.
+   *
+   * @return `true` if another row has been written to the [buffer]; `false` if
+   * no additional objects are available.
+   */
   private fun tryPrepareNext() =
-    if (iterator.hasNext()) {
-      prepareBuffer(iterator.next())
+    if (s3Objects.hasNext()) {
+      prepareBuffer(s3Objects.next())
       true
     } else {
       false
     }
 
+  /**
+   * Writes the given S3 object as a TSV row to the [buffer].
+   *
+   * @param next S3 object for the row to write.
+   */
   private fun prepareBuffer(next: S3Object) {
     buffer.clear()
       .writeASCII(next.path)
@@ -63,12 +99,38 @@ internal class ObjectDetailsStream(private val stream: Stream<S3Object>): InputS
       .flip()
   }
 
+  /**
+   * Writes the given string to the target [ByteBuffer] as if it was a stream of
+   * ASCII characters.
+   *
+   * This should always be true as the only strings we are printing are dates,
+   * numbers, and paths, and VDI does not use user input for object names.
+   *
+   * **WARNING**: This method makes no attempt to check whether there is size in
+   * the buffer to contain the given string.  That check should be performed by
+   * callers before invoking this method.
+   *
+   * @receiver The `ByteBuffer` into which the string should be written.
+   *
+   * @param value ASCII string to write to the buffer.
+   *
+   * @return The receiver instance.
+   */
   private fun ByteBuffer.writeASCII(value: CharSequence): ByteBuffer {
     for (i in value.indices)
       put(value[i].code.toByte())
     return this
   }
 
+  /**
+   * Writes the given timestamp to the target [ByteBuffer] in RFC3339 format.
+   *
+   * @receiver The `ByteBuffer` into which the string should be written.
+   *
+   * @param value Timestamp to write.
+   *
+   * @return The receiver instance.
+   */
   private fun ByteBuffer.writeDate(value: OffsetDateTime): ByteBuffer {
     return writeInt(value.year)
       .put(Dash)
@@ -106,10 +168,32 @@ internal class ObjectDetailsStream(private val stream: Stream<S3Object>): InputS
     return writeInt(value, p)
   }
 
+  /**
+   * Writes the given `Int` value to the target [ByteBuffer] left-padded to the
+   * given width with zero characters.
+   *
+   * If the given value's string width is greater than or equal to the target
+   * width, no padding will be written.
+   *
+   * **Examples**
+   * ```kt
+   * buffer.writePaddedInt(value = 3, width = 5) // 00003
+   *
+   * buffer.writePaddedInt(value = 100, width = 2) // 100
+   * ```
+   *
+   * @receiver The `ByteBuffer` into which the string should be written.
+   *
+   * @param value Value to be written to the buffer.
+   *
+   * @param width Target width for the padded number string.
+   *
+   * @return The receiver instance.
+   */
   private fun ByteBuffer.writePaddedInt(value: Int, width: Int): ByteBuffer {
     val size = value.stringSize()
     val o = position()
-    val p = o + width
+    val p = o + max(width, size)
 
     position(p)
     writeInt(value, p)
@@ -140,6 +224,16 @@ internal class ObjectDetailsStream(private val stream: Stream<S3Object>): InputS
     return this
   }
 
+  /**
+   * Writes the zone-offset string for the given timestamp to the target
+   * [ByteBuffer] in RFC3339 format ('00:00' or 'Z').
+   *
+   * @receiver The `ByteBuffer` into which the string should be written.
+   *
+   * @param value Timestamp whose zone offset should be written to the buffer.
+   *
+   * @return The receiver instance.
+   */
   private fun ByteBuffer.writeZoneOffset(value: OffsetDateTime): ByteBuffer {
     var seconds = value.offset.totalSeconds
 
@@ -160,6 +254,14 @@ internal class ObjectDetailsStream(private val stream: Stream<S3Object>): InputS
   }
 }
 
+/**
+ * Determines how many ASCII characters are necessary to render the target
+ * `Long` value as a string.
+ *
+ * @receiver Value whose string length should be calculated.
+ *
+ * @return The number of ASCII characters needed to represent the target value.
+ */
 private fun Long.stringSize(): Int {
   var t = this
   var s = 0
@@ -176,6 +278,14 @@ private fun Long.stringSize(): Int {
   }
 }
 
+/**
+ * Determines how many ASCII characters are necessary to render the target `Int`
+ * value as a string.
+ *
+ * @receiver Value whose string length should be calculated.
+ *
+ * @return The number of ASCII characters needed to represent the target value.
+ */
 private fun Int.stringSize(): Int {
   var t = this
   var s = 0

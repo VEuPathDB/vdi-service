@@ -48,7 +48,7 @@ data class InstallTriggerHandlerConfig(
   object Defaults {
     const val WorkerPoolSize = 5u
 
-    const val JobQueueSize   = 5u
+    const val JobQueueSize = 5u
 
     inline val InstallDataTriggerTopic
       get() = KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC
@@ -57,4 +57,3 @@ data class InstallTriggerHandlerConfig(
       get() = KafkaRouterConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY
   }
 }
-
