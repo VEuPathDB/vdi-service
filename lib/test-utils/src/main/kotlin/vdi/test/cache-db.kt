@@ -192,7 +192,6 @@ fun mockAdminDatasetDetailsRecord(
     mockMetaAddOn(visibility, name, summary, description, sourceURL)
     projectIDs?.also { on { this.projectIDs } doReturn it }
     on { this.syncControl } doReturn syncControl
-    on { this.importMessage } doReturn importMessage
     messages?.also { on { this.messages } doReturn it }
     installFiles?.also { on { this.installFiles } doReturn it }
     uploadFiles?.also { on { this.uploadFiles } doReturn it }

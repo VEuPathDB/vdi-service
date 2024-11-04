@@ -281,6 +281,7 @@ types:
         description: User provided summary for the dataset.
         type: string
         required: false
+        maxLength: 4000
       description:
         displayName: Dataset Description
         description: User provided description for the dataset.
@@ -740,9 +741,7 @@ types:
     additionalProperties: false
     properties:
       projectId: ProjectID
-      metaStatus:
-        type: DatasetInstallStatus
-        required: false
+      metaStatus: DatasetInstallStatus
       metaMessage:
         type: string
         required: false

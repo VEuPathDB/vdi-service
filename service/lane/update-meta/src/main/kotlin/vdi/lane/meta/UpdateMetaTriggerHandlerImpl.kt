@@ -241,6 +241,7 @@ internal class UpdateMetaTriggerHandlerImpl(
 
           it.insertDataset(record)
           it.insertDatasetVisibility(datasetID, meta.owner)
+          it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
 
           log.debug("inserting sync control record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
           it.insertSyncControl(VDISyncControlRecord(
