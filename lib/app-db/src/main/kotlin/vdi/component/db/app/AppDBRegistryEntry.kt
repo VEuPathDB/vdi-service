@@ -11,3 +11,4 @@ data class AppDBRegistryEntry(
   val ctlSchema: String,
   val platform: AppDBPlatform,
 )
+

@@ -5,6 +5,7 @@ plugins {
 dependencies {
   implementation(platform(project(":platform")))
 
+  implementation(project(":lib:env"))
   implementation(project(":lib:ldap"))
 
   implementation("org.veupathdb.vdi:vdi-component-common")

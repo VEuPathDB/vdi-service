@@ -1240,15 +1240,25 @@ the type of their datasets.
 
 ==== Application Database Key Components
 
-[source]
+[source, bash]
 ----
+DB_CONNECTION_ENABLED_<NAME>
 DB_CONNECTION_NAME_<NAME>
-DB_CONNECTION_LDAP_<NAME>
 DB_CONNECTION_USER_<NAME>
 DB_CONNECTION_PASS_<NAME>
 DB_CONNECTION_DATA_SCHEMA_<NAME>
 DB_CONNECTION_CONTROL_SCHEMA_<NAME>
 DB_CONNECTION_POOL_SIZE_<NAME>
+
+# restrict to plugins
+DB_CONNECTION_DATA_TYPES_<NAME>
+
+# for LDAP
+DB_CONNECTION_LDAP_<NAME>
+# else, for manual connection
+DB_CONNECTION_HOST_<NAME>
+DB_CONNECTION_PORT_<NAME>
+DB_CONNECTION_PLATFORM_<NAME>
 ----
 
 Unlike most of the other environment key values defined here, these values
@@ -1261,6 +1271,7 @@ in groups that contain all prefixes.  For example, given the `<NAME>` value
 
 [source]
 ----
+DB_CONNECTION_ENABLED_PLASMO
 DB_CONNECTION_NAME_PLASMO
 DB_CONNECTION_LDAP_PLASMO
 DB_CONNECTION_USER_PLASMO
@@ -1270,9 +1281,18 @@ DB_CONNECTION_CONTROL_SCHEMA_PLASMO
 DB_CONNECTION_POOL_SIZE_PLASMO
 ----
 
+Database connections detail sets *MUST* provide either an LDAP lookup name for
+a database _OR_ a host and port.
+
+===== Variable Definitions
+
 [%header, cols="1,3m,3m,8"]
 |===
 | Req. | Name | Type | Description
+|
+| DB_CONNECTION_ENABLED_<NAME>
+| bool
+| Whether the database connection should be enabled for use by VDI.
 
 | :exclamation:
 | DB_CONNECTION_NAME_<NAME>
@@ -1280,11 +1300,29 @@ DB_CONNECTION_POOL_SIZE_PLASMO
 | Name for the connection, typically the project ID or identifier for the
   application database.
 
-| :exclamation:
+|
 | DB_CONNECTION_LDAP_<NAME>
 | String
 | LDAP distinguished name for the database connection `OrclNetDesc` entry
   containing the connection details for the target database.
+
+|
+| DB_CONNECTION_HOST_<NAME>
+| String
+| Host URI to use when providing manual database connection details.
+
+*WARNING*: This variable will be ignored if `DB_CONNECTION_LDAP` is provided.
+
+*WARNING*: This variable is required if `DB_CONNECTION_LDAP` is absent.
+
+|
+| DB_CONNECTION_PORT_<NAME>
+| uint16
+| Port to use when providing manual database connection details.
+
+*WARNING*: This variable will be ignored if `DB_CONNECTION_LDAP` is provided.
+
+*WARNING*: This variable is required if `DB_CONNECTION_LDAP` is absent.
 
 | :exclamation:
 | DB_CONNECTION_USER_<NAME>
@@ -1306,11 +1344,51 @@ DB_CONNECTION_POOL_SIZE_PLASMO
 | String
 | Database schema where the VDI control tables are installed to.
 
-| :exclamation:
+|
 | DB_CONNECTION_POOL_SIZE_<NAME>
 | uint8
 | Connection pool size for the JDBC `DataSource`.
+
+|
+| DB_CONNECTION_DATA_TYPES_<NAME>
+| List<String>
+| Dataset type names that align with plugins registered in the VDI environment
+  configuration.
+
+If provided, VDI will only use this connection for datasets whose type name
+matches an item in the given list.
+
+If omitted, VDI will use this connection for all datasets whose type name _does
+not_ match another DB connection with declared types.
 |===
+
+===== One to Many Project to DB Configs
+
+A single project may have multiple target databases registered provided that
+each connection has a unique `(name, dataset type)` pairing.
+
+By default, if a database connection detail set does not contain a dataset type
+list via `DB_CONNECTION_DATA_TYPES_<NAME>` it will be used as a fallback for all
+dataset types that do not match a configured connection.
+
+If multiple database connection detail sets omit the data types restriction
+variable, VDI will refuse to start.  If multiple database connection detail sets
+specify the same data type, VDI will refuse to start.
+
+.Example
+[source, bash]
+----
+# This DB connection is a fallback because it provides no data type list.
+# It is NOT used for datasets of type foo and bar.
+DB_CONNECTION_ENABLED_PLASMO_1=true
+DB_CONNECTION_NAME_PLASMO_1=PlasmoDB
+#DB_CONNECTION_DATA_TYPES_PLASMO_1='*'  # Wildcard is implied by omission
+
+# This DB connection is only used for datasets of type foo and bar.
+DB_CONNECTION_ENABLED_PLASMO_2=true
+DB_CONNECTION_NAME_PLASMO_2=PlasmoDB
+DB_CONNECTION_DATA_TYPES_PLASMO_2=foo,bar
+----
 
 === Environment Variable Types
 

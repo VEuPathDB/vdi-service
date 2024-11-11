@@ -34,6 +34,7 @@ internal object AppDBImpl : AppDB {
 
     val out = HashMap<ProjectID, InstallStatuses>(projects.size)
 
+    // TODO: need to stream through all connections and match them to given projects, plugin type doesn't matter here
     for (projectID in projects) {
       val ds = AppDatabaseRegistry.require(projectID)
 
@@ -43,12 +44,12 @@ internal object AppDBImpl : AppDB {
     return out
   }
 
-  override fun accessor(key: ProjectID): AppDBAccessor? =
-    AppDatabaseRegistry[key]
+  override fun accessor(key: ProjectID, dataType: String): AppDBAccessor? =
+    AppDatabaseRegistry[key, dataType]
       ?.let { AppDBAccessorImpl(key, it.ctlSchema, it.source) }
 
-  override fun transaction(key: ProjectID): AppDBTransaction? =
-    AppDatabaseRegistry[key]
+  override fun transaction(key: ProjectID, dataType: String): AppDBTransaction? =
+    AppDatabaseRegistry[key, dataType]
       ?.let { ds -> AppDBTransactionImpl(key, ds.ctlSchema, ds.source.connection.also { it.autoCommit = false }, ds.platform) }
 }
 

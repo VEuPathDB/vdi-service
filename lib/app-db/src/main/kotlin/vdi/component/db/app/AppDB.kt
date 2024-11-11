@@ -16,9 +16,9 @@ interface AppDB {
 
   fun getDatasetStatuses(target: DatasetID, projects: Collection<ProjectID>): Map<ProjectID, InstallStatuses>
 
-  fun accessor(key: ProjectID): AppDBAccessor?
+  fun accessor(key: ProjectID, dataType: String): AppDBAccessor?
 
-  fun transaction(key: ProjectID): AppDBTransaction?
+  fun transaction(key: ProjectID, dataType: String): AppDBTransaction?
 }
 
 /**
@@ -46,12 +46,12 @@ interface AppDB {
  * @return The value returned by the given function [fn].
  */
 @OptIn(ExperimentalContracts::class)
-inline fun <T> AppDB.withTransaction(projectID: ProjectID, fn: (AppDBTransaction) -> T): T {
+inline fun <T> AppDB.withTransaction(projectID: ProjectID, dataType: String, fn: (AppDBTransaction) -> T): T {
   contract {
     callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
   }
 
-  val trans = transaction(projectID)!!
+  val trans = transaction(projectID, dataType)!!
   val out: T
 
   try {

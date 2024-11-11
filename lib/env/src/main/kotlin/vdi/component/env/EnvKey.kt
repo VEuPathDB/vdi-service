@@ -7,6 +7,9 @@ object EnvKey {
 
   inline val AppDB get() = EnvKey.AppDB
 
+  inline val EnvKey.AppDB.DBConnectionDataTypes
+    get() = "DB_CONNECTION_DATA_TYPES_"
+
   inline val LDAP get() = EnvKey.LDAP
 
   object CacheDB {
