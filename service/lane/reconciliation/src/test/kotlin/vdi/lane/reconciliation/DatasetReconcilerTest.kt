@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import org.veupathdb.vdi.lib.common.OriginTimestamp
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.*
@@ -24,7 +25,7 @@ private val datasetID = DatasetID()
 @DisplayName("when dataset")
 class DatasetReconcilerTest {
 
-  private val dsType = VDIDatasetTypeImpl("foo", "bar")
+  private val dsType = VDIDatasetTypeImpl(DataType.of("foo"), "bar")
 
   private val projects = setOf("foo")
 
@@ -245,13 +246,13 @@ class DatasetReconcilerTest {
           dataset = { mockAppDatasetRecord(isDeleted = DeleteFlag.DeletedAndUninstalled) }
         )
 
-        val appDB = mockAppDB(accessor = { accessor })
+        val appDB = mockAppDB(accessor = { _, _ -> accessor })
 
         val router = mockKafkaRouter()
 
         DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
 
-        verify(appDB, times(1)).accessor(projects.first())
+        verify(appDB, times(1)).accessor(projects.first(), dsType.name)
         verify(accessor, times(1)).selectDataset(datasetID)
 
         verifyNoInteractions(router)
@@ -280,13 +281,13 @@ class DatasetReconcilerTest {
           dataset = { mockAppDatasetRecord(isDeleted = DeleteFlag.DeletedNotUninstalled) }
         )
 
-        val appDB = mockAppDB(accessor = { accessor })
+        val appDB = mockAppDB(accessor = { _, _ -> accessor })
 
         val router = mockKafkaRouter()
 
         DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
 
-        verify(appDB, times(1)).accessor(projects.first())
+        verify(appDB, times(1)).accessor(projects.first(), dsType.name)
         verify(accessor, times(1)).selectDataset(datasetID)
 
         verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID, EventSource.SlimReconciler)
@@ -316,7 +317,7 @@ class DatasetReconcilerTest {
 
         DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
 
-        verify(appDB, times(1)).accessor(projects.first())
+        verify(appDB, times(1)).accessor(projects.first(), dsType.name)
 
         verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID, EventSource.SlimReconciler)
         verifyNoMoreInteractions(router)
@@ -343,12 +344,12 @@ class DatasetReconcilerTest {
 
         val accessor = mockAppDBAccessor()
 
-        val appDB = mockAppDB(accessor = { accessor })
+        val appDB = mockAppDB(accessor = { _, _ -> accessor })
         val router = mockKafkaRouter()
 
         DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
 
-        verify(appDB, times(1)).accessor(projects.first())
+        verify(appDB, times(1)).accessor(projects.first(), dsType.name)
         verify(accessor, times(1)).selectDataset(datasetID)
 
         verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID, EventSource.SlimReconciler)
@@ -716,7 +717,7 @@ class DatasetReconcilerTest {
           onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, now) }
         )
 
-        val appDB = mockAppDB(accessor = { mockAppDBAccessor(
+        val appDB = mockAppDB(accessor = { _, _ -> mockAppDBAccessor(
           syncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
         ) })
 
@@ -763,7 +764,7 @@ class DatasetReconcilerTest {
           onSelectSyncControl = { VDISyncControlRecord(datasetID, now, OriginTimestamp, OriginTimestamp) }
         )
 
-        val appDB = mockAppDB(accessor = { mockAppDBAccessor(
+        val appDB = mockAppDB(accessor = { _, _ -> mockAppDBAccessor(
           syncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
         ) })
 
@@ -810,7 +811,7 @@ class DatasetReconcilerTest {
           onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, now, OriginTimestamp) }
         )
 
-        val appDB = mockAppDB(accessor = { mockAppDBAccessor(
+        val appDB = mockAppDB(accessor = { _, _ -> mockAppDBAccessor(
           syncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
         ) })
 

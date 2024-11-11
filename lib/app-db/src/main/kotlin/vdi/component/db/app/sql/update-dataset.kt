@@ -19,14 +19,12 @@ WHERE
 """
 
 internal fun Connection.updateDataset(schema: String, dataset: DatasetRecord) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setLong(1, dataset.owner.toLong())
-      ps.setString(2, dataset.typeName)
-      ps.setString(3, dataset.typeVersion)
-      ps.setInt(4, dataset.isDeleted.value)
-      ps.setBoolean(5, dataset.isPublic)
-      ps.setString(6, dataset.datasetID.toString())
-      ps.executeUpdate()
-    }
+  preparedUpdate(sql(schema)) {
+    setUserID(1, dataset.owner)
+    setDataType(2, dataset.typeName)
+    setString(3, dataset.typeVersion)
+    setDeleteFlag(4, dataset.isDeleted)
+    setBoolean(5, dataset.isPublic)
+    setDatasetID(6, dataset.datasetID)
+  }
 }

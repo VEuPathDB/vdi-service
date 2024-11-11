@@ -19,6 +19,6 @@ private fun PluginListItem(p: Pair<PluginHandlers.NameVersionPair, PluginHandler
   PluginListItemImpl().also {
     it.displayName = p.second.displayName
     it.projects = p.second.projects()
-    it.typeName = p.first.name
+    it.typeName = p.first.name.toString()
     it.typeVersion = p.first.version
   }

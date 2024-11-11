@@ -14,10 +14,8 @@ WHERE
   AND project_id = ?
 """
 
-internal fun Connection.deleteDatasetProjectLink(schema: String, datasetID: DatasetID, projectID: ProjectID): Int =
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, datasetID.toString())
-      ps.setString(2, projectID)
-      ps.executeUpdate()
-    }
+internal fun Connection.deleteDatasetProjectLink(schema: String, datasetID: DatasetID, projectID: ProjectID) =
+  preparedUpdate(sql(schema)) {
+    setDatasetID(1, datasetID)
+    setString(2, projectID)
+  }

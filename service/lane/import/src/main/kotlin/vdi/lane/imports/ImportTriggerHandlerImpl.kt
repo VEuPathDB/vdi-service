@@ -128,7 +128,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     val datasetMeta = datasetDir.getMetaFile().load()!!
 
     val timer = Metrics.Import.duration
-      .labels(datasetMeta.type.name, datasetMeta.type.version)
+      .labels(datasetMeta.type.name.toString(), datasetMeta.type.version)
       .startTimer()
 
     // lookup the target dataset in the cache database to ensure it
@@ -200,7 +200,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         throw PluginRequestException.import(handler.displayName, userID, datasetID, cause = e)
       }
 
-      Metrics.Import.count.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
+      Metrics.Import.count.labels(meta.type.name.toString(), meta.type.version, result.responseCode.toString()).inc()
 
       when (result.type) {
         ImportResponseType.Success -> handleImportSuccessResult(

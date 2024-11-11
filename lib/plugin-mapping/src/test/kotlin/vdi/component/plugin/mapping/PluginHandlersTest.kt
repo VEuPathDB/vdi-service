@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.veupathdb.vdi.lib.common.field.DataType
 
 @DisplayName("PluginHandlers")
 class PluginHandlersTest {
@@ -47,7 +48,7 @@ class PluginHandlersTest {
 
       PluginHandlers.init(env2)
 
-      assertTrue(PluginHandlers.contains("Bar", "1.0"))
+      assertTrue(PluginHandlers.contains(DataType.of("Bar"), "1.0"))
     }
   }
 }

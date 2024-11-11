@@ -2,10 +2,7 @@ package vdi.component.db.app.sql
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.app.model.DatasetInstallMessage
-import vdi.component.db.app.model.InstallStatus
-import vdi.component.db.app.model.InstallType
 import java.sql.Connection
-import java.time.OffsetDateTime
 
 private fun sql(schema: String) =
 // language=oracle
@@ -26,7 +23,7 @@ internal fun Connection.selectDatasetInstallMessages(
   datasetID: DatasetID
 ): List<DatasetInstallMessage> {
   prepareStatement(sql(schema)).use { ps ->
-    ps.setString(1, datasetID.toString())
+    ps.setDatasetID(1, datasetID)
 
     ps.executeQuery().use { rs ->
       if (!rs.next())
@@ -37,10 +34,10 @@ internal fun Connection.selectDatasetInstallMessages(
       do {
         out.add(DatasetInstallMessage(
           datasetID   = datasetID,
-          installType = InstallType.fromString(rs.getString("install_type")),
-          status      = InstallStatus.fromString(rs.getString("status")),
+          installType = rs.getInstallType("install_type"),
+          status      = rs.getInstallStatus("status"),
           message     = rs.getString("message"),
-          updated     = rs.getObject("updated", OffsetDateTime::class.java)
+          updated     = rs.getDateTime("updated")
         ))
       } while (rs.next())
 

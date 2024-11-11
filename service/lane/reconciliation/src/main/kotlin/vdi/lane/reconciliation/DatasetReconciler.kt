@@ -169,8 +169,10 @@ internal class DatasetReconciler(
     if (metaOutOfSync && sharesOutOfSync && installOutOfSync)
       return SyncIndicator(metaOutOfSync = true, sharesOutOfSync = true, installOutOfSync = true)
 
+    val meta = loadMeta()
+
     getProjects().forEach { projectID ->
-      val appDB = appDB.accessor(projectID)
+      val appDB = appDB.accessor(projectID, meta.type.name)
 
       if (appDB == null) {
         logWarning("skipping dataset state comparison for dataset {}/{}, project {} due to the target project being disabled", userID, datasetID, projectID)
@@ -378,8 +380,10 @@ internal class DatasetReconciler(
     safeExec({ "failed to fetch dataset sync control record from $project" }) { selectDatasetSyncControlRecord(datasetID) }
 
   private fun ReconciliationState.isFullyUninstalled(projects: Iterable<ProjectID>): Boolean {
+    val meta = loadMeta()
+
     projects.forEach { projectID ->
-      val appDB = appDB.accessor(projectID)
+      val appDB = appDB.accessor(projectID, meta.type.name)
 
       if (appDB == null) {
         logWarning("cannot check installation status of dataset {}/{} in project {} due to the target being disabled in the service config", userID, datasetID, projectID)

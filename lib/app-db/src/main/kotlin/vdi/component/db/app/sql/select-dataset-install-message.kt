@@ -27,8 +27,8 @@ internal fun Connection.selectDatasetInstallMessage(
   installType: InstallType
 ): DatasetInstallMessage? {
   prepareStatement(sql(schema)).use { ps ->
-    ps.setString(1, datasetID.toString())
-    ps.setString(2, installType.value)
+    ps.setDatasetID(1, datasetID)
+    ps.setInstallType(2, installType)
 
     ps.executeQuery().use { rs ->
       if (!rs.next())

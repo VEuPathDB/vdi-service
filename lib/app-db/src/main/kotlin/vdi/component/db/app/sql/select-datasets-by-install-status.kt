@@ -1,10 +1,7 @@
 package vdi.component.db.app.sql
 
-import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.app.model.DatasetRecord
-import vdi.component.db.app.model.DeleteFlag
 import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallType
 import java.sql.Connection
@@ -38,8 +35,8 @@ internal fun Connection.selectDatasetsByInstallStatus(
   projectID: ProjectID,
 ): List<DatasetRecord> {
   prepareStatement(sql(schema)).use { ps ->
-    ps.setString(1, installType.value)
-    ps.setString(2, installStatus.value)
+    ps.setInstallType(1, installType)
+    ps.setInstallStatus(2, installStatus)
     ps.setString(3, projectID)
 
     ps.executeQuery().use { rs ->
@@ -50,11 +47,11 @@ internal fun Connection.selectDatasetsByInstallStatus(
 
       do {
         out.add(DatasetRecord(
-          datasetID   = DatasetID(rs.getString("dataset_id")),
-          owner       = UserID(rs.getLong("owner")),
-          typeName    = rs.getString("type_name"),
+          datasetID   = rs.getDatasetID("dataset_id"),
+          owner       = rs.getUserID("owner"),
+          typeName    = rs.getDataType("type_name"),
           typeVersion = rs.getString("type_version"),
-          isDeleted   = DeleteFlag.fromInt(rs.getInt("is_deleted")),
+          isDeleted   = rs.getDeleteFlag("is_deleted"),
           isPublic    = rs.getBoolean("is_public"),
         ))
       } while (rs.next())

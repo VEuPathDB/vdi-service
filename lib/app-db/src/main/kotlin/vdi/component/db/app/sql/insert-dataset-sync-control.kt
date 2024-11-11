@@ -18,12 +18,10 @@ VALUES
 """
 
 internal fun Connection.insertDatasetSyncControl(schema: String, sync: VDISyncControlRecord) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, sync.datasetID.toString())
-      ps.setObject(2, sync.sharesUpdated)
-      ps.setObject(3, sync.dataUpdated)
-      ps.setObject(4, sync.metaUpdated)
-      ps.executeUpdate()
-    }
+  preparedUpdate(sql(schema)) {
+    setDatasetID(1, sync.datasetID)
+    setDateTime(2, sync.sharesUpdated)
+    setDateTime(3, sync.dataUpdated)
+    setDateTime(4, sync.metaUpdated)
+  }
 }

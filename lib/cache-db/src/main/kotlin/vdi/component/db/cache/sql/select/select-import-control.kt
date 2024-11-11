@@ -1,7 +1,7 @@
 package vdi.component.db.cache.sql.select
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.cache.model.DatasetImportStatus
+import vdi.component.db.cache.util.getImportStatus
 import vdi.component.db.cache.util.setDatasetID
 import vdi.component.db.cache.util.withPreparedStatement
 import vdi.component.db.cache.util.withResults
@@ -25,6 +25,6 @@ internal fun Connection.selectImportControl(datasetID: DatasetID) =
       if (!next())
         null
       else
-        DatasetImportStatus.fromString(getString(1))
+        getImportStatus(1)!!
     }
   }

@@ -1,6 +1,7 @@
 package org.veupathdb.service.vdi.generated.model
 
 import org.veupathdb.service.vdi.util.ValidationErrors
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetDependencyImpl
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMetaImpl
@@ -32,7 +33,7 @@ internal fun DatasetPostRequest.validate(): ValidationErrors {
 internal fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
   VDIDatasetMetaImpl(
     type         = VDIDatasetTypeImpl(
-      name    = meta.datasetType.name.lowercase(),
+      name    = DataType.of(meta.datasetType.name),
       version = meta.datasetType.version,
     ),
     projects     = meta.projects.toSet(),

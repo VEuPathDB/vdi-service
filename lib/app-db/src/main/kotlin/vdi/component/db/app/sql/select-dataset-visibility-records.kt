@@ -1,7 +1,6 @@
 package vdi.component.db.app.sql
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.app.model.DatasetVisibilityRecord
 import java.sql.Connection
 
@@ -21,15 +20,12 @@ internal fun Connection.selectDatasetVisibilityRecords(
   datasetID: DatasetID
 ): List<DatasetVisibilityRecord> =
   prepareStatement(sql(schema)).use { ps ->
-    ps.setString(1, datasetID.toString())
+    ps.setDatasetID(1, datasetID)
     ps.executeQuery().use { rs ->
       val out = ArrayList<DatasetVisibilityRecord>()
 
       while (rs.next()) {
-        out.add(DatasetVisibilityRecord(
-          datasetID = datasetID,
-          userID    = UserID(rs.getLong("user_id"))
-        ))
+        out.add(DatasetVisibilityRecord(datasetID, rs.getUserID("user_id")))
       }
 
       out

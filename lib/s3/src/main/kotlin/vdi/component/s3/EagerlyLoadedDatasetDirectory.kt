@@ -46,7 +46,7 @@ internal class EagerlyLoadedDatasetDirectory(
           when (file) {
             S3Paths.ShareOfferFileName -> ref.offer = it
             S3Paths.ShareReceiptFileName -> ref.receipt = it
-            else -> return@also // Fall through to the when block
+            else -> return@also // Fall through to the 'when' block
           }
 
           return@forEach // Continue to the next s3 object

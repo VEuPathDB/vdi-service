@@ -1,6 +1,5 @@
 package vdi.component.db.cache.sql.select
 
-import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.model.DatasetRecordImpl
@@ -41,13 +40,13 @@ internal fun Connection.selectNonPrivateDatasets(): List<DatasetRecord> {
       map {
         DatasetRecordImpl(
           datasetID    = getDatasetID("dataset_id"),
-          typeName     = getString("type_name"),
+          typeName     = getDataType("type_name"),
           typeVersion  = getString("type_version"),
           ownerID      = getUserID("owner_id"),
           isDeleted    = getBoolean("is_deleted"),
           created      = getDateTime("created"),
-          importStatus = getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
-          visibility   = VDIDatasetVisibility.fromString(getString("visibility")),
+          importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
+          visibility   = getDatasetVisibility("visibility"),
           origin       = getString("origin"),
           name         = getString("name"),
           summary      = getString("summary"),

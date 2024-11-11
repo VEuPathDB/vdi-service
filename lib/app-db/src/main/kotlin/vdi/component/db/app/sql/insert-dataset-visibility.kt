@@ -17,10 +17,8 @@ VALUES
 """
 
 internal fun Connection.insertDatasetVisibility(schema: String, datasetID: DatasetID, userID: UserID) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, datasetID.toString())
-      ps.setLong(2, userID.toLong())
-      ps.executeUpdate()
-    }
+  preparedUpdate(sql(schema)) {
+    setDatasetID(1, datasetID)
+    setUserID(2, userID)
+  }
 }

@@ -44,7 +44,7 @@ internal fun Connection.selectAcceptedSharesFor(userID: UserID) =
         DatasetShareListEntry(
           datasetID     = it.getDatasetID("dataset_id"),
           ownerID       = it.getUserID("owner_id"),
-          typeName      = it.getString("type_name"),
+          typeName      = it.getDataType("type_name"),
           typeVersion   = it.getString("type_version"),
           receiptStatus = VDIShareReceiptAction.Accept,
           projects      = it.getProjectIDList("projects")

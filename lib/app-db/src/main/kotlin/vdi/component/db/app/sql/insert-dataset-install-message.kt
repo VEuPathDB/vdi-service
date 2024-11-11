@@ -19,13 +19,11 @@ VALUES
 """
 
 internal fun Connection.insertDatasetInstallMessage(schema: String, message: DatasetInstallMessage) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, message.datasetID.toString())
-      ps.setString(2, message.installType.value)
-      ps.setString(3, message.status.value)
-      ps.setString(4, message.message)
-      ps.setObject(5, message.updated)
-      ps.executeUpdate()
-    }
+  preparedUpdate(sql(schema)) {
+    setDatasetID(1, message.datasetID)
+    setInstallType(2, message.installType)
+    setInstallStatus(3, message.status)
+    setString(4, message.message)
+    setDateTime(5, message.updated)
+  }
 }

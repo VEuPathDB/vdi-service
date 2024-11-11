@@ -130,7 +130,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     log.info("dataset {}/{} meta timestamp is {}", userID, datasetID, metaTimestamp)
 
     val timer = Metrics.MetaUpdates.duration
-      .labels(datasetMeta.type.name, datasetMeta.type.version)
+      .labels(datasetMeta.type.name.toString(), datasetMeta.type.version)
       .startTimer()
 
     // Attempt to select the dataset details from the cache DB
@@ -210,7 +210,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       return
     }
 
-    val appDb = appDB.accessor(projectID) or {
+    val appDb = appDB.accessor(projectID, ph.type) or {
       log.info("skipping dataset {}/{}, project {} update meta due to target being disabled", userID, datasetID, projectID)
       return
     }
@@ -224,7 +224,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       return
     }
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, ph.type) {
       try {
         log.debug("testing for existence of dataset {}/{} in app db for project {}", userID, datasetID, projectID)
         val record = it.selectDataset(datasetID) or {
@@ -281,14 +281,14 @@ internal class UpdateMetaTriggerHandlerImpl(
       }
     }
 
-    val sync = appDB.accessor(projectID)!!.selectDatasetSyncControlRecord(datasetID)!!
+    val sync = appDB.accessor(projectID, ph.type)!!.selectDatasetSyncControlRecord(datasetID)!!
 
     if (!sync.metaUpdated.isBefore(metaTimestamp)) {
       log.info("skipping install-meta for dataset {}/{}, project {} as nothing has changed.", userID, datasetID, projectID)
       return
     }
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, ph.type) {
       log.debug("upserting install-meta message for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
       it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
     }
@@ -299,7 +299,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       throw PluginRequestException.installMeta(ph.displayName, projectID, userID, datasetID, cause = e)
     }
 
-    Metrics.MetaUpdates.count.labels(meta.type.name, meta.type.version, result.responseCode.toString()).inc()
+    Metrics.MetaUpdates.count.labels(meta.type.name.toString(), meta.type.version, result.responseCode.toString()).inc()
 
     try {
       when (result.type) {
@@ -323,7 +323,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       }
     } catch (e: Throwable) {
       log.info("install-meta request to handler server failed with exception:", e)
-      appDB.withTransaction(projectID) {
+      appDB.withTransaction(projectID, ph.type) {
         try {
           it.upsertInstallMetaMessage(datasetID, InstallStatus.FailedInstallation)
         } catch (e: SQLException) {
@@ -336,7 +336,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       }
       throw e
     } finally {
-      appDB.withTransaction(projectID) { it.updateSyncControlMetaTimestamp(datasetID, metaTimestamp) }
+      appDB.withTransaction(projectID, ph.type) { it.updateSyncControlMetaTimestamp(datasetID, metaTimestamp) }
     }
   }
 
@@ -349,7 +349,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       handler,
     )
 
-    appDB.withTransaction(projectID) { it.upsertInstallMetaMessage(datasetID, InstallStatus.Complete) }
+    appDB.withTransaction(projectID, handler.type) { it.upsertInstallMetaMessage(datasetID, InstallStatus.Complete) }
   }
 
   private fun AppDBTransaction.upsertInstallMetaMessage(datasetID: DatasetID, status: InstallStatus) {

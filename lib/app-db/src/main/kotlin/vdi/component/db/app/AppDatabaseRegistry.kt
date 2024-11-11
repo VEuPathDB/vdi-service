@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.ldap.OracleNetDesc
 import org.veupathdb.vdi.lib.common.env.DBEnvGroup
 import org.veupathdb.vdi.lib.common.env.Environment
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.SecretString
 import vdi.component.env.EnvKey
 import vdi.component.env.EnvKey.DBConnectionDataTypes
@@ -24,9 +25,13 @@ object AppDatabaseRegistry {
     init(System.getenv())
   }
 
-  fun contains(key: String, pluginName: String): Boolean = get(key, pluginName) != null
+  fun contains(key: String, dataType: DataType): Boolean = get(key, dataType) != null
 
-  operator fun get(key: String, pluginName: String): AppDBRegistryEntry? = dataSources[key]?.get(pluginName)
+  fun contains(key: String): Boolean = key in dataSources
+
+  operator fun get(key: String, dataType: DataType): AppDBRegistryEntry? = dataSources[key]?.get(dataType)
+
+  operator fun get(key: String): AppDBRegistryCollection? = dataSources[key]
 
   /**
    * Iterates over all known app database registry entries as pairs of
@@ -50,10 +55,10 @@ object AppDatabaseRegistry {
     dataSources.entries
       .asSequence()
       .map { (key, value) -> key to value }
-      .flatMap { (dbName, values) -> values.map { (_, value) -> dbName to value } }
+      .flatMap { (dbName, values) -> values.map { (dataType, value) -> RegisteredAppDatabase(dbName, dataType, value) } }
 
-  fun require(key: String, pluginName: String): AppDBRegistryEntry =
-    get(key, pluginName)
+  fun require(key: String, dataType: DataType): AppDBRegistryEntry =
+    get(key, dataType)
       ?: throw IllegalStateException("required AppDB connection $key was not registered with AppDatabases")
 
   internal fun init(env: Environment) {
@@ -182,7 +187,7 @@ object AppDatabaseRegistry {
                   throw IllegalStateException("Database connection config set for ${env.connectionName} specifies that it is both a fallback and data type restricted")
               } else {
                 for (plugin in plugins)
-                  put(plugin.lowercase(), entry)
+                  put(DataType.of(plugin), entry)
               }
             }
           }
@@ -264,5 +269,5 @@ object AppDatabaseRegistry {
 
   private fun makeJDBCPostgresConnectionString(host: String, port: UShort, name: String) =
     "jdbc:postgresql://$host:$port/$name"
-
 }
+

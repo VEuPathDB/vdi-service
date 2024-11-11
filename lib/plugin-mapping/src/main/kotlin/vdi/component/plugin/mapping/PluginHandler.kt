@@ -1,5 +1,6 @@
 package vdi.component.plugin.mapping
 
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.ProjectID
 
 /**
@@ -12,7 +13,7 @@ interface PluginHandler {
   /**
    * Name of the type of dataset that this plugin handler handles.
    */
-  val type: String
+  val type: DataType
 
   /**
    * Display name of the type of dataset that this plugin handler handles.

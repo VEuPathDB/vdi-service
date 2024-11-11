@@ -4,6 +4,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -16,16 +17,16 @@ import vdi.component.db.app.model.*
 import java.time.OffsetDateTime
 
 fun mockAppDB(
-  accessor: (ProjectID) -> AppDBAccessor? = ::oneParamNull,
-  transaction: (ProjectID) -> AppDBTransaction? = ::oneParamNull,
+  accessor: (ProjectID, DataType) -> AppDBAccessor? = ::twoParamNull,
+  transaction: (ProjectID, DataType) -> AppDBTransaction? = ::twoParamNull,
   bulkStatuses: (Map<ProjectID, Collection<DatasetID>>) -> Map<DatasetID, Map<ProjectID, InstallStatuses>> = ::oneParamMap,
   datasetStatuses: (DatasetID, Collection<ProjectID>) -> Map<ProjectID, InstallStatuses> = ::twoParamMap,
 ): AppDB =
   mock {
     on { getDatasetStatuses(any()) } doAnswer { bulkStatuses(it.getArgument(0)) }
     on { getDatasetStatuses(any(), any()) } doAnswer { datasetStatuses(it.getArgument(0), it.getArgument(1)) }
-    on { this.accessor(any()) } doAnswer { accessor(it.getArgument(0)) }
-    on { this.transaction(any()) } doAnswer { transaction(it.getArgument(0)) }
+    on { this.accessor(any(), any()) } doAnswer { accessor(it.getArgument(0), it.getArgument(1)) }
+    on { this.transaction(any(), any()) } doAnswer { transaction(it.getArgument(0), it.getArgument(1)) }
   }
 
 fun mockAppDBAccessor(
@@ -166,7 +167,7 @@ fun mockInstallMessage(
 fun mockAppDatasetRecord(
   datasetID: DatasetID? = null,
   owner: UserID? = null,
-  typeName: String? = null,
+  typeName: DataType? = null,
   typeVersion: String? = null,
   isDeleted: DeleteFlag? = null,
 ): DatasetRecord =

@@ -92,8 +92,12 @@ private fun listExpandedBrokenDatasets(): BrokenDatasetListing {
 }
 
 private fun getBrokenDatasets(projectID: ProjectID) =
-  AppDB().accessor(projectID)!!
-    .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FailedInstallation)
+  ArrayList<DatasetRecord>(1024).apply {
+    for ((_, dataType) in AppDatabaseRegistry) {
+      addAll(AppDB().accessor(projectID, dataType)!!
+        .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FailedInstallation))
+    }
+  }
 
 private fun DatasetRecord.toDetails(
   projects: Collection<ProjectID>,

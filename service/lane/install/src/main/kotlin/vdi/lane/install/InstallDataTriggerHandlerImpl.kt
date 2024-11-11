@@ -222,7 +222,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     var timer: Histogram.Timer? = null
 
     try {
-      val appDB = appDB.accessor(projectID) or {
+      val appDB = appDB.accessor(projectID, handler.type) or {
         log.info(
           "skipping install event for dataset {}/{} into project {} due to the target project being disabled.",
           userID,
@@ -254,11 +254,11 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
       val status = appDB.selectDatasetInstallMessage(datasetID, InstallType.Data)
 
-      timer = Metrics.Install.duration.labels(dataset.typeName, dataset.typeVersion).startTimer()
+      timer = Metrics.Install.duration.labels(dataset.typeName.toString(), dataset.typeVersion).startTimer()
 
       if (status == null) {
         var race = false
-        this.appDB.withTransaction(projectID) {
+        this.appDB.withTransaction(projectID, handler.type) {
           try {
             it.insertDatasetInstallMessage(
               DatasetInstallMessage(
@@ -309,7 +309,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         throw PluginRequestException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
       }
 
-      Metrics.Install.count.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
+      Metrics.Install.count.labels(dataset.typeName.toString(), dataset.typeVersion, response.responseCode.toString()).inc()
 
       when (response.type) {
         InstallDataResponseType.Success
@@ -387,7 +387,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       handler.displayName,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, handler.type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -416,7 +416,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       res.message,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, handler.type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -446,7 +446,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       handler,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, handler.type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -474,7 +474,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       handler.displayName,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, handler.type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -505,7 +505,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       handler.displayName,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, handler.type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(

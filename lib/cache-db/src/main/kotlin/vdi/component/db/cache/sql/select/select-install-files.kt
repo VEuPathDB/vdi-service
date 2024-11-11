@@ -1,7 +1,8 @@
 package vdi.component.db.cache.sql.select
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.cache.model.DatasetFile
+import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
+import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfoImpl
 import vdi.component.db.cache.util.map
 import vdi.component.db.cache.util.setDatasetID
 import vdi.component.db.cache.util.withPreparedStatement
@@ -19,8 +20,8 @@ WHERE
   dataset_id = ?
 """
 
-internal fun Connection.selectInstallFiles(datasetID: DatasetID) =
+internal fun Connection.selectInstallFiles(datasetID: DatasetID): List<VDIDatasetFileInfo> =
   withPreparedStatement(SQL) {
     setDatasetID(1, datasetID)
-    withResults { map { DatasetFile(it.getString(1), it.getLong(2).toULong()) } }
+    withResults { map { VDIDatasetFileInfoImpl(it.getString(1), it.getLong(2)) } }
   }

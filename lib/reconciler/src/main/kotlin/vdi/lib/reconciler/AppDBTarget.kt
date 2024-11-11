@@ -1,8 +1,10 @@
 package vdi.lib.reconciler
 
+import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.component.db.app.AppDB
+import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.app.withTransaction
 import vdi.component.plugin.client.PluginException
 import vdi.component.plugin.client.PluginRequestException
@@ -15,9 +17,8 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
 
   override val type = ReconcilerTargetType.Install
 
-  override fun streamSortedSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord> {
-    return appDB.accessor(projectID)!!.streamAllSyncControlRecords()
-  }
+  override fun streamSortedSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord> =
+    CloseableMultiIterator(projectID)
 
   override suspend fun deleteDataset(dataset: VDIReconcilerTargetRecord) {
     if (!PluginHandlers.contains(dataset.type.name, dataset.type.version)) {
@@ -47,7 +48,7 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
           throw PluginException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID)
       }
 
-      appDB.withTransaction(projectID) {
+      appDB.withTransaction(projectID, dataset.type.name) {
         it.deleteDatasetVisibilities(dataset.datasetID)
         it.deleteDatasetProjectLinks(dataset.datasetID)
         it.deleteSyncControl(dataset.datasetID)
@@ -55,5 +56,35 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
         it.deleteDatasetMeta(dataset.datasetID)
         it.deleteDataset(dataset.datasetID)
       }
+  }
+}
+
+private class CloseableMultiIterator(private val projectID: ProjectID) : CloseableIterator<VDIReconcilerTargetRecord> {
+  private val dataTypeIterator = AppDatabaseRegistry[projectID]!!.keys().iterator()
+  private var current: CloseableIterator<VDIReconcilerTargetRecord>? = null
+
+  override fun hasNext() =
+    current?.let { it.hasNext() || dataTypeIterator.hasNext() }
+      ?: dataTypeIterator.hasNext()
+
+  override fun next(): VDIReconcilerTargetRecord {
+    // iterate until we have a record stream with at least one record in it.
+    while (current?.hasNext() != true) {
+      // close the previous stream (if one exists)
+      current?.close()
+
+      // ensure there is another type to move to for the current project
+      if (!dataTypeIterator.hasNext())
+        throw NoSuchElementException()
+
+      // attempt to get a stream for the project/type pairing
+      current = AppDB().accessor(projectID, dataTypeIterator.next())?.streamAllSyncControlRecords()
+    }
+
+    return current!!.next()
+  }
+
+  override fun close() {
+    current?.close()
   }
 }

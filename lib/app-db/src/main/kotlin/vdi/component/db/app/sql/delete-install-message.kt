@@ -14,10 +14,8 @@ WHERE
   AND install_type = ?
 """
 
-internal fun Connection.deleteInstallMessage(schema: String, datasetID: DatasetID, installType: InstallType): Int =
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, datasetID.toString())
-      ps.setString(2, installType.value)
-      ps.executeUpdate()
-    }
+internal fun Connection.deleteInstallMessage(schema: String, datasetID: DatasetID, installType: InstallType) =
+  preparedUpdate(sql(schema)) {
+    setDatasetID(1, datasetID)
+    setInstallType(2, installType)
+  }

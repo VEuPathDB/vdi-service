@@ -1,5 +1,6 @@
 package vdi.component.db.app.sql
 
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetTypeImpl
@@ -46,13 +47,13 @@ class RecordIterator(val rs: ResultSet,
 
   override fun next(): VDIReconcilerTargetRecord {
     return VDIReconcilerTargetRecord(
-      datasetID = DatasetID(rs.getString("dataset_id")),
-      ownerID = UserID(rs.getLong("owner")),
-      sharesUpdated = rs.getObject("shares_update_time", OffsetDateTime::class.java),
-      dataUpdated = rs.getObject("data_update_time", OffsetDateTime::class.java),
-      metaUpdated = rs.getObject("meta_update_time", OffsetDateTime::class.java),
+      datasetID = rs.getDatasetID("dataset_id"),
+      ownerID = rs.getUserID("owner"),
+      sharesUpdated = rs.getDateTime("shares_update_time"),
+      dataUpdated = rs.getDateTime("data_update_time"),
+      metaUpdated = rs.getDateTime("meta_update_time"),
       type=VDIDatasetTypeImpl(
-        name = rs.getString("type_name"),
+        name = rs.getDataType("type_name"),
         version = rs.getString("type_version")
       ),
       isUninstalled = rs.getInt("is_deleted") == DeleteFlag.DeletedAndUninstalled.value
