@@ -64,6 +64,14 @@ internal class EagerlyLoadedDatasetDirectory(
       }
     }
 
+    // Perform bad state checks on dataset directories.
+    when {
+      // Meta file should always be present, if not we either caught minio at a
+      // bad time, or the dataset is busted.  Either way, we shouldn't try and
+      // operate on it.
+      metaFile == null -> throw MalformedDatasetException("no meta file found for $ownerID/$datasetID")
+    }
+
     shares = shareRefs.mapValues { (_, ref) -> ref.toDatasetShare(pathFactory) }
   }
 
