@@ -5,8 +5,8 @@ plugins {
 dependencies {
   implementation(platform(project(":platform")))
 
-  implementation("org.mockito:mockito-core:5.2.0")
-  implementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+  implementation("org.mockito:mockito-core")
+  implementation("org.mockito.kotlin:mockito-kotlin")
 
   implementation("org.veupathdb.vdi:vdi-component-common")
 

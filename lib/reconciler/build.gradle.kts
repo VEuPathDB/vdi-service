@@ -25,9 +25,9 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
   testImplementation(kotlin("test"))
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.3")
-  testImplementation("org.mockito:mockito-core:5.14.2")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.3")
+  testImplementation("org.junit.jupiter:junit-jupiter-api")
+  testImplementation("org.mockito:mockito-core")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
   testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
 }
 

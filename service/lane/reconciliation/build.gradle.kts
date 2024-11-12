@@ -26,10 +26,10 @@ dependencies {
 
   testImplementation(kotlin("test"))
   testImplementation(project(":lib:test-utils"))
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.3")
-  testImplementation("org.mockito:mockito-core:5.14.2")
-  testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.3")
+  testImplementation("org.junit.jupiter:junit-jupiter-api")
+  testImplementation("org.mockito:mockito-core")
+  testImplementation("org.mockito.kotlin:mockito-kotlin")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
   testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
 }
 

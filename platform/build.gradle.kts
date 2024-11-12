@@ -4,6 +4,10 @@ plugins {
 
 dependencies {
   constraints {
+    //
+    // Compile/Runtime
+    //
+
     api("org.gusdb:fgputil-db:2.13.1")
     api("org.veupathdb.lib:jaxrs-container-core:7.1.0")
     api("org.veupathdb.lib:multipart-jackson-pojo:1.1.7")
@@ -45,5 +49,16 @@ dependencies {
     // S3
     api("org.veupathdb.lib.s3:s34k-minio:0.7.1+s34k-0.11.0")
 
+    //
+    // Unit Testing
+    //
+
+    // JUnit5
+    api("org.junit.jupiter:junit-jupiter-api:5.11.3")
+    api("org.junit.jupiter:junit-jupiter-engine:5.11.3")
+
+    // Mockito
+    api("org.mockito:mockito-core:5.14.2")
+    api("org.mockito.kotlin:mockito-kotlin:5.4.0")
   }
 }
