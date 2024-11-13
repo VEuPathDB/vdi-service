@@ -64,7 +64,7 @@ fun createDataset(
       throw BadRequestException("unrecognized target project")
   }
 
-  CacheDB().withTransaction {
+  val (tempDirectory, uploadFile) = CacheDB().withTransaction {
     it.tryInsertDataset(DatasetImpl(
       datasetID    = datasetID,
       typeName     = datasetMeta.type.name,
@@ -92,32 +92,32 @@ fun createDataset(
       dataUpdated   = OriginTimestamp,
       metaUpdated   = OriginTimestamp
     ))
-  }
 
-  // TODO: Post release!
-  //       The following call represents a 'unified' path for handling uploads
-  //       whether they are direct or via URL.  This leaves us open to proxy
-  //       timeouts in the case of URL uploads if the file transfer between the
-  //       VDI service and the remote server takes too long.
-  //
-  //       To handle this, the 'unified' path will need to be split into two
-  //       paths:
-  //       - Direct upload path
-  //       - URL upload path
-  //
-  //       For the direct upload path, the upload file will need to be copied to
-  //       a new temp directory (as the rest service thread will delete the
-  //       original upload file).  Then the new thread can be forked and the
-  //       file uploaded to MinIO.
-  //
-  //       For the URL upload path, the URL will need to be validated before
-  //       starting the new thread.  Then the new thread will be forked and the
-  //       target file downloaded into a temp directory in that thread before
-  //       being uploaded to MinIO (also in that forked thread).
-  val (tempDirectory, uploadFile) = try { entity.fetchDatasetFile() }
-  catch (e: Throwable) {
-    CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
-    throw e
+    // TODO: Post release!
+    //       The following call represents a 'unified' path for handling uploads
+    //       whether they are direct or via URL.  This leaves us open to proxy
+    //       timeouts in the case of URL uploads if the file transfer between the
+    //       VDI service and the remote server takes too long.
+    //
+    //       To handle this, the 'unified' path will need to be split into two
+    //       paths:
+    //       - Direct upload path
+    //       - URL upload path
+    //
+    //       For the direct upload path, the upload file will need to be copied to
+    //       a new temp directory (as the rest service thread will delete the
+    //       original upload file).  Then the new thread can be forked and the
+    //       file uploaded to MinIO.
+    //
+    //       For the URL upload path, the URL will need to be validated before
+    //       starting the new thread.  Then the new thread will be forked and the
+    //       target file downloaded into a temp directory in that thread before
+    //       being uploaded to MinIO (also in that forked thread).
+    try { entity.fetchDatasetFile() }
+    catch (e: Throwable) {
+      CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+      throw e
+    }
   }
 
   Metrics.Upload.queueSize.inc()
