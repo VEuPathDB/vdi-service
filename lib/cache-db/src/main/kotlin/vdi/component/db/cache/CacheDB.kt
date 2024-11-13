@@ -78,11 +78,10 @@ interface CacheDB {
   fun openTransaction(): vdi.component.db.cache.CacheDBTransaction
 }
 
-inline fun vdi.component.db.cache.CacheDB.withTransaction(fn: (vdi.component.db.cache.CacheDBTransaction) -> Unit) =
+inline fun <T> vdi.component.db.cache.CacheDB.withTransaction(fn: (vdi.component.db.cache.CacheDBTransaction) -> T) =
   openTransaction().use {
     try {
-      fn(it)
-      it.commit()
+      fn(it).apply { it.commit() }
     } catch (e: Throwable) {
       it.rollback()
       throw e
