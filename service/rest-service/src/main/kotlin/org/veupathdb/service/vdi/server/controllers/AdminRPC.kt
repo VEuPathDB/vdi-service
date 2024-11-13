@@ -4,6 +4,7 @@ import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.core.StreamingOutput
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.repo.UserRepo
 import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
@@ -13,11 +14,13 @@ import org.veupathdb.service.vdi.generated.resources.Admin
 import org.veupathdb.service.vdi.service.admin.getDatasetDetails
 import org.veupathdb.service.vdi.service.admin.listAllDatasets
 import org.veupathdb.service.vdi.service.admin.listAllS3Objects
+import org.veupathdb.service.vdi.service.admin.purgeDataset
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.listBrokenDatasets
 import org.veupathdb.service.vdi.util.fixVariableDateString
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.field.toDatasetID
 import org.veupathdb.vdi.lib.common.field.toUserID
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.BrokenImportListQuery
@@ -35,9 +38,10 @@ private const val biQueryLimitDefault = 100
 private const val biQueryOffsetMinimum = 0
 private const val biQueryOffsetDefault = 0
 
-@Authenticated(adminOverride = ALLOW_ALWAYS)
 @AdminRequired
+@Authenticated(adminOverride = ALLOW_ALWAYS)
 class AdminRPC : Admin {
+  private val log = LoggerFactory.getLogger(javaClass)
 
   override fun getAdminListBroken(expanded: Boolean?): Admin.GetAdminListBrokenResponse {
     return Admin.GetAdminListBrokenResponse
@@ -153,6 +157,17 @@ class AdminRPC : Admin {
         }
         it.results = broken
       })
+  }
+
+  override fun postAdminPurgeDataset(userId: Long, datasetId: String): Admin.PostAdminPurgeDatasetResponse {
+    val validUserID = userId.toUserID()
+    val validDatasetID = datasetId.toDatasetID()
+
+    log.info("attempting to purge dataset {}/{}", validUserID, validDatasetID)
+
+    purgeDataset(validUserID, validDatasetID)
+
+    return Admin.PostAdminPurgeDatasetResponse.respond204()
   }
 
   override fun getAdminListAllDatasets(

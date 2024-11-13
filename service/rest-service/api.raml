@@ -663,6 +663,52 @@ uses:
             application/json:
               type: lib.AllDatasetsListResponse
 
+  /purge-dataset:
+    displayName: Purge Dataset
+    post:
+      description: |
+        Removes a dataset from the object store and internal postgres database.
+        
+        This is intended to be used exclusively for clearing bad state created
+        by errors or bugs.
+        
+        This action does not perform dataset uninstalls, and may leave VDI in a
+        bad state if run against a dataset that isn't broken.
+      queryParameters:
+        user-id: lib.User-ID
+        dataset-id: lib.VDI-ID
+      responses:
+        204:
+        400:
+          description: Bad Request.
+          body:
+            application/json:
+              type: lib.BadRequestError
+              example:
+                status: bad-request
+                message: Invalid project_id value.
+        401:
+          description: Unauthorized.
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+              example:
+                status: unauthorized
+                message: Users must be logged in to access this resource.
+        404:
+          description: Not Found
+          body: lib.NotFoundError
+        500:
+          description: Internal Server Error.
+          body:
+            application/json:
+              type: lib.ServerError
+              example:
+                status: server-error
+                message: Dataset store is unreachable
+                requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+
+
 /vdi-datasets/community:
   displayName: Community Datasets
   get:

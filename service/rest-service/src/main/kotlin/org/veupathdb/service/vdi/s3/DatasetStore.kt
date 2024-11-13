@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
+import org.veupathdb.lib.s3.s34k.objects.S3Object
 import org.veupathdb.lib.s3.s34k.objects.StreamObject
 import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -98,6 +99,11 @@ object DatasetStore {
   fun putDeleteFlag(userID: UserID, datasetID: DatasetID) {
     log.debug("uploading soft-delete flag for dataset {}/{}", userID, datasetID)
     bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID)) { overwrite = true }
+  }
+
+  fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> {
+    log.debug("listing objects at prefix {}/{}", userID, datasetID)
+    return bucket.objects.list(prefix = S3Paths.datasetDir(userID, datasetID))
   }
 
   fun streamAll() = bucket.objects.streamAll().stream()
