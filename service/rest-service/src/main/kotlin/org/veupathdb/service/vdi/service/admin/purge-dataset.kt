@@ -1,10 +1,14 @@
 package org.veupathdb.service.vdi.service.admin
 
+import jakarta.ws.rs.BadRequestException
+import org.veupathdb.service.vdi.generated.model.AdminPurgeDatasetPostApplicationJson
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.withTransaction
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 internal fun purgeDataset(userID: UserID, datasetID: DatasetID) {
   for (obj in DatasetStore.listObjectsForDataset(userID, datasetID)) {
@@ -23,4 +27,14 @@ internal fun purgeDataset(userID: UserID, datasetID: DatasetID) {
     it.deleteSyncControl(datasetID)
     it.deleteDataset(datasetID)
   }
+}
+
+@OptIn(ExperimentalContracts::class)
+internal fun AdminPurgeDatasetPostApplicationJson?.validate() {
+  contract {
+    returns() implies (this@validate != null)
+  }
+
+  if (this == null || userId == null || datasetId == null)
+    throw BadRequestException()
 }

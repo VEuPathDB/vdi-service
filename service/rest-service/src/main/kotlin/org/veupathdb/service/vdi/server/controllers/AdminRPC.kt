@@ -11,10 +11,7 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.Admin
-import org.veupathdb.service.vdi.service.admin.getDatasetDetails
-import org.veupathdb.service.vdi.service.admin.listAllDatasets
-import org.veupathdb.service.vdi.service.admin.listAllS3Objects
-import org.veupathdb.service.vdi.service.admin.purgeDataset
+import org.veupathdb.service.vdi.service.admin.*
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.listBrokenDatasets
 import org.veupathdb.service.vdi.util.fixVariableDateString
@@ -159,9 +156,11 @@ class AdminRPC : Admin {
       })
   }
 
-  override fun postAdminPurgeDataset(userId: Long, datasetId: String): Admin.PostAdminPurgeDatasetResponse {
-    val validUserID = userId.toUserID()
-    val validDatasetID = datasetId.toDatasetID()
+  override fun postAdminPurgeDataset(json: AdminPurgeDatasetPostApplicationJson?): Admin.PostAdminPurgeDatasetResponse {
+    json.validate()
+
+    val validUserID = json.userId.toUserID()
+    val validDatasetID = json.datasetId.toDatasetID()
 
     log.info("attempting to purge dataset {}/{}", validUserID, validDatasetID)
 

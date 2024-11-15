@@ -674,9 +674,12 @@ uses:
         
         This action does not perform dataset uninstalls, and may leave VDI in a
         bad state if run against a dataset that isn't broken.
-      queryParameters:
-        user-id: lib.User-ID
-        dataset-id: lib.VDI-ID
+      body:
+        application/json:
+          type: object
+          properties:
+            userId: lib.User-ID
+            datasetId: lib.VDI-ID
       responses:
         204:
         400:

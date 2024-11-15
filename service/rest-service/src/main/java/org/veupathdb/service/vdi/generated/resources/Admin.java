@@ -9,6 +9,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
+import org.veupathdb.service.vdi.generated.model.AdminPurgeDatasetPostApplicationJson;
 import org.veupathdb.service.vdi.generated.model.AllDatasetsListResponse;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.BrokenDatasetListing;
@@ -87,8 +88,8 @@ public interface Admin {
   @POST
   @Path("/purge-dataset")
   @Produces("application/json")
-  PostAdminPurgeDatasetResponse postAdminPurgeDataset(@QueryParam("user-id") Long userId,
-      @QueryParam("dataset-id") String datasetId);
+  @Consumes("application/json")
+  PostAdminPurgeDatasetResponse postAdminPurgeDataset(AdminPurgeDatasetPostApplicationJson entity);
 
   class PostAdminReconcilerResponse extends ResponseDelegate {
     private PostAdminReconcilerResponse(Response response, Object entity) {
