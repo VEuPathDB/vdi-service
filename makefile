@@ -1,6 +1,9 @@
 _COLOR := $(shell echo "\\033[38;5;69m")
 _RESET := $(shell echo "\\033[0m")
 
+CONTAINER_CMD := $(shell if command -v podman 2>&1 >/dev/null; then echo 'podman'; else echo 'docker'; fi)
+
+
 .PHONY: default
 default:
 	@echo "Please pick a make target."
@@ -12,7 +15,7 @@ default:
 
 .PHONY: build
 build:
-	@docker compose \
+	@$(CONTAINER_CMD) compose \
       -f docker-compose.local.yml \
       -f docker-compose.dev.yml \
       build \
@@ -32,19 +35,19 @@ raml-gen:
 
 .PHONY: up
 up: env-file-test
-	@docker compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml up -d
+	@$(CONTAINER_CMD) compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml up -d
 
 .PHONY: down
 down: env-file-test
-	@docker compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml down -v
+	@$(CONTAINER_CMD) compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml down -v
 
 .PHONY: start
 start: env-file-test
-	@docker compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml start
+	@$(CONTAINER_CMD) compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml start
 
 .PHONY: stop
 stop: env-file-test
-	@docker compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml stop
+	@$(CONTAINER_CMD) compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml stop
 
 
 ####
@@ -53,43 +56,43 @@ stop: env-file-test
 
 .PHONY: log-service
 log-service:
-	@docker logs -f vdi-service-service-1
+	@$(CONTAINER_CMD) logs -f vdi-service-service-1
 
 .PHONY: log-plugin-noop
 log-plugin-noop:
-	@docker logs -f vdi-service-plugin-example-1
+	@$(CONTAINER_CMD) logs -f vdi-service-plugin-example-1
 
 .PHONY: log-plugin-genelist
 log-plugin-genelist:
-	@docker logs -f vdi-service-plugin-genelist-1
+	@$(CONTAINER_CMD) logs -f vdi-service-plugin-genelist-1
 
 .PHONY: log-plugin-rnaseq
 log-plugin-rnaseq:
-	@docker logs -f vdi-service-plugin-rnaseq-1
+	@$(CONTAINER_CMD) logs -f vdi-service-plugin-rnaseq-1
 
 .PHONY: log-plugin-isasimple
 log-plugin-isasimple:
-	@docker logs -f vdi-service-plugin-isasimple-1
+	@$(CONTAINER_CMD) logs -f vdi-service-plugin-isasimple-1
 
 .PHONY: log-plugin-biom
 log-plugin-biom:
-	@docker logs -f vdi-service-plugin-biom-1
+	@$(CONTAINER_CMD) logs -f vdi-service-plugin-biom-1
 
 .PHONY: log-plugin-bigwig
 log-plugin-bigwig:
-	@docker logs -f vdi-service-plugin-bigwig-1
+	@$(CONTAINER_CMD) logs -f vdi-service-plugin-bigwig-1
 
 .PHONY: log-kafka
 log-kafka:
-	@docker logs -f vdi-service-kafka-1
+	@$(CONTAINER_CMD) logs -f vdi-service-kafka-1
 
 .PHONY: log-minio
 log-minio:
-	@docker logs -f vdi-service-minio-external-1
+	@$(CONTAINER_CMD) logs -f vdi-service-minio-external-1
 
 .PHONY: log-rabbit
 log-rabbit:
-	@docker logs -f vdi-service-rabbit-external-1
+	@$(CONTAINER_CMD) logs -f vdi-service-rabbit-external-1
 
 
 ####
