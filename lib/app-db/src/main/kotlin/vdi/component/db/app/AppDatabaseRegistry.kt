@@ -105,7 +105,7 @@ object AppDatabaseRegistry {
               host     = env.host!!,
               port     = env.port!!,
               dbName   = env.dbName!!,
-              poolSize = env.poolSize!!.toInt(),
+              poolSize = (env.poolSize ?: DefaultPoolSize).toInt(),
             )
           else
             LDAPConnectDetails(
@@ -113,7 +113,7 @@ object AppDatabaseRegistry {
               user     = env.controlSchema!!,
               pw       = env.pass!!,
               ldap     = env.ldap!!,
-              poolSize = env.poolSize!!.toInt(),
+              poolSize = (env.poolSize ?: DefaultPoolSize).toInt(),
             )
         AppDBPlatform.Postgres -> ManualConnectDetails(
           name     = env.connectionName!!,
@@ -122,7 +122,7 @@ object AppDatabaseRegistry {
           host     = env.host!!,
           port     = env.port!!,
           dbName   = env.dbName!!,
-          poolSize = env.poolSize!!.toInt(),
+          poolSize = (env.poolSize ?: DefaultPoolSize).toInt(),
         )
       }
     } catch (e: Throwable) {
