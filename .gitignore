@@ -8,9 +8,10 @@ build/
 /vendor/
 /bin/
 /tmp/
-.envrc
-
 /*ssh*
+
+.envrc
+merged-compose.yml
 
 *.tmp
 *.bak

@@ -3,6 +3,8 @@ _RESET := $(shell echo "\\033[0m")
 
 CONTAINER_CMD := $(shell if command -v podman 2>&1 >/dev/null; then echo 'podman'; else echo 'docker'; fi)
 
+MERGED_COMPOSE_FILE := /tmp/$(shell basename $(shell pwd))-merged-compose.yml
+
 
 .PHONY: default
 default:
@@ -33,21 +35,31 @@ raml-gen:
 ##  Stack Management
 ####
 
+.PHONY: config
+config: env-file-test __MERGE_COMPOSE
+	@$(CONTAINER_CMD) compose -f $(MERGED_COMPOSE_FILE) config
+
 .PHONY: up
-up: env-file-test
-	@$(CONTAINER_CMD) compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml up -d
+up: env-file-test __MERGE_COMPOSE
+	@if [ -z "${SSH_AUTH_SOCK}" ]; then echo "SSH agent does not appear to be correctly running"; exit 1; fi
+	@$(CONTAINER_CMD) compose -f $(MERGED_COMPOSE_FILE) up -d
 
 .PHONY: down
-down: env-file-test
-	@$(CONTAINER_CMD) compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml down -v
+down: env-file-test __MERGE_COMPOSE
+	@$(CONTAINER_CMD) compose -f $(MERGED_COMPOSE_FILE) down -v
 
 .PHONY: start
-start: env-file-test
-	@$(CONTAINER_CMD) compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml start
+start: env-file-test __MERGE_COMPOSE
+	@if [ -z "${SSH_AUTH_SOCK}" ]; then echo "SSH agent does not appear to be correctly running"; exit 1; fi
+	@$(CONTAINER_CMD) compose -f $(MERGED_COMPOSE_FILE) start
 
 .PHONY: stop
-stop: env-file-test
-	@$(CONTAINER_CMD) compose -f docker-compose.local.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml stop
+stop: env-file-test __MERGE_COMPOSE
+	@$(CONTAINER_CMD) compose -f $(MERGED_COMPOSE_FILE) stop
+
+.PHONY: __MERGE_COMPOSE
+__MERGE_COMPOSE:
+	@vpdb merge-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml > $(MERGED_COMPOSE_FILE)
 
 
 ####

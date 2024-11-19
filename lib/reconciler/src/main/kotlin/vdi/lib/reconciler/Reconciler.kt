@@ -41,6 +41,11 @@ object Reconciler {
     // Initialize
     runBlocking {
       active.withLock {
+        if (AppDatabaseRegistry.isBroken) {
+          logger.error("refusing to start reconciler, app db registry is in a bad state")
+          abortCB("app db registry in bad state")
+        }
+
         try {
           val s3 = S3Api.newClient(config.s3Config)
           val bucket = s3.buckets[config.s3Bucket]

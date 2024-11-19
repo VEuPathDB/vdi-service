@@ -21,8 +21,16 @@ object AppDatabaseRegistry {
 
   private val dataSources = HashMap<String, AppDBRegistryCollection>(12)
 
+  var isBroken = false
+    private set
+
   init {
-    init(System.getenv())
+    try {
+      init(System.getenv())
+    } catch (e: Throwable) {
+      isBroken = true
+      throw e
+    }
   }
 
   fun contains(key: String, dataType: DataType): Boolean = get(key, dataType) != null
@@ -108,8 +116,8 @@ object AppDatabaseRegistry {
       Pool Size: {}""",
       env.connectionName,
       env.connectionName,
-      env.extensions[EnvKey.AppDB.DBConnectionDataTypes],
       env.ldap,
+      env.extensions[EnvKey.AppDB.DBConnectionDataTypes],
       env.host,
       env.port,
       env.dbName,
@@ -119,7 +127,7 @@ object AppDatabaseRegistry {
 
     val platform = env.platform?.let { AppDBPlatform.fromString(it) } ?: AppDBPlatform.Oracle
 
-    log.info("constructing a DataSource for database {} with platform {}", env.connectionName, env.platform)
+    log.info("constructing a DataSource for database {} with platform {}", env.connectionName, platform)
 
     val connectDetails: DbConnectDetails = try {
       when (platform) {
@@ -132,7 +140,7 @@ object AppDatabaseRegistry {
               host     = env.host!!,
               port     = env.port!!,
               dbName   = env.dbName!!,
-              poolSize = env.poolSize!!.toInt(),
+              poolSize = (env.poolSize ?: DefaultPoolSize).toInt(),
             )
           else
             LDAPConnectDetails(
@@ -140,7 +148,7 @@ object AppDatabaseRegistry {
               user     = env.controlSchema!!,
               pw       = env.pass!!,
               ldap     = env.ldap!!,
-              poolSize = env.poolSize!!.toInt(),
+              poolSize = (env.poolSize ?: DefaultPoolSize).toInt(),
             )
         AppDBPlatform.Postgres -> ManualConnectDetails(
           name     = env.connectionName!!,
@@ -149,7 +157,7 @@ object AppDatabaseRegistry {
           host     = env.host!!,
           port     = env.port!!,
           dbName   = env.dbName!!,
-          poolSize = env.poolSize!!.toInt(),
+          poolSize = (env.poolSize ?: DefaultPoolSize).toInt(),
         )
       }
     } catch (e: Throwable) {
