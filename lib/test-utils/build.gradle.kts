@@ -3,12 +3,9 @@ plugins {
 }
 
 dependencies {
-  implementation(platform(project(":platform")))
-
-  implementation("org.mockito:mockito-core")
-  implementation("org.mockito.kotlin:mockito-kotlin")
-
-  implementation("org.veupathdb.vdi:vdi-component-common")
+  implementation(libs.mockito.core)
+  implementation(libs.mockito.kotlin)
+  implementation(libs.vdi.common)
 
   implementation(project(":lib:app-db"))
   implementation(project(":lib:cache-db"))

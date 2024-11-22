@@ -5,7 +5,7 @@ import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.core.StreamingOutput
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import org.veupathdb.lib.container.jaxrs.repo.UserRepo
+import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
@@ -101,8 +101,10 @@ class AdminRPC : Admin {
 
     val userID = UserID(userID)
 
-    if (UserRepo.Select.registeredUserById(userID.toLong()).isEmpty)
-      throw ForbiddenException("target user does not exist or is a guest user")
+    with (UserProvider.getUsersById(listOf(userID.toLong()))) {
+      if (isEmpty() || get(userID.toLong())?.isGuest != false)
+        throw ForbiddenException("target user does not exist or is a guest user")
+    }
 
     val datasetID = DatasetID()
 

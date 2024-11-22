@@ -263,7 +263,7 @@ private fun Path.repackZip(into: Path, using: Path): List<VDIDatasetFileInfo> {
       tmpFile.createFile()
       tmpFile.outputStream().use { out -> input.transferTo(out) }
 
-      files.add(VDIDatasetFileInfoImpl(entry.name, tmpFile.fileSize()))
+      files.add(VDIDatasetFileInfo(entry.name, tmpFile.fileSize().toULong()))
 
       unpacked.add(tmpFile)
     }
@@ -309,7 +309,7 @@ private fun Path.repackTar(into: Path, using: Path): List<VDIDatasetFileInfo> {
     throw BadRequestException("uploaded file contained no files or was not a valid tar archive")
 
   for (file in files)
-    sizes.add(VDIDatasetFileInfoImpl(file.name, file.fileSize()))
+    sizes.add(VDIDatasetFileInfo(file.name, file.fileSize().toULong()))
 
   Zip.compress(into, files)
 
@@ -319,7 +319,7 @@ private fun Path.repackTar(into: Path, using: Path): List<VDIDatasetFileInfo> {
 private fun Path.repackRaw(into: Path): List<VDIDatasetFileInfo> {
   log.trace("repacking raw file {} into {}", this, into)
   Zip.compress(into, listOf(this))
-  return listOf(VDIDatasetFileInfoImpl(name, fileSize()))
+  return listOf(VDIDatasetFileInfo(name, fileSize().toULong()))
 }
 
 private data class FileReference(val tempDirectory: Path, val tempFile: Path)

@@ -8,6 +8,7 @@ import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.util.or
 import vdi.component.async.WorkerPool
 import vdi.component.db.app.AppDB
@@ -145,7 +146,7 @@ internal class SoftDeleteTriggerHandlerImpl(
     appDB.withTransaction(projectID, record.typeName) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedNotUninstalled) }
 
     val response = try {
-      handler.client.postUninstall(datasetID, projectID)
+      handler.client.postUninstall(datasetID, projectID, VDIDatasetType(record.typeName, record.typeVersion))
     } catch (e: Throwable) {
       throw PluginRequestException.uninstall(handler.displayName, projectID, userID, datasetID, cause = e)
     }

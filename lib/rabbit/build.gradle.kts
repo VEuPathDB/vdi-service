@@ -3,14 +3,12 @@ plugins {
 }
 
 dependencies {
-  implementation(platform(project(":platform")))
-
   implementation(project(":lib:async"))
   implementation(project(":lib:env"))
   implementation(project(":lib:metrics"))
 
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-  implementation("org.veupathdb.vdi:vdi-component-common")
-  implementation("org.slf4j:slf4j-api")
-  implementation("com.rabbitmq:amqp-client")
+  implementation(libs.kt.coroutines)
+  implementation(libs.vdi.common)
+  implementation(libs.log.slf4j)
+  implementation(libs.msg.rabbit)
 }

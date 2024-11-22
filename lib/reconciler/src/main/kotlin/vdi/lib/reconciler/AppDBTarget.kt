@@ -1,6 +1,7 @@
 package vdi.lib.reconciler
 
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.component.db.app.AppDB
@@ -31,7 +32,7 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
     val handler = PluginHandlers[dataset.type.name, dataset.type.version]!!
 
     val res = try {
-      handler.client.postUninstall(dataset.datasetID, projectID)
+      handler.client.postUninstall(dataset.datasetID, projectID, dataset.type)
     } catch (e: Throwable) {
       throw PluginRequestException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID, cause = e)
     }

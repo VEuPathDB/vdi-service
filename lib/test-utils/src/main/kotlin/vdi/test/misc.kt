@@ -58,11 +58,11 @@ fun mockDatasetManifest(
 
 fun mockDatasetFileInfo(
   filename: String? = null,
-  fileSize: Long? = null,
+  size: ULong? = null,
 ): VDIDatasetFileInfo =
   mock {
     filename?.also { on { this.filename } doReturn it }
-    fileSize?.also { on { this.fileSize } doReturn it }
+    size?.also { on { this.size } doReturn it }
   }
 
 fun mockDatasetDependency(

@@ -3,9 +3,9 @@ package org.veupathdb.service.vdi.generated.model
 import org.veupathdb.service.vdi.util.ValidationErrors
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetDependencyImpl
-import org.veupathdb.vdi.lib.common.model.VDIDatasetMetaImpl
-import org.veupathdb.vdi.lib.common.model.VDIDatasetTypeImpl
+import org.veupathdb.vdi.lib.common.model.VDIDatasetDependency
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import java.time.OffsetDateTime
 
@@ -31,8 +31,8 @@ internal fun DatasetPostRequest.validate(): ValidationErrors {
 }
 
 internal fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
-  VDIDatasetMetaImpl(
-    type         = VDIDatasetTypeImpl(
+  VDIDatasetMeta(
+    type         = VDIDatasetType(
       name    = DataType.of(meta.datasetType.name),
       version = meta.datasetType.version,
     ),
@@ -46,7 +46,7 @@ internal fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
     sourceURL    = url,
     created      = meta.createdOn ?: OffsetDateTime.now(),
     dependencies = (meta.dependencies ?: emptyList()).map {
-      VDIDatasetDependencyImpl(
+      VDIDatasetDependency(
         identifier  = it.resourceIdentifier,
         version     = it.resourceVersion,
         displayName = it.resourceDisplayName

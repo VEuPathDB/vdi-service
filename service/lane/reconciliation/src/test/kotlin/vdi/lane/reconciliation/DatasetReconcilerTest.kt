@@ -25,7 +25,7 @@ private val datasetID = DatasetID()
 @DisplayName("when dataset")
 class DatasetReconcilerTest {
 
-  private val dsType = VDIDatasetTypeImpl(DataType.of("foo"), "bar")
+  private val dsType = VDIDatasetType(DataType.of("foo"), "bar")
 
   private val projects = setOf("foo")
 
@@ -827,7 +827,7 @@ class DatasetReconcilerTest {
 }
 
 private fun generateFileInfo(): VDIDatasetFileInfo =
-  VDIDatasetFileInfoImpl(
+  VDIDatasetFileInfo(
     filename = UUID.randomUUID().toString(),
-    fileSize = Random.nextLong(),
+    size = Random.nextLong().toULong(),
   )

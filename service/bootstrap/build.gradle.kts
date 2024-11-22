@@ -3,18 +3,13 @@ plugins {
 }
 
 dependencies {
-  implementation(platform(project(":platform")))
-
-  implementation("org.veupathdb.vdi:vdi-component-common")
+  implementation(libs.vdi.common)
 
   implementation(project(":lib:module-core"))
-
   implementation(project(":service:rest-service"))
-
   implementation(project(":service:daemon:event-router"))
   implementation(project(":service:daemon:reconciler"))
   implementation(project(":service:daemon:pruner"))
-
   implementation(project(":service:lane:hard-delete"))
   implementation(project(":service:lane:import"))
   implementation(project(":service:lane:install"))
@@ -23,12 +18,12 @@ dependencies {
   implementation(project(":service:lane:soft-delete"))
   implementation(project(":service:lane:update-meta"))
 
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-  implementation("org.veupathdb.lib:jaxrs-container-core")
+  implementation(libs.kt.coroutines)
+  implementation(libs.container.core)
 
-  implementation("org.slf4j:slf4j-api")
-  implementation("org.apache.logging.log4j:log4j-api")
-  implementation("org.apache.logging.log4j:log4j-core")
-  implementation("org.apache.logging.log4j:log4j-slf4j-impl")
+  implementation(libs.log.slf4j)
+  implementation(libs.log.log4j.api)
+  implementation(libs.log.log4j.core)
+  implementation(libs.log.log4j.slf4j)
   implementation(kotlin("stdlib-jdk8"))
 }

@@ -7,7 +7,6 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
-import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfoImpl
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import vdi.component.db.cache.model.DatasetImportStatus
 import java.sql.Connection
@@ -112,7 +111,7 @@ internal inline fun ResultSet.getFileDetailList(column: String): List<VDIDataset
       .let { it.trim('(', ')') }
       .let {
         val c = it.lastIndexOf(',')
-        VDIDatasetFileInfoImpl(it.substring(0, c).trim('"'), it.substring(c + 1).toLong())
+        VDIDatasetFileInfo(it.substring(0, c).trim('"'), it.substring(c + 1).toULong())
       }
   }
 

@@ -46,8 +46,6 @@ containerBuild {
 }
 
 dependencies {
-  implementation(platform(project(":platform")))
-
   implementation(project(":lib:app-db"))
   implementation(project(":lib:cache-db"))
   implementation(project(":lib:dataset-reinstaller"))
@@ -59,34 +57,34 @@ dependencies {
   implementation(project(":lib:s3"))
   implementation(project(":lib:metrics"))
 
-  implementation("org.veupathdb.vdi:vdi-component-json")
-  implementation("org.veupathdb.vdi:vdi-component-common")
+  implementation(libs.vdi.json)
+  implementation(libs.vdi.common)
 
-  implementation("org.gusdb:fgputil-db")
-  implementation("org.veupathdb.lib:jaxrs-container-core")
-  implementation("org.veupathdb.lib:multipart-jackson-pojo")
+  implementation(libs.fgputil.db)
+  implementation(libs.container.core)
+  implementation(libs.container.multipart)
 
-  implementation("org.veupathdb.lib.s3:s34k-minio")
+  implementation(libs.s34k)
 
   implementation(kotlin("stdlib-jdk8"))
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+  implementation(libs.kt.coroutines)
 
   // Jersey
-  implementation("org.glassfish.jersey.core:jersey-server")
+  implementation(libs.http.server.jersey)
 
   // Log4J
-  implementation("org.slf4j:slf4j-api")
-  implementation("org.apache.logging.log4j:log4j-core")
-  implementation("org.apache.logging.log4j:log4j-slf4j-impl")
+  implementation(libs.log.slf4j)
+  implementation(libs.log.log4j.core)
+  implementation(libs.log.log4j.slf4j)
 
   // Metrics (can remove if not adding custom service metrics over those provided by container core)
-  implementation("io.prometheus:simpleclient")
-  implementation("io.prometheus:simpleclient_common")
+  implementation(libs.prometheus.client)
+  implementation(libs.prometheus.common)
 
   // Unit Testing
   testImplementation(kotlin("test"))
-  testImplementation("org.junit.jupiter:junit-jupiter-api")
-  testImplementation("org.mockito:mockito-core")
-  testImplementation("org.mockito.kotlin:mockito-kotlin")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+  testImplementation(libs.junit.api)
+  testImplementation(libs.mockito.core)
+  testImplementation(libs.mockito.kotlin)
+  testRuntimeOnly(libs.junit.engine)
 }

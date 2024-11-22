@@ -10,7 +10,6 @@ import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.SecretString
 import vdi.component.env.EnvKey
-import vdi.component.env.EnvKey.DBConnectionDataTypes
 import vdi.component.ldap.LDAP
 import javax.sql.DataSource
 

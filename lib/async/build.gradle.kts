@@ -3,10 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation(platform(project(":platform")))
-
-  implementation("org.veupathdb.vdi:vdi-component-common")
-
-  api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-  implementation("org.apache.logging.log4j:log4j-api-kotlin")
+  implementation(libs.vdi.common)
+  api(libs.kt.coroutines)
+  implementation(libs.log.log4j.kotlin)
 }

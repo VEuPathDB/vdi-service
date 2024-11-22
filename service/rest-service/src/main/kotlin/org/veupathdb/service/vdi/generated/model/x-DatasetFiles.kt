@@ -11,5 +11,5 @@ fun DatasetZipDetails(zipSize: Long, files: List<VDIDatasetFileInfo>): DatasetZi
 fun DatasetFileDetails(file: VDIDatasetFileInfo): DatasetFileDetails =
   DatasetFileDetailsImpl().also {
     it.fileName = file.filename
-    it.fileSize = file.fileSize
+    it.fileSize = file.size.toLong()
   }
