@@ -44,6 +44,9 @@ import java.nio.file.Path
 import java.time.OffsetDateTime
 import kotlin.io.path.*
 
+private const val WarningsFileName = "warnings.json"
+private const val DataZipName = "data.zip"
+
 internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig, abortCB: AbortCB)
   : ImportTriggerHandler
   , AbstractVDIModule("import-trigger-handler", abortCB)
@@ -248,58 +251,51 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   ) {
     log.info("dataset handler server reports dataset {}/{} imported successfully in plugin {}", userID, datasetID, handler.displayName)
 
-    // Create a temp directory to use as a workspace for the following process
-    TempFiles.withTempDirectory { tempDirectory ->
-      TempFiles.withTempPath { tempArchive ->
-        result.resultArchive
-          .buffered()
-          .use { input -> tempArchive.outputStream().buffered().use { output -> input.transferTo(output) } }
+    var warnings = emptyList<String>()
+    var hasData = false
+    var manifest: VDIDatasetManifest? = null
 
-        Zip.zipEntries(tempArchive).forEach { (entry, stream) ->
-          tempDirectory.resolve(entry.name)
-            .createFile()
-            .outputStream()
-            .buffered()
-            .use { stream.transferTo(it) }
+    Zip.zipEntries(result.resultArchive)
+      .forEach { (entry, stream) ->
+        when (entry.name) {
+          DatasetManifestFilename -> {
+            log.debug("writing manifest contents to object store for dataset {}/{}", userID, datasetID)
+
+            manifest = JSON.readValue(stream)
+            dd.putManifestFile(manifest!!)
+          }
+
+          WarningsFileName -> {
+            log.debug("deserializing warnings for dataset {}/{}", userID, datasetID)
+            warnings = JSON.readValue<WarningsFile>(stream).warnings
+          }
+
+          DataZipName -> {
+            log.debug("writing install-ready zip contents to object store for dataset {}/{}", userID, datasetID)
+            dd.getInstallReadyFile().writeContents(stream)
+            hasData = true
+          }
+
+          else -> {
+            log.error("unrecognized zip entry received from plugin server for dataset {}/{}: {}", userID, datasetID, entry.name)
+            stream.skip(Long.MAX_VALUE)
+          }
         }
       }
 
-      // Consume the warnings file and delete it from the data directory.
-      val warnings = tempDirectory.resolve("warnings.json")
-        .consumeAsJSON<WarningsFile>()
-        .warnings
+    if (!hasData || manifest == null) {
+      throw IllegalStateException("missing either data zip or manifest file for dataset $userID/$datasetID")
+    }
 
-      // Remove the meta file and delete it from the data directory.
-      tempDirectory.resolve(DatasetMetaFilename).deleteExisting()
-
-      // Consume the manifest file and delete it from the data directory.
-      val manifest = tempDirectory.resolve(DatasetManifestFilename)
-        .consumeAsJSON<VDIDatasetManifest>()
-
-      // After deleting the warnings.json file, the metadata JSON file, and the
-      // manifest JSON file the remaining files should be the ones we care about
-      // for importing into the data files directory in S3
-      val dataFiles = tempDirectory.listDirectoryEntries()
-
-      // For each data file, push to S3
-
-      TempFiles.withTempFile { tempFile ->
-        Zip.compress(tempFile, dataFiles)
-        dd.putInstallReadyFile { tempFile.inputStream() }
+    // Record the status update to the cache DB
+    cacheDB.withTransaction { transaction ->
+      if (warnings.isNotEmpty()) {
+        transaction.upsertImportMessages(datasetID, warnings.joinToString("\n"))
       }
 
-      dd.putManifestFile(manifest)
-
-      // Record the status update to the cache DB
-      cacheDB.withTransaction { transaction ->
-        if (warnings.isNotEmpty()) {
-          transaction.upsertImportMessages(datasetID, warnings.joinToString("\n"))
-        }
-
-        transaction.tryInsertInstallFiles(datasetID, manifest.dataFiles)
-        transaction.updateDataSyncControl(datasetID, dd.getInstallReadyTimestamp() ?: OffsetDateTime.now())
-        transaction.updateImportControl(datasetID, DatasetImportStatus.Complete)
-      }
+      transaction.tryInsertInstallFiles(datasetID, manifest!!.dataFiles)
+      transaction.updateDataSyncControl(datasetID, dd.getInstallReadyTimestamp() ?: OffsetDateTime.now())
+      transaction.updateImportControl(datasetID, DatasetImportStatus.Complete)
     }
   }
 

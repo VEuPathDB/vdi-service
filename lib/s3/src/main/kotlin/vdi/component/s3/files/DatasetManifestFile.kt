@@ -1,6 +1,7 @@
 package vdi.component.s3.files
 
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
+import vdi.component.s3.DatasetDirectory
 
 /**
  * Represents a possible manifest JSON file that may exist in a target
