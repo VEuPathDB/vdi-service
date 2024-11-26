@@ -20,7 +20,7 @@ dependencies {
   testImplementation(kotlin("test"))
   testImplementation(libs.junit.api)
   testImplementation(libs.mockito.core)
-  testImplementation("org.hamcrest:hamcrest:2.2")
+  testImplementation("org.hamcrest:hamcrest:3.0")
   testRuntimeOnly(libs.junit.engine)
   testRuntimeOnly(libs.log.log4j.slf4j)
 }
