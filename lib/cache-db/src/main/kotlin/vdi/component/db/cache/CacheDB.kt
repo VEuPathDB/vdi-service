@@ -2,6 +2,7 @@ package vdi.component.db.cache
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
@@ -9,19 +10,19 @@ import vdi.component.db.cache.model.*
 import vdi.component.db.cache.query.AdminAllDatasetsQuery
 import javax.sql.DataSource
 
-fun CacheDB(): vdi.component.db.cache.CacheDB = vdi.component.db.cache.CacheDBImpl
+fun CacheDB(): CacheDB = CacheDBImpl
 
 interface CacheDB {
 
-  val details: vdi.component.db.cache.CacheDBConnectionDetails
+  val details: CacheDBConnectionDetails
 
   val dataSource: DataSource
 
   fun selectDataset(datasetID: DatasetID): DatasetRecord?
 
-  fun selectInstallFiles(datasetID: DatasetID): List<DatasetFile>
+  fun selectInstallFiles(datasetID: DatasetID): List<VDIDatasetFileInfo>
 
-  fun selectUploadFiles(datasetID: DatasetID): List<DatasetFile>
+  fun selectUploadFiles(datasetID: DatasetID): List<VDIDatasetFileInfo>
 
   fun selectAdminAllDatasetCount(query: AdminAllDatasetsQuery): UInt
 
@@ -75,15 +76,15 @@ interface CacheDB {
 
   fun selectBrokenDatasetImports(query: BrokenImportListQuery): List<BrokenImportRecord>
 
-  fun openTransaction(): vdi.component.db.cache.CacheDBTransaction
+  fun openTransaction(): CacheDBTransaction
 }
 
-inline fun <T> vdi.component.db.cache.CacheDB.withTransaction(fn: (vdi.component.db.cache.CacheDBTransaction) -> T) =
-  openTransaction().use {
+inline fun <T> CacheDB.withTransaction(fn: (CacheDBTransaction) -> T) =
+  openTransaction().use { t ->
     try {
-      fn(it).apply { it.commit() }
+      fn(t).also { t.commit() }
     } catch (e: Throwable) {
-      it.rollback()
+      t.rollback()
       throw e
     }
   }

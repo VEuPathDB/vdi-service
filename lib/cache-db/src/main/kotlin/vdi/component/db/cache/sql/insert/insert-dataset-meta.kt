@@ -3,6 +3,7 @@ package vdi.component.db.cache.sql.insert
 import vdi.component.db.cache.model.DatasetMeta
 import vdi.component.db.cache.util.preparedUpdate
 import vdi.component.db.cache.util.setDatasetID
+import vdi.component.db.cache.util.setDatasetVisibility
 import java.sql.Connection
 
 // language=postgresql
@@ -25,7 +26,7 @@ ON CONFLICT (dataset_id)
 internal fun Connection.tryInsertDatasetMeta(row: DatasetMeta) =
   preparedUpdate(SQL) {
     setDatasetID(1, row.datasetID)
-    setString(2, row.visibility.value)
+    setDatasetVisibility(2, row.visibility)
     setString(3, row.name)
     setString(4, row.summary)
     setString(5, row.description)

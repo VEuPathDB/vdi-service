@@ -2,6 +2,7 @@ package vdi.component.db.cache.sql.insert
 
 import vdi.component.db.cache.model.Dataset
 import vdi.component.db.cache.util.preparedUpdate
+import vdi.component.db.cache.util.setDataType
 import vdi.component.db.cache.util.setDatasetID
 import vdi.component.db.cache.util.setUserID
 import java.sql.Connection
@@ -28,7 +29,7 @@ ON CONFLICT (dataset_id)
 internal fun Connection.tryInsertDatasetRecord(row: Dataset) =
   preparedUpdate(SQL) {
     setDatasetID(1, row.datasetID)
-    setString(2, row.typeName.lowercase())
+    setDataType(2, row.typeName)
     setString(3, row.typeVersion)
     setUserID(4, row.ownerID)
     setBoolean(5, row.isDeleted)

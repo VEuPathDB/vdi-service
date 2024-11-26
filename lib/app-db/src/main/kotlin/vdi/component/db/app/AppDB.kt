@@ -1,5 +1,6 @@
 package vdi.component.db.app
 
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.component.db.app.model.InstallStatuses
@@ -16,9 +17,9 @@ interface AppDB {
 
   fun getDatasetStatuses(target: DatasetID, projects: Collection<ProjectID>): Map<ProjectID, InstallStatuses>
 
-  fun accessor(key: ProjectID): AppDBAccessor?
+  fun accessor(key: ProjectID, dataType: DataType): AppDBAccessor?
 
-  fun transaction(key: ProjectID): AppDBTransaction?
+  fun transaction(key: ProjectID, dataType: DataType): AppDBTransaction?
 }
 
 /**
@@ -46,12 +47,12 @@ interface AppDB {
  * @return The value returned by the given function [fn].
  */
 @OptIn(ExperimentalContracts::class)
-inline fun <T> AppDB.withTransaction(projectID: ProjectID, fn: (AppDBTransaction) -> T): T {
+inline fun <T> AppDB.withTransaction(projectID: ProjectID, dataType: DataType, fn: (AppDBTransaction) -> T): T {
   contract {
     callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
   }
 
-  val trans = transaction(projectID)!!
+  val trans = transaction(projectID, dataType)!!
   val out: T
 
   try {
@@ -65,4 +66,34 @@ inline fun <T> AppDB.withTransaction(projectID: ProjectID, fn: (AppDBTransaction
   }
 
   return out
+}
+
+/**
+ * Executes the given callback function for every dataset type registered for a
+ * target project.
+ *
+ * @param projectID ID of the project for which registered dataset types should
+ * be iterated over.
+ *
+ * @param fn Function that will be executed for every data type registered for a
+ * target dataset.
+ */
+inline fun AppDB.accessorForEachDataType(projectID: ProjectID, fn: AppDBAccessor.(DataType) -> Unit) {
+  for (entry in AppDatabaseRegistry[projectID]!!)
+    accessor(projectID, entry.first)!!.fn(entry.first)
+}
+
+/**
+ * Executes the given callback function for every dataset type registered for a
+ * target project.
+ *
+ * @param projectID ID of the project for which registered dataset types should
+ * be iterated over.
+ *
+ * @param fn Function that will be executed for every data type registered for a
+ * target dataset.
+ */
+inline fun AppDB.transactionForEachDataType(projectID: ProjectID, fn: AppDBTransaction.(DataType) -> Unit) {
+  for (entry in AppDatabaseRegistry[projectID]!!)
+    transaction(projectID, entry.first)!!.fn(entry.first)
 }

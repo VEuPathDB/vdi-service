@@ -46,7 +46,7 @@ internal class EagerlyLoadedDatasetDirectory(
           when (file) {
             S3Paths.ShareOfferFileName -> ref.offer = it
             S3Paths.ShareReceiptFileName -> ref.receipt = it
-            else -> return@also // Fall through to the when block
+            else -> return@also // Fall through to the 'when' block
           }
 
           return@forEach // Continue to the next s3 object
@@ -62,6 +62,14 @@ internal class EagerlyLoadedDatasetDirectory(
         S3Paths.DeleteFlagFileName -> deleteFlag = DatasetDeleteFlagFileImpl(it)
         else -> throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
       }
+    }
+
+    // Perform bad state checks on dataset directories.
+    when {
+      // Meta file should always be present, if not we either caught minio at a
+      // bad time, or the dataset is busted.  Either way, we shouldn't try and
+      // operate on it.
+      metaFile == null -> throw MalformedDatasetException("no meta file found for $ownerID/$datasetID")
     }
 
     shares = shareRefs.mapValues { (_, ref) -> ref.toDatasetShare(pathFactory) }

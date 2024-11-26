@@ -1,6 +1,7 @@
 package vdi.component.install_cleanup
 
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.component.db.app.AppDB
@@ -9,6 +10,7 @@ import vdi.component.db.app.model.DatasetInstallMessage
 import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallType
 import vdi.component.db.app.withTransaction
+import vdi.component.db.cache.CacheDB
 
 object InstallCleaner {
 
@@ -26,10 +28,11 @@ object InstallCleaner {
     log.info("starting broken install cleanup for all broken datasets")
 
     // Iterate through all the registered application databases.
-    for ((projectID, _) in AppDatabaseRegistry) {
+    for ((projectID, dataType, _) in AppDatabaseRegistry) {
+
       try {
         // Fetch a list of datasets with broken installs
-        val targets = AppDB().accessor(projectID)!!
+        val targets = AppDB().accessor(projectID, dataType)!!
           .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FailedInstallation)
 
         log.info("found {} broken datasets for cleanup in project {}", targets.size, projectID)
@@ -37,7 +40,7 @@ object InstallCleaner {
         // Iterate through the broken datasets and try to clean them
         for (target in targets) {
           try {
-            cleanTarget(target.datasetID, projectID)
+            cleanTarget(target.datasetID, projectID, dataType)
           } catch (e: Throwable) {
             log.error(msgFailedByProject(target.datasetID, projectID), e)
           }
@@ -59,8 +62,15 @@ object InstallCleaner {
     log.info("starting broken install cleanup for target datasets")
 
     for ((datasetID, projectID) in targets) {
+      val cacheRecord = CacheDB().selectDataset(datasetID)
+
+      if (cacheRecord == null) {
+        log.warn("no record for dataset {} found in cache DB; skipping", datasetID)
+        continue
+      }
+
       try {
-        maybeCleanDatasetFromTargetDB(datasetID, projectID)
+        maybeCleanDatasetFromTargetDB(datasetID, projectID, cacheRecord.typeName)
       } catch (e: Throwable) {
         log.error("failed to clean broken dataset $datasetID for project $projectID installations due to internal error:", e)
       }
@@ -74,9 +84,9 @@ object InstallCleaner {
    * database only if it is already in the [InstallStatus.FailedInstallation]
    * status.
    */
-  private fun maybeCleanDatasetFromTargetDB(datasetID: DatasetID, projectID: ProjectID) {
+  private fun maybeCleanDatasetFromTargetDB(datasetID: DatasetID, projectID: ProjectID, dataType: DataType) {
     try {
-      val accessor = AppDB().accessor(projectID)
+      val accessor = AppDB().accessor(projectID, dataType)
 
       if (accessor == null) {
         log.info("Skipping database clean for dataset {} project {} as the target project is not currently enabled.", datasetID, projectID)
@@ -99,32 +109,18 @@ object InstallCleaner {
         return
       }
 
-      cleanTarget(datasetID, projectID)
+      cleanTarget(datasetID, projectID, dataType)
     } catch (e: Throwable) {
       log.error(msgFailedByProject(datasetID, projectID), e)
     }
   }
 
-  /**
-   * Marks the target dataset as [InstallStatus.ReadyForReinstall] in all app
-   * databases in which it is already in the [InstallStatus.FailedInstallation]
-   * status.
-   */
-  private fun maybeCleanDatasetFromAllDBs(datasetID: DatasetID) {
-    val cacheDBRecord = vdi.component.db.cache.CacheDB().selectDataset(datasetID)
-      ?: throw IllegalStateException("target dataset $datasetID is not in the internal cache database")
-
-    for (project in cacheDBRecord.projects) {
-      maybeCleanDatasetFromTargetDB(datasetID, project)
-    }
-  }
-
-  private fun cleanTarget(datasetID: DatasetID, projectID: ProjectID) {
+  private fun cleanTarget(datasetID: DatasetID, projectID: ProjectID, dataType: DataType) {
 
     log.debug("marking dataset {} as ready-for-reinstall in project {}", datasetID, projectID)
 
     // Update the dataset install message in the database.
-    AppDB().withTransaction(projectID) {
+    AppDB().withTransaction(projectID, dataType) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,

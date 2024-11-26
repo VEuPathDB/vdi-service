@@ -3,23 +3,20 @@ plugins {
 }
 
 dependencies {
-  implementation(platform(project(":platform")))
-
-  implementation("org.veupathdb.vdi:vdi-component-common")
+  implementation(libs.vdi.common)
 
   implementation(project(":lib:env"))
   implementation(project(":lib:module-core"))
   implementation(project(":lib:reconciler"))
 
-  implementation("org.apache.logging.log4j:log4j-api-kotlin")
-
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+  implementation(libs.log.log4j.kotlin)
+  implementation(libs.kt.coroutines)
 
   testImplementation(kotlin("test"))
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-  testImplementation("org.mockito:mockito-core:5.2.0")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-  testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
+  testImplementation(libs.junit.api)
+  testImplementation(libs.mockito.core)
+  testRuntimeOnly(libs.junit.engine)
+  testRuntimeOnly(libs.log.log4j.slf4j)
 }
 
 tasks.test {

@@ -1,6 +1,7 @@
 package vdi.test
 
 import org.mockito.kotlin.*
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -12,8 +13,8 @@ import java.time.OffsetDateTime
 
 fun mockCacheDB(
   onSelectDataset: DSGetter<DatasetRecord?> = ::oneParamNull,
-  onSelectInstallFiles: DSGetter<List<DatasetFile>> = ::oneParamList,
-  onSelectUploadFiles: DSGetter<List<DatasetFile>> = ::oneParamList,
+  onSelectInstallFiles: DSGetter<List<VDIDatasetFileInfo>> = ::oneParamList,
+  onSelectUploadFiles: DSGetter<List<VDIDatasetFileInfo>> = ::oneParamList,
   onSelectAllDatasetCount: (AdminAllDatasetsQuery) -> UInt = { 0u },
   onSelectAllDatasets: (AdminAllDatasetsQuery) -> List<AdminAllDatasetsRow> = ::oneParamList,
   onSelectAdminDetails: DSGetter<AdminDatasetDetailsRecord?> = ::oneParamNull,
@@ -224,7 +225,7 @@ fun mockBrokenImportListQuery(
 fun mockBrokenImportRecord(
   datasetID: DatasetID? = null,
   ownerID: UserID? = null,
-  typeName: String? = null,
+  typeName: DataType? = null,
   typeVersion: String? = null,
   projects: List<String>? = null,
   messages: List<String>? = null,
@@ -333,7 +334,7 @@ fun mockDatasetShare(
 fun mockShareListEntry(
   datasetID: DatasetID? = null,
   ownerID: UserID? = null,
-  typeName: String? = null,
+  typeName: DataType? = null,
   typeVersion: String? = null,
   receiptStatus: VDIShareReceiptAction? = null,
   projects: List<ProjectID>? = null,
@@ -396,7 +397,7 @@ private fun KStubbing<DatasetMeta>.mockMetaAddOn(
 
 private fun KStubbing<Dataset>.mockDataset(
   datasetID: DatasetID?,
-  typeName: String?,
+  typeName: DataType?,
   typeVersion: String?,
   ownerID: UserID?,
   isDeleted: Boolean?,

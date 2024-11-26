@@ -6,6 +6,8 @@ networks:
   rabbitmq:
     external: false
 
+name: "vdi"
+
 services:
   minio-external:
     image: veupathdb/minio

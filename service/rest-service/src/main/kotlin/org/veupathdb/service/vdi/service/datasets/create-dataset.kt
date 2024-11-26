@@ -18,6 +18,7 @@ import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.compression.Zip.getZipType
 import org.veupathdb.vdi.lib.common.compression.ZipType
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
@@ -60,7 +61,7 @@ fun createDataset(
     if (!handler.appliesToProject(projectID))
       throw BadRequestException("target dataset type does not apply to project $projectID")
 
-    if (projectID !in AppDatabaseRegistry)
+    if (!AppDatabaseRegistry.contains(projectID, datasetMeta.type.name))
       throw BadRequestException("unrecognized target project")
   }
 
@@ -263,7 +264,7 @@ private fun Path.repackZip(into: Path, using: Path): List<VDIDatasetFileInfo> {
       tmpFile.createFile()
       tmpFile.outputStream().use { out -> input.transferTo(out) }
 
-      files.add(VDIDatasetFileInfoImpl(entry.name, tmpFile.fileSize()))
+      files.add(VDIDatasetFileInfo(entry.name, tmpFile.fileSize().toULong()))
 
       unpacked.add(tmpFile)
     }
@@ -309,7 +310,7 @@ private fun Path.repackTar(into: Path, using: Path): List<VDIDatasetFileInfo> {
     throw BadRequestException("uploaded file contained no files or was not a valid tar archive")
 
   for (file in files)
-    sizes.add(VDIDatasetFileInfoImpl(file.name, file.fileSize()))
+    sizes.add(VDIDatasetFileInfo(file.name, file.fileSize().toULong()))
 
   Zip.compress(into, files)
 
@@ -319,7 +320,7 @@ private fun Path.repackTar(into: Path, using: Path): List<VDIDatasetFileInfo> {
 private fun Path.repackRaw(into: Path): List<VDIDatasetFileInfo> {
   log.trace("repacking raw file {} into {}", this, into)
   Zip.compress(into, listOf(this))
-  return listOf(VDIDatasetFileInfoImpl(name, fileSize()))
+  return listOf(VDIDatasetFileInfo(name, fileSize().toULong()))
 }
 
 private data class FileReference(val tempDirectory: Path, val tempFile: Path)
@@ -348,6 +349,8 @@ private fun DatasetPostRequest.fetchDatasetFile(): FileReference =
 private fun DatasetPostRequest.downloadRemoteFile(): FileReference {
   val url = try { url.toJavaURL() }
   catch (e: MalformedURLException) { throw BadRequestException("invalid file source: ${e.message}") }
+
+  log.info("attempting to download a remote file from {}", url)
 
   // If the user gave us a URL then we have to download the contents of that
   // URL to a local file to be uploaded.   This is done to catch errors with

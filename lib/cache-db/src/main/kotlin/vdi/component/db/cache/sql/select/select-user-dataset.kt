@@ -2,7 +2,6 @@ package vdi.component.db.cache.sql.select
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import vdi.component.db.cache.model.DatasetImportStatus
@@ -66,14 +65,14 @@ internal fun Connection.selectDatasetForUser(userID: UserID, datasetID: DatasetI
       else
         DatasetRecordImpl(
           datasetID    = datasetID,
-          typeName     = getString("type_name"),
+          typeName     = getDataType("type_name"),
           typeVersion  = getString("type_version"),
           ownerID      = getUserID("owner_id"),
           isDeleted    = getBoolean("is_deleted"),
           created      = getDateTime("created"),
-          importStatus = getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
+          importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
           origin       = getString("origin"),
-          visibility   = VDIDatasetVisibility.fromString(getString("visibility")),
+          visibility   = getDatasetVisibility("visibility"),
           name         = getString("name"),
           summary      = getString("summary"),
           description  = getString("description"),

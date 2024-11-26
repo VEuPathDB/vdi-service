@@ -10,9 +10,10 @@ internal class DatasetRawUploadFileImpl(
   path: String,
   existsChecker: () -> Boolean = { false },
   lastModifiedSupplier: () -> OffsetDateTime? = { null },
-  loadObjectStream: () -> InputStream? = { null }
+  loadObjectStream: () -> InputStream? = { null },
+  putObjectStream: (InputStream) -> Unit = { it.skip(Long.MAX_VALUE) },
 )
-  : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream)
+  : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream, putObjectStream)
   , DatasetRawUploadFile
 {
   constructor(
@@ -23,7 +24,8 @@ internal class DatasetRawUploadFileImpl(
     // This looks weird, but we use list instead of stat since stat only returns seconds resolution, not milliseconds.
     lastModifiedSupplier = { bucket.objects.list(path).stream().findFirst().map { o -> o.lastModified }.orElse(null) },
     existsChecker = { path in bucket.objects },
-    loadObjectStream = { bucket.objects.open(path)?.stream }
+    loadObjectStream = { bucket.objects.open(path)?.stream },
+    putObjectStream = { bucket.objects.put(path, it) },
   )
 
   constructor(s3Object: S3Object) : this(

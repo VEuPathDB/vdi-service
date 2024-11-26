@@ -5,8 +5,6 @@ plugins {
 }
 
 dependencies {
-  implementation(platform(project(":platform")))
-
   implementation(project(":lib:app-db"))
   implementation(project(":lib:cache-db"))
   implementation(project(":lib:env"))
@@ -16,21 +14,20 @@ dependencies {
   implementation(project(":lib:plugin-mapping"))
   implementation(project(":lib:s3"))
 
-  implementation("org.veupathdb.vdi:vdi-component-json")
-  implementation("org.veupathdb.vdi:vdi-component-common")
-  implementation("org.veupathdb.lib.s3:s34k-minio")
-
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-  implementation("org.slf4j:slf4j-api")
+  implementation(libs.vdi.json)
+  implementation(libs.vdi.common)
+  implementation(libs.s34k)
+  implementation(libs.kt.coroutines)
+  implementation(libs.log.slf4j)
   implementation(kotlin("stdlib-jdk8"))
 
   testImplementation(kotlin("test"))
   testImplementation(project(":lib:test-utils"))
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-  testImplementation("org.mockito:mockito-core:5.2.0")
-  testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.0")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-  testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
+  testImplementation(libs.junit.api)
+  testImplementation(libs.mockito.core)
+  testImplementation(libs.mockito.kotlin)
+  testRuntimeOnly(libs.junit.engine)
+  testRuntimeOnly(libs.log.log4j.slf4j)
 }
 
 tasks.withType<KotlinCompile>().configureEach {

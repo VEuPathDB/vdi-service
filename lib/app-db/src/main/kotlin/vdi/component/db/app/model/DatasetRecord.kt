@@ -1,5 +1,6 @@
 package vdi.component.db.app.model
 
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 
@@ -21,7 +22,7 @@ data class DatasetRecord(
   /**
    * Name of the dataset type.
    */
-  val typeName: String,
+  val typeName: DataType,
 
   /**
    * Version of the dataset type.

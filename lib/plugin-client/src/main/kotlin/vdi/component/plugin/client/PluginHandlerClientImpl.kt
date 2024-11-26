@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.intra.*
+import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
 import vdi.component.plugin.client.response.imp.*
@@ -18,6 +20,9 @@ import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+
+private const val JsonContentType = "application/json; charset=utf-8"
+
 
 internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig) : PluginHandlerClient {
 
@@ -100,17 +105,35 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     }
   }
 
-  override suspend fun postInstallData(datasetID: DatasetID, projectID: ProjectID, payload: InputStream): InstallDataResponse {
+  override suspend fun postInstallData(
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    meta: InputStream,
+    manifest: InputStream,
+    payload: InputStream,
+  ): InstallDataResponse {
     val multipart = MultiPart.createBody {
       withPart {
         fieldName = FieldName.Details
-        contentType("application/json; charset=utf-8")
+        contentType(JsonContentType)
         withBody(InstallDataRequest(datasetID, projectID).toJSONString())
       }
 
       withPart {
+        fieldName = FieldName.Meta
+        contentType(JsonContentType)
+        withBody(meta)
+      }
+
+      withPart {
+        fieldName = FieldName.Manifest
+        contentType(JsonContentType)
+        withBody(manifest)
+      }
+
+      withPart {
         fieldName = FieldName.Payload
-        fileName  = "data.tgz"
+        fileName = "install-ready.zip"
         withBody(payload)
       }
     }
@@ -145,15 +168,15 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     }
   }
 
-  override suspend fun postUninstall(datasetID: DatasetID, projectID: ProjectID): UninstallResponse {
+  override suspend fun postUninstall(datasetID: DatasetID, projectID: ProjectID, type: VDIDatasetType): UninstallResponse {
     val uri = resolve(EP.Uninstall)
 
-    log.debug("submitting uninstall POST request to {} for project {} for dataset {}", uri, projectID, datasetID)
+    log.debug("submitting uninstall POST request to {} for project {} for dataset {} (type {})", uri, projectID, datasetID, type.name)
 
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(UninstallRequest(datasetID, projectID).toJSONString()))
+        .POST(HttpRequest.BodyPublishers.ofString(UninstallRequest(datasetID, projectID, type).toJSONString()))
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()

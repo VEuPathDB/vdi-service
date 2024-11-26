@@ -2,13 +2,14 @@ package org.veupathdb.service.vdi.generated.model
 
 import org.veupathdb.service.vdi.model.ShareFilterStatus
 import org.veupathdb.service.vdi.model.UserDetails
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 
 internal fun ShareOfferEntry(
   datasetID:   DatasetID,
   shareStatus: ShareFilterStatus,
-  datasetTypeName: String,
+  datasetTypeName: DataType,
   datasetTypeVersion: String,
   datasetTypeDisplayName: String,
   owner:       UserDetails,

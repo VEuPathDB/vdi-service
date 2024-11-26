@@ -1,7 +1,6 @@
 package vdi.component.db.app.sql
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallStatuses
 import vdi.component.db.app.model.InstallType
 import java.sql.Connection
@@ -24,11 +23,11 @@ internal fun Connection.selectInstallStatuses(schema: String, datasetID: Dataset
   val result = InstallStatuses()
 
   prepareStatement(sql(schema)).use { ps ->
-    ps.setString(1, datasetID.toString())
+    ps.setDatasetID(1, datasetID)
     ps.executeQuery().use { rs ->
       while (rs.next()) {
-        val type    = InstallType.fromString(rs.getString("install_type"))
-        val status  = InstallStatus.fromString(rs.getString("status"))
+        val type    = rs.getInstallType("install_type")
+        val status  = rs.getInstallStatus("status")
         val message = rs.getString("message")
 
         when (type) {

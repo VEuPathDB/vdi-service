@@ -1,0 +1,55 @@
+[libraries]
+
+# VPDB
+fgputil-db = { group = "org.gusdb", name = "fgputil-db", version = "2.13.1" }
+
+container-core      = { group = "org.veupathdb.lib", name = "jaxrs-container-core",   version = "8.0.0" }
+container-multipart = { group = "org.veupathdb.lib", name = "multipart-jackson-pojo", version = "1.1.7" }
+
+vdi-common = { group = "org.veupathdb.vdi", name = "vdi-component-common", version = "14.2.1" }
+vdi-json   = { group = "org.veupathdb.vdi", name = "vdi-component-json",   version = "1.0.2"  }
+
+# Database
+db-pool            = { group = "com.zaxxer",               name = "HikariCP",   version = "6.1.0"        }
+db-driver-oracle   = { group = "com.oracle.database.jdbc", name = "ojdbc8",     version = "23.6.0.24.10" }
+db-driver-postgres = { group = "org.postgresql",           name = "postgresql", version = "42.7.4"       }
+
+# Logging
+log-slf4j        = { group = "org.slf4j",                name = "slf4j-api",        version = "1.7.36" }
+log-log4j-api    = { group = "org.apache.logging.log4j", name = "log4j-api",        version = "2.24.1" }
+log-log4j-core   = { group = "org.apache.logging.log4j", name = "log4j-core",       version = "2.24.1" }
+log-log4j-slf4j  = { group = "org.apache.logging.log4j", name = "log4j-slf4j-impl", version = "2.24.1" }
+log-log4j-kotlin = { group = "org.apache.logging.log4j", name = "log4j-api-kotlin", version = "1.5.0"  }
+
+# Kotlin Extensions
+kt-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.9.0" }
+
+# HTTP
+http-client-multipart = { group = "io.foxcapades.lib",         name = "k-multipart",   version = "1.2.1" }
+http-server-jersey    = { group = "org.glassfish.jersey.core", name = "jersey-server", version = "3.1.9" }
+
+# Messaging
+msg-kafka  = { group = "org.apache.kafka", name = "kafka-clients", version = "3.9.0" }
+msg-rabbit = { group = "com.rabbitmq",     name = "amqp-client",   version = "5.22.0" }
+
+# LDAP
+ldap = { group = "org.veupathdb.lib", name = "ldap-utils", version = "1.0.0" }
+
+# Metrics
+prometheus-client = { group = "io.prometheus", name = "simpleclient",        version = "0.16.0" }
+prometheus-common = { group = "io.prometheus", name = "simpleclient_common", version = "0.16.0" }
+
+# S3
+s34k = { group = "org.veupathdb.lib.s3", name = "s34k-minio", version = "0.7.1+s34k-0.11.0" }
+
+#
+# Unit Testing
+#
+
+# JUnit5
+junit-api    = { group = "org.junit.jupiter", name = "junit-jupiter-api",    version = "5.11.3" }
+junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "5.11.3" }
+
+# Mockito
+mockito-core   = { group = "org.mockito",        name = "mockito-core",   version = "5.14.2" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version = "5.4.0"  }

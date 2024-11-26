@@ -16,10 +16,8 @@ WHERE
 """
 
 internal fun Connection.updateDatasetDeletedFlag(schema: String, datasetID: DatasetID, deleteFlag: DeleteFlag) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setInt(1, deleteFlag.value)
-      ps.setString(2, datasetID.toString())
-      ps.executeUpdate()
-    }
+  preparedUpdate(sql(schema)) {
+    setDeleteFlag(1, deleteFlag)
+    setDatasetID(2, datasetID)
+  }
 }

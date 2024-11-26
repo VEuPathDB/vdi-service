@@ -222,7 +222,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     var timer: Histogram.Timer? = null
 
     try {
-      val appDB = appDB.accessor(projectID) or {
+      val appDB = appDB.accessor(projectID, handler.type) or {
         log.info(
           "skipping install event for dataset {}/{} into project {} due to the target project being disabled.",
           userID,
@@ -254,11 +254,11 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
       val status = appDB.selectDatasetInstallMessage(datasetID, InstallType.Data)
 
-      timer = Metrics.Install.duration.labels(dataset.typeName, dataset.typeVersion).startTimer()
+      timer = Metrics.Install.duration.labels(dataset.typeName.toString(), dataset.typeVersion).startTimer()
 
       if (status == null) {
         var race = false
-        this.appDB.withTransaction(projectID) {
+        this.appDB.withTransaction(projectID, handler.type) {
           try {
             it.insertDatasetInstallMessage(
               DatasetInstallMessage(
@@ -302,14 +302,16 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       // FIXME: MOVE THE ZIP CREATION OUTSIDE OF THE PROJECT LOOP TO AVOID
       //        RECREATING IT FOR EACH TARGET.
       val response = try {
-        withInstallBundle(s3Dir) { handler.client.postInstallData(datasetID, projectID, it) }
+        withInstallBundle(s3Dir) { meta, manifest, data ->
+          handler.client.postInstallData(datasetID, projectID, meta, manifest, data)
+        }
       } catch (e: S34KError) { // Don't mix up minio errors with request errors.
         throw PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
       } catch (e: Throwable) {
         throw PluginRequestException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
       }
 
-      Metrics.Install.count.labels(dataset.typeName, dataset.typeVersion, response.responseCode.toString()).inc()
+      Metrics.Install.count.labels(dataset.typeName.toString(), dataset.typeVersion, response.responseCode.toString()).inc()
 
       when (response.type) {
         InstallDataResponseType.Success
@@ -387,7 +389,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       handler.displayName,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, handler.type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -416,7 +418,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       res.message,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, handler.type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -446,7 +448,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       handler,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, handler.type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -474,7 +476,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       handler.displayName,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, handler.type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -505,7 +507,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       handler.displayName,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, handler.type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -519,43 +521,15 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     throw PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
-  private suspend fun <T> withInstallBundle(s3Dir: DatasetDirectory, fn: suspend (upload: InputStream) -> T) =
-    TempFiles.withTempDirectory { tmpDir ->
-      val files = ArrayList<Path>(8)
-
-      TempFiles.withTempFile { zipFile ->
-        zipFile.outputStream()
-          .buffered()
-          .use { out -> s3Dir.getInstallReadyFile().loadContents()!!.buffered().use { inp -> inp.transferTo(out) } }
-
-        Zip.zipEntries(zipFile)
-          .forEach { (entry, stream) ->
-            tmpDir.resolve(entry.name)
-              .also(files::add)
-              .outputStream()
-              .buffered()
-              .use { stream.buffered().transferTo(it) }
-          }
+  private suspend fun <T> withInstallBundle(
+    s3Dir: DatasetDirectory,
+    fn: suspend (meta: InputStream, manifest: InputStream, upload: InputStream) -> T
+  ) =
+    s3Dir.getMetaFile().loadContents()!!.use { meta ->
+      s3Dir.getManifestFile().loadContents()!!.use { manifest ->
+        s3Dir.getInstallReadyFile().loadContents()!!.use { data ->
+          fn(meta, manifest, data)
+        }
       }
-
-      tmpDir.resolve(S3Paths.MetadataFileName)
-        .also(files::add)
-        .outputStream()
-        .buffered()
-        .use { out -> s3Dir.getMetaFile().loadContents()!!.use { input -> input.transferTo(out) } }
-
-      tmpDir.resolve(S3Paths.ManifestFileName)
-        .also(files::add)
-        .outputStream()
-        .buffered()
-        .use { out -> s3Dir.getManifestFile().loadContents()!!.use { input -> input.transferTo(out) } }
-
-      val zip = tmpDir.resolve("install-bundle.zip")
-        .also { Zip.compress(it, files, Zip.Level(0u)) }
-
-      files.forEach { it.deleteIfExists() }
-      files.clear()
-
-      zip.inputStream().buffered().use { fn(it) }
     }
 }

@@ -17,10 +17,8 @@ VALUES
 """
 
 internal fun Connection.insertDatasetProjectLink(schema: String, datasetID: DatasetID, projectID: ProjectID) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, datasetID.toString())
-      ps.setString(2, projectID)
-      ps.executeUpdate()
-    }
+  preparedUpdate(sql(schema)) {
+    setDatasetID(1, datasetID)
+    setString(2, projectID)
+  }
 }

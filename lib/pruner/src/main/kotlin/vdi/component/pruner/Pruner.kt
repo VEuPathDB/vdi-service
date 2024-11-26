@@ -8,6 +8,7 @@ import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.app.model.DeleteFlag
 import vdi.component.db.app.withTransaction
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DeletedDataset
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
@@ -42,7 +43,7 @@ object Pruner {
 
   private val config = PrunerConfig()
 
-  private val cacheDB = vdi.component.db.cache.CacheDB()
+  private val cacheDB = CacheDB()
 
   private val appDB = AppDB()
 
@@ -132,7 +133,7 @@ object Pruner {
    */
   private fun DeletedDataset.hasBeenUninstalled(): Boolean {
     projects.forEach { projectID ->
-      val appDB = appDB.accessor(projectID)
+      val appDB = appDB.accessor(projectID, dataType)
 
       if (appDB == null) {
         log.warn("cannot prune dataset {}/{} as the dataset's install target {} is currently disabled", ownerID, datasetID, projectID)
@@ -190,14 +191,14 @@ object Pruner {
   }
 
   private fun DeletedDataset.deleteFromAppDB(projectID: ProjectID) {
-    if (projectID !in AppDatabaseRegistry) {
+    if (!AppDatabaseRegistry.contains(projectID, dataType)) {
       log.info("Cannot delete dataset {}/{} from project {} due to target project config being disabled.", ownerID, datasetID, projectID)
       return
     }
 
     log.debug("deleting dataset {}/{} from project {} app DB", ownerID, datasetID, projectID)
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, dataType) {
       it.deleteDatasetVisibilities(datasetID)
       it.deleteDatasetProjectLinks(datasetID)
       it.deleteSyncControl(datasetID)

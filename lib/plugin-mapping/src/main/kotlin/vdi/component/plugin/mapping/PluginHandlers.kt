@@ -4,6 +4,7 @@ import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.env.optSet
 import org.veupathdb.vdi.lib.common.env.reqHostAddress
 import org.veupathdb.vdi.lib.common.env.require
+import org.veupathdb.vdi.lib.common.field.DataType
 import vdi.component.env.EnvKey
 import vdi.component.plugin.client.PluginHandlerClient
 import vdi.component.plugin.client.PluginHandlerClientConfig
@@ -27,8 +28,8 @@ object PluginHandlers {
    * @return `true` if this [PluginHandlers] instance contains a [PluginHandler]
    * for the given dataset type, otherwise `false`.
    */
-  fun contains(type: String, version: String): Boolean =
-    NameVersionPair(type.lowercase(), version) in mapping
+  fun contains(type: DataType, version: String): Boolean =
+    NameVersionPair(type, version) in mapping
 
   /**
    * Attempts to look up a [PluginHandler] for the given dataset type name.
@@ -39,8 +40,8 @@ object PluginHandlers {
    * @return The [PluginHandler] for the given dataset type, or `null` if no
    * such [PluginHandler] exists.
    */
-  operator fun get(type: String, version: String): PluginHandler? =
-    mapping[NameVersionPair(type.lowercase(), version)]
+  operator fun get(type: DataType, version: String): PluginHandler? =
+    mapping[NameVersionPair(type, version)]
 
   fun sequence(): Sequence<Pair<NameVersionPair, PluginHandler>> {
     return mapping.asSequence().map { (k, v) -> k to v }
@@ -79,7 +80,7 @@ object PluginHandlers {
     key.substring(EnvKey.Handlers.Prefix.length, key.length - suffix.length)
 
   private fun parseEnvironmentChunk(env: Environment, key: String) {
-    val name          = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.NameSuffix).lowercase()
+    val name          = DataType.of(env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.NameSuffix))
     val dispName      = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.DisplayNameSuffix)
     val address       = env.reqHostAddress(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.AddressSuffix)
     val version       = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.VersionSuffix)
@@ -93,5 +94,5 @@ object PluginHandlers {
     )
   }
 
-  data class NameVersionPair(val name: String, val version: String)
+  data class NameVersionPair(val name: DataType, val version: String)
 }

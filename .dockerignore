@@ -1,4 +1,16 @@
 .idea/
 .git/
 build/
+tmp/
+docs/
+.github/
+.bin/
+gradle/wrapper/
+
+
 readme.adoc
+*.env
+gradlew
+gradlew.bat
+LICENSE
+docker-compose.*

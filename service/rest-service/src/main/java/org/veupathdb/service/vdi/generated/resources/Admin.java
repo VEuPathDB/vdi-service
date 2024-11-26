@@ -9,6 +9,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
+import org.veupathdb.service.vdi.generated.model.AdminPurgeDatasetPostApplicationJson;
 import org.veupathdb.service.vdi.generated.model.AllDatasetsListResponse;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.BrokenDatasetListing;
@@ -18,6 +19,7 @@ import org.veupathdb.service.vdi.generated.model.DatasetPostResponse;
 import org.veupathdb.service.vdi.generated.model.ForbiddenError;
 import org.veupathdb.service.vdi.generated.model.InstallCleanupRequest;
 import org.veupathdb.service.vdi.generated.model.InternalDatasetDetails;
+import org.veupathdb.service.vdi.generated.model.NotFoundError;
 import org.veupathdb.service.vdi.generated.model.ServerError;
 import org.veupathdb.service.vdi.generated.model.UnauthorizedError;
 import org.veupathdb.service.vdi.generated.model.UnprocessableEntityError;
@@ -82,6 +84,12 @@ public interface Admin {
       @QueryParam("limit") @DefaultValue("100") Integer limit,
       @QueryParam("project_id") String projectId,
       @QueryParam("include_deleted") @DefaultValue("false") Boolean includeDeleted);
+
+  @POST
+  @Path("/purge-dataset")
+  @Produces("application/json")
+  @Consumes("application/json")
+  PostAdminPurgeDatasetResponse postAdminPurgeDataset(AdminPurgeDatasetPostApplicationJson entity);
 
   class PostAdminReconcilerResponse extends ResponseDelegate {
     private PostAdminReconcilerResponse(Response response, Object entity) {
@@ -319,6 +327,48 @@ public interface Admin {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetAdminListAllDatasetsResponse(responseBuilder.build(), entity);
+    }
+  }
+
+  class PostAdminPurgeDatasetResponse extends ResponseDelegate {
+    private PostAdminPurgeDatasetResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    private PostAdminPurgeDatasetResponse(Response response) {
+      super(response);
+    }
+
+    public static PostAdminPurgeDatasetResponse respond204() {
+      Response.ResponseBuilder responseBuilder = Response.status(204);
+      return new PostAdminPurgeDatasetResponse(responseBuilder.build());
+    }
+
+    public static PostAdminPurgeDatasetResponse respond400WithApplicationJson(
+        BadRequestError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(400).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostAdminPurgeDatasetResponse(responseBuilder.build(), entity);
+    }
+
+    public static PostAdminPurgeDatasetResponse respond401WithApplicationJson(
+        UnauthorizedError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostAdminPurgeDatasetResponse(responseBuilder.build(), entity);
+    }
+
+    public static PostAdminPurgeDatasetResponse respond404WithApplicationJson(
+        NotFoundError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostAdminPurgeDatasetResponse(responseBuilder.build(), entity);
+    }
+
+    public static PostAdminPurgeDatasetResponse respond500WithApplicationJson(ServerError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostAdminPurgeDatasetResponse(responseBuilder.build(), entity);
     }
   }
 }

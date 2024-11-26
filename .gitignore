@@ -1,15 +1,17 @@
 .gradle/
 .idea/
+.tools/
+.bin/
+.settings/
+.kotlin/
 build/
 /vendor/
-.tools/
 /bin/
-.bin/
 /tmp/
-.settings/
-.envrc
-
 /*ssh*
+
+.envrc
+merged-compose.yml
 
 *.tmp
 *.bak

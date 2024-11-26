@@ -18,7 +18,7 @@ WHERE
 internal fun Connection.selectDatasetProjectLinks(schema: String, datasetID: DatasetID): List<DatasetProjectLinkRecord> =
   prepareStatement(sql(schema))
     .use { ps ->
-      ps.setString(1, datasetID.toString())
+      ps.setDatasetID(1, datasetID)
       ps.executeQuery()
         .use { rs ->
           val out = ArrayList<DatasetProjectLinkRecord>()

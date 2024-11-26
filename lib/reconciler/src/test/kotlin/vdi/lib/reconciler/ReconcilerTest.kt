@@ -6,10 +6,10 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
-import org.veupathdb.vdi.lib.common.model.VDIDatasetTypeImpl
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.component.kafka.router.KafkaRouter
@@ -295,7 +295,7 @@ class ReconcilerTest {
         sharesUpdated: OffsetDateTime = UpdateTime,
         dataUpdated: OffsetDateTime = UpdateTime,
         metaUpdated: OffsetDateTime = UpdateTime,
-        type: VDIDatasetType = VDIDatasetTypeImpl("Stub", "Stub"),
+        type: VDIDatasetType = VDIDatasetType(DataType.of("Stub"), "Stub"),
         isUninstalled: Boolean = false,
     ) =
         VDIReconcilerTargetRecord(

@@ -12,9 +12,5 @@ WHERE
   dataset_id = ?
 """
 
-internal fun Connection.deleteDatasetMeta(schema: String, datasetID: DatasetID): Int =
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, datasetID.toString())
-      ps.executeUpdate()
-    }
+internal fun Connection.deleteDatasetMeta(schema: String, datasetID: DatasetID) =
+  preparedUpdate(sql(schema)) { setString(1, datasetID.toString()) }

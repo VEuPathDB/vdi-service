@@ -2,7 +2,9 @@ package vdi.component.plugin.client
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import vdi.component.plugin.client.response.imp.ImportResponse
 import vdi.component.plugin.client.response.ind.InstallDataResponse
 import vdi.component.plugin.client.response.inm.InstallMetaResponse
@@ -49,12 +51,22 @@ interface PluginHandlerClient {
    *
    * @param projectID Target project for the data installation.
    *
-   * @param payload `tar.gz` archive containing the data files for the dataset.
+   * @param meta Dataset Metadata.
+   *
+   * @param manifest Dataset post-import manifest.
+   *
+   * @param payload Imported data zip stream.
    *
    * @return An [InstallDataResponse] instance wrapping the raw response from
    * the plugin handler server.
    */
-  suspend fun postInstallData(datasetID: DatasetID, projectID: ProjectID, payload: InputStream): InstallDataResponse
+  suspend fun postInstallData(
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    meta: InputStream,
+    manifest: InputStream,
+    payload: InputStream,
+  ): InstallDataResponse
 
   /**
    * `POST`s an uninstall request to the configured plugin handler server.
@@ -66,5 +78,5 @@ interface PluginHandlerClient {
    * @return An [UninstallResponse] instance wrapping the raw response from the
    * plugin handler server.
    */
-  suspend fun postUninstall(datasetID: DatasetID, projectID: ProjectID): UninstallResponse
+  suspend fun postUninstall(datasetID: DatasetID, projectID: ProjectID, type: VDIDatasetType): UninstallResponse
 }

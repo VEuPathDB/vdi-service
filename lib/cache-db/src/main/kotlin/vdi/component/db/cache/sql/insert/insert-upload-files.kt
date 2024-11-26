@@ -22,7 +22,7 @@ internal fun Connection.tryInsertUploadFiles(datasetID: DatasetID, files: Iterab
 
     files.forEach {
       setString(2, it.filename)
-      setLong(3, it.fileSize)
+      setLong(3, it.size.toLong())
       addBatch()
     }
 

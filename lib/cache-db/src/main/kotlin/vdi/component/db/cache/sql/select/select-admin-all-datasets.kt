@@ -1,13 +1,11 @@
 package vdi.component.db.cache.sql.select
 
-import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import vdi.component.db.cache.model.AdminAllDatasetsRow
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.query.AdminAllDatasetsQuery
 import vdi.component.db.cache.util.*
 import java.sql.Connection
 import java.sql.Types
-import java.time.OffsetDateTime
 
 // language=postgresql
 private const val SQL_BASE = """
@@ -118,15 +116,15 @@ internal fun Connection.selectAdminAllDatasets(query: AdminAllDatasetsQuery): Li
           datasetID     = it.getDatasetID("dataset_id"),
           ownerID       = it.getUserID("owner_id"),
           origin        = it.getString("origin"),
-          created       = it.getObject("created", OffsetDateTime::class.java),
+          created       = it.getDateTime("created"),
           isDeleted     = it.getBoolean("is_deleted"),
-          typeName      = it.getString("type_name"),
+          typeName      = it.getDataType("type_name"),
           typeVersion   = it.getString("type_version"),
           name          = it.getString("name"),
           summary       = it.getString("summary"),
           description   = it.getString("description"),
           sourceURL     = it.getString("source_url"),
-          visibility    = VDIDatasetVisibility.fromString(it.getString("visibility")),
+          visibility    = it.getDatasetVisibility("visibility"),
           projectIDs    = it.getProjectIDList("projects"),
           importStatus  = it.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
           importMessage = it.getString("message"),

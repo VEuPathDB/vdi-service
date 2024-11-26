@@ -18,13 +18,11 @@ WHERE
 """
 
 internal fun Connection.updateDatasetInstallMessage(schema: String, message: DatasetInstallMessage) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, message.status.value)
-      ps.setString(2, message.message)
-      ps.setObject(3, message.updated)
-      ps.setString(4, message.datasetID.toString())
-      ps.setString(5, message.installType.value)
-      ps.executeUpdate()
-    }
+  preparedUpdate(sql(schema)) {
+    setInstallStatus(1, message.status)
+    setString(2, message.message)
+    setDateTime(3, message.updated)
+    setDatasetID(4, message.datasetID)
+    setInstallType(5, message.installType)
+  }
 }

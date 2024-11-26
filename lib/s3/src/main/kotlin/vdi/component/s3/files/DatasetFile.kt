@@ -36,4 +36,6 @@ interface DatasetFile {
   fun lastModified(): OffsetDateTime?
 
   fun loadContents(): InputStream?
+
+  fun writeContents(content: InputStream)
 }

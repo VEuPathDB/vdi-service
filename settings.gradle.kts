@@ -37,8 +37,6 @@ pluginManagement {
 
 rootProject.name = "vdi"
 
-include(":platform")
-
 include(":lib:app-db")
 include(":lib:async")
 include(":lib:cache-db")

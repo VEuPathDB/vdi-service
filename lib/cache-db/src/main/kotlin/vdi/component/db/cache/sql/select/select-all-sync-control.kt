@@ -3,13 +3,10 @@ package vdi.component.db.cache.sql.select
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
-import org.veupathdb.vdi.lib.common.model.VDIDatasetTypeImpl
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.util.getDatasetID
-import vdi.component.db.cache.util.getDateTime
-import vdi.component.db.cache.util.getUserID
+import vdi.component.db.cache.util.*
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -60,30 +57,27 @@ class TempHackCacheDBReconcilerTargetRecord(
   override fun getComparableID() = "$ownerID/$datasetID"
 }
 
-class RecordIterator(val rs: ResultSet,
-                     val connection: Connection,
-                     val preparedStatement: PreparedStatement): CloseableIterator<VDIReconcilerTargetRecord> {
+class RecordIterator(
+  val rs: ResultSet,
+  val connection: Connection,
+  val preparedStatement: PreparedStatement
+): CloseableIterator<VDIReconcilerTargetRecord> {
 
-  override fun hasNext(): Boolean {
-    return rs.next();
-  }
+  override fun hasNext() = rs.next()
 
   override fun next(): VDIReconcilerTargetRecord {
     // FIXME: Remove this when the target db delete logic is moved from the
     //        reconciler to the hard-delete lane.
     return TempHackCacheDBReconcilerTargetRecord(
-      ownerID = rs.getUserID("owner_id"),
-      datasetID = rs.getDatasetID("dataset_id"),
+      ownerID       = rs.getUserID("owner_id"),
+      datasetID     = rs.getDatasetID("dataset_id"),
       sharesUpdated = rs.getDateTime("shares_update_time"),
-      dataUpdated = rs.getDateTime("data_update_time"),
-      metaUpdated = rs.getDateTime("meta_update_time"),
-      type = VDIDatasetTypeImpl(
-        name = rs.getString("type_name"),
-        version = rs.getString("type_version")
-      ),
+      dataUpdated   = rs.getDateTime("data_update_time"),
+      metaUpdated   = rs.getDateTime("meta_update_time"),
+      type          = VDIDatasetType(rs.getDataType("type_name"), rs.getString("type_version")),
       isUninstalled = rs.getBoolean("is_deleted"),
-      inserted = rs.getDateTime("inserted"),
-      importStatus = rs.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued
+      inserted      = rs.getDateTime("inserted"),
+      importStatus  = rs.getImportStatus("status") ?: DatasetImportStatus.Queued
     )
 
 // FIXME: Uncomment the following when the target db delete logic is moved from

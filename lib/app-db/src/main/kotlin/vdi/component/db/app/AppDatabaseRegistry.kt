@@ -6,9 +6,10 @@ import oracle.jdbc.OracleDriver
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.ldap.OracleNetDesc
 import org.veupathdb.vdi.lib.common.env.DBEnvGroup
-import org.veupathdb.vdi.lib.common.env.EnvKey
 import org.veupathdb.vdi.lib.common.env.Environment
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.SecretString
+import vdi.component.env.EnvKey
 import vdi.component.ldap.LDAP
 import javax.sql.DataSource
 
@@ -17,34 +18,63 @@ object AppDatabaseRegistry {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val dataSources = HashMap<String, AppDBRegistryEntry>(12)
+  private val dataSources = HashMap<String, AppDBRegistryCollection>(12)
+
+  var isBroken = false
+    private set
 
   init {
-    init(System.getenv())
+    try {
+      init(System.getenv())
+    } catch (e: Throwable) {
+      isBroken = true
+      throw e
+    }
   }
 
-  operator fun contains(key: String): Boolean = dataSources.containsKey(key)
+  fun contains(key: String, dataType: DataType): Boolean = get(key, dataType) != null
 
-  operator fun get(key: String): AppDBRegistryEntry? = dataSources[key]
+  operator fun get(key: String, dataType: DataType): AppDBRegistryEntry? = dataSources[key]?.get(dataType)
 
+  operator fun get(key: String): AppDBRegistryCollection? = dataSources[key]
+
+  /**
+   * Iterates over all known app database registry entries as pairs of
+   * DB/project name to details.
+   *
+   * **CAUTION**: The DB/project name values may not be unique!  Multiple
+   * database entries may have the same name.
+   */
   operator fun iterator() = asSequence().iterator()
 
   fun size() = dataSources.size
 
+  /**
+   * Returns a sequence over all known app database registry entries as pairs of
+   * DB/project name to details.
+   *
+   * **CAUTION**: The DB/project name values may not be unique!  Multiple
+   * database entries may have the same name.
+   */
   fun asSequence() =
     dataSources.entries
       .asSequence()
       .map { (key, value) -> key to value }
+      .flatMap { (dbName, values) -> values.map { (dataType, value) -> RegisteredAppDatabase(dbName, dataType, value) } }
 
-  fun require(key: String): AppDBRegistryEntry =
-    get(key) ?: throw IllegalStateException("required AppDB connection $key was not registered with AppDatabases")
+  fun require(key: String, dataType: DataType): AppDBRegistryEntry =
+    get(key, dataType)
+      ?: throw IllegalStateException("required AppDB connection $key was not registered with AppDatabases")
 
   internal fun init(env: Environment) {
-    dataSources.clear()
+    val builders = HashMap<String, AppDBRegistryCollection.Builder>()
 
-    DBEnvGroup.fromEnvironment(env)
+    DBEnvGroup.fromEnvironment(env, EnvKey.AppDB.DBConnectionDataTypes)
       .onEach { if (it.enabled == true) requireFullChunk(it) }
-      .forEach { parseChunk(it) }
+      .forEach { parseChunk(it, builders) }
+
+    dataSources.clear()
+    builders.forEach { (k, v) -> dataSources[k] = v.build() }
   }
 
   private inline fun throwForMissingVar(envVar: String): Nothing =
@@ -65,7 +95,7 @@ object AppDatabaseRegistry {
     }
   }
 
-  private fun parseChunk(env: DBEnvGroup) {
+  private fun parseChunk(env: DBEnvGroup, builders: MutableMap<String, AppDBRegistryCollection.Builder>) {
     if (env.enabled != true) {
       log.info("Database {} is marked as disabled, skipping.", env.connectionName)
       return
@@ -75,6 +105,7 @@ object AppDatabaseRegistry {
       """registering database {} with the following details:
       Connection Name: {}
       TNS: {}
+      Plugin Restrictions: {}
       Host: {}
       Port: {}
       DB Name: {}
@@ -83,6 +114,7 @@ object AppDatabaseRegistry {
       env.connectionName,
       env.connectionName,
       env.ldap,
+      env.extensions[EnvKey.AppDB.DBConnectionDataTypes],
       env.host,
       env.port,
       env.dbName,
@@ -92,7 +124,7 @@ object AppDatabaseRegistry {
 
     val platform = env.platform?.let { AppDBPlatform.fromString(it) } ?: AppDBPlatform.Oracle
 
-    log.info("constructing a DataSource for database {} with platform {}", env.connectionName, env.platform)
+    log.info("constructing a DataSource for database {} with platform {}", env.connectionName, platform)
 
     val connectDetails: DbConnectDetails = try {
       when (platform) {
@@ -129,15 +161,43 @@ object AppDatabaseRegistry {
       throw IllegalStateException("error encountered while attempting to create a JDBC connection for ${env.connectionName}", e)
     }
 
-    dataSources[env.connectionName!!] = AppDBRegistryEntry(
-      env.connectionName!!,
-      connectDetails.findHost(),
-      connectDetails.findPort(),
-      connectDetails.makeDataSource(),
-      env.dataSchema!!,
-      env.controlSchema!!,
-      platform
-    )
+    builders.computeIfAbsent(env.connectionName!!) {
+      AppDBRegistryCollection.Builder()
+        .apply {
+          val entry = AppDBRegistryEntry(
+            env.connectionName!!,
+            connectDetails.findHost(),
+            connectDetails.findPort(),
+            connectDetails.makeDataSource(),
+            env.dataSchema!!,
+            env.controlSchema!!,
+            platform
+          )
+
+          when (val dt = env.extensions[EnvKey.AppDB.DBConnectionDataTypes]) {
+            null -> put(entry)
+            "*"  -> put(entry)
+            else -> {
+              val plugins = dt.splitToSequence(',')
+                .filter { it.isNotBlank() }
+                .map { it.trim() }
+                .toSet()
+
+              if (plugins.isEmpty()) {
+                put(entry)
+              } else if (plugins.contains("*")) {
+                if (plugins.size == 1)
+                  put(entry)
+                else
+                  throw IllegalStateException("Database connection config set for ${env.connectionName} specifies that it is both a fallback and data type restricted")
+              } else {
+                for (plugin in plugins)
+                  put(DataType.of(plugin), entry)
+              }
+            }
+          }
+        }
+    }
   }
 
   interface DbConnectDetails {
@@ -214,5 +274,4 @@ object AppDatabaseRegistry {
 
   private fun makeJDBCPostgresConnectionString(host: String, port: UShort, name: String) =
     "jdbc:postgresql://$host:$port/$name"
-
 }

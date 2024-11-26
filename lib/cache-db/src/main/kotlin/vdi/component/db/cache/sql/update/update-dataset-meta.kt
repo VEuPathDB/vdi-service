@@ -4,6 +4,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import vdi.component.db.cache.util.preparedUpdate
 import vdi.component.db.cache.util.setDatasetID
+import vdi.component.db.cache.util.setDatasetVisibility
 import java.sql.Connection
 
 // language=postgresql
@@ -30,6 +31,6 @@ internal fun Connection.updateDatasetMeta(
     setString(1, name)
     setString(2, summary)
     setString(3, description)
-    setString(4, visibility.value)
+    setDatasetVisibility(4, visibility)
     setDatasetID(5, datasetID)
   }

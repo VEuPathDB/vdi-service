@@ -19,8 +19,7 @@ WHERE
 internal fun Connection.testDatasetVisibilityExists(schema: String, datasetID: DatasetID, userID: UserID): Boolean =
   prepareStatement(sql(schema))
     .use { ps ->
-      ps.setString(1, datasetID.toString())
-      ps.setLong(2, userID.toLong())
-      ps.executeQuery()
-        .use { rs -> rs.next() }
+      ps.setDatasetID(1, datasetID)
+      ps.setUserID(2, userID)
+      ps.executeQuery().use { rs -> rs.next() }
     }

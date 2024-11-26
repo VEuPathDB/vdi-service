@@ -7,6 +7,7 @@ import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.app.model.DatasetInstallMessage
@@ -75,7 +76,7 @@ object DatasetReinstaller {
     val manager = DatasetManager(bucket)
 
     // For each project registered with the service...
-    for ((projectID, _) in AppDatabaseRegistry.iterator()) {
+    for ((projectID, _) in AppDatabaseRegistry) {
       try {
         processProject(projectID, manager)
       } catch (e: Throwable) {
@@ -88,22 +89,30 @@ object DatasetReinstaller {
   }
 
   private suspend fun processProject(projectID: ProjectID, manager: DatasetManager) {
-    // locate datasets in the ready-for-reinstall status
-    val datasets = appDB.accessor(projectID)!!
-      .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.ReadyForReinstall)
+    for ((dataType, _) in AppDatabaseRegistry[projectID]!!) {
+      // locate datasets in the ready-for-reinstall status
+      val datasets = appDB.accessor(projectID, dataType)!!
+        .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.ReadyForReinstall)
 
-    log.info("found {} datasets in project {} that are ready for reinstall", datasets.size, projectID)
+      log.info("found {} datasets in project {} that are ready for reinstall", datasets.size, projectID)
 
-    // for each located dataset for the target project...
-    for (dataset in datasets) {
-      try {
-        processDataset(dataset, projectID, manager)
-      } catch (e: PluginException) {
-        Metrics.Reinstaller.failedDatasetReinstall.inc()
-        log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID via plugin ${e.plugin}", e)
-      } catch (e: Throwable) {
-        Metrics.Reinstaller.failedDatasetReinstall.inc()
-        log.error("failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID", e)
+      // for each located dataset for the target project...
+      for (dataset in datasets) {
+        try {
+          processDataset(dataset, projectID, manager)
+        } catch (e: PluginException) {
+          Metrics.Reinstaller.failedDatasetReinstall.inc()
+          log.error(
+            "failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID via plugin ${e.plugin}",
+            e
+          )
+        } catch (e: Throwable) {
+          Metrics.Reinstaller.failedDatasetReinstall.inc()
+          log.error(
+            "failed to process dataset ${dataset.owner}/${dataset.datasetID} reinstallation for project $projectID",
+            e
+          )
+        }
       }
     }
   }
@@ -129,7 +138,7 @@ object DatasetReinstaller {
     log.debug("attempting to uninstall dataset {}/{} from project {}", dataset.owner, dataset.datasetID, projectID)
 
     val uninstallResult = try {
-      handler.client.postUninstall(dataset.datasetID, projectID)
+      handler.client.postUninstall(dataset.datasetID, projectID, VDIDatasetType(dataset.typeName, dataset.typeVersion))
     } catch (e: Throwable) {
       throw PluginRequestException.uninstall(handler.displayName, projectID, dataset.owner, dataset.datasetID, cause = e)
     }
@@ -171,7 +180,9 @@ object DatasetReinstaller {
     }
 
     val response = try {
-      withInstallBundle(directory) { handler.client.postInstallData(dataset.datasetID, projectID, it) }
+      withInstallBundle(directory) { meta, manifest, data ->
+        handler.client.postInstallData(dataset.datasetID, projectID, meta, manifest, data)
+      }
     } catch (e: S34KError) { // don't mix up minio errors with request errors
       throw PluginException.installData(handler.displayName, projectID, dataset.owner, dataset.datasetID, cause = e)
     } catch (e: Throwable) {
@@ -231,7 +242,7 @@ object DatasetReinstaller {
       handler.displayName,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, dataset.typeName) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -256,7 +267,7 @@ object DatasetReinstaller {
       response.message,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, dataset.typeName) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -282,7 +293,7 @@ object DatasetReinstaller {
       handler.displayName,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, dataset.typeName) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -306,7 +317,7 @@ object DatasetReinstaller {
       handler.displayName
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, dataset.typeName) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -330,7 +341,7 @@ object DatasetReinstaller {
       handler.displayName,
     )
 
-    appDB.withTransaction(projectID) {
+    appDB.withTransaction(projectID, dataset.typeName) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
@@ -342,43 +353,15 @@ object DatasetReinstaller {
     throw PluginException.installData(handler.displayName, projectID, dataset.owner, dataset.datasetID, response.message)
   }
 
-  private suspend fun <T> withInstallBundle(s3Dir: DatasetDirectory, fn: suspend (upload: InputStream) -> T) =
-    TempFiles.withTempDirectory { tmpDir ->
-      val files = ArrayList<Path>(8)
-
-      TempFiles.withTempFile { zipFile ->
-        zipFile.outputStream()
-          .buffered()
-          .use { out -> s3Dir.getInstallReadyFile().loadContents()!!.buffered().use { inp -> inp.transferTo(out) } }
-
-        Zip.zipEntries(zipFile)
-          .forEach { (entry, stream) ->
-            tmpDir.resolve(entry.name)
-              .also(files::add)
-              .outputStream()
-              .buffered()
-              .use { stream.buffered().transferTo(it) }
-          }
+  private suspend fun <T> withInstallBundle(
+    s3Dir: DatasetDirectory,
+    fn: suspend (meta: InputStream, manifest: InputStream, upload: InputStream) -> T
+  ) =
+    s3Dir.getMetaFile().loadContents()!!.use { meta ->
+      s3Dir.getManifestFile().loadContents()!!.use { manifest ->
+        s3Dir.getInstallReadyFile().loadContents()!!.use { data ->
+          fn(meta, manifest, data)
+        }
       }
-
-      tmpDir.resolve(S3Paths.MetadataFileName)
-        .also(files::add)
-        .outputStream()
-        .buffered()
-        .use { out -> s3Dir.getMetaFile().loadContents()!!.use { input -> input.transferTo(out) } }
-
-      tmpDir.resolve(S3Paths.ManifestFileName)
-        .also(files::add)
-        .outputStream()
-        .buffered()
-        .use { out -> s3Dir.getManifestFile().loadContents()!!.use { input -> input.transferTo(out) } }
-
-      val zip = tmpDir.resolve("install-bundle.zip")
-        .also { Zip.compress(it, files, Zip.Level(0u)) }
-
-      files.forEach { it.deleteIfExists() }
-      files.clear()
-
-      zip.inputStream().buffered().use { fn(it) }
     }
 }

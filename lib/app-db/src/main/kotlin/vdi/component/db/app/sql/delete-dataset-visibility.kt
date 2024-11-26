@@ -14,10 +14,8 @@ WHERE
   AND user_id = ?
 """
 
-internal fun Connection.deleteDatasetVisibility(schema: String, datasetID: DatasetID, userID: UserID): Int =
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, datasetID.toString())
-      ps.setLong(2, userID.toLong())
-      ps.executeUpdate()
-    }
+internal fun Connection.deleteDatasetVisibility(schema: String, datasetID: DatasetID, userID: UserID) =
+  preparedUpdate(sql(schema)) {
+    setDatasetID(1, datasetID)
+    setUserID(2, userID)
+  }

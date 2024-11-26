@@ -3,16 +3,12 @@ plugins {
 }
 
 dependencies {
-  implementation(platform(project(":platform")))
-
   implementation(project(":lib:env"))
 
-  implementation("org.veupathdb.vdi:vdi-component-json")
-  implementation("org.veupathdb.vdi:vdi-component-common")
-
-  implementation("org.slf4j:slf4j-api")
-
-  implementation("org.apache.kafka:kafka-clients")
+  implementation(libs.vdi.json)
+  implementation(libs.vdi.common)
+  implementation(libs.log.slf4j)
+  implementation(libs.msg.kafka)
 
   testImplementation(kotlin("test"))
 }

@@ -2,6 +2,7 @@ package vdi.test
 
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -57,11 +58,11 @@ fun mockDatasetManifest(
 
 fun mockDatasetFileInfo(
   filename: String? = null,
-  fileSize: Long? = null,
+  size: ULong? = null,
 ): VDIDatasetFileInfo =
   mock {
     filename?.also { on { this.filename } doReturn it }
-    fileSize?.also { on { this.fileSize } doReturn it }
+    size?.also { on { this.size } doReturn it }
   }
 
 fun mockDatasetDependency(
@@ -76,7 +77,7 @@ fun mockDatasetDependency(
   }
 
 fun mockDatasetType(
-  name: String? = null,
+  name: DataType? = null,
   version: String? = null,
 ): VDIDatasetType =
   mock {

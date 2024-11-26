@@ -3,6 +3,7 @@ package vdi.component.db.cache.sql.update
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.cache.util.preparedUpdate
 import vdi.component.db.cache.util.setDatasetID
+import vdi.component.db.cache.util.setDateTime
 import java.sql.Connection
 import java.time.OffsetDateTime
 
@@ -37,7 +38,7 @@ WHERE
  */
 internal fun Connection.updateSyncControlData(datasetID: DatasetID, timestamp: OffsetDateTime) =
   preparedUpdate(SQL) {
-    setObject(1, timestamp)
+    setDateTime(1, timestamp)
     setDatasetID(2, datasetID)
-    setObject(3, timestamp)
+    setDateTime(3, timestamp)
   } > 0

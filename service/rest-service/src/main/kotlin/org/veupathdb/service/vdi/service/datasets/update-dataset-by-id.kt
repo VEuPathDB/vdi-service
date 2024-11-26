@@ -9,7 +9,7 @@ import org.veupathdb.service.vdi.util.ValidationErrors
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetMetaImpl
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
 
@@ -42,7 +42,7 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
     DatasetStore.putDatasetMeta(
       userID,
       datasetID,
-      VDIDatasetMetaImpl(
+      VDIDatasetMeta(
         type         = meta.type,
         projects     = meta.projects,
         visibility   = visibility,

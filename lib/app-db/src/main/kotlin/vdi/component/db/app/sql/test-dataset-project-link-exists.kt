@@ -23,8 +23,7 @@ internal fun Connection.testDatasetProjectLinkExists(
 ): Boolean =
   prepareStatement(sql(schema))
     .use { ps ->
-      ps.setString(1, datasetID.toString())
+      ps.setDatasetID(1, datasetID)
       ps.setString(2, projectID)
-      ps.executeQuery()
-        .use { rs -> rs.next() }
+      ps.executeQuery().use { rs -> rs.next() }
     }

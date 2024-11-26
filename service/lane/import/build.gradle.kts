@@ -3,8 +3,6 @@ plugins {
 }
 
 dependencies {
-  implementation(platform(project(":platform")))
-
   implementation(project(":lib:cache-db"))
   implementation(project(":lib:env"))
   implementation(project(":lib:plugin-client"))
@@ -14,12 +12,12 @@ dependencies {
   implementation(project(":lib:plugin-mapping"))
   implementation(project(":lib:s3"))
 
-  implementation("org.veupathdb.vdi:vdi-component-json")
-  implementation("org.veupathdb.vdi:vdi-component-common")
-  implementation("org.veupathdb.lib.s3:s34k-minio")
+  implementation(libs.vdi.json)
+  implementation(libs.vdi.common)
+  implementation(libs.s34k)
 
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-  implementation("org.slf4j:slf4j-api")
-  implementation("org.apache.logging.log4j:log4j-api-kotlin")
+  implementation(libs.kt.coroutines)
+  implementation(libs.log.slf4j)
+  implementation(libs.log.log4j.kotlin)
   implementation(kotlin("stdlib-jdk8"))
 }

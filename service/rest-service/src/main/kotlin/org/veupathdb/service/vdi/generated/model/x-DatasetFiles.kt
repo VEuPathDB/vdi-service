@@ -1,15 +1,15 @@
 package org.veupathdb.service.vdi.generated.model
 
-import vdi.component.db.cache.model.DatasetFile
+import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 
-fun DatasetZipDetails(zipSize: Long, files: List<DatasetFile>): DatasetZipDetails =
+fun DatasetZipDetails(zipSize: Long, files: List<VDIDatasetFileInfo>): DatasetZipDetails =
   DatasetZipDetailsImpl().also {
     it.zipSize = zipSize
     it.contents = files.map(::DatasetFileDetails)
   }
 
-fun DatasetFileDetails(file: DatasetFile): DatasetFileDetails =
+fun DatasetFileDetails(file: VDIDatasetFileInfo): DatasetFileDetails =
   DatasetFileDetailsImpl().also {
-    it.fileName = file.fileName
-    it.fileSize = file.fileSize.toLong()
+    it.fileName = file.filename
+    it.fileSize = file.size.toLong()
   }

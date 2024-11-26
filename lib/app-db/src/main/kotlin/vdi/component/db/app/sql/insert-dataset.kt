@@ -20,14 +20,12 @@ VALUES
 """
 
 internal fun Connection.insertDataset(schema: String, dataset: DatasetRecord) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, dataset.datasetID.toString())
-      ps.setLong(2, dataset.owner.toLong())
-      ps.setString(3, dataset.typeName.lowercase())
-      ps.setString(4, dataset.typeVersion)
-      ps.setInt(5, dataset.isDeleted.value)
-      ps.setBoolean(6, dataset.isPublic)
-      ps.executeUpdate()
-    }
+  preparedUpdate(sql(schema)) {
+    setDatasetID(1, dataset.datasetID)
+    setUserID(2, dataset.owner)
+    setDataType(3, dataset.typeName)
+    setString(4, dataset.typeVersion)
+    setDeleteFlag(5, dataset.isDeleted)
+    setBoolean(6, dataset.isPublic)
+  }
 }

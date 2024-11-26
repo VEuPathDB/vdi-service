@@ -23,18 +23,15 @@ ON CONFLICT (dataset_id, install_type) DO UPDATE SET
 """
 
 internal fun Connection.upsertDatasetInstallMessage(schema: String, message: DatasetInstallMessage) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setString(1, message.datasetID.toString())
-      ps.setString(2, message.installType.value)
-      ps.setString(3, message.status.value)
-      ps.setString(4, message.message)
-      ps.setObject(5, message.updated)
+  preparedUpdate(sql(schema)) {
+    setString(1, message.datasetID.toString())
+    setString(2, message.installType.value)
+    setString(3, message.status.value)
+    setString(4, message.message)
+    setObject(5, message.updated)
 
-      ps.setString(6, message.status.value)
-      ps.setString(7, message.message)
-      ps.setObject(8, message.updated)
-
-      ps.executeUpdate()
-    }
+    setString(6, message.status.value)
+    setString(7, message.message)
+    setObject(8, message.updated)
+  }
 }

@@ -1,10 +1,14 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package vdi.component.db.cache.util
 
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
-import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfoImpl
+import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
+import vdi.component.db.cache.model.DatasetImportStatus
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -42,6 +46,15 @@ internal fun PreparedStatement.setDatasetID(index: Int, datasetID: DatasetID) =
 internal fun PreparedStatement.setUserID(index: Int, userID: UserID) =
   setString(index, userID.toString())
 
+internal fun PreparedStatement.setDatasetVisibility(index: Int, visibility: VDIDatasetVisibility) =
+  setString(index, visibility.value)
+internal fun PreparedStatement.setDataType(index: Int, dataType: DataType) =
+  setString(index, dataType.toString())
+internal fun PreparedStatement.setDateTime(index: Int, dateTime: OffsetDateTime) =
+  setObject(index, dateTime)
+internal fun PreparedStatement.setImportStatus(index: Int, importStatus: DatasetImportStatus) =
+  setString(index, importStatus.value)
+
 internal inline fun <T> PreparedStatement.withResults(fn: ResultSet.() -> T): T =
   executeQuery().use(fn)
 
@@ -49,7 +62,6 @@ internal inline fun <T> PreparedStatement.withResults(fn: ResultSet.() -> T): T 
 
 // region ResultSet
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun ResultSet.getStringList(column: String): List<String> =
   getArray(column).resultSet.map { it.getString(2) }
 
@@ -64,18 +76,21 @@ internal inline fun ResultSet.getStringList(column: String): List<String> =
  *
  * @return A list of [ProjectID] values parsed from the target [ResultSet].
  */
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun ResultSet.getProjectIDList(column: String): List<ProjectID> =
   getStringList(column)
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun ResultSet.getDatasetID(column: String) = DatasetID(getString(column))
 
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun ResultSet.getUserID(column: String) = UserID(getString(column))
 
-@Suppress("NOTHING_TO_INLINE")
+internal inline fun ResultSet.getDataType(column: String) = DataType.of(getString(column))
+
+internal inline fun ResultSet.getDatasetVisibility(column: String) = VDIDatasetVisibility.fromString(getString(column))
+
 internal inline fun ResultSet.getDateTime(column: String) = getObject(column, OffsetDateTime::class.java)
+
+internal inline fun ResultSet.getImportStatus(column: Int) = getString(column)?.let(DatasetImportStatus::fromString)
+internal inline fun ResultSet.getImportStatus(column: String) = getString(column)?.let(DatasetImportStatus::fromString)
 
 /**
  * Parses a postgres array containing 2-value sub-arrays that contain a file
@@ -96,7 +111,7 @@ internal inline fun ResultSet.getFileDetailList(column: String): List<VDIDataset
       .let { it.trim('(', ')') }
       .let {
         val c = it.lastIndexOf(',')
-        VDIDatasetFileInfoImpl(it.substring(0, c).trim('"'), it.substring(c + 1).toLong())
+        VDIDatasetFileInfo(it.substring(0, c).trim('"'), it.substring(c + 1).toULong())
       }
   }
 

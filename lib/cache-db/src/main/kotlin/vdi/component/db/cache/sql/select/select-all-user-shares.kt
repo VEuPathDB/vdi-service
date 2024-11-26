@@ -43,7 +43,7 @@ internal fun Connection.selectAllSharesFor(userID: UserID): List<DatasetShareLis
         DatasetShareListEntry(
           datasetID     = it.getDatasetID("dataset_id"),
           ownerID       = it.getUserID("owner_id"),
-          typeName      = it.getString("type_name"),
+          typeName      = it.getDataType("type_name"),
           typeVersion   = it.getString("type_version"),
           receiptStatus = it.getString("status")?.let(VDIShareReceiptAction::fromString),
           projects      = it.getProjectIDList("projects")

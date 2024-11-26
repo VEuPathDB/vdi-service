@@ -95,7 +95,7 @@ internal fun Connection.selectBrokenImports(query: BrokenImportListQuery): List<
         out.add(BrokenImportRecord(
           datasetID   = getDatasetID("dataset_id"),
           ownerID     = getUserID("owner_id"),
-          typeName    = getString("type_name"),
+          typeName    = getDataType("type_name"),
           typeVersion = getString("type_version"),
           projects    = getProjectIDList("projects"),
           messages    = getStringList("messages"),

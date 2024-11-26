@@ -20,10 +20,8 @@ internal fun Connection.updateSyncControlDataTimestamp(
   datasetID: DatasetID,
   timestamp: OffsetDateTime
 ) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setObject(1, timestamp)
-      ps.setString(2, datasetID.toString())
-      ps.executeUpdate()
-    }
+  preparedUpdate(sql(schema)) {
+    setDateTime(1, timestamp)
+    setDatasetID(2, datasetID)
+  }
 }

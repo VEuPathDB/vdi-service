@@ -4,9 +4,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.util.or
 import vdi.component.async.WorkerPool
 import vdi.component.db.app.AppDB
@@ -82,7 +84,7 @@ internal class SoftDeleteTriggerHandlerImpl(
     cacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
 
     val timer = Metrics.Uninstall.duration
-      .labels(internalDBRecord.typeName, internalDBRecord.typeVersion)
+      .labels(internalDBRecord.typeName.toString(), internalDBRecord.typeVersion)
       .startTimer()
 
     // Grab a plugin handler instance for this dataset type.
@@ -99,12 +101,12 @@ internal class SoftDeleteTriggerHandlerImpl(
         return@forEach
       }
 
-      if (projectID !in AppDatabaseRegistry) {
+      if (!AppDatabaseRegistry.contains(projectID, internalDBRecord.typeName)) {
         log.warn("dataset {}/{} cannot be uninstalled from target project {} as the project is disabled", userID, datasetID, projectID)
         return@forEach
       }
 
-      if (datasetShouldBeUninstalled(userID, datasetID, projectID)) {
+      if (datasetShouldBeUninstalled(userID, datasetID, projectID, internalDBRecord.typeName)) {
         try {
           uninstallDataset(userID, datasetID, projectID, handler, internalDBRecord)
         } catch (e: PluginException) {
@@ -141,15 +143,15 @@ internal class SoftDeleteTriggerHandlerImpl(
     handler: PluginHandler,
     record: DatasetRecord
   ) {
-    appDB.withTransaction(projectID) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedNotUninstalled) }
+    appDB.withTransaction(projectID, record.typeName) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedNotUninstalled) }
 
     val response = try {
-      handler.client.postUninstall(datasetID, projectID)
+      handler.client.postUninstall(datasetID, projectID, VDIDatasetType(record.typeName, record.typeVersion))
     } catch (e: Throwable) {
       throw PluginRequestException.uninstall(handler.displayName, projectID, userID, datasetID, cause = e)
     }
 
-    Metrics.Uninstall.count.labels(record.typeName, record.typeVersion, response.responseCode.toString()).inc()
+    Metrics.Uninstall.count.labels(record.typeName.toString(), record.typeVersion, response.responseCode.toString()).inc()
 
     when (response.type) {
       UninstallResponseType.Success
@@ -163,8 +165,13 @@ internal class SoftDeleteTriggerHandlerImpl(
     }
   }
 
-  private fun datasetShouldBeUninstalled(userID: UserID, datasetID: DatasetID, projectID: ProjectID): Boolean {
-    val dataset = appDB.accessor(projectID)!!.selectDataset(datasetID)
+  private fun datasetShouldBeUninstalled(
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    dataType: DataType,
+  ): Boolean {
+    val dataset = appDB.accessor(projectID, dataType)!!.selectDataset(datasetID)
 
     if (dataset == null) {
       log.warn("dataset {}/{} does not appear in target project {}, cannot run uninstall", userID, datasetID, projectID)
@@ -188,7 +195,7 @@ internal class SoftDeleteTriggerHandlerImpl(
       handler.displayName
     )
 
-    appDB.withTransaction(projectID) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedAndUninstalled) }
+    appDB.withTransaction(projectID, handler.type) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedAndUninstalled) }
   }
 
   private fun handleBadRequestResponse(

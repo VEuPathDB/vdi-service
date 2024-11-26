@@ -1,6 +1,7 @@
 package vdi.component.db.app
 
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.component.db.app.model.InstallStatuses
@@ -16,13 +17,15 @@ internal object AppDBImpl : AppDB {
     val result = HashMap<DatasetID, MutableMap<ProjectID, InstallStatuses>>(100)
 
     for ((projectID, datasetIDs) in targets) {
-      val ds = AppDatabaseRegistry.require(projectID)
+      for ((dataType, _) in AppDatabaseRegistry[projectID]!!) {
+        val ds = AppDatabaseRegistry.require(projectID, dataType)
 
-      ds.source.connection.use { con ->
-        con.selectInstallStatuses(ds.ctlSchema, datasetIDs)
-          .forEach { (datasetID, statuses) ->
-            result.computeIfAbsent(datasetID) { HashMap() } [projectID] = statuses
-          }
+        ds.source.connection.use { con ->
+          con.selectInstallStatuses(ds.ctlSchema, datasetIDs)
+            .forEach { (datasetID, statuses) ->
+              result.computeIfAbsent(datasetID) { HashMap() }[projectID] = statuses
+            }
+        }
       }
     }
 
@@ -35,20 +38,22 @@ internal object AppDBImpl : AppDB {
     val out = HashMap<ProjectID, InstallStatuses>(projects.size)
 
     for (projectID in projects) {
-      val ds = AppDatabaseRegistry.require(projectID)
-
-      ds.source.connection.use { con -> out[projectID] = con.selectInstallStatuses(ds.ctlSchema, target) }
+      for ((dataType, _) in AppDatabaseRegistry[projectID]!!) {
+        with(AppDatabaseRegistry.require(projectID, dataType)) {
+          source.connection.use { con -> out[projectID] = con.selectInstallStatuses(ctlSchema, target) }
+        }
+      }
     }
 
     return out
   }
 
-  override fun accessor(key: ProjectID): AppDBAccessor? =
-    AppDatabaseRegistry[key]
+  override fun accessor(key: ProjectID, dataType: DataType): AppDBAccessor? =
+    AppDatabaseRegistry[key, dataType]
       ?.let { AppDBAccessorImpl(key, it.ctlSchema, it.source) }
 
-  override fun transaction(key: ProjectID): AppDBTransaction? =
-    AppDatabaseRegistry[key]
+  override fun transaction(key: ProjectID, dataType: DataType): AppDBTransaction? =
+    AppDatabaseRegistry[key, dataType]
       ?.let { ds -> AppDBTransactionImpl(key, ds.ctlSchema, ds.source.connection.also { it.autoCommit = false }, ds.platform) }
 }
 

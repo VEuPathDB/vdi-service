@@ -1,7 +1,6 @@
 package vdi.component.db.cache.sql.select
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import vdi.component.db.cache.model.AdminDatasetDetailsRecord
 import vdi.component.db.cache.model.DatasetImportStatus
@@ -65,15 +64,15 @@ internal fun Connection.selectAdminDatasetDetails(datasetID: DatasetID): AdminDa
         origin       = getString("origin"),
         created      = getDateTime("created"),
         inserted     = getDateTime("inserted"),
-        typeName     = getString("type_name"),
+        typeName     = getDataType("type_name"),
         typeVersion  = getString("type_version"),
         name         = getString("name"),
         summary      = getString("summary"),
         description  = getString("description"),
         sourceURL    = getString("source_url"),
-        visibility   = VDIDatasetVisibility.fromString(getString("visibility")),
+        visibility   = getDatasetVisibility("visibility"),
         projectIDs   = getProjectIDList("projects"),
-        importStatus = getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
+        importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
         syncControl  = VDISyncControlRecord(
           datasetID     = getDatasetID("dataset_id"),
           sharesUpdated = getDateTime("shares_update_time"),

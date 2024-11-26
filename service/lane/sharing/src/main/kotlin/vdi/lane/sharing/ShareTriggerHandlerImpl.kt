@@ -139,7 +139,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   ) {
     synchronizeCacheDB(dataset, shares, latestShareTimestamp)
     dataset.projects.forEach { projectID ->
-      if (projectID in AppDatabaseRegistry)
+      if (AppDatabaseRegistry.contains(projectID, dataset.typeName))
         synchronizeProject(projectID, dataset, shares, latestShareTimestamp)
       else
         log.info("dataset {}/{} target {} is not currently enabled, skipping share sync", dataset.ownerID, dataset.datasetID, projectID)
@@ -152,7 +152,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     latestShareTimestamp: OffsetDateTime
   ) {
     dataset.projects.forEach {
-      val targetDB = appDB.accessor(it)
+      val targetDB = appDB.accessor(it, dataset.typeName)
 
       if (targetDB == null) {
         log.info("dataset {}/{} target {} is not currently enabled, skipping share sync", dataset.ownerID, dataset.datasetID, it)
@@ -276,7 +276,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   ) {
     log.info("synchronizing shares for dataset {}/{} in project {}", dataset.ownerID, dataset.datasetID, projectID)
 
-    appDB.withTransaction(projectID) { db ->
+    appDB.withTransaction(projectID, dataset.typeName) { db ->
       // Get a set of the recipient user IDs for all the users that this
       // dataset has been shared with in the target database.
       //
@@ -348,12 +348,12 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
 
     dataset.projects.forEach { projectID ->
 
-      if (projectID !in AppDatabaseRegistry) {
+      if (!AppDatabaseRegistry.contains(projectID, dataset.typeName)) {
         log.warn("cannot purge dataset visibility records for dataset {}/{} from project {} as that target is not currently enabled", dataset.ownerID, dataset.datasetID, projectID)
         return@forEach
       }
 
-      appDB.withTransaction(projectID) { db -> db.deleteDatasetVisibilities(dataset.datasetID) }
+      appDB.withTransaction(projectID, dataset.typeName) { db -> db.deleteDatasetVisibilities(dataset.datasetID) }
     }
   }
 
