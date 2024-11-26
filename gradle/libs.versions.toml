@@ -6,7 +6,7 @@ fgputil-db = { group = "org.gusdb", name = "fgputil-db", version = "2.13.1" }
 container-core      = { group = "org.veupathdb.lib", name = "jaxrs-container-core",   version = "8.0.0" }
 container-multipart = { group = "org.veupathdb.lib", name = "multipart-jackson-pojo", version = "1.1.7" }
 
-vdi-common = { group = "org.veupathdb.vdi", name = "vdi-component-common", version = "14.2.0" }
+vdi-common = { group = "org.veupathdb.vdi", name = "vdi-component-common", version = "14.2.1" }
 vdi-json   = { group = "org.veupathdb.vdi", name = "vdi-component-json",   version = "1.0.2"  }
 
 # Database
@@ -53,5 +53,3 @@ junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", ver
 # Mockito
 mockito-core   = { group = "org.mockito",        name = "mockito-core",   version = "5.14.2" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version = "5.4.0"  }
-
-
