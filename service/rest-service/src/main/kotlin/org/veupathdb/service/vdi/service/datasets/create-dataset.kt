@@ -18,6 +18,7 @@ import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.compression.Zip.getZipType
 import org.veupathdb.vdi.lib.common.compression.ZipType
+import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
@@ -60,7 +61,7 @@ fun createDataset(
     if (!handler.appliesToProject(projectID))
       throw BadRequestException("target dataset type does not apply to project $projectID")
 
-    if (!AppDatabaseRegistry.contains(projectID))
+    if (!AppDatabaseRegistry.contains(projectID, datasetMeta.type.name))
       throw BadRequestException("unrecognized target project")
   }
 

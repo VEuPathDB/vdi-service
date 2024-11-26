@@ -191,7 +191,7 @@ object Pruner {
   }
 
   private fun DeletedDataset.deleteFromAppDB(projectID: ProjectID) {
-    if (!AppDatabaseRegistry.contains(projectID)) {
+    if (!AppDatabaseRegistry.contains(projectID, dataType)) {
       log.info("Cannot delete dataset {}/{} from project {} due to target project config being disabled.", ownerID, datasetID, projectID)
       return
     }

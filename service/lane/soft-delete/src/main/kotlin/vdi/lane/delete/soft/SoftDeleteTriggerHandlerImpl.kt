@@ -101,7 +101,7 @@ internal class SoftDeleteTriggerHandlerImpl(
         return@forEach
       }
 
-      if (!AppDatabaseRegistry.contains(projectID)) {
+      if (!AppDatabaseRegistry.contains(projectID, internalDBRecord.typeName)) {
         log.warn("dataset {}/{} cannot be uninstalled from target project {} as the project is disabled", userID, datasetID, projectID)
         return@forEach
       }

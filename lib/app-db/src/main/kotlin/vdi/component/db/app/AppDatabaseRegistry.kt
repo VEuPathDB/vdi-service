@@ -34,8 +34,6 @@ object AppDatabaseRegistry {
 
   fun contains(key: String, dataType: DataType): Boolean = get(key, dataType) != null
 
-  fun contains(key: String): Boolean = key in dataSources
-
   operator fun get(key: String, dataType: DataType): AppDBRegistryEntry? = dataSources[key]?.get(dataType)
 
   operator fun get(key: String): AppDBRegistryCollection? = dataSources[key]
@@ -277,4 +275,3 @@ object AppDatabaseRegistry {
   private fun makeJDBCPostgresConnectionString(host: String, port: UShort, name: String) =
     "jdbc:postgresql://$host:$port/$name"
 }
-

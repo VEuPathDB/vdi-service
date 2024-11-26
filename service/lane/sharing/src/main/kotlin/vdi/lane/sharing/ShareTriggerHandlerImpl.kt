@@ -139,7 +139,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   ) {
     synchronizeCacheDB(dataset, shares, latestShareTimestamp)
     dataset.projects.forEach { projectID ->
-      if (AppDatabaseRegistry.contains(projectID))
+      if (AppDatabaseRegistry.contains(projectID, dataset.typeName))
         synchronizeProject(projectID, dataset, shares, latestShareTimestamp)
       else
         log.info("dataset {}/{} target {} is not currently enabled, skipping share sync", dataset.ownerID, dataset.datasetID, projectID)
@@ -348,7 +348,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
 
     dataset.projects.forEach { projectID ->
 
-      if (!AppDatabaseRegistry.contains(projectID)) {
+      if (!AppDatabaseRegistry.contains(projectID, dataset.typeName)) {
         log.warn("cannot purge dataset visibility records for dataset {}/{} from project {} as that target is not currently enabled", dataset.ownerID, dataset.datasetID, projectID)
         return@forEach
       }
