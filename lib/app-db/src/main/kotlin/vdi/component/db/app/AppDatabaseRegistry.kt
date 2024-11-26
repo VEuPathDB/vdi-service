@@ -8,6 +8,7 @@ import org.veupathdb.lib.ldap.OracleNetDesc
 import org.veupathdb.vdi.lib.common.env.DBEnvGroup
 import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.field.DataType
+import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.SecretString
 import vdi.component.env.EnvKey
 import vdi.component.ldap.LDAP
@@ -15,10 +16,9 @@ import javax.sql.DataSource
 
 @Suppress("NOTHING_TO_INLINE")
 object AppDatabaseRegistry {
-
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val dataSources = HashMap<String, AppDBRegistryCollection>(12)
+  private val dataSources = HashMap<ProjectID, AppDBRegistryCollection>(12)
 
   var isBroken = false
     private set
@@ -32,11 +32,11 @@ object AppDatabaseRegistry {
     }
   }
 
-  fun contains(key: String, dataType: DataType): Boolean = get(key, dataType) != null
+  fun contains(key: ProjectID, dataType: DataType): Boolean = get(key, dataType) != null
 
-  operator fun get(key: String, dataType: DataType): AppDBRegistryEntry? = dataSources[key]?.get(dataType)
+  operator fun get(key: ProjectID, dataType: DataType): AppDBRegistryEntry? = dataSources[key]?.get(dataType)
 
-  operator fun get(key: String): AppDBRegistryCollection? = dataSources[key]
+  operator fun get(key: ProjectID): AppDBRegistryCollection? = dataSources[key]
 
   /**
    * Iterates over all known app database registry entries as pairs of
@@ -62,12 +62,12 @@ object AppDatabaseRegistry {
       .map { (key, value) -> key to value }
       .flatMap { (dbName, values) -> values.map { (dataType, value) -> RegisteredAppDatabase(dbName, dataType, value) } }
 
-  fun require(key: String, dataType: DataType): AppDBRegistryEntry =
+  fun require(key: ProjectID, dataType: DataType): AppDBRegistryEntry =
     get(key, dataType)
       ?: throw IllegalStateException("required AppDB connection $key was not registered with AppDatabases")
 
   internal fun init(env: Environment) {
-    val builders = HashMap<String, AppDBRegistryCollection.Builder>()
+    val builders = HashMap<ProjectID, AppDBRegistryCollection.Builder>()
 
     DBEnvGroup.fromEnvironment(env, EnvKey.AppDB.DBConnectionDataTypes)
       .onEach { if (it.enabled == true) requireFullChunk(it) }
@@ -95,7 +95,7 @@ object AppDatabaseRegistry {
     }
   }
 
-  private fun parseChunk(env: DBEnvGroup, builders: MutableMap<String, AppDBRegistryCollection.Builder>) {
+  private fun parseChunk(env: DBEnvGroup, builders: MutableMap<ProjectID, AppDBRegistryCollection.Builder>) {
     if (env.enabled != true) {
       log.info("Database {} is marked as disabled, skipping.", env.connectionName)
       return
@@ -199,79 +199,78 @@ object AppDatabaseRegistry {
         }
     }
   }
-
-  interface DbConnectDetails {
-    fun makeDataSource(): DataSource
-    fun findHost(): String
-    fun findPort(): UShort
-  }
-
-  class LDAPConnectDetails(
-    val name: String,
-    val user: String,
-    val pw: SecretString,
-    val ldap: String,
-    val poolSize: Int
-  ) : DbConnectDetails {
-
-    val desc: OracleNetDesc by lazy { LDAP.requireSingularOracleNetDesc(ldap) }
-
-    override fun makeDataSource(): DataSource {
-      return HikariConfig()
-        .apply {
-          jdbcUrl = makeJDBCOracleConnectionString(desc.host, desc.port, desc.serviceName)
-          username = user
-          password = pw.unwrap()
-          maximumPoolSize = poolSize
-          driverClassName = OracleDriver::class.java.name
-        }
-        .let(::HikariDataSource)
-    }
-
-    override fun findHost(): String {
-      return desc.host
-    }
-
-    override fun findPort(): UShort {
-      return desc.port
-    }
-  }
-
-  class ManualConnectDetails(
-    val name: String,
-    val user: String,
-    val pw: SecretString,
-    val host: String,
-    val port: UShort,
-    val dbName: String,
-    val poolSize: Int,
-  ) : DbConnectDetails {
-
-    override fun makeDataSource(): DataSource {
-      log.info("Making data source with connection string {}", makeJDBCPostgresConnectionString(host, port, dbName))
-      return HikariConfig()
-        .apply {
-          jdbcUrl = makeJDBCPostgresConnectionString(host, port, dbName)
-          username = user
-          password = pw.unwrap()
-          maximumPoolSize = poolSize
-          driverClassName = org.postgresql.Driver::class.java.name
-        }
-        .let(::HikariDataSource)
-    }
-
-    override fun findHost(): String {
-      return host
-    }
-
-    override fun findPort(): UShort {
-      return port
-    }
-  }
-
-  private fun makeJDBCOracleConnectionString(host: String, port: UShort, name: String) =
-    "jdbc:oracle:thin:@//$host:$port/$name"
-
-  private fun makeJDBCPostgresConnectionString(host: String, port: UShort, name: String) =
-    "jdbc:postgresql://$host:$port/$name"
 }
+
+private interface DbConnectDetails {
+  fun makeDataSource(): DataSource
+  fun findHost(): String
+  fun findPort(): UShort
+}
+
+private class ManualConnectDetails(
+  val name: String,
+  val user: String,
+  val pw: SecretString,
+  val host: String,
+  val port: UShort,
+  val dbName: String,
+  val poolSize: Int,
+) : DbConnectDetails {
+
+  override fun makeDataSource(): DataSource {
+    return HikariConfig()
+      .apply {
+        jdbcUrl = makeJDBCPostgresConnectionString(host, port, dbName)
+        username = user
+        password = pw.unwrap()
+        maximumPoolSize = poolSize
+        driverClassName = org.postgresql.Driver::class.java.name
+      }
+      .let(::HikariDataSource)
+  }
+
+  override fun findHost(): String {
+    return host
+  }
+
+  override fun findPort(): UShort {
+    return port
+  }
+}
+
+private class LDAPConnectDetails(
+  val name: String,
+  val user: String,
+  val pw: SecretString,
+  val ldap: String,
+  val poolSize: Int
+) : DbConnectDetails {
+
+  val desc: OracleNetDesc by lazy { LDAP.requireSingularOracleNetDesc(ldap) }
+
+  override fun makeDataSource(): DataSource {
+    return HikariConfig()
+      .apply {
+        jdbcUrl = makeJDBCOracleConnectionString(desc.host, desc.port, desc.serviceName)
+        username = user
+        password = pw.unwrap()
+        maximumPoolSize = poolSize
+        driverClassName = OracleDriver::class.java.name
+      }
+      .let(::HikariDataSource)
+  }
+
+  override fun findHost(): String {
+    return desc.host
+  }
+
+  override fun findPort(): UShort {
+    return desc.port
+  }
+}
+
+private fun makeJDBCOracleConnectionString(host: String, port: UShort, name: String) =
+  "jdbc:oracle:thin:@//$host:$port/$name"
+
+private fun makeJDBCPostgresConnectionString(host: String, port: UShort, name: String) =
+  "jdbc:postgresql://$host:$port/$name"
