@@ -10,7 +10,7 @@ vdi-common = { group = "org.veupathdb.vdi", name = "vdi-component-common", versi
 vdi-json   = { group = "org.veupathdb.vdi", name = "vdi-component-json",   version = "1.0.2"  }
 
 # Database
-db-pool            = { group = "com.zaxxer",               name = "HikariCP",   version = "6.1.0"        }
+db-pool            = { group = "com.zaxxer",               name = "HikariCP",   version = "6.2.1"        }
 db-driver-oracle   = { group = "com.oracle.database.jdbc", name = "ojdbc8",     version = "23.6.0.24.10" }
 db-driver-postgres = { group = "org.postgresql",           name = "postgresql", version = "42.7.4"       }
 
