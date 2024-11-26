@@ -8,3 +8,8 @@ updates:
   directory: "/"
   schedule:
     interval: monthly
+registries:
+  github-packages:
+    type: maven-repository
+    url: https://maven.pkg.github.com/veupathdb/maven-packages
+    token: ${{ secrets.PACKAGES_KEY }}
