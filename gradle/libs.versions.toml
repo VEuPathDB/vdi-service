@@ -30,7 +30,7 @@ http-server-jersey    = { group = "org.glassfish.jersey.core", name = "jersey-se
 
 # Messaging
 msg-kafka  = { group = "org.apache.kafka", name = "kafka-clients", version = "3.9.0" }
-msg-rabbit = { group = "com.rabbitmq",     name = "amqp-client",   version = "5.23.0" }
+msg-rabbit = { group = "com.rabbitmq",     name = "amqp-client",   version = "5.24.0" }
 
 # LDAP
 ldap = { group = "org.veupathdb.lib", name = "ldap-utils", version = "1.0.0" }
