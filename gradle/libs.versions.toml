@@ -22,7 +22,7 @@ log-log4j-slf4j  = { group = "org.apache.logging.log4j", name = "log4j-slf4j-imp
 log-log4j-kotlin = { group = "org.apache.logging.log4j", name = "log4j-api-kotlin", version = "1.5.0"  }
 
 # Kotlin Extensions
-kt-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.9.0" }
+kt-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.10.1" }
 
 # HTTP
 http-client-multipart = { group = "io.foxcapades.lib",         name = "k-multipart",   version = "1.2.1" }
