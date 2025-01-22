@@ -379,6 +379,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         // Insert a new dataset record
         it.tryInsertDataset(DatasetImpl(
           datasetID    = datasetID,
+          userStableID = meta.userStableID,
           typeName     = meta.type.name,
           typeVersion  = meta.type.version,
           ownerID      = meta.owner,

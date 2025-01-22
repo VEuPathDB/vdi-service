@@ -490,6 +490,7 @@ internal class DatasetReconciler(
       cacheDB.withTransaction { db ->
         db.tryInsertDataset(DatasetImpl(
           datasetID = datasetID,
+          userStableID = meta.userStableID,
           typeName = meta.type.name,
           typeVersion = meta.type.version,
           ownerID = userID,

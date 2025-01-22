@@ -15,6 +15,7 @@ $prefix
 )
 SELECT
   d.dataset_id
+, d.user_stable_id
 , d.type_name
 , d.type_version
 , d.owner_id
@@ -135,6 +136,7 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
       map {
         DatasetRecordImpl(
           datasetID    = it.getDatasetID("dataset_id"),
+          userStableID = getString("user_stable_id"),
           typeName     = it.getDataType("type_name"),
           typeVersion  = it.getString("type_version"),
           ownerID      = it.getUserID("owner_id"),

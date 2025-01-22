@@ -11,6 +11,7 @@ import java.sql.Types
 private const val SQL_BASE = """
 SELECT
   d.dataset_id
+, d.user_stable_id
 , d.owner_id
 , d.origin
 , d.created
@@ -114,6 +115,7 @@ internal fun Connection.selectAdminAllDatasets(query: AdminAllDatasetsQuery): Li
       map {
         AdminAllDatasetsRow(
           datasetID     = it.getDatasetID("dataset_id"),
+          userStableID  = it.getString("user_stable_id"),
           ownerID       = it.getUserID("owner_id"),
           origin        = it.getString("origin"),
           created       = it.getDateTime("created"),

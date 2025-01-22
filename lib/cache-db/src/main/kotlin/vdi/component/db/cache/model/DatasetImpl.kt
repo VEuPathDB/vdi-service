@@ -7,6 +7,7 @@ import java.time.OffsetDateTime
 
 data class DatasetImpl(
   override val datasetID: DatasetID,
+  override val userStableID: String?,
   override val typeName: DataType,
   override val typeVersion: String,
   override val ownerID: UserID,

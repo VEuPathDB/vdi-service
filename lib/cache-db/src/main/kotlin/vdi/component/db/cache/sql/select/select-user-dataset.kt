@@ -15,6 +15,7 @@ private val SQL = """
 SELECT
   vd.type_name
 , vd.type_version
+, vd.user_stable_id
 , vd.owner_id
 , vd.is_deleted
 , vd.origin
@@ -65,6 +66,7 @@ internal fun Connection.selectDatasetForUser(userID: UserID, datasetID: DatasetI
       else
         DatasetRecordImpl(
           datasetID    = datasetID,
+          userStableID = getString("user_stable_id"),
           typeName     = getDataType("type_name"),
           typeVersion  = getString("type_version"),
           ownerID      = getUserID("owner_id"),

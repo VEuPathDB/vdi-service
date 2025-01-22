@@ -75,6 +75,7 @@ types:
     additionalProperties: false
     properties:
       datasetId: common.VDI-ID
+      userStableID?: common.UserStableID
       owner: common.User-ID
       datasetType: common.DatasetTypeInfo
       visibility: common.DatasetVisibility
@@ -101,6 +102,7 @@ types:
     additionalProperties: false
     properties:
       datasetType: common.DatasetTypeInfo
+      userStableID?: common.UserStableID
       owner: common.User-ID
       isDeleted: boolean
       origin: string

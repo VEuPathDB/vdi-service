@@ -71,6 +71,7 @@ types:
     additionalProperties: false
     properties:
       datasetId: VDI-ID
+      userStableID?: UserStableID
       owner: User-ID
       datasetType: DatasetTypeInfo
       visibility: DatasetVisibility
@@ -95,6 +96,7 @@ types:
     additionalProperties: false
     properties:
       datasetType: DatasetTypeInfo
+      userStableID?: UserStableID
       owner: User-ID
       isDeleted: boolean
       origin: string
@@ -167,6 +169,9 @@ types:
       datasetId:
         displayName: Dataset ID
         type: VDI-ID
+      userStableId:
+        type: UserStableID
+        required: false
       owner:
         displayName: Owner Details
         type: DatasetOwner
@@ -263,6 +268,9 @@ types:
     type: object
     additionalProperties: false
     properties:
+      userStableId:
+        type: UserStableID
+        required: false
       datasetType:
         displayName: Dataset Type
         description: Type of the dataset that is being uploaded.
@@ -380,6 +388,9 @@ types:
       datasetId:
         displayName: Dataset ID
         type: VDI-ID
+      userStableId:
+        type: UserStableID
+        required: false
       owner:
         displayName: Owner Details
         type: DatasetOwner
@@ -633,6 +644,13 @@ types:
       - VectorBase
       - VEuPathDB
     type: string
+  UserStableID:
+    displayName: User Stable ID
+    description: User provided stable ID value.
+    type: string
+    pattern: /[\w\-]{5,96}/
+    minLength: 5
+    maxLength: 96
   DatasetOwner:
     displayName: Dataset Owner
     description: Details about the owner of a VDI dataset.

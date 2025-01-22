@@ -85,6 +85,7 @@ private fun AllDatasetsListEntry(
 ): AllDatasetsListEntry =
   AllDatasetsListEntryImpl().also {
     it.datasetId = row.datasetID.toString()
+    it.userStableID = row.userStableID
     it.owner = row.ownerID.toLong()
     it.datasetType = DatasetTypeInfo(row.typeName, row.typeVersion)
     it.visibility = DatasetVisibility(row.visibility)

@@ -3,6 +3,8 @@ package org.veupathdb.service.vdi.generated.model
 import org.veupathdb.service.vdi.util.ValidationErrors
 import vdi.component.db.app.MaxSummaryFieldLength
 
+private val userStableIDRegex = Regex("^[\\w\\-]{5,96}$")
+
 internal fun DatasetPostMeta.cleanup() {
   datasetType?.cleanup()
 
@@ -12,6 +14,9 @@ internal fun DatasetPostMeta.cleanup() {
   description = description?.takeIf { it.isNotBlank() }
     ?.trim()
   origin = origin?.trim()
+
+  userStableId = userStableId?.takeIf { it.isNotBlank() }
+    ?.trim()
 
   projects?.forEachIndexed { i, s -> projects[i] = s?.takeIf { it.isNotBlank() } ?.trim() }
 
@@ -28,6 +33,9 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
 
   if (name.isNullOrBlank())
     validationErrors.add("meta.name", "field is required")
+
+  if (userStableId?.let(userStableIDRegex::matches) == false)
+    validationErrors.add("meta.userStableId", "invalid field value, must be alphanumeric between 5-96 characters")
 
   if (summary != null) {
     if (summary.length > MaxSummaryFieldLength) validationErrors.add("meta.summary", "must be $MaxSummaryFieldLength characters or less")

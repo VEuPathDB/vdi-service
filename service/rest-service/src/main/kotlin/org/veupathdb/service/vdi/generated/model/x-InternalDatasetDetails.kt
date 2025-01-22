@@ -15,6 +15,7 @@ internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): Internal
     it.summary = record.summary
     it.status = record.importStatus.toString()
     it.visibility = DatasetVisibility(record.visibility)
+    it.userStableID = record.userStableID
 
     record.syncControl?.let { queriedSyncControl ->
       it.syncControl = SyncControlRecordImpl().also { syncControl ->

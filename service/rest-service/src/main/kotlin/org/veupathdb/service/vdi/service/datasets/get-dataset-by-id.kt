@@ -33,6 +33,7 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
 
   return DatasetDetailsImpl().also { out ->
     out.datasetId      = datasetID.toString()
+    out.userStableId   = dataset.userStableID
     out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
     out.name           = dataset.name
     out.summary        = dataset.summary

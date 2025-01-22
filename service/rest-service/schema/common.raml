@@ -44,6 +44,14 @@ types:
       - VEuPathDB
     type: string
 
+  UserStableID:
+    displayName: User Stable ID
+    description: User provided stable ID value.
+    type: string
+    minLength: 5
+    maxLength: 96
+    pattern: '/[\w\-]{5,96}/'
+
   DatasetOwner:
     displayName: Dataset Owner
     description: Details about the owner of a VDI dataset.

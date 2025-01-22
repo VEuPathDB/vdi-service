@@ -11,6 +11,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "datasetId",
+    "userStableID",
     "owner",
     "datasetType",
     "visibility",
@@ -27,6 +28,9 @@ import java.util.List;
 public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty("datasetId")
   private String datasetId;
+
+  @JsonProperty("userStableID")
+  private String userStableID;
 
   @JsonProperty("owner")
   private Long owner;
@@ -72,6 +76,16 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty("datasetId")
   public void setDatasetId(String datasetId) {
     this.datasetId = datasetId;
+  }
+
+  @JsonProperty("userStableID")
+  public String getUserStableID() {
+    return this.userStableID;
+  }
+
+  @JsonProperty("userStableID")
+  public void setUserStableID(String userStableID) {
+    this.userStableID = userStableID;
   }
 
   @JsonProperty("owner")

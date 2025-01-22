@@ -15,6 +15,12 @@ public interface DatasetListEntry {
   @JsonProperty("datasetId")
   void setDatasetId(String datasetId);
 
+  @JsonProperty("userStableId")
+  String getUserStableId();
+
+  @JsonProperty("userStableId")
+  void setUserStableId(String userStableId);
+
   @JsonProperty("owner")
   DatasetOwner getOwner();
 

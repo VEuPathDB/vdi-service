@@ -7,6 +7,7 @@ import java.time.OffsetDateTime
 
 interface Dataset {
   val datasetID: DatasetID
+  val userStableID: String?
   val typeName: DataType
   val typeVersion: String
   val ownerID: UserID

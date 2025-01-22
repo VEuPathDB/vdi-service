@@ -418,6 +418,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       // Insert a new dataset record
       it.tryInsertDataset(DatasetImpl(
         datasetID    = datasetID,
+        userStableID = meta.userStableID,
         typeName     = meta.type.name,
         typeVersion  = meta.type.version,
         ownerID      = meta.owner,

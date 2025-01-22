@@ -43,6 +43,7 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
       userID,
       datasetID,
       VDIDatasetMeta(
+        userStableID = meta.userStableID,
         type         = meta.type,
         projects     = meta.projects,
         visibility   = visibility,

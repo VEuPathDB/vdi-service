@@ -10,6 +10,7 @@ import java.time.OffsetDateTime
 
 data class AdminAllDatasetsRow(
   override val datasetID: DatasetID,
+  override val userStableID: String?,
   override val ownerID: UserID,
   override val origin: String,
   override val created: OffsetDateTime,

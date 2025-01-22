@@ -15,6 +15,12 @@ public interface InternalDatasetDetails {
   @JsonProperty("datasetType")
   void setDatasetType(DatasetTypeInfo datasetType);
 
+  @JsonProperty("userStableID")
+  String getUserStableID();
+
+  @JsonProperty("userStableID")
+  void setUserStableID(String userStableID);
+
   @JsonProperty("owner")
   Long getOwner();
 

@@ -9,6 +9,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+    "userStableId",
     "datasetType",
     "name",
     "visibility",
@@ -20,6 +21,9 @@ import java.util.List;
     "createdOn"
 })
 public class DatasetPostMetaImpl implements DatasetPostMeta {
+  @JsonProperty("userStableId")
+  private String userStableId;
+
   @JsonProperty("datasetType")
   private DatasetPostType datasetType;
 
@@ -47,9 +51,19 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("dependencies")
   private List<DatasetDependency> dependencies;
 
-
   @JsonProperty("createdOn")
+
   private OffsetDateTime createdOn;
+
+  @JsonProperty("userStableId")
+  public String getUserStableId() {
+    return this.userStableId;
+  }
+
+  @JsonProperty("userStableId")
+  public void setUserStableId(String userStableId) {
+    this.userStableId = userStableId;
+  }
 
   @JsonProperty("datasetType")
   public DatasetPostType getDatasetType() {

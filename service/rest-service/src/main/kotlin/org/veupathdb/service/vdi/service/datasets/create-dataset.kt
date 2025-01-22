@@ -18,7 +18,6 @@ import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.compression.Zip.getZipType
 import org.veupathdb.vdi.lib.common.compression.ZipType
-import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
@@ -68,6 +67,7 @@ fun createDataset(
   val (tempDirectory, uploadFile) = CacheDB().withTransaction {
     it.tryInsertDataset(DatasetImpl(
       datasetID    = datasetID,
+      userStableID = datasetMeta.userStableID,
       typeName     = datasetMeta.type.name,
       typeVersion  = datasetMeta.type.version,
       ownerID      = userID,

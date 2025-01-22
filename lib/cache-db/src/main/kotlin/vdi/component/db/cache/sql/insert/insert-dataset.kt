@@ -12,6 +12,7 @@ private const val SQL = """
 INSERT INTO
   vdi.datasets (
     dataset_id
+  , user_stable_id
   , type_name
   , type_version
   , owner_id
@@ -21,7 +22,7 @@ INSERT INTO
   , inserted
   )
 VALUES
-  (?, ?, ?, ?, ?, ?, ?, ?)
+  (?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON CONFLICT (dataset_id)
   DO NOTHING
 """
@@ -29,11 +30,12 @@ ON CONFLICT (dataset_id)
 internal fun Connection.tryInsertDatasetRecord(row: Dataset) =
   preparedUpdate(SQL) {
     setDatasetID(1, row.datasetID)
-    setDataType(2, row.typeName)
-    setString(3, row.typeVersion)
-    setUserID(4, row.ownerID)
-    setBoolean(5, row.isDeleted)
-    setString(6, row.origin)
-    setObject(7, row.created)
-    setObject(8, row.inserted)
+    setString(2, row.userStableID)
+    setDataType(3, row.typeName)
+    setString(4, row.typeVersion)
+    setUserID(5, row.ownerID)
+    setBoolean(6, row.isDeleted)
+    setString(7, row.origin)
+    setObject(8, row.created)
+    setObject(9, row.inserted)
   }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import vdi.component.modules.VDIModule
 import org.veupathdb.service.vdi.RestService
+import vdi.component.db.cache.TempPatchStableIDs
 import vdi.daemon.events.routing.EventRouter
 import vdi.daemon.pruner.PrunerModule
 import vdi.daemon.reconciler.Reconciler
@@ -38,6 +39,9 @@ object Main {
       Reconciler(abortCB = ::fatality),
       ReconciliationEventHandler(::fatality),
     )
+
+    // FIXME: remove this line after the vdi.datasets.user_stable_id column is in DB
+    TempPatchStableIDs.applyPatch()
 
     Runtime.getRuntime().addShutdownHook(Thread { shutdownModules(modules) })
 

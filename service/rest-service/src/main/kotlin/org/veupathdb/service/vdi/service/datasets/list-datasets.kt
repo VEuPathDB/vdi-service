@@ -121,6 +121,7 @@ private fun DatasetRecord.toListEntry(
   fileSummary: DatasetFileSummary,
 ) = DatasetListEntryImpl().also { out ->
   out.datasetId     = datasetID.toString()
+  out.userStableId  = userStableID
   out.owner         = DatasetOwner(owner)
   out.datasetType   = DatasetTypeInfo(this, pluginDisplayName)
   out.name          = name

@@ -18,6 +18,9 @@ dependencies {
   implementation(project(":service:lane:soft-delete"))
   implementation(project(":service:lane:update-meta"))
 
+  // FIXME: remove me after vdi.datasets.user_stable_id column is added to DB
+  implementation(project(":lib:cache-db"))
+
   implementation(libs.kt.coroutines)
   implementation(libs.container.core)
 

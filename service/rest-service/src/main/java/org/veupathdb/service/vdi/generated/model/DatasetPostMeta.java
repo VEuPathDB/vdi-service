@@ -9,6 +9,12 @@ import java.util.List;
     as = DatasetPostMetaImpl.class
 )
 public interface DatasetPostMeta {
+  @JsonProperty("userStableId")
+  String getUserStableId();
+
+  @JsonProperty("userStableId")
+  void setUserStableId(String userStableId);
+
   @JsonProperty("datasetType")
   DatasetPostType getDatasetType();
 

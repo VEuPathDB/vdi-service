@@ -11,6 +11,7 @@ import java.sql.Connection
 private const val SQL_BASE = """
 SELECT
   d.dataset_id
+, d.user_stable_id
 , d.owner_id
 , d.origin
 , d.created
@@ -60,6 +61,7 @@ internal fun Connection.selectAdminDatasetDetails(datasetID: DatasetID): AdminDa
 
       AdminDatasetDetailsRecord(
         datasetID    = getDatasetID("dataset_id"),
+        userStableID = getString("user_stable_id"),
         ownerID      = getUserID("owner_id"),
         origin       = getString("origin"),
         created      = getDateTime("created"),

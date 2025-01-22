@@ -32,6 +32,7 @@ internal fun DatasetPostRequest.validate(): ValidationErrors {
 
 internal fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
   VDIDatasetMeta(
+    userStableID = meta.userStableId,
     type         = VDIDatasetType(
       name    = DataType.of(meta.datasetType.name),
       version = meta.datasetType.version,

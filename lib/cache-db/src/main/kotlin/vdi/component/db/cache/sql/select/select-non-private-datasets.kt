@@ -10,6 +10,7 @@ import java.sql.Connection
 private const val SQL = """
 SELECT
   d.dataset_id
+, d.user_stable_id
 , d.type_name
 , d.type_version
 , d.owner_id
@@ -40,6 +41,7 @@ internal fun Connection.selectNonPrivateDatasets(): List<DatasetRecord> {
       map {
         DatasetRecordImpl(
           datasetID    = getDatasetID("dataset_id"),
+          userStableID = getString("user_stable_id"),
           typeName     = getDataType("type_name"),
           typeVersion  = getString("type_version"),
           ownerID      = getUserID("owner_id"),
