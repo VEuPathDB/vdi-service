@@ -31,6 +31,15 @@ internal inline fun Connection.preparedUpdate(sql: String, fn: PreparedStatement
     it.executeUpdate()
   }
 
+internal inline fun <T> Connection.preparedBatchUpdate(sql: String, values: Iterable<T>, fn: PreparedStatement.(T) -> Unit): IntArray =
+  prepareStatement(sql).use { ps ->
+    values.forEach {
+      ps.fn(it)
+      ps.addBatch()
+    }
+    ps.executeBatch()
+  }
+
 internal fun ResultSet.getDatasetID(column: String) = DatasetID(getString(column))
 internal fun ResultSet.getDataType(column: String) = DataType.of(getString(column))
 internal fun ResultSet.getDateTime(column: String) = getObject(column, OffsetDateTime::class.java)

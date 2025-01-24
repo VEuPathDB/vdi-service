@@ -8,6 +8,9 @@ import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetContact
+import org.veupathdb.vdi.lib.common.model.VDIDatasetHyperlink
+import org.veupathdb.vdi.lib.common.model.VDIDatasetPublication
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import vdi.component.db.app.AppDB
 import vdi.component.db.cache.model.DatasetRecord
@@ -32,25 +35,32 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, datasetID)
 
   return DatasetDetailsImpl().also { out ->
-    out.datasetId      = datasetID.toString()
-    out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
-    out.name           = dataset.name
-    out.summary        = dataset.summary
-    out.description    = dataset.description
-    out.importMessages = importMessages
-    out.origin         = dataset.origin
-    out.status         = DatasetStatusInfo(dataset.importStatus, statuses)
-    out.visibility     = DatasetVisibility(dataset.visibility)
-    out.sourceUrl      = dataset.sourceURL
-    out.projectIds     = dataset.projects.toList()
-    out.created        = dataset.created.defaultZone()
-    out.dependencies   = (metaJson?.dependencies ?: emptyList()).map {
+    out.datasetId        = datasetID.toString()
+    out.datasetType      = DatasetTypeInfo(dataset, typeDisplayName)
+    out.name             = dataset.name
+    out.shortName        = dataset.shortName
+    out.shortAttribution = dataset.shortAttribution
+    out.category         = dataset.category
+    out.summary          = dataset.summary
+    out.description      = dataset.description
+    out.importMessages   = importMessages
+    out.origin           = dataset.origin
+    out.status           = DatasetStatusInfo(dataset.importStatus, statuses)
+    out.visibility       = DatasetVisibility(dataset.visibility)
+    out.sourceUrl        = dataset.sourceURL
+    out.projectIds       = dataset.projects.toList()
+    out.created          = dataset.created.defaultZone()
+    out.dependencies     = (metaJson?.dependencies ?: emptyList()).map {
       DatasetDependencyImpl().apply {
         resourceIdentifier = it.identifier
         resourceDisplayName = it.displayName
         resourceVersion = it.version
       }
     }
+    out.publications     = (metaJson?.publications ?: emptyList()).map(VDIDatasetPublication::toExternal)
+    out.hyperlinks       = (metaJson?.hyperlinks ?: emptyList()).map(VDIDatasetHyperlink::toExternal)
+    out.contacts         = (metaJson?.contacts ?: emptyList()).map(VDIDatasetContact::toExternal)
+    out.taxonIds         = metaJson?.taxonIDs?.toList() ?: emptyList()
   }
 }
 
@@ -97,27 +107,34 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
 
   // return the dataset
   return DatasetDetailsImpl().also { out ->
-    out.datasetId      = datasetID.toString()
-    out.owner          = DatasetOwner(userDetails[dataset.ownerID] ?: throw IllegalStateException("no user details for dataset owner"))
-    out.datasetType    = DatasetTypeInfo(dataset, typeDisplayName)
-    out.name           = dataset.name
-    out.summary        = dataset.summary
-    out.description    = dataset.description
-    out.importMessages = importMessages
-    out.origin         = dataset.origin
-    out.status         = DatasetStatusInfo(dataset.importStatus, statuses)
-    out.shares         = ArrayList(shares.size)
-    out.visibility     = DatasetVisibility(dataset.visibility)
-    out.sourceUrl      = dataset.sourceURL
-    out.projectIds     = dataset.projects.toList()
-    out.created        = dataset.created.defaultZone()
-    out.dependencies   = (metaJson?.dependencies ?: emptyList()).map {
+    out.datasetId        = datasetID.toString()
+    out.owner            = DatasetOwner(userDetails[dataset.ownerID] ?: throw IllegalStateException("no user details for dataset owner"))
+    out.datasetType      = DatasetTypeInfo(dataset, typeDisplayName)
+    out.name             = dataset.name
+    out.shortName        = dataset.shortName
+    out.shortAttribution = dataset.shortAttribution
+    out.category         = dataset.category
+    out.summary          = dataset.summary
+    out.description      = dataset.description
+    out.importMessages   = importMessages
+    out.origin           = dataset.origin
+    out.status           = DatasetStatusInfo(dataset.importStatus, statuses)
+    out.shares           = ArrayList(shares.size)
+    out.visibility       = DatasetVisibility(dataset.visibility)
+    out.sourceUrl        = dataset.sourceURL
+    out.projectIds       = dataset.projects.toList()
+    out.created          = dataset.created.defaultZone()
+    out.dependencies     = (metaJson?.dependencies ?: emptyList()).map {
       DatasetDependencyImpl().apply {
         resourceIdentifier = it.identifier
         resourceDisplayName = it.displayName
         resourceVersion = it.version
       }
     }
+    out.publications     = (metaJson?.publications ?: emptyList()).map(VDIDatasetPublication::toExternal)
+    out.hyperlinks       = (metaJson?.hyperlinks ?: emptyList()).map(VDIDatasetHyperlink::toExternal)
+    out.contacts         = (metaJson?.contacts ?: emptyList()).map(VDIDatasetContact::toExternal)
+    out.taxonIds         = metaJson?.taxonIDs?.toList() ?: emptyList()
 
     shares.forEach { share ->
       if (share.offerStatus != null)

@@ -5,6 +5,9 @@ import vdi.component.db.cache.model.AdminDatasetDetailsRecord
 internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): InternalDatasetDetails =
   InternalDatasetDetailsImpl().also {
     it.name = record.name
+    it.shortName = record.shortName
+    it.shortAttribution = record.shortAttribution
+    it.category = record.category
     it.created = record.created
     it.inserted = record.inserted
     it.origin = record.origin

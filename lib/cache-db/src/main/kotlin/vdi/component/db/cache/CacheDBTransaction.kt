@@ -4,6 +4,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import vdi.component.db.cache.model.*
 import java.time.OffsetDateTime
@@ -107,10 +108,8 @@ interface CacheDBTransaction : AutoCloseable {
   /**
    * Attempts to insert dataset metadata for a target dataset, aborting the
    * insert query silently if a record already exists.
-   *
-   * @param row Dataset metadata to insert.
    */
-  fun tryInsertDatasetMeta(row: DatasetMeta)
+  fun tryInsertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
 
   /**
    * Attempts to insert dataset-to-project links for a target dataset, aborting
@@ -149,7 +148,7 @@ interface CacheDBTransaction : AutoCloseable {
 
   fun updateImportControl(datasetID: DatasetID, status: DatasetImportStatus)
 
-  fun updateDatasetMeta(row: DatasetMeta)
+  fun updateDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
 
   /**
    * Updates the sync control record for a target dataset setting the meta

@@ -19,6 +19,9 @@ SELECT
 , d.created
 , d.inserted
 , md.name
+, md.short_name
+, md.short_attribution
+, md.category
 , md.summary
 , md.description
 , md.visibility
@@ -42,21 +45,24 @@ internal fun Connection.selectDatasetsForUser(userID: UserID): List<DatasetRecor
     withResults {
       map {
         DatasetRecordImpl(
-          datasetID    = getDatasetID("dataset_id"),
-          typeName     = getDataType("type_name"),
-          typeVersion  = getString("type_version"),
-          ownerID      = getUserID("owner_id"),
-          isDeleted    = getBoolean("is_deleted"),
-          created      = getDateTime("created"),
-          importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
-          origin       = getString("origin"),
-          visibility   = getDatasetVisibility("visibility"),
-          name         = getString("name"),
-          summary      = getString("summary"),
-          description  = getString("description"),
-          sourceURL    = getString("source_url"),
-          projects     = getProjectIDList("projects"),
-          inserted     = getDateTime("inserted"),
+          datasetID        = getDatasetID("dataset_id"),
+          typeName         = getDataType("type_name"),
+          typeVersion      = getString("type_version"),
+          ownerID          = getUserID("owner_id"),
+          isDeleted        = getBoolean("is_deleted"),
+          created          = getDateTime("created"),
+          importStatus     = getImportStatus("status") ?: DatasetImportStatus.Queued,
+          origin           = getString("origin"),
+          visibility       = getDatasetVisibility("visibility"),
+          name             = getString("name"),
+          shortName        = getString("short_name"),
+          shortAttribution = getString("short_attribution"),
+          category         = getString("category"),
+          summary          = getString("summary"),
+          description      = getString("description"),
+          sourceURL        = getString("source_url"),
+          projects         = getProjectIDList("projects"),
+          inserted         = getDateTime("inserted"),
         )
       }
     }

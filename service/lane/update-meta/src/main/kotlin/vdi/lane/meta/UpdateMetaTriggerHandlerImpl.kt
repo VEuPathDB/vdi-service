@@ -14,10 +14,8 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.or
 import vdi.component.async.WorkerPool
-import vdi.component.db.app.AppDB
-import vdi.component.db.app.AppDBTransaction
+import vdi.component.db.app.*
 import vdi.component.db.app.model.*
-import vdi.component.db.app.withTransaction
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.CacheDBTransaction
 import vdi.component.db.cache.model.DatasetImpl
@@ -154,14 +152,7 @@ internal class UpdateMetaTriggerHandlerImpl(
 
     cacheDB.withTransaction { db ->
         // 1. Update meta info
-        db.updateDatasetMeta(DatasetMetaImpl(
-          datasetID   = datasetID,
-          visibility  = datasetMeta.visibility,
-          name        = datasetMeta.name,
-          summary     = datasetMeta.summary,
-          description = datasetMeta.description,
-          sourceURL   = datasetMeta.sourceURL,
-        ))
+        db.updateDatasetMeta(datasetID, datasetMeta)
 
         // 2. Update meta timestamp
         db.updateMetaSyncControl(datasetID, metaTimestamp)
@@ -226,36 +217,7 @@ internal class UpdateMetaTriggerHandlerImpl(
 
     appDB.withTransaction(projectID, ph.type) {
       try {
-        log.debug("testing for existence of dataset {}/{} in app db for project {}", userID, datasetID, projectID)
-        val record = it.selectDataset(datasetID) or {
-          log.debug("inserting dataset record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
-
-          val record = DatasetRecord(
-            datasetID   = datasetID,
-            owner       = meta.owner,
-            typeName    = meta.type.name,
-            typeVersion = meta.type.version,
-            isDeleted   = DeleteFlag.NotDeleted,
-            isPublic    = meta.visibility == VDIDatasetVisibility.Public
-          )
-
-          it.insertDataset(record)
-          it.insertDatasetVisibility(datasetID, meta.owner)
-          it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
-
-          log.debug("inserting sync control record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
-          it.insertSyncControl(VDISyncControlRecord(
-            datasetID     = datasetID,
-            sharesUpdated = OriginTimestamp,
-            dataUpdated   = OriginTimestamp,
-            metaUpdated   = OriginTimestamp,
-          ))
-
-          log.debug("inserting dataset project link for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
-          it.insertDatasetProjectLink(datasetID, projectID)
-
-          record
-        }
+        val record = it.getOrInsertDatasetRecord(userID, datasetID, projectID, meta)
 
         // If the record in the app db has an isPublic flag value different from
         // what we expect, update the app db record.
@@ -264,10 +226,26 @@ internal class UpdateMetaTriggerHandlerImpl(
         }
 
         log.debug("upserting dataset meta record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
-        it.upsertDatasetMeta(datasetID, meta.name, meta.summary, meta.description)
+        it.upsertDatasetMeta(datasetID, meta)
+
+        it.deleteDatasetContacts(datasetID)
+        if (meta.contacts.isNotEmpty())
+          it.insertDatasetContacts(datasetID, meta.contacts)
+
+        it.deleteDatasetHyperlinks(datasetID)
+        if (meta.hyperlinks.isNotEmpty())
+          it.insertDatasetHyperlinks(datasetID, meta.hyperlinks)
+
+        it.deleteDatasetContacts(datasetID)
+        if (meta.publications.isNotEmpty())
+          it.insertDatasetPublications(datasetID, meta.publications)
+
+        it.deleteDatasetTaxonIDs(datasetID)
+        if (meta.taxonIDs.isNotEmpty())
+          it.insertDatasetTaxonIDs(datasetID, meta.taxonIDs)
 
         it.selectDatasetSyncControlRecord(datasetID) or {
-          it.insertSyncControl(VDISyncControlRecord(
+          it.insertDatasetSyncControl(VDISyncControlRecord(
             datasetID     = datasetID,
             sharesUpdated = OriginTimestamp,
             dataUpdated   = OriginTimestamp,
@@ -357,6 +335,61 @@ internal class UpdateMetaTriggerHandlerImpl(
     upsertDatasetInstallMessage(message)
   }
 
+  private fun AppDBTransaction.getOrInsertDatasetRecord(
+    userID: UserID,
+    datasetID: DatasetID,
+    projectID: ProjectID,
+    meta: VDIDatasetMeta,
+  ): DatasetRecord {
+    // Return the dataset if found
+    selectDataset(datasetID)?.also { return it }
+
+    log.debug("inserting dataset record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
+
+    val record = DatasetRecord(
+      datasetID   = datasetID,
+      owner       = meta.owner,
+      typeName    = meta.type.name,
+      typeVersion = meta.type.version,
+      isDeleted   = DeleteFlag.NotDeleted,
+      isPublic    = meta.visibility == VDIDatasetVisibility.Public
+    )
+
+    // this stuff is not project specific!
+    //
+    // NOTE: We don't install meta stuff here because we will be synchronizing
+    // it immediately after this function call anyway.
+    try {
+      insertDataset(record)
+      insertDatasetVisibility(datasetID, meta.owner)
+
+      upsertInstallMetaMessage(datasetID, InstallStatus.Running)
+
+      log.debug("inserting sync control record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
+      insertDatasetSyncControl(VDISyncControlRecord(
+        datasetID     = datasetID,
+        sharesUpdated = OriginTimestamp,
+        dataUpdated   = OriginTimestamp,
+        metaUpdated   = OriginTimestamp,
+      ))
+    } catch (e: SQLException) {
+      // Race condition: someone else inserted the record before us, which
+      // should be fine.
+      if (!isUniqueConstraintViolation(e))
+        throw e
+    }
+
+    try {
+      log.debug("inserting dataset project link for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
+      insertDatasetProjectLink(datasetID, projectID)
+    } catch (e: SQLException) {
+      if (!isUniqueConstraintViolation(e))
+        throw e
+    }
+
+    return record
+  }
+
   private fun handleBadRequestResponse(
     handler: PluginHandler,
     userID: UserID,
@@ -429,14 +462,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       ))
 
       // insert metadata for the dataset
-      it.tryInsertDatasetMeta(DatasetMetaImpl(
-        datasetID   = datasetID,
-        visibility  = meta.visibility,
-        name        = meta.name,
-        summary     = meta.summary,
-        description = meta.description,
-        sourceURL   = meta.sourceURL,
-      ))
+      it.tryInsertDatasetMeta(datasetID, meta)
 
       // Insert an import control record for the dataset
       it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)

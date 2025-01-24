@@ -89,6 +89,9 @@ private fun AllDatasetsListEntry(
     it.datasetType = DatasetTypeInfo(row.typeName, row.typeVersion)
     it.visibility = DatasetVisibility(row.visibility)
     it.name = row.name
+    it.shortName = row.shortName
+    it.shortAttribution = row.shortAttribution
+    it.category = row.category
     it.summary = row.summary
     it.description = row.description
     it.sourceUrl = row.sourceURL

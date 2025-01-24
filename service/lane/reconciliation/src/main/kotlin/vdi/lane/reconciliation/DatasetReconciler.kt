@@ -500,16 +500,7 @@ internal class DatasetReconciler(
           inserted = OffsetDateTime.now(),
         ))
 
-        db.tryInsertDatasetMeta(
-          DatasetMetaImpl(
-            datasetID = datasetID,
-            visibility = meta.visibility,
-            name = meta.name,
-            summary = meta.summary,
-            description = meta.description,
-            sourceURL = meta.sourceURL,
-          )
-        )
+        db.tryInsertDatasetMeta(datasetID, meta)
 
         db.tryInsertDatasetProjects(datasetID, meta.projects)
 

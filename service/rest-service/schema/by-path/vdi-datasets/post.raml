@@ -52,6 +52,18 @@ types:
         description: User provided name for the dataset.
         type: string
         required: true
+      shortName:
+        type: string
+        required: false
+        maxLength: 300
+      shortAttribution:
+        type: string
+        required: false
+        maxLength: 300
+      category:
+        type: string
+        required: false
+        maxLength: 100
       visibility:
         displayName: Dataset Visibility
         type: common.DatasetVisibility
@@ -81,10 +93,35 @@ types:
         type: common.ProjectID[]
         required: true
         minItems: 1
+        uniqueItems: true
       dependencies:
         displayName: Dataset Dependencies
         type: common.DatasetDependency[]
         required: true
+        uniqueItems: true
+      publications:
+        displayName: Dataset Publications
+        type: common.DatasetPublication[]
+        required: false
+        uniqueItems: true
+      hyperlinks:
+        displayName: Dataset Hyperlinks
+        type: common.DatasetHyperlink[]
+        required: false
+        uniqueItems: true
+      taxonIds:
+        displayName: Dataset Taxon IDs
+        type: array
+        items:
+          type: integer
+          format: int64
+        uniqueItems: true
+        required: false
+      contacts:
+        displayName: Dataset Contacts
+        type: common.DatasetContact[]
+        required: false
+        uniqueItems: true
       createdOn:
         displayName: Creation Date
         type: datetime-only

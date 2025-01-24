@@ -18,6 +18,9 @@ SELECT
 , d.type_version
 , d.inserted
 , m.name
+, m.short_name
+, m.short_attribution
+, m.category
 , m.summary
 , m.description
 , m.source_url
@@ -59,30 +62,33 @@ internal fun Connection.selectAdminDatasetDetails(datasetID: DatasetID): AdminDa
       }
 
       AdminDatasetDetailsRecord(
-        datasetID    = getDatasetID("dataset_id"),
-        ownerID      = getUserID("owner_id"),
-        origin       = getString("origin"),
-        created      = getDateTime("created"),
-        inserted     = getDateTime("inserted"),
-        typeName     = getDataType("type_name"),
-        typeVersion  = getString("type_version"),
-        name         = getString("name"),
-        summary      = getString("summary"),
-        description  = getString("description"),
-        sourceURL    = getString("source_url"),
-        visibility   = getDatasetVisibility("visibility"),
-        projectIDs   = getProjectIDList("projects"),
-        importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
-        syncControl  = VDISyncControlRecord(
+        datasetID        = getDatasetID("dataset_id"),
+        ownerID          = getUserID("owner_id"),
+        origin           = getString("origin"),
+        created          = getDateTime("created"),
+        inserted         = getDateTime("inserted"),
+        typeName         = getDataType("type_name"),
+        typeVersion      = getString("type_version"),
+        name             = getString("name"),
+        shortName        = getString("short_name"),
+        shortAttribution = getString("short_attribution"),
+        category         = getString("short_attribution"),
+        summary          = getString("summary"),
+        description      = getString("description"),
+        sourceURL        = getString("source_url"),
+        visibility       = getDatasetVisibility("visibility"),
+        projectIDs       = getProjectIDList("projects"),
+        importStatus     = getImportStatus("status") ?: DatasetImportStatus.Queued,
+        syncControl      = VDISyncControlRecord(
           datasetID     = getDatasetID("dataset_id"),
           sharesUpdated = getDateTime("shares_update_time"),
           dataUpdated   = getDateTime("data_update_time"),
           metaUpdated   = getDateTime("meta_update_time")
         ),
-        messages     = getStringList("messages"),
-        installFiles = getStringList("install_files"),
-        uploadFiles  = getStringList("upload_files"),
-        isDeleted    = false,
+        messages         = getStringList("messages"),
+        installFiles     = getStringList("install_files"),
+        uploadFiles      = getStringList("upload_files"),
+        isDeleted        = false,
       )
     }
   }

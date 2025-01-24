@@ -6,7 +6,11 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallType
-import vdi.component.db.app.sql.*
+import vdi.component.db.app.sql.select.*
+import vdi.component.db.app.sql.select.selectAllSyncControl
+import vdi.component.db.app.sql.select.selectDataset
+import vdi.component.db.app.sql.select.selectDatasetsByInstallStatus
+import vdi.component.db.app.sql.select.selectSyncControl
 import javax.sql.DataSource
 
 internal class AppDBAccessorImpl(

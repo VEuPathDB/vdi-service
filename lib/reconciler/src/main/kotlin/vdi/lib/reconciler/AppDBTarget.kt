@@ -54,6 +54,10 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
         it.deleteDatasetProjectLinks(dataset.datasetID)
         it.deleteSyncControl(dataset.datasetID)
         it.deleteInstallMessages(dataset.datasetID)
+        it.deleteDatasetContacts(dataset.datasetID)
+        it.deleteDatasetHyperlinks(dataset.datasetID)
+        it.deleteDatasetPublications(dataset.datasetID)
+        it.deleteDatasetTaxonIDs(dataset.datasetID)
         it.deleteDatasetMeta(dataset.datasetID)
         it.deleteDataset(dataset.datasetID)
       }

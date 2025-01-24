@@ -95,9 +95,11 @@ class AdminRPC : Admin {
     if (userID == null)
       throw BadRequestException("no target user ID provided")
 
-    (entity ?: throw BadRequestException())
-      .validate()
-      .throwIfNotEmpty()
+    with(entity ?: throw BadRequestException()) {
+      cleanup()
+      validate()
+        .throwIfNotEmpty()
+    }
 
     val userID = UserID(userID)
 

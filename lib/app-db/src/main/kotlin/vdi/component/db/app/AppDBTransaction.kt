@@ -4,7 +4,7 @@ import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.model.*
 import vdi.component.db.app.model.DatasetInstallMessage
 import vdi.component.db.app.model.DatasetRecord
 import vdi.component.db.app.model.DeleteFlag
@@ -25,40 +25,42 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun deleteDataset(datasetID: DatasetID)
 
+  fun deleteDatasetContacts(datasetID: DatasetID)
+
+  fun deleteDatasetHyperlinks(datasetID: DatasetID)
+
   /**
-   * Deletes the sync control record for a target dataset.
+   * Deletes a specific dataset meta record.
+   *
+   * @param datasetID ID of the dataset whose dataset_meta record should be
+   * deleted.
+   */
+  fun deleteDatasetMeta(datasetID: DatasetID)
+
+  /**
+   * Deletes a specific project link record for a target dataset and project.
+   *
+   * @param datasetID ID of the dataset whose project link should be deleted.
+   *
+   * @param projectID ID of the project to which the link should be deleted.
+   */
+  fun deleteDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID)
+
+  /**
+   * Deletes the project link records for a target dataset.
    *
    * **WARNING**: Deleting this record will leave the dataset in a broken,
    * incomplete state.  This method should only be called as part of a full
    * delete of a dataset.
    *
-   * @param datasetID ID of the target dataset whose sync control record should
+   * @param datasetID ID of the target dataset whose project link records should
    * be deleted.
    */
-  fun deleteSyncControl(datasetID: DatasetID)
+  fun deleteDatasetProjectLinks(datasetID: DatasetID)
 
-  /**
-   * Deletes the installation messages for a target dataset.
-   *
-   * **WARNING**: Deleting this record will leave the dataset in a broken,
-   * incomplete state.  This method should only be called as part of a full
-   * delete of a dataset.
-   *
-   * @param datasetID ID of the target dataset whose install messages should be
-   * deleted.
-   */
-  fun deleteInstallMessages(datasetID: DatasetID)
+  fun deleteDatasetPublications(datasetID: DatasetID)
 
-  /**
-   * Deletes an installation message for a target dataset and install type.
-   *
-   * @param datasetID ID of the target dataset whose install message should be
-   * deleted.
-   *
-   * @param installType Install type for the install message that should be
-   * deleted.
-   */
-  fun deleteInstallMessage(datasetID: DatasetID, installType: InstallType)
+  fun deleteDatasetTaxonIDs(datasetID: DatasetID)
 
   /**
    * Deletes the dataset visibility records for a target dataset.
@@ -73,27 +75,6 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
   fun deleteDatasetVisibilities(datasetID: DatasetID)
 
   /**
-   * Deletes the project link records for a target dataset.
-   *
-   * **WARNING**: Deleting this record will leave the dataset in a broken,
-   * incomplete state.  This method should only be called as part of a full
-   * delete of a dataset.
-   *
-   * @param datasetID ID of the target dataset whose project link records should
-   * be deleted.
-   */
-  fun deleteDatasetProjectLinks(datasetID: DatasetID)
-
-  /**
-   * Deletes a specific project link record for a target dataset and project.
-   *
-   * @param datasetID ID of the dataset whose project link should be deleted.
-   *
-   * @param projectID ID of the project to which the link should be deleted.
-   */
-  fun deleteDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID)
-
-  /**
    * Deletes a specific visibility record for a target dataset and user.
    *
    * @param datasetID ID of the dataset whose visibility record should be
@@ -105,12 +86,39 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
   fun deleteDatasetVisibility(datasetID: DatasetID, userID: UserID)
 
   /**
-   * Deletes a specific dataset meta record.
+   * Deletes an installation message for a target dataset and install type.
    *
-   * @param datasetID ID of the dataset whose dataset_meta record should be
+   * @param datasetID ID of the target dataset whose install message should be
+   * deleted.
+   *
+   * @param installType Install type for the install message that should be
    * deleted.
    */
-  fun deleteDatasetMeta(datasetID: DatasetID)
+  fun deleteInstallMessage(datasetID: DatasetID, installType: InstallType)
+
+  /**
+   * Deletes the installation messages for a target dataset.
+   *
+   * **WARNING**: Deleting this record will leave the dataset in a broken,
+   * incomplete state.  This method should only be called as part of a full
+   * delete of a dataset.
+   *
+   * @param datasetID ID of the target dataset whose install messages should be
+   * deleted.
+   */
+  fun deleteInstallMessages(datasetID: DatasetID)
+
+  /**
+   * Deletes the sync control record for a target dataset.
+   *
+   * **WARNING**: Deleting this record will leave the dataset in a broken,
+   * incomplete state.  This method should only be called as part of a full
+   * delete of a dataset.
+   *
+   * @param datasetID ID of the target dataset whose sync control record should
+   * be deleted.
+   */
+  fun deleteSyncControl(datasetID: DatasetID)
 
   // endregion Delete Operations
 
@@ -123,6 +131,10 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun insertDataset(dataset: DatasetRecord)
 
+  fun insertDatasetContacts(datasetID: DatasetID, contacts: Collection<VDIDatasetContact>)
+
+  fun insertDatasetHyperlinks(datasetID: DatasetID, hyperlinks: Collection<VDIDatasetHyperlink>)
+
   /**
    * Inserts a new dataset install message record.
    *
@@ -130,7 +142,10 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun insertDatasetInstallMessage(message: DatasetInstallMessage)
 
-  fun upsertDatasetInstallMessage(message: DatasetInstallMessage)
+  /**
+   * Inserts a dataset meta record for the target dataset.
+   */
+  fun insertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
 
   /**
    * Inserts a new project link for a dataset.
@@ -154,6 +169,19 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun insertDatasetProjectLinks(datasetID: DatasetID, projectIDs: Iterable<ProjectID>)
 
+  fun insertDatasetPublications(datasetID: DatasetID, publications: Collection<VDIDatasetPublication>)
+
+  /**
+   * Inserts a sync control record with default timestamps for all fields set
+   * to [OriginTimestamp].
+   *
+   * The sync control record, once created, will need to be updated as various
+   * sync operations are completed for the target dataset.
+   */
+  fun insertDatasetSyncControl(sync: VDISyncControlRecord)
+
+  fun insertDatasetTaxonIDs(datasetID: DatasetID, taxonIDs: Collection<Long>)
+
   /**
    * Inserts a new dataset visibility record for a target dataset and user.
    *
@@ -167,30 +195,6 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    * created.
    */
   fun insertDatasetVisibility(datasetID: DatasetID, userID: UserID)
-
-  /**
-   * Inserts a sync control record with default timestamps for all fields set
-   * to [OriginTimestamp].
-   *
-   * The sync control record, once created, will need to be updated as various
-   * sync operations are completed for the target dataset.
-   *
-   * @param datasetID ID of the target dataset for which a sync control record
-   * should be created.
-   */
-  fun insertSyncControl(sync: VDISyncControlRecord)
-
-  /**
-   * Inserts a dataset meta record for the target dataset.
-   *
-   * @param datasetID ID of the dataset for which a dataset_meta record should
-   * be inserted.
-   *
-   * @param name Name of the dataset.
-   *
-   * @param description Optional description of the dataset.
-   */
-  fun insertDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?)
 
   // endregion Insert Operations
 
@@ -211,7 +215,7 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    * @param datasetID ID of the target dataset whose deleted flag should be
    * updated.
    *
-   * @param deleted The new value for the deleted flag.
+   * @param deleteFlag The new value for the deleted flag.
    */
   fun updateDatasetDeletedFlag(datasetID: DatasetID, deleteFlag: DeleteFlag)
 
@@ -259,31 +263,21 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
 
   /**
    * Updates the target dataset metadata with the new given values.
-   *
-   * @param datasetID ID of the dataset whose meta record will be updated.
-   *
-   * @param name Name of the dataset.
-   *
-   * @param description Optional description of the dataset.
    */
-  fun updateDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?)
+  fun updateDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
 
   // endregion Update Operations
 
   // region Upsert Operations
 
+  fun upsertDatasetInstallMessage(message: DatasetInstallMessage)
+
   /**
    * Upserts the target dataset metadata with the given values.  If the target
    * record already exists it will be updated, if it does not exist, it will be
    * created.
-   *
-   * @param datasetID ID of the dataset whose meta record will be upserted.
-   *
-   * @param name Name of the dataset.
-   *
-   * @param description Optional description of the dataset.
    */
-  fun upsertDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?)
+  fun upsertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
 
   // endregion Upsert Operations
 

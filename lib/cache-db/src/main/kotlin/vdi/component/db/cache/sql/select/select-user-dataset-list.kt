@@ -23,6 +23,9 @@ SELECT
 , d.created
 , d.inserted
 , md.name
+, md.short_name
+, md.short_attribution
+, md.category
 , md.summary
 , md.description
 , md.visibility
@@ -134,21 +137,24 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
     ps.withResults {
       map {
         DatasetRecordImpl(
-          datasetID    = it.getDatasetID("dataset_id"),
-          typeName     = it.getDataType("type_name"),
-          typeVersion  = it.getString("type_version"),
-          ownerID      = it.getUserID("owner_id"),
-          isDeleted    = it.getBoolean("is_deleted"),
-          created      = it.getDateTime("created"),
-          importStatus = it.getImportStatus("status") ?: DatasetImportStatus.Queued,
-          visibility   = it.getDatasetVisibility("visibility"),
-          origin       = it.getString("origin"),
-          name         = it.getString("name"),
-          summary      = it.getString("summary"),
-          description  = it.getString("description"),
-          sourceURL    = it.getString("source_url"),
-          projects     = it.getProjectIDList("projects"),
-          inserted     = it.getDateTime("inserted"),
+          datasetID        = it.getDatasetID("dataset_id"),
+          typeName         = it.getDataType("type_name"),
+          typeVersion      = it.getString("type_version"),
+          ownerID          = it.getUserID("owner_id"),
+          isDeleted        = it.getBoolean("is_deleted"),
+          created          = it.getDateTime("created"),
+          importStatus     = it.getImportStatus("status") ?: DatasetImportStatus.Queued,
+          visibility       = it.getDatasetVisibility("visibility"),
+          origin           = it.getString("origin"),
+          name             = it.getString("name"),
+          shortName        = getString("short_name"),
+          shortAttribution = getString("short_attribution"),
+          category         = getString("category"),
+          summary          = it.getString("summary"),
+          description      = it.getString("description"),
+          sourceURL        = it.getString("source_url"),
+          projects         = it.getProjectIDList("projects"),
+          inserted         = it.getDateTime("inserted"),
         )
       }
     }

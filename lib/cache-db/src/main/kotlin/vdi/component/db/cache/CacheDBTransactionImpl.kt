@@ -5,6 +5,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import vdi.component.db.cache.model.*
 import vdi.component.db.cache.sql.delete.*
@@ -116,9 +117,9 @@ internal class CacheDBTransactionImpl(private val connection: Connection) : Cach
       log.debug("inserted dataset upload files for dataset {}", datasetID)
   }
 
-  override fun tryInsertDatasetMeta(row: DatasetMeta) {
-    if (con.tryInsertDatasetMeta(row) > 0)
-      log.debug("inserted metadata for dataset {}", row.datasetID)
+  override fun tryInsertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
+    if (con.tryInsertDatasetMeta(datasetID, meta) > 0)
+      log.debug("inserted metadata for dataset {}", datasetID)
   }
 
   override fun tryInsertDatasetProjects(datasetID: DatasetID, projects: Collection<ProjectID>) {
@@ -148,9 +149,9 @@ internal class CacheDBTransactionImpl(private val connection: Connection) : Cach
     con.updateDatasetImportStatus(datasetID, status)
   }
 
-  override fun updateDatasetMeta(row: DatasetMeta) {
-    log.debug("updating metadata for dataset {}", row.datasetID)
-    con.updateDatasetMeta(row.datasetID, row.visibility, row.name, row.summary, row.description)
+  override fun updateDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
+    log.debug("updating metadata for dataset {}", datasetID)
+    con.updateDatasetMeta(datasetID, meta)
   }
 
   override fun updateMetaSyncControl(datasetID: DatasetID, timestamp: OffsetDateTime) {

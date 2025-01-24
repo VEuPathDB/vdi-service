@@ -14,6 +14,9 @@ import java.util.List;
     "owner",
     "datasetType",
     "name",
+    "shortName",
+    "shortAttribution",
+    "category",
     "summary",
     "description",
     "sourceUrl",
@@ -24,7 +27,11 @@ import java.util.List;
     "status",
     "shares",
     "created",
-    "dependencies"
+    "dependencies",
+    "publications",
+    "hyperlinks",
+    "taxonIds",
+    "contacts"
 })
 public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("datasetId")
@@ -38,6 +45,15 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty("name")
   private String name;
+
+  @JsonProperty("shortName")
+  private String shortName;
+
+  @JsonProperty("shortAttribution")
+  private String shortAttribution;
+
+  @JsonProperty("category")
+  private String category;
 
   @JsonProperty("summary")
   private String summary;
@@ -77,6 +93,18 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("dependencies")
   private List<DatasetDependency> dependencies;
 
+  @JsonProperty("publications")
+  private List<DatasetPublication> publications;
+
+  @JsonProperty("hyperlinks")
+  private List<DatasetHyperlink> hyperlinks;
+
+  @JsonProperty("taxonIds")
+  private List<Long> taxonIds;
+
+  @JsonProperty("contacts")
+  private List<DatasetContact> contacts;
+
   @JsonProperty("datasetId")
   public String getDatasetId() {
     return this.datasetId;
@@ -115,6 +143,36 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  @JsonProperty("shortName")
+  public String getShortName() {
+    return this.shortName;
+  }
+
+  @JsonProperty("shortName")
+  public void setShortName(String shortName) {
+    this.shortName = shortName;
+  }
+
+  @JsonProperty("shortAttribution")
+  public String getShortAttribution() {
+    return this.shortAttribution;
+  }
+
+  @JsonProperty("shortAttribution")
+  public void setShortAttribution(String shortAttribution) {
+    this.shortAttribution = shortAttribution;
+  }
+
+  @JsonProperty("category")
+  public String getCategory() {
+    return this.category;
+  }
+
+  @JsonProperty("category")
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   @JsonProperty("summary")
@@ -235,5 +293,45 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("dependencies")
   public void setDependencies(List<DatasetDependency> dependencies) {
     this.dependencies = dependencies;
+  }
+
+  @JsonProperty("publications")
+  public List<DatasetPublication> getPublications() {
+    return this.publications;
+  }
+
+  @JsonProperty("publications")
+  public void setPublications(List<DatasetPublication> publications) {
+    this.publications = publications;
+  }
+
+  @JsonProperty("hyperlinks")
+  public List<DatasetHyperlink> getHyperlinks() {
+    return this.hyperlinks;
+  }
+
+  @JsonProperty("hyperlinks")
+  public void setHyperlinks(List<DatasetHyperlink> hyperlinks) {
+    this.hyperlinks = hyperlinks;
+  }
+
+  @JsonProperty("taxonIds")
+  public List<Long> getTaxonIds() {
+    return this.taxonIds;
+  }
+
+  @JsonProperty("taxonIds")
+  public void setTaxonIds(List<Long> taxonIds) {
+    this.taxonIds = taxonIds;
+  }
+
+  @JsonProperty("contacts")
+  public List<DatasetContact> getContacts() {
+    return this.contacts;
+  }
+
+  @JsonProperty("contacts")
+  public void setContacts(List<DatasetContact> contacts) {
+    this.contacts = contacts;
   }
 }

@@ -1,19 +1,52 @@
 package org.veupathdb.service.vdi.generated.model
 
 import org.veupathdb.service.vdi.util.ValidationErrors
-import vdi.component.db.app.MaxSummaryFieldLength
+import vdi.component.db.app.DatasetMetaMaxCategoryLength
+import vdi.component.db.app.DatasetMetaMaxShortAttributionLength
+import vdi.component.db.app.DatasetMetaMaxShortNameLength
+import vdi.component.db.app.DatasetMetaMaxSummaryFieldLength
 
 internal fun DatasetPostMeta.cleanup() {
   datasetType?.cleanup()
 
   name = name?.trim()
+
+  shortName = shortName?.takeIf { it.isNotBlank() }
+    ?.trim()
+
+  shortAttribution = shortAttribution?.takeIf { it.isNotBlank() }
+    ?.trim()
+
+  category = category?.takeIf { it.isNotBlank() }
+    ?.trim()
+
   summary = summary?.takeIf { it.isNotBlank() }
     ?.trim()
+
   description = description?.takeIf { it.isNotBlank() }
     ?.trim()
+
   origin = origin?.trim()
 
   projects?.forEachIndexed { i, s -> projects[i] = s?.takeIf { it.isNotBlank() } ?.trim() }
+
+  if (publications.isNullOrEmpty())
+    publications = emptyList()
+  else
+    publications.forEach { it?.cleanup() }
+
+  if (hyperlinks.isNullOrEmpty())
+    hyperlinks = emptyList()
+  else
+    hyperlinks.forEach { it?.cleanup() }
+
+  if (contacts.isNullOrEmpty())
+    contacts = emptyList()
+  else
+    contacts.forEach { it?.cleanup() }
+
+  if (taxonIds.isNullOrEmpty())
+    taxonIds = emptyList()
 
   dependencies?.forEach {
     it.resourceVersion = it.resourceVersion?.takeIf { it.isNotBlank() } ?.trim()
@@ -29,9 +62,15 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
   if (name.isNullOrBlank())
     validationErrors.add("meta.name", "field is required")
 
+  shortName?.checkLength("meta.shortName", DatasetMetaMaxShortNameLength, validationErrors)
+  shortAttribution?.checkLength("meta.shortAttribution", DatasetMetaMaxShortAttributionLength, validationErrors)
+  category?.checkLength("meta.category", DatasetMetaMaxCategoryLength, validationErrors)
+
   if (summary != null) {
-    if (summary.length > MaxSummaryFieldLength) validationErrors.add("meta.summary", "must be $MaxSummaryFieldLength characters or less")
-    if (summary.isBlank()) summary = null
+    if (summary.length > DatasetMetaMaxSummaryFieldLength)
+      validationErrors.add("meta.summary", "must be $DatasetMetaMaxSummaryFieldLength characters or less")
+    if (summary.isBlank())
+      summary = null
   }
 
   if (description != null && description.isBlank())
@@ -47,4 +86,9 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
       if (it.isNullOrBlank())
         validationErrors.add("meta.projects[$i]", "must not be null or blank")
     }
+
+  publications.forEachIndexed { i, pub -> pub.validate(i, validationErrors) }
+  hyperlinks.forEachIndexed { i, link -> link.validate(i, validationErrors) }
+  contacts.forEachIndexed { i, con -> con.validate(i, validationErrors) }
+  taxonIds.forEachIndexed { i, l -> if (l == null) validationErrors.add("meta.taxonIds[$i]", "entries must not be null") }
 }
