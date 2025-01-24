@@ -1,2 +1,5 @@
 *.html linguist-generated=true
+gradlew linguist-generated=true
+gradlew.bat linguist-generated=true
+
 modules/rest-service/schema/library.raml linguist-generated=true
