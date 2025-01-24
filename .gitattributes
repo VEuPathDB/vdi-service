@@ -2,4 +2,5 @@
 gradlew linguist-generated=true
 gradlew.bat linguist-generated=true
 
+service/rest-service/src/main/java/org/veupathdb/service/vdi/generated/model/* linguist-generated=true
 modules/rest-service/schema/library.raml linguist-generated=true
