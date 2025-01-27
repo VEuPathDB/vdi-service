@@ -257,5 +257,4 @@ class AppDBTransactionImpl(
 
   override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
     connection.selectDatasetsByInstallStatus(schema, installType, installStatus, project)
-
 }

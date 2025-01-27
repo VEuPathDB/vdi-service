@@ -72,7 +72,7 @@ internal fun Connection.selectAdminDatasetDetails(datasetID: DatasetID): AdminDa
         name             = getString("name"),
         shortName        = getString("short_name"),
         shortAttribution = getString("short_attribution"),
-        category         = getString("short_attribution"),
+        category         = getString("category"),
         summary          = getString("summary"),
         description      = getString("description"),
         sourceURL        = getString("source_url"),

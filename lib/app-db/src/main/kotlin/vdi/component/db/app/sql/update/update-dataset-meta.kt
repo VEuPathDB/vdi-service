@@ -11,8 +11,7 @@ private fun sql(schema: String) =
 // language=oracle
 """
 UPDATE
---  ${schema}.dataset_meta
-  vdi_control_dev_n.dataset_meta
+  ${schema}.dataset_meta
 SET
   name = ?              -- 1
 , short_name = ?
