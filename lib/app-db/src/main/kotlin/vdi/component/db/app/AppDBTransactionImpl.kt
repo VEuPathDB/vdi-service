@@ -159,16 +159,6 @@ class AppDBTransactionImpl(
     connection.updateDatasetDeletedFlag(schema, datasetID, deleteFlag)
   }
 
-  override fun updateDatasetInstallMessage(message: DatasetInstallMessage) {
-    log.debug("updating dataset install message for dataset {}, install type {}", message.datasetID, message.installType)
-    connection.updateDatasetInstallMessage(schema, message)
-  }
-
-  override fun updateDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
-    log.debug("updating dataset meta record for dataset {}", datasetID)
-    connection.updateDatasetMeta(schema, datasetID, meta)
-  }
-
   override fun updateSyncControlDataTimestamp(datasetID: DatasetID, timestamp: OffsetDateTime) {
     log.debug("updating dataset sync control data timestamp for dataset {} to {}", datasetID, timestamp)
     connection.updateSyncControlDataTimestamp(schema, datasetID, timestamp)
@@ -182,6 +172,16 @@ class AppDBTransactionImpl(
   override fun updateSyncControlSharesTimestamp(datasetID: DatasetID, timestamp: OffsetDateTime) {
     log.debug("updating dataset sync control shares timestamp for dataset {} to {}", datasetID, timestamp)
     connection.updateSyncControlSharesTimestamp(schema, datasetID, timestamp)
+  }
+
+  override fun updateDatasetInstallMessage(message: DatasetInstallMessage) {
+    log.debug("updating dataset install message for dataset {}, install type {}", message.datasetID, message.installType)
+    connection.updateDatasetInstallMessage(schema, message)
+  }
+
+  override fun updateDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
+    log.debug("updating dataset meta record for dataset {}", datasetID)
+    connection.updateDatasetMeta(schema, datasetID, meta)
   }
 
   override fun upsertDatasetInstallMessage(message: DatasetInstallMessage) {
