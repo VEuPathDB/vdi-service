@@ -114,11 +114,6 @@ class AppDBTransactionImpl(
     connection.insertDatasetInstallMessage(schema, message)
   }
 
-  override fun insertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
-    log.debug("inserting dataset meta record for dataset {}", datasetID)
-    connection.insertDatasetMeta(schema, datasetID, meta)
-  }
-
   override fun insertDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID) {
     log.debug("inserting dataset project link for dataset {}, project {}", datasetID, projectID)
     connection.insertDatasetProjectLink(schema, datasetID, projectID)
@@ -139,6 +134,11 @@ class AppDBTransactionImpl(
     connection.insertDatasetSyncControl(schema, sync)
   }
 
+  override fun insertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
+    log.debug("inserting dataset meta record for dataset {}", datasetID)
+    connection.insertDatasetMeta(schema, datasetID, meta)
+  }
+
   override fun insertDatasetPublications(datasetID: DatasetID, publications: Collection<VDIDatasetPublication>) {
     log.debug("inserting {} publication records for dataset {}", publications.size, datasetID)
     connection.insertDatasetPublications(schema, datasetID, publications)
@@ -148,8 +148,6 @@ class AppDBTransactionImpl(
     log.debug("inserting {} taxon ID records for dataset {}", taxonIDs.size, datasetID)
     connection.insertDatasetTaxonIDs(schema, datasetID, taxonIDs)
   }
-
-  // region Update
 
   override fun updateDataset(dataset: DatasetRecord) {
     log.debug("updating dataset record for dataset {}", dataset.datasetID)
@@ -186,10 +184,6 @@ class AppDBTransactionImpl(
     connection.updateSyncControlSharesTimestamp(schema, datasetID, timestamp)
   }
 
-  // endregion Update
-
-  // region Upsert
-
   override fun upsertDatasetInstallMessage(message: DatasetInstallMessage) {
     log.debug("upserting dataset install message for dataset {}, install type {}", message.datasetID, message.installType)
     if (platform === AppDBPlatform.Postgres) {
@@ -224,8 +218,6 @@ class AppDBTransactionImpl(
     }
   }
 
-  // endregion Upsert
-
   override fun rollback() {
     connection.rollback()
   }
@@ -237,8 +229,6 @@ class AppDBTransactionImpl(
   override fun close() {
     connection.close()
   }
-
-  // region Select
 
   override fun selectDataset(datasetID: DatasetID) = connection.selectDataset(schema, datasetID)
 
@@ -267,7 +257,5 @@ class AppDBTransactionImpl(
 
   override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
     connection.selectDatasetsByInstallStatus(schema, installType, installStatus, project)
-
-  // endregion Select
 
 }
