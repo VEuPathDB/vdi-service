@@ -65,21 +65,16 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
   fun deleteInstallMessage(datasetID: DatasetID, installType: InstallType)
 
   /**
-   * Deletes a specific dataset meta record.
+   * Deletes the dataset visibility records for a target dataset.
    *
-   * @param datasetID ID of the dataset whose dataset_meta record should be
-   * deleted.
+   * **WARNING**: Deleting this record will leave the dataset in a broken,
+   * incomplete state.  This method should only be called as part of a full
+   * delete of a dataset.
+   *
+   * @param datasetID ID of the target dataset whose visibility records should
+   * be deleted.
    */
-  fun deleteDatasetMeta(datasetID: DatasetID)
-
-  /**
-   * Deletes a specific project link record for a target dataset and project.
-   *
-   * @param datasetID ID of the dataset whose project link should be deleted.
-   *
-   * @param projectID ID of the project to which the link should be deleted.
-   */
-  fun deleteDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID)
+  fun deleteDatasetVisibilities(datasetID: DatasetID)
 
   /**
    * Deletes the project link records for a target dataset.
@@ -93,21 +88,18 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun deleteDatasetProjectLinks(datasetID: DatasetID)
 
+  /**
+   * Deletes a specific project link record for a target dataset and project.
+   *
+   * @param datasetID ID of the dataset whose project link should be deleted.
+   *
+   * @param projectID ID of the project to which the link should be deleted.
+   */
+  fun deleteDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID)
+
   fun deleteDatasetPublications(datasetID: DatasetID)
 
   fun deleteDatasetTaxonIDs(datasetID: DatasetID)
-
-  /**
-   * Deletes the dataset visibility records for a target dataset.
-   *
-   * **WARNING**: Deleting this record will leave the dataset in a broken,
-   * incomplete state.  This method should only be called as part of a full
-   * delete of a dataset.
-   *
-   * @param datasetID ID of the target dataset whose visibility records should
-   * be deleted.
-   */
-  fun deleteDatasetVisibilities(datasetID: DatasetID)
 
   /**
    * Deletes a specific visibility record for a target dataset and user.
@@ -119,6 +111,14 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    * be deleted.
    */
   fun deleteDatasetVisibility(datasetID: DatasetID, userID: UserID)
+
+  /**
+   * Deletes a specific dataset meta record.
+   *
+   * @param datasetID ID of the dataset whose dataset_meta record should be
+   * deleted.
+   */
+  fun deleteDatasetMeta(datasetID: DatasetID)
 
   // endregion Delete Operations
 
