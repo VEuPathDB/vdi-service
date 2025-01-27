@@ -114,6 +114,22 @@ class AppDBTransactionImpl(
     connection.insertDatasetInstallMessage(schema, message)
   }
 
+  override fun upsertDatasetInstallMessage(message: DatasetInstallMessage) {
+    log.debug("upserting dataset install message for dataset {}, install type {}", message.datasetID, message.installType)
+    if (platform === AppDBPlatform.Postgres) {
+      connection.upsertDatasetInstallMessage(schema, message)
+    } else {
+      try {
+        insertDatasetInstallMessage(message)
+      } catch (e: SQLException) {
+        if (e.errorCode == UniqueConstraintViolation)
+          updateDatasetInstallMessage(message)
+        else
+          throw e
+      }
+    }
+  }
+
   override fun insertDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID) {
     log.debug("inserting dataset project link for dataset {}, project {}", datasetID, projectID)
     connection.insertDatasetProjectLink(schema, datasetID, projectID)
@@ -137,6 +153,24 @@ class AppDBTransactionImpl(
   override fun insertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.debug("inserting dataset meta record for dataset {}", datasetID)
     connection.insertDatasetMeta(schema, datasetID, meta)
+  }
+
+  override fun upsertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
+    log.debug("upserting dataset meta record for dataset {}", datasetID)
+    if (platform === AppDBPlatform.Postgres) {
+      connection.upsertDatasetMeta(schema, datasetID, meta)
+    } else {
+      try {
+        insertDatasetMeta(datasetID, meta)
+      } catch (e: SQLException) {
+        if (e.errorCode == 1) {
+          log.debug("dataset meta record already exists for dataset {}", datasetID)
+          updateDatasetMeta(datasetID, meta)
+        } else {
+          throw e
+        }
+      }
+    }
   }
 
   override fun insertDatasetPublications(datasetID: DatasetID, publications: Collection<VDIDatasetPublication>) {
@@ -182,40 +216,6 @@ class AppDBTransactionImpl(
   override fun updateDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.debug("updating dataset meta record for dataset {}", datasetID)
     connection.updateDatasetMeta(schema, datasetID, meta)
-  }
-
-  override fun upsertDatasetInstallMessage(message: DatasetInstallMessage) {
-    log.debug("upserting dataset install message for dataset {}, install type {}", message.datasetID, message.installType)
-    if (platform === AppDBPlatform.Postgres) {
-      connection.upsertDatasetInstallMessage(schema, message)
-    } else {
-      try {
-        insertDatasetInstallMessage(message)
-      } catch (e: SQLException) {
-        if (e.errorCode == UniqueConstraintViolation)
-          updateDatasetInstallMessage(message)
-        else
-          throw e
-      }
-    }
-  }
-
-  override fun upsertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
-    log.debug("upserting dataset meta record for dataset {}", datasetID)
-    if (platform === AppDBPlatform.Postgres) {
-      connection.upsertDatasetMeta(schema, datasetID, meta)
-    } else {
-      try {
-        insertDatasetMeta(datasetID, meta)
-      } catch (e: SQLException) {
-        if (e.errorCode == 1) {
-          log.debug("dataset meta record already exists for dataset {}", datasetID)
-          updateDatasetMeta(datasetID, meta)
-        } else {
-          throw e
-        }
-      }
-    }
   }
 
   override fun rollback() {
