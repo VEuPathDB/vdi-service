@@ -50,7 +50,7 @@ internal object AppDBImpl : AppDB {
 
   override fun accessor(key: ProjectID, dataType: DataType): AppDBAccessor? =
     AppDatabaseRegistry[key, dataType]
-      ?.let { AppDBAccessorImpl(key, it.ctlSchema, it.source) }
+      ?.let { AppDBAccessorImpl(key, it.ctlSchema, it.source, it.platform) }
 
   override fun transaction(key: ProjectID, dataType: DataType): AppDBTransaction? =
     AppDatabaseRegistry[key, dataType]

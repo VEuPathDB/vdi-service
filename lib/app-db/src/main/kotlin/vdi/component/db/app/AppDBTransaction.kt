@@ -30,6 +30,41 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
   fun deleteDatasetHyperlinks(datasetID: DatasetID)
 
   /**
+   * Deletes the sync control record for a target dataset.
+   *
+   * **WARNING**: Deleting this record will leave the dataset in a broken,
+   * incomplete state.  This method should only be called as part of a full
+   * delete of a dataset.
+   *
+   * @param datasetID ID of the target dataset whose sync control record should
+   * be deleted.
+   */
+  fun deleteSyncControl(datasetID: DatasetID)
+
+  /**
+   * Deletes the installation messages for a target dataset.
+   *
+   * **WARNING**: Deleting this record will leave the dataset in a broken,
+   * incomplete state.  This method should only be called as part of a full
+   * delete of a dataset.
+   *
+   * @param datasetID ID of the target dataset whose install messages should be
+   * deleted.
+   */
+  fun deleteInstallMessages(datasetID: DatasetID)
+
+  /**
+   * Deletes an installation message for a target dataset and install type.
+   *
+   * @param datasetID ID of the target dataset whose install message should be
+   * deleted.
+   *
+   * @param installType Install type for the install message that should be
+   * deleted.
+   */
+  fun deleteInstallMessage(datasetID: DatasetID, installType: InstallType)
+
+  /**
    * Deletes a specific dataset meta record.
    *
    * @param datasetID ID of the dataset whose dataset_meta record should be
@@ -84,41 +119,6 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    * be deleted.
    */
   fun deleteDatasetVisibility(datasetID: DatasetID, userID: UserID)
-
-  /**
-   * Deletes an installation message for a target dataset and install type.
-   *
-   * @param datasetID ID of the target dataset whose install message should be
-   * deleted.
-   *
-   * @param installType Install type for the install message that should be
-   * deleted.
-   */
-  fun deleteInstallMessage(datasetID: DatasetID, installType: InstallType)
-
-  /**
-   * Deletes the installation messages for a target dataset.
-   *
-   * **WARNING**: Deleting this record will leave the dataset in a broken,
-   * incomplete state.  This method should only be called as part of a full
-   * delete of a dataset.
-   *
-   * @param datasetID ID of the target dataset whose install messages should be
-   * deleted.
-   */
-  fun deleteInstallMessages(datasetID: DatasetID)
-
-  /**
-   * Deletes the sync control record for a target dataset.
-   *
-   * **WARNING**: Deleting this record will leave the dataset in a broken,
-   * incomplete state.  This method should only be called as part of a full
-   * delete of a dataset.
-   *
-   * @param datasetID ID of the target dataset whose sync control record should
-   * be deleted.
-   */
-  fun deleteSyncControl(datasetID: DatasetID)
 
   // endregion Delete Operations
 

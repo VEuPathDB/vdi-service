@@ -1,26 +1,19 @@
 package vdi.component.db.app
 
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallType
 import vdi.component.db.app.sql.select.*
-import vdi.component.db.app.sql.select.selectAllSyncControl
-import vdi.component.db.app.sql.select.selectDataset
-import vdi.component.db.app.sql.select.selectDatasetsByInstallStatus
-import vdi.component.db.app.sql.select.selectSyncControl
 import javax.sql.DataSource
 
 internal class AppDBAccessorImpl(
   override val project: ProjectID,
   private val schema: String,
-  private val dataSource: DataSource
+  private val dataSource: DataSource,
+  override val platform: AppDBPlatform,
 ) : AppDBAccessor {
-
-  private val log = LoggerFactory.getLogger(javaClass)
-
   private inline val con
     get() = dataSource.connection
 
