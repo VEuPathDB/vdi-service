@@ -29,11 +29,29 @@ class AppDBTransactionImpl(
     connection.autoCommit = false
   }
 
-  // region Delete
-
   override fun deleteDataset(datasetID: DatasetID) {
     log.debug("deleting dataset record for dataset {}", datasetID)
     connection.deleteDataset(schema, datasetID)
+  }
+
+  override fun deleteSyncControl(datasetID: DatasetID) {
+    log.debug("deleting sync control record for dataset {}", datasetID)
+    connection.deleteSyncControl(schema, datasetID)
+  }
+
+  override fun deleteInstallMessage(datasetID: DatasetID, installType: InstallType) {
+    log.debug("deleting install message for dataset {} and install type {}", datasetID, installType)
+    connection.deleteInstallMessage(schema, datasetID, installType)
+  }
+
+  override fun deleteInstallMessages(datasetID: DatasetID) {
+    log.debug("deleting all install messages for dataset {}", datasetID)
+    connection.deleteInstallMessages(schema, datasetID)
+  }
+
+  override fun deleteDatasetVisibility(datasetID: DatasetID, userID: UserID) {
+    log.debug("deleting dataset visibility record for dataset {} and user {}", datasetID, userID)
+    connection.deleteDatasetVisibility(schema, datasetID, userID)
   }
 
   override fun deleteDatasetContacts(datasetID: DatasetID) {
@@ -75,28 +93,6 @@ class AppDBTransactionImpl(
     log.debug("deleting all dataset visibility records for dataset {}", datasetID)
     connection.deleteDatasetVisibilities(schema, datasetID)
   }
-
-  override fun deleteDatasetVisibility(datasetID: DatasetID, userID: UserID) {
-    log.debug("deleting dataset visibility record for dataset {} and user {}", datasetID, userID)
-    connection.deleteDatasetVisibility(schema, datasetID, userID)
-  }
-
-  override fun deleteInstallMessage(datasetID: DatasetID, installType: InstallType) {
-    log.debug("deleting install message for dataset {} and install type {}", datasetID, installType)
-    connection.deleteInstallMessage(schema, datasetID, installType)
-  }
-
-  override fun deleteInstallMessages(datasetID: DatasetID) {
-    log.debug("deleting all install messages for dataset {}", datasetID)
-    connection.deleteInstallMessages(schema, datasetID)
-  }
-
-  override fun deleteSyncControl(datasetID: DatasetID) {
-    log.debug("deleting sync control record for dataset {}", datasetID)
-    connection.deleteSyncControl(schema, datasetID)
-  }
-
-  // endregion Delete
 
   // region Insert
 
