@@ -54,6 +54,11 @@ class AppDBTransactionImpl(
     connection.deleteDatasetVisibility(schema, datasetID, userID)
   }
 
+  override fun deleteDatasetVisibilities(datasetID: DatasetID) {
+    log.debug("deleting all dataset visibility records for dataset {}", datasetID)
+    connection.deleteDatasetVisibilities(schema, datasetID)
+  }
+
   override fun deleteDatasetContacts(datasetID: DatasetID) {
     log.debug("deleting dataset contact records for dataset {}", datasetID)
     connection.deleteDatasetContacts(schema, datasetID)
@@ -62,11 +67,6 @@ class AppDBTransactionImpl(
   override fun deleteDatasetHyperlinks(datasetID: DatasetID) {
     log.debug("deleting dataset hyperlink records for dataset {}", datasetID)
     connection.deleteDatasetHyperlinks(schema, datasetID)
-  }
-
-  override fun deleteDatasetMeta(datasetID: DatasetID) {
-    log.debug("deleting dataset meta for dataset {}", datasetID)
-    connection.deleteDatasetMeta(schema, datasetID)
   }
 
   override fun deleteDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID) {
@@ -79,6 +79,11 @@ class AppDBTransactionImpl(
     connection.deleteDatasetProjectLinks(schema, datasetID)
   }
 
+  override fun deleteDatasetMeta(datasetID: DatasetID) {
+    log.debug("deleting dataset meta for dataset {}", datasetID)
+    connection.deleteDatasetMeta(schema, datasetID)
+  }
+
   override fun deleteDatasetPublications(datasetID: DatasetID) {
     log.debug("deleting dataset publication records for dataset {}", datasetID)
     connection.deleteDatasetPublications(schema, datasetID)
@@ -88,13 +93,6 @@ class AppDBTransactionImpl(
     log.debug("deleting dataset taxon id records for dataset {}", datasetID)
     connection.deleteDatasetTaxonIDs(schema, datasetID)
   }
-
-  override fun deleteDatasetVisibilities(datasetID: DatasetID) {
-    log.debug("deleting all dataset visibility records for dataset {}", datasetID)
-    connection.deleteDatasetVisibilities(schema, datasetID)
-  }
-
-  // region Insert
 
   override fun insertDataset(dataset: DatasetRecord) {
     log.debug("inserting dataset record for dataset {}", dataset.datasetID)
@@ -131,9 +129,9 @@ class AppDBTransactionImpl(
     connection.insertDatasetProjectLinks(schema, datasetID, projectIDs)
   }
 
-  override fun insertDatasetPublications(datasetID: DatasetID, publications: Collection<VDIDatasetPublication>) {
-    log.debug("inserting {} publication records for dataset {}", publications.size, datasetID)
-    connection.insertDatasetPublications(schema, datasetID, publications)
+  override fun insertDatasetVisibility(datasetID: DatasetID, userID: UserID) {
+    log.debug("inserting dataset visibility record for dataset {}, user {}", datasetID, userID)
+    connection.insertDatasetVisibility(schema, datasetID, userID)
   }
 
   override fun insertDatasetSyncControl(sync: VDISyncControlRecord) {
@@ -141,49 +139,15 @@ class AppDBTransactionImpl(
     connection.insertDatasetSyncControl(schema, sync)
   }
 
+  override fun insertDatasetPublications(datasetID: DatasetID, publications: Collection<VDIDatasetPublication>) {
+    log.debug("inserting {} publication records for dataset {}", publications.size, datasetID)
+    connection.insertDatasetPublications(schema, datasetID, publications)
+  }
+
   override fun insertDatasetTaxonIDs(datasetID: DatasetID, taxonIDs: Collection<Long>) {
     log.debug("inserting {} taxon ID records for dataset {}", taxonIDs.size, datasetID)
     connection.insertDatasetTaxonIDs(schema, datasetID, taxonIDs)
   }
-
-  override fun insertDatasetVisibility(datasetID: DatasetID, userID: UserID) {
-    log.debug("inserting dataset visibility record for dataset {}, user {}", datasetID, userID)
-    connection.insertDatasetVisibility(schema, datasetID, userID)
-  }
-
-  // endregion Insert
-
-  // region Select
-
-  override fun selectDataset(datasetID: DatasetID) = connection.selectDataset(schema, datasetID)
-
-  override fun selectDatasetInstallMessage(datasetID: DatasetID, installType: InstallType) =
-    connection.selectDatasetInstallMessage(schema, datasetID, installType)
-
-  override fun selectDatasetInstallMessages(datasetID: DatasetID) =
-    connection.selectDatasetInstallMessages(schema, datasetID)
-
-  override fun selectDatasetSyncControlRecord(datasetID: DatasetID) =
-    connection.selectSyncControl(schema, datasetID)
-
-  override fun selectDatasetVisibilityRecords(datasetID: DatasetID) =
-    connection.selectDatasetVisibilityRecords(schema, datasetID)
-
-  override fun selectDatasetProjectLinks(datasetID: DatasetID) =
-    connection.selectDatasetProjectLinks(schema, datasetID)
-
-  override fun streamAllSyncControlRecords() = connection.selectAllSyncControl(schema)
-
-  override fun testDatasetVisibilityExists(datasetID: DatasetID, userID: UserID) =
-    connection.testDatasetVisibilityExists(schema, datasetID, userID)
-
-  override fun testDatasetProjectLinkExists(datasetID: DatasetID, projectID: ProjectID) =
-    connection.testDatasetProjectLinkExists(schema, datasetID, projectID)
-
-  override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
-    connection.selectDatasetsByInstallStatus(schema, installType, installStatus, project)
-
-  // endregion Select
 
   // region Update
 
@@ -273,5 +237,37 @@ class AppDBTransactionImpl(
   override fun close() {
     connection.close()
   }
+
+  // region Select
+
+  override fun selectDataset(datasetID: DatasetID) = connection.selectDataset(schema, datasetID)
+
+  override fun selectDatasetInstallMessage(datasetID: DatasetID, installType: InstallType) =
+    connection.selectDatasetInstallMessage(schema, datasetID, installType)
+
+  override fun selectDatasetInstallMessages(datasetID: DatasetID) =
+    connection.selectDatasetInstallMessages(schema, datasetID)
+
+  override fun selectDatasetSyncControlRecord(datasetID: DatasetID) =
+    connection.selectSyncControl(schema, datasetID)
+
+  override fun selectDatasetVisibilityRecords(datasetID: DatasetID) =
+    connection.selectDatasetVisibilityRecords(schema, datasetID)
+
+  override fun selectDatasetProjectLinks(datasetID: DatasetID) =
+    connection.selectDatasetProjectLinks(schema, datasetID)
+
+  override fun streamAllSyncControlRecords() = connection.selectAllSyncControl(schema)
+
+  override fun testDatasetVisibilityExists(datasetID: DatasetID, userID: UserID) =
+    connection.testDatasetVisibilityExists(schema, datasetID, userID)
+
+  override fun testDatasetProjectLinkExists(datasetID: DatasetID, projectID: ProjectID) =
+    connection.testDatasetProjectLinkExists(schema, datasetID, projectID)
+
+  override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
+    connection.selectDatasetsByInstallStatus(schema, installType, installStatus, project)
+
+  // endregion Select
 
 }
