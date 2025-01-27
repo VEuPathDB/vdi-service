@@ -167,6 +167,20 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
   fun insertDatasetPublications(datasetID: DatasetID, publications: Collection<VDIDatasetPublication>)
 
   /**
+   * Inserts a new dataset visibility record for a target dataset and user.
+   *
+   * Dataset visibility records declare that a dataset should be visible to a
+   * target user via the user interface of a VEuPathDB site.
+   *
+   * @param datasetID ID of the dataset for which a visibility record should be
+   * created.
+   *
+   * @param userID ID of the user for which a visibility record should be
+   * created.
+   */
+  fun insertDatasetVisibility(datasetID: DatasetID, userID: UserID)
+
+  /**
    * Inserts a sync control record with default timestamps for all fields set
    * to [OriginTimestamp].
    *
@@ -181,20 +195,6 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
   fun insertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
 
   fun insertDatasetTaxonIDs(datasetID: DatasetID, taxonIDs: Collection<Long>)
-
-  /**
-   * Inserts a new dataset visibility record for a target dataset and user.
-   *
-   * Dataset visibility records declare that a dataset should be visible to a
-   * target user via the user interface of a VEuPathDB site.
-   *
-   * @param datasetID ID of the dataset for which a visibility record should be
-   * created.
-   *
-   * @param userID ID of the user for which a visibility record should be
-   * created.
-   */
-  fun insertDatasetVisibility(datasetID: DatasetID, userID: UserID)
 
   // endregion Insert Operations
 
