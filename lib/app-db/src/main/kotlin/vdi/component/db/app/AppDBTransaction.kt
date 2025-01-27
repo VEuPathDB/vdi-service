@@ -143,11 +143,6 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
   fun insertDatasetInstallMessage(message: DatasetInstallMessage)
 
   /**
-   * Inserts a dataset meta record for the target dataset.
-   */
-  fun insertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
-
-  /**
    * Inserts a new project link for a dataset.
    *
    * @param datasetID ID of the dataset for which a project link should be
@@ -179,6 +174,11 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    * sync operations are completed for the target dataset.
    */
   fun insertDatasetSyncControl(sync: VDISyncControlRecord)
+
+  /**
+   * Inserts a dataset meta record for the target dataset.
+   */
+  fun insertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
 
   fun insertDatasetTaxonIDs(datasetID: DatasetID, taxonIDs: Collection<Long>)
 
