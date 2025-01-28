@@ -1,7 +1,7 @@
 [libraries]
 
 # VPDB
-fgputil-db = { group = "org.gusdb", name = "fgputil-db", version = "2.13.1" }
+fgputil-db = { group = "org.gusdb", name = "fgputil-db", version = "2.14.2-jakarta" }
 
 container-core      = { group = "org.veupathdb.lib", name = "jaxrs-container-core",   version = "8.0.0" }
 container-multipart = { group = "org.veupathdb.lib", name = "multipart-jackson-pojo", version = "1.1.7" }
