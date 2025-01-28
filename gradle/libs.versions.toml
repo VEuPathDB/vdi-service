@@ -40,7 +40,7 @@ prometheus-client = { group = "io.prometheus", name = "simpleclient",        ver
 prometheus-common = { group = "io.prometheus", name = "simpleclient_common", version = "0.16.0" }
 
 # S3
-s34k = { group = "org.veupathdb.lib.s3", name = "s34k-minio", version = "0.7.1+s34k-0.11.0" }
+s34k = { group = "org.veupathdb.lib.s3", name = "s34k-minio", version = "0.7.2+" }
 
 #
 # Unit Testing
