@@ -10,7 +10,7 @@ private fun sql(schema: String) =
 // language=oracle
   """
 INSERT INTO
-  ${schema}.dataset_hyperlink (
+  ${schema}.dataset_taxon_id (
     dataset_id
   , taxon_id
   )

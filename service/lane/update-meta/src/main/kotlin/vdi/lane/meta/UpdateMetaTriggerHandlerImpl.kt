@@ -236,7 +236,7 @@ internal class UpdateMetaTriggerHandlerImpl(
         if (meta.hyperlinks.isNotEmpty())
           it.insertDatasetHyperlinks(datasetID, meta.hyperlinks)
 
-        it.deleteDatasetContacts(datasetID)
+        it.deleteDatasetPublications(datasetID)
         if (meta.publications.isNotEmpty())
           it.insertDatasetPublications(datasetID, meta.publications)
 
