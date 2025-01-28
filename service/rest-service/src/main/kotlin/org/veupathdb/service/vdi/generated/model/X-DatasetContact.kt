@@ -22,23 +22,23 @@ internal fun DatasetContact.cleanup() {
     ?.trim()
 }
 
-internal fun DatasetContact?.validate(index: Int, validationErrors: ValidationErrors) {
+internal fun DatasetContact?.validate(prefix: String, index: Int, validationErrors: ValidationErrors) {
   if (this == null) {
-    validationErrors.add("meta.contacts[$index]", "entries must not be null")
+    validationErrors.add("${prefix}contacts[$index]", "entries must not be null")
     return
   }
 
   if (name == null)
-    validationErrors.add("meta.contacts[$index].name", "field is required")
+    validationErrors.add("${prefix}contacts[$index].name", "field is required")
   else
-    name.checkLength({ "meta.contacts[$index].name" }, 3, DatasetContactNameMaxLength, validationErrors)
+    name.checkLength({ "${prefix}contacts[$index].name" }, 3, DatasetContactNameMaxLength, validationErrors)
 
-  email?.checkLength({ "meta.contacts[$index].email" }, 5, DatasetContactEmailMaxLength, validationErrors)
-  affiliation?.checkLength({ "meta.contacts[$index].affiliation" }, DatasetContactAffiliationMaxLength, validationErrors)
-  city?.checkLength({ "meta.contacts[$index].city" }, DatasetContactCityMaxLength, validationErrors)
-  state?.checkLength({ "meta.contacts[$index].state" }, DatasetContactStateMaxLength, validationErrors)
-  country?.checkLength({ "meta.contacts[$index].country" }, DatasetContactCountryMaxLength, validationErrors)
-  address?.checkLength({ "meta.contacts[$index].address" }, DatasetContactAddressMaxLength, validationErrors)
+  email?.checkLength({ "${prefix}contacts[$index].email" }, 5, DatasetContactEmailMaxLength, validationErrors)
+  affiliation?.checkLength({ "${prefix}contacts[$index].affiliation" }, DatasetContactAffiliationMaxLength, validationErrors)
+  city?.checkLength({ "${prefix}contacts[$index].city" }, DatasetContactCityMaxLength, validationErrors)
+  state?.checkLength({ "${prefix}contacts[$index].state" }, DatasetContactStateMaxLength, validationErrors)
+  country?.checkLength({ "${prefix}contacts[$index].country" }, DatasetContactCountryMaxLength, validationErrors)
+  address?.checkLength({ "${prefix}contacts[$index].address" }, DatasetContactAddressMaxLength, validationErrors)
 }
 
 internal fun DatasetContact.toInternal() =

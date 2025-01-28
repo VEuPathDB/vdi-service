@@ -13,25 +13,25 @@ internal fun DatasetPublication.cleanup() {
     ?.trim()
 }
 
-internal fun DatasetPublication?.validate(index: Int, validationErrors: ValidationErrors) {
+internal fun DatasetPublication?.validate(prefix: String, index: Int, validationErrors: ValidationErrors) {
   if (this == null) {
-    validationErrors.add("meta.publications[$index]", "entries must not be null")
+    validationErrors.add("${prefix}publications[$index]", "entries must not be null")
     return
   }
 
   if (citation == null)
-    validationErrors.add("meta.publications[$index].citation", "field is required")
+    validationErrors.add("${prefix}publications[$index].citation", "field is required")
   else if (citation.length < 3)
-    validationErrors.add("meta.publications[$index].citation", "field value must be at least 3 characters in length")
+    validationErrors.add("${prefix}publications[$index].citation", "field value must be at least 3 characters in length")
   else if (citation.toByteArray().size > DatasetPublicationCitationMaxLength)
-    validationErrors.add("meta.publications[$index].citation", "field must not be larger than $DatasetPublicationCitationMaxLength bytes")
+    validationErrors.add("${prefix}publications[$index].citation", "field must not be larger than $DatasetPublicationCitationMaxLength bytes")
 
   if (pubMedId == null)
-    validationErrors.add("meta.publications[$index].pubMedId", "field is required")
+    validationErrors.add("${prefix}publications[$index].pubMedId", "field is required")
   else if (pubMedId.length < 3)
-    validationErrors.add("meta.publications[$index].pubMedId", "field value must be at least 3 characters in length")
+    validationErrors.add("${prefix}publications[$index].pubMedId", "field value must be at least 3 characters in length")
   else if (pubMedId.toByteArray().size > DatasetPublicationPubMedIDMaxLength)
-    validationErrors.add("meta.publications[$index].pubMedId", "field must not be larger than $DatasetPublicationPubMedIDMaxLength bytes")
+    validationErrors.add("${prefix}publications[$index].pubMedId", "field must not be larger than $DatasetPublicationPubMedIDMaxLength bytes")
 }
 
 internal fun DatasetPublication.toInternal() =

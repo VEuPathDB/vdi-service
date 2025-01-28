@@ -87,8 +87,8 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
         validationErrors.add("meta.projects[$i]", "must not be null or blank")
     }
 
-  publications.forEachIndexed { i, pub -> pub.validate(i, validationErrors) }
-  hyperlinks.forEachIndexed { i, link -> link.validate(i, validationErrors) }
-  contacts.forEachIndexed { i, con -> con.validate(i, validationErrors) }
+  publications.forEachIndexed { i, pub -> pub.validate("meta.", i, validationErrors) }
+  hyperlinks.forEachIndexed { i, link -> link.validate("meta.", i, validationErrors) }
+  contacts.forEachIndexed { i, con -> con.validate("meta.", i, validationErrors) }
   taxonIds.forEachIndexed { i, l -> if (l == null) validationErrors.add("meta.taxonIds[$i]", "entries must not be null") }
 }

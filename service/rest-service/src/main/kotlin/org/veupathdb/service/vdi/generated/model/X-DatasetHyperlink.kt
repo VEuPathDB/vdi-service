@@ -16,23 +16,23 @@ internal fun DatasetHyperlink.cleanup() {
   isPublication = isPublication ?: false
 }
 
-internal fun DatasetHyperlink?.validate(index: Int, validationErrors: ValidationErrors) {
+internal fun DatasetHyperlink?.validate(prefix: String, index: Int, validationErrors: ValidationErrors) {
   if (this == null) {
-    validationErrors.add("meta.hyperlinks[$index]", "entries must not be null")
+    validationErrors.add("${prefix}hyperlinks[$index]", "entries must not be null")
     return
   }
 
   if (url == null)
-    validationErrors.add("meta.hyperlinks[$index].url", "field is required")
+    validationErrors.add("${prefix}hyperlinks[$index].url", "field is required")
   else
-    url.checkLength({ "meta.hyperlinks[$index].url" }, 3, DatasetHyperlinkUrlMaxLength, validationErrors)
+    url.checkLength({ "${prefix}hyperlinks[$index].url" }, 3, DatasetHyperlinkUrlMaxLength, validationErrors)
 
   if (text == null)
-    validationErrors.add("meta.hyperlinks[$index].text", "field is required")
+    validationErrors.add("${prefix}hyperlinks[$index].text", "field is required")
   else
-    url.checkLength({ "meta.hyperlinks[$index].text" }, 3, DatasetHyperlinkTextMaxLength, validationErrors)
+    url.checkLength({ "${prefix}hyperlinks[$index].text" }, 3, DatasetHyperlinkTextMaxLength, validationErrors)
 
-  description?.checkLength({ "meta.hyperlinks[$index].description" }, DatasetHyperlinkDescriptionMaxLength, validationErrors)
+  description?.checkLength({ "${prefix}hyperlinks[$index].description" }, DatasetHyperlinkDescriptionMaxLength, validationErrors)
 }
 
 internal fun DatasetHyperlink.toInternal() =
