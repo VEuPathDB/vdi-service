@@ -8,10 +8,10 @@ private fun sql(schema: String) =
 // language=oracle
 """
 DELETE FROM
-  ${schema}.dataset_taxon_id
+  ${schema}.dataset_organism
 WHERE
   dataset_id = ?
 """
 
-internal fun Connection.deleteDatasetTaxonIDs(schema: String, datasetID: DatasetID) =
+internal fun Connection.deleteDatasetOrganisms(schema: String, datasetID: DatasetID) =
   preparedUpdate(sql(schema)) { setString(1, datasetID.toString()) }

@@ -55,5 +55,5 @@ internal fun DatasetPostRequest.toDatasetMeta(userID: UserID) =
     publications     = meta.publications.map(DatasetPublication::toInternal),
     hyperlinks       = meta.hyperlinks.map(DatasetHyperlink::toInternal),
     contacts         = meta.contacts.map(DatasetContact::toInternal),
-    taxonIDs         = meta.taxonIds
+    organisms        = meta.organisms
   )

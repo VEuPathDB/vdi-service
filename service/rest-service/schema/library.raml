@@ -340,14 +340,14 @@ types:
         type: DatasetHyperlink[]
         uniqueItems: true
         required: false
-      taxonIds:
-        displayName: Dataset Taxon IDs
+      organisms:
+        displayName: Dataset Organisms
         type: array
         required: false
         uniqueItems: true
         items:
-          type: integer
-          format: int64
+          type: string
+          maxLength: 200
       contacts:
         displayName: Dataset Contacts
         type: DatasetContact[]
@@ -517,14 +517,14 @@ types:
         type: DatasetHyperlink[]
         uniqueItems: true
         required: false
-      taxonIds:
-        displayName: Dataset Taxon IDs
+      organisms:
+        displayName: Dataset Organisms
         type: array
         required: false
         uniqueItems: true
         items:
-          type: integer
-          format: int64
+          type: string
+          maxLength: 200
       contacts:
         displayName: Dataset Contacts
         type: DatasetContact[]
@@ -619,14 +619,14 @@ types:
         type: DatasetHyperlink[]
         uniqueItems: true
         required: false
-      taxonIds:
-        displayName: Dataset Taxon IDs
+      organisms:
+        displayName: Dataset Organisms
         type: array
         required: false
         uniqueItems: true
         items:
-          type: integer
-          format: int64
+          type: string
+          maxLength: 200
       contacts:
         displayName: Dataset Contacts
         type: DatasetContact[]

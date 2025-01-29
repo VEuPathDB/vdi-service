@@ -45,8 +45,8 @@ internal fun DatasetPostMeta.cleanup() {
   else
     contacts.forEach { it?.cleanup() }
 
-  if (taxonIds.isNullOrEmpty())
-    taxonIds = emptyList()
+  if (organisms.isNullOrEmpty())
+    organisms = emptyList()
 
   dependencies?.forEach {
     it.resourceVersion = it.resourceVersion?.takeIf { it.isNotBlank() } ?.trim()
@@ -90,5 +90,5 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
   publications.forEachIndexed { i, pub -> pub.validate("meta.", i, validationErrors) }
   hyperlinks.forEachIndexed { i, link -> link.validate("meta.", i, validationErrors) }
   contacts.forEachIndexed { i, con -> con.validate("meta.", i, validationErrors) }
-  taxonIds.forEachIndexed { i, l -> if (l == null) validationErrors.add("meta.taxonIds[$i]", "entries must not be null") }
+  organisms.forEachIndexed { i, l -> if (l == null) validationErrors.add("meta.organisms[$i]", "entries must not be null") }
 }

@@ -58,10 +58,10 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
         emptyList()
       else
         patch.contacts?.map(DatasetContact::toInternal) ?: meta.contacts,
-      taxonIDs         = if (patch.taxonIds?.isEmpty() == true)
+      organisms         = if (patch.organisms?.isEmpty() == true)
         emptyList()
       else
-        patch.taxonIds ?: meta.taxonIDs,
+        patch.organisms ?: meta.organisms,
     )
 
     DatasetStore.putDatasetMeta(userID, datasetID, newMeta)
@@ -80,4 +80,4 @@ private fun DatasetPatchRequest.hasSomethingToUpdate(): Boolean =
   || publications != null
   || hyperlinks != null
   || contacts != null
-  ||taxonIds != null
+  || organisms != null

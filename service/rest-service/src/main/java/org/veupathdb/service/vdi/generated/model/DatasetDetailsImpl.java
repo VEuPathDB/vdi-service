@@ -30,7 +30,7 @@ import java.util.List;
     "dependencies",
     "publications",
     "hyperlinks",
-    "taxonIds",
+    "organisms",
     "contacts"
 })
 public class DatasetDetailsImpl implements DatasetDetails {
@@ -99,8 +99,8 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("hyperlinks")
   private List<DatasetHyperlink> hyperlinks;
 
-  @JsonProperty("taxonIds")
-  private List<Long> taxonIds;
+  @JsonProperty("organisms")
+  private List<String> organisms;
 
   @JsonProperty("contacts")
   private List<DatasetContact> contacts;
@@ -315,14 +315,14 @@ public class DatasetDetailsImpl implements DatasetDetails {
     this.hyperlinks = hyperlinks;
   }
 
-  @JsonProperty("taxonIds")
-  public List<Long> getTaxonIds() {
-    return this.taxonIds;
+  @JsonProperty("organisms")
+  public List<String> getOrganisms() {
+    return this.organisms;
   }
 
-  @JsonProperty("taxonIds")
-  public void setTaxonIds(List<Long> taxonIds) {
-    this.taxonIds = taxonIds;
+  @JsonProperty("organisms")
+  public void setOrganisms(List<String> organisms) {
+    this.organisms = organisms;
   }
 
   @JsonProperty("contacts")

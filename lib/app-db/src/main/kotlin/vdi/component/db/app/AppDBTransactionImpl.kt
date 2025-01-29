@@ -89,9 +89,9 @@ class AppDBTransactionImpl(
     connection.deleteDatasetPublications(schema, datasetID)
   }
 
-  override fun deleteDatasetTaxonIDs(datasetID: DatasetID) {
-    log.debug("deleting dataset taxon id records for dataset {}", datasetID)
-    connection.deleteDatasetTaxonIDs(schema, datasetID)
+  override fun deleteDatasetOrganisms(datasetID: DatasetID) {
+    log.debug("deleting dataset organism records for dataset {}", datasetID)
+    connection.deleteDatasetOrganisms(schema, datasetID)
   }
 
   override fun insertDataset(dataset: DatasetRecord) {
@@ -178,9 +178,9 @@ class AppDBTransactionImpl(
     connection.insertDatasetPublications(schema, datasetID, publications)
   }
 
-  override fun insertDatasetTaxonIDs(datasetID: DatasetID, taxonIDs: Collection<Long>) {
-    log.debug("inserting {} taxon ID records for dataset {}", taxonIDs.size, datasetID)
-    connection.insertDatasetTaxonIDs(schema, datasetID, taxonIDs)
+  override fun insertDatasetOrganisms(datasetID: DatasetID, organisms: Collection<String>) {
+    log.debug("inserting {} organism records for dataset {}", organisms.size, datasetID)
+    connection.insertDatasetOrganisms(schema, datasetID, organisms)
   }
 
   override fun updateDataset(dataset: DatasetRecord) {

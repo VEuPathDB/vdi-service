@@ -16,7 +16,7 @@ import java.util.List;
     "description",
     "publications",
     "hyperlinks",
-    "taxonIds",
+    "organisms",
     "contacts"
 })
 public class DatasetPatchRequestImpl implements DatasetPatchRequest {
@@ -47,8 +47,8 @@ public class DatasetPatchRequestImpl implements DatasetPatchRequest {
   @JsonProperty("hyperlinks")
   private List<DatasetHyperlink> hyperlinks;
 
-  @JsonProperty("taxonIds")
-  private List<Long> taxonIds;
+  @JsonProperty("organisms")
+  private List<String> organisms;
 
   @JsonProperty("contacts")
   private List<DatasetContact> contacts;
@@ -143,14 +143,14 @@ public class DatasetPatchRequestImpl implements DatasetPatchRequest {
     this.hyperlinks = hyperlinks;
   }
 
-  @JsonProperty("taxonIds")
-  public List<Long> getTaxonIds() {
-    return this.taxonIds;
+  @JsonProperty("organisms")
+  public List<String> getOrganisms() {
+    return this.organisms;
   }
 
-  @JsonProperty("taxonIds")
-  public void setTaxonIds(List<Long> taxonIds) {
-    this.taxonIds = taxonIds;
+  @JsonProperty("organisms")
+  public void setOrganisms(List<String> organisms) {
+    this.organisms = organisms;
   }
 
   @JsonProperty("contacts")

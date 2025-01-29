@@ -60,7 +60,7 @@ fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
     out.publications     = (metaJson?.publications ?: emptyList()).map(VDIDatasetPublication::toExternal)
     out.hyperlinks       = (metaJson?.hyperlinks ?: emptyList()).map(VDIDatasetHyperlink::toExternal)
     out.contacts         = (metaJson?.contacts ?: emptyList()).map(VDIDatasetContact::toExternal)
-    out.taxonIds         = metaJson?.taxonIDs?.toList() ?: emptyList()
+    out.organisms        = metaJson?.organisms?.toList() ?: emptyList()
   }
 }
 
@@ -134,7 +134,7 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     out.publications     = (metaJson?.publications ?: emptyList()).map(VDIDatasetPublication::toExternal)
     out.hyperlinks       = (metaJson?.hyperlinks ?: emptyList()).map(VDIDatasetHyperlink::toExternal)
     out.contacts         = (metaJson?.contacts ?: emptyList()).map(VDIDatasetContact::toExternal)
-    out.taxonIds         = metaJson?.taxonIDs?.toList() ?: emptyList()
+    out.organisms        = metaJson?.organisms?.toList() ?: emptyList()
 
     shares.forEach { share ->
       if (share.offerStatus != null)

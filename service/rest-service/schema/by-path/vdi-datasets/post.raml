@@ -109,12 +109,12 @@ types:
         type: common.DatasetHyperlink[]
         required: false
         uniqueItems: true
-      taxonIds:
-        displayName: Dataset Taxon IDs
+      organisms:
+        displayName: Dataset Organisms
         type: array
         items:
-          type: integer
-          format: int64
+          type: string
+          maxLength: 200
         uniqueItems: true
         required: false
       contacts:

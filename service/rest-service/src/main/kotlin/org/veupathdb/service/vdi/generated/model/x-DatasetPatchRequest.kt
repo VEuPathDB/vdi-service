@@ -29,8 +29,8 @@ internal fun DatasetPatchRequest.cleanup() {
   else
     contacts.forEach { it?.cleanup() }
 
-  if (taxonIds.isNullOrEmpty())
-    taxonIds = emptyList()
+  if (organisms.isNullOrEmpty())
+    organisms = emptyList()
 }
 
 internal fun DatasetPatchRequest.validate() {
@@ -51,5 +51,5 @@ internal fun DatasetPatchRequest.validate() {
   publications.forEachIndexed { i, pub -> pub.validate("", i, errors) }
   hyperlinks.forEachIndexed { i, link -> link.validate("", i, errors) }
   contacts.forEachIndexed { i, con -> con.validate("", i, errors) }
-  taxonIds.forEachIndexed { i, l -> if (l == null) errors.add("taxonIds[$i]", "entries must not be null") }
+  organisms.forEachIndexed { i, l -> if (l == null) errors.add("organisms[$i]", "entries must not be null") }
 }

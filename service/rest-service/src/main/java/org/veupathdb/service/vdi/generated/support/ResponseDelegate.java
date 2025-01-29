@@ -155,13 +155,13 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public Object getEntity() {
-    return this.entity;}
-
-  @Override
   public String getHeaderString(String p0) {
     return this.delegate.getHeaderString(p0);
   }
+
+  @Override
+  public Object getEntity() {
+    return this.entity;}
 
   public static class HeaderBuilderBase {
     protected final Map<String, String> headerMap;

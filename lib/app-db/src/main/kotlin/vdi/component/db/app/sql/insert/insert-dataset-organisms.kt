@@ -10,21 +10,21 @@ private fun sql(schema: String) =
 // language=oracle
   """
 INSERT INTO
-  ${schema}.dataset_taxon_id (
+  ${schema}.dataset_organism (
     dataset_id
-  , taxon_id
+  , organism_name_for_files
   )
 VALUES
   (?, ?)
 """
 
-internal fun Connection.insertDatasetTaxonIDs(
+internal fun Connection.insertDatasetOrganisms(
   schema: String,
   datasetID: DatasetID,
-  taxonIDs: Collection<Long>,
+  organisms: Collection<String>,
 ) {
-  preparedBatchUpdate(sql(schema), taxonIDs) {
+  preparedBatchUpdate(sql(schema), organisms) {
     setDatasetID(1, datasetID)
-    setLong(2, it)
+    setString(2, it)
   }
 }

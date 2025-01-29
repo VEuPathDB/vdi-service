@@ -62,11 +62,11 @@ public interface DatasetPatchRequest {
   @JsonProperty("hyperlinks")
   void setHyperlinks(List<DatasetHyperlink> hyperlinks);
 
-  @JsonProperty("taxonIds")
-  List<Long> getTaxonIds();
+  @JsonProperty("organisms")
+  List<String> getOrganisms();
 
-  @JsonProperty("taxonIds")
-  void setTaxonIds(List<Long> taxonIds);
+  @JsonProperty("organisms")
+  void setOrganisms(List<String> organisms);
 
   @JsonProperty("contacts")
   List<DatasetContact> getContacts();

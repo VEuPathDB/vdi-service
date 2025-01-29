@@ -20,7 +20,6 @@ import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.CacheDBTransaction
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
 import vdi.component.kafka.EventMessage
 import vdi.component.kafka.EventSource
@@ -240,9 +239,9 @@ internal class UpdateMetaTriggerHandlerImpl(
         if (meta.publications.isNotEmpty())
           it.insertDatasetPublications(datasetID, meta.publications)
 
-        it.deleteDatasetTaxonIDs(datasetID)
-        if (meta.taxonIDs.isNotEmpty())
-          it.insertDatasetTaxonIDs(datasetID, meta.taxonIDs)
+        it.deleteDatasetOrganisms(datasetID)
+        if (meta.organisms.isNotEmpty())
+          it.insertDatasetOrganisms(datasetID, meta.organisms)
 
         it.selectDatasetSyncControlRecord(datasetID) or {
           it.insertDatasetSyncControl(VDISyncControlRecord(
