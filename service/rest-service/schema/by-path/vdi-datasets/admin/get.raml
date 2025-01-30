@@ -35,7 +35,11 @@ types:
     type: object
     additionalProperties: false
     properties:
-      count: integer
+      count:
+        displayName: Result Count
+        description: Number of records in the result.
+        type: integer
+        required: true
       before?: string
       after?: string
       user?: common.User-ID
