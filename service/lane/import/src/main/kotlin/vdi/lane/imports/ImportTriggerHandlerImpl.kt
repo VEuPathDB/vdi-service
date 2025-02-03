@@ -390,14 +390,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         ))
 
         // insert metadata for the dataset
-        it.tryInsertDatasetMeta(DatasetMetaImpl(
-          datasetID   = datasetID,
-          visibility  = meta.visibility,
-          name        = meta.name,
-          summary     = meta.summary,
-          description = meta.description,
-          sourceURL   = meta.sourceURL,
-        ))
+        it.tryInsertDatasetMeta(datasetID, meta)
 
         // Insert an import control record for the dataset
         it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)

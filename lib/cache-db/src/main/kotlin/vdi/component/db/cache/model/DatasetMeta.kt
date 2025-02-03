@@ -7,6 +7,9 @@ interface DatasetMeta {
   val datasetID: DatasetID
   val visibility: VDIDatasetVisibility
   val name: String
+  val shortName: String?
+  val shortAttribution: String?
+  val category: String?
   val summary: String?
   val description: String?
   val sourceURL: String?

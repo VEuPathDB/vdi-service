@@ -5,7 +5,7 @@ import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.component.db.app.model.InstallStatuses
-import vdi.component.db.app.sql.selectInstallStatuses
+import vdi.component.db.app.sql.select.selectInstallStatuses
 
 internal object AppDBImpl : AppDB {
 
@@ -50,7 +50,7 @@ internal object AppDBImpl : AppDB {
 
   override fun accessor(key: ProjectID, dataType: DataType): AppDBAccessor? =
     AppDatabaseRegistry[key, dataType]
-      ?.let { AppDBAccessorImpl(key, it.ctlSchema, it.source) }
+      ?.let { AppDBAccessorImpl(key, it.ctlSchema, it.source, it.platform) }
 
   override fun transaction(key: ProjectID, dataType: DataType): AppDBTransaction? =
     AppDatabaseRegistry[key, dataType]

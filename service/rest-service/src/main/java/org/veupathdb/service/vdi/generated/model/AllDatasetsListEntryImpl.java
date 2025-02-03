@@ -15,6 +15,9 @@ import java.util.List;
     "datasetType",
     "visibility",
     "name",
+    "shortName",
+    "shortAttribution",
+    "category",
     "summary",
     "description",
     "sourceUrl",
@@ -39,6 +42,15 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
 
   @JsonProperty("name")
   private String name;
+
+  @JsonProperty("shortName")
+  private String shortName;
+
+  @JsonProperty("shortAttribution")
+  private String shortAttribution;
+
+  @JsonProperty("category")
+  private String category;
 
   @JsonProperty("summary")
   private String summary;
@@ -112,6 +124,36 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  @JsonProperty("shortName")
+  public String getShortName() {
+    return this.shortName;
+  }
+
+  @JsonProperty("shortName")
+  public void setShortName(String shortName) {
+    this.shortName = shortName;
+  }
+
+  @JsonProperty("shortAttribution")
+  public String getShortAttribution() {
+    return this.shortAttribution;
+  }
+
+  @JsonProperty("shortAttribution")
+  public void setShortAttribution(String shortAttribution) {
+    this.shortAttribution = shortAttribution;
+  }
+
+  @JsonProperty("category")
+  public String getCategory() {
+    return this.category;
+  }
+
+  @JsonProperty("category")
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   @JsonProperty("summary")

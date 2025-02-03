@@ -1,7 +1,6 @@
 package vdi.test
 
 import org.mockito.kotlin.*
-import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -86,13 +85,13 @@ fun mockCacheDBTransaction(
   onInsertDataset: (Dataset) -> Unit = ::consumer,
   onInsertUploadFiles: (DatasetID, Iterable<VDIDatasetFileInfo>) -> Unit = ::biConsumer,
   onInsertInstallFiles: (DatasetID, Iterable<VDIDatasetFileInfo>) -> Unit = ::biConsumer,
-  onInsertMeta: (DatasetMeta) -> Unit = ::consumer,
+  onInsertMeta: (DatasetID, VDIDatasetMeta) -> Unit = ::biConsumer,
   onInsertProjects: (DatasetID, Collection<ProjectID>) -> Unit = ::biConsumer,
   onInsertImportControl: (DatasetID, DatasetImportStatus) -> Unit = ::biConsumer,
   onInsertSyncControl: (VDISyncControlRecord) -> Unit = ::consumer,
   onInsertImportMessages: (DatasetID, String) -> Unit = ::biConsumer,
   onUpdateImportControl: (DatasetID, DatasetImportStatus) -> Unit = ::biConsumer,
-  onUpdateMeta: (DatasetMeta) -> Unit = ::consumer,
+  onUpdateMeta: (DatasetID, VDIDatasetMeta) -> Unit = ::biConsumer,
   onUpdateMetaSync: DSSync = ::biConsumer,
   onUpdateDataSync: DSSync = ::biConsumer,
   onUpdateShareSync: DSSync = ::biConsumer,
@@ -121,13 +120,13 @@ fun mockCacheDBTransaction(
     on { tryInsertDataset(any()) } doAnswer { onInsertDataset(it.getArgument(0)) }
     on { tryInsertUploadFiles(any(), any()) } doAnswer { onInsertUploadFiles(it.getArgument(0), it.getArgument(1)) }
     on { tryInsertInstallFiles(any(), any()) } doAnswer { onInsertInstallFiles(it.getArgument(0), it.getArgument(1)) }
-    on { tryInsertDatasetMeta(any()) } doAnswer { onInsertMeta(it.getArgument(0)) }
+    on { tryInsertDatasetMeta(any(), any()) } doAnswer { onInsertMeta(it.getArgument(0), it.getArgument(1)) }
     on { tryInsertDatasetProjects(any(), any()) } doAnswer { onInsertProjects(it.getArgument(0), it.getArgument(1)) }
     on { tryInsertImportControl(any(), any()) } doAnswer { onInsertImportControl(it.getArgument(0), it.getArgument(1)) }
     on { tryInsertSyncControl(any()) } doAnswer { onInsertSyncControl(it.getArgument(0)) }
     on { tryInsertImportMessages(any(), any()) } doAnswer { onInsertImportMessages(it.getArgument(0), it.getArgument(1)) }
     on { updateImportControl(any(), any()) } doAnswer { onUpdateImportControl(it.getArgument(0), it.getArgument(1)) }
-    on { updateDatasetMeta(any()) } doAnswer { onUpdateMeta(it.getArgument(0)) }
+    on { updateDatasetMeta(any(), any()) } doAnswer { onUpdateMeta(it.getArgument(0), it.getArgument(1)) }
     on { updateMetaSyncControl(any(), any()) } doAnswer { onUpdateMetaSync(it.getArgument(0), it.getArgument(1)) }
     on { updateDataSyncControl(any(), any()) } doAnswer { onUpdateDataSync(it.getArgument(0), it.getArgument(1)) }
     on { updateShareSyncControl(any(), any()) } doAnswer { onUpdateShareSync(it.getArgument(0), it.getArgument(1)) }
@@ -139,104 +138,6 @@ fun mockCacheDBTransaction(
     on { rollback() } doAnswer { onRollback() }
     on { commit() } doAnswer { onCommit() }
     on { close() } doAnswer { onClose() }
-  }
-
-fun mockAdminAllDatasetsRow(
-  datasetID: DatasetID? = null,
-  ownerID: UserID? = null,
-  origin: String? = null,
-  created: OffsetDateTime? = null,
-  typeName: String? = null,
-  typeVersion: String? = null,
-  isDeleted: Boolean? = null,
-  name: String? = null,
-  summary: String? = null,
-  description: String? = null,
-  sourceURL: String? = null,
-  visibility: VDIDatasetVisibility? = null,
-  projectIDs: List<ProjectID>? = null,
-  importStatus: DatasetImportStatus? = null,
-  importMessage: String? = null,
-  inserted: OffsetDateTime? = null,
-): AdminAllDatasetsRow =
-  mock {
-    mockDataset(datasetID, typeName, typeVersion, ownerID, isDeleted, created, importStatus, origin, inserted)
-    mockMetaAddOn(visibility, name, summary, description, sourceURL)
-    projectIDs?.also { on { this.projectIDs } doReturn projectIDs }
-    on { this.importMessage } doReturn importMessage
-  }
-
-fun mockAdminDatasetDetailsRecord(
-  datasetID: DatasetID? = null,
-  ownerID: UserID? = null,
-  origin: String? = null,
-  created: OffsetDateTime? = null,
-  inserted: OffsetDateTime? = null,
-  typeName: String? = null,
-  typeVersion: String? = null,
-  isDeleted: Boolean? = null,
-  name: String? = null,
-  summary: String? = null,
-  description: String? = null,
-  sourceURL: String? = null,
-  visibility: VDIDatasetVisibility? = null,
-  projectIDs: List<ProjectID>? = null,
-  syncControl: VDISyncControlRecord? = null,
-  importStatus: DatasetImportStatus? = null,
-  messages: List<String>? = null,
-  installFiles: List<String>? = null,
-  uploadFiles: List<String>? = null
-): AdminDatasetDetailsRecord =
-  mock {
-    mockDataset(datasetID, typeName, typeVersion, ownerID, isDeleted, created, importStatus, origin, inserted)
-    mockMetaAddOn(visibility, name, summary, description, sourceURL)
-    projectIDs?.also { on { this.projectIDs } doReturn it }
-    on { this.syncControl } doReturn syncControl
-    messages?.also { on { this.messages } doReturn it }
-    installFiles?.also { on { this.installFiles } doReturn it }
-    uploadFiles?.also { on { this.uploadFiles } doReturn it }
-  }
-
-fun mockBrokenImportListQuery(
-  userID: UserID? = null,
-  before: OffsetDateTime? = null,
-  after: OffsetDateTime? = null,
-  order: SortOrder? = null,
-  sortBy: BrokenImportListQuery.SortField? = null,
-  limit: UByte? = null,
-  offset: UInt? = null,
-): BrokenImportListQuery =
-  mock {
-    on { this.userID } doReturn userID
-    on { this.hasUserID } doReturn (userID != null)
-
-    on { this.before } doReturn before
-    on { this.hasBefore } doReturn (before != null)
-
-    on { this.after } doReturn after
-    on { this.hasAfter } doReturn (after != null)
-
-    order?.also { on { this.order } doReturn it }
-    sortBy?.also { on { this.sortBy } doReturn it }
-    limit?.also { on { this.limit } doReturn it }
-    offset?.also { on { this.offset } doReturn it }
-  }
-
-fun mockBrokenImportRecord(
-  datasetID: DatasetID? = null,
-  ownerID: UserID? = null,
-  typeName: DataType? = null,
-  typeVersion: String? = null,
-  projects: List<String>? = null,
-  messages: List<String>? = null,
-): BrokenImportRecord =
-  mock {
-    datasetID?.also { on { this.datasetID } doReturn it }
-    ownerID?.also { on { this.ownerID } doReturn it }
-    typeName?.also { on { this.typeName } doReturn it }
-    typeVersion?.also { on { this.typeVersion } doReturn it }
-    projects?.also { on { this.projects } doReturn it }
-    messages?.also { on { this.messages } doReturn it }
   }
 
 fun mockDataset(
@@ -252,51 +153,6 @@ fun mockDataset(
 ): Dataset =
   mock { mockDataset(datasetID, typeName, typeVersion, ownerID, isDeleted, created, importStatus, origin, inserted) }
 
-fun mockDatasetMeta(
-  datasetID: DatasetID? = null,
-  visibility: VDIDatasetVisibility? = null,
-  name: String? = null,
-  summary: String? = null,
-  description: String? = null,
-  sourceURL: String? = null,
-): DatasetMeta =
-  mock {
-    datasetID?.also { on { this.datasetID } doReturn it }
-    mockMetaAddOn(visibility, name, summary, description, sourceURL)
-  }
-
-fun mockDatasetFile(fileName: String? = null, fileSize: ULong? = null): DatasetFile =
-  mock {
-    fileName?.also { on { this.fileName } doReturn it }
-    fileSize?.also { on { this.fileSize } doReturn it }
-  }
-
-fun mockDatasetFileSummary(count: UInt? = null, size: ULong? = null): DatasetFileSummary =
-  mock {
-    count?.also { on { this.count } doReturn it }
-    size?.also { on { this.size } doReturn it }
-  }
-
-fun mockDatasetListQuery(
-  userID: Long? = null,
-  projectID: String? = null,
-  ownership: DatasetOwnershipFilter? = null,
-): DatasetListQuery =
-  mock {
-    userID?.also { on { this.userID } doReturn it }
-    on { this.projectID } doReturn projectID
-    ownership?.also { on { this.ownership } doReturn it }
-  }
-
-fun mockDatasetProjectLinks(
-  datasetID: DatasetID? = null,
-  projects: List<String>? = null,
-): DatasetProjectLinks =
-  mock {
-    datasetID?.also { on { this.datasetID } doReturn it }
-    projects?.also { on { this.projects } doReturn it }
-  }
-
 fun mockCacheDatasetRecord(
   datasetID: DatasetID? = null,
   typeName: String? = null,
@@ -309,6 +165,9 @@ fun mockCacheDatasetRecord(
   inserted: OffsetDateTime? = null,
   visibility: VDIDatasetVisibility? = null,
   name: String? = null,
+  shortName: String? = null,
+  shortAttribution: String? = null,
+  category: String? = null,
   summary: String? = null,
   description: String? = null,
   sourceURL: String? = null,
@@ -316,103 +175,26 @@ fun mockCacheDatasetRecord(
 ): DatasetRecord =
   mock {
     mockDataset(datasetID, typeName, typeVersion, ownerID, isDeleted, created, importStatus, origin, inserted)
-    mockMetaAddOn(visibility, name, summary, description, sourceURL)
-    projects?.also { on { this.projects } doReturn it }
-  }
-
-fun mockDatasetShare(
-  recipientID: UserID? = null,
-  offerStatus: VDIShareOfferAction? = null,
-  receiptStatus: VDIShareReceiptAction? = null,
-): DatasetShare =
-  mock {
-    recipientID?.also { on { this.recipientID } doReturn it }
-    on { this.offerStatus } doReturn offerStatus
-    on { this.receiptStatus } doReturn receiptStatus
-  }
-
-fun mockShareListEntry(
-  datasetID: DatasetID? = null,
-  ownerID: UserID? = null,
-  typeName: DataType? = null,
-  typeVersion: String? = null,
-  receiptStatus: VDIShareReceiptAction? = null,
-  projects: List<ProjectID>? = null,
-): DatasetShareListEntry =
-  mock {
-    datasetID?.also { on { this.datasetID } doReturn it }
-    ownerID?.also { on { this.ownerID } doReturn it }
-    typeName?.also { on { this.typeName } doReturn it }
-    typeVersion?.also { on { this.typeVersion } doReturn it }
-    receiptStatus?.also { on { this.receiptStatus } doReturn it }
-    projects?.also { on { this.projects } doReturn it }
-  }
-
-fun mockShareOffer(
-  datasetID: DatasetID? = null,
-  recipientID: UserID? = null,
-  action: VDIShareOfferAction? = null,
-): DatasetShareOffer =
-  mock {
-    datasetID?.also { on { this.datasetID } doReturn it }
-    recipientID?.also { on { this.recipientID } doReturn it }
-    action?.also { on { this.action } doReturn it }
-  }
-
-fun mockShareReceipt(
-  datasetID: DatasetID? = null,
-  recipientID: UserID? = null,
-  action: VDIShareReceiptAction? = null,
-): DatasetShareReceipt =
-  mock {
-    datasetID?.also { on { this.datasetID } doReturn it }
-    recipientID?.also { on { this.recipientID } doReturn it }
-    action?.also { on { this.action } doReturn it }
-  }
-
-fun mockDeletedDataset(
-  datasetID: DatasetID? = null,
-  ownerID: UserID? = null,
-  projects: List<ProjectID>? = null,
-): DeletedDataset =
-  mock {
-    datasetID?.also { on { this.datasetID } doReturn it }
-    ownerID?.also { on { this.ownerID } doReturn it }
+    mockMetaAddOn(visibility, name, shortName, shortAttribution, category, summary, description, sourceURL)
     projects?.also { on { this.projects } doReturn it }
   }
 
 private fun KStubbing<DatasetMeta>.mockMetaAddOn(
   visibility: VDIDatasetVisibility?,
   name: String?,
+  shortName: String?,
+  shortAttribution: String?,
+  category: String?,
   summary: String?,
   description: String?,
   sourceURL: String?,
 ) {
   visibility?.also { on { this.visibility } doReturn it }
   name?.also { on { this.name } doReturn name }
+  on { this.shortName } doReturn shortName
+  on { this.shortAttribution } doReturn shortAttribution
+  on { this.category } doReturn category
   on { this.summary } doReturn summary
   on { this.description } doReturn description
   on { this.sourceURL } doReturn sourceURL
-}
-
-private fun KStubbing<Dataset>.mockDataset(
-  datasetID: DatasetID?,
-  typeName: DataType?,
-  typeVersion: String?,
-  ownerID: UserID?,
-  isDeleted: Boolean?,
-  created: OffsetDateTime?,
-  importStatus: DatasetImportStatus?,
-  origin: String?,
-  inserted: OffsetDateTime?,
-) {
-  datasetID?.also { on { this.datasetID } doReturn it }
-  typeName?.also { on { this.typeName } doReturn it }
-  typeVersion?.also { on { this.typeVersion } doReturn it }
-  ownerID?.also { on { this.ownerID } doReturn it }
-  isDeleted?.also { on { this.isDeleted } doReturn it }
-  created?.also { on { this.created } doReturn it }
-  importStatus?.also { on { this.importStatus } doReturn it }
-  origin?.also { on { this.origin } doReturn it }
-  inserted?.also { on { this.inserted } doReturn it }
 }

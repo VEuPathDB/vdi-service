@@ -2,6 +2,7 @@ package org.veupathdb.service.vdi.service.shares
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.service.vdi.generated.model.ShareOfferEntry
+import org.veupathdb.service.vdi.genx.model.ShareOfferEntry
 import org.veupathdb.service.vdi.model.ShareFilterStatus
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.UserID

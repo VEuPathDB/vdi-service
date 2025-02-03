@@ -60,11 +60,6 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public MultivaluedMap<String, Object> getHeaders() {
-    return this.delegate.getHeaders();
-  }
-
-  @Override
   public Link.Builder getLinkBuilder(String p0) {
     return this.delegate.getLinkBuilder(p0);
   }
@@ -99,6 +94,11 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
+  public <T> T readEntity(Class<T> p0) {
+    return this.delegate.readEntity(p0);
+  }
+
+  @Override
   public <T> T readEntity(GenericType<T> p0, Annotation[] p1) {
     return this.delegate.readEntity(p0,p1);
   }
@@ -110,11 +110,6 @@ public class ResponseDelegate extends Response {
 
   @Override
   public <T> T readEntity(GenericType<T> p0) {
-    return this.delegate.readEntity(p0);
-  }
-
-  @Override
-  public <T> T readEntity(Class<T> p0) {
     return this.delegate.readEntity(p0);
   }
 
@@ -161,6 +156,11 @@ public class ResponseDelegate extends Response {
   @Override
   public Link getLink(String p0) {
     return this.delegate.getLink(p0);
+  }
+
+  @Override
+  public MultivaluedMap<String, Object> getHeaders() {
+    return this.delegate.getHeaders();
   }
 
   public static class HeaderBuilderBase {

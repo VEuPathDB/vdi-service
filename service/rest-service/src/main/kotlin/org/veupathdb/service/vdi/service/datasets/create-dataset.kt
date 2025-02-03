@@ -6,23 +6,21 @@ import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
-import org.veupathdb.service.vdi.generated.model.toDatasetMeta
+import org.veupathdb.service.vdi.genx.model.toDatasetMeta
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.service.users.getCurrentQuotaUsage
 import org.veupathdb.service.vdi.util.*
-import org.veupathdb.service.vdi.util.URLFetchException
-import org.veupathdb.service.vdi.util.fetchContent
-import org.veupathdb.service.vdi.util.toJavaURL
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.compression.Zip.getZipType
 import org.veupathdb.vdi.lib.common.compression.ZipType
-import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
-import org.veupathdb.vdi.lib.common.model.*
+import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetImpl
@@ -77,14 +75,7 @@ fun createDataset(
       origin       = datasetMeta.origin,
       inserted     = OffsetDateTime.now(),
     ))
-    it.tryInsertDatasetMeta(DatasetMetaImpl(
-      datasetID   = datasetID,
-      visibility  = datasetMeta.visibility,
-      name        = datasetMeta.name,
-      summary     = datasetMeta.summary,
-      description = datasetMeta.description,
-      sourceURL   = datasetMeta.sourceURL,
-    ))
+    it.tryInsertDatasetMeta(datasetID, datasetMeta)
     it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)
     it.tryInsertDatasetProjects(datasetID, datasetMeta.projects)
     it.tryInsertSyncControl(VDISyncControlRecord(

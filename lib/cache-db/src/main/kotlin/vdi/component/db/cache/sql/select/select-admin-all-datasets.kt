@@ -19,6 +19,9 @@ SELECT
 , d.is_deleted
 , d.inserted
 , m.name
+, m.short_name
+, m.short_attribution
+, m.category
 , m.summary
 , m.description
 , m.source_url
@@ -113,24 +116,27 @@ internal fun Connection.selectAdminAllDatasets(query: AdminAllDatasetsQuery): Li
     withResults {
       map {
         AdminAllDatasetsRow(
-          datasetID     = it.getDatasetID("dataset_id"),
-          ownerID       = it.getUserID("owner_id"),
-          origin        = it.getString("origin"),
-          created       = it.getDateTime("created"),
-          isDeleted     = it.getBoolean("is_deleted"),
-          typeName      = it.getDataType("type_name"),
-          typeVersion   = it.getString("type_version"),
-          name          = it.getString("name"),
-          summary       = it.getString("summary"),
-          description   = it.getString("description"),
-          sourceURL     = it.getString("source_url"),
-          visibility    = it.getDatasetVisibility("visibility"),
-          projectIDs    = it.getProjectIDList("projects"),
-          importStatus  = it.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
-          importMessage = it.getString("message"),
-          inserted      = it.getDateTime("inserted"),
-          uploadFiles   = it.getFileDetailList("upload_files"),
-          installFiles  = it.getFileDetailList("install_files"),
+          datasetID        = it.getDatasetID("dataset_id"),
+          ownerID          = it.getUserID("owner_id"),
+          origin           = it.getString("origin"),
+          created          = it.getDateTime("created"),
+          isDeleted        = it.getBoolean("is_deleted"),
+          typeName         = it.getDataType("type_name"),
+          typeVersion      = it.getString("type_version"),
+          name             = it.getString("name"),
+          shortName        = it.getString("short_name"),
+          shortAttribution = it.getString("short_attribution"),
+          category         = it.getString("category"),
+          summary          = it.getString("summary"),
+          description      = it.getString("description"),
+          sourceURL        = it.getString("source_url"),
+          visibility       = it.getDatasetVisibility("visibility"),
+          projectIDs       = it.getProjectIDList("projects"),
+          importStatus     = it.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
+          importMessage    = it.getString("message"),
+          inserted         = it.getDateTime("inserted"),
+          uploadFiles      = it.getFileDetailList("upload_files"),
+          installFiles     = it.getFileDetailList("install_files"),
         )
       }
     }

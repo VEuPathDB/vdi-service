@@ -11,6 +11,7 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.Admin
+import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.service.admin.*
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.listBrokenDatasets
@@ -95,9 +96,11 @@ class AdminRPC : Admin {
     if (userID == null)
       throw BadRequestException("no target user ID provided")
 
-    (entity ?: throw BadRequestException())
-      .validate()
-      .throwIfNotEmpty()
+    with(entity ?: throw BadRequestException()) {
+      cleanup()
+      validate()
+        .throwIfNotEmpty()
+    }
 
     val userID = UserID(userID)
 

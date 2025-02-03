@@ -11,12 +11,19 @@ import java.util.List;
 @JsonPropertyOrder({
     "datasetType",
     "name",
+    "shortName",
+    "shortAttribution",
+    "category",
     "visibility",
     "summary",
     "description",
     "origin",
     "projects",
     "dependencies",
+    "publications",
+    "hyperlinks",
+    "organisms",
+    "contacts",
     "createdOn"
 })
 public class DatasetPostMetaImpl implements DatasetPostMeta {
@@ -25,6 +32,15 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
 
   @JsonProperty("name")
   private String name;
+
+  @JsonProperty("shortName")
+  private String shortName;
+
+  @JsonProperty("shortAttribution")
+  private String shortAttribution;
+
+  @JsonProperty("category")
+  private String category;
 
   @JsonProperty(
       value = "visibility",
@@ -47,8 +63,20 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("dependencies")
   private List<DatasetDependency> dependencies;
 
+  @JsonProperty("publications")
+  private List<DatasetPublication> publications;
+
+  @JsonProperty("hyperlinks")
+  private List<DatasetHyperlink> hyperlinks;
+
+  @JsonProperty("organisms")
+  private List<String> organisms;
+
+  @JsonProperty("contacts")
+  private List<DatasetContact> contacts;
 
   @JsonProperty("createdOn")
+
   private OffsetDateTime createdOn;
 
   @JsonProperty("datasetType")
@@ -69,6 +97,36 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  @JsonProperty("shortName")
+  public String getShortName() {
+    return this.shortName;
+  }
+
+  @JsonProperty("shortName")
+  public void setShortName(String shortName) {
+    this.shortName = shortName;
+  }
+
+  @JsonProperty("shortAttribution")
+  public String getShortAttribution() {
+    return this.shortAttribution;
+  }
+
+  @JsonProperty("shortAttribution")
+  public void setShortAttribution(String shortAttribution) {
+    this.shortAttribution = shortAttribution;
+  }
+
+  @JsonProperty("category")
+  public String getCategory() {
+    return this.category;
+  }
+
+  @JsonProperty("category")
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   @JsonProperty(
@@ -135,6 +193,46 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("dependencies")
   public void setDependencies(List<DatasetDependency> dependencies) {
     this.dependencies = dependencies;
+  }
+
+  @JsonProperty("publications")
+  public List<DatasetPublication> getPublications() {
+    return this.publications;
+  }
+
+  @JsonProperty("publications")
+  public void setPublications(List<DatasetPublication> publications) {
+    this.publications = publications;
+  }
+
+  @JsonProperty("hyperlinks")
+  public List<DatasetHyperlink> getHyperlinks() {
+    return this.hyperlinks;
+  }
+
+  @JsonProperty("hyperlinks")
+  public void setHyperlinks(List<DatasetHyperlink> hyperlinks) {
+    this.hyperlinks = hyperlinks;
+  }
+
+  @JsonProperty("organisms")
+  public List<String> getOrganisms() {
+    return this.organisms;
+  }
+
+  @JsonProperty("organisms")
+  public void setOrganisms(List<String> organisms) {
+    this.organisms = organisms;
+  }
+
+  @JsonProperty("contacts")
+  public List<DatasetContact> getContacts() {
+    return this.contacts;
+  }
+
+  @JsonProperty("contacts")
+  public void setContacts(List<DatasetContact> contacts) {
+    this.contacts = contacts;
   }
 
   @JsonProperty("createdOn")

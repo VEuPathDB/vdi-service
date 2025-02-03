@@ -100,13 +100,13 @@ class DatasetReconcilerTest {
           assertEquals("origin", it.origin)
           // We can't really check the inserted timestamp reliably
         },
-        onInsertMeta = {
-          assertEquals(datasetID, it.datasetID)
-          assertEquals(VDIDatasetVisibility.Protected, it.visibility)
-          assertEquals("fizz", it.name)
-          assertEquals("buzz", it.summary)
-          assertEquals("something", it.description)
-          assertEquals("source url", it.sourceURL)
+        onInsertMeta = { id, meta ->
+          assertEquals(datasetID, id)
+          assertEquals(VDIDatasetVisibility.Protected, meta.visibility)
+          assertEquals("fizz", meta.name)
+          assertEquals("buzz", meta.summary)
+          assertEquals("something", meta.description)
+          assertEquals("source url", meta.sourceURL)
         },
         onInsertSyncControl = {
           assertEquals(datasetID, it.datasetID)
@@ -128,7 +128,7 @@ class DatasetReconcilerTest {
       verifyNoMoreInteractions(cacheDB)
 
       verify(transaction, times(1)).tryInsertDataset(any())
-      verify(transaction, times(1)).tryInsertDatasetMeta(any())
+      verify(transaction, times(1)).tryInsertDatasetMeta(any(), any())
       verify(transaction, times(1)).tryInsertDatasetProjects(datasetID, projects)
       // Because we didn't mock an import-ready file or an install-ready file,
       // the process should attempt to set the status to failed for invalid

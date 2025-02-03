@@ -51,6 +51,24 @@ public interface InternalDatasetDetails {
   @JsonProperty("name")
   void setName(String name);
 
+  @JsonProperty("shortName")
+  String getShortName();
+
+  @JsonProperty("shortName")
+  void setShortName(String shortName);
+
+  @JsonProperty("shortAttribution")
+  String getShortAttribution();
+
+  @JsonProperty("shortAttribution")
+  void setShortAttribution(String shortAttribution);
+
+  @JsonProperty("category")
+  String getCategory();
+
+  @JsonProperty("category")
+  void setCategory(String category);
+
   @JsonProperty("summary")
   String getSummary();
 

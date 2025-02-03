@@ -198,3 +198,80 @@ types:
       resourceVersion:
         type: string
         required: true
+
+  DatasetContact:
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        required: true
+        minLength: 3
+        maxLength: 300
+      email:
+        type: string
+        required: false
+        minLength: 5
+        maxLength: 4000
+      affiliation:
+        type: string
+        required: false
+        maxLength: 4000
+      city:
+        type: string
+        required: false
+        maxLength: 200
+      state:
+        type: string
+        required: false
+        maxLength: 200
+      country:
+        type: string
+        required: false
+        maxLength: 200
+      address:
+        type: string
+        required: false
+        maxLength: 1000
+      isPrimary:
+        type: boolean
+        default: false
+        required: false
+
+  DatasetHyperlink:
+    type: object
+    additionalProperties: false
+    properties:
+      url:
+        type: string
+        required: true
+        minLength: 3
+        maxLength: 200
+      text:
+        type: string
+        required: true
+        minLength: 3
+        maxLength: 300
+      description:
+        type: string
+        required: false
+        maxLength: 4000
+      isPublication:
+        type: boolean
+        required: false
+        default: false
+
+  DatasetPublication:
+    type: object
+    additionalProperties: false
+    properties:
+      pubMedId:
+        type: string
+        required: true
+        minLength: 3
+        maxLength: 30
+      citation:
+        type: string
+        required: false
+        minLength: 3
+        maxLength: 2000

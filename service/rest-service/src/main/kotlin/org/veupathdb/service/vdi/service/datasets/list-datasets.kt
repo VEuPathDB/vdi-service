@@ -1,6 +1,7 @@
 package org.veupathdb.service.vdi.service.datasets
 
 import org.veupathdb.service.vdi.generated.model.*
+import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.service.vdi.util.reduceTo
@@ -120,22 +121,25 @@ private fun DatasetRecord.toListEntry(
   shares: List<DatasetListShareUser>,
   fileSummary: DatasetFileSummary,
 ) = DatasetListEntryImpl().also { out ->
-  out.datasetId     = datasetID.toString()
-  out.owner         = DatasetOwner(owner)
-  out.datasetType   = DatasetTypeInfo(this, pluginDisplayName)
-  out.name          = name
-  out.summary       = summary
-  out.description   = description
-  out.projectIds    = projects.toList()
-  out.visibility    = DatasetVisibility(visibility)
-  out.status        = DatasetStatusInfo(importStatus, statuses)
-  out.origin        = origin
-  out.sourceUrl     = sourceURL
-  if (importStatus !== DatasetImportStatus.Invalid && importStatus !== DatasetImportStatus.Failed) {
+  out.datasetId        = datasetID.toString()
+  out.owner            = DatasetOwner(owner)
+  out.datasetType      = DatasetTypeInfo(this, pluginDisplayName)
+  out.name             = name
+  out.shortName        = shortName
+  out.shortAttribution = shortAttribution
+  out.category         = category
+  out.summary          = summary
+  out.description      = description
+  out.projectIds       = projects.toList()
+  out.visibility       = DatasetVisibility(visibility)
+  out.status           = DatasetStatusInfo(importStatus, statuses)
+  out.origin           = origin
+  out.sourceUrl        = sourceURL
+  if (importStatus != DatasetImportStatus.Invalid && importStatus != DatasetImportStatus.Failed) {
     // Don't set shares if import status is failed since dataset will never be usable by others.
     out.shares = shares
   }
-  out.fileCount     = fileSummary.count.toInt()
-  out.fileSizeTotal = fileSummary.size.toLong()
-  out.created       = created.defaultZone()
+  out.fileCount        = fileSummary.count.toInt()
+  out.fileSizeTotal    = fileSummary.size.toLong()
+  out.created          = created.defaultZone()
 }

@@ -203,6 +203,10 @@ object Pruner {
       it.deleteDatasetProjectLinks(datasetID)
       it.deleteSyncControl(datasetID)
       it.deleteInstallMessages(datasetID)
+      it.deleteDatasetContacts(datasetID)
+      it.deleteDatasetHyperlinks(datasetID)
+      it.deleteDatasetPublications(datasetID)
+      it.deleteDatasetOrganisms(datasetID)
       it.deleteDatasetMeta(datasetID)
       it.deleteDataset(datasetID)
     }

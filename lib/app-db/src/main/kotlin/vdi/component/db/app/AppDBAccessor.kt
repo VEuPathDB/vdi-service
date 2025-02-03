@@ -10,6 +10,8 @@ import vdi.component.db.app.model.*
 
 interface AppDBAccessor {
 
+  val platform: AppDBPlatform
+
   val project: ProjectID
 
   /**
