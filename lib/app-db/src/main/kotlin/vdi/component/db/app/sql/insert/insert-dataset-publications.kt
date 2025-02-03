@@ -13,8 +13,8 @@ private fun sql(schema: String) =
 INSERT INTO
   ${schema}.dataset_publication (
     dataset_id
-  , citation
   , pubmed_id
+  , citation
   )
 VALUES
   (?, ?, ?)
@@ -23,11 +23,11 @@ VALUES
 internal fun Connection.insertDatasetPublications(
   schema: String,
   datasetID: DatasetID,
-  publications: Collection<VDIDatasetPublication>,
+  publications: Iterable<VDIDatasetPublication>,
 ) {
   preparedBatchUpdate(sql(schema), publications) {
     setDatasetID(1, datasetID)
-    setString(2, it.citation)
-    setString(3, it.pubmedID)
+    setString(2, it.pubmedID)
+    setString(3, it.citation)
   }
 }

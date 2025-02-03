@@ -1,10 +1,8 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
 import org.veupathdb.service.vdi.util.ValidationErrors
-import vdi.component.db.app.DatasetMetaMaxCategoryLength
-import vdi.component.db.app.DatasetMetaMaxShortAttributionLength
-import vdi.component.db.app.DatasetMetaMaxShortNameLength
-import vdi.component.db.app.DatasetMetaMaxSummaryFieldLength
+import vdi.component.db.app.*
 
 internal fun DatasetPatchRequest.cleanup() {
   name = name?.trim()
@@ -38,6 +36,8 @@ internal fun DatasetPatchRequest.validate() {
 
   if (name.isNullOrBlank())
     errors.add("name", "field cannot be blank")
+  else
+    name.checkLength("meta.name", DatasetMetaMaxNameLength, errors)
 
   shortName?.checkLength("shortName", DatasetMetaMaxShortNameLength, errors)
   shortAttribution?.checkLength("shortAttribution", DatasetMetaMaxShortAttributionLength, errors)
@@ -51,5 +51,10 @@ internal fun DatasetPatchRequest.validate() {
   publications.forEachIndexed { i, pub -> pub.validate("", i, errors) }
   hyperlinks.forEachIndexed { i, link -> link.validate("", i, errors) }
   contacts.forEachIndexed { i, con -> con.validate("", i, errors) }
-  organisms.forEachIndexed { i, l -> if (l == null) errors.add("organisms[$i]", "entries must not be null") }
+  organisms.forEachIndexed { i, l ->
+    if (l == null)
+      errors.add("meta.organisms[$i]", "entries must not be null")
+
+    l.checkLength("meta.organism[$i]", DatasetOrganismAbbrevMaxLength, errors)
+  }
 }

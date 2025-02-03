@@ -1,5 +1,7 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetPublication
+import org.veupathdb.service.vdi.generated.model.DatasetPublicationImpl
 import org.veupathdb.service.vdi.util.ValidationErrors
 import org.veupathdb.vdi.lib.common.model.VDIDatasetPublication
 import vdi.component.db.app.DatasetPublicationCitationMaxLength
@@ -19,12 +21,18 @@ internal fun DatasetPublication?.validate(prefix: String, index: Int, validation
     return
   }
 
-  if (citation == null)
-    validationErrors.add("${prefix}publications[$index].citation", "field is required")
-  else if (citation.length < 3)
-    validationErrors.add("${prefix}publications[$index].citation", "field value must be at least 3 characters in length")
-  else if (citation.toByteArray().size > DatasetPublicationCitationMaxLength)
-    validationErrors.add("${prefix}publications[$index].citation", "field must not be larger than $DatasetPublicationCitationMaxLength bytes")
+  if (citation != null) {
+    if (citation.length < 3)
+      validationErrors.add(
+        "${prefix}publications[$index].citation",
+        "field value must be at least 3 characters in length"
+      )
+    else if (citation.toByteArray().size > DatasetPublicationCitationMaxLength)
+      validationErrors.add(
+        "${prefix}publications[$index].citation",
+        "field must not be larger than $DatasetPublicationCitationMaxLength bytes"
+      )
+  }
 
   if (pubMedId == null)
     validationErrors.add("${prefix}publications[$index].pubMedId", "field is required")

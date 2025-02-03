@@ -1,5 +1,7 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetContact
+import org.veupathdb.service.vdi.generated.model.DatasetContactImpl
 import org.veupathdb.service.vdi.util.ValidationErrors
 import org.veupathdb.vdi.lib.common.model.VDIDatasetContact
 import vdi.component.db.app.*

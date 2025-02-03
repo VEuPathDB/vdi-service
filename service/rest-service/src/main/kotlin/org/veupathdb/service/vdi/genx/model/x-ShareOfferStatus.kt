@@ -1,5 +1,6 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.ShareOfferStatus
 import org.veupathdb.service.vdi.model.ShareFilterStatus
 
 internal fun ShareOfferStatus(status: ShareFilterStatus): ShareOfferStatus =

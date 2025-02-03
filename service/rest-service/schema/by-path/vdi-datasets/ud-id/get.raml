@@ -112,11 +112,11 @@ types:
         required: false
         uniqueItems: true
       organisms:
-        displayName: Dataset Organisms
+        displayName: Dataset Organism Abbreviations
         type: array
         items:
           type: string
-          maxLength: 200
+          maxLength: 20
         uniqueItems: true
         required: false
       contacts:
@@ -124,6 +124,7 @@ types:
         type: common.DatasetContact[]
         required: false
         uniqueItems: true
+
 
   ShareOffer:
     displayName: Share Offer
@@ -144,6 +145,7 @@ types:
         email: juser@ujoe.edu
         organization: University of Joe
       status: revoke
+
 
   ShareOfferRecipient:
     displayName: Share Offer Recipient

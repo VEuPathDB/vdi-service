@@ -1,5 +1,7 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.BrokenImportDetails
+import org.veupathdb.service.vdi.generated.model.BrokenImportDetailsImpl
 import vdi.component.db.cache.model.BrokenImportRecord
 import vdi.component.plugin.mapping.PluginHandlers
 

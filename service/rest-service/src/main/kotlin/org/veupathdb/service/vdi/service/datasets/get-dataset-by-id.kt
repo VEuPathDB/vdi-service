@@ -3,6 +3,7 @@ package org.veupathdb.service.vdi.service.datasets
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.service.vdi.generated.model.*
+import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.util.defaultZone

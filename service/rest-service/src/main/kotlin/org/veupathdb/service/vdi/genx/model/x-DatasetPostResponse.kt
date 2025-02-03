@@ -1,5 +1,7 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetPostResponse
+import org.veupathdb.service.vdi.generated.model.DatasetPostResponseImpl
 import org.veupathdb.vdi.lib.common.field.DatasetID
 
 /**

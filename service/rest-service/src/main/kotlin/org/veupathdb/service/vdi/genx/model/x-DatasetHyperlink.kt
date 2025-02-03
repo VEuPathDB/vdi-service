@@ -1,5 +1,7 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetHyperlink
+import org.veupathdb.service.vdi.generated.model.DatasetHyperlinkImpl
 import org.veupathdb.service.vdi.util.ValidationErrors
 import org.veupathdb.vdi.lib.common.model.VDIDatasetHyperlink
 import vdi.component.db.app.DatasetHyperlinkDescriptionMaxLength

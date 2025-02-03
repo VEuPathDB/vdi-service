@@ -1,5 +1,6 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetVisibility
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 
 fun DatasetVisibility.toInternalVisibility() = when (this) {

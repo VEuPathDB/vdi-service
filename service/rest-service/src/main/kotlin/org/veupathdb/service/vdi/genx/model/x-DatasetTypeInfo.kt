@@ -1,5 +1,7 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetTypeInfo
+import org.veupathdb.service.vdi.generated.model.DatasetTypeInfoImpl
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import vdi.component.db.cache.model.DatasetRecord

@@ -1,6 +1,7 @@
 package org.veupathdb.service.vdi.service.datasets
 
 import org.veupathdb.service.vdi.generated.model.*
+import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.service.vdi.util.reduceTo

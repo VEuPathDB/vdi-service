@@ -1,5 +1,9 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetContact
+import org.veupathdb.service.vdi.generated.model.DatasetHyperlink
+import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
+import org.veupathdb.service.vdi.generated.model.DatasetPublication
 import org.veupathdb.service.vdi.util.ValidationErrors
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.UserID

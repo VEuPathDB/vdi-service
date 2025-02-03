@@ -1,5 +1,7 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetInstallStatusEntry
+import org.veupathdb.service.vdi.generated.model.DatasetInstallStatusEntryImpl
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.component.db.app.model.InstallStatuses
 

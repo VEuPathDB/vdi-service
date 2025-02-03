@@ -12,7 +12,7 @@ private fun sql(schema: String) =
 INSERT INTO
   ${schema}.dataset_organism (
     dataset_id
-  , organism_name_for_files
+  , organism_abbrev
   )
 VALUES
   (?, ?)
@@ -21,7 +21,7 @@ VALUES
 internal fun Connection.insertDatasetOrganisms(
   schema: String,
   datasetID: DatasetID,
-  organisms: Collection<String>,
+  organisms: Iterable<String>,
 ) {
   preparedBatchUpdate(sql(schema), organisms) {
     setDatasetID(1, datasetID)

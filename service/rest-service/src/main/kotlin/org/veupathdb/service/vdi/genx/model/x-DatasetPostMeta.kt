@@ -1,10 +1,8 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetPostMeta
 import org.veupathdb.service.vdi.util.ValidationErrors
-import vdi.component.db.app.DatasetMetaMaxCategoryLength
-import vdi.component.db.app.DatasetMetaMaxShortAttributionLength
-import vdi.component.db.app.DatasetMetaMaxShortNameLength
-import vdi.component.db.app.DatasetMetaMaxSummaryFieldLength
+import vdi.component.db.app.*
 
 internal fun DatasetPostMeta.cleanup() {
   datasetType?.cleanup()
@@ -61,6 +59,8 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
 
   if (name.isNullOrBlank())
     validationErrors.add("meta.name", "field is required")
+  else
+    name.checkLength("meta.name", DatasetMetaMaxNameLength, validationErrors)
 
   shortName?.checkLength("meta.shortName", DatasetMetaMaxShortNameLength, validationErrors)
   shortAttribution?.checkLength("meta.shortAttribution", DatasetMetaMaxShortAttributionLength, validationErrors)
@@ -90,5 +90,10 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
   publications.forEachIndexed { i, pub -> pub.validate("meta.", i, validationErrors) }
   hyperlinks.forEachIndexed { i, link -> link.validate("meta.", i, validationErrors) }
   contacts.forEachIndexed { i, con -> con.validate("meta.", i, validationErrors) }
-  organisms.forEachIndexed { i, l -> if (l == null) validationErrors.add("meta.organisms[$i]", "entries must not be null") }
+  organisms.forEachIndexed { i, l ->
+    if (l == null)
+      validationErrors.add("meta.organisms[$i]", "entries must not be null")
+
+    l.checkLength("meta.organism[$i]", DatasetOrganismAbbrevMaxLength, validationErrors)
+  }
 }

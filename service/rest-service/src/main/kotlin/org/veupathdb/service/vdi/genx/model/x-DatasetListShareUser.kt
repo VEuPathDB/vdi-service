@@ -1,5 +1,7 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetListShareUser
+import org.veupathdb.service.vdi.generated.model.DatasetListShareUserImpl
 import org.veupathdb.service.vdi.model.UserDetails
 
 fun DatasetListShareUser(user: UserDetails, accepted: Boolean): DatasetListShareUser =

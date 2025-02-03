@@ -1,5 +1,7 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.ShareOfferRecipient
+import org.veupathdb.service.vdi.generated.model.ShareOfferRecipientImpl
 import org.veupathdb.service.vdi.model.UserDetails
 
 fun ShareOfferRecipient(user: UserDetails): ShareOfferRecipient =

@@ -1,5 +1,6 @@
-package org.veupathdb.service.vdi.generated.model
+package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.service.vdi.generated.model.DatasetPostType
 import org.veupathdb.service.vdi.util.ValidationErrors
 
 internal fun DatasetPostType.cleanup() {

@@ -7,15 +7,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetPublicationImpl.class
 )
 public interface DatasetPublication {
-  @JsonProperty("citation")
-  String getCitation();
-
-  @JsonProperty("citation")
-  void setCitation(String citation);
-
   @JsonProperty("pubMedId")
   String getPubMedId();
 
   @JsonProperty("pubMedId")
   void setPubMedId(String pubMedId);
+
+  @JsonProperty("citation")
+  String getCitation();
+
+  @JsonProperty("citation")
+  void setCitation(String citation);
 }

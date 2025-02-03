@@ -265,13 +265,13 @@ types:
     type: object
     additionalProperties: false
     properties:
-      citation:
-        type: string
-        required: true
-        minLength: 3
-        maxLength: 1024
       pubMedId:
         type: string
         required: true
         minLength: 3
         maxLength: 30
+      citation:
+        type: string
+        required: false
+        minLength: 3
+        maxLength: 2000
