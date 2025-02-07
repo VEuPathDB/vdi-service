@@ -19,6 +19,8 @@ jobs:
   deploy:
     name: Deploy API Docs
     runs-on: ubuntu-latest
+    needs:
+    - build
     permissions:
       pages: write
       id-token: write
