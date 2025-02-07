@@ -5,6 +5,8 @@ networks:
     external: false
   rabbitmq:
     external: false
+  traefik:
+    external: false
 
 name: "vdi"
 
