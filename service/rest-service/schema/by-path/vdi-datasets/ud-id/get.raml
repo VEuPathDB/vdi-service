@@ -28,6 +28,15 @@ types:
         displayName: Dataset Name
         type: string
         required: true
+      shortName:
+        type: string
+        required: false
+      shortAttribution:
+        type: string
+        required: false
+      category:
+        type: string
+        required: false
       summary:
         displayName: Dataset Summary
         type: string
@@ -54,6 +63,7 @@ types:
         description: |
           Project IDs for projects the user dataset record was submitted to.
         type: common.ProjectID[]
+        uniqueItems: true
         required: true
       visibility:
         displayName: Dataset Visibility
@@ -90,6 +100,31 @@ types:
         displayName: Dataset Dependencies
         type: common.DatasetDependency[]
         required: true
+        uniqueItems: true
+      publications:
+        displayName: Dataset Publications
+        type: common.DatasetPublication[]
+        required: false
+        uniqueItems: true
+      hyperlinks:
+        displayName: Dataset Hyperlinks
+        type: common.DatasetHyperlink[]
+        required: false
+        uniqueItems: true
+      organisms:
+        displayName: Dataset Organism Abbreviations
+        type: array
+        items:
+          type: string
+          maxLength: 20
+        uniqueItems: true
+        required: false
+      contacts:
+        displayName: Dataset Contacts
+        type: common.DatasetContact[]
+        required: false
+        uniqueItems: true
+
 
   ShareOffer:
     displayName: Share Offer
@@ -110,6 +145,7 @@ types:
         email: juser@ujoe.edu
         organization: University of Joe
       status: revoke
+
 
   ShareOfferRecipient:
     displayName: Share Offer Recipient

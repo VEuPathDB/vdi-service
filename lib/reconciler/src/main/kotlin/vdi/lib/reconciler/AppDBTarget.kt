@@ -1,7 +1,6 @@
 package vdi.lib.reconciler
 
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.component.db.app.AppDB
@@ -54,6 +53,10 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
         it.deleteDatasetProjectLinks(dataset.datasetID)
         it.deleteSyncControl(dataset.datasetID)
         it.deleteInstallMessages(dataset.datasetID)
+        it.deleteDatasetContacts(dataset.datasetID)
+        it.deleteDatasetHyperlinks(dataset.datasetID)
+        it.deleteDatasetPublications(dataset.datasetID)
+        it.deleteDatasetOrganisms(dataset.datasetID)
         it.deleteDatasetMeta(dataset.datasetID)
         it.deleteDataset(dataset.datasetID)
       }

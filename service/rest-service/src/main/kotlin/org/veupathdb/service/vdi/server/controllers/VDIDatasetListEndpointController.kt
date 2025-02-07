@@ -6,9 +6,8 @@ import org.glassfish.jersey.server.ContainerRequest
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
-import org.veupathdb.service.vdi.generated.model.DatasetPostResponse
-import org.veupathdb.service.vdi.generated.model.validate
 import org.veupathdb.service.vdi.generated.resources.VdiDatasets
+import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.service.datasets.createDataset
 import org.veupathdb.service.vdi.service.datasets.fetchUserDatasetList
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -44,9 +43,11 @@ class VDIDatasetListEndpointController(@Context request: ContainerRequest) : Vdi
     log.trace("postVdiDatasets(entity={})", entity)
 
     // Require and validate the request body.
-    (entity ?: throw BadRequestException("request body must not be empty"))
-      .validate()
-      .throwIfNotEmpty()
+    with(entity ?: throw BadRequestException("request body must not be empty")) {
+      cleanup()
+      validate()
+        .throwIfNotEmpty()
+    }
 
     // Generate a new dataset ID.
     val datasetID = DatasetID()

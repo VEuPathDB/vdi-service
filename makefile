@@ -1,26 +1,23 @@
 _COLOR := $(shell echo "\\033[38;5;69m")
 _RESET := $(shell echo "\\033[0m")
 
-ifneq '$(shell command -v podman 2>&1 >/dev/null; echo $?)' '0'
+ifeq ($(shell command -v docker 2>&1 >/dev/null && echo 0),0)
+CONTAINER_CMD := docker
+CONTAINER_PREFIX := $(notdir ${PWD})-
+CONTAINER_SUFFIX := -1
+MERGED_COMPOSE_FILES := docker-compose.yml docker-compose.dev.yml docker-compose.ssh.yml
+MERGE_TARGET :=
+else
 CONTAINER_CMD := podman
 CONTAINER_PREFIX := vdi_
 CONTAINER_SUFFIX := _1
 MERGED_COMPOSE_FILES := /tmp/$(shell basename $(shell pwd))-merged-compose.yml
 MERGE_TARGET := __MERGE_COMPOSE
-else
-CONTAINER_CMD := docker
-# FIXME: Incorrect prefix for docker compose
-# This was based on the directory name, but with a name now defined in the
-# compose files, it will likely change.  Either set it based on the current
-# directory name (if that's what docker compose does) or use the name from the
-# compose.dev file.
-CONTAINER_PREFIX := vdi-service-
-CONTAINER_SUFFIX := -1
-MERGED_COMPOSE_FILES := docker-compose.yml docker-compose.dev.yml docker-compose.ssh.yml
-MERGE_TARGET :=
 endif
 
 MERGED_COMPOSE_FLAGS := $(foreach file,$(MERGED_COMPOSE_FILES),-f $(file))
+
+SERVICES ?=
 
 
 
@@ -60,20 +57,20 @@ config: env-file-test $(MERGE_TARGET)
 .PHONY: up
 up: env-file-test $(MERGE_TARGET)
 	@if [ -z "${SSH_AUTH_SOCK}" ]; then echo "SSH agent does not appear to be correctly running"; exit 1; fi
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) up -d
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) up -d $(SERVICES)
 
 .PHONY: down
 down: env-file-test $(MERGE_TARGET)
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) down -v
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) down -v $(SERVICES)
 
 .PHONY: start
 start: env-file-test $(MERGE_TARGET)
 	@if [ -z "${SSH_AUTH_SOCK}" ]; then echo "SSH agent does not appear to be correctly running"; exit 1; fi
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) start
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) start $(SERVICES)
 
 .PHONY: stop
 stop: env-file-test $(MERGE_TARGET)
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) stop
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) stop $(SERVICES)
 
 .PHONY: __MERGE_COMPOSE
 __MERGE_COMPOSE:

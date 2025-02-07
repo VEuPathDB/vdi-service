@@ -35,7 +35,10 @@ types:
     type: object
     additionalProperties: false
     properties:
-      count: integer
+      count:
+        displayName: Result Count
+        description: Number of records in the result.
+        type: integer
       before?: string
       after?: string
       user?: User-ID
@@ -75,6 +78,9 @@ types:
       datasetType: DatasetTypeInfo
       visibility: DatasetVisibility
       name: string
+      shortName?: string
+      shortAttribution?: string
+      category?: string
       summary?: string
       description?: string
       sourceUrl?: string
@@ -101,6 +107,9 @@ types:
       created: datetime
       inserted: datetime
       name: string
+      shortName?: string
+      shortAttribution?: string
+      category?: string
       summary?: string
       description?: string
       visibility: DatasetVisibility
@@ -180,6 +189,15 @@ types:
         displayName: Dataset Name
         description: User provided name for the dataset.
         type: string
+      shortName:
+        type: string
+        required: false
+      shortAttribution:
+        type: string
+        required: false
+      category:
+        type: string
+        required: false
       summary:
         displayName: Dataset Summary
         description: User provided summary of the dataset.
@@ -271,6 +289,18 @@ types:
         displayName: Dataset Name
         description: User provided name for the dataset.
         type: string
+      shortName:
+        type: string
+        required: false
+        maxLength: 300
+      shortAttribution:
+        type: string
+        required: false
+        maxLength: 300
+      category:
+        type: string
+        required: false
+        maxLength: 100
       visibility:
         displayName: Dataset Visibility
         type: DatasetVisibility
@@ -298,9 +328,34 @@ types:
         description: IDs of the projects this dataset is being submitted to.
         type: ProjectID[]
         minItems: 1
+        uniqueItems: true
       dependencies:
         displayName: Dataset Dependencies
         type: DatasetDependency[]
+        uniqueItems: true
+      publications:
+        displayName: Dataset Publications
+        type: DatasetPublication[]
+        uniqueItems: true
+        required: false
+      hyperlinks:
+        displayName: Dataset Hyperlinks
+        type: DatasetHyperlink[]
+        uniqueItems: true
+        required: false
+      organisms:
+        displayName: Dataset Organisms
+        type: array
+        required: false
+        uniqueItems: true
+        items:
+          type: string
+          maxLength: 200
+      contacts:
+        displayName: Dataset Contacts
+        type: DatasetContact[]
+        uniqueItems: true
+        required: false
       createdOn:
         displayName: Creation Date
         type: datetime-only
@@ -389,6 +444,15 @@ types:
       name:
         displayName: Dataset Name
         type: string
+      shortName:
+        type: string
+        required: false
+      shortAttribution:
+        type: string
+        required: false
+      category:
+        type: string
+        required: false
       summary:
         displayName: Dataset Summary
         type: string
@@ -414,6 +478,7 @@ types:
         description: |
           Project IDs for projects the user dataset record was submitted to.
         type: ProjectID[]
+        uniqueItems: true
       visibility:
         displayName: Dataset Visibility
         type: DatasetVisibility
@@ -444,6 +509,30 @@ types:
       dependencies:
         displayName: Dataset Dependencies
         type: DatasetDependency[]
+        uniqueItems: true
+      publications:
+        displayName: Dataset Publications
+        type: DatasetPublication[]
+        uniqueItems: true
+        required: false
+      hyperlinks:
+        displayName: Dataset Hyperlinks
+        type: DatasetHyperlink[]
+        uniqueItems: true
+        required: false
+      organisms:
+        displayName: Dataset Organism Abbreviations
+        type: array
+        required: false
+        uniqueItems: true
+        items:
+          type: string
+          maxLength: 20
+      contacts:
+        displayName: Dataset Contacts
+        type: DatasetContact[]
+        uniqueItems: true
+        required: false
   ShareOffer:
     displayName: Share Offer
     type: object
@@ -504,6 +593,15 @@ types:
         description: User provided name for a dataset.
         type: string
         required: false
+      shortName:
+        type: string
+        required: false
+      shortAttribution:
+        type: string
+        required: false
+      category:
+        type: string
+        required: false
       summary:
         displayName: Dataset Summary
         description: User provided summary for a dataset.
@@ -513,6 +611,29 @@ types:
         displayName: Dataset Description
         description: User provided description for a dataset.
         type: string
+        required: false
+      publications:
+        displayName: Dataset Publications
+        type: DatasetPublication[]
+        uniqueItems: true
+        required: false
+      hyperlinks:
+        displayName: Dataset Hyperlinks
+        type: DatasetHyperlink[]
+        uniqueItems: true
+        required: false
+      organisms:
+        displayName: Dataset Organism Abbreviations
+        type: array
+        required: false
+        uniqueItems: true
+        items:
+          type: string
+          maxLength: 20
+      contacts:
+        displayName: Dataset Contacts
+        type: DatasetContact[]
+        uniqueItems: true
         required: false
   DatasetShareOffer:
     displayName: Dataset Share Offer
@@ -758,6 +879,76 @@ types:
       resourceIdentifier: string
       resourceDisplayName: string
       resourceVersion: string
+  DatasetContact:
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        minLength: 3
+        maxLength: 300
+      email:
+        type: string
+        required: false
+        minLength: 5
+        maxLength: 4000
+      affiliation:
+        type: string
+        required: false
+        maxLength: 4000
+      city:
+        type: string
+        required: false
+        maxLength: 200
+      state:
+        type: string
+        required: false
+        maxLength: 200
+      country:
+        type: string
+        required: false
+        maxLength: 200
+      address:
+        type: string
+        required: false
+        maxLength: 1000
+      isPrimary:
+        type: boolean
+        default: false
+        required: false
+  DatasetHyperlink:
+    type: object
+    additionalProperties: false
+    properties:
+      url:
+        type: string
+        minLength: 3
+        maxLength: 200
+      text:
+        type: string
+        minLength: 3
+        maxLength: 300
+      description:
+        type: string
+        required: false
+        maxLength: 4000
+      isPublication:
+        type: boolean
+        default: false
+        required: false
+  DatasetPublication:
+    type: object
+    additionalProperties: false
+    properties:
+      pubMedId:
+        type: string
+        minLength: 3
+        maxLength: 30
+      citation:
+        type: string
+        required: false
+        minLength: 3
+        maxLength: 2000
   Error:
     type: object
     additionalProperties: false

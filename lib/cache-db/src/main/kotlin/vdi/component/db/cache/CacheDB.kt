@@ -42,6 +42,7 @@ interface CacheDB {
 
   fun selectDatasetForUser(userID: UserID, datasetID: DatasetID): DatasetRecord?
 
+  // TODO: this is only used to list dataset IDs, very wasteful!!!
   fun selectDatasetsForUser(userID: UserID): List<DatasetRecord>
 
   fun selectNonPrivateDatasets(): List<DatasetRecord>

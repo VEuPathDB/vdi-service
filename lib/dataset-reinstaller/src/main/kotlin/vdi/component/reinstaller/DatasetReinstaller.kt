@@ -4,9 +4,7 @@ import kotlinx.coroutines.sync.Mutex
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.errors.S34KError
-import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
@@ -26,12 +24,7 @@ import vdi.component.plugin.mapping.PluginHandler
 import vdi.component.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
-import vdi.component.s3.paths.S3Paths
 import java.io.InputStream
-import java.nio.file.Path
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
 
 object DatasetReinstaller {
 

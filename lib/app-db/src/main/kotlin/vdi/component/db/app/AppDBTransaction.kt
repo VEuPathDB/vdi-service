@@ -4,7 +4,7 @@ import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.model.*
 import vdi.component.db.app.model.DatasetInstallMessage
 import vdi.component.db.app.model.DatasetRecord
 import vdi.component.db.app.model.DeleteFlag
@@ -24,6 +24,10 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    * @param datasetID ID of the target dataset that should be deleted.
    */
   fun deleteDataset(datasetID: DatasetID)
+
+  fun deleteDatasetContacts(datasetID: DatasetID)
+
+  fun deleteDatasetHyperlinks(datasetID: DatasetID)
 
   /**
    * Deletes the sync control record for a target dataset.
@@ -93,6 +97,10 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun deleteDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID)
 
+  fun deleteDatasetPublications(datasetID: DatasetID)
+
+  fun deleteDatasetOrganisms(datasetID: DatasetID)
+
   /**
    * Deletes a specific visibility record for a target dataset and user.
    *
@@ -123,14 +131,16 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun insertDataset(dataset: DatasetRecord)
 
+  fun insertDatasetContacts(datasetID: DatasetID, contacts: Collection<VDIDatasetContact>)
+
+  fun insertDatasetHyperlinks(datasetID: DatasetID, hyperlinks: Collection<VDIDatasetHyperlink>)
+
   /**
    * Inserts a new dataset install message record.
    *
    * @param message Dataset install message to insert.
    */
   fun insertDatasetInstallMessage(message: DatasetInstallMessage)
-
-  fun upsertDatasetInstallMessage(message: DatasetInstallMessage)
 
   /**
    * Inserts a new project link for a dataset.
@@ -154,6 +164,8 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    */
   fun insertDatasetProjectLinks(datasetID: DatasetID, projectIDs: Iterable<ProjectID>)
 
+  fun insertDatasetPublications(datasetID: DatasetID, publications: Collection<VDIDatasetPublication>)
+
   /**
    * Inserts a new dataset visibility record for a target dataset and user.
    *
@@ -174,23 +186,15 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    *
    * The sync control record, once created, will need to be updated as various
    * sync operations are completed for the target dataset.
-   *
-   * @param datasetID ID of the target dataset for which a sync control record
-   * should be created.
    */
-  fun insertSyncControl(sync: VDISyncControlRecord)
+  fun insertDatasetSyncControl(sync: VDISyncControlRecord)
 
   /**
    * Inserts a dataset meta record for the target dataset.
-   *
-   * @param datasetID ID of the dataset for which a dataset_meta record should
-   * be inserted.
-   *
-   * @param name Name of the dataset.
-   *
-   * @param description Optional description of the dataset.
    */
-  fun insertDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?)
+  fun insertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
+
+  fun insertDatasetOrganisms(datasetID: DatasetID, organisms: Collection<String>)
 
   // endregion Insert Operations
 
@@ -211,7 +215,7 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
    * @param datasetID ID of the target dataset whose deleted flag should be
    * updated.
    *
-   * @param deleted The new value for the deleted flag.
+   * @param deleteFlag The new value for the deleted flag.
    */
   fun updateDatasetDeletedFlag(datasetID: DatasetID, deleteFlag: DeleteFlag)
 
@@ -259,31 +263,21 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
 
   /**
    * Updates the target dataset metadata with the new given values.
-   *
-   * @param datasetID ID of the dataset whose meta record will be updated.
-   *
-   * @param name Name of the dataset.
-   *
-   * @param description Optional description of the dataset.
    */
-  fun updateDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?)
+  fun updateDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
 
   // endregion Update Operations
 
   // region Upsert Operations
 
+  fun upsertDatasetInstallMessage(message: DatasetInstallMessage)
+
   /**
    * Upserts the target dataset metadata with the given values.  If the target
    * record already exists it will be updated, if it does not exist, it will be
    * created.
-   *
-   * @param datasetID ID of the dataset whose meta record will be upserted.
-   *
-   * @param name Name of the dataset.
-   *
-   * @param description Optional description of the dataset.
    */
-  fun upsertDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?)
+  fun upsertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
 
   // endregion Upsert Operations
 

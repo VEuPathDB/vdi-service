@@ -4,9 +4,14 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
+import org.veupathdb.vdi.lib.common.model.*
 import vdi.component.db.app.model.*
-import vdi.component.db.app.sql.*
+import vdi.component.db.app.sql.delete.*
+import vdi.component.db.app.sql.insert.*
+import vdi.component.db.app.sql.select.*
+import vdi.component.db.app.sql.update.*
+import vdi.component.db.app.sql.upsert.upsertDatasetInstallMessage
+import vdi.component.db.app.sql.upsert.upsertDatasetMeta
 import java.sql.Connection
 import java.sql.SQLException
 import java.time.OffsetDateTime
@@ -15,7 +20,7 @@ class AppDBTransactionImpl(
   override val project: ProjectID,
   private val schema: String,
   private val connection: Connection,
-  private val platform: AppDBPlatform,
+  override val platform: AppDBPlatform,
 ) : AppDBTransaction {
 
   private val log = LoggerFactory.getLogger(javaClass)
@@ -54,6 +59,16 @@ class AppDBTransactionImpl(
     connection.deleteDatasetVisibilities(schema, datasetID)
   }
 
+  override fun deleteDatasetContacts(datasetID: DatasetID) {
+    log.debug("deleting dataset contact records for dataset {}", datasetID)
+    connection.deleteDatasetContacts(schema, datasetID)
+  }
+
+  override fun deleteDatasetHyperlinks(datasetID: DatasetID) {
+    log.debug("deleting dataset hyperlink records for dataset {}", datasetID)
+    connection.deleteDatasetHyperlinks(schema, datasetID)
+  }
+
   override fun deleteDatasetProjectLink(datasetID: DatasetID, projectID: ProjectID) {
     log.debug("deleting dataset project link for dataset {} and project {}", datasetID, projectID)
     connection.deleteDatasetProjectLink(schema, datasetID, projectID)
@@ -69,9 +84,29 @@ class AppDBTransactionImpl(
     connection.deleteDatasetMeta(schema, datasetID)
   }
 
+  override fun deleteDatasetPublications(datasetID: DatasetID) {
+    log.debug("deleting dataset publication records for dataset {}", datasetID)
+    connection.deleteDatasetPublications(schema, datasetID)
+  }
+
+  override fun deleteDatasetOrganisms(datasetID: DatasetID) {
+    log.debug("deleting dataset organism records for dataset {}", datasetID)
+    connection.deleteDatasetOrganisms(schema, datasetID)
+  }
+
   override fun insertDataset(dataset: DatasetRecord) {
     log.debug("inserting dataset record for dataset {}", dataset.datasetID)
     connection.insertDataset(schema, dataset)
+  }
+
+  override fun insertDatasetContacts(datasetID: DatasetID, contacts: Collection<VDIDatasetContact>) {
+    log.debug("inserting {} contact records for dataset {}", contacts.size, datasetID)
+    connection.insertDatasetContacts(schema, datasetID, contacts)
+  }
+
+  override fun insertDatasetHyperlinks(datasetID: DatasetID, hyperlinks: Collection<VDIDatasetHyperlink>) {
+    log.debug("inserting {} hyperlink records for dataset {}", hyperlinks.size, datasetID)
+    connection.insertDatasetHyperlinks(schema, datasetID, hyperlinks)
   }
 
   override fun insertDatasetInstallMessage(message: DatasetInstallMessage) {
@@ -110,32 +145,42 @@ class AppDBTransactionImpl(
     connection.insertDatasetVisibility(schema, datasetID, userID)
   }
 
-  override fun insertSyncControl(sync: VDISyncControlRecord) {
+  override fun insertDatasetSyncControl(sync: VDISyncControlRecord) {
     log.debug("inserting dataset sync control record for dataset {}", sync.datasetID)
     connection.insertDatasetSyncControl(schema, sync)
   }
 
-  override fun insertDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?) {
+  override fun insertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.debug("inserting dataset meta record for dataset {}", datasetID)
-    connection.insertDatasetMeta(schema, datasetID, name, summary, description)
+    connection.insertDatasetMeta(schema, datasetID, meta)
   }
 
-  override fun upsertDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?) {
+  override fun upsertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.debug("upserting dataset meta record for dataset {}", datasetID)
     if (platform === AppDBPlatform.Postgres) {
-      connection.upsertDatasetMeta(schema, datasetID, name, summary, description)
+      connection.upsertDatasetMeta(schema, datasetID, meta)
     } else {
       try {
-        insertDatasetMeta(datasetID, name, summary, description)
+        insertDatasetMeta(datasetID, meta)
       } catch (e: SQLException) {
         if (e.errorCode == 1) {
           log.debug("dataset meta record already exists for dataset {}", datasetID)
-          updateDatasetMeta(datasetID, name, summary, description)
+          updateDatasetMeta(datasetID, meta)
         } else {
           throw e
         }
       }
     }
+  }
+
+  override fun insertDatasetPublications(datasetID: DatasetID, publications: Collection<VDIDatasetPublication>) {
+    log.debug("inserting {} publication records for dataset {}", publications.size, datasetID)
+    connection.insertDatasetPublications(schema, datasetID, publications)
+  }
+
+  override fun insertDatasetOrganisms(datasetID: DatasetID, organisms: Collection<String>) {
+    log.debug("inserting {} organism records for dataset {}", organisms.size, datasetID)
+    connection.insertDatasetOrganisms(schema, datasetID, organisms)
   }
 
   override fun updateDataset(dataset: DatasetRecord) {
@@ -168,9 +213,9 @@ class AppDBTransactionImpl(
     connection.updateDatasetInstallMessage(schema, message)
   }
 
-  override fun updateDatasetMeta(datasetID: DatasetID, name: String, summary: String?, description: String?) {
+  override fun updateDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.debug("updating dataset meta record for dataset {}", datasetID)
-    connection.updateDatasetMeta(schema, datasetID, name, summary, description)
+    connection.updateDatasetMeta(schema, datasetID, meta)
   }
 
   override fun rollback() {

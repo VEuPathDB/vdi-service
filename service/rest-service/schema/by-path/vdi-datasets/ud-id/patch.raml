@@ -20,6 +20,15 @@ types:
         description: User provided name for a dataset.
         type: string
         required: false
+      shortName:
+        type: string
+        required: false
+      shortAttribution:
+        type: string
+        required: false
+      category:
+        type: string
+        required: false
       summary:
         displayName: Dataset Summary
         description: User provided summary for a dataset.
@@ -30,3 +39,26 @@ types:
         description: User provided description for a dataset.
         type: string
         required: false
+      publications:
+        displayName: Dataset Publications
+        type: common.DatasetPublication[]
+        required: false
+        uniqueItems: true
+      hyperlinks:
+        displayName: Dataset Hyperlinks
+        type: common.DatasetHyperlink[]
+        required: false
+        uniqueItems: true
+      organisms:
+        displayName: Dataset Organism Abbreviations
+        type: array
+        items:
+          type: string
+          maxLength: 20
+        uniqueItems: true
+        required: false
+      contacts:
+        displayName: Dataset Contacts
+        type: common.DatasetContact[]
+        required: false
+        uniqueItems: true
