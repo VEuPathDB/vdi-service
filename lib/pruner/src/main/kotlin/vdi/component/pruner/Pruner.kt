@@ -207,6 +207,7 @@ object Pruner {
       it.deleteDatasetHyperlinks(datasetID)
       it.deleteDatasetPublications(datasetID)
       it.deleteDatasetOrganisms(datasetID)
+      it.deleteDatasetDependencies(datasetID)
       it.deleteDatasetMeta(datasetID)
       it.deleteDataset(datasetID)
     }

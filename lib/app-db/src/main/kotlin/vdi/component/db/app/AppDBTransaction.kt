@@ -101,6 +101,8 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
 
   fun deleteDatasetOrganisms(datasetID: DatasetID)
 
+  fun deleteDatasetDependencies(datasetID: DatasetID)
+
   /**
    * Deletes a specific visibility record for a target dataset and user.
    *
@@ -195,6 +197,8 @@ interface AppDBTransaction : AppDBAccessor, AutoCloseable {
   fun insertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta)
 
   fun insertDatasetOrganisms(datasetID: DatasetID, organisms: Collection<String>)
+
+  fun insertDatasetDependencies(datasetID: DatasetID, dependencies: Collection<VDIDatasetDependency>)
 
   // endregion Insert Operations
 

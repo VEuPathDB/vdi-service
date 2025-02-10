@@ -361,6 +361,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     try {
       insertDataset(record)
       insertDatasetVisibility(datasetID, meta.owner)
+      insertDatasetDependencies(datasetID, meta.dependencies)
 
       upsertInstallMetaMessage(datasetID, InstallStatus.Running)
 
