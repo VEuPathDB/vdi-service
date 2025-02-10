@@ -89,7 +89,16 @@ internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
 
   publications.forEachIndexed { i, pub -> pub.validate("meta.", i, validationErrors) }
   hyperlinks.forEachIndexed { i, link -> link.validate("meta.", i, validationErrors) }
-  contacts.forEachIndexed { i, con -> con.validate("meta.", i, validationErrors) }
+
+  var primaries = 0
+  contacts.forEachIndexed { i, con ->
+    con.validate("meta.", i, validationErrors)
+    if (con.isPrimary == true)
+      primaries++
+  }
+  if (primaries > 1)
+    validationErrors.add("meta.contacts", "only one contact may be marked as primary")
+
   organisms.forEachIndexed { i, l ->
     if (l == null)
       validationErrors.add("meta.organisms[$i]", "entries must not be null")
