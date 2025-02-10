@@ -94,6 +94,11 @@ class AppDBTransactionImpl(
     connection.deleteDatasetOrganisms(schema, datasetID)
   }
 
+  override fun deleteDatasetDependencies(datasetID: DatasetID) {
+    log.debug("deleting dataset dependency records for dataset {}", datasetID)
+    connection.deleteDatasetDependencies(schema, datasetID)
+  }
+
   override fun insertDataset(dataset: DatasetRecord) {
     log.debug("inserting dataset record for dataset {}", dataset.datasetID)
     connection.insertDataset(schema, dataset)
@@ -181,6 +186,11 @@ class AppDBTransactionImpl(
   override fun insertDatasetOrganisms(datasetID: DatasetID, organisms: Collection<String>) {
     log.debug("inserting {} organism records for dataset {}", organisms.size, datasetID)
     connection.insertDatasetOrganisms(schema, datasetID, organisms)
+  }
+
+  override fun insertDatasetDependencies(datasetID: DatasetID, dependencies: Collection<VDIDatasetDependency>) {
+    log.debug("inserting {} dependency records for dataset {}", dependencies.size, datasetID)
+    connection.insertDatasetDependencies(schema, datasetID, dependencies)
   }
 
   override fun updateDataset(dataset: DatasetRecord) {
