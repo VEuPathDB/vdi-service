@@ -84,7 +84,7 @@ internal object CacheDBImpl: CacheDB {
   override fun selectDatasetForUser(userID: UserID, datasetID: DatasetID) =
     connection.use { it.selectDatasetForUser(userID, datasetID) }
 
-  override fun selectDatasetsForUser(userID: UserID) = connection.use { it.selectDatasetsForUser(userID) }
+  override fun selectUndeletedDatasetIDsForUser(userID: UserID) = connection.use { it.selectUndeletedDatasetIDsForUser(userID) }
 
   override fun selectNonPrivateDatasets() = connection.use { it.selectNonPrivateDatasets() }
 

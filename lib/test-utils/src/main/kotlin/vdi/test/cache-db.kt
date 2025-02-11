@@ -23,7 +23,7 @@ fun mockCacheDB(
   onSelectUploadFileSummaries: (List<DatasetID>) -> Map<DatasetID, DatasetFileSummary> = ::oneParamMap,
   onSelectDatasetList: (DatasetListQuery) -> List<DatasetRecord> = ::oneParamList,
   onSelectDatasetForUser: (UserID, DatasetID) -> DatasetRecord? = ::twoParamNull,
-  onSelectDatasetsForUser: (UserID) -> List<DatasetRecord> = ::oneParamList,
+  onSelectDatasetsForUser: (UserID) -> List<DatasetID> = ::oneParamList,
   onSelectNonPrivateDatasets: () -> List<DatasetRecord> = ::noParamList,
   onSelectSharesForDataset: DSGetter<List<DatasetShare>> = ::oneParamList,
   onSelectSharesForDatasets: (List<DatasetID>) -> Map<DatasetID, List<DatasetShare>> = ::oneParamMap,
@@ -52,7 +52,7 @@ fun mockCacheDB(
     on { selectUploadFileSummaries(any()) } doAnswer { onSelectUploadFileSummaries(it.getArgument(0)) }
     on { selectDatasetList(any()) } doAnswer { onSelectDatasetList(it.getArgument(0)) }
     on { selectDatasetForUser(any(), any()) } doAnswer { onSelectDatasetForUser(it.getArgument(0), it.getArgument(1)) }
-    on { selectDatasetsForUser(any()) } doAnswer { onSelectDatasetsForUser(it.getArgument(0)) }
+    on { selectUndeletedDatasetIDsForUser(any()) } doAnswer { onSelectDatasetsForUser(it.getArgument(0)) }
     on { selectNonPrivateDatasets() } doAnswer { onSelectNonPrivateDatasets() }
     on { selectSharesForDataset(any()) } doAnswer { onSelectSharesForDataset(it.getArgument(0)) }
     on { selectSharesForDatasets(any()) } doAnswer { onSelectSharesForDatasets(it.getArgument(0)) }
