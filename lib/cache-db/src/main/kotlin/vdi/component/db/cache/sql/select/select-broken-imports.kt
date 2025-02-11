@@ -12,7 +12,7 @@ private fun sqlBody(
   afterFilter:  String,
   orderBy:      String,
   sortOrder:    String,
-  limit:        UByte,
+  limit:        UInt,
   offset:       UInt,
 ) =
 // language=postgresql

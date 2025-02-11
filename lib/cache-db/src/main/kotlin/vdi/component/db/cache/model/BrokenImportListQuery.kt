@@ -17,7 +17,7 @@ class BrokenImportListQuery {
 
   var sortBy: SortField = SortField.Date
 
-  var limit: UByte = 100u
+  var limit: UInt = UInt.MAX_VALUE
 
   var offset: UInt = 0u
 

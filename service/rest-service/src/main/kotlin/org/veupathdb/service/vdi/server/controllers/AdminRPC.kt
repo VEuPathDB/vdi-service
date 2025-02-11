@@ -31,8 +31,6 @@ import vdi.lib.reconciler.Reconciler
 
 // Broken Import Query Constants
 private const val biQueryLimitMinimum = 0
-private const val biQueryLimitMaximum = 250
-private const val biQueryLimitDefault = 100
 private const val biQueryOffsetMinimum = 0
 private const val biQueryOffsetDefault = 0
 
@@ -126,7 +124,7 @@ class AdminRPC : Admin {
     sort: String?,
     order: String?,
   ): Admin.GetAdminFailedImportsResponse {
-    if (limit != null && (limit < biQueryLimitMinimum || limit > biQueryLimitMaximum))
+    if (limit != null && limit < biQueryLimitMinimum)
       throw BadRequestException("invalid limit value")
 
     if (offset != null && offset < biQueryOffsetMinimum)
@@ -136,12 +134,12 @@ class AdminRPC : Admin {
       it.userID = user?.toUserID()
       it.before = before?.let { fixVariableDateString(it) { BadRequestException("invalid before date value") } }
       it.after  = after?.let { fixVariableDateString(it) { BadRequestException("invalid after date value") } }
-      it.limit  = limit?.toUByte() ?: biQueryLimitDefault.toUByte()
+      limit?.toUInt()?.let { lim -> it.limit = lim }
       it.offset = offset?.toUInt() ?: biQueryOffsetDefault.toUInt()
-      it.sortBy = sort?.let { BrokenImportListQuery.SortField.fromStringOrNull(it) }
-        ?: throw BadRequestException("invalid sort by value")
-      it.order  = order?.let { SortOrder.fromStringOrNull(it) }
-        ?: throw BadRequestException("invalid sort order value")
+      sort?.let { s -> it.sortBy = BrokenImportListQuery.SortField.fromStringOrNull(s)
+        ?: throw BadRequestException("invalid sort by value") }
+      order?.let { o -> it.order = SortOrder.fromStringOrNull(o)
+        ?: throw BadRequestException("invalid sort order value") }
     }
 
     val broken = CacheDB().selectBrokenDatasetImports(query)
