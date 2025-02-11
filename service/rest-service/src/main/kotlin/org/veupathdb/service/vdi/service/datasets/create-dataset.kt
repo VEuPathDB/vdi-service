@@ -1,6 +1,7 @@
 package org.veupathdb.service.vdi.service.datasets
 
 import jakarta.ws.rs.BadRequestException
+import jakarta.ws.rs.WebApplicationException
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
@@ -146,11 +147,20 @@ private fun uploadFiles(
         log.debug("uploading raw user data to S3 for new dataset {}/{}", userID, datasetID)
         DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
 
-        cacheDB.withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
+        CacheDB().withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
       } catch (e: Throwable) {
-        log.error("user dataset upload to minio failed: ", e)
-        Metrics.Upload.failed.inc();
-        cacheDB.withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+        if (e is WebApplicationException && (e.response?.status ?: 500) in 400..499) {
+          log.info("rejecting user dataset upload for user error: {}", e.message)
+          CacheDB().withTransaction {
+            it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
+            e.message?.let { msg -> it.tryInsertImportMessages(datasetID, msg) }
+          }
+        } else {
+          log.error("user dataset upload to minio failed: ", e)
+          Metrics.Upload.failed.inc();
+          CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+        }
+
         throw e
       } finally {
         uploadFile.deleteIfExists()
@@ -164,7 +174,7 @@ private fun uploadFiles(
     DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
   } catch (e: Throwable) {
     log.error("user dataset meta file upload to minio failed: ", e)
-    cacheDB.withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+    CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     throw e
   }
 }
@@ -235,14 +245,14 @@ private fun Path.repackZip(into: Path, using: Path): List<VDIDatasetFileInfo> {
   val unpacked = ArrayList<Path>(12)
 
   // Iterate through the zip entries
+  try {
   Zip.zipEntries(this)
     .forEach { (entry, input) ->
 
       // If the zip entry contains a slash, we reject it (we don't presently
       // allow subdirectories)
       if (entry.name.contains('/') || entry.isDirectory) {
-        // If the archive contains that awful __MACOSX directory, skip it
-        // silently.
+        // If the archive contains a __MACOSX directory, skip it silently.
         if (entry.name.startsWith("__MACOSX")) {
           return@forEach
         }
@@ -259,6 +269,9 @@ private fun Path.repackZip(into: Path, using: Path): List<VDIDatasetFileInfo> {
 
       unpacked.add(tmpFile)
     }
+  } catch (e: IllegalStateException) {
+    throw BadRequestException("decompressed file size is too large")
+  }
 
   // ensure that the zip actually contained some files
   if (unpacked.isEmpty())
