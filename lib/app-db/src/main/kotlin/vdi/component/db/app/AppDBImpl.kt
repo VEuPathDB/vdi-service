@@ -17,7 +17,7 @@ internal object AppDBImpl : AppDB {
     val result = HashMap<DatasetID, MutableMap<ProjectID, InstallStatuses>>(100)
 
     for ((projectID, datasetIDs) in targets) {
-      for ((dataType, _) in AppDatabaseRegistry[projectID]!!) {
+      for ((dataType, _) in AppDatabaseRegistry[projectID] ?: emptyList()) {
         val ds = AppDatabaseRegistry.require(projectID, dataType)
 
         ds.source.connection.use { con ->
@@ -38,7 +38,7 @@ internal object AppDBImpl : AppDB {
     val out = HashMap<ProjectID, InstallStatuses>(projects.size)
 
     for (projectID in projects) {
-      for ((dataType, _) in AppDatabaseRegistry[projectID]!!) {
+      for ((dataType, _) in AppDatabaseRegistry[projectID] ?: emptyList()) {
         with(AppDatabaseRegistry.require(projectID, dataType)) {
           source.connection.use { con -> out[projectID] = con.selectInstallStatuses(ctlSchema, target) }
         }
