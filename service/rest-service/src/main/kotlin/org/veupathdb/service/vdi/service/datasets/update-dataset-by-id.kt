@@ -26,6 +26,7 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
   if (!patch.hasSomethingToUpdate())
     return
 
+  patch.cleanup()
   patch.validate()
 
   val meta = DatasetStore.getDatasetMeta(userID, datasetID)
