@@ -6,6 +6,8 @@ updates:
   - github-packages
   schedule:
     interval: weekly
+  commit-message:
+    prefix: '[skip ci]'
 - package-ecosystem: docker
   directory: "/"
   schedule:
