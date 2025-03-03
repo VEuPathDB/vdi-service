@@ -8,6 +8,7 @@ updates:
     interval: weekly
   commit-message:
     prefix: '[skip ci]'
+  open-pull-request-limit: 20
 - package-ecosystem: docker
   directory: "/"
   schedule:
