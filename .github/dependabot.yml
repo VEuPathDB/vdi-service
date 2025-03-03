@@ -8,6 +8,8 @@ updates:
     interval: weekly
   commit-message:
   open-pull-request-limit: 20
+  ignore:
+    dependency-name: org.gusdb:fgputil*
 - package-ecosystem: docker
   directory: "/"
   schedule:
