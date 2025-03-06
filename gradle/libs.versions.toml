@@ -9,6 +9,9 @@ container-multipart = { group = "org.veupathdb.lib", name = "multipart-jackson-p
 vdi-common = { group = "org.veupathdb.vdi", name = "vdi-component-common", version = "17.1.5" }
 vdi-json   = { group = "org.veupathdb.vdi", name = "vdi-component-json",   version = "1.0.2"  }
 
+# Jackson (TODO: fix code to not require this)
+jackson-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version = "2.18.3" }
+
 # Database
 db-pool            = { group = "com.zaxxer",               name = "HikariCP",   version = "6.2.1"        }
 db-driver-oracle   = { group = "com.oracle.database.jdbc", name = "ojdbc8",     version = "23.7.0.25.01" }

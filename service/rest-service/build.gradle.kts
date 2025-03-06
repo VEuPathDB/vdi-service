@@ -69,6 +69,9 @@ dependencies {
   implementation(kotlin("stdlib-jdk8"))
   implementation(libs.kt.coroutines)
 
+  // Jackson
+  implementation(libs.jackson.jsr310)
+
   // Jersey
   implementation(libs.http.server.jersey)
 
