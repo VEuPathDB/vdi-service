@@ -13,6 +13,7 @@ import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.query.AdminAllDatasetsQuery
 import vdi.component.db.cache.sql.select.*
 import vdi.component.env.EnvKey
+import vdi.health.RemoteDependencies
 import javax.sql.DataSource
 import org.postgresql.Driver as PostgresDriver
 
@@ -47,6 +48,8 @@ internal object CacheDBImpl: CacheDB {
         it.maximumPoolSize = poolSize.toInt()
         it.driverClassName = PostgresDriver::class.java.name
       }
+
+    RemoteDependencies.register("internal cache db", host, port)
 
     dataSource = HikariDataSource(config)
     details    = CacheDBConnectionDetails(host, port, name)

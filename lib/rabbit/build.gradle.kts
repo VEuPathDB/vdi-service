@@ -5,6 +5,7 @@ plugins {
 dependencies {
   implementation(project(":lib:async"))
   implementation(project(":lib:env"))
+  implementation(project(":lib:health"))
   implementation(project(":lib:metrics"))
 
   implementation(libs.kt.coroutines)

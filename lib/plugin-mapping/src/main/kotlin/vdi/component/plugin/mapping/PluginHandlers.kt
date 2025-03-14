@@ -8,6 +8,8 @@ import org.veupathdb.vdi.lib.common.field.DataType
 import vdi.component.env.EnvKey
 import vdi.component.plugin.client.PluginHandlerClient
 import vdi.component.plugin.client.PluginHandlerClientConfig
+import vdi.health.RemoteDependencies
+import java.net.URI
 
 /**
  * Collection of [PluginHandler] instances mapped by dataset type name.
@@ -92,6 +94,8 @@ object PluginHandlers {
       PluginHandlerClient(PluginHandlerClientConfig(address)),
       projects,
     )
+
+    RemoteDependencies.register("Plugin $dispName", address.host, address.port)
   }
 
   data class NameVersionPair(val name: DataType, val version: String)

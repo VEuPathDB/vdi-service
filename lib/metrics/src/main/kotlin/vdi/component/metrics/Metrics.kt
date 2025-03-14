@@ -11,6 +11,16 @@ fun Counter.initZeroes(): Counter = run {
 
 object Metrics {
 
+  object RabbitMQ {
+    var lastMessageReceived = 0L
+
+    val unparseableRabbitMessage: Counter = Counter.build()
+      .name("unparseable_rabbit_message")
+      .help("A rabbit message is unparseable.")
+      .register()
+      .initZeroes()
+  }
+
   object Import {
     val count: Counter = Counter.build()
       .name("dataset_imports")
@@ -200,12 +210,6 @@ object Metrics {
     .name("soft_delete_queue_size")
     .help("Number of soft deletes currently queued to be processed.")
     .register()
-
-  val unparseableRabbitMessage: Counter = Counter.build()
-    .name("unparseable_rabbit_message")
-    .help("A rabbit message is unparseable.")
-    .register()
-    .initZeroes()
 
   val malformedDatasetFound: Counter = Counter.build()
     .name("malformed_dataset_found")
