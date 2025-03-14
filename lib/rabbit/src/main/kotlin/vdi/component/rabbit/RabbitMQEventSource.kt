@@ -27,7 +27,7 @@ class RabbitMQEventSource<T : Any>(private val config: RabbitMQConfig, mappingFu
             if (Metrics.RabbitMQ.lastMessageReceived > 0)
               mapOf("lastMessage" to (System.currentTimeMillis() - Metrics.RabbitMQ.lastMessageReceived).milliseconds.toString())
             else
-              emptyMap()
+              mapOf("lastMessage" to "n/a")
           }
         }
       }

@@ -1,3 +1,5 @@
+version: "3.5"
+
 networks:
   internal:
   traefik:
@@ -980,9 +982,6 @@ services:
     - type: bind
       source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
       target: ${DATASET_DIRECTORY_TARGET_PATH:?}
-    - type: bind
-      source: ./service.jar
-      target: /service.jar
     environment:
       LDAP_SERVER: ${LDAP_SERVER:?}
       ORACLE_BASE_DN: ${ORACLE_BASE_DN:?}

@@ -9,7 +9,6 @@ import vdi.component.env.EnvKey
 import vdi.component.plugin.client.PluginHandlerClient
 import vdi.component.plugin.client.PluginHandlerClientConfig
 import vdi.health.RemoteDependencies
-import java.net.URI
 
 /**
  * Collection of [PluginHandler] instances mapped by dataset type name.

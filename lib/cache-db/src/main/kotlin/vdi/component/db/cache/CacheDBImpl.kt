@@ -8,6 +8,7 @@ import org.veupathdb.vdi.lib.common.env.optUShort
 import org.veupathdb.vdi.lib.common.env.require
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import vdi.component.db.cache.health.DatabaseDependency
 import vdi.component.db.cache.model.BrokenImportListQuery
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.query.AdminAllDatasetsQuery
@@ -49,10 +50,10 @@ internal object CacheDBImpl: CacheDB {
         it.driverClassName = PostgresDriver::class.java.name
       }
 
-    RemoteDependencies.register("internal cache db", host, port)
-
     dataSource = HikariDataSource(config)
     details    = CacheDBConnectionDetails(host, port, name)
+
+    RemoteDependencies.register(DatabaseDependency(this))
   }
 
   override fun selectDataset(datasetID: DatasetID) = connection.use { it.selectDataset(datasetID) }
