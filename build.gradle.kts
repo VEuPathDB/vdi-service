@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  kotlin("jvm") version "2.1.10"
+  kotlin("jvm") version libs.versions.kotlin
   id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -65,7 +65,7 @@ tasks.shadowJar {
   }
 }
 
-tasks.create("compile-design-doc") {
+tasks.register("compile-design-doc") {
   doLast {
     val command = arrayOf(
       "asciidoctor",
@@ -86,7 +86,7 @@ tasks.create("compile-design-doc") {
   }
 }
 
-tasks.create("generate-raml-docs") {
+tasks.register("generate-raml-docs") {
   dependsOn(":service:rest-service:generate-raml-docs")
 
   doLast {
@@ -103,6 +103,20 @@ tasks.create("generate-raml-docs") {
       target.delete()
       source.copyTo(target)
       source.delete()
+    }
+  }
+}
+
+tasks.register("download-dependencies") {
+  configurations {
+    create("download") {
+      project.versionCatalogs.forEach { catalog ->
+        catalog.libraryAliases.forEach { libName ->
+          dependencies.addLater(catalog.findLibrary(libName).get())
+        }
+      }
+
+      this.files
     }
   }
 }

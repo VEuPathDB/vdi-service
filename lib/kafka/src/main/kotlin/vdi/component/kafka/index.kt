@@ -4,11 +4,27 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
+import org.veupathdb.vdi.lib.common.util.HostAddress
+import vdi.health.RemoteDependencies
 import java.util.*
+import kotlin.collections.HashSet
 import org.apache.kafka.clients.consumer.KafkaConsumer as KConsumer
 import org.apache.kafka.clients.producer.KafkaProducer as KProducer
 
+private val knownServers = HashSet<HostAddress>(1)
+private fun init(servers: Iterable<HostAddress>) {
+  synchronized(knownServers) {
+    for (server in servers) {
+      if (server !in knownServers) {
+        knownServers.add(server)
+        RemoteDependencies.register("Kafka ${server}", server.host, server.port)
+      }
+    }
+  }
+}
+
 fun KafkaConsumer(topic: String, config: KafkaConsumerConfig): KafkaConsumer {
+  init(config.servers)
   val props = Properties()
     .apply {
       setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.servers.joinToString(",") { it.toString() })
@@ -43,6 +59,7 @@ fun KafkaConsumer(topic: String, config: KafkaConsumerConfig): KafkaConsumer {
 }
 
 fun KafkaProducer(config: KafkaProducerConfig): KafkaProducer {
+  init(config.servers)
   val props = Properties()
     .apply {
       setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.servers.joinToString(",") { it.toString() })

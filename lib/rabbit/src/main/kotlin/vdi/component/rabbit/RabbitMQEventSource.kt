@@ -3,7 +3,11 @@ package vdi.component.rabbit
 import com.rabbitmq.client.Channel
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import org.veupathdb.vdi.lib.common.util.HostAddress
 import vdi.component.async.SuspendingSequence
+import vdi.component.metrics.Metrics
+import vdi.health.RemoteDependencies
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 private const val MaxConnectionRetries = 5
@@ -12,6 +16,24 @@ private val RetryDelay = 1.seconds
 class RabbitMQEventSource<T : Any>(private val config: RabbitMQConfig, mappingFunction: (ByteArray) -> T)
   : SuspendingSequence<T>
 {
+  private companion object {
+    private val knownHosts = HashSet<HostAddress>(1)
+
+    fun init(address: HostAddress) {
+      synchronized(knownHosts) {
+        if (address !in knownHosts) {
+          knownHosts.add(address)
+          RemoteDependencies.register("RabbitMQ ${address.host}", address.host, address.port) {
+            if (Metrics.RabbitMQ.lastMessageReceived > 0)
+              mapOf("lastMessage" to (System.currentTimeMillis() - Metrics.RabbitMQ.lastMessageReceived).milliseconds.toString())
+            else
+              mapOf("lastMessage" to "n/a")
+          }
+        }
+      }
+    }
+  }
+
   private val log = LoggerFactory.getLogger(javaClass)
 
   private val fac = RabbitInstanceFactory(config)
@@ -29,6 +51,7 @@ class RabbitMQEventSource<T : Any>(private val config: RabbitMQConfig, mappingFu
 
   init {
     runBlocking { initChannel() }
+    init(config.serverAddress)
   }
 
   override fun iterator() = iterator

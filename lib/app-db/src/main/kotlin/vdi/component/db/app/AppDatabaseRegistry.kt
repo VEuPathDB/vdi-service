@@ -10,8 +10,10 @@ import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.SecretString
+import vdi.component.db.app.health.DatabaseDependency
 import vdi.component.env.EnvKey
 import vdi.component.ldap.LDAP
+import vdi.health.RemoteDependencies
 import javax.sql.DataSource
 
 @Suppress("NOTHING_TO_INLINE")
@@ -196,6 +198,8 @@ object AppDatabaseRegistry {
               }
             }
           }
+
+          RemoteDependencies.register(DatabaseDependency(entry))
         }
     }
   }

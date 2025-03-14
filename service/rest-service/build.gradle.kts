@@ -50,6 +50,7 @@ dependencies {
   implementation(project(":lib:cache-db"))
   implementation(project(":lib:dataset-reinstaller"))
   implementation(project(":lib:env"))
+  implementation(project(":lib:health"))
   implementation(project(":lib:install-cleanup"))
   implementation(project(":lib:plugin-mapping"))
   implementation(project(":lib:pruner"))

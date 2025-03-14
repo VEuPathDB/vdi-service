@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
   implementation(project(":lib:env"))
+  implementation(project(":lib:health"))
   implementation(project(":lib:ldap"))
 
   implementation(libs.vdi.common)

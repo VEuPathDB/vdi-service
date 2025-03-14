@@ -31,18 +31,19 @@ class RabbitMQEventIterator<T>(
       val res = channelProvider().basicGet(queue, true)
 
       if (res != null) {
-         try {
+        try {
           nextValue = mappingFunction(res.body)
+          Metrics.RabbitMQ.lastMessageReceived = System.currentTimeMillis()
           return true
-         } catch (e: Throwable) {
-           Metrics.unparseableRabbitMessage.inc()
-           log.error("message from RabbitMQ could not be parsed as a MinIO event", e)
+        } catch (e: Throwable) {
+          Metrics.RabbitMQ.unparseableRabbitMessage.inc()
+          log.error("message from RabbitMQ could not be parsed as a MinIO event", e)
 
-           if (res.body.size <= MAX_LOGGABLE_MESSAGE_SIZE_BYTES)
-             log.error("message was: {}", res.body.decodeToString())
-           else
-             log.error("message was too large to print")
-         }
+          if (res.body.size <= MAX_LOGGABLE_MESSAGE_SIZE_BYTES)
+            log.error("message was: {}", res.body.decodeToString())
+          else
+            log.error("message was too large to print")
+        }
       } else {
         delay(pollingInterval)
       }

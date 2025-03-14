@@ -10,6 +10,7 @@ tasks.test {
 
 dependencies {
   implementation(project(":lib:env"))
+  implementation(project(":lib:health"))
   implementation(project(":lib:metrics"))
 
   implementation(libs.vdi.common)

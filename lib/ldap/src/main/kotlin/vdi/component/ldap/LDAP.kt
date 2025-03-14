@@ -7,6 +7,7 @@ import org.veupathdb.vdi.lib.common.env.EnvKey
 import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.env.reqHostAddresses
 import org.veupathdb.vdi.lib.common.env.require
+import vdi.health.RemoteDependencies
 
 object LDAP {
 
@@ -28,5 +29,9 @@ object LDAP {
     val oracleDN = env.require(EnvKey.LDAP.OracleBaseDN)
 
     ldap = LDAP(LDAPConfig(servers, oracleDN))
+
+    servers.forEach {
+      RemoteDependencies.register("LDAP ${it.host}", it.host, it.port)
+    }
   }
 }
