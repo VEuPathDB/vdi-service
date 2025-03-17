@@ -5,9 +5,11 @@ ARG GITHUB_TOKEN
 
 WORKDIR /workspace
 
-COPY settings.gradle.kts settings.gradle.kts
-COPY build.gradle.kts build.gradle.kts
+COPY ["settings.gradle.kts", "build.gradle.kts", "./"]
 COPY gradle/libs.versions.toml gradle/libs.versions.toml
+
+RUN gradle --no-daemon download-dependencies
+
 COPY service service
 COPY lib lib
 
