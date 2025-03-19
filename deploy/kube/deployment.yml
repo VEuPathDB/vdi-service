@@ -1,0 +1,212 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi-cache-db
+  namespace: vdi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      vpdb/app: vdi
+  template:
+    metadata:
+      labels:
+        vpdb/app: vdi
+    spec:
+      containers:
+      - name: cache-db
+        image: veupathdb/vdi-internal-db:1.12.0
+        ports:
+        - containerPort: 5432
+        startupProbe:
+          exec:
+            command:
+            - nc
+            - -zv
+            - localhost
+            - '5432'
+        readinessProbe:
+          exec:
+            command:
+            - nc
+            - -zv
+            - localhost
+            - '5432'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi-minio
+  namespace: vdi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      vpdb/app: vdi-minio
+  template:
+    metadata:
+      labels:
+        vpdb/app: vdi-minio
+    spec:
+      containers:
+        - name: minio
+          image: veupathdb/minio:1.0.0
+          envFrom:
+          - secretRef:
+              name: vdi-minio
+          - configMapRef:
+
+          ports:
+          - containerPort: 9000
+          - containerPort: 9001
+          command:
+          - /bin/sh
+          - -c
+          - |
+            while ! nc -zv vdi-rabbit 5672; do echo "waiting for rabbitmq"; sleep 5; done; \
+            minio server --console-address ':9001' /data;
+        - name: minio-startup
+          image: veupathdb/minio-mc:1.0.0
+          command:
+          - /bin/sh
+          - -c
+          - |
+            while ! nc -zv 127.0.0.1 9000; do echo "waiting for minio"; sleep 5; done; \
+            mc alias set minioc http://localhost:9000 $(S3_ACCESS_TOKEN) $(S3_SECRET_KEY); \
+            while !
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi-service
+  namespace: vdi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      vpdb/app: vdi
+  template:
+    metadata:
+      labels:
+        vpdb/app: vdi
+    spec:
+      containers:
+      - name: service
+        image: veupathdb/vdi-service:1.6.3
+        startupProbe:
+          httpGet:
+            port: 80
+            path: /health
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "printf 'HEAD / HTTP/1.1\r\nHost: google.com\r\nAccept: */*\r\n\r\n' | nc google.com 80"
+      initContainers:
+      - name: await-cache-db
+        image: foxcapades/alpine-netcat:3.21.3
+        command:
+        - /bin/sh
+        - -c
+        - |
+          while ! nc -zv vdi-cache-db 5432; do echo "waiting for the cache db"; sleep 5; done; \
+          while ! nc -zv vdi-kafka 9092; do echo "waiting for kafka"; sleep 5; done; \
+          while ! nc -zv vdi-rabbit 5672; do echo "waiting for rabbit; sleep 5; done; \
+          while ! nc -zv vdi-minio 9000; do echo "waiting for minio"; sleep 5; done;
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi-plugin-bigwig
+  namespace: vdi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      vpdb/app: vdi
+  template:
+    metadata:
+      labels:
+        vpdb/app: vdi
+    spec:
+      containers:
+      - name: plugin-bigwig
+        image: veupathdb/vdi-plugin-bigwig:1.5.3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi-plugin-biom
+  namespace: vdi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      vpdb/app: vdi
+  template:
+    metadata:
+      labels:
+        vpdb/app: vdi
+    spec:
+      containers:
+      - name: plugin-biom
+        image: veupathdb/vdi-plugin-biom:1.5.3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi-plugin-genelist
+  namespace: vdi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      vpdb/app: vdi
+  template:
+    metadata:
+      labels:
+        vpdb/app: vdi
+    spec:
+      containers:
+      - name: plugin-genelist
+        image: veupathdb/vdi-plugin-genelist:1.5.3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi-plugin-isasimple
+  namespace: vdi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      vpdb/app: vdi
+  template:
+    metadata:
+      labels:
+        vpdb/app: vdi
+    spec:
+      containers:
+      - name: plugin-isasimple
+        image: veupathdb/vdi-plugin-isasimple:1.5.3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi-plugin-genelist
+  namespace: vdi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      vpdb/app: vdi
+  template:
+    metadata:
+      labels:
+        vpdb/app: vdi
+    spec:
+      containers:
+      - name: plugin-genelist
+        image: veupathdb/vdi-plugin-genelist:1.5.3

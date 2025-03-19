@@ -1,0 +1,19 @@
+= Podman Kube Config Notes
+
+== Limitations
+
+
+Complex stacks and local dev require multiple deployments/pods::
++
+--
+
+--
+
+No support for Services::
++
+--
+Without support for services, working with stacks depends on port binding to the
+host machine on a per-container level.
+--
+
+Complex

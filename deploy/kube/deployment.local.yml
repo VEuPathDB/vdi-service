@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi-prod
+  labels:
+    vpdb/app: vdi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      vpdb/app: vdi
+  template:
+    spec:
+      containers:
+        - name: service
+          image: veupathdb/vdi-service:1.6.3
+        - name: plugin-bigwig
+          image: veupathdb/vdi-plugin-bigwig:1.5.3
+        - name: plugin-biom
+          image: veupathdb/vdi-plugin-biom:1.5.3
+        - name: plugin-genelist
+          image: veupathdb/vdi-plugin-genelist:1.5.3
+        - name: plugin-isasimple
+          image: veupathdb/vdi-plugin-isasimple:1.5.3
+        - name: plugin-rnaseq
+          image: veupathdb/vdi-plugin-rnaseq:1.6.3
+        - name: minio
+          image: veupathdb/minio:latest
+
