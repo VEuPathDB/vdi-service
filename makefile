@@ -115,6 +115,11 @@ log-plugin-biom:
 log-plugin-bigwig:
 	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-bigwig
 
+.PHONY: log-plugin-wrangler
+log-plugin-wrangler:
+	@(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-wrangler
+
+
 .PHONY: log-kafka
 log-kafka:
 	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) kafka
