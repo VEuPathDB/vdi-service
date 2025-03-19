@@ -277,8 +277,6 @@ object Metrics {
         .name("dataset_reconciler_times")
         .help("Dataset reconciler run times.")
         .buckets(
-          5.0,
-          15.0,
           30.0,
           60.0,  // 1 minute
           150.0, // 2.5 minutes

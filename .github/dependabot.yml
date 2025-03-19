@@ -6,10 +6,9 @@ updates:
   - github-packages
   schedule:
     interval: weekly
-  commit-message:
-  open-pull-request-limit: 20
+  open-pull-requests-limit: 20
   ignore:
-    dependency-name: org.gusdb:fgputil*
+  - dependency-name: org.gusdb:fgputil*
 - package-ecosystem: docker
   directory: "/"
   schedule:
