@@ -1,11 +1,11 @@
-#apiVersion: v1
-#kind: Secret
-#metadata:
-#  name: derp-secret
-#  namespace: derp
-#stringData:
-#  FOOBAR: "hello world"
-#---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: derp-secret
+  namespace: derp
+stringData:
+  FOOBAR: "hello world"
+---
 apiVersion: v1
 kind: Pod
 metadata:
@@ -17,8 +17,8 @@ spec:
     image: alpine:3.21.3
     envFrom:
     - secretRef:
-        name:
+        name: derp-secret
     command:
     - sh
     - -c
-    - echo $FOOBAR
+    - 'echo $FOOBAR; sleep 10000'

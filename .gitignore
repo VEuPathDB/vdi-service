@@ -18,6 +18,7 @@ merged-compose.yml
 *.bak
 *.swp
 *.jar
+*.zip
 
 local.properties
 .loadpath

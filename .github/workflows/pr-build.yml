@@ -14,7 +14,9 @@ jobs:
       with:
         cache-read-only: false
     - name: Build
-      run: ./gradlew --no-daemon clean build test
+      run: |
+        printf "gpr.user=%s\ngpr.key=%s" ${GH_USERNAME} ${GH_TOKEN} > gradle.properties; \
+        ./gradlew --no-daemon clean build test
       env:
-        GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        GH_USERNAME: ${{ secrets.GH_USERNAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}

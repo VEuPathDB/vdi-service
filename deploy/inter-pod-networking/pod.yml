@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: inter-pod-network-test-pod-1
+  namespace: test1
+spec:
+  hostname: pod1
+  containers:
+  - name: test
+    image: foxcapades/alpine-netcat:3.21.3
+    command:
+    - nc
+    - -lp
+    - "80"
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: inter-pod-network-test-pod-2
+  namespace: test1
+spec:
+  containers:
+  - name: test
+    image: foxcapades/alpine-netcat:3.21.3
+    command:
+    - sh
+    - -c
+    - |
+      nc -zv pod1 80 || nc -zv inter-pod-network-test-pod-1 80 || sleep 10000
