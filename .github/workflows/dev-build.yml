@@ -1,11 +1,10 @@
 on:
-  push:
-    branches:
-    - main
+  schedule:
+    - cron: '0 0,6,12,18 * * *'
 
 jobs:
   gradle-build:
-    name: Pull Request Build Verification
+    name: Main Branch Code Test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -18,9 +17,7 @@ jobs:
         cache-read-only: false
     - name: Build
       run: |
-        printf "gpr.user=%s\ngpr.key=%s" ${GH_USERNAME} ${GH_TOKEN} > gradle.properties; \
-        cat gradle.properties; \
         ./gradlew --no-daemon clean build test
       env:
-        GH_USERNAME: ${{ secrets.GH_USERNAME }}
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
