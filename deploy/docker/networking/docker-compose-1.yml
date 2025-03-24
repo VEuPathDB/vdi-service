@@ -1,0 +1,23 @@
+name: "test1"
+
+services:
+  test:
+    image: foxcapades/alpine-netcat:3.21.3
+    secrets:
+    -
+    command:
+    - nc
+    - -lp
+    - "80"
+    networks:
+      foo:
+        aliases:
+        - test1
+
+networks:
+  foo:
+    external: true
+
+secrets:
+  happy:
+    file: makefile

@@ -18,7 +18,6 @@ endif::[]
 
 === Branch Rules
 
-
 ==== `qa`
 
 The `qa` branch is to reflect what is currently on QA.  Code may only be pushed

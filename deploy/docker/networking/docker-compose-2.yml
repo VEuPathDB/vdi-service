@@ -1,0 +1,16 @@
+name: test2
+
+networks:
+  foo:
+    external: true
+
+services:
+  test:
+    image: foxcapades/alpine-netcat:3.21.3
+    command:
+    - sh
+    - -c
+    - |
+      wget test1:80 -O - || sleep 10000
+    networks:
+    - foo
