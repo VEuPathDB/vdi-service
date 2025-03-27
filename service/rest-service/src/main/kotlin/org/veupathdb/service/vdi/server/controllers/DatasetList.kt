@@ -8,15 +8,15 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
 import org.veupathdb.service.vdi.generated.resources.VdiDatasets
 import org.veupathdb.service.vdi.genx.model.*
-import org.veupathdb.service.vdi.service.datasets.createDataset
-import org.veupathdb.service.vdi.service.datasets.fetchUserDatasetList
+import org.veupathdb.service.vdi.service.dataset.createDataset
+import org.veupathdb.service.vdi.service.dataset.fetchUserDatasetList
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.toUserID
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.model.DatasetOwnershipFilter
 
 @Authenticated(allowGuests = false)
-class VDIDatasetListEndpointController(@Context request: ContainerRequest) : VdiDatasets, ControllerBase(request) {
+class DatasetList(@Context request: ContainerRequest) : VdiDatasets, ControllerBase(request) {
 
   private val log = LoggerFactory.getLogger(javaClass)
 

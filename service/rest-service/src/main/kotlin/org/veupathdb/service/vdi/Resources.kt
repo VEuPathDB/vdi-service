@@ -11,13 +11,13 @@ class Resources(opts: Options) : ContainerResources(opts) {
 
   override fun resources() = arrayOf<Any>(
     AdminRPC::class.java,
-    VDIDatasetByIDEndpointsController::class.java,
-    VDIDatasetListEndpointController::class.java,
-    VDIDatasetShareGetController::class.java,
-    VDIDatasetSharePutController::class.java,
-    VDIUsersController::class.java,
-    VDIDatasetFilesController::class.java,
-    VDICommunityDatasetsController::class.java,
-    PluginController::class.java,
+    DatasetByID::class.java,
+    DatasetList::class.java,
+    DatasetShareList::class.java,
+    DatasetSharePut::class.java,
+    UserInfo::class.java,
+    DatasetFiles::class.java,
+    CommunityDatasets::class.java,
+    PluginInfo::class.java,
   )
 }

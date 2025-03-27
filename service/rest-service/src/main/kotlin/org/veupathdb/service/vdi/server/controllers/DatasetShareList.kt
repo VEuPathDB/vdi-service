@@ -9,7 +9,7 @@ import org.veupathdb.service.vdi.service.shares.lookupShares
 import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated(allowGuests = false)
-class VDIDatasetShareGetController(@Context request: ContainerRequest)
+class DatasetShareList(@Context request: ContainerRequest)
   : VdiDatasetsShareOffers
   , ControllerBase(request)
 {

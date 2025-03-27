@@ -1,4 +1,4 @@
-package org.veupathdb.service.vdi.service.datasets
+package org.veupathdb.service.vdi.service.dataset
 
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException

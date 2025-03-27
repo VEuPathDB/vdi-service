@@ -1,4 +1,4 @@
-package org.veupathdb.service.vdi.service.datasets
+package org.veupathdb.service.vdi.service.dataset
 
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.genx.model.*
@@ -20,7 +20,7 @@ import vdi.component.db.cache.model.DatasetImportStatus
  * simple list of dataset IDs based on whether the [expanded] flag is set to
  * `true`.
  */
-internal fun listBrokenDatasets(expanded: Boolean): BrokenDatasetListing {
+internal fun listInstallFailedDatasets(expanded: Boolean): BrokenDatasetListing {
   return if (expanded)
     listExpandedBrokenDatasets()
   else

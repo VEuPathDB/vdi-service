@@ -13,8 +13,8 @@ import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.Admin
 import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.service.admin.*
-import org.veupathdb.service.vdi.service.datasets.createDataset
-import org.veupathdb.service.vdi.service.datasets.listBrokenDatasets
+import org.veupathdb.service.vdi.service.dataset.createDataset
+import org.veupathdb.service.vdi.service.dataset.listInstallFailedDatasets
 import org.veupathdb.service.vdi.util.fixVariableDateString
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -41,7 +41,7 @@ class AdminRPC : Admin {
 
   override fun getAdminListBroken(expanded: Boolean?): Admin.GetAdminListBrokenResponse {
     return Admin.GetAdminListBrokenResponse
-      .respond200WithApplicationJson(listBrokenDatasets(expanded ?: true))
+      .respond200WithApplicationJson(listInstallFailedDatasets(expanded ?: true))
   }
 
   override fun postAdminReconciler(): Admin.PostAdminReconcilerResponse {

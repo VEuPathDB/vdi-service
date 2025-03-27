@@ -6,12 +6,12 @@ import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdIdFiles
-import org.veupathdb.service.vdi.service.datasets.*
+import org.veupathdb.service.vdi.service.dataset.*
 import org.veupathdb.vdi.lib.common.field.toDatasetIDOrNull
 import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated(adminOverride = ALLOW_ALWAYS)
-class VDIDatasetFilesController(@Context request: ContainerRequest) : VdiDatasetsVdIdFiles, ControllerBase(request) {
+class DatasetFiles(@Context request: ContainerRequest) : VdiDatasetsVdIdFiles, ControllerBase(request) {
 
   override fun getVdiDatasetsFilesByVdId(vdId: String): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesByVdIdResponse {
     val datasetID = vdId.toDatasetIDOrNull() ?: throw NotFoundException()

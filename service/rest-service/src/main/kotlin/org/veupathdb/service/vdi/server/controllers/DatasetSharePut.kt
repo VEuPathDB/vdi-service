@@ -16,7 +16,7 @@ import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated
 @Path("/vdi-datasets/{vd-id}/shares/{recipient-user-id}")
-class VDIDatasetSharePutController(@Context request: ContainerRequest) : VdiDatasetsVdIdSharesRecipientUserId, ControllerBase(request) {
+class DatasetSharePut(@Context request: ContainerRequest) : VdiDatasetsVdIdSharesRecipientUserId, ControllerBase(request) {
 
   @PUT
   @Path("/offer")
