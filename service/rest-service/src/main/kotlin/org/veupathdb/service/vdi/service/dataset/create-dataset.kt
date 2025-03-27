@@ -1,8 +1,8 @@
-package org.veupathdb.service.vdi.service.datasets
+package org.veupathdb.service.vdi.service.dataset
 
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.WebApplicationException
-import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import org.veupathdb.service.vdi.config.Options
@@ -39,18 +39,17 @@ import java.util.concurrent.Executors
 import java.util.zip.ZipException
 import kotlin.io.path.*
 import kotlin.math.max
-
-private val log = LoggerFactory.getLogger("create-dataset.kt")
+import kotlin.math.min
 
 private val WorkPool = Executors.newFixedThreadPool(10)
 
 @OptIn(ExperimentalPathApi::class)
-fun createDataset(
+fun <T: Any> T.createDataset(
   userID: UserID,
   datasetID: DatasetID,
   entity: DatasetPostRequest,
 ) {
-  log.trace("createDataset(userID={}, datasetID={}, entity={})", userID, datasetID, entity)
+  logger.trace("createDataset(userID={}, datasetID={}, entity={})", userID, datasetID, entity)
 
   val datasetMeta = entity.toDatasetMeta(userID)
 
@@ -107,12 +106,12 @@ fun createDataset(
     //       starting the new thread.  Then the new thread will be forked and the
     //       target file downloaded into a temp directory in that thread before
     //       being uploaded to MinIO (also in that forked thread).
-    try { entity.fetchDatasetFile() }
+    try { entity.fetchDatasetFile(userID, logger) }
     catch (e: Throwable) {
-      CacheDB().withTransaction {
-        it.updateImportControl(datasetID, DatasetImportStatus.Failed)
+      CacheDB().withTransaction { t ->
+        t.updateImportControl(datasetID, DatasetImportStatus.Failed)
         if (e is FailedDependencyException && e.message != null) {
-          it.tryInsertImportMessages(datasetID, e.message!!)
+          t.tryInsertImportMessages(datasetID, e.message!!)
         }
       }
       throw e
@@ -131,7 +130,7 @@ fun createDataset(
 }
 
 @OptIn(ExperimentalPathApi::class)
-private fun uploadFiles(
+private fun <T: Any> T.uploadFiles(
   userID: UserID,
   datasetID: DatasetID,
   tempDirectory: Path,
@@ -142,25 +141,25 @@ private fun uploadFiles(
   TempFiles.withTempDirectory { directory ->
     TempFiles.withTempPath { archive ->
       try {
-        log.debug("Verifying file sizes for dataset {}/{} to ensure the user quota is not exceeded.", userID, datasetID)
+        logger.debug("Verifying file sizes for dataset {}/{} to ensure the user quota is not exceeded.", userID, datasetID)
         verifyFileSize(uploadFile, userID)
 
-        log.debug("Repacking input file for dataset {}/{}.", userID, datasetID)
-        val sizes = uploadFile.repack(into = archive, using = directory)
+        logger.debug("Repacking input file for dataset {}/{}.", userID, datasetID)
+        val sizes = uploadFile.repack(into = archive, using = directory, logger = logger)
 
-        log.debug("uploading raw user data to S3 for new dataset {}/{}", userID, datasetID)
+        logger.debug("uploading raw user data to S3 for new dataset {}/{}", userID, datasetID)
         DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
 
         CacheDB().withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
       } catch (e: Throwable) {
         if (e is WebApplicationException && (e.response?.status ?: 500) in 400..499) {
-          log.info("rejecting user dataset upload for user error: {}", e.message)
+          logger.info("rejecting user dataset upload for user error: {}", e.message)
           CacheDB().withTransaction {
             it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
             e.message?.let { msg -> it.tryInsertImportMessages(datasetID, msg) }
           }
         } else {
-          log.error("user dataset upload to minio failed: ", e)
+          logger.error("user dataset upload to minio failed: ", e)
           Metrics.Upload.failed.inc();
           CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
         }
@@ -174,10 +173,10 @@ private fun uploadFiles(
   }
 
   try {
-    log.debug("uploading dataset metadata to S3 for new dataset {}/{}", userID, datasetID)
+    logger.debug("uploading dataset metadata to S3 for new dataset {}/{}", userID, datasetID)
     DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
   } catch (e: Throwable) {
-    log.error("user dataset meta file upload to minio failed: ", e)
+    logger.error("user dataset meta file upload to minio failed: ", e)
     CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     throw e
   }
@@ -190,12 +189,16 @@ private fun verifyFileSize(file: Path, userID: UserID) {
     throw BadRequestException("upload file size larger than the max permitted file size of "
       + Options.Quota.maxUploadSize.toString() + " bytes")
 
-  val diff = max(0L, Options.Quota.quotaLimit.toLong() - getCurrentQuotaUsage(userID))
+  val remainingUploadAllowance = getUserRemainingQuota(userID)
 
-  if (fileSize > diff)
-    throw BadRequestException("upload file size is larger than the remaining space allowed by the user quota " +
-      "($diff bytes)")
+  if (fileSize > remainingUploadAllowance)
+    throw BadRequestException(
+      "upload file size is larger than the remaining space allowed by the user quota " +
+        "($remainingUploadAllowance bytes)")
 }
+
+private fun getUserRemainingQuota(userID: UserID): Long =
+  max(0L, Options.Quota.quotaLimit.toLong() - getCurrentQuotaUsage(userID))
 
 /**
  * Repacks the receiver file or archive into a zip file for upload to S3.
@@ -208,19 +211,19 @@ private fun verifyFileSize(file: Path, userID: UserID) {
  *
  * @return A map of upload files and their sizes.
  */
-private fun Path.repack(into: Path, using: Path): List<VDIDatasetFileInfo> {
+private fun Path.repack(into: Path, using: Path, logger: Logger): List<VDIDatasetFileInfo> {
   // If it resembles a zip file
   return if (name.endsWith(".zip")) {
-    repackZip(into, using)
+    repackZip(into, using, logger)
   }
 
   // If it resembles a tar file
   else if (name.endsWith(".tar.gz") || name.endsWith(".tgz")) {
-    repackTar(into, using)
+    repackTar(into, using, logger)
   }
 
   else {
-    repackRaw(into)
+    repackRaw(into, logger)
   }
 }
 
@@ -236,8 +239,8 @@ private fun Path.repack(into: Path, using: Path): List<VDIDatasetFileInfo> {
  *
  * @return A map of upload files and their sizes.
  */
-private fun Path.repackZip(into: Path, using: Path): List<VDIDatasetFileInfo> {
-  log.trace("repacking zip file {} into {}", this, into)
+private fun Path.repackZip(into: Path, using: Path, logger: Logger): List<VDIDatasetFileInfo> {
+  logger.trace("repacking zip file {} into {}", this, into)
 
   // Map of file names to sizes that will be stored in the postgres database.
   val files = ArrayList<VDIDatasetFileInfo>(12)
@@ -281,7 +284,7 @@ private fun Path.repackZip(into: Path, using: Path): List<VDIDatasetFileInfo> {
   if (unpacked.isEmpty())
     throw BadRequestException("uploaded file was empty or was not a valid zip")
 
-  log.info("Compressing file from {} into {}", unpacked, into)
+  logger.info("Compressing file from {} into {}", unpacked, into)
   // recompress the files as a tgz file
   Zip.compress(into, unpacked)
 
@@ -300,8 +303,8 @@ private fun Path.repackZip(into: Path, using: Path): List<VDIDatasetFileInfo> {
  *
  * @return A map of upload files and their sizes.
  */
-private fun Path.repackTar(into: Path, using: Path): List<VDIDatasetFileInfo> {
-  log.trace("repacking tar {} into {}", this, into)
+private fun Path.repackTar(into: Path, using: Path, logger: Logger): List<VDIDatasetFileInfo> {
+  logger.trace("repacking tar {} into {}", this, into)
 
   // Output map of files to sizes that will be written to the postgres DB.
   val sizes = ArrayList<VDIDatasetFileInfo>(12)
@@ -325,8 +328,8 @@ private fun Path.repackTar(into: Path, using: Path): List<VDIDatasetFileInfo> {
   return sizes
 }
 
-private fun Path.repackRaw(into: Path): List<VDIDatasetFileInfo> {
-  log.trace("repacking raw file {} into {}", this, into)
+private fun Path.repackRaw(into: Path, logger: Logger): List<VDIDatasetFileInfo> {
+  logger.trace("repacking raw file {} into {}", this, into)
   Zip.compress(into, listOf(this))
   return listOf(VDIDatasetFileInfo(name, fileSize().toULong()))
 }
@@ -343,30 +346,55 @@ private data class FileReference(val tempDirectory: Path, val tempFile: Path)
  * If the request provided a URL to a target file, that file will be downloaded
  * into a new temp directory.
  *
- * @return A [Pair] containing the temp directory path first and the temp file
- * path second.
+ * @param userID ID of the user attempting to upload a dataset.
+ *
+ * @param logger Logger attached to the controller class handling the request.
+ *
+ * @return A data object containing the temp directory path and the temp file
+ * path for the dataset input file.
  */
-private fun DatasetPostRequest.fetchDatasetFile(): FileReference =
+private fun DatasetPostRequest.fetchDatasetFile(userID: UserID, logger: Logger): FileReference =
   file?.let {
     TempFiles.makeTempPath(it.name)
       .also { (_, tmpFile) -> it.copyTo(tmpFile.toFile(), true) }
       .let { (tmpDir, tmpFile) -> FileReference(tmpDir, tmpFile) }
-  } ?: downloadRemoteFile()
+  } ?: downloadRemoteFile(userID, logger)
 
+/**
+ * Attempts to download a file from a remote server by user-provided URL.
+ *
+ * @param userID ID of the user attempting to upload a dataset.
+ *
+ * @param logger Logger attached to the controller class handling the request.
+ *
+ * @return A data object containing the temp directory path and temp file path
+ * for the downloaded remote file.
+ *
+ * @throws BadRequestException If:
+ * * The user-provided URL is invalid (cannot be parsed as a URL).
+ * * The user-provided URL is to a file that would cause the user's upload quota
+ *   to exceed the maximum allowed value.
+ * * The user-provided URL is to a file that is larger than
+ *   [JaxRSMultipartUpload.maxFileUploadSize].
+ *
+ * @throws FailedDependencyException If:
+ * * The remote server returned an error code or empty response body.
+ * * An IO error occurred while downloading the remote file.
+ */
 @OptIn(ExperimentalPathApi::class)
-private fun DatasetPostRequest.downloadRemoteFile(): FileReference {
+private fun DatasetPostRequest.downloadRemoteFile(userID: UserID, logger: Logger): FileReference {
   val url = try { url.toJavaURL() }
   catch (e: MalformedURLException) { throw BadRequestException("invalid file source: ${e.message}") }
 
-  log.info("attempting to download a remote file from {}", url)
+  logger.info("attempting to download a remote file from {}", url)
 
   // If the user gave us a URL then we have to download the contents of that
-  // URL to a local file to be uploaded.   This is done to catch errors with
-  // the URL or transfer before we start uploading to the dataset store.
+  // URL to a local file to be uploaded.   This is done now instead of piping
+  // directly to the object store to catch errors in a place that we can report
+  // useful errors back to the user.
   val fileName = url.safeFilename()
-
-  if (fileName.isBlank())
-    throw BadRequestException("could not determine file name or type from the given URL")
+    .takeUnless { it.isBlank() }
+    ?: (url.host.replace('.', '_') + "_download")
 
   val response = try { url.fetchContent() }
   catch (e: URLFetchException) { throw FailedDependencyException(this.url, e.message, e) }
@@ -379,11 +407,11 @@ private fun DatasetPostRequest.downloadRemoteFile(): FileReference {
     url.getAWSExpires()
       ?.format(DateFormat)
       ?.let { timestamp ->
-        log.debug("could not download remote file from \"{}\", url expired at {}", url.host, timestamp)
+        logger.debug("could not download remote file from \"{}\", url expired at {}", url.host, timestamp)
         throw FailedDependencyException(this.url, "remote server at \"${url.host}\" returned unexpected status code ${response.status}; given url appears to have expired at $timestamp")
       }
 
-    log.debug("could not download remote file from \"{}\", got status code {}", this.url, response.status)
+    logger.debug("could not download remote file from \"{}\", got status code {}", this.url, response.status)
     throw FailedDependencyException(this.url, "remote server at \"${url.host}\" returned unexpected status code ${response.status}")
   }
 
@@ -395,13 +423,19 @@ private fun DatasetPostRequest.downloadRemoteFile(): FileReference {
 
   // Try to download the file from the source URL.
   try {
-    BoundedInputStream(JaxRSMultipartUpload.maxFileUploadSize, response.body!!) {
-      BadRequestException("given source file URL pointed to a file that exceeded the max allowed upload size of " +
-        "${JaxRSMultipartUpload.maxFileUploadSize} bytes.")
-    }
-      .use { inp -> tmpFile.outputStream().use { out -> inp.transferTo(out) } }
+    val maxUploadSize = min(getUserRemainingQuota(userID), JaxRSMultipartUpload.maxFileUploadSize)
+
+    BoundedInputStream(maxUploadSize, response.body!!) {
+      val message = if (maxUploadSize < JaxRSMultipartUpload.maxFileUploadSize)
+        "given source URL was to a file that exceeds the remaining upload space allowed by the user quota " +
+          "($maxUploadSize bytes)"
+      else
+        "given source URL was to a file that exceeded the maximum allowed file size of $maxUploadSize bytes."
+
+      BadRequestException(message)
+    }.use { inp -> tmpFile.outputStream().use { out -> inp.transferTo(out) } }
   } catch (e: Throwable) {
-    log.error("content transfer from ${url.shortForm}", e)
+    logger.error("content transfer from ${url.shortForm}", e)
     tmpFile.deleteIfExists()
     tmpDir.deleteRecursively()
     throw FailedDependencyException(

@@ -1,4 +1,4 @@
-package org.veupathdb.service.vdi.service.datasets
+package org.veupathdb.service.vdi.service.dataset
 
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.genx.model.*
@@ -99,7 +99,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
       statuses = datasetInstallStatusMap[it.datasetID] ?: emptyMap(),
       shares = (if (it.ownerID == requesterID) shares[it.datasetID] ?: emptyList() else emptyList())
         .asSequence()
-        .filter { it.offerStatus == VDIShareOfferAction.Grant }
+        .filter { share -> share.offerStatus == VDIShareOfferAction.Grant }
         .map { sh ->
           DatasetListShareUser(
             userDetails[sh.recipientID]!!,
