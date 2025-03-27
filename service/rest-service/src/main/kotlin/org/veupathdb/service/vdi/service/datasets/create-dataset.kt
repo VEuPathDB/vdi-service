@@ -108,7 +108,12 @@ fun createDataset(
     //       being uploaded to MinIO (also in that forked thread).
     try { entity.fetchDatasetFile() }
     catch (e: Throwable) {
-      CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+      CacheDB().withTransaction {
+        it.updateImportControl(datasetID, DatasetImportStatus.Failed)
+        if (e is FailedDependencyException && e.message != null) {
+          it.tryInsertImportMessages(datasetID, e.message!!)
+        }
+      }
       throw e
     }
   }
@@ -369,8 +374,10 @@ private fun DatasetPostRequest.downloadRemoteFile(): FileReference {
 
   // If the remote server "successfully" returned an error code or some other
   // non-2xx code.
-  if (!response.isSuccess)
-    throw FailedDependencyException(this.url, "unexpected status code ${response.status}")
+  if (!response.isSuccess) {
+    log.debug("could not download remote file from {}, got status code {}", this.url, response.status)
+    throw FailedDependencyException(this.url, "remote server returned unexpected status code ${response.status}")
+  }
 
   // If for some reason the server returned nothing.
   if (!response.hasBody)
