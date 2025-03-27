@@ -26,14 +26,15 @@ import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
 import vdi.component.plugin.mapping.PluginHandlers
 import java.net.MalformedURLException
 import java.net.URL
 import java.nio.file.Path
+import java.time.Instant
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.concurrent.Executors
 import java.util.zip.ZipException
 import kotlin.io.path.*
@@ -137,8 +138,6 @@ private fun uploadFiles(
   uploadFile: Path,
   datasetMeta: VDIDatasetMeta,
 ) {
-  val cacheDB = CacheDB()
-
   // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
   TempFiles.withTempDirectory { directory ->
     TempFiles.withTempPath { archive ->
@@ -375,8 +374,16 @@ private fun DatasetPostRequest.downloadRemoteFile(): FileReference {
   // If the remote server "successfully" returned an error code or some other
   // non-2xx code.
   if (!response.isSuccess) {
-    log.debug("could not download remote file from \"{}\", got status code {}", this.url, response.status)
+    // If the user gave us an expired AWS URL (common for Nephele), then we can
+    // give them a more informative error message.
+    url.getAWSExpires()
+      ?.format(DateFormat)
+      ?.let { timestamp ->
+        log.debug("could not download remote file from \"{}\", url expired at {}", url.host, timestamp)
+        throw FailedDependencyException(this.url, "remote server at \"${url.host}\" returned unexpected status code ${response.status}; given url appears to have expired at $timestamp")
+      }
 
+    log.debug("could not download remote file from \"{}\", got status code {}", this.url, response.status)
     throw FailedDependencyException(this.url, "remote server at \"${url.host}\" returned unexpected status code ${response.status}")
   }
 
@@ -441,4 +448,20 @@ private fun URL.safeFilename(): String {
 
     it.substring(idx1+1, idx2)
   } + "_download"
+}
+
+
+/**
+ * Special handling for AWS urls that contain an Expires query parameter.  If
+ * we get a 403 from AWS there is a good chance the link expired, in which case
+ * we can give the user a more informative error message.
+ */
+private fun URL.getAWSExpires(): OffsetDateTime? {
+  if (!host.endsWith("amazonaws.com"))
+    return null
+
+  val match = Regex("Expires=(\\d+)").find(query) ?: return null
+
+  return Instant.ofEpochSecond(match.groupValues[1].toLongOrNull() ?: return null)
+    .atOffset(ZoneOffset.UTC)
 }
