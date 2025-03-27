@@ -376,7 +376,8 @@ private fun DatasetPostRequest.downloadRemoteFile(): FileReference {
   // non-2xx code.
   if (!response.isSuccess) {
     log.debug("could not download remote file from {}, got status code {}", this.url, response.status)
-    throw FailedDependencyException(this.url, "remote server returned unexpected status code ${response.status}")
+
+    throw FailedDependencyException(this.url, "remote server at \"${url.host}\" returned unexpected status code ${response.status}")
   }
 
   // If for some reason the server returned nothing.
