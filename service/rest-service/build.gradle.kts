@@ -2,46 +2,22 @@ import org.veupathdb.lib.gradle.container.util.Logger.Level
 
 plugins {
   kotlin("jvm")
-  id("org.veupathdb.lib.gradle.container.container-utils") version "5.0.5"
+  id("org.veupathdb.lib.gradle.container.container-utils") version "6.0.0-SNAPSHOT-1"
 }
 
-// configure VEupathDB container plugin
-containerBuild {
-
-  // Change if debugging the build process is necessary.
-  logLevel = Level.Info
-
-  // General project level configuration.
-  project {
-
-    // Project Name
+containerService {
+  service {
     name = "vdi-service"
-
-    // Project Group
-    group = "org.veupathdb.service"
-
-    // Project Version
-    version = "1.0.0"
-
-    // Project Root Package
     projectPackage = "org.veupathdb.service.vdi"
-
-    // Main Class Name
-    mainClassName = "Main"
   }
 
-  // Docker build configuration.
+  raml {
+    schemaRootDir = file("schema/types")
+    rootApiDefinition = file("api-deprecation.raml")
+  }
+
   docker {
-
-    // Docker build context
-    context = "."
-
-    // Name of the target docker file
-    dockerFile = "Dockerfile"
-
-    // Resulting image tag
     imageName = "vdi-service"
-
   }
 }
 

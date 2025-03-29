@@ -1,0 +1,470 @@
+#%RAML 1.0 Resource
+
+displayName: Service Admin
+
+/reconciler:
+  displayName: Reconciler
+  post:
+    displayName: Execute Reconciler
+    description: |
+      Triggers a full reconciliation run if one is not already in progress.
+    responses:
+      204:
+        description: Success
+      409:
+        description: Reconciler already running.
+
+/proxy-upload:
+  displayName: Proxy Upload
+  post:
+    description: |
+      Upload a dataset on behalf of another user.
+    headers:
+      User-ID:
+        displayName: Target User ID
+        description: |
+          ID of the target user on whose behalf a dataset is being uploaded
+        type: lib.User-ID
+        required: true
+    body:
+      multipart/form-data:
+        description: |
+          `multipart/form-data` HTTP `POST` request to upload a new dataset.
+          
+          Note, the body description below is of the multipart form data fields and
+          not of a JSON object.
+          
+          The `meta` field, however, is expected to be a JSON blob.
+        type: lib.DatasetPostRequest
+    responses:
+      200:
+        description: Success
+        body:
+          type: lib.DatasetPostResponse
+          example:
+            datasetId: zaZqAAGLGJhBgg
+      400:
+        description: |
+          Bad Request.
+          
+          Request body did not resemble the expected JSON form.
+        body:
+          application/json:
+            type: lib.BadRequestError
+            example:
+              status: bad-request
+              message: Invalid project_id value.
+      401:
+        description: Unauthorized
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
+      403:
+        description: Forbidden
+        body:
+          application/json:
+            type: lib.ForbiddenError
+            example:
+              status: forbidden
+              message: Target user does not exist.
+      422:
+        description: |
+          Unprocessable Entity.
+          
+          Request body was syntactically valid JSON, however the body failed
+          validation.
+        body:
+          application/json:
+            type: lib.UnprocessableEntityError
+      500:
+        description: |
+          Internal Server Error.
+          
+          This status is returned when an unhandled or unexpected issue arises
+          when attempting to process the request.
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+
+/failed-imports:
+  displayName: Failed Imports
+  get:
+    displayName: List
+    description: |
+      Lists datasets that failed to import.
+      
+      **Note**: A failed import is different from an invalid import.  Failed
+      imports are caused by process bugs or errors, invalid imports are caused
+      by bad user input.
+    queryParameters:
+      user:
+        type: lib.User-ID
+        required: false
+        default: null
+      before:
+        description: |
+          Filter results to only those records created before the given
+          date-time value.
+          
+          Examples:
+          
+          * 2023
+          * 2023-10
+          * 2023-10-02
+          * 2023-10-02T17:10
+          * 2023-10-02T17:10:00
+          * 2023-10-02T17:10:00.000
+          * 2023-10-02T17:10:00.000Z
+          
+          If no timezone is provided, the service will assume its local zone.
+        type: string
+        required: false
+        default: null
+      after:
+        description: |
+          Filter results to only those records created after the given
+          date-time value.
+          
+          Examples:
+          
+          * 2023
+          * 2023-10
+          * 2023-10-02
+          * 2023-10-02T17:10
+          * 2023-10-02T17:10:00
+          * 2023-10-02T17:10:00.000
+          * 2023-10-02T17:10:00.000Z
+          
+          If no timezone is provided, the service will assume its local zone.
+        type: string
+        required: false
+        default: null
+      limit:
+        type: integer
+        minimum: 0
+        maximum: 250
+        default: 100
+        required: false
+      offset:
+        type: integer
+        minimum: 0
+        default: 0
+        required: false
+      sort:
+        description: |
+          One of:
+          
+          * date
+        type: string
+        required: false
+        default: date
+      order:
+        description: |
+          One of:
+          
+          * asc
+          * desc
+        type: string
+        required: false
+        default: desc
+    responses:
+      200:
+        body:
+          application/json:
+            type: lib.BrokenImportListing
+
+/list-broken:
+  displayName: Broken Installs
+  get:
+    displayName: List Broken Installs
+    description: |
+      Lists datasets that failed installation due to non-user error.
+    headers:
+    queryParameters:
+      expanded:
+        displayName: Expanded Dataset List
+        description: |
+          Whether the returned broken dataset install list should be expanded
+          to include additional details about each dataset or should be just
+          a simple list of dataset IDs.
+        type: boolean
+        default: true
+        required: false
+    responses:
+      200:
+        description: |
+          Success.
+          
+          Broken dataset install list successfully generated.
+        body:
+          application/json:
+            type: lib.BrokenDatasetListing
+      401:
+        description: |
+          Unauthorized
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
+      500:
+        description: |
+          Internal Server Error
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+
+/fix-broken-installs:
+  displayName: Install Cleanup
+  post:
+    displayName: Run Install Cleanup
+    description: |
+      Marks all or target datasets that are in a status of installation
+      failure into a `ready-for-reinstall` status then runs the dataset
+      reinstallation process which attempts to uninstall and reinstall all
+      datasets in that status.
+      
+      The request body should specify exactly one of `all` or `targets` to
+      select whether install cleanup should target all failed datasets across
+      all sites, or if install cleanup should target only specific datasets on
+      specific sites.
+      
+      If the request specifies neither `all` or `targets` the endpoint will do
+      nothing.
+      
+      Optionally the query param `skip-run` may be provided to skip the
+      execution of the dataset reinstallation process.  This may be used in
+      situations where multiple batches of datasets are being marked as
+      `ready-for-reinstall`.
+    queryParameters:
+      skip-run:
+        type: boolean
+        required: false
+        default: false
+
+    body:
+      application/json:
+        type: lib.InstallCleanupRequest
+        examples:
+          all:
+            displayName: All Example
+            value:
+              all: true
+          targeted:
+            displayName: Target Example
+            value:
+              targets:
+              - datasetId: zaZqAAGLGJhBgg
+                projectId: PlasmoDB
+    responses:
+      204:
+        description: |
+          Success.
+          
+          Dataset install cleanup process completed successfully.
+      400:
+        description: |
+          Bad Request.
+          
+          Request body did not resemble the expected JSON form.
+        body:
+          application/json:
+            type: lib.BadRequestError
+            example:
+              status: bad-request
+              message: Invalid project_id value.
+      401:
+        description: |
+          Unauthorized.
+          
+          This status is returned when the request contains either no user
+          authorization token or an invalid user authorization token.
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
+      500:
+        description: |
+          Internal Server Error.
+          
+          This status is returned when an unhandled or unexpected issue arises
+          when attempting to process the request.
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+
+/delete-cleanup:
+  displayName: Deleted Dataset Cleanup
+  post:
+    displayName: Run Deleted Dataset Cleanup
+    description: |
+      Permanently delete jobs that were soft deleted more than 24 hours prior
+      to the execution of this task.
+    headers:
+    responses:
+      204:
+        description: Action completed successfully.
+      400:
+        description: |
+          Bad Request.
+          
+          Request body did not resemble the expected JSON form.
+        body:
+          application/json:
+            type: lib.BadRequestError
+            example:
+              status: bad-request
+              message: Invalid project_id value.
+      401:
+        description: |
+          Unauthorized.
+          
+          This status is returned when the request contains either no user
+          authorization token or an invalid user authorization token.
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
+      500:
+        description: |
+          Internal Server Error.
+          
+          This status is returned when an unhandled or unexpected issue arises
+          when attempting to process the request.
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+
+/dataset-details:
+  get:
+    queryParameters:
+      datasetId:
+        type: string
+        required: true
+    responses:
+      200:
+        body:
+          application/json:
+            type: lib.InternalDatasetDetails
+
+/list-s3-objects:
+  get:
+    description: |
+      Lists all the objects currently in the S3 object store backing VDI.
+      
+      This endpoint returns the data in TSV format with the following columns
+      for each object in the store:
+      
+      * Key/path
+      * Size (in bytes)
+      * Last modified date
+    responses:
+      200:
+        body:
+          text/plain:
+            type: any
+            example: |
+              /foo/bar/fizz	342345	2023-08-13T15:34:04.0342Z
+              /foo/bar/buzz	32125	2023-08-13T15:34:06.1254Z
+
+/list-all-datasets:
+  get:
+    description: |
+      Lists all datasets known to VDI via the internal cache database.
+    queryParameters:
+      offset:
+        type: integer
+        default: 0
+        required: false
+      limit:
+        type: integer
+        default: 100
+        minimum: 1
+        required: false
+      project_id:
+        description: |
+          Optionally filter the results to only datasets that target the given
+          project ID.
+        type: string
+        required: false
+      include_deleted:
+        type: boolean
+        default: false
+        required: false
+    responses:
+      200:
+        body:
+          application/json:
+            type: lib.AllDatasetsListResponse
+
+/purge-dataset:
+  displayName: Purge Dataset
+  post:
+    description: |
+      Removes a dataset from the object store and internal postgres database.
+      
+      This is intended to be used exclusively for clearing bad state created
+      by errors or bugs.
+      
+      This action does not perform dataset uninstalls, and may leave VDI in a
+      bad state if run against a dataset that isn't broken.
+    body:
+      application/json:
+        type: object
+        properties:
+          userId: lib.User-ID
+          datasetId: lib.VDI-ID
+    responses:
+      204:
+      400:
+        description: Bad Request.
+        body:
+          application/json:
+            type: lib.BadRequestError
+            example:
+              status: bad-request
+              message: Invalid project_id value.
+      401:
+        description: Unauthorized.
+        body:
+          application/json:
+            type: lib.UnauthorizedError
+            example:
+              status: unauthorized
+              message: Users must be logged in to access this resource.
+      404:
+        description: Not Found
+        body: lib.NotFoundError
+      500:
+        description: Internal Server Error.
+        body:
+          application/json:
+            type: lib.ServerError
+            example:
+              status: server-error
+              message: Dataset store is unreachable
+              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3

@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public class ExcludingMap extends HashMap<String, Object> {
-  private static final Long serialVersionUID = 1L;
-
   Set<Pattern> additionalProperties =  new HashSet<Pattern>();
 
   @Override
@@ -31,8 +29,8 @@ public class ExcludingMap extends HashMap<String, Object> {
       super.putAll(otherMap);
     }
     else {
-      for ( Map.Entry<? extends String, ?> entry : otherMap.entrySet() ) {
-        setProperty(entry.getKey(), entry.getValue());
+      for ( String key: otherMap.keySet() ) {
+        setProperty(key, otherMap.get(key));
       }
     }
   }
