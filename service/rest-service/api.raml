@@ -9,7 +9,10 @@ mediaType: application/json
 uses:
   lib: schema/types/library.raml
 
-#
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃  ENDPOINT PATHS                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
 /datasets: !include schema/resources/dataset-list/resource.raml
 /datasets/community: !include schema/resources/community-datasets/resource.raml
@@ -23,9 +26,9 @@ uses:
 /admin: !include schema/resources/admin/resource.raml
 
 
-#
-# DEPRECATED ENDPOINT PATHS
-#
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃  DEPRECATED ENDPOINT PATHS                                               ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
 /vdi-datasets: !include schema/resources/dataset-list/resource.raml
 /vdi-datasets/community: !include schema/resources/community-datasets/resource.raml

@@ -13,6 +13,7 @@ displayName: Service Admin
         description: Success
       409:
         description: Reconciler already running.
+        body: lib.ConflictError
 
 /proxy-upload:
   displayName: Proxy Upload
@@ -24,7 +25,7 @@ displayName: Service Admin
         displayName: Target User ID
         description: |
           ID of the target user on whose behalf a dataset is being uploaded
-        type: lib.User-ID
+        type: lib.UserId
         required: true
     body:
       multipart/form-data:
@@ -38,60 +39,17 @@ displayName: Service Admin
         type: lib.DatasetPostRequest
     responses:
       200:
-        description: Success
-        body:
-          type: lib.DatasetPostResponse
-          example:
-            datasetId: zaZqAAGLGJhBgg
+        body: lib.DatasetPostResponse
       400:
-        description: |
-          Bad Request.
-          
-          Request body did not resemble the expected JSON form.
-        body:
-          application/json:
-            type: lib.BadRequestError
-            example:
-              status: bad-request
-              message: Invalid project_id value.
+        body: lib.BadRequestError
       401:
-        description: Unauthorized
-        body:
-          application/json:
-            type: lib.UnauthorizedError
-            example:
-              status: unauthorized
-              message: Users must be logged in to access this resource.
+        body: lib.UnauthorizedError
       403:
-        description: Forbidden
-        body:
-          application/json:
-            type: lib.ForbiddenError
-            example:
-              status: forbidden
-              message: Target user does not exist.
+        body: lib.ForbiddenError
       422:
-        description: |
-          Unprocessable Entity.
-          
-          Request body was syntactically valid JSON, however the body failed
-          validation.
-        body:
-          application/json:
-            type: lib.UnprocessableEntityError
+        body: lib.UnprocessableEntityError
       500:
-        description: |
-          Internal Server Error.
-          
-          This status is returned when an unhandled or unexpected issue arises
-          when attempting to process the request.
-        body:
-          application/json:
-            type: lib.ServerError
-            example:
-              status: server-error
-              message: Dataset store is unreachable
-              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+        body: lib.ServerError
 
 /failed-imports:
   displayName: Failed Imports
@@ -105,7 +63,7 @@ displayName: Service Admin
       by bad user input.
     queryParameters:
       user:
-        type: lib.User-ID
+        type: lib.UserId
         required: false
         default: null
       before:
@@ -199,32 +157,11 @@ displayName: Service Admin
         required: false
     responses:
       200:
-        description: |
-          Success.
-          
-          Broken dataset install list successfully generated.
-        body:
-          application/json:
-            type: lib.BrokenDatasetListing
+        body: lib.BrokenDatasetListing
       401:
-        description: |
-          Unauthorized
-        body:
-          application/json:
-            type: lib.UnauthorizedError
-            example:
-              status: unauthorized
-              message: Users must be logged in to access this resource.
+        body: lib.UnauthorizedError
       500:
-        description: |
-          Internal Server Error
-        body:
-          application/json:
-            type: lib.ServerError
-            example:
-              status: server-error
-              message: Dataset store is unreachable
-              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+        body: lib.ServerError
 
 /fix-broken-installs:
   displayName: Install Cleanup
@@ -257,59 +194,14 @@ displayName: Service Admin
     body:
       application/json:
         type: lib.InstallCleanupRequest
-        examples:
-          all:
-            displayName: All Example
-            value:
-              all: true
-          targeted:
-            displayName: Target Example
-            value:
-              targets:
-              - datasetId: zaZqAAGLGJhBgg
-                projectId: PlasmoDB
     responses:
       204:
-        description: |
-          Success.
-          
-          Dataset install cleanup process completed successfully.
       400:
-        description: |
-          Bad Request.
-          
-          Request body did not resemble the expected JSON form.
-        body:
-          application/json:
-            type: lib.BadRequestError
-            example:
-              status: bad-request
-              message: Invalid project_id value.
+        body: lib.BadRequestError
       401:
-        description: |
-          Unauthorized.
-          
-          This status is returned when the request contains either no user
-          authorization token or an invalid user authorization token.
-        body:
-          application/json:
-            type: lib.UnauthorizedError
-            example:
-              status: unauthorized
-              message: Users must be logged in to access this resource.
+        body: lib.UnauthorizedError
       500:
-        description: |
-          Internal Server Error.
-          
-          This status is returned when an unhandled or unexpected issue arises
-          when attempting to process the request.
-        body:
-          application/json:
-            type: lib.ServerError
-            example:
-              status: server-error
-              message: Dataset store is unreachable
-              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+        body: lib.ServerError
 
 /delete-cleanup:
   displayName: Deleted Dataset Cleanup
@@ -323,53 +215,21 @@ displayName: Service Admin
       204:
         description: Action completed successfully.
       400:
-        description: |
-          Bad Request.
-          
-          Request body did not resemble the expected JSON form.
-        body:
-          application/json:
-            type: lib.BadRequestError
-            example:
-              status: bad-request
-              message: Invalid project_id value.
+        body: lib.BadRequestError
       401:
-        description: |
-          Unauthorized.
-          
-          This status is returned when the request contains either no user
-          authorization token or an invalid user authorization token.
-        body:
-          application/json:
-            type: lib.UnauthorizedError
-            example:
-              status: unauthorized
-              message: Users must be logged in to access this resource.
+        body: lib.UnauthorizedError
       500:
-        description: |
-          Internal Server Error.
-          
-          This status is returned when an unhandled or unexpected issue arises
-          when attempting to process the request.
-        body:
-          application/json:
-            type: lib.ServerError
-            example:
-              status: server-error
-              message: Dataset store is unreachable
-              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+        body: lib.ServerError
 
 /dataset-details:
   get:
     queryParameters:
       datasetId:
-        type: string
+        type: lib.VdiId
         required: true
     responses:
       200:
-        body:
-          application/json:
-            type: lib.InternalDatasetDetails
+        body: lib.InternalDatasetDetails
 
 /list-s3-objects:
   get:
@@ -434,12 +294,12 @@ displayName: Service Admin
       bad state if run against a dataset that isn't broken.
     body:
       application/json:
-        type: object
+        additionalProperties: false
         properties:
-          userId: lib.User-ID
-          datasetId: lib.VDI-ID
+          userId: lib.UserId
+          datasetId: lib.VdiId
     responses:
-      204:
+      204: {}
       400:
         description: Bad Request.
         body:

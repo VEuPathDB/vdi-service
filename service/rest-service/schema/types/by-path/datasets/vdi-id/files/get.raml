@@ -5,36 +5,24 @@ uses:
 
 types:
   DatasetFileListing:
-    displayName: Dataset File Listing
-    type: object
     additionalProperties: false
     properties:
-      upload:
-        type: DatasetZipDetails
-      install?:
-        type: DatasetZipDetails
+      upload: DatasetZipDetails
+      install?: DatasetZipDetails
 
   DatasetZipDetails:
-    displayName: Dataset Zip Details
-    type: object
     additionalProperties: false
     properties:
       zipSize:
         type: integer
         format: int64
-      contents:
-        type: DatasetFileDetails[]
+      contents: DatasetFileDetails[]
 
   DatasetFileDetails:
-    displayName: Dataset File Details
-    type: object
     additionalProperties: false
     properties:
-      fileName:
-        displayName: File Name
-        type: string
+      fileName: string
       fileSize:
-        displayName: File Size
         description: Size of the file in bytes.
         type: integer
         format: int64

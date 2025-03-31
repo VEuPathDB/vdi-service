@@ -20,12 +20,11 @@ get:
         This means only datasets that are relevant to the project ID given
         will be returned.
         
-        Additionally, this controls the sites on which the dataset
-        installation status will be checked.  Meaning, if this parameter is
-        specified and set to, for example, `PlasmoDB`, the status block in the
-        response objects will only include installation status details for
-        `PlasmoDB` and not any other sites that the dataset may have been
-        installed into.
+        Additionally, this controls the sites on which the dataset installation
+        status will be checked.  Meaning, if this parameter is specified and set
+        to, for example, `PlasmoDB`, the status block in the response objects
+        will only include installation status details for `PlasmoDB` and not any
+        other sites that the dataset may have been installed into.
       type: lib.ProjectID
       example: PlasmoDB
       required: false
@@ -151,8 +150,7 @@ post:
     * a `.zip` file containing one or more files to import
     * a `.tar.gz` or `.tgz` file containing one or more files to import.
     
-    The `url` field may point to a file that is one of the allowed upload
-    types.
+    The `url` field may point to a file that is one of the allowed upload types.
     
     The `url` and `file` fields cannot both be used at the same time, one must
     be used or the other.

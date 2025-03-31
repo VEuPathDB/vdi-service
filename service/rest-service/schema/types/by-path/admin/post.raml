@@ -4,7 +4,6 @@ uses:
   common: ../../common.raml
 
 types:
-
   AuthorizationKey:
     displayName: RPC Authorization Key
     description: |
@@ -24,27 +23,19 @@ types:
       Requesters should specify one of the fields `all` or `targets` to control
       what datasets will be cleaned up.  If neither is specified the endpoint
       will do nothing.
-    type: object
     additionalProperties: false
     properties:
-      all:
+      all?:
         type: boolean
         default: false
-        required: false
-      targets:
-        type: array
-        items:
-          type: InstallCleanupTarget
+      targets?:
+        type: InstallCleanupTarget[]
         minItems: 1
         uniqueItems: true
-        required: false
 
   InstallCleanupTarget:
     displayName: Install Cleanup Target
-    type: object
     additionalProperties: false
     properties:
-      datasetId:
-        type: common.VDI-ID
-      projectId:
-        type: common.ProjectID
+      datasetId: common.VdiId
+      projectId: common.ProjectId

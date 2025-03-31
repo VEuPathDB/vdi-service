@@ -5,14 +5,11 @@ uses:
 
 types:
   DatasetShareOffer:
-    displayName: Dataset Share Offer
     description: |
       An offer to share (or un-share) a dataset with a single target user.
-    type: object
     additionalProperties: false
     properties:
       action:
-        displayName: Offer Action
         description: |
           What action to take with the dataset share offer.
 
@@ -27,17 +24,14 @@ types:
           sharing should be stopped if the user did already have access to
           the dataset.
         type: common.ShareOfferAction
-        required: true
 
   DatasetShareReceipt:
     displayName: Dataset Share Receipt
     description: |
       A receipt or response to a share offer of a dataset to a single user.
-    type: object
     additionalProperties: false
     properties:
       action:
-        displayName: Acknowledgement Action
         description: |
           What action to take with acknowledging a dataset share offer.
 
@@ -49,4 +43,3 @@ types:
           A value of `reject` means that the dataset that a share was
           offered for should become unavailable to the rejecting user.
         type: common.ShareReceiptAction
-        required: true

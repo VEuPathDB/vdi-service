@@ -8,24 +8,21 @@
 
 types:
   BrokenDatasetListing:
-    displayName: Broken Dataset Listing
     type: object
     additionalProperties: false
     properties:
       details?: BrokenDatasetDetails[]
-      ids?: VDI-ID[]
+      ids?: VdiId[]
   BrokenDatasetDetails:
-    displayName: Broken Dataset Details
     type: object
     additionalProperties: false
     properties:
-      datasetId: VDI-ID
-      owner: User-ID
+      datasetId: VdiId
+      owner: UserId
       datasetType: DatasetTypeInfo
       projectIds: ProjectID[]
       status: DatasetStatusInfo
   BrokenImportListing:
-    displayName: Broken Import Listing
     type: object
     additionalProperties: false
     properties:
@@ -36,12 +33,11 @@ types:
     additionalProperties: false
     properties:
       count:
-        displayName: Result Count
-        description: Number of records in the result.
+        description: Number of records in the result
         type: integer
       before?: string
       after?: string
-      user?: User-ID
+      user?: UserId
       limit?: integer
       offset?: integer
   BrokenImportDetails:
@@ -49,10 +45,10 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetId: VDI-ID
-      owner: User-ID
+      datasetId: VdiId
+      owner: UserId
       datasetType: DatasetTypeInfo
-      projectIds: ProjectID[]
+      projectIds: ProjectId[]
       messages: string[]
   AllDatasetsListResponse:
     displayName: All Datasets Listing Response
@@ -73,22 +69,22 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetId: VDI-ID
-      owner: User-ID
+      datasetId: VdiId
+      owner: UserId
       datasetType: DatasetTypeInfo
       visibility: DatasetVisibility
-      name: string
-      shortName?: string
-      shortAttribution?: string
-      category?: string
-      summary?: string
-      description?: string
-      sourceUrl?: string
-      origin: string
-      projectIds: ProjectID[]
+      name: DatasetName
+      origin: DatasetOrigin
+      projectIds: ProjectId[]
       status: DatasetStatusInfo
-      created: datetime
+      created: DatasetCreationDate
       isDeleted: boolean
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      sourceUrl?: DatasetSourceUrl
   SyncControlRecord:
     type: object
     additionalProperties: false
@@ -101,25 +97,25 @@ types:
     additionalProperties: false
     properties:
       datasetType: DatasetTypeInfo
-      owner: User-ID
+      owner: UserId
       isDeleted: boolean
-      origin: string
-      created: datetime
+      origin: DatasetOrigin
+      created: DatasetCreationDate
       inserted: datetime
-      name: string
-      shortName?: string
-      shortAttribution?: string
-      category?: string
-      summary?: string
-      description?: string
-      visibility: DatasetVisibility
-      sourceUrl?: string
-      projectIds: ProjectID[]
+      name: DatasetName
+      projectIds: ProjectId[]
       status: string
+      importMessages: string[]
+      visibility: DatasetVisibility
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      sourceUrl?: DatasetSourceUrl
       syncControl?: SyncControlRecord
       uploadFiles?: string[]
       installFiles?: string[]
-      importMessages: string[]
   AuthorizationKey:
     displayName: RPC Authorization Key
     description: |
@@ -141,28 +137,25 @@ types:
     type: object
     additionalProperties: false
     properties:
-      all:
+      all?:
         type: boolean
         default: false
-        required: false
-      targets:
-        type: array
-        required: false
-        uniqueItems: true
+      targets?:
+        type: InstallCleanupTarget[]
         minItems: 1
-        items: InstallCleanupTarget
+        uniqueItems: true
   InstallCleanupTarget:
     displayName: Install Cleanup Target
     type: object
     additionalProperties: false
     properties:
-      datasetId: VDI-ID
-      projectId: ProjectID
+      datasetId: VdiId
+      projectId: ProjectId
   DatasetListShareUser:
     type: object
     additionalProperties: false
     properties:
-      userId: User-ID
+      userId: UserId
       firstName: string
       lastName: string
       organization: string
@@ -173,78 +166,34 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetId:
-        displayName: Dataset ID
-        type: VDI-ID
-      owner:
-        displayName: Owner Details
-        type: DatasetOwner
-      datasetType:
-        displayName: Dataset Type
-        type: DatasetTypeInfo
-      visibility:
-        displayName: Dataset Visibility
-        type: DatasetVisibility
-      name:
-        displayName: Dataset Name
-        description: User provided name for the dataset.
-        type: string
-      shortName:
-        type: string
-        required: false
-      shortAttribution:
-        type: string
-        required: false
-      category:
-        type: string
-        required: false
-      summary:
-        displayName: Dataset Summary
-        description: User provided summary of the dataset.
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        description: User provided description of the dataset.
-        type: string
-        required: false
-      sourceUrl:
-        displayName: Source URL
-        description: |
-          URL of the dataset data source, if the dataset was uploaded via URL.
-        type: string
-        required: false
-      origin:
-        displayName: Dataset Origin
-        description: |
-          String representing the origin of the dataset.  Examples include
-          `direct-upload`, `nephele`, or `galaxy`.
-        type: string
+      datasetId: VdiId
+      owner: DatasetOwner
+      datasetType: DatasetTypeInfo
+      visibility: DatasetVisibility
+      name: DatasetName
+      origin: DatasetOrigin
       projectIds:
-        displayName: Project IDs
         description: |
           Project IDs for projects the dataset record was submitted to.
-        type: ProjectID[]
-      status:
-        displayName: Status Info
-        type: DatasetStatusInfo
-      shares:
-        displayName: Shared With
-        type: DatasetListShareUser[]
+        type: ProjectId[]
+        uniqueItems: true
+      status: DatasetStatusInfo
+      shares: DatasetListShareUser[]
       fileCount:
-        displayName: File Count
         description: Number of files uploaded for this dataset.
         type: integer
       fileSizeTotal:
-        displayName: File Size Total
         description: |
           Sum of the sizes of all the files uploaded for this dataset.
         type: integer
         format: int64
-      created:
-        displayName: Creation Timestamp
-        description: Timestamp of the creation of this dataset.
-        type: datetime
+      created: DatasetCreationDate
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      sourceUrl?: DatasetSourceUrl
   DatasetPostRequest:
     displayName: Dataset Post Request
     description: |
@@ -258,116 +207,72 @@ types:
     additionalProperties: false
     properties:
       meta:
-        displayName: Dataset Meta
         description: Metadata about the dataset being submitted.
         type: DatasetPostMeta
-      file:
-        displayName: Dataset File
+      file?:
         description: |
           Dataset file to upload.
 
           This field is incompatible with the `url` field.
         type: file
-        required: false
-      url:
-        displayName: Dataset URL
+      url?:
         description: |
           URL to a dataset file to upload.
 
           This field is incompatible with the `file` field.
         type: string
-        required: false
   DatasetPostMeta:
     type: object
     additionalProperties: false
     properties:
-      datasetType:
-        displayName: Dataset Type
-        description: Type of the dataset that is being uploaded.
-        type: DatasetPostType
-      name:
-        displayName: Dataset Name
-        description: User provided name for the dataset.
-        type: string
-      shortName:
-        type: string
-        required: false
-        maxLength: 300
-      shortAttribution:
-        type: string
-        required: false
-        maxLength: 300
-      category:
-        type: string
-        required: false
-        maxLength: 100
-      visibility:
-        displayName: Dataset Visibility
-        type: DatasetVisibility
-        default: "private"
-        required: false
-      summary:
-        displayName: Dataset Summary
-        description: User provided summary for the dataset.
-        type: string
-        required: false
-        maxLength: 4000
-      description:
-        displayName: Dataset Description
-        description: User provided description for the dataset.
-        type: string
-        required: false
-      origin:
-        displayName: Dataset Origin
-        description: |
-          String representing the origin of the dataset.  Examples include
-          `direct-upload`, `nephele`, or `galaxy`.
-        type: string
-      projects:
-        displayName: Project IDs
-        description: IDs of the projects this dataset is being submitted to.
-        type: ProjectID[]
-        minItems: 1
-        uniqueItems: true
+      name: DatasetName
+      datasetType: DatasetPostType
+      origin: DatasetOrigin
       dependencies:
-        displayName: Dataset Dependencies
         type: DatasetDependency[]
         uniqueItems: true
-      publications:
-        displayName: Dataset Publications
+      projects:
+        description: IDs of the projects this dataset is being submitted to.
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      visibility?:
+        type: DatasetVisibility
+        default: "private"
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      publications?:
         type: DatasetPublication[]
         uniqueItems: true
-        required: false
-      hyperlinks:
-        displayName: Dataset Hyperlinks
+      hyperlinks?:
         type: DatasetHyperlink[]
         uniqueItems: true
-        required: false
-      organisms:
-        displayName: Dataset Organisms
+      organisms?:
         type: array
-        required: false
         uniqueItems: true
         items:
           type: string
           maxLength: 200
-      contacts:
-        displayName: Dataset Contacts
+      contacts?:
         type: DatasetContact[]
         uniqueItems: true
-        required: false
-      createdOn:
+      createdOn?:
         displayName: Creation Date
-        type: datetime-only
-        required: false
+        description: |
+          This field is only used for admin override uploads, for normal dataset
+          uploads this field is ignored.
+        type: datetime
   DatasetPostType:
+    description: Type of the dataset that is being uploaded.
     type: object
     additionalProperties: false
     properties:
       name: string
       version: string
   DatasetPostResponse:
-    displayName: Dataset Upload Response
     description: |
       Response object returned on successful upload of a dataset.
 
@@ -378,16 +283,14 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetId: VDI-ID
+      datasetId: VdiId
   DatasetFileListing:
-    displayName: Dataset File Listing
     type: object
     additionalProperties: false
     properties:
       upload: DatasetZipDetails
       install?: DatasetZipDetails
   DatasetZipDetails:
-    displayName: Dataset Zip Details
     type: object
     additionalProperties: false
     properties:
@@ -396,15 +299,11 @@ types:
         format: int64
       contents: DatasetFileDetails[]
   DatasetFileDetails:
-    displayName: Dataset File Details
     type: object
     additionalProperties: false
     properties:
-      fileName:
-        displayName: File Name
-        type: string
+      fileName: string
       fileSize:
-        displayName: File Size
         description: Size of the file in bytes.
         type: integer
         format: int64
@@ -415,151 +314,70 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetId:
-        displayName: Dataset ID
-        type: VDI-ID
-      owner:
-        displayName: Owner Details
-        type: DatasetOwner
-      datasetType:
-        displayName: Dataset Type Info
-        type: DatasetTypeInfo
-      name:
-        displayName: Dataset Name
-        type: string
-      shortName:
-        type: string
-        required: false
-      shortAttribution:
-        type: string
-        required: false
-      category:
-        type: string
-        required: false
-      summary:
-        displayName: Dataset Summary
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        type: string
-        required: false
-      sourceUrl:
-        displayName: Source URL
-        description: |
-          URL of the dataset data source, if the dataset was uploaded via URL.
-        type: string
-        required: false
-      origin:
-        displayName: Dataset Origin
-        description: |
-          String representing the origin of the dataset.  Examples include
-          `direct-upload`, `nephele`, or `galaxy`.
-        type: string
+      datasetId: VdiId
+      owner: DatasetOwner
+      datasetType: DatasetTypeInfo
+      name: DatasetName
+      origin: DatasetOrigin
       projectIds:
-        displayName: Project IDs
         description: |
           Project IDs for projects the user dataset record was submitted to.
         type: ProjectID[]
         uniqueItems: true
-      visibility:
-        displayName: Dataset Visibility
-        type: DatasetVisibility
-      importMessages:
-        displayName: Import Messages
+      visibility: DatasetVisibility
+      status: DatasetStatusInfo
+      created: DatasetCreationDate
+      dependencies:
+        type: DatasetDependency[]
+        uniqueItems: true
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      sourceUrl?: DatasetSourceUrl
+      importMessages?:
         description: |
           Log lines from the import process.
 
           These messages will be warnings and/or validation errors.
         type: string[]
-        default: []
-        required: false
-      status:
-        displayName: Dataset Status Info
-        type: DatasetStatusInfo
-      shares:
-        displayName: Shares
+      shares?:
         description: |
           Array of share offers that have been created by the owner of this
           dataset to share it with other users.
-        type: array
-        required: false
-        items: ShareOffer
-      created:
-        displayName: Creation Timestamp
-        description: Timestamp for when this dataset was created.
-        type: datetime
-      dependencies:
-        displayName: Dataset Dependencies
-        type: DatasetDependency[]
-        uniqueItems: true
-      publications:
-        displayName: Dataset Publications
+        type: ShareOffer[]
+      publications?:
         type: DatasetPublication[]
         uniqueItems: true
-        required: false
-      hyperlinks:
-        displayName: Dataset Hyperlinks
+      hyperlinks?:
         type: DatasetHyperlink[]
         uniqueItems: true
-        required: false
-      organisms:
+      organisms?:
         displayName: Dataset Organism Abbreviations
         type: array
-        required: false
         uniqueItems: true
         items:
           type: string
           maxLength: 20
-      contacts:
-        displayName: Dataset Contacts
+      contacts?:
         type: DatasetContact[]
         uniqueItems: true
-        required: false
   ShareOffer:
-    displayName: Share Offer
     type: object
     additionalProperties: false
     properties:
       recipient: ShareOfferRecipient
       status: ShareOfferAction
-    example:
-      recipient:
-        userId: 123456
-        firstName: Joe
-        lastName: User
-        email: juser@ujoe.edu
-        organization: University of Joe
-      status: revoke
   ShareOfferRecipient:
-    displayName: Share Offer Recipient
-    description: I AM A UNION!
     type: object
     additionalProperties: false
     properties:
-      userId:
-        displayName: User ID
-        type: integer
-        format: int64
-      firstName:
-        displayName: First Name
-        type: string
-        required: false
-      lastName:
-        displayName: Last Name
-        type: string
-        required: false
-      organization:
-        displayName: Organization
-        type: string
-        required: false
-      email:
-        displayName: Email
-        type: string
-        required: false
-    example:
-      userId: 123456
-      email: myusername@someuniversity.edu
+      userId: UserId
+      firstName?: string
+      lastName?: string
+      organization?: string
+      email?: string
   DatasetPatchRequest:
     displayName: Dataset Patch Request
     description: |
@@ -567,66 +385,43 @@ types:
     type: object
     additionalProperties: false
     properties:
-      visibility:
-        displayName: Dataset Visibility
-        type: DatasetVisibility
-        required: false
-      name:
-        displayName: Dataset Name
-        description: User provided name for a dataset.
-        type: string
-        required: false
-      shortName:
-        type: string
-        required: false
-      shortAttribution:
-        type: string
-        required: false
-      category:
-        type: string
-        required: false
-      summary:
-        displayName: Dataset Summary
-        description: User provided summary for a dataset.
-        type: string
-        required: false
-      description:
-        displayName: Dataset Description
-        description: User provided description for a dataset.
-        type: string
-        required: false
-      publications:
-        displayName: Dataset Publications
+      visibility?: DatasetVisibility
+      name?: DatasetName
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      publications?:
         type: DatasetPublication[]
         uniqueItems: true
-        required: false
-      hyperlinks:
-        displayName: Dataset Hyperlinks
+      hyperlinks?:
         type: DatasetHyperlink[]
         uniqueItems: true
-        required: false
-      organisms:
-        displayName: Dataset Organism Abbreviations
+      organisms?:
         type: array
-        required: false
         uniqueItems: true
         items:
           type: string
           maxLength: 20
-      contacts:
-        displayName: Dataset Contacts
+      contacts?:
         type: DatasetContact[]
         uniqueItems: true
-        required: false
+  DatasetPutRequest:
+    displayName: Dataset Data Put Request
+    type: object
+    additionalProperties: false
+    properties:
+      meta:
+        displayName: Dataset Metadata
+        type: string
   DatasetShareOffer:
-    displayName: Dataset Share Offer
     description: |
       An offer to share (or un-share) a dataset with a single target user.
     type: object
     additionalProperties: false
     properties:
       action:
-        displayName: Offer Action
         description: |
           What action to take with the dataset share offer.
 
@@ -649,7 +444,6 @@ types:
     additionalProperties: false
     properties:
       action:
-        displayName: Acknowledgement Action
         description: |
           What action to take with acknowledging a dataset share offer.
 
@@ -662,27 +456,18 @@ types:
           offered for should become unavailable to the rejecting user.
         type: ShareReceiptAction
   PluginListItem:
-    displayName: Plugin Listing Entry
     type: object
     additionalProperties: false
     properties:
-      displayName:
-        displayName: Plugin Display Name
-        type: string
-      typeName:
-        displayName: Dataset Type Name
-        type: string
-      typeVersion:
-        displayName: Dataset Type Version
-        type: string
-      projects:
-        displayName: Relevant Projects
+      displayName: string
+      typeName: string
+      typeVersion: string
+      projects?:
         description: |
           Projects that this plugin is restricted to.  An empty or absent list
           indicates that the plugin has no project restrictions and may be used
           on any site.
-        type: string[]
-        required: false
+        type: ProjectId[]
   UserMetadata:
     type: object
     additionalProperties: false
@@ -705,11 +490,11 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetId: VDI-ID
+      datasetId: VdiId
       owner: DatasetOwner
       shareStatus: ShareOfferStatus
       datasetType: DatasetTypeInfo
-      projectIds: ProjectID[]
+      projectIds: ProjectId[]
   ShareOfferStatus:
     displayName: Share Offer Status
     type: string
@@ -717,22 +502,177 @@ types:
       - open
       - accepted
       - rejected
-  VDI-ID:
-    displayName: VDI ID
-    description: Unique VDI Dataset identifier string.
+  DatasetCategory:
     type: string
-    pattern: ^[a-zA-Z0-9_-]{14}$
-    minLength: 14
-    maxLength: 14
-  User-ID:
-    displayName: VEuPathDB User ID
-    description: Unique user identifier
-    type: integer
-    format: int64
-    minimum: 1
-    maximum: 9223372036854775807
-  ProjectID:
-    displayName: Project ID
+    maxLength: 100
+  DatasetContact:
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        minLength: 3
+        maxLength: 300
+      email?:
+        type: string
+        minLength: 5
+        maxLength: 4000
+      affiliation?:
+        type: string
+        maxLength: 4000
+      city?:
+        type: string
+        maxLength: 200
+      state?:
+        type: string
+        maxLength: 200
+      country?:
+        type: string
+        maxLength: 200
+      address?:
+        type: string
+        maxLength: 1000
+      isPrimary?:
+        type: boolean
+        default: false
+  DatasetCreationDate:
+    description: Timestamp of the creation of the dataset
+    type: datetime
+  DatasetDependency:
+    type: object
+    additionalProperties: false
+    properties:
+      resourceIdentifier: string
+      resourceDisplayName: string
+      resourceVersion: string
+  DatasetDescription:
+    description: Longform description of the dataset.
+    type: string
+  DatasetHyperlink:
+    type: object
+    additionalProperties: false
+    properties:
+      url:
+        type: string
+        minLength: 3
+        maxLength: 200
+      text:
+        type: string
+        minLength: 3
+        maxLength: 300
+      description?:
+        type: string
+        maxLength: 4000
+      isPublication?:
+        type: boolean
+        default: false
+  DatasetImportStatus:
+    description: |
+      Import status of the dataset.
+
+      | Value         | Description                                                           |
+      |---------------|-----------------------------------------------------------------------|
+      | `queued`      | The dataset has not yet been processed and is waiting in the queue.   |
+      | `in-progress` | The dataset is currently being import processed.                      |
+      | `complete`    | The dataset has been processed and imported for installation.         |
+      | `invalid`     | The dataset failed import validation.                                 |
+      | `failed`      | The dataset import failed due to an internal server error.            |
+    type: string
+    enum:
+      - queued
+      - in-progress
+      - complete
+      - invalid
+      - failed
+  DatasetInstallStatus:
+    type: string
+    enum:
+      - running
+      - complete
+      - failed-validation
+      - failed-installation
+      - ready-for-reinstall
+      - missing-dependency
+  DatasetInstallStatusEntry:
+    description: Entry in a list of install statuses for a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      projectId: ProjectId
+      metaStatus: DatasetInstallStatus
+      metaMessage?: string
+      dataStatus?: DatasetInstallStatus
+      dataMessage?: string
+  DatasetName:
+    description: User-provided name for the dataset.
+    type: string
+  DatasetOrigin:
+    description: |
+      String representing the origin of the dataset.  Examples include
+      `direct-upload`, `nephele`, or `galaxy`.
+    type: string
+  DatasetOwner:
+    description: Details about the owner of a VDI dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      userId: UserId
+      firstName?: string
+      lastName?: string
+      email?: string
+      organization?: string
+  DatasetPublication:
+    type: object
+    additionalProperties: false
+    properties:
+      pubMedId:
+        type: string
+        minLength: 3
+        maxLength: 30
+      citation?:
+        type: string
+        minLength: 3
+        maxLength: 2000
+  DatasetShortAttribution:
+    type: string
+    maxLength: 300
+  DatasetShortName:
+    type: string
+    maxLength: 300
+  DatasetSourceUrl:
+    description: |
+      URL of the dataset data source, if the dataset was uploaded via URL.
+    type: string
+  DatasetStatusInfo:
+    description: Information about the import and install status of a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      import: DatasetImportStatus
+      install?: DatasetInstallStatusEntry[]
+  DatasetSummary:
+    description: Brief summary of the dataset.
+    type: string
+    maxLength: 4000
+  DatasetTypeInfo:
+    description: Details about a specific dataset type.
+    type: object
+    additionalProperties: false
+    properties:
+      name: string
+      version: string
+      displayName?:
+        description: |
+          Display name for the type.  This field is ignored in requests and will
+          always be present in responses.
+        type: string
+  DatasetVisibility:
+    type: string
+    enum:
+      - private
+      - protected
+      - public
+  ProjectId:
     description: |
       Name or ID of a target VEuPathDB project.
 
@@ -754,51 +694,6 @@ types:
       - VectorBase
       - VEuPathDB
     type: string
-  DatasetOwner:
-    displayName: Dataset Owner
-    description: Details about the owner of a VDI dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      userId:
-        displayName: Owner User ID
-        description: VEuPathDB user ID of the owner of the dataset.
-        type: User-ID
-      firstName:
-        displayName: Owner First Name
-        type: string
-        required: false
-      lastName:
-        displayName: Owner Last Name
-        type: string
-        required: false
-      email:
-        displayName: Owner Email
-        type: string
-        required: false
-      organization:
-        displayName: Owner Organization
-        type: string
-        required: false
-  DatasetTypeInfo:
-    displayName: Dataset Type Info
-    description: Information about a specific dataset type.
-    type: object
-    additionalProperties: false
-    properties:
-      name:
-        displayName: Type Name
-        type: string
-      displayName:
-        displayName: Type Display Name
-        description: |
-          Display name for the type.  This field is ignored in requests and will
-          always be present in responses.
-        type: string
-        required: false
-      version:
-        displayName: Type Version
-        type: string
   ShareOfferAction:
     type: string
     enum:
@@ -809,146 +704,16 @@ types:
     enum:
       - accept
       - reject
-  DatasetVisibility:
+  UserId:
+    description: VEuPathDB User ID
+    type: integer
+    format: int64
+    minimum: 1
+    maximum: 9223372036854775807
+  VdiId:
+    description: VDI dataset identifier
     type: string
-    enum:
-      - private
-      - protected
-      - public
-  DatasetStatusInfo:
-    displayName: Dataset Status Info
-    description: Information about the import and install status of a dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      import: DatasetImportStatus
-      install:
-        type: DatasetInstallStatusEntry[]
-        default: null
-        required: false
-  DatasetImportStatus:
-    displayName: Dataset Import Status
-    description: |
-      Import status of the dataset.
-
-      | Value         | Description                                                           |
-      |---------------|-----------------------------------------------------------------------|
-      | `queued`      | The dataset has not yet been processed and is waiting in the queue.   |
-      | `in-progress` | The dataset is currently being import processed.                      |
-      | `complete`    | The dataset has been processed and imported for installation.         |
-      | `invalid`     | The dataset failed import validation.                                 |
-      | `failed`      | The dataset import failed due to an internal server error.            |
-    type: string
-    enum:
-      - queued
-      - in-progress
-      - complete
-      - invalid
-      - failed
-  DatasetInstallStatus:
-    displayName: Dataset Install Status
-    type: string
-    enum:
-      - running
-      - complete
-      - failed-validation
-      - failed-installation
-      - ready-for-reinstall
-      - missing-dependency
-  DatasetInstallStatusEntry:
-    displayName: Dataset Install Status Entry
-    description: Entry in a list of install statuses for a dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      projectId: ProjectID
-      metaStatus: DatasetInstallStatus
-      metaMessage:
-        type: string
-        required: false
-      dataStatus:
-        type: DatasetInstallStatus
-        required: false
-      dataMessage:
-        type: string
-        required: false
-  DatasetDependency:
-    type: object
-    additionalProperties: false
-    properties:
-      resourceIdentifier: string
-      resourceDisplayName: string
-      resourceVersion: string
-  DatasetContact:
-    type: object
-    additionalProperties: false
-    properties:
-      name:
-        type: string
-        minLength: 3
-        maxLength: 300
-      email:
-        type: string
-        required: false
-        minLength: 5
-        maxLength: 4000
-      affiliation:
-        type: string
-        required: false
-        maxLength: 4000
-      city:
-        type: string
-        required: false
-        maxLength: 200
-      state:
-        type: string
-        required: false
-        maxLength: 200
-      country:
-        type: string
-        required: false
-        maxLength: 200
-      address:
-        type: string
-        required: false
-        maxLength: 1000
-      isPrimary:
-        type: boolean
-        default: false
-        required: false
-  DatasetHyperlink:
-    type: object
-    additionalProperties: false
-    properties:
-      url:
-        type: string
-        minLength: 3
-        maxLength: 200
-      text:
-        type: string
-        minLength: 3
-        maxLength: 300
-      description:
-        type: string
-        required: false
-        maxLength: 4000
-      isPublication:
-        type: boolean
-        default: false
-        required: false
-  DatasetPublication:
-    type: object
-    additionalProperties: false
-    properties:
-      pubMedId:
-        type: string
-        minLength: 3
-        maxLength: 30
-      citation:
-        type: string
-        required: false
-        minLength: 3
-        maxLength: 2000
+    pattern: ^[a-zA-Z0-9_-]+$
   Error:
     type: object
     additionalProperties: false

@@ -1,6 +1,6 @@
 #%RAML 1.0 Method
 
-displayName: Update Dataset
+displayName: Replace Dataset
 description: |
   Updates the metadata for a target dataset.
   
@@ -15,8 +15,11 @@ body:
     type: lib.DatasetPatchRequest
 
 responses:
-  204:
-    description: Target dataset metadata was updated.
+  200:
+    description: Replacement dataset request has been accepted for processing.
+    body:
+      application/json:
+
   400:
     description: |
       Bad Request.

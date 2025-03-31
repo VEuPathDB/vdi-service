@@ -27,44 +27,16 @@ displayName: Dataset Sharing
       204:
         description: Share offer record was successfully (re)placed.
       400:
-        description: |
-          Bad Request.
-          
-          Request body did not resemble the expected JSON form.
         body: lib.BadRequestError
       401:
-        description: |
-          Unauthorized.
-          
-          This status is returned when the request contains either no user
-          authorization token or an invalid user authorization token.
         body: lib.UnauthorizedError
       403:
-        description: |
-          Action Forbidden.
-          
-          This status is returned when the dataset target of the operation is
-          not owned by the requesting user, thus the requesting user is
-          forbidden from offering shares to the dataset.
         body: lib.ForbiddenError
       404:
-        description: |
-          Not Found.
-          
-          Either the target dataset or target user was not found.
+        body: lib.NotFoundError
       422:
-        description: |
-          Unprocessable Entity.
-          
-          Request body was syntactically valid JSON, however the body failed
-          validation.
         body: lib.UnprocessableEntityError
       500:
-        description: |
-          Internal Server Error.
-          
-          This status is returned when an unhandled or unexpected issue arises
-          when attempting to process the request.
         body: lib.ServerError
 
 /receipt:
@@ -91,42 +63,14 @@ displayName: Dataset Sharing
       204:
         description: Share offer receipt record was successfully created.
       400:
-        description: |
-          Bad Request.
-          
-          Request body did not resemble the expected JSON form.
         body: lib.BadRequestError
       401:
-        description: |
-          Unauthorized.
-          
-          This status is returned when the request contains either no user
-          authorization token or an invalid user authorization token.
         body: lib.UnauthorizedError
       403:
-        description: |
-          Action Forbidden.
-          
-          This status is returned when the requesting user is not the target
-          user and/or the target user was not offered a share for the target
-          dataset.
+        body: lib.ForbiddenError
       404:
-        description: |
-          Not Found.
-          
-          This status is returned when the target dataset does not exist.
         body: lib.NotFoundError
       422:
-        description: |
-          Unprocessable Entity.
-          
-          Request body was syntactically valid JSON, however the body failed
-          validation.
         body: lib.UnprocessableEntityError
       500:
-        description: |
-          Internal Server Error.
-          
-          This status is returned when an unhandled or unexpected issue arises
-          when attempting to process the request.
         body: lib.ServerError

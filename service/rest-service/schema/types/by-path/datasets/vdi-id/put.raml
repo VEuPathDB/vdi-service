@@ -1,3 +1,13 @@
 #%RAML 1.0 Library
 
-types: {}
+uses:
+  common: ../../../common.raml
+
+types:
+  DatasetPutRequest:
+    displayName: Dataset Data Put Request
+    type: object
+    additionalProperties: false
+    properties:
+      meta:
+        displayName: Dataset Metadata

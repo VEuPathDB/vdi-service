@@ -5,24 +5,14 @@ uses:
 
 types:
   PluginListItem:
-    displayName: Plugin Listing Entry
-    type: object
     additionalProperties: false
     properties:
-      displayName:
-        displayName: Plugin Display Name
-        type: string
-      typeName:
-        displayName: Dataset Type Name
-        type: string
-      typeVersion:
-        displayName: Dataset Type Version
-        type: string
-      projects:
-        displayName: Relevant Projects
+      displayName: string
+      typeName: string
+      typeVersion: string
+      projects?:
         description: |
           Projects that this plugin is restricted to.  An empty or absent list
           indicates that the plugin has no project restrictions and may be used
           on any site.
-        type: string[]
-        required: false
+        type: common.ProjectId[]

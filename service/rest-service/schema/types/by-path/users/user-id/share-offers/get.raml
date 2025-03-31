@@ -6,24 +6,13 @@ uses:
 types:
   ShareOfferEntry:
     displayName: Share Offer
-    type: object
     additionalProperties: false
     properties:
-      datasetId:
-        type: common.VDI-ID
-        required: true
-      owner:
-        type: common.DatasetOwner
-        required: true
-      shareStatus:
-        type: ShareOfferStatus
-        required: true
-      datasetType:
-        type: common.DatasetTypeInfo
-        required: true
-      projectIds:
-        type: common.ProjectID[]
-        required: true
+      datasetId: common.VdiId
+      owner: common.DatasetOwner
+      shareStatus: ShareOfferStatus
+      datasetType: common.DatasetTypeInfo
+      projectIds: common.ProjectId[]
 
   ShareOfferStatus:
     displayName: Share Offer Status

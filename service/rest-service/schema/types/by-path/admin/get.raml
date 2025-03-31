@@ -5,26 +5,21 @@ uses:
 
 types:
   BrokenDatasetListing:
-    displayName: Broken Dataset Listing
-    type: object
     additionalProperties: false
     properties:
       details?: BrokenDatasetDetails[]
-      ids?: common.VDI-ID[]
+      ids?: common.VdiId[]
 
   BrokenDatasetDetails:
-    displayName: Broken Dataset Details
-    type: object
     additionalProperties: false
     properties:
-      datasetId: common.VDI-ID
-      owner: common.User-ID
+      datasetId: common.VdiId
+      owner: common.UserId
       datasetType: common.DatasetTypeInfo
       projectIds: common.ProjectID[]
       status: common.DatasetStatusInfo
 
   BrokenImportListing:
-    displayName: Broken Import Listing
     type: object
     additionalProperties: false
     properties:
@@ -36,37 +31,32 @@ types:
     additionalProperties: false
     properties:
       count:
-        displayName: Result Count
-        description: Number of records in the result.
+        description: Number of records in the result
         type: integer
-        required: true
       before?: string
       after?: string
-      user?: common.User-ID
+      user?: common.UserId
       limit?: integer
       offset?: integer
 
   BrokenImportDetails:
     displayName: Broken Import Details
-    type: object
     additionalProperties: false
     properties:
-      datasetId: common.VDI-ID
-      owner: common.User-ID
+      datasetId: common.VdiId
+      owner: common.UserId
       datasetType: common.DatasetTypeInfo
-      projectIds: common.ProjectID[]
+      projectIds: common.ProjectId[]
       messages: string[]
 
   AllDatasetsListResponse:
     displayName: All Datasets Listing Response
-    type: object
     additionalProperties: false
     properties:
       meta: AllDatasetsListMeta
       results: AllDatasetsListEntry[]
 
   AllDatasetsListMeta:
-    type: object
     additionalProperties: false
     properties:
       count: integer
@@ -75,28 +65,26 @@ types:
       total: integer
 
   AllDatasetsListEntry:
-    type: object
     additionalProperties: false
     properties:
-      datasetId: common.VDI-ID
-      owner: common.User-ID
+      datasetId: common.VdiId
+      owner: common.UserId
       datasetType: common.DatasetTypeInfo
       visibility: common.DatasetVisibility
-      name: string
-      shortName?: string
-      shortAttribution?: string
-      category?: string
-      summary?: string
-      description?: string
-      sourceUrl?: string
-      origin: string
-      projectIds: common.ProjectID[]
+      name: common.DatasetName
+      origin: common.DatasetOrigin
+      projectIds: common.ProjectId[]
       status: common.DatasetStatusInfo
-      created: datetime
+      created: common.DatasetCreationDate
       isDeleted: boolean
+      shortName?: common.DatasetShortName
+      shortAttribution?: common.DatasetShortAttribution
+      category?: common.DatasetCategory
+      summary?: common.DatasetSummary
+      description?: common.DatasetDescription
+      sourceUrl?: common.DatasetSourceUrl
 
   SyncControlRecord:
-    type: object
     additionalProperties: false
     properties:
       sharesUpdateTime: datetime
@@ -104,28 +92,25 @@ types:
       metaUpdateTime: datetime
 
   InternalDatasetDetails:
-    type: object
     additionalProperties: false
     properties:
       datasetType: common.DatasetTypeInfo
-      owner: common.User-ID
+      owner: common.UserId
       isDeleted: boolean
-      origin: string
-      created: datetime
+      origin: common.DatasetOrigin
+      created: common.DatasetCreationDate
       inserted: datetime
-      name: string
-      shortName?: string
-      shortAttribution?: string
-      category?: string
-      summary?: string
-      description?: string
-      visibility: common.DatasetVisibility
-      sourceUrl?: string
-      projectIds: common.ProjectID[]
+      name: common.DatasetName
+      projectIds: common.ProjectId[]
       status: string
+      importMessages: string[]
+      visibility: common.DatasetVisibility
+      shortName?: common.DatasetShortName
+      shortAttribution?: common.DatasetShortAttribution
+      category?: common.DatasetCategory
+      summary?: common.DatasetSummary
+      description?: common.DatasetDescription
+      sourceUrl?: common.DatasetSourceUrl
       syncControl?: SyncControlRecord
       uploadFiles?: string[]
       installFiles?: string[]
-      importMessages: string[]
-
-
