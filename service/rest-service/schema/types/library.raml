@@ -379,23 +379,6 @@ types:
     additionalProperties: false
     properties:
       datasetId: VDI-ID
-  ShareOfferEntry:
-    displayName: Share Offer
-    type: object
-    additionalProperties: false
-    properties:
-      datasetId: VDI-ID
-      owner: DatasetOwner
-      shareStatus: ShareOfferStatus
-      datasetType: DatasetTypeInfo
-      projectIds: ProjectID[]
-  ShareOfferStatus:
-    displayName: Share Offer Status
-    type: string
-    enum:
-      - open
-      - accepted
-      - rejected
   DatasetFileListing:
     displayName: Dataset File Listing
     type: object
@@ -717,6 +700,23 @@ types:
         description: Current number of bytes counted against the user's quota.
         type: integer
         format: int64
+  ShareOfferEntry:
+    displayName: Share Offer
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: VDI-ID
+      owner: DatasetOwner
+      shareStatus: ShareOfferStatus
+      datasetType: DatasetTypeInfo
+      projectIds: ProjectID[]
+  ShareOfferStatus:
+    displayName: Share Offer Status
+    type: string
+    enum:
+      - open
+      - accepted
+      - rejected
   VDI-ID:
     displayName: VDI ID
     description: Unique VDI Dataset identifier string.

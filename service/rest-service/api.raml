@@ -3,77 +3,35 @@
 extends: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.2.0/libraries/base-service.raml
 
 title: VEuPathDB Dataset Installer
-version: 2.1.0
+version: 1.7.0
 mediaType: application/json
-
-traits:
-  adminEnabled:
-    headers:
-      Admin-Token?: string
-  adminRequired:
-    headers:
-      Admin-Token: string
-
-annotationTypes:
-  deprecated:
-    displayName: Deprecated
-    allowedTargets: [ Resource ]
-    type: nil
 
 uses:
   lib: schema/types/library.raml
 
+#
+
 /datasets: !include schema/resources/dataset-list/resource.raml
-
 /datasets/community: !include schema/resources/community-datasets/resource.raml
-
 /datasets/{vdi-id}: !include schema/resources/dataset/resource.raml
-
 /datasets/{vdi-id}/files: !include schema/resources/dataset-files/resource.raml
-
 /datasets/{vdi-id}/shares/{recipient-user-id}: !include schema/resources/dataset-shares/resource.raml
 
-/datasets/share-offers: !include schema/resources/dataset-share-offers/resource.raml
-
+/users: !include schema/resources/users/resource.raml
 /plugins: !include schema/resources/plugins/resource.raml
 
 /admin: !include schema/resources/admin/resource.raml
 
 
-
-/vdi-users:
-  displayName: Users
-
-  /self:
-    displayName: User By ID
-
-    /meta:
-      displayName: User Meta
-
-      get:
-        description: Get user metadata.
-
-        responses:
-          200:
-            description: Success
-            body:
-              application/json:
-                type: lib.UserMetadata
-          401:
-            description: Unauthorized
-            body:
-              application/json:
-                type: lib.UnauthorizedError
-          500:
-            description: Internal Server Error
-            body:
-              application/json:
-                type: lib.ServerError
+#
+# DEPRECATED ENDPOINT PATHS
+#
 
 /vdi-datasets: !include schema/resources/dataset-list/resource.raml
 /vdi-datasets/community: !include schema/resources/community-datasets/resource.raml
 /vdi-datasets/{vdi-id}: !include schema/resources/dataset/resource.raml
 /vdi-datasets/{vdi-id}/files: !include schema/resources/dataset-files/resource.raml
 /vdi-datasets/{vdi-id}/shares/{recipient-user-id}: !include schema/resources/dataset-shares/resource.raml
-/vdi-datasets/share-offers: !include schema/resources/dataset-share-offers/resource.raml
+/vdi-datasets/share-offers: !include schema/resources/users/self/share-offers/resource.raml
 /vdi-plugins: !include schema/resources/plugins/resource.raml
+/vdi-users: !include schema/resources/users/resource.raml

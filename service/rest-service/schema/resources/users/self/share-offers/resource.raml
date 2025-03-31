@@ -1,7 +1,6 @@
 #%RAML 1.0 Resource
 
 displayName: Open Dataset Share Offers
-
 get:
   displayName: List Offers
   description: |
@@ -13,16 +12,16 @@ get:
       description: |
         Controls the results by filtering them to only shares that are in the
         specified target status.
-        
+
         Valid `status` values are:
-        
+
         - `open`
         - `accepted`
         - `rejected`
         - `all`
-        
+
         These status values mean:
-        
+
         <table>
           <tr>
             <th>Status</th>
@@ -56,7 +55,7 @@ get:
     200:
       description: |
         Success.
-        
+
         A list of zero or more dataset shares were found for the requesting
         user.
       body:
@@ -66,14 +65,14 @@ get:
     400:
       description: |
         Bad Request.
-        
+
         This response is returned when the `status` query parameter was
         provided but was an invalid value.
       body: lib.BadRequestError
     401:
       description: |
         Unauthorized.
-        
+
         This response is returned when the request either contained an invalid
         user authorization token, or did not contain a user authorization
         token at all.
@@ -81,7 +80,7 @@ get:
     500:
       description: |
         Internal Server Error.
-        
+
         This response is returned when an unhandled or unexpected issue arises
         when attempting to process the request.
       body: lib.ServerError

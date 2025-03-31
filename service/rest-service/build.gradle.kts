@@ -1,8 +1,6 @@
-import org.veupathdb.lib.gradle.container.util.Logger.Level
-
 plugins {
   kotlin("jvm")
-  id("org.veupathdb.lib.gradle.container.container-utils") version "6.0.0-SNAPSHOT-1"
+  alias(libs.plugins.vpdb)
 }
 
 containerService {
@@ -43,22 +41,17 @@ dependencies {
 
   implementation(libs.s34k)
 
-  implementation(kotlin("stdlib-jdk8"))
   implementation(libs.kt.coroutines)
 
-  // Jersey
   implementation(libs.http.server.jersey)
 
-  // Log4J
   implementation(libs.log.slf4j)
   implementation(libs.log.log4j.core)
   implementation(libs.log.log4j.slf4j)
 
-  // Metrics (can remove if not adding custom service metrics over those provided by container core)
   implementation(libs.prometheus.client)
   implementation(libs.prometheus.common)
 
-  // Unit Testing
   testImplementation(kotlin("test"))
   testImplementation(libs.junit.api)
   testImplementation(libs.mockito.core)

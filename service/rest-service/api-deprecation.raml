@@ -8,7 +8,7 @@ extends: api.raml
 /datasets/{vdi-id}: {}
 /datasets/{vdi-id}/files: {}
 /datasets/{vdi-id}/shares/{recipient-user-id}: {}
-/datasets/share-offers: {}
+/users: {}
 /plugins: {}
 /admin: {}
 /api: {}
@@ -19,7 +19,6 @@ extends: api.raml
 # Deprecated endpoints
 
 /vdi-datasets:
-  (deprecated):
   displayName: "/vdi-datasets"
   get:
     description: Deprecated alias of [/datasets](#resources:/datasets:get)
@@ -27,13 +26,11 @@ extends: api.raml
     description: Deprecated alias of [/datasets](#resources:/datasets:post)
 
 /vdi-datasets/community:
-  (deprecated):
   displayName: /vdi-datasets/community
   get:
     description: Deprecated alias of [/datasets/community](#resources:/datasets/community:get)
 
 /vdi-datasets/{vdi-id}:
-  (deprecated):
   displayName: "/vdi-datasets/{vdi-id}"
   get:
     description: Deprecated alias of [/datasets/{vdi-id}](#resources:/datasets/{vd-id}:get)
@@ -43,7 +40,6 @@ extends: api.raml
     description: Deprecated alias of [/datasets/{vdi-id}](#resources:/datasets/{vd-id}:delete)
 
 /vdi-datasets/{vdi-id}/files:
-  (deprecated):
   displayName: "/vdi-datasets/{vdi-id}/files"
   get:
     description: Deprecated alias of [/datasets/{vdi-id}/files](#resources:/datasets/{vdi-id}/files:get)
@@ -55,23 +51,29 @@ extends: api.raml
       description: Deprecated alias of [/datasets/{vdi-id}/files](#resources:/datasets/{vdi-id}/files/data:get)
 
 /vdi-datasets/{vdi-id}/shares/{recipient-user-id}:
-  (deprecated):
   displayName: /vdi-datasets/{vdi-id}/shares/{recipient-user-id}
   /offer:
+    displayName: /offer
     put:
       description: Deprecated alias of [/datasets/{vdi-id}/shares/{recipient-user-id}/offer](#resources:/datasets/{vdi-id}/shares/{recipient-user-id}/offer:put)
   /receipt:
+    displayName: /receipt
     put:
       description: Deprecated alias of [/datasets/{vdi-id}/shares/{recipient-user-id}/receipt](#resources:/datasets/{vdi-id}/shares/{recipient-user-id}/receipt:put)
 
 /vdi-datasets/share-offers:
-  (deprecated):
   displayName: /vdi-datasets/share-offers
   get:
-    description: Deprecated alias of [/datasets/share-offers](#resources:/datasets/share-offers:get)
+    description: Deprecated alias of [/users/self/share-offers](#resources:/users/self/share-offers:get)
+
+/vdi-users:
+  displayName: /vdi-users
+  /self:
+    /meta:
+      get:
+        description: Deprecated alias of [/users/self/meta](#resources:/users/self/meta:get)
 
 /vdi-plugins:
-  (deprecated):
   displayName: /vdi-plugins
   get:
     description: Deprecated alias of [/plugins](#resources:/plugins:get)

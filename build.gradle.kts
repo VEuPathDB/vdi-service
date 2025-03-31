@@ -3,8 +3,8 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  kotlin("jvm") version libs.versions.kotlin
-  id("com.github.johnrengelman.shadow") version "8.1.1"
+  alias(libs.plugins.kotlin)
+  alias(libs.plugins.shadow)
 }
 
 allprojects {

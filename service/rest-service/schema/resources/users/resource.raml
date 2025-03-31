@@ -1,0 +1,27 @@
+#%RAML 1.0 Resource
+
+displayName: Users
+
+/self:
+  displayName: Current User
+  /meta:
+    displayName: Metadata
+    get:
+      description: Get user metadata.
+      responses:
+        200:
+          description: Success
+          body:
+            application/json:
+              type: lib.UserMetadata
+        401:
+          description: Unauthorized
+          body:
+            application/json:
+              type: lib.UnauthorizedError
+        500:
+          description: Internal Server Error
+          body:
+            application/json:
+              type: lib.ServerError
+  /share-offers: !include self/share-offers/resource.raml
