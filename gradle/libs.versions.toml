@@ -37,7 +37,7 @@ msg-kafka  = { group = "org.apache.kafka", name = "kafka-clients", version = "4.
 msg-rabbit = { group = "com.rabbitmq",     name = "amqp-client",   version = "5.25.0" }
 
 # LDAP
-ldap = { group = "org.veupathdb.lib", name = "ldap-utils", version = "1.0.0" }
+ldap = { group = "org.veupathdb.lib", name = "ldap-utils", version = "2.0.1" }
 
 # Metrics
 prometheus-client = { group = "io.prometheus", name = "simpleclient",        version = "0.16.0" }
