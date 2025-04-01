@@ -1,14 +1,14 @@
 package org.veupathdb.service.vdi.server.controllers
 
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
-import org.veupathdb.service.vdi.generated.resources.VdiDatasetsCommunity
+import org.veupathdb.service.vdi.generated.resources.DatasetsCommunity
 import org.veupathdb.service.vdi.service.dataset.fetchCommunityUserDatasetList
 
 @Authenticated(allowGuests = true)
-class CommunityDatasets : VdiDatasetsCommunity {
+class CommunityDatasets : DatasetsCommunity {
 
-  override fun getVdiDatasetsCommunity(): VdiDatasetsCommunity.GetVdiDatasetsCommunityResponse {
-    return VdiDatasetsCommunity.GetVdiDatasetsCommunityResponse
+  override fun getDatasetsCommunity(): DatasetsCommunity.GetDatasetsCommunityResponse {
+    return DatasetsCommunity.GetDatasetsCommunityResponse
       .respond200WithApplicationJson(fetchCommunityUserDatasetList())
   }
 }

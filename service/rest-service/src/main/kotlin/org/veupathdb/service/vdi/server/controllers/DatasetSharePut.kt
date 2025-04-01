@@ -1,13 +1,17 @@
 package org.veupathdb.service.vdi.server.controllers
 
-import jakarta.ws.rs.*
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.service.vdi.generated.model.DatasetShareOffer
 import org.veupathdb.service.vdi.generated.model.DatasetShareReceipt
-import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdIdSharesRecipientUserId
+import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdSharesRecipientUserId
+import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdiIdSharesRecipientUserId
+import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdSharesRecipientUserId.PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse as PutOffer
+import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdSharesRecipientUserId.PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse as PutReceipt
+import org.veupathdb.service.vdi.genx.model.BadRequestError
+import org.veupathdb.service.vdi.genx.model.ForbiddenError
 import org.veupathdb.service.vdi.service.shares.adminPutShareOffer
 import org.veupathdb.service.vdi.service.shares.putShareOffer
 import org.veupathdb.service.vdi.service.shares.putShareReceipt
@@ -15,57 +19,70 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated
-@Path("/vdi-datasets/{vd-id}/shares/{recipient-user-id}")
-class DatasetSharePut(@Context request: ContainerRequest) : VdiDatasetsVdIdSharesRecipientUserId, ControllerBase(request) {
-
-  @PUT
-  @Path("/offer")
-  @Produces("application/json")
-  @Consumes("application/json")
+class DatasetSharePut(@Context request: ContainerRequest)
+  : DatasetsVdiIdSharesRecipientUserId
+  , VdiDatasetsVdiIdSharesRecipientUserId // DEPRECATED API
+  , ControllerBase(request)
+{
   @Authenticated(adminOverride = ALLOW_ALWAYS)
-  override fun putVdiDatasetsSharesOfferByVdIdAndRecipientUserId(
-    @PathParam("vd-id") vdId: String,
-    @PathParam("recipient-user-id") recipientUserId: Long,
+  override fun putDatasetsSharesOfferByVdiIdAndRecipientUserId(
+    vdiId: String,
+    recipientUserId: Long,
     entity: DatasetShareOffer?,
-  ): VdiDatasetsVdIdSharesRecipientUserId.PutVdiDatasetsSharesOfferByVdIdAndRecipientUserIdResponse {
+  ): PutOffer {
     if (entity == null)
-      throw BadRequestException("body must not be blank or null")
+      return PutOffer.respond400WithApplicationJson(BadRequestError("body must not be blank or null"))
 
     val userID = maybeUserID?.toUserID()
 
     if (userID == null) {
-      adminPutShareOffer(vdId.asVDIID(), recipientUserId.toUserID(), entity)
+      adminPutShareOffer(vdiId.asVDIID(), recipientUserId.toUserID(), entity)
     } else {
-      putShareOffer(vdId.asVDIID(), userID, UserID(recipientUserId), entity)
+      putShareOffer(vdiId.asVDIID(), userID, UserID(recipientUserId), entity)
     }
 
-    return VdiDatasetsVdIdSharesRecipientUserId.PutVdiDatasetsSharesOfferByVdIdAndRecipientUserIdResponse.respond204()
+    return PutOffer.respond204()
   }
 
-  @PUT
-  @Path("/receipt")
-  @Produces("application/json")
-  @Consumes("application/json")
   @Authenticated(adminOverride = ALLOW_ALWAYS)
-  override fun putVdiDatasetsSharesReceiptByVdIdAndRecipientUserId(
-    @PathParam("vd-id") vdId: String,
-    @PathParam("recipient-user-id") recipientUserId: Long,
+  override fun putDatasetsSharesReceiptByVdiIdAndRecipientUserId(
+    vdiId: String,
+    recipientUserId: Long,
     entity: DatasetShareReceipt?,
-  ): VdiDatasetsVdIdSharesRecipientUserId.PutVdiDatasetsSharesReceiptByVdIdAndRecipientUserIdResponse {
+  ): PutReceipt {
     if (entity == null)
-      throw BadRequestException("body must not be blank or null")
+      return PutReceipt.respond400WithApplicationJson(BadRequestError("body must not be blank or null"))
 
     val userID = maybeUserID
 
     if (userID == null) {
-      putShareReceipt(vdId.asVDIID(), recipientUserId.toUserID(), entity)
+      putShareReceipt(vdiId.asVDIID(), recipientUserId.toUserID(), entity)
     } else {
       if (userID != recipientUserId)
-        throw ForbiddenException("cannot accept share offers for other users")
+        return PutReceipt.respond403WithApplicationJson(ForbiddenError("cannot accept share offers for other users"))
 
-      putShareReceipt(vdId.asVDIID(), userID.toUserID(), entity)
+      putShareReceipt(vdiId.asVDIID(), userID.toUserID(), entity)
     }
 
-    return VdiDatasetsVdIdSharesRecipientUserId.PutVdiDatasetsSharesReceiptByVdIdAndRecipientUserIdResponse.respond204()
+    return PutReceipt.respond204()
+  }
+
+  // DEPRECATED API
+  override fun putVdiDatasetsSharesOfferByVdiIdAndRecipientUserId(
+    vdiId: String,
+    recipientUserId: Long,
+    entity: DatasetShareOffer?,
+  ): VdiDatasetsVdiIdSharesRecipientUserId.PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse {
+    putDatasetsSharesOfferByVdiIdAndRecipientUserId(vdiId, recipientUserId, entity)
+    return VdiDatasetsVdiIdSharesRecipientUserId.PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse.respond204()
+  }
+
+  override fun putVdiDatasetsSharesReceiptByVdiIdAndRecipientUserId(
+    vdiId: String,
+    recipientUserId: Long,
+    entity: DatasetShareReceipt?,
+  ): VdiDatasetsVdiIdSharesRecipientUserId.PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse {
+    putDatasetsSharesReceiptByVdiIdAndRecipientUserId(vdiId, recipientUserId, entity)
+    return VdiDatasetsVdiIdSharesRecipientUserId.PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse.respond204()
   }
 }

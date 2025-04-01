@@ -16,8 +16,7 @@ import org.veupathdb.service.vdi.generated.support.ResponseDelegate;
 public interface DatasetsVdiIdFiles {
   @GET
   @Produces("application/json")
-  GetDatasetsFilesByVdIdAndVdiIdResponse getDatasetsFilesByVdIdAndVdiId(
-      @PathParam("vd-id") String vdId, @PathParam("vdi-id") String vdiId);
+  GetDatasetsFilesByVdiIdResponse getDatasetsFilesByVdiId(@PathParam("vdi-id") String vdiId);
 
   @GET
   @Path("/upload")
@@ -25,8 +24,8 @@ public interface DatasetsVdiIdFiles {
       "application/octet-stream",
       "application/json"
   })
-  GetDatasetsFilesUploadByVdIdAndVdiIdResponse getDatasetsFilesUploadByVdIdAndVdiId(
-      @PathParam("vd-id") String vdId, @PathParam("vdi-id") String vdiId);
+  GetDatasetsFilesUploadByVdiIdResponse getDatasetsFilesUploadByVdiId(
+      @PathParam("vdi-id") String vdiId);
 
   @GET
   @Path("/data")
@@ -34,53 +33,53 @@ public interface DatasetsVdiIdFiles {
       "application/octet-stream",
       "application/json"
   })
-  GetDatasetsFilesDataByVdIdAndVdiIdResponse getDatasetsFilesDataByVdIdAndVdiId(
-      @PathParam("vd-id") String vdId, @PathParam("vdi-id") String vdiId);
+  GetDatasetsFilesDataByVdiIdResponse getDatasetsFilesDataByVdiId(
+      @PathParam("vdi-id") String vdiId);
 
-  class GetDatasetsFilesByVdIdAndVdiIdResponse extends ResponseDelegate {
-    private GetDatasetsFilesByVdIdAndVdiIdResponse(Response response, Object entity) {
+  class GetDatasetsFilesByVdiIdResponse extends ResponseDelegate {
+    private GetDatasetsFilesByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetDatasetsFilesByVdIdAndVdiIdResponse(Response response) {
+    private GetDatasetsFilesByVdiIdResponse(Response response) {
       super(response);
     }
 
-    public static GetDatasetsFilesByVdIdAndVdiIdResponse respond200WithApplicationJson(
+    public static GetDatasetsFilesByVdiIdResponse respond200WithApplicationJson(
         DatasetFileListing entity) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetDatasetsFilesByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsFilesByVdIdAndVdiIdResponse respond401WithApplicationJson(
+    public static GetDatasetsFilesByVdiIdResponse respond401WithApplicationJson(
         UnauthorizedError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetDatasetsFilesByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsFilesByVdIdAndVdiIdResponse respond404WithApplicationJson(
+    public static GetDatasetsFilesByVdiIdResponse respond404WithApplicationJson(
         NotFoundError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetDatasetsFilesByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsFilesByVdIdAndVdiIdResponse respond500WithApplicationJson(
+    public static GetDatasetsFilesByVdiIdResponse respond500WithApplicationJson(
         ServerError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetDatasetsFilesByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesByVdiIdResponse(responseBuilder.build(), entity);
     }
   }
 
-  class GetDatasetsFilesUploadByVdIdAndVdiIdResponse extends ResponseDelegate {
-    private GetDatasetsFilesUploadByVdIdAndVdiIdResponse(Response response, Object entity) {
+  class GetDatasetsFilesUploadByVdiIdResponse extends ResponseDelegate {
+    private GetDatasetsFilesUploadByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetDatasetsFilesUploadByVdIdAndVdiIdResponse(Response response) {
+    private GetDatasetsFilesUploadByVdiIdResponse(Response response) {
       super(response);
     }
 
@@ -88,33 +87,33 @@ public interface DatasetsVdiIdFiles {
       return new HeadersFor200();
     }
 
-    public static GetDatasetsFilesUploadByVdIdAndVdiIdResponse respond200WithApplicationOctetStream(
+    public static GetDatasetsFilesUploadByVdiIdResponse respond200WithApplicationOctetStream(
         StreamingOutput entity, HeadersFor200 headers) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/octet-stream");
       responseBuilder.entity(entity);
       headers.toResponseBuilder(responseBuilder);
-      return new GetDatasetsFilesUploadByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesUploadByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsFilesUploadByVdIdAndVdiIdResponse respond401WithApplicationJson(
+    public static GetDatasetsFilesUploadByVdiIdResponse respond401WithApplicationJson(
         UnauthorizedError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetDatasetsFilesUploadByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesUploadByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsFilesUploadByVdIdAndVdiIdResponse respond404WithApplicationJson(
+    public static GetDatasetsFilesUploadByVdiIdResponse respond404WithApplicationJson(
         NotFoundError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetDatasetsFilesUploadByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesUploadByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsFilesUploadByVdIdAndVdiIdResponse respond500WithApplicationJson(
+    public static GetDatasetsFilesUploadByVdiIdResponse respond500WithApplicationJson(
         ServerError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetDatasetsFilesUploadByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesUploadByVdiIdResponse(responseBuilder.build(), entity);
     }
 
     public static class HeadersFor200 extends HeaderBuilderBase {
@@ -128,12 +127,12 @@ public interface DatasetsVdiIdFiles {
     }
   }
 
-  class GetDatasetsFilesDataByVdIdAndVdiIdResponse extends ResponseDelegate {
-    private GetDatasetsFilesDataByVdIdAndVdiIdResponse(Response response, Object entity) {
+  class GetDatasetsFilesDataByVdiIdResponse extends ResponseDelegate {
+    private GetDatasetsFilesDataByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetDatasetsFilesDataByVdIdAndVdiIdResponse(Response response) {
+    private GetDatasetsFilesDataByVdiIdResponse(Response response) {
       super(response);
     }
 
@@ -141,33 +140,33 @@ public interface DatasetsVdiIdFiles {
       return new HeadersFor200();
     }
 
-    public static GetDatasetsFilesDataByVdIdAndVdiIdResponse respond200WithApplicationOctetStream(
+    public static GetDatasetsFilesDataByVdiIdResponse respond200WithApplicationOctetStream(
         StreamingOutput entity, HeadersFor200 headers) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/octet-stream");
       responseBuilder.entity(entity);
       headers.toResponseBuilder(responseBuilder);
-      return new GetDatasetsFilesDataByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesDataByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsFilesDataByVdIdAndVdiIdResponse respond401WithApplicationJson(
+    public static GetDatasetsFilesDataByVdiIdResponse respond401WithApplicationJson(
         UnauthorizedError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetDatasetsFilesDataByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesDataByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsFilesDataByVdIdAndVdiIdResponse respond404WithApplicationJson(
+    public static GetDatasetsFilesDataByVdiIdResponse respond404WithApplicationJson(
         NotFoundError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetDatasetsFilesDataByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesDataByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsFilesDataByVdIdAndVdiIdResponse respond500WithApplicationJson(
+    public static GetDatasetsFilesDataByVdiIdResponse respond500WithApplicationJson(
         ServerError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetDatasetsFilesDataByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetDatasetsFilesDataByVdiIdResponse(responseBuilder.build(), entity);
     }
 
     public static class HeadersFor200 extends HeaderBuilderBase {

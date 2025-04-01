@@ -23,7 +23,7 @@ public interface VdiDatasetsVdiIdSharesRecipientUserId {
   @Produces("application/json")
   @Consumes("application/json")
   PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse putVdiDatasetsSharesOfferByVdiIdAndRecipientUserId(
-      @PathParam("vdi-id") String vdiId, @PathParam("recipient-user-id") String recipientUserId,
+      @PathParam("vdi-id") String vdiId, @PathParam("recipient-user-id") Long recipientUserId,
       DatasetShareOffer entity);
 
   @PUT
@@ -31,7 +31,7 @@ public interface VdiDatasetsVdiIdSharesRecipientUserId {
   @Produces("application/json")
   @Consumes("application/json")
   PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse putVdiDatasetsSharesReceiptByVdiIdAndRecipientUserId(
-      @PathParam("vdi-id") String vdiId, @PathParam("recipient-user-id") String recipientUserId,
+      @PathParam("vdi-id") String vdiId, @PathParam("recipient-user-id") Long recipientUserId,
       DatasetShareReceipt entity);
 
   class PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse extends ResponseDelegate {

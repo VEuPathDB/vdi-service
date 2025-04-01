@@ -17,8 +17,8 @@ import org.veupathdb.vdi.lib.json.JSON
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
 class ValidationErrors {
-  private val byKey   = HashMap<String, MutableList<String>>()
-  private val general = ArrayList<String>()
+  val byKey   = HashMap<String, MutableList<String>>()
+  val general = ArrayList<String>()
 
   /**
    * `true` if this [ValidationErrors] instance contains no errors.

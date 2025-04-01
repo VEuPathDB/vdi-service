@@ -25,33 +25,30 @@ import org.veupathdb.service.vdi.generated.support.ResponseDelegate;
 public interface VdiDatasetsVdiId {
   @GET
   @Produces("application/json")
-  GetVdiDatasetsByVdIdAndVdiIdResponse getVdiDatasetsByVdIdAndVdiId(@PathParam("vd-id") String vdId,
-      @PathParam("vdi-id") String vdiId);
+  GetVdiDatasetsByVdiIdResponse getVdiDatasetsByVdiId(@PathParam("vdi-id") String vdiId);
 
   @PATCH
   @Produces("application/json")
   @Consumes("application/json")
-  PatchVdiDatasetsByVdIdAndVdiIdResponse patchVdiDatasetsByVdIdAndVdiId(
-      @PathParam("vd-id") String vdId, @PathParam("vdi-id") String vdiId,
+  PatchVdiDatasetsByVdiIdResponse patchVdiDatasetsByVdiId(@PathParam("vdi-id") String vdiId,
       DatasetPatchRequestBody entity);
 
   @PUT
   @Produces("application/json")
   @Consumes("application/json")
-  PutVdiDatasetsByVdIdAndVdiIdResponse putVdiDatasetsByVdIdAndVdiId(@PathParam("vd-id") String vdId,
-      @PathParam("vdi-id") String vdiId, DatasetPutRequestBody entity);
+  PutVdiDatasetsByVdiIdResponse putVdiDatasetsByVdiId(@PathParam("vdi-id") String vdiId,
+      DatasetPutRequestBody entity);
 
   @DELETE
   @Produces("application/json")
-  DeleteVdiDatasetsByVdIdAndVdiIdResponse deleteVdiDatasetsByVdIdAndVdiId(
-      @PathParam("vd-id") String vdId, @PathParam("vdi-id") String vdiId);
+  DeleteVdiDatasetsByVdiIdResponse deleteVdiDatasetsByVdiId(@PathParam("vdi-id") String vdiId);
 
-  class PutVdiDatasetsByVdIdAndVdiIdResponse extends ResponseDelegate {
-    private PutVdiDatasetsByVdIdAndVdiIdResponse(Response response, Object entity) {
+  class PutVdiDatasetsByVdiIdResponse extends ResponseDelegate {
+    private PutVdiDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PutVdiDatasetsByVdIdAndVdiIdResponse(Response response) {
+    private PutVdiDatasetsByVdiIdResponse(Response response) {
       super(response);
     }
 
@@ -59,54 +56,53 @@ public interface VdiDatasetsVdiId {
       return new HeadersFor201();
     }
 
-    public static PutVdiDatasetsByVdIdAndVdiIdResponse respond201WithApplicationJson(
+    public static PutVdiDatasetsByVdiIdResponse respond201WithApplicationJson(
         DatasetPutResponseBody entity, HeadersFor201 headers) {
       Response.ResponseBuilder responseBuilder = Response.status(201).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       headers.toResponseBuilder(responseBuilder);
-      return new PutVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PutVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PutVdiDatasetsByVdIdAndVdiIdResponse respond400WithApplicationJson(
+    public static PutVdiDatasetsByVdiIdResponse respond400WithApplicationJson(
         BadRequestError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(400).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PutVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PutVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PutVdiDatasetsByVdIdAndVdiIdResponse respond401WithApplicationJson(
+    public static PutVdiDatasetsByVdiIdResponse respond401WithApplicationJson(
         UnauthorizedError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PutVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PutVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PutVdiDatasetsByVdIdAndVdiIdResponse respond403WithApplicationJson(
+    public static PutVdiDatasetsByVdiIdResponse respond403WithApplicationJson(
         ForbiddenError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(403).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PutVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PutVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PutVdiDatasetsByVdIdAndVdiIdResponse respond404WithApplicationJson(
+    public static PutVdiDatasetsByVdiIdResponse respond404WithApplicationJson(
         NotFoundError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PutVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PutVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PutVdiDatasetsByVdIdAndVdiIdResponse respond422WithApplicationJson(
+    public static PutVdiDatasetsByVdiIdResponse respond422WithApplicationJson(
         UnprocessableEntityError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(422).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PutVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PutVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PutVdiDatasetsByVdIdAndVdiIdResponse respond500WithApplicationJson(
-        ServerError entity) {
+    public static PutVdiDatasetsByVdiIdResponse respond500WithApplicationJson(ServerError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PutVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PutVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
     public static class HeadersFor201 extends HeaderBuilderBase {
@@ -120,51 +116,50 @@ public interface VdiDatasetsVdiId {
     }
   }
 
-  class GetVdiDatasetsByVdIdAndVdiIdResponse extends ResponseDelegate {
-    private GetVdiDatasetsByVdIdAndVdiIdResponse(Response response, Object entity) {
+  class GetVdiDatasetsByVdiIdResponse extends ResponseDelegate {
+    private GetVdiDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiDatasetsByVdIdAndVdiIdResponse(Response response) {
+    private GetVdiDatasetsByVdiIdResponse(Response response) {
       super(response);
     }
 
-    public static GetVdiDatasetsByVdIdAndVdiIdResponse respond200WithApplicationJson(
+    public static GetVdiDatasetsByVdiIdResponse respond200WithApplicationJson(
         DatasetDetails entity) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
     public static HeadersFor301 headersFor301() {
       return new HeadersFor301();
     }
 
-    public static GetVdiDatasetsByVdIdAndVdiIdResponse respond301(HeadersFor301 headers) {
+    public static GetVdiDatasetsByVdiIdResponse respond301(HeadersFor301 headers) {
       Response.ResponseBuilder responseBuilder = Response.status(301);
       responseBuilder = headers.toResponseBuilder(responseBuilder);
-      return new GetVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build());
+      return new GetVdiDatasetsByVdiIdResponse(responseBuilder.build());
     }
 
-    public static GetVdiDatasetsByVdIdAndVdiIdResponse respond401WithApplicationJson(
+    public static GetVdiDatasetsByVdiIdResponse respond401WithApplicationJson(
         UnauthorizedError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetVdiDatasetsByVdIdAndVdiIdResponse respond404WithApplicationJson(
+    public static GetVdiDatasetsByVdiIdResponse respond404WithApplicationJson(
         NotFoundError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetVdiDatasetsByVdIdAndVdiIdResponse respond500WithApplicationJson(
-        ServerError entity) {
+    public static GetVdiDatasetsByVdiIdResponse respond500WithApplicationJson(ServerError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new GetVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
     public static class HeadersFor301 extends HeaderBuilderBase {
@@ -178,103 +173,103 @@ public interface VdiDatasetsVdiId {
     }
   }
 
-  class PatchVdiDatasetsByVdIdAndVdiIdResponse extends ResponseDelegate {
-    private PatchVdiDatasetsByVdIdAndVdiIdResponse(Response response, Object entity) {
+  class PatchVdiDatasetsByVdiIdResponse extends ResponseDelegate {
+    private PatchVdiDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PatchVdiDatasetsByVdIdAndVdiIdResponse(Response response) {
+    private PatchVdiDatasetsByVdiIdResponse(Response response) {
       super(response);
     }
 
-    public static PatchVdiDatasetsByVdIdAndVdiIdResponse respond204() {
+    public static PatchVdiDatasetsByVdiIdResponse respond204() {
       Response.ResponseBuilder responseBuilder = Response.status(204);
-      return new PatchVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build());
+      return new PatchVdiDatasetsByVdiIdResponse(responseBuilder.build());
     }
 
-    public static PatchVdiDatasetsByVdIdAndVdiIdResponse respond400WithApplicationJson(
+    public static PatchVdiDatasetsByVdiIdResponse respond400WithApplicationJson(
         BadRequestError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(400).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PatchVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PatchVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PatchVdiDatasetsByVdIdAndVdiIdResponse respond401WithApplicationJson(
+    public static PatchVdiDatasetsByVdiIdResponse respond401WithApplicationJson(
         UnauthorizedError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PatchVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PatchVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PatchVdiDatasetsByVdIdAndVdiIdResponse respond403WithApplicationJson(
+    public static PatchVdiDatasetsByVdiIdResponse respond403WithApplicationJson(
         ForbiddenError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(403).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PatchVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PatchVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PatchVdiDatasetsByVdIdAndVdiIdResponse respond404WithApplicationJson(
+    public static PatchVdiDatasetsByVdiIdResponse respond404WithApplicationJson(
         NotFoundError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PatchVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PatchVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PatchVdiDatasetsByVdIdAndVdiIdResponse respond422WithApplicationJson(
+    public static PatchVdiDatasetsByVdiIdResponse respond422WithApplicationJson(
         UnprocessableEntityError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(422).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PatchVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PatchVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PatchVdiDatasetsByVdIdAndVdiIdResponse respond500WithApplicationJson(
+    public static PatchVdiDatasetsByVdiIdResponse respond500WithApplicationJson(
         ServerError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new PatchVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new PatchVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
   }
 
-  class DeleteVdiDatasetsByVdIdAndVdiIdResponse extends ResponseDelegate {
-    private DeleteVdiDatasetsByVdIdAndVdiIdResponse(Response response, Object entity) {
+  class DeleteVdiDatasetsByVdiIdResponse extends ResponseDelegate {
+    private DeleteVdiDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private DeleteVdiDatasetsByVdIdAndVdiIdResponse(Response response) {
+    private DeleteVdiDatasetsByVdiIdResponse(Response response) {
       super(response);
     }
 
-    public static DeleteVdiDatasetsByVdIdAndVdiIdResponse respond204() {
+    public static DeleteVdiDatasetsByVdiIdResponse respond204() {
       Response.ResponseBuilder responseBuilder = Response.status(204);
-      return new DeleteVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build());
+      return new DeleteVdiDatasetsByVdiIdResponse(responseBuilder.build());
     }
 
-    public static DeleteVdiDatasetsByVdIdAndVdiIdResponse respond401WithApplicationJson(
+    public static DeleteVdiDatasetsByVdiIdResponse respond401WithApplicationJson(
         UnauthorizedError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new DeleteVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new DeleteVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static DeleteVdiDatasetsByVdIdAndVdiIdResponse respond403WithApplicationJson(
+    public static DeleteVdiDatasetsByVdiIdResponse respond403WithApplicationJson(
         ForbiddenError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(403).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new DeleteVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new DeleteVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static DeleteVdiDatasetsByVdIdAndVdiIdResponse respond404WithApplicationJson(
+    public static DeleteVdiDatasetsByVdiIdResponse respond404WithApplicationJson(
         NotFoundError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new DeleteVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new DeleteVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static DeleteVdiDatasetsByVdIdAndVdiIdResponse respond500WithApplicationJson(
+    public static DeleteVdiDatasetsByVdiIdResponse respond500WithApplicationJson(
         ServerError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new DeleteVdiDatasetsByVdIdAndVdiIdResponse(responseBuilder.build(), entity);
+      return new DeleteVdiDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
   }
 }

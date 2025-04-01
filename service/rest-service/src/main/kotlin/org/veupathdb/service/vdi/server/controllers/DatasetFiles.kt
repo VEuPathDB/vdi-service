@@ -1,22 +1,24 @@
 package org.veupathdb.service.vdi.server.controllers
 
-import jakarta.ws.rs.NotFoundException
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
-import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdIdFiles
+import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdFiles
+import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdFiles.*
+import org.veupathdb.service.vdi.genx.model.NotFoundError
 import org.veupathdb.service.vdi.service.dataset.*
 import org.veupathdb.vdi.lib.common.field.toDatasetIDOrNull
 import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated(adminOverride = ALLOW_ALWAYS)
-class DatasetFiles(@Context request: ContainerRequest) : VdiDatasetsVdIdFiles, ControllerBase(request) {
+class DatasetFiles(@Context request: ContainerRequest) : DatasetsVdiIdFiles, ControllerBase(request) {
 
-  override fun getVdiDatasetsFilesByVdId(vdId: String): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesByVdIdResponse {
-    val datasetID = vdId.toDatasetIDOrNull() ?: throw NotFoundException()
+  override fun getDatasetsFilesByVdiId(vdId: String): GetDatasetsFilesByVdiIdResponse {
+    val datasetID = vdId.toDatasetIDOrNull()
+      ?: return GetDatasetsFilesByVdiIdResponse.respond404WithApplicationJson(NotFoundError())
 
-    return VdiDatasetsVdIdFiles.GetVdiDatasetsFilesByVdIdResponse.respond200WithApplicationJson(
+    return GetDatasetsFilesByVdiIdResponse.respond200WithApplicationJson(
       if (maybeUserID == null) {
         listDatasetFilesForAdmin(datasetID)
       } else {
@@ -25,8 +27,9 @@ class DatasetFiles(@Context request: ContainerRequest) : VdiDatasetsVdIdFiles, C
     )
   }
 
-  override fun getVdiDatasetsFilesUploadByVdId(vdId: String): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesUploadByVdIdResponse {
-    val datasetID = vdId.toDatasetIDOrNull() ?: throw NotFoundException()
+  override fun getDatasetsFilesUploadByVdiId(vdId: String): GetDatasetsFilesUploadByVdiIdResponse {
+    val datasetID = vdId.toDatasetIDOrNull()
+      ?: return GetDatasetsFilesUploadByVdiIdResponse.respond404WithApplicationJson(NotFoundError())
 
     val obj = if (maybeUserID == null) {
       getUploadFileForAdmin(datasetID)
@@ -34,17 +37,18 @@ class DatasetFiles(@Context request: ContainerRequest) : VdiDatasetsVdIdFiles, C
       getUploadFileForUser(userID.toUserID(), datasetID)
     }
 
-    return VdiDatasetsVdIdFiles.GetVdiDatasetsFilesUploadByVdIdResponse
+    return GetDatasetsFilesUploadByVdiIdResponse
       .respond200WithApplicationOctetStream(
         { obj.stream.use { inp -> inp.transferTo(it) } },
-        VdiDatasetsVdIdFiles.GetVdiDatasetsFilesUploadByVdIdResponse
+        GetDatasetsFilesUploadByVdiIdResponse
           .headersFor200()
           .withContentDisposition("attachment; filename=\"$datasetID-upload.zip\"")
       )
   }
 
-  override fun getVdiDatasetsFilesDataByVdId(vdId: String): VdiDatasetsVdIdFiles.GetVdiDatasetsFilesDataByVdIdResponse {
-    val datasetID = vdId.toDatasetIDOrNull() ?: throw NotFoundException()
+  override fun getDatasetsFilesDataByVdiId(vdId: String): GetDatasetsFilesDataByVdiIdResponse {
+    val datasetID = vdId.toDatasetIDOrNull()
+      ?: return GetDatasetsFilesDataByVdiIdResponse.respond404WithApplicationJson(NotFoundError())
 
     val obj = if (maybeUserID == null) {
       getDataFileForAdmin(datasetID)
@@ -52,10 +56,10 @@ class DatasetFiles(@Context request: ContainerRequest) : VdiDatasetsVdIdFiles, C
       getDataFileForUser(userID.toUserID(), datasetID)
     }
 
-    return VdiDatasetsVdIdFiles.GetVdiDatasetsFilesDataByVdIdResponse
+    return GetDatasetsFilesDataByVdiIdResponse
       .respond200WithApplicationOctetStream(
         { obj.stream.use { inp -> inp.transferTo(it) } },
-        VdiDatasetsVdIdFiles.GetVdiDatasetsFilesDataByVdIdResponse
+        GetDatasetsFilesDataByVdiIdResponse
           .headersFor200()
           .withContentDisposition("attachment; filename=\"$datasetID-data.zip\"")
       )

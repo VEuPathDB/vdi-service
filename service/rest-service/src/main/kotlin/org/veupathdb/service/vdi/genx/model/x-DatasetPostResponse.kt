@@ -1,15 +1,15 @@
 package org.veupathdb.service.vdi.genx.model
 
-import org.veupathdb.service.vdi.generated.model.DatasetPostResponse
-import org.veupathdb.service.vdi.generated.model.DatasetPostResponseImpl
+import org.veupathdb.service.vdi.generated.model.DatasetPostResponseBody
+import org.veupathdb.service.vdi.generated.model.DatasetPostResponseBodyImpl
 import org.veupathdb.vdi.lib.common.field.DatasetID
 
 /**
- * Creates a new [DatasetPostResponse] instance wrapping the given [datasetID].
+ * Creates a new [DatasetPostResponseBody] instance wrapping the given [datasetID].
  *
  * @param datasetID Dataset ID for the response.
  *
- * @return A new [DatasetPostResponse] instance.
+ * @return A new [DatasetPostResponseBody] instance.
  */
-fun DatasetPostResponse(datasetID: DatasetID): DatasetPostResponse =
-  DatasetPostResponseImpl().also { it.datasetId = datasetID.toString() }
+fun DatasetPostResponseBody(datasetID: DatasetID): DatasetPostResponseBody =
+  DatasetPostResponseBodyImpl().also { it.datasetId = datasetID.toString() }

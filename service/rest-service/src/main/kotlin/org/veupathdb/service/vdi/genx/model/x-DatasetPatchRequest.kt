@@ -1,10 +1,10 @@
 package org.veupathdb.service.vdi.genx.model
 
-import org.veupathdb.service.vdi.generated.model.DatasetPatchRequest
+import org.veupathdb.service.vdi.generated.model.DatasetPatchRequestBody
 import org.veupathdb.service.vdi.util.ValidationErrors
 import vdi.component.db.app.*
 
-internal fun DatasetPatchRequest.cleanup() {
+internal fun DatasetPatchRequestBody.cleanup() {
   name = name?.trim()
   shortName = shortName?.trim()
   shortAttribution = shortAttribution?.trim()
@@ -31,7 +31,7 @@ internal fun DatasetPatchRequest.cleanup() {
     organisms = emptyList()
 }
 
-internal fun DatasetPatchRequest.validate() {
+internal fun DatasetPatchRequestBody.validate() {
   val errors = ValidationErrors()
 
   if (name.isNullOrBlank())

@@ -11,6 +11,7 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.Admin
+import org.veupathdb.service.vdi.generated.resources.Admin.*
 import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.service.admin.*
 import org.veupathdb.service.vdi.service.dataset.createDataset
@@ -39,25 +40,27 @@ private const val biQueryOffsetDefault = 0
 class AdminRPC : Admin {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  override fun getAdminListBroken(expanded: Boolean?): Admin.GetAdminListBrokenResponse {
-    return Admin.GetAdminListBrokenResponse
+  override fun getAdminListBroken(expanded: Boolean?): GetAdminListBrokenResponse {
+    return GetAdminListBrokenResponse
       .respond200WithApplicationJson(listInstallFailedDatasets(expanded ?: true))
   }
 
-  override fun postAdminReconciler(): Admin.PostAdminReconcilerResponse {
+  override fun postAdminReconciler(): PostAdminReconcilerResponse {
     return runBlocking {
       if (Reconciler.runFull()) {
-        Admin.PostAdminReconcilerResponse.respond204()
+        PostAdminReconcilerResponse.respond204()
       } else {
-        Admin.PostAdminReconcilerResponse.respond409()
+        PostAdminReconcilerResponse.respond409WithApplicationJson(ConflictErrorImpl().apply {
+          message = "reconciler is already running"
+        })
       }
     }
   }
 
   override fun postAdminFixBrokenInstalls(
     skipRun: Boolean,
-    entity: InstallCleanupRequest?
-  ): Admin.PostAdminFixBrokenInstallsResponse {
+    entity: InstallCleanupRequestBody?
+  ): PostAdminFixBrokenInstallsResponse {
     if (entity == null)
       throw BadRequestException()
 
@@ -70,27 +73,24 @@ class AdminRPC : Admin {
     if (!skipRun)
       runBlocking { DatasetReinstaller.tryRun() }
 
-    return Admin.PostAdminFixBrokenInstallsResponse.respond204()
+    return PostAdminFixBrokenInstallsResponse.respond204()
   }
 
-  override fun postAdminDeleteCleanup(): Admin.PostAdminDeleteCleanupResponse {
+  override fun postAdminDeleteCleanup(): PostAdminDeleteCleanupResponse {
     Pruner.tryPruneDatasets()
 
-    return Admin.PostAdminDeleteCleanupResponse.respond204()
+    return PostAdminDeleteCleanupResponse.respond204()
   }
 
-  override fun getAdminDatasetDetails(datasetId: String?): Admin.GetAdminDatasetDetailsResponse {
+  override fun getAdminDatasetDetails(datasetId: String?): GetAdminDatasetDetailsResponse {
     if (datasetId == null) {
       throw BadRequestException("no target dataset ID provided")
     }
 
-    return Admin.GetAdminDatasetDetailsResponse.respond200WithApplicationJson(InternalDatasetDetails(getDatasetDetails(DatasetID(datasetId))))
+    return GetAdminDatasetDetailsResponse.respond200WithApplicationJson(InternalDatasetDetails(getDatasetDetails(DatasetID(datasetId))))
   }
 
-  override fun postAdminProxyUpload(
-    userID: Long?,
-    entity: DatasetPostRequest?,
-  ): Admin.PostAdminProxyUploadResponse {
+  override fun postAdminProxyUpload(userID: Long?, entity: DatasetPostRequestBody?): PostAdminProxyUploadResponse {
     if (userID == null)
       throw BadRequestException("no target user ID provided")
 
@@ -111,8 +111,8 @@ class AdminRPC : Admin {
 
     createDataset(userID, datasetID, entity)
 
-    return Admin.PostAdminProxyUploadResponse
-      .respond200WithApplicationJson(DatasetPostResponse(datasetID))
+    return PostAdminProxyUploadResponse
+      .respond200WithApplicationJson(DatasetPostResponseBody(datasetID))
   }
 
   override fun getAdminFailedImports(
@@ -123,7 +123,7 @@ class AdminRPC : Admin {
     offset: Int?,
     sort: String?,
     order: String?,
-  ): Admin.GetAdminFailedImportsResponse {
+  ): GetAdminFailedImportsResponse {
     if (limit != null && limit < biQueryLimitMinimum)
       throw BadRequestException("invalid limit value")
 
@@ -145,7 +145,7 @@ class AdminRPC : Admin {
     val broken = CacheDB().selectBrokenDatasetImports(query)
       .map(::BrokenImportDetails)
 
-    return Admin.GetAdminFailedImportsResponse
+    return GetAdminFailedImportsResponse
       .respond200WithApplicationJson(BrokenImportListingImpl().also {
         it.meta = BrokenImportListingMetaImpl().also { meta ->
           meta.count = broken.size
@@ -159,7 +159,7 @@ class AdminRPC : Admin {
       })
   }
 
-  override fun postAdminPurgeDataset(json: AdminPurgeDatasetPostApplicationJson?): Admin.PostAdminPurgeDatasetResponse {
+  override fun postAdminPurgeDataset(json: AdminPurgeDatasetPostApplicationJson?): PostAdminPurgeDatasetResponse {
     json.validate()
 
     val validUserID = json.userId.toUserID()
@@ -169,7 +169,7 @@ class AdminRPC : Admin {
 
     purgeDataset(validUserID, validDatasetID)
 
-    return Admin.PostAdminPurgeDatasetResponse.respond204()
+    return PostAdminPurgeDatasetResponse.respond204()
   }
 
   override fun getAdminListAllDatasets(
@@ -177,13 +177,13 @@ class AdminRPC : Admin {
     limit: Int?,
     projectId: String?,
     includeDeleted: Boolean?,
-  ): Admin.GetAdminListAllDatasetsResponse {
-    return Admin.GetAdminListAllDatasetsResponse
+  ): GetAdminListAllDatasetsResponse {
+    return GetAdminListAllDatasetsResponse
       .respond200WithApplicationJson(listAllDatasets(offset, limit, projectId, includeDeleted))
   }
 
-  override fun getAdminListS3Objects(): Admin.GetAdminListS3ObjectsResponse {
-    return Admin.GetAdminListS3ObjectsResponse
+  override fun getAdminListS3Objects(): GetAdminListS3ObjectsResponse {
+    return GetAdminListS3ObjectsResponse
       .respond200WithTextPlain(StreamingOutput { out -> out.use { listAllS3Objects().transferTo(it) } })
   }
 }
