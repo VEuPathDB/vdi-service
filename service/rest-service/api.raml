@@ -15,10 +15,10 @@ uses:
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
 /datasets: !include schema/resources/dataset-list/resource.raml
-/datasets/community: !include schema/resources/community-datasets/resource.raml
 /datasets/{vdi-id}: !include schema/resources/dataset/resource.raml
 /datasets/{vdi-id}/files: !include schema/resources/dataset-files/resource.raml
 /datasets/{vdi-id}/shares/{recipient-user-id}: !include schema/resources/dataset-shares/resource.raml
+/datasets/community: !include schema/resources/community-datasets/resource.raml
 
 /users: !include schema/resources/users/resource.raml
 /plugins: !include schema/resources/plugins/resource.raml
@@ -31,10 +31,10 @@ uses:
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
 /vdi-datasets: !include schema/resources/dataset-list/resource.raml
-/vdi-datasets/community: !include schema/resources/community-datasets/resource.raml
 /vdi-datasets/{vdi-id}: !include schema/resources/dataset/resource.raml
 /vdi-datasets/{vdi-id}/files: !include schema/resources/dataset-files/resource.raml
 /vdi-datasets/{vdi-id}/shares/{recipient-user-id}: !include schema/resources/dataset-shares/resource.raml
+/vdi-datasets/community: !include schema/resources/community-datasets/resource.raml
 /vdi-datasets/share-offers: !include schema/resources/users/self/share-offers/resource.raml
 /vdi-plugins: !include schema/resources/plugins/resource.raml
 /vdi-users: !include schema/resources/users/resource.raml

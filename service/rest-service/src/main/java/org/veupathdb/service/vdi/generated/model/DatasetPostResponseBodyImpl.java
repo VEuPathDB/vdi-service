@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder("datasetId")
-public class DatasetPostResponseImpl implements DatasetPostResponse {
+public class DatasetPostResponseBodyImpl implements DatasetPostResponseBody {
   @JsonProperty("datasetId")
   private String datasetId;
 

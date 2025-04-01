@@ -1,50 +1,35 @@
 #%RAML 1.0 Method
 
 displayName: Replace Dataset
-description: |
-  Updates the metadata for a target dataset.
-  
-  If a field in the request body is null, the matching metadata field will
-  retain it's previous value.  To "clear" a field, it must be set to an
-  empty string.
-  
-  The name field, if provided, must not be blank.
 
-body:
-  application/json:
-    type: lib.DatasetPatchRequest
+description: |
+  Uploads a new dataset data revision to replace the existing target dataset.
+  
+  This method is effectively a modification of the `PATCH` request rules for the
+  metadata body to add the required field `revisionNote`.
+  
+  This means that omitting fields from the request or setting them to `null`
+  will tell VDI to use the original dataset's values for those fields.
+
+
+body: lib.DatasetPutRequestBody
 
 responses:
-  200:
+  201:
     description: Replacement dataset request has been accepted for processing.
-    body:
-      application/json:
-
+    headers:
+      Location:
+        type: string
+        description: URL to the new dataset resource.
+        required: true
+    body: lib.DatasetPutResponseBody
   400:
-    description: |
-      Bad Request.
-      
-      Request body did not resemble the expected JSON form.
-    body:
-      application/json:
-        type: lib.BadRequestError
+    body: lib.BadRequestError
   401:
-    description: |
-      Unauthorized.
-      
-      This status is returned when the request contains either no user
-      authorization token or an invalid user authorization token.
-    body:
-      application/json:
-        type: lib.UnauthorizedError
+    body: lib.UnauthorizedError
   403:
-    description: |
-      Action Forbidden.
-      
-      Target dataset is not owned by the requesting user.
     body: lib.ForbiddenError
   404:
-    description: Target dataset was not found.
     body: lib.NotFoundError
   422:
     description: |
@@ -53,19 +38,5 @@ responses:
       Request body was syntactically valid JSON, however the body failed
       validation.
     body: lib.UnprocessableEntityError
-  425:
-    description: |
-      Too Early.
-      
-      Patch request was submitted before the dataset data was written to the
-      dataset store.
-
   500:
-    description: |
-      Internal Server Error.
-      
-      This status is returned when an unhandled or unexpected issue arises
-      when attempting to process the request.
-    body:
-      application/json:
-        type: lib.ServerError
+    body: lib.ServerError

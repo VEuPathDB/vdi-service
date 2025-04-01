@@ -14,20 +14,20 @@ import java.util.List;
     "owner",
     "datasetType",
     "name",
+    "origin",
+    "projectIds",
+    "visibility",
+    "status",
+    "created",
+    "dependencies",
     "shortName",
     "shortAttribution",
     "category",
     "summary",
     "description",
     "sourceUrl",
-    "origin",
-    "projectIds",
-    "visibility",
     "importMessages",
-    "status",
     "shares",
-    "created",
-    "dependencies",
     "publications",
     "hyperlinks",
     "organisms",
@@ -45,6 +45,24 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty("name")
   private String name;
+
+  @JsonProperty("origin")
+  private String origin;
+
+  @JsonProperty("projectIds")
+  private List<String> projectIds;
+
+  @JsonProperty("visibility")
+  private DatasetVisibility visibility;
+
+  @JsonProperty("status")
+  private DatasetStatusInfo status;
+
+  @JsonProperty("created")
+  private OffsetDateTime created;
+
+  @JsonProperty("dependencies")
+  private List<DatasetDependency> dependencies;
 
   @JsonProperty("shortName")
   private String shortName;
@@ -64,34 +82,11 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("sourceUrl")
   private String sourceUrl;
 
-  @JsonProperty("origin")
-  private String origin;
-
-  @JsonProperty("projectIds")
-  private List<String> projectIds;
-
-  @JsonProperty("visibility")
-  private DatasetVisibility visibility;
-
-  @JsonProperty(
-      value = "importMessages",
-      defaultValue = "[\n"
-              + "\n"
-              + "]"
-  )
+  @JsonProperty("importMessages")
   private List<String> importMessages;
-
-  @JsonProperty("status")
-  private DatasetStatusInfo status;
 
   @JsonProperty("shares")
   private List<ShareOffer> shares;
-
-  @JsonProperty("created")
-  private OffsetDateTime created;
-
-  @JsonProperty("dependencies")
-  private List<DatasetDependency> dependencies;
 
   @JsonProperty("publications")
   private List<DatasetPublication> publications;
@@ -143,6 +138,66 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  @JsonProperty("origin")
+  public String getOrigin() {
+    return this.origin;
+  }
+
+  @JsonProperty("origin")
+  public void setOrigin(String origin) {
+    this.origin = origin;
+  }
+
+  @JsonProperty("projectIds")
+  public List<String> getProjectIds() {
+    return this.projectIds;
+  }
+
+  @JsonProperty("projectIds")
+  public void setProjectIds(List<String> projectIds) {
+    this.projectIds = projectIds;
+  }
+
+  @JsonProperty("visibility")
+  public DatasetVisibility getVisibility() {
+    return this.visibility;
+  }
+
+  @JsonProperty("visibility")
+  public void setVisibility(DatasetVisibility visibility) {
+    this.visibility = visibility;
+  }
+
+  @JsonProperty("status")
+  public DatasetStatusInfo getStatus() {
+    return this.status;
+  }
+
+  @JsonProperty("status")
+  public void setStatus(DatasetStatusInfo status) {
+    this.status = status;
+  }
+
+  @JsonProperty("created")
+  public OffsetDateTime getCreated() {
+    return this.created;
+  }
+
+  @JsonProperty("created")
+  public void setCreated(OffsetDateTime created) {
+    this.created = created;
+  }
+
+  @JsonProperty("dependencies")
+  public List<DatasetDependency> getDependencies() {
+    return this.dependencies;
+  }
+
+  @JsonProperty("dependencies")
+  public void setDependencies(List<DatasetDependency> dependencies) {
+    this.dependencies = dependencies;
   }
 
   @JsonProperty("shortName")
@@ -205,64 +260,14 @@ public class DatasetDetailsImpl implements DatasetDetails {
     this.sourceUrl = sourceUrl;
   }
 
-  @JsonProperty("origin")
-  public String getOrigin() {
-    return this.origin;
-  }
-
-  @JsonProperty("origin")
-  public void setOrigin(String origin) {
-    this.origin = origin;
-  }
-
-  @JsonProperty("projectIds")
-  public List<String> getProjectIds() {
-    return this.projectIds;
-  }
-
-  @JsonProperty("projectIds")
-  public void setProjectIds(List<String> projectIds) {
-    this.projectIds = projectIds;
-  }
-
-  @JsonProperty("visibility")
-  public DatasetVisibility getVisibility() {
-    return this.visibility;
-  }
-
-  @JsonProperty("visibility")
-  public void setVisibility(DatasetVisibility visibility) {
-    this.visibility = visibility;
-  }
-
-  @JsonProperty(
-      value = "importMessages",
-      defaultValue = "[\n"
-              + "\n"
-              + "]"
-  )
+  @JsonProperty("importMessages")
   public List<String> getImportMessages() {
     return this.importMessages;
   }
 
-  @JsonProperty(
-      value = "importMessages",
-      defaultValue = "[\n"
-              + "\n"
-              + "]"
-  )
+  @JsonProperty("importMessages")
   public void setImportMessages(List<String> importMessages) {
     this.importMessages = importMessages;
-  }
-
-  @JsonProperty("status")
-  public DatasetStatusInfo getStatus() {
-    return this.status;
-  }
-
-  @JsonProperty("status")
-  public void setStatus(DatasetStatusInfo status) {
-    this.status = status;
   }
 
   @JsonProperty("shares")
@@ -273,26 +278,6 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty("shares")
   public void setShares(List<ShareOffer> shares) {
     this.shares = shares;
-  }
-
-  @JsonProperty("created")
-  public OffsetDateTime getCreated() {
-    return this.created;
-  }
-
-  @JsonProperty("created")
-  public void setCreated(OffsetDateTime created) {
-    this.created = created;
-  }
-
-  @JsonProperty("dependencies")
-  public List<DatasetDependency> getDependencies() {
-    return this.dependencies;
-  }
-
-  @JsonProperty("dependencies")
-  public void setDependencies(List<DatasetDependency> dependencies) {
-    this.dependencies = dependencies;
   }
 
   @JsonProperty("publications")

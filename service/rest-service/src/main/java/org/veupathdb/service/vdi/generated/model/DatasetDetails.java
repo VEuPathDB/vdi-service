@@ -33,6 +33,42 @@ public interface DatasetDetails {
   @JsonProperty("name")
   void setName(String name);
 
+  @JsonProperty("origin")
+  String getOrigin();
+
+  @JsonProperty("origin")
+  void setOrigin(String origin);
+
+  @JsonProperty("projectIds")
+  List<String> getProjectIds();
+
+  @JsonProperty("projectIds")
+  void setProjectIds(List<String> projectIds);
+
+  @JsonProperty("visibility")
+  DatasetVisibility getVisibility();
+
+  @JsonProperty("visibility")
+  void setVisibility(DatasetVisibility visibility);
+
+  @JsonProperty("status")
+  DatasetStatusInfo getStatus();
+
+  @JsonProperty("status")
+  void setStatus(DatasetStatusInfo status);
+
+  @JsonProperty("created")
+  OffsetDateTime getCreated();
+
+  @JsonProperty("created")
+  void setCreated(OffsetDateTime created);
+
+  @JsonProperty("dependencies")
+  List<DatasetDependency> getDependencies();
+
+  @JsonProperty("dependencies")
+  void setDependencies(List<DatasetDependency> dependencies);
+
   @JsonProperty("shortName")
   String getShortName();
 
@@ -69,63 +105,17 @@ public interface DatasetDetails {
   @JsonProperty("sourceUrl")
   void setSourceUrl(String sourceUrl);
 
-  @JsonProperty("origin")
-  String getOrigin();
-
-  @JsonProperty("origin")
-  void setOrigin(String origin);
-
-  @JsonProperty("projectIds")
-  List<String> getProjectIds();
-
-  @JsonProperty("projectIds")
-  void setProjectIds(List<String> projectIds);
-
-  @JsonProperty("visibility")
-  DatasetVisibility getVisibility();
-
-  @JsonProperty("visibility")
-  void setVisibility(DatasetVisibility visibility);
-
-  @JsonProperty(
-      value = "importMessages",
-      defaultValue = "[\n"
-              + "\n"
-              + "]"
-  )
+  @JsonProperty("importMessages")
   List<String> getImportMessages();
 
-  @JsonProperty(
-      value = "importMessages",
-      defaultValue = "[\n"
-              + "\n"
-              + "]"
-  )
+  @JsonProperty("importMessages")
   void setImportMessages(List<String> importMessages);
-
-  @JsonProperty("status")
-  DatasetStatusInfo getStatus();
-
-  @JsonProperty("status")
-  void setStatus(DatasetStatusInfo status);
 
   @JsonProperty("shares")
   List<ShareOffer> getShares();
 
   @JsonProperty("shares")
   void setShares(List<ShareOffer> shares);
-
-  @JsonProperty("created")
-  OffsetDateTime getCreated();
-
-  @JsonProperty("created")
-  void setCreated(OffsetDateTime created);
-
-  @JsonProperty("dependencies")
-  List<DatasetDependency> getDependencies();
-
-  @JsonProperty("dependencies")
-  void setDependencies(List<DatasetDependency> dependencies);
 
   @JsonProperty("publications")
   List<DatasetPublication> getPublications();

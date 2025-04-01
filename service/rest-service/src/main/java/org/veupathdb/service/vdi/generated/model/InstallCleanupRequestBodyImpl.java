@@ -10,7 +10,7 @@ import java.util.List;
     "all",
     "targets"
 })
-public class InstallCleanupRequestImpl implements InstallCleanupRequest {
+public class InstallCleanupRequestBodyImpl implements InstallCleanupRequestBody {
   @JsonProperty(
       value = "all",
       defaultValue = "false"

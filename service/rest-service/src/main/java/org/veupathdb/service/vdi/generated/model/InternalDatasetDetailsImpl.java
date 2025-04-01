@@ -17,19 +17,19 @@ import java.util.List;
     "created",
     "inserted",
     "name",
+    "projectIds",
+    "status",
+    "importMessages",
+    "visibility",
     "shortName",
     "shortAttribution",
     "category",
     "summary",
     "description",
-    "visibility",
     "sourceUrl",
-    "projectIds",
-    "status",
     "syncControl",
     "uploadFiles",
-    "installFiles",
-    "importMessages"
+    "installFiles"
 })
 public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   @JsonProperty("datasetType")
@@ -53,6 +53,18 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   @JsonProperty("name")
   private String name;
 
+  @JsonProperty("projectIds")
+  private List<String> projectIds;
+
+  @JsonProperty("status")
+  private String status;
+
+  @JsonProperty("importMessages")
+  private List<String> importMessages;
+
+  @JsonProperty("visibility")
+  private DatasetVisibility visibility;
+
   @JsonProperty("shortName")
   private String shortName;
 
@@ -68,17 +80,8 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   @JsonProperty("description")
   private String description;
 
-  @JsonProperty("visibility")
-  private DatasetVisibility visibility;
-
   @JsonProperty("sourceUrl")
   private String sourceUrl;
-
-  @JsonProperty("projectIds")
-  private List<String> projectIds;
-
-  @JsonProperty("status")
-  private String status;
 
   @JsonProperty("syncControl")
   private SyncControlRecord syncControl;
@@ -88,9 +91,6 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
 
   @JsonProperty("installFiles")
   private List<String> installFiles;
-
-  @JsonProperty("importMessages")
-  private List<String> importMessages;
 
   @JsonProperty("datasetType")
   public DatasetTypeInfo getDatasetType() {
@@ -162,6 +162,46 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
     this.name = name;
   }
 
+  @JsonProperty("projectIds")
+  public List<String> getProjectIds() {
+    return this.projectIds;
+  }
+
+  @JsonProperty("projectIds")
+  public void setProjectIds(List<String> projectIds) {
+    this.projectIds = projectIds;
+  }
+
+  @JsonProperty("status")
+  public String getStatus() {
+    return this.status;
+  }
+
+  @JsonProperty("status")
+  public void setStatus(String status) {
+    this.status = status;
+  }
+
+  @JsonProperty("importMessages")
+  public List<String> getImportMessages() {
+    return this.importMessages;
+  }
+
+  @JsonProperty("importMessages")
+  public void setImportMessages(List<String> importMessages) {
+    this.importMessages = importMessages;
+  }
+
+  @JsonProperty("visibility")
+  public DatasetVisibility getVisibility() {
+    return this.visibility;
+  }
+
+  @JsonProperty("visibility")
+  public void setVisibility(DatasetVisibility visibility) {
+    this.visibility = visibility;
+  }
+
   @JsonProperty("shortName")
   public String getShortName() {
     return this.shortName;
@@ -212,16 +252,6 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
     this.description = description;
   }
 
-  @JsonProperty("visibility")
-  public DatasetVisibility getVisibility() {
-    return this.visibility;
-  }
-
-  @JsonProperty("visibility")
-  public void setVisibility(DatasetVisibility visibility) {
-    this.visibility = visibility;
-  }
-
   @JsonProperty("sourceUrl")
   public String getSourceUrl() {
     return this.sourceUrl;
@@ -230,26 +260,6 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   @JsonProperty("sourceUrl")
   public void setSourceUrl(String sourceUrl) {
     this.sourceUrl = sourceUrl;
-  }
-
-  @JsonProperty("projectIds")
-  public List<String> getProjectIds() {
-    return this.projectIds;
-  }
-
-  @JsonProperty("projectIds")
-  public void setProjectIds(List<String> projectIds) {
-    this.projectIds = projectIds;
-  }
-
-  @JsonProperty("status")
-  public String getStatus() {
-    return this.status;
-  }
-
-  @JsonProperty("status")
-  public void setStatus(String status) {
-    this.status = status;
   }
 
   @JsonProperty("syncControl")
@@ -280,15 +290,5 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   @JsonProperty("installFiles")
   public void setInstallFiles(List<String> installFiles) {
     this.installFiles = installFiles;
-  }
-
-  @JsonProperty("importMessages")
-  public List<String> getImportMessages() {
-    return this.importMessages;
-  }
-
-  @JsonProperty("importMessages")
-  public void setImportMessages(List<String> importMessages) {
-    this.importMessages = importMessages;
   }
 }

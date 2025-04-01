@@ -1,39 +1,28 @@
 #%RAML 1.0 Method
 
-displayName: Lookup Dataset
+displayName: Dataset Details
+
 description: |
   Fetch details about a dataset and its status(es).
   
   If the target dataset has just been posted, this endpoint may return a
   404 for several seconds until the post has been asynchronously processed.
+
 responses:
   200:
     description: Target dataset was located and returned.
-    body:
-      type: lib.DatasetDetails
+    body: lib.DatasetDetails
+  301:
+    description: |
+      Target dataset has been moved by replacement with the a new VDI ID.
+    headers:
+      Location:
+        type: string
+        description: URL to the newest dataset revision.
+        required: true
   401:
-    description: |
-      Unauthorized.
-      
-      This status is returned when the request contains either no user
-      authorization token or an invalid user authorization token.
-    body:
-      application/json:
-        type: lib.UnauthorizedError
-        example:
-          status: unauthorized
-          message: Users must be logged in to access this resource.
+    body: lib.UnauthorizedError
   404:
-    description: |
-      Target dataset was not located or is not visible to the requesting
-      user.
     body: lib.NotFoundError
   500:
-    description: |
-      Internal Server Error.
-      
-      This status is returned when an unhandled or unexpected issue arises
-      when attempting to process the request.
-    body:
-      application/json:
-        type: lib.ServerError
+    body: lib.ServerError

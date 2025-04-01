@@ -17,9 +17,10 @@ import java.util.List;
     "publications",
     "hyperlinks",
     "organisms",
-    "contacts"
+    "contacts",
+    "revisionNote"
 })
-public class DatasetPatchRequestImpl implements DatasetPatchRequest {
+public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty("visibility")
   private DatasetVisibility visibility;
 
@@ -52,6 +53,9 @@ public class DatasetPatchRequestImpl implements DatasetPatchRequest {
 
   @JsonProperty("contacts")
   private List<DatasetContact> contacts;
+
+  @JsonProperty("revisionNote")
+  private String revisionNote;
 
   @JsonProperty("visibility")
   public DatasetVisibility getVisibility() {
@@ -161,5 +165,15 @@ public class DatasetPatchRequestImpl implements DatasetPatchRequest {
   @JsonProperty("contacts")
   public void setContacts(List<DatasetContact> contacts) {
     this.contacts = contacts;
+  }
+
+  @JsonProperty("revisionNote")
+  public String getRevisionNote() {
+    return this.revisionNote;
+  }
+
+  @JsonProperty("revisionNote")
+  public void setRevisionNote(String revisionNote) {
+    this.revisionNote = revisionNote;
   }
 }

@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize(
-    as = DatasetPostResponseImpl.class
+    as = DatasetPostResponseBodyImpl.class
 )
-public interface DatasetPostResponse {
+public interface DatasetPostResponseBody {
   @JsonProperty("datasetId")
   String getDatasetId();
 

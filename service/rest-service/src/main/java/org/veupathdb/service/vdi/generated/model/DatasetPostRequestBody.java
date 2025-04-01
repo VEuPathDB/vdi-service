@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.File;
 
 @JsonDeserialize(
-    as = DatasetPostRequestImpl.class
+    as = DatasetPostRequestBodyImpl.class
 )
-public interface DatasetPostRequest {
+public interface DatasetPostRequestBody {
   @JsonProperty("meta")
   DatasetPostMeta getMeta();
 

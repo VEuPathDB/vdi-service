@@ -14,10 +14,11 @@ import org.veupathdb.service.vdi.generated.model.AllDatasetsListResponse;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.BrokenDatasetListing;
 import org.veupathdb.service.vdi.generated.model.BrokenImportListing;
-import org.veupathdb.service.vdi.generated.model.DatasetPostRequest;
-import org.veupathdb.service.vdi.generated.model.DatasetPostResponse;
+import org.veupathdb.service.vdi.generated.model.ConflictError;
+import org.veupathdb.service.vdi.generated.model.DatasetPostRequestBody;
+import org.veupathdb.service.vdi.generated.model.DatasetPostResponseBody;
 import org.veupathdb.service.vdi.generated.model.ForbiddenError;
-import org.veupathdb.service.vdi.generated.model.InstallCleanupRequest;
+import org.veupathdb.service.vdi.generated.model.InstallCleanupRequestBody;
 import org.veupathdb.service.vdi.generated.model.InternalDatasetDetails;
 import org.veupathdb.service.vdi.generated.model.NotFoundError;
 import org.veupathdb.service.vdi.generated.model.ServerError;
@@ -29,6 +30,7 @@ import org.veupathdb.service.vdi.generated.support.ResponseDelegate;
 public interface Admin {
   @POST
   @Path("/reconciler")
+  @Produces("application/json")
   PostAdminReconcilerResponse postAdminReconciler();
 
   @POST
@@ -36,7 +38,7 @@ public interface Admin {
   @Produces("application/json")
   @Consumes("multipart/form-data")
   PostAdminProxyUploadResponse postAdminProxyUpload(@HeaderParam("User-ID") Long userID,
-      DatasetPostRequest entity);
+      DatasetPostRequestBody entity);
 
   @GET
   @Path("/failed-imports")
@@ -59,7 +61,8 @@ public interface Admin {
   @Produces("application/json")
   @Consumes("application/json")
   PostAdminFixBrokenInstallsResponse postAdminFixBrokenInstalls(
-      @QueryParam("skip-run") @DefaultValue("false") Boolean skipRun, InstallCleanupRequest entity);
+      @QueryParam("skip-run") @DefaultValue("false") Boolean skipRun,
+      InstallCleanupRequestBody entity);
 
   @POST
   @Path("/delete-cleanup")
@@ -105,9 +108,10 @@ public interface Admin {
       return new PostAdminReconcilerResponse(responseBuilder.build());
     }
 
-    public static PostAdminReconcilerResponse respond409() {
-      Response.ResponseBuilder responseBuilder = Response.status(409);
-      return new PostAdminReconcilerResponse(responseBuilder.build());
+    public static PostAdminReconcilerResponse respond409WithApplicationJson(ConflictError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(409).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PostAdminReconcilerResponse(responseBuilder.build(), entity);
     }
   }
 
@@ -121,7 +125,7 @@ public interface Admin {
     }
 
     public static PostAdminProxyUploadResponse respond200WithApplicationJson(
-        DatasetPostResponse entity) {
+        DatasetPostResponseBody entity) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new PostAdminProxyUploadResponse(responseBuilder.build(), entity);

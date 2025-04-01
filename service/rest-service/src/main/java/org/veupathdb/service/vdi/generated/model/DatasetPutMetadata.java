@@ -2,42 +2,23 @@ package org.veupathdb.service.vdi.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonDeserialize(
-    as = DatasetPostMetaImpl.class
+    as = DatasetPutMetadataImpl.class
 )
-public interface DatasetPostMeta {
+public interface DatasetPutMetadata extends DatasetPatchRequestBody {
+  @JsonProperty("visibility")
+  DatasetVisibility getVisibility();
+
+  @JsonProperty("visibility")
+  void setVisibility(DatasetVisibility visibility);
+
   @JsonProperty("name")
   String getName();
 
   @JsonProperty("name")
   void setName(String name);
-
-  @JsonProperty("datasetType")
-  DatasetPostType getDatasetType();
-
-  @JsonProperty("datasetType")
-  void setDatasetType(DatasetPostType datasetType);
-
-  @JsonProperty("origin")
-  String getOrigin();
-
-  @JsonProperty("origin")
-  void setOrigin(String origin);
-
-  @JsonProperty("dependencies")
-  List<DatasetDependency> getDependencies();
-
-  @JsonProperty("dependencies")
-  void setDependencies(List<DatasetDependency> dependencies);
-
-  @JsonProperty("projects")
-  List<String> getProjects();
-
-  @JsonProperty("projects")
-  void setProjects(List<String> projects);
 
   @JsonProperty("shortName")
   String getShortName();
@@ -56,18 +37,6 @@ public interface DatasetPostMeta {
 
   @JsonProperty("category")
   void setCategory(String category);
-
-  @JsonProperty(
-      value = "visibility",
-      defaultValue = "private"
-  )
-  DatasetVisibility getVisibility();
-
-  @JsonProperty(
-      value = "visibility",
-      defaultValue = "private"
-  )
-  void setVisibility(DatasetVisibility visibility);
 
   @JsonProperty("summary")
   String getSummary();
@@ -105,9 +74,9 @@ public interface DatasetPostMeta {
   @JsonProperty("contacts")
   void setContacts(List<DatasetContact> contacts);
 
-  @JsonProperty("createdOn")
-  OffsetDateTime getCreatedOn();
+  @JsonProperty("revisionNote")
+  String getRevisionNote();
 
-  @JsonProperty("createdOn")
-  void setCreatedOn(OffsetDateTime createdOn);
+  @JsonProperty("revisionNote")
+  void setRevisionNote(String revisionNote);
 }

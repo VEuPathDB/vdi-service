@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 
 @JsonDeserialize(
-    as = InstallCleanupRequestImpl.class
+    as = InstallCleanupRequestBodyImpl.class
 )
-public interface InstallCleanupRequest {
+public interface InstallCleanupRequestBody {
   @JsonProperty(
       value = "all",
       defaultValue = "false"

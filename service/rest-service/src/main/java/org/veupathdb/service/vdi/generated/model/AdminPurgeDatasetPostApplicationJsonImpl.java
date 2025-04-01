@@ -1,12 +1,8 @@
 package org.veupathdb.service.vdi.generated.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -19,9 +15,6 @@ public class AdminPurgeDatasetPostApplicationJsonImpl implements AdminPurgeDatas
 
   @JsonProperty("datasetId")
   private String datasetId;
-
-  @JsonIgnore
-  private Map<String, Object> additionalProperties = new ExcludingMap();
 
   @JsonProperty("userId")
   public Long getUserId() {
@@ -41,15 +34,5 @@ public class AdminPurgeDatasetPostApplicationJsonImpl implements AdminPurgeDatas
   @JsonProperty("datasetId")
   public void setDatasetId(String datasetId) {
     this.datasetId = datasetId;
-  }
-
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperties(String key, Object value) {
-    this.additionalProperties.put(key, value);
   }
 }

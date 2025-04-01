@@ -16,25 +16,13 @@ get:
     the zip size cannot yet be shown.
   responses:
     200:
-      description: Success
-      body:
-        application/json:
-          type: lib.DatasetFileListing
+      body: lib.DatasetFileListing
     401:
-      description: Unauthorized
-      body:
-        application/json:
-          type: lib.UnauthorizedError
+      body: lib.UnauthorizedError
     404:
-      description: Not Found
-      body:
-        application/json:
-          type: lib.NotFoundError
+      body: lib.NotFoundError
     500:
-      description: Internal Server Error
-      body:
-        application/json:
-          type: lib.ServerError
+      body: lib.ServerError
 
 /upload:
   displayName: Original User Data
@@ -45,29 +33,20 @@ get:
       dataset importer.
     responses:
       200:
-        description: Success
         headers:
           Content-Disposition:
+            description: Content disposition of `attachment` with a filename.
             type: string
             example: attachment; filename="1234567-upload.zip"
         body:
           application/octet-stream:
             type: any
       401:
-        description: Unauthorized
-        body:
-          application/json:
-            type: lib.UnauthorizedError
+        body: lib.UnauthorizedError
       404:
-        description: Not Found
-        body:
-          application/json:
-            type: lib.NotFoundError
+        body: lib.NotFoundError
       500:
-        description: Internal Server Error
-        body:
-          application/json:
-            type: lib.ServerError
+        body: lib.ServerError
 
 /data:
   displayName: Install-Ready Data
@@ -79,26 +58,17 @@ get:
       processing.
     responses:
       200:
-        description: Success
         headers:
           Content-Disposition:
+            description: Content disposition of `attachment` with a filename.
             type: string
             example: attachment; filename="1234567-data.zip"
         body:
           application/octet-stream:
             type: any
       401:
-        description: Unauthorized
-        body:
-          application/json:
-            type: lib.UnauthorizedError
+        body: lib.UnauthorizedError
       404:
-        description: Not Found
-        body:
-          application/json:
-            type: lib.NotFoundError
+        body: lib.NotFoundError
       500:
-        description: Internal Server Error
-        body:
-          application/json:
-            type: lib.ServerError
+        body: lib.ServerError

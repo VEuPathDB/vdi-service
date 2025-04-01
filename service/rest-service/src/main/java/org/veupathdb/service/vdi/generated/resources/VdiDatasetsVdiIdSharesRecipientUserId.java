@@ -70,9 +70,11 @@ public interface VdiDatasetsVdiIdSharesRecipientUserId {
       return new PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse respond404() {
-      Response.ResponseBuilder responseBuilder = Response.status(404);
-      return new PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(responseBuilder.build());
+    public static PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse respond404WithApplicationJson(
+        NotFoundError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(responseBuilder.build(), entity);
     }
 
     public static PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse respond422WithApplicationJson(
@@ -119,9 +121,11 @@ public interface VdiDatasetsVdiIdSharesRecipientUserId {
       return new PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse respond403() {
-      Response.ResponseBuilder responseBuilder = Response.status(403);
-      return new PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(responseBuilder.build());
+    public static PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse respond403WithApplicationJson(
+        ForbiddenError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(403).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(responseBuilder.build(), entity);
     }
 
     public static PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse respond404WithApplicationJson(

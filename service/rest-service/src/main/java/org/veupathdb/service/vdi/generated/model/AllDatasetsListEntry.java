@@ -39,6 +39,36 @@ public interface AllDatasetsListEntry {
   @JsonProperty("name")
   void setName(String name);
 
+  @JsonProperty("origin")
+  String getOrigin();
+
+  @JsonProperty("origin")
+  void setOrigin(String origin);
+
+  @JsonProperty("projectIds")
+  List<String> getProjectIds();
+
+  @JsonProperty("projectIds")
+  void setProjectIds(List<String> projectIds);
+
+  @JsonProperty("status")
+  DatasetStatusInfo getStatus();
+
+  @JsonProperty("status")
+  void setStatus(DatasetStatusInfo status);
+
+  @JsonProperty("created")
+  OffsetDateTime getCreated();
+
+  @JsonProperty("created")
+  void setCreated(OffsetDateTime created);
+
+  @JsonProperty("isDeleted")
+  Boolean getIsDeleted();
+
+  @JsonProperty("isDeleted")
+  void setIsDeleted(Boolean isDeleted);
+
   @JsonProperty("shortName")
   String getShortName();
 
@@ -74,34 +104,4 @@ public interface AllDatasetsListEntry {
 
   @JsonProperty("sourceUrl")
   void setSourceUrl(String sourceUrl);
-
-  @JsonProperty("origin")
-  String getOrigin();
-
-  @JsonProperty("origin")
-  void setOrigin(String origin);
-
-  @JsonProperty("projectIds")
-  List<String> getProjectIds();
-
-  @JsonProperty("projectIds")
-  void setProjectIds(List<String> projectIds);
-
-  @JsonProperty("status")
-  DatasetStatusInfo getStatus();
-
-  @JsonProperty("status")
-  void setStatus(DatasetStatusInfo status);
-
-  @JsonProperty("created")
-  OffsetDateTime getCreated();
-
-  @JsonProperty("created")
-  void setCreated(OffsetDateTime created);
-
-  @JsonProperty("isDeleted")
-  Boolean getIsDeleted();
-
-  @JsonProperty("isDeleted")
-  void setIsDeleted(Boolean isDeleted);
 }

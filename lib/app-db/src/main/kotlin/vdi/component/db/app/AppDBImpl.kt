@@ -28,7 +28,7 @@ internal object AppDBImpl : AppDB {
         }
       }
     }
-
+    oracle.jdbc.driver.OracleDriver::class.java.name
     return result
   }
 

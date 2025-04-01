@@ -39,42 +39,6 @@ public interface DatasetListEntry {
   @JsonProperty("name")
   void setName(String name);
 
-  @JsonProperty("shortName")
-  String getShortName();
-
-  @JsonProperty("shortName")
-  void setShortName(String shortName);
-
-  @JsonProperty("shortAttribution")
-  String getShortAttribution();
-
-  @JsonProperty("shortAttribution")
-  void setShortAttribution(String shortAttribution);
-
-  @JsonProperty("category")
-  String getCategory();
-
-  @JsonProperty("category")
-  void setCategory(String category);
-
-  @JsonProperty("summary")
-  String getSummary();
-
-  @JsonProperty("summary")
-  void setSummary(String summary);
-
-  @JsonProperty("description")
-  String getDescription();
-
-  @JsonProperty("description")
-  void setDescription(String description);
-
-  @JsonProperty("sourceUrl")
-  String getSourceUrl();
-
-  @JsonProperty("sourceUrl")
-  void setSourceUrl(String sourceUrl);
-
   @JsonProperty("origin")
   String getOrigin();
 
@@ -116,4 +80,40 @@ public interface DatasetListEntry {
 
   @JsonProperty("created")
   void setCreated(OffsetDateTime created);
+
+  @JsonProperty("shortName")
+  String getShortName();
+
+  @JsonProperty("shortName")
+  void setShortName(String shortName);
+
+  @JsonProperty("shortAttribution")
+  String getShortAttribution();
+
+  @JsonProperty("shortAttribution")
+  void setShortAttribution(String shortAttribution);
+
+  @JsonProperty("category")
+  String getCategory();
+
+  @JsonProperty("category")
+  void setCategory(String category);
+
+  @JsonProperty("summary")
+  String getSummary();
+
+  @JsonProperty("summary")
+  void setSummary(String summary);
+
+  @JsonProperty("description")
+  String getDescription();
+
+  @JsonProperty("description")
+  void setDescription(String description);
+
+  @JsonProperty("sourceUrl")
+  String getSourceUrl();
+
+  @JsonProperty("sourceUrl")
+  void setSourceUrl(String sourceUrl);
 }

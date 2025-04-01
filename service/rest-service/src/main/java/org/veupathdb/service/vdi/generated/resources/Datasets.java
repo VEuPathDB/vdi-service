@@ -12,8 +12,8 @@ import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.Response;
 import org.veupathdb.service.vdi.generated.model.BadRequestError;
 import org.veupathdb.service.vdi.generated.model.DatasetListEntry;
-import org.veupathdb.service.vdi.generated.model.DatasetPostRequest;
-import org.veupathdb.service.vdi.generated.model.DatasetPostResponse;
+import org.veupathdb.service.vdi.generated.model.DatasetPostRequestBody;
+import org.veupathdb.service.vdi.generated.model.DatasetPostResponseBody;
 import org.veupathdb.service.vdi.generated.model.FailedDependencyError;
 import org.veupathdb.service.vdi.generated.model.ServerError;
 import org.veupathdb.service.vdi.generated.model.UnauthorizedError;
@@ -29,8 +29,8 @@ public interface Datasets {
 
   @POST
   @Produces("application/json")
-  @Consumes("multipart/form-data")
-  PostDatasetsResponse postDatasets(DatasetPostRequest entity);
+  @Consumes("application/json")
+  PostDatasetsResponse postDatasets(DatasetPostRequestBody entity);
 
   class GetDatasetsResponse extends ResponseDelegate {
     private GetDatasetsResponse(Response response, Object entity) {
@@ -76,9 +76,15 @@ public interface Datasets {
       super(response);
     }
 
-    public static PostDatasetsResponse respond200WithApplicationJson(DatasetPostResponse entity) {
-      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
+    public static HeadersFor201 headersFor201() {
+      return new HeadersFor201();
+    }
+
+    public static PostDatasetsResponse respond201WithApplicationJson(DatasetPostResponseBody entity,
+        HeadersFor201 headers) {
+      Response.ResponseBuilder responseBuilder = Response.status(201).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
+      headers.toResponseBuilder(responseBuilder);
       return new PostDatasetsResponse(responseBuilder.build(), entity);
     }
 
@@ -111,6 +117,16 @@ public interface Datasets {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new PostDatasetsResponse(responseBuilder.build(), entity);
+    }
+
+    public static class HeadersFor201 extends HeaderBuilderBase {
+      private HeadersFor201() {
+      }
+
+      public HeadersFor201 withLocation(final String p) {
+        headerMap.put("Location", String.valueOf(p));;
+        return this;
+      }
     }
   }
 }

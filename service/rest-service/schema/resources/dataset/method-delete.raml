@@ -12,36 +12,10 @@ responses:
   204:
     description: Target dataset was marked as deleted.
   401:
-    description: |
-      Unauthorized.
-      
-      This status is returned when the request contains either no user
-      authorization token or an invalid user authorization token.
-    body:
-      application/json:
-        type: lib.UnauthorizedError
-        example:
-          status: unauthorized
-          message: Users must be logged in to access this resource.
+    body: lib.UnauthorizedError
   403:
-    description: |
-      Action Forbidden.
-      
-      Target dataset is not owned by the requesting user.
     body: lib.ForbiddenError
   404:
-    description: Target dataset was not located.
     body: lib.NotFoundError
   500:
-    description: |
-      Internal Server Error.
-      
-      This status is returned when an unhandled or unexpected issue arises
-      when attempting to process the request.
-    body:
-      application/json:
-        type: lib.ServerError
-        example:
-          status: server-error
-          message: Dataset store is unreachable
-          requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+    body: lib.ServerError

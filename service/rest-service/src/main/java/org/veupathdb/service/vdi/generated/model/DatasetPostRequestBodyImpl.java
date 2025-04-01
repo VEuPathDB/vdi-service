@@ -11,7 +11,7 @@ import java.io.File;
     "file",
     "url"
 })
-public class DatasetPostRequestImpl implements DatasetPostRequest {
+public class DatasetPostRequestBodyImpl implements DatasetPostRequestBody {
   @JsonProperty("meta")
   private DatasetPostMeta meta;
 

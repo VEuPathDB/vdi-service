@@ -51,6 +51,30 @@ public interface InternalDatasetDetails {
   @JsonProperty("name")
   void setName(String name);
 
+  @JsonProperty("projectIds")
+  List<String> getProjectIds();
+
+  @JsonProperty("projectIds")
+  void setProjectIds(List<String> projectIds);
+
+  @JsonProperty("status")
+  String getStatus();
+
+  @JsonProperty("status")
+  void setStatus(String status);
+
+  @JsonProperty("importMessages")
+  List<String> getImportMessages();
+
+  @JsonProperty("importMessages")
+  void setImportMessages(List<String> importMessages);
+
+  @JsonProperty("visibility")
+  DatasetVisibility getVisibility();
+
+  @JsonProperty("visibility")
+  void setVisibility(DatasetVisibility visibility);
+
   @JsonProperty("shortName")
   String getShortName();
 
@@ -81,29 +105,11 @@ public interface InternalDatasetDetails {
   @JsonProperty("description")
   void setDescription(String description);
 
-  @JsonProperty("visibility")
-  DatasetVisibility getVisibility();
-
-  @JsonProperty("visibility")
-  void setVisibility(DatasetVisibility visibility);
-
   @JsonProperty("sourceUrl")
   String getSourceUrl();
 
   @JsonProperty("sourceUrl")
   void setSourceUrl(String sourceUrl);
-
-  @JsonProperty("projectIds")
-  List<String> getProjectIds();
-
-  @JsonProperty("projectIds")
-  void setProjectIds(List<String> projectIds);
-
-  @JsonProperty("status")
-  String getStatus();
-
-  @JsonProperty("status")
-  void setStatus(String status);
 
   @JsonProperty("syncControl")
   SyncControlRecord getSyncControl();
@@ -122,10 +128,4 @@ public interface InternalDatasetDetails {
 
   @JsonProperty("installFiles")
   void setInstallFiles(List<String> installFiles);
-
-  @JsonProperty("importMessages")
-  List<String> getImportMessages();
-
-  @JsonProperty("importMessages")
-  void setImportMessages(List<String> importMessages);
 }

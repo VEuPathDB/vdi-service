@@ -1,10 +1,7 @@
 package org.veupathdb.service.vdi.generated.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Map;
 
 @JsonDeserialize(
     as = AdminPurgeDatasetPostApplicationJsonImpl.class
@@ -21,10 +18,4 @@ public interface AdminPurgeDatasetPostApplicationJson {
 
   @JsonProperty("datasetId")
   void setDatasetId(String datasetId);
-
-  @JsonAnyGetter
-  Map<String, Object> getAdditionalProperties();
-
-  @JsonAnySetter
-  void setAdditionalProperties(String key, Object value);
 }

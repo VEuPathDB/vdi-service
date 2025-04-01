@@ -20,7 +20,7 @@ types:
       datasetId: VdiId
       owner: UserId
       datasetType: DatasetTypeInfo
-      projectIds: ProjectID[]
+      projectIds: ProjectId[]
       status: DatasetStatusInfo
   BrokenImportListing:
     type: object
@@ -125,7 +125,7 @@ types:
     pattern: ^[0-9a-fA-F]{64}$
     minLength: 64
     maxLength: 64
-  InstallCleanupRequest:
+  InstallCleanupRequestBody:
     displayName: Install Cleanup Request
     description: |
       Object controlling the install cleanup process and what datasets it should
@@ -194,7 +194,7 @@ types:
       summary?: DatasetSummary
       description?: DatasetDescription
       sourceUrl?: DatasetSourceUrl
-  DatasetPostRequest:
+  DatasetPostRequestBody:
     displayName: Dataset Post Request
     description: |
       HTTP POST request body requesting the creation of a dataset from the
@@ -272,14 +272,13 @@ types:
     properties:
       name: string
       version: string
-  DatasetPostResponse:
+  DatasetPostResponseBody:
     description: |
-      Response object returned on successful upload of a dataset.
+      Successful upload response.
 
-      Note that this response does not mean the uploaded dataset has been made
-      available on the target site(s).  The upload must first be processed and
-      installed into the target sites before the dataset will become available
-      for use.
+      This response does not mean the uploaded dataset has been made available
+      on the target site(s).  The upload must first be validated and installed
+      into the target sites before the dataset will become available for use.
     type: object
     additionalProperties: false
     properties:
@@ -322,7 +321,7 @@ types:
       projectIds:
         description: |
           Project IDs for projects the user dataset record was submitted to.
-        type: ProjectID[]
+        type: ProjectId[]
         uniqueItems: true
       visibility: DatasetVisibility
       status: DatasetStatusInfo
@@ -378,7 +377,7 @@ types:
       lastName?: string
       organization?: string
       email?: string
-  DatasetPatchRequest:
+  DatasetPatchRequestBody:
     displayName: Dataset Patch Request
     description: |
       Request to update the metadata for a dataset.
@@ -407,14 +406,36 @@ types:
       contacts?:
         type: DatasetContact[]
         uniqueItems: true
-  DatasetPutRequest:
+  DatasetPutMetadata:
+    type: DatasetPatchRequestBody
+    additionalProperties: false
+    properties:
+      revisionNote: DatasetRevisionNote
+  DatasetPutRequestBody:
     displayName: Dataset Data Put Request
     type: object
     additionalProperties: false
     properties:
       meta:
-        displayName: Dataset Metadata
+        description: Updated dataset metadata.
+        type: DatasetPutMetadata
+      file?:
+        description: |
+          Dataset file to upload.
+
+          This field is incompatible with the `url` field.
+        type: file
+      url?:
+        description: |
+          URL to a dataset file.
+
+          This field is incompatible with the `file` field.
         type: string
+  DatasetPutResponseBody:
+    type: DatasetPatchRequestBody
+    additionalProperties: false
+    properties:
+      datasetId: VdiId
   DatasetShareOffer:
     description: |
       An offer to share (or un-share) a dataset with a single target user.
@@ -633,6 +654,11 @@ types:
         type: string
         minLength: 3
         maxLength: 2000
+  DatasetRevisionNote:
+    description: Note providing a reason and/or description for the revision.
+    type: string
+    minLength: 10
+    maxLength: 4096
   DatasetShortAttribution:
     type: string
     maxLength: 300

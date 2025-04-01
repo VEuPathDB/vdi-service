@@ -36,10 +36,10 @@ displayName: Service Admin
           not of a JSON object.
           
           The `meta` field, however, is expected to be a JSON blob.
-        type: lib.DatasetPostRequest
+        type: lib.DatasetPostRequestBody
     responses:
       200:
-        body: lib.DatasetPostResponse
+        body: lib.DatasetPostResponseBody
       400:
         body: lib.BadRequestError
       401:
@@ -134,9 +134,7 @@ displayName: Service Admin
         default: desc
     responses:
       200:
-        body:
-          application/json:
-            type: lib.BrokenImportListing
+        body: lib.BrokenImportListing
 
 /list-broken:
   displayName: Broken Installs
@@ -185,6 +183,7 @@ displayName: Service Admin
       execution of the dataset reinstallation process.  This may be used in
       situations where multiple batches of datasets are being marked as
       `ready-for-reinstall`.
+
     queryParameters:
       skip-run:
         type: boolean
@@ -193,9 +192,10 @@ displayName: Service Admin
 
     body:
       application/json:
-        type: lib.InstallCleanupRequest
+        type: lib.InstallCleanupRequestBody
+
     responses:
-      204:
+      204: {}
       400:
         body: lib.BadRequestError
       401:
@@ -212,8 +212,7 @@ displayName: Service Admin
       to the execution of this task.
     headers:
     responses:
-      204:
-        description: Action completed successfully.
+      204: {}
       400:
         body: lib.BadRequestError
       401:
@@ -277,9 +276,7 @@ displayName: Service Admin
         required: false
     responses:
       200:
-        body:
-          application/json:
-            type: lib.AllDatasetsListResponse
+        body: lib.AllDatasetsListResponse
 
 /purge-dataset:
   displayName: Purge Dataset
@@ -301,30 +298,10 @@ displayName: Service Admin
     responses:
       204: {}
       400:
-        description: Bad Request.
-        body:
-          application/json:
-            type: lib.BadRequestError
-            example:
-              status: bad-request
-              message: Invalid project_id value.
+        body: lib.BadRequestError
       401:
-        description: Unauthorized.
-        body:
-          application/json:
-            type: lib.UnauthorizedError
-            example:
-              status: unauthorized
-              message: Users must be logged in to access this resource.
+        body: lib.UnauthorizedError
       404:
-        description: Not Found
         body: lib.NotFoundError
       500:
-        description: Internal Server Error.
-        body:
-          application/json:
-            type: lib.ServerError
-            example:
-              status: server-error
-              message: Dataset store is unreachable
-              requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+        body: lib.ServerError

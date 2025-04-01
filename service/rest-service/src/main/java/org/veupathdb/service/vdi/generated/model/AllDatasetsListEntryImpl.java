@@ -15,17 +15,17 @@ import java.util.List;
     "datasetType",
     "visibility",
     "name",
+    "origin",
+    "projectIds",
+    "status",
+    "created",
+    "isDeleted",
     "shortName",
     "shortAttribution",
     "category",
     "summary",
     "description",
-    "sourceUrl",
-    "origin",
-    "projectIds",
-    "status",
-    "created",
-    "isDeleted"
+    "sourceUrl"
 })
 public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty("datasetId")
@@ -42,6 +42,21 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
 
   @JsonProperty("name")
   private String name;
+
+  @JsonProperty("origin")
+  private String origin;
+
+  @JsonProperty("projectIds")
+  private List<String> projectIds;
+
+  @JsonProperty("status")
+  private DatasetStatusInfo status;
+
+  @JsonProperty("created")
+  private OffsetDateTime created;
+
+  @JsonProperty("isDeleted")
+  private Boolean isDeleted;
 
   @JsonProperty("shortName")
   private String shortName;
@@ -60,21 +75,6 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
 
   @JsonProperty("sourceUrl")
   private String sourceUrl;
-
-  @JsonProperty("origin")
-  private String origin;
-
-  @JsonProperty("projectIds")
-  private List<String> projectIds;
-
-  @JsonProperty("status")
-  private DatasetStatusInfo status;
-
-  @JsonProperty("created")
-  private OffsetDateTime created;
-
-  @JsonProperty("isDeleted")
-  private Boolean isDeleted;
 
   @JsonProperty("datasetId")
   public String getDatasetId() {
@@ -124,6 +124,56 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  @JsonProperty("origin")
+  public String getOrigin() {
+    return this.origin;
+  }
+
+  @JsonProperty("origin")
+  public void setOrigin(String origin) {
+    this.origin = origin;
+  }
+
+  @JsonProperty("projectIds")
+  public List<String> getProjectIds() {
+    return this.projectIds;
+  }
+
+  @JsonProperty("projectIds")
+  public void setProjectIds(List<String> projectIds) {
+    this.projectIds = projectIds;
+  }
+
+  @JsonProperty("status")
+  public DatasetStatusInfo getStatus() {
+    return this.status;
+  }
+
+  @JsonProperty("status")
+  public void setStatus(DatasetStatusInfo status) {
+    this.status = status;
+  }
+
+  @JsonProperty("created")
+  public OffsetDateTime getCreated() {
+    return this.created;
+  }
+
+  @JsonProperty("created")
+  public void setCreated(OffsetDateTime created) {
+    this.created = created;
+  }
+
+  @JsonProperty("isDeleted")
+  public Boolean getIsDeleted() {
+    return this.isDeleted;
+  }
+
+  @JsonProperty("isDeleted")
+  public void setIsDeleted(Boolean isDeleted) {
+    this.isDeleted = isDeleted;
   }
 
   @JsonProperty("shortName")
@@ -184,55 +234,5 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty("sourceUrl")
   public void setSourceUrl(String sourceUrl) {
     this.sourceUrl = sourceUrl;
-  }
-
-  @JsonProperty("origin")
-  public String getOrigin() {
-    return this.origin;
-  }
-
-  @JsonProperty("origin")
-  public void setOrigin(String origin) {
-    this.origin = origin;
-  }
-
-  @JsonProperty("projectIds")
-  public List<String> getProjectIds() {
-    return this.projectIds;
-  }
-
-  @JsonProperty("projectIds")
-  public void setProjectIds(List<String> projectIds) {
-    this.projectIds = projectIds;
-  }
-
-  @JsonProperty("status")
-  public DatasetStatusInfo getStatus() {
-    return this.status;
-  }
-
-  @JsonProperty("status")
-  public void setStatus(DatasetStatusInfo status) {
-    this.status = status;
-  }
-
-  @JsonProperty("created")
-  public OffsetDateTime getCreated() {
-    return this.created;
-  }
-
-  @JsonProperty("created")
-  public void setCreated(OffsetDateTime created) {
-    this.created = created;
-  }
-
-  @JsonProperty("isDeleted")
-  public Boolean getIsDeleted() {
-    return this.isDeleted;
-  }
-
-  @JsonProperty("isDeleted")
-  public void setIsDeleted(Boolean isDeleted) {
-    this.isDeleted = isDeleted;
   }
 }

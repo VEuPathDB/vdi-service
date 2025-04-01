@@ -8,11 +8,11 @@ import java.util.function.Consumer;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.StreamingOutput;
 
-public class DatasetPatchRequestStream extends DatasetPatchRequestImpl implements StreamingOutput {
+public class DatasetPatchRequestBodyStream extends DatasetPatchRequestBodyImpl implements StreamingOutput {
 
   private final Consumer<OutputStream> _streamer;
 
-  public DatasetPatchRequestStream(Consumer<OutputStream> streamer) {
+  public DatasetPatchRequestBodyStream(Consumer<OutputStream> streamer) {
     _streamer = streamer;
   }
 

@@ -1,47 +1,30 @@
 package org.veupathdb.service.vdi.generated.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+    "visibility",
     "name",
-    "datasetType",
-    "origin",
-    "dependencies",
-    "projects",
     "shortName",
     "shortAttribution",
     "category",
-    "visibility",
     "summary",
     "description",
     "publications",
     "hyperlinks",
     "organisms",
-    "contacts",
-    "createdOn"
+    "contacts"
 })
-public class DatasetPostMetaImpl implements DatasetPostMeta {
+public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
+  @JsonProperty("visibility")
+  private DatasetVisibility visibility;
+
   @JsonProperty("name")
   private String name;
-
-  @JsonProperty("datasetType")
-  private DatasetPostType datasetType;
-
-  @JsonProperty("origin")
-  private String origin;
-
-  @JsonProperty("dependencies")
-  private List<DatasetDependency> dependencies;
-
-  @JsonProperty("projects")
-  private List<String> projects;
 
   @JsonProperty("shortName")
   private String shortName;
@@ -51,12 +34,6 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
 
   @JsonProperty("category")
   private String category;
-
-  @JsonProperty(
-      value = "visibility",
-      defaultValue = "private"
-  )
-  private DatasetVisibility visibility;
 
   @JsonProperty("summary")
   private String summary;
@@ -76,8 +53,15 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("contacts")
   private List<DatasetContact> contacts;
 
-  @JsonProperty("createdOn")
-  private OffsetDateTime createdOn;
+  @JsonProperty("visibility")
+  public DatasetVisibility getVisibility() {
+    return this.visibility;
+  }
+
+  @JsonProperty("visibility")
+  public void setVisibility(DatasetVisibility visibility) {
+    this.visibility = visibility;
+  }
 
   @JsonProperty("name")
   public String getName() {
@@ -87,46 +71,6 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
-  }
-
-  @JsonProperty("datasetType")
-  public DatasetPostType getDatasetType() {
-    return this.datasetType;
-  }
-
-  @JsonProperty("datasetType")
-  public void setDatasetType(DatasetPostType datasetType) {
-    this.datasetType = datasetType;
-  }
-
-  @JsonProperty("origin")
-  public String getOrigin() {
-    return this.origin;
-  }
-
-  @JsonProperty("origin")
-  public void setOrigin(String origin) {
-    this.origin = origin;
-  }
-
-  @JsonProperty("dependencies")
-  public List<DatasetDependency> getDependencies() {
-    return this.dependencies;
-  }
-
-  @JsonProperty("dependencies")
-  public void setDependencies(List<DatasetDependency> dependencies) {
-    this.dependencies = dependencies;
-  }
-
-  @JsonProperty("projects")
-  public List<String> getProjects() {
-    return this.projects;
-  }
-
-  @JsonProperty("projects")
-  public void setProjects(List<String> projects) {
-    this.projects = projects;
   }
 
   @JsonProperty("shortName")
@@ -157,22 +101,6 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("category")
   public void setCategory(String category) {
     this.category = category;
-  }
-
-  @JsonProperty(
-      value = "visibility",
-      defaultValue = "private"
-  )
-  public DatasetVisibility getVisibility() {
-    return this.visibility;
-  }
-
-  @JsonProperty(
-      value = "visibility",
-      defaultValue = "private"
-  )
-  public void setVisibility(DatasetVisibility visibility) {
-    this.visibility = visibility;
   }
 
   @JsonProperty("summary")
@@ -233,15 +161,5 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty("contacts")
   public void setContacts(List<DatasetContact> contacts) {
     this.contacts = contacts;
-  }
-
-  @JsonProperty("createdOn")
-  public OffsetDateTime getCreatedOn() {
-    return this.createdOn;
-  }
-
-  @JsonProperty("createdOn")
-  public void setCreatedOn(OffsetDateTime createdOn) {
-    this.createdOn = createdOn;
   }
 }

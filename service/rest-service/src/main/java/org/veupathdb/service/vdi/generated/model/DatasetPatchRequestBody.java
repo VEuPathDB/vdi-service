@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 
 @JsonDeserialize(
-    as = DatasetPatchRequestImpl.class
+    as = DatasetPatchRequestBodyImpl.class
 )
-public interface DatasetPatchRequest {
+public interface DatasetPatchRequestBody {
   @JsonProperty("visibility")
   DatasetVisibility getVisibility();
 

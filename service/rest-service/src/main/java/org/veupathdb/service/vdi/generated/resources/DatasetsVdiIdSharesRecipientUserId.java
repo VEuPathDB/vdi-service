@@ -70,9 +70,11 @@ public interface DatasetsVdiIdSharesRecipientUserId {
       return new PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse respond404() {
-      Response.ResponseBuilder responseBuilder = Response.status(404);
-      return new PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(responseBuilder.build());
+    public static PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse respond404WithApplicationJson(
+        NotFoundError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(responseBuilder.build(), entity);
     }
 
     public static PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse respond422WithApplicationJson(
@@ -119,9 +121,11 @@ public interface DatasetsVdiIdSharesRecipientUserId {
       return new PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(responseBuilder.build(), entity);
     }
 
-    public static PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse respond403() {
-      Response.ResponseBuilder responseBuilder = Response.status(403);
-      return new PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(responseBuilder.build());
+    public static PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse respond403WithApplicationJson(
+        ForbiddenError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(403).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(responseBuilder.build(), entity);
     }
 
     public static PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse respond404WithApplicationJson(

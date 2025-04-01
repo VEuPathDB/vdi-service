@@ -4,7 +4,7 @@ uses:
   common: ../../common.raml
 
 types:
-  DatasetPostRequest:
+  DatasetPostRequestBody:
     displayName: Dataset Post Request
     description: |
       HTTP POST request body requesting the creation of a dataset from the
@@ -83,14 +83,13 @@ types:
       name: string
       version: string
 
-  DatasetPostResponse:
+  DatasetPostResponseBody:
     description: |
-      Response object returned on successful upload of a dataset.
+      Successful upload response.
 
-      Note that this response does not mean the uploaded dataset has been made
-      available on the target site(s).  The upload must first be processed and
-      installed into the target sites before the dataset will become available
-      for use.
+      This response does not mean the uploaded dataset has been made available
+      on the target site(s).  The upload must first be validated and installed
+      into the target sites before the dataset will become available for use.
     additionalProperties: false
     properties:
       datasetId: common.VdiId
