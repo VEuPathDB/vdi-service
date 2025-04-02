@@ -8,6 +8,7 @@ import org.veupathdb.vdi.lib.common.env.require
 import vdi.component.env.EnvKey
 import vdi.component.env.Environment
 import vdi.component.kafka.KafkaConsumerConfig
+import vdi.component.kafka.router.KafkaRouterConfig
 import vdi.component.kafka.router.KafkaRouterConfigDefaults
 import vdi.component.s3.util.S3Config
 
@@ -15,6 +16,7 @@ data class InstallTriggerHandlerConfig(
   val workerPoolSize:               UInt,
   val jobQueueSize:                 UInt,
   val kafkaConsumerConfig:          KafkaConsumerConfig,
+  val kafkaRouterConfig:            KafkaRouterConfig,
   val s3Config:                     S3Config,
   val s3Bucket:                     BucketName,
   val installDataTriggerTopic:      String,
@@ -30,8 +32,15 @@ data class InstallTriggerHandlerConfig(
       ?: Defaults.JobQueueSize,
 
     kafkaConsumerConfig = KafkaConsumerConfig(
-      env.optional(EnvKey.InstallDataTriggerHandler.KafkaConsumerClientID) ?: "install-data-handler",
+      env.optional(EnvKey.InstallDataTriggerHandler.KafkaConsumerClientID)
+        ?: Defaults.KafkaConsumerClientID,
       env
+    ),
+
+    kafkaRouterConfig = KafkaRouterConfig(
+      env,
+      env.optional(EnvKey.InstallDataTriggerHandler.KafkaProducerClientID)
+        ?: Defaults.KafkaProducerClientID
     ),
 
     s3Config = S3Config(env),
@@ -47,8 +56,10 @@ data class InstallTriggerHandlerConfig(
 
   object Defaults {
     const val WorkerPoolSize = 5u
-
     const val JobQueueSize = 5u
+
+    const val KafkaConsumerClientID = "install-data-handler" // keep this the same to avoid leaving dead messages
+    const val KafkaProducerClientID = "install-data-handler-send"
 
     inline val InstallDataTriggerTopic
       get() = KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC

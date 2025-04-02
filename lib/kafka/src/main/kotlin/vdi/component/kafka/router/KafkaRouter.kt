@@ -13,28 +13,31 @@ class KafkaRouter(
   private val producer: KafkaProducer,
 ) {
   fun sendImportTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
-    send(config.importTriggerTopic, config.importTriggerMessageKey, userID, datasetID, source)
+    send(config.importTrigger, userID, datasetID, source)
 
   fun sendInstallTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
-    send(config.installTriggerTopic, config.installTriggerMessageKey, userID, datasetID, source)
+    send(config.installTrigger, userID, datasetID, source)
 
   fun sendUpdateMetaTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
-    send(config.updateMetaTriggerTopic, config.updateMetaTriggerMessageKey, userID, datasetID, source)
+    send(config.updateMetaTrigger, userID, datasetID, source)
 
   fun sendSoftDeleteTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
-    send(config.softDeleteTriggerTopic, config.softDeleteTriggerMessageKey, userID, datasetID, source)
+    send(config.softDeleteTrigger, userID, datasetID, source)
 
   fun sendHardDeleteTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
-    send(config.hardDeleteTriggerTopic, config.hardDeleteTriggerMessageKey, userID, datasetID, source)
+    send(config.hardDeleteTrigger, userID, datasetID, source)
 
   fun sendShareTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
-    send(config.shareTriggerTopic, config.shareTriggerMessageKey, userID, datasetID, source)
+    send(config.shareTrigger, userID, datasetID, source)
 
   fun sendReconciliationTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
-    send(config.reconciliationTriggerTopic, config.reconciliationTriggerMessageKey, userID, datasetID, source)
+    send(config.reconciliationTrigger, userID, datasetID, source)
+
+  fun sendRevisionPruningTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
+    send(config.revisionPruningTrigger, userID, datasetID, source)
 
   fun close() = producer.close()
 
-  private fun send(topic: String, key: String, userID: UserID, datasetID: DatasetID, source: EventSource) =
-    producer.send(topic, KafkaMessage(key, JSON.writeValueAsString(EventMessage(userID, datasetID, source))))
+  private fun send(tc: TriggerConfig, userID: UserID, datasetID: DatasetID, source: EventSource) =
+    producer.send(tc.topic, KafkaMessage(tc.messageKey, JSON.writeValueAsString(EventMessage(userID, datasetID, source))))
 }

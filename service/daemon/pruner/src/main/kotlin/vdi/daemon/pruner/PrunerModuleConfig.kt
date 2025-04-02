@@ -14,9 +14,9 @@ data class PrunerModuleConfig(
   constructor() : this(System.getenv())
 
   constructor(env: Environment) : this(
-    pruningInterval = env.optDuration(EnvKey.Pruner.PruningInterval)
+    pruningInterval = env.optDuration(EnvKey.DeletedDatasetPruner.PruningInterval)
       ?: Defaults.PruningInterval,
-    wakeupInterval = env.optDuration(EnvKey.Pruner.PruningWakeupInterval)
+    wakeupInterval = env.optDuration(EnvKey.DeletedDatasetPruner.PruningWakeupInterval)
       ?: Defaults.WakeupInterval
   )
 

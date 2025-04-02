@@ -7,6 +7,7 @@ enum class EventSource {
   FullReconciler,
   SlimReconciler,
   UpdateMetaLane,
+  InstallDataLane,
   ;
 
   companion object {

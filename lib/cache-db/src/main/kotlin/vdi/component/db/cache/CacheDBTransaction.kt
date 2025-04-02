@@ -5,6 +5,7 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import vdi.component.db.cache.model.*
 import java.time.OffsetDateTime
@@ -143,6 +144,8 @@ interface CacheDBTransaction : AutoCloseable {
   fun tryInsertSyncControl(record: VDISyncControlRecord)
 
   fun tryInsertImportMessages(datasetID: DatasetID, messages: String)
+
+  fun tryInsertRevisionLink(revision: VDIDatasetRevision)
 
   // endregion Try-Insert
 

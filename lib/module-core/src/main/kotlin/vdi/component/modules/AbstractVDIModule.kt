@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Client
 import org.veupathdb.lib.s3.s34k.S3Config
+import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.util.AtomicBool
 import org.veupathdb.vdi.lib.json.JSON
@@ -150,20 +151,14 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
     DatasetManager(requireS3Bucket(requireS3Client(s3Config), bucketName))
 
   /**
-   * Fetches messages from Kafka matching the given [key] and converts them into
-   * a stream of values of type [T].
+   * Fetches event messages from Kafka matching the given [key].
    *
    * Messages with a key that does not match the given [key] parameter will be
    * filtered out with a warning log message.
    *
-   * Messages with a value that cannot be converted into type [T] will be
-   * filtered out with an error log message.
-   *
    * @param key Message key that incoming Kafka messages must match.
    *
-   * @param type Class used to convert the incoming values into type [T].
-   *
-   * @return A stream of values of type [T]
+   * @return A stream of event messages.
    */
   protected fun KafkaConsumer.fetchMessages(key: String): Sequence<EventMessage> =
     receive()
@@ -178,7 +173,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
       }
       .map {
         try {
-          JSON.readValue(it.value, vdi.component.kafka.EventMessage::class.java)
+          JSON.readValue(it.value, EventMessage::class.java)
         } catch (e: Throwable) {
           log.error("received invalid message body from Kafka: {}", it.value)
           null

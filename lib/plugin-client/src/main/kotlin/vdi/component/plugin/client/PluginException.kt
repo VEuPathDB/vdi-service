@@ -1,6 +1,5 @@
 package vdi.component.plugin.client
 
-import org.slf4j.Logger
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID

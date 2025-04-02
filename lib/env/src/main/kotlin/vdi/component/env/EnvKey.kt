@@ -222,6 +222,32 @@ object EnvKey {
      * Required: no
      */
     const val KafkaConsumerClientID = "INSTALL_DATA_HANDLER_KAFKA_CONSUMER_CLIENT_ID"
+
+    /**
+     * Type: String
+     * Required: no
+     */
+    const val KafkaProducerClientID = "INSTALL_DATA_HANDLER_KAFKA_PRODUCER_CLIENT_ID"
+  }
+
+  object RevisionPruningTriggerHandler {
+    /**
+     * Type: UInt
+     * Required: no
+     */
+    const val WorkerPoolSize = "REVISION_PRUNER_WORKER_POOL_SIZE"
+
+    /**
+     * Type: UInt
+     * Required: no
+     */
+    const val WorkQueueSize = "REVISION_PRUNER_WORK_QUEUE_SIZE"
+
+    /**
+     * Type: String
+     * Required: no
+     */
+    const val KafkaConsumerClientID = "REVISION_PRUNER_KAFKA_CONSUMER_CLIENT_ID"
   }
 
   object Kafka {
@@ -497,6 +523,12 @@ object EnvKey {
        * Required: no
        */
       const val ReconciliationTriggers = "KAFKA_TOPIC_RECONCILIATION_TRIGGERS"
+
+      /**
+       * Type: String
+       * Required: no
+       */
+      const val RevisionPruningTriggers = "KAFKA_TOPIC_REVISION_PRUNING_TRIGGERS"
     }
 
     object MessageKey {
@@ -541,13 +573,19 @@ object EnvKey {
        * Required: no
        */
       const val ReconciliationTriggers = "KAFKA_MESSAGE_KEY_RECONCILIATION_TRIGGERS"
+
+      /**
+       * Type: String
+       * Required: no
+       */
+      const val RevisionPruningTriggers = "KAFKA_MESSAGE_KEY_REVISION_PRUNING_TRIGGERS"
     }
   }
 
   /**
    * Configuration variables for the Dataset Pruner component of VDI.
    */
-  object Pruner {
+  object DeletedDatasetPruner {
 
     /**
      * How old a dataset must be before it is considered "prunable" from S3.

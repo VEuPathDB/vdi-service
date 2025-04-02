@@ -19,7 +19,7 @@ data class PrunerConfig(
   constructor(env: Environment) : this (
     s3Config   = S3Config(env),
     bucketName = BucketName(env.require(EnvKey.S3.BucketName)),
-    pruneAge   = env.optDuration(EnvKey.Pruner.DeletionThreshold)
+    pruneAge   = env.optDuration(EnvKey.DeletedDatasetPruner.DeletionThreshold)
       ?: PrunerConfigDefaults.DeletionThreshold
   )
 }

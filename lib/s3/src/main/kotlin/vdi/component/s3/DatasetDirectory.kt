@@ -4,6 +4,8 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
+import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import vdi.component.s3.files.*
 import java.io.InputStream
 import java.time.OffsetDateTime
@@ -220,11 +222,24 @@ interface DatasetDirectory {
 
   /**
    * Puts a new "share" into this [DatasetDirectory] by creating a share offer
-   * and share receipt file into the `DatasetDirectory`.
+   * and share receipt file in the `DatasetDirectory` with default values that
+   * automatically accept the share on behalf of the recipient..
    *
    * @param recipientID ID of the share recipient.
    */
   fun putShare(recipientID: UserID)
+
+  /**
+   * Puts a new "share" into this [DatasetDirectory] by creating a share offer
+   * and share receipt file in the `DatasetDirectory`.
+   *
+   * @param recipientID ID of the share recipient.
+   *
+   * @param offer Share offer.
+   *
+   * @param receipt Share receipt.
+   */
+  fun putShare(recipientID: UserID, offer: VDIDatasetShareOffer, receipt: VDIDatasetShareReceipt)
 
   /**
    * Returns the last modified timestamp of the dataset metadata file in this

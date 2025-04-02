@@ -122,10 +122,15 @@ internal class DatasetDirectoryImpl(
   }
 
   override fun putShare(recipientID: UserID) {
-    log.debug("putting a new share for user {} into dataset {}/{}", recipientID, ownerID, datasetID)
+    putShare(
+      recipientID,
+      VDIDatasetShareOffer(VDIShareOfferAction.Grant),
+      VDIDatasetShareReceipt(VDIShareReceiptAction.Accept)
+    )
+  }
 
-    val offer   = VDIDatasetShareOffer(VDIShareOfferAction.Grant)
-    val receipt = VDIDatasetShareReceipt(VDIShareReceiptAction.Accept)
+  override fun putShare(recipientID: UserID, offer: VDIDatasetShareOffer, receipt: VDIDatasetShareReceipt) {
+    log.debug("{}/{}: putting a new share for user {} with offer action {} and receipt action {} ", ownerID, datasetID, recipientID, offer.action, receipt.action)
 
     bucket.objects.put(pathFactory.datasetShareOfferFile(recipientID), JSON.writeValueAsBytes(offer).inputStream())
     bucket.objects.put(pathFactory.datasetShareReceiptFile(recipientID), JSON.writeValueAsBytes(receipt).inputStream())

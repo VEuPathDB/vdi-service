@@ -6,11 +6,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.errors.S34KError
-import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.util.or
 import vdi.component.async.WorkerPool
 import vdi.component.db.app.AppDB
@@ -21,6 +19,8 @@ import vdi.component.db.app.model.InstallType
 import vdi.component.db.app.withTransaction
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.withTransaction
+import vdi.component.kafka.EventSource
+import vdi.component.kafka.router.KafkaRouter
 import vdi.component.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
@@ -31,15 +31,10 @@ import vdi.component.plugin.mapping.PluginHandler
 import vdi.component.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
-import vdi.component.s3.paths.S3Paths
 import java.io.InputStream
-import java.nio.file.Path
 import java.sql.SQLException
 import java.time.OffsetDateTime
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
 
 internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig, abortCB: AbortCB)
   : InstallDataTriggerHandler
@@ -55,6 +50,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
+    val kr = requireKafkaRouter(config.kafkaRouterConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val wp = WorkerPool("install-data-workers", config.jobQueueSize, config.workerPoolSize) {
       Metrics.Install.queueSize.inc(it.toDouble())
@@ -66,7 +62,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           kc.fetchMessages(config.installDataTriggerMessageKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received install job for dataset $userID/$datasetID from source $source")
-              wp.submit { tryInstallData(userID, datasetID, dm) }
+              wp.submit { tryInstallData(userID, datasetID, dm, kr) }
             }
       }
     }
@@ -76,10 +72,13 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     confirmShutdown()
   }
 
-  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
+  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetManager, kr: KafkaRouter) {
     if (datasetsInProgress.add(datasetID)) {
       try {
         installData(userID, datasetID, dm)
+
+        // on successful install, handle possible data revisions
+        maybeFireRevisionEvent(userID, datasetID, dm, kr)
       } catch (e: PluginException) {
         e.log(log::error)
       } catch (e: Throwable) {
@@ -198,6 +197,17 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     } catch (e: Throwable) {
       throw PluginException.installData(handler.displayName, "N/A", userID, datasetID, cause = e)
     }
+  }
+
+  /**
+   * Checks if the dataset has a revision history, and if so, fires a revision
+   * pruning event to prune previous revisions.
+   */
+  private fun maybeFireRevisionEvent(userID: UserID, datasetID: DatasetID, dm: DatasetManager, kr: KafkaRouter) {
+    val meta = dm.getDatasetDirectory(userID, datasetID).getMetaFile().load()!!
+
+    if (meta.originalID != null)
+      kr.sendRevisionPruningTrigger(userID, datasetID, EventSource.InstallDataLane)
   }
 
   /**
