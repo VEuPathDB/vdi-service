@@ -35,13 +35,17 @@ public interface DatasetsVdiIdSharesRecipientUserId {
       DatasetShareReceipt entity);
 
   class PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse extends ResponseDelegate {
-    private PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(Response response,
+    public PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(Response response,
         Object entity) {
       super(response, entity);
     }
 
-    private PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(Response response) {
+    public PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(Response response) {
       super(response);
+    }
+
+    public PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse respond204() {
@@ -93,13 +97,17 @@ public interface DatasetsVdiIdSharesRecipientUserId {
   }
 
   class PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse extends ResponseDelegate {
-    private PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(Response response,
+    public PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(Response response,
         Object entity) {
       super(response, entity);
     }
 
-    private PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(Response response) {
+    public PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(Response response) {
       super(response);
+    }
+
+    public PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse respond204() {

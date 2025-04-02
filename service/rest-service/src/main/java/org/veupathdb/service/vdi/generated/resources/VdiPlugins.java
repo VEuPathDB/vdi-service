@@ -19,12 +19,16 @@ public interface VdiPlugins {
   GetVdiPluginsResponse getVdiPlugins(@QueryParam("project") String project);
 
   class GetVdiPluginsResponse extends ResponseDelegate {
-    private GetVdiPluginsResponse(Response response, Object entity) {
+    public GetVdiPluginsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiPluginsResponse(Response response) {
+    public GetVdiPluginsResponse(Response response) {
       super(response);
+    }
+
+    public GetVdiPluginsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetVdiPluginsResponse respond200WithApplicationJson(List<PluginListItem> entity) {

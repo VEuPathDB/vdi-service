@@ -16,6 +16,5 @@ class CommunityDatasets
 
   // DEPRECATED API
   override fun getVdiDatasetsCommunity() =
-    VdiDatasetsCommunity.GetVdiDatasetsCommunityResponse
-      .respond200WithApplicationJson(fetchCommunityUserDatasetList())!!
+    VdiDatasetsCommunity.GetVdiDatasetsCommunityResponse(datasetsCommunity)
 }

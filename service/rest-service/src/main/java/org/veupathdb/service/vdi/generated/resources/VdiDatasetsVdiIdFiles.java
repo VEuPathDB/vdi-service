@@ -37,12 +37,16 @@ public interface VdiDatasetsVdiIdFiles {
       @PathParam("vdi-id") String vdiId);
 
   class GetVdiDatasetsFilesByVdiIdResponse extends ResponseDelegate {
-    private GetVdiDatasetsFilesByVdiIdResponse(Response response, Object entity) {
+    public GetVdiDatasetsFilesByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiDatasetsFilesByVdiIdResponse(Response response) {
+    public GetVdiDatasetsFilesByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public GetVdiDatasetsFilesByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetVdiDatasetsFilesByVdiIdResponse respond200WithApplicationJson(
@@ -75,12 +79,16 @@ public interface VdiDatasetsVdiIdFiles {
   }
 
   class GetVdiDatasetsFilesUploadByVdiIdResponse extends ResponseDelegate {
-    private GetVdiDatasetsFilesUploadByVdiIdResponse(Response response, Object entity) {
+    public GetVdiDatasetsFilesUploadByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiDatasetsFilesUploadByVdiIdResponse(Response response) {
+    public GetVdiDatasetsFilesUploadByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public GetVdiDatasetsFilesUploadByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static HeadersFor200 headersFor200() {
@@ -128,12 +136,16 @@ public interface VdiDatasetsVdiIdFiles {
   }
 
   class GetVdiDatasetsFilesDataByVdiIdResponse extends ResponseDelegate {
-    private GetVdiDatasetsFilesDataByVdiIdResponse(Response response, Object entity) {
+    public GetVdiDatasetsFilesDataByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiDatasetsFilesDataByVdiIdResponse(Response response) {
+    public GetVdiDatasetsFilesDataByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public GetVdiDatasetsFilesDataByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static HeadersFor200 headersFor200() {

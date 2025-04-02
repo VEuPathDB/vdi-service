@@ -71,7 +71,7 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
   }
 }
 
-private fun DatasetPatchRequest.hasSomethingToUpdate(): Boolean =
+private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
   name != null
   || summary != null
   || description != null

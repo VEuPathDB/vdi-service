@@ -31,18 +31,15 @@ class UserInfo(@Context request: ContainerRequest)
   //==========================================================================//
   // DEPRECATED API METHODS!!
 
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getUsersSelfMeta()"))
   override fun getVdiUsersSelfMeta() =
-    VdiUsers.GetVdiUsersSelfMetaResponse.respond200WithApplicationJson(getUserMetadata(userID.toUserID()))!!
+    VdiUsers.GetVdiUsersSelfMetaResponse(usersSelfMeta)
 
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getUsersSelfShareOffers(status)"))
   override fun getVdiUsersSelfShareOffers(status: String?) =
-    VdiUsers.GetVdiUsersSelfShareOffersResponse.respond200WithApplicationJson(lookupShares(
-      userID.toUserID(),
-      status?.let(ShareFilterStatus::fromString) ?: ShareFilterStatus.Open
-    ))!!
+    VdiUsers.GetVdiUsersSelfShareOffersResponse(getUsersSelfShareOffers(status))
 
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getUsersSelfShareOffers(status)"))
   override fun getVdiDatasetsShareOffers(status: String?) =
-    VdiDatasetsShareOffers.GetVdiDatasetsShareOffersResponse.respond200WithApplicationJson(lookupShares(
-      userID.toUserID(),
-      status?.let(ShareFilterStatus::fromString) ?: ShareFilterStatus.Open
-    ))!!
+    VdiDatasetsShareOffers.GetVdiDatasetsShareOffersResponse(getUsersSelfShareOffers(status))
 }

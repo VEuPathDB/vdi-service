@@ -60,22 +60,15 @@ class DatasetByID(@Context request: ContainerRequest)
   // DEPRECATED API
 
   override fun getVdiDatasetsByVdiId(vdiId: String) =
-    VdiDatasetsVdiId.GetVdiDatasetsByVdiIdResponse
-      .respond200WithApplicationJson(getDatasetsByVdiId(vdiId).entity as DatasetDetails?)!!
+    VdiDatasetsVdiId.GetVdiDatasetsByVdiIdResponse(getDatasetsByVdiId(vdiId))
 
   override fun patchVdiDatasetsByVdiId(vdiId: String, entity: DatasetPatchRequestBody?) =
-    patchDatasetsByVdiId(vdiId, entity).let {
-      if (it.status == 400)
-        VdiDatasetsVdiId.PatchVdiDatasetsByVdiIdResponse.respond400WithApplicationJson(it.entity as BadRequestError)
-      else
-        VdiDatasetsVdiId.PatchVdiDatasetsByVdiIdResponse.respond204()
-    }!!
+    VdiDatasetsVdiId.PatchVdiDatasetsByVdiIdResponse(patchDatasetsByVdiId(vdiId, entity))
 
 
   override fun putVdiDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?) =
-    VdiDatasetsVdiId.PutVdiDatasetsByVdiIdResponse
+    VdiDatasetsVdiId.PutVdiDatasetsByVdiIdResponse(putDatasetsByVdiId(vdiId, entity))
 
   override fun deleteVdiDatasetsByVdiId(vdiId: String) =
-    deleteDatasetsByVdiId(vdiId)
-      .let { VdiDatasetsVdiId.DeleteVdiDatasetsByVdiIdResponse.respond204()!! }
+    VdiDatasetsVdiId.DeleteVdiDatasetsByVdiIdResponse(deleteDatasetsByVdiId(vdiId))
 }

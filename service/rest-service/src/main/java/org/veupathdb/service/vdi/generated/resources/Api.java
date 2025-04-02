@@ -13,12 +13,16 @@ public interface Api {
   GetApiResponse getApi();
 
   class GetApiResponse extends ResponseDelegate {
-    private GetApiResponse(Response response, Object entity) {
+    public GetApiResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetApiResponse(Response response) {
+    public GetApiResponse(Response response) {
       super(response);
+    }
+
+    public GetApiResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetApiResponse respond200WithTextHtml(Object entity) {

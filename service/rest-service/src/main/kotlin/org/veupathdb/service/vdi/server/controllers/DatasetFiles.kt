@@ -70,21 +70,15 @@ class DatasetFiles(@Context request: ContainerRequest)
       )
   }
 
-  // DEPRECATED API
-  // DEPRECATED API
-  // DEPRECATED API
-  // DEPRECATED API
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasetsFilesByVdiId(vdiId)"))
+  override fun getVdiDatasetsFilesByVdiId(vdiId: String) =
+    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesByVdiIdResponse(getDatasetsFilesByVdiId(vdiId))
 
-  override fun getVdiDatasetsFilesByVdiId(vdiId: String): VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesByVdiIdResponse {
-    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesByVdiIdResponse::class.java.c
-    TODO("Not yet implemented")
-  }
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasetsFilesUploadByVdiId(vdiId)"))
+  override fun getVdiDatasetsFilesUploadByVdiId(vdiId: String) =
+    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesUploadByVdiIdResponse(getDatasetsFilesUploadByVdiId(vdiId))
 
-  override fun getVdiDatasetsFilesUploadByVdiId(vdiId: String): VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesUploadByVdiIdResponse {
-    TODO("Not yet implemented")
-  }
-
-  override fun getVdiDatasetsFilesDataByVdiId(vdiId: String): VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesDataByVdiIdResponse {
-    TODO("Not yet implemented")
-  }
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasetsFilesDataByVdiId(vdiId)"))
+  override fun getVdiDatasetsFilesDataByVdiId(vdiId: String) =
+    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesDataByVdiIdResponse(getDatasetsFilesDataByVdiId(vdiId))
 }

@@ -7,7 +7,6 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequestBody
 import org.veupathdb.service.vdi.generated.resources.Datasets
 import org.veupathdb.service.vdi.generated.resources.VdiDatasets
-import org.veupathdb.service.vdi.generated.resources.VdiDatasets.*
 import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.service.dataset.createDataset
 import org.veupathdb.service.vdi.service.dataset.fetchUserDatasetList
@@ -24,27 +23,26 @@ class DatasetList(@Context request: ContainerRequest)
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  override fun getVdiDatasets(projectId: String?, ownership: String?): GetVdiDatasetsResponse {
+  override fun getDatasets(projectId: String?, ownership: String?): Datasets.GetDatasetsResponse {
     // Parse the ownership filter field
     val parsedOwnership = ownership
       ?.let {
         DatasetOwnershipFilter.fromStringOrNull(it)
-          ?: return GetVdiDatasetsResponse.respond400WithApplicationJson(BadRequestError("Invalid ownership query param value."))
+          ?: return Datasets.GetDatasetsResponse.respond400WithApplicationJson(BadRequestError("Invalid ownership query param value."))
       }
       ?: DatasetOwnershipFilter.ANY
 
-    return GetVdiDatasetsResponse.respond200WithApplicationJson(
+    return Datasets.GetDatasetsResponse.respond200WithApplicationJson(
       fetchUserDatasetList(DatasetListQuery(userID, projectId, parsedOwnership), userID.toUserID())
     )
   }
 
-  override fun postVdiDatasets(entity: DatasetPostRequestBody?): PostVdiDatasetsResponse {
-    // Require and validate the request body.
-    with(entity ?: return PostVdiDatasetsResponse.respond400WithApplicationJson(BadRequestError("request body must not be empty"))) {
+  override fun postDatasets(entity: DatasetPostRequestBody?): Datasets.PostDatasetsResponse {
+    with(entity ?: return Datasets.PostDatasetsResponse.respond400WithApplicationJson(BadRequestError("request body must not be empty"))) {
       cleanup()
       validate().let {
         if (it.isNotEmpty)
-          return PostVdiDatasetsResponse.respond422WithApplicationJson(UnprocessableEntityError(it))
+          return Datasets.PostDatasetsResponse.respond422WithApplicationJson(UnprocessableEntityError(it))
       }
     }
 
@@ -60,12 +58,20 @@ class DatasetList(@Context request: ContainerRequest)
 
     createDataset(userID.toUserID(), datasetID, entity)
 
-    return PostVdiDatasetsResponse
+    return Datasets.PostDatasetsResponse
       .respond201WithApplicationJson(
         DatasetPostResponseBody(datasetID),
-        PostVdiDatasetsResponse.headersFor201()
+        Datasets.PostDatasetsResponse.headersFor201()
           .withLocation(request.absolutePath.toString().replaceAfterLast('/', datasetID.toString()))
       )
   }
+
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasets(projectId, ownership)"))
+  override fun getVdiDatasets(projectId: String?, ownership: String?) =
+    VdiDatasets.GetVdiDatasetsResponse(getDatasets(projectId, ownership))
+
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("postDatasets(entity)"))
+  override fun postVdiDatasets(entity: DatasetPostRequestBody?) =
+    VdiDatasets.PostVdiDatasetsResponse(postDatasets(entity))
 }
 

@@ -19,12 +19,16 @@ public interface Plugins {
   GetPluginsResponse getPlugins(@QueryParam("project") String project);
 
   class GetPluginsResponse extends ResponseDelegate {
-    private GetPluginsResponse(Response response, Object entity) {
+    public GetPluginsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetPluginsResponse(Response response) {
+    public GetPluginsResponse(Response response) {
       super(response);
+    }
+
+    public GetPluginsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetPluginsResponse respond200WithApplicationJson(List<PluginListItem> entity) {

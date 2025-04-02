@@ -18,12 +18,16 @@ public interface VdiDatasetsCommunity {
   GetVdiDatasetsCommunityResponse getVdiDatasetsCommunity();
 
   class GetVdiDatasetsCommunityResponse extends ResponseDelegate {
-    private GetVdiDatasetsCommunityResponse(Response response, Object entity) {
+    public GetVdiDatasetsCommunityResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiDatasetsCommunityResponse(Response response) {
+    public GetVdiDatasetsCommunityResponse(Response response) {
       super(response);
+    }
+
+    public GetVdiDatasetsCommunityResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetVdiDatasetsCommunityResponse respond200WithApplicationJson(

@@ -1,3 +1,5 @@
+import org.veupathdb.lib.gradle.container.tasks.jaxrs.GenerateJaxRS
+
 plugins {
   kotlin("jvm")
   alias(libs.plugins.vpdb)
@@ -17,6 +19,10 @@ containerService {
   docker {
     imageName = "vdi-service"
   }
+}
+
+tasks.withType<GenerateJaxRS> {
+  finalizedBy(task("patch-"))
 }
 
 dependencies {

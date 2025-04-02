@@ -11,13 +11,12 @@ class Resources(opts: Options) : ContainerResources(opts) {
 
   override fun resources() = arrayOf<Any>(
     AdminRPC::class.java,
-    DatasetByID::class.java,
-    DatasetList::class.java,
-    DatasetShareList::class.java,
-    DatasetSharePut::class.java,
-    UserInfo::class.java,
-    DatasetFiles::class.java,
     CommunityDatasets::class.java,
+    DatasetByID::class.java,
+    DatasetFiles::class.java,
+    DatasetList::class.java,
+    DatasetSharePut::class.java,
     PluginInfo::class.java,
+    UserInfo::class.java,
   )
 }

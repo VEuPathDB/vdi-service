@@ -44,12 +44,16 @@ public interface VdiDatasetsVdiId {
   DeleteVdiDatasetsByVdiIdResponse deleteVdiDatasetsByVdiId(@PathParam("vdi-id") String vdiId);
 
   class PutVdiDatasetsByVdiIdResponse extends ResponseDelegate {
-    private PutVdiDatasetsByVdiIdResponse(Response response, Object entity) {
+    public PutVdiDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PutVdiDatasetsByVdiIdResponse(Response response) {
+    public PutVdiDatasetsByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public PutVdiDatasetsByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static HeadersFor201 headersFor201() {
@@ -117,12 +121,16 @@ public interface VdiDatasetsVdiId {
   }
 
   class GetVdiDatasetsByVdiIdResponse extends ResponseDelegate {
-    private GetVdiDatasetsByVdiIdResponse(Response response, Object entity) {
+    public GetVdiDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiDatasetsByVdiIdResponse(Response response) {
+    public GetVdiDatasetsByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public GetVdiDatasetsByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetVdiDatasetsByVdiIdResponse respond200WithApplicationJson(
@@ -174,12 +182,16 @@ public interface VdiDatasetsVdiId {
   }
 
   class PatchVdiDatasetsByVdiIdResponse extends ResponseDelegate {
-    private PatchVdiDatasetsByVdiIdResponse(Response response, Object entity) {
+    public PatchVdiDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PatchVdiDatasetsByVdiIdResponse(Response response) {
+    public PatchVdiDatasetsByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public PatchVdiDatasetsByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PatchVdiDatasetsByVdiIdResponse respond204() {
@@ -231,12 +243,16 @@ public interface VdiDatasetsVdiId {
   }
 
   class DeleteVdiDatasetsByVdiIdResponse extends ResponseDelegate {
-    private DeleteVdiDatasetsByVdiIdResponse(Response response, Object entity) {
+    public DeleteVdiDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private DeleteVdiDatasetsByVdiIdResponse(Response response) {
+    public DeleteVdiDatasetsByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public DeleteVdiDatasetsByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static DeleteVdiDatasetsByVdiIdResponse respond204() {

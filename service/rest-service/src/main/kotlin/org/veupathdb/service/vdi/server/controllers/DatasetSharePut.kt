@@ -8,6 +8,8 @@ import org.veupathdb.service.vdi.generated.model.DatasetShareOffer
 import org.veupathdb.service.vdi.generated.model.DatasetShareReceipt
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdSharesRecipientUserId
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdiIdSharesRecipientUserId
+import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdiIdSharesRecipientUserId.PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse
+import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdiIdSharesRecipientUserId.PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdSharesRecipientUserId.PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse as PutOffer
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdSharesRecipientUserId.PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse as PutReceipt
 import org.veupathdb.service.vdi.genx.model.BadRequestError
@@ -68,21 +70,19 @@ class DatasetSharePut(@Context request: ContainerRequest)
   }
 
   // DEPRECATED API
+  @Authenticated(adminOverride = ALLOW_ALWAYS)
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("putDatasetsSharesOfferByVdiIdAndRecipientUserId(vdiId, recipientUserId, entity)"))
   override fun putVdiDatasetsSharesOfferByVdiIdAndRecipientUserId(
     vdiId: String,
     recipientUserId: Long,
     entity: DatasetShareOffer?,
-  ): VdiDatasetsVdiIdSharesRecipientUserId.PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse {
-    putDatasetsSharesOfferByVdiIdAndRecipientUserId(vdiId, recipientUserId, entity)
-    return VdiDatasetsVdiIdSharesRecipientUserId.PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse.respond204()
-  }
+  ) = PutVdiDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(putDatasetsSharesOfferByVdiIdAndRecipientUserId(vdiId, recipientUserId, entity))
 
+  @Authenticated(adminOverride = ALLOW_ALWAYS)
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("putDatasetsSharesReceiptByVdiIdAndRecipientUserId(vdiId, recipientUserId, entity)"))
   override fun putVdiDatasetsSharesReceiptByVdiIdAndRecipientUserId(
     vdiId: String,
     recipientUserId: Long,
     entity: DatasetShareReceipt?,
-  ): VdiDatasetsVdiIdSharesRecipientUserId.PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse {
-    putDatasetsSharesReceiptByVdiIdAndRecipientUserId(vdiId, recipientUserId, entity)
-    return VdiDatasetsVdiIdSharesRecipientUserId.PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse.respond204()
-  }
+  ) = PutVdiDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(putDatasetsSharesReceiptByVdiIdAndRecipientUserId(vdiId, recipientUserId, entity))
 }

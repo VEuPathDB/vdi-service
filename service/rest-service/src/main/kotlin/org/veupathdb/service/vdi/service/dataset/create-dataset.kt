@@ -6,7 +6,7 @@ import org.slf4j.Logger
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import org.veupathdb.service.vdi.config.Options
-import org.veupathdb.service.vdi.generated.model.DatasetPostRequest
+import org.veupathdb.service.vdi.generated.model.DatasetPostRequestBody
 import org.veupathdb.service.vdi.genx.model.toDatasetMeta
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.service.users.getCurrentQuotaUsage
@@ -47,7 +47,7 @@ private val WorkPool = Executors.newFixedThreadPool(10)
 fun <T: Any> T.createDataset(
   userID: UserID,
   datasetID: DatasetID,
-  entity: DatasetPostRequest,
+  entity: DatasetPostRequestBody,
 ) {
   logger.trace("createDataset(userID={}, datasetID={}, entity={})", userID, datasetID, entity)
 
@@ -353,7 +353,7 @@ private data class FileReference(val tempDirectory: Path, val tempFile: Path)
  * @return A data object containing the temp directory path and the temp file
  * path for the dataset input file.
  */
-private fun DatasetPostRequest.fetchDatasetFile(userID: UserID, logger: Logger): FileReference =
+private fun DatasetPostRequestBody.fetchDatasetFile(userID: UserID, logger: Logger): FileReference =
   file?.let {
     TempFiles.makeTempPath(it.name)
       .also { (_, tmpFile) -> it.copyTo(tmpFile.toFile(), true) }
@@ -382,7 +382,7 @@ private fun DatasetPostRequest.fetchDatasetFile(userID: UserID, logger: Logger):
  * * An IO error occurred while downloading the remote file.
  */
 @OptIn(ExperimentalPathApi::class)
-private fun DatasetPostRequest.downloadRemoteFile(userID: UserID, logger: Logger): FileReference {
+private fun DatasetPostRequestBody.downloadRemoteFile(userID: UserID, logger: Logger): FileReference {
   val url = try { url.toJavaURL() }
   catch (e: MalformedURLException) { throw BadRequestException("invalid file source: ${e.message}") }
 

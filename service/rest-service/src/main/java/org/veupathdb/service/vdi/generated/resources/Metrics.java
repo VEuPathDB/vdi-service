@@ -13,12 +13,16 @@ public interface Metrics {
   GetMetricsResponse getMetrics();
 
   class GetMetricsResponse extends ResponseDelegate {
-    private GetMetricsResponse(Response response, Object entity) {
+    public GetMetricsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetMetricsResponse(Response response) {
+    public GetMetricsResponse(Response response) {
       super(response);
+    }
+
+    public GetMetricsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetMetricsResponse respond200WithTextPlain(Object entity) {

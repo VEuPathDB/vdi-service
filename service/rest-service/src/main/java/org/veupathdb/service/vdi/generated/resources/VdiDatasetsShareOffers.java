@@ -22,12 +22,16 @@ public interface VdiDatasetsShareOffers {
       @QueryParam("status") @DefaultValue("open") String status);
 
   class GetVdiDatasetsShareOffersResponse extends ResponseDelegate {
-    private GetVdiDatasetsShareOffersResponse(Response response, Object entity) {
+    public GetVdiDatasetsShareOffersResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiDatasetsShareOffersResponse(Response response) {
+    public GetVdiDatasetsShareOffersResponse(Response response) {
       super(response);
+    }
+
+    public GetVdiDatasetsShareOffersResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetVdiDatasetsShareOffersResponse respond200WithApplicationJson(

@@ -37,12 +37,16 @@ public interface DatasetsVdiIdFiles {
       @PathParam("vdi-id") String vdiId);
 
   class GetDatasetsFilesByVdiIdResponse extends ResponseDelegate {
-    private GetDatasetsFilesByVdiIdResponse(Response response, Object entity) {
+    public GetDatasetsFilesByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetDatasetsFilesByVdiIdResponse(Response response) {
+    public GetDatasetsFilesByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public GetDatasetsFilesByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetDatasetsFilesByVdiIdResponse respond200WithApplicationJson(
@@ -75,12 +79,16 @@ public interface DatasetsVdiIdFiles {
   }
 
   class GetDatasetsFilesUploadByVdiIdResponse extends ResponseDelegate {
-    private GetDatasetsFilesUploadByVdiIdResponse(Response response, Object entity) {
+    public GetDatasetsFilesUploadByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetDatasetsFilesUploadByVdiIdResponse(Response response) {
+    public GetDatasetsFilesUploadByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public GetDatasetsFilesUploadByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static HeadersFor200 headersFor200() {
@@ -128,12 +136,16 @@ public interface DatasetsVdiIdFiles {
   }
 
   class GetDatasetsFilesDataByVdiIdResponse extends ResponseDelegate {
-    private GetDatasetsFilesDataByVdiIdResponse(Response response, Object entity) {
+    public GetDatasetsFilesDataByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetDatasetsFilesDataByVdiIdResponse(Response response) {
+    public GetDatasetsFilesDataByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public GetDatasetsFilesDataByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static HeadersFor200 headersFor200() {

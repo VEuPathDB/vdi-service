@@ -33,12 +33,16 @@ public interface Datasets {
   PostDatasetsResponse postDatasets(DatasetPostRequestBody entity);
 
   class GetDatasetsResponse extends ResponseDelegate {
-    private GetDatasetsResponse(Response response, Object entity) {
+    public GetDatasetsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetDatasetsResponse(Response response) {
+    public GetDatasetsResponse(Response response) {
       super(response);
+    }
+
+    public GetDatasetsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetDatasetsResponse respond200WithApplicationJson(List<DatasetListEntry> entity) {
@@ -68,12 +72,16 @@ public interface Datasets {
   }
 
   class PostDatasetsResponse extends ResponseDelegate {
-    private PostDatasetsResponse(Response response, Object entity) {
+    public PostDatasetsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostDatasetsResponse(Response response) {
+    public PostDatasetsResponse(Response response) {
       super(response);
+    }
+
+    public PostDatasetsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static HeadersFor201 headersFor201() {

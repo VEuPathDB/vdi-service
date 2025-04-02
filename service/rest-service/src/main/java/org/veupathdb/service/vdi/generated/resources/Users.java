@@ -29,12 +29,16 @@ public interface Users {
       @QueryParam("status") @DefaultValue("open") String status);
 
   class GetUsersSelfMetaResponse extends ResponseDelegate {
-    private GetUsersSelfMetaResponse(Response response, Object entity) {
+    public GetUsersSelfMetaResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetUsersSelfMetaResponse(Response response) {
+    public GetUsersSelfMetaResponse(Response response) {
       super(response);
+    }
+
+    public GetUsersSelfMetaResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetUsersSelfMetaResponse respond200WithApplicationJson(UserMetadata entity) {
@@ -57,12 +61,16 @@ public interface Users {
   }
 
   class GetUsersSelfShareOffersResponse extends ResponseDelegate {
-    private GetUsersSelfShareOffersResponse(Response response, Object entity) {
+    public GetUsersSelfShareOffersResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetUsersSelfShareOffersResponse(Response response) {
+    public GetUsersSelfShareOffersResponse(Response response) {
       super(response);
+    }
+
+    public GetUsersSelfShareOffersResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetUsersSelfShareOffersResponse respond200WithApplicationJson(

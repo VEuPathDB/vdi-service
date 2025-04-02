@@ -15,12 +15,16 @@ public interface Health {
   GetHealthResponse getHealth();
 
   class GetHealthResponse extends ResponseDelegate {
-    private GetHealthResponse(Response response, Object entity) {
+    public GetHealthResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetHealthResponse(Response response) {
+    public GetHealthResponse(Response response) {
       super(response);
+    }
+
+    public GetHealthResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetHealthResponse respond200WithApplicationJson(HealthResponse entity) {

@@ -29,12 +29,16 @@ public interface VdiUsers {
       @QueryParam("status") @DefaultValue("open") String status);
 
   class GetVdiUsersSelfMetaResponse extends ResponseDelegate {
-    private GetVdiUsersSelfMetaResponse(Response response, Object entity) {
+    public GetVdiUsersSelfMetaResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiUsersSelfMetaResponse(Response response) {
+    public GetVdiUsersSelfMetaResponse(Response response) {
       super(response);
+    }
+
+    public GetVdiUsersSelfMetaResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetVdiUsersSelfMetaResponse respond200WithApplicationJson(UserMetadata entity) {
@@ -58,12 +62,16 @@ public interface VdiUsers {
   }
 
   class GetVdiUsersSelfShareOffersResponse extends ResponseDelegate {
-    private GetVdiUsersSelfShareOffersResponse(Response response, Object entity) {
+    public GetVdiUsersSelfShareOffersResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiUsersSelfShareOffersResponse(Response response) {
+    public GetVdiUsersSelfShareOffersResponse(Response response) {
       super(response);
+    }
+
+    public GetVdiUsersSelfShareOffersResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetVdiUsersSelfShareOffersResponse respond200WithApplicationJson(

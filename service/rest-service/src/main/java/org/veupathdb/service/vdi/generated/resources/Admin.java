@@ -95,12 +95,16 @@ public interface Admin {
   PostAdminPurgeDatasetResponse postAdminPurgeDataset(AdminPurgeDatasetPostApplicationJson entity);
 
   class PostAdminReconcilerResponse extends ResponseDelegate {
-    private PostAdminReconcilerResponse(Response response, Object entity) {
+    public PostAdminReconcilerResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostAdminReconcilerResponse(Response response) {
+    public PostAdminReconcilerResponse(Response response) {
       super(response);
+    }
+
+    public PostAdminReconcilerResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PostAdminReconcilerResponse respond204() {
@@ -116,12 +120,16 @@ public interface Admin {
   }
 
   class PostAdminProxyUploadResponse extends ResponseDelegate {
-    private PostAdminProxyUploadResponse(Response response, Object entity) {
+    public PostAdminProxyUploadResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostAdminProxyUploadResponse(Response response) {
+    public PostAdminProxyUploadResponse(Response response) {
       super(response);
+    }
+
+    public PostAdminProxyUploadResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PostAdminProxyUploadResponse respond200WithApplicationJson(
@@ -167,12 +175,16 @@ public interface Admin {
   }
 
   class GetAdminFailedImportsResponse extends ResponseDelegate {
-    private GetAdminFailedImportsResponse(Response response, Object entity) {
+    public GetAdminFailedImportsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetAdminFailedImportsResponse(Response response) {
+    public GetAdminFailedImportsResponse(Response response) {
       super(response);
+    }
+
+    public GetAdminFailedImportsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetAdminFailedImportsResponse respond200WithApplicationJson(
@@ -191,12 +203,16 @@ public interface Admin {
   }
 
   class GetAdminListBrokenResponse extends ResponseDelegate {
-    private GetAdminListBrokenResponse(Response response, Object entity) {
+    public GetAdminListBrokenResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetAdminListBrokenResponse(Response response) {
+    public GetAdminListBrokenResponse(Response response) {
       super(response);
+    }
+
+    public GetAdminListBrokenResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetAdminListBrokenResponse respond200WithApplicationJson(
@@ -221,12 +237,16 @@ public interface Admin {
   }
 
   class PostAdminFixBrokenInstallsResponse extends ResponseDelegate {
-    private PostAdminFixBrokenInstallsResponse(Response response, Object entity) {
+    public PostAdminFixBrokenInstallsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostAdminFixBrokenInstallsResponse(Response response) {
+    public PostAdminFixBrokenInstallsResponse(Response response) {
       super(response);
+    }
+
+    public PostAdminFixBrokenInstallsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PostAdminFixBrokenInstallsResponse respond204() {
@@ -257,12 +277,16 @@ public interface Admin {
   }
 
   class PostAdminDeleteCleanupResponse extends ResponseDelegate {
-    private PostAdminDeleteCleanupResponse(Response response, Object entity) {
+    public PostAdminDeleteCleanupResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostAdminDeleteCleanupResponse(Response response) {
+    public PostAdminDeleteCleanupResponse(Response response) {
       super(response);
+    }
+
+    public PostAdminDeleteCleanupResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PostAdminDeleteCleanupResponse respond204() {
@@ -292,12 +316,16 @@ public interface Admin {
   }
 
   class GetAdminDatasetDetailsResponse extends ResponseDelegate {
-    private GetAdminDatasetDetailsResponse(Response response, Object entity) {
+    public GetAdminDatasetDetailsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetAdminDatasetDetailsResponse(Response response) {
+    public GetAdminDatasetDetailsResponse(Response response) {
       super(response);
+    }
+
+    public GetAdminDatasetDetailsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetAdminDatasetDetailsResponse respond200WithApplicationJson(
@@ -316,12 +344,16 @@ public interface Admin {
   }
 
   class GetAdminListS3ObjectsResponse extends ResponseDelegate {
-    private GetAdminListS3ObjectsResponse(Response response, Object entity) {
+    public GetAdminListS3ObjectsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetAdminListS3ObjectsResponse(Response response) {
+    public GetAdminListS3ObjectsResponse(Response response) {
       super(response);
+    }
+
+    public GetAdminListS3ObjectsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetAdminListS3ObjectsResponse respond200WithTextPlain(Object entity) {
@@ -332,12 +364,16 @@ public interface Admin {
   }
 
   class GetAdminListAllDatasetsResponse extends ResponseDelegate {
-    private GetAdminListAllDatasetsResponse(Response response, Object entity) {
+    public GetAdminListAllDatasetsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetAdminListAllDatasetsResponse(Response response) {
+    public GetAdminListAllDatasetsResponse(Response response) {
       super(response);
+    }
+
+    public GetAdminListAllDatasetsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetAdminListAllDatasetsResponse respond200WithApplicationJson(
@@ -349,12 +385,16 @@ public interface Admin {
   }
 
   class PostAdminPurgeDatasetResponse extends ResponseDelegate {
-    private PostAdminPurgeDatasetResponse(Response response, Object entity) {
+    public PostAdminPurgeDatasetResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostAdminPurgeDatasetResponse(Response response) {
+    public PostAdminPurgeDatasetResponse(Response response) {
       super(response);
+    }
+
+    public PostAdminPurgeDatasetResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PostAdminPurgeDatasetResponse respond204() {

@@ -33,12 +33,16 @@ public interface VdiDatasets {
   PostVdiDatasetsResponse postVdiDatasets(DatasetPostRequestBody entity);
 
   class GetVdiDatasetsResponse extends ResponseDelegate {
-    private GetVdiDatasetsResponse(Response response, Object entity) {
+    public GetVdiDatasetsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetVdiDatasetsResponse(Response response) {
+    public GetVdiDatasetsResponse(Response response) {
       super(response);
+    }
+
+    public GetVdiDatasetsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetVdiDatasetsResponse respond200WithApplicationJson(
@@ -69,12 +73,16 @@ public interface VdiDatasets {
   }
 
   class PostVdiDatasetsResponse extends ResponseDelegate {
-    private PostVdiDatasetsResponse(Response response, Object entity) {
+    public PostVdiDatasetsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostVdiDatasetsResponse(Response response) {
+    public PostVdiDatasetsResponse(Response response) {
       super(response);
+    }
+
+    public PostVdiDatasetsResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static HeadersFor201 headersFor201() {

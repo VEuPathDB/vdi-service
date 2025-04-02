@@ -16,16 +16,16 @@ import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 
 public class ResponseDelegate extends Response {
-  private final Response delegate;
+  public final Response delegate;
 
-  private final Object entity;
+  public final Object entity;
 
-  protected ResponseDelegate(Response delegate, Object entity) {
+  public ResponseDelegate(Response delegate, Object entity) {
     this.delegate = delegate;
     this.entity = entity;
   }
 
-  protected ResponseDelegate(Response delegate) {
+  public ResponseDelegate(Response delegate) {
     this(delegate, null);
   }
 
@@ -75,8 +75,27 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
+  public MultivaluedMap<String, String> getStringHeaders() {
+    return this.delegate.getStringHeaders();
+  }
+
+  @Override
+  public String getHeaderString(String p0) {
+    return this.delegate.getHeaderString(p0);
+  }
+
+  @Override
+  public Object getEntity() {
+    return this.entity;}
+
+  @Override
   public Response.StatusType getStatusInfo() {
     return this.delegate.getStatusInfo();
+  }
+
+  @Override
+  public <T> T readEntity(Class<T> p0) {
+    return this.delegate.readEntity(p0);
   }
 
   @Override
@@ -85,17 +104,12 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public <T> T readEntity(GenericType<T> p0) {
-    return this.delegate.readEntity(p0);
-  }
-
-  @Override
   public <T> T readEntity(Class<T> p0, Annotation[] p1) {
     return this.delegate.readEntity(p0,p1);
   }
 
   @Override
-  public <T> T readEntity(Class<T> p0) {
+  public <T> T readEntity(GenericType<T> p0) {
     return this.delegate.readEntity(p0);
   }
 
@@ -148,20 +162,6 @@ public class ResponseDelegate extends Response {
   public Link.Builder getLinkBuilder(String p0) {
     return this.delegate.getLinkBuilder(p0);
   }
-
-  @Override
-  public MultivaluedMap<String, String> getStringHeaders() {
-    return this.delegate.getStringHeaders();
-  }
-
-  @Override
-  public String getHeaderString(String p0) {
-    return this.delegate.getHeaderString(p0);
-  }
-
-  @Override
-  public Object getEntity() {
-    return this.entity;}
 
   public static class HeaderBuilderBase {
     protected final Map<String, String> headerMap;

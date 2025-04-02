@@ -12,6 +12,7 @@ class PluginInfo
     Plugins.GetPluginsResponse.respond200WithApplicationJson(listPlugins(project))!!
 
   // DEPRECATED API
+  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getPlugins(project)"))
   override fun getVdiPlugins(project: String?) =
-    VdiPlugins.GetVdiPluginsResponse.respond200WithApplicationJson(listPlugins(project))!!
+    VdiPlugins.GetVdiPluginsResponse(getPlugins(project))
 }

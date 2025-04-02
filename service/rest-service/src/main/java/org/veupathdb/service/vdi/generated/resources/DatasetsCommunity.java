@@ -18,12 +18,16 @@ public interface DatasetsCommunity {
   GetDatasetsCommunityResponse getDatasetsCommunity();
 
   class GetDatasetsCommunityResponse extends ResponseDelegate {
-    private GetDatasetsCommunityResponse(Response response, Object entity) {
+    public GetDatasetsCommunityResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetDatasetsCommunityResponse(Response response) {
+    public GetDatasetsCommunityResponse(Response response) {
       super(response);
+    }
+
+    public GetDatasetsCommunityResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetDatasetsCommunityResponse respond200WithApplicationJson(
