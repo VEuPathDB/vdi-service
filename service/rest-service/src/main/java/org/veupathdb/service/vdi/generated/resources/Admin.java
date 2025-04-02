@@ -181,6 +181,13 @@ public interface Admin {
       responseBuilder.entity(entity);
       return new GetAdminFailedImportsResponse(responseBuilder.build(), entity);
     }
+
+    public static GetAdminFailedImportsResponse respond400WithApplicationJson(
+        BadRequestError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(400).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetAdminFailedImportsResponse(responseBuilder.build(), entity);
+    }
   }
 
   class GetAdminListBrokenResponse extends ResponseDelegate {
@@ -296,6 +303,13 @@ public interface Admin {
     public static GetAdminDatasetDetailsResponse respond200WithApplicationJson(
         InternalDatasetDetails entity) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetAdminDatasetDetailsResponse(responseBuilder.build(), entity);
+    }
+
+    public static GetAdminDatasetDetailsResponse respond400WithApplicationJson(
+        BadRequestError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(400).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetAdminDatasetDetailsResponse(responseBuilder.build(), entity);
     }

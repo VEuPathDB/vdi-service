@@ -135,6 +135,8 @@ displayName: Service Admin
     responses:
       200:
         body: lib.BrokenImportListing
+      400:
+        body: lib.BadRequestError
 
 /list-broken:
   displayName: Broken Installs
@@ -229,6 +231,8 @@ displayName: Service Admin
     responses:
       200:
         body: lib.InternalDatasetDetails
+      400:
+        body: lib.BadRequestError
 
 /list-s3-objects:
   get:

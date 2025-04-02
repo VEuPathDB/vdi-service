@@ -11,7 +11,7 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import vdi.component.db.cache.withTransaction
 
-internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequest) {
+internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequestBody) {
   val cacheDB = vdi.component.db.cache.CacheDB()
 
   val dataset = cacheDB.selectDataset(datasetID)

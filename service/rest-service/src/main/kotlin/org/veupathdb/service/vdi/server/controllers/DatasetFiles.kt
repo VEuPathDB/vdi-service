@@ -6,13 +6,18 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdFiles
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdFiles.*
+import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdiIdFiles
 import org.veupathdb.service.vdi.genx.model.NotFoundError
 import org.veupathdb.service.vdi.service.dataset.*
 import org.veupathdb.vdi.lib.common.field.toDatasetIDOrNull
 import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated(adminOverride = ALLOW_ALWAYS)
-class DatasetFiles(@Context request: ContainerRequest) : DatasetsVdiIdFiles, ControllerBase(request) {
+class DatasetFiles(@Context request: ContainerRequest)
+  : DatasetsVdiIdFiles
+  , VdiDatasetsVdiIdFiles // DEPRECATED API
+  , ControllerBase(request)
+{
 
   override fun getDatasetsFilesByVdiId(vdId: String): GetDatasetsFilesByVdiIdResponse {
     val datasetID = vdId.toDatasetIDOrNull()
@@ -63,5 +68,23 @@ class DatasetFiles(@Context request: ContainerRequest) : DatasetsVdiIdFiles, Con
           .headersFor200()
           .withContentDisposition("attachment; filename=\"$datasetID-data.zip\"")
       )
+  }
+
+  // DEPRECATED API
+  // DEPRECATED API
+  // DEPRECATED API
+  // DEPRECATED API
+
+  override fun getVdiDatasetsFilesByVdiId(vdiId: String): VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesByVdiIdResponse {
+    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesByVdiIdResponse::class.java.c
+    TODO("Not yet implemented")
+  }
+
+  override fun getVdiDatasetsFilesUploadByVdiId(vdiId: String): VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesUploadByVdiIdResponse {
+    TODO("Not yet implemented")
+  }
+
+  override fun getVdiDatasetsFilesDataByVdiId(vdiId: String): VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesDataByVdiIdResponse {
+    TODO("Not yet implemented")
   }
 }

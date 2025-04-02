@@ -1,10 +1,8 @@
 package org.veupathdb.service.vdi.server.controllers
 
 import jakarta.ws.rs.BadRequestException
-import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.core.StreamingOutput
 import kotlinx.coroutines.runBlocking
-import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
@@ -17,6 +15,7 @@ import org.veupathdb.service.vdi.service.admin.*
 import org.veupathdb.service.vdi.service.dataset.createDataset
 import org.veupathdb.service.vdi.service.dataset.listInstallFailedDatasets
 import org.veupathdb.service.vdi.util.fixVariableDateString
+import org.veupathdb.service.vdi.util.logger
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toDatasetID
@@ -38,8 +37,6 @@ private const val biQueryOffsetDefault = 0
 @AdminRequired
 @Authenticated(adminOverride = ALLOW_ALWAYS)
 class AdminRPC : Admin {
-  private val log = LoggerFactory.getLogger(javaClass)
-
   override fun getAdminListBroken(expanded: Boolean?): GetAdminListBrokenResponse {
     return GetAdminListBrokenResponse
       .respond200WithApplicationJson(listInstallFailedDatasets(expanded ?: true))
@@ -62,7 +59,7 @@ class AdminRPC : Admin {
     entity: InstallCleanupRequestBody?
   ): PostAdminFixBrokenInstallsResponse {
     if (entity == null)
-      throw BadRequestException()
+      return PostAdminFixBrokenInstallsResponse.respond400WithApplicationJson(BadRequestError("empty request body"))
 
     if (entity.all == true) {
       InstallCleaner.cleanAll()
@@ -82,29 +79,29 @@ class AdminRPC : Admin {
     return PostAdminDeleteCleanupResponse.respond204()
   }
 
-  override fun getAdminDatasetDetails(datasetId: String?): GetAdminDatasetDetailsResponse {
-    if (datasetId == null) {
-      throw BadRequestException("no target dataset ID provided")
-    }
+  override fun getAdminDatasetDetails(datasetId: String?) =
+    if (datasetId == null)
+      GetAdminDatasetDetailsResponse.respond400WithApplicationJson(BadRequestError("no target dataset ID provided"))!!
+    else
+      GetAdminDatasetDetailsResponse.respond200WithApplicationJson(InternalDatasetDetails(getDatasetDetails(DatasetID(datasetId))))!!
 
-    return GetAdminDatasetDetailsResponse.respond200WithApplicationJson(InternalDatasetDetails(getDatasetDetails(DatasetID(datasetId))))
-  }
-
-  override fun postAdminProxyUpload(userID: Long?, entity: DatasetPostRequestBody?): PostAdminProxyUploadResponse {
-    if (userID == null)
-      throw BadRequestException("no target user ID provided")
+  override fun postAdminProxyUpload(userIDRaw: Long?, entity: DatasetPostRequestBody?): PostAdminProxyUploadResponse {
+    if (userIDRaw == null)
+      return PostAdminProxyUploadResponse.respond400WithApplicationJson(BadRequestError("no target user ID provided"))
 
     with(entity ?: throw BadRequestException()) {
       cleanup()
-      validate()
-        .throwIfNotEmpty()
+      validate().let {
+        if (it.isNotEmpty)
+          return PostAdminProxyUploadResponse.respond422WithApplicationJson(UnprocessableEntityError(it))
+      }
     }
 
-    val userID = UserID(userID)
+    val userID = UserID(userIDRaw)
 
     with (UserProvider.getUsersById(listOf(userID.toLong()))) {
       if (isEmpty() || get(userID.toLong())?.isGuest != false)
-        throw ForbiddenException("target user does not exist or is a guest user")
+        return PostAdminProxyUploadResponse.respond403WithApplicationJson(ForbiddenError("target user does not exist or is a guest user"))
     }
 
     val datasetID = DatasetID()
@@ -125,21 +122,33 @@ class AdminRPC : Admin {
     order: String?,
   ): GetAdminFailedImportsResponse {
     if (limit != null && limit < biQueryLimitMinimum)
-      throw BadRequestException("invalid limit value")
+      return GetAdminFailedImportsResponse.respond400WithApplicationJson(BadRequestError("invalid limit value"))
 
     if (offset != null && offset < biQueryOffsetMinimum)
-      throw BadRequestException("invalid offset value")
+      return GetAdminFailedImportsResponse.respond400WithApplicationJson(BadRequestError("invalid offset value"))
 
-    val query = BrokenImportListQuery().also {
-      it.userID = user?.toUserID()
-      it.before = before?.let { fixVariableDateString(it) { BadRequestException("invalid before date value") } }
-      it.after  = after?.let { fixVariableDateString(it) { BadRequestException("invalid after date value") } }
-      limit?.toUInt()?.let { lim -> it.limit = lim }
-      it.offset = offset?.toUInt() ?: biQueryOffsetDefault.toUInt()
-      sort?.let { s -> it.sortBy = BrokenImportListQuery.SortField.fromStringOrNull(s)
-        ?: throw BadRequestException("invalid sort by value") }
-      order?.let { o -> it.order = SortOrder.fromStringOrNull(o)
-        ?: throw BadRequestException("invalid sort order value") }
+    val query = BrokenImportListQuery().also { q ->
+      q.userID = user?.toUserID()
+
+      q.before = before?.let {
+        fixVariableDateString(it)
+          ?: return GetAdminFailedImportsResponse.respond400WithApplicationJson(BadRequestError("invalid before date value"))
+      }
+
+      q.after  = after?.let {
+        fixVariableDateString(it)
+          ?: return GetAdminFailedImportsResponse.respond400WithApplicationJson(BadRequestError("invalid after date value"))
+      }
+
+      limit?.toUInt()?.let { lim -> q.limit = lim }
+
+      q.offset = offset?.toUInt() ?: biQueryOffsetDefault.toUInt()
+
+      sort?.let { s -> q.sortBy = BrokenImportListQuery.SortField.fromStringOrNull(s)
+        ?: return GetAdminFailedImportsResponse.respond400WithApplicationJson(BadRequestError("invalid sort by value")) }
+
+      order?.let { o -> q.order = SortOrder.fromStringOrNull(o)
+        ?: return GetAdminFailedImportsResponse.respond400WithApplicationJson(BadRequestError("invalid sort order value")) }
     }
 
     val broken = CacheDB().selectBrokenDatasetImports(query)
@@ -165,7 +174,7 @@ class AdminRPC : Admin {
     val validUserID = json.userId.toUserID()
     val validDatasetID = json.datasetId.toDatasetID()
 
-    log.info("attempting to purge dataset {}/{}", validUserID, validDatasetID)
+    logger.info("attempting to purge dataset {}/{}", validUserID, validDatasetID)
 
     purgeDataset(validUserID, validDatasetID)
 
@@ -177,13 +186,11 @@ class AdminRPC : Admin {
     limit: Int?,
     projectId: String?,
     includeDeleted: Boolean?,
-  ): GetAdminListAllDatasetsResponse {
-    return GetAdminListAllDatasetsResponse
-      .respond200WithApplicationJson(listAllDatasets(offset, limit, projectId, includeDeleted))
-  }
+  ) =
+    GetAdminListAllDatasetsResponse
+      .respond200WithApplicationJson(listAllDatasets(offset, limit, projectId, includeDeleted))!!
 
-  override fun getAdminListS3Objects(): GetAdminListS3ObjectsResponse {
-    return GetAdminListS3ObjectsResponse
-      .respond200WithTextPlain(StreamingOutput { out -> out.use { listAllS3Objects().transferTo(it) } })
-  }
+  override fun getAdminListS3Objects() =
+    GetAdminListS3ObjectsResponse
+      .respond200WithTextPlain(StreamingOutput { out -> out.use { listAllS3Objects().transferTo(it) } })!!
 }
