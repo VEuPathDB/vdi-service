@@ -2,7 +2,7 @@ import org.veupathdb.lib.gradle.container.util.Logger.Level
 
 plugins {
   kotlin("jvm")
-  id("org.veupathdb.lib.gradle.container.container-utils") version "5.0.5"
+  id("org.veupathdb.lib.gradle.container.container-utils") version "6.1.0"
 }
 
 // configure VEupathDB container plugin
