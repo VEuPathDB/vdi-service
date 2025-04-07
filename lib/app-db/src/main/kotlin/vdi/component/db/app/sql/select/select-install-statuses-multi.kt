@@ -1,12 +1,15 @@
 package vdi.component.db.app.sql.select
 
+import io.foxcapades.kdbc.forEach
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.app.model.InstallStatuses
 import vdi.component.db.app.model.InstallType
-import vdi.component.db.app.sql.getDatasetID
 import vdi.component.db.app.sql.getInstallStatus
 import vdi.component.db.app.sql.getInstallType
-import vdi.component.db.app.sql.setDatasetID
+import vdi.component.db.jdbc.getDatasetID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 import kotlin.math.max
 import kotlin.math.min
@@ -55,37 +58,35 @@ internal fun Connection.selectInstallStatuses(
 
     sb.append(SQL_GET_STATUSES_SUFFIX)
 
-    prepareStatement(sb.toString()).use { ps ->
+    withPreparedStatement(sb.toString()) {
       for (j in 0 until limit)
-        ps.setDatasetID(j + 1, list[j + offset])
+        setDatasetID(j + 1, list[j + offset])
 
-      ps.executeQuery().use { rs ->
-        while (rs.next()) {
-          val datasetID = rs.getDatasetID("dataset_id")
-          val type      = rs.getInstallType("install_type")
-          val status    = rs.getInstallStatus("status")
-          val message   = rs.getString("message")
+      withResults { forEach {
+        val datasetID = getDatasetID("dataset_id")
+        val type      = getInstallType("install_type")
+        val status    = getInstallStatus("status")
+        val message   = getString("message")
 
-          if (datasetID in result) {
-            when (type) {
-              InstallType.Meta -> result[datasetID]!!.apply {
-                meta = status
-                metaMessage = message
-              }
-
-              InstallType.Data -> result[datasetID]!!.apply {
-                data = status
-                dataMessage = message
-              }
+        if (datasetID in result) {
+          when (type) {
+            InstallType.Meta -> result[datasetID]!!.apply {
+              meta = status
+              metaMessage = message
             }
-          } else {
-            result[datasetID] = when (type) {
-              InstallType.Meta -> InstallStatuses(meta = status, metaMessage = message)
-              InstallType.Data -> InstallStatuses(data = status, dataMessage = message)
+
+            InstallType.Data -> result[datasetID]!!.apply {
+              data = status
+              dataMessage = message
             }
           }
+        } else {
+          result[datasetID] = when (type) {
+            InstallType.Meta -> InstallStatuses(meta = status, metaMessage = message)
+            InstallType.Data -> InstallStatuses(data = status, dataMessage = message)
+          }
         }
-      }
+      } }
     }
   }
 

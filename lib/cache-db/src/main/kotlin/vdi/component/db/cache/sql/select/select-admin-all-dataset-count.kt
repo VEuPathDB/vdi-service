@@ -1,8 +1,8 @@
 package vdi.component.db.cache.sql.select
 
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import vdi.component.db.cache.query.AdminAllDatasetsQuery
-import vdi.component.db.cache.util.withPreparedStatement
-import vdi.component.db.cache.util.withResults
 import java.sql.Connection
 import java.sql.Types
 

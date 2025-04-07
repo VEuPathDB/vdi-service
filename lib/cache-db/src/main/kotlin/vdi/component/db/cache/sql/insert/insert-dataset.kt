@@ -1,10 +1,10 @@
 package vdi.component.db.cache.sql.insert
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import vdi.component.db.cache.model.Dataset
-import vdi.component.db.cache.util.preparedUpdate
-import vdi.component.db.cache.util.setDataType
-import vdi.component.db.cache.util.setDatasetID
-import vdi.component.db.cache.util.setUserID
+import vdi.component.db.jdbc.setDataType
+import vdi.component.db.jdbc.setDatasetID
+import vdi.component.db.jdbc.setUserID
 import java.sql.Connection
 
 // language=postgresql
@@ -27,7 +27,7 @@ ON CONFLICT (dataset_id)
 """
 
 internal fun Connection.tryInsertDatasetRecord(row: Dataset) =
-  preparedUpdate(SQL) {
+  withPreparedUpdate(SQL) {
     setDatasetID(1, row.datasetID)
     setDataType(2, row.typeName)
     setString(3, row.typeVersion)

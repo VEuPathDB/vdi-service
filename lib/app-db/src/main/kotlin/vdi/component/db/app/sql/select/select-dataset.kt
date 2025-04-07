@@ -1,8 +1,14 @@
 package vdi.component.db.app.sql.select
 
+import io.foxcapades.kdbc.usingResults
+import io.foxcapades.kdbc.withPreparedStatement
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.app.model.DatasetRecord
 import vdi.component.db.app.sql.*
+import vdi.component.db.jdbc.getDataType
+import vdi.component.db.jdbc.getDatasetID
+import vdi.component.db.jdbc.getUserID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -21,21 +27,21 @@ WHERE
   dataset_id = ?
 """
 
-internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): DatasetRecord? {
-  prepareStatement(sql(schema)).use { ps ->
-    ps.setDatasetID(1, datasetID)
-    ps.executeQuery().use { rs ->
-      if (!rs.next())
-        return null
+internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): DatasetRecord? =
+  withPreparedStatement(sql(schema)) {
+    setDatasetID(1, datasetID)
 
-      return DatasetRecord(
-        datasetID   = rs.getDatasetID("dataset_id"),
-        owner       = rs.getUserID("owner"),
-        typeName    = rs.getDataType("type_name"),
-        typeVersion = rs.getString("type_version"),
-        isDeleted   = rs.getDeleteFlag("is_deleted"),
-        isPublic    = rs.getBoolean("is_public")
-      )
+    usingResults { rs ->
+      if (!rs.next())
+        null
+      else
+        DatasetRecord(
+          datasetID   = rs.getDatasetID("dataset_id"),
+          owner       = rs.getUserID("owner"),
+          typeName    = rs.getDataType("type_name"),
+          typeVersion = rs.getString("type_version"),
+          isDeleted   = rs.getDeleteFlag("is_deleted"),
+          isPublic    = rs.getBoolean("is_public")
+        )
     }
   }
-}

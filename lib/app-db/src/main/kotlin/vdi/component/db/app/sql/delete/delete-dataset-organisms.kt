@@ -1,7 +1,7 @@
 package vdi.component.db.app.sql.delete
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.app.sql.preparedUpdate
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -14,4 +14,4 @@ WHERE
 """
 
 internal fun Connection.deleteDatasetOrganisms(schema: String, datasetID: DatasetID) =
-  preparedUpdate(sql(schema)) { setString(1, datasetID.toString()) }
+  withPreparedUpdate(sql(schema)) { setString(1, datasetID.toString()) }

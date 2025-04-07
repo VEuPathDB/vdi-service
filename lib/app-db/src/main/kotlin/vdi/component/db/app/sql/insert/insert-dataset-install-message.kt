@@ -1,7 +1,10 @@
 package vdi.component.db.app.sql.insert
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import vdi.component.db.app.model.DatasetInstallMessage
 import vdi.component.db.app.sql.*
+import vdi.component.db.jdbc.setDatasetID
+import vdi.component.db.jdbc.setDateTime
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -20,7 +23,7 @@ VALUES
 """
 
 internal fun Connection.insertDatasetInstallMessage(schema: String, message: DatasetInstallMessage) {
-  preparedUpdate(sql(schema)) {
+  withPreparedUpdate(sql(schema)) {
     setDatasetID(1, message.datasetID)
     setInstallType(2, message.installType)
     setInstallStatus(3, message.status)

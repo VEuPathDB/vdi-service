@@ -6,6 +6,7 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import vdi.component.db.cache.model.*
 import vdi.component.db.cache.sql.delete.*
@@ -35,70 +36,74 @@ internal class CacheDBTransactionImpl(private val connection: Connection) : Cach
   // region Delete
 
   override fun deleteShareOffer(datasetID: DatasetID, recipientID: UserID) {
-    log.debug("deleting share offer record for dataset {}, recipient {}", datasetID, recipientID)
-    con.deleteShareOffer(datasetID, recipientID)
+    if (con.deleteShareOffer(datasetID, recipientID))
+      log.debug("deleted share offer for dataset {}, recipient {}", datasetID, recipientID)
   }
 
   override fun deleteShareReceipt(datasetID: DatasetID, recipientID: UserID) {
-    log.debug("deleting share receipt record for dataset {}, recipient {}", datasetID, recipientID)
-    con.deleteShareReceipt(datasetID, recipientID)
+    if (con.deleteShareReceipt(datasetID, recipientID))
+      log.debug("deleted share receipt for dataset {}, recipient {}", datasetID, recipientID)
   }
 
   override fun deleteDatasetMetadata(datasetID: DatasetID) {
-    log.debug("deleting dataset metadata for dataset {}", datasetID)
-    con.deleteDatasetMetadata(datasetID)
+    if (con.deleteDatasetMetadata(datasetID))
+      log.debug("deleted metadata for dataset {}", datasetID)
   }
 
   override fun deleteDatasetProjects(datasetID: DatasetID) {
-    log.debug("deleting dataset project links for dataset {}", datasetID)
-    con.deleteDatasetProjects(datasetID)
+    if (con.deleteDatasetProjects(datasetID) > 0)
+      log.debug("deleted project links for dataset {}", datasetID)
   }
 
   override fun deleteDatasetShareOffers(datasetID: DatasetID) {
-    log.debug("deleting dataset share offers for dataset {}", datasetID)
-    con.deleteDatasetShareOffers(datasetID)
+    val count = con.deleteDatasetShareOffers(datasetID)
+    if (count > 0)
+      log.debug("deleted {} share offers for dataset {}", count, datasetID)
   }
 
   override fun deleteDatasetShareReceipts(datasetID: DatasetID) {
-    log.debug("deleting dataset share receipts for dataset {}", datasetID)
-    con.deleteDatasetShareReceipts(datasetID)
+    val count = con.deleteDatasetShareReceipts(datasetID)
+    if (count > 0)
+      log.debug("deleted {} share receipts for dataset {}", count, datasetID)
   }
 
   override fun deleteDataset(datasetID: DatasetID) {
-    log.debug("deleting dataset {}", datasetID)
-    con.deleteDataset(datasetID)
+    if (con.deleteDataset(datasetID))
+      log.info("deleted dataset record for {}", datasetID)
   }
 
   override fun deleteImportControl(datasetID: DatasetID) {
-    log.debug("deleting import control record for dataset {}", datasetID)
-    con.deleteImportControl(datasetID)
+    if (con.deleteImportControl(datasetID) > 0)
+      log.debug("deleted import control record for dataset {}", datasetID)
   }
 
   override fun deleteImportMessages(datasetID: DatasetID) {
-    log.debug("deleting import messages for dataset {}", datasetID)
-    con.deleteImportMessages(datasetID)
+    if (con.deleteImportMessages(datasetID) > 0)
+      log.debug("deleted import messages for dataset {}", datasetID)
   }
 
   override fun deleteSyncControl(datasetID: DatasetID) {
-    log.debug("deleting sync control record for dataset {}", datasetID)
-    con.deleteSyncControl(datasetID)
+    if (con.deleteSyncControl(datasetID) > 0)
+      log.debug("deleted sync control record for dataset {}", datasetID)
   }
 
   override fun deleteInstallFiles(datasetID: DatasetID) {
-    log.debug("deleting install files for dataset {}", datasetID)
-    con.deleteInstallFiles(datasetID)
+    if (con.deleteInstallFiles(datasetID) > 0)
+      log.debug("deleted install files for dataset {}", datasetID)
   }
 
   override fun deleteUploadFiles(datasetID: DatasetID) {
-    log.debug("deleting upload files for dataset {}", datasetID)
-    con.deleteUploadFiles(datasetID)
+    if (con.deleteUploadFiles(datasetID) > 0)
+      log.debug("deleting upload files for dataset {}", datasetID)
+  }
+
+  override fun deleteRevisions(originalID: DatasetID) {
+    val count = con.deleteDatasetRevisions(originalID)
+    if (count > 0)
+      log.debug("deleted {} revisions for dataset {}", count, originalID)
   }
 
   // endregion Delete
-
-  // region Insert
-
-  // endregion Insert
 
   // region Try-Insert
 
@@ -140,6 +145,17 @@ internal class CacheDBTransactionImpl(private val connection: Connection) : Cach
   override fun tryInsertImportMessages(datasetID: DatasetID, messages: String) {
     if (con.tryInsertImportMessages(datasetID, messages) > 0)
       log.debug("inserted import messages for dataset {}", datasetID)
+  }
+
+  override fun tryInsertRevisionLink(originalID: DatasetID, revision: VDIDatasetRevision) {
+    if (con.tryInsertDatasetRevision(originalID, revision) > 0)
+      log.debug("inserted revision link from dataset {} to revision {}", originalID, revision.revisionID)
+  }
+
+  override fun tryInsertRevisionLinks(originalID: DatasetID, revisions: Iterable<VDIDatasetRevision>) {
+    val count = con.tryInsertDatasetRevisions(originalID, revisions)
+    if (count > 0)
+      log.debug("inserted {} revision links for dataset {}", count, originalID)
   }
 
   // endregion Try-Insert

@@ -1,17 +1,17 @@
 package org.veupathdb.service.vdi.server.controllers
 
+import jakarta.ws.rs.NotFoundException
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
-import org.veupathdb.service.vdi.generated.model.BadRequestError
-import org.veupathdb.service.vdi.generated.model.DatasetDetails
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequestBody
 import org.veupathdb.service.vdi.generated.model.DatasetPutRequestBody
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiId
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiId.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdiId
 import org.veupathdb.service.vdi.genx.model.BadRequestError
+import org.veupathdb.service.vdi.genx.model.NotFoundError
 import org.veupathdb.service.vdi.service.dataset.*
 import org.veupathdb.vdi.lib.common.field.toUserID
 
@@ -22,14 +22,25 @@ class DatasetByID(@Context request: ContainerRequest)
   , ControllerBase(request)
 {
   @Authenticated(adminOverride = ALLOW_ALWAYS)
-  override fun getDatasetsByVdiId(vdiID: String): GetDatasetsByVdiIdResponse {
-    val userID = maybeUserID
-      ?: return GetDatasetsByVdiIdResponse
-        .respond200WithApplicationJson(adminGetDatasetByID(vdiID.asVDIID()))
+  override fun getDatasetsByVdiId(rawID: String): GetDatasetsByVdiIdResponse =
+    rawID.asVDIID().let { vdiID ->
+      try {
+        when (val userID = maybeUserID) {
+          null -> GetDatasetsByVdiIdResponse
+            .respond200WithApplicationJson(adminGetDatasetByID(vdiID))
 
-    return GetDatasetsByVdiIdResponse
-      .respond200WithApplicationJson(getDatasetByID(userID.toUserID(), vdiID.asVDIID()))
-  }
+          else -> GetDatasetsByVdiIdResponse
+            .respond200WithApplicationJson(getDatasetByID(userID.toUserID(), vdiID))
+        }
+      } catch (e: NotFoundException) {
+        getLatestRevision(vdiID)?.let {
+          GetDatasetsByVdiIdResponse.respond301(
+            GetDatasetsByVdiIdResponse.headersFor301()
+              .withLocation(redirectURL(it))
+          )
+        } ?: GetDatasetsByVdiIdResponse.respond404WithApplicationJson(NotFoundError())
+      }
+    }
 
   override fun patchDatasetsByVdiId(vdiID: String, entity: DatasetPatchRequestBody?): PatchDatasetsByVdiIdResponse {
     updateDatasetMeta(

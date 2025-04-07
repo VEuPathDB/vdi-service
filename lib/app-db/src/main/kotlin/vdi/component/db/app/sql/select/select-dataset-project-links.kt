@@ -1,8 +1,11 @@
 package vdi.component.db.app.sql.select
 
+import io.foxcapades.kdbc.map
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.app.model.DatasetProjectLinkRecord
-import vdi.component.db.app.sql.setDatasetID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -16,21 +19,15 @@ WHERE
   dataset_id = ?
 """
 
-internal fun Connection.selectDatasetProjectLinks(schema: String, datasetID: DatasetID): List<DatasetProjectLinkRecord> =
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setDatasetID(1, datasetID)
-      ps.executeQuery()
-        .use { rs ->
-          val out = ArrayList<DatasetProjectLinkRecord>()
-
-          while (rs.next()) {
-            out.add(DatasetProjectLinkRecord(
-              datasetID = datasetID,
-              projectID = rs.getString("project_id")
-            ))
-          }
-
-          out
-        }
+internal fun Connection.selectDatasetProjectLinks(schema: String, datasetID: DatasetID) =
+  withPreparedStatement(sql(schema)) {
+    setDatasetID(1, datasetID)
+    withResults {
+      map {
+        DatasetProjectLinkRecord(
+          datasetID = datasetID,
+          projectID = it.getString("project_id")
+        )
+      }
     }
+  }

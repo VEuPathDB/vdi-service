@@ -1,9 +1,9 @@
 package vdi.component.db.cache.sql.update
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.cache.util.preparedUpdate
-import vdi.component.db.cache.util.setDatasetID
-import vdi.component.db.cache.util.setDateTime
+import vdi.component.db.jdbc.setDatasetID
+import vdi.component.db.jdbc.setDateTime
 import java.sql.Connection
 import java.time.OffsetDateTime
 
@@ -37,7 +37,7 @@ WHERE
  * that was already set in the existing sync control record.
  */
 internal fun Connection.updateSyncControlData(datasetID: DatasetID, timestamp: OffsetDateTime) =
-  preparedUpdate(SQL) {
+  withPreparedUpdate(SQL) {
     setDateTime(1, timestamp)
     setDatasetID(2, datasetID)
     setDateTime(3, timestamp)

@@ -1,9 +1,9 @@
 package vdi.component.db.app.sql.update
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.app.sql.preparedUpdate
-import vdi.component.db.app.sql.setDatasetID
-import vdi.component.db.app.sql.setDateTime
+import vdi.component.db.jdbc.setDatasetID
+import vdi.component.db.jdbc.setDateTime
 import java.sql.Connection
 import java.time.OffsetDateTime
 
@@ -23,7 +23,7 @@ internal fun Connection.updateSyncControlMetaTimestamp(
   datasetID: DatasetID,
   timestamp: OffsetDateTime
 ) {
-  preparedUpdate(sql(schema)) {
+  withPreparedUpdate(sql(schema)) {
     setDateTime(1, timestamp)
     setDatasetID(2, datasetID)
   }

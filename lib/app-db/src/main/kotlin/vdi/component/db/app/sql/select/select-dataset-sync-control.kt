@@ -1,9 +1,11 @@
 package vdi.component.db.app.sql.select
 
+import io.foxcapades.kdbc.get
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import vdi.component.db.app.sql.getDateTime
-import vdi.component.db.app.sql.setDatasetID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -19,20 +21,19 @@ WHERE
   dataset_id = ?
 """
 
-internal fun Connection.selectSyncControl(schema: String, datasetID: DatasetID): VDISyncControlRecord? {
-  prepareStatement(sql(schema)).use { ps ->
-    ps.setDatasetID(1, datasetID)
+internal fun Connection.selectSyncControl(schema: String, datasetID: DatasetID) =
+  withPreparedStatement(sql(schema)) {
+    setDatasetID(1, datasetID)
 
-    ps.executeQuery().use { rs ->
-      if (!rs.next())
-        return null
-
-      return VDISyncControlRecord(
-        datasetID     = datasetID,
-        sharesUpdated = rs.getDateTime("shares_update_time"),
-        dataUpdated   = rs.getDateTime("data_update_time"),
-        metaUpdated   = rs.getDateTime("meta_update_time"),
-      )
+    withResults {
+      if (!next())
+        null
+      else
+        VDISyncControlRecord(
+          datasetID     = datasetID,
+          sharesUpdated = get("shares_update_time"),
+          dataUpdated   = get("data_update_time"),
+          metaUpdated   = get("meta_update_time"),
+        )
     }
   }
-}

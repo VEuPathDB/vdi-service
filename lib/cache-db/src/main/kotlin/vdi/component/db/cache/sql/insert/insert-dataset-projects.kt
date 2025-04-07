@@ -1,8 +1,9 @@
 package vdi.component.db.cache.sql.insert
 
+import io.foxcapades.kdbc.withPreparedBatchUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.cache.util.setDatasetID
-import vdi.component.db.cache.util.withPreparedStatement
+import org.veupathdb.vdi.lib.common.field.ProjectID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -18,13 +19,8 @@ ON CONFLICT (dataset_id, project_id)
   DO NOTHING
 """
 
-internal fun Connection.tryInsertDatasetProjects(datasetID: DatasetID, projects: Iterable<String>) =
-  withPreparedStatement(SQL) {
-    for (project in projects) {
-      setDatasetID(1, datasetID)
-      setString(2, project)
-      addBatch()
-    }
-
-    executeBatch().reduce(Int::plus)
-  }
+internal fun Connection.tryInsertDatasetProjects(datasetID: DatasetID, projects: Iterable<ProjectID>) =
+  withPreparedBatchUpdate(SQL, projects) {
+    setDatasetID(1, datasetID)
+    setString(2, it)
+  }.reduce(Int::plus)

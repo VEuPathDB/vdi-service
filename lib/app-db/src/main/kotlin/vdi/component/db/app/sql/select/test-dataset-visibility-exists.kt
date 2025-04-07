@@ -1,9 +1,11 @@
 package vdi.component.db.app.sql.select
 
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.app.sql.setDatasetID
-import vdi.component.db.app.sql.setUserID
+import vdi.component.db.jdbc.setDatasetID
+import vdi.component.db.jdbc.setUserID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -19,9 +21,8 @@ WHERE
 """
 
 internal fun Connection.testDatasetVisibilityExists(schema: String, datasetID: DatasetID, userID: UserID): Boolean =
-  prepareStatement(sql(schema))
-    .use { ps ->
-      ps.setDatasetID(1, datasetID)
-      ps.setUserID(2, userID)
-      ps.executeQuery().use { rs -> rs.next() }
-    }
+  withPreparedStatement(sql(schema)) {
+    setDatasetID(1, datasetID)
+    setUserID(2, userID)
+    withResults { next() }
+  }

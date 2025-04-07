@@ -1,13 +1,15 @@
 package vdi.component.db.app.sql.select
 
+import io.foxcapades.kdbc.get
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.app.model.DatasetInstallMessage
 import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallType
-import vdi.component.db.app.sql.setDatasetID
 import vdi.component.db.app.sql.setInstallType
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
-import java.time.OffsetDateTime
 
 private fun sql(schema: String) =
 // language=oracle
@@ -27,22 +29,21 @@ internal fun Connection.selectDatasetInstallMessage(
   schema: String,
   datasetID: DatasetID,
   installType: InstallType
-): DatasetInstallMessage? {
-  prepareStatement(sql(schema)).use { ps ->
-    ps.setDatasetID(1, datasetID)
-    ps.setInstallType(2, installType)
+) =
+  withPreparedStatement(sql(schema)) {
+    setDatasetID(1, datasetID)
+    setInstallType(2, installType)
 
-    ps.executeQuery().use { rs ->
-      if (!rs.next())
-        return null
-
-      return DatasetInstallMessage(
-        datasetID   = datasetID,
-        installType = installType,
-        status      = InstallStatus.fromString(rs.getString("status")),
-        message     = rs.getString("message"),
-        updated     = rs.getObject("updated", OffsetDateTime::class.java),
-      )
+    withResults {
+      if (!next())
+        null
+      else
+        DatasetInstallMessage(
+          datasetID   = datasetID,
+          installType = installType,
+          status      = InstallStatus.fromString(get("status")),
+          message     = get("message"),
+          updated     = get("updated"),
+        )
     }
   }
-}

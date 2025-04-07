@@ -1,10 +1,10 @@
 package vdi.component.db.app.sql.update
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.app.model.DeleteFlag
-import vdi.component.db.app.sql.preparedUpdate
-import vdi.component.db.app.sql.setDatasetID
 import vdi.component.db.app.sql.setDeleteFlag
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -19,7 +19,7 @@ WHERE
 """
 
 internal fun Connection.updateDatasetDeletedFlag(schema: String, datasetID: DatasetID, deleteFlag: DeleteFlag) {
-  preparedUpdate(sql(schema)) {
+  withPreparedUpdate(sql(schema)) {
     setDeleteFlag(1, deleteFlag)
     setDatasetID(2, datasetID)
   }

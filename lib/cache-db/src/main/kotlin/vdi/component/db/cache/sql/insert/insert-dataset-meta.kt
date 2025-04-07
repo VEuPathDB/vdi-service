@@ -1,10 +1,10 @@
 package vdi.component.db.cache.sql.insert
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
-import vdi.component.db.cache.util.preparedUpdate
-import vdi.component.db.cache.util.setDatasetID
 import vdi.component.db.cache.util.setDatasetVisibility
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -28,7 +28,7 @@ ON CONFLICT (dataset_id)
 """
 
 internal fun Connection.tryInsertDatasetMeta(datasetID: DatasetID, meta: VDIDatasetMeta) =
-  preparedUpdate(SQL) {
+  withPreparedUpdate(SQL) {
     setDatasetID(1, datasetID)
     setDatasetVisibility(2, meta.visibility)
     setString(3, meta.name)

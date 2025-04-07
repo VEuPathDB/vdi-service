@@ -1,7 +1,7 @@
 package vdi.component.db.app.sql.upsert
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import vdi.component.db.app.model.DatasetInstallMessage
-import vdi.component.db.app.sql.preparedUpdate
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -24,7 +24,7 @@ ON CONFLICT (dataset_id, install_type) DO UPDATE SET
 """
 
 internal fun Connection.upsertDatasetInstallMessage(schema: String, message: DatasetInstallMessage) {
-  preparedUpdate(sql(schema)) {
+  withPreparedUpdate(sql(schema)) {
     setString(1, message.datasetID.toString())
     setString(2, message.installType.value)
     setString(3, message.status.value)

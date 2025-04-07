@@ -56,11 +56,14 @@ internal object CacheDBImpl: CacheDB {
     RemoteDependencies.register(DatabaseDependency(this))
   }
 
-  override fun selectDataset(datasetID: DatasetID) = connection.use { it.selectDataset(datasetID) }
+  override fun selectDataset(datasetID: DatasetID) =
+    connection.use { it.selectDataset(datasetID) }
 
-  override fun selectInstallFiles(datasetID: DatasetID) = connection.use { it.selectInstallFiles(datasetID) }
+  override fun selectInstallFiles(datasetID: DatasetID) =
+    connection.use { it.selectInstallFiles(datasetID) }
 
-  override fun selectUploadFiles(datasetID: DatasetID) = connection.use { it.selectUploadFiles(datasetID) }
+  override fun selectUploadFiles(datasetID: DatasetID) =
+    connection.use { it.selectUploadFiles(datasetID) }
 
   override fun selectAdminAllDatasetCount(query: AdminAllDatasetsQuery) =
     connection.use { it.selectAdminAllDatasetCount(query) }
@@ -83,28 +86,38 @@ internal object CacheDBImpl: CacheDB {
   override fun selectUploadFileSummaries(datasetIDs: List<DatasetID>) =
     connection.use { it.selectUploadFileSummaries(datasetIDs) }
 
-  override fun selectDatasetList(query: DatasetListQuery) = connection.use { it.selectDatasetList(query) }
+  override fun selectDatasetList(query: DatasetListQuery) =
+    connection.use { it.selectDatasetList(query) }
 
   override fun selectDatasetForUser(userID: UserID, datasetID: DatasetID) =
     connection.use { it.selectDatasetForUser(userID, datasetID) }
 
-  override fun selectUndeletedDatasetIDsForUser(userID: UserID) = connection.use { it.selectUndeletedDatasetIDsForUser(userID) }
+  override fun selectUndeletedDatasetIDsForUser(userID: UserID) =
+    connection.use { it.selectUndeletedDatasetIDsForUser(userID) }
 
-  override fun selectNonPrivateDatasets() = connection.use { it.selectNonPrivateDatasets() }
+  override fun selectNonPrivateDatasets() =
+    connection.use { it.selectNonPrivateDatasets() }
 
-  override fun selectSharesForDataset(datasetID: DatasetID) = connection.use { it.selectSharesFor(datasetID) }
+  override fun selectSharesForDataset(datasetID: DatasetID) =
+    connection.use { it.selectSharesFor(datasetID) }
 
-  override fun selectSharesForDatasets(datasetIDs: List<DatasetID>) = connection.use { it.selectSharesFor(datasetIDs) }
+  override fun selectSharesForDatasets(datasetIDs: List<DatasetID>) =
+    connection.use { it.selectSharesFor(datasetIDs) }
 
-  override fun selectImportControl(datasetID: DatasetID) = connection.use { it.selectImportControl(datasetID) }
+  override fun selectImportControl(datasetID: DatasetID) =
+    connection.use { it.selectImportControl(datasetID) }
 
-  override fun selectImportMessages(datasetID: DatasetID) = connection.use { it.selectImportMessages(datasetID) }
+  override fun selectImportMessages(datasetID: DatasetID) =
+    connection.use { it.selectImportMessages(datasetID) }
 
-  override fun selectSyncControl(datasetID: DatasetID) = connection.use { it.selectSyncControl(datasetID) }
+  override fun selectSyncControl(datasetID: DatasetID) =
+    connection.use { it.selectSyncControl(datasetID) }
 
-  override fun selectDeletedDatasets() = connection.use { it.selectDeletedDatasets() }
+  override fun selectDeletedDatasets() =
+    connection.use { it.selectDeletedDatasets() }
 
-  override fun selectOpenSharesForUser(recipientID: UserID) = connection.use { it.selectOpenSharesFor(recipientID) }
+  override fun selectOpenSharesForUser(recipientID: UserID) =
+    connection.use { it.selectOpenSharesFor(recipientID) }
 
   override fun selectAcceptedSharesForUser(recipientID: UserID) =
     connection.use { it.selectAcceptedSharesFor(recipientID) }
@@ -112,11 +125,21 @@ internal object CacheDBImpl: CacheDB {
   override fun selectRejectedSharesForUser(recipientID: UserID) =
     connection.use { it.selectRejectedSharesFor(recipientID) }
 
-  override fun selectAllSharesForUser(recipientID: UserID) = connection.use { it.selectAllSharesFor(recipientID) }
+  override fun selectAllSharesForUser(recipientID: UserID) =
+    connection.use { it.selectAllSharesFor(recipientID) }
 
-  override fun selectAllSyncControlRecords() = connection.selectAllSyncControl()
+  // NOTE: THE CALLER IS RESPONSIBLE FOR CLOSING THE CONNECTION!
+  override fun selectAllSyncControlRecords() =
+    connection.selectAllSyncControl()
 
-  override fun selectBrokenDatasetImports(query: BrokenImportListQuery) = connection.use { it.selectBrokenImports(query) }
+  override fun selectBrokenDatasetImports(query: BrokenImportListQuery) =
+    connection.use { it.selectBrokenImports(query) }
+
+  override fun selectLatestRevision(datasetID: DatasetID) =
+    connection.use { it.selectLatestDatasetRevision(datasetID) }
+
+  override fun selectRevisions(datasetID: DatasetID) =
+    connection.use { it.selectDatasetRevisions(datasetID) }
 
   override fun openTransaction() =
     CacheDBTransactionImpl(connection.apply { autoCommit = false })

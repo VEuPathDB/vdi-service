@@ -9,6 +9,14 @@ updates:
   open-pull-requests-limit: 20
   ignore:
   - dependency-name: org.gusdb:fgputil*
+  groups:
+    test-dependencies:
+      patterns:
+      - org.junit.*
+      - org.mockito.*
+    log4j:
+      patterns:
+      - org.apache.logging.*
 - package-ecosystem: docker
   directory: "/"
   schedule:

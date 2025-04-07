@@ -1,9 +1,9 @@
 package vdi.component.db.cache.sql.insert
 
+import io.foxcapades.kdbc.withPreparedBatchUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
-import vdi.component.db.cache.util.setDatasetID
-import vdi.component.db.cache.util.withPreparedStatement
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -17,15 +17,9 @@ ON CONFLICT
 """
 
 internal fun Connection.tryInsertInstallFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>) =
-  withPreparedStatement(SQL) {
+  withPreparedBatchUpdate(SQL, files) {
     setDatasetID(1, datasetID)
-
-    files.forEach {
-      setString(2, it.filename)
-      setLong(3, it.size.toLong())
-      addBatch()
-    }
-
-    executeBatch()
+    setString(2, it.filename)
+    setLong(3, it.size.toLong())
   }
     .reduce { a, b -> a + b }

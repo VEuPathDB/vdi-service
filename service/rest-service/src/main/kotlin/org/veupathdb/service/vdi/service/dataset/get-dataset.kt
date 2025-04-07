@@ -22,10 +22,9 @@ import vdi.component.plugin.mapping.PluginHandlers
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
  * return user information.
  */
-fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails {
-  return DatasetDetailsImpl()
+fun adminGetDatasetByID(datasetID: DatasetID): DatasetDetails =
+  DatasetDetailsImpl()
     .appendCommon(CacheDB().selectDataset(datasetID) ?: throw NotFoundException())
-}
 
 fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
   // Lookup dataset that is owned by or shared with the current user
@@ -70,6 +69,9 @@ fun getDatasetByID(userID: UserID, datasetID: DatasetID): DatasetDetails {
     }
   }.appendCommon(dataset)
 }
+
+internal fun getLatestRevision(datasetID: DatasetID) =
+  CacheDB().selectLatestRevision(datasetID)?.revisionID
 
 private fun requireDataset(userID: UserID, datasetID: DatasetID): DatasetRecord {
   var ds = CacheDB().selectDatasetForUser(userID, datasetID)

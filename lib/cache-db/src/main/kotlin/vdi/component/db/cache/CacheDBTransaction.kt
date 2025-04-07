@@ -92,6 +92,8 @@ interface CacheDBTransaction : AutoCloseable {
 
   fun deleteUploadFiles(datasetID: DatasetID)
 
+  fun deleteRevisions(originalID: DatasetID)
+
 
   fun tryInsertUploadFiles(datasetID: DatasetID, files: Iterable<VDIDatasetFileInfo>)
 
@@ -145,7 +147,9 @@ interface CacheDBTransaction : AutoCloseable {
 
   fun tryInsertImportMessages(datasetID: DatasetID, messages: String)
 
-  fun tryInsertRevisionLink(revision: VDIDatasetRevision)
+  fun tryInsertRevisionLink(originalID: DatasetID, revision: VDIDatasetRevision)
+
+  fun tryInsertRevisionLinks(originalID: DatasetID, revisions: Iterable<VDIDatasetRevision>)
 
   // endregion Try-Insert
 

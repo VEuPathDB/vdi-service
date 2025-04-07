@@ -1,9 +1,12 @@
 package vdi.component.db.app.sql.select
 
+import io.foxcapades.kdbc.map
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.app.model.DatasetVisibilityRecord
-import vdi.component.db.app.sql.getUserID
-import vdi.component.db.app.sql.setDatasetID
+import vdi.component.db.jdbc.getUserID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -21,15 +24,7 @@ internal fun Connection.selectDatasetVisibilityRecords(
   schema: String,
   datasetID: DatasetID
 ): List<DatasetVisibilityRecord> =
-  prepareStatement(sql(schema)).use { ps ->
-    ps.setDatasetID(1, datasetID)
-    ps.executeQuery().use { rs ->
-      val out = ArrayList<DatasetVisibilityRecord>()
-
-      while (rs.next()) {
-        out.add(DatasetVisibilityRecord(datasetID, rs.getUserID("user_id")))
-      }
-
-      out
-    }
+  withPreparedStatement(sql(schema)) {
+    setDatasetID(1, datasetID)
+    withResults { map { DatasetVisibilityRecord(datasetID, getUserID("user_id")) } }
   }

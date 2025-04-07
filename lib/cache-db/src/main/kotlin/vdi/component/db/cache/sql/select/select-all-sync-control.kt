@@ -6,7 +6,11 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.util.*
+import vdi.component.db.cache.util.getImportStatus
+import vdi.component.db.jdbc.getDataType
+import vdi.component.db.jdbc.getDatasetID
+import vdi.component.db.jdbc.getDateTime
+import vdi.component.db.jdbc.getUserID
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet

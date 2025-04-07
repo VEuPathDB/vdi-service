@@ -1,10 +1,10 @@
 package vdi.component.db.cache.sql.delete
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.util.preparedUpdate
-import vdi.component.db.cache.util.setDatasetID
-import vdi.component.db.cache.util.setUserID
+import vdi.component.db.jdbc.setDatasetID
+import vdi.component.db.jdbc.setUserID
 import java.sql.Connection
 
 // language=postgresql
@@ -17,7 +17,7 @@ WHERE
 """
 
 internal fun Connection.deleteShareOffer(datasetID: DatasetID, recipientID: UserID) =
-  preparedUpdate(SQL) {
+  withPreparedUpdate(SQL) {
     setDatasetID(1, datasetID)
     setUserID(2, recipientID)
-  }
+  } > 0

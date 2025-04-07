@@ -1,7 +1,11 @@
 package vdi.component.db.app.sql.update
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import vdi.component.db.app.model.DatasetRecord
 import vdi.component.db.app.sql.*
+import vdi.component.db.jdbc.setDataType
+import vdi.component.db.jdbc.setDatasetID
+import vdi.component.db.jdbc.setUserID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -20,7 +24,7 @@ WHERE
 """
 
 internal fun Connection.updateDataset(schema: String, dataset: DatasetRecord) {
-  preparedUpdate(sql(schema)) {
+  withPreparedUpdate(sql(schema)) {
     setUserID(1, dataset.owner)
     setDataType(2, dataset.typeName)
     setString(3, dataset.typeVersion)

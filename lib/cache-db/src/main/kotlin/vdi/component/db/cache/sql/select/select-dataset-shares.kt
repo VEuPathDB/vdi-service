@@ -1,10 +1,14 @@
 package vdi.component.db.cache.sql.select
 
+import io.foxcapades.kdbc.map
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import vdi.component.db.cache.model.DatasetShare
-import vdi.component.db.cache.util.*
+import vdi.component.db.jdbc.getUserID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 // language=postgresql

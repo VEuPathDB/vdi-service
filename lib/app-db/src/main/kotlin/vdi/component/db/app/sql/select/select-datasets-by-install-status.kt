@@ -1,10 +1,18 @@
 package vdi.component.db.app.sql.select
 
+import io.foxcapades.kdbc.map
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.component.db.app.model.DatasetRecord
 import vdi.component.db.app.model.InstallStatus
 import vdi.component.db.app.model.InstallType
-import vdi.component.db.app.sql.*
+import vdi.component.db.app.sql.getDeleteFlag
+import vdi.component.db.app.sql.setInstallStatus
+import vdi.component.db.app.sql.setInstallType
+import vdi.component.db.jdbc.getDataType
+import vdi.component.db.jdbc.getDatasetID
+import vdi.component.db.jdbc.getUserID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -34,30 +42,20 @@ internal fun Connection.selectDatasetsByInstallStatus(
   installType: InstallType,
   installStatus: InstallStatus,
   projectID: ProjectID,
-): List<DatasetRecord> {
-  prepareStatement(sql(schema)).use { ps ->
-    ps.setInstallType(1, installType)
-    ps.setInstallStatus(2, installStatus)
-    ps.setString(3, projectID)
+): List<DatasetRecord> =
+  withPreparedStatement(sql(schema)) {
+    setInstallType(1, installType)
+    setInstallStatus(2, installStatus)
+    setString(3, projectID)
 
-    ps.executeQuery().use { rs ->
-      if (!rs.next())
-        return emptyList()
-
-      val out = ArrayList<DatasetRecord>()
-
-      do {
-        out.add(DatasetRecord(
-          datasetID   = rs.getDatasetID("dataset_id"),
-          owner       = rs.getUserID("owner"),
-          typeName    = rs.getDataType("type_name"),
-          typeVersion = rs.getString("type_version"),
-          isDeleted   = rs.getDeleteFlag("is_deleted"),
-          isPublic    = rs.getBoolean("is_public"),
-        ))
-      } while (rs.next())
-
-      return out
-    }
+    withResults { map {
+      DatasetRecord(
+        datasetID   = getDatasetID("dataset_id"),
+        owner       = getUserID("owner"),
+        typeName    = getDataType("type_name"),
+        typeVersion = getString("type_version"),
+        isDeleted   = getDeleteFlag("is_deleted"),
+        isPublic    = getBoolean("is_public"),
+      )
+    } }
   }
-}

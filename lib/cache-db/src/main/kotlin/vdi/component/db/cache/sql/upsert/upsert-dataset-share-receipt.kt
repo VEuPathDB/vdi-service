@@ -1,11 +1,11 @@
 package vdi.component.db.cache.sql.upsert
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
-import vdi.component.db.cache.util.preparedUpdate
-import vdi.component.db.cache.util.setDatasetID
-import vdi.component.db.cache.util.setUserID
+import vdi.component.db.jdbc.setDatasetID
+import vdi.component.db.jdbc.setUserID
 import java.sql.Connection
 
 // language=postgresql
@@ -24,7 +24,7 @@ internal fun Connection.upsertDatasetShareReceipt(
   recipientID: UserID,
   status: VDIShareReceiptAction,
 ) =
-  preparedUpdate(SQL) {
+  withPreparedUpdate(SQL) {
     setDatasetID(1, datasetID)
     setUserID(2, recipientID)
     setString(3, status.value)

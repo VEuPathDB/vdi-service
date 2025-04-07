@@ -1,8 +1,8 @@
 package vdi.component.db.cache.sql.upsert
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.cache.util.preparedUpdate
-import vdi.component.db.cache.util.setDatasetID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -20,7 +20,7 @@ SET
 """
 
 internal fun Connection.upsertImportMessages(datasetID: DatasetID, messages: String) =
-  preparedUpdate(SQL) {
+  withPreparedUpdate(SQL) {
     setDatasetID(1, datasetID)
     setString(2, messages)
     setString(3, messages)

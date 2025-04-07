@@ -1,13 +1,14 @@
 package vdi.component.db.cache.sql.select
 
+import io.foxcapades.kdbc.forEach
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import vdi.component.db.cache.model.DatasetShare
-import vdi.component.db.cache.util.getDatasetID
-import vdi.component.db.cache.util.getUserID
-import vdi.component.db.cache.util.withPreparedStatement
-import vdi.component.db.cache.util.withResults
+import vdi.component.db.jdbc.getDatasetID
+import vdi.component.db.jdbc.getUserID
 import java.sql.Connection
 
 // language=postgresql
@@ -31,7 +32,7 @@ internal fun Connection.selectSharesFor(datasetIDs: List<DatasetID>): Map<Datase
   withPreparedStatement(SQL) {
     setArray(1, createArrayOf("varchar", datasetIDs.toTypedArray()))
     withResults {
-      while (next()) {
+      forEach {
         val dsID = getDatasetID("dataset_id")
         out.computeIfAbsent(dsID) { ArrayList() }.add(DatasetShare(
           recipientID   = getUserID("recipient_id"),

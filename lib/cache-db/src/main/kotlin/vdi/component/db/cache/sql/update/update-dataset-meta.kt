@@ -1,10 +1,10 @@
 package vdi.component.db.cache.sql.update
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
-import vdi.component.db.cache.util.preparedUpdate
-import vdi.component.db.cache.util.setDatasetID
 import vdi.component.db.cache.util.setDatasetVisibility
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -27,7 +27,7 @@ internal fun Connection.updateDatasetMeta(
   datasetID: DatasetID,
   meta: VDIDatasetMeta,
 ) =
-  preparedUpdate(SQL) {
+  withPreparedUpdate(SQL) {
     setString(1, meta.name)
     setString(2, meta.shortName)
     setString(3, meta.shortAttribution)

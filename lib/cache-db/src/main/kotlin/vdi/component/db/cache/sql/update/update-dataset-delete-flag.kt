@@ -1,8 +1,8 @@
 package vdi.component.db.cache.sql.update
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.cache.util.preparedUpdate
-import vdi.component.db.cache.util.setDatasetID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -16,7 +16,7 @@ WHERE
 """
 
 internal fun Connection.updateDatasetDeleteFlag(datasetID: DatasetID, deleted: Boolean) =
-  preparedUpdate(SQL) {
+  withPreparedUpdate(SQL) {
     setBoolean(1, deleted)
     setDatasetID(2, datasetID)
   }

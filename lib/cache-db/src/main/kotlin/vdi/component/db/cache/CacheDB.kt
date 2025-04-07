@@ -3,6 +3,7 @@ package vdi.component.db.cache
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
+import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
@@ -69,10 +70,17 @@ interface CacheDB {
   /**
    * Streams sorted stream of all dataset control records.
    *
+   * **NOTE**: THE CALLER IS RESPONSIBLE FOR CLOSING THE RETURNED VALUE TO AVOID
+   * CONNECTION LEAKS!
+   *
    * @return Stream of dataset control records sorted by user ID and then dataset ID. The stream
    * must be closed to release the db connection.
    */
   fun selectAllSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord>
+
+  fun selectLatestRevision(datasetID: DatasetID): VDIDatasetRevision?
+
+  fun selectRevisions(datasetID: DatasetID): List<VDIDatasetRevision>
 
   fun selectBrokenDatasetImports(query: BrokenImportListQuery): List<BrokenImportRecord>
 

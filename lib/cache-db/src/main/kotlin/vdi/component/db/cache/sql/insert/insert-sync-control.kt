@@ -1,9 +1,9 @@
 package vdi.component.db.cache.sql.insert
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import vdi.component.db.cache.util.preparedUpdate
-import vdi.component.db.cache.util.setDatasetID
-import vdi.component.db.cache.util.setDateTime
+import vdi.component.db.jdbc.setDatasetID
+import vdi.component.db.jdbc.setDateTime
 import java.sql.Connection
 
 // language=postgresql
@@ -22,7 +22,7 @@ ON CONFLICT (dataset_id)
 """
 
 internal fun Connection.tryInsertSyncControl(record: VDISyncControlRecord) =
-  preparedUpdate(SQL) {
+  withPreparedUpdate(SQL) {
     setDatasetID(1, record.datasetID)
     setDateTime(2, record.sharesUpdated)
     setDateTime(3, record.dataUpdated)

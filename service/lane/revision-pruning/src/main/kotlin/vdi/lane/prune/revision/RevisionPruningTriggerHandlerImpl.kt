@@ -62,7 +62,7 @@ internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPru
     }
 
     try {
-      tryProcessDataset(message.userID, message.datasetID, s3Dir)
+      tryProcessDataset(message.userID, message.datasetID, s3Dir, dm)
     } catch (e: Throwable) {
       log.error("{}/{}: unexpected error encountered while processing revision pruning event ", message.userID, message.datasetID, e)
     }

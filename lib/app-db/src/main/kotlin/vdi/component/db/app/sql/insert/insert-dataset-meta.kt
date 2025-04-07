@@ -1,10 +1,10 @@
 package vdi.component.db.app.sql.insert
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import vdi.component.db.app.DatasetMetaMaxSummaryFieldLength
-import vdi.component.db.app.sql.preparedUpdate
-import vdi.component.db.app.sql.setDatasetID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -26,7 +26,7 @@ VALUES
 
 internal fun Connection.insertDatasetMeta(schema: String, datasetID: DatasetID, meta: VDIDatasetMeta) {
   // limit to fit into varchar(4000)
-  preparedUpdate(sql(schema)) {
+  withPreparedUpdate(sql(schema)) {
     setDatasetID(1, datasetID)
     setString(2, meta.name)
     setString(3, meta.shortName)

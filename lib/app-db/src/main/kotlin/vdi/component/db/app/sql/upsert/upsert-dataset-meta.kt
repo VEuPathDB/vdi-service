@@ -1,10 +1,10 @@
 package vdi.component.db.app.sql.upsert
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import vdi.component.db.app.DatasetMetaMaxSummaryFieldLength
-import vdi.component.db.app.sql.preparedUpdate
-import vdi.component.db.app.sql.setDatasetID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -32,7 +32,7 @@ ON CONFLICT (dataset_id) DO UPDATE SET
 """
 
 internal fun Connection.upsertDatasetMeta(schema: String, datasetID: DatasetID, meta: VDIDatasetMeta) {
-  preparedUpdate(sql(schema)) {
+  withPreparedUpdate(sql(schema)) {
     // insert
     setDatasetID(1, datasetID)
     setString(2, meta.name)

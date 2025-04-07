@@ -1,11 +1,13 @@
 package vdi.component.db.app.sql.select
 
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.app.model.DatasetInstallMessage
-import vdi.component.db.app.sql.getDateTime
 import vdi.component.db.app.sql.getInstallStatus
 import vdi.component.db.app.sql.getInstallType
-import vdi.component.db.app.sql.setDatasetID
+import vdi.component.db.jdbc.getDateTime
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 private fun sql(schema: String) =
@@ -25,27 +27,24 @@ WHERE
 internal fun Connection.selectDatasetInstallMessages(
   schema: String,
   datasetID: DatasetID
-): List<DatasetInstallMessage> {
-  prepareStatement(sql(schema)).use { ps ->
-    ps.setDatasetID(1, datasetID)
+): List<DatasetInstallMessage> =
+  withPreparedStatement(sql(schema)) {
+    setDatasetID(1, datasetID)
 
-    ps.executeQuery().use { rs ->
-      if (!rs.next())
+    withResults {
+      if (!next())
         return emptyList()
-
-      val out = ArrayList<DatasetInstallMessage>(2)
-
-      do {
-        out.add(DatasetInstallMessage(
-          datasetID   = datasetID,
-          installType = rs.getInstallType("install_type"),
-          status      = rs.getInstallStatus("status"),
-          message     = rs.getString("message"),
-          updated     = rs.getDateTime("updated")
-        ))
-      } while (rs.next())
-
-      return out
+      else
+        ArrayList<DatasetInstallMessage>(2).also {
+          do {
+            it.add(DatasetInstallMessage(
+              datasetID   = datasetID,
+              installType = getInstallType("install_type"),
+              status      = getInstallStatus("status"),
+              message     = getString("message"),
+              updated     = getDateTime("updated")
+            ))
+          } while (next())
+        }
     }
   }
-}

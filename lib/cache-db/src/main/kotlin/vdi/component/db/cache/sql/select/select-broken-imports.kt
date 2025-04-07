@@ -1,8 +1,15 @@
 package vdi.component.db.cache.sql.select
 
+import io.foxcapades.kdbc.forEach
+import io.foxcapades.kdbc.withPreparedStatement
+import io.foxcapades.kdbc.withResults
 import vdi.component.db.cache.model.BrokenImportListQuery
 import vdi.component.db.cache.model.BrokenImportRecord
-import vdi.component.db.cache.util.*
+import vdi.component.db.cache.util.getProjectIDList
+import vdi.component.db.cache.util.getStringList
+import vdi.component.db.jdbc.getDataType
+import vdi.component.db.jdbc.getDatasetID
+import vdi.component.db.jdbc.getUserID
 import java.sql.Connection
 import java.sql.Types
 
@@ -91,7 +98,7 @@ internal fun Connection.selectBrokenImports(query: BrokenImportListQuery): List<
     withResults {
       val out = ArrayList<BrokenImportRecord>(query.limit.toInt())
 
-      while (next())
+      forEach {
         out.add(BrokenImportRecord(
           datasetID   = getDatasetID("dataset_id"),
           ownerID     = getUserID("owner_id"),
@@ -100,6 +107,7 @@ internal fun Connection.selectBrokenImports(query: BrokenImportListQuery): List<
           projects    = getProjectIDList("projects"),
           messages    = getStringList("messages"),
         ))
+      }
 
       out
     }

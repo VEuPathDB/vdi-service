@@ -1,10 +1,10 @@
 package vdi.component.db.cache.sql.update
 
+import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.util.preparedUpdate
-import vdi.component.db.cache.util.setDatasetID
 import vdi.component.db.cache.util.setImportStatus
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -18,7 +18,7 @@ WHERE
 """
 
 internal fun Connection.updateDatasetImportStatus(datasetID: DatasetID, syncStatus: DatasetImportStatus) =
-  preparedUpdate(SQL) {
+  withPreparedUpdate(SQL) {
     setImportStatus(1, syncStatus)
     setDatasetID(2, datasetID)
   }

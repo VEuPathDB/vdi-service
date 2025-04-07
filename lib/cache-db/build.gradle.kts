@@ -5,6 +5,7 @@ plugins {
 dependencies {
   implementation(project(":lib:env"))
   implementation(project(":lib:health"))
+  implementation(project(":lib:jdbc"))
 
   implementation(libs.vdi.json)
   implementation(libs.vdi.common)
@@ -13,4 +14,5 @@ dependencies {
 
   implementation(libs.db.pool)
   implementation(libs.db.driver.postgres)
+  implementation(libs.db.kotlin.extended)
 }

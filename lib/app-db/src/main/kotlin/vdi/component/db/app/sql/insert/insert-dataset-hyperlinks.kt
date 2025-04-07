@@ -1,9 +1,9 @@
 package vdi.component.db.app.sql.insert
 
+import io.foxcapades.kdbc.withPreparedBatchUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetHyperlink
-import vdi.component.db.app.sql.preparedBatchUpdate
-import vdi.component.db.app.sql.setDatasetID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 
@@ -27,7 +27,7 @@ internal fun Connection.insertDatasetHyperlinks(
   datasetID: DatasetID,
   hyperlinks: Collection<VDIDatasetHyperlink>,
 ) {
-  preparedBatchUpdate(sql(schema), hyperlinks) {
+  withPreparedBatchUpdate(sql(schema), hyperlinks) {
     setDatasetID(1, datasetID)
     setString(2, it.url)
     setString(3, it.text)

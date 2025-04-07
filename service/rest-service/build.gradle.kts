@@ -14,15 +14,12 @@ containerService {
   raml {
     schemaRootDir = file("schema/types")
     rootApiDefinition = file("api-deprecation.raml")
+    generateModelStreams = false
   }
 
   docker {
     imageName = "vdi-service"
   }
-}
-
-tasks.withType<GenerateJaxRS> {
-  finalizedBy(task("patch-"))
 }
 
 dependencies {

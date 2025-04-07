@@ -1,8 +1,8 @@
 package vdi.component.db.app.sql.insert
 
+import io.foxcapades.kdbc.withPreparedBatchUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.app.sql.preparedBatchUpdate
-import vdi.component.db.app.sql.setDatasetID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 
@@ -23,7 +23,7 @@ internal fun Connection.insertDatasetOrganisms(
   datasetID: DatasetID,
   organisms: Iterable<String>,
 ) {
-  preparedBatchUpdate(sql(schema), organisms) {
+  withPreparedBatchUpdate(sql(schema), organisms) {
     setDatasetID(1, datasetID)
     setString(2, it)
   }

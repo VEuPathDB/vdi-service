@@ -1,5 +1,6 @@
 package vdi.component.db.app.sql.insert
 
+import io.foxcapades.kdbc.withPreparedBatchUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import java.sql.Connection
@@ -21,14 +22,8 @@ internal fun Connection.insertDatasetProjectLinks(
   datasetID: DatasetID,
   projectIDs: Iterable<ProjectID>
 ) {
-  prepareStatement(sql(schema))
-    .use { ps ->
-      for (projectID in projectIDs) {
-        ps.setString(1, datasetID.toString())
-        ps.setString(2, projectID)
-        ps.addBatch()
-      }
-
-      ps.executeBatch()
-    }
+  withPreparedBatchUpdate(sql(schema), projectIDs) {
+    setString(1, datasetID.toString())
+    setString(2, it)
+  }
 }

@@ -1,9 +1,9 @@
 package vdi.component.db.app.sql.insert
 
+import io.foxcapades.kdbc.withPreparedBatchUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetPublication
-import vdi.component.db.app.sql.preparedBatchUpdate
-import vdi.component.db.app.sql.setDatasetID
+import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
 
 
@@ -25,7 +25,7 @@ internal fun Connection.insertDatasetPublications(
   datasetID: DatasetID,
   publications: Iterable<VDIDatasetPublication>,
 ) {
-  preparedBatchUpdate(sql(schema), publications) {
+  withPreparedBatchUpdate(sql(schema), publications) {
     setDatasetID(1, datasetID)
     setString(2, it.pubmedID)
     setString(3, it.citation)

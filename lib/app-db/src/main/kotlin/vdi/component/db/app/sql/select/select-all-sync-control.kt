@@ -4,10 +4,10 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.component.db.app.model.DeleteFlag
-import vdi.component.db.app.sql.getDataType
-import vdi.component.db.app.sql.getDatasetID
-import vdi.component.db.app.sql.getDateTime
-import vdi.component.db.app.sql.getUserID
+import vdi.component.db.jdbc.getDataType
+import vdi.component.db.jdbc.getDatasetID
+import vdi.component.db.jdbc.getDateTime
+import vdi.component.db.jdbc.getUserID
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
