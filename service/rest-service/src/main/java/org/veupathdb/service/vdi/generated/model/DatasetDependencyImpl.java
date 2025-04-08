@@ -11,41 +11,41 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "resourceVersion"
 })
 public class DatasetDependencyImpl implements DatasetDependency {
-  @JsonProperty("resourceIdentifier")
+  @JsonProperty(JsonField.RESOURCE_IDENTIFIER)
   private String resourceIdentifier;
 
-  @JsonProperty("resourceDisplayName")
+  @JsonProperty(JsonField.RESOURCE_DISPLAY_NAME)
   private String resourceDisplayName;
 
-  @JsonProperty("resourceVersion")
+  @JsonProperty(JsonField.RESOURCE_VERSION)
   private String resourceVersion;
 
-  @JsonProperty("resourceIdentifier")
+  @JsonProperty(JsonField.RESOURCE_IDENTIFIER)
   public String getResourceIdentifier() {
     return this.resourceIdentifier;
   }
 
-  @JsonProperty("resourceIdentifier")
+  @JsonProperty(JsonField.RESOURCE_IDENTIFIER)
   public void setResourceIdentifier(String resourceIdentifier) {
     this.resourceIdentifier = resourceIdentifier;
   }
 
-  @JsonProperty("resourceDisplayName")
+  @JsonProperty(JsonField.RESOURCE_DISPLAY_NAME)
   public String getResourceDisplayName() {
     return this.resourceDisplayName;
   }
 
-  @JsonProperty("resourceDisplayName")
+  @JsonProperty(JsonField.RESOURCE_DISPLAY_NAME)
   public void setResourceDisplayName(String resourceDisplayName) {
     this.resourceDisplayName = resourceDisplayName;
   }
 
-  @JsonProperty("resourceVersion")
+  @JsonProperty(JsonField.RESOURCE_VERSION)
   public String getResourceVersion() {
     return this.resourceVersion;
   }
 
-  @JsonProperty("resourceVersion")
+  @JsonProperty(JsonField.RESOURCE_VERSION)
   public void setResourceVersion(String resourceVersion) {
     this.resourceVersion = resourceVersion;
   }

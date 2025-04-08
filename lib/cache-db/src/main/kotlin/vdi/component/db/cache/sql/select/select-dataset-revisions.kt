@@ -7,6 +7,8 @@ import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevisionAction
+import vdi.component.db.cache.model.DatasetRevisionRecord
+import vdi.component.db.cache.model.DatasetRevisionRecordSet
 import vdi.component.db.jdbc.getDatasetID
 import vdi.component.db.jdbc.setDatasetID
 import java.sql.Connection
@@ -63,23 +65,32 @@ ORDER BY timestamp
 """
 
 fun Connection.selectDatasetRevisions(datasetID: DatasetID) =
-  executeQuery(datasetID, false) { map {
-    VDIDatasetRevision(
-      revisionID   = getDatasetID("revision_id"),
-      action       = VDIDatasetRevisionAction.fromID(it["action"]),
-      timestamp    = it["timestamp"],
-      revisionNote = ""
-    )
-  } }
+  executeQuery(datasetID, false) {
+    var originalID: DatasetID? = null
+    val records = map {
+      if (originalID == null)
+        originalID = getDatasetID("original_id")
+
+      VDIDatasetRevision(
+        revisionID   = getDatasetID("revision_id"),
+        action       = VDIDatasetRevisionAction.fromID(it["action"]),
+        timestamp    = it["timestamp"],
+        revisionNote = ""
+      )
+    }
+
+    originalID?.let { DatasetRevisionRecordSet(it, records) }
+  }
 
 fun Connection.selectLatestDatasetRevision(datasetID: DatasetID) =
   executeQuery(datasetID, false) {
     if (next())
-      VDIDatasetRevision(
+      DatasetRevisionRecord(
         revisionID   = getDatasetID("revision_id"),
         action       = VDIDatasetRevisionAction.fromID(get("action")),
         timestamp    = get("timestamp"),
-        revisionNote = ""
+        revisionNote = "",
+        originalID   = getDatasetID("original_id"),
       )
     else
       null

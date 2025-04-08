@@ -8,27 +8,27 @@ import java.util.List;
     as = PluginListItemImpl.class
 )
 public interface PluginListItem {
-  @JsonProperty("displayName")
+  @JsonProperty(JsonField.DISPLAY_NAME)
   String getDisplayName();
 
-  @JsonProperty("displayName")
+  @JsonProperty(JsonField.DISPLAY_NAME)
   void setDisplayName(String displayName);
 
-  @JsonProperty("typeName")
+  @JsonProperty(JsonField.TYPE_NAME)
   String getTypeName();
 
-  @JsonProperty("typeName")
+  @JsonProperty(JsonField.TYPE_NAME)
   void setTypeName(String typeName);
 
-  @JsonProperty("typeVersion")
+  @JsonProperty(JsonField.TYPE_VERSION)
   String getTypeVersion();
 
-  @JsonProperty("typeVersion")
+  @JsonProperty(JsonField.TYPE_VERSION)
   void setTypeVersion(String typeVersion);
 
-  @JsonProperty("projects")
+  @JsonProperty(JsonField.PROJECTS)
   List<String> getProjects();
 
-  @JsonProperty("projects")
+  @JsonProperty(JsonField.PROJECTS)
   void setProjects(List<String> projects);
 }

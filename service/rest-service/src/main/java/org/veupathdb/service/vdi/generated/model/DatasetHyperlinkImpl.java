@@ -12,53 +12,53 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "isPublication"
 })
 public class DatasetHyperlinkImpl implements DatasetHyperlink {
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   private String url;
 
-  @JsonProperty("text")
+  @JsonProperty(JsonField.TEXT)
   private String text;
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   private String description;
 
   @JsonProperty(
-      value = "isPublication",
+      value = JsonField.IS_PUBLICATION,
       defaultValue = "false"
   )
   private Boolean isPublication;
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   public String getUrl() {
     return this.url;
   }
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   public void setUrl(String url) {
     this.url = url;
   }
 
-  @JsonProperty("text")
+  @JsonProperty(JsonField.TEXT)
   public String getText() {
     return this.text;
   }
 
-  @JsonProperty("text")
+  @JsonProperty(JsonField.TEXT)
   public void setText(String text) {
     this.text = text;
   }
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   public String getDescription() {
     return this.description;
   }
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   public void setDescription(String description) {
     this.description = description;
   }
 
   @JsonProperty(
-      value = "isPublication",
+      value = JsonField.IS_PUBLICATION,
       defaultValue = "false"
   )
   public Boolean getIsPublication() {
@@ -66,7 +66,7 @@ public class DatasetHyperlinkImpl implements DatasetHyperlink {
   }
 
   @JsonProperty(
-      value = "isPublication",
+      value = JsonField.IS_PUBLICATION,
       defaultValue = "false"
   )
   public void setIsPublication(Boolean isPublication) {

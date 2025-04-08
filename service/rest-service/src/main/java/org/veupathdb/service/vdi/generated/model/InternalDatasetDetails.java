@@ -9,123 +9,123 @@ import java.util.List;
     as = InternalDatasetDetailsImpl.class
 )
 public interface InternalDatasetDetails {
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   DatasetTypeInfo getDatasetType();
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   void setDatasetType(DatasetTypeInfo datasetType);
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   Long getOwner();
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   void setOwner(Long owner);
 
-  @JsonProperty("isDeleted")
+  @JsonProperty(JsonField.IS_DELETED)
   Boolean getIsDeleted();
 
-  @JsonProperty("isDeleted")
+  @JsonProperty(JsonField.IS_DELETED)
   void setIsDeleted(Boolean isDeleted);
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   void setOrigin(String origin);
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   OffsetDateTime getCreated();
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   void setCreated(OffsetDateTime created);
 
-  @JsonProperty("inserted")
+  @JsonProperty(JsonField.INSERTED)
   OffsetDateTime getInserted();
 
-  @JsonProperty("inserted")
+  @JsonProperty(JsonField.INSERTED)
   void setInserted(OffsetDateTime inserted);
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   String getName();
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   void setName(String name);
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   List<String> getProjectIds();
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   void setProjectIds(List<String> projectIds);
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   String getStatus();
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   void setStatus(String status);
 
-  @JsonProperty("importMessages")
+  @JsonProperty(JsonField.IMPORT_MESSAGES)
   List<String> getImportMessages();
 
-  @JsonProperty("importMessages")
+  @JsonProperty(JsonField.IMPORT_MESSAGES)
   void setImportMessages(List<String> importMessages);
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   DatasetVisibility getVisibility();
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   void setVisibility(DatasetVisibility visibility);
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   String getShortName();
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   void setShortName(String shortName);
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   String getShortAttribution();
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   void setShortAttribution(String shortAttribution);
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   String getCategory();
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   void setCategory(String category);
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   String getSummary();
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   void setSummary(String summary);
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   String getDescription();
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   void setDescription(String description);
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   String getSourceUrl();
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   void setSourceUrl(String sourceUrl);
 
-  @JsonProperty("syncControl")
+  @JsonProperty(JsonField.SYNC_CONTROL)
   SyncControlRecord getSyncControl();
 
-  @JsonProperty("syncControl")
+  @JsonProperty(JsonField.SYNC_CONTROL)
   void setSyncControl(SyncControlRecord syncControl);
 
-  @JsonProperty("uploadFiles")
+  @JsonProperty(JsonField.UPLOAD_FILES)
   List<String> getUploadFiles();
 
-  @JsonProperty("uploadFiles")
+  @JsonProperty(JsonField.UPLOAD_FILES)
   void setUploadFiles(List<String> uploadFiles);
 
-  @JsonProperty("installFiles")
+  @JsonProperty(JsonField.INSTALL_FILES)
   List<String> getInstallFiles();
 
-  @JsonProperty("installFiles")
+  @JsonProperty(JsonField.INSTALL_FILES)
   void setInstallFiles(List<String> installFiles);
 }

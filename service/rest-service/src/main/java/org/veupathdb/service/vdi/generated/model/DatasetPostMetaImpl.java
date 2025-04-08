@@ -28,139 +28,139 @@ import java.util.List;
     "createdOn"
 })
 public class DatasetPostMetaImpl implements DatasetPostMeta {
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   private String name;
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   private DatasetPostType datasetType;
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   private String origin;
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   private List<DatasetDependency> dependencies;
 
-  @JsonProperty("projects")
+  @JsonProperty(JsonField.PROJECTS)
   private List<String> projects;
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   private String shortName;
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   private String shortAttribution;
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   private String category;
 
   @JsonProperty(
-      value = "visibility",
+      value = JsonField.VISIBILITY,
       defaultValue = "private"
   )
   private DatasetVisibility visibility;
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   private String summary;
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   private String description;
 
-  @JsonProperty("publications")
+  @JsonProperty(JsonField.PUBLICATIONS)
   private List<DatasetPublication> publications;
 
-  @JsonProperty("hyperlinks")
+  @JsonProperty(JsonField.HYPERLINKS)
   private List<DatasetHyperlink> hyperlinks;
 
-  @JsonProperty("organisms")
+  @JsonProperty(JsonField.ORGANISMS)
   private List<String> organisms;
 
-  @JsonProperty("contacts")
+  @JsonProperty(JsonField.CONTACTS)
   private List<DatasetContact> contacts;
 
-  @JsonProperty("createdOn")
+  @JsonProperty(JsonField.CREATED_ON)
   private OffsetDateTime createdOn;
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   public String getName() {
     return this.name;
   }
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   public void setName(String name) {
     this.name = name;
   }
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   public DatasetPostType getDatasetType() {
     return this.datasetType;
   }
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   public void setDatasetType(DatasetPostType datasetType) {
     this.datasetType = datasetType;
   }
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   public String getOrigin() {
     return this.origin;
   }
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   public void setOrigin(String origin) {
     this.origin = origin;
   }
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   public List<DatasetDependency> getDependencies() {
     return this.dependencies;
   }
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   public void setDependencies(List<DatasetDependency> dependencies) {
     this.dependencies = dependencies;
   }
 
-  @JsonProperty("projects")
+  @JsonProperty(JsonField.PROJECTS)
   public List<String> getProjects() {
     return this.projects;
   }
 
-  @JsonProperty("projects")
+  @JsonProperty(JsonField.PROJECTS)
   public void setProjects(List<String> projects) {
     this.projects = projects;
   }
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   public String getShortName() {
     return this.shortName;
   }
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   public void setShortName(String shortName) {
     this.shortName = shortName;
   }
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   public String getShortAttribution() {
     return this.shortAttribution;
   }
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   public void setShortAttribution(String shortAttribution) {
     this.shortAttribution = shortAttribution;
   }
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   public String getCategory() {
     return this.category;
   }
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   public void setCategory(String category) {
     this.category = category;
   }
 
   @JsonProperty(
-      value = "visibility",
+      value = JsonField.VISIBILITY,
       defaultValue = "private"
   )
   public DatasetVisibility getVisibility() {
@@ -168,79 +168,79 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   }
 
   @JsonProperty(
-      value = "visibility",
+      value = JsonField.VISIBILITY,
       defaultValue = "private"
   )
   public void setVisibility(DatasetVisibility visibility) {
     this.visibility = visibility;
   }
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   public String getSummary() {
     return this.summary;
   }
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   public void setSummary(String summary) {
     this.summary = summary;
   }
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   public String getDescription() {
     return this.description;
   }
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   public void setDescription(String description) {
     this.description = description;
   }
 
-  @JsonProperty("publications")
+  @JsonProperty(JsonField.PUBLICATIONS)
   public List<DatasetPublication> getPublications() {
     return this.publications;
   }
 
-  @JsonProperty("publications")
+  @JsonProperty(JsonField.PUBLICATIONS)
   public void setPublications(List<DatasetPublication> publications) {
     this.publications = publications;
   }
 
-  @JsonProperty("hyperlinks")
+  @JsonProperty(JsonField.HYPERLINKS)
   public List<DatasetHyperlink> getHyperlinks() {
     return this.hyperlinks;
   }
 
-  @JsonProperty("hyperlinks")
+  @JsonProperty(JsonField.HYPERLINKS)
   public void setHyperlinks(List<DatasetHyperlink> hyperlinks) {
     this.hyperlinks = hyperlinks;
   }
 
-  @JsonProperty("organisms")
+  @JsonProperty(JsonField.ORGANISMS)
   public List<String> getOrganisms() {
     return this.organisms;
   }
 
-  @JsonProperty("organisms")
+  @JsonProperty(JsonField.ORGANISMS)
   public void setOrganisms(List<String> organisms) {
     this.organisms = organisms;
   }
 
-  @JsonProperty("contacts")
+  @JsonProperty(JsonField.CONTACTS)
   public List<DatasetContact> getContacts() {
     return this.contacts;
   }
 
-  @JsonProperty("contacts")
+  @JsonProperty(JsonField.CONTACTS)
   public void setContacts(List<DatasetContact> contacts) {
     this.contacts = contacts;
   }
 
-  @JsonProperty("createdOn")
+  @JsonProperty(JsonField.CREATED_ON)
   public OffsetDateTime getCreatedOn() {
     return this.createdOn;
   }
 
-  @JsonProperty("createdOn")
+  @JsonProperty(JsonField.CREATED_ON)
   public void setCreatedOn(OffsetDateTime createdOn) {
     this.createdOn = createdOn;
   }

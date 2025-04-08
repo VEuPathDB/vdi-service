@@ -8,15 +8,15 @@ import java.util.List;
     as = DatasetZipDetailsImpl.class
 )
 public interface DatasetZipDetails {
-  @JsonProperty("zipSize")
+  @JsonProperty(JsonField.ZIP_SIZE)
   Long getZipSize();
 
-  @JsonProperty("zipSize")
+  @JsonProperty(JsonField.ZIP_SIZE)
   void setZipSize(Long zipSize);
 
-  @JsonProperty("contents")
+  @JsonProperty(JsonField.CONTENTS)
   List<DatasetFileDetails> getContents();
 
-  @JsonProperty("contents")
+  @JsonProperty(JsonField.CONTENTS)
   void setContents(List<DatasetFileDetails> contents);
 }

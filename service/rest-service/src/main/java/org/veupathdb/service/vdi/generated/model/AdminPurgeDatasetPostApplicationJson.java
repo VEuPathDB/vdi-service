@@ -7,15 +7,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = AdminPurgeDatasetPostApplicationJsonImpl.class
 )
 public interface AdminPurgeDatasetPostApplicationJson {
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   Long getUserId();
 
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   void setUserId(Long userId);
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   String getDatasetId();
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   void setDatasetId(String datasetId);
 }

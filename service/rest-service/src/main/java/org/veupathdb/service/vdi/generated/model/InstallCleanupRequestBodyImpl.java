@@ -12,16 +12,16 @@ import java.util.List;
 })
 public class InstallCleanupRequestBodyImpl implements InstallCleanupRequestBody {
   @JsonProperty(
-      value = "all",
+      value = JsonField.ALL,
       defaultValue = "false"
   )
   private Boolean all;
 
-  @JsonProperty("targets")
+  @JsonProperty(JsonField.TARGETS)
   private List<InstallCleanupTarget> targets;
 
   @JsonProperty(
-      value = "all",
+      value = JsonField.ALL,
       defaultValue = "false"
   )
   public Boolean getAll() {
@@ -29,19 +29,19 @@ public class InstallCleanupRequestBodyImpl implements InstallCleanupRequestBody 
   }
 
   @JsonProperty(
-      value = "all",
+      value = JsonField.ALL,
       defaultValue = "false"
   )
   public void setAll(Boolean all) {
     this.all = all;
   }
 
-  @JsonProperty("targets")
+  @JsonProperty(JsonField.TARGETS)
   public List<InstallCleanupTarget> getTargets() {
     return this.targets;
   }
 
-  @JsonProperty("targets")
+  @JsonProperty(JsonField.TARGETS)
   public void setTargets(List<InstallCleanupTarget> targets) {
     this.targets = targets;
   }

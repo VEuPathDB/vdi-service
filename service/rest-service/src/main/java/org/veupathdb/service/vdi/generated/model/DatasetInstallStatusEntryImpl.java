@@ -13,67 +13,67 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "dataMessage"
 })
 public class DatasetInstallStatusEntryImpl implements DatasetInstallStatusEntry {
-  @JsonProperty("projectId")
+  @JsonProperty(JsonField.PROJECT_ID)
   private String projectId;
 
-  @JsonProperty("metaStatus")
+  @JsonProperty(JsonField.META_STATUS)
   private DatasetInstallStatus metaStatus;
 
-  @JsonProperty("metaMessage")
+  @JsonProperty(JsonField.META_MESSAGE)
   private String metaMessage;
 
-  @JsonProperty("dataStatus")
+  @JsonProperty(JsonField.DATA_STATUS)
   private DatasetInstallStatus dataStatus;
 
-  @JsonProperty("dataMessage")
+  @JsonProperty(JsonField.DATA_MESSAGE)
   private String dataMessage;
 
-  @JsonProperty("projectId")
+  @JsonProperty(JsonField.PROJECT_ID)
   public String getProjectId() {
     return this.projectId;
   }
 
-  @JsonProperty("projectId")
+  @JsonProperty(JsonField.PROJECT_ID)
   public void setProjectId(String projectId) {
     this.projectId = projectId;
   }
 
-  @JsonProperty("metaStatus")
+  @JsonProperty(JsonField.META_STATUS)
   public DatasetInstallStatus getMetaStatus() {
     return this.metaStatus;
   }
 
-  @JsonProperty("metaStatus")
+  @JsonProperty(JsonField.META_STATUS)
   public void setMetaStatus(DatasetInstallStatus metaStatus) {
     this.metaStatus = metaStatus;
   }
 
-  @JsonProperty("metaMessage")
+  @JsonProperty(JsonField.META_MESSAGE)
   public String getMetaMessage() {
     return this.metaMessage;
   }
 
-  @JsonProperty("metaMessage")
+  @JsonProperty(JsonField.META_MESSAGE)
   public void setMetaMessage(String metaMessage) {
     this.metaMessage = metaMessage;
   }
 
-  @JsonProperty("dataStatus")
+  @JsonProperty(JsonField.DATA_STATUS)
   public DatasetInstallStatus getDataStatus() {
     return this.dataStatus;
   }
 
-  @JsonProperty("dataStatus")
+  @JsonProperty(JsonField.DATA_STATUS)
   public void setDataStatus(DatasetInstallStatus dataStatus) {
     this.dataStatus = dataStatus;
   }
 
-  @JsonProperty("dataMessage")
+  @JsonProperty(JsonField.DATA_MESSAGE)
   public String getDataMessage() {
     return this.dataMessage;
   }
 
-  @JsonProperty("dataMessage")
+  @JsonProperty(JsonField.DATA_MESSAGE)
   public void setDataMessage(String dataMessage) {
     this.dataMessage = dataMessage;
   }

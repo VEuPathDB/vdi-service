@@ -8,15 +8,15 @@ import java.util.List;
     as = DatasetStatusInfoImpl.class
 )
 public interface DatasetStatusInfo {
-  @JsonProperty("import")
+  @JsonProperty(JsonField.IMPORT)
   DatasetImportStatus getImport();
 
-  @JsonProperty("import")
+  @JsonProperty(JsonField.IMPORT)
   void setImport(DatasetImportStatus importVariable);
 
-  @JsonProperty("install")
+  @JsonProperty(JsonField.INSTALL)
   List<DatasetInstallStatusEntry> getInstall();
 
-  @JsonProperty("install")
+  @JsonProperty(JsonField.INSTALL)
   void setInstall(List<DatasetInstallStatusEntry> install);
 }

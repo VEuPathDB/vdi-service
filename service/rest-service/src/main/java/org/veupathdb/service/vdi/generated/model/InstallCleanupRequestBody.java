@@ -9,20 +9,20 @@ import java.util.List;
 )
 public interface InstallCleanupRequestBody {
   @JsonProperty(
-      value = "all",
+      value = JsonField.ALL,
       defaultValue = "false"
   )
   Boolean getAll();
 
   @JsonProperty(
-      value = "all",
+      value = JsonField.ALL,
       defaultValue = "false"
   )
   void setAll(Boolean all);
 
-  @JsonProperty("targets")
+  @JsonProperty(JsonField.TARGETS)
   List<InstallCleanupTarget> getTargets();
 
-  @JsonProperty("targets")
+  @JsonProperty(JsonField.TARGETS)
   void setTargets(List<InstallCleanupTarget> targets);
 }

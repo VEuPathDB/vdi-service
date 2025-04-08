@@ -194,6 +194,7 @@ types:
       summary?: DatasetSummary
       description?: DatasetDescription
       sourceUrl?: DatasetSourceUrl
+      originalId?: VdiId
   DatasetPostRequestBody:
     displayName: Dataset Post Request
     description: |
@@ -354,14 +355,13 @@ types:
         uniqueItems: true
       organisms?:
         displayName: Dataset Organism Abbreviations
-        type: array
+        type: OrganismAbbreviation[]
         uniqueItems: true
-        items:
-          type: string
-          maxLength: 20
       contacts?:
         type: DatasetContact[]
         uniqueItems: true
+      originalId?: VdiId
+      revisionHistory?: DatasetRevision[]
   ShareOffer:
     type: object
     additionalProperties: false
@@ -627,6 +627,8 @@ types:
   DatasetName:
     description: User-provided name for the dataset.
     type: string
+    minLength: 3
+    maxLength: 1024
   DatasetOrigin:
     description: |
       String representing the origin of the dataset.  Examples include
@@ -654,11 +656,26 @@ types:
         type: string
         minLength: 3
         maxLength: 2000
+      isPrimary?:
+        type: boolean
+        default: false
+  DatasetRevision:
+    type: object
+    additionalProperties: false
+    properties:
+      action: DatasetRevisionAction
+      timestamp: datetime
+      revisionId: VdiId
+      revisionNote: DatasetRevisionNote
   DatasetRevisionNote:
     description: Note providing a reason and/or description for the revision.
     type: string
     minLength: 10
     maxLength: 4096
+  DatasetRevisionAction:
+    type: string
+    enum:
+      - revise
   DatasetShortAttribution:
     type: string
     maxLength: 300
@@ -698,6 +715,10 @@ types:
       - private
       - protected
       - public
+  OrganismAbbreviation:
+    type: string
+    minLength: 3
+    maxLength: 20
   ProjectId:
     description: |
       Name or ID of a target VEuPathDB project.

@@ -12,54 +12,54 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "total"
 })
 public class AllDatasetsListMetaImpl implements AllDatasetsListMeta {
-  @JsonProperty("count")
+  @JsonProperty(JsonField.COUNT)
   private Integer count;
 
-  @JsonProperty("offset")
+  @JsonProperty(JsonField.OFFSET)
   private Integer offset;
 
-  @JsonProperty("limit")
+  @JsonProperty(JsonField.LIMIT)
   private Integer limit;
 
-  @JsonProperty("total")
+  @JsonProperty(JsonField.TOTAL)
   private Integer total;
 
-  @JsonProperty("count")
+  @JsonProperty(JsonField.COUNT)
   public Integer getCount() {
     return this.count;
   }
 
-  @JsonProperty("count")
+  @JsonProperty(JsonField.COUNT)
   public void setCount(Integer count) {
     this.count = count;
   }
 
-  @JsonProperty("offset")
+  @JsonProperty(JsonField.OFFSET)
   public Integer getOffset() {
     return this.offset;
   }
 
-  @JsonProperty("offset")
+  @JsonProperty(JsonField.OFFSET)
   public void setOffset(Integer offset) {
     this.offset = offset;
   }
 
-  @JsonProperty("limit")
+  @JsonProperty(JsonField.LIMIT)
   public Integer getLimit() {
     return this.limit;
   }
 
-  @JsonProperty("limit")
+  @JsonProperty(JsonField.LIMIT)
   public void setLimit(Integer limit) {
     this.limit = limit;
   }
 
-  @JsonProperty("total")
+  @JsonProperty(JsonField.TOTAL)
   public Integer getTotal() {
     return this.total;
   }
 
-  @JsonProperty("total")
+  @JsonProperty(JsonField.TOTAL)
   public void setTotal(Integer total) {
     this.total = total;
   }

@@ -8,15 +8,15 @@ import java.util.List;
     as = BrokenDatasetListingImpl.class
 )
 public interface BrokenDatasetListing {
-  @JsonProperty("details")
+  @JsonProperty(JsonField.DETAILS)
   List<BrokenDatasetDetails> getDetails();
 
-  @JsonProperty("details")
+  @JsonProperty(JsonField.DETAILS)
   void setDetails(List<BrokenDatasetDetails> details);
 
-  @JsonProperty("ids")
+  @JsonProperty(JsonField.IDS)
   List<String> getIds();
 
-  @JsonProperty("ids")
+  @JsonProperty(JsonField.IDS)
   void setIds(List<String> ids);
 }

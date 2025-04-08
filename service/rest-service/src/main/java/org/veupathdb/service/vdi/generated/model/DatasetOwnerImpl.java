@@ -13,67 +13,67 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "organization"
 })
 public class DatasetOwnerImpl implements DatasetOwner {
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   private Long userId;
 
-  @JsonProperty("firstName")
+  @JsonProperty(JsonField.FIRST_NAME)
   private String firstName;
 
-  @JsonProperty("lastName")
+  @JsonProperty(JsonField.LAST_NAME)
   private String lastName;
 
-  @JsonProperty("email")
+  @JsonProperty(JsonField.EMAIL)
   private String email;
 
-  @JsonProperty("organization")
+  @JsonProperty(JsonField.ORGANIZATION)
   private String organization;
 
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   public Long getUserId() {
     return this.userId;
   }
 
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   public void setUserId(Long userId) {
     this.userId = userId;
   }
 
-  @JsonProperty("firstName")
+  @JsonProperty(JsonField.FIRST_NAME)
   public String getFirstName() {
     return this.firstName;
   }
 
-  @JsonProperty("firstName")
+  @JsonProperty(JsonField.FIRST_NAME)
   public void setFirstName(String firstName) {
     this.firstName = firstName;
   }
 
-  @JsonProperty("lastName")
+  @JsonProperty(JsonField.LAST_NAME)
   public String getLastName() {
     return this.lastName;
   }
 
-  @JsonProperty("lastName")
+  @JsonProperty(JsonField.LAST_NAME)
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
 
-  @JsonProperty("email")
+  @JsonProperty(JsonField.EMAIL)
   public String getEmail() {
     return this.email;
   }
 
-  @JsonProperty("email")
+  @JsonProperty(JsonField.EMAIL)
   public void setEmail(String email) {
     this.email = email;
   }
 
-  @JsonProperty("organization")
+  @JsonProperty(JsonField.ORGANIZATION)
   public String getOrganization() {
     return this.organization;
   }
 
-  @JsonProperty("organization")
+  @JsonProperty(JsonField.ORGANIZATION)
   public void setOrganization(String organization) {
     this.organization = organization;
   }

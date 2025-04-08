@@ -13,67 +13,67 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "accepted"
 })
 public class DatasetListShareUserImpl implements DatasetListShareUser {
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   private Long userId;
 
-  @JsonProperty("firstName")
+  @JsonProperty(JsonField.FIRST_NAME)
   private String firstName;
 
-  @JsonProperty("lastName")
+  @JsonProperty(JsonField.LAST_NAME)
   private String lastName;
 
-  @JsonProperty("organization")
+  @JsonProperty(JsonField.ORGANIZATION)
   private String organization;
 
-  @JsonProperty("accepted")
+  @JsonProperty(JsonField.ACCEPTED)
   private Boolean accepted;
 
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   public Long getUserId() {
     return this.userId;
   }
 
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   public void setUserId(Long userId) {
     this.userId = userId;
   }
 
-  @JsonProperty("firstName")
+  @JsonProperty(JsonField.FIRST_NAME)
   public String getFirstName() {
     return this.firstName;
   }
 
-  @JsonProperty("firstName")
+  @JsonProperty(JsonField.FIRST_NAME)
   public void setFirstName(String firstName) {
     this.firstName = firstName;
   }
 
-  @JsonProperty("lastName")
+  @JsonProperty(JsonField.LAST_NAME)
   public String getLastName() {
     return this.lastName;
   }
 
-  @JsonProperty("lastName")
+  @JsonProperty(JsonField.LAST_NAME)
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
 
-  @JsonProperty("organization")
+  @JsonProperty(JsonField.ORGANIZATION)
   public String getOrganization() {
     return this.organization;
   }
 
-  @JsonProperty("organization")
+  @JsonProperty(JsonField.ORGANIZATION)
   public void setOrganization(String organization) {
     this.organization = organization;
   }
 
-  @JsonProperty("accepted")
+  @JsonProperty(JsonField.ACCEPTED)
   public Boolean getAccepted() {
     return this.accepted;
   }
 
-  @JsonProperty("accepted")
+  @JsonProperty(JsonField.ACCEPTED)
   public void setAccepted(Boolean accepted) {
     this.accepted = accepted;
   }

@@ -1,8 +1,10 @@
 package org.veupathdb.service.vdi.server.controllers
 
+import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.NotFoundException
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
+import org.veupathdb.lib.container.jaxrs.errors.UnprocessableEntityException
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequestBody
@@ -10,8 +12,7 @@ import org.veupathdb.service.vdi.generated.model.DatasetPutRequestBody
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiId
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiId.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdiId
-import org.veupathdb.service.vdi.genx.model.BadRequestError
-import org.veupathdb.service.vdi.genx.model.NotFoundError
+import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.service.dataset.*
 import org.veupathdb.vdi.lib.common.field.toUserID
 
@@ -52,7 +53,25 @@ class DatasetByID(@Context request: ContainerRequest)
   }
 
   override fun putDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?): PutDatasetsByVdiIdResponse {
-    TODO("Not yet implemented")
+    entity ?: return PutDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError("empty request body"))
+    return try {
+      entity.cleanup()
+      entity.validate()
+
+      putDataset(userID.toUserID(), vdiId.asVDIID(), )
+        .let {
+          PutDatasetsByVdiIdResponse.respond201WithApplicationJson(
+            it,
+            PutDatasetsByVdiIdResponse.headersFor201().withLocation(redirectURL(it.datasetId))
+          )
+        }
+    } catch (e: BadRequestException) {
+      PutDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError(e.message ?: "bad request"))
+    } catch (e: NotFoundException) {
+      PutDatasetsByVdiIdResponse.respond404WithApplicationJson(NotFoundError())
+    } catch (e: UnprocessableEntityException) {
+      PutDatasetsByVdiIdResponse.respond422WithApplicationJson(UnprocessableEntityError(e))
+    }
   }
 
   @Authenticated(adminOverride = ALLOW_ALWAYS)
@@ -75,7 +94,6 @@ class DatasetByID(@Context request: ContainerRequest)
 
   override fun patchVdiDatasetsByVdiId(vdiId: String, entity: DatasetPatchRequestBody?) =
     VdiDatasetsVdiId.PatchVdiDatasetsByVdiIdResponse(patchDatasetsByVdiId(vdiId, entity))
-
 
   override fun putVdiDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?) =
     VdiDatasetsVdiId.PutVdiDatasetsByVdiIdResponse(putDatasetsByVdiId(vdiId, entity))

@@ -11,22 +11,22 @@ import java.util.Map;
     as = HealthResponseImpl.class
 )
 public interface HealthResponse {
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   StatusType getStatus();
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   void setStatus(StatusType status);
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   List<DependencyStatus> getDependencies();
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   void setDependencies(List<DependencyStatus> dependencies);
 
-  @JsonProperty("info")
+  @JsonProperty(JsonField.INFO)
   InfoType getInfo();
 
-  @JsonProperty("info")
+  @JsonProperty(JsonField.INFO)
   void setInfo(InfoType info);
 
   enum StatusType {

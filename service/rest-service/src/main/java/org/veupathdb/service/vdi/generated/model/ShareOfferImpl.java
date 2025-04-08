@@ -10,28 +10,28 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "status"
 })
 public class ShareOfferImpl implements ShareOffer {
-  @JsonProperty("recipient")
+  @JsonProperty(JsonField.RECIPIENT)
   private ShareOfferRecipient recipient;
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   private ShareOfferAction status;
 
-  @JsonProperty("recipient")
+  @JsonProperty(JsonField.RECIPIENT)
   public ShareOfferRecipient getRecipient() {
     return this.recipient;
   }
 
-  @JsonProperty("recipient")
+  @JsonProperty(JsonField.RECIPIENT)
   public void setRecipient(ShareOfferRecipient recipient) {
     this.recipient = recipient;
   }
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   public ShareOfferAction getStatus() {
     return this.status;
   }
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   public void setStatus(ShareOfferAction status) {
     this.status = status;
   }

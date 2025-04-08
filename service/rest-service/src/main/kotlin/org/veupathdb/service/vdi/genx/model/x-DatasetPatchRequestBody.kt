@@ -4,6 +4,7 @@ import org.veupathdb.service.vdi.generated.model.DatasetPatchRequestBody
 import org.veupathdb.service.vdi.util.ValidationErrors
 import vdi.component.db.app.*
 
+@Suppress("DuplicatedCode") // Overlap in generated API types
 internal fun DatasetPatchRequestBody.cleanup() {
   name = name?.trim()
   shortName = shortName?.trim()
@@ -31,30 +32,18 @@ internal fun DatasetPatchRequestBody.cleanup() {
     organisms = emptyList()
 }
 
-internal fun DatasetPatchRequestBody.validate() {
-  val errors = ValidationErrors()
-
+internal fun DatasetPatchRequestBody.validate(errors: ValidationErrors = ValidationErrors()) {
   if (name.isNullOrBlank())
     errors.add("name", "field cannot be blank")
   else
     name.checkLength("meta.name", DatasetMetaMaxNameLength, errors)
 
-  shortName?.checkLength("shortName", DatasetMetaMaxShortNameLength, errors)
-  shortAttribution?.checkLength("shortAttribution", DatasetMetaMaxShortAttributionLength, errors)
-  category?.checkLength("category", DatasetMetaMaxCategoryLength, errors)
-
-  if (summary != null) {
-    if (summary.length > DatasetMetaMaxSummaryFieldLength)
-      errors.add("summary", "must be $DatasetMetaMaxSummaryFieldLength characters or less")
-  }
-
-  publications.forEachIndexed { i, pub -> pub.validate("", i, errors) }
-  hyperlinks.forEachIndexed { i, link -> link.validate("", i, errors) }
-  contacts.forEachIndexed { i, con -> con.validate("", i, errors) }
-  organisms.forEachIndexed { i, l ->
-    if (l == null)
-      errors.add("meta.organisms[$i]", "entries must not be null")
-
-    l.checkLength("meta.organism[$i]", DatasetOrganismAbbrevMaxLength, errors)
-  }
+  shortName?.validateShortName(errors)
+  shortAttribution?.validateShortAttribution(errors)
+  category?.validateCategory(errors)
+  summary?.validateSummary(errors)
+  publications.validate(errors)
+  hyperlinks.validate(errors)
+  contacts.validate(errors)
+  organisms.validateOrganisms(errors)
 }

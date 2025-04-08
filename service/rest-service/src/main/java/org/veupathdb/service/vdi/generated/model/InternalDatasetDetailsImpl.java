@@ -32,262 +32,262 @@ import java.util.List;
     "installFiles"
 })
 public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   private DatasetTypeInfo datasetType;
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   private Long owner;
 
-  @JsonProperty("isDeleted")
+  @JsonProperty(JsonField.IS_DELETED)
   private Boolean isDeleted;
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   private String origin;
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   private OffsetDateTime created;
 
-  @JsonProperty("inserted")
+  @JsonProperty(JsonField.INSERTED)
   private OffsetDateTime inserted;
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   private String name;
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   private List<String> projectIds;
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   private String status;
 
-  @JsonProperty("importMessages")
+  @JsonProperty(JsonField.IMPORT_MESSAGES)
   private List<String> importMessages;
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   private DatasetVisibility visibility;
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   private String shortName;
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   private String shortAttribution;
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   private String category;
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   private String summary;
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   private String description;
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   private String sourceUrl;
 
-  @JsonProperty("syncControl")
+  @JsonProperty(JsonField.SYNC_CONTROL)
   private SyncControlRecord syncControl;
 
-  @JsonProperty("uploadFiles")
+  @JsonProperty(JsonField.UPLOAD_FILES)
   private List<String> uploadFiles;
 
-  @JsonProperty("installFiles")
+  @JsonProperty(JsonField.INSTALL_FILES)
   private List<String> installFiles;
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   public DatasetTypeInfo getDatasetType() {
     return this.datasetType;
   }
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   public void setDatasetType(DatasetTypeInfo datasetType) {
     this.datasetType = datasetType;
   }
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   public Long getOwner() {
     return this.owner;
   }
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   public void setOwner(Long owner) {
     this.owner = owner;
   }
 
-  @JsonProperty("isDeleted")
+  @JsonProperty(JsonField.IS_DELETED)
   public Boolean getIsDeleted() {
     return this.isDeleted;
   }
 
-  @JsonProperty("isDeleted")
+  @JsonProperty(JsonField.IS_DELETED)
   public void setIsDeleted(Boolean isDeleted) {
     this.isDeleted = isDeleted;
   }
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   public String getOrigin() {
     return this.origin;
   }
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   public void setOrigin(String origin) {
     this.origin = origin;
   }
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   public OffsetDateTime getCreated() {
     return this.created;
   }
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   public void setCreated(OffsetDateTime created) {
     this.created = created;
   }
 
-  @JsonProperty("inserted")
+  @JsonProperty(JsonField.INSERTED)
   public OffsetDateTime getInserted() {
     return this.inserted;
   }
 
-  @JsonProperty("inserted")
+  @JsonProperty(JsonField.INSERTED)
   public void setInserted(OffsetDateTime inserted) {
     this.inserted = inserted;
   }
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   public String getName() {
     return this.name;
   }
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   public void setName(String name) {
     this.name = name;
   }
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   public List<String> getProjectIds() {
     return this.projectIds;
   }
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   public void setProjectIds(List<String> projectIds) {
     this.projectIds = projectIds;
   }
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   public String getStatus() {
     return this.status;
   }
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   public void setStatus(String status) {
     this.status = status;
   }
 
-  @JsonProperty("importMessages")
+  @JsonProperty(JsonField.IMPORT_MESSAGES)
   public List<String> getImportMessages() {
     return this.importMessages;
   }
 
-  @JsonProperty("importMessages")
+  @JsonProperty(JsonField.IMPORT_MESSAGES)
   public void setImportMessages(List<String> importMessages) {
     this.importMessages = importMessages;
   }
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   public DatasetVisibility getVisibility() {
     return this.visibility;
   }
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   public void setVisibility(DatasetVisibility visibility) {
     this.visibility = visibility;
   }
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   public String getShortName() {
     return this.shortName;
   }
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   public void setShortName(String shortName) {
     this.shortName = shortName;
   }
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   public String getShortAttribution() {
     return this.shortAttribution;
   }
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   public void setShortAttribution(String shortAttribution) {
     this.shortAttribution = shortAttribution;
   }
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   public String getCategory() {
     return this.category;
   }
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   public void setCategory(String category) {
     this.category = category;
   }
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   public String getSummary() {
     return this.summary;
   }
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   public void setSummary(String summary) {
     this.summary = summary;
   }
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   public String getDescription() {
     return this.description;
   }
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   public void setDescription(String description) {
     this.description = description;
   }
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   public String getSourceUrl() {
     return this.sourceUrl;
   }
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   public void setSourceUrl(String sourceUrl) {
     this.sourceUrl = sourceUrl;
   }
 
-  @JsonProperty("syncControl")
+  @JsonProperty(JsonField.SYNC_CONTROL)
   public SyncControlRecord getSyncControl() {
     return this.syncControl;
   }
 
-  @JsonProperty("syncControl")
+  @JsonProperty(JsonField.SYNC_CONTROL)
   public void setSyncControl(SyncControlRecord syncControl) {
     this.syncControl = syncControl;
   }
 
-  @JsonProperty("uploadFiles")
+  @JsonProperty(JsonField.UPLOAD_FILES)
   public List<String> getUploadFiles() {
     return this.uploadFiles;
   }
 
-  @JsonProperty("uploadFiles")
+  @JsonProperty(JsonField.UPLOAD_FILES)
   public void setUploadFiles(List<String> uploadFiles) {
     this.uploadFiles = uploadFiles;
   }
 
-  @JsonProperty("installFiles")
+  @JsonProperty(JsonField.INSTALL_FILES)
   public List<String> getInstallFiles() {
     return this.installFiles;
   }
 
-  @JsonProperty("installFiles")
+  @JsonProperty(JsonField.INSTALL_FILES)
   public void setInstallFiles(List<String> installFiles) {
     this.installFiles = installFiles;
   }

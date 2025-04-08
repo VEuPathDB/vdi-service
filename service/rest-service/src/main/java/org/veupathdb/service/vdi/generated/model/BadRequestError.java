@@ -11,12 +11,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 public interface BadRequestError extends Error {
   ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.BADREQUEST;
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   ErrorType getStatus();
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   String getMessage();
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   void setMessage(String message);
 }

@@ -8,33 +8,33 @@ import java.util.List;
     as = ShareOfferEntryImpl.class
 )
 public interface ShareOfferEntry {
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   String getDatasetId();
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   void setDatasetId(String datasetId);
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   DatasetOwner getOwner();
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   void setOwner(DatasetOwner owner);
 
-  @JsonProperty("shareStatus")
+  @JsonProperty(JsonField.SHARE_STATUS)
   ShareOfferStatus getShareStatus();
 
-  @JsonProperty("shareStatus")
+  @JsonProperty(JsonField.SHARE_STATUS)
   void setShareStatus(ShareOfferStatus shareStatus);
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   DatasetTypeInfo getDatasetType();
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   void setDatasetType(DatasetTypeInfo datasetType);
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   List<String> getProjectIds();
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   void setProjectIds(List<String> projectIds);
 }

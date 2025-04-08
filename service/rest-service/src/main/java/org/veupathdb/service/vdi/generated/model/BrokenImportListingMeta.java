@@ -7,39 +7,39 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = BrokenImportListingMetaImpl.class
 )
 public interface BrokenImportListingMeta {
-  @JsonProperty("count")
+  @JsonProperty(JsonField.COUNT)
   Integer getCount();
 
-  @JsonProperty("count")
+  @JsonProperty(JsonField.COUNT)
   void setCount(Integer count);
 
-  @JsonProperty("before")
+  @JsonProperty(JsonField.BEFORE)
   String getBefore();
 
-  @JsonProperty("before")
+  @JsonProperty(JsonField.BEFORE)
   void setBefore(String before);
 
-  @JsonProperty("after")
+  @JsonProperty(JsonField.AFTER)
   String getAfter();
 
-  @JsonProperty("after")
+  @JsonProperty(JsonField.AFTER)
   void setAfter(String after);
 
-  @JsonProperty("user")
+  @JsonProperty(JsonField.USER)
   Long getUser();
 
-  @JsonProperty("user")
+  @JsonProperty(JsonField.USER)
   void setUser(Long user);
 
-  @JsonProperty("limit")
+  @JsonProperty(JsonField.LIMIT)
   Integer getLimit();
 
-  @JsonProperty("limit")
+  @JsonProperty(JsonField.LIMIT)
   void setLimit(Integer limit);
 
-  @JsonProperty("offset")
+  @JsonProperty(JsonField.OFFSET)
   Integer getOffset();
 
-  @JsonProperty("offset")
+  @JsonProperty(JsonField.OFFSET)
   void setOffset(Integer offset);
 }

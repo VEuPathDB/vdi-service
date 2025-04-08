@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetPostResponseBodyImpl.class
 )
 public interface DatasetPostResponseBody {
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   String getDatasetId();
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   void setDatasetId(String datasetId);
 }

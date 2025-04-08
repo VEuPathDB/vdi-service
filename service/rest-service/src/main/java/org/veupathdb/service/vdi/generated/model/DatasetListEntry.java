@@ -9,111 +9,117 @@ import java.util.List;
     as = DatasetListEntryImpl.class
 )
 public interface DatasetListEntry {
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   String getDatasetId();
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   void setDatasetId(String datasetId);
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   DatasetOwner getOwner();
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   void setOwner(DatasetOwner owner);
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   DatasetTypeInfo getDatasetType();
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   void setDatasetType(DatasetTypeInfo datasetType);
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   DatasetVisibility getVisibility();
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   void setVisibility(DatasetVisibility visibility);
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   String getName();
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   void setName(String name);
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   void setOrigin(String origin);
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   List<String> getProjectIds();
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   void setProjectIds(List<String> projectIds);
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   DatasetStatusInfo getStatus();
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   void setStatus(DatasetStatusInfo status);
 
-  @JsonProperty("shares")
+  @JsonProperty(JsonField.SHARES)
   List<DatasetListShareUser> getShares();
 
-  @JsonProperty("shares")
+  @JsonProperty(JsonField.SHARES)
   void setShares(List<DatasetListShareUser> shares);
 
-  @JsonProperty("fileCount")
+  @JsonProperty(JsonField.FILE_COUNT)
   Integer getFileCount();
 
-  @JsonProperty("fileCount")
+  @JsonProperty(JsonField.FILE_COUNT)
   void setFileCount(Integer fileCount);
 
-  @JsonProperty("fileSizeTotal")
+  @JsonProperty(JsonField.FILE_SIZE_TOTAL)
   Long getFileSizeTotal();
 
-  @JsonProperty("fileSizeTotal")
+  @JsonProperty(JsonField.FILE_SIZE_TOTAL)
   void setFileSizeTotal(Long fileSizeTotal);
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   OffsetDateTime getCreated();
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   void setCreated(OffsetDateTime created);
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   String getShortName();
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   void setShortName(String shortName);
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   String getShortAttribution();
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   void setShortAttribution(String shortAttribution);
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   String getCategory();
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   void setCategory(String category);
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   String getSummary();
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   void setSummary(String summary);
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   String getDescription();
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   void setDescription(String description);
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   String getSourceUrl();
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   void setSourceUrl(String sourceUrl);
+
+  @JsonProperty(JsonField.ORIGINAL_ID)
+  String getOriginalId();
+
+  @JsonProperty(JsonField.ORIGINAL_ID)
+  void setOriginalId(String originalId);
 }

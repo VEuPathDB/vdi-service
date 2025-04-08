@@ -13,54 +13,54 @@ import java.util.List;
     "projects"
 })
 public class PluginListItemImpl implements PluginListItem {
-  @JsonProperty("displayName")
+  @JsonProperty(JsonField.DISPLAY_NAME)
   private String displayName;
 
-  @JsonProperty("typeName")
+  @JsonProperty(JsonField.TYPE_NAME)
   private String typeName;
 
-  @JsonProperty("typeVersion")
+  @JsonProperty(JsonField.TYPE_VERSION)
   private String typeVersion;
 
-  @JsonProperty("projects")
+  @JsonProperty(JsonField.PROJECTS)
   private List<String> projects;
 
-  @JsonProperty("displayName")
+  @JsonProperty(JsonField.DISPLAY_NAME)
   public String getDisplayName() {
     return this.displayName;
   }
 
-  @JsonProperty("displayName")
+  @JsonProperty(JsonField.DISPLAY_NAME)
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
   }
 
-  @JsonProperty("typeName")
+  @JsonProperty(JsonField.TYPE_NAME)
   public String getTypeName() {
     return this.typeName;
   }
 
-  @JsonProperty("typeName")
+  @JsonProperty(JsonField.TYPE_NAME)
   public void setTypeName(String typeName) {
     this.typeName = typeName;
   }
 
-  @JsonProperty("typeVersion")
+  @JsonProperty(JsonField.TYPE_VERSION)
   public String getTypeVersion() {
     return this.typeVersion;
   }
 
-  @JsonProperty("typeVersion")
+  @JsonProperty(JsonField.TYPE_VERSION)
   public void setTypeVersion(String typeVersion) {
     this.typeVersion = typeVersion;
   }
 
-  @JsonProperty("projects")
+  @JsonProperty(JsonField.PROJECTS)
   public List<String> getProjects() {
     return this.projects;
   }
 
-  @JsonProperty("projects")
+  @JsonProperty(JsonField.PROJECTS)
   public void setProjects(List<String> projects) {
     this.projects = projects;
   }

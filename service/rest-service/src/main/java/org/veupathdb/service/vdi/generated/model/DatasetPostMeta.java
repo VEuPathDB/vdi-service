@@ -9,105 +9,105 @@ import java.util.List;
     as = DatasetPostMetaImpl.class
 )
 public interface DatasetPostMeta {
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   String getName();
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   void setName(String name);
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   DatasetPostType getDatasetType();
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   void setDatasetType(DatasetPostType datasetType);
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   void setOrigin(String origin);
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   List<DatasetDependency> getDependencies();
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   void setDependencies(List<DatasetDependency> dependencies);
 
-  @JsonProperty("projects")
+  @JsonProperty(JsonField.PROJECTS)
   List<String> getProjects();
 
-  @JsonProperty("projects")
+  @JsonProperty(JsonField.PROJECTS)
   void setProjects(List<String> projects);
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   String getShortName();
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   void setShortName(String shortName);
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   String getShortAttribution();
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   void setShortAttribution(String shortAttribution);
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   String getCategory();
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   void setCategory(String category);
 
   @JsonProperty(
-      value = "visibility",
+      value = JsonField.VISIBILITY,
       defaultValue = "private"
   )
   DatasetVisibility getVisibility();
 
   @JsonProperty(
-      value = "visibility",
+      value = JsonField.VISIBILITY,
       defaultValue = "private"
   )
   void setVisibility(DatasetVisibility visibility);
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   String getSummary();
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   void setSummary(String summary);
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   String getDescription();
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   void setDescription(String description);
 
-  @JsonProperty("publications")
+  @JsonProperty(JsonField.PUBLICATIONS)
   List<DatasetPublication> getPublications();
 
-  @JsonProperty("publications")
+  @JsonProperty(JsonField.PUBLICATIONS)
   void setPublications(List<DatasetPublication> publications);
 
-  @JsonProperty("hyperlinks")
+  @JsonProperty(JsonField.HYPERLINKS)
   List<DatasetHyperlink> getHyperlinks();
 
-  @JsonProperty("hyperlinks")
+  @JsonProperty(JsonField.HYPERLINKS)
   void setHyperlinks(List<DatasetHyperlink> hyperlinks);
 
-  @JsonProperty("organisms")
+  @JsonProperty(JsonField.ORGANISMS)
   List<String> getOrganisms();
 
-  @JsonProperty("organisms")
+  @JsonProperty(JsonField.ORGANISMS)
   void setOrganisms(List<String> organisms);
 
-  @JsonProperty("contacts")
+  @JsonProperty(JsonField.CONTACTS)
   List<DatasetContact> getContacts();
 
-  @JsonProperty("contacts")
+  @JsonProperty(JsonField.CONTACTS)
   void setContacts(List<DatasetContact> contacts);
 
-  @JsonProperty("createdOn")
+  @JsonProperty(JsonField.CREATED_ON)
   OffsetDateTime getCreatedOn();
 
-  @JsonProperty("createdOn")
+  @JsonProperty(JsonField.CREATED_ON)
   void setCreatedOn(OffsetDateTime createdOn);
 }

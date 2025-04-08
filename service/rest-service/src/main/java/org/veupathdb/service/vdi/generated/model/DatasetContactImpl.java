@@ -16,105 +16,105 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "isPrimary"
 })
 public class DatasetContactImpl implements DatasetContact {
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   private String name;
 
-  @JsonProperty("email")
+  @JsonProperty(JsonField.EMAIL)
   private String email;
 
-  @JsonProperty("affiliation")
+  @JsonProperty(JsonField.AFFILIATION)
   private String affiliation;
 
-  @JsonProperty("city")
+  @JsonProperty(JsonField.CITY)
   private String city;
 
-  @JsonProperty("state")
+  @JsonProperty(JsonField.STATE)
   private String state;
 
-  @JsonProperty("country")
+  @JsonProperty(JsonField.COUNTRY)
   private String country;
 
-  @JsonProperty("address")
+  @JsonProperty(JsonField.ADDRESS)
   private String address;
 
   @JsonProperty(
-      value = "isPrimary",
+      value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
   private Boolean isPrimary;
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   public String getName() {
     return this.name;
   }
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   public void setName(String name) {
     this.name = name;
   }
 
-  @JsonProperty("email")
+  @JsonProperty(JsonField.EMAIL)
   public String getEmail() {
     return this.email;
   }
 
-  @JsonProperty("email")
+  @JsonProperty(JsonField.EMAIL)
   public void setEmail(String email) {
     this.email = email;
   }
 
-  @JsonProperty("affiliation")
+  @JsonProperty(JsonField.AFFILIATION)
   public String getAffiliation() {
     return this.affiliation;
   }
 
-  @JsonProperty("affiliation")
+  @JsonProperty(JsonField.AFFILIATION)
   public void setAffiliation(String affiliation) {
     this.affiliation = affiliation;
   }
 
-  @JsonProperty("city")
+  @JsonProperty(JsonField.CITY)
   public String getCity() {
     return this.city;
   }
 
-  @JsonProperty("city")
+  @JsonProperty(JsonField.CITY)
   public void setCity(String city) {
     this.city = city;
   }
 
-  @JsonProperty("state")
+  @JsonProperty(JsonField.STATE)
   public String getState() {
     return this.state;
   }
 
-  @JsonProperty("state")
+  @JsonProperty(JsonField.STATE)
   public void setState(String state) {
     this.state = state;
   }
 
-  @JsonProperty("country")
+  @JsonProperty(JsonField.COUNTRY)
   public String getCountry() {
     return this.country;
   }
 
-  @JsonProperty("country")
+  @JsonProperty(JsonField.COUNTRY)
   public void setCountry(String country) {
     this.country = country;
   }
 
-  @JsonProperty("address")
+  @JsonProperty(JsonField.ADDRESS)
   public String getAddress() {
     return this.address;
   }
 
-  @JsonProperty("address")
+  @JsonProperty(JsonField.ADDRESS)
   public void setAddress(String address) {
     this.address = address;
   }
 
   @JsonProperty(
-      value = "isPrimary",
+      value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
   public Boolean getIsPrimary() {
@@ -122,7 +122,7 @@ public class DatasetContactImpl implements DatasetContact {
   }
 
   @JsonProperty(
-      value = "isPrimary",
+      value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
   public void setIsPrimary(Boolean isPrimary) {

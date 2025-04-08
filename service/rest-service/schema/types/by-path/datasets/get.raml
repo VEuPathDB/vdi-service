@@ -6,7 +6,6 @@ uses:
 types:
 
   DatasetListShareUser:
-    type: object
     additionalProperties: false
     properties:
       userId: common.UserId
@@ -18,7 +17,6 @@ types:
   DatasetListEntry:
     displayName: Dataset List Item
     description: Short entry with basic details about a dataset.
-    type: object
     additionalProperties: false
     properties:
       datasetId: common.VdiId
@@ -50,3 +48,4 @@ types:
       summary?: common.DatasetSummary
       description?: common.DatasetDescription
       sourceUrl?: common.DatasetSourceUrl
+      originalId?: common.VdiId

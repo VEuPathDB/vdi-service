@@ -12,41 +12,41 @@ import java.io.File;
     "url"
 })
 public class DatasetPostRequestBodyImpl implements DatasetPostRequestBody {
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   private DatasetPostMeta meta;
 
-  @JsonProperty("file")
+  @JsonProperty(JsonField.FILE)
   private File file;
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   private String url;
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   public DatasetPostMeta getMeta() {
     return this.meta;
   }
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   public void setMeta(DatasetPostMeta meta) {
     this.meta = meta;
   }
 
-  @JsonProperty("file")
+  @JsonProperty(JsonField.FILE)
   public File getFile() {
     return this.file;
   }
 
-  @JsonProperty("file")
+  @JsonProperty(JsonField.FILE)
   public void setFile(File file) {
     this.file = file;
   }
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   public String getUrl() {
     return this.url;
   }
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   public void setUrl(String url) {
     this.url = url;
   }

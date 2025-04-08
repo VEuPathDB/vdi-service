@@ -10,28 +10,28 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "projectId"
 })
 public class InstallCleanupTargetImpl implements InstallCleanupTarget {
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   private String datasetId;
 
-  @JsonProperty("projectId")
+  @JsonProperty(JsonField.PROJECT_ID)
   private String projectId;
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   public String getDatasetId() {
     return this.datasetId;
   }
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   public void setDatasetId(String datasetId) {
     this.datasetId = datasetId;
   }
 
-  @JsonProperty("projectId")
+  @JsonProperty(JsonField.PROJECT_ID)
   public String getProjectId() {
     return this.projectId;
   }
 
-  @JsonProperty("projectId")
+  @JsonProperty(JsonField.PROJECT_ID)
   public void setProjectId(String projectId) {
     this.projectId = projectId;
   }

@@ -8,15 +8,15 @@ import java.util.List;
     as = AllDatasetsListResponseImpl.class
 )
 public interface AllDatasetsListResponse {
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   AllDatasetsListMeta getMeta();
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   void setMeta(AllDatasetsListMeta meta);
 
-  @JsonProperty("results")
+  @JsonProperty(JsonField.RESULTS)
   List<AllDatasetsListEntry> getResults();
 
-  @JsonProperty("results")
+  @JsonProperty(JsonField.RESULTS)
   void setResults(List<AllDatasetsListEntry> results);
 }

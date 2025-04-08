@@ -14,67 +14,67 @@ import java.util.List;
     "status"
 })
 public class BrokenDatasetDetailsImpl implements BrokenDatasetDetails {
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   private String datasetId;
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   private Long owner;
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   private DatasetTypeInfo datasetType;
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   private List<String> projectIds;
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   private DatasetStatusInfo status;
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   public String getDatasetId() {
     return this.datasetId;
   }
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   public void setDatasetId(String datasetId) {
     this.datasetId = datasetId;
   }
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   public Long getOwner() {
     return this.owner;
   }
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   public void setOwner(Long owner) {
     this.owner = owner;
   }
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   public DatasetTypeInfo getDatasetType() {
     return this.datasetType;
   }
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   public void setDatasetType(DatasetTypeInfo datasetType) {
     this.datasetType = datasetType;
   }
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   public List<String> getProjectIds() {
     return this.projectIds;
   }
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   public void setProjectIds(List<String> projectIds) {
     this.projectIds = projectIds;
   }
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   public DatasetStatusInfo getStatus() {
     return this.status;
   }
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   public void setStatus(DatasetStatusInfo status) {
     this.status = status;
   }

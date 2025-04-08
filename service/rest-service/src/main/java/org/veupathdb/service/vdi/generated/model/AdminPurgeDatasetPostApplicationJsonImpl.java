@@ -10,28 +10,28 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "datasetId"
 })
 public class AdminPurgeDatasetPostApplicationJsonImpl implements AdminPurgeDatasetPostApplicationJson {
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   private Long userId;
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   private String datasetId;
 
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   public Long getUserId() {
     return this.userId;
   }
 
-  @JsonProperty("userId")
+  @JsonProperty(JsonField.USER_ID)
   public void setUserId(Long userId) {
     this.userId = userId;
   }
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   public String getDatasetId() {
     return this.datasetId;
   }
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   public void setDatasetId(String datasetId) {
     this.datasetId = datasetId;
   }

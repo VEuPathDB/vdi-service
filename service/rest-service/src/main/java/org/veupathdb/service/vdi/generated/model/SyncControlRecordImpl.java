@@ -14,41 +14,41 @@ import java.time.OffsetDateTime;
     "metaUpdateTime"
 })
 public class SyncControlRecordImpl implements SyncControlRecord {
-  @JsonProperty("sharesUpdateTime")
+  @JsonProperty(JsonField.SHARES_UPDATE_TIME)
   private OffsetDateTime sharesUpdateTime;
 
-  @JsonProperty("dataUpdateTime")
+  @JsonProperty(JsonField.DATA_UPDATE_TIME)
   private OffsetDateTime dataUpdateTime;
 
-  @JsonProperty("metaUpdateTime")
+  @JsonProperty(JsonField.META_UPDATE_TIME)
   private OffsetDateTime metaUpdateTime;
 
-  @JsonProperty("sharesUpdateTime")
+  @JsonProperty(JsonField.SHARES_UPDATE_TIME)
   public OffsetDateTime getSharesUpdateTime() {
     return this.sharesUpdateTime;
   }
 
-  @JsonProperty("sharesUpdateTime")
+  @JsonProperty(JsonField.SHARES_UPDATE_TIME)
   public void setSharesUpdateTime(OffsetDateTime sharesUpdateTime) {
     this.sharesUpdateTime = sharesUpdateTime;
   }
 
-  @JsonProperty("dataUpdateTime")
+  @JsonProperty(JsonField.DATA_UPDATE_TIME)
   public OffsetDateTime getDataUpdateTime() {
     return this.dataUpdateTime;
   }
 
-  @JsonProperty("dataUpdateTime")
+  @JsonProperty(JsonField.DATA_UPDATE_TIME)
   public void setDataUpdateTime(OffsetDateTime dataUpdateTime) {
     this.dataUpdateTime = dataUpdateTime;
   }
 
-  @JsonProperty("metaUpdateTime")
+  @JsonProperty(JsonField.META_UPDATE_TIME)
   public OffsetDateTime getMetaUpdateTime() {
     return this.metaUpdateTime;
   }
 
-  @JsonProperty("metaUpdateTime")
+  @JsonProperty(JsonField.META_UPDATE_TIME)
   public void setMetaUpdateTime(OffsetDateTime metaUpdateTime) {
     this.metaUpdateTime = metaUpdateTime;
   }

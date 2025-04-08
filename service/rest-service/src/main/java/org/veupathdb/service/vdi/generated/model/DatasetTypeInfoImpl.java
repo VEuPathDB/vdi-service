@@ -11,41 +11,41 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "displayName"
 })
 public class DatasetTypeInfoImpl implements DatasetTypeInfo {
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   private String name;
 
-  @JsonProperty("version")
+  @JsonProperty(JsonField.VERSION)
   private String version;
 
-  @JsonProperty("displayName")
+  @JsonProperty(JsonField.DISPLAY_NAME)
   private String displayName;
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   public String getName() {
     return this.name;
   }
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   public void setName(String name) {
     this.name = name;
   }
 
-  @JsonProperty("version")
+  @JsonProperty(JsonField.VERSION)
   public String getVersion() {
     return this.version;
   }
 
-  @JsonProperty("version")
+  @JsonProperty(JsonField.VERSION)
   public void setVersion(String version) {
     this.version = version;
   }
 
-  @JsonProperty("displayName")
+  @JsonProperty(JsonField.DISPLAY_NAME)
   public String getDisplayName() {
     return this.displayName;
   }
 
-  @JsonProperty("displayName")
+  @JsonProperty(JsonField.DISPLAY_NAME)
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
   }

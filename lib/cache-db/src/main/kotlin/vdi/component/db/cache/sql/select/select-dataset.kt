@@ -70,7 +70,8 @@ internal fun Connection.selectDataset(datasetID: DatasetID): DatasetRecord? =
           description      = getString("description"),
           sourceURL        = getString("source_url"),
           projects         = getProjectIDList("projects"),
-          inserted         = getDateTime("inserted")
+          inserted         = getDateTime("inserted"),
+          originalID       = null,
         )
     }
   }

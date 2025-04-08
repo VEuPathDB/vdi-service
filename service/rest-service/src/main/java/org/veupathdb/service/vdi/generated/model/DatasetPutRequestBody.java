@@ -8,21 +8,21 @@ import java.io.File;
     as = DatasetPutRequestBodyImpl.class
 )
 public interface DatasetPutRequestBody {
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   DatasetPutMetadata getMeta();
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   void setMeta(DatasetPutMetadata meta);
 
-  @JsonProperty("file")
+  @JsonProperty(JsonField.FILE)
   File getFile();
 
-  @JsonProperty("file")
+  @JsonProperty(JsonField.FILE)
   void setFile(File file);
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   String getUrl();
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   void setUrl(String url);
 }

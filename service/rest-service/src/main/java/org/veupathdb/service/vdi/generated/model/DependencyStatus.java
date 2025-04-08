@@ -7,22 +7,22 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DependencyStatusImpl.class
 )
 public interface DependencyStatus {
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   String getName();
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   void setName(String name);
 
-  @JsonProperty("reachable")
+  @JsonProperty(JsonField.REACHABLE)
   Boolean getReachable();
 
-  @JsonProperty("reachable")
+  @JsonProperty(JsonField.REACHABLE)
   void setReachable(Boolean reachable);
 
-  @JsonProperty("online")
+  @JsonProperty(JsonField.ONLINE)
   OnlineType getOnline();
 
-  @JsonProperty("online")
+  @JsonProperty(JsonField.ONLINE)
   void setOnline(OnlineType online);
 
   enum OnlineType {

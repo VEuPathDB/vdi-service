@@ -7,15 +7,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetPostTypeImpl.class
 )
 public interface DatasetPostType {
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   String getName();
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   void setName(String name);
 
-  @JsonProperty("version")
+  @JsonProperty(JsonField.VERSION)
   String getVersion();
 
-  @JsonProperty("version")
+  @JsonProperty(JsonField.VERSION)
   void setVersion(String version);
 }

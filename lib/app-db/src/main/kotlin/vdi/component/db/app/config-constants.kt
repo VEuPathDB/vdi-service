@@ -26,6 +26,3 @@ const val DatasetHyperlinkDescriptionMaxLength = 4000
 // vdi_control_*.dataset_publication
 const val DatasetPublicationCitationMaxLength = 2000
 const val DatasetPublicationPubMedIDMaxLength = 30
-
-// vdi_control_*.dataset_organism
-const val DatasetOrganismAbbrevMaxLength = 20

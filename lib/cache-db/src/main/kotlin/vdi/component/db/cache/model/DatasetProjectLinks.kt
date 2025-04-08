@@ -5,5 +5,5 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 
 interface DatasetProjectLinks {
   val datasetID: DatasetID
-  val projects: Collection<ProjectID>
+  val projects: List<ProjectID>
 }

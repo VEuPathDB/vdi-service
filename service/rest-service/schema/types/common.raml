@@ -115,6 +115,8 @@ types:
   DatasetName:
     type: string
     description: User-provided name for the dataset.
+    minLength: 3
+    maxLength: 1024
 
   DatasetOrigin:
     description: |
@@ -143,12 +145,28 @@ types:
         type: string
         minLength: 3
         maxLength: 2000
+      isPrimary?:
+        type: boolean
+        default: false
+
+  DatasetRevision:
+    additionalProperties: false
+    properties:
+      action: DatasetRevisionAction
+      timestamp: datetime
+      revisionId: VdiId
+      revisionNote: DatasetRevisionNote
 
   DatasetRevisionNote:
     description: Note providing a reason and/or description for the revision.
     type: string
     minLength: 10
     maxLength: 4096
+
+  DatasetRevisionAction:
+    type: string
+    enum:
+    - revise
 
   DatasetShortAttribution:
     type: string
@@ -193,6 +211,11 @@ types:
     - private
     - protected
     - public
+
+  OrganismAbbreviation:
+    type: string
+    minLength: 3
+    maxLength: 20
 
   ProjectId:
     description: |

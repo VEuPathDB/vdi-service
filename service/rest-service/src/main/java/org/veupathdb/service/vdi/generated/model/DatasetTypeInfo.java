@@ -7,21 +7,21 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetTypeInfoImpl.class
 )
 public interface DatasetTypeInfo {
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   String getName();
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   void setName(String name);
 
-  @JsonProperty("version")
+  @JsonProperty(JsonField.VERSION)
   String getVersion();
 
-  @JsonProperty("version")
+  @JsonProperty(JsonField.VERSION)
   void setVersion(String version);
 
-  @JsonProperty("displayName")
+  @JsonProperty(JsonField.DISPLAY_NAME)
   String getDisplayName();
 
-  @JsonProperty("displayName")
+  @JsonProperty(JsonField.DISPLAY_NAME)
   void setDisplayName(String displayName);
 }

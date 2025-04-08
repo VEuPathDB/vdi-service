@@ -54,14 +54,13 @@ types:
         uniqueItems: true
       organisms?:
         displayName: Dataset Organism Abbreviations
-        type: array
-        items:
-          type: string
-          maxLength: 20
+        type: common.OrganismAbbreviation[]
         uniqueItems: true
       contacts?:
         type: common.DatasetContact[]
         uniqueItems: true
+      originalId?: common.VdiId
+      revisionHistory?: common.DatasetRevision[]
 
   ShareOffer:
     additionalProperties: false

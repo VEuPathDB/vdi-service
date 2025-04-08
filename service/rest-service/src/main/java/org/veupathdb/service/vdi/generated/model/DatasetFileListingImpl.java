@@ -10,28 +10,28 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "install"
 })
 public class DatasetFileListingImpl implements DatasetFileListing {
-  @JsonProperty("upload")
+  @JsonProperty(JsonField.UPLOAD)
   private DatasetZipDetails upload;
 
-  @JsonProperty("install")
+  @JsonProperty(JsonField.INSTALL)
   private DatasetZipDetails install;
 
-  @JsonProperty("upload")
+  @JsonProperty(JsonField.UPLOAD)
   public DatasetZipDetails getUpload() {
     return this.upload;
   }
 
-  @JsonProperty("upload")
+  @JsonProperty(JsonField.UPLOAD)
   public void setUpload(DatasetZipDetails upload) {
     this.upload = upload;
   }
 
-  @JsonProperty("install")
+  @JsonProperty(JsonField.INSTALL)
   public DatasetZipDetails getInstall() {
     return this.install;
   }
 
-  @JsonProperty("install")
+  @JsonProperty(JsonField.INSTALL)
   public void setInstall(DatasetZipDetails install) {
     this.install = install;
   }

@@ -11,28 +11,28 @@ import java.util.List;
     "install"
 })
 public class DatasetStatusInfoImpl implements DatasetStatusInfo {
-  @JsonProperty("import")
+  @JsonProperty(JsonField.IMPORT)
   private DatasetImportStatus importVariable;
 
-  @JsonProperty("install")
+  @JsonProperty(JsonField.INSTALL)
   private List<DatasetInstallStatusEntry> install;
 
-  @JsonProperty("import")
+  @JsonProperty(JsonField.IMPORT)
   public DatasetImportStatus getImport() {
     return this.importVariable;
   }
 
-  @JsonProperty("import")
+  @JsonProperty(JsonField.IMPORT)
   public void setImport(DatasetImportStatus importVariable) {
     this.importVariable = importVariable;
   }
 
-  @JsonProperty("install")
+  @JsonProperty(JsonField.INSTALL)
   public List<DatasetInstallStatusEntry> getInstall() {
     return this.install;
   }
 
-  @JsonProperty("install")
+  @JsonProperty(JsonField.INSTALL)
   public void setInstall(List<DatasetInstallStatusEntry> install) {
     this.install = install;
   }

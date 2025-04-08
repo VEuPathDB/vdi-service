@@ -11,28 +11,28 @@ import java.util.List;
     "results"
 })
 public class AllDatasetsListResponseImpl implements AllDatasetsListResponse {
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   private AllDatasetsListMeta meta;
 
-  @JsonProperty("results")
+  @JsonProperty(JsonField.RESULTS)
   private List<AllDatasetsListEntry> results;
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   public AllDatasetsListMeta getMeta() {
     return this.meta;
   }
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   public void setMeta(AllDatasetsListMeta meta) {
     this.meta = meta;
   }
 
-  @JsonProperty("results")
+  @JsonProperty(JsonField.RESULTS)
   public List<AllDatasetsListEntry> getResults() {
     return this.results;
   }
 
-  @JsonProperty("results")
+  @JsonProperty(JsonField.RESULTS)
   public void setResults(List<AllDatasetsListEntry> results) {
     this.results = results;
   }

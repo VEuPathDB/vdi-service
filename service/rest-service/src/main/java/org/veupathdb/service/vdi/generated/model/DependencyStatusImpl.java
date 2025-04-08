@@ -11,41 +11,41 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "online"
 })
 public class DependencyStatusImpl implements DependencyStatus {
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   private String name;
 
-  @JsonProperty("reachable")
+  @JsonProperty(JsonField.REACHABLE)
   private Boolean reachable;
 
-  @JsonProperty("online")
+  @JsonProperty(JsonField.ONLINE)
   private DependencyStatus.OnlineType online;
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   public String getName() {
     return this.name;
   }
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   public void setName(String name) {
     this.name = name;
   }
 
-  @JsonProperty("reachable")
+  @JsonProperty(JsonField.REACHABLE)
   public Boolean getReachable() {
     return this.reachable;
   }
 
-  @JsonProperty("reachable")
+  @JsonProperty(JsonField.REACHABLE)
   public void setReachable(Boolean reachable) {
     this.reachable = reachable;
   }
 
-  @JsonProperty("online")
+  @JsonProperty(JsonField.ONLINE)
   public DependencyStatus.OnlineType getOnline() {
     return this.online;
   }
 
-  @JsonProperty("online")
+  @JsonProperty(JsonField.ONLINE)
   public void setOnline(DependencyStatus.OnlineType online) {
     this.online = online;
   }

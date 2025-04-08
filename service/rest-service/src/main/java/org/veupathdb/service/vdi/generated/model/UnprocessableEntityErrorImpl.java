@@ -18,36 +18,36 @@ import java.util.Map;
     "errors"
 })
 public class UnprocessableEntityErrorImpl implements UnprocessableEntityError {
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   private final ErrorType status = _DISCRIMINATOR_TYPE_NAME;
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   private String message;
 
-  @JsonProperty("errors")
+  @JsonProperty(JsonField.ERRORS)
   private UnprocessableEntityError.ErrorsType errors;
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   public ErrorType getStatus() {
     return this.status;
   }
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   public String getMessage() {
     return this.message;
   }
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   public void setMessage(String message) {
     this.message = message;
   }
 
-  @JsonProperty("errors")
+  @JsonProperty(JsonField.ERRORS)
   public UnprocessableEntityError.ErrorsType getErrors() {
     return this.errors;
   }
 
-  @JsonProperty("errors")
+  @JsonProperty(JsonField.ERRORS)
   public void setErrors(UnprocessableEntityError.ErrorsType errors) {
     this.errors = errors;
   }

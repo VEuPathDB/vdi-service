@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetShareOfferImpl.class
 )
 public interface DatasetShareOffer {
-  @JsonProperty("action")
+  @JsonProperty(JsonField.ACTION)
   ShareOfferAction getAction();
 
-  @JsonProperty("action")
+  @JsonProperty(JsonField.ACTION)
   void setAction(ShareOfferAction action);
 }

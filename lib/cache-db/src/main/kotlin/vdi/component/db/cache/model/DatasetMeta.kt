@@ -13,4 +13,5 @@ interface DatasetMeta {
   val summary: String?
   val description: String?
   val sourceURL: String?
+  val originalID: DatasetID?
 }

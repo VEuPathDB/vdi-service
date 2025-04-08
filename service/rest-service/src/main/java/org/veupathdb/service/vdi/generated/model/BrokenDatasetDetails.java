@@ -8,33 +8,33 @@ import java.util.List;
     as = BrokenDatasetDetailsImpl.class
 )
 public interface BrokenDatasetDetails {
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   String getDatasetId();
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   void setDatasetId(String datasetId);
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   Long getOwner();
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   void setOwner(Long owner);
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   DatasetTypeInfo getDatasetType();
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   void setDatasetType(DatasetTypeInfo datasetType);
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   List<String> getProjectIds();
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   void setProjectIds(List<String> projectIds);
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   DatasetStatusInfo getStatus();
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   void setStatus(DatasetStatusInfo status);
 }

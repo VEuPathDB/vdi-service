@@ -7,15 +7,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetFileListingImpl.class
 )
 public interface DatasetFileListing {
-  @JsonProperty("upload")
+  @JsonProperty(JsonField.UPLOAD)
   DatasetZipDetails getUpload();
 
-  @JsonProperty("upload")
+  @JsonProperty(JsonField.UPLOAD)
   void setUpload(DatasetZipDetails upload);
 
-  @JsonProperty("install")
+  @JsonProperty(JsonField.INSTALL)
   DatasetZipDetails getInstall();
 
-  @JsonProperty("install")
+  @JsonProperty(JsonField.INSTALL)
   void setInstall(DatasetZipDetails install);
 }

@@ -15,19 +15,19 @@ import java.util.Map;
 public interface UnprocessableEntityError extends Error {
   ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.INVALIDINPUT;
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   ErrorType getStatus();
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   String getMessage();
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   void setMessage(String message);
 
-  @JsonProperty("errors")
+  @JsonProperty(JsonField.ERRORS)
   ErrorsType getErrors();
 
-  @JsonProperty("errors")
+  @JsonProperty(JsonField.ERRORS)
   void setErrors(ErrorsType errors);
 
   @JsonDeserialize(

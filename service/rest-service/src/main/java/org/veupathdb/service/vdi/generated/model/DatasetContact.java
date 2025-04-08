@@ -7,56 +7,56 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetContactImpl.class
 )
 public interface DatasetContact {
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   String getName();
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   void setName(String name);
 
-  @JsonProperty("email")
+  @JsonProperty(JsonField.EMAIL)
   String getEmail();
 
-  @JsonProperty("email")
+  @JsonProperty(JsonField.EMAIL)
   void setEmail(String email);
 
-  @JsonProperty("affiliation")
+  @JsonProperty(JsonField.AFFILIATION)
   String getAffiliation();
 
-  @JsonProperty("affiliation")
+  @JsonProperty(JsonField.AFFILIATION)
   void setAffiliation(String affiliation);
 
-  @JsonProperty("city")
+  @JsonProperty(JsonField.CITY)
   String getCity();
 
-  @JsonProperty("city")
+  @JsonProperty(JsonField.CITY)
   void setCity(String city);
 
-  @JsonProperty("state")
+  @JsonProperty(JsonField.STATE)
   String getState();
 
-  @JsonProperty("state")
+  @JsonProperty(JsonField.STATE)
   void setState(String state);
 
-  @JsonProperty("country")
+  @JsonProperty(JsonField.COUNTRY)
   String getCountry();
 
-  @JsonProperty("country")
+  @JsonProperty(JsonField.COUNTRY)
   void setCountry(String country);
 
-  @JsonProperty("address")
+  @JsonProperty(JsonField.ADDRESS)
   String getAddress();
 
-  @JsonProperty("address")
+  @JsonProperty(JsonField.ADDRESS)
   void setAddress(String address);
 
   @JsonProperty(
-      value = "isPrimary",
+      value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
   Boolean getIsPrimary();
 
   @JsonProperty(
-      value = "isPrimary",
+      value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
   void setIsPrimary(Boolean isPrimary);

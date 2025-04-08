@@ -7,15 +7,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = InstallCleanupTargetImpl.class
 )
 public interface InstallCleanupTarget {
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   String getDatasetId();
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   void setDatasetId(String datasetId);
 
-  @JsonProperty("projectId")
+  @JsonProperty(JsonField.PROJECT_ID)
   String getProjectId();
 
-  @JsonProperty("projectId")
+  @JsonProperty(JsonField.PROJECT_ID)
   void setProjectId(String projectId);
 }

@@ -11,28 +11,28 @@ import java.util.List;
     "ids"
 })
 public class BrokenDatasetListingImpl implements BrokenDatasetListing {
-  @JsonProperty("details")
+  @JsonProperty(JsonField.DETAILS)
   private List<BrokenDatasetDetails> details;
 
-  @JsonProperty("ids")
+  @JsonProperty(JsonField.IDS)
   private List<String> ids;
 
-  @JsonProperty("details")
+  @JsonProperty(JsonField.DETAILS)
   public List<BrokenDatasetDetails> getDetails() {
     return this.details;
   }
 
-  @JsonProperty("details")
+  @JsonProperty(JsonField.DETAILS)
   public void setDetails(List<BrokenDatasetDetails> details) {
     this.details = details;
   }
 
-  @JsonProperty("ids")
+  @JsonProperty(JsonField.IDS)
   public List<String> getIds() {
     return this.ids;
   }
 
-  @JsonProperty("ids")
+  @JsonProperty(JsonField.IDS)
   public void setIds(List<String> ids) {
     this.ids = ids;
   }

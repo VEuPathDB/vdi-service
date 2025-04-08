@@ -11,18 +11,18 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 public interface ServerError extends Error {
   ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.SERVERERROR;
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   ErrorType getStatus();
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   String getMessage();
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   void setMessage(String message);
 
-  @JsonProperty("requestId")
+  @JsonProperty(JsonField.REQUEST_ID)
   String getRequestId();
 
-  @JsonProperty("requestId")
+  @JsonProperty(JsonField.REQUEST_ID)
   void setRequestId(String requestId);
 }

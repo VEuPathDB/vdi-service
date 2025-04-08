@@ -7,32 +7,32 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetHyperlinkImpl.class
 )
 public interface DatasetHyperlink {
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   String getUrl();
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   void setUrl(String url);
 
-  @JsonProperty("text")
+  @JsonProperty(JsonField.TEXT)
   String getText();
 
-  @JsonProperty("text")
+  @JsonProperty(JsonField.TEXT)
   void setText(String text);
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   String getDescription();
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   void setDescription(String description);
 
   @JsonProperty(
-      value = "isPublication",
+      value = JsonField.IS_PUBLICATION,
       defaultValue = "false"
   )
   Boolean getIsPublication();
 
   @JsonProperty(
-      value = "isPublication",
+      value = JsonField.IS_PUBLICATION,
       defaultValue = "false"
   )
   void setIsPublication(Boolean isPublication);

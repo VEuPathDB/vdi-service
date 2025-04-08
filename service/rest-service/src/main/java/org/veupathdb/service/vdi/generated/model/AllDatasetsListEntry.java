@@ -9,99 +9,99 @@ import java.util.List;
     as = AllDatasetsListEntryImpl.class
 )
 public interface AllDatasetsListEntry {
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   String getDatasetId();
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   void setDatasetId(String datasetId);
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   Long getOwner();
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   void setOwner(Long owner);
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   DatasetTypeInfo getDatasetType();
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   void setDatasetType(DatasetTypeInfo datasetType);
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   DatasetVisibility getVisibility();
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   void setVisibility(DatasetVisibility visibility);
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   String getName();
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   void setName(String name);
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   void setOrigin(String origin);
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   List<String> getProjectIds();
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   void setProjectIds(List<String> projectIds);
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   DatasetStatusInfo getStatus();
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   void setStatus(DatasetStatusInfo status);
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   OffsetDateTime getCreated();
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   void setCreated(OffsetDateTime created);
 
-  @JsonProperty("isDeleted")
+  @JsonProperty(JsonField.IS_DELETED)
   Boolean getIsDeleted();
 
-  @JsonProperty("isDeleted")
+  @JsonProperty(JsonField.IS_DELETED)
   void setIsDeleted(Boolean isDeleted);
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   String getShortName();
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   void setShortName(String shortName);
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   String getShortAttribution();
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   void setShortAttribution(String shortAttribution);
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   String getCategory();
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   void setCategory(String category);
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   String getSummary();
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   void setSummary(String summary);
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   String getDescription();
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   void setDescription(String description);
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   String getSourceUrl();
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   void setSourceUrl(String sourceUrl);
 }

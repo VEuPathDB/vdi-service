@@ -9,135 +9,147 @@ import java.util.List;
     as = DatasetDetailsImpl.class
 )
 public interface DatasetDetails {
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   String getDatasetId();
 
-  @JsonProperty("datasetId")
+  @JsonProperty(JsonField.DATASET_ID)
   void setDatasetId(String datasetId);
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   DatasetOwner getOwner();
 
-  @JsonProperty("owner")
+  @JsonProperty(JsonField.OWNER)
   void setOwner(DatasetOwner owner);
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   DatasetTypeInfo getDatasetType();
 
-  @JsonProperty("datasetType")
+  @JsonProperty(JsonField.DATASET_TYPE)
   void setDatasetType(DatasetTypeInfo datasetType);
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   String getName();
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   void setName(String name);
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
 
-  @JsonProperty("origin")
+  @JsonProperty(JsonField.ORIGIN)
   void setOrigin(String origin);
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   List<String> getProjectIds();
 
-  @JsonProperty("projectIds")
+  @JsonProperty(JsonField.PROJECT_IDS)
   void setProjectIds(List<String> projectIds);
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   DatasetVisibility getVisibility();
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   void setVisibility(DatasetVisibility visibility);
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   DatasetStatusInfo getStatus();
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   void setStatus(DatasetStatusInfo status);
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   OffsetDateTime getCreated();
 
-  @JsonProperty("created")
+  @JsonProperty(JsonField.CREATED)
   void setCreated(OffsetDateTime created);
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   List<DatasetDependency> getDependencies();
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   void setDependencies(List<DatasetDependency> dependencies);
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   String getShortName();
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   void setShortName(String shortName);
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   String getShortAttribution();
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   void setShortAttribution(String shortAttribution);
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   String getCategory();
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   void setCategory(String category);
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   String getSummary();
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   void setSummary(String summary);
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   String getDescription();
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   void setDescription(String description);
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   String getSourceUrl();
 
-  @JsonProperty("sourceUrl")
+  @JsonProperty(JsonField.SOURCE_URL)
   void setSourceUrl(String sourceUrl);
 
-  @JsonProperty("importMessages")
+  @JsonProperty(JsonField.IMPORT_MESSAGES)
   List<String> getImportMessages();
 
-  @JsonProperty("importMessages")
+  @JsonProperty(JsonField.IMPORT_MESSAGES)
   void setImportMessages(List<String> importMessages);
 
-  @JsonProperty("shares")
+  @JsonProperty(JsonField.SHARES)
   List<ShareOffer> getShares();
 
-  @JsonProperty("shares")
+  @JsonProperty(JsonField.SHARES)
   void setShares(List<ShareOffer> shares);
 
-  @JsonProperty("publications")
+  @JsonProperty(JsonField.PUBLICATIONS)
   List<DatasetPublication> getPublications();
 
-  @JsonProperty("publications")
+  @JsonProperty(JsonField.PUBLICATIONS)
   void setPublications(List<DatasetPublication> publications);
 
-  @JsonProperty("hyperlinks")
+  @JsonProperty(JsonField.HYPERLINKS)
   List<DatasetHyperlink> getHyperlinks();
 
-  @JsonProperty("hyperlinks")
+  @JsonProperty(JsonField.HYPERLINKS)
   void setHyperlinks(List<DatasetHyperlink> hyperlinks);
 
-  @JsonProperty("organisms")
+  @JsonProperty(JsonField.ORGANISMS)
   List<String> getOrganisms();
 
-  @JsonProperty("organisms")
+  @JsonProperty(JsonField.ORGANISMS)
   void setOrganisms(List<String> organisms);
 
-  @JsonProperty("contacts")
+  @JsonProperty(JsonField.CONTACTS)
   List<DatasetContact> getContacts();
 
-  @JsonProperty("contacts")
+  @JsonProperty(JsonField.CONTACTS)
   void setContacts(List<DatasetContact> contacts);
+
+  @JsonProperty(JsonField.ORIGINAL_ID)
+  String getOriginalId();
+
+  @JsonProperty(JsonField.ORIGINAL_ID)
+  void setOriginalId(String originalId);
+
+  @JsonProperty(JsonField.REVISION_HISTORY)
+  List<DatasetRevision> getRevisionHistory();
+
+  @JsonProperty(JsonField.REVISION_HISTORY)
+  void setRevisionHistory(List<DatasetRevision> revisionHistory);
 }

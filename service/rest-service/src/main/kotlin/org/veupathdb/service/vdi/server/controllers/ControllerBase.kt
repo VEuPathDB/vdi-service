@@ -19,5 +19,7 @@ sealed class ControllerBase(protected val request: ContainerRequest) {
   protected fun String.asVDIID() = try { DatasetID(this) } catch (e: Throwable) { throw NotFoundException() }
 
   protected fun redirectURL(id: DatasetID) =
-    request.baseUri.toString().replaceAfterLast('/', id.toString())
+    redirectURL(id.toString())
+  protected fun redirectURL(id: String) =
+    request.baseUri.toString().replaceAfterLast('/', id)
 }

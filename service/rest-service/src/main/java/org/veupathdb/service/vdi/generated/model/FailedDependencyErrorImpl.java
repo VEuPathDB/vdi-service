@@ -13,36 +13,36 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
     "dependency"
 })
 public class FailedDependencyErrorImpl implements FailedDependencyError {
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   private final ErrorType status = _DISCRIMINATOR_TYPE_NAME;
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   private String message;
 
-  @JsonProperty("dependency")
+  @JsonProperty(JsonField.DEPENDENCY)
   private String dependency;
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   public ErrorType getStatus() {
     return this.status;
   }
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   public String getMessage() {
     return this.message;
   }
 
-  @JsonProperty("message")
+  @JsonProperty(JsonField.MESSAGE)
   public void setMessage(String message) {
     this.message = message;
   }
 
-  @JsonProperty("dependency")
+  @JsonProperty(JsonField.DEPENDENCY)
   public String getDependency() {
     return this.dependency;
   }
 
-  @JsonProperty("dependency")
+  @JsonProperty(JsonField.DEPENDENCY)
   public void setDependency(String dependency) {
     this.dependency = dependency;
   }

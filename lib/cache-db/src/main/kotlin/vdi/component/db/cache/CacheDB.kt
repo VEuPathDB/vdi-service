@@ -78,9 +78,9 @@ interface CacheDB {
    */
   fun selectAllSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord>
 
-  fun selectLatestRevision(datasetID: DatasetID): VDIDatasetRevision?
+  fun selectLatestRevision(datasetID: DatasetID): DatasetRevisionRecord?
 
-  fun selectRevisions(datasetID: DatasetID): List<VDIDatasetRevision>
+  fun selectRevisions(datasetID: DatasetID): DatasetRevisionRecordSet?
 
   fun selectBrokenDatasetImports(query: BrokenImportListQuery): List<BrokenImportRecord>
 

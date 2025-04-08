@@ -7,21 +7,21 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetDependencyImpl.class
 )
 public interface DatasetDependency {
-  @JsonProperty("resourceIdentifier")
+  @JsonProperty(JsonField.RESOURCE_IDENTIFIER)
   String getResourceIdentifier();
 
-  @JsonProperty("resourceIdentifier")
+  @JsonProperty(JsonField.RESOURCE_IDENTIFIER)
   void setResourceIdentifier(String resourceIdentifier);
 
-  @JsonProperty("resourceDisplayName")
+  @JsonProperty(JsonField.RESOURCE_DISPLAY_NAME)
   String getResourceDisplayName();
 
-  @JsonProperty("resourceDisplayName")
+  @JsonProperty(JsonField.RESOURCE_DISPLAY_NAME)
   void setResourceDisplayName(String resourceDisplayName);
 
-  @JsonProperty("resourceVersion")
+  @JsonProperty(JsonField.RESOURCE_VERSION)
   String getResourceVersion();
 
-  @JsonProperty("resourceVersion")
+  @JsonProperty(JsonField.RESOURCE_VERSION)
   void setResourceVersion(String resourceVersion);
 }

@@ -4,6 +4,7 @@ import org.veupathdb.service.vdi.generated.model.DatasetPostMeta
 import org.veupathdb.service.vdi.util.ValidationErrors
 import vdi.component.db.app.*
 
+@Suppress("DuplicatedCode") // Overlap in generated API types
 internal fun DatasetPostMeta.cleanup() {
   datasetType?.cleanup()
 
@@ -53,56 +54,49 @@ internal fun DatasetPostMeta.cleanup() {
   }
 }
 
-internal fun DatasetPostMeta.validate(validationErrors: ValidationErrors) {
+internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
+  name.validateName(errors, "meta")
+  origin.validateOrigin(errors, "meta")
+
   if (datasetType == null)
-    validationErrors.add("meta.type", "field is required")
+    errors.add("meta.type", "field is required")
 
-  if (name.isNullOrBlank())
-    validationErrors.add("meta.name", "field is required")
-  else
-    name.checkLength("meta.name", DatasetMetaMaxNameLength, validationErrors)
+  shortName?.validateShortName(errors, "meta")
+  shortAttribution?.validateShortAttribution(errors, "meta")
+  category?.validateCategory(errors, "meta")
+  summary?.validateSummary(errors, "meta")
 
-  shortName?.checkLength("meta.shortName", DatasetMetaMaxShortNameLength, validationErrors)
-  shortAttribution?.checkLength("meta.shortAttribution", DatasetMetaMaxShortAttributionLength, validationErrors)
-  category?.checkLength("meta.category", DatasetMetaMaxCategoryLength, validationErrors)
+  description = description?.ifBlank { null }
 
-  if (summary != null) {
-    if (summary.length > DatasetMetaMaxSummaryFieldLength)
-      validationErrors.add("meta.summary", "must be $DatasetMetaMaxSummaryFieldLength characters or less")
-    if (summary.isBlank())
-      summary = null
-  }
-
-  if (description != null && description.isBlank())
-    description = null
 
   if (origin.isNullOrBlank())
-    validationErrors.add("meta.origin", "field is required")
+    errors.add("meta.origin", "field is required")
 
   if (projects == null || projects.isEmpty())
-    validationErrors.add("meta.projects", "one or more projects is required")
+    errors.add("meta.projects", "one or more projects is required")
   else
     projects.forEachIndexed { i, it ->
       if (it.isNullOrBlank())
-        validationErrors.add("meta.projects[$i]", "must not be null or blank")
+        errors.add("meta.projects[$i]", "must not be null or blank")
     }
 
-  publications.forEachIndexed { i, pub -> pub.validate("meta.", i, validationErrors) }
-  hyperlinks.forEachIndexed { i, link -> link.validate("meta.", i, validationErrors) }
+  publications.validate(errors, "meta.")
+
+  hyperlinks.forEachIndexed { i, link -> link.validate("meta.", i, errors) }
 
   var primaries = 0
   contacts.forEachIndexed { i, con ->
-    con.validate("meta.", i, validationErrors)
+    con.validate("meta.", i, errors)
     if (con.isPrimary == true)
       primaries++
   }
   if (primaries > 1)
-    validationErrors.add("meta.contacts", "only one contact may be marked as primary")
+    errors.add("meta.contacts", "only one contact may be marked as primary")
 
   organisms.forEachIndexed { i, l ->
     if (l == null)
-      validationErrors.add("meta.organisms[$i]", "entries must not be null")
+      errors.add("meta.organisms[$i]", "entries must not be null")
 
-    l.checkLength("meta.organism[$i]", DatasetOrganismAbbrevMaxLength, validationErrors)
+    l.checkLength("meta.organism[$i]", DatasetOrganismAbbrevMaxLength, errors)
   }
 }

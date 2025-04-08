@@ -11,28 +11,28 @@ import java.util.List;
     "results"
 })
 public class BrokenImportListingImpl implements BrokenImportListing {
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   private BrokenImportListingMeta meta;
 
-  @JsonProperty("results")
+  @JsonProperty(JsonField.RESULTS)
   private List<BrokenImportDetails> results;
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   public BrokenImportListingMeta getMeta() {
     return this.meta;
   }
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   public void setMeta(BrokenImportListingMeta meta) {
     this.meta = meta;
   }
 
-  @JsonProperty("results")
+  @JsonProperty(JsonField.RESULTS)
   public List<BrokenImportDetails> getResults() {
     return this.results;
   }
 
-  @JsonProperty("results")
+  @JsonProperty(JsonField.RESULTS)
   public void setResults(List<BrokenImportDetails> results) {
     this.results = results;
   }

@@ -2,6 +2,7 @@ package vdi.component.db.cache.sql.select
 
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withResults
+import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.component.db.cache.model.*
 import vdi.component.db.cache.util.getDatasetVisibility
 import vdi.component.db.cache.util.getImportStatus
@@ -39,6 +40,7 @@ SELECT
 , md.visibility
 , md.source_url
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id) AS projects
+, (SELECT r.original_id FROM vdi.dataset_revisions AS r WHERE r.revision_id = d.dataset_id LIMIT 1) AS original_id
 , ic.status
 FROM
   dataset_ids AS did
@@ -155,14 +157,15 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
           visibility       = it.getDatasetVisibility("visibility"),
           origin           = it.getString("origin"),
           name             = it.getString("name"),
-          shortName        = getString("short_name"),
-          shortAttribution = getString("short_attribution"),
-          category         = getString("category"),
+          shortName        = it.getString("short_name"),
+          shortAttribution = it.getString("short_attribution"),
+          category         = it.getString("category"),
           summary          = it.getString("summary"),
           description      = it.getString("description"),
           sourceURL        = it.getString("source_url"),
           projects         = it.getProjectIDList("projects"),
           inserted         = it.getDateTime("inserted"),
+          originalID       = it.getString("original_id")?.let(::DatasetID)
         )
       }
     }

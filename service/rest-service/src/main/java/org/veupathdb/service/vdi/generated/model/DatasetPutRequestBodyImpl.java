@@ -12,41 +12,41 @@ import java.io.File;
     "url"
 })
 public class DatasetPutRequestBodyImpl implements DatasetPutRequestBody {
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   private DatasetPutMetadata meta;
 
-  @JsonProperty("file")
+  @JsonProperty(JsonField.FILE)
   private File file;
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   private String url;
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   public DatasetPutMetadata getMeta() {
     return this.meta;
   }
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   public void setMeta(DatasetPutMetadata meta) {
     this.meta = meta;
   }
 
-  @JsonProperty("file")
+  @JsonProperty(JsonField.FILE)
   public File getFile() {
     return this.file;
   }
 
-  @JsonProperty("file")
+  @JsonProperty(JsonField.FILE)
   public void setFile(File file) {
     this.file = file;
   }
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   public String getUrl() {
     return this.url;
   }
 
-  @JsonProperty("url")
+  @JsonProperty(JsonField.URL)
   public void setUrl(String url) {
     this.url = url;
   }

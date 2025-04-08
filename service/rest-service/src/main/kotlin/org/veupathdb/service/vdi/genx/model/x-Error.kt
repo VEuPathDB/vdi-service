@@ -1,5 +1,6 @@
 package org.veupathdb.service.vdi.genx.model
 
+import org.veupathdb.lib.container.jaxrs.errors.UnprocessableEntityException
 import org.veupathdb.service.vdi.generated.model.BadRequestError
 import org.veupathdb.service.vdi.generated.model.BadRequestErrorImpl
 import org.veupathdb.service.vdi.generated.model.ForbiddenError
@@ -25,6 +26,16 @@ internal fun UnprocessableEntityError(errors: ValidationErrors): UnprocessableEn
       e.general = errors.general
       e.byKey   = UnprocessableEntityErrorImpl.ErrorsTypeImpl.ByKeyTypeImpl().also { k ->
         k.additionalProperties.putAll(errors.byKey)
+      }
+    }
+  }
+
+internal fun UnprocessableEntityError(x: UnprocessableEntityException): UnprocessableEntityError =
+  UnprocessableEntityErrorImpl().also {
+    it.errors = UnprocessableEntityErrorImpl.ErrorsTypeImpl().also { e ->
+      e.general = x.general
+      e.byKey = UnprocessableEntityErrorImpl.ErrorsTypeImpl.ByKeyTypeImpl().also { k ->
+        k.additionalProperties.putAll(x.byKey)
       }
     }
   }

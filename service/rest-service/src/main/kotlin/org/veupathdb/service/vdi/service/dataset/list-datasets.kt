@@ -1,24 +1,19 @@
 package org.veupathdb.service.vdi.service.dataset
 
-import org.veupathdb.service.vdi.generated.model.*
-import org.veupathdb.service.vdi.genx.model.*
+import org.veupathdb.lib.container.jaxrs.providers.UserProvider
+import org.veupathdb.service.vdi.generated.model.DatasetListEntry
+import org.veupathdb.service.vdi.genx.model.DatasetListShareUser
+import org.veupathdb.service.vdi.genx.model.toExternal
 import org.veupathdb.service.vdi.model.UserDetails
-import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.service.vdi.util.reduceTo
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import vdi.component.db.app.AppDB
-import vdi.component.db.app.model.InstallStatuses
 import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.DatasetFileSummary
-import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.model.DatasetListQuery
 import vdi.component.db.cache.model.DatasetRecord
-import vdi.component.plugin.mapping.PluginHandlers
-import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 
 fun fetchUserDatasetList(query: DatasetListQuery, userID: UserID): List<DatasetListEntry> {
   return fetchDatasetList(CacheDB().selectDatasetList(query), userID)
@@ -86,60 +81,23 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
     .toMap()
   userIDs.clear()
 
-  // Build a list for the results we will be returning.
-  val results = ArrayList<DatasetListEntry>(datasetList.size)
-
-  // For each dataset we found with the original query.
-  datasetList.forEach {
-    // Convert the found dataset into the expected output type
-    // (DatasetListEntry) and add it to the result list.
-    results.add(it.toListEntry(
-      owner = userDetails[it.ownerID] ?: throw IllegalStateException("missing user details for user id ${it.ownerID}"),
-      pluginDisplayName = PluginHandlers[it.typeName, it.typeVersion]?.displayName ?: throw IllegalStateException("missing plugin ${it.typeName}:${it.typeVersion}"),
-      statuses = datasetInstallStatusMap[it.datasetID] ?: emptyMap(),
-      shares = (if (it.ownerID == requesterID) shares[it.datasetID] ?: emptyList() else emptyList())
-        .asSequence()
-        .filter { share -> share.offerStatus == VDIShareOfferAction.Grant }
-        .map { sh ->
-          DatasetListShareUser(
-            userDetails[sh.recipientID]!!,
-            sh.receiptStatus == VDIShareReceiptAction.Accept
-          )
-        }
-        .toList(),
-      fileSummary = fileSummaries[it.datasetID] ?: DatasetFileSummary(0u, 0u),
-    ))
+  return datasetList.map {
+    it.toExternal(
+      owner    = userDetails.requireDetails(it.ownerID),
+      statuses = datasetInstallStatusMap[it.datasetID],
+      fileInfo = fileSummaries[it.datasetID],
+      shares   = if (it.ownerID != requesterID)
+        null
+      else
+        shares[it.datasetID]?.asSequence()
+          ?.filter { share -> share.offerStatus == VDIShareOfferAction.Grant }
+          ?.map { sh ->
+            DatasetListShareUser(
+              userDetails.requireDetails(sh.recipientID),
+              sh.receiptStatus == VDIShareReceiptAction.Accept
+            )
+          }
+          ?.toList()
+    )
   }
-
-  return results
-}
-
-private fun DatasetRecord.toListEntry(
-  owner: UserDetails,
-  pluginDisplayName: String,
-  statuses: Map<ProjectID, InstallStatuses>,
-  shares: List<DatasetListShareUser>,
-  fileSummary: DatasetFileSummary,
-) = DatasetListEntryImpl().also { out ->
-  out.datasetId        = datasetID.toString()
-  out.owner            = DatasetOwner(owner)
-  out.datasetType      = DatasetTypeInfo(this, pluginDisplayName)
-  out.name             = name
-  out.shortName        = shortName
-  out.shortAttribution = shortAttribution
-  out.category         = category
-  out.summary          = summary
-  out.description      = description
-  out.projectIds       = projects.toList()
-  out.visibility       = DatasetVisibility(visibility)
-  out.status           = DatasetStatusInfo(importStatus, statuses)
-  out.origin           = origin
-  out.sourceUrl        = sourceURL
-  if (importStatus != DatasetImportStatus.Invalid && importStatus != DatasetImportStatus.Failed) {
-    // Don't set shares if import status is failed since dataset will never be usable by others.
-    out.shares = shares
-  }
-  out.fileCount        = fileSummary.count.toInt()
-  out.fileSizeTotal    = fileSummary.size.toLong()
-  out.created          = created.defaultZone()
 }

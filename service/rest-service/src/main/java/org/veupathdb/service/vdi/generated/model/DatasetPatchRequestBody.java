@@ -8,69 +8,69 @@ import java.util.List;
     as = DatasetPatchRequestBodyImpl.class
 )
 public interface DatasetPatchRequestBody {
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   DatasetVisibility getVisibility();
 
-  @JsonProperty("visibility")
+  @JsonProperty(JsonField.VISIBILITY)
   void setVisibility(DatasetVisibility visibility);
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   String getName();
 
-  @JsonProperty("name")
+  @JsonProperty(JsonField.NAME)
   void setName(String name);
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   String getShortName();
 
-  @JsonProperty("shortName")
+  @JsonProperty(JsonField.SHORT_NAME)
   void setShortName(String shortName);
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   String getShortAttribution();
 
-  @JsonProperty("shortAttribution")
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   void setShortAttribution(String shortAttribution);
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   String getCategory();
 
-  @JsonProperty("category")
+  @JsonProperty(JsonField.CATEGORY)
   void setCategory(String category);
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   String getSummary();
 
-  @JsonProperty("summary")
+  @JsonProperty(JsonField.SUMMARY)
   void setSummary(String summary);
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   String getDescription();
 
-  @JsonProperty("description")
+  @JsonProperty(JsonField.DESCRIPTION)
   void setDescription(String description);
 
-  @JsonProperty("publications")
+  @JsonProperty(JsonField.PUBLICATIONS)
   List<DatasetPublication> getPublications();
 
-  @JsonProperty("publications")
+  @JsonProperty(JsonField.PUBLICATIONS)
   void setPublications(List<DatasetPublication> publications);
 
-  @JsonProperty("hyperlinks")
+  @JsonProperty(JsonField.HYPERLINKS)
   List<DatasetHyperlink> getHyperlinks();
 
-  @JsonProperty("hyperlinks")
+  @JsonProperty(JsonField.HYPERLINKS)
   void setHyperlinks(List<DatasetHyperlink> hyperlinks);
 
-  @JsonProperty("organisms")
+  @JsonProperty(JsonField.ORGANISMS)
   List<String> getOrganisms();
 
-  @JsonProperty("organisms")
+  @JsonProperty(JsonField.ORGANISMS)
   void setOrganisms(List<String> organisms);
 
-  @JsonProperty("contacts")
+  @JsonProperty(JsonField.CONTACTS)
   List<DatasetContact> getContacts();
 
-  @JsonProperty("contacts")
+  @JsonProperty(JsonField.CONTACTS)
   void setContacts(List<DatasetContact> contacts);
 }

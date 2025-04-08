@@ -7,15 +7,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder("action")
 public class DatasetShareOfferImpl implements DatasetShareOffer {
-  @JsonProperty("action")
+  @JsonProperty(JsonField.ACTION)
   private ShareOfferAction action;
 
-  @JsonProperty("action")
+  @JsonProperty(JsonField.ACTION)
   public ShareOfferAction getAction() {
     return this.action;
   }
 
-  @JsonProperty("action")
+  @JsonProperty(JsonField.ACTION)
   public void setAction(ShareOfferAction action) {
     this.action = action;
   }

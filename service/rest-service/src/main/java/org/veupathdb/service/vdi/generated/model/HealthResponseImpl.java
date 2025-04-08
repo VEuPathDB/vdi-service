@@ -16,41 +16,41 @@ import java.util.Map;
     "info"
 })
 public class HealthResponseImpl implements HealthResponse {
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   private HealthResponse.StatusType status;
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   private List<DependencyStatus> dependencies;
 
-  @JsonProperty("info")
+  @JsonProperty(JsonField.INFO)
   private HealthResponse.InfoType info;
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   public HealthResponse.StatusType getStatus() {
     return this.status;
   }
 
-  @JsonProperty("status")
+  @JsonProperty(JsonField.STATUS)
   public void setStatus(HealthResponse.StatusType status) {
     this.status = status;
   }
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   public List<DependencyStatus> getDependencies() {
     return this.dependencies;
   }
 
-  @JsonProperty("dependencies")
+  @JsonProperty(JsonField.DEPENDENCIES)
   public void setDependencies(List<DependencyStatus> dependencies) {
     this.dependencies = dependencies;
   }
 
-  @JsonProperty("info")
+  @JsonProperty(JsonField.INFO)
   public HealthResponse.InfoType getInfo() {
     return this.info;
   }
 
-  @JsonProperty("info")
+  @JsonProperty(JsonField.INFO)
   public void setInfo(HealthResponse.InfoType info) {
     this.info = info;
   }

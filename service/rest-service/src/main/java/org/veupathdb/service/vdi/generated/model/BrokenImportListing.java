@@ -8,15 +8,15 @@ import java.util.List;
     as = BrokenImportListingImpl.class
 )
 public interface BrokenImportListing {
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   BrokenImportListingMeta getMeta();
 
-  @JsonProperty("meta")
+  @JsonProperty(JsonField.META)
   void setMeta(BrokenImportListingMeta meta);
 
-  @JsonProperty("results")
+  @JsonProperty(JsonField.RESULTS)
   List<BrokenImportDetails> getResults();
 
-  @JsonProperty("results")
+  @JsonProperty(JsonField.RESULTS)
   void setResults(List<BrokenImportDetails> results);
 }

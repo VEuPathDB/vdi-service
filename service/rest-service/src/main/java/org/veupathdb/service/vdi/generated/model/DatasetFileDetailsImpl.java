@@ -10,28 +10,28 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "fileSize"
 })
 public class DatasetFileDetailsImpl implements DatasetFileDetails {
-  @JsonProperty("fileName")
+  @JsonProperty(JsonField.FILE_NAME)
   private String fileName;
 
-  @JsonProperty("fileSize")
+  @JsonProperty(JsonField.FILE_SIZE)
   private Long fileSize;
 
-  @JsonProperty("fileName")
+  @JsonProperty(JsonField.FILE_NAME)
   public String getFileName() {
     return this.fileName;
   }
 
-  @JsonProperty("fileName")
+  @JsonProperty(JsonField.FILE_NAME)
   public void setFileName(String fileName) {
     this.fileName = fileName;
   }
 
-  @JsonProperty("fileSize")
+  @JsonProperty(JsonField.FILE_SIZE)
   public Long getFileSize() {
     return this.fileSize;
   }
 
-  @JsonProperty("fileSize")
+  @JsonProperty(JsonField.FILE_SIZE)
   public void setFileSize(Long fileSize) {
     this.fileSize = fileSize;
   }
