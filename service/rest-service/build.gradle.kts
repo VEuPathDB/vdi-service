@@ -32,7 +32,7 @@ dependencies {
   implementation(project(":lib:env"))
   implementation(project(":lib:health"))
   implementation(project(":lib:install-cleanup"))
-  implementation(project(":lib:plugin-mapping"))
+  implementation(project(":lib:plugins"))
   implementation(project(":lib:pruner"))
   implementation(project(":lib:reconciler"))
   implementation(project(":lib:s3"))

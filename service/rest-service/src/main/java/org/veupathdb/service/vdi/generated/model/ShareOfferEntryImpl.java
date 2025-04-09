@@ -24,7 +24,7 @@ public class ShareOfferEntryImpl implements ShareOfferEntry {
   private ShareOfferStatus shareStatus;
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeInfo datasetType;
+  private DatasetTypeResponseBody datasetType;
 
   @JsonProperty(JsonField.PROJECT_IDS)
   private List<String> projectIds;
@@ -60,12 +60,12 @@ public class ShareOfferEntryImpl implements ShareOfferEntry {
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeInfo getDatasetType() {
+  public DatasetTypeResponseBody getDatasetType() {
     return this.datasetType;
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeInfo datasetType) {
+  public void setDatasetType(DatasetTypeResponseBody datasetType) {
     this.datasetType = datasetType;
   }
 

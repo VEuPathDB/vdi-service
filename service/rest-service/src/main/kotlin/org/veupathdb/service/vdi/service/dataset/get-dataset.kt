@@ -6,6 +6,7 @@ import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.service.vdi.s3.DatasetStore
+import org.veupathdb.service.vdi.server.input.DatasetTypeInfo
 import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID

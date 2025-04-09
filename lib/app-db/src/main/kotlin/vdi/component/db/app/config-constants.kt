@@ -3,11 +3,7 @@ package vdi.component.db.app
 internal const val DefaultPoolSize: UByte = 5u
 
 // vdi_control_*.dataset_meta
-const val DatasetMetaMaxNameLength = 1024
-const val DatasetMetaMaxShortNameLength = 300
-const val DatasetMetaMaxShortAttributionLength = 300
-const val DatasetMetaMaxCategoryLength = 100
-const val DatasetMetaMaxSummaryFieldLength: Int = 4000 // max size for varchar in oracle
+
 
 // vdi_control_*.dataset_contact
 const val DatasetContactNameMaxLength = 300

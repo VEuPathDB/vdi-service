@@ -35,7 +35,7 @@ types:
     additionalProperties: false
     properties:
       name: common.DatasetName
-      datasetType: DatasetPostType
+      datasetType: common.DatasetTypeRequestBody
       origin: common.DatasetOrigin
       dependencies:
         type: common.DatasetDependency[]
@@ -75,13 +75,6 @@ types:
           uploads this field is ignored.
         displayName: Creation Date
         type: datetime
-
-  DatasetPostType:
-    description: Type of the dataset that is being uploaded.
-    additionalProperties: false
-    properties:
-      name: string
-      version: string
 
   DatasetPostResponseBody:
     description: |

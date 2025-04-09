@@ -22,10 +22,10 @@ public interface DatasetDetails {
   void setOwner(DatasetOwner owner);
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  DatasetTypeInfo getDatasetType();
+  DatasetTypeResponseBody getDatasetType();
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  void setDatasetType(DatasetTypeInfo datasetType);
+  void setDatasetType(DatasetTypeResponseBody datasetType);
 
   @JsonProperty(JsonField.NAME)
   String getName();

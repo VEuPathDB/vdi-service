@@ -2,6 +2,7 @@ package vdi.component.plugin.mapping
 
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import vdi.component.plugin.client.PluginHandlerClient
 
 /**
  * Plugin Handler
@@ -24,7 +25,7 @@ interface PluginHandler {
    * The plugin handler API client for connecting to and performing actions on
    * the target plugin handler service.
    */
-  val client: vdi.component.plugin.client.PluginHandlerClient
+  val client: PluginHandlerClient
 
   /**
    * Tests whether this [PluginHandler] instance applies to the target
@@ -40,5 +41,5 @@ interface PluginHandler {
    */
   fun appliesToProject(projectID: ProjectID): Boolean
 
-  fun projects(): List<String>
+  fun projects(): Collection<String>
 }

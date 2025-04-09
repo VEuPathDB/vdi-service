@@ -2,18 +2,20 @@ package vdi.component.plugin.mapping
 
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import vdi.component.plugin.client.PluginHandlerClient
+import vdi.component.plugins.PluginDetails
 
 internal class PluginHandlerImpl(
   override val type: DataType,
-  override val displayName: String,
-  override val client: vdi.component.plugin.client.PluginHandlerClient,
-  private val projects: Set<ProjectID>,
+  override val client: PluginHandlerClient,
+  private val details: PluginDetails
 ) : PluginHandler {
-  override fun appliesToProject(projectID: ProjectID): Boolean {
-    return projects.isEmpty() || projects.contains(projectID)
-  }
+  override val displayName: String
+    get() = details.displayName
 
-  override fun projects(): List<String> {
-    return projects.toList()
-  }
+  override fun appliesToProject(projectID: ProjectID) =
+    details.appliesTo(projectID)
+
+  override fun projects() =
+    details.projects.ifEmpty { setOf("*") }
 }

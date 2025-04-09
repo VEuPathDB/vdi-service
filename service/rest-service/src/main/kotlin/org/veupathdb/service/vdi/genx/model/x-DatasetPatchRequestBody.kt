@@ -1,6 +1,11 @@
 package org.veupathdb.service.vdi.genx.model
 
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequestBody
+import org.veupathdb.service.vdi.server.input.*
+import org.veupathdb.service.vdi.server.input.validateCategory
+import org.veupathdb.service.vdi.server.input.validateShortAttribution
+import org.veupathdb.service.vdi.server.input.validateShortName
+import org.veupathdb.service.vdi.server.input.validateSummary
 import org.veupathdb.service.vdi.util.ValidationErrors
 import vdi.component.db.app.*
 

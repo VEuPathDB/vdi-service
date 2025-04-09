@@ -19,7 +19,7 @@ types:
     properties:
       datasetId: VdiId
       owner: UserId
-      datasetType: DatasetTypeInfo
+      datasetType: DatasetTypeResponseBody
       projectIds: ProjectId[]
       status: DatasetStatusInfo
   BrokenImportListing:
@@ -47,7 +47,7 @@ types:
     properties:
       datasetId: VdiId
       owner: UserId
-      datasetType: DatasetTypeInfo
+      datasetType: DatasetTypeResponseBody
       projectIds: ProjectId[]
       messages: string[]
   AllDatasetsListResponse:
@@ -71,7 +71,7 @@ types:
     properties:
       datasetId: VdiId
       owner: UserId
-      datasetType: DatasetTypeInfo
+      datasetType: DatasetTypeResponseBody
       visibility: DatasetVisibility
       name: DatasetName
       origin: DatasetOrigin
@@ -96,7 +96,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetType: DatasetTypeInfo
+      datasetType: DatasetTypeResponseBody
       owner: UserId
       isDeleted: boolean
       origin: DatasetOrigin
@@ -168,7 +168,7 @@ types:
     properties:
       datasetId: VdiId
       owner: DatasetOwner
-      datasetType: DatasetTypeInfo
+      datasetType: DatasetTypeResponseBody
       visibility: DatasetVisibility
       name: DatasetName
       origin: DatasetOrigin
@@ -227,7 +227,7 @@ types:
     additionalProperties: false
     properties:
       name: DatasetName
-      datasetType: DatasetPostType
+      datasetType: DatasetTypeRequestBody
       origin: DatasetOrigin
       dependencies:
         type: DatasetDependency[]
@@ -266,13 +266,6 @@ types:
           This field is only used for admin override uploads, for normal dataset
           uploads this field is ignored.
         type: datetime
-  DatasetPostType:
-    description: Type of the dataset that is being uploaded.
-    type: object
-    additionalProperties: false
-    properties:
-      name: string
-      version: string
   DatasetPostResponseBody:
     description: |
       Successful upload response.
@@ -316,7 +309,7 @@ types:
     properties:
       datasetId: VdiId
       owner: DatasetOwner
-      datasetType: DatasetTypeInfo
+      datasetType: DatasetTypeResponseBody
       name: DatasetName
       origin: DatasetOrigin
       projectIds:
@@ -514,7 +507,7 @@ types:
       datasetId: VdiId
       owner: DatasetOwner
       shareStatus: ShareOfferStatus
-      datasetType: DatasetTypeInfo
+      datasetType: DatasetTypeResponseBody
       projectIds: ProjectId[]
   ShareOfferStatus:
     displayName: Share Offer Status
@@ -697,7 +690,7 @@ types:
     description: Brief summary of the dataset.
     type: string
     maxLength: 4000
-  DatasetTypeInfo:
+  DatasetTypeResponseBody:
     description: Details about a specific dataset type.
     type: object
     additionalProperties: false
@@ -709,6 +702,12 @@ types:
           Display name for the type.  This field is ignored in requests and will
           always be present in responses.
         type: string
+  DatasetTypeRequestBody:
+    type: object
+    additionalProperties: false
+    properties:
+      name: string
+      version: string
   DatasetVisibility:
     type: string
     enum:

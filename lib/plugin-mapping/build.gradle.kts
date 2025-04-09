@@ -6,6 +6,7 @@ dependencies {
   implementation(project(":lib:env"))
   implementation(project(":lib:health"))
   implementation(project(":lib:plugin-client"))
+  implementation(project(":lib:plugins"))
 
   implementation(libs.vdi.common)
 

@@ -3,6 +3,7 @@ package org.veupathdb.service.vdi.genx.model
 import org.veupathdb.service.vdi.generated.model.InternalDatasetDetails
 import org.veupathdb.service.vdi.generated.model.InternalDatasetDetailsImpl
 import org.veupathdb.service.vdi.generated.model.SyncControlRecordImpl
+import org.veupathdb.service.vdi.server.input.DatasetTypeInfo
 import vdi.component.db.cache.model.AdminDatasetDetailsRecord
 
 internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): InternalDatasetDetails =

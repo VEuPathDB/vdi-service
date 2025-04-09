@@ -21,7 +21,7 @@ public class BrokenImportDetailsImpl implements BrokenImportDetails {
   private Long owner;
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeInfo datasetType;
+  private DatasetTypeResponseBody datasetType;
 
   @JsonProperty(JsonField.PROJECT_IDS)
   private List<String> projectIds;
@@ -50,12 +50,12 @@ public class BrokenImportDetailsImpl implements BrokenImportDetails {
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeInfo getDatasetType() {
+  public DatasetTypeResponseBody getDatasetType() {
     return this.datasetType;
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeInfo datasetType) {
+  public void setDatasetType(DatasetTypeResponseBody datasetType) {
     this.datasetType = datasetType;
   }
 

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "name",
     "version"
 })
-public class DatasetPostTypeImpl implements DatasetPostType {
+public class DatasetTypeRequestBodyImpl implements DatasetTypeRequestBody {
   @JsonProperty(JsonField.NAME)
   private String name;
 

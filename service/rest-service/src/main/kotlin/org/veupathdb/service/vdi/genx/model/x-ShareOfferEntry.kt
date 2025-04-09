@@ -4,6 +4,7 @@ import org.veupathdb.service.vdi.generated.model.ShareOfferEntry
 import org.veupathdb.service.vdi.generated.model.ShareOfferEntryImpl
 import org.veupathdb.service.vdi.model.ShareFilterStatus
 import org.veupathdb.service.vdi.model.UserDetails
+import org.veupathdb.service.vdi.server.input.DatasetTypeInfo
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID

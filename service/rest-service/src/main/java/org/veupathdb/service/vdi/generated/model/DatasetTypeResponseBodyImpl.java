@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "version",
     "displayName"
 })
-public class DatasetTypeInfoImpl implements DatasetTypeInfo {
+public class DatasetTypeResponseBodyImpl implements DatasetTypeResponseBody {
   @JsonProperty(JsonField.NAME)
   private String name;
 

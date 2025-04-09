@@ -1,4 +1,4 @@
-package org.veupathdb.service.vdi.genx.model
+package org.veupathdb.service.vdi.server.input
 
 import org.veupathdb.service.vdi.generated.model.DatasetTypeInfo
 import org.veupathdb.service.vdi.generated.model.DatasetTypeInfoImpl
@@ -24,3 +24,12 @@ internal fun DatasetTypeInfo(name: DataType, version: String, displayName: Strin
 internal fun DatasetTypeInfo(name: DataType, version: String): DatasetTypeInfo =
   DatasetTypeInfo(name, version, PluginHandlers[name, version]?.displayName
       ?: throw IllegalStateException("missing plugin handler for plugin $name $version"))
+
+internal fun VDIDatasetType.toExternal(): DatasetTypeInfo =
+  DatasetTypeInfoImpl().also {
+    it.name = name.toString()
+    it.version = version
+    it.displayName = PluginHandlers[name, version]?.displayName ?: ""
+  }
+
+

@@ -38,7 +38,7 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   private DatasetOwner owner;
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeInfo datasetType;
+  private DatasetTypeResponseBody datasetType;
 
   @JsonProperty(JsonField.VISIBILITY)
   private DatasetVisibility visibility;
@@ -109,12 +109,12 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeInfo getDatasetType() {
+  public DatasetTypeResponseBody getDatasetType() {
     return this.datasetType;
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeInfo datasetType) {
+  public void setDatasetType(DatasetTypeResponseBody datasetType) {
     this.datasetType = datasetType;
   }
 

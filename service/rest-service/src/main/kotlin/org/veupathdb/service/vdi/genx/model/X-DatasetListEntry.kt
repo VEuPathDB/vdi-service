@@ -8,6 +8,7 @@ import org.veupathdb.service.vdi.generated.model.DatasetStatusInfo
 import org.veupathdb.service.vdi.generated.model.DatasetTypeInfo
 import org.veupathdb.service.vdi.generated.model.DatasetVisibility
 import org.veupathdb.service.vdi.model.UserDetails
+import org.veupathdb.service.vdi.server.input.DatasetTypeInfo
 import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID

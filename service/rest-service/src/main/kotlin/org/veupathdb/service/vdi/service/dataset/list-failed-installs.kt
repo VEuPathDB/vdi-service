@@ -2,6 +2,7 @@ package org.veupathdb.service.vdi.service.dataset
 
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.genx.model.*
+import org.veupathdb.service.vdi.server.input.DatasetTypeInfo
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.component.db.app.AppDB

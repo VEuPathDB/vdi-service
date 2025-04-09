@@ -15,7 +15,7 @@ types:
     properties:
       datasetId: common.VdiId
       owner: common.UserId
-      datasetType: common.DatasetTypeInfo
+      datasetType: common.DatasetTypeResponseBody
       projectIds: common.ProjectId[]
       status: common.DatasetStatusInfo
 
@@ -45,7 +45,7 @@ types:
     properties:
       datasetId: common.VdiId
       owner: common.UserId
-      datasetType: common.DatasetTypeInfo
+      datasetType: common.DatasetTypeResponseBody
       projectIds: common.ProjectId[]
       messages: string[]
 
@@ -69,7 +69,7 @@ types:
     properties:
       datasetId: common.VdiId
       owner: common.UserId
-      datasetType: common.DatasetTypeInfo
+      datasetType: common.DatasetTypeResponseBody
       visibility: common.DatasetVisibility
       name: common.DatasetName
       origin: common.DatasetOrigin
@@ -94,7 +94,7 @@ types:
   InternalDatasetDetails:
     additionalProperties: false
     properties:
-      datasetType: common.DatasetTypeInfo
+      datasetType: common.DatasetTypeResponseBody
       owner: common.UserId
       isDeleted: boolean
       origin: common.DatasetOrigin

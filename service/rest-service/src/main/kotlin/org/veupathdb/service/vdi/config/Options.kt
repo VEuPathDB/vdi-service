@@ -1,6 +1,7 @@
 package org.veupathdb.service.vdi.config
 
 import org.veupathdb.lib.container.jaxrs.config.Options
+import org.veupathdb.vdi.lib.common.env.DBEnvGroup
 import vdi.component.env.EnvKey
 import java.math.BigInteger
 
@@ -19,6 +20,8 @@ object Options : Options() {
     val maxUploadSize = uLongOr(EnvKey.Quotas.MaxUploadFileSize, 1073741824uL)
     val quotaLimit    = uLongOr(EnvKey.Quotas.UserUploadQuota, 10737418240uL)
   }
+
+  val projects = scanProjects()
 }
 
 private fun requireEnv(key: String): String =
@@ -35,3 +38,9 @@ private fun uLongOr(key: String, other: ULong): ULong {
 
   return value.toString().toULong()
 }
+
+private fun scanProjects() =
+  DBEnvGroup.fromEnvironment(System.getenv())
+    .filter { it.enabled == true }
+    .mapNotNull { it.connectionName }
+    .toSet()

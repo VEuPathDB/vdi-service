@@ -10,10 +10,10 @@ import java.util.List;
 )
 public interface InternalDatasetDetails {
   @JsonProperty(JsonField.DATASET_TYPE)
-  DatasetTypeInfo getDatasetType();
+  DatasetTypeResponseBody getDatasetType();
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  void setDatasetType(DatasetTypeInfo datasetType);
+  void setDatasetType(DatasetTypeResponseBody datasetType);
 
   @JsonProperty(JsonField.OWNER)
   Long getOwner();

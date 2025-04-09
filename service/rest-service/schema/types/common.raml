@@ -193,7 +193,7 @@ types:
     type: string
     maxLength: 4000
 
-  DatasetTypeInfo:
+  DatasetTypeResponseBody:
     description: Details about a specific dataset type.
     additionalProperties: false
     properties:
@@ -204,6 +204,12 @@ types:
           Display name for the type.  This field is ignored in requests and will
           always be present in responses.
         type: string
+
+  DatasetTypeRequestBody:
+    additionalProperties: false
+    properties:
+      name: string
+      version: string
 
   DatasetVisibility:
     type: string

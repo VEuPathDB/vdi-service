@@ -1,8 +1,13 @@
 package org.veupathdb.service.vdi.genx.model
 
 import org.veupathdb.service.vdi.generated.model.DatasetPostMeta
+import org.veupathdb.service.vdi.generated.model.JsonField
+import org.veupathdb.service.vdi.server.input.*
+import org.veupathdb.service.vdi.server.input.validateName
+import org.veupathdb.service.vdi.server.input.validateOrigin
+import org.veupathdb.service.vdi.server.input.validateShortAttribution
+import org.veupathdb.service.vdi.server.input.validateShortName
 import org.veupathdb.service.vdi.util.ValidationErrors
-import vdi.component.db.app.*
 
 @Suppress("DuplicatedCode") // Overlap in generated API types
 internal fun DatasetPostMeta.cleanup() {
@@ -27,7 +32,12 @@ internal fun DatasetPostMeta.cleanup() {
 
   origin = origin?.trim()
 
-  projects?.forEachIndexed { i, s -> projects[i] = s?.takeIf { it.isNotBlank() } ?.trim() }
+  // Trim strings and ensure no duplicates.
+  projects
+    ?.asSequence()
+    ?.map { it?.trim() }
+    ?.distinct()
+    ?.toList()
 
   if (publications.isNullOrEmpty())
     publications = emptyList()
@@ -55,22 +65,19 @@ internal fun DatasetPostMeta.cleanup() {
 }
 
 internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
-  name.validateName(errors, "meta")
-  origin.validateOrigin(errors, "meta")
+  name.validateName(errors, JsonField.META)
+  origin.validateOrigin(errors, JsonField.META)
 
   if (datasetType == null)
-    errors.add("meta.type", "field is required")
+    errors.add("${JsonField.META}.${JsonField.DATASET_TYPE}", "field is required")
 
-  shortName?.validateShortName(errors, "meta")
-  shortAttribution?.validateShortAttribution(errors, "meta")
-  category?.validateCategory(errors, "meta")
-  summary?.validateSummary(errors, "meta")
+  shortName?.validateShortName(errors, JsonField.META)
+  shortAttribution?.validateShortAttribution(errors, JsonField.META)
+  category?.validateCategory(errors, JsonField.META)
+  summary?.validateSummary(errors, JsonField.META)
 
   description = description?.ifBlank { null }
 
-
-  if (origin.isNullOrBlank())
-    errors.add("meta.origin", "field is required")
 
   if (projects == null || projects.isEmpty())
     errors.add("meta.projects", "one or more projects is required")
@@ -80,7 +87,7 @@ internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
         errors.add("meta.projects[$i]", "must not be null or blank")
     }
 
-  publications.validate(errors, "meta.")
+  publications.validate(errors, JsonField.META)
 
   hyperlinks.forEachIndexed { i, link -> link.validate("meta.", i, errors) }
 
