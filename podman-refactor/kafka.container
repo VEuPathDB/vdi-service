@@ -1,0 +1,22 @@
+[Unit]
+Description=Kafka service for VDI
+
+[Container]
+# Use the centos image
+Image=docker.io/veupathdb/apache-kafka:latest
+ContainerName=${COMPOSE_PROJECT_NAME}-%N
+
+# Use volume and network defined below
+Network=internal.network
+NetworkAlias=kafka
+
+EnvironmentFile=env/env_kafka_defaults
+
+HealthCmd=nc -z localhost 9092 || exit 1
+HealthInterval=30s
+HealthTimeout=10s
+HealthRetries=5
+
+
+[Service]
+EnvironmentFile=/etc/containers/systemd/vdi/env/env_common_defaults

@@ -1,0 +1,55 @@
+[Unit]
+Description=VDI Rest Service
+
+Requires=cache-db.service
+Requires=kafka.service
+Requires=plugin-bigwig.service
+Requires=plugin-biom.service
+Requires=plugin-genelist.service
+Requires=plugin-isasimple.service
+Requires=plugin-rnaseq.service
+
+[Container]
+# Use the centos image
+#Image=docker.io/veupathdb/vdi-service:latest
+Image=docker.io/veupathdb/vdi-service:${VDI_SERVICE_TAG}
+ContainerName=${COMPOSE_PROJECT_NAME}-%N
+
+# Use volume and network defined below
+Network=internal.network
+#    - traefik
+#    - monitoring-ext
+#    - rabbitmq
+
+EnvironmentFile=env/env_common_defaults
+EnvironmentFile=env/env_service_defaults
+
+## SECRETS
+Secret=GLOBAL_RABBIT_PASSWORD,type=env
+Secret=AUTH_SECRET_KEY,type=env
+Secret=ADMIN_AUTH_TOKEN,type=env
+Secret=OAUTH_CLIENT_SECRET,type=env
+Secret=S3_SECRET_KEY,type=env
+Secret=CACHE_DB_PASSWORD,type=env
+Secret=ACCT_DB_PASS,type=env
+Secret=USER_DB_PASS,type=env
+
+#Replaces watchtower with podman-auto-update
+AutoUpdate=registry
+
+# timeout is defined in seconds (this is replacing stop_grace_period from compose)
+StopTimeout=60
+
+#    labels:
+#    - "prometheus.scrape_enabled=true"
+#    - "traefik.http.services.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.loadbalancer.server.port=${VDI_SERVICE_HTTP_PORT:-80}"
+#    - "traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.rule=Host(`${TRAEFIK_VDI_HOST:-vdi-dev.local.apidb.org}`)"
+#    - "traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.tls=${USE_TRAEFIK_SSL:-true}"
+#    - "traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.entrypoints=${TRAEFIK_ENTRYPOINTS:-local}"
+#    - "traefik.docker.network=traefik"
+
+[Service]
+EnvironmentFile=/etc/containers/systemd/vdi/env/env_common_defaults
+EnvironmentFile=/etc/containers/systemd/vdi/env/env_service_defaults
+
+

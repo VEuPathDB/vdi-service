@@ -1,0 +1,185 @@
+networks:
+  internal:
+  traefik:
+    external: true
+  monitoring-ext:
+    external: true
+  rabbitmq:
+    # Rabbit is local then the network is defined externally (set this to true)
+    #
+    # If rabbit is not local then the network is not defined externally and we
+    # need to define it ourselves (set this to false)
+    external: false
+
+volumes:
+  cache-db-data:
+
+services:
+  cache-db:
+    image: docker.io/veupathdb/vdi-internal-db:latest
+    env_file:
+      - env/env_cache_db_defaults
+      - env/env_secrets
+    environment:
+      POSTGRES_PASSWORD: ${CACHE_DB_PASSWORD:?}
+    healthcheck:
+      test: "pg_isready -U ${CACHE_DB_USERNAME:?} -d ${CACHE_DB_NAME:?}"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+    - internal
+    volumes:
+    - cache-db-data:/var/lib/postgresql/data
+    labels:
+      - "io.containers.autoupdate=registry"
+
+  kafka:
+    image: docker.io/veupathdb/apache-kafka:latest
+    healthcheck:
+      test: nc -z localhost 9092 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    env_file:
+        - env/env_kafka_defaults
+    networks:
+    - internal
+
+  service:
+    image: docker.io/veupathdb/vdi-service:latest
+    depends_on:
+    - cache-db
+    - kafka
+    - plugin-bigwig
+    - plugin-biom
+    - plugin-genelist
+    - plugin-isasimple
+    - plugin-rnaseq
+    networks:
+    - internal
+    - traefik
+    - monitoring-ext
+    - rabbitmq
+    stop_grace_period: 1m
+    env_file:
+      - env/env_common_defaults
+      - env/env_service_defaults
+      - env/env_secrets
+
+    labels:
+      - "io.containers.autoupdate=registry"
+      - "prometheus.scrape_enabled=true"
+      # - "traefik.http.services.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.loadbalancer.server.port=${VDI_SERVICE_HTTP_PORT:-80}"
+      # - "traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.rule=Host(`${TRAEFIK_VDI_HOST:-vdi-dev.local.apidb.org}`)"
+      # - "traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.tls=${USE_TRAEFIK_SSL:-true}"
+      # - "traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.entrypoints=${TRAEFIK_ENTRYPOINTS:-local}"
+      # - "traefik.docker.network=traefik"
+
+  plugin-genelist:
+    image: docker.io/veupathdb/vdi-plugin-genelist:latest
+    networks:
+      internal:
+        aliases:
+        - genelist
+      monitoring-ext: {}
+    labels:
+      - "io.containers.autoupdate=registry"
+      - "prometheus.scrape_enabled=true"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
+    env_file:
+      - env/env_common_defaults
+      - env/env_plugin_genelist_defaults
+      - env/env_secrets
+    environment:
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
+
+
+  plugin-isasimple:
+    image: docker.io/veupathdb/vdi-plugin-isasimple:${VDI_PLUGIN_ISASIMPLE_TAG:-latest}
+    networks:
+      internal:
+        aliases:
+        - isasimple
+      monitoring-ext: {}
+    labels:
+      - "prometheus.scrape_enabled=true"
+      - "io.containers.autoupdate=registry"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
+    env_file:
+      - env/env_common_defaults
+      - env/env_plugin_isasimple_defaults
+      - env/env_secrets
+    environment:
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
+
+  plugin-bigwig:
+    image: docker.io/veupathdb/vdi-plugin-bigwig:${VDI_PLUGIN_BIGWIG_TAG:-latest}
+    networks:
+      internal:
+        aliases:
+        - bigwig
+      monitoring-ext: {}
+    labels:
+      - "prometheus.scrape_enabled=true"
+      - "io.containers.autoupdate=registry"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
+    env_file:
+      - env/env_common_defaults
+      - env/env_plugin_bigwig_defaults
+      - env/env_secrets
+    environment:
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
+
+  plugin-biom:
+    image: docker.io/veupathdb/vdi-plugin-biom:${VDI_PLUGIN_BIOM_TAG:-latest}
+    networks:
+      internal:
+        aliases:
+        - biom
+      monitoring-ext: {}
+    labels:
+      - "prometheus.scrape_enabled=true"
+      - "io.containers.autoupdate=registry"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
+    env_file:
+      - env/env_common_defaults
+      - env/env_plugin_biom_defaults
+      - env/env_secrets
+    environment:
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
+
+
+  plugin-rnaseq:
+    image: docker.io/veupathdb/vdi-plugin-rnaseq:${VDI_PLUGIN_RNASEQ_TAG:-latest}
+    networks:
+      internal:
+        aliases:
+        - rnaseq
+      monitoring-ext: {}
+    labels:
+      - "prometheus.scrape_enabled=true"
+      - "io.containers.autoupdate=registry"
+    volumes:
+    - type: bind
+      source: ${DATASET_DIRECTORY_SOURCE_PATH:?}
+      target: ${DATASET_DIRECTORY_TARGET_PATH:?}
+    env_file:
+      - env/env_common_defaults
+      - env/env_plugin_rnaseq_defaults
+      - env/env_secrets
+    environment:
+      DATASET_INSTALL_ROOT: ${DATASET_DIRECTORY_TARGET_PATH:?}
+

@@ -1,0 +1,2 @@
+POSTGRES_DB=cache-db
+POSTGRES_USER=cache-db

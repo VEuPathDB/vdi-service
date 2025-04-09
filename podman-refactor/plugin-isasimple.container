@@ -1,0 +1,29 @@
+[Unit]
+Description=plugin-isasimple
+
+[Container]
+# Use the centos image
+Image=docker.io/veupathdb/vdi-plugin-isasimple:latest
+ContainerName=${COMPOSE_PROJECT_NAME}-%N
+
+# Use volume and network defined below
+Network=internal.network
+NetworkAlias=isasimple
+#-monitoring-ext: {}
+
+EnvironmentFile=env/env_common_defaults
+EnvironmentFile=env/env_plugin_isasimple_defaults
+Environment=DATASET_INSTALL_ROOT=${DATASET_DIRECTORY_TARGET_PATH}
+
+Secret=DB_CONNECTION_PASS_AMOEBA,type=env
+
+#Volume=${DATASET_DIRECTORY_SOURCE_PATH}:${DATASET_DIRECTORY_TARGET_PATH}:Z
+Volume=datasets.volume:${DATASET_DIRECTORY_TARGET_PATH}:Z
+
+#Replaces watchtower with podman-auto-update
+AutoUpdate=registry
+#    labels:
+#    - "prometheus.scrape_enabled=true"
+
+[Service]
+EnvironmentFile=/etc/containers/systemd/vdi/env/env_common_defaults

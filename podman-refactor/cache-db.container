@@ -1,0 +1,33 @@
+[Unit]
+Description=PostgresSQL Cache-DB for VDI
+
+[Container]
+
+# We need the fully qualified image reference here.
+# Otherwise, auto-update will throw an error with the short-name only
+Image=docker.io/veupathdb/vdi-internal-db:latest
+
+ContainerName=${COMPOSE_PROJECT_NAME}-%N
+
+# Use volume and network defined below
+Volume=cache-db-data.volume:/var/lib/postgresql/data
+Network=internal.network
+NetworkAlias=cache-db
+
+EnvironmentFile=env/env_cache_db_defaults
+
+Secret=CACHE_DB_PASSWORD,type=env,target=POSTGRES_PASSWORD
+
+# Since the health command is run inside the container, we use double $$ to escape the $ and make sure the variable is
+# read from the environment instead the container. The command below will be passed to the container for execution as
+# pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+HealthCmd=pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+HealthRetries=5
+HealthInterval=30s
+HealthTimeout=10s
+
+#Replaces watchtower with podman-auto-update
+AutoUpdate=registry
+
+[Service]
+EnvironmentFile=/etc/containers/systemd/vdi/env/env_common_defaults
