@@ -12,7 +12,11 @@ import org.veupathdb.service.vdi.generated.model.DatasetPutRequestBody
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiId
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiId.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdiId
-import org.veupathdb.service.vdi.genx.model.*
+import org.veupathdb.service.vdi.server.inputs.cleanup
+import org.veupathdb.service.vdi.server.inputs.validate
+import org.veupathdb.service.vdi.server.outputs.BadRequestError
+import org.veupathdb.service.vdi.server.outputs.NotFoundError
+import org.veupathdb.service.vdi.server.outputs.UnprocessableEntityError
 import org.veupathdb.service.vdi.service.dataset.*
 import org.veupathdb.vdi.lib.common.field.toUserID
 

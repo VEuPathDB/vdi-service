@@ -2,12 +2,12 @@ package org.veupathdb.service.vdi.service.shares
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.service.vdi.generated.model.ShareOfferEntry
-import org.veupathdb.service.vdi.genx.model.ShareOfferEntry
+import org.veupathdb.service.vdi.server.outputs.ShareOfferEntry
 import org.veupathdb.service.vdi.model.ShareFilterStatus
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.cache.model.DatasetShareListEntry
-import vdi.component.plugin.mapping.PluginHandlers
+import vdi.component.plugins.PluginRegistry
 
 /**
  * Looks up share information for the target recipient user where the share
@@ -54,7 +54,7 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
     .toMap()
 
   return shares.map {
-    val typeDisplayName = PluginHandlers[it.typeName, it.typeVersion]?.displayName
+    val typeDisplayName = PluginRegistry[it.typeName, it.typeVersion]?.displayName
       ?: throw IllegalStateException("unregistered dataset type: ${it.typeName}:${it.typeVersion}")
 
     ShareOfferEntry(

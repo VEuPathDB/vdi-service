@@ -74,6 +74,12 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   @JsonProperty(JsonField.CONTACTS)
   void setContacts(List<DatasetContact> contacts);
 
+  @JsonProperty(JsonField.DATASET_TYPE)
+  DatasetTypeRequestBody getDatasetType();
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  void setDatasetType(DatasetTypeRequestBody datasetType);
+
   @JsonProperty(JsonField.REVISION_NOTE)
   String getRevisionNote();
 

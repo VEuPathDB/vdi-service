@@ -38,4 +38,7 @@ types:
     additionalProperties: false
     properties:
       datasetId: common.VdiId
-      projectId: common.ProjectId
+      projectIds:
+        type: common.ProjectId[]
+        minItems: 1
+        uniqueItems: true

@@ -62,9 +62,7 @@ types:
         uniqueItems: true
       organisms?:
         type: array
-        items:
-          type: string
-          maxLength: 200
+        items: common.OrganismAbbreviation
         uniqueItems: true
       contacts?:
         type: common.DatasetContact[]

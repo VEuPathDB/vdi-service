@@ -16,7 +16,10 @@ types:
       datasetId: common.VdiId
       owner: common.UserId
       datasetType: common.DatasetTypeResponseBody
-      projectIds: common.ProjectId[]
+      projectIds:
+        type: common.ProjectId[]
+        minItems: 1
+        uniqueItems: true
       status: common.DatasetStatusInfo
 
   BrokenImportListing:
@@ -46,7 +49,10 @@ types:
       datasetId: common.VdiId
       owner: common.UserId
       datasetType: common.DatasetTypeResponseBody
-      projectIds: common.ProjectId[]
+      projectIds:
+        type: common.ProjectId[]
+        minItems: 1
+        uniqueItems: true
       messages: string[]
 
   AllDatasetsListResponse:
@@ -73,7 +79,10 @@ types:
       visibility: common.DatasetVisibility
       name: common.DatasetName
       origin: common.DatasetOrigin
-      projectIds: common.ProjectId[]
+      projectIds:
+        type: common.ProjectId[]
+        minItems: 1
+        uniqueItems: true
       status: common.DatasetStatusInfo
       created: common.DatasetCreationDate
       isDeleted: boolean
@@ -101,7 +110,10 @@ types:
       created: common.DatasetCreationDate
       inserted: datetime
       name: common.DatasetName
-      projectIds: common.ProjectId[]
+      projectIds:
+        type: common.ProjectId[]
+        minItems: 1
+        uniqueItems: true
       status: string
       importMessages: string[]
       visibility: common.DatasetVisibility

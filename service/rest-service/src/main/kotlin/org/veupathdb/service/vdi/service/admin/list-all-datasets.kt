@@ -1,8 +1,8 @@
 package org.veupathdb.service.vdi.service.admin
 
 import org.veupathdb.service.vdi.generated.model.*
-import org.veupathdb.service.vdi.genx.model.*
-import org.veupathdb.service.vdi.server.input.DatasetTypeInfo
+import org.veupathdb.service.vdi.server.outputs.DatasetStatusInfo
+import org.veupathdb.service.vdi.server.outputs.DatasetTypeResponseBody
 import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -88,7 +88,7 @@ private fun AllDatasetsListEntry(
   AllDatasetsListEntryImpl().also {
     it.datasetId = row.datasetID.toString()
     it.owner = row.ownerID.toLong()
-    it.datasetType = DatasetTypeInfo(row.typeName, row.typeVersion)
+    it.datasetType = DatasetTypeResponseBody(row.typeName, row.typeVersion)
     it.visibility = DatasetVisibility(row.visibility)
     it.name = row.name
     it.shortName = row.shortName

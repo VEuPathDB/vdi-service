@@ -20,7 +20,10 @@ types:
       datasetId: VdiId
       owner: UserId
       datasetType: DatasetTypeResponseBody
-      projectIds: ProjectId[]
+      projectIds:
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
       status: DatasetStatusInfo
   BrokenImportListing:
     type: object
@@ -48,7 +51,10 @@ types:
       datasetId: VdiId
       owner: UserId
       datasetType: DatasetTypeResponseBody
-      projectIds: ProjectId[]
+      projectIds:
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
       messages: string[]
   AllDatasetsListResponse:
     displayName: All Datasets Listing Response
@@ -75,7 +81,10 @@ types:
       visibility: DatasetVisibility
       name: DatasetName
       origin: DatasetOrigin
-      projectIds: ProjectId[]
+      projectIds:
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
       status: DatasetStatusInfo
       created: DatasetCreationDate
       isDeleted: boolean
@@ -103,7 +112,10 @@ types:
       created: DatasetCreationDate
       inserted: datetime
       name: DatasetName
-      projectIds: ProjectId[]
+      projectIds:
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
       status: string
       importMessages: string[]
       visibility: DatasetVisibility
@@ -150,7 +162,10 @@ types:
     additionalProperties: false
     properties:
       datasetId: VdiId
-      projectId: ProjectId
+      projectIds:
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
   DatasetListShareUser:
     type: object
     additionalProperties: false
@@ -177,6 +192,7 @@ types:
           Project IDs for projects the dataset record was submitted to.
         type: ProjectId[]
         uniqueItems: true
+        minItems: 1
       status: DatasetStatusInfo
       shares: DatasetListShareUser[]
       fileCount:
@@ -254,9 +270,7 @@ types:
       organisms?:
         type: array
         uniqueItems: true
-        items:
-          type: string
-          maxLength: 200
+        items: OrganismAbbreviation
       contacts?:
         type: DatasetContact[]
         uniqueItems: true
@@ -317,6 +331,7 @@ types:
           Project IDs for projects the user dataset record was submitted to.
         type: ProjectId[]
         uniqueItems: true
+        minItems: 1
       visibility: DatasetVisibility
       status: DatasetStatusInfo
       created: DatasetCreationDate
@@ -393,12 +408,15 @@ types:
       organisms?:
         type: array
         uniqueItems: true
-        items:
-          type: string
-          maxLength: 20
+        items: OrganismAbbreviation
       contacts?:
         type: DatasetContact[]
         uniqueItems: true
+      datasetType?:
+        description: |
+          Only allowed when transitioning from a none-type dataset into an
+          actual dataset type.
+        type: DatasetTypeRequestBody
   DatasetPutMetadata:
     type: DatasetPatchRequestBody
     additionalProperties: false
@@ -508,7 +526,10 @@ types:
       owner: DatasetOwner
       shareStatus: ShareOfferStatus
       datasetType: DatasetTypeResponseBody
-      projectIds: ProjectId[]
+      projectIds:
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
   ShareOfferStatus:
     displayName: Share Offer Status
     type: string
@@ -518,6 +539,7 @@ types:
       - rejected
   DatasetCategory:
     type: string
+    minLength: 3
     maxLength: 100
   DatasetContact:
     type: object
@@ -556,9 +578,18 @@ types:
     type: object
     additionalProperties: false
     properties:
-      resourceIdentifier: string
-      resourceDisplayName: string
-      resourceVersion: string
+      resourceIdentifier:
+        type: string
+        minLength: 3
+        maxLength: 50
+      resourceDisplayName:
+        type: string
+        minLength: 3
+        maxLength: 100
+      resourceVersion:
+        type: string
+        minLength: 1
+        maxLength: 50
   DatasetDescription:
     description: Longform description of the dataset.
     type: string
@@ -568,7 +599,7 @@ types:
     properties:
       url:
         type: string
-        minLength: 3
+        minLength: 7
         maxLength: 200
       text:
         type: string
@@ -627,6 +658,8 @@ types:
       String representing the origin of the dataset.  Examples include
       `direct-upload`, `nephele`, or `galaxy`.
     type: string
+    minLength: 3
+    maxLength: 256
   DatasetOwner:
     description: Details about the owner of a VDI dataset.
     type: object
@@ -671,9 +704,11 @@ types:
       - revise
   DatasetShortAttribution:
     type: string
+    minLength: 3
     maxLength: 300
   DatasetShortName:
     type: string
+    minLength: 3
     maxLength: 300
   DatasetSourceUrl:
     description: |
@@ -706,8 +741,14 @@ types:
     type: object
     additionalProperties: false
     properties:
-      name: string
-      version: string
+      name:
+        type: string
+        minLength: 3
+        maxLength: 128
+      version:
+        type: string
+        minLength: 1
+        maxLength: 32
   DatasetVisibility:
     type: string
     enum:
@@ -717,29 +758,12 @@ types:
   OrganismAbbreviation:
     type: string
     minLength: 3
-    maxLength: 20
+    maxLength: 200
   ProjectId:
-    description: |
-      Name or ID of a target VEuPathDB project.
-
-      Valid project IDs are:
-
-      - AmoebaDB
-      - ClinEpiDB
-      - CryptoDB
-      - FungiDB
-      - GiardiaDB
-      - HostDB
-      - MicrobiomeDB
-      - MicrosporidiaDB
-      - PiroplasmaDB
-      - PlasmoDB
-      - ToxoDB
-      - TrichDB
-      - TriTrypDB
-      - VectorBase
-      - VEuPathDB
+    description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".
     type: string
+    minLength: 5
+    maxLength: 32
   ShareOfferAction:
     type: string
     enum:

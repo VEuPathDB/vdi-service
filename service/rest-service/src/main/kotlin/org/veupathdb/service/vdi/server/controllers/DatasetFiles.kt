@@ -7,7 +7,7 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminO
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdFiles
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdFiles.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdiIdFiles
-import org.veupathdb.service.vdi.genx.model.NotFoundError
+import org.veupathdb.service.vdi.server.outputs.NotFoundError
 import org.veupathdb.service.vdi.service.dataset.*
 import org.veupathdb.vdi.lib.common.field.toDatasetIDOrNull
 import org.veupathdb.vdi.lib.common.field.toUserID

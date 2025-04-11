@@ -18,6 +18,7 @@ import java.util.List;
     "hyperlinks",
     "organisms",
     "contacts",
+    "datasetType",
     "datasetId"
 })
 public class DatasetPutResponseBodyImpl implements DatasetPutResponseBody {
@@ -53,6 +54,9 @@ public class DatasetPutResponseBodyImpl implements DatasetPutResponseBody {
 
   @JsonProperty(JsonField.CONTACTS)
   private List<DatasetContact> contacts;
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  private DatasetTypeRequestBody datasetType;
 
   @JsonProperty(JsonField.DATASET_ID)
   private String datasetId;
@@ -165,6 +169,16 @@ public class DatasetPutResponseBodyImpl implements DatasetPutResponseBody {
   @JsonProperty(JsonField.CONTACTS)
   public void setContacts(List<DatasetContact> contacts) {
     this.contacts = contacts;
+  }
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  public DatasetTypeRequestBody getDatasetType() {
+    return this.datasetType;
+  }
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  public void setDatasetType(DatasetTypeRequestBody datasetType) {
+    this.datasetType = datasetType;
   }
 
   @JsonProperty(JsonField.DATASET_ID)

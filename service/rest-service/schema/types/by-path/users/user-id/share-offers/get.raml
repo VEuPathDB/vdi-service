@@ -12,7 +12,10 @@ types:
       owner: common.DatasetOwner
       shareStatus: ShareOfferStatus
       datasetType: common.DatasetTypeResponseBody
-      projectIds: common.ProjectId[]
+      projectIds:
+        type: common.ProjectId[]
+        minItems: 1
+        uniqueItems: true
 
   ShareOfferStatus:
     displayName: Share Offer Status

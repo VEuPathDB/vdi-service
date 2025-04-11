@@ -4,14 +4,17 @@ import jakarta.ws.rs.NotFoundException
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.genx.model.*
+import org.veupathdb.service.vdi.server.outputs.toExternal
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.service.vdi.s3.DatasetStore
-import org.veupathdb.service.vdi.server.input.DatasetTypeInfo
+import org.veupathdb.service.vdi.server.outputs.*
+import org.veupathdb.service.vdi.server.outputs.DatasetDependencies
+import org.veupathdb.service.vdi.server.outputs.DatasetDetails
+import org.veupathdb.service.vdi.server.outputs.DatasetTypeResponseBody
+import org.veupathdb.service.vdi.server.outputs.toExternal
 import org.veupathdb.service.vdi.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDIDatasetContact
-import org.veupathdb.vdi.lib.common.model.VDIDatasetHyperlink
 import org.veupathdb.vdi.lib.common.model.VDIDatasetPublication
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import vdi.component.db.app.AppDB
@@ -63,11 +66,11 @@ fun getDatasetByID(userID: UserID?, datasetID: DatasetID, includeDeleted: Boolea
   return DatasetDetails(
     datasetID = datasetID,
     owner = DatasetOwner(userDetails.requireDetails(dataset.ownerID)),
-    datasetType = DatasetTypeInfo(dataset, typeDisplayName),
+    datasetType = DatasetTypeResponseBody(dataset, typeDisplayName),
     name = dataset.name,
     origin = dataset.origin,
     projectIDs = dataset.projects,
-    visibility = DatasetVisibility(dataset.visibility),
+    visibility = org.veupathdb.service.vdi.server.inputs.DatasetVisibility(dataset.visibility),
     status = DatasetStatusInfo(dataset.importStatus, AppDB().getDatasetStatuses(dataset.datasetID, dataset.projects)),
     created = dataset.created.defaultZone(),
     dependencies = metaJson?.dependencies?.let(::DatasetDependencies) ?: emptyList(),
@@ -83,9 +86,9 @@ fun getDatasetByID(userID: UserID?, datasetID: DatasetID, includeDeleted: Boolea
       .filterNotNull()
       .toList(),
     publications = metaJson?.publications?.map(VDIDatasetPublication::toExternal),
-    hyperlinks = metaJson?.hyperlinks?.map(VDIDatasetHyperlink::toExternal),
+    hyperlinks = metaJson?.hyperlinks?.map(::toExternal),
     organisms = metaJson?.organisms?.toList(),
-    contacts = metaJson?.contacts?.map(VDIDatasetContact::toExternal),
+    contacts = metaJson?.contacts?.map(::toExternal),
     originalID = revisions?.originalID,
     revisionHistory = revisions?.records?.map { it.toExternal(revisionIndex[it.revisionID]?.revisionNote) }
   )

@@ -7,7 +7,11 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequestBody
 import org.veupathdb.service.vdi.generated.resources.Datasets
 import org.veupathdb.service.vdi.generated.resources.VdiDatasets
-import org.veupathdb.service.vdi.genx.model.*
+import org.veupathdb.service.vdi.server.inputs.cleanup
+import org.veupathdb.service.vdi.server.inputs.validate
+import org.veupathdb.service.vdi.server.outputs.BadRequestError
+import org.veupathdb.service.vdi.server.outputs.DatasetPostResponseBody
+import org.veupathdb.service.vdi.server.outputs.UnprocessableEntityError
 import org.veupathdb.service.vdi.service.dataset.createDataset
 import org.veupathdb.service.vdi.service.dataset.fetchUserDatasetList
 import org.veupathdb.vdi.lib.common.field.DatasetID

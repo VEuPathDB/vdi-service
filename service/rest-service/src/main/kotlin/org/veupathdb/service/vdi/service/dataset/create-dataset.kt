@@ -7,7 +7,7 @@ import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import org.veupathdb.service.vdi.config.Options
 import org.veupathdb.service.vdi.generated.model.DatasetPostRequestBody
-import org.veupathdb.service.vdi.genx.model.toDatasetMeta
+import org.veupathdb.service.vdi.server.inputs.toDatasetMeta
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.service.users.getCurrentQuotaUsage
 import org.veupathdb.service.vdi.util.*
@@ -22,13 +22,11 @@ import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.withTransaction
 import vdi.component.metrics.Metrics
-import vdi.component.plugin.mapping.PluginHandlers
 import java.net.MalformedURLException
 import java.net.URL
 import java.nio.file.Path
@@ -52,17 +50,6 @@ fun <T: Any> T.createDataset(
   logger.trace("createDataset(userID={}, datasetID={}, entity={})", userID, datasetID, entity)
 
   val datasetMeta = entity.toDatasetMeta(userID)
-
-  val handler = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version]
-    ?: throw BadRequestException("target dataset type is unknown to the VDI service")
-
-  for (projectID in datasetMeta.projects) {
-    if (!handler.appliesToProject(projectID))
-      throw BadRequestException("target dataset type does not apply to project $projectID")
-
-    if (!AppDatabaseRegistry.contains(projectID, datasetMeta.type.name))
-      throw BadRequestException("unrecognized target project")
-  }
 
   val (tempDirectory, uploadFile) = CacheDB().withTransaction {
     it.tryInsertDataset(DatasetImpl(

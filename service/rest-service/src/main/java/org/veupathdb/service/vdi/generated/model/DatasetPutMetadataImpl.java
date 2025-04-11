@@ -18,6 +18,7 @@ import java.util.List;
     "hyperlinks",
     "organisms",
     "contacts",
+    "datasetType",
     "revisionNote"
 })
 public class DatasetPutMetadataImpl implements DatasetPutMetadata {
@@ -53,6 +54,9 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
 
   @JsonProperty(JsonField.CONTACTS)
   private List<DatasetContact> contacts;
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  private DatasetTypeRequestBody datasetType;
 
   @JsonProperty(JsonField.REVISION_NOTE)
   private String revisionNote;
@@ -165,6 +169,16 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.CONTACTS)
   public void setContacts(List<DatasetContact> contacts) {
     this.contacts = contacts;
+  }
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  public DatasetTypeRequestBody getDatasetType() {
+    return this.datasetType;
+  }
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  public void setDatasetType(DatasetTypeRequestBody datasetType) {
+    this.datasetType = datasetType;
   }
 
   @JsonProperty(JsonField.REVISION_NOTE)

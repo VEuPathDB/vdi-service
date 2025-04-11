@@ -1,14 +1,9 @@
-import org.veupathdb.lib.gradle.container.tasks.jaxrs.GenerateJaxRS
-import org.veupathdb.lib.gradle.container.util.Logger
-
 plugins {
   kotlin("jvm")
   alias(libs.plugins.vpdb)
 }
 
 containerService {
-  logLevel = Logger.Level.Trace
-
   service {
     name = "vdi-service"
     projectPackage = "org.veupathdb.service.vdi"
@@ -44,6 +39,8 @@ dependencies {
   implementation(libs.fgputil.db)
   implementation(libs.container.core)
   implementation(libs.container.multipart)
+
+  implementation(libs.json.validation)
 
   implementation(libs.s34k)
 

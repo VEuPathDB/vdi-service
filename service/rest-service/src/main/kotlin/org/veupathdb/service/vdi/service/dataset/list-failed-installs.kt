@@ -1,8 +1,8 @@
 package org.veupathdb.service.vdi.service.dataset
 
 import org.veupathdb.service.vdi.generated.model.*
-import org.veupathdb.service.vdi.genx.model.*
-import org.veupathdb.service.vdi.server.input.DatasetTypeInfo
+import org.veupathdb.service.vdi.server.outputs.DatasetStatusInfo
+import org.veupathdb.service.vdi.server.outputs.DatasetTypeResponseBody
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.component.db.app.AppDB
@@ -108,7 +108,7 @@ private fun DatasetRecord.toDetails(
   BrokenDatasetDetailsImpl().also { out ->
     out.datasetId   = datasetID.toString()
     out.owner       = owner.toLong()
-    out.datasetType = DatasetTypeInfo(typeName, typeVersion)
+    out.datasetType = DatasetTypeResponseBody(typeName, typeVersion)
     out.projectIds  = projects.toList()
     out.status      = DatasetStatusInfo(DatasetImportStatus.Complete, statuses)
   }

@@ -11,8 +11,9 @@ vpdb = { id = "org.veupathdb.lib.gradle.container.container-utils", version = "6
 # VPDB
 fgputil-db = { group = "org.gusdb", name = "fgputil-db", version = "2.16.0-jakarta" }
 
-container-core      = { group = "org.veupathdb.lib", name = "jaxrs-container-core",   version = "9.4.5" }
-container-multipart = { group = "org.veupathdb.lib", name = "multipart-jackson-pojo", version = "1.1.7" }
+container-core      = { group = "org.veupathdb.lib", name = "jaxrs-container-core",     version = "9.4.5" }
+container-multipart = { group = "org.veupathdb.lib", name = "multipart-jackson-pojo",   version = "1.1.7" }
+json-validation     = { group = "org.veupathdb.lib", name = "jpath-request-validation", version = "0.1.0" }
 
 vdi-common = { group = "org.veupathdb.vdi", name = "vdi-component-common", version = "18.0.0-SNAPSHOT" }
 vdi-json   = { group = "org.veupathdb.vdi", name = "vdi-component-json",   version = "1.0.3"  }

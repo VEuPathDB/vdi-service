@@ -17,7 +17,8 @@ import java.util.List;
     "publications",
     "hyperlinks",
     "organisms",
-    "contacts"
+    "contacts",
+    "datasetType"
 })
 public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.VISIBILITY)
@@ -52,6 +53,9 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
 
   @JsonProperty(JsonField.CONTACTS)
   private List<DatasetContact> contacts;
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  private DatasetTypeRequestBody datasetType;
 
   @JsonProperty(JsonField.VISIBILITY)
   public DatasetVisibility getVisibility() {
@@ -161,5 +165,15 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.CONTACTS)
   public void setContacts(List<DatasetContact> contacts) {
     this.contacts = contacts;
+  }
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  public DatasetTypeRequestBody getDatasetType() {
+    return this.datasetType;
+  }
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  public void setDatasetType(DatasetTypeRequestBody datasetType) {
+    this.datasetType = datasetType;
   }
 }

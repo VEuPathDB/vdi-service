@@ -3,8 +3,10 @@ package org.veupathdb.service.vdi.service.dataset
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.service.vdi.generated.model.*
-import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.s3.DatasetStore
+import org.veupathdb.service.vdi.server.inputs.cleanup
+import org.veupathdb.service.vdi.server.inputs.toInternal
+import org.veupathdb.service.vdi.server.inputs.validate
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -36,7 +38,7 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
     val newMeta = VDIDatasetMeta(
       type             = meta.type,
       projects         = meta.projects,
-      visibility       = patch.visibility?.toInternalVisibility() ?: meta.visibility,
+      visibility       = patch.visibility?.toInternal() ?: meta.visibility,
       owner            = userID,
       name             = patch.name ?: meta.name,
       shortName        = if (patch.shortName?.isBlank() == true) null else patch.shortName ?: meta.shortName,

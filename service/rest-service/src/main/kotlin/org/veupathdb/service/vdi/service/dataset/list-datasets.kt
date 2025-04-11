@@ -2,8 +2,8 @@ package org.veupathdb.service.vdi.service.dataset
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.service.vdi.generated.model.DatasetListEntry
-import org.veupathdb.service.vdi.genx.model.DatasetListShareUser
-import org.veupathdb.service.vdi.genx.model.toExternal
+import org.veupathdb.service.vdi.server.outputs.DatasetListShareUser
+import org.veupathdb.service.vdi.server.outputs.toExternal
 import org.veupathdb.service.vdi.model.UserDetails
 import org.veupathdb.service.vdi.util.reduceTo
 import org.veupathdb.vdi.lib.common.field.DatasetID
