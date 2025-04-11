@@ -3,30 +3,35 @@ package org.veupathdb.service.vdi.service.dataset
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.service.vdi.generated.model.*
+import org.veupathdb.service.vdi.generated.resources.DatasetsVdiId.PatchDatasetsByVdiIdResponse
+import org.veupathdb.service.vdi.generated.resources.DatasetsVdiId.PatchDatasetsByVdiIdResponse.*
 import org.veupathdb.service.vdi.s3.DatasetStore
 import org.veupathdb.service.vdi.server.inputs.cleanup
 import org.veupathdb.service.vdi.server.inputs.toInternal
 import org.veupathdb.service.vdi.server.inputs.validate
+import org.veupathdb.service.vdi.server.outputs.ForbiddenError
+import org.veupathdb.service.vdi.server.outputs.NotFoundError
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.withTransaction
 
-internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequestBody) {
-  val cacheDB = vdi.component.db.cache.CacheDB()
+internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequestBody): PatchDatasetsByVdiIdResponse {
+  val cacheDB = CacheDB()
 
   val dataset = cacheDB.selectDataset(datasetID)
-    ?: throw NotFoundException()
+    ?: return respond404WithApplicationJson(NotFoundError())
 
   if (dataset.isDeleted)
-    throw ForbiddenException("cannot update metadata on a deleted dataset")
+    return respond403WithApplicationJson(ForbiddenError("cannot update metadata on a deleted dataset"))
 
   if (dataset.ownerID != userID)
-    throw ForbiddenException("cannot update metadata on a dataset you do not own")
+    return respond403WithApplicationJson(ForbiddenError("cannot update metadata on a dataset you do not own"))
 
   if (!patch.hasSomethingToUpdate())
-    return
+    return respond204()
 
   patch.cleanup()
   patch.validate()
