@@ -148,17 +148,16 @@ object EnvKey {
 
     /**
      * Represents the environment variable
-     * `PLUGIN_HANDLER_{NAME}_USER_FILES_PATH` where `{NAME}` is a wildcard
+     * `PLUGIN_HANDLER_{NAME}_ENABLE_TYPE_CHANGE` where `{NAME}` is a wildcard
      * matching any string.
      *
-     * This environment variable declares the plugin's user data files mount
-     * path.  User data files will be installed into subdirectories under this
-     * mount point.
+     * This environment variable configures whether datasets of this type may
+     * have their type updated to another type as part of a dataset update.
      *
-     * Type: String
-     * Required: yes
+     * Type: Boolean
+     * Required: no
      */
-    const val UserFilesSuffix = "_USER_FILES_PATH"
+    const val TypeChangesEnabledSuffix = "_ENABLE_TYPE_CHANGE"
   }
 
   object HardDeleteTriggerHandler {

@@ -6,6 +6,7 @@ import org.veupathdb.service.vdi.generated.model.DatasetHyperlink
 import org.veupathdb.service.vdi.generated.model.DatasetPatchRequestBody
 import org.veupathdb.service.vdi.generated.model.DatasetPublication
 import org.veupathdb.service.vdi.generated.model.JsonField
+import org.veupathdb.vdi.lib.common.field.ProjectID
 
 @Suppress("DuplicatedCode") // Overlap in generated API types
 internal fun DatasetPatchRequestBody.cleanup() {
@@ -25,7 +26,7 @@ internal fun DatasetPatchRequestBody.cleanup() {
   datasetType?.cleanup()
 }
 
-internal fun DatasetPatchRequestBody.validate(errors: ValidationErrors = ValidationErrors()) {
+internal fun DatasetPatchRequestBody.validate(projects: List<ProjectID>, errors: ValidationErrors = ValidationErrors()): ValidationErrors {
   name?.validateName(JsonField.NAME, errors)
   shortName.validateShortName(JsonField.SHORT_NAME, errors)
   shortAttribution.validateShortAttribution(JsonField.SHORT_ATTRIBUTION, errors)
@@ -37,5 +38,7 @@ internal fun DatasetPatchRequestBody.validate(errors: ValidationErrors = Validat
   organisms.validateOrganisms(JsonField.ORGANISMS, errors)
   contacts.validate(JsonField.CONTACTS, errors)
   // pass an empty list for projects because we don't have that information yet.
-  datasetType?.validate(JsonField.DATASET_TYPE, emptyList(), errors)
+  datasetType?.validate(JsonField.DATASET_TYPE, projects, errors)
+
+  return errors
 }

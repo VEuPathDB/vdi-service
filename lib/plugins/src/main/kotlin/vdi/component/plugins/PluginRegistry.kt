@@ -1,6 +1,7 @@
 @file:Suppress("NOTHING_TO_INLINE")
 package vdi.component.plugins
 
+import org.veupathdb.vdi.lib.common.env.optBool
 import org.veupathdb.vdi.lib.common.env.optSet
 import org.veupathdb.vdi.lib.common.env.require
 import org.veupathdb.vdi.lib.common.field.DataType
@@ -55,16 +56,22 @@ object PluginRegistry : Iterable<Triple<DataType, String, PluginDetails>> {
   fun asSequence() =
     sequence { mapping.forEach { (k, v) -> yield(Triple(k.type, k.version, v)) } }
 
-  fun
-
   private fun parseEnvKeyName(key: String): String? {
     return when {
-      key.endsWith(EnvKey.Handlers.DisplayNameSuffix) -> substringEnvKeyName(key, EnvKey.Handlers.DisplayNameSuffix)
-      key.endsWith(EnvKey.Handlers.NameSuffix)        -> substringEnvKeyName(key, EnvKey.Handlers.NameSuffix)
-      key.endsWith(EnvKey.Handlers.AddressSuffix)     -> substringEnvKeyName(key, EnvKey.Handlers.AddressSuffix)
-      key.endsWith(EnvKey.Handlers.ProjectIDsSuffix)  -> substringEnvKeyName(key, EnvKey.Handlers.ProjectIDsSuffix)
-      key.endsWith(EnvKey.Handlers.VersionSuffix)     -> substringEnvKeyName(key, EnvKey.Handlers.VersionSuffix)
-      else                                            -> null
+      key.endsWith(EnvKey.Handlers.DisplayNameSuffix)
+        -> substringEnvKeyName(key, EnvKey.Handlers.DisplayNameSuffix)
+      key.endsWith(EnvKey.Handlers.NameSuffix)
+        -> substringEnvKeyName(key, EnvKey.Handlers.NameSuffix)
+      key.endsWith(EnvKey.Handlers.AddressSuffix)
+        -> substringEnvKeyName(key, EnvKey.Handlers.AddressSuffix)
+      key.endsWith(EnvKey.Handlers.ProjectIDsSuffix)
+        -> substringEnvKeyName(key, EnvKey.Handlers.ProjectIDsSuffix)
+      key.endsWith(EnvKey.Handlers.VersionSuffix)
+        -> substringEnvKeyName(key, EnvKey.Handlers.VersionSuffix)
+      key.endsWith(EnvKey.Handlers.TypeChangesEnabledSuffix) ->
+        substringEnvKeyName(key, EnvKey.Handlers.TypeChangesEnabledSuffix)
+      else
+        -> null
     }
   }
 
@@ -76,8 +83,9 @@ object PluginRegistry : Iterable<Triple<DataType, String, PluginDetails>> {
     val displayName = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.DisplayNameSuffix)
     val version     = env.require(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.VersionSuffix)
     val projects    = env.optSet(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.ProjectIDsSuffix)
+    val changing    = env.optBool(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.TypeChangesEnabledSuffix)
 
-    return KeyPair(DataType.of(name), version) to PluginDetails(displayName, projects ?: emptySet())
+    return KeyPair(DataType.of(name), version) to PluginDetails(displayName, projects ?: emptySet(), changing ?: false)
   }
 
   private data class KeyPair(val type: DataType, val version: String)

@@ -5,17 +5,22 @@ uses:
 
 types:
   DatasetPatchRequestBody:
-    displayName: Dataset Patch Request
+    displayName: Dataset Metadata Patch Request
     description: |
       Request to update the metadata for a dataset.
     type: object
     additionalProperties: false
     properties:
-      visibility?: common.DatasetVisibility
       name?: common.DatasetName
+      datasetType?:
+        description: |
+          Only allowed when transitioning from a none-type dataset into an
+          actual dataset type.
+        type: common.DatasetTypeRequestBody
       shortName?: common.DatasetShortName
       shortAttribution?: common.DatasetShortAttribution
       category?: common.DatasetCategory
+      visibility?: common.DatasetVisibility
       summary?: common.DatasetSummary
       description?: common.DatasetDescription
       publications?:
@@ -31,8 +36,3 @@ types:
       contacts?:
         type: common.DatasetContact[]
         uniqueItems: true
-      datasetType?:
-        description: |
-          Only allowed when transitioning from a none-type dataset into an
-          actual dataset type.
-        type: common.DatasetTypeRequestBody

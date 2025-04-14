@@ -13,7 +13,7 @@ fun DatasetTypeRequestBody.cleanup() {
   version = version.cleanupString()
 }
 
-fun DatasetTypeRequestBody?.validate(jPath: String, projects: List<ProjectID>, errors: ValidationErrors) {
+fun DatasetTypeRequestBody?.validate(jPath: String, projects: List<ProjectID>, errors: ValidationErrors) =
   require(jPath, errors) {
     if (
       name.checkNonBlank(jPath..JsonField.NAME, errors)
@@ -28,7 +28,6 @@ fun DatasetTypeRequestBody?.validate(jPath: String, projects: List<ProjectID>, e
       }
     }
   }
-}
 
 fun DatasetTypeRequestBody.toInternal(): VDIDatasetType =
   VDIDatasetType(DataType.of(name), version)

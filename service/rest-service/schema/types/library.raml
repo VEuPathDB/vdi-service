@@ -7,70 +7,6 @@
 ################################################################################
 
 types:
-  BrokenDatasetListing:
-    type: object
-    additionalProperties: false
-    properties:
-      details?: BrokenDatasetDetails[]
-      ids?: VdiId[]
-  BrokenDatasetDetails:
-    type: object
-    additionalProperties: false
-    properties:
-      datasetId: VdiId
-      owner: UserId
-      datasetType: DatasetTypeResponseBody
-      projectIds:
-        type: ProjectId[]
-        minItems: 1
-        uniqueItems: true
-      status: DatasetStatusInfo
-  BrokenImportListing:
-    type: object
-    additionalProperties: false
-    properties:
-      meta: BrokenImportListingMeta
-      results: BrokenImportDetails[]
-  BrokenImportListingMeta:
-    type: object
-    additionalProperties: false
-    properties:
-      count:
-        description: Number of records in the result
-        type: integer
-      before?: string
-      after?: string
-      user?: UserId
-      limit?: integer
-      offset?: integer
-  BrokenImportDetails:
-    displayName: Broken Import Details
-    type: object
-    additionalProperties: false
-    properties:
-      datasetId: VdiId
-      owner: UserId
-      datasetType: DatasetTypeResponseBody
-      projectIds:
-        type: ProjectId[]
-        minItems: 1
-        uniqueItems: true
-      messages: string[]
-  AllDatasetsListResponse:
-    displayName: All Datasets Listing Response
-    type: object
-    additionalProperties: false
-    properties:
-      meta: AllDatasetsListMeta
-      results: AllDatasetsListEntry[]
-  AllDatasetsListMeta:
-    type: object
-    additionalProperties: false
-    properties:
-      count: integer
-      offset: integer
-      limit: integer
-      total: integer
   AllDatasetsListEntry:
     type: object
     additionalProperties: false
@@ -94,40 +30,21 @@ types:
       summary?: DatasetSummary
       description?: DatasetDescription
       sourceUrl?: DatasetSourceUrl
-  SyncControlRecord:
+  AllDatasetsListMeta:
     type: object
     additionalProperties: false
     properties:
-      sharesUpdateTime: datetime
-      dataUpdateTime: datetime
-      metaUpdateTime: datetime
-  InternalDatasetDetails:
+      count: integer
+      offset: integer
+      limit: integer
+      total: integer
+  AllDatasetsListResponse:
+    displayName: All Datasets Listing Response
     type: object
     additionalProperties: false
     properties:
-      datasetType: DatasetTypeResponseBody
-      owner: UserId
-      isDeleted: boolean
-      origin: DatasetOrigin
-      created: DatasetCreationDate
-      inserted: datetime
-      name: DatasetName
-      projectIds:
-        type: ProjectId[]
-        minItems: 1
-        uniqueItems: true
-      status: string
-      importMessages: string[]
-      visibility: DatasetVisibility
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      category?: DatasetCategory
-      summary?: DatasetSummary
-      description?: DatasetDescription
-      sourceUrl?: DatasetSourceUrl
-      syncControl?: SyncControlRecord
-      uploadFiles?: string[]
-      installFiles?: string[]
+      meta: AllDatasetsListMeta
+      results: AllDatasetsListEntry[]
   AuthorizationKey:
     displayName: RPC Authorization Key
     description: |
@@ -137,406 +54,75 @@ types:
     pattern: ^[0-9a-fA-F]{64}$
     minLength: 64
     maxLength: 64
-  InstallCleanupRequestBody:
-    displayName: Install Cleanup Request
-    description: |
-      Object controlling the install cleanup process and what datasets it should
-      target.
-
-      Requesters should specify one of the fields `all` or `targets` to control
-      what datasets will be cleaned up.  If neither is specified the endpoint
-      will do nothing.
-    type: object
-    additionalProperties: false
-    properties:
-      all?:
-        type: boolean
-        default: false
-      targets?:
-        type: InstallCleanupTarget[]
-        minItems: 1
-        uniqueItems: true
-  InstallCleanupTarget:
-    displayName: Install Cleanup Target
+  BadRequestError:
+    displayName: Bad Request
+    description: Request could not be parsed or was otherwise unusable.
+    type: Error
+    discriminatorValue: bad-request
+    example:
+      status: bad-request
+      message: malformed JSON
+  BrokenDatasetDetails:
     type: object
     additionalProperties: false
     properties:
       datasetId: VdiId
-      projectIds:
-        type: ProjectId[]
-        minItems: 1
-        uniqueItems: true
-  DatasetListShareUser:
-    type: object
-    additionalProperties: false
-    properties:
-      userId: UserId
-      firstName: string
-      lastName: string
-      organization: string
-      accepted: boolean
-  DatasetListEntry:
-    displayName: Dataset List Item
-    description: Short entry with basic details about a dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      datasetId: VdiId
-      owner: DatasetOwner
+      owner: UserId
       datasetType: DatasetTypeResponseBody
-      visibility: DatasetVisibility
-      name: DatasetName
-      origin: DatasetOrigin
       projectIds:
-        description: |
-          Project IDs for projects the dataset record was submitted to.
         type: ProjectId[]
-        uniqueItems: true
         minItems: 1
+        uniqueItems: true
       status: DatasetStatusInfo
-      shares: DatasetListShareUser[]
-      fileCount:
-        description: Number of files uploaded for this dataset.
-        type: integer
-      fileSizeTotal:
-        description: |
-          Sum of the sizes of all the files uploaded for this dataset.
-        type: integer
-        format: int64
-      created: DatasetCreationDate
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      category?: DatasetCategory
-      summary?: DatasetSummary
-      description?: DatasetDescription
-      sourceUrl?: DatasetSourceUrl
-      originalId?: VdiId
-  DatasetPostRequestBody:
-    displayName: Dataset Post Request
-    description: |
-      HTTP POST request body requesting the creation of a dataset from the
-      components included in the request.
-
-      For a request to be considered valid, it must contain exactly 1 of the
-      optional parameters `file` or `url`.  If a request body contains both a
-      `file` and a `url` field value, the service will return a `400` error.
+  BrokenDatasetListing:
     type: object
     additionalProperties: false
     properties:
-      meta:
-        description: Metadata about the dataset being submitted.
-        type: DatasetPostMeta
-      file?:
-        description: |
-          Dataset file to upload.
-
-          This field is incompatible with the `url` field.
-        type: file
-      url?:
-        description: |
-          URL to a dataset file to upload.
-
-          This field is incompatible with the `file` field.
-        type: string
-  DatasetPostMeta:
-    type: object
-    additionalProperties: false
-    properties:
-      name: DatasetName
-      datasetType: DatasetTypeRequestBody
-      origin: DatasetOrigin
-      dependencies:
-        type: DatasetDependency[]
-        uniqueItems: true
-      projects:
-        description: IDs of the projects this dataset is being submitted to.
-        type: ProjectId[]
-        minItems: 1
-        uniqueItems: true
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      category?: DatasetCategory
-      visibility?:
-        type: DatasetVisibility
-        default: "private"
-      summary?: DatasetSummary
-      description?: DatasetDescription
-      publications?:
-        type: DatasetPublication[]
-        uniqueItems: true
-      hyperlinks?:
-        type: DatasetHyperlink[]
-        uniqueItems: true
-      organisms?:
-        type: array
-        uniqueItems: true
-        items: OrganismAbbreviation
-      contacts?:
-        type: DatasetContact[]
-        uniqueItems: true
-      createdOn?:
-        displayName: Creation Date
-        description: |
-          This field is only used for admin override uploads, for normal dataset
-          uploads this field is ignored.
-        type: datetime
-  DatasetPostResponseBody:
-    description: |
-      Successful upload response.
-
-      This response does not mean the uploaded dataset has been made available
-      on the target site(s).  The upload must first be validated and installed
-      into the target sites before the dataset will become available for use.
+      details?: BrokenDatasetDetails[]
+      ids?: VdiId[]
+  BrokenImportDetails:
+    displayName: Broken Import Details
     type: object
     additionalProperties: false
     properties:
       datasetId: VdiId
-  DatasetFileListing:
-    type: object
-    additionalProperties: false
-    properties:
-      upload: DatasetZipDetails
-      install?: DatasetZipDetails
-  DatasetZipDetails:
-    type: object
-    additionalProperties: false
-    properties:
-      zipSize:
-        type: integer
-        format: int64
-      contents: DatasetFileDetails[]
-  DatasetFileDetails:
-    type: object
-    additionalProperties: false
-    properties:
-      fileName: string
-      fileSize:
-        description: Size of the file in bytes.
-        type: integer
-        format: int64
-  DatasetDetails:
-    displayName: Dataset Details
-    description: |
-      Details about a specific singular dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      datasetId: VdiId
-      owner: DatasetOwner
-      datasetType: DatasetTypeResponseBody
-      name: DatasetName
-      origin: DatasetOrigin
-      projectIds:
-        description: |
-          Project IDs for projects the user dataset record was submitted to.
-        type: ProjectId[]
-        uniqueItems: true
-        minItems: 1
-      visibility: DatasetVisibility
-      status: DatasetStatusInfo
-      created: DatasetCreationDate
-      dependencies:
-        type: DatasetDependency[]
-        uniqueItems: true
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      category?: DatasetCategory
-      summary?: DatasetSummary
-      description?: DatasetDescription
-      sourceUrl?: DatasetSourceUrl
-      importMessages?:
-        description: |
-          Log lines from the import process.
-
-          These messages will be warnings and/or validation errors.
-        type: string[]
-      shares?:
-        description: |
-          Array of share offers that have been created by the owner of this
-          dataset to share it with other users.
-        type: ShareOffer[]
-      publications?:
-        type: DatasetPublication[]
-        uniqueItems: true
-      hyperlinks?:
-        type: DatasetHyperlink[]
-        uniqueItems: true
-      organisms?:
-        displayName: Dataset Organism Abbreviations
-        type: OrganismAbbreviation[]
-        uniqueItems: true
-      contacts?:
-        type: DatasetContact[]
-        uniqueItems: true
-      originalId?: VdiId
-      revisionHistory?: DatasetRevision[]
-  ShareOffer:
-    type: object
-    additionalProperties: false
-    properties:
-      recipient: ShareOfferRecipient
-      status: ShareOfferAction
-  ShareOfferRecipient:
-    type: object
-    additionalProperties: false
-    properties:
-      userId: UserId
-      firstName?: string
-      lastName?: string
-      organization?: string
-      email?: string
-  DatasetPatchRequestBody:
-    displayName: Dataset Patch Request
-    description: |
-      Request to update the metadata for a dataset.
-    type: object
-    additionalProperties: false
-    properties:
-      visibility?: DatasetVisibility
-      name?: DatasetName
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      category?: DatasetCategory
-      summary?: DatasetSummary
-      description?: DatasetDescription
-      publications?:
-        type: DatasetPublication[]
-        uniqueItems: true
-      hyperlinks?:
-        type: DatasetHyperlink[]
-        uniqueItems: true
-      organisms?:
-        type: array
-        uniqueItems: true
-        items: OrganismAbbreviation
-      contacts?:
-        type: DatasetContact[]
-        uniqueItems: true
-      datasetType?:
-        description: |
-          Only allowed when transitioning from a none-type dataset into an
-          actual dataset type.
-        type: DatasetTypeRequestBody
-  DatasetPutMetadata:
-    type: DatasetPatchRequestBody
-    additionalProperties: false
-    properties:
-      revisionNote: DatasetRevisionNote
-  DatasetPutRequestBody:
-    displayName: Dataset Data Put Request
-    type: object
-    additionalProperties: false
-    properties:
-      meta:
-        description: Updated dataset metadata.
-        type: DatasetPutMetadata
-      file?:
-        description: |
-          Dataset file to upload.
-
-          This field is incompatible with the `url` field.
-        type: file
-      url?:
-        description: |
-          URL to a dataset file.
-
-          This field is incompatible with the `file` field.
-        type: string
-  DatasetPutResponseBody:
-    type: DatasetPatchRequestBody
-    additionalProperties: false
-    properties:
-      datasetId: VdiId
-  DatasetShareOffer:
-    description: |
-      An offer to share (or un-share) a dataset with a single target user.
-    type: object
-    additionalProperties: false
-    properties:
-      action:
-        description: |
-          What action to take with the dataset share offer.
-
-          Either `grant` or `revoke`.
-
-          A value of `grant` means the share should be offered to the user
-          if they do not already have the dataset, or continue to be
-          allowed if they already have access to the dataset.
-
-          A value of `revoke` means the share should not be offered to the
-          target user if they do not already have the dataset, or the
-          sharing should be stopped if the user did already have access to
-          the dataset.
-        type: ShareOfferAction
-  DatasetShareReceipt:
-    displayName: Dataset Share Receipt
-    description: |
-      A receipt or response to a share offer of a dataset to a single user.
-    type: object
-    additionalProperties: false
-    properties:
-      action:
-        description: |
-          What action to take with acknowledging a dataset share offer.
-
-          Either `accept` or `reject`.
-
-          A value of `accept` means that the dataset that a share was
-          offered for should become available to the accepting user.
-
-          A value of `reject` means that the dataset that a share was
-          offered for should become unavailable to the rejecting user.
-        type: ShareReceiptAction
-  PluginListItem:
-    type: object
-    additionalProperties: false
-    properties:
-      displayName: string
-      typeName: string
-      typeVersion: string
-      projects?:
-        description: |
-          Projects that this plugin is restricted to.  An empty or absent list
-          indicates that the plugin has no project restrictions and may be used
-          on any site.
-        type: ProjectId[]
-  UserMetadata:
-    type: object
-    additionalProperties: false
-    properties:
-      quota: UserQuotaDetails
-  UserQuotaDetails:
-    type: object
-    additionalProperties: false
-    properties:
-      limit:
-        description: Max number of bytes a user is allowed to upload.
-        type: integer
-        format: int64
-      usage:
-        description: Current number of bytes counted against the user's quota.
-        type: integer
-        format: int64
-  ShareOfferEntry:
-    displayName: Share Offer
-    type: object
-    additionalProperties: false
-    properties:
-      datasetId: VdiId
-      owner: DatasetOwner
-      shareStatus: ShareOfferStatus
+      owner: UserId
       datasetType: DatasetTypeResponseBody
       projectIds:
         type: ProjectId[]
         minItems: 1
         uniqueItems: true
-  ShareOfferStatus:
-    displayName: Share Offer Status
-    type: string
-    enum:
-      - open
-      - accepted
-      - rejected
+      messages: string[]
+  BrokenImportListing:
+    type: object
+    additionalProperties: false
+    properties:
+      meta: BrokenImportListingMeta
+      results: BrokenImportDetails[]
+  BrokenImportListingMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      count:
+        description: Number of records in the result
+        type: integer
+      before?: string
+      after?: string
+      user?: UserId
+      limit?: integer
+      offset?: integer
+  ConflictError:
+    displayName: Conflict
+    description: |
+      The request could not be completed due to a conflict with the current
+      state of the resource.
+
+      If you submitted a resource, that resource may already exist.
+    type: Error
+    discriminatorValue: conflict
+    example:
+      status: conflict
+      message: Target resource already exists and cannot be overwritten.
   DatasetCategory:
     type: string
     minLength: 3
@@ -593,6 +179,77 @@ types:
   DatasetDescription:
     description: Longform description of the dataset.
     type: string
+  DatasetDetails:
+    displayName: Dataset Details
+    description: |
+      Details about a specific singular dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: VdiId
+      owner: DatasetOwner
+      datasetType: DatasetTypeResponseBody
+      name: DatasetName
+      origin: DatasetOrigin
+      projectIds:
+        description: |
+          Project IDs for projects the user dataset record was submitted to.
+        type: ProjectId[]
+        uniqueItems: true
+        minItems: 1
+      visibility: DatasetVisibility
+      status: DatasetStatusInfo
+      created: DatasetCreationDate
+      dependencies:
+        type: DatasetDependency[]
+        uniqueItems: true
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      sourceUrl?: DatasetSourceUrl
+      importMessages?:
+        description: |
+          Log lines from the import process.
+
+          These messages will be warnings and/or validation errors.
+        type: string[]
+      shares?:
+        description: |
+          Array of share offers that have been created by the owner of this
+          dataset to share it with other users.
+        type: ShareOffer[]
+      publications?:
+        type: DatasetPublication[]
+        uniqueItems: true
+      hyperlinks?:
+        type: DatasetHyperlink[]
+        uniqueItems: true
+      organisms?:
+        displayName: Dataset Organism Abbreviations
+        type: OrganismAbbreviation[]
+        uniqueItems: true
+      contacts?:
+        type: DatasetContact[]
+        uniqueItems: true
+      originalId?: VdiId
+      revisionHistory?: DatasetRevision[]
+  DatasetFileDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      fileName: string
+      fileSize:
+        description: Size of the file in bytes.
+        type: integer
+        format: int64
+  DatasetFileListing:
+    type: object
+    additionalProperties: false
+    properties:
+      upload: DatasetZipDetails
+      install?: DatasetZipDetails
   DatasetHyperlink:
     type: object
     additionalProperties: false
@@ -648,6 +305,51 @@ types:
       metaMessage?: string
       dataStatus?: DatasetInstallStatus
       dataMessage?: string
+  DatasetListEntry:
+    displayName: Dataset List Item
+    description: Short entry with basic details about a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: VdiId
+      owner: DatasetOwner
+      datasetType: DatasetTypeResponseBody
+      visibility: DatasetVisibility
+      name: DatasetName
+      origin: DatasetOrigin
+      projectIds:
+        description: |
+          Project IDs for projects the dataset record was submitted to.
+        type: ProjectId[]
+        uniqueItems: true
+        minItems: 1
+      status: DatasetStatusInfo
+      shares: DatasetListShareUser[]
+      fileCount:
+        description: Number of files uploaded for this dataset.
+        type: integer
+      fileSizeTotal:
+        description: |
+          Sum of the sizes of all the files uploaded for this dataset.
+        type: integer
+        format: int64
+      created: DatasetCreationDate
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      sourceUrl?: DatasetSourceUrl
+      originalId?: VdiId
+  DatasetListShareUser:
+    type: object
+    additionalProperties: false
+    properties:
+      userId: UserId
+      firstName: string
+      lastName: string
+      organization: string
+      accepted: boolean
   DatasetName:
     description: User-provided name for the dataset.
     type: string
@@ -670,6 +372,118 @@ types:
       lastName?: string
       email?: string
       organization?: string
+  DatasetPatchRequestBody:
+    displayName: Dataset Metadata Patch Request
+    description: |
+      Request to update the metadata for a dataset.
+    type: object
+    additionalProperties: false
+    properties:
+      name?: DatasetName
+      datasetType?:
+        description: |
+          Only allowed when transitioning from a none-type dataset into an
+          actual dataset type.
+        type: DatasetTypeRequestBody
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      visibility?: DatasetVisibility
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      publications?:
+        type: DatasetPublication[]
+        uniqueItems: true
+      hyperlinks?:
+        type: DatasetHyperlink[]
+        uniqueItems: true
+      organisms?:
+        type: array
+        uniqueItems: true
+        items: OrganismAbbreviation
+      contacts?:
+        type: DatasetContact[]
+        uniqueItems: true
+  DatasetPostMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      name: DatasetName
+      datasetType: DatasetTypeRequestBody
+      origin: DatasetOrigin
+      dependencies:
+        type: DatasetDependency[]
+        uniqueItems: true
+      projects:
+        description: IDs of the projects this dataset is being submitted to.
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      visibility?:
+        type: DatasetVisibility
+        default: "private"
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      publications?:
+        type: DatasetPublication[]
+        uniqueItems: true
+      hyperlinks?:
+        type: DatasetHyperlink[]
+        uniqueItems: true
+      organisms?:
+        type: array
+        uniqueItems: true
+        items: OrganismAbbreviation
+      contacts?:
+        type: DatasetContact[]
+        uniqueItems: true
+      createdOn?:
+        displayName: Creation Date
+        description: |
+          This field is only used for admin override uploads, for normal dataset
+          uploads this field is ignored.
+        type: datetime
+  DatasetPostRequestBody:
+    displayName: Dataset Post Request
+    description: |
+      HTTP POST request body requesting the creation of a dataset from the
+      components included in the request.
+
+      For a request to be considered valid, it must contain exactly 1 of the
+      optional parameters `file` or `url`.  If a request body contains both a
+      `file` and a `url` field value, the service will return a `400` error.
+    type: object
+    additionalProperties: false
+    properties:
+      meta:
+        description: Metadata about the dataset being submitted.
+        type: DatasetPostMeta
+      file?:
+        description: |
+          Dataset file to upload.
+
+          This field is incompatible with the `url` field.
+        type: file
+      url?:
+        description: |
+          URL to a dataset file to upload.
+
+          This field is incompatible with the `file` field.
+        type: string
+  DatasetPostResponseBody:
+    description: |
+      Successful upload response.
+
+      This response does not mean the uploaded dataset has been made available
+      on the target site(s).  The upload must first be validated and installed
+      into the target sites before the dataset will become available for use.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: VdiId
   DatasetPublication:
     type: object
     additionalProperties: false
@@ -685,6 +499,36 @@ types:
       isPrimary?:
         type: boolean
         default: false
+  DatasetPutMetadata:
+    type: DatasetPatchRequestBody
+    additionalProperties: false
+    properties:
+      revisionNote: DatasetRevisionNote
+  DatasetPutRequestBody:
+    displayName: Dataset Data Put Request
+    type: object
+    additionalProperties: false
+    properties:
+      meta:
+        description: Updated dataset metadata.
+        type: DatasetPutMetadata
+      file?:
+        description: |
+          Dataset file to upload.
+
+          This field is incompatible with the `url` field.
+        type: file
+      url?:
+        description: |
+          URL to a dataset file.
+
+          This field is incompatible with the `file` field.
+        type: string
+  DatasetPutResponseBody:
+    type: DatasetPatchRequestBody
+    additionalProperties: false
+    properties:
+      datasetId: VdiId
   DatasetRevision:
     type: object
     additionalProperties: false
@@ -693,15 +537,55 @@ types:
       timestamp: datetime
       revisionId: VdiId
       revisionNote: DatasetRevisionNote
+  DatasetRevisionAction:
+    type: string
+    enum:
+      - revise
   DatasetRevisionNote:
     description: Note providing a reason and/or description for the revision.
     type: string
     minLength: 10
     maxLength: 4096
-  DatasetRevisionAction:
-    type: string
-    enum:
-      - revise
+  DatasetShareOffer:
+    description: |
+      An offer to share (or un-share) a dataset with a single target user.
+    type: object
+    additionalProperties: false
+    properties:
+      action:
+        description: |
+          What action to take with the dataset share offer.
+
+          Either `grant` or `revoke`.
+
+          A value of `grant` means the share should be offered to the user
+          if they do not already have the dataset, or continue to be
+          allowed if they already have access to the dataset.
+
+          A value of `revoke` means the share should not be offered to the
+          target user if they do not already have the dataset, or the
+          sharing should be stopped if the user did already have access to
+          the dataset.
+        type: ShareOfferAction
+  DatasetShareReceipt:
+    displayName: Dataset Share Receipt
+    description: |
+      A receipt or response to a share offer of a dataset to a single user.
+    type: object
+    additionalProperties: false
+    properties:
+      action:
+        description: |
+          What action to take with acknowledging a dataset share offer.
+
+          Either `accept` or `reject`.
+
+          A value of `accept` means that the dataset that a share was
+          offered for should become available to the accepting user.
+
+          A value of `reject` means that the dataset that a share was
+          offered for should become unavailable to the rejecting user.
+        type: ShareReceiptAction
   DatasetShortAttribution:
     type: string
     minLength: 3
@@ -725,18 +609,6 @@ types:
     description: Brief summary of the dataset.
     type: string
     maxLength: 4000
-  DatasetTypeResponseBody:
-    description: Details about a specific dataset type.
-    type: object
-    additionalProperties: false
-    properties:
-      name: string
-      version: string
-      displayName?:
-        description: |
-          Display name for the type.  This field is ignored in requests and will
-          always be present in responses.
-        type: string
   DatasetTypeRequestBody:
     type: object
     additionalProperties: false
@@ -749,41 +621,32 @@ types:
         type: string
         minLength: 1
         maxLength: 32
+  DatasetTypeResponseBody:
+    description: Details about a specific dataset type.
+    type: object
+    additionalProperties: false
+    properties:
+      name: string
+      version: string
+      displayName?:
+        description: |
+          Display name for the type.  This field is ignored in requests and will
+          always be present in responses.
+        type: string
   DatasetVisibility:
     type: string
     enum:
       - private
       - protected
       - public
-  OrganismAbbreviation:
-    type: string
-    minLength: 3
-    maxLength: 200
-  ProjectId:
-    description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".
-    type: string
-    minLength: 5
-    maxLength: 32
-  ShareOfferAction:
-    type: string
-    enum:
-      - grant
-      - revoke
-  ShareReceiptAction:
-    type: string
-    enum:
-      - accept
-      - reject
-  UserId:
-    description: VEuPathDB User ID
-    type: integer
-    format: int64
-    minimum: 1
-    maximum: 9223372036854775807
-  VdiId:
-    description: VDI dataset identifier
-    type: string
-    pattern: ^[a-zA-Z0-9_-]+$
+  DatasetZipDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      zipSize:
+        type: integer
+        format: int64
+      contents: DatasetFileDetails[]
   Error:
     type: object
     additionalProperties: false
@@ -804,23 +667,16 @@ types:
       - invalid-input
       - failed-dependency
       - server-error
-  BadRequestError:
-    displayName: Bad Request
-    description: Request could not be parsed or was otherwise unusable.
+  FailedDependencyError:
+    displayName: Failed Dependency Error
     type: Error
-    discriminatorValue: bad-request
+    discriminatorValue: failed-dependency
+    properties:
+      dependency: string
     example:
-      status: bad-request
-      message: malformed JSON
-  UnauthorizedError:
-    displayName: Unauthorized
-    description: |
-      Unauthenticated client requested a resource that requires authentication.
-    type: Error
-    discriminatorValue: unauthorized
-    example:
-      status: unauthorized
-      message: users must be logged in to access this resource
+      status: failed-dependency
+      dependency: google.com
+      message: unexpected status code 403 from google.com
   ForbiddenError:
     displayName: Forbidden
     description: |
@@ -834,36 +690,6 @@ types:
     example:
       status: forbidden
       message: the current user is not permitted to perform this action
-  NotFoundError:
-    displayName: Not Found
-    description: The requested resource was not found on this server.
-    type: Error
-    discriminatorValue: not-found
-    example:
-      status: not-found
-      message: the requested resource could not be found
-  MethodNotAllowedError:
-    displayName: Method Not Allowed
-    description: |
-      The HTTP method used to request a resource is not allowed or configured by
-      the server.
-    type: Error
-    discriminatorValue: bad-method
-    example:
-      status: bad-method
-      message: PUT requests are not permitted on this endpoint
-  ConflictError:
-    displayName: Conflict
-    description: |
-      The request could not be completed due to a conflict with the current
-      state of the resource.
-
-      If you submitted a resource, that resource may already exist.
-    type: Error
-    discriminatorValue: conflict
-    example:
-      status: conflict
-      message: Target resource already exists and cannot be overwritten.
   GoneError:
     displayName: Gone
     description: |
@@ -874,6 +700,173 @@ types:
     example:
       status: gone
       message: The target resource or its dependencies no longer exists.
+  InstallCleanupRequestBody:
+    displayName: Install Cleanup Request
+    description: |
+      Object controlling the install cleanup process and what datasets it should
+      target.
+
+      Requesters should specify one of the fields `all` or `targets` to control
+      what datasets will be cleaned up.  If neither is specified the endpoint
+      will do nothing.
+    type: object
+    additionalProperties: false
+    properties:
+      all?:
+        type: boolean
+        default: false
+      targets?:
+        type: InstallCleanupTarget[]
+        minItems: 1
+        uniqueItems: true
+  InstallCleanupTarget:
+    displayName: Install Cleanup Target
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: VdiId
+      projectIds:
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
+  InternalDatasetDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetType: DatasetTypeResponseBody
+      owner: UserId
+      isDeleted: boolean
+      origin: DatasetOrigin
+      created: DatasetCreationDate
+      inserted: datetime
+      name: DatasetName
+      projectIds:
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
+      status: string
+      importMessages: string[]
+      visibility: DatasetVisibility
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      summary?: DatasetSummary
+      description?: DatasetDescription
+      sourceUrl?: DatasetSourceUrl
+      syncControl?: SyncControlRecord
+      uploadFiles?: string[]
+      installFiles?: string[]
+  MethodNotAllowedError:
+    displayName: Method Not Allowed
+    description: |
+      The HTTP method used to request a resource is not allowed or configured by
+      the server.
+    type: Error
+    discriminatorValue: bad-method
+    example:
+      status: bad-method
+      message: PUT requests are not permitted on this endpoint
+  NotFoundError:
+    displayName: Not Found
+    description: The requested resource was not found on this server.
+    type: Error
+    discriminatorValue: not-found
+    example:
+      status: not-found
+      message: the requested resource could not be found
+  OrganismAbbreviation:
+    type: string
+    minLength: 3
+    maxLength: 200
+  PluginListItem:
+    type: object
+    additionalProperties: false
+    properties:
+      displayName: string
+      typeName: string
+      typeVersion: string
+      projects?:
+        description: |
+          Projects that this plugin is restricted to.  An empty or absent list
+          indicates that the plugin has no project restrictions and may be used
+          on any site.
+        type: ProjectId[]
+  ProjectId:
+    description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".
+    type: string
+    minLength: 5
+    maxLength: 32
+  ServerError:
+    displayName: Internal Server Error
+    type: Error
+    discriminatorValue: server-error
+    properties:
+      requestId: string
+    example:
+      status: server-error
+      message: Datastore connection lost
+      requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+  ShareOffer:
+    type: object
+    additionalProperties: false
+    properties:
+      recipient: ShareOfferRecipient
+      status: ShareOfferAction
+  ShareOfferAction:
+    type: string
+    enum:
+      - grant
+      - revoke
+  ShareOfferEntry:
+    displayName: Share Offer
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: VdiId
+      owner: DatasetOwner
+      shareStatus: ShareOfferStatus
+      datasetType: DatasetTypeResponseBody
+      projectIds:
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
+  ShareOfferRecipient:
+    type: object
+    additionalProperties: false
+    properties:
+      userId: UserId
+      firstName?: string
+      lastName?: string
+      organization?: string
+      email?: string
+  ShareOfferStatus:
+    displayName: Share Offer Status
+    type: string
+    enum:
+      - open
+      - accepted
+      - rejected
+  ShareReceiptAction:
+    type: string
+    enum:
+      - accept
+      - reject
+  SyncControlRecord:
+    type: object
+    additionalProperties: false
+    properties:
+      sharesUpdateTime: datetime
+      dataUpdateTime: datetime
+      metaUpdateTime: datetime
+  UnauthorizedError:
+    displayName: Unauthorized
+    description: |
+      Unauthenticated client requested a resource that requires authentication.
+    type: Error
+    discriminatorValue: unauthorized
+    example:
+      status: unauthorized
+      message: users must be logged in to access this resource
   UnprocessableEntityError:
     displayName: Unprocessable Entity
     description: |
@@ -898,24 +891,31 @@ types:
         general: []
         byKey:
           id: [Given ID value does not point to an existing record.]
-  FailedDependencyError:
-    displayName: Failed Dependency Error
-    type: Error
-    discriminatorValue: failed-dependency
+  UserId:
+    description: VEuPathDB User ID
+    type: integer
+    format: int64
+    minimum: 1
+    maximum: 9223372036854775807
+  UserMetadata:
+    type: object
+    additionalProperties: false
     properties:
-      dependency: string
-    example:
-      status: failed-dependency
-      dependency: google.com
-      message: unexpected status code 403 from google.com
-  ServerError:
-    displayName: Internal Server Error
-    type: Error
-    discriminatorValue: server-error
+      quota: UserQuotaDetails
+  UserQuotaDetails:
+    type: object
+    additionalProperties: false
     properties:
-      requestId: string
-    example:
-      status: server-error
-      message: Datastore connection lost
-      requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+      limit:
+        description: Max number of bytes a user is allowed to upload.
+        type: integer
+        format: int64
+      usage:
+        description: Current number of bytes counted against the user's quota.
+        type: integer
+        format: int64
+  VdiId:
+    description: VDI dataset identifier
+    type: string
+    pattern: ^[a-zA-Z0-9_-]+$
 

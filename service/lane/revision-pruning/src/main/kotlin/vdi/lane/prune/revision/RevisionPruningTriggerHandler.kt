@@ -6,7 +6,7 @@ import vdi.component.modules.VDIModule
  * Revision Pruning Trigger Handler
  *
  * This module consumes the Kafka topic for dataset revision pruning events and
- * purges obsolete dataset revisions.
+ * uninstalls outdated dataset revisions.
  *
  * Not all events handled by the revision pruner will result in a revision's
  * removal.  It is the job of the module implementation to verify that it is
