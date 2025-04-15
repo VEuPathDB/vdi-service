@@ -14,53 +14,13 @@ ifndef::env-github[]
 :icons: font
 endif::[]
 
-== Links
-
-=== Documentation
+== Documentation Links
 
 * link:https://veupathdb.github.io/vdi-service/vdi-api.html[VDI Service API Doc]
 * link:https://veupathdb.github.io/vdi-service/design/1.0/design.html[Service Design Doc]
 * link:https://veupathdb.atlassian.net/wiki/spaces/UI/pages/36438144/VDI+User+Datasets+Design[Original Design Doc]
 * link:docs/env-vars.adoc[Environment Config Doc]
 * link:docs/local-dev-readme.adoc[Local Development Doc]
-
-
-=== VDI Project Index
-
-==== Services
-
-* https://github.com/VEuPathDB/vdi-service[VDI Core Service]
-* https://github.com/VEuPathDB/vdi-plugin-handler-server[VDI Plugin Handler Service]
-
-==== Docker Images
-
-* https://github.com/VEuPathDB/vdi-internal-db[Cache DB Docker Image]
-
-==== Libraries
-
-===== Service Libraries
-
-* https://github.com/VEuPathDB/vdi-component-common[Commons Library]
-* https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
-
-===== Plugin Libraries
-
-* https://github.com/VEuPathDB/lib-vdi-plugin-rnaseq[lib-rnaseq]
-* https://github.com/VEuPathDB/lib-vdi-plugin-study[lib-study]
-
-==== Plugins
-
-===== Production
-
-* https://github.com/VEuPathDB/vdi-plugin-bigwig[bigwig]
-* https://github.com/VEuPathDB/vdi-plugin-biom[biom]
-* https://github.com/VEuPathDB/vdi-plugin-isasimple[isasimple]
-* https://github.com/VEuPathDB/vdi-plugin-rnaseq[rnaseq]
-* https://github.com/VEuPathDB/vdi-plugin-genelist[genelist]
-
-===== Examples
-
-* https://github.com/VEuPathDB/vdi-handler-plugin-example[Example Plugin]
 
 
 == Development
@@ -153,3 +113,35 @@ and ensuring a full JVM shutdown if any service module crashes.
 * link:lib/module-core/[Service/Module Core API]
 * link:lib/test-utils[Unit Test Utilities]
 
+
+== VDI Project Repository Links
+
+.Services
+* https://github.com/VEuPathDB/vdi-service[VDI Core Service]
+* https://github.com/VEuPathDB/vdi-plugin-handler-server[VDI Plugin Handler Service]
+
+.Plugins
+* https://github.com/VEuPathDB/vdi-plugin-bigwig[bigWig]
+* https://github.com/VEuPathDB/vdi-plugin-biom[BIOM]
+* https://github.com/VEuPathDB/vdi-plugin-genelist[Gene List]
+* https://github.com/VEuPathDB/vdi-plugin-isasimple[ISA Study]
+* https://github.com/VEuPathDB/vdi-plugin-noop[NoOp]
+* https://github.com/VEuPathDB/vdi-plugin-wrangler[Phenotype]
+* https://github.com/VEuPathDB/vdi-plugin-rnaseq[RNA-Seq]
+
+.Docker Images
+* https://github.com/VEuPathDB/vdi-internal-db[Cache DB Docker Image]
+* https://github.com/VEuPathDB/docker-gus-apidb-base[Gus/ApiDB Schema Base] +
+[.small]#_Not explicitly part of VDI, but the base image for several plugins_#
+
+.Service Libraries
+* https://github.com/VEuPathDB/vdi-component-common[Commons Library]
+* https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
+
+.Plugin Libraries
+* https://github.com/VEuPathDB/lib-vdi-plugin-rnaseq[lib-rnaseq]
+* https://github.com/VEuPathDB/lib-vdi-plugin-study[lib-study]
+
+.Misc
+* https://github.com/VEuPathDB/vdi-handler-plugin-example[Example Plugin]
+* https://github.com/VEuPathDB/VdiSchema[VDI App DB Schema]
