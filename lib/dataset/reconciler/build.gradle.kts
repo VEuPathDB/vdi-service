@@ -10,7 +10,6 @@ dependencies {
   implementation(project(":lib:plugin:client"))
   implementation(project(":lib:kafka"))
   implementation(project(":lib:module-core"))
-  implementation(project(":lib:plugin:application-mapping"))
   implementation(project(":lib:external:s3"))
 
   implementation(libs.vdi.common)

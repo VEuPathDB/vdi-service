@@ -52,7 +52,6 @@ include(":lib:external:ldap")
 include(":lib:external:rabbit")
 include(":lib:external:s3")
 
-include(":lib:plugin:application-mapping")
 include(":lib:plugin:client")
 include(":lib:plugin:registry")
 
