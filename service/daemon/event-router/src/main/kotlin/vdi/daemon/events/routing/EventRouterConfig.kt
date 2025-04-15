@@ -1,8 +1,8 @@
 package vdi.daemon.events.routing
 
 import org.veupathdb.vdi.lib.common.env.require
-import vdi.component.env.EnvKey
-import vdi.component.env.Environment
+import vdi.lib.env.EnvKey
+import vdi.lib.env.Environment
 import vdi.component.kafka.router.KafkaRouterConfig
 import vdi.component.rabbit.RabbitMQConfig
 

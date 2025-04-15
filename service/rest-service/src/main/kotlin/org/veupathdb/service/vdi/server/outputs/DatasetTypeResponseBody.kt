@@ -5,7 +5,7 @@ import org.veupathdb.service.vdi.generated.model.DatasetTypeResponseBodyImpl
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import vdi.component.db.cache.model.DatasetRecord
-import vdi.component.plugins.PluginRegistry
+import vdi.lib.plugin.registry.PluginRegistry
 
 
 internal fun DatasetTypeResponseBody(rec: DatasetRecord, typeName: String): DatasetTypeResponseBody =

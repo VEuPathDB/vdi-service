@@ -5,14 +5,12 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":lib:app-db"))
-  implementation(project(":lib:cache-db"))
-  implementation(project(":lib:env"))
+  implementation(project(":lib:commons"))
+  implementation(project(":lib:db:application"))
+  implementation(project(":lib:db:internal"))
   implementation(project(":lib:kafka"))
-  implementation(project(":lib:metrics"))
   implementation(project(":lib:module-core"))
-  implementation(project(":lib:plugin-mapping"))
-  implementation(project(":lib:s3"))
+  implementation(project(":lib:external:s3"))
 
   implementation(libs.vdi.json)
   implementation(libs.vdi.common)

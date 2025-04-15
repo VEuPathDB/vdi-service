@@ -5,7 +5,7 @@ plugins {
 dependencies {
   api(project(":lib:async"))
   implementation(project(":lib:kafka"))
-  implementation(project(":lib:s3"))
+  implementation(project(":lib:external:s3"))
 
   implementation(libs.vdi.common)
   implementation(libs.s34k)

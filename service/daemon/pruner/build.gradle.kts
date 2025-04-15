@@ -3,11 +3,10 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":lib:env"))
-  implementation(project(":lib:metrics"))
+  implementation(project(":lib:commons"))
+  implementation(project(":lib:dataset:pruner"))
   implementation(project(":lib:module-core"))
-  implementation(project(":lib:pruner"))
-  implementation(project(":lib:s3"))
+  implementation(project(":lib:external:s3"))
 
   implementation(libs.vdi.common)
 

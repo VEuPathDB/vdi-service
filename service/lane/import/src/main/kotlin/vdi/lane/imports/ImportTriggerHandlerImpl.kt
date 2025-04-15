@@ -14,28 +14,24 @@ import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.compression.Zip
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.isNull
-import org.veupathdb.vdi.lib.common.util.or
 import org.veupathdb.vdi.lib.json.JSON
 import vdi.component.async.WorkerPool
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.CacheDBTransaction
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.model.DatasetMetaImpl
 import vdi.component.db.cache.withTransaction
-import vdi.component.metrics.Metrics
+import vdi.lib.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
-import vdi.component.plugin.client.PluginException
-import vdi.component.plugin.client.PluginRequestException
-import vdi.component.plugin.client.response.imp.*
-import vdi.component.plugin.mapping.PluginHandler
-import vdi.component.plugin.mapping.PluginHandlers
+import vdi.lib.plugin.client.PluginRequestException
+import vdi.lib.plugin.client.response.imp.*
+import vdi.lib.plugin.mapping.PluginHandler
+import vdi.lib.plugin.registry.PluginRegistry
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import vdi.lane.imports.config.ImportTriggerHandlerConfig
@@ -86,10 +82,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   private suspend fun tryHandleImportEvent(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
     try {
       handleImportEvent(dm, userID, datasetID)
-    } catch (e: PluginException) {
+    } catch (e: vdi.lib.plugin.client.PluginException) {
       e.log(log::error)
     } catch (e: Throwable) {
-      PluginException.import("N/A", userID, datasetID, cause = e).log(log::error)
+      vdi.lib.plugin.client.PluginException.import("N/A", userID, datasetID, cause = e).log(log::error)
     }
   }
 
@@ -162,10 +158,8 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
 
     try {
-      val handler = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version] or {
-        log.warn("attempted to import dataset {}/{} but no plugin is currently enabled for dataset type {}", userID, datasetID, datasetMeta.type)
-        return
-      }
+      val handler = PluginRegistry[datasetMeta.type.name, datasetMeta.type.version] ?:
+        return log.warn("attempted to import dataset {}/{} but no plugin is currently enabled for dataset type {}", userID, datasetID, datasetMeta.type)
 
       processImportJob(handler, datasetMeta, userID, datasetID, datasetDir)
     } catch (e: Throwable) {
@@ -174,7 +168,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         tran.tryInsertImportMessages(datasetID, "Process error: ${e.message}")
       }
 
-      throw if (e is PluginException) e else PluginException.import("N/A", userID, datasetID, cause = e)
+      throw if (e is vdi.lib.plugin.client.PluginException) e else vdi.lib.plugin.client.PluginException.import("N/A", userID, datasetID, cause = e)
     } finally {
       timer.observeDuration()
     }
@@ -198,7 +192,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
           .loadContents()!!
           .use { handler.client.postImport(datasetID, meta, it) }
       } catch (e: S34KError) { // don't mix up minio errors with request errors
-        throw PluginException.import(handler.displayName, userID, datasetID, cause = e)
+        throw vdi.lib.plugin.client.PluginException.import(handler.displayName, userID, datasetID, cause = e)
       } catch (e: Throwable) {
         throw PluginRequestException.import(handler.displayName, userID, datasetID, cause = e)
       }
@@ -235,10 +229,10 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
           result as ImportUnhandledErrorResponse,
         )
       }
-    } catch (e: PluginException) {
+    } catch (e: vdi.lib.plugin.client.PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.import(handler.displayName, userID, datasetID, cause = e)
+      throw vdi.lib.plugin.client.PluginException.import(handler.displayName, userID, datasetID, cause = e)
     }
   }
 
@@ -312,7 +306,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       it.upsertImportMessages(datasetID, result.message)
     }
 
-    throw PluginException.import(handler.displayName, userID, datasetID, result.message)
+    throw vdi.lib.plugin.client.PluginException.import(handler.displayName, userID, datasetID, result.message)
   }
 
   private fun handleImportInvalidResult(
@@ -337,7 +331,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       it.upsertImportMessages(datasetID, result.message)
     }
 
-    throw PluginException.import(handler.displayName, userID, datasetID, result.message)
+    throw vdi.lib.plugin.client.PluginException.import(handler.displayName, userID, datasetID, result.message)
   }
 
   private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {

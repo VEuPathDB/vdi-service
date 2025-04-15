@@ -8,7 +8,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.async.WorkerPool
 import vdi.component.kafka.EventSource
-import vdi.component.metrics.Metrics
+import vdi.lib.metrics.Metrics
 import vdi.component.modules.AbstractVDIModule
 import java.util.concurrent.ConcurrentHashMap
 

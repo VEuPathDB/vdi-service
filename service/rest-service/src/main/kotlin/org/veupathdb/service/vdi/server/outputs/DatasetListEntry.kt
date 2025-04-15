@@ -14,7 +14,7 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.component.db.app.model.InstallStatuses
 import vdi.component.db.cache.model.DatasetFileSummary
 import vdi.component.db.cache.model.DatasetRecord
-import vdi.component.plugins.PluginRegistry
+import vdi.lib.plugin.registry.PluginRegistry
 import java.time.OffsetDateTime
 
 @Suppress("DuplicatedCode") // overlap in separate API type fields

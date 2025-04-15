@@ -18,7 +18,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.withTransaction
-import vdi.component.plugins.PluginRegistry
+import vdi.lib.plugin.registry.PluginRegistry
 
 internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequestBody): PatchDatasetsByVdiIdResponse {
   val cacheDB = CacheDB()
@@ -79,6 +79,8 @@ internal fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: Data
     DatasetStore.putDatasetMeta(userID, datasetID, newMeta)
     it.updateDatasetMeta(datasetID, newMeta)
   }
+
+  return respond204()
 }
 
 private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =

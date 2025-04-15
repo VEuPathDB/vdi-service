@@ -26,7 +26,7 @@ import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.withTransaction
-import vdi.component.metrics.Metrics
+import vdi.lib.metrics.Metrics
 import java.net.MalformedURLException
 import java.net.URL
 import java.nio.file.Path
@@ -147,7 +147,7 @@ private fun <T: Any> T.uploadFiles(
           }
         } else {
           logger.error("user dataset upload to minio failed: ", e)
-          Metrics.Upload.failed.inc();
+          Metrics.Upload.failed.inc()
           CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
         }
 

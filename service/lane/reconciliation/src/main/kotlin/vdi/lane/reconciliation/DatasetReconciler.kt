@@ -17,7 +17,7 @@ import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.withTransaction
 import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
-import vdi.component.metrics.Metrics
+import vdi.lib.metrics.Metrics
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import java.time.OffsetDateTime

@@ -6,7 +6,7 @@ dependencies {
   implementation(libs.vdi.common)
 
   // FIXME: REMOVE THIS ONCE THE EXTENDED METADATA PATCH HAS BEEN APPLIED TO PRODUCTION!!!!
-  implementation(project(":lib:cache-db"))
+  implementation(project(":lib:db:internal"))
 
   implementation(project(":lib:module-core"))
   implementation(project(":service:rest-service"))

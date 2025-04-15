@@ -9,7 +9,7 @@ fun DatasetInstallStatusEntry(projectID: ProjectID, status: InstallStatuses): Da
   DatasetInstallStatusEntryImpl().also {
     it.projectId = projectID
 
-    it.metaStatus = status.meta?.let(::DatasetInstallStatus)
+    it.metaStatus = status.meta.let(::DatasetInstallStatus)
     it.metaMessage = status.metaMessage
 
     it.dataStatus = status.data?.let(::DatasetInstallStatus)

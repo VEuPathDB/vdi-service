@@ -5,9 +5,9 @@ plugins {
 dependencies {
   implementation(libs.vdi.common)
 
-  implementation(project(":lib:env"))
+  implementation(project(":lib:commons"))
   implementation(project(":lib:module-core"))
-  implementation(project(":lib:reconciler"))
+  implementation(project(":lib:dataset:reconciler"))
 
   implementation(libs.log.log4j.kotlin)
   implementation(libs.kt.coroutines)

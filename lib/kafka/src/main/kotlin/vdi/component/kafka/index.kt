@@ -5,7 +5,7 @@ import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.veupathdb.vdi.lib.common.util.HostAddress
-import vdi.health.RemoteDependencies
+import vdi.lib.health.RemoteDependencies
 import java.util.*
 import kotlin.collections.HashSet
 import org.apache.kafka.clients.consumer.KafkaConsumer as KConsumer

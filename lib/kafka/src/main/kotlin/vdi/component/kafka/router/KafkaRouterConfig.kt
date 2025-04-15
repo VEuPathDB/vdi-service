@@ -2,7 +2,7 @@ package vdi.component.kafka.router
 
 import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.env.optional
-import vdi.component.env.EnvKey
+import vdi.lib.env.EnvKey
 import vdi.component.kafka.KafkaProducerConfig
 
 data class TriggerConfig(val messageKey: String, val topic: String)

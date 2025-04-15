@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":lib:env"))
+  implementation(project(":lib:commons"))
   implementation(project(":lib:kafka"))
   implementation(project(":lib:module-core"))
 

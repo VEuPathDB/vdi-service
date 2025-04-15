@@ -21,7 +21,7 @@ import vdi.component.db.app.AppDB
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.model.DatasetShare
-import vdi.component.plugin.mapping.PluginHandlers
+import vdi.lib.plugin.mapping.PluginHandlers
 
 /**
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't

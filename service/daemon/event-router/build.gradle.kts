@@ -3,11 +3,11 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":lib:env"))
+  implementation(project(":lib:commons"))
   implementation(project(":lib:kafka"))
   implementation(project(":lib:module-core"))
-  implementation(project(":lib:rabbit"))
-  implementation(project(":lib:s3"))
+  implementation(project(":lib:external:rabbit"))
+  implementation(project(":lib:external:s3"))
 
   implementation(libs.vdi.json)
   implementation(libs.vdi.common)

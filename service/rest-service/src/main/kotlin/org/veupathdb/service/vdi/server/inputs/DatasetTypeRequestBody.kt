@@ -6,7 +6,7 @@ import org.veupathdb.service.vdi.generated.model.JsonField
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
-import vdi.component.plugins.PluginRegistry
+import vdi.lib.plugin.registry.PluginRegistry
 
 fun DatasetTypeRequestBody.cleanup() {
   name = name.cleanupString()

@@ -37,25 +37,28 @@ pluginManagement {
 
 rootProject.name = "vdi"
 
-include(":lib:app-db")
+include(":lib:commons")
+
+include(":lib:db:application")
+include(":lib:db:commons")
+include(":lib:db:internal")
+
+include(":lib:dataset:reinstaller")
+include(":lib:dataset:pruner")
+include(":lib:dataset:reconciler")
+include(":lib:dataset:install-cleanup")
+
+include(":lib:external:ldap")
+include(":lib:external:rabbit")
+include(":lib:external:s3")
+
+include(":lib:plugin:application-mapping")
+include(":lib:plugin:client")
+include(":lib:plugin:registry")
+
 include(":lib:async")
-include(":lib:cache-db")
-include(":lib:dataset-reinstaller")
-include(":lib:env")
-include(":lib:health")
-include(":lib:install-cleanup")
-include(":lib:jdbc")
 include(":lib:kafka")
-include(":lib:ldap")
-include(":lib:plugin-client")
-include(":lib:plugin-mapping")
-include(":lib:plugins")
-include(":lib:metrics")
 include(":lib:module-core")
-include(":lib:pruner")
-include(":lib:rabbit")
-include(":lib:reconciler")
-include(":lib:s3")
 include(":lib:test-utils")
 
 include(":service:bootstrap")

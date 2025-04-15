@@ -3,8 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":lib:env"))
-  implementation(project(":lib:health"))
+  implementation(project(":lib:commons"))
 
   implementation(libs.vdi.json)
   implementation(libs.vdi.common)

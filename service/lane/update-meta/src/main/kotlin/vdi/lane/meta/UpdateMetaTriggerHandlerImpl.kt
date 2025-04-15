@@ -24,16 +24,14 @@ import vdi.component.db.cache.withTransaction
 import vdi.component.kafka.EventMessage
 import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
-import vdi.component.metrics.Metrics
+import vdi.lib.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
-import vdi.component.plugin.client.PluginException
-import vdi.component.plugin.client.PluginRequestException
-import vdi.component.plugin.client.response.inm.InstallMetaBadRequestResponse
-import vdi.component.plugin.client.response.inm.InstallMetaResponseType
-import vdi.component.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
-import vdi.component.plugin.mapping.PluginHandler
-import vdi.component.plugin.mapping.PluginHandlers
+import vdi.lib.plugin.client.PluginRequestException
+import vdi.lib.plugin.client.response.inm.InstallMetaResponseType
+import vdi.lib.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
+import vdi.lib.plugin.mapping.PluginHandler
+import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import java.sql.SQLException
@@ -101,10 +99,10 @@ internal class UpdateMetaTriggerHandlerImpl(
         updateMeta(dm, msg.userID, msg.datasetID)
         kr.sendReconciliationTrigger(msg.userID, msg.datasetID, EventSource.UpdateMetaLane)
       }
-    } catch (e: PluginException) {
+    } catch (e: vdi.lib.plugin.client.PluginException) {
       e.log(log::error)
     } catch (e: Throwable) {
-      PluginException.installMeta("N/A", "N/A", msg.userID, msg.datasetID, cause = e).log(log::error)
+      vdi.lib.plugin.client.PluginException.installMeta("N/A", "N/A", msg.userID, msg.datasetID, cause = e).log(log::error)
     }
   }
 
@@ -180,10 +178,10 @@ internal class UpdateMetaTriggerHandlerImpl(
   ) {
     try {
       updateTargetMeta(ph, meta, metaTimestamp, datasetID, projectID, userID)
-    } catch (e: PluginException) {
+    } catch (e: vdi.lib.plugin.client.PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.installMeta(ph.displayName, projectID, userID, datasetID, cause = e)
+      throw vdi.lib.plugin.client.PluginException.installMeta(ph.displayName, projectID, userID, datasetID, cause = e)
     }
   }
 
@@ -287,7 +285,7 @@ internal class UpdateMetaTriggerHandlerImpl(
           userID,
           datasetID,
           projectID,
-          result as InstallMetaBadRequestResponse,
+          result as vdi.lib.plugin.client.response.inm.InstallMetaBadRequestResponse,
         )
 
         InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(
@@ -307,7 +305,7 @@ internal class UpdateMetaTriggerHandlerImpl(
           if (e.errorCode == 1) {
             log.info("unique key constraint violation on dataset {}/{} install meta, assuming race condition.", userID, datasetID)
           } else {
-            throw e;
+            throw e
           }
         }
       }
@@ -395,7 +393,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     userID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
-    res: InstallMetaBadRequestResponse
+    res: vdi.lib.plugin.client.response.inm.InstallMetaBadRequestResponse
   ) {
     log.error(
       "dataset handler server reports 400 error for meta-install on dataset {}/{}, project {} via plugin {}",
@@ -405,7 +403,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       handler.displayName,
     )
 
-    throw PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
+    throw vdi.lib.plugin.client.PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private fun handleUnexpectedErrorResponse(
@@ -423,7 +421,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       handler.displayName
     )
 
-    throw PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
+    throw vdi.lib.plugin.client.PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {

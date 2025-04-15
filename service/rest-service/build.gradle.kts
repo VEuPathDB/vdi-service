@@ -21,17 +21,15 @@ containerService {
 }
 
 dependencies {
-  implementation(project(":lib:app-db"))
-  implementation(project(":lib:cache-db"))
-  implementation(project(":lib:dataset-reinstaller"))
-  implementation(project(":lib:env"))
-  implementation(project(":lib:health"))
-  implementation(project(":lib:install-cleanup"))
-  implementation(project(":lib:plugins"))
-  implementation(project(":lib:pruner"))
-  implementation(project(":lib:reconciler"))
-  implementation(project(":lib:s3"))
-  implementation(project(":lib:metrics"))
+  implementation(project(":lib:commons"))
+  implementation(project(":lib:db:application"))
+  implementation(project(":lib:db:internal"))
+  implementation(project(":lib:dataset:reinstaller"))
+  implementation(project(":lib:dataset:install-cleanup"))
+  implementation(project(":lib:plugin:registry"))
+  implementation(project(":lib:dataset:pruner"))
+  implementation(project(":lib:dataset:reconciler"))
+  implementation(project(":lib:external:s3"))
 
   implementation(libs.vdi.json)
   implementation(libs.vdi.common)

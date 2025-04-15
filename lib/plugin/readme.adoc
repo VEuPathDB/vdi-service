@@ -1,0 +1,6 @@
+= `:lib:plugin`
+
+VDI-internal libraries for working with the satellite VDI plugin services.
+
+.Projects
+* `:application-mapping`

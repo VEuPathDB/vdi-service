@@ -21,14 +21,13 @@ import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.withTransaction
 import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
-import vdi.component.metrics.Metrics
+import vdi.lib.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
-import vdi.component.plugin.client.PluginException
-import vdi.component.plugin.client.PluginRequestException
-import vdi.component.plugin.client.response.ind.*
-import vdi.component.plugin.mapping.PluginHandler
-import vdi.component.plugin.mapping.PluginHandlers
+import vdi.lib.plugin.client.PluginRequestException
+import vdi.lib.plugin.client.response.ind.*
+import vdi.lib.plugin.mapping.PluginHandler
+import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import java.io.InputStream
@@ -79,10 +78,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
         // on successful install, handle possible data revisions
         maybeFireRevisionEvent(userID, datasetID, dm, kr)
-      } catch (e: PluginException) {
+      } catch (e: vdi.lib.plugin.client.PluginException) {
         e.log(log::error)
       } catch (e: Throwable) {
-        PluginException.installData("N/A", "N/A", userID, datasetID, cause = e).log(log::error)
+        vdi.lib.plugin.client.PluginException.installData("N/A", "N/A", userID, datasetID, cause = e).log(log::error)
       } finally {
         datasetsInProgress.remove(datasetID)
       }
@@ -192,10 +191,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
           installData(userID, datasetID, projectID, dir, handler, installableFileTimestamp)
         }
-    } catch (e: PluginException) {
+    } catch (e: vdi.lib.plugin.client.PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.installData(handler.displayName, "N/A", userID, datasetID, cause = e)
+      throw vdi.lib.plugin.client.PluginException.installData(handler.displayName, "N/A", userID, datasetID, cause = e)
     }
   }
 
@@ -316,7 +315,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           handler.client.postInstallData(datasetID, projectID, meta, manifest, data)
         }
       } catch (e: S34KError) { // Don't mix up minio errors with request errors.
-        throw PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
+        throw vdi.lib.plugin.client.PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
       } catch (e: Throwable) {
         throw PluginRequestException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
       }
@@ -374,10 +373,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           installableFileTimestamp
         )
       }
-    } catch (e: PluginException) {
+    } catch (e: vdi.lib.plugin.client.PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
+      throw vdi.lib.plugin.client.PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
     } finally {
       timer?.observeDuration()
     }
@@ -439,7 +438,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       ))
     }
 
-    throw PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
+    throw vdi.lib.plugin.client.PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private fun handleValidationFailureResponse(
@@ -528,7 +527,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       ))
     }
 
-    throw PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
+    throw vdi.lib.plugin.client.PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private suspend fun <T> withInstallBundle(

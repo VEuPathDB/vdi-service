@@ -3,7 +3,7 @@ package org.veupathdb.service.vdi.server.outputs
 import org.veupathdb.service.vdi.generated.model.BrokenImportDetails
 import org.veupathdb.service.vdi.generated.model.BrokenImportDetailsImpl
 import vdi.component.db.cache.model.BrokenImportRecord
-import vdi.component.plugins.PluginRegistry
+import vdi.lib.plugin.registry.PluginRegistry
 
 fun BrokenImportDetails(record: BrokenImportRecord): BrokenImportDetails =
   BrokenImportDetailsImpl().apply {

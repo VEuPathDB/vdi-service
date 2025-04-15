@@ -47,14 +47,9 @@ class DatasetByID(@Context request: ContainerRequest)
       }
     }
 
-  override fun patchDatasetsByVdiId(vdiID: String, entity: DatasetPatchRequestBody?): PatchDatasetsByVdiIdResponse {
-    updateDatasetMeta(
-      userID.toUserID(),
-      vdiID.asVDIID(),
-      entity ?: return PatchDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError("request body cannot be empty"))
-    )
-    return PatchDatasetsByVdiIdResponse.respond204()
-  }
+  override fun patchDatasetsByVdiId(vdiID: String, entity: DatasetPatchRequestBody?): PatchDatasetsByVdiIdResponse =
+    entity?.let { updateDatasetMeta(userID.toUserID(), vdiID.asVDIID(), it) }
+      ?: PatchDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError("request body cannot be empty"))
 
   override fun putDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?): PutDatasetsByVdiIdResponse {
     entity ?: return PutDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError("empty request body"))

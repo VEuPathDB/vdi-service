@@ -5,8 +5,8 @@ import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.env.optUInt
 import org.veupathdb.vdi.lib.common.env.optional
 import org.veupathdb.vdi.lib.common.env.require
-import vdi.component.env.EnvKey
-import vdi.component.env.Environment
+import vdi.lib.env.EnvKey
+import vdi.lib.env.Environment
 import vdi.component.kafka.KafkaConsumerConfig
 import vdi.component.kafka.router.KafkaRouterConfig
 import vdi.component.s3.util.S3Config

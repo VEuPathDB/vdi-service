@@ -20,7 +20,7 @@ import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.model.DatasetShareOfferImpl
 import vdi.component.db.cache.model.DatasetShareReceiptImpl
 import vdi.component.db.cache.withTransaction
-import vdi.component.metrics.Metrics
+import vdi.lib.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
 import vdi.component.s3.DatasetManager

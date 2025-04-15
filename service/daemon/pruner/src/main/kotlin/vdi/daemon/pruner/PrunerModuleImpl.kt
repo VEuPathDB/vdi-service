@@ -1,7 +1,7 @@
 package vdi.daemon.pruner
 
 import org.slf4j.LoggerFactory
-import vdi.component.metrics.Metrics
+import vdi.lib.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractJobExecutor
 import vdi.component.pruner.Pruner

@@ -6,8 +6,8 @@ import org.veupathdb.lib.container.jaxrs.health.Dependency.TestResult
 import org.veupathdb.lib.container.jaxrs.health.DependencySource
 import org.veupathdb.lib.container.jaxrs.health.ExternalDependency
 import org.veupathdb.service.vdi.util.logger
-import vdi.health.RemoteDependencies
-import vdi.health.Dependency as VDep
+import vdi.lib.health.RemoteDependencies
+import vdi.lib.health.Dependency as VDep
 
 internal class DependencySource : DependencySource {
   override fun iterator(): MutableIterator<Dependency> {
@@ -34,7 +34,7 @@ private fun VDep.Status.toCoreStatus() = when (this) {
 private class RemoteDependency(private val raw: VDep) : ExternalDependency(raw.name) {
   override fun close() {}
   override fun test(): TestResult {
-    logger.info("Checking health for external dependency {}", this.name);
+    logger.info("Checking health for external dependency {}", this.name)
     return if (pinger.isReachable(raw.urlString(), raw.port.toInt()))
       TestResult(this, true, raw.checkStatus().toCoreStatus(), raw.extra)
     else
