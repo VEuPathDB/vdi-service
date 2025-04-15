@@ -28,6 +28,6 @@ ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
     JVM_ARGS=""
 
 COPY --from=prep /workspace/build/libs/service.jar /service.jar
-COPY service/startup.sh startup.sh
+COPY service/bootstrap/startup.sh startup.sh
 
 CMD /startup.sh
