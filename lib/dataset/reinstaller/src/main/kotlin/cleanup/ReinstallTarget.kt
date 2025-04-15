@@ -1,4 +1,4 @@
-package vdi.component.install_cleanup
+package cleanup
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID

@@ -1,0 +1,10 @@
+= `:lib:db`
+
+VDI-internal libraries for interacting with database instances.
+
+.Projects
+* `:application` - API for working with dataset install-target application
+databases.
+* `:internal` - API for working with the VDI stack-internal cache database.
+* `:commons` - Models and methods for use with any DB instance, or modules that
+use shared record model types.

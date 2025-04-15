@@ -1,4 +1,4 @@
-package vdi.component.reinstaller
+package vdi.lib.install.retry
 
 import kotlinx.coroutines.sync.Mutex
 import org.slf4j.LoggerFactory

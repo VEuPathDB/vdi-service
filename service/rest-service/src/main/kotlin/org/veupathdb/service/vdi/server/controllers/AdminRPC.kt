@@ -29,10 +29,10 @@ import org.veupathdb.vdi.lib.common.field.toUserID
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.BrokenImportListQuery
 import vdi.component.db.cache.model.SortOrder
-import vdi.component.install_cleanup.InstallCleaner
-import vdi.component.install_cleanup.ReinstallTarget
+import cleanup.InstallCleaner
+import cleanup.ReinstallTarget
 import vdi.component.pruner.Pruner
-import vdi.component.reinstaller.DatasetReinstaller
+import vdi.lib.install.retry.DatasetReinstaller
 import vdi.lib.reconciler.Reconciler
 
 // Broken Import Query Constants

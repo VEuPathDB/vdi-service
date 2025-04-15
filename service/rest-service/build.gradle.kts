@@ -25,7 +25,6 @@ dependencies {
   implementation(project(":lib:db:application"))
   implementation(project(":lib:db:internal"))
   implementation(project(":lib:dataset:reinstaller"))
-  implementation(project(":lib:dataset:install-cleanup"))
   implementation(project(":lib:plugin:registry"))
   implementation(project(":lib:dataset:pruner"))
   implementation(project(":lib:dataset:reconciler"))

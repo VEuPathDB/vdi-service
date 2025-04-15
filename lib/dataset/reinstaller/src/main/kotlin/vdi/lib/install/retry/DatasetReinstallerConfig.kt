@@ -1,4 +1,4 @@
-package vdi.component.reinstaller
+package vdi.lib.install.retry
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName

@@ -46,7 +46,6 @@ include(":lib:db:internal")
 include(":lib:dataset:reinstaller")
 include(":lib:dataset:pruner")
 include(":lib:dataset:reconciler")
-include(":lib:dataset:install-cleanup")
 
 include(":lib:external:ldap")
 include(":lib:external:rabbit")

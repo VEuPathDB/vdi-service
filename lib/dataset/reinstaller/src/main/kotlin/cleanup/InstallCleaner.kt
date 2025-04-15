@@ -1,4 +1,4 @@
-package vdi.component.install_cleanup
+package cleanup
 
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DataType
