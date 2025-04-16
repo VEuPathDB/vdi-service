@@ -138,6 +138,9 @@ internal object CacheDBImpl: CacheDB {
   override fun selectLatestRevision(datasetID: DatasetID) =
     connection.use { it.selectLatestDatasetRevision(datasetID) }
 
+  override fun selectOriginalDatasetID(datasetID: DatasetID) =
+    connection.use { it.selectOriginalDatasetID(datasetID) }
+
   override fun selectRevisions(datasetID: DatasetID) =
     connection.use { it.selectDatasetRevisions(datasetID) }
 

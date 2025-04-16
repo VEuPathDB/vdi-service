@@ -9,6 +9,8 @@ import java.time.OffsetDateTime
 
 fun ResultSet.getDatasetID(column: String) = DatasetID(getString(column))
 
+fun ResultSet.getDatasetID(column: Int) = DatasetID(getString(column))
+
 fun ResultSet.getUserID(column: String) = UserID(getString(column))
 
 fun ResultSet.getDateTime(column: String): OffsetDateTime = getObject(column, OffsetDateTime::class.java)

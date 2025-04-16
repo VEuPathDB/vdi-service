@@ -1,22 +1,25 @@
 package vdi.component.pruner
 
+import kotlinx.coroutines.sync.Mutex
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
+import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.app.model.DeleteFlag
 import vdi.component.db.app.withTransaction
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DeletedDataset
+import vdi.component.db.cache.purgeDataset
 import vdi.component.db.cache.withTransaction
-import vdi.lib.metrics.Metrics
 import vdi.component.s3.DatasetManager
 import vdi.component.s3.paths.S3Paths
+import vdi.lib.metrics.Metrics
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.locks.ReentrantLock
 
 /**
  * Dataset Pruner
@@ -39,7 +42,7 @@ import java.util.concurrent.locks.ReentrantLock
 object Pruner {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val lock = ReentrantLock()
+  private val lock = Mutex()
 
   private val config = PrunerConfig()
 
@@ -101,16 +104,19 @@ object Pruner {
 
     log.info("found {} candidates for pruning", deletable.size)
 
+    val context = DeletionContext()
+
     deletable.forEach {
       if (!it.hasBeenUninstalled())
         return@forEach
 
+      context.init(it)
       try {
-        runDelete(s3Bucket, it)
+        runDelete(s3Bucket, context)
         Metrics.Pruner.count.inc()
       } catch (e: Throwable) {
         Metrics.Pruner.failed.inc()
-        log.error("failed to delete dataset ${it.ownerID}/${it.datasetID} due to exception:", e)
+        context.logger.error("failed to delete dataset", e)
       }
     }
   }
@@ -160,43 +166,98 @@ object Pruner {
     val dir = dsm.getDatasetDirectory(ownerID, datasetID)
 
     // If the directory doesn't exist, then it has already been deleted.
-    if (!dir.exists()) {
-      Metrics.Pruner.conflict.inc()
-      log.error("dataset {}/{} still has a record in the cache db even though it has been deleted from S3", ownerID, datasetID)
-      return false
-    }
+    when {
+      !dir.exists() -> {
+        Metrics.Pruner.conflict.inc()
+        log.error("dataset {}/{} still has a record in the cache db even though it has been deleted from S3", ownerID, datasetID)
+        return false
+      }
 
-    if (!dir.hasDeleteFlag()) {
-      Metrics.Pruner.conflict.inc()
-      log.error("dataset {}/{} is marked as deleted in the cache db but has no delete flag in S3", ownerID, datasetID)
-      return false
-    }
+      dir.hasDeleteFlag() -> {
+        return dir.getDeleteFlag()
+          .lastModified()!!
+          .isBefore(threshold)
+      }
 
-    return dir.getDeleteFlag()
-      .lastModified()!!
-      .isBefore(threshold)
+      dir.hasRevisedFlag() -> {
+        return dir.getRevisedFlag()
+          .lastModified()!!
+          .isBefore(threshold)
+      }
+
+      else -> {
+        Metrics.Pruner.conflict.inc()
+        log.error("dataset {}/{} is marked as deleted in the cache db but has no delete or revision flag in S3", ownerID, datasetID)
+        return false
+      }
+    }
   }
 
-  private fun runDelete(bucket: S3Bucket, ds: DeletedDataset) {
+  private fun runDelete(bucket: S3Bucket, ds: DeletionContext) {
     log.info("hard-deleting dataset {}/{}", ds.ownerID, ds.datasetID)
 
     // Delete records from app databases
     ds.projects.forEach { projectID -> ds.deleteFromAppDB(projectID) }
 
-    // Delete records from cache DB
-    ds.deleteFromCacheDB()
+    if (bucket.objects.contains(S3Paths.datasetRevisedFlagFile(ds.ownerID, ds.datasetID))) {
+      // If the revised flag exists, then the current dataset is not the latest
+      // version.
+      ds.deleteFromCacheDB(retainRevisions = true) // retain revisions until the latest version is deleted
+      bucket.pruneObsoleteRevision(ds)
 
-    // Delete objects from S3
-    ds.deleteFromS3(bucket)
-  }
-
-  private fun DeletedDataset.deleteFromAppDB(projectID: ProjectID) {
-    if (!AppDatabaseRegistry.contains(projectID, dataType)) {
-      log.info("Cannot delete dataset {}/{} from project {} due to target project config being disabled.", ownerID, datasetID, projectID)
       return
     }
 
-    log.debug("deleting dataset {}/{} from project {} app DB", ownerID, datasetID, projectID)
+    // If the revised flag doesn't exist, then this is the latest revision,
+    // and has been marked for deletion.
+    val revisions = cacheDB.selectRevisions(ds.datasetID)
+
+    ds.deleteFromCacheDB(retainRevisions = false) // wipe revisions as the latest is being removed
+
+    // If there is no revision history, then we only have to prune the
+    // current dataset.
+    if (revisions == null) {
+      bucket.pruneAllObjects(ds)
+
+      return
+    }
+
+    for (revision in revisions.records) {
+      // make sure the older revision records are removed from the cache db
+      // just in case
+      ds.safely("failed to remove obsolete revision {} records from cache db", revision.revisionID) {
+        ds.logger.info("removing obsolete revision records for {} from cache db", revision.revisionID)
+        // retainRevisionHistory is set to true here as the history has
+        // already been deleted so we can avoid the extra query
+        cacheDB.withTransaction { it.purgeDataset(revision.revisionID, true) }
+      }
+
+      ds.safely("failed to remove obsolete revision {} data from object store", revision.revisionID) {
+        ds.logger.info("removing obsolete revision data for {} from object store", revision.revisionID)
+        bucket.pruneAllObjects(ds.ownerID, revision.revisionID)
+      }
+    }
+  }
+
+  /**
+   * Executes the given function within a try/catch block, consuming any
+   * exception and logging it to the receiver context's logger
+   */
+  private inline fun DeletionContext.safely(msg: String, arg: Any, fn: () -> Unit) {
+    try {
+      fn()
+    } catch (e: Throwable) {
+      logger.error(msg, arg, e)
+    }
+  }
+
+  private fun DeletionContext.deleteFromAppDB(projectID: ProjectID) {
+    if (!AppDatabaseRegistry.contains(projectID, dataType)) {
+      logger.info("cannot delete dataset from disabled target {}", projectID)
+      return
+    }
+
+    logger.debug("deleting dataset from target {}", projectID)
 
     appDB.withTransaction(projectID, dataType) {
       it.deleteDatasetVisibilities(datasetID)
@@ -213,28 +274,51 @@ object Pruner {
     }
   }
 
-  private fun DeletedDataset.deleteFromCacheDB() {
-    log.debug("deleting dataset {}/{} from cache DB", ownerID, datasetID)
-
-    cacheDB.withTransaction {
-      it.deleteInstallFiles(datasetID)
-      it.deleteUploadFiles(datasetID)
-      it.deleteDatasetMetadata(datasetID)
-      it.deleteDatasetProjects(datasetID)
-      it.deleteDatasetShareOffers(datasetID)
-      it.deleteDatasetShareReceipts(datasetID)
-      it.deleteImportControl(datasetID)
-      it.deleteImportMessages(datasetID)
-      it.deleteSyncControl(datasetID)
-      it.deleteDataset(datasetID)
-    }
+  /**
+   * Delete a dataset's cache records from the stack-internal database.
+   *
+   * @receiver Current dataset context.
+   *
+   * @param retainRevisions Whether revisions for the dataset should be kept.
+   *
+   * When pruning an obsolete dataset revision, this will be set to `true`.
+   */
+  private fun DeletionContext.deleteFromCacheDB(retainRevisions: Boolean) {
+    logger.debug("deleting cache DB records")
+    cacheDB.withTransaction { it.purgeDataset(datasetID, retainRevisions) }
   }
 
-  private fun DeletedDataset.deleteFromS3(bucket: S3Bucket) {
-    log.debug("deleting dataset {}/{} from S3", ownerID, datasetID)
+  private fun DeletionContext.deleteFromS3(bucket: S3Bucket) {
+    if (bucket.objects.stat(S3Paths.datasetRevisedFlagFile(ownerID, datasetID)) == null)
+      bucket.pruneAllObjects(this)
+    else
+      bucket.pruneObsoleteRevision(this)
+  }
 
-    bucket.objects.list(prefix = S3Paths.datasetDir(ownerID, datasetID))
+  private fun S3Bucket.pruneAllObjects(ctx: DeletionContext) {
+    ctx.logger.debug("deleting dataset from object store")
+    pruneAllObjects(ctx.ownerID, ctx.datasetID)
+  }
+
+  private fun S3Bucket.pruneAllObjects(ownerID: UserID, datasetID: DatasetID) {
+    objects.list(prefix = S3Paths.datasetDir(ownerID, datasetID))
       .map { it.path }
-      .let { bucket.objects.deleteAll(it) }
+      .let { objects.deleteAll(it) }
+  }
+
+  private fun S3Bucket.pruneObsoleteRevision(ctx: DeletionContext) {
+    ctx.logger.debug("deleting obsolete dataset revision from object store")
+
+    objects.list(prefix = S3Paths.datasetDir(ctx.ownerID, ctx.datasetID))
+      .asSequence()
+      .map { it.path }
+      .filter {
+        !it.endsWith(S3Paths.RevisionFlagFileName)
+        && !it.endsWith(S3Paths.RawUploadZipName)
+        && !it.endsWith(S3Paths.ImportReadyZipName) // TODO: remove this when the async upload process is implemented
+      }
+      .toList()
+      .let { objects.deleteAll(it) }
   }
 }
+

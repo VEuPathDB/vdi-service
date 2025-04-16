@@ -7,6 +7,7 @@ plugins {
 dependencies {
   implementation(project(":lib:commons"))
   implementation(project(":lib:db:application"))
+  implementation(project(":lib:db:commons"))
   implementation(project(":lib:db:internal"))
   implementation(project(":lib:kafka"))
   implementation(project(":lib:module-core"))
@@ -26,10 +27,4 @@ dependencies {
   testImplementation(libs.mockito.kotlin)
   testRuntimeOnly(libs.junit.engine)
   testRuntimeOnly(libs.log.log4j.slf4j)
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions {
-    freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
-  }
 }
