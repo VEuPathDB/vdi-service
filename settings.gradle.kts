@@ -37,10 +37,10 @@ pluginManagement {
 
 rootProject.name = "vdi"
 
-include(":lib:commons")
+include(":lib:common")
 
 include(":lib:db:application")
-include(":lib:db:commons")
+include(":lib:db:common")
 include(":lib:db:internal")
 
 include(":lib:dataset:reinstaller")

@@ -8,7 +8,12 @@ import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdFiles
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdFiles.*
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsVdiIdFiles
 import org.veupathdb.service.vdi.server.outputs.NotFoundError
-import org.veupathdb.service.vdi.service.dataset.*
+import org.veupathdb.service.vdi.server.services.dataset.getDataFileForAdmin
+import org.veupathdb.service.vdi.server.services.dataset.getDataFileForUser
+import org.veupathdb.service.vdi.server.services.dataset.getUploadFileForAdmin
+import org.veupathdb.service.vdi.server.services.dataset.getUploadFileForUser
+import org.veupathdb.service.vdi.server.services.dataset.listDatasetFilesForAdmin
+import org.veupathdb.service.vdi.server.services.dataset.listDatasetFilesForUser
 import org.veupathdb.vdi.lib.common.field.toDatasetIDOrNull
 import org.veupathdb.vdi.lib.common.field.toUserID
 

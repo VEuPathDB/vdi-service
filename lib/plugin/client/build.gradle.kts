@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":lib:commons"))
+  implementation(project(":lib:common"))
   implementation(project(":lib:plugin:registry"))
 
   implementation(libs.vdi.common)

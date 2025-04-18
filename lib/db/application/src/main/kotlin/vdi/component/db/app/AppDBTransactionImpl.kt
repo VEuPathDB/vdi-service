@@ -128,7 +128,7 @@ class AppDBTransactionImpl(
       try {
         insertDatasetInstallMessage(message)
       } catch (e: SQLException) {
-        if (e.errorCode == UniqueConstraintViolation)
+        if (isUniqueConstraintViolation(e))
           updateDatasetInstallMessage(message)
         else
           throw e
@@ -169,7 +169,7 @@ class AppDBTransactionImpl(
       try {
         insertDatasetMeta(datasetID, meta)
       } catch (e: SQLException) {
-        if (e.errorCode == 1) {
+        if (isUniqueConstraintViolation(e)) {
           log.debug("dataset meta record already exists for dataset {}", datasetID)
           updateDatasetMeta(datasetID, meta)
         } else {
@@ -241,7 +241,8 @@ class AppDBTransactionImpl(
     connection.close()
   }
 
-  override fun selectDataset(datasetID: DatasetID) = connection.selectDataset(schema, datasetID)
+  override fun selectDataset(datasetID: DatasetID) =
+    connection.selectDataset(schema, datasetID)
 
   override fun selectDatasetInstallMessage(datasetID: DatasetID, installType: InstallType) =
     connection.selectDatasetInstallMessage(schema, datasetID, installType)
@@ -258,7 +259,8 @@ class AppDBTransactionImpl(
   override fun selectDatasetProjectLinks(datasetID: DatasetID) =
     connection.selectDatasetProjectLinks(schema, datasetID)
 
-  override fun streamAllSyncControlRecords() = connection.selectAllSyncControl(schema)
+  override fun streamAllSyncControlRecords() =
+    connection.selectAllSyncControl(schema)
 
   override fun testDatasetVisibilityExists(datasetID: DatasetID, userID: UserID) =
     connection.testDatasetVisibilityExists(schema, datasetID, userID)

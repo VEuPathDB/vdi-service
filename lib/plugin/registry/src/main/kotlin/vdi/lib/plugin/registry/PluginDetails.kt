@@ -3,8 +3,8 @@ package vdi.lib.plugin.registry
 import org.veupathdb.vdi.lib.common.field.ProjectID
 
 data class PluginDetails(
-  val displayName: String,
-  val projects: Set<ProjectID>,
+  val displayName:    String,
+  val projects:       Set<ProjectID>,
   val changesEnabled: Boolean,
 ) {
   @Suppress("NOTHING_TO_INLINE")

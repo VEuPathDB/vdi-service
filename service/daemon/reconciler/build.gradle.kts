@@ -5,7 +5,7 @@ plugins {
 dependencies {
   implementation(libs.vdi.common)
 
-  implementation(project(":lib:commons"))
+  implementation(project(":lib:common"))
   implementation(project(":lib:module-core"))
   implementation(project(":lib:dataset:reconciler"))
 

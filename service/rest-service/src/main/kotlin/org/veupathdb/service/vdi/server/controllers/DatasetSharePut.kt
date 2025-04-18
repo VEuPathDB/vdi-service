@@ -14,9 +14,9 @@ import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdSharesRecipien
 import org.veupathdb.service.vdi.generated.resources.DatasetsVdiIdSharesRecipientUserId.PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse as PutReceipt
 import org.veupathdb.service.vdi.server.outputs.BadRequestError
 import org.veupathdb.service.vdi.server.outputs.ForbiddenError
-import org.veupathdb.service.vdi.service.shares.adminPutShareOffer
-import org.veupathdb.service.vdi.service.shares.putShareOffer
-import org.veupathdb.service.vdi.service.shares.putShareReceipt
+import org.veupathdb.service.vdi.server.services.shares.adminPutShareOffer
+import org.veupathdb.service.vdi.server.services.shares.putShareOffer
+import org.veupathdb.service.vdi.server.services.shares.putShareReceipt
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserID
 

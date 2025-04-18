@@ -72,7 +72,7 @@ public class HealthResponseImpl implements HealthResponse {
     private Long uptimeMillis;
 
     @JsonIgnore
-    private final Map<String, Object> additionalProperties = new ExcludingMap();
+    private Map<String, Object> additionalProperties = new ExcludingMap();
 
     @JsonProperty("threads")
     public Integer getThreads() {

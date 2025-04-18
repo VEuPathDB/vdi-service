@@ -341,6 +341,13 @@ public interface Admin {
       responseBuilder.entity(entity);
       return new GetAdminDatasetDetailsResponse(responseBuilder.build(), entity);
     }
+
+    public static GetAdminDatasetDetailsResponse respond404WithApplicationJson(
+        NotFoundError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetAdminDatasetDetailsResponse(responseBuilder.build(), entity);
+    }
   }
 
   class GetAdminListS3ObjectsResponse extends ResponseDelegate {

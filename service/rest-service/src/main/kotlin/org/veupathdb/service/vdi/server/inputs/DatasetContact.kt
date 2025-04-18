@@ -37,7 +37,7 @@ private fun DatasetContact.validate(jPath: String, index: Int, errors: Validatio
   address.optCheckMaxLength(jPath..JsonField.ADDRESS, index, AddressMaxLength, errors)
 }
 
-internal fun Collection<DatasetContact?>.validate(jPath: String, errors: ValidationErrors) {
+internal fun Iterable<DatasetContact?>.validate(jPath: String, errors: ValidationErrors) {
   var primaries = 0
   forEachIndexed { i, c ->
     c.require(jPath, i, errors) {

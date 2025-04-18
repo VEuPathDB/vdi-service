@@ -2,7 +2,7 @@ package org.veupathdb.service.vdi.server.controllers
 
 import org.veupathdb.service.vdi.generated.resources.Plugins
 import org.veupathdb.service.vdi.generated.resources.VdiPlugins
-import org.veupathdb.service.vdi.service.plugins.listPlugins
+import org.veupathdb.service.vdi.server.services.plugins.listPlugins
 
 class PluginInfo
   : Plugins

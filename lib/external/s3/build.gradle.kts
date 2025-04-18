@@ -9,7 +9,7 @@ tasks.test {
 }
 
 dependencies {
-  implementation(project(":lib:commons"))
+  implementation(project(":lib:common"))
 
   implementation(libs.vdi.common)
   implementation(libs.vdi.json)

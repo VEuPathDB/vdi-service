@@ -26,7 +26,7 @@ internal fun DatasetPatchRequestBody.cleanup() {
   datasetType?.cleanup()
 }
 
-internal fun DatasetPatchRequestBody.validate(projects: List<ProjectID>, errors: ValidationErrors = ValidationErrors()): ValidationErrors {
+internal fun DatasetPatchRequestBody.validate(projects: Iterable<ProjectID>, errors: ValidationErrors = ValidationErrors()): ValidationErrors {
   name?.validateName(JsonField.NAME, errors)
   shortName.validateShortName(JsonField.SHORT_NAME, errors)
   shortAttribution.validateShortAttribution(JsonField.SHORT_ATTRIBUTION, errors)

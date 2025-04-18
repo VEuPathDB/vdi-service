@@ -7,8 +7,8 @@ import org.veupathdb.service.vdi.generated.resources.Users
 import org.veupathdb.service.vdi.generated.resources.VdiDatasetsShareOffers
 import org.veupathdb.service.vdi.generated.resources.VdiUsers
 import org.veupathdb.service.vdi.model.ShareFilterStatus
-import org.veupathdb.service.vdi.service.shares.lookupShares
-import org.veupathdb.service.vdi.service.users.getUserMetadata
+import org.veupathdb.service.vdi.server.services.shares.lookupShares
+import org.veupathdb.service.vdi.server.services.users.getUserMetadata
 import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated(allowGuests = false)
@@ -23,10 +23,12 @@ class UserInfo(@Context request: ContainerRequest)
 
   override fun getUsersSelfShareOffers(status: String?) =
     Users.GetUsersSelfShareOffersResponse
-      .respond200WithApplicationJson(lookupShares(
+      .respond200WithApplicationJson(
+        lookupShares(
         userID.toUserID(),
         status?.let(ShareFilterStatus::fromString) ?: ShareFilterStatus.Open
-      ))!!
+      )
+      )!!
 
   //==========================================================================//
   // DEPRECATED API METHODS!!

@@ -18,7 +18,7 @@ internal fun DatasetHyperlink.cleanup() {
   isPublication = isPublication ?: false
 }
 
-internal fun Collection<DatasetHyperlink?>.validate(jPath: String, errors: ValidationErrors) =
+internal fun Iterable<DatasetHyperlink?>.validate(jPath: String, errors: ValidationErrors) =
   forEachIndexed { i, h -> h.require(jPath, i, errors) { validate(jPath, i, errors) } }
 
 private fun DatasetHyperlink.validate(jPath: String, index: Int, errors: ValidationErrors) {

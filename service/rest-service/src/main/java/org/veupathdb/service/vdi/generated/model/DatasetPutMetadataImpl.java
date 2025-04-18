@@ -7,26 +7,26 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "visibility",
     "name",
+    "datasetType",
     "shortName",
     "shortAttribution",
     "category",
+    "visibility",
     "summary",
     "description",
     "publications",
     "hyperlinks",
     "organisms",
     "contacts",
-    "datasetType",
     "revisionNote"
 })
 public class DatasetPutMetadataImpl implements DatasetPutMetadata {
-  @JsonProperty(JsonField.VISIBILITY)
-  private DatasetVisibility visibility;
-
   @JsonProperty(JsonField.NAME)
   private String name;
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  private DatasetTypeRequestBody datasetType;
 
   @JsonProperty(JsonField.SHORT_NAME)
   private String shortName;
@@ -36,6 +36,9 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
 
   @JsonProperty(JsonField.CATEGORY)
   private String category;
+
+  @JsonProperty(JsonField.VISIBILITY)
+  private DatasetVisibility visibility;
 
   @JsonProperty(JsonField.SUMMARY)
   private String summary;
@@ -55,21 +58,8 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.CONTACTS)
   private List<DatasetContact> contacts;
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeRequestBody datasetType;
-
   @JsonProperty(JsonField.REVISION_NOTE)
   private String revisionNote;
-
-  @JsonProperty(JsonField.VISIBILITY)
-  public DatasetVisibility getVisibility() {
-    return this.visibility;
-  }
-
-  @JsonProperty(JsonField.VISIBILITY)
-  public void setVisibility(DatasetVisibility visibility) {
-    this.visibility = visibility;
-  }
 
   @JsonProperty(JsonField.NAME)
   public String getName() {
@@ -79,6 +69,16 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.NAME)
   public void setName(String name) {
     this.name = name;
+  }
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  public DatasetTypeRequestBody getDatasetType() {
+    return this.datasetType;
+  }
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  public void setDatasetType(DatasetTypeRequestBody datasetType) {
+    this.datasetType = datasetType;
   }
 
   @JsonProperty(JsonField.SHORT_NAME)
@@ -109,6 +109,16 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.CATEGORY)
   public void setCategory(String category) {
     this.category = category;
+  }
+
+  @JsonProperty(JsonField.VISIBILITY)
+  public DatasetVisibility getVisibility() {
+    return this.visibility;
+  }
+
+  @JsonProperty(JsonField.VISIBILITY)
+  public void setVisibility(DatasetVisibility visibility) {
+    this.visibility = visibility;
   }
 
   @JsonProperty(JsonField.SUMMARY)
@@ -169,16 +179,6 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.CONTACTS)
   public void setContacts(List<DatasetContact> contacts) {
     this.contacts = contacts;
-  }
-
-  @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeRequestBody getDatasetType() {
-    return this.datasetType;
-  }
-
-  @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeRequestBody datasetType) {
-    this.datasetType = datasetType;
   }
 
   @JsonProperty(JsonField.REVISION_NOTE)

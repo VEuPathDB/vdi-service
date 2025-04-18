@@ -10,6 +10,7 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.app.model.DeleteFlag
+import vdi.component.db.app.purgeDatasetControlTables
 import vdi.component.db.app.withTransaction
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DeletedDataset
@@ -252,25 +253,11 @@ object Pruner {
   }
 
   private fun DeletionContext.deleteFromAppDB(projectID: ProjectID) {
-    if (!AppDatabaseRegistry.contains(projectID, dataType)) {
+    if (AppDatabaseRegistry.contains(projectID, dataType)) {
+      logger.debug("deleting dataset control data from target {}", projectID)
+      appDB.withTransaction(projectID, dataType) { it.purgeDatasetControlTables(datasetID) }
+    } else {
       logger.info("cannot delete dataset from disabled target {}", projectID)
-      return
-    }
-
-    logger.debug("deleting dataset from target {}", projectID)
-
-    appDB.withTransaction(projectID, dataType) {
-      it.deleteDatasetVisibilities(datasetID)
-      it.deleteDatasetProjectLinks(datasetID)
-      it.deleteSyncControl(datasetID)
-      it.deleteInstallMessages(datasetID)
-      it.deleteDatasetContacts(datasetID)
-      it.deleteDatasetHyperlinks(datasetID)
-      it.deleteDatasetPublications(datasetID)
-      it.deleteDatasetOrganisms(datasetID)
-      it.deleteDatasetDependencies(datasetID)
-      it.deleteDatasetMeta(datasetID)
-      it.deleteDataset(datasetID)
     }
   }
 
@@ -288,24 +275,44 @@ object Pruner {
     cacheDB.withTransaction { it.purgeDataset(datasetID, retainRevisions) }
   }
 
-  private fun DeletionContext.deleteFromS3(bucket: S3Bucket) {
-    if (bucket.objects.stat(S3Paths.datasetRevisedFlagFile(ownerID, datasetID)) == null)
-      bucket.pruneAllObjects(this)
-    else
-      bucket.pruneObsoleteRevision(this)
-  }
-
+  /**
+   * Prunes all objects in the object store for a target dataset.
+   *
+   * @receiver Object store bucket accessor.
+   *
+   * @param ctx Dataset deletion context information.
+   */
   private fun S3Bucket.pruneAllObjects(ctx: DeletionContext) {
     ctx.logger.debug("deleting dataset from object store")
     pruneAllObjects(ctx.ownerID, ctx.datasetID)
   }
 
+  /**
+   * Prunes all objects in the object store for a target dataset.
+   *
+   * @receiver Object store bucket accessor.
+   *
+   * @param ownerID ID of the user that owns the dataset.
+   *
+   * @param datasetID ID of the target dataset.
+   */
   private fun S3Bucket.pruneAllObjects(ownerID: UserID, datasetID: DatasetID) {
     objects.list(prefix = S3Paths.datasetDir(ownerID, datasetID))
       .map { it.path }
       .let { objects.deleteAll(it) }
   }
 
+  /**
+   * Prunes the unnecessary files left in the object store for an obsoleted
+   * dataset revision.
+   *
+   * The original user upload and a revision marker file should be the only
+   * objects retained for the old data.
+   *
+   * @receiver Object store bucket accessor.
+   *
+   * @param ctx Dataset deletion context information.
+   */
   private fun S3Bucket.pruneObsoleteRevision(ctx: DeletionContext) {
     ctx.logger.debug("deleting obsolete dataset revision from object store")
 

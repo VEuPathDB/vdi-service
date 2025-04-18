@@ -5,9 +5,9 @@ import org.veupathdb.lib.container.jaxrs.health.Dependency.Status
 import org.veupathdb.lib.container.jaxrs.health.Dependency.TestResult
 import org.veupathdb.lib.container.jaxrs.health.DependencySource
 import org.veupathdb.lib.container.jaxrs.health.ExternalDependency
-import org.veupathdb.service.vdi.util.logger
 import vdi.lib.health.RemoteDependencies
 import vdi.lib.health.Dependency as VDep
+import vdi.lib.logging.logger
 
 internal class DependencySource : DependencySource {
   override fun iterator(): MutableIterator<Dependency> {

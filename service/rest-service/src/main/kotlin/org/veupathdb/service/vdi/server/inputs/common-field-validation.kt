@@ -1,7 +1,7 @@
 package org.veupathdb.service.vdi.server.inputs
 
+import org.veupathdb.lib.request.validation.*
 import org.veupathdb.service.vdi.config.Options
-import org.veupathdb.service.vdi.util.ValidationErrors
 
 
 /* ┌────────────────────────────────────────────────────────────────────────┐ *\

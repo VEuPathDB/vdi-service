@@ -95,7 +95,7 @@ and ensuring a full JVM shutdown if any service module crashes.
 .link:lib/db/[Database Interaction]
 * link:lib/db/application/[Application DB Client]
 * link:lib/db/internal/[Internal DB Client]
-* link:lib/db/commons/[Shared DB Components]
+* link:lib/db/common/[Shared DB Components]
 
 .link:lib/plugin/[Plugin Communication]
 * link:lib/plugin/client[Plugin HTTP Client]
@@ -108,7 +108,7 @@ and ensuring a full JVM shutdown if any service module crashes.
 
 .Misc
 * link:lib/async/[Async Utilities]
-* link:lib/commons/[Universal Components]
+* link:lib/common/[Universal Components]
 * link:lib/kafka[Kafka Client]
 * link:lib/module-core/[Service/Module Core API]
 * link:lib/test-utils[Unit Test Utilities]

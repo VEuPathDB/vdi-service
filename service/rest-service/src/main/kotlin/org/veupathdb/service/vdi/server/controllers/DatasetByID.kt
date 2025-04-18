@@ -17,6 +17,10 @@ import org.veupathdb.service.vdi.server.inputs.validate
 import org.veupathdb.service.vdi.server.outputs.BadRequestError
 import org.veupathdb.service.vdi.server.outputs.NotFoundError
 import org.veupathdb.service.vdi.server.outputs.UnprocessableEntityError
+import org.veupathdb.service.vdi.server.services.dataset.*
+import org.veupathdb.service.vdi.server.services.dataset.getLatestRevision
+import org.veupathdb.service.vdi.server.services.dataset.putDataset
+import org.veupathdb.service.vdi.server.services.dataset.updateDatasetMeta
 import org.veupathdb.service.vdi.service.dataset.*
 import org.veupathdb.vdi.lib.common.field.toUserID
 
@@ -28,50 +32,39 @@ class DatasetByID(@Context request: ContainerRequest)
 {
   @Authenticated(adminOverride = ALLOW_ALWAYS)
   override fun getDatasetsByVdiId(rawID: String): GetDatasetsByVdiIdResponse =
-    rawID.asVDIID().let { vdiID ->
-      try {
+    rawID.asVDIID()
+      .let { vdiID ->
         when (val userID = maybeUserID) {
-          null -> GetDatasetsByVdiIdResponse
-            .respond200WithApplicationJson(adminGetDatasetByID(vdiID))
-
-          else -> GetDatasetsByVdiIdResponse
-            .respond200WithApplicationJson(getDatasetByID(userID.toUserID(), vdiID))
+          null -> adminGetDatasetByID(vdiID)
+          else -> getDatasetByID(userID.toUserID(), vdiID)
+        }.let {
+          // If the dataset could not be found under the given dataset ID, then
+          // check if it has been revised.  If there is a newer revision,
+          // redirect to the new dataset ID endpoint.
+          it.takeIf { it.status == 404 }
+            ?.let { getLatestRevision(vdiID, ::redirectURL) }
+            ?: it
         }
-      } catch (e: NotFoundException) {
-        getLatestRevision(vdiID)?.let {
-          GetDatasetsByVdiIdResponse.respond301(
-            GetDatasetsByVdiIdResponse.headersFor301()
-              .withLocation(redirectURL(it))
-          )
-        } ?: GetDatasetsByVdiIdResponse.respond404WithApplicationJson(NotFoundError())
       }
-    }
 
   override fun patchDatasetsByVdiId(vdiID: String, entity: DatasetPatchRequestBody?): PatchDatasetsByVdiIdResponse =
-    entity?.let { updateDatasetMeta(userID.toUserID(), vdiID.asVDIID(), it) }
+    entity?.let { body ->
+
+
+      updateDatasetMeta(userID.toUserID(), vdiID.asVDIID(), body)
+    }
       ?: PatchDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError("request body cannot be empty"))
 
-  override fun putDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?): PutDatasetsByVdiIdResponse {
-    entity ?: return PutDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError("empty request body"))
-    return try {
-      entity.cleanup()
-      entity.validate()
-
-      putDataset(userID.toUserID(), vdiId.asVDIID(), )
-        .let {
-          PutDatasetsByVdiIdResponse.respond201WithApplicationJson(
-            it,
-            PutDatasetsByVdiIdResponse.headersFor201().withLocation(redirectURL(it.datasetId))
-          )
+  override fun putDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?): PutDatasetsByVdiIdResponse =
+    entity?.let { body ->
+        try {
+          putDataset(userID.toUserID(), vdiId.asVDIID(), body)
+        } catch (e: BadRequestException) {
+          PutDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError(e.message ?: "bad request"))
+        } catch (e: NotFoundException) {
+          PutDatasetsByVdiIdResponse.respond404WithApplicationJson(NotFoundError())
         }
-    } catch (e: BadRequestException) {
-      PutDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError(e.message ?: "bad request"))
-    } catch (e: NotFoundException) {
-      PutDatasetsByVdiIdResponse.respond404WithApplicationJson(NotFoundError())
-    } catch (e: UnprocessableEntityException) {
-      PutDatasetsByVdiIdResponse.respond422WithApplicationJson(UnprocessableEntityError(e))
-    }
-  }
+    } ?: PutDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError("empty request body"))
 
   @Authenticated(adminOverride = ALLOW_ALWAYS)
   override fun deleteDatasetsByVdiId(vdiID: String): DeleteDatasetsByVdiIdResponse {

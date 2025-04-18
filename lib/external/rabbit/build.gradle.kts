@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
   implementation(project(":lib:async"))
-  implementation(project(":lib:commons"))
+  implementation(project(":lib:common"))
 
   implementation(libs.kt.coroutines)
   implementation(libs.vdi.common)

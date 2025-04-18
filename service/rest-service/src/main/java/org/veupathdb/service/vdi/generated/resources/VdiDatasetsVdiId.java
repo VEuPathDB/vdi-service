@@ -114,7 +114,7 @@ public interface VdiDatasetsVdiId {
       }
 
       public HeadersFor201 withLocation(final String p) {
-        headerMap.put("Location", String.valueOf(p));
+        headerMap.put("Location", String.valueOf(p));;
         return this;
       }
     }
@@ -175,7 +175,7 @@ public interface VdiDatasetsVdiId {
       }
 
       public HeadersFor301 withLocation(final String p) {
-        headerMap.put("Location", String.valueOf(p));
+        headerMap.put("Location", String.valueOf(p));;
         return this;
       }
     }

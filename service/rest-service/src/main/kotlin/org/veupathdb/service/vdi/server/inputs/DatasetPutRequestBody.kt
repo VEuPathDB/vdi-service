@@ -7,9 +7,8 @@ import org.veupathdb.service.vdi.generated.model.DatasetPatchRequestBody
 import org.veupathdb.service.vdi.generated.model.DatasetPutMetadata
 import org.veupathdb.service.vdi.generated.model.DatasetPutRequestBody
 import org.veupathdb.service.vdi.generated.model.JsonField
+import org.veupathdb.vdi.lib.common.field.ProjectID
 
-private const val RevisionNoteMinLength = 10
-private const val RevisionNoteMaxLength = 4096
 
 fun DatasetPutRequestBody.cleanup() {
   meta.cleanup()
@@ -25,7 +24,7 @@ private fun DatasetPutMetadata.cleanup() {
 }
 
 @Suppress("DuplicatedCode") // overlap in generated API pojo field names
-fun DatasetPutRequestBody.validate(): ValidationErrors {
+fun DatasetPutRequestBody.validate(projects: Iterable<ProjectID>): ValidationErrors {
   // DatasetPutRequestBody is not a JSON object, it is a multipart/form-data
   // request.  The "fields" are form parts and are not validated as if they are
   // part of a syntactically correct JSON body.
@@ -43,11 +42,13 @@ fun DatasetPutRequestBody.validate(): ValidationErrors {
     throw BadRequestException("cannot provide both an upload file and a source file URL")
   }
 
-  return ValidationErrors().also { meta.validate(it) }
+  return ValidationErrors().also { meta.validate(projects, it) }
 }
 
-private fun DatasetPutMetadata.validate(errors: ValidationErrors) {
-  (this as DatasetPatchRequestBody).validate(errors)
+private const val RevisionNoteMinLength = 10
+private const val RevisionNoteMaxLength = 4096
+private fun DatasetPutMetadata.validate(projects: Iterable<ProjectID>, errors: ValidationErrors) {
+  (this as DatasetPatchRequestBody).validate(projects, errors)
 
   revisionNote.reqCheckLength(JsonField.REVISION_NOTE, RevisionNoteMinLength, RevisionNoteMaxLength, errors)
 }

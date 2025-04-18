@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":lib:commons"))
+  implementation(project(":lib:common"))
 
   api(libs.ldap)
 

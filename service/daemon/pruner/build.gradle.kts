@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":lib:commons"))
+  implementation(project(":lib:common"))
   implementation(project(":lib:dataset:pruner"))
   implementation(project(":lib:module-core"))
   implementation(project(":lib:external:s3"))

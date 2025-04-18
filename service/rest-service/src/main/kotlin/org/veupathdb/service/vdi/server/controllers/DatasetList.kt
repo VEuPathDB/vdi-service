@@ -12,8 +12,8 @@ import org.veupathdb.service.vdi.server.inputs.validate
 import org.veupathdb.service.vdi.server.outputs.BadRequestError
 import org.veupathdb.service.vdi.server.outputs.DatasetPostResponseBody
 import org.veupathdb.service.vdi.server.outputs.UnprocessableEntityError
-import org.veupathdb.service.vdi.service.dataset.createDataset
-import org.veupathdb.service.vdi.service.dataset.fetchUserDatasetList
+import org.veupathdb.service.vdi.server.services.dataset.createDataset
+import org.veupathdb.service.vdi.server.services.dataset.fetchUserDatasetList
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.toUserID
 import vdi.component.db.cache.model.DatasetListQuery

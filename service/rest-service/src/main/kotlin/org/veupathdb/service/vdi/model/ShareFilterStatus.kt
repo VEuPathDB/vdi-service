@@ -15,7 +15,7 @@ internal enum class ShareFilterStatus {
     fun fromStringOrNull(value: String): ShareFilterStatus? {
       val lowercaseValue = value.lowercase()
 
-      for (enum in values())
+      for (enum in entries)
         if (enum.name.lowercase() == lowercaseValue)
           return enum
 

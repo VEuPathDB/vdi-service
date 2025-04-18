@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":lib:commons"))
+  implementation(project(":lib:common"))
   implementation(project(":lib:db:internal"))
   implementation(project(":lib:plugin:client"))
   implementation(project(":lib:kafka"))

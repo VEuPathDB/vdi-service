@@ -48,8 +48,7 @@ internal fun CacheDB.dropImportMessages(ctx: ReconciliationContext) =
 
 internal fun CacheDB.tryInitDataset(ctx: ReconciliationContext, importStatus: DatasetImportStatus) {
   withTransaction { db ->
-    db.tryInsertDataset(
-      DatasetImpl(
+    db.tryInsertDataset(DatasetImpl(
       datasetID    = ctx.datasetID,
       typeName     = ctx.meta.type.name,
       typeVersion  = ctx.meta.type.version,
@@ -59,8 +58,7 @@ internal fun CacheDB.tryInitDataset(ctx: ReconciliationContext, importStatus: Da
       importStatus = DatasetImportStatus.Queued, // this value is not used for inserts
       origin       = ctx.meta.origin,
       inserted     = OffsetDateTime.now(),
-    )
-    )
+    ))
 
     db.tryInsertDatasetMeta(ctx.datasetID, ctx.meta)
 

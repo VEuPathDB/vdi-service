@@ -13,7 +13,7 @@ fun DatasetTypeRequestBody.cleanup() {
   version = version.cleanupString()
 }
 
-fun DatasetTypeRequestBody?.validate(jPath: String, projects: List<ProjectID>, errors: ValidationErrors) =
+fun DatasetTypeRequestBody?.validate(jPath: String, projects: Iterable<ProjectID>, errors: ValidationErrors) =
   require(jPath, errors) {
     if (
       name.checkNonBlank(jPath..JsonField.NAME, errors)

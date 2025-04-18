@@ -8,17 +8,17 @@ import java.util.List;
     as = DatasetPatchRequestBodyImpl.class
 )
 public interface DatasetPatchRequestBody {
-  @JsonProperty(JsonField.VISIBILITY)
-  DatasetVisibility getVisibility();
-
-  @JsonProperty(JsonField.VISIBILITY)
-  void setVisibility(DatasetVisibility visibility);
-
   @JsonProperty(JsonField.NAME)
   String getName();
 
   @JsonProperty(JsonField.NAME)
   void setName(String name);
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  DatasetTypeRequestBody getDatasetType();
+
+  @JsonProperty(JsonField.DATASET_TYPE)
+  void setDatasetType(DatasetTypeRequestBody datasetType);
 
   @JsonProperty(JsonField.SHORT_NAME)
   String getShortName();
@@ -37,6 +37,12 @@ public interface DatasetPatchRequestBody {
 
   @JsonProperty(JsonField.CATEGORY)
   void setCategory(String category);
+
+  @JsonProperty(JsonField.VISIBILITY)
+  DatasetVisibility getVisibility();
+
+  @JsonProperty(JsonField.VISIBILITY)
+  void setVisibility(DatasetVisibility visibility);
 
   @JsonProperty(JsonField.SUMMARY)
   String getSummary();
@@ -73,10 +79,4 @@ public interface DatasetPatchRequestBody {
 
   @JsonProperty(JsonField.CONTACTS)
   void setContacts(List<DatasetContact> contacts);
-
-  @JsonProperty(JsonField.DATASET_TYPE)
-  DatasetTypeRequestBody getDatasetType();
-
-  @JsonProperty(JsonField.DATASET_TYPE)
-  void setDatasetType(DatasetTypeRequestBody datasetType);
 }

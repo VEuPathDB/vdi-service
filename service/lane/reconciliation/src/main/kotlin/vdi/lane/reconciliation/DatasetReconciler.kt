@@ -22,27 +22,25 @@ internal class DatasetReconciler(
   private val eventRouter: KafkaRouter,
   private val datasetManager: DatasetManager,
 ) {
-  private val log = logger()
-
   // TODO: If the import-ready file is newer than the install-ready or manifest
   //       files then we should fire an import event.
   // TODO: If the raw upload file is newer than the import-ready file then we
   //       should fire an upload processing event.
 
   fun reconcile(userID: UserID, datasetID: DatasetID, source: EventSource) {
-    log.info("beginning reconciliation for dataset {}/{}", userID, datasetID)
+    logger.info("beginning reconciliation for dataset {}/{}", userID, datasetID)
     try {
       reconcile(ReconciliationContext(
         datasetManager.getDatasetDirectory(userID, datasetID),
         source,
         logger(datasetID, userID)
       ))
-      log.info("reconciliation completed for dataset {}/{}", userID, datasetID)
+      logger.info("reconciliation completed for dataset {}/{}", userID, datasetID)
     } catch (e: CriticalReconciliationError) {
-      log.error("reconciliation failed for dataset {}/{}", userID, datasetID)
+      logger.error("reconciliation failed for dataset {}/{}", userID, datasetID)
     } catch (e: Throwable) {
       Metrics.ReconciliationHandler.errors.inc()
-      log.error("reconciliation failed for dataset $userID/$datasetID", e)
+      logger.error("reconciliation failed for dataset $userID/$datasetID", e)
     }
   }
 

@@ -44,6 +44,9 @@ object PluginRegistry : Iterable<Triple<DataType, String, PluginDetails>> {
   operator fun get(type: DataType, version: String) =
     mapping[KeyPair(type, version)]
 
+  operator fun get(type: String, version: String) =
+    mapping[KeyPair(DataType.of(type), version)]
+
   operator fun get(name: String) =
     byEnvKey[name]?.let { Triple(it.type, it.version, mapping[it]!!) }
 

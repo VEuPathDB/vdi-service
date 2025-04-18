@@ -233,6 +233,8 @@ displayName: Service Admin
         body: lib.InternalDatasetDetails
       400:
         body: lib.BadRequestError
+      404:
+        body: lib.NotFoundError
 
 /list-s3-objects:
   get:

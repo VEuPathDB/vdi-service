@@ -4,8 +4,8 @@ plugins {
 
 dependencies {
 
-  implementation(project(":lib:commons"))
-  implementation(project(":lib:db:commons"))
+  implementation(project(":lib:common"))
+  implementation(project(":lib:db:common"))
   implementation(project(":lib:external:ldap"))
 
   implementation(libs.vdi.common)

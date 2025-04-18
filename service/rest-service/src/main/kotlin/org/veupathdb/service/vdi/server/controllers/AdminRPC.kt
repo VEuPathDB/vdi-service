@@ -1,5 +1,7 @@
 package org.veupathdb.service.vdi.server.controllers
 
+import cleanup.InstallCleaner
+import cleanup.ReinstallTarget
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.core.StreamingOutput
 import kotlinx.coroutines.runBlocking
@@ -10,18 +12,13 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminO
 import org.veupathdb.service.vdi.generated.model.*
 import org.veupathdb.service.vdi.generated.resources.Admin
 import org.veupathdb.service.vdi.generated.resources.Admin.*
-import org.veupathdb.service.vdi.genx.model.*
 import org.veupathdb.service.vdi.server.inputs.cleanup
 import org.veupathdb.service.vdi.server.inputs.validate
 import org.veupathdb.service.vdi.server.outputs.*
-import org.veupathdb.service.vdi.server.outputs.BadRequestError
-import org.veupathdb.service.vdi.server.outputs.ForbiddenError
-import org.veupathdb.service.vdi.server.outputs.UnprocessableEntityError
-import org.veupathdb.service.vdi.service.admin.*
-import org.veupathdb.service.vdi.service.dataset.createDataset
-import org.veupathdb.service.vdi.service.dataset.listInstallFailedDatasets
+import org.veupathdb.service.vdi.server.services.admin.*
+import org.veupathdb.service.vdi.server.services.dataset.createDataset
+import org.veupathdb.service.vdi.server.services.dataset.listInstallFailedDatasets
 import org.veupathdb.service.vdi.util.fixVariableDateString
-import org.veupathdb.service.vdi.util.logger
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toDatasetID
@@ -29,10 +26,9 @@ import org.veupathdb.vdi.lib.common.field.toUserID
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.BrokenImportListQuery
 import vdi.component.db.cache.model.SortOrder
-import cleanup.InstallCleaner
-import cleanup.ReinstallTarget
 import vdi.component.pruner.Pruner
 import vdi.lib.install.retry.DatasetReinstaller
+import vdi.lib.logging.logger
 import vdi.lib.reconciler.Reconciler
 
 // Broken Import Query Constants
@@ -85,11 +81,10 @@ class AdminRPC : Admin {
     return PostAdminDeleteCleanupResponse.respond204()
   }
 
-  override fun getAdminDatasetDetails(datasetId: String?) =
-    if (datasetId == null)
-      GetAdminDatasetDetailsResponse.respond400WithApplicationJson(BadRequestError("no target dataset ID provided"))!!
-    else
-      GetAdminDatasetDetailsResponse.respond200WithApplicationJson(InternalDatasetDetails(getDatasetDetails(DatasetID(datasetId))))!!
+  override fun getAdminDatasetDetails(datasetId: String?): GetAdminDatasetDetailsResponse =
+    datasetId?.let(::DatasetID)
+      ?.let(::getDatasetDetails)
+      ?: GetAdminDatasetDetailsResponse.respond400WithApplicationJson(BadRequestError("no target dataset ID provided"))
 
   override fun postAdminProxyUpload(userIDRaw: Long?, entity: DatasetPostRequestBody?): PostAdminProxyUploadResponse {
     if (userIDRaw == null)
