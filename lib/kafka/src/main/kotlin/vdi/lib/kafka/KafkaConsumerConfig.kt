@@ -10,110 +10,110 @@ data class KafkaConsumerConfig(
   val servers: List<HostAddress>,
 
   // fetch.min.bytes
-  val fetchMinBytes: Int = vdi.lib.kafka.KafkaConsumerConfigDefaults.FetchMinBytes,
+  val fetchMinBytes: Int = KafkaConsumerConfigDefaults.FetchMinBytes,
 
   // group.id
   val groupID: String,
 
   // heartbeat.interval.ms
-  val heartbeatInterval: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.HeartbeatInterval,
+  val heartbeatInterval: Duration = KafkaConsumerConfigDefaults.HeartbeatInterval,
 
   // session.timeout.ms
-  val sessionTimeout: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.SessionTimeout,
+  val sessionTimeout: Duration = KafkaConsumerConfigDefaults.SessionTimeout,
 
   // auto.offset.reset
-  val autoOffsetReset: vdi.lib.kafka.KafkaOffsetType = vdi.lib.kafka.KafkaConsumerConfigDefaults.AutoOffsetReset,
+  val autoOffsetReset: KafkaOffsetType = KafkaConsumerConfigDefaults.AutoOffsetReset,
 
   // connections.max.idle.ms
-  val connectionsMaxIdle: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.ConnectionsMaxIdle,
+  val connectionsMaxIdle: Duration = KafkaConsumerConfigDefaults.ConnectionsMaxIdle,
 
   // default.api.timeout.ms
-  val defaultAPITimeout: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.DefaultAPITimeout,
+  val defaultAPITimeout: Duration = KafkaConsumerConfigDefaults.DefaultAPITimeout,
 
   // enable.auto.commit
-  val enableAutoCommit: Boolean = vdi.lib.kafka.KafkaConsumerConfigDefaults.EnableAutoCommit,
+  val enableAutoCommit: Boolean = KafkaConsumerConfigDefaults.EnableAutoCommit,
 
   // fetch.max.bytes
-  val fetchMaxBytes: Int = vdi.lib.kafka.KafkaConsumerConfigDefaults.FetchMaxBytes,
+  val fetchMaxBytes: Int = KafkaConsumerConfigDefaults.FetchMaxBytes,
 
   // group.instance.id
-  val groupInstanceID: String? = vdi.lib.kafka.KafkaConsumerConfigDefaults.GroupInstanceID,
+  val groupInstanceID: String? = KafkaConsumerConfigDefaults.GroupInstanceID,
 
   // max.poll.interval.ms
-  val maxPollInterval: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.MaxPollInterval,
+  val maxPollInterval: Duration = KafkaConsumerConfigDefaults.MaxPollInterval,
 
   // max.poll.records
-  val maxPollRecords: Int = vdi.lib.kafka.KafkaConsumerConfigDefaults.MaxPollRecords,
+  val maxPollRecords: Int = KafkaConsumerConfigDefaults.MaxPollRecords,
 
   // receive.buffer.byte
-  val receiveBufferSizeBytes: Int = vdi.lib.kafka.KafkaConsumerConfigDefaults.ReceiveBufferSizeBytes,
+  val receiveBufferSizeBytes: Int = KafkaConsumerConfigDefaults.ReceiveBufferSizeBytes,
 
   // request.timeout.ms
-  val requestTimeout: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.RequestTimeout,
+  val requestTimeout: Duration = KafkaConsumerConfigDefaults.RequestTimeout,
 
   // send.buffer.bytes
-  val sendBufferSizeBytes: Int = vdi.lib.kafka.KafkaConsumerConfigDefaults.SendBufferSizeBytes,
+  val sendBufferSizeBytes: Int = KafkaConsumerConfigDefaults.SendBufferSizeBytes,
 
   // auto.commit.interval.ms
-  val autoCommitInterval: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.AutoCommitInterval,
+  val autoCommitInterval: Duration = KafkaConsumerConfigDefaults.AutoCommitInterval,
 
   // client.id
   val clientID: String,
 
   // reconnect.backoff.max.ms
-  val reconnectBackoffMaxTime: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.ReconnectBackoffMaxTime,
+  val reconnectBackoffMaxTime: Duration = KafkaConsumerConfigDefaults.ReconnectBackoffMaxTime,
 
   // reconnect.backoff.ms
-  val reconnectBackoffTime: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.ReconnectBackoffTime,
+  val reconnectBackoffTime: Duration = KafkaConsumerConfigDefaults.ReconnectBackoffTime,
 
   // retry.backoff.ms
-  val retryBackoffTime: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.RetryBackoffTime,
+  val retryBackoffTime: Duration = KafkaConsumerConfigDefaults.RetryBackoffTime,
 
-  val pollDuration: Duration = vdi.lib.kafka.KafkaConsumerConfigDefaults.PollDuration,
+  val pollDuration: Duration = KafkaConsumerConfigDefaults.PollDuration,
 ) {
   constructor(clientID: String, env: Environment) : this(
     servers                 = env.reqHostAddresses(EnvKey.Kafka.Servers),
     fetchMinBytes           = env.optInt(EnvKey.Kafka.Consumer.FetchMinBytes)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.FetchMinBytes,
+                                 ?: KafkaConsumerConfigDefaults.FetchMinBytes,
     groupID                 = env.require(EnvKey.Kafka.Consumer.GroupID),
     heartbeatInterval       = env.optDuration(EnvKey.Kafka.Consumer.HeartbeatInterval)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.HeartbeatInterval,
+                                 ?: KafkaConsumerConfigDefaults.HeartbeatInterval,
     sessionTimeout          = env.optDuration(EnvKey.Kafka.Consumer.SessionTimeout)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.SessionTimeout,
+                                 ?: KafkaConsumerConfigDefaults.SessionTimeout,
     autoOffsetReset         = env.optional(EnvKey.Kafka.Consumer.AutoOffsetReset)
-                                 ?.let(vdi.lib.kafka.KafkaOffsetType.Companion::fromString)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.AutoOffsetReset,
+                                 ?.let(KafkaOffsetType.Companion::fromString)
+                                 ?: KafkaConsumerConfigDefaults.AutoOffsetReset,
     connectionsMaxIdle      = env.optDuration(EnvKey.Kafka.Consumer.ConnectionsMaxIdle)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.ConnectionsMaxIdle,
+                                 ?: KafkaConsumerConfigDefaults.ConnectionsMaxIdle,
     defaultAPITimeout       = env.optDuration(EnvKey.Kafka.Consumer.DefaultAPITimeout)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.DefaultAPITimeout,
+                                 ?: KafkaConsumerConfigDefaults.DefaultAPITimeout,
     enableAutoCommit        = env.optBool(EnvKey.Kafka.Consumer.EnableAutoCommit)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.EnableAutoCommit,
+                                 ?: KafkaConsumerConfigDefaults.EnableAutoCommit,
     fetchMaxBytes           = env.optInt(EnvKey.Kafka.Consumer.FetchMaxBytes)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.FetchMaxBytes,
+                                 ?: KafkaConsumerConfigDefaults.FetchMaxBytes,
     groupInstanceID         = env.optional(EnvKey.Kafka.Consumer.GroupInstanceID)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.GroupInstanceID,
+                                 ?: KafkaConsumerConfigDefaults.GroupInstanceID,
     maxPollInterval         = env.optDuration(EnvKey.Kafka.Consumer.MaxPollInterval)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.MaxPollInterval,
+                                 ?: KafkaConsumerConfigDefaults.MaxPollInterval,
     maxPollRecords          = env.optInt(EnvKey.Kafka.Consumer.MaxPollRecords)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.MaxPollRecords,
+                                 ?: KafkaConsumerConfigDefaults.MaxPollRecords,
     receiveBufferSizeBytes  = env.optInt(EnvKey.Kafka.Consumer.ReceiveBufferSizeBytes)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.ReceiveBufferSizeBytes,
+                                 ?: KafkaConsumerConfigDefaults.ReceiveBufferSizeBytes,
     requestTimeout          = env.optDuration(EnvKey.Kafka.Consumer.RequestTimeout)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.RequestTimeout,
+                                 ?: KafkaConsumerConfigDefaults.RequestTimeout,
     sendBufferSizeBytes     = env.optInt(EnvKey.Kafka.Consumer.SendBufferSizeBytes)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.SendBufferSizeBytes,
+                                 ?: KafkaConsumerConfigDefaults.SendBufferSizeBytes,
     autoCommitInterval      = env.optDuration(EnvKey.Kafka.Consumer.AutoCommitInterval)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.AutoCommitInterval,
+                                 ?: KafkaConsumerConfigDefaults.AutoCommitInterval,
     clientID                = clientID,
     reconnectBackoffMaxTime = env.optDuration(EnvKey.Kafka.Consumer.ReconnectBackoffMaxTime)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.ReconnectBackoffMaxTime,
+                                 ?: KafkaConsumerConfigDefaults.ReconnectBackoffMaxTime,
     reconnectBackoffTime    = env.optDuration(EnvKey.Kafka.Consumer.ReconnectBackoffTime)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.ReconnectBackoffTime,
+                                 ?: KafkaConsumerConfigDefaults.ReconnectBackoffTime,
     retryBackoffTime        = env.optDuration(EnvKey.Kafka.Consumer.RetryBackoffTime)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.RetryBackoffTime,
+                                 ?: KafkaConsumerConfigDefaults.RetryBackoffTime,
     pollDuration            = env.optDuration(EnvKey.Kafka.Consumer.PollDuration)
-                                 ?: vdi.lib.kafka.KafkaConsumerConfigDefaults.PollDuration
+                                 ?: KafkaConsumerConfigDefaults.PollDuration
 
   )
 }

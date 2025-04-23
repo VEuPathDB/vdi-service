@@ -43,7 +43,7 @@ data class InstallTriggerHandlerConfig(
         ?: Defaults.KafkaProducerClientID
     ),
 
-    s3Config = vdi.lib.s3.util.S3Config(env),
+    s3Config = S3Config(env),
 
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
 
@@ -62,9 +62,9 @@ data class InstallTriggerHandlerConfig(
     const val KafkaProducerClientID = "install-data-handler-send"
 
     inline val InstallDataTriggerTopic
-      get() = vdi.lib.kafka.router.KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC
+      get() = KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC
 
     inline val InstallDataTriggerMessageKey
-      get() = vdi.lib.kafka.router.KafkaRouterConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY
+      get() = KafkaRouterConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY
   }
 }

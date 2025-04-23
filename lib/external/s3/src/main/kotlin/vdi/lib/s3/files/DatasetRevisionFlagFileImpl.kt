@@ -14,7 +14,7 @@ internal class DatasetRevisionFlagFileImpl(
   putObjectStream: (InputStream) -> Unit = { it.skip(Long.MAX_VALUE) }
 )
   : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream, putObjectStream)
-  , vdi.lib.s3.files.DatasetRevisionFlagFile
+  , DatasetRevisionFlagFile
 {
 
   constructor(

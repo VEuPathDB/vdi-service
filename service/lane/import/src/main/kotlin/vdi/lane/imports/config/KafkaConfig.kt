@@ -22,7 +22,7 @@ data class KafkaConfig(
    * Messages received on the import trigger topic that do not have this message
    * key will be ignored with a warning.
    */
-  val importTriggerMessageKey: String = vdi.lib.kafka.router.KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
+  val importTriggerMessageKey: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
 
   /**
    * Import Triggers Topic
@@ -30,15 +30,15 @@ data class KafkaConfig(
    * Name of the Kafka topic that import trigger messages will be listened for
    * on.
    */
-  val importTriggerTopic: String = vdi.lib.kafka.router.KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
+  val importTriggerTopic: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
 ) {
   constructor(clientID: String) : this(System.getenv(), clientID)
 
   constructor(env: Environment, clientID: String) : this(
     consumerConfig          = KafkaConsumerConfig(clientID, env),
     importTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.ImportTriggers)
-      ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
+      ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
     importTriggerTopic      = env.optional(EnvKey.Kafka.Topic.ImportTriggers)
-      ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
+      ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
   )
 }

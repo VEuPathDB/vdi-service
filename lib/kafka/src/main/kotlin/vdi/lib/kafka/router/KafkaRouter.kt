@@ -9,8 +9,8 @@ import vdi.lib.kafka.KafkaMessage
 import vdi.lib.kafka.KafkaProducer
 
 class KafkaRouter(
-  private val config: vdi.lib.kafka.router.KafkaRouterConfig,
-  private val producer: vdi.lib.kafka.KafkaProducer,
+  private val config: KafkaRouterConfig,
+  private val producer: KafkaProducer,
 ) {
   fun sendImportTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
     send(config.importTrigger, userID, datasetID, source)
@@ -38,6 +38,6 @@ class KafkaRouter(
 
   fun close() = producer.close()
 
-  private fun send(tc: vdi.lib.kafka.router.TriggerConfig, userID: UserID, datasetID: DatasetID, source: EventSource) =
-    producer.send(tc.topic, KafkaMessage(tc.messageKey, JSON.writeValueAsString(vdi.lib.kafka.EventMessage(userID, datasetID, source))))
+  private fun send(tc: TriggerConfig, userID: UserID, datasetID: DatasetID, source: EventSource) =
+    producer.send(tc.topic, KafkaMessage(tc.messageKey, JSON.writeValueAsString(EventMessage(userID, datasetID, source))))
 }

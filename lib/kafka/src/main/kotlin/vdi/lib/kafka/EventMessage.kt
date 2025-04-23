@@ -12,5 +12,5 @@ data class EventMessage(
   val datasetID: DatasetID,
 
   @JsonProperty("source")
-  val eventSource: vdi.lib.kafka.EventSource,
+  val eventSource: EventSource,
 )

@@ -1166,7 +1166,7 @@ function bindTabs() {
 
 			});
 
-		};
+		}
 
 		for (var i = 0; i < links.length; i++)
 			bindLink(links.item(i));
@@ -1604,7 +1604,7 @@ curl ...
 curl ...
 curl ...
 
-# After all datasets have been marked, start the reinstaller. 
+# After all datasets have been marked, start the reinstaller.
 curl --request POST \
 --header "Admin-Token: ${VDI_ADMIN_TOKEN}" \
 "${VDI_INSTANCE}/admin/rpc/datasets/reconcile"

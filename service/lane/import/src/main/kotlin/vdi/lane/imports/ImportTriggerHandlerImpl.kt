@@ -122,7 +122,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private suspend fun processImportJob(userID: UserID, datasetID: DatasetID, datasetDir: vdi.lib.s3.DatasetDirectory) {
+  private suspend fun processImportJob(userID: UserID, datasetID: DatasetID, datasetDir: DatasetDirectory) {
     // Load the dataset metadata from S3
     val datasetMeta = datasetDir.getMetaFile().load()!!
 
@@ -179,7 +179,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     meta: VDIDatasetMeta,
     userID: UserID,
     datasetID: DatasetID,
-    datasetDir: vdi.lib.s3.DatasetDirectory
+    datasetDir: DatasetDirectory
   ) {
     try {
       cacheDB.withTransaction {
@@ -241,7 +241,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     userID: UserID,
     datasetID: DatasetID,
     result: ImportSuccessResponse,
-    dd: vdi.lib.s3.DatasetDirectory
+    dd: DatasetDirectory
   ) {
     log.info("dataset handler server reports dataset {}/{} imported successfully in plugin {}", userID, datasetID, handler.displayName)
 
@@ -334,7 +334,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     throw vdi.lib.plugin.client.PluginException.import(handler.displayName, userID, datasetID, result.message)
   }
 
-  private fun vdi.lib.s3.DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
+  private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
     if (!exists()) {
       log.warn("got an import event for dataset {}/{} which no longer has a directory", userID, datasetID)
       return false

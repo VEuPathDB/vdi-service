@@ -204,7 +204,7 @@ object Pruner {
     val dir = dos.getDatasetDirectory(ownerID, datasetID)
 
     // If the directory doesn't exist, then it has already been deleted.
-    state = dir.takeIf(vdi.lib.s3.DatasetDirectory::exists)
+    state = dir.takeIf(DatasetDirectory::exists)
       // If the dataset directory doesn't exist, log an error and mark the
       // dataset as not prunable for future investigation.
       .let { when (it) {

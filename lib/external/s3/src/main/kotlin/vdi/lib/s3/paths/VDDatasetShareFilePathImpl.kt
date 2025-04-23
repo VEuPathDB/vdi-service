@@ -9,7 +9,7 @@ internal data class VDDatasetShareFilePathImpl(
   override val datasetID: DatasetID,
   override val recipientID: UserID,
   override val fileName: String
-) : vdi.lib.s3.paths.VDDatasetShareFilePath {
+) : VDDatasetShareFilePath {
   override val isOffer
     get() = fileName == S3Paths.ShareOfferFileName
 

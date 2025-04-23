@@ -43,7 +43,7 @@ WHERE
 """
 
 internal fun Connection.selectAllSharesFor(userID: UserID): List<DatasetShareListEntry> {
-  return withPreparedStatement(vdi.lib.db.cache.sql.select.SQL) {
+  return withPreparedStatement(SQL) {
     setUserID(1, userID)
     withResults {
       map {

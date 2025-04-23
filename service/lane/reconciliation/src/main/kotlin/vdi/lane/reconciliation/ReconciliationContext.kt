@@ -10,7 +10,7 @@ import vdi.lane.reconciliation.util.safeExec
 import vdi.lane.reconciliation.util.safeTest
 
 internal class ReconciliationContext(
-  val datasetDirectory: vdi.lib.s3.DatasetDirectory,
+  val datasetDirectory: DatasetDirectory,
   val source: EventSource,
   val logger: Logger,
 ) {

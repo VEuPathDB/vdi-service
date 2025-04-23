@@ -18,7 +18,7 @@ public class TimestampDeserializer extends StdDeserializer<Date> {
     super(Date.class);}
 
   public Date deserialize(JsonParser jsonParser, DeserializationContext jsonContext) throws
-      IOException, JsonProcessingException {
+      IOException {
     try {
       ObjectMapper mapper  = new ObjectMapper();
       String dateString = mapper.readValue(jsonParser, String.class);

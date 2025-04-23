@@ -41,7 +41,7 @@ internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPru
     confirmShutdown()
   }
 
-  private fun tryProcessMessage(message: vdi.lib.kafka.EventMessage, dm: DatasetObjectStore) {
+  private fun tryProcessMessage(message: EventMessage, dm: DatasetObjectStore) {
     if (datasetsInProgress.add(message.datasetID)) {
       try {
         processMessage(message, dm)
@@ -51,7 +51,7 @@ internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPru
     }
   }
 
-  private fun processMessage(message: vdi.lib.kafka.EventMessage, dm: DatasetObjectStore) {
+  private fun processMessage(message: EventMessage, dm: DatasetObjectStore) {
     log.info("{}/{}: received revision pruning event from {}", message.userID, message.datasetID, message.eventSource)
 
     val s3Dir = dm.getDatasetDirectory(message.userID, message.datasetID)
@@ -68,7 +68,7 @@ internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPru
     }
   }
 
-  private fun tryProcessDataset(userID: UserID, datasetID: DatasetID, s3Dir: vdi.lib.s3.DatasetDirectory, dm: DatasetObjectStore) {
+  private fun tryProcessDataset(userID: UserID, datasetID: DatasetID, s3Dir: DatasetDirectory, dm: DatasetObjectStore) {
     val meta = s3Dir.getMetaFile().load()
 
     if (meta == null) {
@@ -105,7 +105,7 @@ internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPru
     processDataset(userID, s3Dir, previousS3Dir)
   }
 
-  private fun processDataset(userID: UserID, curDir: vdi.lib.s3.DatasetDirectory, prevDir: vdi.lib.s3.DatasetDirectory) {
+  private fun processDataset(userID: UserID, curDir: DatasetDirectory, prevDir: DatasetDirectory) {
     copyShares(curDir, prevDir)
 
     CacheDB().withTransaction { db ->
@@ -118,7 +118,7 @@ internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPru
 
   }
 
-  private fun copyShares(curDir: vdi.lib.s3.DatasetDirectory, prevDir: vdi.lib.s3.DatasetDirectory) {
+  private fun copyShares(curDir: DatasetDirectory, prevDir: DatasetDirectory) {
     for ((recipient, details) in prevDir.getShares()) {
       curDir.putShare(
         recipient,

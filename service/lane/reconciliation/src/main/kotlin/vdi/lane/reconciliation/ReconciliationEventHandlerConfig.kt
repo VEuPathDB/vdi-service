@@ -41,7 +41,7 @@ data class ReconciliationEventHandlerConfig(
     kafkaMessageKey = env.optional(EnvKey.Kafka.MessageKey.ReconciliationTriggers)
       ?: Defaults.ReconciliationMessageKey,
 
-    s3Config = vdi.lib.s3.util.S3Config(env),
+    s3Config = S3Config(env),
 
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName))
   )
@@ -51,10 +51,10 @@ data class ReconciliationEventHandlerConfig(
     const val WorkerPoolSize = 10u
 
     inline val ReconciliationTopic
-      get() = vdi.lib.kafka.router.KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_TOPIC
+      get() = KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_TOPIC
 
     inline val ReconciliationMessageKey
-      get() = vdi.lib.kafka.router.KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_MESSAGE_KEY
+      get() = KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_MESSAGE_KEY
   }
 }
 

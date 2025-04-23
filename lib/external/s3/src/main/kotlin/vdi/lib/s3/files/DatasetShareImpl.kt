@@ -4,6 +4,6 @@ import org.veupathdb.vdi.lib.common.field.UserID
 
 internal data class DatasetShareImpl(
   override val recipientID: UserID,
-  override val offer: vdi.lib.s3.files.DatasetShareOfferFile,
+  override val offer: DatasetShareOfferFile,
   override val receipt: DatasetShareReceiptFile
 ) : DatasetShare

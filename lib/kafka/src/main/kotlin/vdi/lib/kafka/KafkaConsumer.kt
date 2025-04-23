@@ -39,7 +39,7 @@ interface KafkaConsumer {
    *
    * @return A list of zero or more messages that were available in Kafka.
    */
-  fun receive(): List<vdi.lib.kafka.KafkaMessage>
+  fun receive(): List<KafkaMessage>
 
   /**
    * Closes the Kafka consumer connection.

@@ -28,7 +28,7 @@ object Reconciler {
 
   private lateinit var datasetManager: DatasetObjectStore
 
-  private lateinit var kafkaRouter: vdi.lib.kafka.router.KafkaRouter
+  private lateinit var kafkaRouter: KafkaRouter
 
   fun initialize(abortCB: AbortCB) {
     // We lock while initializing to avoid double init.

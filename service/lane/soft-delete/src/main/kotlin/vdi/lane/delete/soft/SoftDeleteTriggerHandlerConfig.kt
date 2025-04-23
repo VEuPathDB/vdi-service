@@ -34,15 +34,15 @@ data class SoftDeleteTriggerHandlerConfig(
       env
     ),
 
-    s3Config = vdi.lib.s3.util.S3Config(env),
+    s3Config = S3Config(env),
 
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
 
     softDeleteTriggerTopic = env.optional(EnvKey.Kafka.Topic.SoftDeleteTriggers)
-      ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_TOPIC,
+      ?: KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_TOPIC,
 
     softDeleteTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.SoftDeleteTriggers)
-      ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_MESSAGE_KEY
+      ?: KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_MESSAGE_KEY
 
   )
 

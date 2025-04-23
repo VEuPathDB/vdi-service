@@ -14,7 +14,7 @@ internal class DatasetRawUploadFileImpl(
   putObjectStream: (InputStream) -> Unit = { it.skip(Long.MAX_VALUE) },
 )
   : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream, putObjectStream)
-  , vdi.lib.s3.files.DatasetRawUploadFile
+  , DatasetRawUploadFile
 {
   constructor(
     bucket: S3Bucket,

@@ -29,7 +29,7 @@ data class RevisionPruningTriggerHandlerConfig(
     workerPoolSize = env.optUInt(EnvKey.RevisionPruningTriggerHandler.WorkerPoolSize)
       ?: Defaults.WorkerPoolSize,
 
-    s3Config = vdi.lib.s3.util.S3Config(env),
+    s3Config = S3Config(env),
 
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
 
@@ -53,10 +53,10 @@ data class RevisionPruningTriggerHandlerConfig(
     const val KafkaConsumerClientID = "revision-pruner-receive"
 
     inline val KafkaTopic
-      get() = vdi.lib.kafka.router.KafkaRouterConfigDefaults.REVISION_PRUNE_TRIGGER_TOPIC
+      get() = KafkaRouterConfigDefaults.REVISION_PRUNE_TRIGGER_TOPIC
 
     inline val KafkaMessageKey
-      get() = vdi.lib.kafka.router.KafkaRouterConfigDefaults.REVISION_PRUNE_TRIGGER_MESSAGE_KEY
+      get() = KafkaRouterConfigDefaults.REVISION_PRUNE_TRIGGER_MESSAGE_KEY
   }
 }
 

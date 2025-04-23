@@ -19,7 +19,7 @@ import vdi.lib.metrics.Metrics
 internal class DatasetReconciler(
   private val cacheDB: CacheDB = CacheDB(),
   private val appDB: AppDB = AppDB(),
-  private val eventRouter: vdi.lib.kafka.router.KafkaRouter,
+  private val eventRouter: KafkaRouter,
   private val datasetManager: DatasetObjectStore,
 ) {
   // TODO: If the import-ready file is newer than the install-ready or manifest

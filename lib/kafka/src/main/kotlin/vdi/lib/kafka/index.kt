@@ -23,7 +23,7 @@ private fun init(servers: Iterable<HostAddress>) {
   }
 }
 
-fun KafkaConsumer(topic: String, config: KafkaConsumerConfig): vdi.lib.kafka.KafkaConsumer {
+fun KafkaConsumer(topic: String, config: KafkaConsumerConfig): KafkaConsumer {
   init(config.servers)
   val props = Properties()
     .apply {
@@ -58,7 +58,7 @@ fun KafkaConsumer(topic: String, config: KafkaConsumerConfig): vdi.lib.kafka.Kaf
   )
 }
 
-fun KafkaProducer(config: KafkaProducerConfig): vdi.lib.kafka.KafkaProducer {
+fun KafkaProducer(config: KafkaProducerConfig): KafkaProducer {
   init(config.servers)
   val props = Properties()
     .apply {

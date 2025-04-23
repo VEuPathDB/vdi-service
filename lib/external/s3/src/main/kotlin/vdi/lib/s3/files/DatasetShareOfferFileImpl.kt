@@ -17,7 +17,7 @@ internal class DatasetShareOfferFileImpl(
   putObjectStream: (InputStream) -> Unit = { it.skip(Long.MAX_VALUE) },
 )
   : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream, putObjectStream)
-  , vdi.lib.s3.files.DatasetShareOfferFile
+  , DatasetShareOfferFile
 {
 
   /**

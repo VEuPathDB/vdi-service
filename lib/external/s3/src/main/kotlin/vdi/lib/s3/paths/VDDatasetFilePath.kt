@@ -1,6 +1,6 @@
 package vdi.lib.s3.paths
 
-sealed interface VDDatasetFilePath : vdi.lib.s3.paths.VDPath {
+sealed interface VDDatasetFilePath : VDPath {
   val fileName: String
 
   val isMetaFile: Boolean

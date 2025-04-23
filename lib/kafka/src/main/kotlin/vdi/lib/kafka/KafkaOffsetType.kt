@@ -11,10 +11,10 @@ enum class KafkaOffsetType {
   companion object {
     @JvmStatic
     fun fromString(value: String) =
-      vdi.lib.kafka.KafkaOffsetType.Companion.fromStringOrNull(value) ?: throw IllegalArgumentException("unrecognized KafkaOffsetType value: $value")
+      KafkaOffsetType.Companion.fromStringOrNull(value) ?: throw IllegalArgumentException("unrecognized KafkaOffsetType value: $value")
 
     @JvmStatic
-    fun fromStringOrNull(value: String): vdi.lib.kafka.KafkaOffsetType? {
+    fun fromStringOrNull(value: String): KafkaOffsetType? {
       val value = value.lowercase()
 
       for (enum in values())

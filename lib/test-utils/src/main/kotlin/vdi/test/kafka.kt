@@ -15,7 +15,7 @@ fun mockEventMessage(
   userID: UserID? = null,
   datasetID: DatasetID? = null,
   eventSource: EventSource? = null,
-): vdi.lib.kafka.EventMessage =
+): EventMessage =
   mock {
     userID?.also { on { this.userID } doReturn it }
     datasetID?.also { on { this.datasetID } doReturn it }
@@ -27,7 +27,7 @@ fun mockKafkaConsumer(
   topic: String? = null,
   onReceive: () -> List<KafkaMessage> = ::noParamList,
   onClose: Runnable = ::runnable,
-): vdi.lib.kafka.KafkaConsumer =
+): KafkaConsumer =
   mock {
     pollDuration?.also { on { this.pollDuration } doReturn it }
     topic?.also { on { this.topic } doReturn it }
@@ -45,7 +45,7 @@ fun mockKafkaProducer(
   onSendMessage: (String, KafkaMessage, Boolean) -> Unit = ::triConsumer,
   onSendSerial: (String, KafkaSerializable, Boolean) -> Unit = ::triConsumer,
   onClose: Runnable = ::runnable,
-): vdi.lib.kafka.KafkaProducer =
+): KafkaProducer =
   mock {
     on { send(any(), any() as KafkaMessage, any()) } doAnswer { onSendMessage(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
     on { send(any(), any() as KafkaSerializable, any()) } doAnswer { onSendSerial(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
@@ -61,7 +61,7 @@ fun mockKafkaRouter(
   onSendShare: (UserID, DatasetID, EventSource) -> Unit = ::triConsumer,
   onSendReconcile: (UserID, DatasetID, EventSource) -> Unit = ::triConsumer,
   onClose: Runnable = ::runnable,
-): vdi.lib.kafka.router.KafkaRouter =
+): KafkaRouter =
   mock {
     on { sendImportTrigger(any(), any(), any()) } doAnswer { onSendImport(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
     on { sendInstallTrigger(any(), any(), any()) } doAnswer { onSendInstall(it.getArgument(0), it.getArgument(1), it.getArgument(2)) }
@@ -74,7 +74,7 @@ fun mockKafkaRouter(
   }
 
 fun mockKafkaRouterFactory(
-  onNewKafkaRouter: () -> vdi.lib.kafka.router.KafkaRouter = { mockKafkaRouter() }
+  onNewKafkaRouter: () -> KafkaRouter = { mockKafkaRouter() }
 ): KafkaRouterFactory =
   mock {
     on { newKafkaRouter() } doAnswer { onNewKafkaRouter() }

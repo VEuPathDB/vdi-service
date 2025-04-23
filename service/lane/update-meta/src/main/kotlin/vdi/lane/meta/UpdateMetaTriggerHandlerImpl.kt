@@ -79,7 +79,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     confirmShutdown()
   }
 
-  private suspend fun updateMetaIfNotInProgress(dm: DatasetObjectStore, kr: vdi.lib.kafka.router.KafkaRouter, msg: vdi.lib.kafka.EventMessage) {
+  private suspend fun updateMetaIfNotInProgress(dm: DatasetObjectStore, kr: KafkaRouter, msg: EventMessage) {
     if (datasetsInProgress.add(msg.datasetID)) {
       try {
         tryUpdateMeta(dm, kr, msg)
@@ -91,7 +91,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     }
   }
 
-  private suspend fun tryUpdateMeta(dm: DatasetObjectStore, kr: vdi.lib.kafka.router.KafkaRouter, msg: vdi.lib.kafka.EventMessage) {
+  private suspend fun tryUpdateMeta(dm: DatasetObjectStore, kr: KafkaRouter, msg: EventMessage) {
     try {
       if (msg.eventSource == EventSource.UpdateMetaLane) {
         log.warn("attempted to recurse update meta on dataset ${msg.userID}/${msg.datasetID}")
@@ -424,7 +424,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     throw vdi.lib.plugin.client.PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
-  private fun vdi.lib.s3.DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
+  private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
     if (!exists()) {
       log.warn("got an update-meta event for dataset {}/{} which has no directory?", userID, datasetID)
       return false

@@ -24,58 +24,58 @@ data class KafkaRouterConfig(
 
     importTrigger = TriggerConfig(
       messageKey = env.optional(EnvKey.Kafka.MessageKey.ImportTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
+        ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
       topic = env.optional(EnvKey.Kafka.Topic.ImportTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
+        ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
     ),
 
     installTrigger = TriggerConfig(
       messageKey = env.optional(EnvKey.Kafka.MessageKey.InstallTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY,
+        ?: KafkaRouterConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY,
       topic = env.optional(EnvKey.Kafka.Topic.InstallTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC,
+        ?: KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC,
     ),
 
     updateMetaTrigger = TriggerConfig(
       messageKey = env.optional(EnvKey.Kafka.MessageKey.UpdateMetaTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.UPDATE_META_TRIGGER_MESSAGE_KEY,
+        ?: KafkaRouterConfigDefaults.UPDATE_META_TRIGGER_MESSAGE_KEY,
       topic = env.optional(EnvKey.Kafka.Topic.UpdateMetaTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.UPDATE_META_TRIGGER_TOPIC,
+        ?: KafkaRouterConfigDefaults.UPDATE_META_TRIGGER_TOPIC,
     ),
 
     softDeleteTrigger = TriggerConfig(
       messageKey = env.optional(EnvKey.Kafka.MessageKey.SoftDeleteTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_MESSAGE_KEY,
+        ?: KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_MESSAGE_KEY,
       topic = env.optional(EnvKey.Kafka.Topic.SoftDeleteTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_TOPIC,
+        ?: KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_TOPIC,
     ),
 
     hardDeleteTrigger = TriggerConfig(
       messageKey = env.optional(EnvKey.Kafka.MessageKey.HardDeleteTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY,
+        ?: KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY,
       topic = env.optional(EnvKey.Kafka.Topic.HardDeleteTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC,
+        ?: KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC,
     ),
 
     shareTrigger = TriggerConfig(
       messageKey = env.optional(EnvKey.Kafka.MessageKey.ShareTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY,
+        ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY,
       topic = env.optional(EnvKey.Kafka.Topic.ShareTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.SHARE_TRIGGER_TOPIC,
+        ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_TOPIC,
     ),
 
     reconciliationTrigger = TriggerConfig(
       messageKey = env.optional(EnvKey.Kafka.MessageKey.ReconciliationTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_MESSAGE_KEY,
+        ?: KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_MESSAGE_KEY,
       topic = env.optional(EnvKey.Kafka.Topic.ReconciliationTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_TOPIC,
+        ?: KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_TOPIC,
     ),
 
     revisionPruningTrigger = TriggerConfig(
       messageKey = env.optional(EnvKey.Kafka.MessageKey.RevisionPruningTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.REVISION_PRUNE_TRIGGER_MESSAGE_KEY,
+        ?: KafkaRouterConfigDefaults.REVISION_PRUNE_TRIGGER_MESSAGE_KEY,
       topic = env.optional(EnvKey.Kafka.Topic.RevisionPruningTriggers)
-        ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.REVISION_PRUNE_TRIGGER_TOPIC,
+        ?: KafkaRouterConfigDefaults.REVISION_PRUNE_TRIGGER_TOPIC,
     ),
   )
 }

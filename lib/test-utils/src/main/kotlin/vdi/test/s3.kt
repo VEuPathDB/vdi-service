@@ -15,7 +15,7 @@ import java.util.stream.Stream
 
 private sealed class DummyFileBase
   : DatasetDeleteFlagFile
-  , vdi.lib.s3.files.DatasetRawUploadFile
+  , DatasetRawUploadFile
   , DatasetImportableFile
   , DatasetInstallableFile
 {
@@ -61,7 +61,7 @@ fun mockDatasetDirectory(
   onDeleteDeleteFlag: Runnable = ::runnable,
   deleteFlagTimestamp: OffsetDateTime? = deleteFlag.lastModified(),
 
-  uploadFile: vdi.lib.s3.files.DatasetRawUploadFile = DummyDatasetFile,
+  uploadFile: DatasetRawUploadFile = DummyDatasetFile,
   hasUploadFile: Boolean = uploadFile.exists(),
   onPutUploadFile: Con<Pro<InputStream>> = ::consumer,
   onDeleteUploadFile: Runnable = ::runnable,
@@ -204,12 +204,12 @@ fun mockRawUploadFile(
   exists: Boolean = false,
   lastModified: OffsetDateTime? = null,
   contents: InputStream? = null,
-): vdi.lib.s3.files.DatasetRawUploadFile =
+): DatasetRawUploadFile =
   mock { mockDatasetFile(path, baseName, exists, lastModified, contents) }
 
 fun mockDatasetShare(
   recipientID: UserID? = null,
-  offer: vdi.lib.s3.files.DatasetShareOfferFile? = null,
+  offer: DatasetShareOfferFile? = null,
   receipt: DatasetShareReceiptFile? = null,
 ): DatasetShare =
   mock {
@@ -225,7 +225,7 @@ fun mockShareOfferFile(
   lastModified: OffsetDateTime? = null,
   contents: InputStream? = null,
   offer: VDIDatasetShareOffer? = null,
-): vdi.lib.s3.files.DatasetShareOfferFile =
+): DatasetShareOfferFile =
   mock {
     mockDatasetFile(path, baseName, exists, lastModified, contents)
     on { load() } doReturn offer

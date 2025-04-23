@@ -12,8 +12,8 @@ internal class AppDBAccessorImpl(
   override val project: ProjectID,
   private val schema: String,
   private val dataSource: DataSource,
-  override val platform: vdi.lib.db.app.AppDBPlatform,
-) : vdi.lib.db.app.AppDBAccessor {
+  override val platform: AppDBPlatform,
+) : AppDBAccessor {
   private inline val con
     get() = dataSource.connection
 

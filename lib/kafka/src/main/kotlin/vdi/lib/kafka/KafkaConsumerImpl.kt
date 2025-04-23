@@ -9,7 +9,7 @@ internal class KafkaConsumerImpl(
   override val topic:        String,
   override val pollDuration: Duration,
   private  val kafka:        KConsumer<String, String>
-) : vdi.lib.kafka.KafkaConsumer {
+) : KafkaConsumer {
   private val log = LoggerFactory.getLogger(javaClass)
 
   override fun receive(): List<KafkaMessage> {

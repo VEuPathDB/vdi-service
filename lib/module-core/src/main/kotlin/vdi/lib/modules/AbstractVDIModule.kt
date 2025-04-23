@@ -160,7 +160,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
    *
    * @return A stream of event messages.
    */
-  protected fun vdi.lib.kafka.KafkaConsumer.fetchMessages(key: String): Sequence<vdi.lib.kafka.EventMessage> =
+  protected fun KafkaConsumer.fetchMessages(key: String): Sequence<EventMessage> =
     receive()
       .asSequence()
       .filter {
@@ -173,7 +173,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
       }
       .map {
         try {
-          JSON.readValue(it.value, vdi.lib.kafka.EventMessage::class.java)
+          JSON.readValue(it.value, EventMessage::class.java)
         } catch (e: Throwable) {
           log.error("received invalid message body from Kafka: {}", it.value)
           null

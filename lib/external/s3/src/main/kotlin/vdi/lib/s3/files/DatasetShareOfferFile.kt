@@ -7,7 +7,7 @@ import vdi.lib.s3.DatasetDirectory
  * Represents a possible dataset share offer file that may exist in a target
  * [DatasetDirectory].
  */
-interface DatasetShareOfferFile : vdi.lib.s3.files.DatasetFile {
+interface DatasetShareOfferFile : DatasetFile {
 
   /**
    * Attempts to load and parse the contents of the dataset share offer file.

@@ -35,7 +35,7 @@ data class UpdateMetaTriggerHandlerConfig(
 
     kafkaRouterConfig = KafkaRouterConfig(env, "update-meta"),
 
-    s3Config = vdi.lib.s3.util.S3Config(env),
+    s3Config = S3Config(env),
 
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
   )

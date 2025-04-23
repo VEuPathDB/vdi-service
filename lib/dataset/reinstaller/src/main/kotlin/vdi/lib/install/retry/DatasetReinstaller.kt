@@ -200,7 +200,7 @@ object DatasetReinstaller {
     }
   }
 
-  private fun vdi.lib.s3.DatasetDirectory.isReinstallable(): Boolean {
+  private fun DatasetDirectory.isReinstallable(): Boolean {
     var ok = true
 
     if (!hasMetaFile()) {
@@ -347,7 +347,7 @@ object DatasetReinstaller {
   }
 
   private suspend fun <T> withInstallBundle(
-    s3Dir: vdi.lib.s3.DatasetDirectory,
+    s3Dir: DatasetDirectory,
     fn: suspend (meta: InputStream, manifest: InputStream, upload: InputStream) -> T
   ) =
     s3Dir.getMetaFile().loadContents()!!.use { meta ->

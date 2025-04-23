@@ -137,7 +137,7 @@ interface DatasetDirectory {
    */
   fun hasRevisedFlag(): Boolean
 
-  fun getRevisedFlag(): vdi.lib.s3.files.DatasetRevisionFlagFile
+  fun getRevisedFlag(): DatasetRevisionFlagFile
 
   fun putRevisedFlag()
 
@@ -160,7 +160,7 @@ interface DatasetDirectory {
    * file exists or existed.  The existence of the file can be tested using the
    * returned object's [DatasetDeleteFlagFile.exists] method.
    */
-  fun getUploadFile(): vdi.lib.s3.files.DatasetRawUploadFile
+  fun getUploadFile(): DatasetRawUploadFile
 
   /**
    * Puts a `raw-upload.zip` file into this [DatasetDirectory].

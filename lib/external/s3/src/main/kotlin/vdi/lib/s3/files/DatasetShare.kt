@@ -12,7 +12,7 @@ interface DatasetShare {
   /**
    * A handle on this share offer's offer file.
    */
-  val offer: vdi.lib.s3.files.DatasetShareOfferFile
+  val offer: DatasetShareOfferFile
 
   /**
    * A handle on this share offer's receipt file.

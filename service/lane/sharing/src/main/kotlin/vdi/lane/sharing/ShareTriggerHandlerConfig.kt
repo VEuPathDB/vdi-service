@@ -34,15 +34,15 @@ data class ShareTriggerHandlerConfig(
       env
     ),
 
-    s3Config = vdi.lib.s3.util.S3Config(env),
+    s3Config = S3Config(env),
 
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
 
     shareTriggerTopic = env.optional(EnvKey.Kafka.Topic.ShareTriggers)
-      ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.SHARE_TRIGGER_TOPIC,
+      ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_TOPIC,
 
     shareTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.ShareTriggers)
-      ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY
+      ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY
   )
 
   object Defaults {

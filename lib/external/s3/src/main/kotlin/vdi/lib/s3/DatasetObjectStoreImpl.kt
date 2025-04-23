@@ -28,7 +28,7 @@ private class DatasetObjectStoreImpl(private val s3Bucket: S3Bucket) : DatasetOb
     }
   }
 
-  override fun getDatasetDirectory(ownerID: UserID, datasetID: DatasetID): vdi.lib.s3.DatasetDirectory =
+  override fun getDatasetDirectory(ownerID: UserID, datasetID: DatasetID): DatasetDirectory =
     DatasetDirectoryImpl(ownerID, datasetID, s3Bucket, S3DatasetPathFactory(ownerID, datasetID))
 
   override fun listDatasets(ownerID: UserID): List<DatasetID> =
@@ -36,7 +36,7 @@ private class DatasetObjectStoreImpl(private val s3Bucket: S3Bucket) : DatasetOb
       .commonPrefixes()
       .map(::DatasetID)
 
-  override fun streamAllDatasets(): Stream<vdi.lib.s3.DatasetDirectory> =
+  override fun streamAllDatasets(): Stream<DatasetDirectory> =
     StreamSupport.stream(
       Spliterators.spliteratorUnknownSize(
       DatasetDirIterator(s3Bucket.objects.stream().stream().iterator()),

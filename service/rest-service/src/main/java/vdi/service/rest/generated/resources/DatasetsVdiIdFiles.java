@@ -137,7 +137,7 @@ public interface DatasetsVdiIdFiles {
       }
 
       public HeadersFor200 withContentDisposition(final String p) {
-        headerMap.put("Content-Disposition", String.valueOf(p));;
+        headerMap.put("Content-Disposition", String.valueOf(p));
         return this;
       }
     }
@@ -194,7 +194,7 @@ public interface DatasetsVdiIdFiles {
       }
 
       public HeadersFor200 withContentDisposition(final String p) {
-        headerMap.put("Content-Disposition", String.valueOf(p));;
+        headerMap.put("Content-Disposition", String.valueOf(p));
         return this;
       }
     }

@@ -46,7 +46,7 @@ private fun Iterator<String>.toDatasetSharePathOrNull(
   bucket: String,
   userID: UserID,
   datasetID: DatasetID,
-): vdi.lib.s3.paths.VDDatasetShareFilePath? {
+): VDDatasetShareFilePath? {
   // If we've gotten here, then the previous segment in the iterator was the
   // shares directory.  The remainder of the iterator should be 2 segments, the
   // recipient user id and the name of the file which must be one of
@@ -76,7 +76,7 @@ private fun Iterator<String>.toDatasetFilePathOrNull(
   userID: UserID,
   datasetID: DatasetID,
   segment: String,
-): vdi.lib.s3.paths.VDDatasetFilePath? {
+): VDDatasetFilePath? {
   // If we've gotten here, then we have hit a path segment that is not the
   // shares directory.  At this point the iterator should now contain no more
   // path segments, and the given path segment argument must be one of the known

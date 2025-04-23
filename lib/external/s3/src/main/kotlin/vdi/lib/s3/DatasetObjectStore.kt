@@ -21,7 +21,7 @@ interface DatasetObjectStore {
    * @return A new [DatasetDirectory] instance representing the S3 path for the
    * target dataset.
    */
-  fun getDatasetDirectory(ownerID: UserID, datasetID: DatasetID): vdi.lib.s3.DatasetDirectory
+  fun getDatasetDirectory(ownerID: UserID, datasetID: DatasetID): DatasetDirectory
 
   /**
    * Returns a list of dataset IDs from the target user path.
@@ -32,7 +32,7 @@ interface DatasetObjectStore {
    */
   fun listDatasets(ownerID: UserID): List<DatasetID>
 
-  fun streamAllDatasets(): Stream<vdi.lib.s3.DatasetDirectory>
+  fun streamAllDatasets(): Stream<DatasetDirectory>
 
   fun listUsers(): List<UserID>
 }

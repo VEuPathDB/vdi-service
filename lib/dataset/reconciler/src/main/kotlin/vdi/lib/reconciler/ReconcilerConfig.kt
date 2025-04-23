@@ -19,7 +19,7 @@ internal data class ReconcilerConfig(
 
   constructor(env: Environment) : this(
     kafkaRouterConfig = KafkaRouterConfig(env, "reconciler"),
-    s3Config          = vdi.lib.s3.util.S3Config(env),
+    s3Config          = S3Config(env),
     s3Bucket          = BucketName(env.require(EnvKey.S3.BucketName)),
     deletesEnabled    = env.optBool(EnvKey.Reconciler.DeletesEnabled) ?: DefaultDeletesEnabled,
   )

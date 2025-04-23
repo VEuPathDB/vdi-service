@@ -26,14 +26,14 @@ internal class EagerlyLoadedDatasetDirectory(
 
   private val metaFile: DatasetMetaFile?,
   private val manifest: DatasetManifestFile?,
-  private val uploadFile: vdi.lib.s3.files.DatasetRawUploadFile?,
+  private val uploadFile: DatasetRawUploadFile?,
   private val importableFile: DatasetImportableFile?,
   private val installableFile: DatasetInstallableFile?,
   private val deleteFlag: DatasetDeleteFlagFile?,
-  private val revisedFlag: vdi.lib.s3.files.DatasetRevisionFlagFile?,
+  private val revisedFlag: DatasetRevisionFlagFile?,
   private val shares: Map<UserID, DatasetShare>,
   private val pathFactory: S3DatasetPathFactory
-) : vdi.lib.s3.DatasetDirectory {
+) : DatasetDirectory {
 
   companion object {
     // throws
@@ -46,11 +46,11 @@ internal class EagerlyLoadedDatasetDirectory(
     ): EagerlyLoadedDatasetDirectory {
       var metaFile: DatasetMetaFile? = null
       var manifest: DatasetManifestFile? = null
-      var uploadFile: vdi.lib.s3.files.DatasetRawUploadFile? = null
+      var uploadFile: DatasetRawUploadFile? = null
       var importableFile: DatasetImportableFile? = null
       var installableFile: DatasetInstallableFile? = null
       var deleteFlag: DatasetDeleteFlagFile? = null
-      var revisedFlag: vdi.lib.s3.files.DatasetRevisionFlagFile? = null
+      var revisedFlag: DatasetRevisionFlagFile? = null
 
       val shareRefs = HashMap<UserID, ShareRef>(4)
 
@@ -79,7 +79,7 @@ internal class EagerlyLoadedDatasetDirectory(
           S3Paths.InstallReadyZipName  -> installableFile = DatasetInstallableFileImpl(it)
           S3Paths.DeleteFlagFileName   -> deleteFlag = DatasetDeleteFlagFileImpl(it)
           S3Paths.RevisionFlagFileName -> revisedFlag = DatasetRevisionFlagFileImpl(it)
-          else -> throw vdi.lib.s3.exception.MalformedDatasetException("Unrecognized file path in S3: " + it.path)
+          else -> throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
         }
       }
 

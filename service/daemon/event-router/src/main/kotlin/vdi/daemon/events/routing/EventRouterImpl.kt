@@ -39,7 +39,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
     }
   }
 
-  private val kr: vdi.lib.kafka.router.KafkaRouter = runBlocking {
+  private val kr: KafkaRouter = runBlocking {
     try {
       KafkaRouterFactory(config.kafkaConfig).newKafkaRouter()
     } catch (e: Throwable) {
@@ -102,13 +102,13 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
         continue
       }
 
-      if (path is vdi.lib.s3.paths.VDDatasetShareFilePath) {
+      if (path is VDDatasetShareFilePath) {
         log.debug("received a share event for dataset {}/{}", path.userID, path.datasetID)
         safeSend(path.userID, path.datasetID, kr::sendShareTrigger)
         continue
       }
 
-      if (path !is vdi.lib.s3.paths.VDDatasetFilePath) {
+      if (path !is VDDatasetFilePath) {
         log.error("unrecognized VDPath implementation type {}, someone forgot to update the event router", path::class.qualifiedName)
         continue
       }

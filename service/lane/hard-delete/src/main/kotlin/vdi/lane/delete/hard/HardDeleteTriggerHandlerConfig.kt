@@ -41,10 +41,10 @@ data class HardDeleteTriggerHandlerConfig(
     const val KafkaConsumerClientID = "hard-delete-handler"
 
     inline val HardDeleteTopic
-      get() = vdi.lib.kafka.router.KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC
+      get() = KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC
 
     inline val HardDeleteMesesageKey
-      get() = vdi.lib.kafka.router.KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY
+      get() = KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY
   }
 }
 

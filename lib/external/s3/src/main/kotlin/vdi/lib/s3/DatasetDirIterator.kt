@@ -14,12 +14,12 @@ import vdi.lib.s3.paths.S3DatasetPathFactory
  *
  * All objects must be grouped by dataset for the iterator to function properly.
  */
-internal class DatasetDirIterator(private val objectStream: Iterator<S3Object>) : Iterator<vdi.lib.s3.DatasetDirectory> {
+internal class DatasetDirIterator(private val objectStream: Iterator<S3Object>) : Iterator<DatasetDirectory> {
   private val log = LoggerFactory.getLogger(javaClass)
 
   private val stagedObjects: MutableList<S3Object> = mutableListOf()
 
-  private var currentDataset: vdi.lib.s3.DatasetDirectory? = initFirstDataset()
+  private var currentDataset: DatasetDirectory? = initFirstDataset()
 
   override fun hasNext() = currentDataset != null
 
@@ -30,7 +30,7 @@ internal class DatasetDirIterator(private val objectStream: Iterator<S3Object>) 
   override fun next() = (currentDataset ?: throw NoSuchElementException())
     .also { currentDataset = prepNext() }
 
-  private fun initFirstDataset(): vdi.lib.s3.DatasetDirectory? {
+  private fun initFirstDataset(): DatasetDirectory? {
     if (!objectStream.hasNext()) {
       // Stream was empty to start
       return null
@@ -46,7 +46,7 @@ internal class DatasetDirIterator(private val objectStream: Iterator<S3Object>) 
    * by one dataset to ensure the one we are vending contains all of its
    * files.
    */
-  private fun prepNext(): vdi.lib.s3.DatasetDirectory? {
+  private fun prepNext(): DatasetDirectory? {
 
     while (true) {
 
@@ -62,7 +62,7 @@ internal class DatasetDirIterator(private val objectStream: Iterator<S3Object>) 
 
           try {
             return EagerlyLoadedDatasetDirectory.build(stagedObjects, userID, datasetID, pathFactory)
-          } catch (e: vdi.lib.s3.exception.MalformedDatasetException) {
+          } catch (e: MalformedDatasetException) {
             // Dataset is malformed, note it and return null since our stream is exhausted.
             Metrics.malformedDatasetFound.inc()
             log.warn("found malformed dataset $userID/$datasetID", e)
@@ -92,7 +92,7 @@ internal class DatasetDirIterator(private val objectStream: Iterator<S3Object>) 
           // Otherwise, create the dataset directory and reset staged objects.
           val pathFactory = S3DatasetPathFactory(currUserID, currDatasetID)
           return EagerlyLoadedDatasetDirectory.build(stagedObjects, currUserID, currDatasetID, pathFactory)
-        } catch (e: vdi.lib.s3.exception.MalformedDatasetException) {
+        } catch (e: MalformedDatasetException) {
           // Dataset is malformed. Note it, and set staged objects to the next object in stream to start accumulating
           // objects for the next dataset.
           Metrics.malformedDatasetFound.inc()

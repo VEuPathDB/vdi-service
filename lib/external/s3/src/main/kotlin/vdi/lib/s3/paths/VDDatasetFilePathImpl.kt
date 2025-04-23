@@ -8,7 +8,7 @@ internal data class VDDatasetFilePathImpl(
   override val userID: UserID,
   override val datasetID: DatasetID,
   override val fileName: String
-) : vdi.lib.s3.paths.VDDatasetFilePath {
+) : VDDatasetFilePath {
   override val isMetaFile
     get() = fileName == S3Paths.MetadataFileName
 
