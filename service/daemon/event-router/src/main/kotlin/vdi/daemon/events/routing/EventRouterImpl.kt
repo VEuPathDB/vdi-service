@@ -8,16 +8,16 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
-import vdi.component.kafka.EventSource
+import vdi.lib.kafka.EventSource
 import vdi.lib.kafka.router.KafkaRouter
-import vdi.component.kafka.router.KafkaRouterFactory
+import vdi.lib.kafka.router.KafkaRouterFactory
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
 import vdi.lib.rabbit.RabbitMQEventIterator
 import vdi.lib.rabbit.RabbitMQEventSource
 import vdi.lib.s3.paths.VDDatasetFilePath
 import vdi.lib.s3.paths.VDDatasetShareFilePath
-import vdi.component.s3.paths.toVDPathOrNull
+import vdi.lib.s3.paths.toVDPathOrNull
 import vdi.daemon.events.routing.model.MinIOEvent
 import vdi.daemon.events.routing.model.MinIOEventAction
 

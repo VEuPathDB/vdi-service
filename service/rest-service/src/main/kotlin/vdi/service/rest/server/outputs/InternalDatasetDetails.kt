@@ -3,9 +3,9 @@ package vdi.service.rest.server.outputs
 import vdi.service.rest.generated.model.InternalDatasetDetails
 import vdi.service.rest.generated.model.InternalDatasetDetailsImpl
 import vdi.service.rest.generated.model.SyncControlRecordImpl
-import vdi.component.db.cache.model.AdminDatasetDetailsRecord
+import vdi.lib.db.cache.model.AdminDatasetDetailsRecord
 
-internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): vdi.service.rest.generated.model.InternalDatasetDetails =
+internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): InternalDatasetDetails =
   vdi.service.rest.generated.model.InternalDatasetDetailsImpl().also {
     it.datasetType = DatasetTypeResponseBody(record.typeName, record.typeVersion)
     it.owner = record.ownerID.toLong()

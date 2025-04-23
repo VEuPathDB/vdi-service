@@ -4,13 +4,13 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import vdi.component.db.app.AppDB
-import vdi.component.db.app.AppDatabaseRegistry
-import vdi.component.db.app.model.DatasetInstallMessage
-import vdi.component.db.app.model.InstallStatus
-import vdi.component.db.app.model.InstallType
-import vdi.component.db.app.withTransaction
-import vdi.component.db.cache.CacheDB
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.AppDatabaseRegistry
+import vdi.lib.db.app.model.DatasetInstallMessage
+import vdi.lib.db.app.model.InstallStatus
+import vdi.lib.db.app.model.InstallType
+import vdi.lib.db.app.withTransaction
+import vdi.lib.db.cache.CacheDB
 
 object InstallCleaner {
 

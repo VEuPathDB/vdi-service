@@ -3,7 +3,7 @@ package vdi.service.rest.server.outputs
 import vdi.service.rest.generated.model.DatasetRevision
 import vdi.service.rest.generated.model.DatasetRevisionAction
 import vdi.service.rest.generated.model.DatasetRevisionImpl
-import vdi.service.util.defaultZone
+import vdi.service.rest.util.defaultZone
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 
 
@@ -16,7 +16,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
  * datasets would require making a separate request to the object store for
  * each.
  */
-internal fun DatasetRevision(revision: VDIDatasetRevision, note: String?): vdi.service.rest.generated.model.DatasetRevision =
+internal fun DatasetRevision(revision: VDIDatasetRevision, note: String?): DatasetRevision =
   vdi.service.rest.generated.model.DatasetRevisionImpl().apply {
     action       = vdi.service.rest.generated.model.DatasetRevisionAction.entries.first { it.value == revision.action.stringValue }
     revisionId   = revision.revisionID.toString()

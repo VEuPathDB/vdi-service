@@ -9,9 +9,9 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import vdi.lib.s3.exception.MalformedDatasetException
-import vdi.component.s3.files.*
-import vdi.component.s3.paths.S3DatasetPathFactory
-import vdi.component.s3.paths.S3Paths
+import vdi.lib.s3.files.*
+import vdi.lib.s3.paths.S3DatasetPathFactory
+import vdi.lib.s3.paths.S3Paths
 import java.io.InputStream
 
 /**

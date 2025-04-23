@@ -1,10 +1,10 @@
 package vdi.lane.reconciliation
 
 import org.slf4j.Logger
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.kafka.EventSource
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.kafka.EventSource
 import vdi.lib.s3.DatasetDirectory
-import vdi.component.s3.paths.S3Paths
+import vdi.lib.s3.paths.S3Paths
 import vdi.lane.reconciliation.util.require
 import vdi.lane.reconciliation.util.safeExec
 import vdi.lane.reconciliation.util.safeTest

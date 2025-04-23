@@ -3,19 +3,19 @@ package vdi.service.rest.server.services.dataset
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.withTransaction
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.withTransaction
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.resources.DatasetsVdiId.PatchDatasetsByVdiIdResponse
-import vdi.service.s3.DatasetStore
+import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.inputs.cleanup
-import vdi.service.server.inputs.validate
-import vdi.service.server.outputs.ForbiddenError
-import vdi.service.server.outputs.Static404
-import vdi.service.server.outputs.UnprocessableEntityError
-import vdi.service.server.outputs.wrap
+import vdi.service.rest.server.inputs.validate
+import vdi.service.rest.server.outputs.ForbiddenError
+import vdi.service.rest.server.outputs.Static404
+import vdi.service.rest.server.outputs.UnprocessableEntityError
+import vdi.service.rest.server.outputs.wrap
 
-fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: vdi.service.rest.generated.model.DatasetPatchRequestBody): PatchDatasetsByVdiIdResponse {
+fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequestBody): PatchDatasetsByVdiIdResponse {
   val cacheDB = CacheDB()
 
   val dataset = cacheDB.selectDataset(datasetID)
@@ -53,7 +53,7 @@ fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: vdi.service.r
   return PatchDatasetsByVdiIdResponse.respond204()
 }
 
-private fun vdi.service.rest.generated.model.DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
+private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
   // POJO field null tests have been ordered based on the order of fields as
   // they appear in the API docs.  Not important, but helpful for verifying that
   // all fields are covered.

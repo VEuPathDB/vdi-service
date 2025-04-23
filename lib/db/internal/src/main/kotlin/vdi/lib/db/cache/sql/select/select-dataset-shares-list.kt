@@ -6,7 +6,7 @@ import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
-import vdi.component.db.cache.model.DatasetShare
+import vdi.lib.db.cache.model.DatasetShare
 import vdi.lib.db.jdbc.getDatasetID
 import vdi.lib.db.jdbc.getUserID
 import java.sql.Connection

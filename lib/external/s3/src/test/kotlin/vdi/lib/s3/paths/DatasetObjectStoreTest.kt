@@ -20,7 +20,7 @@ import org.veupathdb.lib.s3.s34k.params.`object`.ObjectExistsParams
 import org.veupathdb.lib.s3.s34k.params.`object`.ObjectStatParams
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.s3.DatasetManager
+import vdi.lib.s3.DatasetManager
 import java.time.OffsetDateTime
 
 class DatasetObjectStoreTest {

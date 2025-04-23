@@ -6,7 +6,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.lib.metrics.Metrics
 import vdi.lib.s3.exception.MalformedDatasetException
-import vdi.component.s3.paths.S3DatasetPathFactory
+import vdi.lib.s3.paths.S3DatasetPathFactory
 
 /**
  * An iterator that returns eagerly loaded dataset directories based on a list

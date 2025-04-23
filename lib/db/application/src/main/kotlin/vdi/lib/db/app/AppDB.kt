@@ -3,7 +3,7 @@ package vdi.lib.db.app
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import vdi.component.db.app.model.InstallStatuses
+import vdi.lib.db.app.model.InstallStatuses
 
 fun AppDB(): AppDB = AppDBImpl
 

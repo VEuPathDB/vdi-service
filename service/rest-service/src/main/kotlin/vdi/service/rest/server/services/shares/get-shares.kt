@@ -2,12 +2,12 @@ package vdi.service.rest.server.services.shares
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import vdi.service.rest.generated.model.ShareOfferEntry
-import vdi.service.server.outputs.ShareOfferEntry
-import vdi.service.model.ShareFilterStatus
-import vdi.service.model.UserDetails
+import vdi.service.rest.server.outputs.ShareOfferEntry
+import vdi.service.rest.model.ShareFilterStatus
+import vdi.service.rest.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.DatasetShareListEntry
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.DatasetShareListEntry
 import vdi.lib.plugin.registry.PluginRegistry
 
 /**
@@ -21,7 +21,7 @@ import vdi.lib.plugin.registry.PluginRegistry
  * @return A list of zero or more [ShareOfferEntry] instance for the shares
  * matching the target filter.
  */
-internal fun lookupShares(userID: UserID, status: ShareFilterStatus): List<vdi.service.rest.generated.model.ShareOfferEntry> =
+internal fun lookupShares(userID: UserID, status: ShareFilterStatus): List<ShareOfferEntry> =
   when (status) {
     ShareFilterStatus.Open     -> lookupOpenShares(userID)
     ShareFilterStatus.Accepted -> lookupAcceptedShares(userID)
@@ -29,19 +29,19 @@ internal fun lookupShares(userID: UserID, status: ShareFilterStatus): List<vdi.s
     ShareFilterStatus.All      -> lookupAllShares(userID)
   }
 
-private fun lookupOpenShares(userID: UserID): List<vdi.service.rest.generated.model.ShareOfferEntry> =
+private fun lookupOpenShares(userID: UserID): List<ShareOfferEntry> =
   convertToOutType(CacheDB().selectOpenSharesForUser(userID))
 
-private fun lookupAcceptedShares(userID: UserID): List<vdi.service.rest.generated.model.ShareOfferEntry> =
+private fun lookupAcceptedShares(userID: UserID): List<ShareOfferEntry> =
   convertToOutType(CacheDB().selectAcceptedSharesForUser(userID))
 
-private fun lookupRejectedShares(userID: UserID): List<vdi.service.rest.generated.model.ShareOfferEntry> =
+private fun lookupRejectedShares(userID: UserID): List<ShareOfferEntry> =
   convertToOutType(CacheDB().selectRejectedSharesForUser(userID))
 
-private fun lookupAllShares(userID: UserID): List<vdi.service.rest.generated.model.ShareOfferEntry> =
+private fun lookupAllShares(userID: UserID): List<ShareOfferEntry> =
   convertToOutType(CacheDB().selectAllSharesForUser(userID))
 
-private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<vdi.service.rest.generated.model.ShareOfferEntry> {
+private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<ShareOfferEntry> {
   val ownerIDs = shares.asSequence()
     .map { it.ownerID }
     .toSet()

@@ -2,28 +2,28 @@ package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import vdi.service.rest.generated.model.DatasetListEntry
-import vdi.service.server.outputs.DatasetListShareUser
-import vdi.service.server.outputs.toExternal
-import vdi.service.model.UserDetails
-import vdi.service.util.reduceTo
+import vdi.service.rest.server.outputs.DatasetListShareUser
+import vdi.service.rest.server.outputs.toExternal
+import vdi.service.rest.model.UserDetails
+import vdi.service.rest.util.reduceTo
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
-import vdi.component.db.app.AppDB
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.DatasetListQuery
-import vdi.component.db.cache.model.DatasetRecord
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.DatasetListQuery
+import vdi.lib.db.cache.model.DatasetRecord
 
-fun fetchUserDatasetList(query: DatasetListQuery, userID: UserID): List<vdi.service.rest.generated.model.DatasetListEntry> {
+fun fetchUserDatasetList(query: DatasetListQuery, userID: UserID): List<DatasetListEntry> {
   return fetchDatasetList(CacheDB().selectDatasetList(query), userID)
 }
 
-fun fetchCommunityUserDatasetList(): List<vdi.service.rest.generated.model.DatasetListEntry> {
+fun fetchCommunityUserDatasetList(): List<DatasetListEntry> {
   return fetchDatasetList(CacheDB().selectNonPrivateDatasets(), null)
 }
 
-private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: UserID?): List<vdi.service.rest.generated.model.DatasetListEntry> {
+private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: UserID?): List<DatasetListEntry> {
   val cacheDB = CacheDB()
 
   val datasetIDs = datasetList.map(DatasetRecord::datasetID)

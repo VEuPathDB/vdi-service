@@ -4,8 +4,8 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.util.getImportStatus
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.util.getImportStatus
 import vdi.lib.db.jdbc.getDataType
 import vdi.lib.db.jdbc.getDatasetID
 import vdi.lib.db.jdbc.getDateTime

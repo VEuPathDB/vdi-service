@@ -3,9 +3,9 @@ package vdi.lib.reconciler
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import vdi.component.db.app.AppDB
-import vdi.component.db.app.AppDatabaseRegistry
-import vdi.component.db.app.withTransaction
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.AppDatabaseRegistry
+import vdi.lib.db.app.withTransaction
 import vdi.lib.plugin.client.PluginRequestException
 import vdi.lib.plugin.client.response.uni.UninstallBadRequestResponse
 import vdi.lib.plugin.client.response.uni.UninstallUnexpectedErrorResponse

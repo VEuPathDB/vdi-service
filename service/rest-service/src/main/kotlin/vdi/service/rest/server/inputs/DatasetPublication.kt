@@ -11,19 +11,19 @@ private const val PubMedMinLength = 3
 private const val PubMedMaxLength = 30
 
 
-fun vdi.service.rest.generated.model.DatasetPublication.cleanup() {
+fun DatasetPublication.cleanup() {
   citation = citation.cleanupString()
   pubMedId = pubMedId.cleanupString()
 }
 
-fun Collection<vdi.service.rest.generated.model.DatasetPublication>.validate(jPath: String, errors: ValidationErrors) {
+fun Collection<DatasetPublication>.validate(jPath: String, errors: ValidationErrors) {
   if (isEmpty())
     return
 
   var primaries = 0
 
-  val citField = jPath..vdi.service.rest.generated.model.JsonField.CITATION
-  val pubField = jPath..vdi.service.rest.generated.model.JsonField.PUB_MED_ID
+  val citField = jPath..JsonField.CITATION
+  val pubField = jPath..JsonField.PUB_MED_ID
 
   forEachIndexed { i, p ->
     p.require(jPath, i, errors) {
@@ -41,5 +41,5 @@ fun Collection<vdi.service.rest.generated.model.DatasetPublication>.validate(jPa
     errors.add(jPath, "only one publication may be marked as primary")
 }
 
-internal fun vdi.service.rest.generated.model.DatasetPublication.toInternal() =
+internal fun DatasetPublication.toInternal() =
   VDIDatasetPublication(citation, pubMedId)

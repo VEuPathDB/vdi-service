@@ -1,10 +1,10 @@
 package vdi.lane.reconciliation.util
 
 import org.veupathdb.vdi.lib.common.OriginTimestamp
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.DatasetImpl
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.withTransaction
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.DatasetImpl
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.withTransaction
 import vdi.lane.reconciliation.ReconciliationContext
 import vdi.lib.db.model.SyncControlRecord
 import java.time.OffsetDateTime

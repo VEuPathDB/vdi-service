@@ -3,8 +3,8 @@ package vdi.lib.db.app.sql.select
 import io.foxcapades.kdbc.usingResults
 import io.foxcapades.kdbc.withPreparedStatement
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.app.model.DatasetRecord
-import vdi.component.db.app.sql.*
+import vdi.lib.db.app.model.DatasetRecord
+import vdi.lib.db.app.sql.*
 import vdi.lib.db.jdbc.getDataType
 import vdi.lib.db.jdbc.getDatasetID
 import vdi.lib.db.jdbc.getUserID

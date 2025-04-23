@@ -5,7 +5,7 @@ import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.json.JSON
-import vdi.component.s3.paths.S3Paths
+import vdi.lib.s3.paths.S3Paths
 import java.io.InputStream
 import java.time.OffsetDateTime
 

@@ -3,9 +3,9 @@ package vdi.service.rest.server.outputs
 import vdi.service.rest.generated.model.DatasetInstallStatusEntry
 import vdi.service.rest.generated.model.DatasetInstallStatusEntryImpl
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import vdi.component.db.app.model.InstallStatuses
+import vdi.lib.db.app.model.InstallStatuses
 
-fun DatasetInstallStatusEntry(projectID: ProjectID, status: InstallStatuses): vdi.service.rest.generated.model.DatasetInstallStatusEntry =
+fun DatasetInstallStatusEntry(projectID: ProjectID, status: InstallStatuses): DatasetInstallStatusEntry =
   vdi.service.rest.generated.model.DatasetInstallStatusEntryImpl().also {
     it.projectId = projectID
 

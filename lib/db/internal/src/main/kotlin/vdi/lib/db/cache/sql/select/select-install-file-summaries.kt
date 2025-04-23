@@ -3,7 +3,7 @@ package vdi.lib.db.cache.sql.select
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.cache.model.DatasetFileSummary
+import vdi.lib.db.cache.model.DatasetFileSummary
 import vdi.lib.db.jdbc.getDatasetID
 import java.sql.Connection
 

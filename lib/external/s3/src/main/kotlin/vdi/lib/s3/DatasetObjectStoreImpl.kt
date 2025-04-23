@@ -5,8 +5,8 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
 import org.veupathdb.vdi.lib.common.util.HostAddress
-import vdi.component.s3.paths.S3DatasetPathFactory
-import vdi.component.s3.paths.S3Paths
+import vdi.lib.s3.paths.S3DatasetPathFactory
+import vdi.lib.s3.paths.S3Paths
 import vdi.lib.health.RemoteDependencies
 import java.util.Spliterator
 import java.util.Spliterators

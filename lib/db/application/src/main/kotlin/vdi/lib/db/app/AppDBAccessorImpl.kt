@@ -3,9 +3,9 @@ package vdi.lib.db.app
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.app.model.InstallStatus
-import vdi.component.db.app.model.InstallType
-import vdi.component.db.app.sql.select.*
+import vdi.lib.db.app.model.InstallStatus
+import vdi.lib.db.app.model.InstallType
+import vdi.lib.db.app.sql.select.*
 import javax.sql.DataSource
 
 internal class AppDBAccessorImpl(

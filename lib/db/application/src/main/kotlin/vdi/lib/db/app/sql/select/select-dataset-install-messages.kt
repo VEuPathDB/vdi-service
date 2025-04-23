@@ -3,9 +3,9 @@ package vdi.lib.db.app.sql.select
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.app.model.DatasetInstallMessage
-import vdi.component.db.app.sql.getInstallStatus
-import vdi.component.db.app.sql.getInstallType
+import vdi.lib.db.app.model.DatasetInstallMessage
+import vdi.lib.db.app.sql.getInstallStatus
+import vdi.lib.db.app.sql.getInstallType
 import vdi.lib.db.jdbc.getDateTime
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection

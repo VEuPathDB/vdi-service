@@ -1,8 +1,8 @@
 package vdi.lib.db.app.sql
 
-import vdi.component.db.app.model.DeleteFlag
-import vdi.component.db.app.model.InstallStatus
-import vdi.component.db.app.model.InstallType
+import vdi.lib.db.app.model.DeleteFlag
+import vdi.lib.db.app.model.InstallStatus
+import vdi.lib.db.app.model.InstallType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 

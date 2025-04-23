@@ -2,8 +2,8 @@ package vdi.lib.db.app.sql.select
 
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import vdi.component.db.app.model.DeleteFlag
-import vdi.component.db.app.model.ReconcilerTargetRecord
+import vdi.lib.db.app.model.DeleteFlag
+import vdi.lib.db.app.model.ReconcilerTargetRecord
 import vdi.lib.db.jdbc.getDataType
 import vdi.lib.db.jdbc.getDatasetID
 import vdi.lib.db.jdbc.getDateTime

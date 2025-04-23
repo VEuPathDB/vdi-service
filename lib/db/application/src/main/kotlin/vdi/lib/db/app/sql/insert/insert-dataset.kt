@@ -1,8 +1,8 @@
 package vdi.lib.db.app.sql.insert
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.component.db.app.model.DatasetRecord
-import vdi.component.db.app.sql.*
+import vdi.lib.db.app.model.DatasetRecord
+import vdi.lib.db.app.sql.*
 import vdi.lib.db.jdbc.setDataType
 import vdi.lib.db.jdbc.setDatasetID
 import vdi.lib.db.jdbc.setUserID

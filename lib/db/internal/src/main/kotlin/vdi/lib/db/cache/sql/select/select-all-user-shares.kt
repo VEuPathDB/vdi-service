@@ -5,9 +5,9 @@ import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
-import vdi.component.db.cache.consts.OfferStatus
-import vdi.component.db.cache.model.DatasetShareListEntry
-import vdi.component.db.cache.util.getProjectIDList
+import vdi.lib.db.cache.consts.OfferStatus
+import vdi.lib.db.cache.model.DatasetShareListEntry
+import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.jdbc.getDataType
 import vdi.lib.db.jdbc.getDatasetID
 import vdi.lib.db.jdbc.getUserID

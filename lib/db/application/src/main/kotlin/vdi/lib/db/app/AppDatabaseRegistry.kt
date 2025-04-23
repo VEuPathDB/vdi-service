@@ -10,7 +10,7 @@ import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.SecretString
-import vdi.component.db.app.health.DatabaseDependency
+import vdi.lib.db.app.health.DatabaseDependency
 import vdi.lib.env.EnvKey
 import vdi.lib.ldap.LDAP
 import vdi.lib.health.RemoteDependencies

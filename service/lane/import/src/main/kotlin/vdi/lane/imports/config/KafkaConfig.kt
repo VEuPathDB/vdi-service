@@ -3,7 +3,7 @@ package vdi.lane.imports.config
 import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.env.optional
 import vdi.lib.env.EnvKey
-import vdi.component.kafka.KafkaConsumerConfig
+import vdi.lib.kafka.KafkaConsumerConfig
 import vdi.lib.kafka.router.KafkaRouterConfigDefaults
 
 

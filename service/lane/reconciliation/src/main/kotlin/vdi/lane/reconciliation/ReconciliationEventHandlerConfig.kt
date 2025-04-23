@@ -7,8 +7,8 @@ import org.veupathdb.vdi.lib.common.env.optional
 import org.veupathdb.vdi.lib.common.env.require
 import vdi.lib.env.EnvKey
 import vdi.lib.env.Environment
-import vdi.component.kafka.KafkaConsumerConfig
-import vdi.component.kafka.router.KafkaRouterConfig
+import vdi.lib.kafka.KafkaConsumerConfig
+import vdi.lib.kafka.router.KafkaRouterConfig
 import vdi.lib.kafka.router.KafkaRouterConfigDefaults
 import vdi.lib.s3.util.S3Config
 

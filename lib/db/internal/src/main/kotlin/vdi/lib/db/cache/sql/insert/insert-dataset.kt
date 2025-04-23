@@ -1,7 +1,7 @@
 package vdi.lib.db.cache.sql.insert
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.component.db.cache.model.Dataset
+import vdi.lib.db.cache.model.Dataset
 import vdi.lib.db.jdbc.setDataType
 import vdi.lib.db.jdbc.setDatasetID
 import vdi.lib.db.jdbc.setUserID

@@ -10,21 +10,21 @@ import vdi.service.rest.generated.model.JsonField
 import org.veupathdb.vdi.lib.common.field.ProjectID
 
 
-fun vdi.service.rest.generated.model.DatasetPutRequestBody.cleanup() {
+fun DatasetPutRequestBody.cleanup() {
   meta.cleanup()
   url = url.takeUnless { it.isNullOrBlank() }
 }
 
-private fun vdi.service.rest.generated.model.DatasetPutMetadata.cleanup() {
+private fun DatasetPutMetadata.cleanup() {
   // Put metadata is an extension of the patch request
-  (this as vdi.service.rest.generated.model.DatasetPatchRequestBody).cleanup()
+  (this as DatasetPatchRequestBody).cleanup()
 
   // Put meta specific fields
   revisionNote = revisionNote.cleanupString()
 }
 
 @Suppress("DuplicatedCode") // overlap in generated API pojo field names
-fun vdi.service.rest.generated.model.DatasetPutRequestBody.validate(projects: Iterable<ProjectID>): ValidationErrors {
+fun DatasetPutRequestBody.validate(projects: Iterable<ProjectID>): ValidationErrors {
   // DatasetPutRequestBody is not a JSON object, it is a multipart/form-data
   // request.  The "fields" are form parts and are not validated as if they are
   // part of a syntactically correct JSON body.
@@ -47,8 +47,8 @@ fun vdi.service.rest.generated.model.DatasetPutRequestBody.validate(projects: It
 
 private const val RevisionNoteMinLength = 10
 private const val RevisionNoteMaxLength = 4096
-private fun vdi.service.rest.generated.model.DatasetPutMetadata.validate(projects: Iterable<ProjectID>, errors: ValidationErrors) {
-  (this as vdi.service.rest.generated.model.DatasetPatchRequestBody).validate(projects, errors)
+private fun DatasetPutMetadata.validate(projects: Iterable<ProjectID>, errors: ValidationErrors) {
+  (this as DatasetPatchRequestBody).validate(projects, errors)
 
-  revisionNote.reqCheckLength(vdi.service.rest.generated.model.JsonField.REVISION_NOTE, RevisionNoteMinLength, RevisionNoteMaxLength, errors)
+  revisionNote.reqCheckLength(JsonField.REVISION_NOTE, RevisionNoteMinLength, RevisionNoteMaxLength, errors)
 }

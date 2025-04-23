@@ -1,7 +1,7 @@
 package vdi.lib.db.app.sql.upsert
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.component.db.app.model.DatasetInstallMessage
+import vdi.lib.db.app.model.DatasetInstallMessage
 import java.sql.Connection
 
 private fun sql(schema: String) =

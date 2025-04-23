@@ -2,8 +2,8 @@ package vdi.lib.db.cache.sql.select
 
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withStatementResults
-import vdi.component.db.cache.model.DeletedDataset
-import vdi.component.db.cache.util.getProjectIDList
+import vdi.lib.db.cache.model.DeletedDataset
+import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.jdbc.getDataType
 import vdi.lib.db.jdbc.getDatasetID
 import vdi.lib.db.jdbc.getUserID

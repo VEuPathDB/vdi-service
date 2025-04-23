@@ -4,10 +4,10 @@ import io.foxcapades.kdbc.get
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.app.model.DatasetInstallMessage
-import vdi.component.db.app.model.InstallStatus
-import vdi.component.db.app.model.InstallType
-import vdi.component.db.app.sql.setInstallType
+import vdi.lib.db.app.model.DatasetInstallMessage
+import vdi.lib.db.app.model.InstallStatus
+import vdi.lib.db.app.model.InstallType
+import vdi.lib.db.app.sql.setInstallType
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
 

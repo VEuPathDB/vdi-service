@@ -1,6 +1,6 @@
 package vdi.lib.pruner
 
-import vdi.component.db.cache.model.DeletedDataset
+import vdi.lib.db.cache.model.DeletedDataset
 import vdi.lib.logging.logger
 
 internal data class DeletionContext(val dataset: DeletedDataset) {

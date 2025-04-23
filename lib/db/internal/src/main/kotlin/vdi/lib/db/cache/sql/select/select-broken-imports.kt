@@ -3,10 +3,10 @@ package vdi.lib.db.cache.sql.select
 import io.foxcapades.kdbc.forEach
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.component.db.cache.model.BrokenImportListQuery
-import vdi.component.db.cache.model.BrokenImportRecord
-import vdi.component.db.cache.util.getProjectIDList
-import vdi.component.db.cache.util.getStringList
+import vdi.lib.db.cache.model.BrokenImportListQuery
+import vdi.lib.db.cache.model.BrokenImportRecord
+import vdi.lib.db.cache.util.getProjectIDList
+import vdi.lib.db.cache.util.getStringList
 import vdi.lib.db.jdbc.getDataType
 import vdi.lib.db.jdbc.getDatasetID
 import vdi.lib.db.jdbc.getUserID

@@ -5,17 +5,17 @@ import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
 import vdi.service.rest.generated.model.DatasetShareReceipt
 import vdi.service.rest.generated.model.ShareReceiptAction
-import vdi.service.s3.DatasetStore
+import vdi.service.rest.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.model.DatasetShareReceiptImpl
-import vdi.component.db.cache.withTransaction
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.model.DatasetShareReceiptImpl
+import vdi.lib.db.cache.withTransaction
 
-internal fun putShareReceipt(datasetID: DatasetID, recipientID: UserID, entity: vdi.service.rest.generated.model.DatasetShareReceipt) {
-  val cacheDB = vdi.component.db.cache.CacheDB()
+internal fun putShareReceipt(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareReceipt) {
+  val cacheDB = vdi.lib.db.cache.CacheDB()
 
   // lookup the target dataset or throw a 404 if it doesn't exist
   val dataset = cacheDB.selectDataset(datasetID)
@@ -43,10 +43,10 @@ internal fun putShareReceipt(datasetID: DatasetID, recipientID: UserID, entity: 
   }
 }
 
-private fun vdi.service.rest.generated.model.DatasetShareReceipt.toInternal() =
+private fun DatasetShareReceipt.toInternal() =
   VDIDatasetShareReceipt(when (action) {
     null                      -> throw BadRequestException("share action is required")
-    vdi.service.rest.generated.model.ShareReceiptAction.ACCEPT -> VDIShareReceiptAction.Accept
-    vdi.service.rest.generated.model.ShareReceiptAction.REJECT -> VDIShareReceiptAction.Reject
+    ShareReceiptAction.ACCEPT -> VDIShareReceiptAction.Accept
+    ShareReceiptAction.REJECT -> VDIShareReceiptAction.Reject
   })
 

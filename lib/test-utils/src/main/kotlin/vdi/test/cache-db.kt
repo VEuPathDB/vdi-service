@@ -5,9 +5,9 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.*
-import vdi.component.db.cache.CacheDBTransaction
-import vdi.component.db.cache.model.*
-import vdi.component.db.cache.query.AdminAllDatasetsQuery
+import vdi.lib.db.cache.CacheDBTransaction
+import vdi.lib.db.cache.model.*
+import vdi.lib.db.cache.query.AdminAllDatasetsQuery
 import java.time.OffsetDateTime
 
 fun mockCacheDB(
@@ -38,7 +38,7 @@ fun mockCacheDB(
   onSelectAllSyncControlRecords: () -> Iterable<VDIReconcilerTargetRecord> = ::noParamList,
   onSelectBrokenImports: (BrokenImportListQuery) -> List<BrokenImportRecord> = ::oneParamList,
   onOpenTransaction: () -> CacheDBTransaction = { mockCacheDBTransaction() }
-): vdi.component.db.cache.CacheDB =
+): vdi.lib.db.cache.CacheDB =
   mock {
     on { selectDataset(any()) } doAnswer { onSelectDataset(it.getArgument(0)) }
     on { selectInstallFiles(any()) } doAnswer { onSelectInstallFiles(it.getArgument(0)) }

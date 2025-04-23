@@ -8,11 +8,11 @@ import org.veupathdb.vdi.lib.common.env.optUShort
 import org.veupathdb.vdi.lib.common.env.require
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.health.DatabaseDependency
-import vdi.component.db.cache.model.BrokenImportListQuery
-import vdi.component.db.cache.model.DatasetListQuery
-import vdi.component.db.cache.query.AdminAllDatasetsQuery
-import vdi.component.db.cache.sql.select.*
+import vdi.lib.db.cache.health.DatabaseDependency
+import vdi.lib.db.cache.model.BrokenImportListQuery
+import vdi.lib.db.cache.model.DatasetListQuery
+import vdi.lib.db.cache.query.AdminAllDatasetsQuery
+import vdi.lib.db.cache.sql.select.*
 import vdi.lib.env.EnvKey
 import vdi.lib.health.RemoteDependencies
 import javax.sql.DataSource

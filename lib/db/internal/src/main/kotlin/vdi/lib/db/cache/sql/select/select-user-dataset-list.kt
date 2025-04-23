@@ -3,10 +3,10 @@ package vdi.lib.db.cache.sql.select
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.cache.model.*
-import vdi.component.db.cache.util.getDatasetVisibility
-import vdi.component.db.cache.util.getImportStatus
-import vdi.component.db.cache.util.getProjectIDList
+import vdi.lib.db.cache.model.*
+import vdi.lib.db.cache.util.getDatasetVisibility
+import vdi.lib.db.cache.util.getImportStatus
+import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.jdbc.getDataType
 import vdi.lib.db.jdbc.getDatasetID
 import vdi.lib.db.jdbc.getDateTime

@@ -7,8 +7,8 @@ import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevisionAction
-import vdi.component.db.cache.model.DatasetRevisionRecord
-import vdi.component.db.cache.model.DatasetRevisionRecordSet
+import vdi.lib.db.cache.model.DatasetRevisionRecord
+import vdi.lib.db.cache.model.DatasetRevisionRecordSet
 import vdi.lib.db.jdbc.getDatasetID
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection

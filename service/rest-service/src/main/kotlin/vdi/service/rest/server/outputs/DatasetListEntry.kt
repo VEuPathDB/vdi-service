@@ -7,27 +7,27 @@ import vdi.service.rest.generated.model.DatasetOwner
 import vdi.service.rest.generated.model.DatasetStatusInfo
 import vdi.service.rest.generated.model.DatasetTypeResponseBody
 import vdi.service.rest.generated.model.DatasetVisibility
-import vdi.service.model.UserDetails
-import vdi.service.util.defaultZone
+import vdi.service.rest.model.UserDetails
+import vdi.service.rest.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import vdi.component.db.app.model.InstallStatuses
-import vdi.component.db.cache.model.DatasetFileSummary
-import vdi.component.db.cache.model.DatasetRecord
+import vdi.lib.db.app.model.InstallStatuses
+import vdi.lib.db.cache.model.DatasetFileSummary
+import vdi.lib.db.cache.model.DatasetRecord
 import vdi.lib.plugin.registry.PluginRegistry
 import java.time.OffsetDateTime
 
 @Suppress("DuplicatedCode") // overlap in separate API type fields
 internal fun DatasetListEntry(
   datasetID: DatasetID,
-  owner: vdi.service.rest.generated.model.DatasetOwner,
-  datasetType: vdi.service.rest.generated.model.DatasetTypeResponseBody,
-  visibility: vdi.service.rest.generated.model.DatasetVisibility,
+  owner: DatasetOwner,
+  datasetType: DatasetTypeResponseBody,
+  visibility: DatasetVisibility,
   name: String,
   origin: String,
   projectIDs: List<ProjectID>,
-  status: vdi.service.rest.generated.model.DatasetStatusInfo,
-  shares: List<vdi.service.rest.generated.model.DatasetListShareUser>,
+  status: DatasetStatusInfo,
+  shares: List<DatasetListShareUser>,
   fileCount: Int,
   fileSizeTotal: Long,
   created: OffsetDateTime,
@@ -38,7 +38,7 @@ internal fun DatasetListEntry(
   description: String?,
   sourceURL: String?,
   originalID: DatasetID?,
-): vdi.service.rest.generated.model.DatasetListEntry =
+): DatasetListEntry =
   vdi.service.rest.generated.model.DatasetListEntryImpl().also {
     it.datasetId = datasetID.toString()
     it.owner = owner
@@ -65,8 +65,8 @@ internal fun DatasetRecord.toExternal(
   owner: UserDetails,
   statuses: Map<ProjectID, InstallStatuses>?,
   fileInfo: DatasetFileSummary?,
-  shares: List<vdi.service.rest.generated.model.DatasetListShareUser>?,
-): vdi.service.rest.generated.model.DatasetListEntry {
+  shares: List<DatasetListShareUser>?,
+): DatasetListEntry {
   val typeDisplayName = PluginRegistry[typeName, typeVersion]?.displayName
     ?: throw IllegalStateException("plugin missing: ${typeName}:${typeVersion}")
 

@@ -1,8 +1,8 @@
 package vdi.service.rest.server.outputs
 
 import vdi.service.generated.model.*
-import vdi.service.model.ShareFilterStatus
-import vdi.service.model.UserDetails
+import vdi.service.rest.model.ShareFilterStatus
+import vdi.service.rest.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID

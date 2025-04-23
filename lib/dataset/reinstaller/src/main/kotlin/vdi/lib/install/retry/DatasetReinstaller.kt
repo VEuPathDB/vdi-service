@@ -6,13 +6,13 @@ import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
-import vdi.component.db.app.AppDB
-import vdi.component.db.app.AppDatabaseRegistry
-import vdi.component.db.app.model.DatasetInstallMessage
-import vdi.component.db.app.model.DatasetRecord
-import vdi.component.db.app.model.InstallStatus
-import vdi.component.db.app.model.InstallType
-import vdi.component.db.app.withTransaction
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.AppDatabaseRegistry
+import vdi.lib.db.app.model.DatasetInstallMessage
+import vdi.lib.db.app.model.DatasetRecord
+import vdi.lib.db.app.model.InstallStatus
+import vdi.lib.db.app.model.InstallType
+import vdi.lib.db.app.withTransaction
 import vdi.lib.metrics.Metrics
 import vdi.lib.plugin.client.PluginRequestException
 import vdi.lib.plugin.client.response.ind.*
@@ -22,8 +22,8 @@ import vdi.lib.plugin.client.response.uni.UninstallUnexpectedErrorResponse
 import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.lib.s3.DatasetDirectory
-import vdi.component.s3.DatasetManager
-import vdi.component.s3.DatasetObjectStore
+import vdi.lib.s3.DatasetManager
+import vdi.lib.s3.DatasetObjectStore
 import java.io.InputStream
 
 object DatasetReinstaller {

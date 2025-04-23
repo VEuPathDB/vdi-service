@@ -2,8 +2,8 @@ package vdi.lib.db.app.sql.delete
 
 import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.app.model.InstallType
-import vdi.component.db.app.sql.setInstallType
+import vdi.lib.db.app.model.InstallType
+import vdi.lib.db.app.sql.setInstallType
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
 

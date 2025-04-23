@@ -4,15 +4,15 @@ import org.veupathdb.lib.s3.s34k.objects.StreamObject
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.DatasetRecord
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.DatasetRecord
 import vdi.service.rest.generated.model.DatasetFileListingImpl
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesByVdiIdResponse
-import vdi.service.s3.DatasetStore
-import vdi.service.server.outputs.DatasetZipDetails
-import vdi.service.server.outputs.Static404
-import vdi.service.server.outputs.wrap
-import vdi.service.util.Either
+import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.outputs.DatasetZipDetails
+import vdi.service.rest.server.outputs.Static404
+import vdi.service.rest.server.outputs.wrap
+import vdi.service.rest.util.Either
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesDataByVdiIdResponse as DataResponse
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesUploadByVdiIdResponse as UploadResponse
 

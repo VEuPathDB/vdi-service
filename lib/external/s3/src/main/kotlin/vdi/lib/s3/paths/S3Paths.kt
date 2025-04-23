@@ -4,7 +4,7 @@ import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.s3.util.PathBuilder
+import vdi.lib.s3.util.PathBuilder
 
 /**
  * S3 Dataset Path Definitions

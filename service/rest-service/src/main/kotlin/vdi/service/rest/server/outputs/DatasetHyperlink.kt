@@ -4,7 +4,7 @@ import vdi.service.rest.generated.model.DatasetHyperlink
 import vdi.service.rest.generated.model.DatasetHyperlinkImpl
 import org.veupathdb.vdi.lib.common.model.VDIDatasetHyperlink
 
-internal fun DatasetHyperlink(internal: VDIDatasetHyperlink): vdi.service.rest.generated.model.DatasetHyperlink =
+internal fun DatasetHyperlink(internal: VDIDatasetHyperlink): DatasetHyperlink =
   vdi.service.rest.generated.model.DatasetHyperlinkImpl().apply {
     url = internal.url
     text = internal.text

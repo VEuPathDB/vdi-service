@@ -4,8 +4,8 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import vdi.component.db.cache.model.*
-import vdi.component.db.cache.query.AdminAllDatasetsQuery
+import vdi.lib.db.cache.model.*
+import vdi.lib.db.cache.query.AdminAllDatasetsQuery
 import vdi.lib.db.model.ReconcilerTargetRecord
 import vdi.lib.db.model.SyncControlRecord
 import javax.sql.DataSource

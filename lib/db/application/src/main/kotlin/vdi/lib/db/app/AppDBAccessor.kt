@@ -4,7 +4,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import vdi.component.db.app.model.*
+import vdi.lib.db.app.model.*
 import vdi.lib.db.model.ReconcilerTargetRecord
 import vdi.lib.db.model.SyncControlRecord
 

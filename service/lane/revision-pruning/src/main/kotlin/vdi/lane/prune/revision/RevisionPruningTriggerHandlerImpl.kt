@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.*
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.withTransaction
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.withTransaction
 import vdi.lib.kafka.EventMessage
 import vdi.lib.modules.AbstractVDIModule
 import vdi.lib.s3.DatasetDirectory
-import vdi.component.s3.DatasetObjectStore
+import vdi.lib.s3.DatasetObjectStore
 import java.util.concurrent.ConcurrentHashMap
 
 internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPruningTriggerHandlerConfig, abortCB: (String?) -> Nothing)

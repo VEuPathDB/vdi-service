@@ -11,23 +11,23 @@ import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.common.util.isNull
 import vdi.lib.async.WorkerPool
-import vdi.component.db.app.AppDB
-import vdi.component.db.app.AppDBTransaction
-import vdi.component.db.app.AppDatabaseRegistry
-import vdi.component.db.app.withTransaction
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.DatasetRecord
-import vdi.component.db.cache.model.DatasetShareOfferImpl
-import vdi.component.db.cache.model.DatasetShareReceiptImpl
-import vdi.component.db.cache.withTransaction
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.AppDBTransaction
+import vdi.lib.db.app.AppDatabaseRegistry
+import vdi.lib.db.app.withTransaction
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.DatasetRecord
+import vdi.lib.db.cache.model.DatasetShareOfferImpl
+import vdi.lib.db.cache.model.DatasetShareReceiptImpl
+import vdi.lib.db.cache.withTransaction
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
-import vdi.component.s3.DatasetObjectStore
-import vdi.component.s3.files.DatasetShare
+import vdi.lib.s3.DatasetObjectStore
+import vdi.lib.s3.files.DatasetShare
 import java.sql.SQLException
 import java.time.OffsetDateTime
-import vdi.component.s3.files.DatasetShare as S3Share
+import vdi.lib.s3.files.DatasetShare as S3Share
 
 private const val UniqueConstraintViolation = 1
 

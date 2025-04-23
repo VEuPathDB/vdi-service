@@ -1,21 +1,21 @@
 package vdi.service.rest.server.services.admin
 
 import vdi.service.generated.model.*
-import vdi.service.server.outputs.DatasetStatusInfo
-import vdi.service.server.outputs.DatasetTypeResponseBody
-import vdi.service.server.outputs.DatasetVisibility
-import vdi.service.util.defaultZone
+import vdi.service.rest.server.outputs.DatasetStatusInfo
+import vdi.service.rest.server.outputs.DatasetTypeResponseBody
+import vdi.service.rest.server.outputs.DatasetVisibility
+import vdi.service.rest.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import vdi.component.db.app.AppDB
-import vdi.component.db.app.model.InstallStatuses
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.AdminAllDatasetsRow
-import vdi.component.db.cache.query.AdminAllDatasetsQuery
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.model.InstallStatuses
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.AdminAllDatasetsRow
+import vdi.lib.db.cache.query.AdminAllDatasetsQuery
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse.respond200WithApplicationJson
-import vdi.service.server.inputs.toSafeLimit
-import vdi.service.server.inputs.toSafeOffset
+import vdi.service.rest.server.inputs.toSafeLimit
+import vdi.service.rest.server.inputs.toSafeOffset
 
 internal fun listAllDatasets(
   offset: Int,

@@ -6,30 +6,30 @@ import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.model.DatasetPutResponseBody
 import vdi.service.rest.generated.model.DatasetPutResponseBodyImpl
 import vdi.service.rest.generated.resources.DatasetsVdiId.PutDatasetsByVdiIdResponse
-import vdi.service.s3.DatasetStore
+import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.inputs.cleanup
-import vdi.service.server.inputs.validate
-import vdi.service.server.outputs.ForbiddenError
-import vdi.service.server.outputs.Static404
-import vdi.service.server.outputs.UnprocessableEntityError
-import vdi.service.server.outputs.wrap
-import vdi.service.util.Either
+import vdi.service.rest.server.inputs.validate
+import vdi.service.rest.server.outputs.ForbiddenError
+import vdi.service.rest.server.outputs.Static404
+import vdi.service.rest.server.outputs.UnprocessableEntityError
+import vdi.service.rest.server.outputs.wrap
+import vdi.service.rest.util.Either
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevisionAction
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.withTransaction
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.withTransaction
 import java.time.OffsetDateTime
 
 internal fun putDataset(
   userID:    UserID,
   datasetID: DatasetID,
-  request: vdi.service.rest.generated.model.DatasetPutRequestBody,
-): Either<vdi.service.rest.generated.model.DatasetPutResponseBody, PutDatasetsByVdiIdResponse> {
+  request: DatasetPutRequestBody,
+): Either<DatasetPutResponseBody, PutDatasetsByVdiIdResponse> {
   // Ensure the dataset exists and is owned by the requesting user.
   val originalDataset = CacheDB().selectDataset(datasetID)
     ?.takeIf { it.ownerID == userID }
@@ -44,7 +44,7 @@ internal fun putDataset(
     ?.let { return Either.ofRight(UnprocessableEntityError(it).wrap()) }
 
   // validate type change
-  val targetType = (request as vdi.service.rest.generated.model.DatasetPatchRequestBodyImpl).optValidateType {
+  val targetType = (request as DatasetPatchRequestBodyImpl).optValidateType {
     return Either.ofRight(ForbiddenError("cannot change the type of ${it.displayName} datasets").wrap())
   }
 
@@ -98,7 +98,7 @@ private fun DatasetID.incrementRevision() =
       ?: DatasetID("$raw.1")
   }
 
-private fun vdi.service.rest.generated.model.DatasetPutRequestBody.fetchDatasetFile(userID: UserID): FileReference =
+private fun DatasetPutRequestBody.fetchDatasetFile(userID: UserID): FileReference =
   file?.let {
     TempFiles.makeTempPath(it.name)
       .also { (_, tmpFile) -> it.copyTo(tmpFile.toFile(), true) }

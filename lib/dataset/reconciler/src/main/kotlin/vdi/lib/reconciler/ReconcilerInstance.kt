@@ -3,13 +3,13 @@ package vdi.lib.reconciler
 import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.sql.select.TempHackCacheDBReconcilerTargetRecord
-import vdi.component.kafka.EventSource
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.sql.select.TempHackCacheDBReconcilerTargetRecord
+import vdi.lib.kafka.EventSource
 import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.metrics.Metrics
 import vdi.lib.s3.DatasetDirectory
-import vdi.component.s3.DatasetObjectStore
+import vdi.lib.s3.DatasetObjectStore
 import vdi.lib.db.model.ReconcilerTargetRecord
 import vdi.lib.db.model.SyncControlRecord
 import java.time.OffsetDateTime

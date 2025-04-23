@@ -10,16 +10,16 @@ import vdi.service.rest.generated.resources.DatasetsVdiId
 import vdi.service.rest.generated.resources.DatasetsVdiId.*
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles
 import vdi.service.rest.generated.resources.VdiDatasetsVdiId
-import vdi.service.server.outputs.BadRequestError
-import vdi.service.server.outputs.wrap
-import vdi.service.server.services.dataset.*
+import vdi.service.rest.server.outputs.BadRequestError
+import vdi.service.rest.server.outputs.wrap
+import vdi.service.rest.server.services.dataset.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated
 class DatasetByID(@Context request: ContainerRequest)
-  : vdi.service.rest.generated.resources.DatasetsVdiId
-  , vdi.service.rest.generated.resources.VdiDatasetsVdiId // DEPRECATED API
+  : DatasetsVdiId
+  , VdiDatasetsVdiId // DEPRECATED API
   , ControllerBase(request)
 {
   @Authenticated(adminOverride = ALLOW_ALWAYS)
@@ -31,7 +31,7 @@ class DatasetByID(@Context request: ContainerRequest)
       }.let {
         if (it.isLeft) {
           it.unwrapLeft()
-            .apply { revisionHistory?.forEach { e -> e.fileListUrl = createURL(vdi.service.rest.generated.resources.DatasetsVdiIdFiles.ROOT_PATH.replace(VDI_ID_VAR, e.revisionId)) } }
+            .apply { revisionHistory?.forEach { e -> e.fileListUrl = createURL(DatasetsVdiIdFiles.ROOT_PATH.replace(VDI_ID_VAR, e.revisionId)) } }
             .let(GetDatasetsByVdiIdResponse::respond200WithApplicationJson)
         } else {
           // If the dataset could not be found under the given dataset ID, then
@@ -45,11 +45,11 @@ class DatasetByID(@Context request: ContainerRequest)
       }
     }
 
-  override fun patchDatasetsByVdiId(vdiID: String, entity: vdi.service.rest.generated.model.DatasetPatchRequestBody?) =
+  override fun patchDatasetsByVdiId(vdiID: String, entity: DatasetPatchRequestBody?) =
     entity?.let { body -> updateDatasetMeta(userID.toUserID(), DatasetID(vdiID), body) }
       ?: PatchDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError("request body cannot be empty"))!!
 
-  override fun putDatasetsByVdiId(vdiId: String, entity: vdi.service.rest.generated.model.DatasetPutRequestBody?) =
+  override fun putDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?) =
     entity
       ?.let { body -> putDataset(userID.toUserID(), DatasetID(vdiId), body) }
       ?.let {
@@ -81,14 +81,14 @@ class DatasetByID(@Context request: ContainerRequest)
   // DEPRECATED API
 
   override fun getVdiDatasetsByVdiId(vdiId: String) =
-    vdi.service.rest.generated.resources.VdiDatasetsVdiId.GetVdiDatasetsByVdiIdResponse(getDatasetsByVdiId(vdiId))
+    VdiDatasetsVdiId.GetVdiDatasetsByVdiIdResponse(getDatasetsByVdiId(vdiId))
 
-  override fun patchVdiDatasetsByVdiId(vdiId: String, entity: vdi.service.rest.generated.model.DatasetPatchRequestBody?) =
-    vdi.service.rest.generated.resources.VdiDatasetsVdiId.PatchVdiDatasetsByVdiIdResponse(patchDatasetsByVdiId(vdiId, entity))
+  override fun patchVdiDatasetsByVdiId(vdiId: String, entity: DatasetPatchRequestBody?) =
+    VdiDatasetsVdiId.PatchVdiDatasetsByVdiIdResponse(patchDatasetsByVdiId(vdiId, entity))
 
-  override fun putVdiDatasetsByVdiId(vdiId: String, entity: vdi.service.rest.generated.model.DatasetPutRequestBody?) =
-    vdi.service.rest.generated.resources.VdiDatasetsVdiId.PutVdiDatasetsByVdiIdResponse(putDatasetsByVdiId(vdiId, entity))
+  override fun putVdiDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?) =
+    VdiDatasetsVdiId.PutVdiDatasetsByVdiIdResponse(putDatasetsByVdiId(vdiId, entity))
 
   override fun deleteVdiDatasetsByVdiId(vdiId: String) =
-    vdi.service.rest.generated.resources.VdiDatasetsVdiId.DeleteVdiDatasetsByVdiIdResponse(deleteDatasetsByVdiId(vdiId))
+    VdiDatasetsVdiId.DeleteVdiDatasetsByVdiIdResponse(deleteDatasetsByVdiId(vdiId))
 }

@@ -4,19 +4,19 @@ import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import vdi.service.rest.generated.model.DatasetDetails
 import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse
 import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse.*
-import vdi.service.server.outputs.toExternal
-import vdi.service.model.UserDetails
-import vdi.service.s3.DatasetStore
-import vdi.service.server.outputs.*
-import vdi.service.util.Either
-import vdi.service.util.defaultZone
+import vdi.service.rest.server.outputs.toExternal
+import vdi.service.rest.model.UserDetails
+import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.outputs.*
+import vdi.service.rest.util.Either
+import vdi.service.rest.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetPublication
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
-import vdi.component.db.app.AppDB
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.DatasetShare
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.DatasetShare
 import vdi.lib.logging.logger
 import vdi.lib.plugin.registry.PluginRegistry
 
@@ -31,7 +31,7 @@ fun getDatasetByID(
   userID: UserID?,
   datasetID: DatasetID,
   includeDeleted: Boolean = false,
-): Either<vdi.service.rest.generated.model.DatasetDetails, GetDatasetsByVdiIdResponse> {
+): Either<DatasetDetails, GetDatasetsByVdiIdResponse> {
   // Lookup dataset that is owned by or shared with the current user
   val dataset = when {
     userID == null -> CacheDB().selectDataset(datasetID)

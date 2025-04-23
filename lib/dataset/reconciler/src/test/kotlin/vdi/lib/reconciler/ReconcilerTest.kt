@@ -14,8 +14,8 @@ import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.s3.DatasetDirectory
-import vdi.component.s3.DatasetObjectStore
-import vdi.component.s3.files.DatasetMetaFile
+import vdi.lib.s3.DatasetObjectStore
+import vdi.lib.s3.files.DatasetMetaFile
 import java.time.OffsetDateTime
 import kotlin.test.DefaultAsserter.assertEquals
 import kotlin.test.assertEquals

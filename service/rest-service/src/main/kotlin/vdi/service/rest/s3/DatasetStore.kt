@@ -7,7 +7,7 @@ import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.lib.s3.s34k.objects.S3Object
 import org.veupathdb.lib.s3.s34k.objects.StreamObject
-import vdi.service.config.Options
+import vdi.service.rest.config.Options
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
@@ -15,7 +15,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
-import vdi.component.s3.paths.S3Paths
+import vdi.lib.s3.paths.S3Paths
 import java.io.InputStream
 
 object DatasetStore {

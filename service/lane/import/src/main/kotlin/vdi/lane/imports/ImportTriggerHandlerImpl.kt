@@ -20,11 +20,11 @@ import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.isNull
 import org.veupathdb.vdi.lib.json.JSON
 import vdi.lib.async.WorkerPool
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.CacheDBTransaction
-import vdi.component.db.cache.model.DatasetImpl
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.withTransaction
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.CacheDBTransaction
+import vdi.lib.db.cache.model.DatasetImpl
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.withTransaction
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
@@ -33,7 +33,7 @@ import vdi.lib.plugin.client.response.imp.*
 import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.registry.PluginRegistry
 import vdi.lib.s3.DatasetDirectory
-import vdi.component.s3.DatasetObjectStore
+import vdi.lib.s3.DatasetObjectStore
 import vdi.lane.imports.config.ImportTriggerHandlerConfig
 import vdi.lane.imports.model.WarningsFile
 import java.nio.file.Path

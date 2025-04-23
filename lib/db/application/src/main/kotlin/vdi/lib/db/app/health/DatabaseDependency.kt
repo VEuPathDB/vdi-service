@@ -1,8 +1,8 @@
 package vdi.lib.db.app.health
 
 import org.slf4j.LoggerFactory
-import vdi.component.db.app.AppDBPlatform
-import vdi.component.db.app.AppDBRegistryEntry
+import vdi.lib.db.app.AppDBPlatform
+import vdi.lib.db.app.AppDBRegistryEntry
 import vdi.lib.health.Dependency
 import vdi.lib.health.StaticDependency
 

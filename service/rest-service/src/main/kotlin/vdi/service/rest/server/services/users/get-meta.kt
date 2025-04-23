@@ -1,20 +1,20 @@
 package vdi.service.rest.server.services.users
 
-import vdi.service.config.Options
+import vdi.service.rest.config.Options
 import vdi.service.rest.generated.model.UserMetadata
 import vdi.service.rest.generated.model.UserMetadataImpl
 import vdi.service.rest.generated.model.UserQuotaDetails
 import vdi.service.rest.generated.model.UserQuotaDetailsImpl
-import vdi.service.s3.DatasetStore
+import vdi.service.rest.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.CacheDB
+import vdi.lib.db.cache.CacheDB
 
-internal fun getUserMetadata(userID: UserID): vdi.service.rest.generated.model.UserMetadata =
+internal fun getUserMetadata(userID: UserID): UserMetadata =
   vdi.service.rest.generated.model.UserMetadataImpl().apply {
     quota = getUserQuotaInfo(userID)
   }
 
-private fun getUserQuotaInfo(userID: UserID): vdi.service.rest.generated.model.UserQuotaDetails =
+private fun getUserQuotaInfo(userID: UserID): UserQuotaDetails =
   vdi.service.rest.generated.model.UserQuotaDetailsImpl().apply {
     usage = getCurrentQuotaUsage(userID)
     limit = Options.Quota.quotaLimit.toLong()

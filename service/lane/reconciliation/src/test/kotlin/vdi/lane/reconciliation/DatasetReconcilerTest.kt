@@ -10,9 +10,9 @@ import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.*
-import vdi.component.db.app.model.DeleteFlag
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.kafka.EventSource
+import vdi.lib.db.app.model.DeleteFlag
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.kafka.EventSource
 import vdi.test.*
 import java.time.OffsetDateTime
 import java.util.*

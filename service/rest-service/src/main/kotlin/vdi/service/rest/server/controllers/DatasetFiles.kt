@@ -7,16 +7,16 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminO
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.*
 import vdi.service.rest.generated.resources.VdiDatasetsVdiIdFiles
-import vdi.service.server.services.dataset.*
+import vdi.service.rest.server.services.dataset.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.toUserID
-import vdi.service.util.fold
-import vdi.service.util.mapLeft
+import vdi.service.rest.util.fold
+import vdi.service.rest.util.mapLeft
 
 @Authenticated(adminOverride = ALLOW_ALWAYS)
 class DatasetFiles(@Context request: ContainerRequest)
-  : vdi.service.rest.generated.resources.DatasetsVdiIdFiles
-  , vdi.service.rest.generated.resources.VdiDatasetsVdiIdFiles // DEPRECATED API
+  : DatasetsVdiIdFiles
+  , VdiDatasetsVdiIdFiles // DEPRECATED API
   , ControllerBase(request)
 {
   override fun getDatasetsFilesByVdiId(rawID: String): GetDatasetsFilesByVdiIdResponse =
@@ -60,13 +60,13 @@ class DatasetFiles(@Context request: ContainerRequest)
 
   @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasetsFilesByVdiId(vdiId)"))
   override fun getVdiDatasetsFilesByVdiId(vdiId: String) =
-    vdi.service.rest.generated.resources.VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesByVdiIdResponse(getDatasetsFilesByVdiId(vdiId))
+    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesByVdiIdResponse(getDatasetsFilesByVdiId(vdiId))
 
   @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasetsFilesUploadByVdiId(vdiId)"))
   override fun getVdiDatasetsFilesUploadByVdiId(vdiId: String) =
-    vdi.service.rest.generated.resources.VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesUploadByVdiIdResponse(getDatasetsFilesUploadByVdiId(vdiId))
+    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesUploadByVdiIdResponse(getDatasetsFilesUploadByVdiId(vdiId))
 
   @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasetsFilesDataByVdiId(vdiId)"))
   override fun getVdiDatasetsFilesDataByVdiId(vdiId: String) =
-    vdi.service.rest.generated.resources.VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesDataByVdiIdResponse(getDatasetsFilesDataByVdiId(vdiId))
+    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesDataByVdiIdResponse(getDatasetsFilesDataByVdiId(vdiId))
 }

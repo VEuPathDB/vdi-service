@@ -5,7 +5,7 @@ import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.cache.util.*
+import vdi.lib.db.cache.util.*
 import java.sql.Connection
 
 // language=postgresql

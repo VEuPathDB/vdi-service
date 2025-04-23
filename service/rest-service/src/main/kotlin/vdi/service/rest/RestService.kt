@@ -4,8 +4,8 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.config.Options
 import org.veupathdb.lib.container.jaxrs.providers.DependencyProvider
 import org.veupathdb.lib.container.jaxrs.server.Server
-import vdi.service.health.DependencySource
-import vdi.service.config.Options as Opts
+import vdi.service.rest.health.DependencySource
+import vdi.service.rest.config.Options as Opts
 
 object RestService : Server() {
 

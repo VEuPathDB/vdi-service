@@ -1,22 +1,22 @@
 package vdi.service.rest.server.services.admin
 
 import org.veupathdb.vdi.lib.common.field.toUserID
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.BrokenImportListQuery
-import vdi.component.db.cache.model.SortOrder
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.BrokenImportListQuery
+import vdi.lib.db.cache.model.SortOrder
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort
 import vdi.service.rest.generated.model.BrokenImportListingImpl
 import vdi.service.rest.generated.model.BrokenImportListingMetaImpl
 import vdi.service.rest.generated.resources.AdminReports
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsImportsFailedResponse
-import vdi.service.server.controllers.AdminReports.Constants
-import vdi.service.server.inputs.toSafeLimit
-import vdi.service.server.inputs.toSafeOffset
-import vdi.service.server.outputs.BadRequestError
-import vdi.service.server.outputs.BrokenImportDetails
-import vdi.service.server.outputs.wrap
-import vdi.service.util.fixVariableDateString
+import vdi.service.rest.server.controllers.AdminReports.Constants
+import vdi.service.rest.server.inputs.toSafeLimit
+import vdi.service.rest.server.inputs.toSafeOffset
+import vdi.service.rest.server.outputs.BadRequestError
+import vdi.service.rest.server.outputs.BrokenImportDetails
+import vdi.service.rest.server.outputs.wrap
+import vdi.service.rest.util.fixVariableDateString
 
 private const val DefaultBrokenImportResultLimit = 100
 
@@ -24,8 +24,8 @@ fun generateFailedImportReport(
   user: Long?,
   before: String?,
   after: String?,
-  sort: vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort,
-  order: vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder,
+  sort: AdminReportsImportsFailedGetSort,
+  order: AdminReportsImportsFailedGetOrder,
   limit: Int,
   offset: Int,
 ): GetAdminReportsImportsFailedResponse {
@@ -57,13 +57,13 @@ fun generateFailedImportReport(
   })
 }
 
-private fun vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort.toInternal(): BrokenImportListQuery.SortField =
+private fun AdminReportsImportsFailedGetSort.toInternal(): BrokenImportListQuery.SortField =
   when (this) {
-    vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort.DATE -> BrokenImportListQuery.SortField.Date
+    AdminReportsImportsFailedGetSort.DATE -> BrokenImportListQuery.SortField.Date
   }
 
-private fun vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder.toInternal(): SortOrder =
+private fun AdminReportsImportsFailedGetOrder.toInternal(): SortOrder =
   when (this) {
-    vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder.ASC -> SortOrder.ASCENDING
-    vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder.DESC -> SortOrder.DESCENDING
+    AdminReportsImportsFailedGetOrder.ASC -> SortOrder.ASCENDING
+    AdminReportsImportsFailedGetOrder.DESC -> SortOrder.DESCENDING
   }

@@ -2,8 +2,8 @@ package vdi.lib.db.cache.sql.upsert
 
 import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.util.setImportStatus
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.util.setImportStatus
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
 

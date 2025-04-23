@@ -4,8 +4,8 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
 import vdi.lib.kafka.EventMessage
-import vdi.component.kafka.EventSource
-import vdi.component.kafka.KafkaMessage
+import vdi.lib.kafka.EventSource
+import vdi.lib.kafka.KafkaMessage
 import vdi.lib.kafka.KafkaProducer
 
 class KafkaRouter(

@@ -9,45 +9,45 @@ import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.resources.Datasets
 import vdi.service.rest.generated.resources.VdiDatasets
 import vdi.service.rest.server.inputs.cleanup
-import vdi.service.server.inputs.validate
-import vdi.service.server.outputs.BadRequestError
-import vdi.service.server.outputs.DatasetPostResponseBody
-import vdi.service.server.outputs.UnprocessableEntityError
-import vdi.service.server.services.dataset.createDataset
-import vdi.service.server.services.dataset.fetchUserDatasetList
+import vdi.service.rest.server.inputs.validate
+import vdi.service.rest.server.outputs.BadRequestError
+import vdi.service.rest.server.outputs.DatasetPostResponseBody
+import vdi.service.rest.server.outputs.UnprocessableEntityError
+import vdi.service.rest.server.services.dataset.createDataset
+import vdi.service.rest.server.services.dataset.fetchUserDatasetList
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.toUserID
-import vdi.component.db.cache.model.DatasetListQuery
-import vdi.component.db.cache.model.DatasetOwnershipFilter
+import vdi.lib.db.cache.model.DatasetListQuery
+import vdi.lib.db.cache.model.DatasetOwnershipFilter
 
 @Authenticated(allowGuests = false)
 class DatasetList(@Context request: ContainerRequest)
-  : vdi.service.rest.generated.resources.Datasets
-  , vdi.service.rest.generated.resources.VdiDatasets // DEPRECATED API
+  : Datasets
+  , VdiDatasets // DEPRECATED API
   , ControllerBase(request)
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  override fun getDatasets(projectId: String?, ownership: String?): vdi.service.rest.generated.resources.Datasets.GetDatasetsResponse {
+  override fun getDatasets(projectId: String?, ownership: String?): Datasets.GetDatasetsResponse {
     // Parse the ownership filter field
     val parsedOwnership = ownership
       ?.let {
         DatasetOwnershipFilter.fromStringOrNull(it)
-          ?: return vdi.service.rest.generated.resources.Datasets.GetDatasetsResponse.respond400WithApplicationJson(BadRequestError("Invalid ownership query param value."))
+          ?: return Datasets.GetDatasetsResponse.respond400WithApplicationJson(BadRequestError("Invalid ownership query param value."))
       }
       ?: DatasetOwnershipFilter.ANY
 
-    return vdi.service.rest.generated.resources.Datasets.GetDatasetsResponse.respond200WithApplicationJson(
+    return Datasets.GetDatasetsResponse.respond200WithApplicationJson(
       fetchUserDatasetList(DatasetListQuery(userID, projectId, parsedOwnership), userID.toUserID())
     )
   }
 
-  override fun postDatasets(entity: vdi.service.rest.generated.model.DatasetPostRequestBody?): vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse {
-    with(entity ?: return vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse.respond400WithApplicationJson(BadRequestError("request body must not be empty"))) {
+  override fun postDatasets(entity: DatasetPostRequestBody?): Datasets.PostDatasetsResponse {
+    with(entity ?: return Datasets.PostDatasetsResponse.respond400WithApplicationJson(BadRequestError("request body must not be empty"))) {
       cleanup()
       validate().let {
         if (it.isNotEmpty)
-          return vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse.respond422WithApplicationJson(UnprocessableEntityError(it))
+          return Datasets.PostDatasetsResponse.respond422WithApplicationJson(UnprocessableEntityError(it))
       }
     }
 
@@ -63,20 +63,20 @@ class DatasetList(@Context request: ContainerRequest)
 
     createDataset(userID.toUserID(), datasetID, entity)
 
-    return vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse
+    return Datasets.PostDatasetsResponse
       .respond201WithApplicationJson(
         DatasetPostResponseBody(datasetID),
-        vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse.headersFor201()
+        Datasets.PostDatasetsResponse.headersFor201()
           .withLocation(request.absolutePath.toString().replaceAfterLast('/', datasetID.toString()))
       )
   }
 
   @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasets(projectId, ownership)"))
   override fun getVdiDatasets(projectId: String?, ownership: String?) =
-    vdi.service.rest.generated.resources.VdiDatasets.GetVdiDatasetsResponse(getDatasets(projectId, ownership))
+    VdiDatasets.GetVdiDatasetsResponse(getDatasets(projectId, ownership))
 
   @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("postDatasets(entity)"))
-  override fun postVdiDatasets(entity: vdi.service.rest.generated.model.DatasetPostRequestBody?) =
-    vdi.service.rest.generated.resources.VdiDatasets.PostVdiDatasetsResponse(postDatasets(entity))
+  override fun postVdiDatasets(entity: DatasetPostRequestBody?) =
+    VdiDatasets.PostVdiDatasetsResponse(postDatasets(entity))
 }
 

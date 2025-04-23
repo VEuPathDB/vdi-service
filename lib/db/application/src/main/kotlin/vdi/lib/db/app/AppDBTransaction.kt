@@ -5,10 +5,10 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.*
-import vdi.component.db.app.model.DatasetInstallMessage
-import vdi.component.db.app.model.DatasetRecord
-import vdi.component.db.app.model.DeleteFlag
-import vdi.component.db.app.model.InstallType
+import vdi.lib.db.app.model.DatasetInstallMessage
+import vdi.lib.db.app.model.DatasetRecord
+import vdi.lib.db.app.model.DeleteFlag
+import vdi.lib.db.app.model.InstallType
 import vdi.lib.db.model.SyncControlRecord
 import java.time.OffsetDateTime
 

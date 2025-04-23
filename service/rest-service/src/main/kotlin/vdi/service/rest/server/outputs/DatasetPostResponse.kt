@@ -11,5 +11,5 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
  *
  * @return A new [DatasetPostResponseBody] instance.
  */
-fun DatasetPostResponseBody(datasetID: DatasetID): vdi.service.rest.generated.model.DatasetPostResponseBody =
+fun DatasetPostResponseBody(datasetID: DatasetID): DatasetPostResponseBody =
   vdi.service.rest.generated.model.DatasetPostResponseBodyImpl().also { it.datasetId = datasetID.toString() }

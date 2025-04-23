@@ -2,8 +2,8 @@ package vdi.service.rest.server.services.admin
 
 import jakarta.ws.rs.core.StreamingOutput
 import org.veupathdb.lib.s3.s34k.objects.S3Object
-import vdi.service.s3.DatasetStore
-import vdi.service.util.defaultZone
+import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.util.defaultZone
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.time.OffsetDateTime
@@ -11,8 +11,8 @@ import java.util.stream.Stream
 import kotlin.math.max
 import vdi.service.rest.generated.resources.AdminReports
 
-fun listAllS3Objects(): vdi.service.rest.generated.resources.AdminReports.GetAdminReportsObjectStoreListAllResponse =
-  vdi.service.rest.generated.resources.AdminReports.GetAdminReportsObjectStoreListAllResponse
+fun listAllS3Objects(): AdminReports.GetAdminReportsObjectStoreListAllResponse =
+  AdminReports.GetAdminReportsObjectStoreListAllResponse
     .respond200WithTextPlain(StreamingOutput { out ->
       ObjectDetailsStream(DatasetStore.streamAll()).buffered().use { it.transferTo(out) }
     })

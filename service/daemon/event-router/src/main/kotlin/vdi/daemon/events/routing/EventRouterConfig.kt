@@ -3,7 +3,7 @@ package vdi.daemon.events.routing
 import org.veupathdb.vdi.lib.common.env.require
 import vdi.lib.env.EnvKey
 import vdi.lib.env.Environment
-import vdi.component.kafka.router.KafkaRouterConfig
+import vdi.lib.kafka.router.KafkaRouterConfig
 import vdi.lib.rabbit.RabbitMQConfig
 
 data class EventRouterConfig(

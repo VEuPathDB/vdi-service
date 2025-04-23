@@ -6,12 +6,12 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.model.DatasetRecord
-import vdi.component.db.cache.model.DatasetRecordImpl
-import vdi.component.db.cache.util.getDatasetVisibility
-import vdi.component.db.cache.util.getImportStatus
-import vdi.component.db.cache.util.getProjectIDList
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.model.DatasetRecord
+import vdi.lib.db.cache.model.DatasetRecordImpl
+import vdi.lib.db.cache.util.getDatasetVisibility
+import vdi.lib.db.cache.util.getImportStatus
+import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.jdbc.*
 import java.sql.Connection
 

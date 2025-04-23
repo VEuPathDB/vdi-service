@@ -2,10 +2,10 @@ package vdi.lib.reconciler
 
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import vdi.component.db.cache.withTransaction
+import vdi.lib.db.cache.withTransaction
 
 internal class CacheDBTarget : ReconcilerTarget {
-  private val cacheDB = vdi.component.db.cache.CacheDB()
+  private val cacheDB = vdi.lib.db.cache.CacheDB()
 
   override val name = "cache-db"
 

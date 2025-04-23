@@ -1,17 +1,17 @@
 package vdi.service.rest.server.services.admin
 
 import vdi.service.generated.model.*
-import vdi.service.server.outputs.DatasetStatusInfo
-import vdi.service.server.outputs.DatasetTypeResponseBody
+import vdi.service.rest.server.outputs.DatasetStatusInfo
+import vdi.service.rest.server.outputs.DatasetTypeResponseBody
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import vdi.component.db.app.AppDB
-import vdi.component.db.app.AppDatabaseRegistry
-import vdi.component.db.app.model.DatasetRecord
-import vdi.component.db.app.model.InstallStatus
-import vdi.component.db.app.model.InstallStatuses
-import vdi.component.db.app.model.InstallType
-import vdi.component.db.cache.model.DatasetImportStatus
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.AppDatabaseRegistry
+import vdi.lib.db.app.model.DatasetRecord
+import vdi.lib.db.app.model.InstallStatus
+import vdi.lib.db.app.model.InstallStatuses
+import vdi.lib.db.app.model.InstallType
+import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse.respond200WithApplicationJson
 

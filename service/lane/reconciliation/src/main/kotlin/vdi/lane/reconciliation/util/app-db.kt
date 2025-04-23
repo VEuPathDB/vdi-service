@@ -1,8 +1,8 @@
 package vdi.lane.reconciliation.util
 
-import vdi.component.db.app.AppDB
-import vdi.component.db.app.AppDBAccessor
-import vdi.component.db.app.model.DeleteFlag
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.AppDBAccessor
+import vdi.lib.db.app.model.DeleteFlag
 import vdi.lane.reconciliation.ReconciliationContext
 
 

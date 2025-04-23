@@ -4,7 +4,7 @@ import org.veupathdb.vdi.lib.common.env.optUInt
 import org.veupathdb.vdi.lib.common.env.optional
 import vdi.lib.env.EnvKey
 import vdi.lib.env.Environment
-import vdi.component.kafka.KafkaConsumerConfig
+import vdi.lib.kafka.KafkaConsumerConfig
 import vdi.lib.kafka.router.KafkaRouterConfigDefaults
 
 data class HardDeleteTriggerHandlerConfig(

@@ -15,7 +15,7 @@ private const val StateMaxLength = 200
 private const val CountryMaxLength = 200
 private const val AddressMaxLength = 1000
 
-internal fun vdi.service.rest.generated.model.DatasetContact.cleanup() {
+internal fun DatasetContact.cleanup() {
   isPrimary   = isPrimary ?: false
   name        = name.cleanupString()
   email       = email.cleanupString()
@@ -26,18 +26,18 @@ internal fun vdi.service.rest.generated.model.DatasetContact.cleanup() {
   address     = address.cleanupString()
 }
 
-private fun vdi.service.rest.generated.model.DatasetContact.validate(jPath: String, index: Int, errors: ValidationErrors) {
-  name.reqCheckLength(jPath..vdi.service.rest.generated.model.JsonField.NAME, index, NameMinLength, NameMaxLength, errors)
+private fun DatasetContact.validate(jPath: String, index: Int, errors: ValidationErrors) {
+  name.reqCheckLength(jPath..JsonField.NAME, index, NameMinLength, NameMaxLength, errors)
 
-  email.optCheckLength(jPath..vdi.service.rest.generated.model.JsonField.EMAIL, index, EmailMinLength, EmailMaxLength, errors)
-  affiliation.optCheckMaxLength(jPath..vdi.service.rest.generated.model.JsonField.AFFILIATION, index, AffiliationMaxLength, errors)
-  city.optCheckMaxLength(jPath..vdi.service.rest.generated.model.JsonField.CITY, index, CityMaxLength, errors)
-  state.optCheckMaxLength(jPath..vdi.service.rest.generated.model.JsonField.STATE, index, StateMaxLength, errors)
-  country.optCheckMaxLength(jPath..vdi.service.rest.generated.model.JsonField.COUNTRY, index, CountryMaxLength, errors)
-  address.optCheckMaxLength(jPath..vdi.service.rest.generated.model.JsonField.ADDRESS, index, AddressMaxLength, errors)
+  email.optCheckLength(jPath..JsonField.EMAIL, index, EmailMinLength, EmailMaxLength, errors)
+  affiliation.optCheckMaxLength(jPath..JsonField.AFFILIATION, index, AffiliationMaxLength, errors)
+  city.optCheckMaxLength(jPath..JsonField.CITY, index, CityMaxLength, errors)
+  state.optCheckMaxLength(jPath..JsonField.STATE, index, StateMaxLength, errors)
+  country.optCheckMaxLength(jPath..JsonField.COUNTRY, index, CountryMaxLength, errors)
+  address.optCheckMaxLength(jPath..JsonField.ADDRESS, index, AddressMaxLength, errors)
 }
 
-internal fun Iterable<vdi.service.rest.generated.model.DatasetContact?>.validate(jPath: String, errors: ValidationErrors) {
+internal fun Iterable<DatasetContact?>.validate(jPath: String, errors: ValidationErrors) {
   var primaries = 0
   forEachIndexed { i, c ->
     c.require(jPath, i, errors) {
@@ -59,5 +59,5 @@ internal fun Iterable<vdi.service.rest.generated.model.DatasetContact?>.validate
   }
 }
 
-internal fun vdi.service.rest.generated.model.DatasetContact.toInternal() =
+internal fun DatasetContact.toInternal() =
   VDIDatasetContact(name, email, affiliation, city, state, country, address, isPrimary)

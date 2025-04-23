@@ -2,13 +2,13 @@ package vdi.lane.reconciliation
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.db.app.AppDB
-import vdi.component.db.cache.CacheDB
-import vdi.component.db.cache.model.DatasetImportStatus
-import vdi.component.db.cache.withTransaction
-import vdi.component.kafka.EventSource
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.withTransaction
+import vdi.lib.kafka.EventSource
 import vdi.lib.kafka.router.KafkaRouter
-import vdi.component.s3.DatasetObjectStore
+import vdi.lib.s3.DatasetObjectStore
 import vdi.lane.reconciliation.util.*
 import vdi.lane.reconciliation.util.requireSyncControl
 import vdi.lane.reconciliation.util.safeExec

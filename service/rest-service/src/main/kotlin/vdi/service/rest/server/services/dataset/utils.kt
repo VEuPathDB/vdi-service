@@ -1,8 +1,8 @@
 package vdi.service.rest.server.services.dataset
 
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
-import vdi.service.model.UserDetails
-import vdi.service.server.inputs.toInternal
+import vdi.service.rest.model.UserDetails
+import vdi.service.rest.server.inputs.toInternal
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import vdi.lib.plugin.registry.PluginDetails
@@ -16,7 +16,7 @@ internal fun Map<UserID, UserDetails>.requireDetails(userID: UserID) =
 
 
 @OptIn(ExperimentalContracts::class)
-internal inline fun vdi.service.rest.generated.model.DatasetPatchRequestBody.optValidateType(onError: (PluginDetails) -> Nothing): VDIDatasetType? {
+internal inline fun DatasetPatchRequestBody.optValidateType(onError: (PluginDetails) -> Nothing): VDIDatasetType? {
   contract { callsInPlace(onError, InvocationKind.AT_MOST_ONCE) }
 
   return datasetType

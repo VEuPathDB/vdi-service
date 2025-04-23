@@ -4,9 +4,9 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort
 import vdi.service.rest.generated.resources.AdminReports
-import vdi.service.server.services.admin.*
+import vdi.service.rest.server.services.admin.*
 
-class AdminReports : vdi.service.rest.generated.resources.AdminReports {
+class AdminReports : AdminReports {
   override fun getAdminReportsDatasetsListAll(
     projectId: String?,
     includeDeleted: Boolean,
@@ -21,8 +21,8 @@ class AdminReports : vdi.service.rest.generated.resources.AdminReports {
     user: Long?,
     before: String?,
     after: String?,
-    sort: vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort,
-    order: vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder,
+    sort: AdminReportsImportsFailedGetSort,
+    order: AdminReportsImportsFailedGetOrder,
     limit: Int,
     offset: Int,
   ) = generateFailedImportReport(user, before, after, sort, order, limit, offset)

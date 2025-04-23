@@ -8,7 +8,7 @@ internal fun DatasetDependency(
   resourceIdentifier: String,
   resourceDisplayName: String,
   resourceVersion: String,
-): vdi.service.rest.generated.model.DatasetDependency =
+): DatasetDependency =
   vdi.service.rest.generated.model.DatasetDependencyImpl().also {
     it.resourceIdentifier = resourceIdentifier
     it.resourceDisplayName = resourceDisplayName

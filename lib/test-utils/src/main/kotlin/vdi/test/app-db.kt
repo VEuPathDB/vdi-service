@@ -10,10 +10,10 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
-import vdi.component.db.app.AppDB
-import vdi.component.db.app.AppDBAccessor
-import vdi.component.db.app.AppDBTransaction
-import vdi.component.db.app.model.*
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.AppDBAccessor
+import vdi.lib.db.app.AppDBTransaction
+import vdi.lib.db.app.model.*
 import java.time.OffsetDateTime
 
 fun mockAppDB(

@@ -10,13 +10,13 @@ import vdi.service.rest.generated.model.DatasetContact
 import vdi.service.rest.generated.model.DatasetHyperlink
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.DatasetPublication
-import vdi.service.server.inputs.toInternal
+import vdi.service.rest.server.inputs.toInternal
 
 
 fun VDIDatasetMeta.applyPatch(
   userID: UserID,
   targetType: VDIDatasetType?,
-  patch: vdi.service.rest.generated.model.DatasetPatchRequestBody,
+  patch: DatasetPatchRequestBody,
   originalID: DatasetID? = this.originalID,
   revisionHistory: List<VDIDatasetRevision> = this.revisionHistory,
 ) =

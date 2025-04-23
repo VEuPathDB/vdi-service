@@ -7,8 +7,8 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
 import org.veupathdb.vdi.lib.common.model.*
 import org.veupathdb.vdi.lib.json.JSON
-import vdi.component.s3.files.*
-import vdi.component.s3.paths.S3DatasetPathFactory
+import vdi.lib.s3.files.*
+import vdi.lib.s3.paths.S3DatasetPathFactory
 import java.io.InputStream
 
 internal class DatasetDirectoryImpl(

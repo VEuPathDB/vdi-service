@@ -3,7 +3,7 @@ package vdi.lib.db.app.sql.insert
 import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
-import vdi.component.db.app.DatasetMetaMaxSummaryFieldLength
+import vdi.lib.db.app.DatasetMetaMaxSummaryFieldLength
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
 

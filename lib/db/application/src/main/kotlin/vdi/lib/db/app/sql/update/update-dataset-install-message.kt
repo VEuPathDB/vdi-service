@@ -1,8 +1,8 @@
 package vdi.lib.db.app.sql.update
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.component.db.app.model.DatasetInstallMessage
-import vdi.component.db.app.sql.*
+import vdi.lib.db.app.model.DatasetInstallMessage
+import vdi.lib.db.app.sql.*
 import vdi.lib.db.jdbc.setDatasetID
 import vdi.lib.db.jdbc.setDateTime
 import java.sql.Connection

@@ -11,10 +11,10 @@ import org.veupathdb.vdi.lib.json.JSON
 import vdi.lib.async.Trigger
 import vdi.lib.kafka.EventMessage
 import vdi.lib.kafka.KafkaConsumer
-import vdi.component.kafka.KafkaConsumerConfig
-import vdi.component.kafka.router.KafkaRouterConfig
-import vdi.component.kafka.router.KafkaRouterFactory
-import vdi.component.s3.DatasetManager
+import vdi.lib.kafka.KafkaConsumerConfig
+import vdi.lib.kafka.router.KafkaRouterConfig
+import vdi.lib.kafka.router.KafkaRouterFactory
+import vdi.lib.s3.DatasetManager
 
 /**
  * VDI Service Module Abstract Base

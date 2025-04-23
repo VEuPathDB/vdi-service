@@ -1,7 +1,7 @@
 package vdi.lib.db.cache.health
 
 import org.slf4j.LoggerFactory
-import vdi.component.db.cache.CacheDBImpl
+import vdi.lib.db.cache.CacheDBImpl
 import vdi.lib.health.Dependency
 import vdi.lib.health.StaticDependency
 

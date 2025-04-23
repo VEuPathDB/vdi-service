@@ -4,8 +4,8 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
-import vdi.component.db.app.model.InstallStatuses
-import vdi.component.db.app.sql.select.selectInstallStatuses
+import vdi.lib.db.app.model.InstallStatuses
+import vdi.lib.db.app.sql.select.selectInstallStatuses
 
 internal object AppDBImpl : AppDB {
 

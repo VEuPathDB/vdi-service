@@ -17,10 +17,10 @@ import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.InstallCleanupRequestBody
 import vdi.service.rest.generated.resources.AdminRpc
 import vdi.service.rest.server.inputs.cleanup
-import vdi.service.server.inputs.validate
-import vdi.service.server.outputs.*
-import vdi.service.server.services.admin.purgeDataset
-import vdi.service.server.services.dataset.createDataset
+import vdi.service.rest.server.inputs.validate
+import vdi.service.rest.server.outputs.*
+import vdi.service.rest.server.services.admin.purgeDataset
+import vdi.service.rest.server.services.dataset.createDataset
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcDatasetsProxyUploadResponse as ProxyUploadResponse
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcDatasetsPruneResponse as DatasetPruneResponse
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcDatasetsReconcileResponse as ReconcileResponse
@@ -28,11 +28,11 @@ import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcInstallsClearFa
 
 @AdminRequired
 @Authenticated(adminOverride = ALLOW_ALWAYS)
-class AdminRPC : vdi.service.rest.generated.resources.AdminRpc {
+class AdminRPC : AdminRpc {
 
   override fun postAdminRpcDatasetsProxyUpload(
     userId: Long?,
-    entity: vdi.service.rest.generated.model.DatasetPostRequestBody?
+    entity: DatasetPostRequestBody?
   ): ProxyUploadResponse {
     if (userId == null)
       return BadRequestError("missing target user ID").wrap()
@@ -75,7 +75,7 @@ class AdminRPC : vdi.service.rest.generated.resources.AdminRpc {
 
   override fun postAdminRpcInstallsClearFailed(
     skipRun: Boolean,
-    entity: vdi.service.rest.generated.model.InstallCleanupRequestBody?
+    entity: InstallCleanupRequestBody?
   ): InstallCleanupResponse {
     if (entity == null)
       return BadRequestError("empty request body").wrap()
@@ -92,6 +92,6 @@ class AdminRPC : vdi.service.rest.generated.resources.AdminRpc {
     return InstallCleanupResponse.respond204()
   }
 
-  override fun postAdminRpcObjectStorePurgeDataset(request: vdi.service.rest.generated.model.DatasetObjectPurgeRequestBody) =
+  override fun postAdminRpcObjectStorePurgeDataset(request: DatasetObjectPurgeRequestBody) =
     purgeDataset(request)
 }
