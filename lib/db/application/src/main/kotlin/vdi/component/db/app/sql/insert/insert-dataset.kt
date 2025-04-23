@@ -30,7 +30,7 @@ internal fun Connection.insertDataset(schema: String, dataset: DatasetRecord) {
     setUserID(2, dataset.owner)
     setDataType(3, dataset.typeName)
     setString(4, dataset.typeVersion)
-    setDeleteFlag(5, dataset.isDeleted)
+    setDeleteFlag(5, dataset.deletionState)
     setBoolean(6, dataset.isPublic)
   }
 }

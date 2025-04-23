@@ -81,5 +81,5 @@ fun mockAppDatasetRecord(
     owner?.also { on { this.owner } doReturn it }
     typeName?.also { on { this.typeName } doReturn typeName }
     typeVersion?.also { on { this.typeVersion } doReturn typeVersion }
-    isDeleted?.also { on { this.isDeleted } doReturn isDeleted }
+    isDeleted?.also { on { this.deletionState } doReturn isDeleted }
   }

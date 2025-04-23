@@ -23,6 +23,7 @@ import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
+import vdi.component.s3.DatasetObjectStore
 import java.io.InputStream
 
 object DatasetReinstaller {
@@ -80,7 +81,7 @@ object DatasetReinstaller {
     log.info("dataset reinstaller run {} complete", runCounter)
   }
 
-  private suspend fun processProject(projectID: ProjectID, manager: DatasetManager) {
+  private suspend fun processProject(projectID: ProjectID, manager: DatasetObjectStore) {
     for ((dataType, _) in AppDatabaseRegistry[projectID]!!) {
       // locate datasets in the ready-for-reinstall status
       val datasets = appDB.accessor(projectID, dataType)!!
@@ -109,7 +110,7 @@ object DatasetReinstaller {
     }
   }
 
-  private suspend fun processDataset(dataset: DatasetRecord, projectID: ProjectID, manager: DatasetManager) {
+  private suspend fun processDataset(dataset: DatasetRecord, projectID: ProjectID, manager: DatasetObjectStore) {
     log.info("reinstall processing dataset {}/{} for project {}", dataset.owner, dataset.datasetID, projectID)
 
     // Get a plugin handler for the target dataset type
@@ -160,7 +161,7 @@ object DatasetReinstaller {
     dataset: DatasetRecord,
     projectID: ProjectID,
     handler: PluginHandler,
-    manager: DatasetManager,
+    manager: DatasetObjectStore,
   ) {
     log.debug("attempting to reinstall dataset {}/{} into project {}", dataset.owner, dataset.datasetID, projectID)
 

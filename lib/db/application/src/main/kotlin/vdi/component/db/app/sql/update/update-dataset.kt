@@ -28,7 +28,7 @@ internal fun Connection.updateDataset(schema: String, dataset: DatasetRecord) {
     setUserID(1, dataset.owner)
     setDataType(2, dataset.typeName)
     setString(3, dataset.typeVersion)
-    setDeleteFlag(4, dataset.isDeleted)
+    setDeleteFlag(4, dataset.deletionState)
     setBoolean(5, dataset.isPublic)
     setDatasetID(6, dataset.datasetID)
   }

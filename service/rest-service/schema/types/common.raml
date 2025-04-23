@@ -162,12 +162,16 @@ types:
         default: false
 
   DatasetRevision:
+    description: Dataset revision history entry.
     additionalProperties: false
     properties:
       action: DatasetRevisionAction
       timestamp: datetime
       revisionId: VdiId
       revisionNote: DatasetRevisionNote
+      fileListUrl:
+        description: URL to the file listing for the revision entry.
+        type: string
 
   DatasetRevisionNote:
     description: Note providing a reason and/or description for the revision.
@@ -243,6 +247,31 @@ types:
     type: string
     minLength: 3
     maxLength: 200
+
+  PartialDate:
+    displayName: Partial Datetime
+    type: string
+    minLength: 4
+    description: |
+      Subset of the RFC3339 format, requiring at least the 4 digit year, and may
+      include additional precision, part by part.  Each part must be 'complete'
+      and include standard preceding segment delimiters.
+      
+      Date segments that are omitted will be defaulted to the minimum valid
+      value for that segment.  For example, If only the year value is provided,
+      the assumed remainder is `-01-01T00:00:00.000Z`.
+
+      Examples:
+      * `2022`
+      * `2022-03`
+      * `2022-03-15`
+      * `2022-03-15T16`
+      * `2022-03-15T16:30`
+      * `2022-03-15T16:30:12`
+      * `2022-03-15T16:30:12Z`
+      * `2022-03-15T16:30:12+04:00`
+      * `2022-03-15T16:30:12.123Z`
+      * `2022-03-15T16:30:12.123-06:00`
 
   ProjectId:
     description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".

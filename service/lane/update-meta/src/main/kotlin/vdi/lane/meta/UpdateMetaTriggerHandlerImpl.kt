@@ -33,7 +33,7 @@ import vdi.lib.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
 import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
-import vdi.component.s3.DatasetManager
+import vdi.component.s3.DatasetObjectStore
 import java.sql.SQLException
 import java.time.OffsetDateTime
 import java.util.concurrent.ConcurrentHashMap
@@ -79,7 +79,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     confirmShutdown()
   }
 
-  private suspend fun updateMetaIfNotInProgress(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
+  private suspend fun updateMetaIfNotInProgress(dm: DatasetObjectStore, kr: KafkaRouter, msg: EventMessage) {
     if (datasetsInProgress.add(msg.datasetID)) {
       try {
         tryUpdateMeta(dm, kr, msg)
@@ -91,7 +91,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     }
   }
 
-  private suspend fun tryUpdateMeta(dm: DatasetManager, kr: KafkaRouter, msg: EventMessage) {
+  private suspend fun tryUpdateMeta(dm: DatasetObjectStore, kr: KafkaRouter, msg: EventMessage) {
     try {
       if (msg.eventSource == EventSource.UpdateMetaLane) {
         log.warn("attempted to recurse update meta on dataset ${msg.userID}/${msg.datasetID}")
@@ -106,7 +106,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     }
   }
 
-  private suspend fun updateMeta(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
+  private suspend fun updateMeta(dm: DatasetObjectStore, userID: UserID, datasetID: DatasetID) {
     log.debug("Looking up dataset directory for dataset {}/{}", userID, datasetID)
 
     // lookup the dataset directory for the given userID and datasetID
@@ -348,7 +348,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       owner       = meta.owner,
       typeName    = meta.type.name,
       typeVersion = meta.type.version,
-      isDeleted   = DeleteFlag.NotDeleted,
+      deletionState   = DeleteFlag.NotDeleted,
       isPublic    = meta.visibility == VDIDatasetVisibility.Public
     )
 

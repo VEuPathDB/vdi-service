@@ -25,7 +25,7 @@ enum class SortOrder {
     fun fromStringOrNull(value: String): SortOrder? {
       val uppercase = value.uppercase()
 
-      for (enumValue in values())
+      for (enumValue in entries)
         if (enumValue.toString() == uppercase)
           return enumValue
 

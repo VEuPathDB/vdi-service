@@ -45,15 +45,6 @@ types:
     properties:
       meta: AllDatasetsListMeta
       results: AllDatasetsListEntry[]
-  AuthorizationKey:
-    displayName: RPC Authorization Key
-    description: |
-      A token unique to an RPC action that allows the action to be run via an
-      HTTP call.
-    type: string
-    pattern: ^[0-9a-fA-F]{64}$
-    minLength: 64
-    maxLength: 64
   BadRequestError:
     displayName: Bad Request
     description: Request could not be parsed or was otherwise unusable.
@@ -62,7 +53,7 @@ types:
     example:
       status: bad-request
       message: malformed JSON
-  BrokenDatasetDetails:
+  BrokenDatasetInstallDetails:
     type: object
     additionalProperties: false
     properties:
@@ -74,11 +65,12 @@ types:
         minItems: 1
         uniqueItems: true
       status: DatasetStatusInfo
-  BrokenDatasetListing:
+  BrokenDatasetInstallReportBody:
+    displayName: Failed Install Report
     type: object
     additionalProperties: false
     properties:
-      details?: BrokenDatasetDetails[]
+      details?: BrokenDatasetInstallDetails[]
       ids?: VdiId[]
   BrokenImportDetails:
     displayName: Broken Import Details
@@ -180,7 +172,7 @@ types:
     description: Longform description of the dataset.
     type: string
   DatasetDetails:
-    displayName: Dataset Details
+    displayName: Dataset Get Response
     description: |
       Details about a specific singular dataset.
     type: object
@@ -236,6 +228,7 @@ types:
       originalId?: VdiId
       revisionHistory?: DatasetRevision[]
   DatasetFileDetails:
+    displayName: Decompressed File Info
     type: object
     additionalProperties: false
     properties:
@@ -245,6 +238,7 @@ types:
         type: integer
         format: int64
   DatasetFileListing:
+    displayName: Dataset File Report
     type: object
     additionalProperties: false
     properties:
@@ -306,7 +300,7 @@ types:
       dataStatus?: DatasetInstallStatus
       dataMessage?: string
   DatasetListEntry:
-    displayName: Dataset List Item
+    displayName: Dataset Listing Item
     description: Short entry with basic details about a dataset.
     type: object
     additionalProperties: false
@@ -342,6 +336,7 @@ types:
       sourceUrl?: DatasetSourceUrl
       originalId?: VdiId
   DatasetListShareUser:
+    displayName: Dataset Listing Share Info
     type: object
     additionalProperties: false
     properties:
@@ -355,6 +350,13 @@ types:
     type: string
     minLength: 3
     maxLength: 1024
+  DatasetObjectPurgeRequestBody:
+    displayName: Dataset Object Purge Request
+    type: object
+    additionalProperties: false
+    properties:
+      userId: UserId
+      datasetId: VdiId
   DatasetOrigin:
     description: |
       String representing the origin of the dataset.  Examples include
@@ -373,7 +375,7 @@ types:
       email?: string
       organization?: string
   DatasetPatchRequestBody:
-    displayName: Dataset Metadata Patch Request
+    displayName: Dataset Patch Request
     description: |
       Request to update the metadata for a dataset.
     type: object
@@ -474,6 +476,7 @@ types:
           This field is incompatible with the `file` field.
         type: string
   DatasetPostResponseBody:
+    displayName: Dataset Post Response
     description: |
       Successful upload response.
 
@@ -505,7 +508,7 @@ types:
     properties:
       revisionNote: DatasetRevisionNote
   DatasetPutRequestBody:
-    displayName: Dataset Data Put Request
+    displayName: Dataset Put Request
     type: object
     additionalProperties: false
     properties:
@@ -525,11 +528,13 @@ types:
           This field is incompatible with the `file` field.
         type: string
   DatasetPutResponseBody:
-    type: DatasetPatchRequestBody
+    displayName: Dataset Put Response
+    type: object
     additionalProperties: false
     properties:
       datasetId: VdiId
   DatasetRevision:
+    description: Dataset revision history entry.
     type: object
     additionalProperties: false
     properties:
@@ -537,6 +542,9 @@ types:
       timestamp: datetime
       revisionId: VdiId
       revisionNote: DatasetRevisionNote
+      fileListUrl:
+        description: URL to the file listing for the revision entry.
+        type: string
   DatasetRevisionAction:
     type: string
     enum:
@@ -547,6 +555,7 @@ types:
     minLength: 10
     maxLength: 4096
   DatasetShareOffer:
+    displayName: Dataset Share Offer
     description: |
       An offer to share (or un-share) a dataset with a single target user.
     type: object
@@ -640,6 +649,7 @@ types:
       - protected
       - public
   DatasetZipDetails:
+    displayName: Archive File Info
     type: object
     additionalProperties: false
     properties:
@@ -707,8 +717,9 @@ types:
       target.
 
       Requesters should specify one of the fields `all` or `targets` to control
-      what datasets will be cleaned up.  If neither is specified the endpoint
-      will do nothing.
+      what datasets will be cleaned up.  If neither is specified, the endpoint
+      will just run the reinstaller, unless `skip-run` is set, in which case the
+      endpoint will do nothing.
     type: object
     additionalProperties: false
     properties:
@@ -775,7 +786,32 @@ types:
     type: string
     minLength: 3
     maxLength: 200
+  PartialDate:
+    displayName: Partial Datetime
+    description: |
+      Subset of the RFC3339 format, requiring at least the 4 digit year, and may
+      include additional precision, part by part.  Each part must be 'complete'
+      and include standard preceding segment delimiters.
+
+      Date segments that are omitted will be defaulted to the minimum valid
+      value for that segment.  For example, If only the year value is provided,
+      the assumed remainder is `-01-01T00:00:00.000Z`.
+
+      Examples:
+      * `2022`
+      * `2022-03`
+      * `2022-03-15`
+      * `2022-03-15T16`
+      * `2022-03-15T16:30`
+      * `2022-03-15T16:30:12`
+      * `2022-03-15T16:30:12Z`
+      * `2022-03-15T16:30:12+04:00`
+      * `2022-03-15T16:30:12.123Z`
+      * `2022-03-15T16:30:12.123-06:00`
+    type: string
+    minLength: 4
   PluginListItem:
+    displayName: Plugin Info
     type: object
     additionalProperties: false
     properties:
@@ -815,7 +851,7 @@ types:
       - grant
       - revoke
   ShareOfferEntry:
-    displayName: Share Offer
+    displayName: Share Offer Details
     type: object
     additionalProperties: false
     properties:
@@ -895,11 +931,13 @@ types:
     minimum: 1
     maximum: 9223372036854775807
   UserMetadata:
+    displayName: User Details
     type: object
     additionalProperties: false
     properties:
       quota: UserQuotaDetails
   UserQuotaDetails:
+    displayName: User Quota Report
     type: object
     additionalProperties: false
     properties:

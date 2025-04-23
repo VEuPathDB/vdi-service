@@ -5,10 +5,40 @@ extends: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.2.0/libr
 title: VEuPathDB Dataset Installer
 version: 1.7.0
 mediaType: application/json
+baseUri: https://veupathdb.org/vdi
 
 uses:
   lib: schema/types/library.raml
 
+securitySchemes:
+  AdminToken:
+    type: x-header-token
+    displayName: Admin Token
+    description: Per-service admin token header.
+    describedBy:
+      responses:
+        401:
+          body: lib.UnauthorizedError
+  WdkAuth:
+    type: x-vpdb-oath
+    displayName: VEuPathDB OAuth 2.0
+    describedBy:
+      responses:
+        401:
+          body: lib.UnauthorizedError
+
+traits:
+  PaginatedList:
+    queryParameters:
+      limit?:
+        description: Result count limit.  If set to `-1`, no limit is applied.
+        type: integer
+        default: 100
+      offset?:
+        description: Pagination offset.  Ignored if `limit < 0`.
+        type: integer
+        minimum: 0
+        default: 0
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃  ENDPOINT PATHS                                                          ┃ #
@@ -23,7 +53,8 @@ uses:
 /users: !include schema/resources/users/resource.raml
 /plugins: !include schema/resources/plugins/resource.raml
 
-/admin: !include schema/resources/admin/resource.raml
+/admin/reports: !include schema/resources/admin/reports/resource.raml
+/admin/rpc: !include schema/resources/admin/rpc/resource.raml
 
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #

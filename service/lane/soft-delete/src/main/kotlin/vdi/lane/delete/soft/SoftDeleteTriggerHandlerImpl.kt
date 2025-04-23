@@ -177,7 +177,7 @@ internal class SoftDeleteTriggerHandlerImpl(
       return false
     }
 
-    if (dataset.isDeleted == DeleteFlag.DeletedAndUninstalled) {
+    if (dataset.deletionState == DeleteFlag.DeletedAndUninstalled) {
       log.info("dataset {}/{} has already been successfully uninstalled from target project {}", userID, datasetID, projectID)
       return false
     }

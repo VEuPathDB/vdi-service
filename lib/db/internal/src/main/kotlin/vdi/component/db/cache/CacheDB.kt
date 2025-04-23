@@ -18,10 +18,24 @@ interface CacheDB {
 
   val dataSource: DataSource
 
+  /**
+   * Attempts to fetch a dataset by [ID][datasetID], returning `null` if no such
+   * dataset was found.
+   */
   fun selectDataset(datasetID: DatasetID): DatasetRecord?
 
+  /**
+   * Fetches the list of install-ready files produced by the import process for
+   * the target dataset.
+   *
+   * If the dataset failed import or has not yet been imported, this method will
+   * return an empty list.
+   */
   fun selectInstallFiles(datasetID: DatasetID): List<VDIDatasetFileInfo>
 
+  /**
+   * Fetches the list of import-ready files uploaded by the user.
+   */
   fun selectUploadFiles(datasetID: DatasetID): List<VDIDatasetFileInfo>
 
   fun selectAdminAllDatasetCount(query: AdminAllDatasetsQuery): UInt
@@ -40,6 +54,16 @@ interface CacheDB {
 
   fun selectDatasetList(query: DatasetListQuery): List<DatasetRecord>
 
+  /**
+   * Attempts to fetch a dataset by [ID][datasetID] that is visible to the user
+   * identified by the given [user ID][userID].
+   *
+   * Datasets may be visible if they are either owned by, or shared with the
+   * target user.
+   *
+   * If no dataset could be found that is visible to the target user, `null`
+   * will be returned.
+   */
   fun selectDatasetForUser(userID: UserID, datasetID: DatasetID): DatasetRecord?
 
   fun selectUndeletedDatasetIDsForUser(userID: UserID): List<DatasetID>

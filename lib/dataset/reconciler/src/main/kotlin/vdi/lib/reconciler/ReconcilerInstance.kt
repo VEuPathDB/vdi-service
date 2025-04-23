@@ -9,7 +9,7 @@ import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
 import vdi.lib.metrics.Metrics
 import vdi.component.s3.DatasetDirectory
-import vdi.component.s3.DatasetManager
+import vdi.component.s3.DatasetObjectStore
 import vdi.lib.db.model.ReconcilerTargetRecord
 import vdi.lib.db.model.SyncControlRecord
 import java.time.OffsetDateTime
@@ -24,7 +24,7 @@ import java.time.OffsetDateTime
  */
 internal class ReconcilerInstance(
   private val targetDB: ReconcilerTarget,
-  private val datasetManager: DatasetManager,
+  private val datasetManager: DatasetObjectStore,
   private val kafkaRouter: KafkaRouter,
   private val slim: Boolean,
   private val deletesEnabled: Boolean

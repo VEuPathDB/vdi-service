@@ -15,6 +15,7 @@ import vdi.component.kafka.router.KafkaRouterFactory
 import vdi.lib.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.s3.DatasetManager
+import vdi.component.s3.DatasetObjectStore
 
 object Reconciler {
   private val logger = logger().delegate
@@ -25,7 +26,7 @@ object Reconciler {
 
   private var initialized = false
 
-  private lateinit var datasetManager: DatasetManager
+  private lateinit var datasetManager: DatasetObjectStore
 
   private lateinit var kafkaRouter: KafkaRouter
 

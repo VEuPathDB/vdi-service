@@ -5,12 +5,14 @@ uses:
 
 types:
   DatasetFileListing:
+    displayName: Dataset File Report
     additionalProperties: false
     properties:
       upload: DatasetZipDetails
       install?: DatasetZipDetails
 
   DatasetZipDetails:
+    displayName: Archive File Info
     additionalProperties: false
     properties:
       zipSize:
@@ -19,6 +21,7 @@ types:
       contents: DatasetFileDetails[]
 
   DatasetFileDetails:
+    displayName: Decompressed File Info
     additionalProperties: false
     properties:
       fileName: string

@@ -54,7 +54,7 @@ internal fun Connection.selectDatasetsByInstallStatus(
         owner       = getUserID("owner"),
         typeName    = getDataType("type_name"),
         typeVersion = getString("type_version"),
-        isDeleted   = getDeleteFlag("is_deleted"),
+        deletionState   = getDeleteFlag("is_deleted"),
         isPublic    = getBoolean("is_public"),
       )
     } }

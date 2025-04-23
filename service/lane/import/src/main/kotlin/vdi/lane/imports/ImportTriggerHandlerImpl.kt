@@ -33,7 +33,7 @@ import vdi.lib.plugin.client.response.imp.*
 import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.registry.PluginRegistry
 import vdi.component.s3.DatasetDirectory
-import vdi.component.s3.DatasetManager
+import vdi.component.s3.DatasetObjectStore
 import vdi.lane.imports.config.ImportTriggerHandlerConfig
 import vdi.lane.imports.model.WarningsFile
 import java.nio.file.Path
@@ -79,7 +79,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     confirmShutdown()
   }
 
-  private suspend fun tryHandleImportEvent(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
+  private suspend fun tryHandleImportEvent(dm: DatasetObjectStore, userID: UserID, datasetID: DatasetID) {
     try {
       handleImportEvent(dm, userID, datasetID)
     } catch (e: vdi.lib.plugin.client.PluginException) {
@@ -89,7 +89,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     }
   }
 
-  private suspend fun handleImportEvent(dm: DatasetManager, userID: UserID, datasetID: DatasetID) {
+  private suspend fun handleImportEvent(dm: DatasetObjectStore, userID: UserID, datasetID: DatasetID) {
     // lookup the dataset in S3
     val datasetDir = dm.getDatasetDirectory(userID, datasetID)
 

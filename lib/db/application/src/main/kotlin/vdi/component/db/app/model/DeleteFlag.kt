@@ -40,7 +40,6 @@ enum class DeleteFlag(val value: Int) {
   ;
 
   companion object {
-
     @JvmStatic
     fun fromInt(value: Int): DeleteFlag {
       for (enumValue in entries)

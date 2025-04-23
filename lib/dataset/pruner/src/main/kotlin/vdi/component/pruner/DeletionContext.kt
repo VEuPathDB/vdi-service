@@ -1,13 +1,12 @@
 package vdi.component.pruner
 
-import org.slf4j.Logger
 import vdi.component.db.cache.model.DeletedDataset
 import vdi.lib.logging.logger
 
-internal class DeletionContext {
-  lateinit var dataset: DeletedDataset
+internal data class DeletionContext(val dataset: DeletedDataset) {
+  val logger = logger<Pruner>(datasetID, ownerID)
 
-  lateinit var logger: Logger
+  lateinit var state: PrunableState
 
   inline val datasetID
     get() = dataset.datasetID
@@ -20,9 +19,4 @@ internal class DeletionContext {
 
   inline val dataType
     get() = dataset.dataType
-
-  fun init(dataset: DeletedDataset) {
-    this.dataset = dataset
-    this.logger = logger<Pruner>(datasetID, ownerID)
-  }
 }

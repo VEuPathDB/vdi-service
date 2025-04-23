@@ -12,7 +12,7 @@ import vdi.component.db.cache.withTransaction
 import vdi.component.kafka.EventMessage
 import vdi.component.modules.AbstractVDIModule
 import vdi.component.s3.DatasetDirectory
-import vdi.component.s3.DatasetManager
+import vdi.component.s3.DatasetObjectStore
 import java.util.concurrent.ConcurrentHashMap
 
 internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPruningTriggerHandlerConfig, abortCB: (String?) -> Nothing)
@@ -41,7 +41,7 @@ internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPru
     confirmShutdown()
   }
 
-  private fun tryProcessMessage(message: EventMessage, dm: DatasetManager) {
+  private fun tryProcessMessage(message: EventMessage, dm: DatasetObjectStore) {
     if (datasetsInProgress.add(message.datasetID)) {
       try {
         processMessage(message, dm)
@@ -51,7 +51,7 @@ internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPru
     }
   }
 
-  private fun processMessage(message: EventMessage, dm: DatasetManager) {
+  private fun processMessage(message: EventMessage, dm: DatasetObjectStore) {
     log.info("{}/{}: received revision pruning event from {}", message.userID, message.datasetID, message.eventSource)
 
     val s3Dir = dm.getDatasetDirectory(message.userID, message.datasetID)
@@ -68,7 +68,7 @@ internal class RevisionPruningTriggerHandlerImpl(private val config: RevisionPru
     }
   }
 
-  private fun tryProcessDataset(userID: UserID, datasetID: DatasetID, s3Dir: DatasetDirectory, dm: DatasetManager) {
+  private fun tryProcessDataset(userID: UserID, datasetID: DatasetID, s3Dir: DatasetDirectory, dm: DatasetObjectStore) {
     val meta = s3Dir.getMetaFile().load()
 
     if (meta == null) {

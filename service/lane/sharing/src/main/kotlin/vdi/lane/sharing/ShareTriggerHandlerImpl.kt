@@ -23,7 +23,7 @@ import vdi.component.db.cache.withTransaction
 import vdi.lib.metrics.Metrics
 import vdi.component.modules.AbortCB
 import vdi.component.modules.AbstractVDIModule
-import vdi.component.s3.DatasetManager
+import vdi.component.s3.DatasetObjectStore
 import vdi.component.s3.files.DatasetShare
 import java.sql.SQLException
 import java.time.OffsetDateTime
@@ -77,7 +77,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     confirmShutdown()
   }
 
-  private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
+  private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore) {
     log.info("processing share trigger for dataset {}/{}", userID, datasetID)
 
     val dataset = cacheDB.selectDataset(datasetID)

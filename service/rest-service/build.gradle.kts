@@ -6,12 +6,11 @@ plugins {
 containerService {
   service {
     name = "vdi-service"
-    projectPackage = "org.veupathdb.service.vdi"
+    projectPackage = "vdi.service"
   }
 
   raml {
     schemaRootDir = file("schema/types")
-    rootApiDefinition = file("api-deprecation.raml")
     generateModelStreams = false
   }
 

@@ -7,7 +7,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
-import vdi.component.s3.DatasetManager
+import vdi.component.s3.DatasetObjectStore
 import vdi.component.s3.files.*
 import java.io.InputStream
 import java.time.OffsetDateTime
@@ -137,7 +137,7 @@ fun mockDatasetManager(
   onListDatasets: Fn<UserID, List<DatasetID>> = ::oneParamList,
   onStreamAllDatasets: Pro<Stream<vdi.component.s3.DatasetDirectory>> = { Stream.empty() },
   onListUsers: Pro<List<UserID>> = ::noParamList,
-): DatasetManager =
+): DatasetObjectStore =
   mock {
     on { getDatasetDirectory(any(), any()) } doAnswer { onGetDatasetDirectory(it.getArgument(0), it.getArgument(1)) }
     on { listDatasets(any()) } doAnswer { onListDatasets(it.getArgument(0)) }

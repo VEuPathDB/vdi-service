@@ -8,7 +8,7 @@ import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.withTransaction
 import vdi.component.kafka.EventSource
 import vdi.component.kafka.router.KafkaRouter
-import vdi.component.s3.DatasetManager
+import vdi.component.s3.DatasetObjectStore
 import vdi.lane.reconciliation.util.*
 import vdi.lane.reconciliation.util.requireSyncControl
 import vdi.lane.reconciliation.util.safeExec
@@ -20,7 +20,7 @@ internal class DatasetReconciler(
   private val cacheDB: CacheDB = CacheDB(),
   private val appDB: AppDB = AppDB(),
   private val eventRouter: KafkaRouter,
-  private val datasetManager: DatasetManager,
+  private val datasetManager: DatasetObjectStore,
 ) {
   // TODO: If the import-ready file is newer than the install-ready or manifest
   //       files then we should fire an import event.

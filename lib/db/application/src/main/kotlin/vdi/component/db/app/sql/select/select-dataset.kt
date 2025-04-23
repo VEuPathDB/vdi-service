@@ -40,7 +40,7 @@ internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): Dat
           owner       = rs.getUserID("owner"),
           typeName    = rs.getDataType("type_name"),
           typeVersion = rs.getString("type_version"),
-          isDeleted   = rs.getDeleteFlag("is_deleted"),
+          deletionState   = rs.getDeleteFlag("is_deleted"),
           isPublic    = rs.getBoolean("is_public")
         )
     }

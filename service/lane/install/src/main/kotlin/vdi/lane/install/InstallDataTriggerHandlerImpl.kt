@@ -29,7 +29,7 @@ import vdi.lib.plugin.client.response.ind.*
 import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.component.s3.DatasetDirectory
-import vdi.component.s3.DatasetManager
+import vdi.component.s3.DatasetObjectStore
 import java.io.InputStream
 import java.sql.SQLException
 import java.time.OffsetDateTime
@@ -71,7 +71,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     confirmShutdown()
   }
 
-  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetManager, kr: KafkaRouter) {
+  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore, kr: KafkaRouter) {
     if (datasetsInProgress.add(datasetID)) {
       try {
         installData(userID, datasetID, dm)
@@ -110,7 +110,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
    * @param dm `DatasetManager` instance that will be used to look up the
    * dataset's files in S3.
    */
-  private suspend fun installData(userID: UserID, datasetID: DatasetID, dm: DatasetManager) {
+  private suspend fun installData(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore) {
     log.debug("looking up dataset directory for {}/{}", userID, datasetID)
 
     val dir = dm.getDatasetDirectory(userID, datasetID)
@@ -202,7 +202,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
    * Checks if the dataset has a revision history, and if so, fires a revision
    * pruning event to prune previous revisions.
    */
-  private fun maybeFireRevisionEvent(userID: UserID, datasetID: DatasetID, dm: DatasetManager, kr: KafkaRouter) {
+  private fun maybeFireRevisionEvent(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore, kr: KafkaRouter) {
     val meta = dm.getDatasetDirectory(userID, datasetID).getMetaFile().load()!!
 
     if (meta.originalID != null)
@@ -251,7 +251,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         return
       }
 
-      if (dataset.isDeleted != DeleteFlag.NotDeleted) {
+      if (dataset.deletionState != DeleteFlag.NotDeleted) {
         log.info(
           "skipping install event for dataset {}/{} into project {} due to the dataset being marked as deleted",
           userID,
