@@ -10,7 +10,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.util.or
-import vdi.component.async.WorkerPool
+import vdi.lib.async.WorkerPool
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.model.DatasetInstallMessage
 import vdi.component.db.app.model.DeleteFlag
@@ -20,15 +20,15 @@ import vdi.component.db.app.withTransaction
 import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.withTransaction
 import vdi.component.kafka.EventSource
-import vdi.component.kafka.router.KafkaRouter
+import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.metrics.Metrics
-import vdi.component.modules.AbortCB
-import vdi.component.modules.AbstractVDIModule
+import vdi.lib.modules.AbortCB
+import vdi.lib.modules.AbstractVDIModule
 import vdi.lib.plugin.client.PluginRequestException
 import vdi.lib.plugin.client.response.ind.*
 import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
-import vdi.component.s3.DatasetDirectory
+import vdi.lib.s3.DatasetDirectory
 import vdi.component.s3.DatasetObjectStore
 import java.io.InputStream
 import java.sql.SQLException
@@ -71,7 +71,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     confirmShutdown()
   }
 
-  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore, kr: KafkaRouter) {
+  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore, kr: vdi.lib.kafka.router.KafkaRouter) {
     if (datasetsInProgress.add(datasetID)) {
       try {
         installData(userID, datasetID, dm)
@@ -202,7 +202,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
    * Checks if the dataset has a revision history, and if so, fires a revision
    * pruning event to prune previous revisions.
    */
-  private fun maybeFireRevisionEvent(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore, kr: KafkaRouter) {
+  private fun maybeFireRevisionEvent(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore, kr: vdi.lib.kafka.router.KafkaRouter) {
     val meta = dm.getDatasetDirectory(userID, datasetID).getMetaFile().load()!!
 
     if (meta.originalID != null)
@@ -224,7 +224,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     userID:    UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
-    s3Dir: DatasetDirectory,
+    s3Dir: vdi.lib.s3.DatasetDirectory,
     handler: PluginHandler,
     installableFileTimestamp: OffsetDateTime,
   ) {
@@ -531,7 +531,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   }
 
   private suspend fun <T> withInstallBundle(
-    s3Dir: DatasetDirectory,
+    s3Dir: vdi.lib.s3.DatasetDirectory,
     fn: suspend (meta: InputStream, manifest: InputStream, upload: InputStream) -> T
   ) =
     s3Dir.getMetaFile().loadContents()!!.use { meta ->

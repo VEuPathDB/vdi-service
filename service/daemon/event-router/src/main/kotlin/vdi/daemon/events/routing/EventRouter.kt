@@ -1,6 +1,6 @@
 package vdi.daemon.events.routing
 
-import vdi.component.modules.VDIModule
+import vdi.lib.modules.VDIModule
 
 /**
  * Represents an instance of the `event-router` VDI Service module.

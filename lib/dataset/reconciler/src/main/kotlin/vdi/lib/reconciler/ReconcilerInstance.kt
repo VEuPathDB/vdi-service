@@ -6,9 +6,9 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.sql.select.TempHackCacheDBReconcilerTargetRecord
 import vdi.component.kafka.EventSource
-import vdi.component.kafka.router.KafkaRouter
+import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.metrics.Metrics
-import vdi.component.s3.DatasetDirectory
+import vdi.lib.s3.DatasetDirectory
 import vdi.component.s3.DatasetObjectStore
 import vdi.lib.db.model.ReconcilerTargetRecord
 import vdi.lib.db.model.SyncControlRecord
@@ -25,7 +25,7 @@ import java.time.OffsetDateTime
 internal class ReconcilerInstance(
   private val targetDB: ReconcilerTarget,
   private val datasetManager: DatasetObjectStore,
-  private val kafkaRouter: KafkaRouter,
+  private val kafkaRouter: vdi.lib.kafka.router.KafkaRouter,
   private val slim: Boolean,
   private val deletesEnabled: Boolean
 ) {
@@ -67,7 +67,7 @@ internal class ReconcilerInstance(
   }
 
   private suspend fun tryReconcile(
-    sourceIterator: Iterator<DatasetDirectory>,
+    sourceIterator: Iterator<vdi.lib.s3.DatasetDirectory>,
     targetIterator: Iterator<ReconcilerTargetRecord>,
   ) {
     nextTargetDataset = targetIterator.nextOrNull()
@@ -172,7 +172,7 @@ internal class ReconcilerInstance(
       sendSyncEvent(ownerID, datasetID, SyncReason.NeedsUninstall(targetDB))
   }
 
-  private fun DatasetDirectory.ensureSynchronized(comparableS3Id: String) {
+  private fun vdi.lib.s3.DatasetDirectory.ensureSynchronized(comparableS3Id: String) {
     // The dataset does not have a delete flag present in MinIO
 
     // If for some reason it is marked as uninstalled in the target
@@ -239,7 +239,7 @@ internal class ReconcilerInstance(
    * @return A boolean value indicating whether the dataset was relevant to the
    * current target project and a reconciliation event was fired.
    */
-  private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory, reason: SyncReason): Boolean {
+  private fun sendSyncIfRelevant(sourceDatasetDir: vdi.lib.s3.DatasetDirectory, reason: SyncReason): Boolean {
     if (targetDB.type == ReconcilerTargetType.Install) {
 
       // Ensure the meta json file exists in S3 to protect against NPEs being
@@ -270,7 +270,7 @@ internal class ReconcilerInstance(
       Metrics.Reconciler.Full.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
 
-  private fun Iterator<DatasetDirectory>.consumeAndTrySync(first: DatasetDirectory) {
+  private fun Iterator<vdi.lib.s3.DatasetDirectory>.consumeAndTrySync(first: vdi.lib.s3.DatasetDirectory) {
     sendSyncIfRelevant(first, SyncReason.MissingInTarget(targetDB))
 
     while (hasNext())
@@ -281,7 +281,7 @@ internal class ReconcilerInstance(
 /**
  * Returns true if any of our scopes are out of sync.
  */
-private fun DatasetDirectory.isOutOfSync(targetLastUpdated: SyncControlRecord): SyncStatus {
+private fun vdi.lib.s3.DatasetDirectory.isOutOfSync(targetLastUpdated: SyncControlRecord): SyncStatus {
   return SyncStatus(
     metaOutOfSync    = targetLastUpdated.metaUpdated.isBefore(getMetaFile().lastModified()),
     sharesOutOfSync = targetLastUpdated.sharesUpdated.isBefore(getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),

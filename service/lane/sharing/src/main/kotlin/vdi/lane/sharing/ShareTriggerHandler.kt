@@ -1,6 +1,6 @@
 package vdi.lane.sharing
 
-import vdi.component.modules.VDIModule
+import vdi.lib.modules.VDIModule
 
 /**
  * Share Trigger Handling Module

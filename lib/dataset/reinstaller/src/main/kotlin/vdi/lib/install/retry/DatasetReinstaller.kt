@@ -21,7 +21,7 @@ import vdi.lib.plugin.client.response.uni.UninstallResponseType
 import vdi.lib.plugin.client.response.uni.UninstallUnexpectedErrorResponse
 import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
-import vdi.component.s3.DatasetDirectory
+import vdi.lib.s3.DatasetDirectory
 import vdi.component.s3.DatasetManager
 import vdi.component.s3.DatasetObjectStore
 import java.io.InputStream
@@ -200,7 +200,7 @@ object DatasetReinstaller {
     }
   }
 
-  private fun DatasetDirectory.isReinstallable(): Boolean {
+  private fun vdi.lib.s3.DatasetDirectory.isReinstallable(): Boolean {
     var ok = true
 
     if (!hasMetaFile()) {
@@ -347,7 +347,7 @@ object DatasetReinstaller {
   }
 
   private suspend fun <T> withInstallBundle(
-    s3Dir: DatasetDirectory,
+    s3Dir: vdi.lib.s3.DatasetDirectory,
     fn: suspend (meta: InputStream, manifest: InputStream, upload: InputStream) -> T
   ) =
     s3Dir.getMetaFile().loadContents()!!.use { meta ->

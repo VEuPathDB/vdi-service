@@ -4,7 +4,7 @@ import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.env.optional
 import vdi.lib.env.EnvKey
 import vdi.component.kafka.KafkaConsumerConfig
-import vdi.component.kafka.router.KafkaRouterConfigDefaults
+import vdi.lib.kafka.router.KafkaRouterConfigDefaults
 
 
 data class KafkaConfig(
@@ -22,7 +22,7 @@ data class KafkaConfig(
    * Messages received on the import trigger topic that do not have this message
    * key will be ignored with a warning.
    */
-  val importTriggerMessageKey: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
+  val importTriggerMessageKey: String = vdi.lib.kafka.router.KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
 
   /**
    * Import Triggers Topic
@@ -30,15 +30,15 @@ data class KafkaConfig(
    * Name of the Kafka topic that import trigger messages will be listened for
    * on.
    */
-  val importTriggerTopic: String = KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
+  val importTriggerTopic: String = vdi.lib.kafka.router.KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
 ) {
   constructor(clientID: String) : this(System.getenv(), clientID)
 
   constructor(env: Environment, clientID: String) : this(
     consumerConfig          = KafkaConsumerConfig(clientID, env),
     importTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.ImportTriggers)
-      ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
+      ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.IMPORT_TRIGGER_MESSAGE_KEY,
     importTriggerTopic      = env.optional(EnvKey.Kafka.Topic.ImportTriggers)
-      ?: KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
+      ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.IMPORT_TRIGGER_TOPIC,
   )
 }

@@ -1,6 +1,6 @@
 package vdi.lane.imports
 
-import vdi.component.modules.VDIModule
+import vdi.lib.modules.VDIModule
 
 /**
  * Import Trigger Handling Module

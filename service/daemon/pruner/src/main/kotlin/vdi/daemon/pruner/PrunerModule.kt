@@ -1,6 +1,6 @@
 package vdi.daemon.pruner
 
-import vdi.component.modules.VDIModule
+import vdi.lib.modules.VDIModule
 
 /**
  * Pruning Module

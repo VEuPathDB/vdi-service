@@ -8,8 +8,8 @@ import org.veupathdb.vdi.lib.common.env.require
 import vdi.lib.env.EnvKey
 import vdi.lib.env.Environment
 import vdi.component.kafka.KafkaConsumerConfig
-import vdi.component.kafka.router.KafkaRouterConfigDefaults
-import vdi.component.s3.util.S3Config
+import vdi.lib.kafka.router.KafkaRouterConfigDefaults
+import vdi.lib.s3.util.S3Config
 
 data class ShareTriggerHandlerConfig(
   val workerPoolSize:         UInt,
@@ -34,15 +34,15 @@ data class ShareTriggerHandlerConfig(
       env
     ),
 
-    s3Config = S3Config(env),
+    s3Config = vdi.lib.s3.util.S3Config(env),
 
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
 
     shareTriggerTopic = env.optional(EnvKey.Kafka.Topic.ShareTriggers)
-      ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_TOPIC,
+      ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.SHARE_TRIGGER_TOPIC,
 
     shareTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.ShareTriggers)
-      ?: KafkaRouterConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY
+      ?: vdi.lib.kafka.router.KafkaRouterConfigDefaults.SHARE_TRIGGER_MESSAGE_KEY
   )
 
   object Defaults {

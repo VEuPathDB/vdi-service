@@ -6,7 +6,7 @@ plugins {
 containerService {
   service {
     name = "vdi-service"
-    projectPackage = "vdi.service"
+    projectPackage = "vdi.service.rest"
   }
 
   raml {

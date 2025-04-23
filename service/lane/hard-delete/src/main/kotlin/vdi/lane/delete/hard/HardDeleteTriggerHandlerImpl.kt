@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-import vdi.component.modules.AbstractVDIModule
+import vdi.lib.modules.AbstractVDIModule
 
 internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTriggerHandlerConfig, abortCB: (String?) -> Nothing)
   : HardDeleteTriggerHandler

@@ -3,14 +3,14 @@ package vdi.lane.reconciliation
 import org.slf4j.Logger
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.kafka.EventSource
-import vdi.component.s3.DatasetDirectory
+import vdi.lib.s3.DatasetDirectory
 import vdi.component.s3.paths.S3Paths
 import vdi.lane.reconciliation.util.require
 import vdi.lane.reconciliation.util.safeExec
 import vdi.lane.reconciliation.util.safeTest
 
 internal class ReconciliationContext(
-  val datasetDirectory: DatasetDirectory,
+  val datasetDirectory: vdi.lib.s3.DatasetDirectory,
   val source: EventSource,
   val logger: Logger,
 ) {

@@ -5,7 +5,7 @@ import org.veupathdb.vdi.lib.common.env.optional
 import vdi.lib.env.EnvKey
 import vdi.lib.env.Environment
 import vdi.component.kafka.KafkaConsumerConfig
-import vdi.component.kafka.router.KafkaRouterConfigDefaults
+import vdi.lib.kafka.router.KafkaRouterConfigDefaults
 
 data class HardDeleteTriggerHandlerConfig(
   val jobQueueSize: UInt,
@@ -41,10 +41,10 @@ data class HardDeleteTriggerHandlerConfig(
     const val KafkaConsumerClientID = "hard-delete-handler"
 
     inline val HardDeleteTopic
-      get() = KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC
+      get() = vdi.lib.kafka.router.KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_TOPIC
 
     inline val HardDeleteMesesageKey
-      get() = KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY
+      get() = vdi.lib.kafka.router.KafkaRouterConfigDefaults.HARD_DELETE_TRIGGER_MESSAGE_KEY
   }
 }
 

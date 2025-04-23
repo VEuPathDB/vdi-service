@@ -12,8 +12,8 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import vdi.component.kafka.router.KafkaRouter
-import vdi.component.s3.DatasetDirectory
+import vdi.lib.kafka.router.KafkaRouter
+import vdi.lib.s3.DatasetDirectory
 import vdi.component.s3.DatasetObjectStore
 import vdi.component.s3.files.DatasetMetaFile
 import java.time.OffsetDateTime
@@ -29,7 +29,7 @@ class ReconcilerTest {
         val cacheDb = mock<ReconcilerTarget>()
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetObjectStore>()
-        val kafkaRouter = mock<KafkaRouter>()
+        val kafkaRouter = mock<vdi.lib.kafka.router.KafkaRouter>()
 
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, true)
 
@@ -63,7 +63,7 @@ class ReconcilerTest {
         val cacheDb = mock<ReconcilerTarget>()
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetObjectStore>()
-        val kafkaRouter = mock<KafkaRouter>()
+        val kafkaRouter = mock<vdi.lib.kafka.router.KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, false)
 
         `when`(cacheDb.streamSortedSyncControlRecords())
@@ -85,7 +85,7 @@ class ReconcilerTest {
         val cacheDb = mock<ReconcilerTarget>()
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetObjectStore>()
-        val kafkaRouter = mock<KafkaRouter>()
+        val kafkaRouter = mock<vdi.lib.kafka.router.KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, false)
 
         `when`(cacheDb.streamSortedSyncControlRecords())
@@ -103,7 +103,7 @@ class ReconcilerTest {
         val cacheDb = mock<ReconcilerTarget>()
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetObjectStore>()
-        val kafkaRouter = mock<KafkaRouter>()
+        val kafkaRouter = mock<vdi.lib.kafka.router.KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, false)
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
@@ -126,7 +126,7 @@ class ReconcilerTest {
         val cacheDb = mock<ReconcilerTarget>()
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetObjectStore>()
-        val kafkaRouter = mock<KafkaRouter>()
+        val kafkaRouter = mock<vdi.lib.kafka.router.KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, true)
 
         `when`(cacheDb.streamSortedSyncControlRecords()).thenReturn(
@@ -159,7 +159,7 @@ class ReconcilerTest {
         val cacheDb = mock<ReconcilerTarget>()
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetObjectStore>()
-        val kafkaRouter = mock<KafkaRouter>()
+        val kafkaRouter = mock<vdi.lib.kafka.router.KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, true)
 
         `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
@@ -193,7 +193,7 @@ class ReconcilerTest {
         val cacheDb = mock<ReconcilerTarget>()
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetObjectStore>()
-        val kafkaRouter = mock<KafkaRouter>()
+        val kafkaRouter = mock<vdi.lib.kafka.router.KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, false)
 
         `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
@@ -225,7 +225,7 @@ class ReconcilerTest {
         val cacheDb = mock<ReconcilerTarget>()
         `when`(cacheDb.name).thenReturn("CacheDB")
         val datasetManager = mock<DatasetObjectStore>()
-        val kafkaRouter = mock<KafkaRouter>()
+        val kafkaRouter = mock<vdi.lib.kafka.router.KafkaRouter>()
         val recon = ReconcilerInstance(cacheDb, datasetManager, kafkaRouter, false, false)
 
         `when`(cacheDb.type).thenReturn(ReconcilerTargetType.Cache)
@@ -265,8 +265,8 @@ class ReconcilerTest {
         }
     }
 
-    private fun mockDatasetDirectory(userID: Long, datasetID: String): DatasetDirectory {
-        val dsMock = mock<DatasetDirectory>()
+    private fun mockDatasetDirectory(userID: Long, datasetID: String): vdi.lib.s3.DatasetDirectory {
+        val dsMock = mock<vdi.lib.s3.DatasetDirectory>()
         `when`(dsMock.datasetID).thenReturn(DatasetID(datasetID))
         `when`(dsMock.ownerID).thenReturn(UserID(userID))
         `when`(dsMock.getInstallReadyTimestamp() ?: UpdateTime).thenReturn(UpdateTime)
@@ -277,8 +277,8 @@ class ReconcilerTest {
         return dsMock
     }
 
-    private fun mockDatasetDirectory(userID: Long, datasetID: String, syncTime: OffsetDateTime): DatasetDirectory {
-        val dsMock = mock<DatasetDirectory>()
+    private fun mockDatasetDirectory(userID: Long, datasetID: String, syncTime: OffsetDateTime): vdi.lib.s3.DatasetDirectory {
+        val dsMock = mock<vdi.lib.s3.DatasetDirectory>()
         `when`(dsMock.datasetID).thenReturn(DatasetID(datasetID))
         `when`(dsMock.ownerID).thenReturn(UserID(userID))
         `when`(dsMock.getInstallReadyTimestamp() ?: UpdateTime).thenReturn(syncTime)

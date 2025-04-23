@@ -1,6 +1,6 @@
 package vdi.lane.install
 
-import vdi.component.modules.VDIModule
+import vdi.lib.modules.VDIModule
 
 /**
  * Install Data Trigger Handler

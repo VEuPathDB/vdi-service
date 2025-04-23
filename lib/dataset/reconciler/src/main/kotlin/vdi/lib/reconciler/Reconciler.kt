@@ -10,10 +10,10 @@ import org.apache.logging.log4j.kotlin.ThreadContextData
 import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.lib.s3.s34k.S3Api
 import vdi.component.db.app.AppDatabaseRegistry
-import vdi.component.kafka.router.KafkaRouter
+import vdi.lib.kafka.router.KafkaRouter
 import vdi.component.kafka.router.KafkaRouterFactory
 import vdi.lib.metrics.Metrics
-import vdi.component.modules.AbortCB
+import vdi.lib.modules.AbortCB
 import vdi.component.s3.DatasetManager
 import vdi.component.s3.DatasetObjectStore
 
@@ -28,7 +28,7 @@ object Reconciler {
 
   private lateinit var datasetManager: DatasetObjectStore
 
-  private lateinit var kafkaRouter: KafkaRouter
+  private lateinit var kafkaRouter: vdi.lib.kafka.router.KafkaRouter
 
   fun initialize(abortCB: AbortCB) {
     // We lock while initializing to avoid double init.

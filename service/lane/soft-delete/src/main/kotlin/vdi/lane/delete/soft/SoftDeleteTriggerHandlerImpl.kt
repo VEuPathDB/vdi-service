@@ -10,7 +10,7 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.util.or
-import vdi.component.async.WorkerPool
+import vdi.lib.async.WorkerPool
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDatabaseRegistry
 import vdi.component.db.app.model.DeleteFlag
@@ -19,8 +19,8 @@ import vdi.component.db.cache.CacheDB
 import vdi.component.db.cache.model.DatasetRecord
 import vdi.component.db.cache.withTransaction
 import vdi.lib.metrics.Metrics
-import vdi.component.modules.AbortCB
-import vdi.component.modules.AbstractVDIModule
+import vdi.lib.modules.AbortCB
+import vdi.lib.modules.AbstractVDIModule
 import vdi.lib.plugin.client.PluginRequestException
 import vdi.lib.plugin.client.response.uni.UninstallBadRequestResponse
 import vdi.lib.plugin.client.response.uni.UninstallResponseType

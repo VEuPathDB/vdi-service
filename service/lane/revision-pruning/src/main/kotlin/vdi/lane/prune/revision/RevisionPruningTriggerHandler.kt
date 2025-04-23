@@ -1,6 +1,6 @@
 package vdi.lane.prune.revision
 
-import vdi.component.modules.VDIModule
+import vdi.lib.modules.VDIModule
 
 /**
  * Revision Pruning Trigger Handler

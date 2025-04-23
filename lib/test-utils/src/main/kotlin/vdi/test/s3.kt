@@ -15,7 +15,7 @@ import java.util.stream.Stream
 
 private sealed class DummyFileBase
   : DatasetDeleteFlagFile
-  , DatasetRawUploadFile
+  , vdi.lib.s3.files.DatasetRawUploadFile
   , DatasetImportableFile
   , DatasetInstallableFile
 {
@@ -61,7 +61,7 @@ fun mockDatasetDirectory(
   onDeleteDeleteFlag: Runnable = ::runnable,
   deleteFlagTimestamp: OffsetDateTime? = deleteFlag.lastModified(),
 
-  uploadFile: DatasetRawUploadFile = DummyDatasetFile,
+  uploadFile: vdi.lib.s3.files.DatasetRawUploadFile = DummyDatasetFile,
   hasUploadFile: Boolean = uploadFile.exists(),
   onPutUploadFile: Con<Pro<InputStream>> = ::consumer,
   onDeleteUploadFile: Runnable = ::runnable,
@@ -83,7 +83,7 @@ fun mockDatasetDirectory(
   onPutShare: Con<UserID> = ::consumer,
 
   onGetLatestShareTimestamp: (OffsetDateTime) -> OffsetDateTime = { it },
-): vdi.component.s3.DatasetDirectory =
+): vdi.lib.s3.DatasetDirectory =
   mock {
     ownerID?.also { on { this.ownerID } doReturn it }
     datasetID?.also { on { this.datasetID } doReturn it }
@@ -133,9 +133,9 @@ fun mockDatasetDirectory(
   }
 
 fun mockDatasetManager(
-  onGetDatasetDirectory: BiFn<UserID, DatasetID, vdi.component.s3.DatasetDirectory> = { u, d -> mockDatasetDirectory(ownerID = u, datasetID = d) },
+  onGetDatasetDirectory: BiFn<UserID, DatasetID, vdi.lib.s3.DatasetDirectory> = { u, d -> mockDatasetDirectory(ownerID = u, datasetID = d) },
   onListDatasets: Fn<UserID, List<DatasetID>> = ::oneParamList,
-  onStreamAllDatasets: Pro<Stream<vdi.component.s3.DatasetDirectory>> = { Stream.empty() },
+  onStreamAllDatasets: Pro<Stream<vdi.lib.s3.DatasetDirectory>> = { Stream.empty() },
   onListUsers: Pro<List<UserID>> = ::noParamList,
 ): DatasetObjectStore =
   mock {
@@ -204,12 +204,12 @@ fun mockRawUploadFile(
   exists: Boolean = false,
   lastModified: OffsetDateTime? = null,
   contents: InputStream? = null,
-): DatasetRawUploadFile =
+): vdi.lib.s3.files.DatasetRawUploadFile =
   mock { mockDatasetFile(path, baseName, exists, lastModified, contents) }
 
 fun mockDatasetShare(
   recipientID: UserID? = null,
-  offer: DatasetShareOfferFile? = null,
+  offer: vdi.lib.s3.files.DatasetShareOfferFile? = null,
   receipt: DatasetShareReceiptFile? = null,
 ): DatasetShare =
   mock {
@@ -225,7 +225,7 @@ fun mockShareOfferFile(
   lastModified: OffsetDateTime? = null,
   contents: InputStream? = null,
   offer: VDIDatasetShareOffer? = null,
-): DatasetShareOfferFile =
+): vdi.lib.s3.files.DatasetShareOfferFile =
   mock {
     mockDatasetFile(path, baseName, exists, lastModified, contents)
     on { load() } doReturn offer

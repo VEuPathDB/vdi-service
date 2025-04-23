@@ -10,7 +10,7 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.common.util.isNull
-import vdi.component.async.WorkerPool
+import vdi.lib.async.WorkerPool
 import vdi.component.db.app.AppDB
 import vdi.component.db.app.AppDBTransaction
 import vdi.component.db.app.AppDatabaseRegistry
@@ -21,8 +21,8 @@ import vdi.component.db.cache.model.DatasetShareOfferImpl
 import vdi.component.db.cache.model.DatasetShareReceiptImpl
 import vdi.component.db.cache.withTransaction
 import vdi.lib.metrics.Metrics
-import vdi.component.modules.AbortCB
-import vdi.component.modules.AbstractVDIModule
+import vdi.lib.modules.AbortCB
+import vdi.lib.modules.AbstractVDIModule
 import vdi.component.s3.DatasetObjectStore
 import vdi.component.s3.files.DatasetShare
 import java.sql.SQLException

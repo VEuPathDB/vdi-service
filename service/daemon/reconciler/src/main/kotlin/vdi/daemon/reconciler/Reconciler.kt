@@ -1,6 +1,6 @@
 package vdi.daemon.reconciler
 
-import vdi.component.modules.VDIModule
+import vdi.lib.modules.VDIModule
 
 /**
  * Reconciler module

@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import vdi.component.modules.VDIModule
+import vdi.lib.modules.VDIModule
 import org.veupathdb.service.vdi.RestService
 import vdi.component.db.cache.patchMetadataTable
 import vdi.daemon.events.routing.EventRouter

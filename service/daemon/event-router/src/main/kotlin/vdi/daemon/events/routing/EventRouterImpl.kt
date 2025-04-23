@@ -9,14 +9,14 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
 import vdi.component.kafka.EventSource
-import vdi.component.kafka.router.KafkaRouter
+import vdi.lib.kafka.router.KafkaRouter
 import vdi.component.kafka.router.KafkaRouterFactory
-import vdi.component.modules.AbortCB
-import vdi.component.modules.AbstractVDIModule
-import vdi.component.rabbit.RabbitMQEventIterator
-import vdi.component.rabbit.RabbitMQEventSource
-import vdi.component.s3.paths.VDDatasetFilePath
-import vdi.component.s3.paths.VDDatasetShareFilePath
+import vdi.lib.modules.AbortCB
+import vdi.lib.modules.AbstractVDIModule
+import vdi.lib.rabbit.RabbitMQEventIterator
+import vdi.lib.rabbit.RabbitMQEventSource
+import vdi.lib.s3.paths.VDDatasetFilePath
+import vdi.lib.s3.paths.VDDatasetShareFilePath
 import vdi.component.s3.paths.toVDPathOrNull
 import vdi.daemon.events.routing.model.MinIOEvent
 import vdi.daemon.events.routing.model.MinIOEventAction
@@ -39,7 +39,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
     }
   }
 
-  private val kr: KafkaRouter = runBlocking {
+  private val kr: vdi.lib.kafka.router.KafkaRouter = runBlocking {
     try {
       KafkaRouterFactory(config.kafkaConfig).newKafkaRouter()
     } catch (e: Throwable) {
@@ -102,13 +102,13 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
         continue
       }
 
-      if (path is VDDatasetShareFilePath) {
+      if (path is vdi.lib.s3.paths.VDDatasetShareFilePath) {
         log.debug("received a share event for dataset {}/{}", path.userID, path.datasetID)
         safeSend(path.userID, path.datasetID, kr::sendShareTrigger)
         continue
       }
 
-      if (path !is VDDatasetFilePath) {
+      if (path !is vdi.lib.s3.paths.VDDatasetFilePath) {
         log.error("unrecognized VDPath implementation type {}, someone forgot to update the event router", path::class.qualifiedName)
         continue
       }

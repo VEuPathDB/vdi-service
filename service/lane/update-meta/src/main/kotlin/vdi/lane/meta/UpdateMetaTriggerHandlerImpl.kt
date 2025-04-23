@@ -13,7 +13,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.or
-import vdi.component.async.WorkerPool
+import vdi.lib.async.WorkerPool
 import vdi.component.db.app.*
 import vdi.component.db.app.model.*
 import vdi.component.db.cache.CacheDB
@@ -21,18 +21,18 @@ import vdi.component.db.cache.CacheDBTransaction
 import vdi.component.db.cache.model.DatasetImpl
 import vdi.component.db.cache.model.DatasetImportStatus
 import vdi.component.db.cache.withTransaction
-import vdi.component.kafka.EventMessage
+import vdi.lib.kafka.EventMessage
 import vdi.component.kafka.EventSource
-import vdi.component.kafka.router.KafkaRouter
+import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.metrics.Metrics
-import vdi.component.modules.AbortCB
-import vdi.component.modules.AbstractVDIModule
+import vdi.lib.modules.AbortCB
+import vdi.lib.modules.AbstractVDIModule
 import vdi.lib.plugin.client.PluginRequestException
 import vdi.lib.plugin.client.response.inm.InstallMetaResponseType
 import vdi.lib.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
 import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
-import vdi.component.s3.DatasetDirectory
+import vdi.lib.s3.DatasetDirectory
 import vdi.component.s3.DatasetObjectStore
 import java.sql.SQLException
 import java.time.OffsetDateTime
@@ -79,7 +79,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     confirmShutdown()
   }
 
-  private suspend fun updateMetaIfNotInProgress(dm: DatasetObjectStore, kr: KafkaRouter, msg: EventMessage) {
+  private suspend fun updateMetaIfNotInProgress(dm: DatasetObjectStore, kr: vdi.lib.kafka.router.KafkaRouter, msg: vdi.lib.kafka.EventMessage) {
     if (datasetsInProgress.add(msg.datasetID)) {
       try {
         tryUpdateMeta(dm, kr, msg)
@@ -91,7 +91,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     }
   }
 
-  private suspend fun tryUpdateMeta(dm: DatasetObjectStore, kr: KafkaRouter, msg: EventMessage) {
+  private suspend fun tryUpdateMeta(dm: DatasetObjectStore, kr: vdi.lib.kafka.router.KafkaRouter, msg: vdi.lib.kafka.EventMessage) {
     try {
       if (msg.eventSource == EventSource.UpdateMetaLane) {
         log.warn("attempted to recurse update meta on dataset ${msg.userID}/${msg.datasetID}")
@@ -424,7 +424,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     throw vdi.lib.plugin.client.PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
-  private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
+  private fun vdi.lib.s3.DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
     if (!exists()) {
       log.warn("got an update-meta event for dataset {}/{} which has no directory?", userID, datasetID)
       return false

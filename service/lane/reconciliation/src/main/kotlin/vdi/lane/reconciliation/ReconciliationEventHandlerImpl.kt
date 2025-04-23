@@ -6,10 +6,10 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.component.async.WorkerPool
+import vdi.lib.async.WorkerPool
 import vdi.component.kafka.EventSource
 import vdi.lib.metrics.Metrics
-import vdi.component.modules.AbstractVDIModule
+import vdi.lib.modules.AbstractVDIModule
 import java.util.concurrent.ConcurrentHashMap
 
 internal class ReconciliationEventHandlerImpl(

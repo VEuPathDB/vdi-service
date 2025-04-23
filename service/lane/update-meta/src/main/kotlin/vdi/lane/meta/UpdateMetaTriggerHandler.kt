@@ -1,6 +1,6 @@
 package vdi.lane.meta
 
-import vdi.component.modules.VDIModule
+import vdi.lib.modules.VDIModule
 
 /**
  * Update Meta Trigger Handling Module

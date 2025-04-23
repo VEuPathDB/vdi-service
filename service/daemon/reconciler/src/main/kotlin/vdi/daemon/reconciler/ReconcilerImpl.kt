@@ -1,8 +1,8 @@
 package vdi.daemon.reconciler
 
 import org.apache.logging.log4j.kotlin.logger
-import vdi.component.modules.AbortCB
-import vdi.component.modules.AbstractJobExecutor
+import vdi.lib.modules.AbortCB
+import vdi.lib.modules.AbstractJobExecutor
 import vdi.lib.reconciler.Reconciler as Recon
 import kotlin.time.Duration.Companion.milliseconds
 

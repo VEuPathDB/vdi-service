@@ -2,9 +2,9 @@ package vdi.daemon.pruner
 
 import org.slf4j.LoggerFactory
 import vdi.lib.metrics.Metrics
-import vdi.component.modules.AbortCB
-import vdi.component.modules.AbstractJobExecutor
-import vdi.component.pruner.Pruner
+import vdi.lib.modules.AbortCB
+import vdi.lib.modules.AbstractJobExecutor
+import vdi.lib.pruner.Pruner
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
