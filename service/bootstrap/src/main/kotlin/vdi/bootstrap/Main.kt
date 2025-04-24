@@ -36,7 +36,7 @@ object Main {
       ShareTriggerHandler(::fatality),
       SoftDeleteTriggerHandler(::fatality),
       UpdateMetaTriggerHandler(::fatality),
-      Reconciler(abortCB = ::fatality),
+      Reconciler(::fatality),
       ReconciliationEventHandler(::fatality),
     )
 
@@ -45,7 +45,13 @@ object Main {
 
     Runtime.getRuntime().addShutdownHook(Thread { shutdownModules(modules) })
 
-    thread { RestService.main(args) }
+    thread {
+      try {
+        RestService.main(args)
+      } finally {
+        shutdownModules(modules)
+      }
+    }
 
     log.info("starting modules")
     runBlocking(Dispatchers.IO) { modules.forEach { launch { it.start() } } }
