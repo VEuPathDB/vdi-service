@@ -1,8 +1,6 @@
 package vdi.service.rest.server.outputs
 
 import vdi.service.rest.generated.model.InternalDatasetDetails
-import vdi.service.rest.generated.model.InternalDatasetDetailsImpl
-import vdi.service.rest.generated.model.SyncControlRecordImpl
 import vdi.lib.db.cache.model.AdminDatasetDetailsRecord
 
 internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): InternalDatasetDetails =
@@ -21,7 +19,7 @@ internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): Internal
     it.description = record.description
     it.visibility = DatasetVisibility(record.visibility)
     it.sourceUrl = record.sourceURL
-    it.projectIds = record.projectIDs
+    it.projectIds = record.projects
     it.status = record.importStatus.toString()
 
     record.syncControl?.let { queriedSyncControl ->

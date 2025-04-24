@@ -1,4 +1,4 @@
-package vdi.service.rest.server.services.admin
+package vdi.service.rest.server.services.admin.report
 
 import org.veupathdb.vdi.lib.common.field.toUserID
 import vdi.lib.db.cache.CacheDB
@@ -8,9 +8,7 @@ import vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort
 import vdi.service.rest.generated.model.BrokenImportListingImpl
 import vdi.service.rest.generated.model.BrokenImportListingMetaImpl
-import vdi.service.rest.generated.resources.AdminReports
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsImportsFailedResponse
-import vdi.service.rest.server.controllers.AdminReports.Constants
 import vdi.service.rest.server.inputs.toSafeLimit
 import vdi.service.rest.server.inputs.toSafeOffset
 import vdi.service.rest.server.outputs.BadRequestError
@@ -18,7 +16,7 @@ import vdi.service.rest.server.outputs.BrokenImportDetails
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.util.fixVariableDateString
 
-private const val DefaultBrokenImportResultLimit = 100
+private const val DefaultBrokenImportResultLimit = 100u
 
 fun generateFailedImportReport(
   user: Long?,
@@ -42,9 +40,9 @@ fun generateFailedImportReport(
   val broken = CacheDB().selectBrokenDatasetImports(query)
     .map(::BrokenImportDetails)
 
-  return GetAdminReportsImportsFailedResponse.respond200WithApplicationJson(vdi.service.rest.generated.model.BrokenImportListingImpl()
+  return GetAdminReportsImportsFailedResponse.respond200WithApplicationJson(BrokenImportListingImpl()
     .also {
-    it.meta = vdi.service.rest.generated.model.BrokenImportListingMetaImpl().also { meta ->
+    it.meta = BrokenImportListingMetaImpl().also { meta ->
       meta.count = broken.size
       meta.before = before
       meta.after = after

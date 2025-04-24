@@ -7,7 +7,7 @@ import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.util.getImportStatus
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getDateTime
 import vdi.lib.db.jdbc.getUserID
 import vdi.lib.db.model.ReconcilerTargetRecord
@@ -72,7 +72,7 @@ class RecordIterator(
     //        reconciler to the hard-delete lane.
     return TempHackCacheDBReconcilerTargetRecord(
       ownerID       = rs.getUserID("owner_id"),
-      datasetID     = rs.getDatasetID("dataset_id"),
+      datasetID     = rs.reqDatasetID("dataset_id"),
       sharesUpdated = rs.getDateTime("shares_update_time"),
       dataUpdated   = rs.getDateTime("data_update_time"),
       metaUpdated   = rs.getDateTime("meta_update_time"),

@@ -1,11 +1,6 @@
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
-import vdi.service.rest.generated.model.DatasetListEntry
-import vdi.service.rest.server.outputs.DatasetListShareUser
-import vdi.service.rest.server.outputs.toExternal
-import vdi.service.rest.model.UserDetails
-import vdi.service.rest.util.reduceTo
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
@@ -14,6 +9,11 @@ import vdi.lib.db.app.AppDB
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetListQuery
 import vdi.lib.db.cache.model.DatasetRecord
+import vdi.service.rest.generated.model.DatasetListEntry
+import vdi.service.rest.model.UserDetails
+import vdi.service.rest.server.outputs.DatasetListShareUser
+import vdi.service.rest.server.outputs.toExternal
+import vdi.service.rest.util.reduceTo
 
 fun fetchUserDatasetList(query: DatasetListQuery, userID: UserID): List<DatasetListEntry> {
   return fetchDatasetList(CacheDB().selectDatasetList(query), userID)

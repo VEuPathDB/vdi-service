@@ -9,7 +9,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevisionAction
 import vdi.lib.db.cache.model.DatasetRevisionRecord
 import vdi.lib.db.cache.model.DatasetRevisionRecordSet
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
 import java.sql.ResultSet
@@ -69,10 +69,10 @@ fun Connection.selectDatasetRevisions(datasetID: DatasetID) =
     var originalID: DatasetID? = null
     val records = map {
       if (originalID == null)
-        originalID = getDatasetID("original_id")
+        originalID = reqDatasetID("original_id")
 
       VDIDatasetRevision(
-        revisionID   = getDatasetID("revision_id"),
+        revisionID   = reqDatasetID("revision_id"),
         action       = VDIDatasetRevisionAction.fromID(it["action"]),
         timestamp    = it["timestamp"],
         revisionNote = ""
@@ -86,11 +86,11 @@ fun Connection.selectLatestDatasetRevision(datasetID: DatasetID) =
   executeQuery(datasetID, false) {
     if (next())
       DatasetRevisionRecord(
-        revisionID   = getDatasetID("revision_id"),
+        revisionID   = reqDatasetID("revision_id"),
         action       = VDIDatasetRevisionAction.fromID(get("action")),
         timestamp    = get("timestamp"),
         revisionNote = "",
-        originalID   = getDatasetID("original_id"),
+        originalID   = reqDatasetID("original_id"),
       )
     else
       null

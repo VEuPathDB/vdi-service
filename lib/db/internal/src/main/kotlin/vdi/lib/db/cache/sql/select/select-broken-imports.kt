@@ -8,7 +8,7 @@ import vdi.lib.db.cache.model.BrokenImportRecord
 import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.cache.util.getStringList
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getUserID
 import java.sql.Connection
 import java.sql.Types
@@ -100,7 +100,7 @@ internal fun Connection.selectBrokenImports(query: BrokenImportListQuery): List<
 
       forEach {
         out.add(BrokenImportRecord(
-          datasetID   = getDatasetID("dataset_id"),
+          datasetID   = reqDatasetID("dataset_id"),
           ownerID     = getUserID("owner_id"),
           typeName    = getDataType("type_name"),
           typeVersion = getString("type_version"),

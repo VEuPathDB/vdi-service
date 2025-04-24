@@ -1,10 +1,5 @@
-package vdi.service.rest.server.services.admin
+package vdi.service.rest.server.services.admin.report
 
-import vdi.service.generated.model.*
-import vdi.service.rest.server.outputs.DatasetStatusInfo
-import vdi.service.rest.server.outputs.DatasetTypeResponseBody
-import vdi.service.rest.server.outputs.DatasetVisibility
-import vdi.service.rest.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.lib.db.app.AppDB
@@ -12,10 +7,15 @@ import vdi.lib.db.app.model.InstallStatuses
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.AdminAllDatasetsRow
 import vdi.lib.db.cache.query.AdminAllDatasetsQuery
+import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse.respond200WithApplicationJson
 import vdi.service.rest.server.inputs.toSafeLimit
 import vdi.service.rest.server.inputs.toSafeOffset
+import vdi.service.rest.server.outputs.DatasetStatusInfo
+import vdi.service.rest.server.outputs.DatasetTypeResponseBody
+import vdi.service.rest.server.outputs.DatasetVisibility
+import vdi.service.rest.util.defaultZone
 
 internal fun listAllDatasets(
   offset: Int,
@@ -54,7 +54,7 @@ private fun getAppDBStatuses(datasets: Collection<AdminAllDatasetsRow>): Map<Dat
   val projectToDatasetID = HashMap<String, MutableSet<DatasetID>>(datasets.size)
 
   datasets.forEach { ds ->
-    ds.projectIDs.forEach { project ->
+    ds.projects.forEach { project ->
       projectToDatasetID.computeIfAbsent(project) { HashSet(1) }
         .add(ds.datasetID)
     }
@@ -64,10 +64,10 @@ private fun getAppDBStatuses(datasets: Collection<AdminAllDatasetsRow>): Map<Dat
 }
 
 private fun AllDatasetsListResponse(
-  meta: vdi.service.rest.generated.model.AllDatasetsListMeta,
-  results: List<vdi.service.rest.generated.model.AllDatasetsListEntry>,
-): vdi.service.rest.generated.model.AllDatasetsListResponse =
-  vdi.service.rest.generated.model.AllDatasetsListResponseImpl().also {
+  meta: AllDatasetsListMeta,
+  results: List<AllDatasetsListEntry>,
+): AllDatasetsListResponse =
+  AllDatasetsListResponseImpl().also {
     it.meta = meta
     it.results = results
   }
@@ -77,8 +77,8 @@ private fun AllDatasetsListMeta(
   offset: UInt,
   limit: UInt,
   total: UInt,
-): vdi.service.rest.generated.model.AllDatasetsListMeta =
-  vdi.service.rest.generated.model.AllDatasetsListMetaImpl().also {
+): AllDatasetsListMeta =
+  AllDatasetsListMetaImpl().also {
     it.count = count.toInt()
     it.offset = offset.toInt()
     it.limit = limit.toInt()
@@ -88,8 +88,8 @@ private fun AllDatasetsListMeta(
 private fun AllDatasetsListEntry(
   row: AdminAllDatasetsRow,
   statuses: Map<ProjectID, InstallStatuses>
-): vdi.service.rest.generated.model.AllDatasetsListEntry =
-  vdi.service.rest.generated.model.AllDatasetsListEntryImpl().also {
+): AllDatasetsListEntry =
+  AllDatasetsListEntryImpl().also {
     it.datasetId = row.datasetID.toString()
     it.owner = row.ownerID.toLong()
     it.datasetType = DatasetTypeResponseBody(row.typeName, row.typeVersion)
@@ -102,7 +102,7 @@ private fun AllDatasetsListEntry(
     it.description = row.description
     it.sourceUrl = row.sourceURL
     it.origin = row.origin
-    it.projectIds = row.projectIDs
+    it.projectIds = row.projects
     it.status = DatasetStatusInfo(row.importStatus, statuses)
     it.created = row.created.defaultZone()
     it.isDeleted = row.isDeleted

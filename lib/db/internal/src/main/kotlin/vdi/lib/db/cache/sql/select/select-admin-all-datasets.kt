@@ -10,11 +10,12 @@ import vdi.lib.db.cache.util.getDatasetVisibility
 import vdi.lib.db.cache.util.getFileDetailList
 import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getDateTime
 import vdi.lib.db.jdbc.getUserID
 import java.sql.Connection
 import java.sql.Types
+import vdi.lib.db.jdbc.optDatasetID
 
 // language=postgresql
 private const val SQL_BASE = """
@@ -52,6 +53,7 @@ SELECT
     FROM vdi.install_files AS f
     WHERE f.dataset_id = d.dataset_id
   ) AS install_files
+, r.original_id
 FROM
   vdi.datasets AS d
   INNER JOIN vdi.dataset_metadata AS m
@@ -60,6 +62,8 @@ FROM
     USING (dataset_id)
   LEFT JOIN vdi.import_messages AS s
     USING (dataset_id)
+  LEFT JOIN vdi.dataset_revisions AS r
+    ON r.revision_id = d.dataset_id
 WHERE
   1 = 1
 """
@@ -125,7 +129,7 @@ internal fun Connection.selectAdminAllDatasets(query: AdminAllDatasetsQuery): Li
     withResults {
       map {
         AdminAllDatasetsRow(
-          datasetID        = it.getDatasetID("dataset_id"),
+          datasetID        = it.reqDatasetID("dataset_id"),
           ownerID          = it.getUserID("owner_id"),
           origin           = it.getString("origin"),
           created          = it.getDateTime("created"),
@@ -140,10 +144,11 @@ internal fun Connection.selectAdminAllDatasets(query: AdminAllDatasetsQuery): Li
           description      = it.getString("description"),
           sourceURL        = it.getString("source_url"),
           visibility       = it.getDatasetVisibility("visibility"),
-          projectIDs       = it.getProjectIDList("projects"),
+          projects         = it.getProjectIDList("projects"),
           importStatus     = it.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
-          importMessage    = it.getString("message"),
           inserted         = it.getDateTime("inserted"),
+          originalID       = it.optDatasetID("original_id"),
+          importMessage    = it.getString("message"),
           uploadFiles      = it.getFileDetailList("upload_files"),
           installFiles     = it.getFileDetailList("install_files"),
         )

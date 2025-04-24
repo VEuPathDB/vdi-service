@@ -10,6 +10,10 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.util.or
+import java.io.InputStream
+import java.sql.SQLException
+import java.time.OffsetDateTime
+import java.util.concurrent.ConcurrentHashMap
 import vdi.lib.async.WorkerPool
 import vdi.lib.db.app.AppDB
 import vdi.lib.db.app.model.DatasetInstallMessage
@@ -30,10 +34,6 @@ import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.lib.s3.DatasetDirectory
 import vdi.lib.s3.DatasetObjectStore
-import java.io.InputStream
-import java.sql.SQLException
-import java.time.OffsetDateTime
-import java.util.concurrent.ConcurrentHashMap
 
 internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig, abortCB: AbortCB)
   : InstallDataTriggerHandler

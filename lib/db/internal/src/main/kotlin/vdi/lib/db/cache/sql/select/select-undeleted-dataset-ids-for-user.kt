@@ -5,8 +5,9 @@ import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.lib.db.cache.util.*
 import java.sql.Connection
+import vdi.lib.db.jdbc.reqDatasetID
+import vdi.lib.db.jdbc.setUserID
 
 // language=postgresql
 private const val SQL = """
@@ -22,6 +23,6 @@ WHERE
 internal fun Connection.selectUndeletedDatasetIDsForUser(userID: UserID): List<DatasetID> {
   return withPreparedStatement(SQL) {
     setUserID(1, userID)
-    withResults { map { getDatasetID("dataset_id") } }
+    withResults { map { reqDatasetID("dataset_id") } }
   }
 }

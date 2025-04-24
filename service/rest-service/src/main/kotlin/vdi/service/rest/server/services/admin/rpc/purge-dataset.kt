@@ -1,4 +1,4 @@
-package vdi.service.rest.server.services.admin
+package vdi.service.rest.server.services.admin.rpc
 
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.toUserID

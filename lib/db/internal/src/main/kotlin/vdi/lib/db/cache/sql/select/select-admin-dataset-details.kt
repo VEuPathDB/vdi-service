@@ -10,11 +10,12 @@ import vdi.lib.db.cache.util.getImportStatus
 import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.cache.util.getStringList
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getDateTime
 import vdi.lib.db.jdbc.getUserID
 import vdi.lib.db.model.SyncControlRecord
 import java.sql.Connection
+import vdi.lib.db.jdbc.optDatasetID
 
 // language=postgresql
 private const val SQL_BASE = """
@@ -46,6 +47,7 @@ SELECT
 , sc.shares_update_time
 , sc.data_update_time
 , sc.meta_update_time
+, r.original_id
 FROM
   vdi.datasets AS d
   INNER JOIN vdi.dataset_metadata AS m
@@ -54,6 +56,8 @@ FROM
     USING (dataset_id)
   LEFT JOIN vdi.sync_control AS sc
     USING (dataset_id)
+  LEFT JOIN vdi.dataset_revisions AS r
+    ON r.revision_id = d.dataset_id
 WHERE
   d.is_deleted = FALSE
 AND
@@ -71,7 +75,7 @@ internal fun Connection.selectAdminDatasetDetails(datasetID: DatasetID): AdminDa
       }
 
       AdminDatasetDetailsRecord(
-        datasetID        = getDatasetID("dataset_id"),
+        datasetID        = reqDatasetID("dataset_id"),
         ownerID          = getUserID("owner_id"),
         origin           = getString("origin"),
         created          = getDateTime("created"),
@@ -86,10 +90,11 @@ internal fun Connection.selectAdminDatasetDetails(datasetID: DatasetID): AdminDa
         description      = getString("description"),
         sourceURL        = getString("source_url"),
         visibility       = getDatasetVisibility("visibility"),
-        projectIDs       = getProjectIDList("projects"),
+        projects         = getProjectIDList("projects"),
         importStatus     = getImportStatus("status") ?: DatasetImportStatus.Queued,
+        originalID       = optDatasetID("original_id"),
         syncControl      = SyncControlRecord(
-          datasetID     = getDatasetID("dataset_id"),
+          datasetID     = reqDatasetID("dataset_id"),
           sharesUpdated = getDateTime("shares_update_time"),
           dataUpdated   = getDateTime("data_update_time"),
           metaUpdated   = getDateTime("meta_update_time")

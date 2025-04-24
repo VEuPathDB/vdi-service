@@ -1,24 +1,24 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.generated.model.*
-import vdi.service.rest.model.ShareFilterStatus
-import vdi.service.rest.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
+import vdi.service.rest.generated.model.*
+import vdi.service.rest.model.ShareFilterStatus
+import vdi.service.rest.model.UserDetails
 
 
-internal fun ShareOffer(user: UserDetails, action: VDIShareOfferAction): vdi.service.rest.generated.model.ShareOffer =
-  vdi.service.rest.generated.model.ShareOfferImpl().also {
+internal fun ShareOffer(user: UserDetails, action: VDIShareOfferAction): ShareOffer =
+  ShareOfferImpl().also {
     it.recipient = ShareOfferRecipient(user)
     it.status    = ShareOfferAction(action)
   }
 
-fun ShareOfferAction(action: VDIShareOfferAction): vdi.service.rest.generated.model.ShareOfferAction =
+fun ShareOfferAction(action: VDIShareOfferAction): ShareOfferAction =
   when (action) {
-    VDIShareOfferAction.Grant  -> vdi.service.rest.generated.model.ShareOfferAction.GRANT
-    VDIShareOfferAction.Revoke -> vdi.service.rest.generated.model.ShareOfferAction.REVOKE
+    VDIShareOfferAction.Grant  -> ShareOfferAction.GRANT
+    VDIShareOfferAction.Revoke -> ShareOfferAction.REVOKE
   }
 
 internal fun ShareOfferEntry(
@@ -29,8 +29,8 @@ internal fun ShareOfferEntry(
   datasetTypeDisplayName: String,
   owner:       UserDetails,
   projectIDs:  List<ProjectID>
-): vdi.service.rest.generated.model.ShareOfferEntry =
-  vdi.service.rest.generated.model.ShareOfferEntryImpl()
+): ShareOfferEntry =
+  ShareOfferEntryImpl()
     .also {
       it.datasetId   = datasetID.toString()
       it.shareStatus = ShareOfferStatus(shareStatus)
@@ -39,8 +39,8 @@ internal fun ShareOfferEntry(
       it.projectIds  = projectIDs
     }
 
-fun ShareOfferRecipient(user: UserDetails): vdi.service.rest.generated.model.ShareOfferRecipient =
-  vdi.service.rest.generated.model.ShareOfferRecipientImpl().also {
+fun ShareOfferRecipient(user: UserDetails): ShareOfferRecipient =
+  ShareOfferRecipientImpl().also {
     it.userId       = user.userID.toLong()
     it.firstName    = user.firstName
     it.lastName     = user.lastName
@@ -48,10 +48,10 @@ fun ShareOfferRecipient(user: UserDetails): vdi.service.rest.generated.model.Sha
     it.organization = user.organization
   }
 
-internal fun ShareOfferStatus(status: ShareFilterStatus): vdi.service.rest.generated.model.ShareOfferStatus =
+internal fun ShareOfferStatus(status: ShareFilterStatus): ShareOfferStatus =
   when (status) {
-    ShareFilterStatus.Open     -> vdi.service.rest.generated.model.ShareOfferStatus.OPEN
-    ShareFilterStatus.Accepted -> vdi.service.rest.generated.model.ShareOfferStatus.ACCEPTED
-    ShareFilterStatus.Rejected -> vdi.service.rest.generated.model.ShareOfferStatus.REJECTED
+    ShareFilterStatus.Open     -> ShareOfferStatus.OPEN
+    ShareFilterStatus.Accepted -> ShareOfferStatus.ACCEPTED
+    ShareFilterStatus.Rejected -> ShareOfferStatus.REJECTED
     ShareFilterStatus.All      -> throw IllegalArgumentException("cannot convert ShareStatus.All to IO type")
   }

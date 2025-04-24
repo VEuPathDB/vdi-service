@@ -2,17 +2,13 @@ package vdi.lib.db.cache.sql.select
 
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withResults
-import org.veupathdb.vdi.lib.common.field.DatasetID
+import java.sql.Connection
+import java.sql.Types
 import vdi.lib.db.cache.model.*
 import vdi.lib.db.cache.util.getDatasetVisibility
 import vdi.lib.db.cache.util.getImportStatus
 import vdi.lib.db.cache.util.getProjectIDList
-import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDatasetID
-import vdi.lib.db.jdbc.getDateTime
-import vdi.lib.db.jdbc.getUserID
-import java.sql.Connection
-import java.sql.Types
+import vdi.lib.db.jdbc.*
 
 // language=postgresql
 private fun sqlBody(
@@ -40,8 +36,8 @@ SELECT
 , md.visibility
 , md.source_url
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id) AS projects
-, (SELECT r.original_id FROM vdi.dataset_revisions AS r WHERE r.revision_id = d.dataset_id LIMIT 1) AS original_id
 , ic.status
+, r.original_id
 FROM
   dataset_ids AS did
   INNER JOIN vdi.datasets AS d
@@ -50,6 +46,8 @@ FROM
     USING (dataset_id)
   LEFT JOIN vdi.import_control AS ic
     USING (dataset_id)
+  LEFT JOIN vdi.dataset_revisions AS r
+    ON r.revision_id = did.dataset_id
 WHERE
   d.is_deleted = FALSE
   $projectFilter
@@ -147,7 +145,7 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
     ps.withResults {
       map {
         DatasetRecordImpl(
-          datasetID        = it.getDatasetID("dataset_id"),
+          datasetID        = it.reqDatasetID("dataset_id"),
           typeName         = it.getDataType("type_name"),
           typeVersion      = it.getString("type_version"),
           ownerID          = it.getUserID("owner_id"),
@@ -165,7 +163,7 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
           sourceURL        = it.getString("source_url"),
           projects         = it.getProjectIDList("projects"),
           inserted         = it.getDateTime("inserted"),
-          originalID       = it.getString("original_id")?.let(::DatasetID)
+          originalID       = it.optDatasetID("original_id")
         )
       }
     }

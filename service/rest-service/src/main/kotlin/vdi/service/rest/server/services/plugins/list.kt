@@ -1,24 +1,25 @@
 package vdi.service.rest.server.services.plugins
 
+import org.veupathdb.vdi.lib.common.field.DataType
+import vdi.lib.plugin.registry.PluginDetails
+import vdi.lib.plugin.registry.PluginRegistry
 import vdi.service.rest.generated.model.PluginListItem
 import vdi.service.rest.generated.model.PluginListItemImpl
-import vdi.lib.plugin.mapping.PluginHandler
-import vdi.lib.plugin.mapping.PluginHandlers
 
 internal fun listPlugins(project: String?): List<PluginListItem> {
-  var seq = PluginHandlers.sequence()
+  var seq = PluginRegistry.asSequence()
 
   if (project != null) {
-    seq = seq.filter { (_, v) -> v.appliesToProject(project) }
+    seq = seq.filter { (_, _, d) -> d.appliesTo(project) }
   }
 
   return seq.map(::PluginListItem).toList()
 }
 
-private fun PluginListItem(p: Pair<PluginHandlers.NameVersionPair, PluginHandler>): PluginListItem =
-  vdi.service.rest.generated.model.PluginListItemImpl().also {
-    it.displayName = p.second.displayName
-    it.projects = p.second.projects()
-    it.typeName = p.first.name.toString()
-    it.typeVersion = p.first.version
+private fun PluginListItem(p: Triple<DataType, String, PluginDetails>): PluginListItem =
+  PluginListItemImpl().also {
+    it.displayName = p.third.displayName
+    it.projects = p.third.projects
+    it.typeName = p.first.toString()
+    it.typeVersion = p.second
   }

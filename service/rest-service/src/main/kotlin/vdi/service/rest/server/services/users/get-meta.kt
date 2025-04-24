@@ -10,12 +10,12 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.lib.db.cache.CacheDB
 
 internal fun getUserMetadata(userID: UserID): UserMetadata =
-  vdi.service.rest.generated.model.UserMetadataImpl().apply {
+  UserMetadataImpl().apply {
     quota = getUserQuotaInfo(userID)
   }
 
 private fun getUserQuotaInfo(userID: UserID): UserQuotaDetails =
-  vdi.service.rest.generated.model.UserQuotaDetailsImpl().apply {
+  UserQuotaDetailsImpl().apply {
     usage = getCurrentQuotaUsage(userID)
     limit = Options.Quota.quotaLimit.toLong()
   }

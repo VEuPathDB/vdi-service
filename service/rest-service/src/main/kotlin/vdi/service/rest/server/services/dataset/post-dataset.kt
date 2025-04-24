@@ -1,9 +1,6 @@
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
-import vdi.service.rest.generated.model.DatasetPostRequestBody
-import vdi.service.rest.server.inputs.toDatasetMeta
-import vdi.service.rest.util.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
@@ -11,7 +8,8 @@ import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
 import vdi.lib.logging.logger
-import kotlin.io.path.*
+import vdi.service.rest.generated.model.DatasetPostRequestBody
+import vdi.service.rest.server.inputs.toDatasetMeta
 
 fun <T: Any> T.createDataset(
   userID: UserID,

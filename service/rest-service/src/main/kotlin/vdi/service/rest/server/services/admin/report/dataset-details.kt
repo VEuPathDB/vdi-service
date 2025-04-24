@@ -1,9 +1,9 @@
-package vdi.service.rest.server.services.admin
+package vdi.service.rest.server.services.admin.report
 
-import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsByVdiIdResponse
-import vdi.service.rest.server.outputs.InternalDatasetDetails
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.lib.db.cache.CacheDB
+import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsByVdiIdResponse
+import vdi.service.rest.server.outputs.InternalDatasetDetails
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.wrap
 

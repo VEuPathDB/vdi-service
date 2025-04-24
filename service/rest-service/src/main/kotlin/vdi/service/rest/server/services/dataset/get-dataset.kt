@@ -1,15 +1,6 @@
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
-import vdi.service.rest.generated.model.DatasetDetails
-import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse
-import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse.*
-import vdi.service.rest.server.outputs.toExternal
-import vdi.service.rest.model.UserDetails
-import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.server.outputs.*
-import vdi.service.rest.util.Either
-import vdi.service.rest.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetPublication
@@ -19,6 +10,15 @@ import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetShare
 import vdi.lib.logging.logger
 import vdi.lib.plugin.registry.PluginRegistry
+import vdi.service.rest.generated.model.DatasetDetails
+import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse
+import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse.headersFor301
+import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse.respond301
+import vdi.service.rest.model.UserDetails
+import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.outputs.*
+import vdi.service.rest.util.Either
+import vdi.service.rest.util.defaultZone
 
 /**
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't

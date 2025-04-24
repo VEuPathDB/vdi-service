@@ -1,12 +1,8 @@
 package vdi.service.rest.server.inputs
 
-import org.veupathdb.lib.request.validation.*
-import vdi.service.rest.generated.model.DatasetContact
-import vdi.service.rest.generated.model.DatasetHyperlink
-import vdi.service.rest.generated.model.DatasetPatchRequestBody
-import vdi.service.rest.generated.model.DatasetPublication
-import vdi.service.rest.generated.model.JsonField
+import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import vdi.service.rest.generated.model.*
 
 @Suppress("DuplicatedCode") // Overlap in generated API types
 internal fun DatasetPatchRequestBody.cleanup() {
@@ -16,13 +12,13 @@ internal fun DatasetPatchRequestBody.cleanup() {
   category = category.cleanupString()
   summary = summary.cleanupString()
   description = description.cleanupString()
-  publications = publications.cleanup(vdi.service.rest.generated.model.DatasetPublication::cleanup)
-  hyperlinks = hyperlinks.cleanup(vdi.service.rest.generated.model.DatasetHyperlink::cleanup)
+  publications = publications.cleanup(DatasetPublication::cleanup)
+  hyperlinks = hyperlinks.cleanup(DatasetHyperlink::cleanup)
   organisms = organisms
     ?.ifEmpty { null }
     ?.onEachIndexed { i, s -> organisms[i] = s.cleanupString() }
     ?: emptyList()
-  contacts = contacts.cleanup(vdi.service.rest.generated.model.DatasetContact::cleanup)
+  contacts = contacts.cleanup(DatasetContact::cleanup)
   datasetType?.cleanup()
 }
 

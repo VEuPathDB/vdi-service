@@ -3,9 +3,9 @@ package vdi.lib.db.app.sql.upsert
 import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
-import vdi.lib.db.app.DatasetMetaMaxSummaryFieldLength
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
+import vdi.lib.db.app.MaxVarchar2Length
 
 private fun sql(schema: String) =
 // language=postgresql
@@ -39,7 +39,7 @@ internal fun Connection.upsertDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(3, meta.shortName)
     setString(4, meta.shortAttribution)
     setString(5, meta.category)
-    setString(6, meta.summary?.take(DatasetMetaMaxSummaryFieldLength))
+    setString(6, meta.summary?.take(MaxVarchar2Length))
     setString(7, meta.description)
 
     // update
@@ -47,7 +47,7 @@ internal fun Connection.upsertDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(9, meta.shortName)
     setString(10, meta.shortAttribution)
     setString(11, meta.category)
-    setString(12, meta.summary?.take(DatasetMetaMaxSummaryFieldLength))
+    setString(12, meta.summary?.take(MaxVarchar2Length))
     setString(13, meta.description)
   }
 }

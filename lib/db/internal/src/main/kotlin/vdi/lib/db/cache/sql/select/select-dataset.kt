@@ -3,6 +3,7 @@ package vdi.lib.db.cache.sql.select
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import java.sql.Connection
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.model.DatasetRecord
 import vdi.lib.db.cache.model.DatasetRecordImpl
@@ -12,8 +13,8 @@ import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.jdbc.getDataType
 import vdi.lib.db.jdbc.getDateTime
 import vdi.lib.db.jdbc.getUserID
+import vdi.lib.db.jdbc.optDatasetID
 import vdi.lib.db.jdbc.setDatasetID
-import java.sql.Connection
 
 // language=postgresql
 private val SQL = """
@@ -35,12 +36,15 @@ SELECT
 , dm.source_url
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = vd.dataset_id) AS projects
 , ic.status
+, r.original_id
 FROM
   vdi.datasets vd
   INNER JOIN vdi.dataset_metadata dm
     USING (dataset_id)
   LEFT JOIN vdi.import_control ic
     USING (dataset_id)
+  LEFT JOIN vdi.dataset_revisions AS r
+    ON r.revision_id = vd.dataset_id
 WHERE
   vd.dataset_id = ?
 """
@@ -71,7 +75,7 @@ internal fun Connection.selectDataset(datasetID: DatasetID): DatasetRecord? =
           sourceURL        = getString("source_url"),
           projects         = getProjectIDList("projects"),
           inserted         = getDateTime("inserted"),
-          originalID       = null,
+          originalID       = optDatasetID("original_id"),
         )
     }
   }

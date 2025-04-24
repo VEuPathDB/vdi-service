@@ -5,10 +5,6 @@ import jakarta.ws.rs.WebApplicationException
 import org.slf4j.Logger
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
-import vdi.service.rest.config.Options
-import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.server.services.users.getCurrentQuotaUsage
-import vdi.service.rest.util.*
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.compression.Tar
 import org.veupathdb.vdi.lib.common.compression.Zip
@@ -19,13 +15,6 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.DatasetImpl
-import vdi.lib.db.cache.model.DatasetImportStatus
-import vdi.lib.db.cache.withTransaction
-import vdi.lib.db.model.SyncControlRecord
-import vdi.lib.logging.logger
-import vdi.lib.metrics.Metrics
 import java.net.MalformedURLException
 import java.net.URL
 import java.nio.file.Path
@@ -37,6 +26,17 @@ import java.util.zip.ZipException
 import kotlin.io.path.*
 import kotlin.math.max
 import kotlin.math.min
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.DatasetImpl
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.withTransaction
+import vdi.lib.db.model.SyncControlRecord
+import vdi.lib.logging.logger
+import vdi.lib.metrics.Metrics
+import vdi.service.rest.config.Options
+import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.services.users.getCurrentQuotaUsage
+import vdi.service.rest.util.*
 
 // region Cache DB Interactions
 
@@ -237,7 +237,7 @@ private fun Path.repackZip(into: Path, using: Path, logger: Logger): List<VDIDat
 
         unpacked.add(tmpFile)
       }
-  } catch (e: IllegalStateException) {
+  } catch (_: IllegalStateException) {
     throw BadRequestException("decompressed file size is too large")
   }
 
@@ -272,7 +272,7 @@ private fun Path.repackTar(into: Path, using: Path, logger: Logger): List<VDIDat
 
   try {
     Tar.decompressWithGZip(this, using)
-  } catch (e: ZipException) {
+  } catch (_: ZipException) {
     throw BadRequestException("input file had gzipped tar extension but could not be packed as a gzipped tar")
   }
 

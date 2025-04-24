@@ -88,7 +88,7 @@ object PluginRegistry : Iterable<Triple<DataType, String, PluginDetails>> {
     val projects    = env.optSet(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.ProjectIDsSuffix)
     val changing    = env.optBool(EnvKey.Handlers.Prefix + key + EnvKey.Handlers.TypeChangesEnabledSuffix)
 
-    return KeyPair(DataType.of(name), version) to PluginDetails(displayName, projects ?: emptySet(), changing ?: false)
+    return KeyPair(DataType.of(name), version) to PluginDetails(displayName, projects?.toList() ?: emptyList(), changing ?: false)
   }
 
   private data class KeyPair(val type: DataType, val version: String)

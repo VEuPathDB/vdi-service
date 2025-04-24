@@ -10,6 +10,7 @@ import org.veupathdb.vdi.lib.json.JSON
 import vdi.lib.s3.files.*
 import vdi.lib.s3.paths.S3DatasetPathFactory
 import java.io.InputStream
+import vdi.lib.logging.logger
 
 internal class DatasetDirectoryImpl(
   override val ownerID: UserID,
@@ -17,8 +18,7 @@ internal class DatasetDirectoryImpl(
   private val bucket: S3Bucket,
   private val pathFactory: S3DatasetPathFactory,
 ) : DatasetDirectory {
-
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger(datasetID, ownerID)
 
   override fun exists(): Boolean =
     bucket.objects.listSubPaths(pathFactory.datasetDir()).count > 0
@@ -98,8 +98,21 @@ internal class DatasetDirectoryImpl(
   override fun deleteInstallReadyFile() =
     bucket.objects.delete(pathFactory.datasetInstallReadyZip())
 
+  override fun hasRevisedFlag() =
+    pathFactory.datasetRevisedFlagFile() in bucket.objects
+
+  override fun getRevisedFlag() =
+    DatasetRevisionFlagFileImpl(bucket, pathFactory.datasetRevisedFlagFile())
+
+  override fun putRevisedFlag() {
+    bucket.objects.touch(pathFactory.datasetRevisedFlagFile())
+  }
+
+  override fun deleteRevisedFlag() =
+    bucket.objects.delete(pathFactory.datasetRevisedFlagFile())
+
   override fun getShares(): Map<UserID, DatasetShare> {
-    log.debug("looking up shares for dataset {}/{}", ownerID, datasetID)
+    log.debug("looking up shares")
 
     val pathPrefix = pathFactory.datasetSharesDir()
     val subPaths   = bucket.objects.listSubPaths(pathPrefix).commonPrefixes()
@@ -130,7 +143,7 @@ internal class DatasetDirectoryImpl(
   }
 
   override fun putShare(recipientID: UserID, offer: VDIDatasetShareOffer, receipt: VDIDatasetShareReceipt) {
-    log.debug("{}/{}: putting a new share for user {} with offer action {} and receipt action {} ", ownerID, datasetID, recipientID, offer.action, receipt.action)
+    log.debug("putting a new share for user {} with offer action {} and receipt action {} ", recipientID, offer.action, receipt.action)
 
     bucket.objects.put(pathFactory.datasetShareOfferFile(recipientID), JSON.writeValueAsBytes(offer).inputStream())
     bucket.objects.put(pathFactory.datasetShareReceiptFile(recipientID), JSON.writeValueAsBytes(receipt).inputStream())

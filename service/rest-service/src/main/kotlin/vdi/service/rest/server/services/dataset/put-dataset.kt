@@ -1,10 +1,19 @@
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
+import org.veupathdb.vdi.lib.common.DatasetMetaFilename
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.fs.TempFiles
+import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
+import org.veupathdb.vdi.lib.common.model.VDIDatasetRevisionAction
+import java.time.OffsetDateTime
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.withTransaction
 import vdi.service.rest.generated.model.DatasetPatchRequestBodyImpl
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.model.DatasetPutResponseBody
-import vdi.service.rest.generated.model.DatasetPutResponseBodyImpl
 import vdi.service.rest.generated.resources.DatasetsVdiId.PutDatasetsByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.inputs.cleanup
@@ -14,16 +23,6 @@ import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.util.Either
-import org.veupathdb.vdi.lib.common.DatasetMetaFilename
-import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.fs.TempFiles
-import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
-import org.veupathdb.vdi.lib.common.model.VDIDatasetRevisionAction
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.DatasetImportStatus
-import vdi.lib.db.cache.withTransaction
-import java.time.OffsetDateTime
 
 internal fun putDataset(
   userID:    UserID,

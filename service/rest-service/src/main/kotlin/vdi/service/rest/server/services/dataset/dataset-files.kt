@@ -6,7 +6,6 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetRecord
-import vdi.service.rest.generated.model.DatasetFileListingImpl
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.outputs.DatasetZipDetails

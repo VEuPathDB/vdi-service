@@ -2,11 +2,11 @@ package vdi.service.rest.server.services.dataset
 
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
-import vdi.service.rest.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.withTransaction
+import vdi.service.rest.s3.DatasetStore
 
 internal fun adminDeleteDataset(datasetID: DatasetID) {
   val ds = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()

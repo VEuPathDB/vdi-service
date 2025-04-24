@@ -3,9 +3,9 @@ plugins {
 }
 
 dependencies {
+  api(project(":lib:db:common"))
 
   implementation(project(":lib:common"))
-  implementation(project(":lib:db:common"))
   implementation(project(":lib:external:ldap"))
 
   implementation(libs.vdi.common)

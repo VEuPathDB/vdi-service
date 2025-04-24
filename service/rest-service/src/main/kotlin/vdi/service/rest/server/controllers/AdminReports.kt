@@ -4,7 +4,11 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort
 import vdi.service.rest.generated.resources.AdminReports
-import vdi.service.rest.server.services.admin.*
+import vdi.service.rest.server.services.admin.report.generateFailedImportReport
+import vdi.service.rest.server.services.admin.report.generateFailedInstallReport
+import vdi.service.rest.server.services.admin.report.getDatasetDetails
+import vdi.service.rest.server.services.admin.report.listAllDatasets
+import vdi.service.rest.server.services.admin.report.listAllS3Objects
 
 class AdminReports : AdminReports {
   override fun getAdminReportsDatasetsListAll(

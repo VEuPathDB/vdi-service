@@ -24,10 +24,11 @@ data class AdminAllDatasetsRow(
   override val description: String?,
   override val sourceURL: String?,
   override val visibility: VDIDatasetVisibility,
-  val projectIDs: List<ProjectID>,
+  override val projects: List<ProjectID>,
   override val importStatus: DatasetImportStatus,
-  val importMessage: String?,
   override val inserted: OffsetDateTime,
+  override val originalID: DatasetID?,
+  val importMessage: String?,
   val uploadFiles: List<VDIDatasetFileInfo>,
   val installFiles: List<VDIDatasetFileInfo>,
-) : Dataset, DatasetMeta
+) : Dataset, DatasetMeta, DatasetProjectLinks

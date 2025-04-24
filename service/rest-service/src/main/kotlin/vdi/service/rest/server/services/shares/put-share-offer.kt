@@ -3,9 +3,6 @@ package vdi.service.rest.server.services.shares
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
-import vdi.service.rest.generated.model.DatasetShareOffer
-import vdi.service.rest.generated.model.ShareOfferAction
-import vdi.service.rest.s3.DatasetStore
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
@@ -16,6 +13,9 @@ import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.model.DatasetShareOfferImpl
 import vdi.lib.db.cache.model.DatasetShareReceiptImpl
 import vdi.lib.db.cache.withTransaction
+import vdi.service.rest.generated.model.DatasetShareOffer
+import vdi.service.rest.generated.model.ShareOfferAction
+import vdi.service.rest.s3.DatasetStore
 
 internal fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareOffer) {
   val dataset = vdi.lib.db.cache.CacheDB().selectDataset(datasetID) ?: throw NotFoundException()

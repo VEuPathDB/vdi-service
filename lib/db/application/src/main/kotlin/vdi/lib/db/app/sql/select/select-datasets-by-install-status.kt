@@ -11,7 +11,7 @@ import vdi.lib.db.app.sql.getDeleteFlag
 import vdi.lib.db.app.sql.setInstallStatus
 import vdi.lib.db.app.sql.setInstallType
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getUserID
 import java.sql.Connection
 
@@ -50,7 +50,7 @@ internal fun Connection.selectDatasetsByInstallStatus(
 
     withResults { map {
       DatasetRecord(
-        datasetID   = getDatasetID("dataset_id"),
+        datasetID   = reqDatasetID("dataset_id"),
         owner       = getUserID("owner"),
         typeName    = getDataType("type_name"),
         typeVersion = getString("type_version"),

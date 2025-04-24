@@ -1,14 +1,14 @@
 package vdi.service.rest.server.services.shares
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
-import vdi.service.rest.generated.model.ShareOfferEntry
-import vdi.service.rest.server.outputs.ShareOfferEntry
-import vdi.service.rest.model.ShareFilterStatus
-import vdi.service.rest.model.UserDetails
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetShareListEntry
 import vdi.lib.plugin.registry.PluginRegistry
+import vdi.service.rest.generated.model.ShareOfferEntry
+import vdi.service.rest.model.ShareFilterStatus
+import vdi.service.rest.model.UserDetails
+import vdi.service.rest.server.outputs.ShareOfferEntry
 
 /**
  * Looks up share information for the target recipient user where the share

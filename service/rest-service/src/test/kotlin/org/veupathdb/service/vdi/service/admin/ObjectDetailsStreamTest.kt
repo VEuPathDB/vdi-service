@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.veupathdb.lib.s3.s34k.objects.S3Object
-import vdi.service.rest.server.services.admin.ObjectDetailsStream
+import vdi.service.rest.server.services.admin.report.ObjectDetailsStream
 import vdi.service.rest.util.DateFormat
 import java.time.Instant
 import java.time.OffsetDateTime

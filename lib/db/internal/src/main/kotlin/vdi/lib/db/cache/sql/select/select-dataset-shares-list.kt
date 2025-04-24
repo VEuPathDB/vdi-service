@@ -7,7 +7,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import vdi.lib.db.cache.model.DatasetShare
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getUserID
 import java.sql.Connection
 
@@ -33,7 +33,7 @@ internal fun Connection.selectSharesFor(datasetIDs: List<DatasetID>): Map<Datase
     setArray(1, createArrayOf("varchar", datasetIDs.toTypedArray()))
     withResults {
       forEach {
-        val dsID = getDatasetID("dataset_id")
+        val dsID = reqDatasetID("dataset_id")
         out.computeIfAbsent(dsID) { ArrayList() }.add(DatasetShare(
           recipientID   = getUserID("recipient_id"),
           offerStatus   = VDIShareOfferAction.fromString(getString("offer_status")),

@@ -9,6 +9,9 @@ import vdi.lib.db.cache.CacheDBTransaction
 import vdi.lib.db.cache.model.*
 import vdi.lib.db.cache.query.AdminAllDatasetsQuery
 import java.time.OffsetDateTime
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.model.ReconcilerTargetRecord
+import vdi.lib.db.model.SyncControlRecord
 
 fun mockCacheDB(
   onSelectDataset: DSGetter<DatasetRecord?> = ::oneParamNull,
@@ -29,16 +32,16 @@ fun mockCacheDB(
   onSelectSharesForDatasets: (List<DatasetID>) -> Map<DatasetID, List<DatasetShare>> = ::oneParamMap,
   onSelectImportControl: DSGetter<DatasetImportStatus?> = ::oneParamNull,
   onSelectImportMessages: DSGetter<List<String>> = ::oneParamList,
-  onSelectSyncControl: DSGetter<VDISyncControlRecord?> = ::oneParamNull,
+  onSelectSyncControl: DSGetter<SyncControlRecord?> = ::oneParamNull,
   onSelectDeletedDatasets: () -> List<DeletedDataset> = ::noParamList,
   onSelectOpenSharesFor: (UserID) -> List<DatasetShareListEntry> = ::oneParamList,
   onSelectAcceptedSharesFor: (UserID) -> List<DatasetShareListEntry> = ::oneParamList,
   onSelectRejectedSharesFor: (UserID) -> List<DatasetShareListEntry> = ::oneParamList,
   onSelectAllSharesFor: (UserID) -> List<DatasetShareListEntry> = ::oneParamList,
-  onSelectAllSyncControlRecords: () -> Iterable<VDIReconcilerTargetRecord> = ::noParamList,
+  onSelectAllSyncControlRecords: () -> Iterable<ReconcilerTargetRecord> = ::noParamList,
   onSelectBrokenImports: (BrokenImportListQuery) -> List<BrokenImportRecord> = ::oneParamList,
   onOpenTransaction: () -> CacheDBTransaction = { mockCacheDBTransaction() }
-): vdi.lib.db.cache.CacheDB =
+): CacheDB =
   mock {
     on { selectDataset(any()) } doAnswer { onSelectDataset(it.getArgument(0)) }
     on { selectInstallFiles(any()) } doAnswer { onSelectInstallFiles(it.getArgument(0)) }
@@ -88,7 +91,7 @@ fun mockCacheDBTransaction(
   onInsertMeta: (DatasetID, VDIDatasetMeta) -> Unit = ::biConsumer,
   onInsertProjects: (DatasetID, Collection<ProjectID>) -> Unit = ::biConsumer,
   onInsertImportControl: (DatasetID, DatasetImportStatus) -> Unit = ::biConsumer,
-  onInsertSyncControl: (VDISyncControlRecord) -> Unit = ::consumer,
+  onInsertSyncControl: (SyncControlRecord) -> Unit = ::consumer,
   onInsertImportMessages: (DatasetID, String) -> Unit = ::biConsumer,
   onUpdateImportControl: (DatasetID, DatasetImportStatus) -> Unit = ::biConsumer,
   onUpdateMeta: (DatasetID, VDIDatasetMeta) -> Unit = ::biConsumer,
@@ -171,7 +174,7 @@ fun mockCacheDatasetRecord(
   summary: String? = null,
   description: String? = null,
   sourceURL: String? = null,
-  projects: Collection<ProjectID>? = null,
+  projects: List<ProjectID>? = null,
 ): DatasetRecord =
   mock {
     mockDataset(datasetID, typeName, typeVersion, ownerID, isDeleted, created, importStatus, origin, inserted)

@@ -8,13 +8,13 @@ import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
-import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import vdi.lib.db.app.AppDB
 import vdi.lib.db.app.AppDBAccessor
 import vdi.lib.db.app.AppDBTransaction
 import vdi.lib.db.app.model.*
 import java.time.OffsetDateTime
+import vdi.lib.db.model.ReconcilerTargetRecord
+import vdi.lib.db.model.SyncControlRecord
 
 fun mockAppDB(
   accessor: (ProjectID, DataType) -> AppDBAccessor? = ::twoParamNull,
@@ -33,10 +33,10 @@ fun mockAppDBAccessor(
   dataset: DSGetter<DatasetRecord?> = ::oneParamNull,
   installMessage: (DatasetID, InstallType) -> DatasetInstallMessage? = ::twoParamNull,
   installMessages: DSGetter<List<DatasetInstallMessage>> = ::oneParamList,
-  syncControl: DSGetter<VDISyncControlRecord?> = ::oneParamNull,
+  syncControl: DSGetter<SyncControlRecord?> = ::oneParamNull,
   visibilityRecords: DSGetter<List<DatasetVisibilityRecord>> = ::oneParamList,
   projectLinks: DSGetter<List<DatasetProjectLinkRecord>> = ::oneParamList,
-  reconcilerRecords: () -> Iterable<VDIReconcilerTargetRecord> = ::noParamList,
+  reconcilerRecords: () -> Iterable<ReconcilerTargetRecord> = ::noParamList,
   byInstallStatus: (InstallType, InstallStatus) -> List<DatasetRecord> = ::twoParamList,
   visibilityExists: (DatasetID, UserID) -> Boolean = { _, _ -> false },
   projectLinkExists: (DatasetID, ProjectID) -> Boolean = { _, _ -> false },

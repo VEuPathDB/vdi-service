@@ -3,9 +3,9 @@ package vdi.lib.db.app.sql.insert
 import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
-import vdi.lib.db.app.DatasetMetaMaxSummaryFieldLength
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
+import vdi.lib.db.app.MaxVarchar2Length
 
 private fun sql(schema: String) =
 // language=oracle
@@ -32,7 +32,7 @@ internal fun Connection.insertDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(3, meta.shortName)
     setString(4, meta.shortAttribution)
     setString(5, meta.category)
-    setString(6, meta.summary?.take(DatasetMetaMaxSummaryFieldLength))
+    setString(6, meta.summary?.take(MaxVarchar2Length))
     setString(7, meta.description)
   }
 }

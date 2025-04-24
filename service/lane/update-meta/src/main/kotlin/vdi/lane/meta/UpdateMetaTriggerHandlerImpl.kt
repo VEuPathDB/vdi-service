@@ -11,16 +11,22 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
-import org.veupathdb.vdi.lib.common.model.VDISyncControlRecord
 import org.veupathdb.vdi.lib.common.util.or
+import java.sql.SQLException
+import java.time.OffsetDateTime
+import java.util.concurrent.ConcurrentHashMap
 import vdi.lib.async.WorkerPool
-import vdi.lib.db.app.*
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.AppDBTransaction
+import vdi.lib.db.app.isUniqueConstraintViolation
 import vdi.lib.db.app.model.*
+import vdi.lib.db.app.withTransaction
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.CacheDBTransaction
 import vdi.lib.db.cache.model.DatasetImpl
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
+import vdi.lib.db.model.SyncControlRecord
 import vdi.lib.kafka.EventMessage
 import vdi.lib.kafka.EventSource
 import vdi.lib.kafka.router.KafkaRouter
@@ -34,9 +40,6 @@ import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.lib.s3.DatasetDirectory
 import vdi.lib.s3.DatasetObjectStore
-import java.sql.SQLException
-import java.time.OffsetDateTime
-import java.util.concurrent.ConcurrentHashMap
 
 internal class UpdateMetaTriggerHandlerImpl(
   private val config: UpdateMetaTriggerHandlerConfig,
@@ -55,7 +58,7 @@ internal class UpdateMetaTriggerHandlerImpl(
 
   override suspend fun run() {
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val kc = requireKafkaConsumer(config.kafkaRouterConfig.updateMetaTriggerTopic, config.kafkaConsumerConfig)
+    val kc = requireKafkaConsumer(config.kafkaRouterConfig.updateMetaTrigger.topic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter(config.kafkaRouterConfig)
     val wp = WorkerPool("update-meta-workers", config.workQueueSize, config.workerPoolSize) {
       Metrics.updateMetaQueueSize.inc(it.toDouble())
@@ -64,7 +67,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
-          kc.fetchMessages(config.kafkaRouterConfig.updateMetaTriggerMessageKey)
+          kc.fetchMessages(config.kafkaRouterConfig.updateMetaTrigger.messageKey)
             .forEach {
               log.info("Received install-meta job for dataset {}/{} from source {}", it.userID, it.datasetID, it.eventSource)
               wp.submit { updateMetaIfNotInProgress(dm, kr, it) }
@@ -242,7 +245,7 @@ internal class UpdateMetaTriggerHandlerImpl(
           it.insertDatasetOrganisms(datasetID, meta.organisms)
 
         it.selectDatasetSyncControlRecord(datasetID) or {
-          it.insertDatasetSyncControl(VDISyncControlRecord(
+          it.insertDatasetSyncControl(SyncControlRecord(
             datasetID     = datasetID,
             sharesUpdated = OriginTimestamp,
             dataUpdated   = OriginTimestamp,
@@ -344,12 +347,12 @@ internal class UpdateMetaTriggerHandlerImpl(
     log.debug("inserting dataset record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
 
     val record = DatasetRecord(
-      datasetID   = datasetID,
-      owner       = meta.owner,
-      typeName    = meta.type.name,
-      typeVersion = meta.type.version,
-      deletionState   = DeleteFlag.NotDeleted,
-      isPublic    = meta.visibility == VDIDatasetVisibility.Public
+      datasetID     = datasetID,
+      owner         = meta.owner,
+      typeName      = meta.type.name,
+      typeVersion   = meta.type.version,
+      deletionState = DeleteFlag.NotDeleted,
+      isPublic      = meta.visibility == VDIDatasetVisibility.Public
     )
 
     // this stuff is not project specific!
@@ -364,7 +367,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       upsertInstallMetaMessage(datasetID, InstallStatus.Running)
 
       log.debug("inserting sync control record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
-      insertDatasetSyncControl(VDISyncControlRecord(
+      insertDatasetSyncControl(SyncControlRecord(
         datasetID     = datasetID,
         sharesUpdated = OriginTimestamp,
         dataUpdated   = OriginTimestamp,
@@ -475,13 +478,11 @@ internal class UpdateMetaTriggerHandlerImpl(
   }
 
   private fun CacheDBTransaction.initSyncControl(datasetID: DatasetID) {
-    tryInsertSyncControl(
-      VDISyncControlRecord(
-        datasetID     = datasetID,
-        sharesUpdated = OriginTimestamp,
-        dataUpdated   = OriginTimestamp,
-        metaUpdated   = OriginTimestamp
-      )
-    )
+    tryInsertSyncControl(SyncControlRecord(
+      datasetID     = datasetID,
+      sharesUpdated = OriginTimestamp,
+      dataUpdated   = OriginTimestamp,
+      metaUpdated   = OriginTimestamp
+    ))
   }
 }

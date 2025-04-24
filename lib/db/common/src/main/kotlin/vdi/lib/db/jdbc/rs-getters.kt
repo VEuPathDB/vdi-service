@@ -7,9 +7,13 @@ import java.sql.ResultSet
 import java.time.OffsetDateTime
 
 
-fun ResultSet.getDatasetID(column: String) = DatasetID(getString(column))
+fun ResultSet.reqDatasetID(column: String) = DatasetID(getString(column))
 
-fun ResultSet.getDatasetID(column: Int) = DatasetID(getString(column))
+fun ResultSet.reqDatasetID(column: Int) = DatasetID(getString(column))
+
+fun ResultSet.optDatasetID(column: String) = getString(column)?.let(::DatasetID)
+
+fun ResultSet.optDatasetID(column: Int) = getString(column)?.let(::DatasetID)
 
 fun ResultSet.getUserID(column: String) = UserID(getString(column))
 

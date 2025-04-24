@@ -1,5 +1,6 @@
 package vdi.lane.reconciliation
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -17,10 +18,11 @@ import vdi.test.*
 import java.time.OffsetDateTime
 import java.util.*
 import kotlin.random.Random
+import vdi.lib.db.model.SyncControlRecord
 
 private val userID = UserID(123456)
 
-private val datasetID = DatasetID()
+private val datasetID = runBlocking { DatasetID() }
 
 @DisplayName("when dataset")
 class DatasetReconcilerTest {
@@ -579,7 +581,7 @@ class DatasetReconcilerTest {
         )
 
         val cacheDB = mockCacheDB(
-          onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+          onSelectSyncControl = { SyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
         )
 
         val appDB = mockAppDB()
@@ -622,7 +624,7 @@ class DatasetReconcilerTest {
         )
 
         val cacheDB = mockCacheDB(
-          onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+          onSelectSyncControl = { SyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
         )
 
         val appDB = mockAppDB()
@@ -665,7 +667,7 @@ class DatasetReconcilerTest {
         )
 
         val cacheDB = mockCacheDB(
-          onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+          onSelectSyncControl = { SyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
         )
 
         val appDB = mockAppDB()
@@ -714,11 +716,11 @@ class DatasetReconcilerTest {
         )
 
         val cacheDB = mockCacheDB(
-          onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, now) }
+          onSelectSyncControl = { SyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, now) }
         )
 
         val appDB = mockAppDB(accessor = { _, _ -> mockAppDBAccessor(
-          syncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+          syncControl = { SyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
         ) })
 
         val router = mockKafkaRouter()
@@ -761,11 +763,11 @@ class DatasetReconcilerTest {
         )
 
         val cacheDB = mockCacheDB(
-          onSelectSyncControl = { VDISyncControlRecord(datasetID, now, OriginTimestamp, OriginTimestamp) }
+          onSelectSyncControl = { SyncControlRecord(datasetID, now, OriginTimestamp, OriginTimestamp) }
         )
 
         val appDB = mockAppDB(accessor = { _, _ -> mockAppDBAccessor(
-          syncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+          syncControl = { SyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
         ) })
 
         val router = mockKafkaRouter()
@@ -808,11 +810,11 @@ class DatasetReconcilerTest {
         )
 
         val cacheDB = mockCacheDB(
-          onSelectSyncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, now, OriginTimestamp) }
+          onSelectSyncControl = { SyncControlRecord(datasetID, OriginTimestamp, now, OriginTimestamp) }
         )
 
         val appDB = mockAppDB(accessor = { _, _ -> mockAppDBAccessor(
-          syncControl = { VDISyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
+          syncControl = { SyncControlRecord(datasetID, OriginTimestamp, OriginTimestamp, OriginTimestamp) }
         ) })
 
         val router = mockKafkaRouter()

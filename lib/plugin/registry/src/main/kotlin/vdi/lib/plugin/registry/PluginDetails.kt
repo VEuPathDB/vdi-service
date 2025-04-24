@@ -4,7 +4,7 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 
 data class PluginDetails(
   val displayName:    String,
-  val projects:       Set<ProjectID>,
+  val projects:       List<ProjectID>,
   val changesEnabled: Boolean,
 ) {
   @Suppress("NOTHING_TO_INLINE")

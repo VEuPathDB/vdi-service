@@ -1,15 +1,15 @@
-package vdi.service.rest.server.services.admin
+package vdi.service.rest.server.services.admin.report
 
 import jakarta.ws.rs.core.StreamingOutput
 import org.veupathdb.lib.s3.s34k.objects.S3Object
-import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.util.defaultZone
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.time.OffsetDateTime
 import java.util.stream.Stream
 import kotlin.math.max
 import vdi.service.rest.generated.resources.AdminReports
+import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.util.defaultZone
 
 fun listAllS3Objects(): AdminReports.GetAdminReportsObjectStoreListAllResponse =
   AdminReports.GetAdminReportsObjectStoreListAllResponse

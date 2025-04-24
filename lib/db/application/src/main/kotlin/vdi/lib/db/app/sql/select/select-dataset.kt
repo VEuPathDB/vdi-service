@@ -6,7 +6,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.lib.db.app.model.DatasetRecord
 import vdi.lib.db.app.sql.*
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getUserID
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
@@ -36,7 +36,7 @@ internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): Dat
         null
       else
         DatasetRecord(
-          datasetID   = rs.getDatasetID("dataset_id"),
+          datasetID   = rs.reqDatasetID("dataset_id"),
           owner       = rs.getUserID("owner"),
           typeName    = rs.getDataType("type_name"),
           typeVersion = rs.getString("type_version"),

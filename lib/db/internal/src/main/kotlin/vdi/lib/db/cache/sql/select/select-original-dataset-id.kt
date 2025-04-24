@@ -3,7 +3,7 @@ package vdi.lib.db.cache.sql.select
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
 
@@ -23,7 +23,7 @@ fun Connection.selectOriginalDatasetID(datasetID: DatasetID) =
 
     withResults {
       if (next())
-        getDatasetID(1)
+        reqDatasetID(1)
       else
         datasetID
     }

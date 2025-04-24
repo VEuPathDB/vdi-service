@@ -1,7 +1,8 @@
 package vdi.service.rest.server.inputs
 
-import org.veupathdb.lib.request.validation.*
-import vdi.service.generated.model.*
+import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.rangeTo
+import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.JsonField as JF
 
 /**
@@ -12,12 +13,12 @@ import vdi.service.rest.generated.model.JsonField as JF
  * ordering as the property definitions in the API docs.
  */
 @Suppress("DuplicatedCode") // Overlap in generated API types
-internal fun vdi.service.rest.generated.model.DatasetPostMeta.cleanup() {
+internal fun DatasetPostMeta.cleanup() {
   // Required Fields
   name = name.cleanupString()
   datasetType?.cleanup()
   origin = origin.cleanupString()
-  dependencies = dependencies.cleanup(vdi.service.rest.generated.model.DatasetDependency::cleanup)
+  dependencies = dependencies.cleanup(DatasetDependency::cleanup)
   projects
     ?.ifEmpty { null }
     ?.asSequence()
@@ -30,20 +31,20 @@ internal fun vdi.service.rest.generated.model.DatasetPostMeta.cleanup() {
   shortName = shortName.cleanupString()
   shortAttribution = shortAttribution.cleanupString()
   category = category.cleanupString()
-  visibility = visibility ?: vdi.service.rest.generated.model.DatasetVisibility.PRIVATE
+  visibility = visibility ?: DatasetVisibility.PRIVATE
   summary = summary.cleanupString()
   description = description.cleanupString()
-  publications = publications.cleanup(vdi.service.rest.generated.model.DatasetPublication::cleanup)
-  hyperlinks = hyperlinks.cleanup(vdi.service.rest.generated.model.DatasetHyperlink::cleanup)
+  publications = publications.cleanup(DatasetPublication::cleanup)
+  hyperlinks = hyperlinks.cleanup(DatasetHyperlink::cleanup)
   organisms = organisms
     ?.ifEmpty { null }
     ?.onEachIndexed { i, s -> organisms[i] = s.cleanupString() }
     ?: emptyList()
-  contacts = contacts.cleanup(vdi.service.rest.generated.model.DatasetContact::cleanup)
+  contacts = contacts.cleanup(DatasetContact::cleanup)
   // createdOn skipped, it's admin use only
 }
 
-internal fun vdi.service.rest.generated.model.DatasetPostMeta.validate(errors: ValidationErrors) {
+internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
   // required fields
   name.validateName(JF.META..JF.NAME, errors)
   datasetType.validate(JF.META..JF.DATASET_TYPE, projects, errors)

@@ -17,5 +17,5 @@ internal class PluginHandlerImpl(
     details.appliesTo(projectID)
 
   override fun projects() =
-    details.projects.ifEmpty { setOf("*") }
+    details.projects.ifEmpty { listOf("*") }
 }

@@ -19,7 +19,7 @@ import vdi.service.rest.generated.resources.AdminRpc
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.*
-import vdi.service.rest.server.services.admin.purgeDataset
+import vdi.service.rest.server.services.admin.rpc.purgeDataset
 import vdi.service.rest.server.services.dataset.createDataset
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcDatasetsProxyUploadResponse as ProxyUploadResponse
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcDatasetsPruneResponse as DatasetPruneResponse

@@ -8,7 +8,7 @@ import vdi.lib.db.cache.consts.OfferStatus
 import vdi.lib.db.cache.model.DatasetShareListEntry
 import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getUserID
 import vdi.lib.db.jdbc.setUserID
 import java.sql.Connection
@@ -53,7 +53,7 @@ internal fun Connection.selectOpenSharesFor(userID: UserID) =
     withResults {
       map {
         DatasetShareListEntry(
-          datasetID     = it.getDatasetID("dataset_id"),
+          datasetID     = it.reqDatasetID("dataset_id"),
           ownerID       = it.getUserID("owner_id"),
           typeName      = it.getDataType("type_name"),
           typeVersion   = it.getString("type_version"),

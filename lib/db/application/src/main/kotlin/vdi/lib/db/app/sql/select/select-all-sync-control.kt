@@ -3,9 +3,9 @@ package vdi.lib.db.app.sql.select
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.lib.db.app.model.DeleteFlag
-import vdi.lib.db.app.model.ReconcilerTargetRecord
+import vdi.lib.db.model.ReconcilerTargetRecord
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getDateTime
 import vdi.lib.db.jdbc.getUserID
 import java.sql.Connection
@@ -48,7 +48,7 @@ class RecordIterator(
 
   override fun next(): ReconcilerTargetRecord {
     return ReconcilerTargetRecord(
-      datasetID     = rs.getDatasetID("dataset_id"),
+      datasetID     = rs.reqDatasetID("dataset_id"),
       ownerID       = rs.getUserID("owner"),
       sharesUpdated = rs.getDateTime("shares_update_time"),
       dataUpdated   = rs.getDateTime("data_update_time"),

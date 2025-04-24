@@ -1,21 +1,21 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.generated.model.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import java.time.OffsetDateTime
+import vdi.service.rest.generated.model.*
 
 @Suppress("DuplicatedCode") // overlap in separate API types
 internal fun DatasetDetails(
   datasetID: DatasetID,
-  owner: vdi.service.rest.generated.model.DatasetOwner,
-  datasetType: vdi.service.rest.generated.model.DatasetTypeResponseBody,
+  owner: DatasetOwner,
+  datasetType: DatasetTypeResponseBody,
   name: String,
   origin: String,
   projectIDs: List<String>,
-  visibility: vdi.service.rest.generated.model.DatasetVisibility,
-  status: vdi.service.rest.generated.model.DatasetStatusInfo,
+  visibility: DatasetVisibility,
+  status: DatasetStatusInfo,
   created: OffsetDateTime,
-  dependencies: List<DatasetDependencyResponseBody>,
+  dependencies: List<DatasetDependency>,
   shortName: String? = null,
   shortAttribution: String? = null,
   category: String? = null,
@@ -23,15 +23,15 @@ internal fun DatasetDetails(
   description: String? = null,
   sourceURL: String? = null,
   importMessages: List<String>? = null,
-  shares: List<vdi.service.rest.generated.model.ShareOffer>? = null,
-  publications: List<vdi.service.rest.generated.model.DatasetPublication>? = null,
-  hyperlinks: List<vdi.service.rest.generated.model.DatasetHyperlink>? = null,
+  shares: List<ShareOffer>? = null,
+  publications: List<DatasetPublication>? = null,
+  hyperlinks: List<DatasetHyperlink>? = null,
   organisms: List<String>? = null,
-  contacts: List<vdi.service.rest.generated.model.DatasetContact>? = null,
+  contacts: List<DatasetContact>? = null,
   originalID: DatasetID? = null,
-  revisionHistory: List<vdi.service.rest.generated.model.DatasetRevision>? = null,
-): vdi.service.rest.generated.model.DatasetDetails =
-  vdi.service.rest.generated.model.DatasetDetailsImpl().also {
+  revisionHistory: List<DatasetRevision>? = null,
+): DatasetDetails =
+  DatasetDetailsImpl().also {
     it.datasetId = datasetID.toString()
     it.owner = owner
     it.datasetType = datasetType

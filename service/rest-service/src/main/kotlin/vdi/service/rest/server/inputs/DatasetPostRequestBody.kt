@@ -2,19 +2,19 @@ package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.*
-import vdi.service.generated.model.*
+import vdi.service.rest.generated.model.*
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.*
 import java.time.OffsetDateTime
 
-internal fun vdi.service.rest.generated.model.DatasetPostRequestBody.cleanup() {
+internal fun DatasetPostRequestBody.cleanup() {
   meta?.cleanup()
   url = url?.ifBlank { null }
     ?.trim()
 }
 
 @Suppress("DuplicatedCode") // overlap in generated API pojo field names
-fun vdi.service.rest.generated.model.DatasetPostRequestBody.validate(): ValidationErrors {
+fun DatasetPostRequestBody.validate(): ValidationErrors {
   // DatasetPostRequestBody is not a JSON object, it is a multipart/form-data
   // request.  The "fields" are form parts and are not validated as if they are
   // part of a syntactically correct JSON body.
@@ -35,7 +35,7 @@ fun vdi.service.rest.generated.model.DatasetPostRequestBody.validate(): Validati
   return ValidationErrors().also { meta.validate(it) }
 }
 
-internal fun vdi.service.rest.generated.model.DatasetPostRequestBody.toDatasetMeta(userID: UserID) =
+internal fun DatasetPostRequestBody.toDatasetMeta(userID: UserID) =
   VDIDatasetMeta(
     type             = meta.datasetType.toInternal(),
     projects         = meta.projects.toSet(),
@@ -50,9 +50,9 @@ internal fun vdi.service.rest.generated.model.DatasetPostRequestBody.toDatasetMe
     origin           = meta.origin,
     sourceURL        = url,
     created          = meta.createdOn ?: OffsetDateTime.now(),
-    dependencies     = meta.dependencies.map(vdi.service.rest.generated.model.DatasetDependency::toInternal),
-    publications     = meta.publications.map(vdi.service.rest.generated.model.DatasetPublication::toInternal),
-    hyperlinks       = meta.hyperlinks.map(vdi.service.rest.generated.model.DatasetHyperlink::toInternal),
-    contacts         = meta.contacts.map(vdi.service.rest.generated.model.DatasetContact::toInternal),
+    dependencies     = meta.dependencies.map(DatasetDependency::toInternal),
+    publications     = meta.publications.map(DatasetPublication::toInternal),
+    hyperlinks       = meta.hyperlinks.map(DatasetHyperlink::toInternal),
+    contacts         = meta.contacts.map(DatasetContact::toInternal),
     organisms        = meta.organisms,
   )

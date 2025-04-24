@@ -4,7 +4,7 @@ import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.lib.db.cache.model.DatasetFileSummary
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import java.sql.Connection
 
 // language=postgresql
@@ -29,7 +29,7 @@ internal fun Connection.selectInstallFileSummaries(datasetIDs: List<DatasetID>):
       val out = HashMap<DatasetID, DatasetFileSummary>(datasetIDs.size)
 
       while (next()) {
-        out[getDatasetID("dataset_id")] = DatasetFileSummary(getInt("count").toUInt(), getLong("size").toULong())
+        out[reqDatasetID("dataset_id")] = DatasetFileSummary(getInt("count").toUInt(), getLong("size").toULong())
       }
 
       out

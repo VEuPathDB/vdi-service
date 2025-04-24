@@ -9,8 +9,10 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.*
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import java.time.OffsetDateTime
+import vdi.lib.db.model.ReconcilerTargetRecord
+import vdi.lib.db.model.SyncControlRecord
 
-internal class ReconcilerStream(it: Iterable<VDIReconcilerTargetRecord>): CloseableIterator<VDIReconcilerTargetRecord> {
+internal class ReconcilerStream(it: Iterable<ReconcilerTargetRecord>): CloseableIterator<ReconcilerTargetRecord> {
   private val raw = it.iterator()
 
   override fun hasNext() = raw.hasNext()
@@ -90,7 +92,7 @@ fun mockSyncControlRecord(
   sharesUpdated: OffsetDateTime? = null,
   dataUpdated: OffsetDateTime? = null,
   metaUpdated: OffsetDateTime? = null,
-): VDISyncControlRecord =
+): SyncControlRecord =
   mock {
     datasetID?.also { on { this.datasetID } doReturn it }
     sharesUpdated?.also { on { this.sharesUpdated } doReturn it }
@@ -106,7 +108,7 @@ fun mockReconcilerTargetRecord(
   dataUpdated: OffsetDateTime? = null,
   metaUpdated: OffsetDateTime? = null,
   comparableID: String? = if (ownerID != null && datasetID != null) "$ownerID/$datasetID" else null,
-): VDIReconcilerTargetRecord =
+): ReconcilerTargetRecord =
   mock {
     ownerID?.also { on { this.ownerID } doReturn it }
     datasetID?.also { on { this.datasetID } doReturn it }

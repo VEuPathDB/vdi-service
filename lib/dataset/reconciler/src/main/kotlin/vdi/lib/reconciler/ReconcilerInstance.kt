@@ -276,20 +276,20 @@ internal class ReconcilerInstance(
     while (hasNext())
       sendSyncIfRelevant(next(), SyncReason.MissingInTarget(targetDB))
   }
+
+  /**
+   * Returns true if any of our scopes are out of sync.
+   */
+  private fun DatasetDirectory.isOutOfSync(targetLastUpdated: SyncControlRecord): SyncStatus {
+    return SyncStatus(
+      metaOutOfSync    = targetLastUpdated.metaUpdated.isBefore(getMetaFile().lastModified()),
+      sharesOutOfSync = targetLastUpdated.sharesUpdated.isBefore(getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
+      installOutOfSync = targetLastUpdated.dataUpdated.isBefore(getInstallReadyTimestamp() ?: targetLastUpdated.dataUpdated),
+    )
+  }
+
+  @Suppress("NOTHING_TO_INLINE")
+  private inline fun <T> Iterator<T>.nextOrNull() =
+    if (hasNext()) next() else null
+
 }
-
-/**
- * Returns true if any of our scopes are out of sync.
- */
-private fun DatasetDirectory.isOutOfSync(targetLastUpdated: SyncControlRecord): SyncStatus {
-  return SyncStatus(
-    metaOutOfSync    = targetLastUpdated.metaUpdated.isBefore(getMetaFile().lastModified()),
-    sharesOutOfSync = targetLastUpdated.sharesUpdated.isBefore(getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
-    installOutOfSync = targetLastUpdated.dataUpdated.isBefore(getInstallReadyTimestamp() ?: targetLastUpdated.dataUpdated),
-  )
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun <T> Iterator<T>.nextOrNull() =
-  if (hasNext()) next() else null
-

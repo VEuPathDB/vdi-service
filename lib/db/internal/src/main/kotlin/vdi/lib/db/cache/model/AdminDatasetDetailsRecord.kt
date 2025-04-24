@@ -25,10 +25,11 @@ data class AdminDatasetDetailsRecord(
   override val description: String?,
   override val sourceURL: String?,
   override val visibility: VDIDatasetVisibility,
-  val projectIDs: List<ProjectID>,
-  val syncControl: SyncControlRecord?,
+  override val projects: List<ProjectID>,
   override val importStatus: DatasetImportStatus,
+  override val originalID: DatasetID?,
+  val syncControl: SyncControlRecord?,
   val messages: List<String>,
   val installFiles: List<String>,
   val uploadFiles: List<String>
-) : Dataset, DatasetMeta
+) : Dataset, DatasetMeta, DatasetProjectLinks

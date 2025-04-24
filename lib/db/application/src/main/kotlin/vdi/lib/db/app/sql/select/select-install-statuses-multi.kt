@@ -8,7 +8,7 @@ import vdi.lib.db.app.model.InstallStatuses
 import vdi.lib.db.app.model.InstallType
 import vdi.lib.db.app.sql.getInstallStatus
 import vdi.lib.db.app.sql.getInstallType
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
 import kotlin.math.max
@@ -63,7 +63,7 @@ internal fun Connection.selectInstallStatuses(
         setDatasetID(j + 1, list[j + offset])
 
       withResults { forEach {
-        val datasetID = getDatasetID("dataset_id")
+        val datasetID = reqDatasetID("dataset_id")
         val type      = getInstallType("install_type")
         val status    = getInstallStatus("status")
         val message   = getString("message")

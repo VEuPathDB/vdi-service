@@ -1,8 +1,5 @@
-package vdi.service.rest.server.services.admin
+package vdi.service.rest.server.services.admin.report
 
-import vdi.service.generated.model.*
-import vdi.service.rest.server.outputs.DatasetStatusInfo
-import vdi.service.rest.server.outputs.DatasetTypeResponseBody
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.lib.db.app.AppDB
@@ -12,8 +9,13 @@ import vdi.lib.db.app.model.InstallStatus
 import vdi.lib.db.app.model.InstallStatuses
 import vdi.lib.db.app.model.InstallType
 import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.service.rest.generated.model.BrokenDatasetInstallDetails
+import vdi.service.rest.generated.model.BrokenDatasetInstallDetailsImpl
+import vdi.service.rest.generated.model.BrokenDatasetInstallReportBodyImpl
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse.respond200WithApplicationJson
+import vdi.service.rest.server.outputs.DatasetStatusInfo
+import vdi.service.rest.server.outputs.DatasetTypeResponseBody
 
 /**
  * Lists datasets across all registered projects that are in the broken install
@@ -40,7 +42,7 @@ private fun listSimpleBrokenDatasets(): GetAdminReportsInstallsFailedResponse {
   for ((project, _) in AppDatabaseRegistry.iterator())
     getBrokenDatasets(project).forEach { out.add(it.datasetID) }
 
-  return respond200WithApplicationJson(vdi.service.rest.generated.model.BrokenDatasetInstallReportBodyImpl()
+  return respond200WithApplicationJson(BrokenDatasetInstallReportBodyImpl()
     .apply { ids = out.map { it.toString() } })
 }
 
@@ -83,7 +85,7 @@ private fun listExpandedBrokenDatasets(): GetAdminReportsInstallsFailedResponse 
   val datasetInstallStatusMap = AppDB().getDatasetStatuses(projectToDatasetIDs)
   projectToDatasetIDs.clear()
 
-  val results = ArrayList<vdi.service.rest.generated.model.BrokenDatasetInstallDetails>(cache.size)
+  val results = ArrayList<BrokenDatasetInstallDetails>(cache.size)
 
   cache.values.forEach {
     results.add(it.toDetails(
@@ -92,7 +94,7 @@ private fun listExpandedBrokenDatasets(): GetAdminReportsInstallsFailedResponse 
     ))
   }
 
-  return respond200WithApplicationJson(vdi.service.rest.generated.model.BrokenDatasetInstallReportBodyImpl()
+  return respond200WithApplicationJson(BrokenDatasetInstallReportBodyImpl()
     .apply { details = results })
 }
 

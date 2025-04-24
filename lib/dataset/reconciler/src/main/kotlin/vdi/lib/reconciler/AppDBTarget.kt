@@ -1,11 +1,11 @@
 package vdi.lib.reconciler
 
-import org.veupathdb.vdi.lib.common.field.ProjectID
-import org.veupathdb.vdi.lib.common.model.VDIReconcilerTargetRecord
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
 import vdi.lib.db.app.AppDB
-import vdi.lib.db.app.AppDatabaseRegistry
+import vdi.lib.db.app.purgeDatasetControlTables
 import vdi.lib.db.app.withTransaction
+import vdi.lib.db.model.ReconcilerTargetRecord
+import vdi.lib.plugin.client.PluginException
 import vdi.lib.plugin.client.PluginRequestException
 import vdi.lib.plugin.client.response.uni.UninstallBadRequestResponse
 import vdi.lib.plugin.client.response.uni.UninstallUnexpectedErrorResponse
@@ -16,10 +16,10 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
 
   override val type = ReconcilerTargetType.Install
 
-  override fun streamSortedSyncControlRecords(): CloseableIterator<VDIReconcilerTargetRecord> =
+  override fun streamSortedSyncControlRecords(): CloseableIterator<ReconcilerTargetRecord> =
     CloseableMultiIterator(projectID)
 
-  override suspend fun deleteDataset(dataset: VDIReconcilerTargetRecord) {
+  override suspend fun deleteDataset(dataset: ReconcilerTargetRecord) {
     if (!PluginHandlers.contains(dataset.type.name, dataset.type.version)) {
       throw UnsupportedTypeException(
         "Unable to delete unknown dataset type ${dataset.type} from target database " +
@@ -38,57 +38,16 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
     if (!res.isSuccessResponse)
       when (res) {
         is UninstallBadRequestResponse ->
-          throw vdi.lib.plugin.client.PluginException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID, res.message)
+          throw PluginException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID, res.message)
 
         is UninstallUnexpectedErrorResponse ->
-          throw vdi.lib.plugin.client.PluginException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID, res.message)
+          throw PluginException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID, res.message)
 
         else ->
-          throw vdi.lib.plugin.client.PluginException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID)
+          throw PluginException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID)
       }
 
-      appDB.withTransaction(projectID, dataset.type.name) {
-        it.deleteDatasetVisibilities(dataset.datasetID)
-        it.deleteDatasetProjectLinks(dataset.datasetID)
-        it.deleteSyncControl(dataset.datasetID)
-        it.deleteInstallMessages(dataset.datasetID)
-        it.deleteDatasetContacts(dataset.datasetID)
-        it.deleteDatasetHyperlinks(dataset.datasetID)
-        it.deleteDatasetPublications(dataset.datasetID)
-        it.deleteDatasetOrganisms(dataset.datasetID)
-        it.deleteDatasetDependencies(dataset.datasetID)
-        it.deleteDatasetMeta(dataset.datasetID)
-        it.deleteDataset(dataset.datasetID)
-      }
+      appDB.withTransaction(projectID, dataset.type.name) { it.purgeDatasetControlTables(dataset.datasetID) }
   }
 }
 
-private class CloseableMultiIterator(private val projectID: ProjectID) : CloseableIterator<VDIReconcilerTargetRecord> {
-  private val dataTypeIterator = AppDatabaseRegistry[projectID]!!.keys().iterator()
-  private var current: CloseableIterator<VDIReconcilerTargetRecord>? = null
-
-  override fun hasNext() =
-    current?.let { it.hasNext() || dataTypeIterator.hasNext() }
-      ?: dataTypeIterator.hasNext()
-
-  override fun next(): VDIReconcilerTargetRecord {
-    // iterate until we have a record stream with at least one record in it.
-    while (current?.hasNext() != true) {
-      // close the previous stream (if one exists)
-      current?.close()
-
-      // ensure there is another type to move to for the current project
-      if (!dataTypeIterator.hasNext())
-        throw NoSuchElementException()
-
-      // attempt to get a stream for the project/type pairing
-      current = AppDB().accessor(projectID, dataTypeIterator.next())?.streamAllSyncControlRecords()
-    }
-
-    return current!!.next()
-  }
-
-  override fun close() {
-    current?.close()
-  }
-}

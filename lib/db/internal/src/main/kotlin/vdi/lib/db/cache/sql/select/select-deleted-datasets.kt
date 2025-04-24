@@ -5,7 +5,7 @@ import io.foxcapades.kdbc.withStatementResults
 import vdi.lib.db.cache.model.DeletedDataset
 import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDatasetID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getUserID
 import java.sql.Connection
 
@@ -25,7 +25,7 @@ WHERE
 internal fun Connection.selectDeletedDatasets(): List<DeletedDataset> =
   createStatement().withStatementResults(SQL) { map {
     DeletedDataset(
-      it.getDatasetID("dataset_id"),
+      it.reqDatasetID("dataset_id"),
       it.getUserID("owner_id"),
       it.getProjectIDList("projects"),
       it.getDataType("type_name")
