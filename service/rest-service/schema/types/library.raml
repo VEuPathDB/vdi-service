@@ -13,7 +13,7 @@ types:
     properties:
       datasetId: VdiId
       owner: UserId
-      datasetType: DatasetTypeResponseBody
+      datasetType: DatasetTypeOutput
       visibility: DatasetVisibility
       name: DatasetName
       origin: DatasetOrigin
@@ -59,7 +59,7 @@ types:
     properties:
       datasetId: VdiId
       owner: UserId
-      datasetType: DatasetTypeResponseBody
+      datasetType: DatasetTypeOutput
       projectIds:
         type: ProjectId[]
         minItems: 1
@@ -79,7 +79,7 @@ types:
     properties:
       datasetId: VdiId
       owner: UserId
-      datasetType: DatasetTypeResponseBody
+      datasetType: DatasetTypeOutput
       projectIds:
         type: ProjectId[]
         minItems: 1
@@ -180,7 +180,7 @@ types:
     properties:
       datasetId: VdiId
       owner: DatasetOwner
-      datasetType: DatasetTypeResponseBody
+      datasetType: DatasetTypeOutput
       name: DatasetName
       origin: DatasetOrigin
       projectIds:
@@ -307,7 +307,7 @@ types:
     properties:
       datasetId: VdiId
       owner: DatasetOwner
-      datasetType: DatasetTypeResponseBody
+      datasetType: DatasetTypeOutput
       visibility: DatasetVisibility
       name: DatasetName
       origin: DatasetOrigin
@@ -386,7 +386,7 @@ types:
         description: |
           Only allowed when transitioning from a none-type dataset into an
           actual dataset type.
-        type: DatasetTypeRequestBody
+        type: DatasetTypeInput
       shortName?: DatasetShortName
       shortAttribution?: DatasetShortAttribution
       category?: DatasetCategory
@@ -411,7 +411,7 @@ types:
     additionalProperties: false
     properties:
       name: DatasetName
-      datasetType: DatasetTypeRequestBody
+      datasetType: DatasetTypeInput
       origin: DatasetOrigin
       dependencies:
         type: DatasetDependency[]
@@ -618,7 +618,7 @@ types:
     description: Brief summary of the dataset.
     type: string
     maxLength: 4000
-  DatasetTypeRequestBody:
+  DatasetTypeInput:
     type: object
     additionalProperties: false
     properties:
@@ -630,7 +630,7 @@ types:
         type: string
         minLength: 1
         maxLength: 32
-  DatasetTypeResponseBody:
+  DatasetTypeOutput:
     description: Details about a specific dataset type.
     type: object
     additionalProperties: false
@@ -741,7 +741,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetType: DatasetTypeResponseBody
+      datasetType: DatasetTypeOutput
       owner: UserId
       isDeleted: boolean
       origin: DatasetOrigin
@@ -858,7 +858,7 @@ types:
       datasetId: VdiId
       owner: DatasetOwner
       shareStatus: ShareOfferStatus
-      datasetType: DatasetTypeResponseBody
+      datasetType: DatasetTypeOutput
       projectIds:
         type: ProjectId[]
         minItems: 1

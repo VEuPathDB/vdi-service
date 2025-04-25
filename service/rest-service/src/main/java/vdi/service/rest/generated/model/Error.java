@@ -11,17 +11,17 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     property = "status"
 )
 @JsonSubTypes({
-    @JsonSubTypes.Type(ConflictError.class),
-    @JsonSubTypes.Type(ServerError.class),
-    @JsonSubTypes.Type(ForbiddenError.class),
-    @JsonSubTypes.Type(UnprocessableEntityError.class),
-    @JsonSubTypes.Type(NotFoundError.class),
-    @JsonSubTypes.Type(UnauthorizedError.class),
-    @JsonSubTypes.Type(MethodNotAllowedError.class),
-    @JsonSubTypes.Type(BadRequestError.class),
-    @JsonSubTypes.Type(FailedDependencyError.class),
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.ConflictError.class),
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.ServerError.class),
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.ForbiddenError.class),
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.UnprocessableEntityError.class),
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.NotFoundError.class),
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.UnauthorizedError.class),
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.MethodNotAllowedError.class),
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.BadRequestError.class),
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.FailedDependencyError.class),
     @JsonSubTypes.Type(java.lang.String.class),
-    @JsonSubTypes.Type(Error.class)
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.Error.class)
 })
 @JsonDeserialize(
     as = ErrorImpl.class

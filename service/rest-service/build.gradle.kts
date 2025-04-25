@@ -1,3 +1,5 @@
+import org.veupathdb.lib.gradle.container.tasks.raml.GenerateRamlDocs
+
 plugins {
   kotlin("jvm")
   alias(libs.plugins.vpdb)
@@ -57,4 +59,17 @@ dependencies {
   testImplementation(libs.mockito.core)
   testImplementation(libs.mockito.kotlin)
   testRuntimeOnly(libs.junit.engine)
+}
+
+tasks.register("raml-docs") {
+  doFirst {
+    val originalFile = containerService.raml.rootApiDefinition
+    containerService.raml.rootApiDefinition = file("deprecated-api.raml")
+
+    with(tasks.getByName<GenerateRamlDocs>(GenerateRamlDocs.TaskName)) {
+      execute()
+    }
+
+    containerService.raml.rootApiDefinition = originalFile
+  }
 }

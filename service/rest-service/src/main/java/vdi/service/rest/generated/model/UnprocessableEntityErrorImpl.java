@@ -65,7 +65,7 @@ public class UnprocessableEntityErrorImpl implements UnprocessableEntityError {
     private UnprocessableEntityError.ErrorsType.ByKeyType byKey;
 
     @JsonIgnore
-    private final Map<String, Object> additionalProperties = new ExcludingMap();
+    private Map<String, Object> additionalProperties = new ExcludingMap();
 
     @JsonProperty("general")
     public List<String> getGeneral() {
@@ -101,7 +101,7 @@ public class UnprocessableEntityErrorImpl implements UnprocessableEntityError {
     @JsonPropertyOrder
     public static class ByKeyTypeImpl implements UnprocessableEntityError.ErrorsType.ByKeyType {
       @JsonIgnore
-      private final Map<String, Object> additionalProperties = new ExcludingMap();
+      private Map<String, Object> additionalProperties = new ExcludingMap();
 
       @JsonAnyGetter
       public Map<String, Object> getAdditionalProperties() {

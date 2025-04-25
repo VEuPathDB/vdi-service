@@ -1,0 +1,101 @@
+#%RAML 1.0 Extension
+extends: api.raml
+
+annotationTypes:
+  deprecated:
+    displayName: Deprecated
+    description: The method is deprecated.
+    allowedTargets: [ Method ]
+    type: nil
+
+# Non-deprecated endpoints included to preserve ordering in rendered HTML.
+/datasets: {}
+/datasets/{vdi-id}: {}
+/datasets/{vdi-id}/files: {}
+/datasets/{vdi-id}/shares/{recipient-user-id}: {}
+/datasets/community: {}
+/users: {}
+/plugins: {}
+/admin/reports: {}
+/admin/rpc: {}
+/api: {}
+/health: {}
+/metrics: {}
+
+# Deprecated endpoint documentation overrides
+/vdi-datasets:
+  displayName: "/vdi-datasets"
+  get:
+    (deprecated):
+    description: Deprecated alias of [/datasets](#resources:/datasets:get)
+  post:
+    (deprecated):
+    description: Deprecated alias of [/datasets](#resources:/datasets:post)
+
+/vdi-datasets/community:
+  displayName: /vdi-datasets/community
+  get:
+    (deprecated):
+    description: Deprecated alias of [/datasets/community](#resources:/datasets/community:get)
+
+/vdi-datasets/{vdi-id}:
+  displayName: "/vdi-datasets/{vdi-id}"
+  get:
+    (deprecated):
+    description: Deprecated alias of [/datasets/{vdi-id}](#resources:/datasets/{vd-id}:get)
+  patch:
+    (deprecated):
+    description: Deprecated alias of [/datasets/{vdi-id}](#resources:/datasets/{vd-id}:patch)
+  put:
+    (deprecated):
+    description: Deprecated alias of [/datasets/{vdi-id}](#resources:/datasets/{vd-id}:put)
+  delete:
+    (deprecated):
+    description: Deprecated alias of [/datasets/{vdi-id}](#resources:/datasets/{vd-id}:delete)
+
+/vdi-datasets/{vdi-id}/files:
+  displayName: "/vdi-datasets/{vdi-id}/files"
+  get:
+    (deprecated):
+    description: Deprecated alias of [/datasets/{vdi-id}/files](#resources:/datasets/{vdi-id}/files:get)
+  /upload:
+    get:
+    (deprecated):
+      description: Deprecated alias of [/datasets/{vdi-id}/files](#resources:/datasets/{vdi-id}/files/upload:get)
+  /data:
+    get:
+    (deprecated):
+      description: Deprecated alias of [/datasets/{vdi-id}/files](#resources:/datasets/{vdi-id}/files/data:get)
+
+/vdi-datasets/{vdi-id}/shares/{recipient-user-id}:
+  displayName: /vdi-datasets/{vdi-id}/shares/{recipient-user-id}
+  /offer:
+    displayName: /offer
+    put:
+    (deprecated):
+      description: Deprecated alias of [/datasets/{vdi-id}/shares/{recipient-user-id}/offer](#resources:/datasets/{vdi-id}/shares/{recipient-user-id}/offer:put)
+  /receipt:
+    displayName: /receipt
+    put:
+    (deprecated):
+      description: Deprecated alias of [/datasets/{vdi-id}/shares/{recipient-user-id}/receipt](#resources:/datasets/{vdi-id}/shares/{recipient-user-id}/receipt:put)
+
+/vdi-datasets/share-offers:
+  displayName: /vdi-datasets/share-offers
+  get:
+    (deprecated):
+    description: Deprecated alias of [/users/self/share-offers](#resources:/users/self/share-offers:get)
+
+/vdi-users:
+  displayName: /vdi-users
+  /self:
+    /meta:
+      get:
+    (deprecated):
+      description: Deprecated alias of [/users/self/meta](#resources:/users/self/meta:get)
+
+/vdi-plugins:
+  displayName: /vdi-plugins
+  get:
+    (deprecated):
+    description: Deprecated alias of [/plugins](#resources:/plugins:get)

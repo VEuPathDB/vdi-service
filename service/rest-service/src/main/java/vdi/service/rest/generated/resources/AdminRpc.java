@@ -15,7 +15,6 @@ import vdi.service.rest.generated.model.DatasetPostRequestBody;
 import vdi.service.rest.generated.model.DatasetPostResponseBody;
 import vdi.service.rest.generated.model.ForbiddenError;
 import vdi.service.rest.generated.model.InstallCleanupRequestBody;
-import vdi.service.rest.generated.model.NotFoundError;
 import vdi.service.rest.generated.model.ServerError;
 import vdi.service.rest.generated.model.UnprocessableEntityError;
 import vdi.service.rest.generated.support.ResponseDelegate;
@@ -236,13 +235,6 @@ public interface AdminRpc {
     public static PostAdminRpcObjectStorePurgeDatasetResponse respond400WithApplicationJson(
         BadRequestError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(400).header("Content-Type", "application/json");
-      responseBuilder.entity(entity);
-      return new PostAdminRpcObjectStorePurgeDatasetResponse(responseBuilder.build(), entity);
-    }
-
-    public static PostAdminRpcObjectStorePurgeDatasetResponse respond404WithApplicationJson(
-        NotFoundError entity) {
-      Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new PostAdminRpcObjectStorePurgeDatasetResponse(responseBuilder.build(), entity);
     }

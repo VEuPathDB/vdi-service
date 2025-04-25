@@ -45,7 +45,7 @@ build:
 raml-gen:
 	@which node || (echo 'NodeJS not found on $$PATH'; exit 1)
 	@./gradlew -q :service:rest-service:generate-jaxrs --rerun-tasks
-	@./gradlew -q generate-raml-docs --rerun-tasks
+	@./gradlew -q build-raml-docs --rerun-tasks
 
 
 ####

@@ -86,8 +86,15 @@ tasks.register("compile-design-doc") {
   }
 }
 
-tasks.register("generate-raml-docs") {
-  dependsOn(":service:rest-service:generate-raml-docs")
+tasks.register("build-raml-docs") {
+  doFirst {
+    with(project(":service:rest-service").tasks["raml-docs"]) {
+      actions.forEach {
+        logger.error("{}", it)
+        it(this)
+      }
+    }
+  }
 
   doLast {
     val restModule = project(":service:rest-service")
