@@ -45,21 +45,18 @@ default:
 # ┃                                                                          ┃ #
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
-CONFIG_VALIDATOR_VERSION := v1.4.1
+ALPINE_DEV_BASE_TAG := jdk24-gradle8.14
 STACK_CONFIG_PATH := config/production-config.yml
 
 # Validates the VDI configuration file against the config JSON schema.
 .PHONY: validate-config
-validate-config: vendor/config-validator-$(CONFIG_VALIDATOR_VERSION)
-	@cd config/schema/ && ../../$< \
-	  -s 'config.json' \
- 	  ../../$(STACK_CONFIG_PATH)
-
-vendor/config-validator-$(CONFIG_VALIDATOR_VERSION):
-	@mkdir -p vendor
-	@wget https://github.com/neilpa/yajsv/releases/download/$(CONFIG_VALIDATOR_VERSION)/yajsv.linux.amd64 -O $@
-	@chmod +x $@
-
+validate-config:
+	@$(CONTAINER_CMD) run \
+	  --rm \
+	  --volume $$PWD:/vdi \
+	  --workdir /vdi \
+	  veupathdb/alpine-dev-base:jdk24-gradle8.14 \
+	  gradle validate-config
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃                                                                          ┃ #

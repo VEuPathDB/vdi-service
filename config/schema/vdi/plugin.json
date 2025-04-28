@@ -46,26 +46,30 @@
       "unevaluatedItems": false
     },
     "scripts": {
-      "checkCompatibility": {
-        "title": "Data Compatibility Test",
-        "$ref": "#/$defs/scriptConfig"
+      "type": "object",
+      "properties": {
+        "checkCompatibility": {
+          "title": "Data Compatibility Test",
+          "$ref": "#/$defs/scriptConfig"
+        },
+        "dataCleaning": {
+          "title": "Data Import/Cleanup",
+          "$ref": "#/$defs/scriptConfig"
+        },
+        "dataInstall": {
+          "title": "Data Installation",
+          "$ref": "#/$defs/scriptConfig"
+        },
+        "metaUpdate": {
+          "title": "Dataset Metadata Upsert",
+          "$ref": "#/$defs/scriptConfig"
+        },
+        "uninstall": {
+          "title": "Dataset Uninstallation",
+          "$ref": "#/$defs/scriptConfig"
+        }
       },
-      "dataCleaning": {
-        "title": "Data Import/Cleanup",
-        "$ref": "#/$defs/scriptConfig"
-      },
-      "dataInstall": {
-        "title": "Data Installation",
-        "$ref": "#/$defs/scriptConfig"
-      },
-      "metaUpdate": {
-        "title": "Dataset Metadata Upsert",
-        "$ref": "#/$defs/scriptConfig"
-      },
-      "uninstall": {
-        "title": "Dataset Uninstallation",
-        "$ref": "#/$defs/scriptConfig"
-      }
+      "additionalProperties": false
     }
   },
   "required": [
