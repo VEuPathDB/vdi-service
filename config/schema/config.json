@@ -1,19 +1,23 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/config.json",
   "title": "VDI Stack Configuration Schema",
   "type": "object",
   "properties": {
     "containerCore": {
-      "$ref": "container-core/config.json#"
+      "$ref": "/vdi-service/schema/container-core/config.json"
     },
     "vdi": {
-      "$ref": "vdi/config.json#"
+      "$ref": "/vdi-service/schema/vdi/config.json"
     },
     "definitions": {
       "title": "Shared Value Definitions",
       "description": "Object that may be used to hold common definitions that may be referenced elsewhere in the config file using YAML anchors and aliases.",
       "type": "object"
+    },
+    "$schema": {
+      "type": "string",
+      "format": "uri"
     }
   },
   "required": [

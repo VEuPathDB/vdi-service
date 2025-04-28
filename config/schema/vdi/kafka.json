@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/kafka.json",
   "title": "Kafka Configuration",
   "type": "object",
@@ -9,13 +9,13 @@
       "items": {
         "oneOf": [
           {
-            "$ref": "../common.json#/definitions/hostString"
+            "$ref": "/vdi-service/schema/common.json#/definitions/hostString"
           },
           {
-            "$ref": "../common.json#/definitions/interpolatedValue"
+            "$ref": "/vdi-service/schema/common.json#/definitions/interpolatedValue"
           },
           {
-            "$ref": "../common.json#/definitions/hostObject"
+            "$ref": "/vdi-service/schema/common.json#/definitions/hostObject"
           }
         ]
       },
@@ -47,7 +47,7 @@
       "type": "object",
       "properties": {
         "autoCommitInterval": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "5s"
         },
         "autoOffsetReset": {
@@ -59,7 +59,7 @@
           "default": "earliest"
         },
         "connectionsMaxIdle": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "9m"
         },
         "groupId": {
@@ -70,7 +70,7 @@
           "default": null
         },
         "defaultApiTimeout": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "1m"
         },
         "enableAutoCommit": {
@@ -88,11 +88,11 @@
           "default": 1
         },
         "heartbeatInterval": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "3s"
         },
         "maxPollInterval": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "5m"
         },
         "maxPollRecords": {
@@ -101,7 +101,7 @@
           "default": 500
         },
         "pollDuration": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "2s"
         },
         "receiveBufferSize": {
@@ -110,19 +110,19 @@
           "default": 65536
         },
         "reconnectBackoffMaxTime": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "1s"
         },
         "reconnectBackoffTime": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "50ms"
         },
         "requestTimeout": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "30s"
         },
         "retryBackoffTime": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "100ms"
         },
         "sendBufferSize": {
@@ -131,7 +131,7 @@
           "default": 131072
         },
         "sessionTimeout": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "45s"
         }
       },
@@ -170,19 +170,19 @@
           "default": 16384
         },
         "connectionsMaxIdle": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "9m"
         },
         "deliveryTimeout": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "2m"
         },
         "lingerTime": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "5ms"
         },
         "maxBlockingTimeout": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "1m"
         },
         "maxRequestSize": {
@@ -195,7 +195,7 @@
           "minimum": -1
         },
         "requestTimeout": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "30s"
         },
         "sendBufferSize": {
@@ -204,15 +204,15 @@
           "default": 131072
         },
         "reconnectBackoffMaxTime": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "1s"
         },
         "reconnectBackoffTime": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "50ms"
         },
         "retryBackoffTime": {
-          "$ref": "../common.json#/definitions/duration",
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration",
           "default": "100ms"
         }
       },

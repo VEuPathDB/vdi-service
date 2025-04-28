@@ -1,11 +1,11 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/plugin.json",
   "title": "VDI Plugin Config",
   "type": "object",
   "properties": {
     "server": {
-      "$ref": "../common.json#/definitions/hostString"
+      "$ref": "/vdi-service/schema/common.json#/definitions/hostString"
     },
     "displayName": {
       "type": "string"
@@ -30,7 +30,7 @@
           "format": "uri-reference"
         },
         {
-          "$ref": "../common.json#/definitions/interpolatedValue"
+          "$ref": "/vdi-service/schema/common.json#/definitions/interpolatedValue"
         }
       ],
       "default": "/datasets",
@@ -41,7 +41,7 @@
     "projectIds": {
       "type": "array",
       "items": {
-        "$ref": "../common.json#/definitions/installTarget"
+        "$ref": "/vdi-service/schema/common.json#/definitions/installTarget"
       },
       "additionalItems": false
     },
@@ -80,7 +80,7 @@
       "properties": {
         "maxDuration": {
           "title": "Maximum Script Execution Time",
-          "$ref": "../common.json#/definitions/duration"
+          "$ref": "/vdi-service/schema/common.json#/definitions/duration"
         },
         "pathOverride": {
           "title": "Script Path Override",

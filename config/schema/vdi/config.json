@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/config.json",
   "title": "VDI Configuration Schema",
   "type": "object",
@@ -11,13 +11,13 @@
       "type": "object",
       "properties": {
         "eventRouter": {
-          "$ref": "daemons/event-router.json#"
+          "$ref": "/vdi-service/schema/vdi/daemons/event-router.json#"
         },
         "pruner": {
-          "$ref": "daemons/pruner.json#"
+          "$ref": "/vdi-service/schema/vdi/daemons/pruner.json#"
         },
         "reconciler": {
-          "$ref": "daemons/reconciler.json#"
+          "$ref": "/vdi-service/schema/vdi/daemons/reconciler.json#"
         }
       },
       "additionalProperties": false
@@ -29,30 +29,30 @@
       "type": "object",
       "properties": {
         "hardDelete": {
-          "$ref": "lanes/hard-delete.json#"
+          "$ref": "/vdi-service/schema/vdi/lanes/hard-delete.json#"
         },
         "import": {
-          "$ref": "lanes/import.json#"
+          "$ref": "/vdi-service/schema/vdi/lanes/import.json#"
         },
         "install": {
-          "$ref": "lanes/install.json#"
+          "$ref": "/vdi-service/schema/vdi/lanes/install.json#"
         },
         "reconciliation": {
-          "$ref": "lanes/reconciliation.json#"
+          "$ref": "/vdi-service/schema/vdi/lanes/reconciliation.json#"
         },
         "sharing": {
-          "$ref": "lanes/sharing.json#"
+          "$ref": "/vdi-service/schema/vdi/lanes/sharing.json#"
         },
         "softDelete": {
-          "$ref": "lanes/soft-delete.json#"
+          "$ref": "/vdi-service/schema/vdi/lanes/soft-delete.json#"
         },
         "updateMeta": {
-          "$ref": "lanes/update-meta.json#"
+          "$ref": "/vdi-service/schema/vdi/lanes/update-meta.json#"
         }
       }
     },
     "ldap": {
-      "$ref": "../common.json#/definitions/ldap"
+      "$ref": "/vdi-service/schema/common.json#/definitions/ldap"
     },
     "objectStore": {
       "$ref": "object-store.json#"
@@ -107,13 +107,13 @@
         "host": {
           "oneOf": [
             {
-              "$ref": "../common.json#/definitions/hostString"
+              "$ref": "/vdi-service/schema/common.json#/definitions/hostString"
             },
             {
-              "$ref": "../common.json#/definitions/interpolatedValue"
+              "$ref": "/vdi-service/schema/common.json#/definitions/interpolatedValue"
             },
             {
-              "$ref": "../common.json#/definitions/hostObject"
+              "$ref": "/vdi-service/schema/common.json#/definitions/hostObject"
             }
           ]
         },

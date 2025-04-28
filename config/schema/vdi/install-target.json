@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/install-target.json",
   "type": "object",
   "allOf": [
@@ -39,7 +39,7 @@
           "default": 5
         },
         "targetName": {
-          "$ref": "../common.json#/definitions/installTarget"
+          "$ref": "/vdi-service/schema/common.json#/definitions/installTarget"
         }
       },
       "required": [
@@ -70,7 +70,7 @@
               "type": "string"
             },
             "port": {
-              "$ref": "../common.json#/definitions/port"
+              "$ref": "/vdi-service/schema/common.json#/definitions/port"
             }
           },
           "required": [

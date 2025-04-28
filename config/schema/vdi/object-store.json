@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/object-store.json",
   "title": "Object Store Connection Config",
   "type": "object",
@@ -10,13 +10,13 @@
     "host": {
       "oneOf": [
         {
-          "$ref": "../common.json#/definitions/hostString"
+          "$ref": "/vdi-service/schema/common.json#/definitions/hostString"
         },
         {
-          "$ref": "../common.json#/definitions/interpolatedValue"
+          "$ref": "/vdi-service/schema/common.json#/definitions/interpolatedValue"
         },
         {
-          "$ref": "../common.json#/definitions/hostObject"
+          "$ref": "/vdi-service/schema/common.json#/definitions/hostObject"
         }
       ]
     },

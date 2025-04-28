@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/container-core/database.json",
   "title": "Database Connection Config",
   "description": "Container core database connection configuration.",
@@ -50,13 +50,13 @@
               "title": "Database Host Details",
               "oneOf": [
                 {
-                  "$ref": "../common.json#/definitions/hostString"
+                  "$ref": "/vdi-service/schema/common.json#/definitions/hostString"
                 },
                 {
-                  "$ref": "../common.json#/definitions/hostObject"
+                  "$ref": "/vdi-service/schema/common.json#/definitions/hostObject"
                 },
                 {
-                  "$ref": "../common.json#/definitions/interpolatedValue"
+                  "$ref": "/vdi-service/schema/common.json#/definitions/interpolatedValue"
                 }
               ]
             },
