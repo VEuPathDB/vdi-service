@@ -51,12 +51,14 @@ STACK_CONFIG_PATH := config/production-config.yml
 # Validates the VDI configuration file against the config JSON schema.
 .PHONY: validate-config
 validate-config:
+	@echo "running validation in dev-build container"
+	@echo
 	@$(CONTAINER_CMD) run \
 	  --rm \
-	  --volume $$PWD:/vdi \
-	  --workdir /vdi \
+	  --volume $$PWD/config:/vdi/config \
+	  --workdir /vdi/config/validator \
 	  veupathdb/alpine-dev-base:jdk24-gradle8.14 \
-	  gradle validate-config
+	  gradle validate-config --quiet -Pconfig-file=/vdi/$(STACK_CONFIG_PATH)
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃                                                                          ┃ #

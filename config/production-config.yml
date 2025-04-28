@@ -47,6 +47,7 @@ containerCore:
 
 vdi:
   ldap: *ldap
+  siteBuild: build-65
   objectStore:
     bucketName: some-bucket
     host: ${env:S3_HOST}
