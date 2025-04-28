@@ -19,6 +19,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: feature-data-updates
+        clean: 'false'
     - name: Copy Schema
       run: cp -r config/schema/ docs-for-upload/schema/
     - name: Upload
