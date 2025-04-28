@@ -5,20 +5,20 @@
   "type": "object",
   "properties": {
     "pollInterval": {
-      "$ref": "/vdi-service/schema/common.json#/definitions/duration",
+      "$ref": "/vdi-service/schema/common.json#/$defs/duration",
       "default": "1s"
     },
     "connection": {
-      "$ref": "#/definitions/connection"
+      "$ref": "#/$defs/connection"
     },
     "exchange": {
-      "$ref": "#/definitions/exchange"
+      "$ref": "#/$defs/exchange"
     },
     "queue": {
-      "$ref": "#/definitions/queue"
+      "$ref": "#/$defs/queue"
     },
     "routing": {
-      "$ref": "#/definitions/routing"
+      "$ref": "#/$defs/routing"
     }
   },
   "required": [
@@ -28,7 +28,7 @@
     "routing"
   ],
   "additionalProperties": false,
-  "definitions": {
+  "$defs": {
     "connection": {
       "type": "object",
       "properties": {
@@ -39,13 +39,13 @@
         "host": {
           "oneOf": [
             {
-              "$ref": "/vdi-service/schema/common.json#/definitions/hostString"
+              "$ref": "/vdi-service/schema/common.json#/$defs/hostString"
             },
             {
-              "$ref": "/vdi-service/schema/common.json#/definitions/interpolatedValue"
+              "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
             },
             {
-              "$ref": "/vdi-service/schema/common.json#/definitions/hostObject"
+              "$ref": "/vdi-service/schema/common.json#/$defs/hostObject"
             }
           ]
         },

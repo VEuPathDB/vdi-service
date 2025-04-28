@@ -16,7 +16,8 @@
           "items": {
             "type": "string"
           },
-          "additionalItems": false
+          "unevaluatedItems": false,
+          "uniqueItems": true
         },
         "enabled": {
           "type": "boolean",
@@ -39,7 +40,7 @@
           "default": 5
         },
         "targetName": {
-          "$ref": "/vdi-service/schema/common.json#/definitions/installTarget"
+          "$ref": "/vdi-service/schema/common.json#/$defs/installTarget"
         }
       },
       "required": [
@@ -70,7 +71,7 @@
               "type": "string"
             },
             "port": {
-              "$ref": "/vdi-service/schema/common.json#/definitions/port"
+              "$ref": "/vdi-service/schema/common.json#/$defs/port"
             }
           },
           "required": [

@@ -1,10 +1,14 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import build.validateServiceConfig
+import java.net.URI
 
 plugins {
   alias(libs.plugins.kotlin)
   alias(libs.plugins.shadow)
+  id("cz.alenkacz.gradle.jsonvalidator") version "1.2.1"
+  id("com.ascert.open.json2yaml") version "1.1.1"
 }
 
 allprojects {
@@ -63,6 +67,13 @@ tasks.shadowJar {
   manifest {
     attributes["Main-Class"] = "vdi.bootstrap.Main"
   }
+}
+
+tasks.register("validate-config") {
+  validateServiceConfig(
+    file("config/production-config.yml"),
+    URI.create("https://veupathdb.github.io/vdi-service/schema/config.json")
+  )
 }
 
 tasks.register("compile-design-doc") {

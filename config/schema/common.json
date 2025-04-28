@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/common.json",
-  "definitions": {
+  "$defs": {
     "duration": {
       "title": "Duration String",
       "type": "string",
@@ -32,7 +32,7 @@
           "maxLength": 253
         },
         "port": {
-          "$ref": "#/definitions/port"
+          "$ref": "#/$defs/port"
         }
       },
       "required": [
@@ -83,20 +83,20 @@
             {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/hostString"
+                "$ref": "#/$defs/hostString"
               }
             },
             {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/hostObject"
+                "$ref": "#/$defs/hostObject"
               }
             },
             {
-              "$ref": "#/definitions/hostCsv"
+              "$ref": "#/$defs/hostCsv"
             },
             {
-              "$ref": "#/definitions/interpolatedValue"
+              "$ref": "#/$defs/interpolatedValue"
             }
           ]
         },

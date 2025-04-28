@@ -5,6 +5,7 @@
 .settings/
 .kotlin/
 build/
+!buildSrc/src/main/kotlin/build/
 /vendor/
 /bin/
 /tmp/

@@ -5,7 +5,7 @@
   "type": "object",
   "allOf": [
     {
-      "$ref": "lane-common.json#"
+      "$ref": "/vdi-service/schema/vdi/lanes/lane-common.json#"
     },
     {
       "properties": {
@@ -13,7 +13,7 @@
           "default": "reconciliation-lane-receive"
         },
         "kafkaProducerId": {
-          "$ref": "lane-common.json#/definitions/kafkaProducerId",
+          "$ref": "/vdi-service/schema/vdi/lanes/lane-common.json#/$defs/kafkaProducerId",
           "default": "reconciliation-lane-send"
         },
         "memoryQueueSize": {

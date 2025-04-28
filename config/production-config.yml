@@ -1,4 +1,6 @@
-commonVars:
+$schema: https://veupathdb.github.io/vdi-service/schema/config.json
+
+definitions:
   genomicsProjects: &genomicsProjects
   - AmoebaDB
   - CryptoDB

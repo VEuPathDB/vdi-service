@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "ldap": {
-      "$ref": "/vdi-service/schema/common.json#/definitions/ldap"
+      "$ref": "/vdi-service/schema/common.json#/$defs/ldap"
     },
     "authentication": {
       "type": "object",
@@ -17,35 +17,35 @@
               "minLength": 32
             },
             {
-              "$ref": "/vdi-service/schema/common.json#/definitions/interpolatedValue"
+              "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
             }
           ]
         },
         "oauth": {
-          "$ref": "#/definitions/oauth"
+          "$ref": "#/$defs/oauth"
         }
       }
     },
     "http": {
-      "$ref": "#/definitions/http"
+      "$ref": "#/$defs/http"
     },
     "databases": {
       "type": "object",
       "properties": {
         "accountDb": {
-          "$ref": "database.json#"
+          "$ref": "/vdi-service/schema/container-core/database.json#"
         },
         "appDb": {
-          "$ref": "database.json#"
+          "$ref": "/vdi-service/schema/container-core/database.json#"
         },
         "userDb": {
-          "$ref": "database.json#"
+          "$ref": "/vdi-service/schema/container-core/database.json#"
         }
       }
     }
   },
   "additionalProperties": false,
-  "definitions": {
+  "$defs": {
     "http": {
       "title": "HTTP Server Config",
       "type": "object",
@@ -57,7 +57,7 @@
         },
         "bindPort": {
           "title": "HTTP Server Port Binding",
-          "$ref": "/vdi-service/schema/common.json#/definitions/port",
+          "$ref": "/vdi-service/schema/common.json#/$defs/port",
           "default": 80
         }
       }

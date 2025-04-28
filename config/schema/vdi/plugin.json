@@ -5,13 +5,13 @@
   "type": "object",
   "properties": {
     "server": {
-      "$ref": "/vdi-service/schema/common.json#/definitions/hostString"
+      "$ref": "/vdi-service/schema/common.json#/$defs/hostString"
     },
     "displayName": {
       "type": "string"
     },
     "dataType": {
-      "$ref": "#/definitions/dataType"
+      "$ref": "#/$defs/dataType"
     },
     "customPath": {
       "title": "PATH Extension",
@@ -30,7 +30,7 @@
           "format": "uri-reference"
         },
         {
-          "$ref": "/vdi-service/schema/common.json#/definitions/interpolatedValue"
+          "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
         }
       ],
       "default": "/datasets",
@@ -41,30 +41,30 @@
     "projectIds": {
       "type": "array",
       "items": {
-        "$ref": "/vdi-service/schema/common.json#/definitions/installTarget"
+        "$ref": "/vdi-service/schema/common.json#/$defs/installTarget"
       },
-      "additionalItems": false
+      "unevaluatedItems": false
     },
     "scripts": {
       "checkCompatibility": {
         "title": "Data Compatibility Test",
-        "$ref": "#/definitions/scriptConfig"
+        "$ref": "#/$defs/scriptConfig"
       },
       "dataCleaning": {
         "title": "Data Import/Cleanup",
-        "$ref": "#/definitions/scriptConfig"
+        "$ref": "#/$defs/scriptConfig"
       },
       "dataInstall": {
         "title": "Data Installation",
-        "$ref": "#/definitions/scriptConfig"
+        "$ref": "#/$defs/scriptConfig"
       },
       "metaUpdate": {
         "title": "Dataset Metadata Upsert",
-        "$ref": "#/definitions/scriptConfig"
+        "$ref": "#/$defs/scriptConfig"
       },
       "uninstall": {
         "title": "Dataset Uninstallation",
-        "$ref": "#/definitions/scriptConfig"
+        "$ref": "#/$defs/scriptConfig"
       }
     }
   },
@@ -74,17 +74,17 @@
     "dataType"
   ],
   "additionalProperties": false,
-  "definitions": {
+  "$defs": {
     "scriptConfig": {
       "type": "object",
       "properties": {
         "maxDuration": {
           "title": "Maximum Script Execution Time",
-          "$ref": "/vdi-service/schema/common.json#/definitions/duration"
+          "$ref": "/vdi-service/schema/common.json#/$defs/duration"
         },
         "pathOverride": {
           "title": "Script Path Override",
-          "$ref": "#/definitions/scriptPath"
+          "$ref": "#/$defs/scriptPath"
         }
       },
       "additionalProperties": false

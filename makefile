@@ -50,10 +50,10 @@ STACK_CONFIG_PATH := config/production-config.yml
 
 # Validates the VDI configuration file against the config JSON schema.
 .PHONY: validate-config
-validate-config:
-	@vendor/yaml-jsonschema \
-	  --schema 'https://veupathdb.github.io/vdi-service/schema/config.json#' \
- 	  --source $(STACK_CONFIG_PATH)
+validate-config: vendor/config-validator-$(CONFIG_VALIDATOR_VERSION)
+	@cd config/schema/ && ../../$< \
+	  -s 'config.json' \
+ 	  ../../$(STACK_CONFIG_PATH)
 
 vendor/config-validator-$(CONFIG_VALIDATOR_VERSION):
 	@mkdir -p vendor

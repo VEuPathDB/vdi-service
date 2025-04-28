@@ -50,13 +50,13 @@
               "title": "Database Host Details",
               "oneOf": [
                 {
-                  "$ref": "/vdi-service/schema/common.json#/definitions/hostString"
+                  "$ref": "/vdi-service/schema/common.json#/$defs/hostString"
                 },
                 {
-                  "$ref": "/vdi-service/schema/common.json#/definitions/hostObject"
+                  "$ref": "/vdi-service/schema/common.json#/$defs/hostObject"
                 },
                 {
-                  "$ref": "/vdi-service/schema/common.json#/definitions/interpolatedValue"
+                  "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
                 }
               ]
             },

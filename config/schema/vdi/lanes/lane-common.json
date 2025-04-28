@@ -40,7 +40,7 @@
       "maxLength": 32
     }
   },
-  "definitions": {
+  "$defs": {
     "kafkaProducerId": {
       "title": "Kafka Producer ID",
       "description": "Name the lane will identify itself with when publishing events to Kafka.",
