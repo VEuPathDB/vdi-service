@@ -29,25 +29,25 @@
       "type": "object",
       "properties": {
         "hardDelete": {
-          "$ref": "lanes/hard-delete.json"
+          "$ref": "lanes/hard-delete.json#"
         },
         "import": {
-          "$ref": "lanes/import.json"
+          "$ref": "lanes/import.json#"
         },
         "install": {
-          "$ref": "lanes/install.json"
+          "$ref": "lanes/install.json#"
         },
         "reconciliation": {
-          "$ref": "lanes/reconciliation.json"
+          "$ref": "lanes/reconciliation.json#"
         },
         "sharing": {
-          "$ref": "lanes/sharing.json"
+          "$ref": "lanes/sharing.json#"
         },
         "softDelete": {
-          "$ref": "lanes/soft-delete.json"
+          "$ref": "lanes/soft-delete.json#"
         },
         "updateMeta": {
-          "$ref": "lanes/update-meta.json"
+          "$ref": "lanes/update-meta.json#"
         }
       }
     },
