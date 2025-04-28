@@ -15,11 +15,9 @@ definitions:
   - TriTrypDB
   - VectorBase
   - VEuPathDB
+  vdiSchemaPass: &vdiSchemaPass ${env:VDI_APPDB_SCHEMA_PASS}
 
 containerCore:
-  ldap: &ldap
-    servers: ${env:LDAP_SERVER}
-    baseDn: ${env:DB_LOOKUP_BASE_DN}
   authentication:
     oauth:
       clientId: ${env:OAUTH_CLIENT_ID}
@@ -28,28 +26,14 @@ containerCore:
       keyStoreFile: ${env:KEY_STORE_FILE}
       keyStorePass: ${env:KEY_STORE_PASS_PHRASE}
     adminToken: ${env:ADMIN_AUTH_TOKEN}
-  http:
-    enableCors: false
-    bindPort: 80
-  databases:
-    accountDb:
-      lookupCn: ${env:ACCT_DB_LOOKUP_CN}
-      user: ${env:ACCT_DB_USER}
-      pass: ${env:ACCT_DB_PASS}
-    appDb:
-      lookupCn: ${env:APP_DB_LOOKUP_CN}
-      user: ${env:APP_DB_USER}
-      pass: ${env:APP_DB_PASS}
-    userDb:
-      lookupCn: ${env:APP_DB_LOOKUP_CN}
-      user: ${env:APP_DB_USER}
-      pass: ${env:APP_DB_PASS}
 
 vdi:
-  ldap: *ldap
-  siteBuild: build-65
+  ldap:
+    servers: ${env:LDAP_SERVER}
+    baseDn: ${env:DB_LOOKUP_BASE_DN}
+  siteBuild: ${env:SITE_BUILD}
   objectStore:
-    bucketName: some-bucket
+    bucketName: vdi-prod
     host: ${env:S3_HOST}
     accessToken: ${env:S3_ACCESS_TOKEN}
     secretKey: ${env:S3_SECRET_KEY}
@@ -66,14 +50,12 @@ vdi:
       routing:
         key: vdi-bucket-notifications
   kafka:
-    consumers:
-      groupId: kafka-consumers
     servers:
     - kafka:9092
     listeners:
     - PLAINTEXT://kafka:9092
   cacheDb:
-    user: ${env:CACHE_DB_USERNAME}
+    user: vdi
     pass: ${env:CACHE_DB_PASSWORD}
     host: cache-db:5432
   plugins:
@@ -130,97 +112,97 @@ vdi:
   targetDbs:
     amoeba:
       targetName: AmoebaDB
-      pass: ${env:DB_CONNECTION_PASS_AMOEBA}
-      ldapCn: ${env:DB_CONNECTION_LDAP_AMOEBA}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_AMOEBA}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     clinepi:
       targetName: ClinEpiDB
-      pass: ${env:DB_CONNECTION_PASS_CLINEPI}
-      ldapCn: ${env:DB_CONNECTION_LDAP_CLINEPI}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_CLINEPI}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     crypto:
       targetName: CryptoDB
-      pass: ${env:DB_CONNECTION_PASS_CRYPTO}
-      ldapCn: ${env:DB_CONNECTION_LDAP_CRYPTO}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_CRYPTO}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     fungi:
       targetName: FungiDB
-      pass: ${env:DB_CONNECTION_PASS_FUNGI}
-      ldapCn: ${env:DB_CONNECTION_LDAP_FUNGI}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_FUNGI}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     giardia:
       targetName: GiardiaDB
-      pass: ${env:DB_CONNECTION_PASS_GIARDIA}
-      ldapCn: ${env:DB_CONNECTION_LDAP_GIARDIA}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_GIARDIA}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     host:
       targetName: HostDB
-      pass: ${env:DB_CONNECTION_PASS_HOST}
-      ldapCn: ${env:DB_CONNECTION_LDAP_HOST}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_HOST}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     microbiome:
       targetName: MicrobiomeDB
-      pass: ${env:DB_CONNECTION_PASS_MICROBIOME}
-      ldapCn: ${env:DB_CONNECTION_LDAP_MICROBIOME}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_MICROBIOME}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     microsporidia:
       targetName: MicrosporidiaDB
-      pass: ${env:DB_CONNECTION_PASS_MICROSPORIDIA}
-      ldapCn: ${env:DB_CONNECTION_LDAP_MICROSPORIDIA}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_MICROSPORIDIA}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     ortho:
       targetName: OrthoMCL
-      pass: ${env:DB_CONNECTION_PASS_ORTHO}
-      ldapCn: ${env:DB_CONNECTION_LDAP_ORTHO}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_ORTHO}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     piroplasma:
       targetName: PiroplasmaDB
-      pass: ${env:DB_CONNECTION_PASS_PIROPLASMA}
-      ldapCn: ${env:DB_CONNECTION_LDAP_PIROPLASMA}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_PIROPLASMA}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     plasmo:
       targetName: PlasmoDB
-      pass: ${env:DB_CONNECTION_PASS_PLASMO}
-      ldapCn: ${env:DB_CONNECTION_LDAP_PLASMO}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_PLASMO}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     toxo:
       targetName: ToxoDB
-      pass: ${env:DB_CONNECTION_PASS_TOXO}
-      ldapCn: ${env:DB_CONNECTION_LDAP_TOXO}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_TOXO}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     trich:
       targetName: TrichDB
-      pass: ${env:DB_CONNECTION_PASS_TRICH}
-      ldapCn: ${env:DB_CONNECTION_LDAP_TRICH}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_TRICH}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     tritryp:
       targetName: TriTrypDB
-      pass: ${env:DB_CONNECTION_PASS_TRITRYP}
-      ldapCn: ${env:DB_CONNECTION_LDAP_TRITRYP}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_TRITRYP}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     uni:
       targetName: VEuPathDB
-      pass: ${env:DB_CONNECTION_PASS_UNIDB}
-      ldapCn: ${env:DB_CONNECTION_LDAP_UNIDB}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_UNIDB}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
     vector:
       targetName: VectorBase
-      pass: ${env:DB_CONNECTION_PASS_VECTOR}
-      ldapCn: ${env:DB_CONNECTION_LDAP_VECTOR}
-      dataSchema: vdi_datasets_prod_n
-      controlSchema: vdi_control_prod_n
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_VECTOR}
+      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
+      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}

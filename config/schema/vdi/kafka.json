@@ -38,8 +38,7 @@
   },
   "required": [
     "listeners",
-    "servers",
-    "consumers"
+    "servers"
   ],
   "additionalProperties": false,
   "$defs": {
