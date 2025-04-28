@@ -17,7 +17,6 @@ data class KafkaRouterConfig(
   val hardDeleteTrigger: TriggerConfig,
   val shareTrigger: TriggerConfig,
   val reconciliationTrigger: TriggerConfig,
-  val revisionPruningTrigger: TriggerConfig,
 ) {
   constructor(env: Environment, clientID: String): this(
     producerConfig = KafkaProducerConfig(env, clientID),
@@ -69,13 +68,6 @@ data class KafkaRouterConfig(
         ?: KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_MESSAGE_KEY,
       topic = env.optional(EnvKey.Kafka.Topic.ReconciliationTriggers)
         ?: KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_TOPIC,
-    ),
-
-    revisionPruningTrigger = TriggerConfig(
-      messageKey = env.optional(EnvKey.Kafka.MessageKey.RevisionPruningTriggers)
-        ?: KafkaRouterConfigDefaults.REVISION_PRUNE_TRIGGER_MESSAGE_KEY,
-      topic = env.optional(EnvKey.Kafka.Topic.RevisionPruningTriggers)
-        ?: KafkaRouterConfigDefaults.REVISION_PRUNE_TRIGGER_TOPIC,
     ),
   )
 }

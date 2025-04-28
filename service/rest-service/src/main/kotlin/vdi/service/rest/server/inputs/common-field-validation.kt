@@ -1,7 +1,7 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
-import vdi.service.rest.config.Options
+import vdi.service.rest.Options
 
 
 /* ┌────────────────────────────────────────────────────────────────────────┐ *\

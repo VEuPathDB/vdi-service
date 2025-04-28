@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/common.json",
+  "definitions": {
+    "duration": {
+      "title": "Duration String",
+      "type": "string",
+      "pattern": "^(?=.{2,})((?:\\d+d)? ?(?:(?<!\\S)\\d+h)? ?(?:(?<!\\S)\\d+m)? ?(?:(?<!\\S)\\d+(?:\\.\\d+s$|s))? ?(?:(?<!\\S)\\d+(?:\\.\\d+ms$|ms))? ?(?:(?<!\\S)\\d+(?:\\.\\d+us$|us))? ?(?:(?<!\\S)\\d+ns)?)$",
+      "examples": [
+        "1d 12h 32m 30.340s",
+        "12s",
+        "1h 22us 5ns"
+      ]
+    },
+    "hostCsv": {
+      "title": "Comma Separated Host:Port List",
+      "type": "string",
+      "pattern": "^(?:(?:(?=[\\da-zA-Z.-]{1,253}(?::|$))([\\da-zA-Z][\\da-zA-Z-]{0,62}(?:\\.[\\da-zA-Z][\\da-zA-Z-]{0,62})*)(?::([1-9]\\d{0,3}|[1-5]\\d{4}|6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5])))))(?:,(?=.+)|$))+)$",
+      "examples": [
+        "something:8080",
+        "foo.com:1234"
+      ]
+    },
+    "hostObject": {
+      "title": "Host Config Object",
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "pattern": "^(?=[\\da-zA-Z.-]{1,253})([\\da-zA-Z][\\da-zA-Z-]{0,62}(?:\\.[\\da-zA-Z][\\da-zA-Z-]{0,62})*)$",
+          "minLength": 1,
+          "maxLength": 253
+        },
+        "port": {
+          "$ref": "#/$defs/common/port"
+        }
+      },
+      "required": [
+        "host"
+      ]
+    },
+    "hostString": {
+      "title": "Single Host:Port",
+      "type": "string",
+      "pattern": "^(?=[\\da-zA-Z.-]{1,253}(?::|$))([\\da-zA-Z][\\da-zA-Z-]{0,62}(?:\\.[\\da-zA-Z][\\da-zA-Z-]{0,62})*)(?::([1-9]\\d{0,3}|[1-5]\\d{4}|6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5])))))$",
+      "examples": [
+        "something:8080",
+        "foo.com:1234"
+      ]
+    },
+    "installTarget": {
+      "title": "Dataset Installation Target",
+      "enum": [
+        "AmoebaDB",
+        "ClinEpiDB",
+        "CryptoDB",
+        "FungiDB",
+        "GiardiaDB",
+        "HostDB",
+        "MicrobiomeDB",
+        "MicrosporidiaDB",
+        "OrthoMCL",
+        "PiroplasmaDB",
+        "PlasmoDB",
+        "ToxoDB",
+        "TrichDB",
+        "TriTrypDB",
+        "VectorBase",
+        "VEuPathDB"
+      ]
+    },
+    "interpolatedValue": {
+      "title": "Interpolated String",
+      "type": "string",
+      "pattern": "^.*\\$\\{env:\\w{3,64}\\}.*$"
+    },
+    "ldap": {
+      "title": "LDAP Connection Configuration",
+      "type": "object",
+      "properties": {
+        "servers": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/common/hostString"
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/common/hostObject"
+              }
+            },
+            {
+              "$ref": "#/$defs/common/hostCsv"
+            },
+            {
+              "$ref": "#/$defs/common/interpolatedValue"
+            }
+          ]
+        },
+        "baseDn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "servers",
+        "baseDn"
+      ]
+    },
+    "port": {
+      "title": "Connection Port",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    }
+  }
+}

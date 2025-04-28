@@ -9,7 +9,6 @@ import vdi.service.rest.generated.resources.VdiUsers
 import vdi.service.rest.model.ShareFilterStatus
 import vdi.service.rest.server.services.shares.lookupShares
 import vdi.service.rest.server.services.users.getUserMetadata
-import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated(allowGuests = false)
 class UserInfo(@Context request: ContainerRequest)
@@ -19,16 +18,11 @@ class UserInfo(@Context request: ContainerRequest)
   , ControllerBase(request)
 {
   override fun getUsersSelfMeta() =
-    Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(getUserMetadata(userID.toUserID()))!!
+    Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(getUserMetadata(userID))!!
 
   override fun getUsersSelfShareOffers(status: String?) =
     Users.GetUsersSelfShareOffersResponse
-      .respond200WithApplicationJson(
-        lookupShares(
-        userID.toUserID(),
-        status?.let(ShareFilterStatus::fromString) ?: ShareFilterStatus.Open
-      )
-      )!!
+      .respond200WithApplicationJson(lookupShares(userID, status?.let(ShareFilterStatus::fromString) ?: ShareFilterStatus.Open))!!
 
   //==========================================================================//
   // DEPRECATED API METHODS!!

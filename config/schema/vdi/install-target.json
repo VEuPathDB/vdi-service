@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/install-target.json",
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "controlSchema": {
+          "type": "string"
+        },
+        "dataSchema": {
+          "type": "string"
+        },
+        "dataTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "additionalItems": false
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "pass": {
+          "type": "string"
+        },
+        "platform": {
+          "enum": [
+            "oracle",
+            "postgres"
+          ],
+          "default": null
+        },
+        "poolSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 255,
+          "default": 5
+        },
+        "targetName": {
+          "$ref": "../common.json#/definitions/installTarget"
+        }
+      },
+      "required": [
+        "controlSchema",
+        "dataSchema",
+        "pass",
+        "targetName"
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "ldapCn": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "ldapCn"
+          ]
+        },
+        {
+          "properties": {
+            "dbName": {
+              "type": "string"
+            },
+            "host": {
+              "type": "string"
+            },
+            "port": {
+              "$ref": "../common.json#/definitions/port"
+            }
+          },
+          "required": [
+            "dbName",
+            "host",
+            "platform"
+          ]
+        }
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

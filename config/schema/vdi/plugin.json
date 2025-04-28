@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/plugin.json",
+  "title": "VDI Plugin Config",
+  "type": "object",
+  "properties": {
+    "server": {
+      "$ref": "../common.json#/definitions/hostString"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "dataType": {
+      "$ref": "#/definitions/dataType"
+    },
+    "customPath": {
+      "title": "PATH Extension",
+      "description": "Allows adding additional paths to the PATH environment variable passed to plugin scripts on execution in the typical colon (`:`) divided format.\nLeading or trailing colon characters are not required.",
+      "type": "string",
+      "examples": [
+        "/opt/something/bin:/opt/other/bin"
+      ]
+    },
+    "installRoot": {
+      "title": "Dataset File Install Root",
+      "description": "The root mount path INSIDE THE CONTAINER which will contain the site build directory hierarchy into which dataset files will be installed.  The build directory itself MUST NOT be part of this path.",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        {
+          "$ref": "../common.json#/definitions/interpolatedValue"
+        }
+      ],
+      "default": "/datasets",
+      "examples": [
+        "/datasets"
+      ]
+    },
+    "projectIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common.json#/definitions/installTarget"
+      },
+      "additionalItems": false
+    },
+    "scripts": {
+      "checkCompatibility": {
+        "title": "Data Compatibility Test",
+        "$ref": "#/definitions/scriptConfig"
+      },
+      "dataCleaning": {
+        "title": "Data Import/Cleanup",
+        "$ref": "#/definitions/scriptConfig"
+      },
+      "dataInstall": {
+        "title": "Data Installation",
+        "$ref": "#/definitions/scriptConfig"
+      },
+      "metaUpdate": {
+        "title": "Dataset Metadata Upsert",
+        "$ref": "#/definitions/scriptConfig"
+      },
+      "uninstall": {
+        "title": "Dataset Uninstallation",
+        "$ref": "#/definitions/scriptConfig"
+      }
+    }
+  },
+  "required": [
+    "server",
+    "displayName",
+    "dataType"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "scriptConfig": {
+      "type": "object",
+      "properties": {
+        "maxDuration": {
+          "title": "Maximum Script Execution Time",
+          "$ref": "../common.json#/definitions/duration"
+        },
+        "pathOverride": {
+          "title": "Script Path Override",
+          "$ref": "#/definitions/scriptPath"
+        }
+      },
+      "additionalProperties": false
+    },
+    "scriptPath": {
+      "type": "string",
+      "format": "uri-reference",
+      "examples": [
+        "/opt/vpdb/import.sh"
+      ]
+    },
+    "dataType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ]
+    }
+  }
+}

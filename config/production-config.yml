@@ -1,0 +1,295 @@
+$schema: 'schema/config.json#'
+
+commonVars:
+  genomicsProjects: &genomicsProjects
+  - AmoebaDB
+  - CryptoDB
+  - FungiDB
+  - GiardiaDB
+  - HostDB
+  - MicrosporidiaDB
+  - PiroplasmaDB
+  - PlasmoDB
+  - ToxoDB
+  - TrichDB
+  - TriTrypDB
+  - VectorBase
+  - VEuPathDB
+
+containerCore:
+  ldap: &ldap
+    servers: ${env:LDAP_SERVER}
+    baseDn: ${env:DB_LOOKUP_BASE_DN}
+  authentication:
+    oauth:
+      clientId: ${env:OAUTH_CLIENT_ID}
+      clientSecret: ${env:OAUTH_CLIENT_SECRET}
+      url: https://eupathdb.org/oauth
+      keyStoreFile: ${env:KEY_STORE_FILE}
+      keyStorePass: ${env:KEY_STORE_PASS_PHRASE}
+    adminToken: ${env:ADMIN_AUTH_TOKEN}
+  http:
+    enableCors: false
+    bindPort: 80
+  databases:
+    accountDb:
+      lookupCn: ${env:ACCT_DB_LOOKUP_CN}
+      user: ${env:ACCT_DB_USER}
+      pass: ${env:ACCT_DB_PASS}
+    appDb:
+      lookupCn: ${env:APP_DB_LOOKUP_CN}
+      user: ${env:APP_DB_USER}
+      pass: ${env:APP_DB_PASS}
+    userDb:
+      lookupCn: ${env:APP_DB_LOOKUP_CN}
+      user: ${env:APP_DB_USER}
+      pass: ${env:APP_DB_PASS}
+
+vdi:
+  ldap: *ldap
+  objectStore:
+    bucketName: some-bucket
+    host: ${env:S3_HOST}
+    accessToken: ${env:S3_ACCESS_TOKEN}
+    secretKey: ${env:S3_SECRET_KEY}
+  rabbit:
+    global:
+      connection:
+        host: ${env:GLOBAL_RABBIT_HOST}
+        user: ${env:GLOBAL_RABBIT_USERNAME}
+        pass: ${env:GLOBAL_RABBIT_PASSWORD}
+      exchange:
+        name: vdi-bucket-notifications
+      queue:
+        name: vdi-bucket-notifications
+      routing:
+        key: vdi-bucket-notifications
+  kafka:
+    consumers:
+      groupId: kafka-consumers
+    servers:
+    - kafka:9092
+    listeners:
+    - PLAINTEXT://kafka:9092
+  cacheDb:
+    user: ${env:CACHE_DB_USERNAME}
+    pass: ${env:CACHE_DB_PASSWORD}
+    host: cache-db:5432
+  plugins:
+    bigwig:
+      server: bigwig:80
+      displayName: bigWig
+      dataType:
+        name: bigwigfiles
+        version: 1.0
+      projectIds: *genomicsProjects
+    biom:
+      server: biom:80
+      displayName: BIOM
+      dataType:
+        name: biom
+        version: 1.0
+      projectIds:
+      - MicrobiomeDB
+    genelist:
+      server: genelist:80
+      displayName: Gene List
+      dataType:
+        name: lightweight
+        version: 1.0
+      projectIds: *genomicsProjects
+    isa:
+      server: isasimple:80
+      displayName: ISA Study
+      dataType:
+        name: isasimple
+        version: 1.0
+      projectIds:
+      - ClinEpiDB
+    noop:
+      server: noop:80
+      displayName: Lightweight
+      dataType:
+        name: lightweight
+        version: 1.0
+    phenotype:
+      server: phenotype:80
+      displayName: Phenotype
+      dataType:
+        name: phenotype
+        version: 1.0
+      projectIds: *genomicsProjects
+    rnaSeq:
+      server: rnaseq:80
+      displayName: RNA-Seq
+      dataType:
+        name: rnaseq
+        version: 1.0
+      projectIds: *genomicsProjects
+  targetDbs:
+    amoeba:
+      targetName: AmoebaDB
+      pass: ${env:DB_CONNECTION_PASS_AMOEBA}
+      ldapCn: ${env:DB_CONNECTION_LDAP_AMOEBA}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    clinepi:
+      targetName: ClinEpiDB
+      pass: ${env:DB_CONNECTION_PASS_CLINEPI}
+      ldapCn: ${env:DB_CONNECTION_LDAP_CLINEPI}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    crypto:
+      targetName: CryptoDB
+      pass: ${env:DB_CONNECTION_PASS_CRYPTO}
+      ldapCn: ${env:DB_CONNECTION_LDAP_CRYPTO}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    fungi:
+      targetName: FungiDB
+      pass: ${env:DB_CONNECTION_PASS_FUNGI}
+      ldapCn: ${env:DB_CONNECTION_LDAP_FUNGI}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    giardia:
+      targetName: GiardiaDB
+      pass: ${env:DB_CONNECTION_PASS_GIARDIA}
+      ldapCn: ${env:DB_CONNECTION_LDAP_GIARDIA}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    host:
+      targetName: HostDB
+      pass: ${env:DB_CONNECTION_PASS_HOST}
+      ldapCn: ${env:DB_CONNECTION_LDAP_HOST}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    microbiome:
+      targetName: MicrobiomeDB
+      pass: ${env:DB_CONNECTION_PASS_MICROBIOME}
+      ldapCn: ${env:DB_CONNECTION_LDAP_MICROBIOME}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    microsporidia:
+      targetName: MicrosporidiaDB
+      pass: ${env:DB_CONNECTION_PASS_MICROSPORIDIA}
+      ldapCn: ${env:DB_CONNECTION_LDAP_MICROSPORIDIA}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    ortho:
+      targetName: OrthoMCL
+      pass: ${env:DB_CONNECTION_PASS_ORTHO}
+      ldapCn: ${env:DB_CONNECTION_LDAP_ORTHO}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    piroplasma:
+      targetName: PiroplasmaDB
+      pass: ${env:DB_CONNECTION_PASS_PIROPLASMA}
+      ldapCn: ${env:DB_CONNECTION_LDAP_PIROPLASMA}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    plasmo:
+      targetName: PlasmoDB
+      pass: ${env:DB_CONNECTION_PASS_PLASMO}
+      ldapCn: ${env:DB_CONNECTION_LDAP_PLASMO}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    toxo:
+      targetName: ToxoDB
+      pass: ${env:DB_CONNECTION_PASS_TOXO}
+      ldapCn: ${env:DB_CONNECTION_LDAP_TOXO}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    trich:
+      targetName: TrichDB
+      pass: ${env:DB_CONNECTION_PASS_TRICH}
+      ldapCn: ${env:DB_CONNECTION_LDAP_TRICH}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    tritryp:
+      targetName: TriTrypDB
+      pass: ${env:DB_CONNECTION_PASS_TRITRYP}
+      ldapCn: ${env:DB_CONNECTION_LDAP_TRITRYP}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    uni:
+      targetName: VEuPathDB
+      pass: ${env:DB_CONNECTION_PASS_UNIDB}
+      ldapCn: ${env:DB_CONNECTION_LDAP_UNIDB}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+    vector:
+      targetName: VectorBase
+      pass: ${env:DB_CONNECTION_PASS_VECTOR}
+      ldapCn: ${env:DB_CONNECTION_LDAP_VECTOR}
+      dataSchema: vdi_datasets_prod_n
+      controlSchema: vdi_control_prod_n
+  modules:
+    daemons:
+      eventRouter:
+        kafkaClientId: event-router
+        channels:
+          hardDelete:
+            topic: hard-delete-triggers
+            messageKey: hard-delete-trigger
+          import:
+            topic: import-triggers
+            messageKey: import-trigger
+          installData:
+            topic: install-triggers
+            messageKey: install-trigger
+          reconciliation:
+            topic: reconciliation-triggers
+            messageKey: reconciliation-trigger
+          share:
+            topic: share-triggers
+            messageKey: share-trigger
+          softDelete:
+            topic: soft-delete-triggers
+            messageKey: soft-delete-trigger
+          updateMeta:
+            topic: update-meta-triggers
+            messageKey: update-meta-trigger
+      pruner:
+        retentionWindow: 5d
+        executionInterval: 6h
+        signalCheckInterval: 10s
+      reconciler:
+        fullSync:
+          disabled: false
+          interval: 6h
+          runDeletes: true
+        slimSync:
+          disabled: false
+          interval: 5m
+    lanes:
+      hardDelete:
+        kafkaClientId: hard-delete-handler
+        workers: 1
+        workQueueSize: 100
+      import:
+        kafkaClientId: import-handler
+        workers: 5
+        workQueueSize: 5
+      installData:
+        kafkaClientId: install-data-handler
+        workers: 5
+        workQueueSize: 5
+      reconciliation:
+        kafkaClientId: reconciliation-handler
+        workers: 10
+        workQueueSize: 10
+      sharing:
+        kafkaClientId: share-handler
+        workers: 10
+        workQueueSize: 5
+      softDelete:
+        kafkaClientId: soft-delete-handler
+        workers: 10
+        workQueueSize: 5
+      updateMeta:
+        kafkaClientId: update-meta-handler
+        workers: 10
+        workQueueSize: 5
+    restService:
+      maxUploadSize: 1073741824
+      userUploadQuota: 10737418240

@@ -14,11 +14,11 @@ sealed interface Either<L, R> {
   }
 }
 
-inline fun <L, R> Either<L, R>.leftOr(fn: () -> Nothing): L =
-  if (isLeft) unwrapLeft() else fn()
+inline fun <L, R> Either<L, R>.leftOr(fn: (right: R) -> L): L =
+  if (isLeft) unwrapLeft() else fn(unwrapRight())
 
-inline fun <L, R> Either<L, R>.rightOr(fn: () -> Nothing): R =
-  if (isRight) unwrapRight() else fn()
+inline fun <L, R> Either<L, R>.rightOr(fn: (left: L) -> R): R =
+  if (isRight) unwrapRight() else fn(unwrapLeft())
 
 inline fun <OL, NL, R> Either<OL, R>.mapLeft(fn: (OL) -> NL): Either<NL, R> =
   if (isLeft) Either.ofLeft(fn(unwrapLeft())) else Either.ofRight(unwrapRight())
@@ -31,6 +31,12 @@ inline fun <L, R, O> Either<L, R>.fold(left: (L) -> O, right: (R) -> O): O =
 
 inline fun <L: O, R: O, O> Either<L, R>.fold(): O =
   if (isLeft) unwrapLeft() else unwrapRight()
+
+inline fun <L, R> Either<L, R>.leftOrNull(): L? =
+  if (isLeft) unwrapLeft() else null
+
+inline fun <L, R> Either<L, R>.rightOrNull(): R? =
+  if (isRight) unwrapRight() else null
 
 @JvmInline
 private value class LeftEither<L, R>(private val actual: L): Either<L, R> {

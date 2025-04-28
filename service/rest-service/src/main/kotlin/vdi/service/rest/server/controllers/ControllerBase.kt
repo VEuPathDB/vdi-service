@@ -4,25 +4,25 @@ import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.model.UserInfo
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.field.toUserID
 import java.net.URI
 
-sealed class ControllerBase(protected val request: ContainerRequest) {
-  protected val urlBase by lazy { request.baseUri.let { URI(it.scheme, it.host, "", "") } }
+sealed class ControllerBase(val request: ContainerRequest) {
+  val urlBase by lazy { request.baseUri.let { URI(it.scheme, it.host, "", "") } }
 
-  protected val maybeUser: UserInfo? by lazy { UserProvider.lookupUser(request).orElse(null) }
+  val maybeUser: UserInfo? by lazy { UserProvider.lookupUser(request).orElse(null) }
+  val maybeUserID by lazy { maybeUser?.userId?.toUserID() }
 
-  protected val maybeUserID get() = maybeUser?.userId
+  val user: UserInfo by lazy { UserProvider.lookupUser(request).orElseThrow() }
+  val userID by lazy { UserID(user.userId) }
 
-  protected val user: UserInfo by lazy { UserProvider.lookupUser(request).orElseThrow() }
-
-  protected val userID get() = user.userId
-
-  protected fun createURL(path: String): String =
+  fun createURL(path: String): String =
     urlBase.resolve(path).toString()
 
-  protected fun redirectURL(id: DatasetID) =
+  fun redirectURL(id: DatasetID) =
     redirectURL(id.toString())
 
-  protected fun redirectURL(id: String) =
+  fun redirectURL(id: String) =
     request.baseUri.toString().replaceAfterLast('/', id)
 }

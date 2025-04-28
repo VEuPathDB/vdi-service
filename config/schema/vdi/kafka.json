@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/kafka.json",
+  "title": "Kafka Configuration",
+  "type": "object",
+  "properties": {
+    "servers": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "../common.json#/definitions/hostString"
+          },
+          {
+            "$ref": "../common.json#/definitions/interpolatedValue"
+          },
+          {
+            "$ref": "../common.json#/definitions/hostObject"
+          }
+        ]
+      },
+      "additionalItems": false
+    },
+    "listeners": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      },
+      "additionalItems": false
+    },
+    "consumers": {
+      "$ref": "#/definitions/consumers"
+    },
+    "producers": {
+      "$ref": "#/definitions/producers"
+    }
+  },
+  "required": [
+    "listeners",
+    "servers",
+    "consumers"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "consumers": {
+      "type": "object",
+      "properties": {
+        "autoCommitInterval": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "5s"
+        },
+        "autoOffsetReset": {
+          "enum": [
+            "earliest",
+            "latest",
+            "none"
+          ],
+          "default": "earliest"
+        },
+        "connectionsMaxIdle": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "9m"
+        },
+        "groupId": {
+          "type": "string"
+        },
+        "groupInstanceId": {
+          "type": "string",
+          "default": null
+        },
+        "defaultApiTimeout": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "1m"
+        },
+        "enableAutoCommit": {
+          "type": "boolean",
+          "default": true
+        },
+        "fetchMaxBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 52428800
+        },
+        "fetchMinBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1
+        },
+        "heartbeatInterval": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "3s"
+        },
+        "maxPollInterval": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "5m"
+        },
+        "maxPollRecords": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 500
+        },
+        "pollDuration": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "2s"
+        },
+        "receiveBufferSize": {
+          "type": "integer",
+          "minimum": -1,
+          "default": 65536
+        },
+        "reconnectBackoffMaxTime": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "1s"
+        },
+        "reconnectBackoffTime": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "50ms"
+        },
+        "requestTimeout": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "30s"
+        },
+        "retryBackoffTime": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "100ms"
+        },
+        "sendBufferSize": {
+          "type": "integer",
+          "minimum": -1,
+          "default": 131072
+        },
+        "sessionTimeout": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "45s"
+        }
+      },
+      "require": [
+        "consumerGroupId"
+      ],
+      "additionalProperties": false
+    },
+    "producers": {
+      "type": "object",
+      "properties": {
+        "bufferMemoryBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 33554432
+        },
+        "compressionType": {
+          "enum": [
+            "none",
+            "gzip",
+            "snappy",
+            "lz4",
+            "zstd"
+          ],
+          "default": "none"
+        },
+        "sendRetries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647,
+          "default": 2147483647
+        },
+        "batchSize": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 16384
+        },
+        "connectionsMaxIdle": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "9m"
+        },
+        "deliveryTimeout": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "2m"
+        },
+        "lingerTime": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "5ms"
+        },
+        "maxBlockingTimeout": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "1m"
+        },
+        "maxRequestSize": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1048576
+        },
+        "receiveBufferSize": {
+          "type": "integer",
+          "minimum": -1
+        },
+        "requestTimeout": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "30s"
+        },
+        "sendBufferSize": {
+          "type": "integer",
+          "minimum": -1,
+          "default": 131072
+        },
+        "reconnectBackoffMaxTime": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "1s"
+        },
+        "reconnectBackoffTime": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "50ms"
+        },
+        "retryBackoffTime": {
+          "$ref": "../common.json#/definitions/duration",
+          "default": "100ms"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

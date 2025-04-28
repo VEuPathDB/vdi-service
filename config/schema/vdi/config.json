@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/config.json",
+  "title": "VDI Configuration Schema",
+  "type": "object",
+  "properties": {
+    "cacheDb": {
+      "$ref": "#/definitions/cacheDb"
+    },
+    "daemons": {
+      "type": "object",
+      "properties": {
+        "eventRouter": {
+          "$ref": "daemons/event-router.json#"
+        },
+        "pruner": {
+          "$ref": "daemons/pruner.json#"
+        },
+        "reconciler": {
+          "$ref": "daemons/reconciler.json#"
+        }
+      },
+      "additionalProperties": false
+    },
+    "kafka": {
+      "$ref": "kafka.json#"
+    },
+    "lanes": {
+      "type": "object",
+      "properties": {
+        "hardDelete": {
+          "$ref": "lanes/hard-delete.json"
+        },
+        "import": {
+          "$ref": "lanes/import.json"
+        },
+        "install": {
+          "$ref": "lanes/install.json"
+        },
+        "reconciliation": {
+          "$ref": "lanes/reconciliation.json"
+        },
+        "sharing": {
+          "$ref": "lanes/sharing.json"
+        },
+        "softDelete": {
+          "$ref": "lanes/soft-delete.json"
+        },
+        "updateMeta": {
+          "$ref": "lanes/update-meta.json"
+        }
+      }
+    },
+    "ldap": {
+      "$ref": "../common.json#/definitions/ldap"
+    },
+    "objectStore": {
+      "$ref": "object-store.json#"
+    },
+    "plugins": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "plugin.json#"
+      }
+    },
+    "rabbit": {
+      "type": "object",
+      "properties": {
+        "global": {
+          "$ref": "rabbitmq.json#"
+        }
+      },
+      "required": [
+        "global"
+      ],
+      "additionalProperties": false
+    },
+    "siteBuild": {
+      "type": "string",
+      "examples": [
+        "build-65"
+      ]
+    },
+    "targetDbs": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "install-target.json#"
+      },
+      "minProperties": 1
+    }
+  },
+  "required": [
+    "cacheDb",
+    "kafka",
+    "ldap",
+    "objectStore",
+    "plugins",
+    "rabbit",
+    "siteBuild",
+    "targetDbs"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "cacheDb": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "oneOf": [
+            {
+              "$ref": "../common.json#/definitions/hostString"
+            },
+            {
+              "$ref": "../common.json#/definitions/interpolatedValue"
+            },
+            {
+              "$ref": "../common.json#/definitions/hostObject"
+            }
+          ]
+        },
+        "user": {
+          "type": "string"
+        },
+        "pass": {
+          "type": "string"
+        },
+        "poolSize": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 255
+        }
+      },
+      "required": [
+        "host",
+        "user",
+        "pass"
+      ]
+    }
+  }
+}

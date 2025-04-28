@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/container-core/config.json",
+  "title": "Container Core Library Config",
+  "type": "object",
+  "properties": {
+    "ldap": {
+      "$ref": "../common.json#/definitions/ldap"
+    },
+    "authentication": {
+      "type": "object",
+      "properties": {
+        "adminToken": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 32
+            },
+            {
+              "$ref": "../common.json#/definitions/interpolatedValue"
+            }
+          ]
+        },
+        "oauth": {
+          "$ref": "#/definitions/oauth"
+        }
+      }
+    },
+    "http": {
+      "$ref": "#/definitions/http"
+    },
+    "databases": {
+      "type": "object",
+      "properties": {
+        "accountDb": {
+          "$ref": "database.json#"
+        },
+        "appDb": {
+          "$ref": "database.json#"
+        },
+        "userDb": {
+          "$ref": "database.json#"
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "http": {
+      "title": "HTTP Server Config",
+      "type": "object",
+      "properties": {
+        "enableCors": {
+          "title": "Enable Cross-Origin Resource Sharing",
+          "type": "boolean",
+          "default": false
+        },
+        "bindPort": {
+          "title": "HTTP Server Port Binding",
+          "$ref": "common.json#/definitions/port",
+          "default": 80
+        }
+      }
+    },
+    "oauth": {
+      "title": "OAuth Connection Config",
+      "type": "object",
+      "properties": {
+        "clientId": {
+          "type": "string"
+        },
+        "clientSecret": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "keyStoreFile": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "keyStorePass": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

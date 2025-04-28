@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/lanes/hard-delete.json",
+  "title": "Hard Delete Lane Config",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "lane-common.json#"
+    },
+    {
+      "properties": {
+        "kafkaConsumerId": {
+          "default": "hard-delete-lane-receive"
+        },
+        "memoryQueueSize": {
+          "default": 10
+        },
+        "workerCount": {
+          "default": 10
+        },
+        "eventChannel": {
+          "default": "hard-delete-triggers"
+        },
+        "eventKey": {
+          "default": "hard-delete-trigger"
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

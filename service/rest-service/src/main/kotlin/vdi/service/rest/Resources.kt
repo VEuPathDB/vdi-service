@@ -1,7 +1,6 @@
 package vdi.service.rest
 
 import org.veupathdb.lib.container.jaxrs.server.ContainerResources
-import vdi.service.rest.config.Options
 import vdi.service.rest.server.controllers.*
 
 class Resources(opts: Options) : ContainerResources(opts) {

@@ -33,9 +33,6 @@ class KafkaRouter(
   fun sendReconciliationTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
     send(config.reconciliationTrigger, userID, datasetID, source)
 
-  fun sendRevisionPruningTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
-    send(config.revisionPruningTrigger, userID, datasetID, source)
-
   fun close() = producer.close()
 
   private fun send(tc: TriggerConfig, userID: UserID, datasetID: DatasetID, source: EventSource) =

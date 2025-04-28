@@ -9,13 +9,10 @@ import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
 import vdi.lib.logging.logger
 import vdi.service.rest.generated.model.DatasetPostRequestBody
+import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.inputs.toDatasetMeta
 
-fun <T: Any> T.createDataset(
-  userID: UserID,
-  datasetID: DatasetID,
-  entity: DatasetPostRequestBody,
-) {
+fun <T: ControllerBase> T.createDataset(datasetID: DatasetID, entity: DatasetPostRequestBody) {
   val datasetMeta = entity.toDatasetMeta(userID)
 
   // IMPORTANT!!!
@@ -36,7 +33,7 @@ fun <T: Any> T.createDataset(
     }
   }
 
-  submitUpload(userID, datasetID, tempDirectory, uploadFile, datasetMeta)
+  submitUpload(datasetID, tempDirectory, uploadFile, datasetMeta)
 }
 
 /**

@@ -21,7 +21,4 @@ object KafkaRouterConfigDefaults {
 
   const val RECONCILIATION_TRIGGER_MESSAGE_KEY = "reconciliation-trigger"
   const val RECONCILIATION_TRIGGER_TOPIC = "reconciliation-triggers"
-
-  const val REVISION_PRUNE_TRIGGER_MESSAGE_KEY = "revision-prune-trigger"
-  const val REVISION_PRUNE_TRIGGER_TOPIC = "revision-prune-triggers"
 }

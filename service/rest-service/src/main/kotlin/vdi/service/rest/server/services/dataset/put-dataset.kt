@@ -16,6 +16,7 @@ import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.model.DatasetPutResponseBody
 import vdi.service.rest.generated.resources.DatasetsVdiId.PutDatasetsByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.ForbiddenError
@@ -24,10 +25,9 @@ import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.util.Either
 
-internal fun putDataset(
-  userID:    UserID,
+internal fun <T: ControllerBase> T.putDataset(
   datasetID: DatasetID,
-  request: DatasetPutRequestBody,
+  request:   DatasetPutRequestBody,
 ): Either<DatasetPutResponseBody, PutDatasetsByVdiIdResponse> {
   // Ensure the dataset exists and is owned by the requesting user.
   val originalDataset = CacheDB().selectDataset(datasetID)
@@ -79,7 +79,7 @@ internal fun putDataset(
     }
   }
 
-  submitUpload(userID, newDatasetID, tempDirectory, uploadFile, meta)
+  submitUpload(newDatasetID, tempDirectory, uploadFile, meta)
 
   return Either.ofLeft(vdi.service.rest.generated.model.DatasetPutResponseBodyImpl().apply { datasetId = newDatasetID.toString() })
 }

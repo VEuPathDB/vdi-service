@@ -9,23 +9,30 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
+import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.model.DatasetShareOfferImpl
 import vdi.lib.db.cache.model.DatasetShareReceiptImpl
 import vdi.lib.db.cache.withTransaction
+import vdi.lib.logging.logger
 import vdi.service.rest.generated.model.DatasetShareOffer
 import vdi.service.rest.generated.model.ShareOfferAction
 import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.outputs.ForbiddenError
+import vdi.service.rest.server.outputs.NotFoundError
+import vdi.service.rest.server.outputs.wrap
+import vdi.service.rest.generated.resources.DatasetsVdiIdSharesRecipientUserId.PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse as PutOffer
 
-internal fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareOffer) {
-  val dataset = vdi.lib.db.cache.CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
+fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareOffer): PutOffer {
+  val dataset = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
 
   // If the dataset has been deleted, then it isn't sharable, throw a 403.
   if (dataset.isDeleted)
-    throw ForbiddenException("cannot share a deleted dataset")
+    return ForbiddenError("cannot share a deleted dataset").wrap()
 
   if (dataset.importStatus != DatasetImportStatus.Complete)
-    throw ForbiddenException("cannot share a dataset until after it has been processed")
+    return ForbiddenError("cannot share a dataset until after it has been processed").wrap()
 
   // Write or overwrite the share offer object.
   DatasetStore.putShareOffer(dataset.ownerID, datasetID, recipientID, entity.toInternal())
@@ -38,38 +45,44 @@ internal fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entit
     recipientID,
     VDIDatasetShareReceipt(VDIShareReceiptAction.Accept)
   )
+
+  return PutOffer.respond204()
 }
 
-internal fun putShareOffer(datasetID: DatasetID, ownerID: UserID, recipientID: UserID, entity: DatasetShareOffer) {
+fun <T: ControllerBase> T.putShareOffer(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareOffer): PutOffer {
+  val ownerID = userID // For clarity
+
   // Lookup the target dataset or throw a 404 if it doesn't exist.
-  val dataset = vdi.lib.db.cache.CacheDB().selectDataset(datasetID)
-    ?: throw NotFoundException("no such dataset")
+  val dataset = CacheDB().selectDataset(datasetID)
+    ?: return NotFoundError("no such dataset").wrap()
 
   // If the dataset is not owned by the requesting user, throw a 403
   if (ownerID != dataset.ownerID)
-    throw ForbiddenException("cannot offer a share to a dataset you do not own")
+    return ForbiddenError("cannot offer a share to a dataset you do not own").wrap()
 
   // If the dataset has been deleted, then it isn't sharable, throw a 403.
   if (dataset.isDeleted)
-    throw ForbiddenException("cannot share a deleted dataset")
+    return ForbiddenError("cannot share a deleted dataset").wrap()
 
   when (dataset.importStatus) {
-    DatasetImportStatus.Queued, DatasetImportStatus.InProgress
-    -> throw ForbiddenException("cannot share a dataset until after it has been processed")
+    DatasetImportStatus.Queued, DatasetImportStatus.InProgress,
+      -> return ForbiddenError("cannot share a dataset until after it has been processed").wrap()
 
-    DatasetImportStatus.Invalid, DatasetImportStatus.Failed
-    -> throw ForbiddenException("cannot share a dataset whose import failed")
+    DatasetImportStatus.Invalid, DatasetImportStatus.Failed,
+      -> return ForbiddenError("cannot share a dataset whose import failed").wrap()
 
     DatasetImportStatus.Complete -> { /* Do nothing */ }
   }
 
-  val existingShareReceipt = vdi.lib.db.cache.CacheDB().selectSharesForDataset(datasetID)
+  val logger = logger(datasetID, ownerID)
+
+  val existingShareReceipt = CacheDB().selectSharesForDataset(datasetID)
     .find { it.recipientID == recipientID }
 
   // Short circuit the normal flow from MinIO to the share handler for insertion
   // to postgres on this campus.  This way the client can reflect the change
   // immediately.
-  vdi.lib.db.cache.CacheDB().withTransaction {
+  CacheDB().withTransaction {
     val internal = entity.toInternal()
 
     // Write or overwrite the share offer object.
@@ -89,14 +102,14 @@ internal fun putShareOffer(datasetID: DatasetID, ownerID: UserID, recipientID: U
       it.upsertDatasetShareReceipt(DatasetShareReceiptImpl(datasetID, recipientID, VDIShareReceiptAction.Accept))
     }
   }
+
+  return PutOffer.respond204()
 }
 
 private fun DatasetShareOffer.toInternal() =
-  VDIDatasetShareOffer(
-    when (action) {
-      null -> throw BadRequestException("share action is required")
-      ShareOfferAction.GRANT -> VDIShareOfferAction.Grant
-      ShareOfferAction.REVOKE -> VDIShareOfferAction.Revoke
-    }
-  )
+  when (action) {
+    null                    -> throw BadRequestException("share action is required")
+    ShareOfferAction.GRANT  -> VDIShareOfferAction.Grant
+    ShareOfferAction.REVOKE -> VDIShareOfferAction.Revoke
+  }
 

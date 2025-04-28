@@ -33,8 +33,9 @@ import vdi.lib.db.cache.withTransaction
 import vdi.lib.db.model.SyncControlRecord
 import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
-import vdi.service.rest.config.Options
+import vdi.service.rest.Options
 import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.services.users.getCurrentQuotaUsage
 import vdi.service.rest.util.*
 
@@ -73,17 +74,16 @@ fun <T> CacheDB.initializeDataset(userID: UserID, datasetID: DatasetID, datasetM
 private val WorkPool = Executors.newFixedThreadPool(10)
 
 @OptIn(ExperimentalPathApi::class)
-fun submitUpload(
-  userID: UserID,
-  datasetID: DatasetID,
+fun <T: ControllerBase> T.submitUpload(
+  datasetID:     DatasetID,
   tempDirectory: Path,
-  uploadFile: Path,
-  datasetMeta: VDIDatasetMeta,
+  uploadFile:    Path,
+  datasetMeta:   VDIDatasetMeta,
 ) {
   Metrics.Upload.queueSize.inc()
   WorkPool.submit {
     try {
-      uploadFiles(userID, datasetID, tempDirectory, uploadFile, datasetMeta)
+      uploadFiles(datasetID, tempDirectory, uploadFile, datasetMeta)
     } finally {
       Metrics.Upload.queueSize.dec()
       tempDirectory.deleteRecursively()
@@ -92,8 +92,7 @@ fun submitUpload(
 }
 
 @OptIn(ExperimentalPathApi::class)
-fun uploadFiles(
-  userID: UserID,
+fun <T: ControllerBase> T.uploadFiles(
   datasetID: DatasetID,
   tempDirectory: Path,
   uploadFile: Path,
@@ -106,7 +105,7 @@ fun uploadFiles(
     TempFiles.withTempPath { archive ->
       try {
         logger.debug("Verifying file sizes for dataset {}/{} to ensure the user quota is not exceeded.", userID, datasetID)
-        verifyFileSize(uploadFile, userID)
+        verifyFileSize(uploadFile)
 
         logger.debug("Repacking input file for dataset {}/{}.", userID, datasetID)
         val sizes = uploadFile.repack(into = archive, using = directory, logger = logger)
@@ -146,7 +145,7 @@ fun uploadFiles(
   }
 }
 
-fun verifyFileSize(file: Path, userID: UserID) {
+fun <T: ControllerBase> T.verifyFileSize(file: Path) {
   val fileSize = file.fileSize()
 
   if (fileSize > Options.Quota.maxUploadSize.toLong())

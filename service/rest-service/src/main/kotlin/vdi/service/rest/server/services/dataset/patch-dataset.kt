@@ -2,12 +2,12 @@ package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.withTransaction
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.resources.DatasetsVdiId.PatchDatasetsByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.ForbiddenError
@@ -15,7 +15,7 @@ import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.outputs.wrap
 
-fun updateDatasetMeta(userID: UserID, datasetID: DatasetID, patch: DatasetPatchRequestBody): PatchDatasetsByVdiIdResponse {
+fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: DatasetPatchRequestBody): PatchDatasetsByVdiIdResponse {
   val cacheDB = CacheDB()
 
   val dataset = cacheDB.selectDataset(datasetID)

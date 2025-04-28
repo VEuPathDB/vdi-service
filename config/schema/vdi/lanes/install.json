@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/lanes/install.json",
+  "title": "Data Installation Lane Config",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "lane-common.json#"
+    },
+    {
+      "properties": {
+        "kafkaConsumerId": {
+          "default": "install-data-lane-receive"
+        },
+        "kafkaProducerId": {
+          "$ref": "lane-common.json#/definitions/kafkaProducerId",
+          "default": "install-data-lane-send"
+        },
+        "memoryQueueSize": {
+          "default": 5
+        },
+        "workerCount": {
+          "default": 5
+        },
+        "eventChannel": {
+          "default": "install-triggers"
+        },
+        "eventKey": {
+          "default": "install-trigger"
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

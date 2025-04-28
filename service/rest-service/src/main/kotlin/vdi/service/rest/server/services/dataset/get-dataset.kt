@@ -16,6 +16,7 @@ import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResp
 import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse.respond301
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.outputs.*
 import vdi.service.rest.util.Either
 import vdi.service.rest.util.defaultZone
@@ -27,10 +28,13 @@ import vdi.service.rest.util.defaultZone
 fun adminGetDatasetByID(datasetID: DatasetID) =
   getDatasetByID(null, datasetID, true)
 
-fun getDatasetByID(
+fun <T: ControllerBase> T.userGetDatasetByID(datasetID: DatasetID) =
+  getDatasetByID(userID, datasetID, false)
+
+private fun getDatasetByID(
   userID: UserID?,
   datasetID: DatasetID,
-  includeDeleted: Boolean = false,
+  includeDeleted: Boolean,
 ): Either<DatasetDetails, GetDatasetsByVdiIdResponse> {
   // Lookup dataset that is owned by or shared with the current user
   val dataset = when {

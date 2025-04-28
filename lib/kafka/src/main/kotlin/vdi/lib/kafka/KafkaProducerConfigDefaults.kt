@@ -6,16 +6,16 @@ import kotlin.time.Duration.Companion.seconds
 
 object KafkaProducerConfigDefaults {
   inline val BUFFER_MEMORY_BYTES
-    get() = 33554432L
+    get() = 33554432uL
 
   inline val COMPRESSION_TYPE
     get() = KafkaCompressionType.NONE
 
   inline val SEND_RETRIES
-    get() = 2147483647
+    get() = 2147483647u
 
   inline val BATCH_SIZE
-    get() = 16384
+    get() = 16384u
 
   inline val CONNECTIONS_MAX_IDLE
     get() = 9.minutes
@@ -24,13 +24,13 @@ object KafkaProducerConfigDefaults {
     get() = 2.minutes
 
   inline val LINGER_TIME
-    get() = 0.milliseconds
+    get() = 5.milliseconds
 
   inline val MAX_BLOCKING_TIMEOUT
     get() = 1.minutes
 
   inline val MAX_REQUEST_SIZE_BYTES
-    get() = 1048576
+    get() = 1048576u
 
   inline val RECEIVE_BUFFER_SIZE_BYTES
     get() = 32768

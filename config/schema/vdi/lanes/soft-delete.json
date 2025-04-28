@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/lanes/soft-delete.json",
+  "title": "Soft Delete Lane Config",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "lane-common.json#"
+    },
+    {
+      "properties": {
+        "kafkaConsumerId": {
+          "default": "soft-delete-lane-receive"
+        },
+        "memoryQueueSize": {
+          "default": 5
+        },
+        "workerCount": {
+          "default": 5
+        },
+        "eventChannel": {
+          "default": "soft-delete-triggers"
+        },
+        "eventKey": {
+          "default": "soft-delete-trigger"
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

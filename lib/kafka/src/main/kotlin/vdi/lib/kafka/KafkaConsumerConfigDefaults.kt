@@ -15,7 +15,7 @@ object KafkaConsumerConfigDefaults {
     get() = 45.seconds
 
   inline val AutoOffsetReset
-    get() = vdi.lib.kafka.KafkaOffsetType.EARLIEST
+    get() = KafkaOffsetType.EARLIEST
 
   inline val ConnectionsMaxIdle
     get() = 9.minutes
@@ -27,7 +27,7 @@ object KafkaConsumerConfigDefaults {
     get() = true
 
   inline val FetchMaxBytes
-    get() = 52428800
+    get() = 52428800u
 
   inline val GroupInstanceID
     get() = null as String?
@@ -36,7 +36,7 @@ object KafkaConsumerConfigDefaults {
     get() = 5.minutes
 
   inline val MaxPollRecords
-    get() = 500
+    get() = 500u
 
   inline val ReceiveBufferSizeBytes
     get() = 65536

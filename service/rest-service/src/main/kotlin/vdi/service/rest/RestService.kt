@@ -5,10 +5,8 @@ import org.veupathdb.lib.container.jaxrs.config.Options
 import org.veupathdb.lib.container.jaxrs.providers.DependencyProvider
 import org.veupathdb.lib.container.jaxrs.server.Server
 import vdi.service.rest.health.DependencySource
-import vdi.service.rest.config.Options as Opts
 
 object RestService : Server() {
-
   private val log = LoggerFactory.getLogger(javaClass)
 
   @JvmStatic
@@ -18,7 +16,7 @@ object RestService : Server() {
     start(args)
   }
 
-  override fun newResourceConfig(opts: Options) = Resources(opts as Opts)
+  override fun newResourceConfig(opts: Options) = Resources(opts as ServiceConfig)
 
-  override fun newOptions() = Opts
+  override fun newOptions() = ServiceConfig
 }

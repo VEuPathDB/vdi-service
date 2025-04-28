@@ -9,7 +9,6 @@ import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.*
 import vdi.service.rest.generated.resources.VdiDatasetsVdiIdFiles
 import vdi.service.rest.server.services.dataset.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.toUserID
 import vdi.service.rest.util.fold
 import vdi.service.rest.util.mapLeft
 
@@ -20,15 +19,15 @@ class DatasetFiles(@Context request: ContainerRequest)
   , ControllerBase(request)
 {
   override fun getDatasetsFilesByVdiId(rawID: String): GetDatasetsFilesByVdiIdResponse =
-    when (val it = maybeUserID) {
+    when (maybeUser) {
       null -> listDatasetFilesForAdmin(DatasetID(rawID))
-      else -> listDatasetFilesForUser(it.toUserID(), DatasetID(rawID))
+      else -> listDatasetFilesForUser(DatasetID(rawID))
     }
 
   override fun getDatasetsFilesUploadByVdiId(rawID: String): GetDatasetsFilesUploadByVdiIdResponse {
-    return when (val it = maybeUserID) {
+    return when (maybeUser) {
       null -> getUploadFileForAdmin(DatasetID(rawID))
-      else -> getUploadFileForUser(it.toUserID(), DatasetID(rawID))
+      else -> getUploadFileForUser(DatasetID(rawID))
     }
       .mapLeft { obj ->
         GetDatasetsFilesUploadByVdiIdResponse
@@ -43,9 +42,9 @@ class DatasetFiles(@Context request: ContainerRequest)
   }
 
   override fun getDatasetsFilesDataByVdiId(rawID: String): GetDatasetsFilesDataByVdiIdResponse =
-    when (val it = maybeUserID) {
+    when (maybeUser) {
       null -> getInstallReadyZipForAdmin(DatasetID(rawID))
-      else -> getInstallReadyZipForUser(it.toUserID(), DatasetID(rawID))
+      else -> getInstallReadyZipForUser(DatasetID(rawID))
     }
       .mapLeft { so ->
         GetDatasetsFilesDataByVdiIdResponse

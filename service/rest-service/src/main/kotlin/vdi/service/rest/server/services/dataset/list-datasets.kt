@@ -11,11 +11,12 @@ import vdi.lib.db.cache.model.DatasetListQuery
 import vdi.lib.db.cache.model.DatasetRecord
 import vdi.service.rest.generated.model.DatasetListEntry
 import vdi.service.rest.model.UserDetails
+import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.outputs.DatasetListShareUser
 import vdi.service.rest.server.outputs.toExternal
 import vdi.service.rest.util.reduceTo
 
-fun fetchUserDatasetList(query: DatasetListQuery, userID: UserID): List<DatasetListEntry> {
+fun <T: ControllerBase> T.fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
   return fetchDatasetList(CacheDB().selectDatasetList(query), userID)
 }
 

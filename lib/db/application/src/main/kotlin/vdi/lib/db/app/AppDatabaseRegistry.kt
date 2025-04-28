@@ -139,7 +139,7 @@ object AppDatabaseRegistry {
               host     = env.host!!,
               port     = env.port!!,
               dbName   = env.dbName!!,
-              poolSize = (env.poolSize ?: DefaultPoolSize).toInt(),
+              poolSize = env.poolSize ?: DefaultPoolSize,
             )
           else
             LDAPConnectDetails(
@@ -147,7 +147,7 @@ object AppDatabaseRegistry {
               user     = env.controlSchema!!,
               pw       = env.pass!!,
               ldap     = env.ldap!!,
-              poolSize = (env.poolSize ?: DefaultPoolSize).toInt(),
+              poolSize = env.poolSize ?: DefaultPoolSize,
             )
         AppDBPlatform.Postgres -> ManualConnectDetails(
           name     = env.connectionName!!,
@@ -156,7 +156,7 @@ object AppDatabaseRegistry {
           host     = env.host!!,
           port     = env.port!!,
           dbName   = env.dbName!!,
-          poolSize = (env.poolSize ?: DefaultPoolSize).toInt(),
+          poolSize = env.poolSize ?: DefaultPoolSize,
         )
       }
     } catch (e: Throwable) {
@@ -218,7 +218,7 @@ private class ManualConnectDetails(
   val host: String,
   val port: UShort,
   val dbName: String,
-  val poolSize: Int,
+  val poolSize: UByte,
 ) : DbConnectDetails {
 
   override fun makeDataSource(): DataSource {
@@ -227,7 +227,7 @@ private class ManualConnectDetails(
         jdbcUrl = makeJDBCPostgresConnectionString(host, port, dbName)
         username = user
         password = pw.unwrap()
-        maximumPoolSize = poolSize
+        maximumPoolSize = poolSize.toInt()
         driverClassName = org.postgresql.Driver::class.java.name
       }
       .let(::HikariDataSource)
@@ -247,7 +247,7 @@ private class LDAPConnectDetails(
   val user: String,
   val pw: SecretString,
   val ldap: String,
-  val poolSize: Int
+  val poolSize: UByte
 ) : DbConnectDetails {
 
   val desc: OracleNetDesc by lazy { LDAP.requireSingularOracleNetDesc(ldap) }
@@ -258,7 +258,7 @@ private class LDAPConnectDetails(
         jdbcUrl = makeJDBCOracleConnectionString(desc.host, desc.port, desc.serviceName)
         username = user
         password = pw.unwrap()
-        maximumPoolSize = poolSize
+        maximumPoolSize = poolSize.toInt()
         driverClassName = OracleDriver::class.java.name
       }
       .let(::HikariDataSource)

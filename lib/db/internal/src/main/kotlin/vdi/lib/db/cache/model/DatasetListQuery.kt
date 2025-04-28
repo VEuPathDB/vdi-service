@@ -1,7 +1,9 @@
 package vdi.lib.db.cache.model
 
+import org.veupathdb.vdi.lib.common.field.UserID
+
 data class DatasetListQuery(
-  val userID: Long,
+  val userID:    UserID,
   val projectID: String?,
   val ownership: DatasetOwnershipFilter,
 )

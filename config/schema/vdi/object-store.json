@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/object-store.json",
+  "title": "Object Store Connection Config",
+  "type": "object",
+  "properties": {
+    "bucketName": {
+      "type": "string"
+    },
+    "host": {
+      "oneOf": [
+        {
+          "$ref": "../common.json#/definitions/hostString"
+        },
+        {
+          "$ref": "../common.json#/definitions/interpolatedValue"
+        },
+        {
+          "$ref": "../common.json#/definitions/hostObject"
+        }
+      ]
+    },
+    "https": {
+      "type": "boolean",
+      "default": true
+    },
+    "accessToken": {
+      "type": "string"
+    },
+    "secretKey": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "bucketName",
+    "host",
+    "accessToken",
+    "secretKey"
+  ],
+  "additionalProperties": false
+}

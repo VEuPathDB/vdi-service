@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/lanes/import.json",
+  "title": "Data Preprocessing Lane Config",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "lane-common.json#"
+    },
+    {
+      "properties": {
+        "kafkaConsumerId": {
+          "default": "import-lane-receive"
+        },
+        "memoryQueueSize": {
+          "default": 10
+        },
+        "workerCount": {
+          "default": 10
+        },
+        "eventChannel": {
+          "default": "import-triggers"
+        },
+        "eventKey": {
+          "default": "import-trigger"
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

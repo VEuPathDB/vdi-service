@@ -14,7 +14,6 @@ import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.server.services.dataset.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.toUserID
 
 @Authenticated
 class DatasetByID(@Context request: ContainerRequest)
@@ -27,7 +26,7 @@ class DatasetByID(@Context request: ContainerRequest)
     DatasetID(rawID).let { vdiID ->
       when (val userID = maybeUserID) {
         null -> adminGetDatasetByID(vdiID)
-        else -> getDatasetByID(userID.toUserID(), vdiID)
+        else -> userGetDatasetByID(vdiID)
       }.let {
         if (it.isLeft) {
           it.unwrapLeft()
@@ -46,12 +45,12 @@ class DatasetByID(@Context request: ContainerRequest)
     }
 
   override fun patchDatasetsByVdiId(vdiID: String, entity: DatasetPatchRequestBody?) =
-    entity?.let { body -> updateDatasetMeta(userID.toUserID(), DatasetID(vdiID), body) }
-      ?: PatchDatasetsByVdiIdResponse.respond400WithApplicationJson(BadRequestError("request body cannot be empty"))!!
+    entity?.let { body -> updateDatasetMeta(DatasetID(vdiID), body) }
+      ?: BadRequestError("request body cannot be empty").wrap()
 
   override fun putDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?) =
     entity
-      ?.let { body -> putDataset(userID.toUserID(), DatasetID(vdiId), body) }
+      ?.let { body -> putDataset(DatasetID(vdiId), body) }
       ?.let {
         if (it.isLeft)
           it.unwrapLeft()
@@ -66,14 +65,11 @@ class DatasetByID(@Context request: ContainerRequest)
       ?: BadRequestError("empty request body").wrap()
 
   @Authenticated(adminOverride = ALLOW_ALWAYS)
-  override fun deleteDatasetsByVdiId(vdiID: String): DeleteDatasetsByVdiIdResponse {
-    if (maybeUserID == null)
-      adminDeleteDataset(DatasetID(vdiID))
-    else
-      userDeleteDataset(maybeUserID!!.toUserID(), DatasetID(vdiID))
-
-    return DeleteDatasetsByVdiIdResponse.respond204()
-  }
+  override fun deleteDatasetsByVdiId(vdiID: String) =
+    when (maybeUser) {
+      null -> adminDeleteDataset(DatasetID(vdiID))
+      else -> userDeleteDataset(DatasetID(vdiID))
+    }
 
   // DEPRECATED API
   // DEPRECATED API

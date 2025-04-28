@@ -16,7 +16,6 @@ import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.services.dataset.createDataset
 import vdi.service.rest.server.services.dataset.fetchUserDatasetList
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.toUserID
 import vdi.lib.db.cache.model.DatasetListQuery
 import vdi.lib.db.cache.model.DatasetOwnershipFilter
 
@@ -38,7 +37,7 @@ class DatasetList(@Context request: ContainerRequest)
       ?: DatasetOwnershipFilter.ANY
 
     return Datasets.GetDatasetsResponse.respond200WithApplicationJson(
-      fetchUserDatasetList(DatasetListQuery(userID, projectId, parsedOwnership), userID.toUserID())
+      fetchUserDatasetList(DatasetListQuery(userID, projectId, parsedOwnership))
     )
   }
 
@@ -61,7 +60,7 @@ class DatasetList(@Context request: ContainerRequest)
     // endpoint.
     entity.meta.createdOn = null
 
-    createDataset(userID.toUserID(), datasetID, entity)
+    createDataset(datasetID, entity)
 
     return Datasets.PostDatasetsResponse
       .respond201WithApplicationJson(

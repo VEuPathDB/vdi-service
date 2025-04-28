@@ -1,11 +1,11 @@
-package vdi.service.rest.config
+package vdi.service.rest
 
 import org.veupathdb.lib.container.jaxrs.config.Options
 import org.veupathdb.vdi.lib.common.env.DBEnvGroup
 import vdi.lib.env.EnvKey
 import java.math.BigInteger
 
-object Options : Options() {
+object ServiceConfig : Options() {
 
   object S3 {
     val host        = requireEnv(EnvKey.S3.Host)

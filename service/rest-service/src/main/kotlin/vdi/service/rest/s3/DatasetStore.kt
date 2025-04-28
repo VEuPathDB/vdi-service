@@ -7,7 +7,6 @@ import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.lib.s3.s34k.objects.S3Object
 import org.veupathdb.lib.s3.s34k.objects.StreamObject
-import vdi.service.rest.config.Options
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
@@ -17,23 +16,24 @@ import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
 import vdi.lib.s3.paths.S3Paths
 import java.io.InputStream
+import vdi.service.rest.ServiceConfig
 
 object DatasetStore {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
   private val client = S3Api.newClient(S3Config(
-    url       = Options.S3.host,
-    port      = Options.S3.port,
-    secure    = Options.S3.useHttps,
-    accessKey = Options.S3.accessToken,
-    secretKey = Options.S3.secretKey,
+    url       = ServiceConfig.S3.host,
+    port      = ServiceConfig.S3.port,
+    secure    = ServiceConfig.S3.useHttps,
+    accessKey = ServiceConfig.S3.accessToken,
+    secretKey = ServiceConfig.S3.secretKey,
   ))
 
   private val bucket
-    get() = try { client.buckets[BucketName(Options.S3.bucketName)] }
+    get() = try { client.buckets[BucketName(ServiceConfig.S3.bucketName)] }
     catch (e: Throwable) { throw IllegalStateException("invalid S3 bucket name") }
-      ?: throw IllegalStateException("bucket ${Options.S3.bucketName} does not exist!")
+      ?: throw IllegalStateException("bucket ${ServiceConfig.S3.bucketName} does not exist!")
 
   fun getDatasetMeta(userID: UserID, datasetID: DatasetID): VDIDatasetMeta? {
     log.debug("fetching dataset meta file for dataset {}/{}", userID, datasetID)

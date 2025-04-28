@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/container-core/database.json",
+  "title": "Database Connection Config",
+  "description": "Container core database connection configuration.",
+  "type": "object",
+  "allOf": [
+    {
+      "properties": {
+        "user": {
+          "type": "string"
+        },
+        "pass": {
+          "type": "string"
+        },
+        "platform": {
+          "enum": [
+            "oracle",
+            "postgres"
+          ],
+          "default": null
+        },
+        "poolSize": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 32,
+          "default": 5
+        }
+      },
+      "required": [
+        "user",
+        "pass"
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "lookupCn": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "lookupCn"
+          ]
+        },
+        {
+          "properties": {
+            "host": {
+              "title": "Database Host Details",
+              "oneOf": [
+                {
+                  "$ref": "../common.json#hostString"
+                },
+                {
+                  "$ref": "../common.json#hostObject"
+                },
+                {
+                  "$ref": "../common.json#interpolatedValue"
+                }
+              ]
+            },
+            "name": {
+              "title": "Database/Userspace Name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "host",
+            "name"
+          ]
+        },
+        {
+          "properties": {
+            "host": {
+              "title": "Database Hostname",
+              "type": "string",
+              "format": "hostname"
+            },
+            "name": {
+              "title": "Database/Userspace Name",
+              "type": "string"
+            },
+            "port": {
+              "oneOf": [
+                {
+                  "enum": [
+                    5432,
+                    1521
+                  ]
+                },
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535
+                }
+              ]
+            }
+          },
+          "required": [
+            "host",
+            "name"
+          ]
+        }
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

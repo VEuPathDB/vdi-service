@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/rabbitmq.json",
+  "title": "RabbitMQ Configuration",
+  "type": "object",
+  "properties": {
+    "pollInterval": {
+      "$ref": "../common.json#/definitions/duration",
+      "default": "1s"
+    },
+    "connection": {
+      "$ref": "#/definitions/connection"
+    },
+    "exchange": {
+      "$ref": "#/definitions/exchange"
+    },
+    "queue": {
+      "$ref": "#/definitions/queue"
+    },
+    "routing": {
+      "$ref": "#/definitions/routing"
+    }
+  },
+  "required": [
+    "connection",
+    "exchange",
+    "queue",
+    "routing"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "connection": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "vdi"
+        },
+        "host": {
+          "oneOf": [
+            {
+              "$ref": "../common.json#/definitions/hostString"
+            },
+            {
+              "$ref": "../common.json#/definitions/interpolatedValue"
+            },
+            {
+              "$ref": "../common.json#/definitions/hostObject"
+            }
+          ]
+        },
+        "user": {
+          "type": "string"
+        },
+        "pass": {
+          "type": "string"
+        },
+        "tls": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "host",
+        "user",
+        "pass"
+      ],
+      "additionalProperties": false
+    },
+    "exchange": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "direct",
+            "fanout",
+            "topic"
+          ],
+          "default": "direct"
+        },
+        "autoDelete": {
+          "type": "boolean",
+          "default": false
+        },
+        "durable": {
+          "type": "boolean",
+          "default": true
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "queue": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "autoDelete": {
+          "type": "boolean",
+          "default": false
+        },
+        "durable": {
+          "type": "boolean",
+          "default": true
+        },
+        "exclusive": {
+          "type": "boolean",
+          "default": false
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "routing": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "key"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
