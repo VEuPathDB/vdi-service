@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/lanes/hard-delete.json",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/lanes/hard-delete.json",
   "title": "Hard Delete Lane Config",
   "type": "object",
   "allOf": [

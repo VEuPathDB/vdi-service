@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "$id": "https://veupathdb.github.io/vdi-service/config/schema/container-core/database.json",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/container-core/database.json",
   "title": "Database Connection Config",
   "description": "Container core database connection configuration.",
   "type": "object",

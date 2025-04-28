@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "$id": "https://veupathdb.github.io/vdi-service/config/schema/config.json",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/config.json",
   "title": "VDI Stack Configuration Schema",
   "type": "object",
   "properties": {

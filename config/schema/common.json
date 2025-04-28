@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "$id": "https://veupathdb.github.io/vdi-service/config/schema/common.json",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/common.json",
   "definitions": {
     "duration": {
       "title": "Duration String",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/object-store.json",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/object-store.json",
   "title": "Object Store Connection Config",
   "type": "object",
   "properties": {

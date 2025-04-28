@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/daemons/reconciler.json",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/daemons/reconciler.json",
   "title": "Dataset Reconciler Config",
   "type": "object",
   "properties": {

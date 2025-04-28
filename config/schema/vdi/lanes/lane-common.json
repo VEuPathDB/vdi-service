@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "$id": "https://veupathdb.github.io/vdi-service/config/schema/vdi/lanes/lane-common.json",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/lanes/lane-common.json",
   "title": "Common Lane Config Options",
   "type": "object",
   "properties": {
