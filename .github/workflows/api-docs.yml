@@ -10,12 +10,20 @@ jobs:
     name: Build API Docs
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
+    - name: Checkout Main
       uses: actions/checkout@v4
+    - name: Copy Docs
+      run: cp -r docs/ docs-for-upload/
+    - name: Checkout Feature
+      uses: actions/checkout@v4
+      with:
+        ref: feature-data-updates
+    - name: Copy Schema
+      run: cp -r config/schema/ docs-for-upload/schema/
     - name: Upload
       uses: actions/upload-pages-artifact@v3
       with:
-        path: docs/
+        path: docs-for-upload/
   deploy:
     name: Deploy API Docs
     runs-on: ubuntu-latest
