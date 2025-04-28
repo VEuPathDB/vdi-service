@@ -13,7 +13,7 @@ data class KafkaConsumerConfig(
   val fetchMinBytes: Int = KafkaConsumerConfigDefaults.FetchMinBytes,
 
   // group.id
-  val groupID: String,
+  val groupID: String = KafkaConsumerConfigDefaults.GroupID,
 
   // heartbeat.interval.ms
   val heartbeatInterval: Duration = KafkaConsumerConfigDefaults.HeartbeatInterval,
@@ -34,7 +34,7 @@ data class KafkaConsumerConfig(
   val enableAutoCommit: Boolean = KafkaConsumerConfigDefaults.EnableAutoCommit,
 
   // fetch.max.bytes
-  val fetchMaxBytes: Int = KafkaConsumerConfigDefaults.FetchMaxBytes,
+  val fetchMaxBytes: UInt = KafkaConsumerConfigDefaults.FetchMaxBytes,
 
   // group.instance.id
   val groupInstanceID: String? = KafkaConsumerConfigDefaults.GroupInstanceID,
@@ -43,7 +43,7 @@ data class KafkaConsumerConfig(
   val maxPollInterval: Duration = KafkaConsumerConfigDefaults.MaxPollInterval,
 
   // max.poll.records
-  val maxPollRecords: Int = KafkaConsumerConfigDefaults.MaxPollRecords,
+  val maxPollRecords: UInt = KafkaConsumerConfigDefaults.MaxPollRecords,
 
   // receive.buffer.byte
   val receiveBufferSizeBytes: Int = KafkaConsumerConfigDefaults.ReceiveBufferSizeBytes,
@@ -89,13 +89,13 @@ data class KafkaConsumerConfig(
                                  ?: KafkaConsumerConfigDefaults.DefaultAPITimeout,
     enableAutoCommit        = env.optBool(EnvKey.Kafka.Consumer.EnableAutoCommit)
                                  ?: KafkaConsumerConfigDefaults.EnableAutoCommit,
-    fetchMaxBytes           = env.optInt(EnvKey.Kafka.Consumer.FetchMaxBytes)
+    fetchMaxBytes           = env.optUInt(EnvKey.Kafka.Consumer.FetchMaxBytes)
                                  ?: KafkaConsumerConfigDefaults.FetchMaxBytes,
     groupInstanceID         = env.optional(EnvKey.Kafka.Consumer.GroupInstanceID)
                                  ?: KafkaConsumerConfigDefaults.GroupInstanceID,
     maxPollInterval         = env.optDuration(EnvKey.Kafka.Consumer.MaxPollInterval)
                                  ?: KafkaConsumerConfigDefaults.MaxPollInterval,
-    maxPollRecords          = env.optInt(EnvKey.Kafka.Consumer.MaxPollRecords)
+    maxPollRecords          = env.optUInt(EnvKey.Kafka.Consumer.MaxPollRecords)
                                  ?: KafkaConsumerConfigDefaults.MaxPollRecords,
     receiveBufferSizeBytes  = env.optInt(EnvKey.Kafka.Consumer.ReceiveBufferSizeBytes)
                                  ?: KafkaConsumerConfigDefaults.ReceiveBufferSizeBytes,

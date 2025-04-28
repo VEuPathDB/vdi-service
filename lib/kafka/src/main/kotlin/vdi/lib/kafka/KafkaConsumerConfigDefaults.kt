@@ -5,6 +5,9 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object KafkaConsumerConfigDefaults {
+  inline val GroupID
+    get() = "vdi-kafka-consumers"
+
   inline val FetchMinBytes
     get() = 1
 

@@ -63,7 +63,8 @@
           "default": "9m"
         },
         "groupId": {
-          "type": "string"
+          "type": "string",
+          "default": "vdi-kafka-consumers"
         },
         "groupInstanceId": {
           "type": "string",
@@ -135,9 +136,6 @@
           "default": "45s"
         }
       },
-      "required": [
-        "consumerGroupId"
-      ],
       "additionalProperties": false
     },
     "producers": {
