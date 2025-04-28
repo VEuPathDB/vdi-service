@@ -77,8 +77,15 @@
           "format": "uri"
         },
         "keyStoreFile": {
-          "type": "string",
-          "format": "uri-reference"
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "uri-reference"
+            },
+            {
+              "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
+            }
+          ]
         },
         "keyStorePass": {
           "type": "string"
