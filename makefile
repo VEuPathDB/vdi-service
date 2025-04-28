@@ -17,21 +17,98 @@ endif
 
 .PHONY: default
 default:
-	@echo "Please pick a make target."
+	@echo
+	@echo "Available Commands:"
+	@echo
+	@awk '{ \
+	  if ($$1 == "#") { \
+	    $$1=""; \
+	    if (ht != "") { \
+	      ht=ht "\n"; \
+	    } \
+	    if ($$2 == "|") { \
+	      $$2=" "; \
+	    } \
+	    ht=ht "    " $$0; \
+	  } else if ($$1 == ".PHONY:") { \
+	    print "  \033[94m" $$2 "\033[39m\n" ht "\n"; \
+	    ht="" \
+	  } else {\
+	    ht="" \
+	  } \
+	}' <(grep -B10 '.PHONY' makefile | grep -v '[═║@]\|default\|__' | grep -E '^[.#]|$$' | grep -v '_')
 
 
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     Stack Management Tasks                                               ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
+
+CONFIG_VALIDATOR_VERSION := v1.4.1
+STACK_CONFIG_PATH := config/production-config.yml
+
+# Validates the VDI configuration file against the config JSON schema.
 .PHONY: validate-config
 validate-config:
+	@vendor/yaml-jsonschema \
+	  --schema 'https://veupathdb.github.io/vdi-service/schema/config.json#' \
+ 	  --source $(STACK_CONFIG_PATH)
 
-vendor/config-validator:
+vendor/config-validator-$(CONFIG_VALIDATOR_VERSION):
+	@mkdir -p vendor
+	@wget https://github.com/neilpa/yajsv/releases/download/$(CONFIG_VALIDATOR_VERSION)/yajsv.linux.amd64 -O $@
+	@chmod +x $@
 
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     Development Tooling                                                  ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
+
+# Regenerates REST API documentation and JaxRS classes from the REST service
+# api.raml file
+.PHONY: raml-gen
+raml-gen:
+	@which node || (echo 'NodeJS not found on $$PATH'; exit 1)
+	@./gradlew -q :service:rest-service:generate-jaxrs --rerun-tasks
+	@./gradlew -q build-raml-docs --rerun-tasks
 
 ####
-##  Component Building
+##  Console Shortcuts
 ####
 
-.PHONY: build
-build:
+# Opens the local-dev minio web console.
+.PHONY: open-minio
+open-minio:
+	@sensible-browser http://localhost:9001
+
+# Opens the local-dev rabbitmq web console.
+.PHONY: open-rabbit
+open-rabbit:
+	@sensible-browser http://localhost:9002
+
+####
+##  Helpers
+####
+
+
+.PHONY: _env-file-test
+_env-file-test:
+	@if [ ! -f .env ]; then echo "Missing .env file."; exit 1; fi
+
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     Docker Management                                                    ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
+
+
+# Builds the VDI service docker image.
+.PHONY: build-image
+build-image:
 	@$(CONTAINER_CMD) compose \
       -f docker-compose.local.yml \
       -f docker-compose.dev.yml \
@@ -39,116 +116,127 @@ build:
       --build-arg=GITHUB_USERNAME=${GITHUB_USERNAME} \
       --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}
 
-.PHONY: raml-gen
-raml-gen:
-	@which node || (echo 'NodeJS not found on $$PATH'; exit 1)
-	@./gradlew -q :service:rest-service:generate-jaxrs --rerun-tasks
-	@./gradlew -q build-raml-docs --rerun-tasks
-
-
-####
-##  Stack Management
-####
-
-.PHONY: config
-config: env-file-test $(MERGE_TARGET)
+# Prints the merged docker compose configuration.
+.PHONY: show-compose-config
+show-compose-config: _env-file-test $(MERGE_TARGET)
 	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) config
 
-.PHONY: up
-up: env-file-test $(MERGE_TARGET)
+# Starts up the stack (re)creating any containers necessary.
+.PHONY: compose-up
+compose-up: _env-file-test $(MERGE_TARGET)
 	@if [ -z "${SSH_AUTH_SOCK}" ]; then echo "SSH agent does not appear to be correctly running"; exit 1; fi
 	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) up -d $(SERVICES)
 
-.PHONY: down
-down: env-file-test $(MERGE_TARGET)
+# Stops the stack and deletes any stack-specific state.
+.PHONY: compose-down
+compose-down: _env-file-test $(MERGE_TARGET)
 	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) down -v $(SERVICES)
 
-.PHONY: start
-start: env-file-test $(MERGE_TARGET)
+# Starts a stack that has been shut down via `compose-stop`
+.PHONY: compose-start
+compose-start: _env-file-test $(MERGE_TARGET)
 	@if [ -z "${SSH_AUTH_SOCK}" ]; then echo "SSH agent does not appear to be correctly running"; exit 1; fi
 	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) start $(SERVICES)
 
-.PHONY: stop
-stop: env-file-test $(MERGE_TARGET)
+# Stops a started stack without removing stack-specific state.
+.PHONY: compose-stop
+compose-stop: _env-file-test $(MERGE_TARGET)
 	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) stop $(SERVICES)
-
-.PHONY: __MERGE_COMPOSE
-__MERGE_COMPOSE:
-	@vpdb merge-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.ssh.yml > $(MERGED_COMPOSE_FILES)
-
-
-####
-##  Logging
-####
-
-.PHONY: logs
-logs:
-	$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) $(SERVICES)
-
-.PHONY: log-service
-log-service:
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) service
-
-.PHONY: log-plugin-noop
-log-plugin-noop:
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-example
-
-.PHONY: log-plugin-genelist
-log-plugin-genelist:
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-genelist
-
-.PHONY: log-plugin-rnaseq
-log-plugin-rnaseq:
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-rnaseq
-
-.PHONY: log-plugin-isasimple
-log-plugin-isasimple:
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-isasimple
-
-.PHONY: log-plugin-biom
-log-plugin-biom:
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-biom
-
-.PHONY: log-plugin-bigwig
-log-plugin-bigwig:
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-bigwig
-
-.PHONY: log-plugin-wrangler
-log-plugin-wrangler:
-	@(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-wrangler
-
-
-.PHONY: log-kafka
-log-kafka:
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) kafka
-
-.PHONY: log-minio
-log-minio:
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) minio-external
-
-.PHONY: log-rabbit
-log-rabbit:
-	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) rabbit-external
-
-
-####
-##  Console Shortcuts
-####
-
-.PHONY: open-minio
-open-minio:
-	@sensible-browser http://localhost:9001
-
-.PHONY: open-rabbit
-open-rabbit:
-	@sensible-browser http://localhost:9002
-
 
 ####
 ##  Helpers
 ####
 
-.PHONY: env-file-test
-env-file-test:
-	@if [ ! -f .env ]; then echo "Missing .env file."; exit 1; fi
+# Prints and watches the full compose stack log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+#
+# Specific services may be specified by using the SERVICES variable.
+.PHONY: logs
+logs:
+	$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) $(SERVICES)
+
+# Prints and tails the core service container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-service
+log-service:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) service
+
+# Prints and tails the example plugin container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-plugin-example
+log-plugin-example:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-example
+
+# Prints and tails the noop plugin container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-plugin-noop
+log-plugin-noop:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-noop
+
+# Prints and tails the genelist plugin container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-plugin-genelist
+log-plugin-genelist:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-genelist
+
+# Prints and tails the rnaseq plugin container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-plugin-rnaseq
+log-plugin-rnaseq:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-rnaseq
+
+# Prints and tails the isasimple plugin container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-plugin-isasimple
+log-plugin-isasimple:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-isasimple
+
+# Prints and tails the biom plugin container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-plugin-biom
+log-plugin-biom:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-biom
+
+# Prints and tails the bigwig plugin container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-plugin-bigwig
+log-plugin-bigwig:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-bigwig
+
+# Prints and tails the phenotype plugin container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-plugin-wrangler
+log-plugin-phenotype:
+	@(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) plugin-phenotype
+
+# Prints and tails the kafka log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-kafka
+log-kafka:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) kafka
+
+# Prints and tails the local minio container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-minio
+log-minio:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) minio-external
+
+# Prints and tails the local rabbitmq container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-rabbit
+log-rabbit:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) rabbit-external
 

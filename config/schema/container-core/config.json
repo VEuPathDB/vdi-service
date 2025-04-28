@@ -57,7 +57,7 @@
         },
         "bindPort": {
           "title": "HTTP Server Port Binding",
-          "$ref": "common.json#/definitions/port",
+          "$ref": "../common.json#/definitions/port",
           "default": 80
         }
       }
