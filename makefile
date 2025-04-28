@@ -1,17 +1,10 @@
-_COLOR := $(shell echo "\\033[38;5;69m")
-_RESET := $(shell echo "\\033[0m")
-
 ifeq ($(shell command -v docker 2>&1 >/dev/null && echo 0),0)
 CONTAINER_CMD := docker --log-level ERROR
-MERGED_COMPOSE_FILES := docker-compose.yml docker-compose.dev.yml docker-compose.ssh.yml
-MERGE_TARGET :=
 else
 CONTAINER_CMD := podman
-MERGED_COMPOSE_FILES := /tmp/$(shell basename $(shell pwd))-merged-compose.yml
-MERGE_TARGET := __MERGE_COMPOSE
 endif
 
-MERGED_COMPOSE_FLAGS := $(foreach file,$(MERGED_COMPOSE_FILES),-f $(file))
+COMPOSE_FILES := docker-compose.yml docker-compose.dev.yml docker-compose.ssh.yml
 
 SERVICES ?=
 
@@ -24,8 +17,13 @@ endif
 
 .PHONY: default
 default:
-	@echo $(_IS_TTY)
 	@echo "Please pick a make target."
+
+
+.PHONY: validate-config
+validate-config:
+
+vendor/config-validator:
 
 
 ####
