@@ -1,4 +1,4 @@
-$schema: 'schema/config.json#'
+$schema: 'https://veupathdb.github.io/vdi-service/schema/config.json#'
 
 commonVars:
   genomicsProjects: &genomicsProjects

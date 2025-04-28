@@ -9,10 +9,16 @@
     },
     "vdi": {
       "$ref": "vdi/config.json#"
+    },
+    "definitions": {
+      "title": "Shared Value Definitions",
+      "description": "Object that may be used to hold common definitions that may be referenced elsewhere in the config file using YAML anchors and aliases.",
+      "type": "object"
     }
   },
   "required": [
     "containerCore",
     "vdi"
-  ]
+  ],
+  "additionalProperties": false
 }
