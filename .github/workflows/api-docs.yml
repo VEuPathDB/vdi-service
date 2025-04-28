@@ -4,6 +4,7 @@ on:
     - main
     paths:
     - 'docs/vdi-api.html'
+    - 'config/schema/**'
 
 jobs:
   build:
