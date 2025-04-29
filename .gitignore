@@ -10,6 +10,7 @@ build/
 /bin/
 /tmp/
 /*ssh*
+.vscode/
 
 .envrc
 merged-compose.yml
