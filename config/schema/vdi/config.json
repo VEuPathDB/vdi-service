@@ -123,6 +123,10 @@
         "pass": {
           "type": "string"
         },
+        "name": {
+          "type": "string",
+          "default": "vdi"
+        },
         "poolSize": {
           "type": "integer",
           "minimum": 1,
