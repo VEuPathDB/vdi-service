@@ -53,7 +53,7 @@ object Pruner {
    * history details.
    */
   private val retainedRevisionHistoryFiles = arrayOf(
-    S3File.RevisionFlagFileName,
+    S3File.RevisionFlag,
     S3File.ManifestFileName,
     S3File.RawUploadZipName,
     S3File.ImportReadyZipName,  // TODO: remove this when the async upload process is implemented

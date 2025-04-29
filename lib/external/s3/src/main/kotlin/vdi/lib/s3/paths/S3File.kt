@@ -33,11 +33,11 @@ enum class S3File(val baseName: String) {
   /**
    * Name of the flag object used to indicate that a dataset has been revised.
    */
-  RevisionFlagFileName("revised-flag"),
+  RevisionFlag("revised-flag"),
 
-  SharesDirName("shares"),
+  SharesDir("shares"),
 
-  ShareOfferFileName("share-offer.json"),
+  ShareOffer("share-offer.json"),
 
   ShareReceipt("share-receipt.json"),
   ;

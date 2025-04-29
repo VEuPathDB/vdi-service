@@ -57,13 +57,13 @@ internal class EagerlyLoadedDatasetDirectory(
       objects.forEach {
         val subPath = it.path.trimIDPrefix()
 
-        if (subPath.startsWith(S3File.SharesDirName)) {
+        if (subPath.startsWith(S3File.SharesDir)) {
           subPath.splitSharePath()?.also { (recipient, file) ->
             val ref = shareRefs.computeIfAbsent(recipient) { ShareRef(recipient) }
 
             when (file) {
-              S3File.ShareOfferFileName -> ref.offer = it
-              S3File.ShareReceipt       -> ref.receipt = it
+              S3File.ShareOffer   -> ref.offer = it
+              S3File.ShareReceipt -> ref.receipt = it
               else                      -> return@also // Fall through to the 'when' block
             }
 
@@ -77,9 +77,9 @@ internal class EagerlyLoadedDatasetDirectory(
           S3File.RawUploadZipName     -> uploadFile = DatasetRawUploadFileImpl(it)
           S3File.ImportReadyZipName   -> importableFile = DatasetImportableFileImpl(it)
           S3File.InstallReadyZipName  -> installableFile = DatasetInstallableFileImpl(it)
-          S3File.DeleteFlagFileName   -> deleteFlag = DatasetDeleteFlagFileImpl(it)
-          S3File.RevisionFlagFileName -> revisedFlag = DatasetRevisionFlagFileImpl(it)
-          else                        -> throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
+          S3File.DeleteFlagFileName -> deleteFlag = DatasetDeleteFlagFileImpl(it)
+          S3File.RevisionFlag       -> revisedFlag = DatasetRevisionFlagFileImpl(it)
+          else                      -> throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
         }
       }
 

@@ -130,7 +130,7 @@ interface DatasetDirectory {
 
   /**
    * Tests whether this [DatasetDirectory] currently contains the
-   * [revised dataset flag][S3File.RevisionFlagFileName] file.
+   * [revised dataset flag][S3File.RevisionFlag] file.
    *
    * @return `true` if this dataset contains, or at the time of this method
    * call, contained a revised dataset flag file.

@@ -8,10 +8,10 @@ import vdi.lib.s3.paths.S3File.DeleteFlagFileName
 import vdi.lib.s3.paths.S3File.ImportReadyZipName
 import vdi.lib.s3.paths.S3File.InstallReadyZipName
 import vdi.lib.s3.paths.S3File.RawUploadZipName
-import vdi.lib.s3.paths.S3File.RevisionFlagFileName
-import vdi.lib.s3.paths.S3File.ShareOfferFileName
+import vdi.lib.s3.paths.S3File.RevisionFlag
+import vdi.lib.s3.paths.S3File.ShareOffer
 import vdi.lib.s3.paths.S3File.ShareReceipt
-import vdi.lib.s3.paths.S3File.SharesDirName
+import vdi.lib.s3.paths.S3File.SharesDir
 import vdi.lib.s3.util.PathBuilder
 
 
@@ -74,7 +74,7 @@ object S3Paths {
    * `{user-id}/{dataset-id}/delete-flag`
    */
   fun datasetRevisedFlagFile(userID: UserID, datasetID: DatasetID) =
-    datasetPath(userID, datasetID).append(RevisionFlagFileName.baseName).toString()
+    datasetPath(userID, datasetID).append(RevisionFlag.baseName).toString()
 
   /**
    * `{user-id}/{dataset-id}/import-ready.zip`
@@ -101,7 +101,7 @@ object S3Paths {
    * `{user-id}/{dataset-id}/shares/{recipient-id}/offer.json`
    */
   fun datasetShareOfferFile(userID: UserID, datasetID: DatasetID, recipientID: UserID) =
-    shareUserPath(userID, datasetID, recipientID).append(ShareOfferFileName.baseName).toString()
+    shareUserPath(userID, datasetID, recipientID).append(ShareOffer.baseName).toString()
 
   /**
    * `{user-id}/{dataset-id}/shares/{recipient-id}/receipt.json`
@@ -130,7 +130,7 @@ object S3Paths {
    * `{userID}/{datasetID}/shares/`
    */
   private inline fun sharePath(userID: UserID, datasetID: DatasetID) =
-    datasetPath(userID, datasetID).append(SharesDirName.baseName)
+    datasetPath(userID, datasetID).append(SharesDir.baseName)
 
   /**
    * `{userID}/{datasetID}/shares/{recipientID}/`

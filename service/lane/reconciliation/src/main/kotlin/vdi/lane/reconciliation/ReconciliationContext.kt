@@ -33,7 +33,7 @@ internal class ReconciliationContext(
 
   val hasDeleteFlag by lazy { safeTest(S3File.DeleteFlagFileName) { datasetDirectory.hasDeleteFlag() } }
 
-  val hasRevisedFlag by lazy { safeTest(S3File.RevisionFlagFileName) {datasetDirectory.hasRevisedFlag() } }
+  val hasRevisedFlag by lazy { safeTest(S3File.RevisionFlag) {datasetDirectory.hasRevisedFlag() } }
 
   val hasRawUpload by lazy { safeTest(S3File.RawUploadZipName) { datasetDirectory.hasUploadFile() } }
 
