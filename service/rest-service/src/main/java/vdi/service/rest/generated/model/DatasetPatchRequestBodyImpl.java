@@ -25,7 +25,7 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   private String name;
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeRequestBody datasetType;
+  private DatasetTypeInput datasetType;
 
   @JsonProperty(JsonField.SHORT_NAME)
   private String shortName;
@@ -68,12 +68,12 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeRequestBody getDatasetType() {
+  public DatasetTypeInput getDatasetType() {
     return this.datasetType;
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeRequestBody datasetType) {
+  public void setDatasetType(DatasetTypeInput datasetType) {
     this.datasetType = datasetType;
   }
 

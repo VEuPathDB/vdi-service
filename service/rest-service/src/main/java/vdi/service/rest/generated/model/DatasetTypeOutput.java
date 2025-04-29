@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize(
-    as = DatasetTypeResponseBodyImpl.class
+    as = DatasetTypeOutputImpl.class
 )
-public interface DatasetTypeResponseBody {
+public interface DatasetTypeOutput {
   @JsonProperty(JsonField.NAME)
   String getName();
 

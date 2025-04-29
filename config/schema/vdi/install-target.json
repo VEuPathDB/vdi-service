@@ -68,7 +68,33 @@
               "type": "string"
             },
             "host": {
+              "oneOf": [
+                {
+                  "$ref": "/vdi-service/schema/common.json#/$defs/hostString"
+                },
+                {
+                  "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
+                },
+                {
+                  "$ref": "/vdi-service/schema/common.json#/$defs/hostObject"
+                }
+              ]
+            }
+          },
+          "required": [
+            "dbName",
+            "host",
+            "platform"
+          ]
+        },
+        {
+          "properties": {
+            "dbName": {
               "type": "string"
+            },
+            "host": {
+              "type": "string",
+              "pattern": "^[\\w-.]+$"
             },
             "port": {
               "$ref": "/vdi-service/schema/common.json#/$defs/port"

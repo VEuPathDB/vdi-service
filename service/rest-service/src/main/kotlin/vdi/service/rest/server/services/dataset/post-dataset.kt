@@ -2,7 +2,6 @@ package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetImportStatus
@@ -22,7 +21,7 @@ fun <T: ControllerBase> T.createDataset(datasetID: DatasetID, entity: DatasetPos
   // file will be deleted out from under us.
   val (tempDirectory, uploadFile) = CacheDB().initializeDataset(userID, datasetID, datasetMeta) {
     try {
-      entity.fetchDatasetFile(userID)
+      fetchDatasetFile(entity)
     } catch (e: Throwable) {
       CacheDB().withTransaction { t ->
         t.updateImportControl(datasetID, DatasetImportStatus.Failed)
@@ -46,16 +45,14 @@ fun <T: ControllerBase> T.createDataset(datasetID: DatasetID, entity: DatasetPos
  * If the request provided a URL to a target file, that file will be downloaded
  * into a new temp directory.
  *
- * @param userID ID of the user attempting to upload a dataset.
- *
  * @param logger Logger attached to the controller class handling the request.
  *
  * @return A data object containing the temp directory path and the temp file
  * path for the dataset input file.
  */
-private fun DatasetPostRequestBody.fetchDatasetFile(userID: UserID): FileReference =
-  file?.let {
+private fun <T: ControllerBase> T.fetchDatasetFile(body: DatasetPostRequestBody): FileReference =
+  body.file?.let {
     TempFiles.makeTempPath(it.name)
       .also { (_, tmpFile) -> it.copyTo(tmpFile.toFile(), true) }
       .let { (tmpDir, tmpFile) -> FileReference(tmpDir, tmpFile) }
-  } ?: downloadRemoteFile(url.toURL(), userID)
+  } ?: downloadRemoteFile(body.url.toURL(), userID)

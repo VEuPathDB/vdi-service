@@ -76,7 +76,7 @@
           "type": "string",
           "format": "uri"
         },
-        "keyStoreFile": {
+        "keystoreFile": {
           "oneOf": [
             {
               "type": "string",
@@ -87,10 +87,15 @@
             }
           ]
         },
-        "keyStorePass": {
+        "keystorePass": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "clientId",
+        "clientSecret",
+        "url"
+      ]
     }
   }
 }

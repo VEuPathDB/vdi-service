@@ -7,18 +7,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "name",
-    "version",
-    "displayName"
+    "version"
 })
-public class DatasetTypeResponseBodyImpl implements DatasetTypeResponseBody {
+public class DatasetTypeInputImpl implements DatasetTypeInput {
   @JsonProperty(JsonField.NAME)
   private String name;
 
   @JsonProperty(JsonField.VERSION)
   private String version;
-
-  @JsonProperty(JsonField.DISPLAY_NAME)
-  private String displayName;
 
   @JsonProperty(JsonField.NAME)
   public String getName() {
@@ -38,15 +34,5 @@ public class DatasetTypeResponseBodyImpl implements DatasetTypeResponseBody {
   @JsonProperty(JsonField.VERSION)
   public void setVersion(String version) {
     this.version = version;
-  }
-
-  @JsonProperty(JsonField.DISPLAY_NAME)
-  public String getDisplayName() {
-    return this.displayName;
-  }
-
-  @JsonProperty(JsonField.DISPLAY_NAME)
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
   }
 }

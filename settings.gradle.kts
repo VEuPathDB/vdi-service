@@ -38,6 +38,7 @@ pluginManagement {
 rootProject.name = "vdi"
 
 include(":lib:common")
+include(":lib:config")
 
 include(":lib:db:application")
 include(":lib:db:common")

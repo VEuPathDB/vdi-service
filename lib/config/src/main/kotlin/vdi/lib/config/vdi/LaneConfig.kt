@@ -1,0 +1,11 @@
+package vdi.lib.config.vdi
+
+data class LaneConfig(
+  val hardDelete: ConsumerLaneConfig?,
+  val import: ConsumerLaneConfig?,
+  val install: ProducerLaneConfig?,
+  val reconciliation: ProducerLaneConfig?,
+  val sharing: ConsumerLaneConfig?,
+  val softDelete: ConsumerLaneConfig?,
+  val updateMeta: ProducerLaneConfig?,
+)

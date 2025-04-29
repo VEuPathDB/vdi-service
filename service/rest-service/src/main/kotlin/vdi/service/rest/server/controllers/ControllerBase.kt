@@ -15,7 +15,18 @@ sealed class ControllerBase(val request: ContainerRequest) {
   val maybeUserID by lazy { maybeUser?.userId?.toUserID() }
 
   val user: UserInfo by lazy { UserProvider.lookupUser(request).orElseThrow() }
-  val userID by lazy { UserID(user.userId) }
+
+  private var actualUserID: UserID? = null
+
+  var userID: UserID
+    get() {
+      if (actualUserID == null)
+        actualUserID = UserID(user.userId)
+      return actualUserID!!
+    }
+    protected set(value) {
+      actualUserID = value
+    }
 
   fun createURL(path: String): String =
     urlBase.resolve(path).toString()

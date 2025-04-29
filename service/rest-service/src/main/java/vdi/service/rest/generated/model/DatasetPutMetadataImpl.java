@@ -26,7 +26,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   private String name;
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeRequestBody datasetType;
+  private DatasetTypeInput datasetType;
 
   @JsonProperty(JsonField.SHORT_NAME)
   private String shortName;
@@ -72,12 +72,12 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeRequestBody getDatasetType() {
+  public DatasetTypeInput getDatasetType() {
     return this.datasetType;
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeRequestBody datasetType) {
+  public void setDatasetType(DatasetTypeInput datasetType) {
     this.datasetType = datasetType;
   }
 

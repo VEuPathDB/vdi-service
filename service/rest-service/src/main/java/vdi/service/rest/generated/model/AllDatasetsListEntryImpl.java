@@ -35,7 +35,7 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   private Long owner;
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeResponseBody datasetType;
+  private DatasetTypeOutput datasetType;
 
   @JsonProperty(JsonField.VISIBILITY)
   private DatasetVisibility visibility;
@@ -97,12 +97,12 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeResponseBody getDatasetType() {
+  public DatasetTypeOutput getDatasetType() {
     return this.datasetType;
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeResponseBody datasetType) {
+  public void setDatasetType(DatasetTypeOutput datasetType) {
     this.datasetType = datasetType;
   }
 

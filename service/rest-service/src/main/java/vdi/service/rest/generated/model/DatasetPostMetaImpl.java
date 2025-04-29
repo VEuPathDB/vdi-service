@@ -32,7 +32,7 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   private String name;
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeRequestBody datasetType;
+  private DatasetTypeInput datasetType;
 
   @JsonProperty(JsonField.ORIGIN)
   private String origin;
@@ -90,12 +90,12 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeRequestBody getDatasetType() {
+  public DatasetTypeInput getDatasetType() {
     return this.datasetType;
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeRequestBody datasetType) {
+  public void setDatasetType(DatasetTypeInput datasetType) {
     this.datasetType = datasetType;
   }
 

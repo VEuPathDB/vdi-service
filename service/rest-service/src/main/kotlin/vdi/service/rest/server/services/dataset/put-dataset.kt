@@ -3,7 +3,6 @@ package vdi.service.rest.server.services.dataset
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevisionAction
@@ -68,7 +67,7 @@ internal fun <T: ControllerBase> T.putDataset(
 
   val (tempDirectory, uploadFile) = CacheDB().initializeDataset(userID, newDatasetID, meta) {
     try {
-      request.fetchDatasetFile(userID)
+      fetchDatasetFile(request)
     } catch (e: Throwable) {
       CacheDB().withTransaction { t ->
         t.updateImportControl(datasetID, DatasetImportStatus.Failed)
@@ -97,9 +96,9 @@ private fun DatasetID.incrementRevision() =
       ?: DatasetID("$raw.1")
   }
 
-private fun DatasetPutRequestBody.fetchDatasetFile(userID: UserID): FileReference =
-  file?.let {
+private fun <T: ControllerBase> T.fetchDatasetFile(body: DatasetPutRequestBody): FileReference =
+  body.file?.let {
     TempFiles.makeTempPath(it.name)
       .also { (_, tmpFile) -> it.copyTo(tmpFile.toFile(), true) }
       .let { (tmpDir, tmpFile) -> FileReference(tmpDir, tmpFile) }
-  } ?: downloadRemoteFile(url.toURL(), userID)
+  } ?: downloadRemoteFile(body.url.toURL(), userID)

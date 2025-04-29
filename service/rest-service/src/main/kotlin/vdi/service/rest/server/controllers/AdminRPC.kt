@@ -1,8 +1,10 @@
 package vdi.service.rest.server.controllers
 
+import jakarta.ws.rs.core.Context
 import vdi.lib.install.cleanup.InstallCleaner
 import vdi.lib.install.cleanup.ReinstallTarget
 import kotlinx.coroutines.runBlocking
+import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
@@ -28,7 +30,7 @@ import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcInstallsClearFa
 
 @AdminRequired
 @Authenticated(adminOverride = ALLOW_ALWAYS)
-class AdminRPC : AdminRpc {
+class AdminRPC(@Context request: ContainerRequest): AdminRpc, ControllerBase(request) {
 
   override fun postAdminRpcDatasetsProxyUpload(
     userId: Long?,
@@ -45,7 +47,7 @@ class AdminRPC : AdminRpc {
       }
     }
 
-    val userID = userId.toUserID()
+    userID = userId.toUserID()
 
     with (UserProvider.getUsersById(listOf(userID.toLong()))) {
       if (isEmpty() || get(userID.toLong())?.isGuest != false)
@@ -54,7 +56,7 @@ class AdminRPC : AdminRpc {
 
     val datasetID = runBlocking { DatasetID() }
 
-    createDataset(userID, datasetID, entity)
+    createDataset(datasetID, entity)
 
     return ProxyUploadResponse.respond200WithApplicationJson(DatasetPostResponseBody(datasetID))
   }

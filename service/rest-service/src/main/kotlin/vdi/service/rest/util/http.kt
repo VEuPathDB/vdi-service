@@ -7,7 +7,7 @@ import java.net.MalformedURLException
 import java.net.URI
 import java.net.URL
 
-internal data class URLFetchResult(val status: Int, val body: InputStream?) : AutoCloseable {
+internal data class URLFetchResult(val status: Int, val fileName: String?, val body: InputStream?) : AutoCloseable {
   inline val isSuccess get() = status in 200 .. 299
 
   inline val hasBody get() = body != null
@@ -39,12 +39,15 @@ internal fun URL.fetchContent(): URLFetchResult {
 
     try {
       val code = con.responseCode
+      val name = con.headerFields["Content-Disposition"]
+        ?.firstOrNull { it.startsWith("filename=") }
+        ?.substringAfter('=')
 
       if (code in 200 .. 299)
-        return URLFetchResult(code, con.inputStream)
+        return URLFetchResult(code, name, con.inputStream)
 
       if (code !in 300 .. 399)
-        return URLFetchResult(code, con.errorStream)
+        return URLFetchResult(code, null, con.errorStream)
 
       val location = con.getHeaderField("Location")
         ?: throw URLFetchException("remote server responded with a 3xx status code but no redirect location")

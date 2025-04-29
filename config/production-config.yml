@@ -25,8 +25,8 @@ containerCore:
       clientId: ${env:OAUTH_CLIENT_ID}
       clientSecret: ${env:OAUTH_CLIENT_SECRET}
       url: https://eupathdb.org/oauth
-      keyStoreFile: ${env:KEY_STORE_FILE}
-      keyStorePass: ${env:KEY_STORE_PASS_PHRASE}
+      keystoreFile: ${env:KEY_STORE_FILE}
+      keystorePass: ${env:KEY_STORE_PASS_PHRASE}
     adminToken: ${env:ADMIN_AUTH_TOKEN}
 
 vdi:

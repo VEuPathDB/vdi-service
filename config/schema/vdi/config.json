@@ -135,7 +135,8 @@
         "poolSize": {
           "type": "integer",
           "minimum": 1,
-          "default": 255
+          "maximum": 255,
+          "default": 5
         }
       },
       "required": [

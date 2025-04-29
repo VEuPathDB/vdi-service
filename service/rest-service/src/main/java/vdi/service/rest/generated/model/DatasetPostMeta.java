@@ -16,10 +16,10 @@ public interface DatasetPostMeta {
   void setName(String name);
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  DatasetTypeRequestBody getDatasetType();
+  DatasetTypeInput getDatasetType();
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  void setDatasetType(DatasetTypeRequestBody datasetType);
+  void setDatasetType(DatasetTypeInput datasetType);
 
   @JsonProperty(JsonField.ORIGIN)
   String getOrigin();

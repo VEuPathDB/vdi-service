@@ -14,6 +14,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
+import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import java.net.MalformedURLException
 import java.net.URL
@@ -33,7 +34,7 @@ import vdi.lib.db.cache.withTransaction
 import vdi.lib.db.model.SyncControlRecord
 import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
-import vdi.service.rest.Options
+import vdi.service.rest.ServiceConfig
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.services.users.getCurrentQuotaUsage
@@ -104,19 +105,22 @@ fun <T: ControllerBase> T.uploadFiles(
   TempFiles.withTempDirectory { directory ->
     TempFiles.withTempPath { archive ->
       try {
-        logger.debug("Verifying file sizes for dataset {}/{} to ensure the user quota is not exceeded.", userID, datasetID)
+        logger.debug("{}/{}: verifying user storage quota is not exceeded", userID, datasetID)
         verifyFileSize(uploadFile)
 
-        logger.debug("Repacking input file for dataset {}/{}.", userID, datasetID)
+        logger.debug("{}/{}: (re)packing input file", userID, datasetID)
         val sizes = uploadFile.repack(into = archive, using = directory, logger = logger)
 
-        logger.debug("uploading raw user data to S3 for new dataset {}/{}", userID, datasetID)
+        logger.debug("{}/{}: uploading manifest", userID, datasetID)
+        DatasetStore.putManifest(userID, datasetID, VDIDatasetManifest(sizes, emptyList()))
+
+        logger.debug("{}/{}: uploading raw user data", userID, datasetID)
         DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
 
         CacheDB().withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
       } catch (e: Throwable) {
         if (e is WebApplicationException && (e.response?.status ?: 500) in 400..499) {
-          logger.info("rejecting user dataset upload for user error: {}", e.message)
+          logger.info("rejecting dataset upload for user error: {}", e.message)
           CacheDB().withTransaction {
             it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
             e.message?.let { msg -> it.tryInsertImportMessages(datasetID, msg) }
@@ -136,7 +140,7 @@ fun <T: ControllerBase> T.uploadFiles(
   }
 
   try {
-    logger.debug("uploading dataset metadata to S3 for new dataset {}/{}", userID, datasetID)
+    logger.debug("{}/{}: uploading dataset metadata", userID, datasetID)
     DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
   } catch (e: Throwable) {
     logger.error("user dataset meta file upload to minio failed: ", e)
@@ -148,11 +152,11 @@ fun <T: ControllerBase> T.uploadFiles(
 fun <T: ControllerBase> T.verifyFileSize(file: Path) {
   val fileSize = file.fileSize()
 
-  if (fileSize > Options.Quota.maxUploadSize.toLong())
+  if (fileSize > ServiceConfig.Quota.maxUploadSize.toLong())
     throw BadRequestException("upload file size larger than the max permitted file size of "
-    + Options.Quota.maxUploadSize.toString() + " bytes")
+    + ServiceConfig.Quota.maxUploadSize.toString() + " bytes")
 
-  val remainingUploadAllowance = getUserRemainingQuota(userID)
+  val remainingUploadAllowance = getUserRemainingQuota()
 
   if (fileSize > remainingUploadAllowance)
     throw BadRequestException(
@@ -307,7 +311,10 @@ private fun Path.validateZip() {
 
 // region Dataset File Retrieval
 
-data class FileReference(val tempDirectory: Path, val tempFile: Path)
+data class FileReference(
+  val tempDirectory: Path,
+  val tempFile: Path,
+)
 
 /**
  * Attempts to download a file from a remote server by user-provided URL.
@@ -330,18 +337,10 @@ data class FileReference(val tempDirectory: Path, val tempFile: Path)
  * * An IO error occurred while downloading the remote file.
  */
 @OptIn(ExperimentalPathApi::class)
-fun downloadRemoteFile(url: URL, userID: UserID): FileReference {
-  val logger = logger("create-dataset")
+fun <T: ControllerBase> T.downloadRemoteFile(url: URL, userID: UserID): FileReference {
+  val logger = logger
 
   logger.info("attempting to download a remote file from {}", url)
-
-  // If the user gave us a URL then we have to download the contents of that
-  // URL to a local file to be uploaded.   This is done now instead of piping
-  // directly to the object store to catch errors in a place that we can report
-  // useful errors back to the user.
-  val fileName = url.safeFilename()
-    .takeUnless { it.isBlank() }
-    ?: (url.host.replace('.', '_') + "_download")
 
   val response = try { url.fetchContent() }
   catch (e: URLFetchException) { throw FailedDependencyException(url.toString(), e.message, e) }
@@ -366,11 +365,15 @@ fun downloadRemoteFile(url: URL, userID: UserID): FileReference {
   if (!response.hasBody)
     throw FailedDependencyException(url, "remote server returned code ${response.status} with no content")
 
+  val fileName = response.fileName
+    ?: url.safeFilename().takeUnless { it.isBlank() }
+    ?: (url.host.replace('.', '_') + "_download")
+
   val (tmpDir, tmpFile) = TempFiles.makeTempPath(fileName)
 
   // Try to download the file from the source URL.
   try {
-    val maxUploadSize = min(getUserRemainingQuota(userID), JaxRSMultipartUpload.maxFileUploadSize)
+    val maxUploadSize = min(getUserRemainingQuota(), JaxRSMultipartUpload.maxFileUploadSize)
 
     BoundedInputStream(maxUploadSize, response.body!!) {
       val message = if (maxUploadSize < JaxRSMultipartUpload.maxFileUploadSize)
@@ -403,8 +406,8 @@ fun String.toURL() =
 
 private fun FailedDependencyException(url: URL, msg: String) = FailedDependencyException(url.toString(), msg)
 
-private fun getUserRemainingQuota(userID: UserID): Long =
-  max(0L, Options.Quota.quotaLimit.toLong() - getCurrentQuotaUsage(userID))
+private fun <T: ControllerBase> T.getUserRemainingQuota(): Long =
+  max(0L, ServiceConfig.Quota.quotaLimit.toLong() - getCurrentQuotaUsage())
 
 /**
  * Special handling for AWS urls that contain an Expires query parameter.  If

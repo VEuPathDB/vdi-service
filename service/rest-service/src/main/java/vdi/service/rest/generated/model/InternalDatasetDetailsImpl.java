@@ -33,7 +33,7 @@ import java.util.List;
 })
 public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeResponseBody datasetType;
+  private DatasetTypeOutput datasetType;
 
   @JsonProperty(JsonField.OWNER)
   private Long owner;
@@ -93,12 +93,12 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   private List<String> installFiles;
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeResponseBody getDatasetType() {
+  public DatasetTypeOutput getDatasetType() {
     return this.datasetType;
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeResponseBody datasetType) {
+  public void setDatasetType(DatasetTypeOutput datasetType) {
     this.datasetType = datasetType;
   }
 

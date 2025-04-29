@@ -4,7 +4,8 @@ import vdi.service.rest.generated.model.DatasetVisibility
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 
 fun DatasetVisibility(vis: VDIDatasetVisibility) = when (vis) {
-  VDIDatasetVisibility.Private   -> DatasetVisibility.PRIVATE
-  VDIDatasetVisibility.Protected -> DatasetVisibility.PROTECTED
-  VDIDatasetVisibility.Public    -> DatasetVisibility.PUBLIC
+  VDIDatasetVisibility.Private    -> DatasetVisibility.PRIVATE
+  VDIDatasetVisibility.Protected  -> DatasetVisibility.PROTECTED
+  VDIDatasetVisibility.Controlled -> DatasetVisibility.CONTROLLED
+  VDIDatasetVisibility.Public     -> DatasetVisibility.PUBLIC
 }
