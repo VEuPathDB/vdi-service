@@ -10,7 +10,7 @@ internal data class VDDatasetFilePathImpl(
   override val fileName: String
 ) : VDDatasetFilePath {
   override val isMetaFile
-    get() = fileName == S3File.MetadataFileName
+    get() = fileName == S3File.Metadata
 
   override val isManifestFile
     get() = fileName == S3File.Manifest

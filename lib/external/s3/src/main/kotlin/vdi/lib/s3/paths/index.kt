@@ -88,7 +88,7 @@ private fun Iterator<String>.toDatasetFilePathOrNull(
 
   // Ensure the given path segment is one of the expected file names.
   return when (segment) {
-    S3File.MetadataFileName,
+    S3File.Metadata,
     S3File.Manifest,
     S3File.RawUploadZip,
     S3File.ImportReadyZipName,

@@ -25,7 +25,7 @@ internal class ReconciliationContext(
 
   // eagerly load metadata to fail fast if absent
   val meta = safeExec("failed to load metadata") { datasetDirectory.getMetaFile().load() }
-    .require(this, "missing ${S3File.MetadataFileName} file")
+    .require(this, "missing ${S3File.Metadata} file")
 
   val manifest by lazy { safeExec("failed to load manifest") { datasetDirectory.getManifestFile().load() } }
   val hasManifest

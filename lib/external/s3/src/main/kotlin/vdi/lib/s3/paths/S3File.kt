@@ -20,7 +20,7 @@ enum class S3File(val baseName: String) {
    */
   InstallReadyZipName("install-ready.zip"),
 
-  MetadataFileName(DatasetMetaFilename),
+  Metadata(DatasetMetaFilename),
 
   Manifest(DatasetManifestFilename),
 
