@@ -74,11 +74,11 @@ internal class EagerlyLoadedDatasetDirectory(
         when (subPath) {
           S3File.Metadata -> metaFile = DatasetMetaFileImpl(it)
           S3File.Manifest -> manifest = DatasetManifestFileImpl(it)
-          S3File.RawUploadZip     -> uploadFile = DatasetRawUploadFileImpl(it)
-          S3File.ImportReadyZipName -> importableFile = DatasetImportableFileImpl(it)
-          S3File.InstallReadyZipName  -> installableFile = DatasetInstallableFileImpl(it)
-          S3File.DeleteFlagFileName -> deleteFlag = DatasetDeleteFlagFileImpl(it)
-          S3File.RevisionFlag       -> revisedFlag = DatasetRevisionFlagFileImpl(it)
+          S3File.RawUploadZip    -> uploadFile = DatasetRawUploadFileImpl(it)
+          S3File.ImportReadyZip  -> importableFile = DatasetImportableFileImpl(it)
+          S3File.InstallReadyZip -> installableFile = DatasetInstallableFileImpl(it)
+          S3File.DeleteFlag      -> deleteFlag = DatasetDeleteFlagFileImpl(it)
+          S3File.RevisionFlag    -> revisedFlag = DatasetRevisionFlagFileImpl(it)
           else                      -> throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
         }
       }

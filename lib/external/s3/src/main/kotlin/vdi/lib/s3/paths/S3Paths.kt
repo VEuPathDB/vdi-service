@@ -4,9 +4,9 @@ import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.lib.s3.paths.S3File.DeleteFlagFileName
-import vdi.lib.s3.paths.S3File.ImportReadyZipName
-import vdi.lib.s3.paths.S3File.InstallReadyZipName
+import vdi.lib.s3.paths.S3File.DeleteFlag
+import vdi.lib.s3.paths.S3File.ImportReadyZip
+import vdi.lib.s3.paths.S3File.InstallReadyZip
 import vdi.lib.s3.paths.S3File.RawUploadZip
 import vdi.lib.s3.paths.S3File.RevisionFlag
 import vdi.lib.s3.paths.S3File.ShareOffer
@@ -68,7 +68,7 @@ object S3Paths {
    * `{user-id}/{dataset-id}/delete-flag`
    */
   fun datasetDeleteFlagFile(userID: UserID, datasetID: DatasetID) =
-    datasetPath(userID, datasetID).append(DeleteFlagFileName.baseName).toString()
+    datasetPath(userID, datasetID).append(DeleteFlag.baseName).toString()
 
   /**
    * `{user-id}/{dataset-id}/delete-flag`
@@ -80,13 +80,13 @@ object S3Paths {
    * `{user-id}/{dataset-id}/import-ready.zip`
    */
   fun datasetImportReadyFile(userID: UserID, datasetID: DatasetID) =
-    datasetPath(userID, datasetID).append(ImportReadyZipName.baseName).toString()
+    datasetPath(userID, datasetID).append(ImportReadyZip.baseName).toString()
 
   /**
    * `{user-id}/{dataset-id}/install-ready.zip`
    */
   fun datasetInstallReadyFile(userID: UserID, datasetID: DatasetID) =
-    datasetPath(userID, datasetID).append(InstallReadyZipName.baseName).toString()
+    datasetPath(userID, datasetID).append(InstallReadyZip.baseName).toString()
 
   fun datasetRawUploadFile(userID: UserID, datasetID: DatasetID) =
     datasetPath(userID, datasetID).append(RawUploadZip.baseName).toString()

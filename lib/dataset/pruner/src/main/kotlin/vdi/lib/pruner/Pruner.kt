@@ -56,7 +56,7 @@ object Pruner {
     S3File.RevisionFlag,
     S3File.Manifest,
     S3File.RawUploadZip,
-    S3File.ImportReadyZipName,  // TODO: remove this when the async upload process is implemented
+    S3File.ImportReadyZip,  // TODO: remove this when the async upload process is implemented
   )
 
   private val lock = Mutex()

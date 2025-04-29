@@ -91,9 +91,9 @@ private fun Iterator<String>.toDatasetFilePathOrNull(
     S3File.Metadata,
     S3File.Manifest,
     S3File.RawUploadZip,
-    S3File.ImportReadyZipName,
-    S3File.InstallReadyZipName,
-    S3File.DeleteFlagFileName,
+    S3File.ImportReadyZip,
+    S3File.InstallReadyZip,
+    S3File.DeleteFlag,
     -> VDDatasetFilePathImpl(bucket, userID, datasetID, segment)
 
     else -> null

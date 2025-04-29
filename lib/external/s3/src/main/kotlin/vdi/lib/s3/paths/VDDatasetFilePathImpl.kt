@@ -19,13 +19,13 @@ internal data class VDDatasetFilePathImpl(
     get() = fileName == S3File.RawUploadZip
 
   override val isImportReadyFile
-    get() = fileName == S3File.ImportReadyZipName
+    get() = fileName == S3File.ImportReadyZip
 
   override val isInstallReadyFile
-    get() = fileName == S3File.InstallReadyZipName
+    get() = fileName == S3File.InstallReadyZip
 
   override val isDeleteFlagFile
-    get() = fileName == S3File.DeleteFlagFileName
+    get() = fileName == S3File.DeleteFlag
 
   override fun toString() = "$bucketName/$userID/$datasetID/$fileName"
 }

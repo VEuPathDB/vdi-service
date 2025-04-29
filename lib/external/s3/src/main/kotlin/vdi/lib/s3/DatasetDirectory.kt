@@ -96,7 +96,7 @@ interface DatasetDirectory {
 
   /**
    * Tests whether this [DatasetDirectory] currently contains the
-   * [delete flag][S3File.DeleteFlagFileName] file.
+   * [delete flag][S3File.DeleteFlag] file.
    *
    * @return `true` if this dataset contains, or at the time of this method
    * call, contained a delete flag file.
@@ -105,7 +105,7 @@ interface DatasetDirectory {
 
   /**
    * Returns a representation of this [DatasetDirectory]'s
-   * [delete flag][S3File.DeleteFlagFileName] file.
+   * [delete flag][S3File.DeleteFlag] file.
    *
    * This method will return a value regardless of whether the delete flag
    * file exists or existed.  The existence of the file can be tested using the
@@ -114,7 +114,7 @@ interface DatasetDirectory {
   fun getDeleteFlag(): DatasetDeleteFlagFile
 
   /**
-   * Puts a [delete flag][S3File.DeleteFlagFileName] file into this
+   * Puts a [delete flag][S3File.DeleteFlag] file into this
    * [DatasetDirectory].
    *
    * If the file already exists, it will be overwritten with a new flag file
@@ -123,7 +123,7 @@ interface DatasetDirectory {
   fun putDeleteFlag()
 
   /**
-   * Deletes the [delete flag][S3File.DeleteFlagFileName] file from this
+   * Deletes the [delete flag][S3File.DeleteFlag] file from this
    * [DatasetDirectory].
    */
   fun deleteDeleteFlag()

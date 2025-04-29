@@ -34,9 +34,9 @@ internal class DatasetImportableFileImpl(
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
   ) {
-    if (s3Object.baseName != S3File.ImportReadyZipName) {
+    if (s3Object.baseName != S3File.ImportReadyZip) {
       throw IllegalArgumentException("Can only construct a import-ready file from s3 object if object base name is "
-        + S3File.ImportReadyZipName + ". Given path: " + s3Object.path)
+        + S3File.ImportReadyZip + ". Given path: " + s3Object.path)
     }
   }
 }

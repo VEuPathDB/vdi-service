@@ -35,10 +35,10 @@ internal class DatasetRevisionFlagFileImpl(
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
   ) {
-    if (s3Object.baseName != S3File.DeleteFlagFileName) {
+    if (s3Object.baseName != S3File.DeleteFlag) {
       throw IllegalArgumentException(
         "Can only construct a delete flag from s3 object if object base name is "
-          + S3File.DeleteFlagFileName + ". Given path: " + s3Object.path
+          + S3File.DeleteFlag + ". Given path: " + s3Object.path
       )
     }
   }

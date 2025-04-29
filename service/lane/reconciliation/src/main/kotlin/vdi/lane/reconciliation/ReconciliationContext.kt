@@ -31,15 +31,15 @@ internal class ReconciliationContext(
   val hasManifest
     get() = manifest != null
 
-  val hasDeleteFlag by lazy { safeTest(S3File.DeleteFlagFileName) { datasetDirectory.hasDeleteFlag() } }
+  val hasDeleteFlag by lazy { safeTest(S3File.DeleteFlag) { datasetDirectory.hasDeleteFlag() } }
 
   val hasRevisedFlag by lazy { safeTest(S3File.RevisionFlag) {datasetDirectory.hasRevisedFlag() } }
 
   val hasRawUpload by lazy { safeTest(S3File.RawUploadZip) { datasetDirectory.hasUploadFile() } }
 
-  val hasImportReadyData by lazy { safeTest(S3File.ImportReadyZipName) { datasetDirectory.hasImportReadyFile() } }
+  val hasImportReadyData by lazy { safeTest(S3File.ImportReadyZip) { datasetDirectory.hasImportReadyFile() } }
 
-  val hasInstallReadyData by lazy { safeTest(S3File.InstallReadyZipName) { datasetDirectory.hasInstallReadyFile() } }
+  val hasInstallReadyData by lazy { safeTest(S3File.InstallReadyZip) { datasetDirectory.hasInstallReadyFile() } }
 
   var importControl: DatasetImportStatus? = null
 

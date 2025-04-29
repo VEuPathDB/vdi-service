@@ -56,7 +56,7 @@ object DatasetStore {
 
         out.computeIfAbsent(datasetID) { 0 }
 
-        if (it.path.endsWith(S3File.ImportReadyZipName))
+        if (it.path.endsWith(S3File.ImportReadyZip))
           out[datasetID] = it.size
       }
 
