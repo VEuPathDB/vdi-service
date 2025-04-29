@@ -1,6 +1,5 @@
 package vdi.lib.s3
 
-import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID

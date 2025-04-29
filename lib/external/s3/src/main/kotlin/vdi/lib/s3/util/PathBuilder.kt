@@ -27,8 +27,7 @@ internal class PathBuilder(root: String, segments: Int = 8, private val delimite
     return this
   }
 
-  @Suppress("NOTHING_TO_INLINE")
-  inline operator fun plus(segment: String) = append(segment)
+  fun dirPath() = append("").toString()
 
   override fun toString(): String {
     val sb = StringBuilder(calcSize())

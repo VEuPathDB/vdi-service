@@ -11,11 +11,11 @@ internal data class VDDatasetShareFilePathImpl(
   override val fileName: String
 ) : VDDatasetShareFilePath {
   override val isOffer
-    get() = fileName == S3Paths.ShareOfferFileName
+    get() = fileName == S3File.ShareOfferFileName
 
   override val isReceipt
-    get() = fileName == S3Paths.ShareReceiptFileName
+    get() = fileName == S3File.ShareReceipt
 
   override fun toString() =
-    "$bucketName/$userID/$datasetID/${S3Paths.SharesDirName}/$recipientID/$fileName"
+    "$bucketName/$userID/$datasetID/${S3File.SharesDirName}/$recipientID/$fileName"
 }

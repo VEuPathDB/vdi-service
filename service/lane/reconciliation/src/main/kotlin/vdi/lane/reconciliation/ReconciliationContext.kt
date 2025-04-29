@@ -4,7 +4,7 @@ import org.slf4j.Logger
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.kafka.EventSource
 import vdi.lib.s3.DatasetDirectory
-import vdi.lib.s3.paths.S3Paths
+import vdi.lib.s3.paths.S3File
 import vdi.lane.reconciliation.util.require
 import vdi.lane.reconciliation.util.safeExec
 import vdi.lane.reconciliation.util.safeTest
@@ -25,21 +25,21 @@ internal class ReconciliationContext(
 
   // eagerly load metadata to fail fast if absent
   val meta = safeExec("failed to load metadata") { datasetDirectory.getMetaFile().load() }
-    .require(this, "missing ${S3Paths.MetadataFileName} file")
+    .require(this, "missing ${S3File.MetadataFileName} file")
 
   val manifest by lazy { safeExec("failed to load manifest") { datasetDirectory.getManifestFile().load() } }
   val hasManifest
     get() = manifest != null
 
-  val hasDeleteFlag by lazy { safeTest(S3Paths.DeleteFlagFileName) { datasetDirectory.hasDeleteFlag() } }
+  val hasDeleteFlag by lazy { safeTest(S3File.DeleteFlagFileName) { datasetDirectory.hasDeleteFlag() } }
 
-  val hasRevisedFlag by lazy { safeTest(S3Paths.RevisionFlagFileName) {datasetDirectory.hasRevisedFlag() } }
+  val hasRevisedFlag by lazy { safeTest(S3File.RevisionFlagFileName) {datasetDirectory.hasRevisedFlag() } }
 
-  val hasRawUpload by lazy { safeTest(S3Paths.RawUploadZipName) { datasetDirectory.hasUploadFile() } }
+  val hasRawUpload by lazy { safeTest(S3File.RawUploadZipName) { datasetDirectory.hasUploadFile() } }
 
-  val hasImportReadyData by lazy { safeTest(S3Paths.ImportReadyZipName) { datasetDirectory.hasImportReadyFile() } }
+  val hasImportReadyData by lazy { safeTest(S3File.ImportReadyZipName) { datasetDirectory.hasImportReadyFile() } }
 
-  val hasInstallReadyData by lazy { safeTest(S3Paths.InstallReadyZipName) { datasetDirectory.hasInstallReadyFile() } }
+  val hasInstallReadyData by lazy { safeTest(S3File.InstallReadyZipName) { datasetDirectory.hasInstallReadyFile() } }
 
   var importControl: DatasetImportStatus? = null
 

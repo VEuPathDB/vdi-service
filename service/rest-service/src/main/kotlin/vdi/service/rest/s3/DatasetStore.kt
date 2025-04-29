@@ -14,7 +14,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
-import vdi.lib.s3.paths.S3Paths
+import vdi.lib.s3.paths.S3File
 import java.io.InputStream
 import vdi.service.rest.ServiceConfig
 
@@ -38,25 +38,25 @@ object DatasetStore {
   fun getDatasetMeta(userID: UserID, datasetID: DatasetID): VDIDatasetMeta? {
     log.debug("fetching dataset meta file for dataset {}/{}", userID, datasetID)
 
-    return bucket.objects.open(S3Paths.datasetMetaFile(userID, datasetID))
+    return bucket.objects.open(S3File.datasetMetaFile(userID, datasetID))
       ?.use { JSON.readValue<VDIDatasetMeta>(it.stream) }
   }
 
   fun getImportReadyZipSize(userID: UserID, datasetID: DatasetID) =
-    bucket.objects[S3Paths.datasetImportReadyFile(userID, datasetID)]?.size ?: -1L
+    bucket.objects[S3File.datasetImportReadyFile(userID, datasetID)]?.size ?: -1L
 
   fun listDatasetImportReadyZipSizes(userID: UserID): Map<DatasetID, Long> {
     log.debug("fetching upload size totals across all datasets for user {}", userID)
 
     val out = HashMap<DatasetID, Long>()
 
-    bucket.objects.list(S3Paths.userDir(userID))
+    bucket.objects.list(S3File.userDir(userID))
       .forEach {
         val datasetID = it.path.getDatasetIDFromPath()
 
         out.computeIfAbsent(datasetID) { 0 }
 
-        if (it.path.endsWith(S3Paths.ImportReadyZipName))
+        if (it.path.endsWith(S3File.ImportReadyZipName))
           out[datasetID] = it.size
       }
 
@@ -65,45 +65,45 @@ object DatasetStore {
 
   fun getImportReadyZip(userID: UserID, datasetID: DatasetID): StreamObject? {
     log.debug("fetching upload zip for dataset {}/{}", userID, datasetID)
-    return bucket.objects.open(S3Paths.datasetImportReadyFile(userID, datasetID))
+    return bucket.objects.open(S3File.datasetImportReadyFile(userID, datasetID))
   }
 
   fun getInstallReadyZipSize(userID: UserID, datasetID: DatasetID) =
-    bucket.objects[S3Paths.datasetInstallReadyFile(userID, datasetID)]?.size ?: -1L
+    bucket.objects[S3File.datasetInstallReadyFile(userID, datasetID)]?.size ?: -1L
 
   fun getInstallReadyZip(userID: UserID, datasetID: DatasetID): StreamObject? {
     log.debug("fetching install-ready zip for dataset {}/{}", userID, datasetID)
-    return bucket.objects.open(S3Paths.datasetInstallReadyFile(userID, datasetID))
+    return bucket.objects.open(S3File.datasetInstallReadyFile(userID, datasetID))
   }
 
   fun putDatasetMeta(userID: UserID, datasetID: DatasetID, meta: VDIDatasetMeta) {
     log.debug("uploading dataset meta file for dataset {}/{}", userID, datasetID)
-    bucket.objects.put(S3Paths.datasetMetaFile(userID, datasetID), meta.toJSONString().byteInputStream())
+    bucket.objects.put(S3File.datasetMetaFile(userID, datasetID), meta.toJSONString().byteInputStream())
   }
 
   fun putImportReadyZip(userID: UserID, datasetID: DatasetID, fn: () -> InputStream) {
     log.debug("uploading import-ready zip for dataset {}/{}", userID, datasetID)
-    fn().use { bucket.objects[S3Paths.datasetImportReadyFile(userID, datasetID)] = it }
+    fn().use { bucket.objects[S3File.datasetImportReadyFile(userID, datasetID)] = it }
   }
 
   fun putShareOffer(userID: UserID, datasetID: DatasetID, recipientID: UserID, offer: VDIDatasetShareOffer) {
     log.debug("uploading share offer for owner {}, dataset {}, recipient {}, action {}", userID, datasetID, recipientID, offer.action)
-    bucket.objects.put(S3Paths.datasetShareOfferFile(userID, datasetID, recipientID), offer.toJSONString().byteInputStream())
+    bucket.objects.put(S3File.datasetShareOfferFile(userID, datasetID, recipientID), offer.toJSONString().byteInputStream())
   }
 
   fun putShareReceipt(userID: UserID, datasetID: DatasetID, recipientID: UserID, receipt: VDIDatasetShareReceipt) {
     log.debug("uploading share receipt for owner {}, dataset {}, recipient {}, action {}", userID, datasetID, recipientID, receipt.action)
-    bucket.objects.put(S3Paths.datasetShareReceiptFile(userID, datasetID, recipientID), receipt.toJSONString().byteInputStream())
+    bucket.objects.put(S3File.datasetShareReceiptFile(userID, datasetID, recipientID), receipt.toJSONString().byteInputStream())
   }
 
   fun putDeleteFlag(userID: UserID, datasetID: DatasetID) {
     log.debug("uploading soft-delete flag for dataset {}/{}", userID, datasetID)
-    bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID)) { overwrite = true }
+    bucket.objects.touch(S3File.datasetDeleteFlagFile(userID, datasetID)) { overwrite = true }
   }
 
   fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> {
     log.debug("listing objects at prefix {}/{}", userID, datasetID)
-    return bucket.objects.list(prefix = S3Paths.datasetDir(userID, datasetID))
+    return bucket.objects.list(prefix = S3File.datasetDir(userID, datasetID))
   }
 
   fun streamAll() = bucket.objects.streamAll().stream()

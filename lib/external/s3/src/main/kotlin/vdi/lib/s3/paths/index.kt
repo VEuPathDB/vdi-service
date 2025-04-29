@@ -36,7 +36,7 @@ fun String.toVDPathOrNull(): VDPath? {
   // of the dataset shares directory.
   val segment = it.next()
 
-  return if (segment == S3Paths.SharesDirName)
+  return if (segment == S3File.SharesDirName)
     it.toDatasetSharePathOrNull(bucket, userID, datasetID)
   else
     it.toDatasetFilePathOrNull(bucket, userID, datasetID, segment)
@@ -63,8 +63,8 @@ private fun Iterator<String>.toDatasetSharePathOrNull(
 
   // Ensure the next segment is one of the valid file names.
   return when (val it = next()) {
-    S3Paths.ShareOfferFileName,
-    S3Paths.ShareReceiptFileName,
+    S3File.ShareOfferFileName,
+    S3File.ShareReceipt,
     -> VDDatasetShareFilePathImpl(bucket, userID, datasetID, recipientID, it)
 
     else -> null
@@ -88,12 +88,12 @@ private fun Iterator<String>.toDatasetFilePathOrNull(
 
   // Ensure the given path segment is one of the expected file names.
   return when (segment) {
-    S3Paths.MetadataFileName,
-    S3Paths.ManifestFileName,
-    S3Paths.RawUploadZipName,
-    S3Paths.ImportReadyZipName,
-    S3Paths.InstallReadyZipName,
-    S3Paths.DeleteFlagFileName,
+    S3File.MetadataFileName,
+    S3File.ManifestFileName,
+    S3File.RawUploadZipName,
+    S3File.ImportReadyZipName,
+    S3File.InstallReadyZipName,
+    S3File.DeleteFlagFileName,
     -> VDDatasetFilePathImpl(bucket, userID, datasetID, segment)
 
     else -> null

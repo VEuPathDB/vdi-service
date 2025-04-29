@@ -10,22 +10,22 @@ internal data class VDDatasetFilePathImpl(
   override val fileName: String
 ) : VDDatasetFilePath {
   override val isMetaFile
-    get() = fileName == S3Paths.MetadataFileName
+    get() = fileName == S3File.MetadataFileName
 
   override val isManifestFile
-    get() = fileName == S3Paths.ManifestFileName
+    get() = fileName == S3File.ManifestFileName
 
   override val isRawUploadFile
-    get() = fileName == S3Paths.RawUploadZipName
+    get() = fileName == S3File.RawUploadZipName
 
   override val isImportReadyFile
-    get() = fileName == S3Paths.ImportReadyZipName
+    get() = fileName == S3File.ImportReadyZipName
 
   override val isInstallReadyFile
-    get() = fileName == S3Paths.InstallReadyZipName
+    get() = fileName == S3File.InstallReadyZipName
 
   override val isDeleteFlagFile
-    get() = fileName == S3Paths.DeleteFlagFileName
+    get() = fileName == S3File.DeleteFlagFileName
 
   override fun toString() = "$bucketName/$userID/$datasetID/$fileName"
 }

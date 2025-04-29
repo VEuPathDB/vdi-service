@@ -7,4 +7,5 @@ sealed interface VDPath {
   val bucketName: String
   val userID: UserID
   val datasetID: DatasetID
+  val file: S3File
 }

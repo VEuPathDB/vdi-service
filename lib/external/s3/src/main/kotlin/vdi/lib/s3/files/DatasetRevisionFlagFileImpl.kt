@@ -2,7 +2,7 @@ package vdi.lib.s3.files
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object
-import vdi.lib.s3.paths.S3Paths
+import vdi.lib.s3.paths.S3File
 import java.io.InputStream
 import java.time.OffsetDateTime
 
@@ -35,10 +35,10 @@ internal class DatasetRevisionFlagFileImpl(
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
   ) {
-    if (s3Object.baseName != S3Paths.DeleteFlagFileName) {
+    if (s3Object.baseName != S3File.DeleteFlagFileName) {
       throw IllegalArgumentException(
         "Can only construct a delete flag from s3 object if object base name is "
-          + S3Paths.DeleteFlagFileName + ". Given path: " + s3Object.path
+          + S3File.DeleteFlagFileName + ". Given path: " + s3Object.path
       )
     }
   }

@@ -11,7 +11,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import vdi.lib.s3.exception.MalformedDatasetException
 import vdi.lib.s3.files.*
 import vdi.lib.s3.paths.S3DatasetPathFactory
-import vdi.lib.s3.paths.S3Paths
+import vdi.lib.s3.paths.S3File
 import java.io.InputStream
 
 /**
@@ -57,14 +57,14 @@ internal class EagerlyLoadedDatasetDirectory(
       objects.forEach {
         val subPath = it.path.trimIDPrefix()
 
-        if (subPath.startsWith(S3Paths.SharesDirName)) {
+        if (subPath.startsWith(S3File.SharesDirName)) {
           subPath.splitSharePath()?.also { (recipient, file) ->
             val ref = shareRefs.computeIfAbsent(recipient) { ShareRef(recipient) }
 
             when (file) {
-              S3Paths.ShareOfferFileName -> ref.offer = it
-              S3Paths.ShareReceiptFileName -> ref.receipt = it
-              else -> return@also // Fall through to the 'when' block
+              S3File.ShareOfferFileName -> ref.offer = it
+              S3File.ShareReceipt       -> ref.receipt = it
+              else                      -> return@also // Fall through to the 'when' block
             }
 
             return@forEach // Continue to the next s3 object
@@ -72,14 +72,14 @@ internal class EagerlyLoadedDatasetDirectory(
         }
 
         when (subPath) {
-          S3Paths.MetadataFileName     -> metaFile = DatasetMetaFileImpl(it)
-          S3Paths.ManifestFileName     -> manifest = DatasetManifestFileImpl(it)
-          S3Paths.RawUploadZipName     -> uploadFile = DatasetRawUploadFileImpl(it)
-          S3Paths.ImportReadyZipName   -> importableFile = DatasetImportableFileImpl(it)
-          S3Paths.InstallReadyZipName  -> installableFile = DatasetInstallableFileImpl(it)
-          S3Paths.DeleteFlagFileName   -> deleteFlag = DatasetDeleteFlagFileImpl(it)
-          S3Paths.RevisionFlagFileName -> revisedFlag = DatasetRevisionFlagFileImpl(it)
-          else -> throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
+          S3File.MetadataFileName     -> metaFile = DatasetMetaFileImpl(it)
+          S3File.ManifestFileName     -> manifest = DatasetManifestFileImpl(it)
+          S3File.RawUploadZipName     -> uploadFile = DatasetRawUploadFileImpl(it)
+          S3File.ImportReadyZipName   -> importableFile = DatasetImportableFileImpl(it)
+          S3File.InstallReadyZipName  -> installableFile = DatasetInstallableFileImpl(it)
+          S3File.DeleteFlagFileName   -> deleteFlag = DatasetDeleteFlagFileImpl(it)
+          S3File.RevisionFlagFileName -> revisedFlag = DatasetRevisionFlagFileImpl(it)
+          else                        -> throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
         }
       }
 

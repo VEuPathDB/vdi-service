@@ -17,7 +17,7 @@ import vdi.lib.db.cache.withTransaction
 import vdi.lib.s3.DatasetDirectory
 import vdi.lib.s3.DatasetManager
 import vdi.lib.s3.DatasetObjectStore
-import vdi.lib.s3.paths.S3Paths
+import vdi.lib.s3.paths.S3File
 import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import java.time.OffsetDateTime
@@ -53,10 +53,10 @@ object Pruner {
    * history details.
    */
   private val retainedRevisionHistoryFiles = arrayOf(
-    S3Paths.RevisionFlagFileName,
-    S3Paths.ManifestFileName,
-    S3Paths.RawUploadZipName,
-    S3Paths.ImportReadyZipName,  // TODO: remove this when the async upload process is implemented
+    S3File.RevisionFlagFileName,
+    S3File.ManifestFileName,
+    S3File.RawUploadZipName,
+    S3File.ImportReadyZipName,  // TODO: remove this when the async upload process is implemented
   )
 
   private val lock = Mutex()
@@ -358,7 +358,7 @@ object Pruner {
    * @param datasetID ID of the target dataset.
    */
   private fun S3Bucket.pruneAllObjects(ownerID: UserID, datasetID: DatasetID) {
-    objects.list(prefix = S3Paths.datasetDir(ownerID, datasetID))
+    objects.list(prefix = S3File.datasetDir(ownerID, datasetID))
       .map { it.path }
       .let { objects.deleteAll(it) }
   }
@@ -412,7 +412,7 @@ object Pruner {
   private fun S3Bucket.pruneObsoleteRevision(ctx: DeletionContext) {
     ctx.logger.debug("removing unnecessary object store data")
 
-    objects.list(prefix = S3Paths.datasetDir(ctx.ownerID, ctx.datasetID))
+    objects.list(prefix = S3File.datasetDir(ctx.ownerID, ctx.datasetID))
       .asSequence()
       .map { it.path }
       .filterNot { path -> retainedRevisionHistoryFiles.any { path.endsWith(it) } }

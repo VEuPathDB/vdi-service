@@ -7,7 +7,7 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import vdi.lib.s3.files.*
-import vdi.lib.s3.paths.S3Paths
+import vdi.lib.s3.paths.S3File
 import java.io.InputStream
 import java.time.OffsetDateTime
 
@@ -96,7 +96,7 @@ interface DatasetDirectory {
 
   /**
    * Tests whether this [DatasetDirectory] currently contains the
-   * [delete flag][S3Paths.DeleteFlagFileName] file.
+   * [delete flag][S3File.DeleteFlagFileName] file.
    *
    * @return `true` if this dataset contains, or at the time of this method
    * call, contained a delete flag file.
@@ -105,7 +105,7 @@ interface DatasetDirectory {
 
   /**
    * Returns a representation of this [DatasetDirectory]'s
-   * [delete flag][S3Paths.DeleteFlagFileName] file.
+   * [delete flag][S3File.DeleteFlagFileName] file.
    *
    * This method will return a value regardless of whether the delete flag
    * file exists or existed.  The existence of the file can be tested using the
@@ -114,7 +114,7 @@ interface DatasetDirectory {
   fun getDeleteFlag(): DatasetDeleteFlagFile
 
   /**
-   * Puts a [delete flag][S3Paths.DeleteFlagFileName] file into this
+   * Puts a [delete flag][S3File.DeleteFlagFileName] file into this
    * [DatasetDirectory].
    *
    * If the file already exists, it will be overwritten with a new flag file
@@ -123,14 +123,14 @@ interface DatasetDirectory {
   fun putDeleteFlag()
 
   /**
-   * Deletes the [delete flag][S3Paths.DeleteFlagFileName] file from this
+   * Deletes the [delete flag][S3File.DeleteFlagFileName] file from this
    * [DatasetDirectory].
    */
   fun deleteDeleteFlag()
 
   /**
    * Tests whether this [DatasetDirectory] currently contains the
-   * [revised dataset flag][S3Paths.RevisionFlagFileName] file.
+   * [revised dataset flag][S3File.RevisionFlagFileName] file.
    *
    * @return `true` if this dataset contains, or at the time of this method
    * call, contained a revised dataset flag file.
