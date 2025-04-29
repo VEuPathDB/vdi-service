@@ -16,6 +16,8 @@ definitions:
   - VectorBase
   - VEuPathDB
   vdiSchemaPass: &vdiSchemaPass ${env:VDI_APPDB_SCHEMA_PASS}
+  vdiControlSchema: &vdiControlSchema vdi_control_prod_${env:LOCATION_INDICATOR}
+  vdiDataSchema: &vdiDataSchema vdi_datasets_prod_${env:LOCATION_INDICATOR}
 
 containerCore:
   authentication:
@@ -114,95 +116,95 @@ vdi:
       targetName: AmoebaDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_AMOEBA}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     clinepi:
       targetName: ClinEpiDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_CLINEPI}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     crypto:
       targetName: CryptoDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_CRYPTO}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     fungi:
       targetName: FungiDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_FUNGI}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     giardia:
       targetName: GiardiaDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_GIARDIA}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     host:
       targetName: HostDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_HOST}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     microbiome:
       targetName: MicrobiomeDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_MICROBIOME}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     microsporidia:
       targetName: MicrosporidiaDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_MICROSPORIDIA}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     ortho:
       targetName: OrthoMCL
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_ORTHO}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     piroplasma:
       targetName: PiroplasmaDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_PIROPLASMA}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     plasmo:
       targetName: PlasmoDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_PLASMO}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     toxo:
       targetName: ToxoDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_TOXO}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     trich:
       targetName: TrichDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_TRICH}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     tritryp:
       targetName: TriTrypDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_TRITRYP}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     uni:
       targetName: VEuPathDB
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_UNIDB}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
     vector:
       targetName: VectorBase
       pass: *vdiSchemaPass
       ldapCn: ${env:LDAP_VECTOR}
-      dataSchema: vdi_datasets_prod_${env:LOCATION_INDICATOR}
-      controlSchema: vdi_control_prod_${env:LOCATION_INDICATOR}
+      dataSchema: *vdiDataSchema
+      controlSchema: *vdiControlSchema
