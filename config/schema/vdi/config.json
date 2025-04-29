@@ -82,11 +82,13 @@
       ]
     },
     "targetDbs": {
-      "type": "object",
-      "additionalProperties": {
+      "type": "array",
+      "items": {
         "$ref": "/vdi-service/schema/vdi/install-target.json"
       },
-      "minProperties": 1
+      "minItems": 1,
+      "unevaluatedItems": false,
+      "uniqueItems": true
     }
   },
   "required": [
