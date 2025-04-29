@@ -42,5 +42,9 @@ enum class S3File(val baseName: String) {
   ShareReceipt("share-receipt.json"),
   ;
 
+  companion object {
+    fun fromStringOrNull(name: String) =
+      entries.firstOrNull { it.baseName == name }
+  }
 }
 
