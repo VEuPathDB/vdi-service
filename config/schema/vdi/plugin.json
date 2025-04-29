@@ -83,7 +83,7 @@
   "required": [
     "server",
     "displayName",
-    "dataType"
+    "dataTypes"
   ],
   "additionalProperties": false,
   "$defs": {

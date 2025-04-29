@@ -63,45 +63,45 @@ vdi:
   plugins:
   - server: bigwig:80
     displayName: bigWig
-    dataType:
-      name: bigwigfiles
+    dataTypes:
+    - name: bigwigfiles
       version: 1.0
     projectIds: *genomicsProjects
   - server: biom:80
     displayName: BIOM
-    dataType:
-      name: biom
+    dataTypes:
+    - name: biom
       version: 1.0
     projectIds:
     - MicrobiomeDB
   - server: genelist:80
     displayName: Gene List
-    dataType:
-      name: lightweight
+    dataTypes:
+    - name: lightweight
       version: 1.0
     projectIds: *genomicsProjects
   - server: isasimple:80
     displayName: ISA Study
-    dataType:
-      name: isasimple
+    dataTypes:
+    - name: isasimple
       version: 1.0
     projectIds:
     - ClinEpiDB
   - server: noop:80
     displayName: Lightweight
-    dataType:
-      name: lightweight
+    dataTypes:
+    - name: lightweight
       version: 1.0
   - server: phenotype:80
     displayName: Phenotype
-    dataType:
-      name: phenotype
+    dataTypes:
+    - name: phenotype
       version: 1.0
     projectIds: *genomicsProjects
   - server: rnaseq:80
     displayName: RNA-Seq
-    dataType:
-      name: rnaseq
+    dataTypes:
+    - name: rnaseq
       version: 1.0
     projectIds: *genomicsProjects
   targetDbs:
