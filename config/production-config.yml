@@ -61,150 +61,127 @@ vdi:
     pass: ${env:CACHE_DB_PASSWORD}
     host: cache-db:5432
   plugins:
-    bigwig:
-      server: bigwig:80
-      displayName: bigWig
-      dataType:
-        name: bigwigfiles
-        version: 1.0
-      projectIds: *genomicsProjects
-    biom:
-      server: biom:80
-      displayName: BIOM
-      dataType:
-        name: biom
-        version: 1.0
-      projectIds:
-      - MicrobiomeDB
-    genelist:
-      server: genelist:80
-      displayName: Gene List
-      dataType:
-        name: lightweight
-        version: 1.0
-      projectIds: *genomicsProjects
-    isa:
-      server: isasimple:80
-      displayName: ISA Study
-      dataType:
-        name: isasimple
-        version: 1.0
-      projectIds:
-      - ClinEpiDB
-    noop:
-      server: noop:80
-      displayName: Lightweight
-      dataType:
-        name: lightweight
-        version: 1.0
-    phenotype:
-      server: phenotype:80
-      displayName: Phenotype
-      dataType:
-        name: phenotype
-        version: 1.0
-      projectIds: *genomicsProjects
-    rnaSeq:
-      server: rnaseq:80
-      displayName: RNA-Seq
-      dataType:
-        name: rnaseq
-        version: 1.0
-      projectIds: *genomicsProjects
+  - server: bigwig:80
+    displayName: bigWig
+    dataType:
+      name: bigwigfiles
+      version: 1.0
+    projectIds: *genomicsProjects
+  - server: biom:80
+    displayName: BIOM
+    dataType:
+      name: biom
+      version: 1.0
+    projectIds:
+    - MicrobiomeDB
+  - server: genelist:80
+    displayName: Gene List
+    dataType:
+      name: lightweight
+      version: 1.0
+    projectIds: *genomicsProjects
+  - server: isasimple:80
+    displayName: ISA Study
+    dataType:
+      name: isasimple
+      version: 1.0
+    projectIds:
+    - ClinEpiDB
+  - server: noop:80
+    displayName: Lightweight
+    dataType:
+      name: lightweight
+      version: 1.0
+  - server: phenotype:80
+    displayName: Phenotype
+    dataType:
+      name: phenotype
+      version: 1.0
+    projectIds: *genomicsProjects
+  - server: rnaseq:80
+    displayName: RNA-Seq
+    dataType:
+      name: rnaseq
+      version: 1.0
+    projectIds: *genomicsProjects
   targetDbs:
-    amoeba:
-      targetName: AmoebaDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_AMOEBA}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    clinepi:
-      targetName: ClinEpiDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_CLINEPI}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    crypto:
-      targetName: CryptoDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_CRYPTO}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    fungi:
-      targetName: FungiDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_FUNGI}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    giardia:
-      targetName: GiardiaDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_GIARDIA}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    host:
-      targetName: HostDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_HOST}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    microbiome:
-      targetName: MicrobiomeDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_MICROBIOME}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    microsporidia:
-      targetName: MicrosporidiaDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_MICROSPORIDIA}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    ortho:
-      targetName: OrthoMCL
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_ORTHO}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    piroplasma:
-      targetName: PiroplasmaDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_PIROPLASMA}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    plasmo:
-      targetName: PlasmoDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_PLASMO}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    toxo:
-      targetName: ToxoDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_TOXO}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    trich:
-      targetName: TrichDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_TRICH}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    tritryp:
-      targetName: TriTrypDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_TRITRYP}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    uni:
-      targetName: VEuPathDB
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_UNIDB}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
-    vector:
-      targetName: VectorBase
-      pass: *vdiSchemaPass
-      ldapCn: ${env:LDAP_VECTOR}
-      dataSchema: *vdiDataSchema
-      controlSchema: *vdiControlSchema
+  - targetName: AmoebaDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_AMOEBA}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: ClinEpiDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_CLINEPI}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: CryptoDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_CRYPTO}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: FungiDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_FUNGI}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: GiardiaDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_GIARDIA}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: HostDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_HOST}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: MicrobiomeDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_MICROBIOME}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: MicrosporidiaDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_MICROSPORIDIA}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: OrthoMCL
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_ORTHO}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: PiroplasmaDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_PIROPLASMA}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: PlasmoDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_PLASMO}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: ToxoDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_TOXO}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: TrichDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_TRICH}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: TriTrypDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_TRITRYP}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: VEuPathDB
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_UNIDB}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema
+  - targetName: VectorBase
+    pass: *vdiSchemaPass
+    ldapCn: ${env:LDAP_VECTOR}
+    dataSchema: *vdiDataSchema
+    controlSchema: *vdiControlSchema

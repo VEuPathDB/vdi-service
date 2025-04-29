@@ -10,8 +10,16 @@
     "displayName": {
       "type": "string"
     },
-    "dataType": {
-      "$ref": "#/$defs/dataType"
+    "dataTypes": {
+      "title": "Data Types",
+      "description": "Types and versions of dataset data handled by the plugin being defined.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dataType"
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "unevaluatedItems": false
     },
     "customPath": {
       "title": "PATH Extension",

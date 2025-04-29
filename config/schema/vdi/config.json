@@ -58,10 +58,13 @@
       "$ref": "/vdi-service/schema/vdi/object-store.json"
     },
     "plugins": {
-      "type": "object",
-      "additionalProperties": {
+      "type": "array",
+      "items": {
         "$ref": "/vdi-service/schema/vdi/plugin.json"
-      }
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "unevaluatedItems": false
     },
     "rabbit": {
       "type": "object",
