@@ -37,9 +37,9 @@ internal class DatasetManifestFileImpl(
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
   ) {
-    if (s3Object.baseName != S3File.ManifestFileName) {
+    if (s3Object.baseName != S3File.Manifest) {
       throw IllegalArgumentException("Can only construct a manifest file from s3 object if object base name is "
-        + S3File.ManifestFileName + ". Given path: " + s3Object.path)
+        + S3File.Manifest + ". Given path: " + s3Object.path)
     }
   }
 

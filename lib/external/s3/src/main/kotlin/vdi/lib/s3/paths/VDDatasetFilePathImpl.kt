@@ -13,10 +13,10 @@ internal data class VDDatasetFilePathImpl(
     get() = fileName == S3File.MetadataFileName
 
   override val isManifestFile
-    get() = fileName == S3File.ManifestFileName
+    get() = fileName == S3File.Manifest
 
   override val isRawUploadFile
-    get() = fileName == S3File.RawUploadZipName
+    get() = fileName == S3File.RawUploadZip
 
   override val isImportReadyFile
     get() = fileName == S3File.ImportReadyZipName

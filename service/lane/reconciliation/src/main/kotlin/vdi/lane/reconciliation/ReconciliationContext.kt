@@ -35,7 +35,7 @@ internal class ReconciliationContext(
 
   val hasRevisedFlag by lazy { safeTest(S3File.RevisionFlag) {datasetDirectory.hasRevisedFlag() } }
 
-  val hasRawUpload by lazy { safeTest(S3File.RawUploadZipName) { datasetDirectory.hasUploadFile() } }
+  val hasRawUpload by lazy { safeTest(S3File.RawUploadZip) { datasetDirectory.hasUploadFile() } }
 
   val hasImportReadyData by lazy { safeTest(S3File.ImportReadyZipName) { datasetDirectory.hasImportReadyFile() } }
 

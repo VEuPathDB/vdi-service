@@ -34,9 +34,9 @@ internal class DatasetRawUploadFileImpl(
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
   ) {
-    if (s3Object.baseName != S3File.RawUploadZipName) {
+    if (s3Object.baseName != S3File.RawUploadZip) {
       throw IllegalArgumentException("Can only construct an upload file from s3 object if object base name is "
-        + S3File.RawUploadZipName + ". Given path: " + s3Object.path)
+        + S3File.RawUploadZip + ". Given path: " + s3Object.path)
     }
   }
 }

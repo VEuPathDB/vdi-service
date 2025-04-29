@@ -22,13 +22,13 @@ enum class S3File(val baseName: String) {
 
   MetadataFileName(DatasetMetaFilename),
 
-  ManifestFileName(DatasetManifestFilename),
+  Manifest(DatasetManifestFilename),
 
   /**
    * Name of the raw user upload file that is awaiting safety checking and
    * repacking into an import ready archive.
    */
-  RawUploadZipName("raw-upload.zip"),
+  RawUploadZip("raw-upload.zip"),
 
   /**
    * Name of the flag object used to indicate that a dataset has been revised.

@@ -7,7 +7,7 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.lib.s3.paths.S3File.DeleteFlagFileName
 import vdi.lib.s3.paths.S3File.ImportReadyZipName
 import vdi.lib.s3.paths.S3File.InstallReadyZipName
-import vdi.lib.s3.paths.S3File.RawUploadZipName
+import vdi.lib.s3.paths.S3File.RawUploadZip
 import vdi.lib.s3.paths.S3File.RevisionFlag
 import vdi.lib.s3.paths.S3File.ShareOffer
 import vdi.lib.s3.paths.S3File.ShareReceipt
@@ -89,7 +89,7 @@ object S3Paths {
     datasetPath(userID, datasetID).append(InstallReadyZipName.baseName).toString()
 
   fun datasetRawUploadFile(userID: UserID, datasetID: DatasetID) =
-    datasetPath(userID, datasetID).append(RawUploadZipName.baseName).toString()
+    datasetPath(userID, datasetID).append(RawUploadZip.baseName).toString()
 
   /**
    * `{user-id}/{dataset-id}/shares/`

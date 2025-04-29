@@ -72,10 +72,10 @@ internal class EagerlyLoadedDatasetDirectory(
         }
 
         when (subPath) {
-          S3File.MetadataFileName     -> metaFile = DatasetMetaFileImpl(it)
-          S3File.ManifestFileName     -> manifest = DatasetManifestFileImpl(it)
-          S3File.RawUploadZipName     -> uploadFile = DatasetRawUploadFileImpl(it)
-          S3File.ImportReadyZipName   -> importableFile = DatasetImportableFileImpl(it)
+          S3File.MetadataFileName -> metaFile = DatasetMetaFileImpl(it)
+          S3File.Manifest         -> manifest = DatasetManifestFileImpl(it)
+          S3File.RawUploadZip     -> uploadFile = DatasetRawUploadFileImpl(it)
+          S3File.ImportReadyZipName -> importableFile = DatasetImportableFileImpl(it)
           S3File.InstallReadyZipName  -> installableFile = DatasetInstallableFileImpl(it)
           S3File.DeleteFlagFileName -> deleteFlag = DatasetDeleteFlagFileImpl(it)
           S3File.RevisionFlag       -> revisedFlag = DatasetRevisionFlagFileImpl(it)
