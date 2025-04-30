@@ -52,9 +52,12 @@ prometheus-common = { group = "io.prometheus", name = "simpleclient_common", ver
 # S3
 s34k = { group = "org.veupathdb.lib.s3", name = "s34k-minio", version = "0.7.2+" }
 
+# Data Formats
+yaml        = { group = "org.yaml", name = "snakeyaml", version = "2.4" }
+json-schema = { group = "com.networknt", name = "json-schema-validator", version = "1.5.6"}
+
 # Utilities
 deque = { group = "io.k-libs", name = "deque", version = "0.9.0" }
-yaml  = { group = "org.yaml", name = "snakeyaml", version = "2.4" }
 
 #
 # Unit Testing

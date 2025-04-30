@@ -44,6 +44,8 @@ sharedDefinitions:
     designs: &reviewDesigns
     - Meta-analysis
 
+
+# JSON Schema Definition
 properties:
   studyDesign:
     oneOf:
