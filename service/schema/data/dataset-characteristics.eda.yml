@@ -1,16 +1,33 @@
-$schema: "https://json-schema.org/draft/2020-12/schema"
+$schema: "dataset-characteristics.metaschema.json"
+type: object
 
 title: EDA Dataset Characteristics
 
-type: object
 
-properties:
-  studyDesign:
-    type: string
-    enum:
+# Reusable Value Definitions
+#
+# Values here are intended to be given anchors for reuse further down in the
+# schema file.  Anchors are defined by an identifier with the prefix '&' placed
+# before the value to be reused.  Anchors may then be later referenced by use
+# of the anchor identifier prefixed with '*' instead of '&'.
+#
+# apple: &myVariable fruit  -> apple: fruit
+# orange: *myVariable       -> orange: fruit
+#
+# See: https://yaml.org/spec/1.2.2/#anchors-and-aliases
+sharedDefinitions:
+
+  # Study Type Definitions
+  studyTypes:
+
+  - displayName: &experimentalDisplayName Experimental
+    designs: &experimentalDesigns
     - Cluster-randomized controlled trial
     - Quasi-experimental
     - Randomized controlled/clinical trial
+
+  - displayName: &observationalDisplayName: Observational
+    designs: &observationalDesigns
     - Case series
     - Case-control
     - Cohort
@@ -18,13 +35,31 @@ properties:
     - Ecological Study
     - Prospective Panel Study
     - Surveillance
-    - Meta-analysis
+
+  - displayName: &otherDisplayName n/a
+    designs: &otherDesigns
     - Other
 
-  # Validation rules, defined below, are based on the value of the `studyDesign`
-  # field.
+  - displayName: &reviewDisplayName Review
+    designs: &reviewDesigns
+    - Meta-analysis
+
+properties:
+  studyDesign:
+    oneOf:
+    - enum: *experimentalDesigns
+    - enum: *observationalDesigns
+    - enum: *otherDesigns
+    - enum: *reviewDesigns
+
+  # Validation rules for this field are defined below, and are based on the
+  # value of the `studyDesign` field.
   studyType:
-    type: string
+    enum:
+    - *experimentalDisplayName
+    - *observationalDisplayName
+    - *otherDisplayName
+    - *reviewDisplayName
 
   host:
     type: string
@@ -75,50 +110,57 @@ required:
 - studyDesign
 - studyType
 
+# Validation Rules
+#
+# A dataset characteristics input JSON object must match the rules defined in
+# this array.
+#
+# JSON schema has an 'else', but no 'else if'.  The 'else' block implied when
+# omitted applies no additional validation.  When stacked in the 'allOf' array,
+# only the blocks whose 'if' conditions are true will have their rules applied.
 allOf:
+
+# studyType: Experimental
 - if:
     properties:
       studyDesign:
-        enum:
-        - Cluster-randomized controlled trial
-        - Quasi-experimental
-        - Randomized controlled/clinical trial
+        enum: *experimentalDesigns
   then:
     properties:
       studyType:
-        const: Experimental
+        const: *experimentalDisplayName
+
+# studyType: Observational
 - if:
     properties:
       studyDesign:
-        enum:
-        - Case series
-        - Case-control
-        - Cohort
-        - Cross-sectional
-        - Ecological Study
-        - Prospective Panel Study
-        - Surveillance
+        enum: *observationalDesigns
   then:
     properties:
       studyType:
-        const: Observational
+        const: *observationalDisplayName
+
+# studyType: Review
 - if:
     properties:
       studyDesign:
-        const: Meta-analysis
+        enum: *reviewDesigns
   then:
     properties:
       studyType:
-        const: Review
+        const: *reviewDisplayName
+
+# studyType: n/a
 - if:
     properties:
       studyDesign:
-        const: Other
+        enum: *otherDesigns
   then:
     properties:
       studyType:
-        const: n/a
+        const: *otherDisplayName
       designComment:
         type: string
 
+# Error on unrecognized input.
 unevaluatedProperties: false
