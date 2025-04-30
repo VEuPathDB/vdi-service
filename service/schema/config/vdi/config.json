@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/config.json",
+  "$id": "https://veupathdb.github.ioconfig.json",
   "title": "VDI Configuration Schema",
   "type": "object",
   "properties": {
@@ -11,56 +11,56 @@
       "type": "object",
       "properties": {
         "eventRouter": {
-          "$ref": "/vdi-service/schema/vdi/daemons/event-router.json"
+          "$ref": "daemons/event-router.json"
         },
         "pruner": {
-          "$ref": "/vdi-service/schema/vdi/daemons/pruner.json"
+          "$ref": "daemons/pruner.json"
         },
         "reconciler": {
-          "$ref": "/vdi-service/schema/vdi/daemons/reconciler.json"
+          "$ref": "daemons/reconciler.json"
         }
       },
       "additionalProperties": false
     },
     "kafka": {
-      "$ref": "/vdi-service/schema/vdi/kafka.json"
+      "$ref": "kafka.json"
     },
     "lanes": {
       "type": "object",
       "properties": {
         "hardDelete": {
-          "$ref": "/vdi-service/schema/vdi/lanes/hard-delete.json"
+          "$ref": "lanes/hard-delete.json"
         },
         "import": {
-          "$ref": "/vdi-service/schema/vdi/lanes/import.json"
+          "$ref": "lanes/import.json"
         },
         "install": {
-          "$ref": "/vdi-service/schema/vdi/lanes/install.json"
+          "$ref": "lanes/install.json"
         },
         "reconciliation": {
-          "$ref": "/vdi-service/schema/vdi/lanes/reconciliation.json"
+          "$ref": "lanes/reconciliation.json"
         },
         "sharing": {
-          "$ref": "/vdi-service/schema/vdi/lanes/sharing.json"
+          "$ref": "lanes/sharing.json"
         },
         "softDelete": {
-          "$ref": "/vdi-service/schema/vdi/lanes/soft-delete.json"
+          "$ref": "lanes/soft-delete.json"
         },
         "updateMeta": {
-          "$ref": "/vdi-service/schema/vdi/lanes/update-meta.json"
+          "$ref": "lanes/update-meta.json"
         }
       }
     },
     "ldap": {
-      "$ref": "/vdi-service/schema/common.json#/$defs/ldap"
+      "$ref": "../common.json#/$defs/ldap"
     },
     "objectStore": {
-      "$ref": "/vdi-service/schema/vdi/object-store.json"
+      "$ref": "object-store.json"
     },
     "plugins": {
       "type": "array",
       "items": {
-        "$ref": "/vdi-service/schema/vdi/plugin.json"
+        "$ref": "plugin.json"
       },
       "minItems": 1,
       "uniqueItems": true,
@@ -70,7 +70,7 @@
       "type": "object",
       "properties": {
         "global": {
-          "$ref": "/vdi-service/schema/vdi/rabbitmq.json"
+          "$ref": "rabbitmq.json"
         }
       },
       "required": [
@@ -87,7 +87,7 @@
     "installTargets": {
       "type": "array",
       "items": {
-        "$ref": "/vdi-service/schema/vdi/install-target.json"
+        "$ref": "install-target.json"
       },
       "minItems": 1,
       "unevaluatedItems": false,
@@ -112,13 +112,13 @@
         "host": {
           "oneOf": [
             {
-              "$ref": "/vdi-service/schema/common.json#/$defs/hostString"
+              "$ref": "../common.json#/$defs/hostString"
             },
             {
-              "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
+              "$ref": "../common.json#/$defs/interpolatedValue"
             },
             {
-              "$ref": "/vdi-service/schema/common.json#/$defs/hostObject"
+              "$ref": "../common.json#/$defs/hostObject"
             }
           ]
         },

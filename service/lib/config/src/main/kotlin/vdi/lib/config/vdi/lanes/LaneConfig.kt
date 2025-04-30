@@ -1,4 +1,4 @@
-package vdi.lib.config.vdi
+package vdi.lib.config.vdi.lanes
 
 data class LaneConfig(
   val hardDelete: ConsumerLaneConfig?,

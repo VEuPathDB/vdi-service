@@ -1,4 +1,4 @@
-package vdi.lib.config.vdi
+package vdi.lib.config.vdi.daemons
 
 import kotlin.time.Duration
 

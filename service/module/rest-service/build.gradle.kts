@@ -39,7 +39,8 @@ dependencies {
   implementation(libs.container.core)
   implementation(libs.container.multipart)
 
-  implementation(libs.json.validation)
+  implementation(libs.json.request.validation)
+  implementation(libs.json.schema.validation)
 
   implementation(libs.s34k)
 

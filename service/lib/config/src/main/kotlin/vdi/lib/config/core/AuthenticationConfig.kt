@@ -1,4 +1,4 @@
-package vdi.lib.config
+package vdi.lib.config.core
 
 import vdi.lib.config.common.SecretString
 

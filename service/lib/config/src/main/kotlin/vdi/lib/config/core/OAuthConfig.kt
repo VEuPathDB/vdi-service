@@ -1,4 +1,4 @@
-package vdi.lib.config
+package vdi.lib.config.core
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import vdi.lib.config.common.SecretString

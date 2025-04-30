@@ -5,7 +5,7 @@
   "type": "object",
   "allOf": [
     {
-      "$ref": "/vdi-service/schema/vdi/lanes/lane-common.json#"
+      "$ref": "lane-common.json#"
     },
     {
       "properties": {

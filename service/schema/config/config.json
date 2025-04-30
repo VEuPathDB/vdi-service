@@ -5,10 +5,10 @@
   "type": "object",
   "properties": {
     "containerCore": {
-      "$ref": "/vdi-service/schema/container-core/config.json"
+      "$ref": "container-core/config.json"
     },
     "vdi": {
-      "$ref": "/vdi-service/schema/vdi/config.json"
+      "$ref": "vdi/config.json"
     },
     "definitions": {
       "title": "Shared Value Definitions",

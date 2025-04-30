@@ -40,7 +40,7 @@
           "default": 5
         },
         "targetName": {
-          "$ref": "/vdi-service/schema/common.json#/$defs/installTarget"
+          "$ref": "../common.json#/$defs/installTarget"
         },
         "propertySchema": {
           "oneOf": [
@@ -90,13 +90,13 @@
             "host": {
               "oneOf": [
                 {
-                  "$ref": "/vdi-service/schema/common.json#/$defs/hostString"
+                  "$ref": "../common.json#/$defs/hostString"
                 },
                 {
-                  "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
+                  "$ref": "../common.json#/$defs/interpolatedValue"
                 },
                 {
-                  "$ref": "/vdi-service/schema/common.json#/$defs/hostObject"
+                  "$ref": "../common.json#/$defs/hostObject"
                 }
               ]
             }
@@ -117,7 +117,7 @@
               "pattern": "^[\\w-.]+$"
             },
             "port": {
-              "$ref": "/vdi-service/schema/common.json#/$defs/port"
+              "$ref": "../common.json#/$defs/port"
             }
           },
           "required": [

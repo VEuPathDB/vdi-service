@@ -1,4 +1,4 @@
-package vdi.lib.config.vdi
+package vdi.lib.config.vdi.lanes
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

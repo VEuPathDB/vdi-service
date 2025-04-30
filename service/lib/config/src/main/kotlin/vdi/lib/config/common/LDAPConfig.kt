@@ -1,9 +1,7 @@
-package vdi.lib.config
+package vdi.lib.config.common
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import vdi.lib.config.common.HostAddress
-import vdi.lib.config.common.HostAddressListDeserializer
 
 data class LDAPConfig(
   @JsonDeserialize(using = HostAddressListDeserializer::class)

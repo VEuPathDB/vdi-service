@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "pollInterval": {
-      "$ref": "/vdi-service/schema/common.json#/$defs/duration",
+      "$ref": "../common.json#/$defs/duration",
       "default": "1s"
     },
     "connection": {
@@ -39,13 +39,13 @@
         "host": {
           "oneOf": [
             {
-              "$ref": "/vdi-service/schema/common.json#/$defs/hostString"
+              "$ref": "../common.json#/$defs/hostString"
             },
             {
-              "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
+              "$ref": "../common.json#/$defs/interpolatedValue"
             },
             {
-              "$ref": "/vdi-service/schema/common.json#/$defs/hostObject"
+              "$ref": "../common.json#/$defs/hostObject"
             }
           ]
         },

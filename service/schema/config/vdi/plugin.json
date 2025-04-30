@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "server": {
-      "$ref": "/vdi-service/schema/common.json#/$defs/hostString"
+      "$ref": "../common.json#/$defs/hostString"
     },
     "displayName": {
       "type": "string"
@@ -38,7 +38,7 @@
           "format": "uri-reference"
         },
         {
-          "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
+          "$ref": "../common.json#/$defs/interpolatedValue"
         }
       ],
       "default": "/datasets",
@@ -49,7 +49,7 @@
     "projectIds": {
       "type": "array",
       "items": {
-        "$ref": "/vdi-service/schema/common.json#/$defs/installTarget"
+        "$ref": "../common.json#/$defs/installTarget"
       },
       "unevaluatedItems": false
     },
@@ -92,7 +92,7 @@
       "properties": {
         "maxDuration": {
           "title": "Maximum Script Execution Time",
-          "$ref": "/vdi-service/schema/common.json#/$defs/duration"
+          "$ref": "../common.json#/$defs/duration"
         },
         "pathOverride": {
           "title": "Script Path Override",
