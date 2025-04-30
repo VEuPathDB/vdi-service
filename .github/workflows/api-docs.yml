@@ -21,7 +21,7 @@ jobs:
         ref: feature-data-updates
         clean: 'false'
     - name: Copy Schema
-      run: cp -r config/schema/ docs-for-upload/schema/
+      run: cp -r service/schema/config/ docs-for-upload/schema/
     - name: Upload
       uses: actions/upload-pages-artifact@v3
       with:
