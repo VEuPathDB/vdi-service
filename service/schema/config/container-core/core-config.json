@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://veupathdb.github.io/vdi-service/schema/container-core/config.json",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/container-core/core-config.json",
   "title": "Container Core Library Config",
   "type": "object",
   "properties": {
     "ldap": {
-      "$ref": "/vdi-service/schema/common.json#/$defs/ldap"
+      "$ref": "../common.json#/$defs/ldap"
     },
     "authentication": {
       "type": "object",
@@ -17,7 +17,7 @@
               "minLength": 32
             },
             {
-              "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
+              "$ref": "../common.json#/$defs/interpolatedValue"
             }
           ]
         },
@@ -33,13 +33,13 @@
       "type": "object",
       "properties": {
         "accountDb": {
-          "$ref": "/vdi-service/schema/container-core/database.json#"
+          "$ref": "database.json#"
         },
         "appDb": {
-          "$ref": "/vdi-service/schema/container-core/database.json#"
+          "$ref": "database.json#"
         },
         "userDb": {
-          "$ref": "/vdi-service/schema/container-core/database.json#"
+          "$ref": "database.json#"
         }
       }
     }
@@ -57,7 +57,7 @@
         },
         "bindPort": {
           "title": "HTTP Server Port Binding",
-          "$ref": "/vdi-service/schema/common.json#/$defs/port",
+          "$ref": "../common.json#/$defs/port",
           "default": 80
         }
       }
@@ -83,7 +83,7 @@
               "format": "uri-reference"
             },
             {
-              "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
+              "$ref": "../common.json#/$defs/interpolatedValue"
             }
           ]
         },
