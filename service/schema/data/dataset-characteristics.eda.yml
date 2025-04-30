@@ -1,7 +1,6 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 
 title: EDA Dataset Characteristics
-description: Also known as dataset properties.
 
 type: object
 
@@ -22,6 +21,8 @@ properties:
     - Meta-analysis
     - Other
 
+  # Validation rules, defined below, are based on the value of the `studyDesign`
+  # field.
   studyType:
     type: string
 
@@ -32,6 +33,7 @@ properties:
     type: array
     items:
       type: string
+      minLength: 3
     unevaluatedItems: false
     uniqueItems: true
 
@@ -39,6 +41,7 @@ properties:
     type: array
     items:
       type: string
+      minLength: 3
     unevaluatedItems: false
     uniqueItems: true
 
