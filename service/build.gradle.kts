@@ -100,7 +100,7 @@ tasks.register("build-raml-docs") {
 
   doLast {
     val restModule = project(":rest-service")
-    val docsDir = file("docs")
+    val docsDir = rootDir.parentFile.resolve("docs")
     docsDir.mkdir()
 
     val docFiles = arrayOf(

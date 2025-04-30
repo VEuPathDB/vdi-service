@@ -1,0 +1,120 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+
+title: EDA Dataset Characteristics
+
+type: object
+
+properties:
+  studyDesign:
+    type: string
+    enum:
+    - Cluster-randomized controlled trial
+    - Quasi-experimental
+    - Randomized controlled/clinical trial
+    - Case series
+    - Case-control
+    - Cohort
+    - Cross-sectional
+    - Ecological Study
+    - Prospective Panel Study
+    - Surveillance
+    - Meta-analysis
+    - Other
+
+  studyType:
+    type: string
+
+  host:
+    type: string
+
+  diseases:
+    type: array
+    items:
+      type: string
+    unevaluatedItems: false
+    uniqueItems: true
+
+  sampleTypes:
+    type: array
+    items:
+      type: string
+    unevaluatedItems: false
+    uniqueItems: true
+
+  countries:
+    type: array
+    items:
+      type: string
+      minLength: 3
+      maxLength: 64
+    unevaluatedItems: false
+    uniqueItems: true
+
+  years:
+    type: array
+    items:
+      type: integer
+      minimum: 1800
+      exclusiveMaximum: 3000
+    unevaluatedItems: false
+    uniqueItems: true
+
+  ages:
+    type: array
+    items:
+      type: string
+      minLength: 1
+    unevaluatedItems: false
+    uniqueItems: true
+
+required:
+- studyDesign
+- studyType
+
+allOf:
+- if:
+    properties:
+      studyDesign:
+        enum:
+        - Cluster-randomized controlled trial
+        - Quasi-experimental
+        - Randomized controlled/clinical trial
+  then:
+    properties:
+      studyType:
+        const: Experimental
+- if:
+    properties:
+      studyDesign:
+        enum:
+        - Case series
+        - Case-control
+        - Cohort
+        - Cross-sectional
+        - Ecological Study
+        - Prospective Panel Study
+        - Surveillance
+  then:
+    properties:
+      studyType:
+        const: Observational
+- if:
+    properties:
+      studyDesign:
+        const: Meta-analysis
+  then:
+    properties:
+      studyType:
+        const: Review
+- if:
+    properties:
+      studyDesign:
+        const: Other
+  then:
+    properties:
+      studyType:
+        const: n/a
+      designComment:
+        type: string
+
+unevaluatedProperties: false
