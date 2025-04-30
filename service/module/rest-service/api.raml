@@ -1,6 +1,6 @@
 #%RAML 1.0 Extension
 
-extends: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.2.0/libraries/base-service.raml
+extends: https://raw.githubusercontent.com/VEuPathDB/docs-api-api-schema/v2.2.0/libraries/base-service.raml
 
 title: VEuPathDB Dataset Installer
 version: 1.7.0
@@ -8,7 +8,7 @@ mediaType: application/json
 baseUri: https://veupathdb.org/vdi
 
 uses:
-  lib: schema/types/library.raml
+  lib: api-api-schema/types/library.raml
 
 securitySchemes:
   AdminToken:
@@ -44,28 +44,28 @@ traits:
 # ┃  ENDPOINT PATHS                                                          ┃ #
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
-/datasets: !include schema/resources/dataset-list/resource.raml
-/datasets/{vdi-id}: !include schema/resources/dataset/resource.raml
-/datasets/{vdi-id}/files: !include schema/resources/dataset-files/resource.raml
-/datasets/{vdi-id}/shares/{recipient-user-id}: !include schema/resources/dataset-shares/resource.raml
-/datasets/community: !include schema/resources/community-datasets/resource.raml
+/datasets: !include api-schema/resources/dataset-list/resource.raml
+/datasets/{vdi-id}: !include api-schema/resources/dataset/resource.raml
+/datasets/{vdi-id}/files: !include api-schema/resources/dataset-files/resource.raml
+/datasets/{vdi-id}/shares/{recipient-user-id}: !include api-schema/resources/dataset-shares/resource.raml
+/datasets/community: !include api-schema/resources/community-datasets/resource.raml
 
-/users: !include schema/resources/users/resource.raml
-/plugins: !include schema/resources/plugins/resource.raml
+/users: !include api-schema/resources/users/resource.raml
+/plugins: !include api-schema/resources/plugins/resource.raml
 
-/admin/reports: !include schema/resources/admin/reports/resource.raml
-/admin/rpc: !include schema/resources/admin/rpc/resource.raml
+/admin/reports: !include api-schema/resources/admin/reports/resource.raml
+/admin/rpc: !include api-schema/resources/admin/rpc/resource.raml
 
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃  DEPRECATED ENDPOINT PATHS                                               ┃ #
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
-/vdi-datasets: !include schema/resources/dataset-list/resource.raml
-/vdi-datasets/{vdi-id}: !include schema/resources/dataset/resource.raml
-/vdi-datasets/{vdi-id}/files: !include schema/resources/dataset-files/resource.raml
-/vdi-datasets/{vdi-id}/shares/{recipient-user-id}: !include schema/resources/dataset-shares/resource.raml
-/vdi-datasets/community: !include schema/resources/community-datasets/resource.raml
-/vdi-datasets/share-offers: !include schema/resources/users/self/share-offers/resource.raml
-/vdi-plugins: !include schema/resources/plugins/resource.raml
-/vdi-users: !include schema/resources/users/resource.raml
+/vdi-datasets: !include api-schema/resources/dataset-list/resource.raml
+/vdi-datasets/{vdi-id}: !include api-schema/resources/dataset/resource.raml
+/vdi-datasets/{vdi-id}/files: !include api-schema/resources/dataset-files/resource.raml
+/vdi-datasets/{vdi-id}/shares/{recipient-user-id}: !include api-schema/resources/dataset-shares/resource.raml
+/vdi-datasets/community: !include api-schema/resources/community-datasets/resource.raml
+/vdi-datasets/share-offers: !include api-schema/resources/users/self/share-offers/resource.raml
+/vdi-plugins: !include api-schema/resources/plugins/resource.raml
+/vdi-users: !include api-schema/resources/users/resource.raml

@@ -12,7 +12,7 @@ containerService {
   }
 
   raml {
-    schemaRootDir = file("schema/types")
+    schemaRootDir = file("api-schema/types")
     generateModelStreams = false
   }
 

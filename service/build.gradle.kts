@@ -90,7 +90,7 @@ tasks.register("compile-design-doc") {
 
 tasks.register("build-raml-docs") {
   doFirst {
-    with(project(":service:rest-service").tasks["raml-docs"]) {
+    with(project(":rest-service").tasks["raml-docs"]) {
       actions.forEach {
         logger.error("{}", it)
         it(this)
@@ -99,7 +99,7 @@ tasks.register("build-raml-docs") {
   }
 
   doLast {
-    val restModule = project(":service:rest-service")
+    val restModule = project(":rest-service")
     val docsDir = file("docs")
     docsDir.mkdir()
 
@@ -131,5 +131,5 @@ tasks.register("download-dependencies") {
 }
 
 dependencies {
-  implementation(project(":service:bootstrap"))
+  implementation(project(":bootstrap"))
 }

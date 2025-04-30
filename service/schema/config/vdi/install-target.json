@@ -41,13 +41,33 @@
         },
         "targetName": {
           "$ref": "/vdi-service/schema/common.json#/$defs/installTarget"
+        },
+        "propertySchema": {
+          "oneOf": [
+            {
+              "title": "Inline Schema Definition",
+              "$ref": "https://json-schema.org/draft/2020-12/schema"
+            },
+            {
+              "title": "Remote Schema File",
+              "type": "string",
+              "pattern": "^(https?)?://([0-9a-zA-Z][\\w-]+(?:\\.[0-9a-zA-Z][\\w-]*)*)((?:/[\\w%.~-]+)+)(\\?.+)?$"
+            },
+            {
+              "title": "Local Schema File",
+              "description": "Path to a local schema file.  If the path is absolute, and does not exist in the host filesystem, the service jar contents will be checked as well.",
+              "type": "string",
+              "format": "uri-reference"
+            }
+          ]
         }
       },
       "required": [
         "controlSchema",
         "dataSchema",
         "pass",
-        "targetName"
+        "targetName",
+        "propertySchema"
       ]
     },
     {

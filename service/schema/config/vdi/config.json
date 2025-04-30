@@ -84,7 +84,7 @@
         "build-65"
       ]
     },
-    "targetDbs": {
+    "installTargets": {
       "type": "array",
       "items": {
         "$ref": "/vdi-service/schema/vdi/install-target.json"
@@ -102,7 +102,7 @@
     "plugins",
     "rabbit",
     "siteBuild",
-    "targetDbs"
+    "installTargets"
   ],
   "additionalProperties": false,
   "$defs": {
