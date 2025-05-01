@@ -46,7 +46,7 @@ class AdminRPC : Admin {
   }
 
   override fun postAdminFixBrokenInstalls(
-    skipRun: Boolean,
+    skipRun: Boolean?,
     entity: InstallCleanupRequest?
   ): Admin.PostAdminFixBrokenInstallsResponse {
     if (entity == null)
@@ -58,7 +58,7 @@ class AdminRPC : Admin {
       InstallCleaner.cleanTargets(entity.targets.map { ReinstallTarget(DatasetID(it.datasetId), it.projectId) })
     }
 
-    if (!skipRun)
+    if (skipRun == true)
       runBlocking { DatasetReinstaller.tryRun() }
 
     return Admin.PostAdminFixBrokenInstallsResponse.respond204()
