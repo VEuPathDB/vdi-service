@@ -32,47 +32,19 @@ types:
         type: string
 
   DatasetPostMeta:
+    type: common.DatasetMetaBase
     additionalProperties: false
     properties:
-      name: common.DatasetName
       datasetType: common.DatasetTypeInput
-      origin: common.DatasetOrigin
-      dependencies:
-        type: common.DatasetDependency[]
-        uniqueItems: true
       projects:
-        description: IDs of the projects this dataset is being submitted to.
+        description: >-
+          DEPRECATED: Use `projectIds`
         type: common.ProjectId[]
         minItems: 1
         uniqueItems: true
-
-      shortName?: common.DatasetShortName
-      shortAttribution?: common.DatasetShortAttribution
-      category?: common.DatasetCategory
       visibility?:
         type: common.DatasetVisibility
         default: "private"
-      summary?: common.DatasetSummary
-      description?: common.DatasetDescription
-      publications?:
-        type: common.DatasetPublication[]
-        uniqueItems: true
-      hyperlinks?:
-        type: common.DatasetHyperlink[]
-        uniqueItems: true
-      organisms?:
-        type: array
-        items: common.OrganismAbbreviation
-        uniqueItems: true
-      contacts?:
-        type: common.DatasetContact[]
-        uniqueItems: true
-      createdOn?:
-        description: |
-          This field is only used for admin override uploads, for normal dataset
-          uploads this field is ignored.
-        displayName: Creation Date
-        type: datetime
 
   DatasetPostResponseBody:
     displayName: Dataset Post Response

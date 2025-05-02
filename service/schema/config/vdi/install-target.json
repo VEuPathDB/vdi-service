@@ -5,44 +5,22 @@
   "allOf": [
     {
       "properties": {
-        "controlSchema": {
-          "type": "string"
-        },
-        "dataSchema": {
-          "type": "string"
-        },
-        "dataTypes": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "unevaluatedItems": false,
-          "uniqueItems": true
-        },
         "enabled": {
           "type": "boolean",
           "default": true
         },
-        "pass": {
-          "type": "string"
-        },
-        "platform": {
-          "enum": [
-            "oracle",
-            "postgres"
-          ],
-          "default": null
-        },
-        "poolSize": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 255,
-          "default": 5
-        },
         "targetName": {
           "$ref": "../common.json#/$defs/installTarget"
         },
-        "propertySchema": {
+        "dataTypes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "unevaluatedItems": false,
+          "uniqueItems": true
+        },
+        "controlDb": { "$ref": "../common.json#/$defs/database" },
+        "dataDb": { "$ref": "../common.json#/$defs/database" },
+        "datasetPropertySchema": {
           "oneOf": [
             {
               "title": "Inline Schema Definition",
@@ -58,15 +36,18 @@
               "description": "Path to a local schema file.  If the path is absolute, and does not exist in the host filesystem, the service jar contents will be checked as well.",
               "type": "string",
               "format": "uri-reference"
+            },
+            {
+              "title": "No Schema Permitted",
+              "type": "null"
             }
           ]
         }
       },
       "required": [
-        "controlSchema",
-        "dataSchema",
-        "pass",
         "targetName",
+        "controlDb",
+        "dataDb",
         "propertySchema"
       ]
     },

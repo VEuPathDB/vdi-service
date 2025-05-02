@@ -175,32 +175,11 @@ types:
     displayName: Dataset Get Response
     description: |
       Details about a specific singular dataset.
-    type: object
+    type: DatasetMetaBase
     additionalProperties: false
     properties:
       datasetId: VdiId
       owner: DatasetOwner
-      datasetType: DatasetTypeOutput
-      name: DatasetName
-      origin: DatasetOrigin
-      projectIds:
-        description: |
-          Project IDs for projects the user dataset record was submitted to.
-        type: ProjectId[]
-        uniqueItems: true
-        minItems: 1
-      visibility: DatasetVisibility
-      status: DatasetStatusInfo
-      created: DatasetCreationDate
-      dependencies:
-        type: DatasetDependency[]
-        uniqueItems: true
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      category?: DatasetCategory
-      summary?: DatasetSummary
-      description?: DatasetDescription
-      sourceUrl?: DatasetSourceUrl
       importMessages?:
         description: |
           Log lines from the import process.
@@ -212,19 +191,12 @@ types:
           Array of share offers that have been created by the owner of this
           dataset to share it with other users.
         type: ShareOffer[]
-      publications?:
-        type: DatasetPublication[]
-        uniqueItems: true
-      hyperlinks?:
-        type: DatasetHyperlink[]
-        uniqueItems: true
-      organisms?:
-        displayName: Dataset Organism Abbreviations
-        type: OrganismAbbreviation[]
-        uniqueItems: true
-      contacts?:
-        type: DatasetContact[]
-        uniqueItems: true
+      # Meta Fields
+      datasetType: DatasetTypeOutput
+      visibility: DatasetVisibility
+      status: DatasetStatusInfo
+      created: DatasetCreationDate
+      sourceUrl?: DatasetSourceUrl
       originalId?: VdiId
       revisionHistory?: DatasetRevision[]
   DatasetFileDetails:
@@ -345,6 +317,37 @@ types:
       lastName: string
       organization: string
       accepted: boolean
+  DatasetMetaBase:
+    type: object
+    properties:
+      name: DatasetName
+      summary: DatasetSummary
+      origin: DatasetOrigin
+      projectIds:
+        description: IDs of the projects this dataset is being submitted to.
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
+      dependencies:
+        type: DatasetDependency[]
+        uniqueItems: true
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      description?: DatasetDescription
+      publications?:
+        type: DatasetPublication[]
+        uniqueItems: true
+      hyperlinks?:
+        type: DatasetHyperlink[]
+        uniqueItems: true
+      organisms?:
+        type: OrganismAbbreviation[]
+        uniqueItems: true
+      contacts?:
+        type: DatasetContact[]
+        uniqueItems: true
+      properties?: DatasetPropertiesEDA | DatasetPropertiesGenomics
   DatasetName:
     description: User-provided name for the dataset.
     type: string
@@ -378,6 +381,9 @@ types:
     displayName: Dataset Patch Request
     description: |
       Request to update the metadata for a dataset.
+
+      Fields that are omitted will be ignored when updating the target dataset
+      record.
     type: object
     additionalProperties: false
     properties:
@@ -407,47 +413,19 @@ types:
         type: DatasetContact[]
         uniqueItems: true
   DatasetPostMeta:
-    type: object
+    type: DatasetMetaBase
     additionalProperties: false
     properties:
-      name: DatasetName
       datasetType: DatasetTypeInput
-      origin: DatasetOrigin
-      dependencies:
-        type: DatasetDependency[]
-        uniqueItems: true
       projects:
-        description: IDs of the projects this dataset is being submitted to.
+        description: >-
+          DEPRECATED: Use `projectIds`
         type: ProjectId[]
         minItems: 1
         uniqueItems: true
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      category?: DatasetCategory
       visibility?:
         type: DatasetVisibility
         default: "private"
-      summary?: DatasetSummary
-      description?: DatasetDescription
-      publications?:
-        type: DatasetPublication[]
-        uniqueItems: true
-      hyperlinks?:
-        type: DatasetHyperlink[]
-        uniqueItems: true
-      organisms?:
-        type: array
-        uniqueItems: true
-        items: OrganismAbbreviation
-      contacts?:
-        type: DatasetContact[]
-        uniqueItems: true
-      createdOn?:
-        displayName: Creation Date
-        description: |
-          This field is only used for admin override uploads, for normal dataset
-          uploads this field is ignored.
-        type: datetime
   DatasetPostRequestBody:
     displayName: Dataset Post Request
     description: |
@@ -487,6 +465,51 @@ types:
     additionalProperties: false
     properties:
       datasetId: VdiId
+  DatasetPropertiesEDA:
+    displayName: EDA Dataset Characteristics
+    description: Any-typed for compatibility with JaxRS and RAML.  Actual schema definition at https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.eda.json
+    type: any
+  DatasetPropertiesGenomics:
+    displayName: Genomics Dataset Characteristics
+    description: Any-typed for compatibility with JaxRS and RAML.  Actual schema definition at https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.genomics.json
+    type: any
+  DatasetProxyPostMeta:
+    type: DatasetMetaBase
+    additionalProperties: false
+    properties:
+      datasetType: DatasetTypeInput
+      projects:
+        description: >-
+          DEPRECATED: Use `projectIds`
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
+      visibility?:
+        type: DatasetVisibility
+        default: "private"
+      createdOn?:
+        displayName: Creation Date
+        type: datetime
+  DatasetProxyPostRequestBody:
+    displayName: Dataset Proxy Post Request
+    type: object
+    additionalProperties: false
+    properties:
+      meta:
+        description: Metadata about the dataset being submitted.
+        type: DatasetPostMeta
+      file?:
+        description: |
+          Dataset file to upload.
+
+          This field is incompatible with the `url` field.
+        type: file
+      url?:
+        description: |
+          URL to a dataset file to upload.
+
+          This field is incompatible with the `file` field.
+        type: string
   DatasetPublication:
     type: object
     additionalProperties: false
@@ -617,6 +640,7 @@ types:
   DatasetSummary:
     description: Brief summary of the dataset.
     type: string
+    minLength: 3
     maxLength: 4000
   DatasetTypeInput:
     type: object

@@ -14,6 +14,7 @@ containerService {
   raml {
     schemaRootDir = file("api-schema/types")
     generateModelStreams = false
+    mergeToolVersion = "v2.1.1"
   }
 
   docker {
@@ -63,6 +64,15 @@ dependencies {
 }
 
 tasks.register("raml-docs") {
+  dependsOn("merge-raml")
+
+  inputs.sourceFiles.files.addAll(listOf(
+    file("deprecated-api.raml"),
+    file("api.raml"),
+    file("api-schema/library.raml")
+  ))
+  outputs.files("docs/api.html", "src/main/resources/api.html")
+
   doFirst {
     val originalFile = containerService.raml.rootApiDefinition
     containerService.raml.rootApiDefinition = file("deprecated-api.raml")
@@ -72,5 +82,14 @@ tasks.register("raml-docs") {
     }
 
     containerService.raml.rootApiDefinition = originalFile
+  }
+}
+
+tasks.register("jaxrs-types") {
+  doFirst {
+    // - backup library.raml
+    // - replace /!include .*/ with "any"
+    // - execute raml gen
+    // - restore backup
   }
 }

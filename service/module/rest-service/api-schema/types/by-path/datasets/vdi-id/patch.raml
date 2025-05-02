@@ -8,6 +8,9 @@ types:
     displayName: Dataset Patch Request
     description: |
       Request to update the metadata for a dataset.
+      
+      Fields that are omitted will be ignored when updating the target dataset
+      record.
     type: object
     additionalProperties: false
     properties:

@@ -122,6 +122,48 @@ types:
       dataStatus?: DatasetInstallStatus
       dataMessage?: string
 
+  DatasetMetaBase:
+    type: object
+    properties:
+      # Fields that are different based on child type (and thus omitted here):
+      # - datasetType (different format for post/get)
+      # - visibility  (optional in post, required in get)
+      # - sourceUrl   (only in get)
+      #
+
+      # Required Fields
+      name: DatasetName
+      summary: DatasetSummary
+      origin: DatasetOrigin
+      projectIds:
+        description: IDs of the projects this dataset is being submitted to.
+        type: ProjectId[]
+        minItems: 1
+        uniqueItems: true
+      dependencies:
+        type: DatasetDependency[]
+        uniqueItems: true
+
+      # Optional Fields
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      category?: DatasetCategory
+      description?: DatasetDescription
+      publications?:
+        type: DatasetPublication[]
+        uniqueItems: true
+      hyperlinks?:
+        type: DatasetHyperlink[]
+        uniqueItems: true
+      organisms?:
+        type: OrganismAbbreviation[]
+        uniqueItems: true
+      contacts?:
+        type: DatasetContact[]
+        uniqueItems: true
+      properties?:
+        type: DatasetPropertiesEDA | DatasetPropertiesGenomics
+
   DatasetName:
     type: string
     description: User-provided name for the dataset.
@@ -145,6 +187,20 @@ types:
       lastName?: string
       email?: string
       organization?: string
+
+  DatasetPropertiesEDA:
+    displayName: EDA Dataset Characteristics
+    description: >-
+      Any-typed for compatibility with JaxRS and RAML.  Actual schema definition
+      at https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.eda.json
+    type: any
+
+  DatasetPropertiesGenomics:
+    displayName: Genomics Dataset Characteristics
+    description: >-
+      Any-typed for compatibility with JaxRS and RAML.  Actual schema definition
+      at https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.genomics.json
+    type: any
 
   DatasetPublication:
     additionalProperties: false
@@ -209,7 +265,7 @@ types:
   DatasetSummary:
     description: Brief summary of the dataset.
     type: string
-    minLength: 0
+    minLength: 3
     maxLength: 4000
 
   DatasetTypeOutput:

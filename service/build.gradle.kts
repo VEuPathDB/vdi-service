@@ -1,6 +1,8 @@
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.yaml.snakeyaml.Yaml
 
 plugins {
   alias(libs.plugins.kotlin)
@@ -57,13 +59,101 @@ allprojects {
   }
 }
 
+dependencies {
+  implementation(project(":bootstrap"))
+}
 
+val schemaBuildDir = layout.buildDirectory.dir("json-schema").get().asFile
+sourceSets.main {
+  output.dir(schemaBuildDir, "builtBy" to "create-dataset-schema-resources")
+}
+
+tasks.clean { delete(schemaBuildDir) }
+
+// Fat Jar Config
 tasks.shadowJar {
   exclude("**/Log4j2Plugins.dat")
   archiveFileName.set("service.jar")
 
   manifest {
     attributes["Main-Class"] = "vdi.bootstrap.Main"
+  }
+}
+
+tasks.register("create-dataset-schema-resources") {
+  val schemaSourceDir = file("schema/data/")
+
+  inputs.dir(schemaSourceDir)
+  outputs.dir(schemaBuildDir)
+
+  doFirst {
+    val json = ObjectMapper()
+
+    schemaBuildDir.mkdirs()
+
+    schemaSourceDir
+      .listFiles()!!
+      .onEach {
+        if (it.name.endsWith("json"))
+          it.copyTo(schemaBuildDir.resolve(it.name))
+      }
+      .filter { it.name.endsWith("yml") }
+      .forEach {
+        json.writerWithDefaultPrettyPrinter().writeValue(
+          schemaBuildDir.resolve(it.name.substringBeforeLast('.') + ".json"),
+//          json.convertValue(Yaml().loadAs(it.readText(), Any::class.java), ObjectNode::class.java),
+          Yaml().loadAs(it.readText(), Any::class.java),
+        )
+      }
+  }
+}
+
+tasks.register("download-dependencies") {
+  doFirst {
+    configurations {
+      create("download") {
+        project.versionCatalogs.forEach { catalog ->
+          catalog.libraryAliases.forEach { libName ->
+            dependencies.addLater(catalog.findLibrary(libName).get())
+          }
+        }
+
+        this.files
+      }
+    }
+  }
+}
+
+tasks.register("generate-raml-docs") {
+  val mainDocsDir  = rootDir.parentFile.resolve("docs")
+  val mainDocsFile = mainDocsDir.resolve("vdi-api.html")
+
+  val restModule  = project(":module:rest-service")
+  val restDocsDir = restModule.projectDir.resolve("docs")
+
+  dependsOn(":module:rest-service:raml-docs")
+
+  inputs.sourceFiles.files.add(restModule.projectDir.resolve("api-schema/types/library.raml"))
+  outputs.files(mainDocsFile)
+
+  doLast {
+
+    // ensure the repo root docs dir exists.
+    mainDocsDir.mkdir()
+
+    val docFiles = arrayOf(
+      // Source File to Target File
+      restDocsDir.resolve("api.html") to mainDocsFile,
+    )
+
+    for ((source, target) in docFiles) {
+      target.delete()
+      source.copyTo(target)
+      source.delete()
+    }
+
+    // drop the empty inner docs dir
+    restDocsDir.deleteRecursively()
   }
 }
 
@@ -86,50 +176,4 @@ tasks.register("compile-design-doc") {
       }
     }
   }
-}
-
-tasks.register("build-raml-docs") {
-  doFirst {
-    with(project(":rest-service").tasks["raml-docs"]) {
-      actions.forEach {
-        logger.error("{}", it)
-        it(this)
-      }
-    }
-  }
-
-  doLast {
-    val restModule = project(":rest-service")
-    val docsDir = rootDir.parentFile.resolve("docs")
-    docsDir.mkdir()
-
-    val docFiles = arrayOf(
-      // Source File to Target File
-      restModule.projectDir.resolve("docs/api.html") to docsDir.resolve("vdi-api.html"),
-    )
-
-    for ((source, target) in docFiles) {
-      target.delete()
-      source.copyTo(target)
-      source.delete()
-    }
-  }
-}
-
-tasks.register("download-dependencies") {
-  configurations {
-    create("download") {
-      project.versionCatalogs.forEach { catalog ->
-        catalog.libraryAliases.forEach { libName ->
-          dependencies.addLater(catalog.findLibrary(libName).get())
-        }
-      }
-
-      this.files
-    }
-  }
-}
-
-dependencies {
-  implementation(project(":bootstrap"))
 }

@@ -33,13 +33,13 @@
       "type": "object",
       "properties": {
         "accountDb": {
-          "$ref": "database.json#"
+          "$ref": "../common.json#/$defs/database"
         },
         "appDb": {
-          "$ref": "database.json#"
+          "$ref": "../common.json#/$defs/database"
         },
         "userDb": {
-          "$ref": "database.json#"
+          "$ref": "../common.json#/$defs/database"
         }
       }
     }

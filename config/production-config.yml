@@ -18,6 +18,9 @@ definitions:
   vdiSchemaPass: &vdiSchemaPass ${env:VDI_APPDB_SCHEMA_PASS}
   vdiControlSchema: &vdiControlSchema vdi_control_prod_${env:LOCATION_INDICATOR}
   vdiDataSchema: &vdiDataSchema vdi_datasets_prod_${env:LOCATION_INDICATOR}
+  datasetPropertiesJsonSchemaFiles:
+  - &genDatasetProps /schema/data/dataset-characteristics.genomics.json
+  - &edaDatasetProps /schema/data/dataset-characteristics.eda.json
 
 containerCore:
   authentication:
@@ -104,84 +107,181 @@ vdi:
     - name: rnaseq
       version: 1.0
     projectIds: *genomicsProjects
+
   installTargets:
   - targetName: AmoebaDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_AMOEBA}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_AMOEBA}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_AMOEBA}
+    propertySchema: *genDatasetProps
+
   - targetName: ClinEpiDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_CLINEPI}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_CLINEPI}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_CLINEPI}
+    propertySchema: *edaDatasetProps
+
   - targetName: CryptoDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_CRYPTO}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_CRYPTO}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_CRYPTO}
+    propertySchema: *genDatasetProps
+
   - targetName: FungiDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_FUNGI}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_FUNGI}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_FUNGI}
+    propertySchema: *genDatasetProps
+
   - targetName: GiardiaDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_GIARDIA}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_GIARDIA}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_GIARDIA}
+    propertySchema: *genDatasetProps
+
   - targetName: HostDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_HOST}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_HOST}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_HOST}
+    propertySchema: *genDatasetProps
+
   - targetName: MicrobiomeDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_MICROBIOME}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_MICROBIOME}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_MICROBIOME}
+    propertySchema: *edaDatasetProps
+
   - targetName: MicrosporidiaDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_MICROSPORIDIA}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_MICROSPORIDIA}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_MICROSPORIDIA}
+    propertySchema: *genDatasetProps
+
   - targetName: OrthoMCL
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_ORTHO}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_ORTHO}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_ORTHO}
+    propertySchema: ~
+
   - targetName: PiroplasmaDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_PIROPLASMA}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_PIROPLASMA}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_PIROPLASMA}
+    propertySchema: *genDatasetProps
+
   - targetName: PlasmoDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_PLASMO}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_PLASMO}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_PLASMO}
+    propertySchema: *genDatasetProps
+
   - targetName: ToxoDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_TOXO}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_TOXO}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_TOXO}
+    propertySchema: *genDatasetProps
+
   - targetName: TrichDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_TRICH}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_TRICH}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_TRICH}
+    propertySchema: *genDatasetProps
+
   - targetName: TriTrypDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_TRITRYP}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
-  - targetName: VEuPathDB
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_UNIDB}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_TRITRYP}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_TRITRYP}
+    propertySchema: *genDatasetProps
+
   - targetName: VectorBase
-    pass: *vdiSchemaPass
-    ldapCn: ${env:LDAP_VECTOR}
-    dataSchema: *vdiDataSchema
-    controlSchema: *vdiControlSchema
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_VECTOR}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_VECTOR}
+    propertySchema: *genDatasetProps
+
+  - targetName: VEuPathDB
+    controlDb:
+      user: *vdiControlSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_UNIDB}
+    dataDb:
+      user: *vdiDataSchema
+      pass: *vdiSchemaPass
+      ldapCn: ${env:LDAP_UNIDB}
+    propertySchema: ~
+

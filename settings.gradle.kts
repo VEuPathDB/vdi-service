@@ -1,4 +1,4 @@
 rootProject.name = "vdi"
 
 includeBuild("service")
-includeBuild("tools/validator")
+includeBuild("tools/config-validator")

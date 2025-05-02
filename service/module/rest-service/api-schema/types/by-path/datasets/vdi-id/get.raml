@@ -9,33 +9,11 @@ types:
     displayName: Dataset Get Response
     description: |
       Details about a specific singular dataset.
-    type: object
+    type: common.DatasetMetaBase
     additionalProperties: false
     properties:
       datasetId: common.VdiId
       owner: common.DatasetOwner
-      datasetType: common.DatasetTypeOutput
-      name: common.DatasetName
-      origin: common.DatasetOrigin
-      projectIds:
-        description: |
-          Project IDs for projects the user dataset record was submitted to.
-        type: common.ProjectId[]
-        uniqueItems: true
-        minItems: 1
-      visibility: common.DatasetVisibility
-      status: common.DatasetStatusInfo
-      created: common.DatasetCreationDate
-      dependencies:
-        type: common.DatasetDependency[]
-        uniqueItems: true
-
-      shortName?: common.DatasetShortName
-      shortAttribution?: common.DatasetShortAttribution
-      category?: common.DatasetCategory
-      summary?: common.DatasetSummary
-      description?: common.DatasetDescription
-      sourceUrl?: common.DatasetSourceUrl
       importMessages?:
         description: |
           Log lines from the import process.
@@ -47,19 +25,13 @@ types:
           Array of share offers that have been created by the owner of this
           dataset to share it with other users.
         type: ShareOffer[]
-      publications?:
-        type: common.DatasetPublication[]
-        uniqueItems: true
-      hyperlinks?:
-        type: common.DatasetHyperlink[]
-        uniqueItems: true
-      organisms?:
-        displayName: Dataset Organism Abbreviations
-        type: common.OrganismAbbreviation[]
-        uniqueItems: true
-      contacts?:
-        type: common.DatasetContact[]
-        uniqueItems: true
+
+      # Meta Fields
+      datasetType: common.DatasetTypeOutput
+      visibility: common.DatasetVisibility
+      status: common.DatasetStatusInfo
+      created: common.DatasetCreationDate
+      sourceUrl?: common.DatasetSourceUrl
       originalId?: common.VdiId
       revisionHistory?: common.DatasetRevision[]
 
