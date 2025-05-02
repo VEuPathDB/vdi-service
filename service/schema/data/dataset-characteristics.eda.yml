@@ -23,18 +23,18 @@ sharedDefinitions:
   - displayName: &experimentalDisplayName Experimental
     designs: &experimentalDesigns
     - Cluster-randomized controlled trial
-    - Quasi-experimental
+    - Quasi-experimental study
     - Randomized controlled/clinical trial
 
-  - displayName: &observationalDisplayName: Observational
+  - displayName: &observationalDisplayName Observational
     designs: &observationalDesigns
-    - Case series
-    - Case-control
-    - Cohort
-    - Cross-sectional
-    - Ecological Study
-    - Prospective Panel Study
-    - Surveillance
+    - Case series study
+    - Case-control study
+    - Cohort study
+    - Cross-sectional study
+    - Ecological study
+    - Panel study
+    - Surveillance study
 
   - displayName: &otherDisplayName n/a
     designs: &otherDesigns
