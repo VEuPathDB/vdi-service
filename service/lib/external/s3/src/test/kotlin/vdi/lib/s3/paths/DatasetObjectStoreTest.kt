@@ -20,7 +20,7 @@ import org.veupathdb.lib.s3.s34k.params.`object`.ObjectExistsParams
 import org.veupathdb.lib.s3.s34k.params.`object`.ObjectStatParams
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.lib.s3.DatasetManager
+import vdi.lib.s3.DatasetObjectStore
 import java.time.OffsetDateTime
 
 class DatasetObjectStoreTest {
@@ -45,7 +45,7 @@ class DatasetObjectStoreTest {
         secondPathFactory.datasetManifestFile()
       )
     )
-    val datasetManager = DatasetManager(mockedS3)
+    val datasetManager = DatasetObjectStore(mockedS3)
     val datasets = datasetManager.streamAllDatasets().toList()
     assertThat(datasets, Matchers.hasSize(2))
     datasets.forEach {
@@ -71,7 +71,7 @@ class DatasetObjectStoreTest {
         secondPathFactory.datasetMetaFile(),
       )
     )
-    val datasetManager = DatasetManager(mockedS3)
+    val datasetManager = DatasetObjectStore(mockedS3)
     val datasets = datasetManager.streamAllDatasets().toList()
     assertThat(datasets, Matchers.hasSize(2))
     datasets.forEach {
@@ -100,7 +100,7 @@ class DatasetObjectStoreTest {
       )
     )
 
-    val datasetManager = DatasetManager(mockedS3)
+    val datasetManager = DatasetObjectStore(mockedS3)
     val datasets = datasetManager.streamAllDatasets().toList()
 
     assertThat(datasets, Matchers.hasSize(3))
@@ -119,7 +119,7 @@ class DatasetObjectStoreTest {
         pathFactory.datasetDeleteFlagFile()
       )
     )
-    val datasetManager = DatasetManager(mockedS3)
+    val datasetManager = DatasetObjectStore(mockedS3)
     val datasets = datasetManager.streamAllDatasets().toList()
     assertThat(datasets, Matchers.hasSize(1))
   }
@@ -148,7 +148,7 @@ class DatasetObjectStoreTest {
         thirdPathFactory.datasetShareReceiptFile(TestUserID1)
       )
     )
-    val datasetManager = DatasetManager(mockedS3)
+    val datasetManager = DatasetObjectStore(mockedS3)
     val datasets = datasetManager.streamAllDatasets().toList()
     assertThat(datasets, Matchers.hasSize(3))
     assertThat(datasets.last().getShares().entries, Matchers.hasSize(1))
@@ -177,7 +177,7 @@ class DatasetObjectStoreTest {
         thirdPathFactory.datasetShareReceiptFile(TestUserID1)
       )
     )
-    val datasetManager = DatasetManager(mockedS3)
+    val datasetManager = DatasetObjectStore(mockedS3)
     val datasets = datasetManager.streamAllDatasets().toList()
     assertThat(datasets, Matchers.hasSize(2))
     assertThat(datasets.last().getShares().entries, Matchers.hasSize(1))
@@ -206,7 +206,7 @@ class DatasetObjectStoreTest {
         thirdPathFactory.datasetShareReceiptFile(TestUserID1)
       )
     )
-    val datasetManager = DatasetManager(mockedS3)
+    val datasetManager = DatasetObjectStore(mockedS3)
     val datasets = datasetManager.streamAllDatasets().toList()
     assertThat(datasets, Matchers.hasSize(2))
     assertThat(datasets.last().getShares().entries, Matchers.hasSize(1))
@@ -236,7 +236,7 @@ class DatasetObjectStoreTest {
         "$TestUserID1/$DatasetID3/Broken-path2",
       )
     )
-    val datasetManager = DatasetManager(mockedS3)
+    val datasetManager = DatasetObjectStore(mockedS3)
     val datasets = datasetManager.streamAllDatasets().toList()
     assertThat(datasets, Matchers.hasSize(2))
   }
@@ -250,7 +250,7 @@ class DatasetObjectStoreTest {
         "$TestUserID1/$DatasetID1/Broken-path2",
       )
     )
-    val datasetManager = DatasetManager(mockedS3)
+    val datasetManager = DatasetObjectStore(mockedS3)
     val datasets = datasetManager.streamAllDatasets().toList()
     assertThat(datasets, Matchers.hasSize(0))
   }

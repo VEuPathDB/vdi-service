@@ -15,7 +15,6 @@ import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.purgeDataset
 import vdi.lib.db.cache.withTransaction
 import vdi.lib.s3.DatasetDirectory
-import vdi.lib.s3.DatasetManager
 import vdi.lib.s3.DatasetObjectStore
 import vdi.lib.s3.paths.S3File
 import vdi.lib.logging.logger
@@ -108,7 +107,7 @@ object Pruner {
     val bucket = S3Api.newClient(config.s3Config).buckets[config.bucketName]
       ?: throw IllegalStateException("bucket ${config.bucketName} does not exist!")
 
-    val dsm = DatasetManager(bucket)
+    val dsm = DatasetObjectStore(bucket)
 
     // Threshold is the start of the retention window going backwards in time
     // from the current timestamp.  Timestamps before this threshold are outside

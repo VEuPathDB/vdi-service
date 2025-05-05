@@ -3,6 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.yaml.snakeyaml.Yaml
+import vdi.ConfigSchemaCompiler
 
 plugins {
   alias(libs.plugins.kotlin)
@@ -63,12 +64,14 @@ dependencies {
   implementation(project(":bootstrap"))
 }
 
-val schemaBuildDir = layout.buildDirectory.dir("json-schema").get().asFile
+val jsonSchemaBuildDir = layout.buildDirectory.dir("json-schema").get().asFile
 sourceSets.main {
-  output.dir(schemaBuildDir, "builtBy" to "create-dataset-schema-resources")
+  resources.srcDir(jsonSchemaBuildDir)
 }
 
-tasks.clean { delete(schemaBuildDir) }
+tasks.processResources { dependsOn("build-config-schema-resource", "build-dataset-schema-resources") }
+
+tasks.clean { delete(jsonSchemaBuildDir) }
 
 // Fat Jar Config
 tasks.shadowJar {
@@ -80,27 +83,39 @@ tasks.shadowJar {
   }
 }
 
-tasks.register("create-dataset-schema-resources") {
+
+data class LoadResult(val raw: String, val refs: Set<IntRange>)
+
+tasks.register("build-config-schema-resource") {
+  ConfigSchemaCompiler.init(this, project)
+
+  doLast {
+    ConfigSchemaCompiler.run()
+  }
+}
+
+tasks.register("build-dataset-schema-resources") {
+  val outputDir = jsonSchemaBuildDir.resolve("schema/data/")
   val schemaSourceDir = file("schema/data/")
 
   inputs.dir(schemaSourceDir)
-  outputs.dir(schemaBuildDir)
+  outputs.dir(outputDir)
 
   doFirst {
     val json = ObjectMapper()
 
-    schemaBuildDir.mkdirs()
+    outputDir.mkdirs()
 
     schemaSourceDir
       .listFiles()!!
       .onEach {
         if (it.name.endsWith("json"))
-          it.copyTo(schemaBuildDir.resolve(it.name))
+          it.copyTo(outputDir.resolve(it.name))
       }
       .filter { it.name.endsWith("yml") }
       .forEach {
         json.writerWithDefaultPrettyPrinter().writeValue(
-          schemaBuildDir.resolve(it.name.substringBeforeLast('.') + ".json"),
+          outputDir.resolve(it.name.substringBeforeLast('.') + ".json"),
 //          json.convertValue(Yaml().loadAs(it.readText(), Any::class.java), ObjectNode::class.java),
           Yaml().loadAs(it.readText(), Any::class.java),
         )

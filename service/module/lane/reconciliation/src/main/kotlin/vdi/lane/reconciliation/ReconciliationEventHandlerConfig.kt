@@ -9,7 +9,7 @@ import vdi.lib.env.EnvKey
 import vdi.lib.env.Environment
 import vdi.lib.kafka.KafkaConsumerConfig
 import vdi.lib.kafka.router.KafkaRouterConfig
-import vdi.lib.kafka.router.KafkaRouterConfigDefaults
+import vdi.lib.kafka.router.RouterDefaults
 import vdi.lib.s3.util.S3Config
 
 data class ReconciliationEventHandlerConfig(
@@ -51,10 +51,10 @@ data class ReconciliationEventHandlerConfig(
     const val WorkerPoolSize = 10u
 
     inline val ReconciliationTopic
-      get() = KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_TOPIC
+      get() = RouterDefaults.ReconciliationTriggerTopic
 
     inline val ReconciliationMessageKey
-      get() = KafkaRouterConfigDefaults.RECONCILIATION_TRIGGER_MESSAGE_KEY
+      get() = RouterDefaults.ReconciliationTriggerMessageKey
   }
 }
 

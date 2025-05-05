@@ -8,7 +8,7 @@ import org.veupathdb.vdi.lib.common.env.require
 import vdi.lib.env.EnvKey
 import vdi.lib.env.Environment
 import vdi.lib.kafka.KafkaConsumerConfig
-import vdi.lib.kafka.router.KafkaRouterConfigDefaults
+import vdi.lib.kafka.router.RouterDefaults
 import vdi.lib.s3.util.S3Config
 
 data class SoftDeleteTriggerHandlerConfig(
@@ -39,10 +39,10 @@ data class SoftDeleteTriggerHandlerConfig(
     s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
 
     softDeleteTriggerTopic = env.optional(EnvKey.Kafka.Topic.SoftDeleteTriggers)
-      ?: KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_TOPIC,
+      ?: RouterDefaults.SoftDeleteTriggerTopic,
 
     softDeleteTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.SoftDeleteTriggers)
-      ?: KafkaRouterConfigDefaults.SOFT_DELETE_TRIGGER_MESSAGE_KEY
+      ?: RouterDefaults.SoftDeleteTriggerMessageKey
 
   )
 

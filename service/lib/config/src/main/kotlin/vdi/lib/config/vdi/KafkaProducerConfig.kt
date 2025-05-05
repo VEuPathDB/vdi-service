@@ -3,15 +3,15 @@ package vdi.lib.config.vdi
 import kotlin.time.Duration
 
 data class KafkaProducerConfig(
-  val bufferMemoryBytes: UInt?,
+  val bufferMemory: Long?,
   val compressionType: String?,
-  val sendRetries: UInt?,
-  val batchSize: UInt?,
+  val sendRetries: Int?,
+  val batchSize: Int?,
   val connectionsMaxIdle: Duration?,
   val deliveryTimeout: Duration?,
   val lingerTime: Duration?,
   val maxBlockingTimeout: Duration?,
-  val maxRequestSize: UInt?,
+  val maxRequestSize: Int?,
   val receiveBufferSize: Int?,
   val requestTimeout: Duration?,
   val sendBufferSize: Int?,

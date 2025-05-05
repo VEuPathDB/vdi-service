@@ -14,7 +14,6 @@ import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.kafka.router.KafkaRouterFactory
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
-import vdi.lib.s3.DatasetManager
 import vdi.lib.s3.DatasetObjectStore
 
 object Reconciler {
@@ -52,7 +51,7 @@ object Reconciler {
           val bucket = s3.buckets[config.s3Bucket]
             ?: throw IllegalStateException("S3 bucket ${config.s3Bucket} does not exist!")
 
-          datasetManager = DatasetManager(bucket)
+          datasetManager = DatasetObjectStore(bucket)
         } catch (e: Throwable) {
           logger.error("failed to init dataset manager", e)
           abortCB(e.message)

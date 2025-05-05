@@ -2,6 +2,10 @@ package vdi.lib.s3.paths
 
 import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
 enum class S3File(val baseName: String) {
   /**
    * Name of the flag object used to indicate that a dataset has soft-deleted.
@@ -35,7 +39,10 @@ enum class S3File(val baseName: String) {
    */
   RevisionFlag("revised-flag"),
 
-  SharesDir("shares"),
+  SharesDir("shares") {
+    private val pat = Regex("\\bshares\\b")
+    override fun resembles(path: String) = path.contains(pat)
+  },
 
   ShareOffer("share-offer.json"),
 
@@ -45,6 +52,18 @@ enum class S3File(val baseName: String) {
   companion object {
     fun fromStringOrNull(name: String) =
       entries.firstOrNull { it.baseName == name }
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun String.resembles(target: S3File) =
+      target.resembles(this)
+
+    @OptIn(ExperimentalContracts::class)
+    inline fun String.resembles(target: S3File, fn: () -> Unit): Boolean {
+      contract { callsInPlace(fn, InvocationKind.AT_MOST_ONCE) }
+      return target.resembles(this).also { if (it) fn() }
+    }
   }
+
+  open fun resembles(path: String) = path.endsWith(baseName)
 }
 

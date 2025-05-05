@@ -9,5 +9,6 @@ import vdi.lib.config.vdi.VDIConfig
 data class StackConfig(
   @JsonProperty("containerCore")
   val core: ContainerCoreConfig?,
+  @JsonProperty("vdiConfig")
   val vdi: VDIConfig,
 )

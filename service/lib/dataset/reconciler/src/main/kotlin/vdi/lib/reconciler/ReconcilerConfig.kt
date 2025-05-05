@@ -5,7 +5,7 @@ import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.env.Environment
 import org.veupathdb.vdi.lib.common.env.optBool
 import org.veupathdb.vdi.lib.common.env.require
-import vdi.lib.env.EnvKey
+import vdi.lib.config.vdi.daemons.ReconcilerConfig
 import vdi.lib.kafka.router.KafkaRouterConfig
 import vdi.lib.s3.util.S3Config
 
@@ -15,9 +15,7 @@ internal data class ReconcilerConfig(
   val s3Bucket:          BucketName,
   val deletesEnabled:    Boolean,
 ) {
-  constructor() : this(System.getenv())
-
-  constructor(env: Environment) : this(
+  constructor(conf: ReconcilerConfig) : this(
     kafkaRouterConfig = KafkaRouterConfig(env, "reconciler"),
     s3Config          = S3Config(env),
     s3Bucket          = BucketName(env.require(EnvKey.S3.BucketName)),

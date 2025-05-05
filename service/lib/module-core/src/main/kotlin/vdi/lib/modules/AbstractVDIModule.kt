@@ -14,7 +14,7 @@ import vdi.lib.kafka.KafkaConsumer
 import vdi.lib.kafka.KafkaConsumerConfig
 import vdi.lib.kafka.router.KafkaRouterConfig
 import vdi.lib.kafka.router.KafkaRouterFactory
-import vdi.lib.s3.DatasetManager
+import vdi.lib.s3.DatasetObjectStore
 
 /**
  * VDI Service Module Abstract Base
@@ -148,7 +148,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
     }
 
   protected suspend fun requireDatasetManager(s3Config: S3Config, bucketName: BucketName) =
-    DatasetManager(requireS3Bucket(requireS3Client(s3Config), bucketName))
+    DatasetObjectStore(requireS3Bucket(requireS3Client(s3Config), bucketName))
 
   /**
    * Fetches event messages from Kafka matching the given [key].

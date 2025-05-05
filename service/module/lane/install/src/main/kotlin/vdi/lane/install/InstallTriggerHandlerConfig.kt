@@ -9,7 +9,7 @@ import vdi.lib.env.EnvKey
 import vdi.lib.env.Environment
 import vdi.lib.kafka.KafkaConsumerConfig
 import vdi.lib.kafka.router.KafkaRouterConfig
-import vdi.lib.kafka.router.KafkaRouterConfigDefaults
+import vdi.lib.kafka.router.RouterDefaults
 import vdi.lib.s3.util.S3Config
 
 data class InstallTriggerHandlerConfig(
@@ -62,9 +62,9 @@ data class InstallTriggerHandlerConfig(
     const val KafkaProducerClientID = "install-data-handler-send"
 
     inline val InstallDataTriggerTopic
-      get() = KafkaRouterConfigDefaults.INSTALL_TRIGGER_TOPIC
+      get() = RouterDefaults.InstallTriggerTopic
 
     inline val InstallDataTriggerMessageKey
-      get() = KafkaRouterConfigDefaults.INSTALL_TRIGGER_MESSAGE_KEY
+      get() = RouterDefaults.InstallTriggerMessageKey
   }
 }

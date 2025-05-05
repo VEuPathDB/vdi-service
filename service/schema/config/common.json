@@ -122,12 +122,8 @@
       "allOf": [
         {
           "properties": {
-            "user": {
-              "type": "string"
-            },
-            "pass": {
-              "type": "string"
-            },
+            "username": { "type": "string" },
+            "password": { "type": "string" },
             "platform": {
               "enum": [
                 "oracle",
@@ -143,8 +139,8 @@
             }
           },
           "required": [
-            "user",
-            "pass"
+            "username",
+            "password"
           ]
         },
         {
@@ -165,13 +161,13 @@
                   "title": "Database Host Details",
                   "oneOf": [
                     {
-                      "$ref": "/vdi-service/schema/common.json#/$defs/hostString"
+                      "$ref": "#/$defs/hostString"
                     },
                     {
-                      "$ref": "/vdi-service/schema/common.json#/$defs/hostObject"
+                      "$ref": "#/$defs/hostObject"
                     },
                     {
-                      "$ref": "/vdi-service/schema/common.json#/$defs/interpolatedValue"
+                      "$ref": "#/$defs/interpolatedValue"
                     }
                   ]
                 },

@@ -2,113 +2,46 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/install-target.json",
   "type": "object",
-  "allOf": [
-    {
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "default": true
-        },
-        "targetName": {
-          "$ref": "../common.json#/$defs/installTarget"
-        },
-        "dataTypes": {
-          "type": "array",
-          "items": { "type": "string" },
-          "unevaluatedItems": false,
-          "uniqueItems": true
-        },
-        "controlDb": { "$ref": "../common.json#/$defs/database" },
-        "dataDb": { "$ref": "../common.json#/$defs/database" },
-        "datasetPropertySchema": {
-          "oneOf": [
-            {
-              "title": "Inline Schema Definition",
-              "$ref": "https://json-schema.org/draft/2020-12/schema"
-            },
-            {
-              "title": "Remote Schema File",
-              "type": "string",
-              "pattern": "^(https?)?://([0-9a-zA-Z][\\w-]+(?:\\.[0-9a-zA-Z][\\w-]*)*)((?:/[\\w%.~-]+)+)(\\?.+)?$"
-            },
-            {
-              "title": "Local Schema File",
-              "description": "Path to a local schema file.  If the path is absolute, and does not exist in the host filesystem, the service jar contents will be checked as well.",
-              "type": "string",
-              "format": "uri-reference"
-            },
-            {
-              "title": "No Schema Permitted",
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "required": [
-        "targetName",
-        "controlDb",
-        "dataDb",
-        "propertySchema"
-      ]
+  "properties": {
+    "enabled": {
+      "type": "boolean",
+      "default": true
     },
-    {
+    "targetName": {
+      "$ref": "../common.json#/$defs/installTarget"
+    },
+    "dataTypes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "unevaluatedItems": false,
+      "uniqueItems": true
+    },
+    "controlDb": { "$ref": "../common.json#/$defs/database" },
+    "dataDb": { "$ref": "../common.json#/$defs/database" },
+    "datasetPropertySchema": {
       "oneOf": [
         {
-          "properties": {
-            "ldapCn": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "ldapCn"
-          ]
+          "title": "Inline Schema Definition",
+          "$ref": "https://json-schema.org/draft/2020-12/schema"
         },
         {
-          "properties": {
-            "dbName": {
-              "type": "string"
-            },
-            "host": {
-              "oneOf": [
-                {
-                  "$ref": "../common.json#/$defs/hostString"
-                },
-                {
-                  "$ref": "../common.json#/$defs/interpolatedValue"
-                },
-                {
-                  "$ref": "../common.json#/$defs/hostObject"
-                }
-              ]
-            }
-          },
-          "required": [
-            "dbName",
-            "host",
-            "platform"
-          ]
+          "title": "Remote Schema File",
+          "type": "string",
+          "pattern": "^(https?)?://([0-9a-zA-Z][\\w-]+(?:\\.[0-9a-zA-Z][\\w-]*)*)((?:/[\\w%.~-]+)+)(\\?.+)?$"
         },
         {
-          "properties": {
-            "dbName": {
-              "type": "string"
-            },
-            "host": {
-              "type": "string",
-              "pattern": "^[\\w-.]+$"
-            },
-            "port": {
-              "$ref": "../common.json#/$defs/port"
-            }
-          },
-          "required": [
-            "dbName",
-            "host",
-            "platform"
-          ]
+          "title": "Local Schema File",
+          "description": "Path to a local schema file.  If the path is absolute, and does not exist in the host filesystem, the service jar contents will be checked as well.",
+          "type": "string",
+          "format": "uri-reference"
         }
       ]
     }
+  },
+  "required": [
+    "targetName",
+    "controlDb",
+    "dataDb"
   ],
   "unevaluatedProperties": false
 }

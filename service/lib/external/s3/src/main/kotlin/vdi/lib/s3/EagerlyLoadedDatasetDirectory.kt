@@ -13,6 +13,7 @@ import vdi.lib.s3.files.*
 import vdi.lib.s3.paths.S3DatasetPathFactory
 import vdi.lib.s3.paths.S3File
 import java.io.InputStream
+import vdi.lib.s3.paths.S3File.Companion.resembles
 
 /**
  * Implementation of a DatasetDirectory in which all objects are already known
@@ -34,7 +35,6 @@ internal class EagerlyLoadedDatasetDirectory(
   private val shares: Map<UserID, DatasetShare>,
   private val pathFactory: S3DatasetPathFactory
 ) : DatasetDirectory {
-
   companion object {
     // throws
     @JvmStatic
@@ -57,30 +57,23 @@ internal class EagerlyLoadedDatasetDirectory(
       objects.forEach {
         val subPath = it.path.trimIDPrefix()
 
-        if (subPath.startsWith(S3File.SharesDir)) {
+        subPath.resembles(S3File.SharesDir) {
           subPath.splitSharePath()?.also { (recipient, file) ->
             val ref = shareRefs.computeIfAbsent(recipient) { ShareRef(recipient) }
 
-            when (file) {
-              S3File.ShareOffer   -> ref.offer = it
-              S3File.ShareReceipt -> ref.receipt = it
-              else                      -> return@also // Fall through to the 'when' block
-            }
-
-            return@forEach // Continue to the next s3 object
+            file.resembles(S3File.ShareOffer) { ref.offer = it }
+            || file.resembles(S3File.ShareReceipt) { ref.receipt = it }
+            || throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
           }
         }
-
-        when (subPath) {
-          S3File.Metadata -> metaFile = DatasetMetaFileImpl(it)
-          S3File.Manifest -> manifest = DatasetManifestFileImpl(it)
-          S3File.RawUploadZip    -> uploadFile = DatasetRawUploadFileImpl(it)
-          S3File.ImportReadyZip  -> importableFile = DatasetImportableFileImpl(it)
-          S3File.InstallReadyZip -> installableFile = DatasetInstallableFileImpl(it)
-          S3File.DeleteFlag      -> deleteFlag = DatasetDeleteFlagFileImpl(it)
-          S3File.RevisionFlag    -> revisedFlag = DatasetRevisionFlagFileImpl(it)
-          else                      -> throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
-        }
+        || subPath.resembles(S3File.Metadata) { metaFile = DatasetMetaFileImpl(it) }
+        || subPath.resembles(S3File.Manifest) { manifest = DatasetManifestFileImpl(it) }
+        || subPath.resembles(S3File.RawUploadZip) { uploadFile = DatasetRawUploadFileImpl(it) }
+        || subPath.resembles(S3File.ImportReadyZip) { importableFile = DatasetImportableFileImpl(it) }
+        || subPath.resembles(S3File.InstallReadyZip) { installableFile = DatasetInstallableFileImpl(it) }
+        || subPath.resembles(S3File.DeleteFlag) { deleteFlag = DatasetDeleteFlagFileImpl(it) }
+        || subPath.resembles(S3File.RevisionFlag) { revisedFlag = DatasetRevisionFlagFileImpl(it) }
+        || throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
       }
 
       return EagerlyLoadedDatasetDirectory(
@@ -97,14 +90,64 @@ internal class EagerlyLoadedDatasetDirectory(
         pathFactory     = pathFactory,
       )
     }
+
+    private data class ShareRef(
+      val recipientID: UserID,
+      var offer: S3Object? = null,
+      var receipt: S3Object? = null,
+    ) {
+      fun toDatasetShare(pathFactory: S3DatasetPathFactory) =
+        DatasetShareImpl(
+          recipientID,
+          offer?.let(::DatasetShareOfferFileImpl)
+            ?: DatasetShareOfferFileImpl(pathFactory.datasetShareOfferFile(recipientID)),
+          receipt?.let(::DatasetShareReceiptFileImpl)
+            ?: DatasetShareReceiptFileImpl(pathFactory.datasetShareReceiptFile(recipientID))
+        )
+    }
+
+    /**
+     * Removes the "{user-id}/{dataset-id}/" prefix from the given path string.
+     */
+    private fun String.trimIDPrefix() =
+      when (val i = indexOf('/', indexOf('/')+1)) {
+        -1   -> ""
+        else -> substring(i+1)
+      }
+
+    /**
+     * Attempts to split the given share object path into the component recipient
+     * user id and share object name.
+     *
+     * Expected object path format: `share/{user-id}/{file-name}`
+     *
+     * If the path cannot be parsed as the expected form, this method will return
+     * `null`.
+     */
+    private fun String.splitSharePath(): Pair<UserID, String>? {
+      val a = indexOf('/')
+      if (a == -1)
+        return null
+
+      val b = indexOf('/', a + 1)
+      if (b == -1)
+        return null
+
+      val recipientID = substring(a + 1, b).toUserIDOrNull()
+        ?: return null
+
+      return recipientID to substring(b + 1)
+    }
   }
 
-  override fun exists(): Boolean = true // Eagerly loaded dataset directory must exist by definition of being constructed.
+  // Eagerly loaded dataset directory must exist by definition of being constructed.
+  override fun exists(): Boolean = true
 
+  override fun hasMetaFile() =
+    metaFile != null
 
-  override fun hasMetaFile() = metaFile != null
-
-  override fun getMetaFile() = metaFile ?: DatasetMetaFileImpl(pathFactory.datasetMetaFile())
+  override fun getMetaFile() =
+    metaFile ?: DatasetMetaFileImpl(pathFactory.datasetMetaFile())
 
   override fun putMetaFile(meta: VDIDatasetMeta) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -112,10 +155,11 @@ internal class EagerlyLoadedDatasetDirectory(
   override fun deleteMetaFile() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
+  override fun hasManifestFile() =
+    manifest != null
 
-  override fun hasManifestFile() = manifest != null
-
-  override fun getManifestFile() = manifest ?: DatasetManifestFileImpl(pathFactory.datasetManifestFile())
+  override fun getManifestFile() =
+    manifest ?: DatasetManifestFileImpl(pathFactory.datasetManifestFile())
 
   override fun putManifestFile(manifest: VDIDatasetManifest) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -123,10 +167,11 @@ internal class EagerlyLoadedDatasetDirectory(
   override fun deleteManifestFile() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
+  override fun hasDeleteFlag() =
+    deleteFlag != null
 
-  override fun hasDeleteFlag() = deleteFlag != null
-
-  override fun getDeleteFlag() = deleteFlag ?: DatasetDeleteFlagFileImpl(pathFactory.datasetDeleteFlagFile())
+  override fun getDeleteFlag() =
+    deleteFlag ?: DatasetDeleteFlagFileImpl(pathFactory.datasetDeleteFlagFile())
 
   override fun putDeleteFlag() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -134,9 +179,11 @@ internal class EagerlyLoadedDatasetDirectory(
   override fun deleteDeleteFlag() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
-  override fun hasRevisedFlag() = revisedFlag != null
+  override fun hasRevisedFlag() =
+    revisedFlag != null
 
-  override fun getRevisedFlag() = revisedFlag ?: DatasetRevisionFlagFileImpl(pathFactory.datasetRevisedFlagFile())
+  override fun getRevisedFlag() =
+    revisedFlag ?: DatasetRevisionFlagFileImpl(pathFactory.datasetRevisedFlagFile())
 
   override fun putRevisedFlag() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -144,19 +191,23 @@ internal class EagerlyLoadedDatasetDirectory(
   override fun deleteRevisedFlag() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
-  override fun hasUploadFile() = uploadFile != null
+  override fun hasUploadFile() =
+    uploadFile != null
 
-  override fun getUploadFile() = uploadFile ?: DatasetRawUploadFileImpl(pathFactory.datasetUploadZip())
+  override fun getUploadFile() =
+    uploadFile ?: DatasetRawUploadFileImpl(pathFactory.datasetUploadZip())
 
-  override fun putUploadFile(fn: () -> InputStream) = throw UnsupportedOperationException("${javaClass.name} is read-only")
+  override fun putUploadFile(fn: () -> InputStream) =
+    throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun deleteUploadFile() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
+  override fun hasImportReadyFile() =
+    importableFile != null
 
-  override fun hasImportReadyFile() = importableFile != null
-
-  override fun getImportReadyFile() = importableFile ?: DatasetImportableFileImpl(pathFactory.datasetImportReadyZip())
+  override fun getImportReadyFile() =
+    importableFile ?: DatasetImportableFileImpl(pathFactory.datasetImportReadyZip())
 
   override fun putImportReadyFile(fn: () -> InputStream) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -164,10 +215,11 @@ internal class EagerlyLoadedDatasetDirectory(
   override fun deleteImportReadyFile() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
+  override fun hasInstallReadyFile() =
+    installableFile != null
 
-  override fun hasInstallReadyFile() = installableFile != null
-
-  override fun getInstallReadyFile() = installableFile ?: DatasetInstallableFileImpl(pathFactory.datasetInstallReadyZip())
+  override fun getInstallReadyFile() =
+    installableFile ?: DatasetInstallableFileImpl(pathFactory.datasetInstallReadyZip())
 
   override fun putInstallReadyFile(fn: () -> InputStream) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -185,52 +237,4 @@ internal class EagerlyLoadedDatasetDirectory(
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun toString() = "EagerDatasetDir($ownerID/$datasetID)"
-}
-
-private data class ShareRef(
-  val recipientID: UserID,
-  var offer: S3Object? = null,
-  var receipt: S3Object? = null,
-) {
-  fun toDatasetShare(pathFactory: S3DatasetPathFactory) =
-    DatasetShareImpl(
-      recipientID,
-      offer?.let(::DatasetShareOfferFileImpl)
-        ?: DatasetShareOfferFileImpl(pathFactory.datasetShareOfferFile(recipientID)),
-      receipt?.let(::DatasetShareReceiptFileImpl)
-        ?: DatasetShareReceiptFileImpl(pathFactory.datasetShareReceiptFile(recipientID))
-    )
-}
-
-/**
- * Removes the "{user-id}/{dataset-id}/" prefix from the given path string.
- */
-private fun String.trimIDPrefix() =
-  when (val i = indexOf('/', indexOf('/')+1)) {
-    -1   -> ""
-    else -> substring(i+1)
-  }
-
-/**
- * Attempts to split the given share object path into the component recipient
- * user id and share object name.
- *
- * Expected object path format: `share/{user-id}/{file-name}`
- *
- * If the path cannot be parsed as the expected form, this method will return
- * `null`.
- */
-private fun String.splitSharePath(): Pair<UserID, String>? {
-  val a = indexOf('/')
-  if (a == -1)
-    return null
-
-  val b = indexOf('/', a + 1)
-  if (b == -1)
-    return null
-
-  val recipientID = substring(a + 1, b).toUserIDOrNull()
-    ?: return null
-
-  return recipientID to substring(b + 1)
 }

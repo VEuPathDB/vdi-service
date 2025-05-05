@@ -43,7 +43,7 @@ services:
       timeout: 10s
       retries: 5
     environment:
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_LISTENERS:-PLAINTEXT://kafka:9092}
     networks:
     - internal
 

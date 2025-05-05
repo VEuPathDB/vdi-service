@@ -37,7 +37,6 @@
     }
   },
   "required": [
-    "listeners",
     "servers"
   ],
   "additionalProperties": false,
@@ -140,7 +139,7 @@
     "producers": {
       "type": "object",
       "properties": {
-        "bufferMemoryBytes": {
+        "bufferMemory": {
           "type": "integer",
           "minimum": 0,
           "default": 33554432

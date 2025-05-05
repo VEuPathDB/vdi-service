@@ -22,7 +22,6 @@ import vdi.lib.plugin.client.response.uni.UninstallUnexpectedErrorResponse
 import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.lib.s3.DatasetDirectory
-import vdi.lib.s3.DatasetManager
 import vdi.lib.s3.DatasetObjectStore
 import java.io.InputStream
 
@@ -66,7 +65,7 @@ object DatasetReinstaller {
 
     val s3 = S3Api.newClient(config.s3Config)
     val bucket = s3.buckets[config.s3Bucket]!!
-    val manager = DatasetManager(bucket)
+    val manager = DatasetObjectStore(bucket)
 
     // For each project registered with the service...
     for ((projectID, _) in AppDatabaseRegistry) {

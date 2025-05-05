@@ -16,6 +16,5 @@ data class VDIConfig(
   val plugins: Set<PluginConfig>,
   val rabbit: RabbitConfigs,
   val siteBuild: String,
-  @JsonProperty("targetDbs")
-  val targetDBs: Set<InstallTargetConfigBase>,
+  val installTargets: Set<InstallTargetConfig>,
 )

@@ -3,7 +3,8 @@ plugins {
 }
 
 dependencies {
-  implementation(libs.vdi.json)
+  api(libs.vdi.common)
+  api(libs.vdi.json)
   implementation(libs.yaml)
   implementation(libs.json.schema.validation)
 }
