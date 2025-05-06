@@ -71,6 +71,7 @@
     },
     "interpolatedValue": {
       "title": "Interpolated String",
+      "description": "String that will be interpolated using the service environment.",
       "type": "string",
       "pattern": "^.*\\$\\{env:\\w{3,64}\\}.*$"
     },
@@ -79,14 +80,18 @@
       "type": "object",
       "properties": {
         "servers": {
+          "title": "LDAP Server List",
+          "description": "List of servers that container core will use to lookup database details.  Servers will be tried in the order they are defined.",
           "oneOf": [
             {
+              "title": "Host Strings",
               "type": "array",
               "items": {
                 "$ref": "#/$defs/hostString"
               }
             },
             {
+              "title": "Host Details",
               "type": "array",
               "items": {
                 "$ref": "#/$defs/hostObject"
@@ -178,7 +183,8 @@
               },
               "required": [
                 "host",
-                "name"
+                "name",
+                "platform"
               ]
             },
             {
@@ -210,7 +216,8 @@
               },
               "required": [
                 "host",
-                "name"
+                "name",
+                "platform"
               ]
             }
           ]

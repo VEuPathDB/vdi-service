@@ -1,12 +1,14 @@
 package vdi.lib.config.vdi
 
+import org.veupathdb.vdi.lib.common.field.SecretString
+import kotlin.time.Duration
 import vdi.lib.config.common.HostAddress
-import vdi.lib.config.common.SecretString
 
 data class RabbitConnectionConfig(
   val name: String?,
   val host: HostAddress,
-  val user: String,
-  val pass: SecretString,
+  val username: String,
+  val password: SecretString,
   val tls: Boolean?,
+  val timeout: Duration?,
 )

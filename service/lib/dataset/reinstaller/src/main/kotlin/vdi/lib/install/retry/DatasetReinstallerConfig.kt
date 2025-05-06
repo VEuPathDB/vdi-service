@@ -2,19 +2,18 @@ package vdi.lib.install.retry
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import org.veupathdb.vdi.lib.common.env.Environment
-import org.veupathdb.vdi.lib.common.env.require
-import vdi.lib.env.EnvKey
+import vdi.lib.config.loadAndCacheStackConfig
+import vdi.lib.config.vdi.ObjectStoreConfig
 import vdi.lib.s3.util.S3Config
 
 data class DatasetReinstallerConfig(
   val s3Config:     S3Config,
   val s3Bucket:     BucketName,
 ) {
-  constructor() : this(System.getenv())
+  constructor() : this(loadAndCacheStackConfig().vdi.objectStore)
 
-  constructor(env: Environment) : this(
-    s3Config     = S3Config(env),
-    s3Bucket     = BucketName(env.require(EnvKey.S3.BucketName)),
+  constructor(conf: ObjectStoreConfig) : this(
+    s3Config     = S3Config(conf),
+    s3Bucket     = BucketName(conf.bucketName),
   )
 }

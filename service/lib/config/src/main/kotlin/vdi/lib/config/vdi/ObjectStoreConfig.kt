@@ -1,7 +1,7 @@
 package vdi.lib.config.vdi
 
+import org.veupathdb.vdi.lib.common.field.SecretString
 import vdi.lib.config.common.HostAddress
-import vdi.lib.config.common.SecretString
 
 data class ObjectStoreConfig(
   val bucketName: String,

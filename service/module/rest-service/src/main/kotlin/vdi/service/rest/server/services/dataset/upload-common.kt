@@ -34,7 +34,7 @@ import vdi.lib.db.cache.withTransaction
 import vdi.lib.db.model.SyncControlRecord
 import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
-import vdi.service.rest.ServiceConfig
+import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.services.users.getCurrentQuotaUsage

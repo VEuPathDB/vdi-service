@@ -2,52 +2,50 @@ package vdi.lane.delete.soft
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import org.veupathdb.vdi.lib.common.env.optUInt
-import org.veupathdb.vdi.lib.common.env.optional
-import org.veupathdb.vdi.lib.common.env.require
-import vdi.lib.env.EnvKey
-import vdi.lib.env.Environment
-import vdi.lib.kafka.KafkaConsumerConfig
+import vdi.lib.config.vdi.KafkaConfig
+import vdi.lib.config.vdi.ObjectStoreConfig
+import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.config.vdi.lanes.ConsumerLaneConfig
+import vdi.lib.kafka.*
 import vdi.lib.kafka.router.RouterDefaults
 import vdi.lib.s3.util.S3Config
+import vdi.lib.s3.util.bucket
 
 data class SoftDeleteTriggerHandlerConfig(
-  val workerPoolSize: UInt,
-  val workQueueSize: UInt,
-  val kafkaConsumerConfig: KafkaConsumerConfig,
-  val s3Config: S3Config,
-  val s3Bucket: BucketName,
-  val softDeleteTriggerTopic: String,
-  val softDeleteTriggerMessageKey: String,
+  val workerCount:  UByte,
+  val jobQueueSize: UByte,
+  val kafkaConfig:  KafkaConsumerConfig,
+  val s3Config:     S3Config,
+  val s3Bucket:     BucketName,
+  val eventChannel: MessageTopic,
+  val eventKey:     MessageKey,
 ) {
-  constructor() : this(System.getenv())
+  constructor(config: VDIConfig): this(config.lanes?.softDelete, config.objectStore, config.kafka)
 
-  constructor(env: Environment) : this(
-    workerPoolSize = env.optUInt(EnvKey.SoftDeleteTriggerHandler.WorkerPoolSize)
-      ?: Defaults.WorkerPoolSize,
-
-    workQueueSize = env.optUInt(EnvKey.SoftDeleteTriggerHandler.WorkQueueSize)
-      ?: Defaults.WorkQueueSize,
-
-    kafkaConsumerConfig = KafkaConsumerConfig(
-      env.optional(EnvKey.SoftDeleteTriggerHandler.KafkaConsumerClientID) ?: "soft-delete-handler",
-      env
-    ),
-
-    s3Config = S3Config(env),
-
-    s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
-
-    softDeleteTriggerTopic = env.optional(EnvKey.Kafka.Topic.SoftDeleteTriggers)
-      ?: RouterDefaults.SoftDeleteTriggerTopic,
-
-    softDeleteTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.SoftDeleteTriggers)
-      ?: RouterDefaults.SoftDeleteTriggerMessageKey
-
+  constructor(lane: ConsumerLaneConfig?, store: ObjectStoreConfig, kafka: KafkaConfig): this(
+    workerCount  = lane?.workerCount ?: WorkerPoolSize,
+    jobQueueSize = lane?.inMemoryQueueSize ?: WorkQueueSize,
+    kafkaConfig  = KafkaConsumerConfig(lane?.kafkaConsumerID ?: ConsumerID, kafka),
+    s3Config     = S3Config(store),
+    s3Bucket     = store.bucket,
+    eventChannel = lane?.eventChannel?.toMessageTopic() ?: EventChannel,
+    eventKey     = lane?.eventKey?.toMessageKey() ?: EventKey,
   )
 
-  object Defaults {
-    const val WorkerPoolSize = 5u
-    const val WorkQueueSize  = 5u
+  private companion object {
+    inline val ConsumerID
+      get() = "soft-delete-lane-receive"
+
+    inline val EventKey
+      get() = RouterDefaults.SoftDeleteTriggerMessageKey
+
+    inline val EventChannel
+      get() = RouterDefaults.SoftDeleteTriggerTopic
+
+    inline val WorkerPoolSize
+      get(): UByte = 5u
+
+    inline val WorkQueueSize
+      get(): UByte = 5u
   }
 }

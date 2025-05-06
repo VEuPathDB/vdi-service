@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
   implementation(project(":lib:plugin:registry"))
 
   implementation(libs.vdi.common)

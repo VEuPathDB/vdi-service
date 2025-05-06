@@ -33,6 +33,7 @@ import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
+import vdi.lib.plugin.client.PluginException
 import vdi.lib.plugin.client.PluginRequestException
 import vdi.lib.plugin.client.response.inm.InstallMetaResponseType
 import vdi.lib.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
@@ -58,16 +59,16 @@ internal class UpdateMetaTriggerHandlerImpl(
 
   override suspend fun run() {
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val kc = requireKafkaConsumer(config.kafkaRouterConfig.updateMetaTrigger.topic, config.kafkaConsumerConfig)
+    val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter(config.kafkaRouterConfig)
-    val wp = WorkerPool("update-meta-workers", config.workQueueSize, config.workerPoolSize) {
+    val wp = WorkerPool("update-meta-workers", config.jobQueueSize, config.workerCount) {
       Metrics.updateMetaQueueSize.inc(it.toDouble())
     }
 
     coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
-          kc.fetchMessages(config.kafkaRouterConfig.updateMetaTrigger.messageKey)
+          kc.fetchMessages(config.eventKey)
             .forEach {
               log.info("Received install-meta job for dataset {}/{} from source {}", it.userID, it.datasetID, it.eventSource)
               wp.submit { updateMetaIfNotInProgress(dm, kr, it) }
@@ -102,10 +103,10 @@ internal class UpdateMetaTriggerHandlerImpl(
         updateMeta(dm, msg.userID, msg.datasetID)
         kr.sendReconciliationTrigger(msg.userID, msg.datasetID, EventSource.UpdateMetaLane)
       }
-    } catch (e: vdi.lib.plugin.client.PluginException) {
+    } catch (e: PluginException) {
       e.log(log::error)
     } catch (e: Throwable) {
-      vdi.lib.plugin.client.PluginException.installMeta("N/A", "N/A", msg.userID, msg.datasetID, cause = e).log(log::error)
+      PluginException.installMeta("N/A", "N/A", msg.userID, msg.datasetID, cause = e).log(log::error)
     }
   }
 
@@ -181,10 +182,10 @@ internal class UpdateMetaTriggerHandlerImpl(
   ) {
     try {
       updateTargetMeta(ph, meta, metaTimestamp, datasetID, projectID, userID)
-    } catch (e: vdi.lib.plugin.client.PluginException) {
+    } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw vdi.lib.plugin.client.PluginException.installMeta(ph.displayName, projectID, userID, datasetID, cause = e)
+      throw PluginException.installMeta(ph.displayName, projectID, userID, datasetID, cause = e)
     }
   }
 
@@ -406,7 +407,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       handler.displayName,
     )
 
-    throw vdi.lib.plugin.client.PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
+    throw PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private fun handleUnexpectedErrorResponse(
@@ -424,7 +425,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       handler.displayName
     )
 
-    throw vdi.lib.plugin.client.PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
+    throw PluginException.installMeta(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {

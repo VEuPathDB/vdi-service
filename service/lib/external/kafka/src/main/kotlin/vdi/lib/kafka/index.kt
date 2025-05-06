@@ -24,7 +24,7 @@ private fun init(servers: Iterable<HostAddress>) {
   }
 }
 
-fun KafkaConsumer(topic: String, config: KafkaConsumerConfig): KafkaConsumer {
+fun KafkaConsumer(topic: MessageTopic, config: KafkaConsumerConfig): KafkaConsumer {
   init(config.servers)
   val props = Properties()
     .apply {

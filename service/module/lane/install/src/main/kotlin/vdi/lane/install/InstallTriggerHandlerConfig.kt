@@ -2,69 +2,54 @@ package vdi.lane.install
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import org.veupathdb.vdi.lib.common.env.optUInt
-import org.veupathdb.vdi.lib.common.env.optional
-import org.veupathdb.vdi.lib.common.env.require
-import vdi.lib.env.EnvKey
-import vdi.lib.env.Environment
-import vdi.lib.kafka.KafkaConsumerConfig
-import vdi.lib.kafka.router.KafkaRouterConfig
+import vdi.lib.config.vdi.KafkaConfig
+import vdi.lib.config.vdi.ObjectStoreConfig
+import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.config.vdi.lanes.ConsumerLaneConfig
+import vdi.lib.config.vdi.lanes.LaneConfig
+import vdi.lib.kafka.*
 import vdi.lib.kafka.router.RouterDefaults
 import vdi.lib.s3.util.S3Config
+import vdi.lib.s3.util.bucket
 
 data class InstallTriggerHandlerConfig(
-  val workerPoolSize:               UInt,
-  val jobQueueSize:                 UInt,
-  val kafkaConsumerConfig:          KafkaConsumerConfig,
-  val kafkaRouterConfig:            KafkaRouterConfig,
-  val s3Config:                     S3Config,
-  val s3Bucket:                     BucketName,
-  val installDataTriggerTopic:      String,
-  val installDataTriggerMessageKey: String,
+  val workerPoolSize: UByte,
+  val jobQueueSize:   UByte,
+  val kafkaConfig:    KafkaConsumerConfig,
+  val s3Config:       S3Config,
+  val s3Bucket:       BucketName,
+  val eventChannel:   MessageTopic,
+  val eventMsgKey:    MessageKey,
 ) {
-  constructor() : this(System.getenv())
+  constructor(conf: VDIConfig): this(conf.lanes?.install, conf.objectStore, conf.lanes, conf.kafka)
 
-  constructor(env: Environment) : this(
-    workerPoolSize = env.optUInt(EnvKey.InstallDataTriggerHandler.WorkerPoolSize)
-      ?: Defaults.WorkerPoolSize,
-
-    jobQueueSize = env.optUInt(EnvKey.InstallDataTriggerHandler.WorkQueueSize)
-      ?: Defaults.JobQueueSize,
-
-    kafkaConsumerConfig = KafkaConsumerConfig(
-      env.optional(EnvKey.InstallDataTriggerHandler.KafkaConsumerClientID)
-        ?: Defaults.KafkaConsumerClientID,
-      env
-    ),
-
-    kafkaRouterConfig = KafkaRouterConfig(
-      env,
-      env.optional(EnvKey.InstallDataTriggerHandler.KafkaProducerClientID)
-        ?: Defaults.KafkaProducerClientID
-    ),
-
-    s3Config = S3Config(env),
-
-    s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
-
-    installDataTriggerTopic = env.optional(EnvKey.Kafka.Topic.InstallTriggers)
-      ?: Defaults.InstallDataTriggerTopic,
-
-    installDataTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.InstallTriggers)
-      ?: Defaults.InstallDataTriggerMessageKey,
+  constructor(lane: ConsumerLaneConfig?, store: ObjectStoreConfig, lanes: LaneConfig?, kafka: KafkaConfig): this(
+    workerPoolSize = lane?.workerCount ?: WorkerCount,
+    jobQueueSize   = lane?.inMemoryQueueSize ?: JobQueueSize,
+    kafkaConfig    = KafkaConsumerConfig(lane?.kafkaConsumerID ?: ConsumerID, kafka),
+    s3Config       = S3Config(store),
+    s3Bucket       = store.bucket,
+    eventChannel   = lane?.eventChannel?.toMessageTopic() ?: EventChannel,
+    eventMsgKey    = lane?.eventKey?.toMessageKey() ?: EventMsgKey,
   )
 
-  object Defaults {
-    const val WorkerPoolSize = 5u
-    const val JobQueueSize = 5u
+  private companion object {
+    inline val WorkerCount
+      get(): UByte = 5u
 
-    const val KafkaConsumerClientID = "install-data-handler" // keep this the same to avoid leaving dead messages
-    const val KafkaProducerClientID = "install-data-handler-send"
+    inline val JobQueueSize
+      get(): UByte = 5u
 
-    inline val InstallDataTriggerTopic
+    inline val ConsumerID
+      get() = "install-data-handler-receive"
+
+    inline val ProducerID
+      get() = "install-data-handler-send"
+
+    inline val EventChannel
       get() = RouterDefaults.InstallTriggerTopic
 
-    inline val InstallDataTriggerMessageKey
+    inline val EventMsgKey
       get() = RouterDefaults.InstallTriggerMessageKey
   }
 }

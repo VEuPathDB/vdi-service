@@ -1,24 +1,22 @@
 package vdi.daemon.reconciler
 
-import org.veupathdb.vdi.lib.common.env.optBool
-import org.veupathdb.vdi.lib.common.env.optDuration
-import vdi.lib.env.EnvKey
-import vdi.lib.env.Environment
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import vdi.lib.config.loadAndCacheStackConfig
+import vdi.lib.config.vdi.daemons.ReconcilerConfig
 
 data class ReconcilerDaemonConfig(
   val reconcilerEnabled: Boolean,
   val fullRunInterval: Duration,
   val slimRunInterval: Duration,
 ) {
-  constructor() : this(System.getenv())
+  constructor(): this(loadAndCacheStackConfig().vdi.daemons?.reconciler)
 
-  constructor(env: Environment) : this(
-    reconcilerEnabled = env.optBool(EnvKey.Reconciler.Enabled) ?: DefaultEnabledValue,
-    fullRunInterval   = env.optDuration(EnvKey.Reconciler.FullRunInterval) ?: DefaultFullRunInterval,
-    slimRunInterval   = env.optDuration(EnvKey.Reconciler.SlimRunInterval) ?: DefaultSlimRunInterval,
+  constructor(config: ReconcilerConfig?): this(
+    reconcilerEnabled = config?.enabled ?: DefaultEnabledValue,
+    fullRunInterval   = config?.fullRunInterval ?: DefaultFullRunInterval,
+    slimRunInterval   = config?.slimRunInterval ?: DefaultSlimRunInterval,
   )
 
   companion object {

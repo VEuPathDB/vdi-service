@@ -3,6 +3,7 @@ package vdi.lane.sharing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -10,33 +11,22 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
 import org.veupathdb.vdi.lib.common.util.isNull
+import java.sql.SQLException
+import java.time.OffsetDateTime
 import vdi.lib.async.WorkerPool
-import vdi.lib.db.app.AppDB
-import vdi.lib.db.app.AppDBTransaction
-import vdi.lib.db.app.AppDatabaseRegistry
-import vdi.lib.db.app.withTransaction
+import vdi.lib.db.app.*
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetRecord
 import vdi.lib.db.cache.model.DatasetShareOfferImpl
 import vdi.lib.db.cache.model.DatasetShareReceiptImpl
 import vdi.lib.db.cache.withTransaction
+import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
 import vdi.lib.s3.DatasetObjectStore
 import vdi.lib.s3.files.DatasetShare
-import java.sql.SQLException
-import java.time.OffsetDateTime
 import vdi.lib.s3.files.DatasetShare as S3Share
-
-private const val UniqueConstraintViolation = 1
-
-private enum class ShareState { Yes, No, Absent }
-
-private data class ShareInfo(val offer: ShareState, val receipt: ShareState) {
-  inline val visibleInTarget
-    get() = offer == ShareState.Yes && receipt == ShareState.Yes
-}
 
 /**
  * Share Trigger Event Handler
@@ -55,16 +45,16 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   private val appDB = AppDB()
 
   override suspend fun run() {
-    val kc = requireKafkaConsumer(config.shareTriggerTopic, config.kafkaConsumerConfig)
+    val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("share-workers", config.workQueueSize, config.workerPoolSize) {
+    val wp = WorkerPool("share-workers", config.jobQueueSize, config.workerCount) {
       Metrics.shareQueueSize.inc(it.toDouble())
     }
 
     coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown())
-          kc.fetchMessages(config.shareTriggerMessageKey)
+          kc.fetchMessages(config.eventMsgKey)
             .forEach { (userID, datasetID, source) ->
               log.debug("submitting job to share worker pool for dataset {}/{} from source {}", datasetID, userID, source)
               wp.submit { executeJob(userID, datasetID, dm) }
@@ -78,7 +68,8 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   }
 
   private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore) {
-    log.info("processing share trigger for dataset {}/{}", userID, datasetID)
+    val log = logger(datasetID, userID)
+    log.info("processing share trigger")
 
     val dataset = cacheDB.selectDataset(datasetID)
 
@@ -86,13 +77,13 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     // database, which is weird because the dataset record is written to the
     // cache database synchronously when the dataset is initially submitted.
     if (dataset.isNull()) {
-      log.warn("target dataset {}/{} does not exist in the internal cache database, skipping event", userID, datasetID)
+      log.warn("skipping event, dataset does not exist in the internal cache database")
       return
     }
 
     if (dataset.isDeleted) {
-      log.info("target dataset {}/{} is marked as deleted in the internal cache database", userID, datasetID)
-      purgeFromTargets(dataset)
+      log.info("dataset is marked as deleted in the internal cache database")
+      purgeFromTargets(dataset, log)
       return
     }
 
@@ -117,7 +108,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     // the timestamp recorded in the postgres cache database, the share is brand
     // new and the share should be synchronized for all target projects.
     if (latestShareFileTimestamp.isAfter(cacheDBSyncControl.sharesUpdated)) {
-      synchronizeAll(dataset, dir.getShares(), latestShareFileTimestamp)
+      synchronizeAll(dataset, dir.getShares(), latestShareFileTimestamp, log)
     }
 
     // Else, if the newest file version in MinIO has a timestamp that is equal
@@ -128,48 +119,50 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     // temporarily disabled, added later, was externally modified, or is being
     // rebuilt.
     else {
-      synchronizeWhereNeeded(dataset, dir.getShares(), latestShareFileTimestamp)
+      synchronizeWhereNeeded(dataset, dir.getShares(), latestShareFileTimestamp, log)
     }
   }
 
   private fun synchronizeAll(
     dataset: DatasetRecord,
     shares: Map<UserID, S3Share>,
-    latestShareTimestamp: OffsetDateTime
+    latestShareTimestamp: OffsetDateTime,
+    log: Logger,
   ) {
-    synchronizeCacheDB(dataset, shares, latestShareTimestamp)
+    synchronizeCacheDB(dataset, shares, latestShareTimestamp, log)
     dataset.projects.forEach { projectID ->
       if (AppDatabaseRegistry.contains(projectID, dataset.typeName))
-        synchronizeProject(projectID, dataset, shares, latestShareTimestamp)
+        synchronizeProject(projectID, dataset, shares, latestShareTimestamp, log)
       else
-        log.info("dataset {}/{} target {} is not currently enabled, skipping share sync", dataset.ownerID, dataset.datasetID, projectID)
+        log.info("skipping share sync, target {} is disabled", projectID)
     }
   }
 
   private fun synchronizeWhereNeeded(
     dataset: DatasetRecord,
     shares: Map<UserID, S3Share>,
-    latestShareTimestamp: OffsetDateTime
+    latestShareTimestamp: OffsetDateTime,
+    log: Logger,
   ) {
     dataset.projects.forEach {
       val targetDB = appDB.accessor(it, dataset.typeName)
 
       if (targetDB == null) {
-        log.info("dataset {}/{} target {} is not currently enabled, skipping share sync", dataset.ownerID, dataset.datasetID, it)
+        log.info("skipping share sync, install target {} is disabled", it)
         return@forEach
       }
 
       val targetSyncControl = targetDB.selectDatasetSyncControlRecord(dataset.datasetID)
 
       if (targetSyncControl == null) {
-        log.info("dataset {}/{} has never been synchronized with target {}, skipping share sync", dataset.ownerID, dataset.datasetID, it)
+        log.info("skipping share sync, dataset never been synchronized with target {}", it)
         return@forEach
       }
 
       if (latestShareTimestamp.isAfter(targetSyncControl.sharesUpdated)) {
-        synchronizeProject(it, dataset, shares, latestShareTimestamp)
+        synchronizeProject(it, dataset, shares, latestShareTimestamp, log)
       } else {
-        log.info("dataset {}/{} is up to date in target {}, skipping share sync", dataset.ownerID, dataset.datasetID, it)
+        log.info("skipping share sync, shares are up to date in target {}", it)
       }
     }
   }
@@ -178,8 +171,9 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     dataset: DatasetRecord,
     shares: Map<UserID, DatasetShare>,
     latestShareTimestamp: OffsetDateTime,
+    log: Logger,
   ) {
-    log.info("processing shares for dataset {}/{} in internal cache database", dataset.ownerID, dataset.datasetID)
+    log.info("synchronizing shares in internal cache database")
 
     // Get a set of all the share recipients for all the shares attached to this
     // dataset in the internal cache db.
@@ -273,8 +267,9 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     dataset: DatasetRecord,
     shares: Map<UserID, S3Share>,
     latestShareTimestamp: OffsetDateTime,
+    log: Logger,
   ) {
-    log.info("synchronizing shares for dataset {}/{} in project {}", dataset.ownerID, dataset.datasetID, projectID)
+    log.info("synchronizing shares for install target {}", projectID)
 
     appDB.withTransaction(projectID, dataset.typeName) { db ->
       // Get a set of the recipient user IDs for all the users that this
@@ -291,7 +286,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
 
       // For all the shares (complete or partial) that appear in S3...
       shares.forEach { (shareRecipient, shareDetails) ->
-        log.debug("examining share for dataset {}/{} to user {} in project {}", dataset.ownerID, dataset.datasetID, shareRecipient, projectID)
+        log.debug("examining share for for recipient {} in install target {}", shareRecipient, projectID)
 
         // Figure out what's going on with the share, as in what share files
         // exist and what the files that do exist say.
@@ -307,15 +302,15 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
         // existed, or been created by a competing worker, unique constraint
         // violations will be ignored on insert.
         if (shareState.visibleInTarget) {
-          log.debug("ensuring dataset {}/{} is visible to user {} in project {}", dataset.ownerID, dataset.datasetID, shareRecipient, projectID)
-          db.tryInsertDatasetVisibility(dataset.ownerID, dataset.datasetID, projectID, shareRecipient)
+          log.debug("ensuring dataset is visible to share recipient {} in install target {}", shareRecipient, projectID)
+          db.tryInsertDatasetVisibility(dataset.datasetID, projectID, shareRecipient, log)
         }
 
         // If the dataset should not be visible to the recipient user as
         // determined by examining the S3 share state, attempt to remove any
         // existing visibility record.
         else {
-          log.info("removing dataset {}/{} visibility from user {} in project {} as per S3 share state", dataset.ownerID, dataset.datasetID, shareRecipient, projectID)
+          log.info("removing dataset visibility from user {} in install target {}", shareRecipient, projectID)
           db.deleteDatasetVisibility(dataset.datasetID, shareRecipient)
         }
       }
@@ -330,26 +325,26 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
       // target app database are invalid as they have no matching records in S3.
       // Purge them from the target app database.
       visibilityRecords.forEach { recipientUserID ->
-        log.info("removing dataset {}/{} visibility from user {} in project {} as S3 contains no such share", dataset.ownerID, dataset.datasetID, recipientUserID, projectID)
+        log.info("removing dataset visibility from user {} in project {}; object store contains no such share", recipientUserID, projectID)
         db.deleteDatasetVisibility(dataset.datasetID, recipientUserID)
       }
 
       // In case the dataset owner's visibility record was accidentally deleted
       // by a user, bug, or other process, ensure that the record exists in the
       // target app db.
-      db.tryInsertDatasetVisibility(dataset.ownerID, dataset.datasetID, projectID, dataset.ownerID)
+      db.tryInsertDatasetVisibility(dataset.datasetID, projectID, dataset.ownerID, log)
 
       db.updateSyncControlSharesTimestamp(dataset.datasetID, latestShareTimestamp)
     }
   }
 
-  private fun purgeFromTargets(dataset: DatasetRecord) {
-    log.info("purging dataset visibility records for dataset {}/{} from all target projects", dataset.ownerID, dataset.datasetID)
+  private fun purgeFromTargets(dataset: DatasetRecord, log: Logger) {
+    log.info("purging dataset visibility records from all target projects")
 
     dataset.projects.forEach { projectID ->
 
       if (!AppDatabaseRegistry.contains(projectID, dataset.typeName)) {
-        log.warn("cannot purge dataset visibility records for dataset {}/{} from project {} as that target is not currently enabled", dataset.ownerID, dataset.datasetID, projectID)
+        log.warn("cannot purge dataset visibility records from disabled install target {}", projectID)
         return@forEach
       }
 
@@ -372,19 +367,19 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
     )
 
   private fun AppDBTransaction.tryInsertDatasetVisibility(
-    ownerID: UserID,
     datasetID: DatasetID,
     projectID: ProjectID,
-    recipientID: UserID
+    recipientID: UserID,
+    log: Logger,
   ) {
     try {
       insertDatasetVisibility(datasetID, recipientID)
       // This log is here because we only want an info level line for attempted
       // actions that actually resulted in something happening.
-      log.info("created dataset visibility record from dataset {}/{} to recipient {} in project {}", ownerID, datasetID, recipientID, projectID)
+      log.info("created dataset visibility record for recipient {} in install target {}", recipientID, projectID)
     } catch (e: SQLException) {
-      if (e.errorCode == UniqueConstraintViolation) {
-        log.debug("share insert race condition: dataset {}/{} already shared with {}", ownerID, datasetID, recipientID)
+      if (isUniqueConstraintViolation(e)) {
+        log.info("share insert race condition; already shared with recipient {}", recipientID)
       } else {
         throw e
       }

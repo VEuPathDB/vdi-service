@@ -32,14 +32,21 @@
     "databases": {
       "type": "object",
       "properties": {
-        "accountDb": {
-          "$ref": "../common.json#/$defs/database"
-        },
-        "appDb": {
-          "$ref": "../common.json#/$defs/database"
-        },
+        "accountDb": { "$ref": "../common.json#/$defs/database" },
+        "appDb": { "$ref": "../common.json#/$defs/database" },
         "userDb": {
-          "$ref": "../common.json#/$defs/database"
+          "allOf": [
+            { "$ref": "../common.json#/$defs/database" },
+            {
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "minLength": 5,
+                  "default": "userlogins5"
+                }
+              }
+            }
+          ]
         }
       }
     }

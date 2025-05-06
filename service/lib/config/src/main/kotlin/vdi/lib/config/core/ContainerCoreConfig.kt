@@ -1,6 +1,10 @@
 package vdi.lib.config.core
 
-data class ContainerCoreConfig(
-  val authentication: AuthenticationConfig?,
-)
+import vdi.lib.config.common.LDAPConfig
 
+data class ContainerCoreConfig(
+  val ldap: LDAPConfig?,
+  val authentication: AuthenticationConfig?,
+  val http: ServerConfig?,
+  val databases: CoreDatabaseSet?,
+)

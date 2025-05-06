@@ -11,20 +11,20 @@ internal class RabbitInstanceFactory(config: RabbitMQConfig) {
 
   private val fac = ConnectionFactory()
     .apply {
-      host = config.serverAddress.host
-      port = config.serverAddress.port.toInt()
-      username = config.serverUsername
-      password = config.serverPassword.unwrap()
+      host = config.connection.address.host
+      port = config.connection.address.port.toInt()
+      username = config.connection.username
+      password = config.connection.password.unwrap()
       isAutomaticRecoveryEnabled = false
-      connectionTimeout = config.connectionTimeout.inWholeMilliseconds.toInt()
+      connectionTimeout = config.connection.connectionTimeout.inWholeMilliseconds.toInt()
       useNio()
 
-      if (config.serverUseTLS) {
+      if (config.connection.useTLS) {
         useSslProtocol()
       }
     }
 
-  private val connectionName = config.serverConnectionName
+  private val connectionName = config.connection.connectionName
 
   suspend fun newInstance(): RabbitInstance {
     return coroutineScope {

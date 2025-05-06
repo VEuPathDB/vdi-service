@@ -1,49 +1,42 @@
 package vdi.lane.delete.hard
 
-import org.veupathdb.vdi.lib.common.env.optUInt
-import org.veupathdb.vdi.lib.common.env.optional
-import vdi.lib.env.EnvKey
-import vdi.lib.env.Environment
-import vdi.lib.kafka.KafkaConsumerConfig
+import vdi.lib.config.vdi.KafkaConfig
+import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.config.vdi.lanes.ConsumerLaneConfig
+import vdi.lib.kafka.*
 import vdi.lib.kafka.router.RouterDefaults
 
 data class HardDeleteTriggerHandlerConfig(
-  val jobQueueSize: UInt,
-  val workerPoolSize: UInt,
-  val kafkaConsumerConfig: KafkaConsumerConfig,
-  val hardDeleteTopic: String,
-  val hardDeleteMessageKey: String,
+  val jobQueueSize:   UByte,
+  val workerPoolSize: UByte,
+  val kafkaConfig:    KafkaConsumerConfig,
+  val eventChannel:   MessageTopic,
+  val eventMsgKey:    MessageKey,
 ) {
-  constructor() : this(System.getenv())
+  constructor(config: VDIConfig): this(config.lanes?.hardDelete, config.kafka)
 
-  constructor(env: Environment) : this(
-    jobQueueSize = env.optUInt(EnvKey.HardDeleteTriggerHandler.WorkQueueSize)
-      ?: Defaults.JobQueueSize,
-
-    workerPoolSize = env.optUInt(EnvKey.HardDeleteTriggerHandler.WorkerPoolSize)
-      ?: Defaults.WorkerPoolSize,
-
-    kafkaConsumerConfig = KafkaConsumerConfig(env.optional(
-      EnvKey.HardDeleteTriggerHandler.KafkaConsumerClientID) ?: Defaults.KafkaConsumerClientID,
-      env
-    ),
-
-    hardDeleteTopic = env.optional(EnvKey.Kafka.Topic.HardDeleteTriggers)
-      ?: Defaults.HardDeleteTopic,
-
-    hardDeleteMessageKey = env.optional(EnvKey.Kafka.MessageKey.HardDeleteTriggers)
-      ?: Defaults.HardDeleteMesesageKey
+  constructor(lConf: ConsumerLaneConfig?, kConf: KafkaConfig): this(
+    jobQueueSize   = lConf?.inMemoryQueueSize ?: Defaults.JobQueueSize,
+    workerPoolSize = lConf?.workerCount ?: Defaults.WorkerPoolSize,
+    kafkaConfig    = KafkaConsumerConfig(lConf?.kafkaConsumerID ?: Defaults.KafkaConsumerClientID, kConf),
+    eventChannel   = lConf?.eventChannel?.toMessageTopic() ?: Defaults.HardDeleteTopic,
+    eventMsgKey    = lConf?.eventKey?.toMessageKey() ?: Defaults.HardDeleteMessageKey,
   )
 
   object Defaults {
-    const val JobQueueSize   = 10u
-    const val WorkerPoolSize = 10u
-    const val KafkaConsumerClientID = "hard-delete-handler"
+    inline val JobQueueSize
+      get(): UByte = 10u
+
+    inline val WorkerPoolSize
+      get(): UByte = 10u
+
+    inline val KafkaConsumerClientID
+      get() = "hard-delete-lane-receive"
 
     inline val HardDeleteTopic
       get() = RouterDefaults.HardDeleteTriggerTopic
 
-    inline val HardDeleteMesesageKey
+    inline val HardDeleteMessageKey
       get() = RouterDefaults.HardDeleteTriggerMessageKey
   }
 }

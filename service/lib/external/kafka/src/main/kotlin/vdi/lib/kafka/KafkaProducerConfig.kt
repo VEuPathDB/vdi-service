@@ -2,6 +2,7 @@ package vdi.lib.kafka
 
 import org.veupathdb.vdi.lib.common.util.HostAddress
 import kotlin.time.Duration
+import vdi.lib.config.loadAndCacheStackConfig
 import vdi.lib.config.vdi.KafkaConfig
 import vdi.lib.config.vdi.KafkaProducerConfig
 
@@ -57,6 +58,8 @@ data class KafkaProducerConfig(
   // retry.backoff.ms
   val retryBackoffTime: Duration?,
 ) {
+  constructor(clientID: String): this(clientID, loadAndCacheStackConfig().vdi.kafka)
+
   constructor(clientID: String, conf: KafkaConfig)
     : this(clientID, conf.servers.map { it.toCommonType(DefaultServerPort) }, conf.producers)
 

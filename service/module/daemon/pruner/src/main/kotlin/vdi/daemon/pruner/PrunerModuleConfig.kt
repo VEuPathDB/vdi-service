@@ -1,23 +1,17 @@
 package vdi.daemon.pruner
 
-import org.veupathdb.vdi.lib.common.env.optDuration
-import vdi.lib.env.EnvKey
-import vdi.lib.env.Environment
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
+import vdi.lib.config.vdi.daemons.PrunerConfig
 
 data class PrunerModuleConfig(
   val pruningInterval: Duration,
   val wakeupInterval: Duration,
 ) {
-  constructor() : this(System.getenv())
-
-  constructor(env: Environment) : this(
-    pruningInterval = env.optDuration(EnvKey.DeletedDatasetPruner.PruningInterval)
-      ?: Defaults.PruningInterval,
-    wakeupInterval = env.optDuration(EnvKey.DeletedDatasetPruner.PruningWakeupInterval)
-      ?: Defaults.WakeupInterval
+  constructor(conf: PrunerConfig?) : this(
+    pruningInterval = conf?.pruneInterval ?: Defaults.PruningInterval,
+    wakeupInterval  = conf?.wakeInterval ?: Defaults.WakeupInterval
   )
 
   object Defaults {

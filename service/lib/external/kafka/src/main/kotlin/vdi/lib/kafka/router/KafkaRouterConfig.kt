@@ -1,5 +1,7 @@
 package vdi.lib.kafka.router
 
+import vdi.lib.config.StackConfig
+import vdi.lib.config.loadAndCacheStackConfig
 import vdi.lib.config.vdi.KafkaConfig
 import vdi.lib.config.vdi.lanes.LaneConfig
 import vdi.lib.kafka.KafkaProducerConfig
@@ -15,55 +17,63 @@ data class KafkaRouterConfig(
   val shareTrigger: TriggerConfig,
   val reconciliationTrigger: TriggerConfig,
 ) {
-  constructor(clientID: String, kafkaConfig: KafkaConfig, lanes: LaneConfig): this(
+  constructor(clientID: String): this(clientID, loadAndCacheStackConfig())
+
+  constructor(clientID: String, conf: StackConfig): this(
+    clientID,
+    conf.vdi.kafka,
+    conf.vdi.lanes,
+  )
+
+  constructor(clientID: String, kafkaConfig: KafkaConfig, lanes: LaneConfig?): this(
     producerConfig = KafkaProducerConfig(clientID, kafkaConfig),
 
     importTrigger = TriggerConfig(
-      messageKey = lanes.import?.eventKey
+      messageKey = lanes?.import?.eventKey
         ?: RouterDefaults.ImportTriggerMessageKey,
-      topic = lanes.import?.eventChannel
+      topic = lanes?.import?.eventChannel
         ?: RouterDefaults.ImportTriggerTopic,
     ),
 
     installTrigger = TriggerConfig(
-      messageKey = lanes.install?.eventKey
+      messageKey = lanes?.install?.eventKey
         ?: RouterDefaults.InstallTriggerMessageKey,
-      topic = lanes.install?.eventChannel
+      topic = lanes?.install?.eventChannel
         ?: RouterDefaults.InstallTriggerTopic,
     ),
 
     updateMetaTrigger = TriggerConfig(
-      messageKey = lanes.updateMeta?.eventKey
+      messageKey = lanes?.updateMeta?.eventKey
         ?: RouterDefaults.UpdateMetaTriggerMessageKey,
-      topic = lanes.updateMeta?.eventChannel
+      topic = lanes?.updateMeta?.eventChannel
         ?: RouterDefaults.UpdateMetaTriggerTopic,
     ),
 
     softDeleteTrigger = TriggerConfig(
-      messageKey = lanes.softDelete?.eventKey
+      messageKey = lanes?.softDelete?.eventKey
         ?: RouterDefaults.SoftDeleteTriggerMessageKey,
-      topic = lanes.softDelete?.eventChannel
+      topic = lanes?.softDelete?.eventChannel
         ?: RouterDefaults.SoftDeleteTriggerTopic,
     ),
 
     hardDeleteTrigger = TriggerConfig(
-      messageKey = lanes.hardDelete?.eventKey
+      messageKey = lanes?.hardDelete?.eventKey
         ?: RouterDefaults.HardDeleteTriggerMessageKey,
-      topic = lanes.hardDelete?.eventChannel
+      topic = lanes?.hardDelete?.eventChannel
         ?: RouterDefaults.HardDeleteTriggerTopic,
     ),
 
     shareTrigger = TriggerConfig(
-      messageKey = lanes.sharing?.eventKey
+      messageKey = lanes?.sharing?.eventKey
         ?: RouterDefaults.ShareTriggerMessageKey,
-      topic = lanes.sharing?.eventChannel
+      topic = lanes?.sharing?.eventChannel
         ?: RouterDefaults.ShareTriggerTopic,
     ),
 
     reconciliationTrigger = TriggerConfig(
-      messageKey = lanes.reconciliation?.eventKey
+      messageKey = lanes?.reconciliation?.eventKey
         ?: RouterDefaults.ReconciliationTriggerMessageKey,
-      topic = lanes.reconciliation?.eventChannel
+      topic = lanes?.reconciliation?.eventChannel
         ?: RouterDefaults.ReconciliationTriggerTopic,
     ),
   )

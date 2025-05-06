@@ -3,35 +3,20 @@ package vdi.lib.ldap
 import org.veupathdb.lib.ldap.LDAP
 import org.veupathdb.lib.ldap.LDAPConfig
 import org.veupathdb.lib.ldap.LDAPHost
-import org.veupathdb.vdi.lib.common.env.EnvKey
-import org.veupathdb.vdi.lib.common.env.Environment
-import org.veupathdb.vdi.lib.common.env.reqHostAddresses
-import org.veupathdb.vdi.lib.common.env.require
-import vdi.lib.health.RemoteDependencies
+import vdi.lib.config.loadAndCacheStackConfig
 
 object LDAP {
-
-  private lateinit var ldap: LDAP
-
-  init {
-    init(System.getenv())
+  private val ldap: LDAP? = loadAndCacheStackConfig().vdi.ldap?.let {
+    LDAP(LDAPConfig(
+      it.servers.map { (host, port) -> LDAPHost(host, port ?: 389u) },
+      it.baseDN,
+    ))
   }
 
-  fun requireSingularOracleNetDesc(commonName: String) = ldap.requireSingularOracleNetDesc(commonName)
+  private inline val reqLDAP
+    get() = ldap ?: throw IllegalStateException("ldap is not configured")
 
-  fun lookupOracleNetDesc(commonName: String) = ldap.lookupOracleNetDesc(commonName)
+  fun requireSingularOracleNetDesc(commonName: String) = reqLDAP.requireSingularOracleNetDesc(commonName)
 
-  private fun init(env: Environment) {
-    val servers = env.reqHostAddresses(EnvKey.LDAP.LDAPServers)
-      .asSequence()
-      .map { (host, port) -> LDAPHost(host, port) }
-      .toList()
-    val oracleDN = env.require(EnvKey.LDAP.OracleBaseDN)
-
-    ldap = LDAP(LDAPConfig(servers, oracleDN))
-
-    servers.forEach {
-      RemoteDependencies.register("LDAP ${it.host}", it.host, it.port)
-    }
-  }
+  fun lookupOracleNetDesc(commonName: String) = reqLDAP.lookupOracleNetDesc(commonName)
 }

@@ -259,3 +259,29 @@ log-minio:
 log-rabbit:
 	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) rabbit-external
 
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     Workflow Tasks                                                       ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
+
+OUTPUT_DOC_DIR := "build/generated-docs"
+
+.PHONY: generate-service-docs
+generate-service-docs:
+	@mkdir -p $(OUTPUT_DOC_DIR)/schema/data $(OUTPUT_DOC_DIR)/schema/config
+	@gradle \
+		:service:generate-raml-docs \
+		:service:build-dataset-schema-resources \
+		:service:build-config-schema-resource
+	@cp -rt $(OUTPUT_DOC_DIR) \
+		docs/vdi-api.html \
+		service/build/json-schema/*
+	@python -m venv venv
+	@source venv/bin/activate \
+		&& pip install json-schema-for-humans \
+		&& generate-schema-doc \
+			--config '{"expand_buttons":true,"description_is_markdown":true,"examples_as_yaml":true}' \
+			service/schema/config/stack-config.json \
+			$(OUTPUT_DOC_DIR)/config-schema.html

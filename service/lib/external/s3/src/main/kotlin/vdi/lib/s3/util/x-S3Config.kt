@@ -1,6 +1,7 @@
 package vdi.lib.s3.util
 
 import org.veupathdb.lib.s3.s34k.S3Config
+import org.veupathdb.lib.s3.s34k.fields.BucketName
 import vdi.lib.config.vdi.ObjectStoreConfig
 import vdi.lib.env.EnvKey
 
@@ -17,6 +18,8 @@ fun S3Config(conf: ObjectStoreConfig): S3Config =
     url       = conf.host.host,
     port      = conf.host.port ?: 9000u,
     secure    = conf.https ?: true,
-    accessKey = conf.accessToken.value,
-    secretKey = conf.secretKey.value,
+    accessKey = conf.accessToken.unwrap(),
+    secretKey = conf.secretKey.unwrap(),
   )
+
+inline val ObjectStoreConfig.bucket get() = BucketName(bucketName)

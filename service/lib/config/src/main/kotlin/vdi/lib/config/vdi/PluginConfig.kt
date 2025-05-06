@@ -7,6 +7,7 @@ data class PluginConfig(
   val server: HostAddress,
   val displayName: String,
   val dataTypes: Set<DataTypeConfig>,
+  val typeChangesEnabled: Boolean?,
   val customPath: String?,
   val installRoot: String?,
   @JsonProperty("projectIds")

@@ -23,11 +23,10 @@ import vdi.lib.db.app.model.InstallType
 import vdi.lib.db.app.withTransaction
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.withTransaction
-import vdi.lib.kafka.EventSource
-import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
+import vdi.lib.plugin.client.PluginException
 import vdi.lib.plugin.client.PluginRequestException
 import vdi.lib.plugin.client.response.ind.*
 import vdi.lib.plugin.mapping.PluginHandler
@@ -48,8 +47,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   private val appDB = AppDB()
 
   override suspend fun run() {
-    val kc = requireKafkaConsumer(config.installDataTriggerTopic, config.kafkaConsumerConfig)
-    val kr = requireKafkaRouter(config.kafkaRouterConfig)
+    val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val wp = WorkerPool("install-data-workers", config.jobQueueSize, config.workerPoolSize) {
       Metrics.Install.queueSize.inc(it.toDouble())
@@ -58,10 +56,10 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown())
-          kc.fetchMessages(config.installDataTriggerMessageKey)
+          kc.fetchMessages(config.eventMsgKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received install job for dataset $userID/$datasetID from source $source")
-              wp.submit { tryInstallData(userID, datasetID, dm, kr) }
+              wp.submit { tryInstallData(userID, datasetID, dm) }
             }
       }
     }
@@ -71,17 +69,14 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     confirmShutdown()
   }
 
-  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore, kr: KafkaRouter) {
+  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore) {
     if (datasetsInProgress.add(datasetID)) {
       try {
         installData(userID, datasetID, dm)
-
-        // on successful install, handle possible data revisions
-        maybeFireRevisionEvent(userID, datasetID, dm, kr)
-      } catch (e: vdi.lib.plugin.client.PluginException) {
+      } catch (e: PluginException) {
         e.log(log::error)
       } catch (e: Throwable) {
-        vdi.lib.plugin.client.PluginException.installData("N/A", "N/A", userID, datasetID, cause = e).log(log::error)
+        PluginException.installData("N/A", "N/A", userID, datasetID, cause = e).log(log::error)
       } finally {
         datasetsInProgress.remove(datasetID)
       }
@@ -185,7 +180,14 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           // If the handler doesn't apply to the target project, again we
           // shouldn't be here, but we can bail out now with a warning.
           if (!handler.appliesToProject(projectID)) {
-            log.warn("skipping install data event for dataset {}/{}: handler for type {}:{} does not apply to project {}", userID, datasetID, meta.type.name, meta.type.version, projectID)
+            log.warn(
+              "skipping install data event for dataset {}/{}: handler for type {}:{} does not apply to project {}",
+              userID,
+              datasetID,
+              meta.type.name,
+              meta.type.version,
+              projectID,
+            )
             return@forEach
           }
 
@@ -194,19 +196,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     } catch (e: vdi.lib.plugin.client.PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw vdi.lib.plugin.client.PluginException.installData(handler.displayName, "N/A", userID, datasetID, cause = e)
+      throw PluginException.installData(handler.displayName, "N/A", userID, datasetID, cause = e)
     }
-  }
-
-  /**
-   * Checks if the dataset has a revision history, and if so, fires a revision
-   * pruning event to prune previous revisions.
-   */
-  private fun maybeFireRevisionEvent(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore, kr: KafkaRouter) {
-    val meta = dm.getDatasetDirectory(userID, datasetID).getMetaFile().load()!!
-
-    if (meta.originalID != null)
-      kr.sendRevisionPruningTrigger(userID, datasetID, EventSource.InstallDataLane)
   }
 
   /**
@@ -315,7 +306,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           handler.client.postInstallData(datasetID, projectID, meta, manifest, data)
         }
       } catch (e: S34KError) { // Don't mix up minio errors with request errors.
-        throw vdi.lib.plugin.client.PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
+        throw PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
       } catch (e: Throwable) {
         throw PluginRequestException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
       }
@@ -376,7 +367,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     } catch (e: vdi.lib.plugin.client.PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw vdi.lib.plugin.client.PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
+      throw PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
     } finally {
       timer?.observeDuration()
     }
@@ -405,7 +396,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         datasetID,
         InstallType.Data,
         InstallStatus.Complete,
-        res.warnings.takeUnless { it.isEmpty() }?.joinToString("\n")
+        res.warnings.takeUnless(Collection<String>::isEmpty)?.joinToString("\n")
       ))
     }
   }
@@ -438,7 +429,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       ))
     }
 
-    throw vdi.lib.plugin.client.PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
+    throw PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private fun handleValidationFailureResponse(
@@ -527,7 +518,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       ))
     }
 
-    throw vdi.lib.plugin.client.PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
+    throw PluginException.installData(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private suspend fun <T> withInstallBundle(

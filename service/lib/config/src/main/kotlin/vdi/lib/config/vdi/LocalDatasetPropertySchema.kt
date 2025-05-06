@@ -5,7 +5,6 @@ import org.veupathdb.vdi.lib.json.JSON
 import java.io.FileNotFoundException
 import java.nio.file.Path
 import kotlin.io.path.exists
-import kotlin.io.path.readText
 
 @JvmInline
 internal value class LocalDatasetPropertySchema(private val path: Path): DatasetPropertySchema {

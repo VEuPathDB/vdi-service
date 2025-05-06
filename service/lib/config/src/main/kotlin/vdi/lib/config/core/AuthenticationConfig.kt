@@ -1,8 +1,5 @@
 package vdi.lib.config.core
 
-import vdi.lib.config.common.SecretString
+import org.veupathdb.vdi.lib.common.field.SecretString
 
-data class AuthenticationConfig(
-  val adminToken: SecretString?,
-  val oauth: OAuthConfig?,
-)
+data class AuthenticationConfig(val adminToken: SecretString?, val oauth: OAuthConfig?)

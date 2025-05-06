@@ -33,36 +33,42 @@ containerCore:
     adminToken: ${env:ADMIN_AUTH_TOKEN}
 
 vdi:
+  siteBuild: ${env:SITE_BUILD}
+
   ldap:
     servers: ${env:LDAP_SERVER}
     baseDn: ${env:DB_LOOKUP_BASE_DN}
-  siteBuild: ${env:SITE_BUILD}
+
   objectStore:
     bucketName: vdi-prod
     host: ${env:S3_HOST}
     accessToken: ${env:S3_ACCESS_TOKEN}
     secretKey: ${env:S3_SECRET_KEY}
+
   rabbit:
     global:
       connection:
         host: ${env:GLOBAL_RABBIT_HOST}
-        user: ${env:GLOBAL_RABBIT_USERNAME}
-        pass: ${env:GLOBAL_RABBIT_PASSWORD}
+        username: ${env:GLOBAL_RABBIT_USERNAME}
+        password: ${env:GLOBAL_RABBIT_PASSWORD}
       exchange:
         name: vdi-bucket-notifications
       queue:
         name: vdi-bucket-notifications
       routing:
         key: vdi-bucket-notifications
+
   kafka:
     servers:
     - kafka:9092
     listeners:
     - PLAINTEXT://kafka:9092
+
   cacheDb:
     user: vdi
     pass: ${env:CACHE_DB_PASSWORD}
     host: cache-db:5432
+
   plugins:
   - server: bigwig:80
     displayName: bigWig
@@ -95,6 +101,7 @@ vdi:
     dataTypes:
     - name: lightweight
       version: 1.0
+    typeChangesEnabled: true
   - server: phenotype:80
     displayName: Phenotype
     dataTypes:

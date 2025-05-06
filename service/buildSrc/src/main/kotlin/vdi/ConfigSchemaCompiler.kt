@@ -18,7 +18,7 @@ object ConfigSchemaCompiler {
     val inputDir = project.file("schema/config/")
 
     rootSchema = inputDir.resolve("stack-config.json").toPath()
-    outputFile = project.layout.buildDirectory.asFile.get().resolve("json-schema/schema/stack-config.json")
+    outputFile = project.layout.buildDirectory.asFile.get().resolve("json-schema/schema/config/stack-config.json")
 
     task.inputs.dir(inputDir)
     task.outputs.file(outputFile)

@@ -9,9 +9,7 @@ import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.vdi.lib.common.util.AtomicBool
 import org.veupathdb.vdi.lib.json.JSON
 import vdi.lib.async.Trigger
-import vdi.lib.kafka.EventMessage
-import vdi.lib.kafka.KafkaConsumer
-import vdi.lib.kafka.KafkaConsumerConfig
+import vdi.lib.kafka.*
 import vdi.lib.kafka.router.KafkaRouterConfig
 import vdi.lib.kafka.router.KafkaRouterFactory
 import vdi.lib.s3.DatasetObjectStore
@@ -91,6 +89,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
    * @return A value of type T as returned by the given function on successful
    * execution.
    */
+  @Suppress("MemberVisibilityCanBePrivate")
   protected suspend fun <T> safeExec(error: String, fn: () -> T): T =
     try {
       fn()
@@ -112,7 +111,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
    *
    * @return A new `KafkaConsumer` instance.
    */
-  protected suspend fun requireKafkaConsumer(topic: String, config: KafkaConsumerConfig) =
+  protected suspend fun requireKafkaConsumer(topic: MessageTopic, config: KafkaConsumerConfig) =
     safeExec("failed to create Kafka consumer client") { KafkaConsumer(topic, config) }
 
   /**
@@ -125,6 +124,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
    *
    * @return A new `S3Client` instance.
    */
+  @Suppress("MemberVisibilityCanBePrivate")
   protected suspend fun requireS3Client(config: S3Config) =
     safeExec("failed to create S3 client") { S3Api.newClient(config) }
 
@@ -141,6 +141,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
    *
    * @return An `S3Bucket` instance.
    */
+  @Suppress("MemberVisibilityCanBePrivate")
   protected suspend fun requireS3Bucket(s3Client: S3Client, bucketName: BucketName) =
     safeExec("failed to lookup S3 bucket") {
       s3Client.buckets[bucketName]
@@ -160,7 +161,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
    *
    * @return A stream of event messages.
    */
-  protected fun KafkaConsumer.fetchMessages(key: String): Sequence<EventMessage> =
+  protected fun KafkaConsumer.fetchMessages(key: MessageKey): Sequence<EventMessage> =
     receive()
       .asSequence()
       .filter {

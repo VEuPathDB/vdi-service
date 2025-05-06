@@ -1,7 +1,10 @@
 package vdi.lane.sharing
 
-fun ShareTriggerHandler(
-  abortCB: (String?) -> Nothing,
-  config: ShareTriggerHandlerConfig = ShareTriggerHandlerConfig()
-): ShareTriggerHandler =
+import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.modules.AbortCB
+
+fun ShareTriggerHandler(config: VDIConfig, abortCB: AbortCB): ShareTriggerHandler =
+  ShareTriggerHandler(ShareTriggerHandlerConfig(config), abortCB)
+
+fun ShareTriggerHandler(config: ShareTriggerHandlerConfig, abortCB: AbortCB): ShareTriggerHandler =
   ShareTriggerHandlerImpl(config, abortCB)

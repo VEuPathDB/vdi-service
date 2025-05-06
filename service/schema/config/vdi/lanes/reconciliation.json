@@ -3,33 +3,31 @@
   "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/lanes/reconciliation.json",
   "title": "Dataset Reconciliation Lane Config",
   "type": "object",
-  "allOf": [
-    {
-      "$ref": "lane-common.json#"
+  "properties": {
+    "kafkaConsumerId": {
+      "$ref": "lane-common.json#/$defs/kafkaConsumerId",
+      "default": "reconciliation-lane-receive"
     },
-    {
-      "properties": {
-        "kafkaConsumerId": {
-          "default": "reconciliation-lane-receive"
-        },
-        "kafkaProducerId": {
-          "$ref": "lane-common.json#/$defs/kafkaProducerId",
-          "default": "reconciliation-lane-send"
-        },
-        "memoryQueueSize": {
-          "default": 10
-        },
-        "workerCount": {
-          "default": 10
-        },
-        "eventChannel": {
-          "default": "reconciliation-triggers"
-        },
-        "eventKey": {
-          "default": "reconciliation-trigger"
-        }
-      }
+    "kafkaProducerId": {
+      "$ref": "lane-common.json#/$defs/kafkaProducerId",
+      "default": "reconciliation-lane-send"
+    },
+    "inMemoryQueueSize": {
+      "$ref": "lane-common.json#/$defs/inMemoryQueueSize",
+      "default": 10
+    },
+    "workerCount": {
+      "$ref": "lane-common.json#/$defs/workerCount",
+      "default": 10
+    },
+    "eventChannel": {
+      "$ref": "lane-common.json#/$defs/eventChannel",
+      "default": "reconciliation-triggers"
+    },
+    "eventKey": {
+      "$ref": "lane-common.json#/$defs/eventKey",
+      "default": "reconciliation-trigger"
     }
-  ],
+  },
   "unevaluatedProperties": false
 }

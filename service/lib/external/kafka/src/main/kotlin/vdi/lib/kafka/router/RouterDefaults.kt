@@ -1,24 +1,41 @@
 package vdi.lib.kafka.router
 
+import vdi.lib.kafka.MessageKey
+import vdi.lib.kafka.MessageTopic
+
 object RouterDefaults {
-  const val ImportTriggerMessageKey = "import-trigger"
-  const val ImportTriggerTopic = "import-triggers"
+  inline val ImportTriggerMessageKey
+    get() = MessageKey("import-trigger")
+  inline val ImportTriggerTopic
+    get() = MessageTopic("import-triggers")
 
-  const val InstallTriggerMessageKey = "install-trigger"
-  const val InstallTriggerTopic = "install-triggers"
+  inline val InstallTriggerMessageKey
+    get() = MessageKey("install-trigger")
+  inline val InstallTriggerTopic
+    get() = MessageTopic("install-triggers")
 
-  const val UpdateMetaTriggerMessageKey = "update-meta-trigger"
-  const val UpdateMetaTriggerTopic = "update-meta-triggers"
+  inline val UpdateMetaTriggerMessageKey
+    get() = MessageKey("update-meta-trigger")
+  inline val UpdateMetaTriggerTopic
+    get() = MessageTopic("update-meta-triggers")
 
-  const val SoftDeleteTriggerMessageKey = "soft-delete-trigger"
-  const val SoftDeleteTriggerTopic = "soft-delete-triggers"
+  inline val SoftDeleteTriggerMessageKey
+    get() = MessageKey("soft-delete-trigger")
+  inline val SoftDeleteTriggerTopic
+    get() = MessageTopic("soft-delete-triggers")
 
-  const val HardDeleteTriggerMessageKey = "hard-delete-trigger"
-  const val HardDeleteTriggerTopic = "hard-delete-triggers"
+  inline val HardDeleteTriggerMessageKey
+    get() = MessageKey("hard-delete-trigger")
+  inline val HardDeleteTriggerTopic
+    get() = MessageTopic("hard-delete-triggers")
 
-  const val ShareTriggerMessageKey = "share-trigger"
-  const val ShareTriggerTopic = "share-triggers"
+  inline val ShareTriggerMessageKey
+    get() = MessageKey("share-trigger")
+  inline val ShareTriggerTopic
+    get() = MessageTopic("share-triggers")
 
-  const val ReconciliationTriggerMessageKey = "reconciliation-trigger"
-  const val ReconciliationTriggerTopic = "reconciliation-triggers"
+  inline val ReconciliationTriggerMessageKey
+    get() = MessageKey("reconciliation-trigger")
+  inline val ReconciliationTriggerTopic
+    get() = MessageTopic("reconciliation-triggers")
 }

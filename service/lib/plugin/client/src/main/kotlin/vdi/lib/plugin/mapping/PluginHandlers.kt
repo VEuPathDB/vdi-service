@@ -1,12 +1,11 @@
 package vdi.lib.plugin.mapping
 
-import org.veupathdb.vdi.lib.common.env.reqHostAddress
 import org.veupathdb.vdi.lib.common.field.DataType
-import vdi.lib.env.EnvKey
+import vdi.lib.config.loadAndCacheStackConfig
+import vdi.lib.health.RemoteDependencies
 import vdi.lib.plugin.client.PluginHandlerClient
 import vdi.lib.plugin.client.PluginHandlerClientConfig
 import vdi.lib.plugin.registry.PluginRegistry
-import vdi.lib.health.RemoteDependencies
 
 /**
  * Collection of [PluginHandler] instances mapped by dataset type name.
@@ -15,19 +14,25 @@ object PluginHandlers {
   private val mapping: Map<NameVersionPair, PluginHandler>
 
   init {
-    val env = System.getenv()
+    val tmpMap = HashMap<NameVersionPair, PluginHandler>(loadAndCacheStackConfig().vdi.plugins.size)
 
-    mapping = PluginRegistry.envKeys()
-      .map {
-        val (dt, version, details) = PluginRegistry[it]!!
-        val address = env.reqHostAddress(EnvKey.Handlers.Prefix + it + EnvKey.Handlers.AddressSuffix)
+    loadAndCacheStackConfig().vdi.plugins.forEach { plug ->
+      val addr = plug.server.toCommonType(80u)
 
-        RemoteDependencies.register("Plugin ${details.displayName}", address.host, address.port)
+      RemoteDependencies.register("Plugin ${plug.displayName}", addr.host, addr.port)
 
-        NameVersionPair(dt, version) to
-          PluginHandlerImpl(dt, PluginHandlerClient(PluginHandlerClientConfig(address)), details)
+      plug.dataTypes.forEach { dt ->
+        val key = NameVersionPair(DataType.of(dt.name), dt.version)
+
+        tmpMap[key] = PluginHandlerImpl(
+          key.name,
+          PluginHandlerClient(PluginHandlerClientConfig(addr)),
+          PluginRegistry[key.name, dt.version]!!
+        )
       }
-      .toMap()
+    }
+
+    mapping = tmpMap
   }
 
   /**
@@ -53,10 +58,6 @@ object PluginHandlers {
    */
   operator fun get(type: DataType, version: String): PluginHandler? =
     mapping[NameVersionPair(type, version)]
-
-  fun sequence(): Sequence<Pair<NameVersionPair, PluginHandler>> {
-    return mapping.asSequence().map { (k, v) -> k to v }
-  }
 
   data class NameVersionPair(val name: DataType, val version: String)
 }

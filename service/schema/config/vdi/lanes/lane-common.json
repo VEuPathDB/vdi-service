@@ -2,8 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/lanes/lane-common.json",
   "title": "Common Lane Config Options",
-  "type": "object",
-  "properties": {
+  "$defs": {
     "kafkaConsumerId": {
       "title": "Kafka Consumer ID",
       "description": "Name the lane will identify itself with when fetching events from Kafka.",
@@ -11,7 +10,7 @@
       "minLength": 3,
       "maxLength": 32
     },
-    "memoryQueueSize": {
+    "inMemoryQueueSize": {
       "title": "In-Memory Job Queue Size",
       "description": "Number of jobs that should be pulled from the event channel and kept in memory for processing.  If there is a service shutdown, the in-memory jobs may be lost and need to be re-queued by the reconciler.",
       "type": "integer",
@@ -27,7 +26,7 @@
     },
     "eventChannel": {
       "title": "Event Channel Name",
-      "description": "Name of the event channel the lane will subscribe to.",
+      "description": "Name of the event channel (topic) the lane will subscribe to.",
       "type": "string",
       "minLength": 3,
       "maxLength": 32
@@ -38,9 +37,7 @@
       "type": "string",
       "minLength": 3,
       "maxLength": 32
-    }
-  },
-  "$defs": {
+    },
     "kafkaProducerId": {
       "title": "Kafka Producer ID",
       "description": "Name the lane will identify itself with when publishing events to Kafka.",

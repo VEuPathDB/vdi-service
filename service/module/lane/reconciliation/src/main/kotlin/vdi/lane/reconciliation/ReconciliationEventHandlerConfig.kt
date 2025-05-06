@@ -2,59 +2,56 @@ package vdi.lane.reconciliation
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import org.veupathdb.vdi.lib.common.env.optUInt
-import org.veupathdb.vdi.lib.common.env.optional
-import org.veupathdb.vdi.lib.common.env.require
-import vdi.lib.env.EnvKey
-import vdi.lib.env.Environment
-import vdi.lib.kafka.KafkaConsumerConfig
+import vdi.lib.config.vdi.KafkaConfig
+import vdi.lib.config.vdi.ObjectStoreConfig
+import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.config.vdi.lanes.LaneConfig
+import vdi.lib.kafka.*
 import vdi.lib.kafka.router.KafkaRouterConfig
 import vdi.lib.kafka.router.RouterDefaults
 import vdi.lib.s3.util.S3Config
 
 data class ReconciliationEventHandlerConfig(
-  val jobQueueSize: UInt,
-  val workerPoolSize: UInt,
-  val kafkaConsumerConfig: KafkaConsumerConfig,
-  val kafkaRouterConfig: KafkaRouterConfig,
-  val kafkaTopic: String,
-  val kafkaMessageKey: String,
-  val s3Config: S3Config,
-  val s3Bucket: BucketName,
+  val workerCount:    UByte,
+  val jobQueueSize:   UByte,
+  val kafkaInConfig:  KafkaConsumerConfig,
+  val kafkaOutConfig: KafkaRouterConfig,
+  val eventChannel:   MessageTopic,
+  val eventMsgKey:    MessageKey,
+  val s3Config:       S3Config,
+  val s3Bucket:       BucketName,
 ) {
-  constructor() : this(System.getenv())
+  constructor(conf: VDIConfig): this(conf.lanes, conf.objectStore, conf.kafka)
 
-  constructor(env: Environment) : this(
-    jobQueueSize = env.optUInt(EnvKey.ReconciliationTriggerHandler.WorkQueueSize)
-      ?: Defaults.JobQueueSize,
-
-    workerPoolSize = env.optUInt(EnvKey.ReconciliationTriggerHandler.WorkerPoolSize)
-      ?: Defaults.WorkerPoolSize,
-
-    kafkaConsumerConfig = KafkaConsumerConfig(env.optional(EnvKey.ReconciliationTriggerHandler.KafkaConsumerClientID) ?: "reconciliation-handler", env),
-
-    kafkaRouterConfig = KafkaRouterConfig(env, "reconciliation-event-handler"),
-
-    kafkaTopic = env.optional(EnvKey.Kafka.Topic.ReconciliationTriggers)
-      ?: Defaults.ReconciliationTopic,
-
-    kafkaMessageKey = env.optional(EnvKey.Kafka.MessageKey.ReconciliationTriggers)
-      ?: Defaults.ReconciliationMessageKey,
-
-    s3Config = S3Config(env),
-
-    s3Bucket = BucketName(env.require(EnvKey.S3.BucketName))
+  constructor(lanes: LaneConfig?, obj: ObjectStoreConfig, kafka: KafkaConfig): this(
+    workerCount    = lanes?.reconciliation?.inMemoryQueueSize ?: JobQueueSize,
+    jobQueueSize   = lanes?.reconciliation?.workerCount ?: WorkerPoolSize,
+    kafkaInConfig  = KafkaConsumerConfig(lanes?.reconciliation?.kafkaConsumerID ?: ConsumerID, kafka),
+    kafkaOutConfig = KafkaRouterConfig(lanes?.reconciliation?.kafkaProducerID ?: ProducerID, kafka, lanes),
+    eventChannel   = lanes?.reconciliation?.eventChannel?.toMessageTopic() ?: KafkaTopic,
+    eventMsgKey    = lanes?.reconciliation?.eventKey?.toMessageKey() ?: KafkaMessageKey,
+    s3Config       = S3Config(obj),
+    s3Bucket       = BucketName(obj.bucketName),
   )
 
-  object Defaults {
-    const val JobQueueSize   = 10u
-    const val WorkerPoolSize = 10u
+  private companion object {
+    inline val ConsumerID
+      get() = "reconciliation-lane-receive"
 
-    inline val ReconciliationTopic
+    inline val ProducerID
+      get() = "reconciliation-lane-send"
+
+    inline val KafkaTopic
       get() = RouterDefaults.ReconciliationTriggerTopic
 
-    inline val ReconciliationMessageKey
+    inline val KafkaMessageKey
       get() = RouterDefaults.ReconciliationTriggerMessageKey
+
+    inline val JobQueueSize
+      get(): UByte = 10u
+
+    inline val WorkerPoolSize
+      get(): UByte = 10u
   }
 }
 

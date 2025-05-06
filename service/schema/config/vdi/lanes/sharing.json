@@ -3,29 +3,27 @@
   "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/lanes/sharing.json",
   "title": "Dataset Share Lane Config",
   "type": "object",
-  "allOf": [
-    {
-      "$ref": "lane-common.json#"
+  "properties": {
+    "kafkaConsumerId": {
+      "$ref": "lane-common.json#/$defs/kafkaConsumerId",
+      "default": "share-lane-receive"
     },
-    {
-      "properties": {
-        "kafkaConsumerId": {
-          "default": "share-lane-receive"
-        },
-        "memoryQueueSize": {
-          "default": 10
-        },
-        "workerCount": {
-          "default": 10
-        },
-        "eventChannel": {
-          "default": "share-triggers"
-        },
-        "eventKey": {
-          "default": "share-trigger"
-        }
-      }
+    "inMemoryQueueSize": {
+      "$ref": "lane-common.json#/$defs/inMemoryQueueSize",
+      "default": 10
+    },
+    "workerCount": {
+      "$ref": "lane-common.json#/$defs/workerCount",
+      "default": 10
+    },
+    "eventChannel": {
+      "$ref": "lane-common.json#/$defs/eventChannel",
+      "default": "share-triggers"
+    },
+    "eventKey": {
+      "$ref": "lane-common.json#/$defs/eventKey",
+      "default": "share-trigger"
     }
-  ],
+  },
   "unevaluatedProperties": false
 }

@@ -21,6 +21,11 @@
       "uniqueItems": true,
       "unevaluatedItems": false
     },
+    "typeChangesEnabled": {
+      "description": "Whether datasets can be revised from this data type to another.",
+      "type": "boolean",
+      "default": false
+    },
     "customPath": {
       "title": "PATH Extension",
       "description": "Allows adding additional paths to the PATH environment variable passed to plugin scripts on execution in the typical colon (`:`) divided format.\nLeading or trailing colon characters are not required.",

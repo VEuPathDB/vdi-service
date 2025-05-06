@@ -2,51 +2,50 @@ package vdi.lane.sharing
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import org.veupathdb.vdi.lib.common.env.optUInt
-import org.veupathdb.vdi.lib.common.env.optional
-import org.veupathdb.vdi.lib.common.env.require
-import vdi.lib.env.EnvKey
-import vdi.lib.env.Environment
-import vdi.lib.kafka.KafkaConsumerConfig
+import vdi.lib.config.vdi.KafkaConfig
+import vdi.lib.config.vdi.ObjectStoreConfig
+import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.config.vdi.lanes.ConsumerLaneConfig
+import vdi.lib.kafka.*
 import vdi.lib.kafka.router.RouterDefaults
 import vdi.lib.s3.util.S3Config
+import vdi.lib.s3.util.bucket
 
 data class ShareTriggerHandlerConfig(
-  val workerPoolSize:         UInt,
-  val workQueueSize:          UInt,
-  val kafkaConsumerConfig:    KafkaConsumerConfig,
-  val s3Config:               S3Config,
-  val s3Bucket:               BucketName,
-  val shareTriggerTopic:      String,
-  val shareTriggerMessageKey: String,
+  val workerCount:  UByte,
+  val jobQueueSize: UByte,
+  val kafkaConfig:  KafkaConsumerConfig,
+  val s3Config:     S3Config,
+  val s3Bucket:     BucketName,
+  val eventTopic:   MessageTopic,
+  val eventMsgKey:  MessageKey,
 ) {
-  constructor() : this(System.getenv())
+  constructor(config: VDIConfig): this(config.lanes?.sharing, config.objectStore, config.kafka)
 
-  constructor(env: Environment) : this(
-    workerPoolSize = env.optUInt(EnvKey.ShareTriggerHandler.WorkerPoolSize)
-      ?: Defaults.WorkerPoolSize,
-
-    workQueueSize = env.optUInt(EnvKey.ShareTriggerHandler.WorkQueueSize)
-      ?: Defaults.WorkQueueSize,
-
-    kafkaConsumerConfig = KafkaConsumerConfig(
-      env.optional(EnvKey.ShareTriggerHandler.KafkaConsumerClientID) ?: "share-handler",
-      env
-    ),
-
-    s3Config = S3Config(env),
-
-    s3Bucket = BucketName(env.require(EnvKey.S3.BucketName)),
-
-    shareTriggerTopic = env.optional(EnvKey.Kafka.Topic.ShareTriggers)
-      ?: RouterDefaults.ShareTriggerTopic,
-
-    shareTriggerMessageKey = env.optional(EnvKey.Kafka.MessageKey.ShareTriggers)
-      ?: RouterDefaults.ShareTriggerMessageKey
+  constructor(lane: ConsumerLaneConfig?, store: ObjectStoreConfig, kafka: KafkaConfig): this(
+    workerCount  = lane?.workerCount ?: WorkerPoolSize,
+    jobQueueSize = lane?.inMemoryQueueSize ?: WorkQueueSize,
+    kafkaConfig  = KafkaConsumerConfig(lane?.kafkaConsumerID ?: ConsumerID, kafka),
+    s3Config     = S3Config(store),
+    s3Bucket     = store.bucket,
+    eventTopic   = lane?.eventChannel?.toMessageTopic() ?: EventChannel,
+    eventMsgKey  = lane?.eventKey?.toMessageKey() ?: EventKey,
   )
 
-  object Defaults {
-    const val WorkerPoolSize = 10u
-    const val WorkQueueSize = 10u
+  private companion object {
+    inline val ConsumerID
+      get() = "share-lane-receive"
+
+    inline val EventKey
+      get() = RouterDefaults.ShareTriggerMessageKey
+
+    inline val EventChannel
+      get() = RouterDefaults.ShareTriggerTopic
+
+    inline val WorkerPoolSize
+      get(): UByte = 10u
+
+    inline val WorkQueueSize
+      get(): UByte = 10u
   }
 }

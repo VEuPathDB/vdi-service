@@ -21,14 +21,6 @@
       },
       "unevaluatedItems": false
     },
-    "listeners": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "format": "uri"
-      },
-      "unevaluatedItems": false
-    },
     "consumers": {
       "$ref": "#/$defs/consumers"
     },

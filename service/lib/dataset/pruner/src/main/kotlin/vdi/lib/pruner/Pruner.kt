@@ -21,6 +21,7 @@ import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
+import vdi.lib.s3.paths.S3Paths
 
 /**
  * Dataset Pruner
@@ -357,7 +358,7 @@ object Pruner {
    * @param datasetID ID of the target dataset.
    */
   private fun S3Bucket.pruneAllObjects(ownerID: UserID, datasetID: DatasetID) {
-    objects.list(prefix = S3File.datasetDir(ownerID, datasetID))
+    objects.list(prefix = S3Paths.datasetDir(ownerID, datasetID))
       .map { it.path }
       .let { objects.deleteAll(it) }
   }
@@ -411,10 +412,10 @@ object Pruner {
   private fun S3Bucket.pruneObsoleteRevision(ctx: DeletionContext) {
     ctx.logger.debug("removing unnecessary object store data")
 
-    objects.list(prefix = S3File.datasetDir(ctx.ownerID, ctx.datasetID))
+    objects.list(prefix = S3Paths.datasetDir(ctx.ownerID, ctx.datasetID))
       .asSequence()
       .map { it.path }
-      .filterNot { path -> retainedRevisionHistoryFiles.any { path.endsWith(it) } }
+      .filterNot { path -> retainedRevisionHistoryFiles.any { it.resembles(path) } }
       .toList()
       .let { objects.deleteAll(it) }
   }

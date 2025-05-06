@@ -12,8 +12,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class WorkerPool(
   private val name: String,
-  private val jobQueueSize: UInt,
-  private val workerCount: UInt = 5u,
+  private val jobQueueSize: UByte,
+  private val workerCount: UByte = 5u,
   private val reportQueueSizeChange: (Int) -> Unit = { }
 ) {
   private val log      = logger().delegate

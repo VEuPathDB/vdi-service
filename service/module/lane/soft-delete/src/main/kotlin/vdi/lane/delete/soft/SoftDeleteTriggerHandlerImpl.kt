@@ -21,6 +21,7 @@ import vdi.lib.db.cache.withTransaction
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
+import vdi.lib.plugin.client.PluginException
 import vdi.lib.plugin.client.PluginRequestException
 import vdi.lib.plugin.client.response.uni.UninstallBadRequestResponse
 import vdi.lib.plugin.client.response.uni.UninstallResponseType
@@ -42,15 +43,15 @@ internal class SoftDeleteTriggerHandlerImpl(
   private val appDB = AppDB()
 
   override suspend fun run() {
-    val kc = requireKafkaConsumer(config.softDeleteTriggerTopic, config.kafkaConsumerConfig)
-    val wp = WorkerPool("soft-delete-workers", config.workQueueSize, config.workerPoolSize) {
+    val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
+    val wp = WorkerPool("soft-delete-workers", config.jobQueueSize, config.workerCount) {
       Metrics.softDeleteQueueSize.inc(it.toDouble())
     }
 
     coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
-          kc.fetchMessages(config.softDeleteTriggerMessageKey)
+          kc.fetchMessages(config.eventKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received uninstall job for dataset $userID/$datasetID from source $source")
               wp.submit { tryHandleUninstall(userID, datasetID) }
@@ -67,10 +68,10 @@ internal class SoftDeleteTriggerHandlerImpl(
   private suspend fun tryHandleUninstall(userID: UserID, datasetID: DatasetID) {
     try {
       handleUninstall(userID, datasetID)
-    } catch (e: vdi.lib.plugin.client.PluginException) {
+    } catch (e: PluginException) {
       e.log(log::error)
     } catch (e: Throwable) {
-      vdi.lib.plugin.client.PluginException.uninstall("N/A", "N/A", userID, datasetID, cause = e).log(log::error)
+      PluginException.uninstall("N/A", "N/A", userID, datasetID, cause = e).log(log::error)
     }
   }
 
@@ -108,10 +109,10 @@ internal class SoftDeleteTriggerHandlerImpl(
       if (datasetShouldBeUninstalled(userID, datasetID, projectID, internalDBRecord.typeName)) {
         try {
           uninstallDataset(userID, datasetID, projectID, handler, internalDBRecord)
-        } catch (e: vdi.lib.plugin.client.PluginException) {
+        } catch (e: PluginException) {
           throw e
         } catch (e: Throwable) {
-          throw vdi.lib.plugin.client.PluginException.uninstall(handler.displayName, projectID, userID, datasetID, cause = e)
+          throw PluginException.uninstall(handler.displayName, projectID, userID, datasetID, cause = e)
         }
       }
     }
@@ -128,10 +129,10 @@ internal class SoftDeleteTriggerHandlerImpl(
   ) {
     try {
       uninstallDataset(userID, datasetID, projectID, handler, record)
-    } catch (e: vdi.lib.plugin.client.PluginException) {
+    } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw vdi.lib.plugin.client.PluginException.uninstall(handler.displayName, projectID, userID, datasetID, cause = e)
+      throw PluginException.uninstall(handler.displayName, projectID, userID, datasetID, cause = e)
     }
   }
 
@@ -212,7 +213,7 @@ internal class SoftDeleteTriggerHandlerImpl(
       handler.displayName,
     )
 
-    throw vdi.lib.plugin.client.PluginException.uninstall(handler.displayName, projectID, userID, datasetID, res.message)
+    throw PluginException.uninstall(handler.displayName, projectID, userID, datasetID, res.message)
   }
 
   private fun handleUnexpectedErrorResponse(
@@ -230,6 +231,6 @@ internal class SoftDeleteTriggerHandlerImpl(
       res.message,
     )
 
-    throw vdi.lib.plugin.client.PluginException.uninstall(handler.displayName, projectID, userID, datasetID, res.message)
+    throw PluginException.uninstall(handler.displayName, projectID, userID, datasetID, res.message)
   }
 }

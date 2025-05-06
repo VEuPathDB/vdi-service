@@ -1,7 +1,16 @@
 package vdi.lane.delete.hard
 
+import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.modules.AbortCB
+
 fun HardDeleteTriggerHandler(
-  abortCB: (String?) -> Nothing,
-  config: HardDeleteTriggerHandlerConfig = HardDeleteTriggerHandlerConfig()
+  config: VDIConfig,
+  abortCB: AbortCB,
+): HardDeleteTriggerHandler =
+  HardDeleteTriggerHandler(HardDeleteTriggerHandlerConfig(config), abortCB)
+
+fun HardDeleteTriggerHandler(
+  config: HardDeleteTriggerHandlerConfig = HardDeleteTriggerHandlerConfig(),
+  abortCB: AbortCB,
 ): HardDeleteTriggerHandler =
   HardDeleteTriggerHandlerImpl(config, abortCB)

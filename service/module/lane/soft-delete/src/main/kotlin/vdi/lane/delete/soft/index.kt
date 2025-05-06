@@ -1,7 +1,10 @@
 package vdi.lane.delete.soft
 
-fun SoftDeleteTriggerHandler(
-  abortCB: (String?) -> Nothing,
-  config: SoftDeleteTriggerHandlerConfig = SoftDeleteTriggerHandlerConfig()
-): SoftDeleteTriggerHandler =
+import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.modules.AbortCB
+
+fun SoftDeleteTriggerHandler(config: VDIConfig, abortCB: AbortCB): SoftDeleteTriggerHandler =
+  SoftDeleteTriggerHandler(SoftDeleteTriggerHandlerConfig(config), abortCB)
+
+fun SoftDeleteTriggerHandler(config: SoftDeleteTriggerHandlerConfig, abortCB: AbortCB): SoftDeleteTriggerHandler =
   SoftDeleteTriggerHandlerImpl(config, abortCB)

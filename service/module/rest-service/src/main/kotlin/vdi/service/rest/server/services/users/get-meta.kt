@@ -6,7 +6,7 @@ import vdi.service.rest.generated.model.UserQuotaDetails
 import vdi.service.rest.generated.model.UserQuotaDetailsImpl
 import vdi.service.rest.s3.DatasetStore
 import vdi.lib.db.cache.CacheDB
-import vdi.service.rest.ServiceConfig
+import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.server.controllers.ControllerBase
 
 fun <T: ControllerBase> T.getUserMetadata(): UserMetadata =

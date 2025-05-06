@@ -7,6 +7,9 @@
     "cacheDb": {
       "$ref": "#/$defs/cacheDb"
     },
+    "restService": {
+      "$ref": "rest-service.json"
+    },
     "daemons": {
       "type": "object",
       "properties": {
@@ -97,7 +100,6 @@
   "required": [
     "cacheDb",
     "kafka",
-    "ldap",
     "objectStore",
     "plugins",
     "rabbit",
