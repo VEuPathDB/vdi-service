@@ -270,8 +270,11 @@ OUTPUT_DOC_DIR := "build/generated-docs"
 
 .PHONY: generate-service-docs
 generate-service-docs:
+	@npm i -g raml2html
+	@npm i -g raml2html-modern-theme
 	@mkdir -p $(OUTPUT_DOC_DIR)/schema/data $(OUTPUT_DOC_DIR)/schema/config
 	@gradle \
+		--no-daemon \
 		:service:generate-raml-docs \
 		:service:build-dataset-schema-resources \
 		:service:build-config-schema-resource
