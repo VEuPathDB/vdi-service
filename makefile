@@ -282,7 +282,7 @@ generate-service-docs:
 		docs/vdi-api.html \
 		service/build/json-schema/*
 	@python -m venv venv
-	@venv/bin/activate \
+	@. venv/bin/activate \
 		&& pip install json-schema-for-humans \
 		&& generate-schema-doc \
 			--config '{"expand_buttons":true,"description_is_markdown":true,"examples_as_yaml":true}' \
