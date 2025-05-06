@@ -28,6 +28,9 @@ jobs:
         clean: 'false'
     - name: Build Branch Docs
       run: make generate-service-docs OUTPUT_DOC_DIR=docs-for-upload
+      env:
+        GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     - name: Upload
       uses: actions/upload-pages-artifact@v3
       with:
