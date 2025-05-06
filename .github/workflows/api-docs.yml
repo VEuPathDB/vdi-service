@@ -11,6 +11,12 @@ jobs:
     name: Build API Docs
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: corretto
+    - uses: gradle/actions/setup-gradle@v4
+    - uses: actions/setup-node@v4
     - name: Checkout Main
       uses: actions/checkout@v4
     - name: Copy Docs
@@ -20,8 +26,8 @@ jobs:
       with:
         ref: feature-data-updates
         clean: 'false'
-    - name: Copy Schema
-      run: cp -r service/schema/config/ docs-for-upload/schema/
+    - name: Build Branch Docs
+      run: make generate-service-docs OUTPUT_DOC_DIR=docs-for-upload
     - name: Upload
       uses: actions/upload-pages-artifact@v3
       with:
