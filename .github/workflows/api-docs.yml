@@ -17,20 +17,23 @@ jobs:
         distribution: corretto
     - uses: gradle/actions/setup-gradle@v4
     - uses: actions/setup-node@v4
-    - name: Checkout Main
-      uses: actions/checkout@v4
-    - name: Copy Docs
-      run: cp -r docs/ docs-for-upload/
     - name: Checkout Feature
       uses: actions/checkout@v4
       with:
         ref: feature-data-updates
-        clean: 'false'
     - name: Build Branch Docs
       run: make generate-service-docs OUTPUT_DOC_DIR=docs-for-upload
       env:
         GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: Checkout Main
+      uses: actions/checkout@v4
+      with:
+        clean: 'false'
+    - name: Copy Docs
+      run: |
+        cp docs-for-upload/vdi-api.html docs-for-upload/vdi-api-feat.html
+        cp docs/vdi-api.html docs-for-upload
     - name: Upload
       uses: actions/upload-pages-artifact@v3
       with:
