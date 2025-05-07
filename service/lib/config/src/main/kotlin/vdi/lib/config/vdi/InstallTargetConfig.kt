@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import vdi.lib.config.common.DatabaseConnectionConfig
 
 data class InstallTargetConfig(
-  val enabled: Boolean,
+  val enabled: Boolean = true,
 
   val targetName: String,
 

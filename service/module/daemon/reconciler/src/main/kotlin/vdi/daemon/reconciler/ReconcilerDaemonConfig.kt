@@ -11,8 +11,6 @@ data class ReconcilerDaemonConfig(
   val fullRunInterval: Duration,
   val slimRunInterval: Duration,
 ) {
-  constructor(): this(loadAndCacheStackConfig().vdi.daemons?.reconciler)
-
   constructor(config: ReconcilerConfig?): this(
     reconcilerEnabled = config?.enabled ?: DefaultEnabledValue,
     fullRunInterval   = config?.fullRunInterval ?: DefaultFullRunInterval,

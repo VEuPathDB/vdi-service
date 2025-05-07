@@ -5,7 +5,7 @@ import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.lib.db.app.model.InstallStatuses
-import vdi.lib.db.app.sql.select.selectInstallStatuses
+import vdi.lib.db.app.sql.dataset_install_message.selectInstallStatuses
 
 internal object AppDBImpl : AppDB {
 

@@ -34,7 +34,7 @@ import vdi.lib.db.cache.withTransaction
 import vdi.lib.db.model.SyncControlRecord
 import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
-import vdi.service.rest.config.ServiceConfig
+import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.services.users.getCurrentQuotaUsage
@@ -80,11 +80,12 @@ fun <T: ControllerBase> T.submitUpload(
   tempDirectory: Path,
   uploadFile:    Path,
   datasetMeta:   VDIDatasetMeta,
+  uploadConfig:  UploadConfig,
 ) {
   Metrics.Upload.queueSize.inc()
   WorkPool.submit {
     try {
-      uploadFiles(datasetID, tempDirectory, uploadFile, datasetMeta)
+      uploadFiles(datasetID, tempDirectory, uploadFile, datasetMeta, uploadConfig)
     } finally {
       Metrics.Upload.queueSize.dec()
       tempDirectory.deleteRecursively()
@@ -94,10 +95,11 @@ fun <T: ControllerBase> T.submitUpload(
 
 @OptIn(ExperimentalPathApi::class)
 fun <T: ControllerBase> T.uploadFiles(
-  datasetID: DatasetID,
+  datasetID:     DatasetID,
   tempDirectory: Path,
-  uploadFile: Path,
-  datasetMeta: VDIDatasetMeta,
+  uploadFile:    Path,
+  datasetMeta:   VDIDatasetMeta,
+  uploadConfig:  UploadConfig,
 ) {
   val logger = logger("minio-upload")
 
@@ -106,7 +108,7 @@ fun <T: ControllerBase> T.uploadFiles(
     TempFiles.withTempPath { archive ->
       try {
         logger.debug("{}/{}: verifying user storage quota is not exceeded", userID, datasetID)
-        verifyFileSize(uploadFile)
+        verifyFileSize(uploadFile, uploadConfig)
 
         logger.debug("{}/{}: (re)packing input file", userID, datasetID)
         val sizes = uploadFile.repack(into = archive, using = directory, logger = logger)
@@ -149,14 +151,14 @@ fun <T: ControllerBase> T.uploadFiles(
   }
 }
 
-fun <T: ControllerBase> T.verifyFileSize(file: Path) {
+fun <T: ControllerBase> T.verifyFileSize(file: Path, uploadConfig: UploadConfig) {
   val fileSize = file.fileSize()
 
-  if (fileSize > ServiceConfig.Quota.maxUploadSize.toLong())
+  if (fileSize > uploadConfig.maxUploadSize.toLong())
     throw BadRequestException("upload file size larger than the max permitted file size of "
-    + ServiceConfig.Quota.maxUploadSize.toString() + " bytes")
+    + uploadConfig.maxUploadSize.toString() + " bytes")
 
-  val remainingUploadAllowance = getUserRemainingQuota()
+  val remainingUploadAllowance = getUserRemainingQuota(uploadConfig)
 
   if (fileSize > remainingUploadAllowance)
     throw BadRequestException(
@@ -321,8 +323,6 @@ data class FileReference(
  *
  * @param url URL of the remote file that will be downloaded.
  *
- * @param userID ID of the user attempting to upload a dataset.
- *
  * @return A data object containing the temp directory path and temp file path
  * for the downloaded remote file.
  *
@@ -337,7 +337,7 @@ data class FileReference(
  * * An IO error occurred while downloading the remote file.
  */
 @OptIn(ExperimentalPathApi::class)
-fun <T: ControllerBase> T.downloadRemoteFile(url: URL, userID: UserID): FileReference {
+fun <T: ControllerBase> T.downloadRemoteFile(url: URL, uploadConfig: UploadConfig): FileReference {
   val logger = logger
 
   logger.info("attempting to download a remote file from {}", url)
@@ -373,10 +373,10 @@ fun <T: ControllerBase> T.downloadRemoteFile(url: URL, userID: UserID): FileRefe
 
   // Try to download the file from the source URL.
   try {
-    val maxUploadSize = min(getUserRemainingQuota(), JaxRSMultipartUpload.maxFileUploadSize)
+    val maxUploadSize = min(getUserRemainingQuota(uploadConfig), uploadConfig.maxUploadSize.toLong())
 
     BoundedInputStream(maxUploadSize, response.body!!) {
-      val message = if (maxUploadSize < JaxRSMultipartUpload.maxFileUploadSize)
+      val message = if (maxUploadSize < uploadConfig.maxUploadSize.toLong())
         "given source URL was to a file that exceeds the remaining upload space allowed by the user quota " +
         "($maxUploadSize bytes)"
       else
@@ -406,8 +406,8 @@ fun String.toURL() =
 
 private fun FailedDependencyException(url: URL, msg: String) = FailedDependencyException(url.toString(), msg)
 
-private fun <T: ControllerBase> T.getUserRemainingQuota(): Long =
-  max(0L, ServiceConfig.Quota.quotaLimit.toLong() - getCurrentQuotaUsage())
+private fun <T: ControllerBase> T.getUserRemainingQuota(uploadConfig: UploadConfig): Long =
+  max(0L, uploadConfig.userMaxStorageSize.toLong() - getCurrentQuotaUsage(userID))
 
 /**
  * Special handling for AWS urls that contain an Expires query parameter.  If

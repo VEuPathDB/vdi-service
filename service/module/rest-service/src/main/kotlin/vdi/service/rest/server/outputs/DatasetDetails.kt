@@ -8,7 +8,7 @@ import vdi.service.rest.generated.model.*
 internal fun DatasetDetails(
   datasetID: DatasetID,
   owner: DatasetOwner,
-  datasetType: DatasetTypeResponseBody,
+  datasetType: DatasetTypeOutput,
   name: String,
   origin: String,
   projectIDs: List<String>,

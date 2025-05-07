@@ -1,3 +1,6 @@
 package vdi.lib.kafka.router
 
-data class TriggerConfig(val messageKey: String, val topic: String)
+import vdi.lib.kafka.MessageKey
+import vdi.lib.kafka.MessageTopic
+
+data class TriggerConfig(val messageKey: MessageKey, val topic: MessageTopic)

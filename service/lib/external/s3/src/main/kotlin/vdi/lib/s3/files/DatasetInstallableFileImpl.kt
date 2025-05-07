@@ -34,7 +34,7 @@ internal class DatasetInstallableFileImpl(
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
   ) {
-    if (s3Object.baseName != S3File.InstallReadyZip) {
+    if (!S3File.InstallReadyZip.resembles(s3Object.baseName)) {
       throw IllegalArgumentException("Can only construct an install-ready file from s3 object if object base name is "
         + S3File.InstallReadyZip + ". Given path: " + s3Object.path)
     }

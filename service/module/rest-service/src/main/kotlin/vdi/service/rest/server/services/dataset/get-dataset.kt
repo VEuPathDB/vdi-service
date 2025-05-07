@@ -80,7 +80,7 @@ private fun getDatasetByID(
   return Either.ofLeft(DatasetDetails(
     datasetID        = datasetID,
     owner            = DatasetOwner(userDetails.requireDetails(dataset.ownerID)),
-    datasetType      = DatasetTypeResponseBody(dataset, typeDisplayName),
+    datasetType      = DatasetTypeOutput(dataset, typeDisplayName),
     name             = dataset.name,
     origin           = dataset.origin,
     projectIDs       = dataset.projects,

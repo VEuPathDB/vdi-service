@@ -1,7 +1,6 @@
 package vdi.service.rest.server.outputs
 
 import vdi.service.rest.generated.model.BrokenImportDetails
-import vdi.service.rest.generated.model.BrokenImportDetailsImpl
 import vdi.lib.db.cache.model.BrokenImportRecord
 import vdi.lib.plugin.registry.PluginRegistry
 
@@ -12,7 +11,7 @@ fun BrokenImportDetails(record: BrokenImportRecord): BrokenImportDetails =
 
     datasetId = record.datasetID.toString()
     owner = record.ownerID.toLong()
-    datasetType = DatasetTypeResponseBody(record.typeName, record.typeVersion, datasetTypeName)
+    datasetType = DatasetTypeOutput(record.typeName, record.typeVersion, datasetTypeName)
     projectIds = record.projects
     messages = record.messages
   }

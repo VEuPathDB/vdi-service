@@ -57,7 +57,7 @@ fun KafkaConsumer(topic: MessageTopic, config: KafkaConsumerConfig): KafkaConsum
     topic,
     config.pollDuration ?: 2.seconds,
     StringDeserializer()
-      .let { KConsumer(props, it, it).apply { subscribe(listOf(topic)) } }
+      .let { KConsumer(props, it, it).apply { subscribe(listOf(topic.value)) } }
   )
 }
 

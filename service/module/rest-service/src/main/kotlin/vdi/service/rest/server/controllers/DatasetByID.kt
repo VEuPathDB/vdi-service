@@ -1,5 +1,6 @@
 package vdi.service.rest.server.controllers
 
+import jakarta.inject.Inject
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
@@ -14,9 +15,10 @@ import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.server.services.dataset.*
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import vdi.service.rest.config.UploadConfig
 
 @Authenticated
-class DatasetByID(@Context request: ContainerRequest)
+class DatasetByID(@Context request: ContainerRequest, @Inject val uploadConfig: UploadConfig)
   : DatasetsVdiId
   , VdiDatasetsVdiId // DEPRECATED API
   , ControllerBase(request)
@@ -24,7 +26,7 @@ class DatasetByID(@Context request: ContainerRequest)
   @Authenticated(adminOverride = ALLOW_ALWAYS)
   override fun getDatasetsByVdiId(rawID: String): GetDatasetsByVdiIdResponse =
     DatasetID(rawID).let { vdiID ->
-      when (val userID = maybeUserID) {
+      when (maybeUserID) {
         null -> adminGetDatasetByID(vdiID)
         else -> userGetDatasetByID(vdiID)
       }.let {
@@ -50,7 +52,7 @@ class DatasetByID(@Context request: ContainerRequest)
 
   override fun putDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?) =
     entity
-      ?.let { body -> putDataset(DatasetID(vdiId), body) }
+      ?.let { body -> putDataset(DatasetID(vdiId), body, uploadConfig) }
       ?.let {
         if (it.isLeft)
           it.unwrapLeft()

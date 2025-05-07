@@ -1,13 +1,11 @@
 package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException
-import org.veupathdb.lib.request.validation.*
-import vdi.service.rest.generated.model.*
+import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.*
-import java.time.OffsetDateTime
+import vdi.service.rest.generated.model.DatasetPostRequestBody
 
-internal fun DatasetPostRequestBody.cleanup() {
+fun DatasetPostRequestBody.cleanup() {
   meta?.cleanup()
   url = url?.ifBlank { null }
     ?.trim()
@@ -35,24 +33,5 @@ fun DatasetPostRequestBody.validate(): ValidationErrors {
   return ValidationErrors().also { meta.validate(it) }
 }
 
-internal fun DatasetPostRequestBody.toDatasetMeta(userID: UserID) =
-  VDIDatasetMeta(
-    type             = meta.datasetType.toInternal(),
-    projects         = meta.projects.toSet(),
-    owner            = userID,
-    name             = meta.name,
-    shortName        = meta.shortName,
-    shortAttribution = meta.shortAttribution,
-    category         = meta.category,
-    summary          = meta.summary,
-    description      = meta.description,
-    visibility       = meta.visibility?.toInternal() ?: VDIDatasetVisibility.Private,
-    origin           = meta.origin,
-    sourceURL        = url,
-    created          = meta.createdOn ?: OffsetDateTime.now(),
-    dependencies     = meta.dependencies.map(DatasetDependency::toInternal),
-    publications     = meta.publications.map(DatasetPublication::toInternal),
-    hyperlinks       = meta.hyperlinks.map(DatasetHyperlink::toInternal),
-    contacts         = meta.contacts.map(DatasetContact::toInternal),
-    organisms        = meta.organisms,
-  )
+fun DatasetPostRequestBody.toDatasetMeta(userID: UserID) =
+  meta.toInternal(userID, url)

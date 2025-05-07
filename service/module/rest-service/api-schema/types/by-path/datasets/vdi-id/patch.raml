@@ -39,3 +39,9 @@ types:
       contacts?:
         type: common.DatasetContact[]
         uniqueItems: true
+      properties?:
+        description: |-
+          When provided and non-empty, wholely replaces any previous dataset
+          characteristics value.  When provided as an empty object, removes the
+          dataset's characteristics.
+        type: common.DatasetCharacteristics

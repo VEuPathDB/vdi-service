@@ -44,7 +44,7 @@ types:
     properties:
       meta:
         description: Metadata about the dataset being submitted.
-        type: DatasetPostMeta
+        type: DatasetProxyPostMeta
       file?:
         description: |
           Dataset file to upload.
@@ -63,12 +63,6 @@ types:
     additionalProperties: false
     properties:
       datasetType: common.DatasetTypeInput
-      projects:
-        description: >-
-          DEPRECATED: Use `projectIds`
-        type: common.ProjectId[]
-        minItems: 1
-        uniqueItems: true
       visibility?:
         type: common.DatasetVisibility
         default: "private"

@@ -13,7 +13,7 @@ import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasets
 import vdi.service.rest.server.inputs.toSafeLimit
 import vdi.service.rest.server.inputs.toSafeOffset
 import vdi.service.rest.server.outputs.DatasetStatusInfo
-import vdi.service.rest.server.outputs.DatasetTypeResponseBody
+import vdi.service.rest.server.outputs.DatasetTypeOutput
 import vdi.service.rest.server.outputs.DatasetVisibility
 import vdi.service.rest.util.defaultZone
 
@@ -92,7 +92,7 @@ private fun AllDatasetsListEntry(
   AllDatasetsListEntryImpl().also {
     it.datasetId = row.datasetID.toString()
     it.owner = row.ownerID.toLong()
-    it.datasetType = DatasetTypeResponseBody(row.typeName, row.typeVersion)
+    it.datasetType = DatasetTypeOutput(row.typeName, row.typeVersion)
     it.visibility = DatasetVisibility(row.visibility)
     it.name = row.name
     it.shortName = row.shortName

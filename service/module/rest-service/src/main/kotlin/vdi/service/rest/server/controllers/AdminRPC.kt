@@ -1,5 +1,6 @@
 package vdi.service.rest.server.controllers
 
+import jakarta.inject.Inject
 import jakarta.ws.rs.core.Context
 import vdi.lib.install.cleanup.InstallCleaner
 import vdi.lib.install.cleanup.ReinstallTarget
@@ -14,8 +15,10 @@ import org.veupathdb.vdi.lib.common.field.toUserID
 import vdi.lib.pruner.Pruner
 import vdi.lib.install.retry.DatasetReinstaller
 import vdi.lib.reconciler.Reconciler
+import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetObjectPurgeRequestBody
 import vdi.service.rest.generated.model.DatasetPostRequestBody
+import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
 import vdi.service.rest.generated.model.InstallCleanupRequestBody
 import vdi.service.rest.generated.resources.AdminRpc
 import vdi.service.rest.server.inputs.cleanup
@@ -30,11 +33,14 @@ import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcInstallsClearFa
 
 @AdminRequired
 @Authenticated(adminOverride = ALLOW_ALWAYS)
-class AdminRPC(@Context request: ContainerRequest): AdminRpc, ControllerBase(request) {
+class AdminRPC(
+  @Context request: ContainerRequest,
+  @Inject val uploadConfig: UploadConfig,
+): AdminRpc, ControllerBase(request) {
 
   override fun postAdminRpcDatasetsProxyUpload(
     userId: Long?,
-    entity: DatasetPostRequestBody?
+    entity: DatasetProxyPostRequestBody?
   ): ProxyUploadResponse {
     if (userId == null)
       return BadRequestError("missing target user ID").wrap()
@@ -56,7 +62,7 @@ class AdminRPC(@Context request: ContainerRequest): AdminRpc, ControllerBase(req
 
     val datasetID = runBlocking { DatasetID() }
 
-    createDataset(datasetID, entity)
+    createDataset(datasetID, entity, uploadConfig)
 
     return ProxyUploadResponse.respond200WithApplicationJson(DatasetPostResponseBody(datasetID))
   }

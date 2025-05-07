@@ -24,15 +24,17 @@ internal class DatabaseConnectionConfigDeserializer: StdDeserializer<DatabaseCon
         platform = platform,
         poolSize = poolSize,
         lookupCN = obj["lookupCn"].textValue(),
+        schema   = obj["schema"]?.textValue(),
       )
     } else {
       DirectDatabaseConnectionConfig(
         username = user,
         password = pass,
-        platform = platform,
+        platform = platform!!,
         poolSize = poolSize,
         host     = HostAddress(obj["host"].textValue(), obj["port"].intValue().toUShort()),
-        dbName   = obj["dbName"].textValue()
+        dbName   = obj["dbName"].textValue(),
+        schema   = obj["schema"]?.textValue(),
       )
     }
   }

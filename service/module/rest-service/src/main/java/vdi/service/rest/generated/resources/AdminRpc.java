@@ -11,8 +11,8 @@ import jakarta.ws.rs.core.Response;
 import vdi.service.rest.generated.model.BadRequestError;
 import vdi.service.rest.generated.model.ConflictError;
 import vdi.service.rest.generated.model.DatasetObjectPurgeRequestBody;
-import vdi.service.rest.generated.model.DatasetPostRequestBody;
 import vdi.service.rest.generated.model.DatasetPostResponseBody;
+import vdi.service.rest.generated.model.DatasetProxyPostRequestBody;
 import vdi.service.rest.generated.model.ForbiddenError;
 import vdi.service.rest.generated.model.InstallCleanupRequestBody;
 import vdi.service.rest.generated.model.ServerError;
@@ -38,7 +38,7 @@ public interface AdminRpc {
   @Produces("application/json")
   @Consumes("multipart/form-data")
   PostAdminRpcDatasetsProxyUploadResponse postAdminRpcDatasetsProxyUpload(
-      @HeaderParam("User-ID") Long userID, DatasetPostRequestBody entity);
+      @HeaderParam("User-ID") Long userID, DatasetProxyPostRequestBody entity);
 
   @POST
   @Path("/datasets/prune")

@@ -10,7 +10,7 @@ fun HardDeleteTriggerHandler(
   HardDeleteTriggerHandler(HardDeleteTriggerHandlerConfig(config), abortCB)
 
 fun HardDeleteTriggerHandler(
-  config: HardDeleteTriggerHandlerConfig = HardDeleteTriggerHandlerConfig(),
+  config: HardDeleteTriggerHandlerConfig,
   abortCB: AbortCB,
 ): HardDeleteTriggerHandler =
   HardDeleteTriggerHandlerImpl(config, abortCB)

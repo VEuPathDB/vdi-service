@@ -74,8 +74,6 @@ fun <T: ControllerBase> T.putShareOffer(datasetID: DatasetID, recipientID: UserI
     DatasetImportStatus.Complete -> { /* Do nothing */ }
   }
 
-  val logger = logger(datasetID, ownerID)
-
   val existingShareReceipt = CacheDB().selectSharesForDataset(datasetID)
     .find { it.recipientID == recipientID }
 
@@ -107,9 +105,9 @@ fun <T: ControllerBase> T.putShareOffer(datasetID: DatasetID, recipientID: UserI
 }
 
 private fun DatasetShareOffer.toInternal() =
-  when (action) {
+  VDIDatasetShareOffer(when (action) {
     null                    -> throw BadRequestException("share action is required")
     ShareOfferAction.GRANT  -> VDIShareOfferAction.Grant
     ShareOfferAction.REVOKE -> VDIShareOfferAction.Revoke
-  }
+  })
 

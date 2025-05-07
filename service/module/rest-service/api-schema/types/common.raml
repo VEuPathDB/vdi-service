@@ -5,11 +5,25 @@ uses:
 
 types:
   DatasetCategory:
+    displayName: Dataset Category
     type: string
     minLength: 3
     maxLength: 100
 
+  DatasetCharacteristics:
+    displayName: Dataset Characteristics
+    description: |-
+      Any-typed for compatibility with JaxRS and RAML.
+      
+      Actual schema definitions are available at:
+      
+      * [EDA Schema](https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.eda.json)
+      * [Genomics Schema](https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.genomics.json)
+    type: any
+
+
   DatasetContact:
+    displayName: Dataset Contact
     additionalProperties: false
     properties:
       name:
@@ -40,10 +54,12 @@ types:
         default: false
 
   DatasetCreationDate:
+    displayName: Dataset Creation Date
     description: Timestamp of the creation of the dataset
     type: datetime
 
   DatasetDependency:
+    displayName: Dataset Dependency
     additionalProperties: false
     properties:
       resourceIdentifier:
@@ -60,10 +76,12 @@ types:
         maxLength: 50
 
   DatasetDescription:
+    displayName: Dataset Description
     type: string
     description: Longform description of the dataset.
 
   DatasetHyperlink:
+    displayName: Dataset Hyperlink
     type: object
     additionalProperties: false
     properties:
@@ -83,6 +101,7 @@ types:
         default: false
 
   DatasetImportStatus:
+    displayName: Dataset Import Status
     description: |
       Import status of the dataset.
 
@@ -103,6 +122,7 @@ types:
     - failed
 
   DatasetInstallStatus:
+    displayName: Dataset Install Status
     type: string
     enum:
     - running
@@ -113,6 +133,7 @@ types:
     - missing-dependency
 
   DatasetInstallStatusEntry:
+    displayName: Dataset Install Target Status
     description: Entry in a list of install statuses for a dataset.
     additionalProperties: false
     properties:
@@ -123,6 +144,7 @@ types:
       dataMessage?: string
 
   DatasetMetaBase:
+    displayName: Dataset Meta Base Fields
     type: object
     properties:
       # Fields that are different based on child type (and thus omitted here):
@@ -145,32 +167,34 @@ types:
         uniqueItems: true
 
       # Optional Fields
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
       category?: DatasetCategory
-      description?: DatasetDescription
-      publications?:
-        type: DatasetPublication[]
+      contacts?:
+        type: DatasetContact[]
         uniqueItems: true
+      description?: DatasetDescription
       hyperlinks?:
         type: DatasetHyperlink[]
         uniqueItems: true
       organisms?:
         type: OrganismAbbreviation[]
         uniqueItems: true
-      contacts?:
-        type: DatasetContact[]
+      publications?:
+        type: DatasetPublication[]
         uniqueItems: true
-      properties?:
-        type: DatasetPropertiesEDA | DatasetPropertiesGenomics
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      properties?: DatasetCharacteristics
+    additionalProperties: false
 
   DatasetName:
+    displayName: Dataset Name
     type: string
     description: User-provided name for the dataset.
     minLength: 3
     maxLength: 1024
 
   DatasetOrigin:
+    displayName: Dataset Origin
     description: |
       String representing the origin of the dataset.  Examples include
       `direct-upload`, `nephele`, or `galaxy`.
@@ -179,6 +203,7 @@ types:
     maxLength: 256
 
   DatasetOwner:
+    displayName: Dataset Owner
     description: Details about the owner of a VDI dataset.
     additionalProperties: false
     properties:
@@ -188,21 +213,8 @@ types:
       email?: string
       organization?: string
 
-  DatasetPropertiesEDA:
-    displayName: EDA Dataset Characteristics
-    description: >-
-      Any-typed for compatibility with JaxRS and RAML.  Actual schema definition
-      at https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.eda.json
-    type: any
-
-  DatasetPropertiesGenomics:
-    displayName: Genomics Dataset Characteristics
-    description: >-
-      Any-typed for compatibility with JaxRS and RAML.  Actual schema definition
-      at https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.genomics.json
-    type: any
-
   DatasetPublication:
+    displayName: Dataset Publication
     additionalProperties: false
     properties:
       pubMedId:
@@ -218,6 +230,7 @@ types:
         default: false
 
   DatasetRevision:
+    displayName: Dataset Revision
     description: Dataset revision history entry.
     additionalProperties: false
     properties:
@@ -230,12 +243,14 @@ types:
         type: string
 
   DatasetRevisionNote:
+    displayName: Dataset Revision Note
     description: Note providing a reason and/or description for the revision.
     type: string
     minLength: 10
     maxLength: 4096
 
   DatasetRevisionAction:
+    displayName: Dataset Revision Action
     type: string
     enum:
     - revise
@@ -297,7 +312,6 @@ types:
     enum:
     - private
     - protected
-    - controlled
     - public
 
   OrganismAbbreviation:

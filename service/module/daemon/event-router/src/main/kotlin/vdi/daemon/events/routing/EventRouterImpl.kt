@@ -30,7 +30,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
 
   private val es: RabbitMQEventSource<MinIOEvent> = runBlocking {
     try {
-      log.debug("Connecting to RabbitMQ: {}", config.rabbitConfig.serverAddress)
+      log.debug("Connecting to RabbitMQ: {}", config.rabbitConfig.connection.address)
       RabbitMQEventSource(config.rabbitConfig) { JSON.readValue<MinIOEvent>(it) }
     } catch (e: Throwable) {
       triggerShutdown()

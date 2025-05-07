@@ -66,6 +66,7 @@ public final class JsonField {
   public static final String PROJECT_ID = "projectId";
   public static final String PROJECT_IDS = "projectIds";
   public static final String PROJECTS = "projects";
+  public static final String PROPERTIES = "properties";
   public static final String PUB_MED_ID = "pubMedId";
   public static final String PUBLICATIONS = "publications";
   public static final String REACHABLE = "reachable";

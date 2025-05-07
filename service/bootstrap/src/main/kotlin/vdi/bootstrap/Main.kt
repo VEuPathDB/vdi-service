@@ -19,6 +19,7 @@ import vdi.lane.reconciliation.ReconciliationEventHandler
 import vdi.lane.sharing.ShareTriggerHandler
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
+import vdi.lib.config.loadAndCacheStackConfig
 
 object Main {
 
@@ -26,18 +27,20 @@ object Main {
 
   @JvmStatic
   fun main(args: Array<String>) {
+    val config = loadAndCacheStackConfig()
+
     log.info("initializing modules")
     val modules = listOf(
-      EventRouter(::fatality),
-      HardDeleteTriggerHandler(::fatality),
-      ImportTriggerHandler(::fatality),
-      InstallDataTriggerHandler(::fatality),
-      PrunerModule(::fatality),
-      ShareTriggerHandler(::fatality),
-      SoftDeleteTriggerHandler(::fatality),
-      UpdateMetaTriggerHandler(::fatality),
-      Reconciler(::fatality),
-      ReconciliationEventHandler(::fatality),
+      EventRouter(config.vdi, ::fatality),
+      HardDeleteTriggerHandler(config.vdi, ::fatality),
+      ImportTriggerHandler(config.vdi, ::fatality),
+      InstallDataTriggerHandler(config.vdi, ::fatality),
+      PrunerModule(config.vdi.daemons?.pruner, ::fatality),
+      ShareTriggerHandler(config.vdi, ::fatality),
+      SoftDeleteTriggerHandler(config.vdi, ::fatality),
+      UpdateMetaTriggerHandler(config.vdi, ::fatality),
+      Reconciler(config.vdi.daemons?.reconciler, ::fatality),
+      ReconciliationEventHandler(config.vdi, ::fatality),
     )
 
     // FIXME: REMOVE THIS ONCE THE EXTENDED METADATA PATCH HAS BEEN APPLIED TO PRODUCTION!!!!
@@ -47,7 +50,7 @@ object Main {
 
     thread {
       try {
-        RestService.main(args)
+        RestService(config).main(args)
       } finally {
         shutdownModules(modules)
       }

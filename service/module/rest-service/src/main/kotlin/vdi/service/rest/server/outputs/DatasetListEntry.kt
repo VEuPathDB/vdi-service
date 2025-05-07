@@ -5,7 +5,7 @@ import vdi.service.rest.generated.model.DatasetListEntryImpl
 import vdi.service.rest.generated.model.DatasetListShareUser
 import vdi.service.rest.generated.model.DatasetOwner
 import vdi.service.rest.generated.model.DatasetStatusInfo
-import vdi.service.rest.generated.model.DatasetTypeResponseBody
+import vdi.service.rest.generated.model.DatasetTypeOutput
 import vdi.service.rest.generated.model.DatasetVisibility
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.util.defaultZone
@@ -21,7 +21,7 @@ import java.time.OffsetDateTime
 internal fun DatasetListEntry(
   datasetID: DatasetID,
   owner: DatasetOwner,
-  datasetType: DatasetTypeResponseBody,
+  datasetType: DatasetTypeOutput,
   visibility: DatasetVisibility,
   name: String,
   origin: String,
@@ -73,7 +73,7 @@ internal fun DatasetRecord.toExternal(
   return DatasetListEntry(
     datasetID        = datasetID,
     owner            = DatasetOwner(owner),
-    datasetType      = DatasetTypeResponseBody(this, typeDisplayName),
+    datasetType      = DatasetTypeOutput(this, typeDisplayName),
     visibility       = DatasetVisibility(visibility),
     name             = name,
     origin           = origin,

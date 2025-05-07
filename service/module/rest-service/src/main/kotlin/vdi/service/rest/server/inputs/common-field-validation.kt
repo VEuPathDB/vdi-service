@@ -1,7 +1,7 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
-import vdi.service.rest.Options
+import vdi.lib.install.InstallTargetRegistry
 
 
 /* ┌────────────────────────────────────────────────────────────────────────┐ *\
@@ -16,9 +16,10 @@ fun String?.validateName(jPath: String, errors: ValidationErrors) =
   reqCheckLength(jPath, NameMinLength, NameMaxLength, errors)
 
 
+private const val SummaryMinLength = 3
 private const val SummaryMaxLength = 4000 // max size for varchar in oracle
 fun String?.validateSummary(jPath: String, errors: ValidationErrors) =
-  optCheckMaxLength(jPath, SummaryMaxLength, errors)
+  reqCheckLength(jPath, SummaryMinLength, SummaryMaxLength, errors)
 
 
 private const val ShortNameMinLength = 3
@@ -62,7 +63,7 @@ fun Iterable<String?>.validateOrganisms(jPath: String, errors: ValidationErrors)
 fun Collection<String?>?.validateProjects(jPath: String, errors: ValidationErrors) {
   requireNonEmpty(jPath, errors) { forEachIndexed { i, p ->
     p.require(jPath, i, errors) {
-      if (!Options.projects.contains(p))
+      if (this !in InstallTargetRegistry)
         errors.add(jPath..i, "unknown or disabled target project")
     }
   } }

@@ -1,3 +1,4 @@
+import org.veupathdb.lib.gradle.container.tasks.jaxrs.GenerateJaxRS
 import org.veupathdb.lib.gradle.container.tasks.raml.GenerateRamlDocs
 
 plugins {
@@ -25,14 +26,15 @@ containerService {
 dependencies {
   implementation(project(":lib:common"))
   implementation(project(":lib:config"))
+  implementation(project(":lib:dataset:pruner"))
+  implementation(project(":lib:dataset:reconciler"))
+  implementation(project(":lib:dataset:reinstaller"))
   implementation(project(":lib:db:application"))
   implementation(project(":lib:db:internal"))
   implementation(project(":lib:db:common"))
-  implementation(project(":lib:dataset:reinstaller"))
-  implementation(project(":lib:plugin:registry"))
-  implementation(project(":lib:dataset:pruner"))
-  implementation(project(":lib:dataset:reconciler"))
   implementation(project(":lib:external:s3"))
+  implementation(project(":lib:install-target"))
+  implementation(project(":lib:plugin:registry"))
 
   implementation(libs.vdi.json)
   implementation(libs.vdi.common)
@@ -86,11 +88,37 @@ tasks.register("raml-docs") {
   }
 }
 
-tasks.register("jaxrs-types") {
-  doFirst {
-    // - backup library.raml
-    // - replace /!include .*/ with "any"
-    // - execute raml gen
-    // - restore backup
+tasks.register("special-patches") {
+  // Filename prefixes for files that should be patched.
+  val targetPrefixes = arrayOf(
+    "DatasetMetaBase",
+    "DatasetPostMeta",
+    "DatasetProxyPostMeta",
+    "DatasetPatchRequest",
+    "DatasetPutMetadata",
+    "DatasetDetails",
+  )
+
+  doLast {
+    val packagePath = containerService
+      .service
+      .projectPackage
+      .replace('.', '/') + "/generated/model"
+
+    val pattern = Regex("\\bObject\\b")
+
+    sourceSets.asSequence()
+      .map { it.allSource }
+      .map { it.srcDirs }
+      .flatMap { it.asSequence() }
+      .map { it.resolve(packagePath) }
+      .filter { it.exists() }
+      .map { it.listFiles()!! }
+      .flatMap { it.asSequence() }
+      .filter { file -> targetPrefixes.any { file.name.startsWith(it) } }
+      .forEach { it.writeText(it.readText().replace(pattern, "com.fasterxml.jackson.databind.node.ObjectNode")) }
   }
 }
+
+tasks.withType<GenerateJaxRS> { finalizedBy("special-patches") }
+

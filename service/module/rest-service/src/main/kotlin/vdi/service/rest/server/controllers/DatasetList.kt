@@ -1,5 +1,6 @@
 package vdi.service.rest.server.controllers
 
+import jakarta.inject.Inject
 import jakarta.ws.rs.core.Context
 import kotlinx.coroutines.runBlocking
 import org.glassfish.jersey.server.ContainerRequest
@@ -18,9 +19,10 @@ import vdi.service.rest.server.services.dataset.fetchUserDatasetList
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.lib.db.cache.model.DatasetListQuery
 import vdi.lib.db.cache.model.DatasetOwnershipFilter
+import vdi.service.rest.config.UploadConfig
 
 @Authenticated(allowGuests = false)
-class DatasetList(@Context request: ContainerRequest)
+class DatasetList(@Context request: ContainerRequest, @Inject val uploadConfig: UploadConfig)
   : Datasets
   , VdiDatasets // DEPRECATED API
   , ControllerBase(request)
@@ -55,12 +57,7 @@ class DatasetList(@Context request: ContainerRequest)
 
     log.info("issuing dataset ID {}", datasetID)
 
-    // The dataset creation date may only be provided via the user-proxy admin
-    // dataset upload endpoint.  Clear any value passed by the client on this
-    // endpoint.
-    entity.meta.createdOn = null
-
-    createDataset(datasetID, entity)
+    createDataset(datasetID, entity, uploadConfig)
 
     return Datasets.PostDatasetsResponse
       .respond201WithApplicationJson(

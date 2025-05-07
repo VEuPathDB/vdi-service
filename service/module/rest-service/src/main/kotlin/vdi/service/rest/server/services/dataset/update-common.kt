@@ -29,7 +29,7 @@ fun VDIDatasetMeta.applyPatch(
     shortName        = patch.shortName.applyPatch(shortName),
     shortAttribution = patch.shortAttribution.applyPatch(shortAttribution),
     category         = patch.category.applyPatch(category),
-    summary          = patch.summary.applyPatch(summary),
+    summary          = patch.summary ?: summary,
     description      = patch.description.applyPatch(description),
     origin           = origin,
     dependencies     = dependencies,

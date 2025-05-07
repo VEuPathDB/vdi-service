@@ -34,7 +34,7 @@ internal fun ShareOfferEntry(
     .also {
       it.datasetId   = datasetID.toString()
       it.shareStatus = ShareOfferStatus(shareStatus)
-      it.datasetType = DatasetTypeResponseBody(datasetTypeName, datasetTypeVersion, datasetTypeDisplayName)
+      it.datasetType = DatasetTypeOutput(datasetTypeName, datasetTypeVersion, datasetTypeDisplayName)
       it.owner       = DatasetOwner(owner)
       it.projectIds  = projectIDs
     }

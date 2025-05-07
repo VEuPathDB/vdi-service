@@ -19,6 +19,7 @@ import java.util.List;
     "hyperlinks",
     "organisms",
     "contacts",
+    "properties",
     "revisionNote"
 })
 public class DatasetPutMetadataImpl implements DatasetPutMetadata {
@@ -57,6 +58,9 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
 
   @JsonProperty(JsonField.CONTACTS)
   private List<DatasetContact> contacts;
+
+  @JsonProperty(JsonField.PROPERTIES)
+  private com.fasterxml.jackson.databind.node.ObjectNode properties;
 
   @JsonProperty(JsonField.REVISION_NOTE)
   private String revisionNote;
@@ -179,6 +183,16 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.CONTACTS)
   public void setContacts(List<DatasetContact> contacts) {
     this.contacts = contacts;
+  }
+
+  @JsonProperty(JsonField.PROPERTIES)
+  public com.fasterxml.jackson.databind.node.ObjectNode getProperties() {
+    return this.properties;
+  }
+
+  @JsonProperty(JsonField.PROPERTIES)
+  public void setProperties(com.fasterxml.jackson.databind.node.ObjectNode properties) {
+    this.properties = properties;
   }
 
   @JsonProperty(JsonField.REVISION_NOTE)

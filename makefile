@@ -91,8 +91,7 @@ validate-config-local:
 .PHONY: raml-gen
 raml-gen:
 	@which node || (echo 'NodeJS not found on $$PATH'; exit 1)
-	@./gradlew -q :service:rest-service:generate-jaxrs --rerun-tasks
-	@./gradlew -q build-raml-docs --rerun-tasks
+	@./gradlew -q :service:module:rest-service:generate-jaxrs :service:generate-raml-docs --rerun-tasks
 
 ####
 ##  Console Shortcuts
@@ -285,6 +284,7 @@ generate-service-docs:
 	@. venv/bin/activate \
 		&& pip install json-schema-for-humans \
 		&& generate-schema-doc \
-			--config '{"expand_buttons":true,"description_is_markdown":true,"examples_as_yaml":true}' \
+			--config expand_buttons \
+			--config examples_as_yaml \
 			service/schema/config/stack-config.json \
 			$(OUTPUT_DOC_DIR)/config-schema.html

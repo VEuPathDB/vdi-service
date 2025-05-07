@@ -116,10 +116,22 @@ types:
       status: conflict
       message: Target resource already exists and cannot be overwritten.
   DatasetCategory:
+    displayName: Dataset Category
     type: string
     minLength: 3
     maxLength: 100
+  DatasetCharacteristics:
+    displayName: Dataset Characteristics
+    description: |-
+      Any-typed for compatibility with JaxRS and RAML.
+
+      Actual schema definitions are available at:
+
+      * [EDA Schema](https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.eda.json)
+      * [Genomics Schema](https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.genomics.json)
+    type: any
   DatasetContact:
+    displayName: Dataset Contact
     type: object
     additionalProperties: false
     properties:
@@ -150,9 +162,11 @@ types:
         type: boolean
         default: false
   DatasetCreationDate:
+    displayName: Dataset Creation Date
     description: Timestamp of the creation of the dataset
     type: datetime
   DatasetDependency:
+    displayName: Dataset Dependency
     type: object
     additionalProperties: false
     properties:
@@ -169,10 +183,11 @@ types:
         minLength: 1
         maxLength: 50
   DatasetDescription:
+    displayName: Dataset Description
     description: Longform description of the dataset.
     type: string
   DatasetDetails:
-    displayName: Dataset Get Response
+    displayName: Dataset Details
     description: |
       Details about a specific singular dataset.
     type: DatasetMetaBase
@@ -217,6 +232,7 @@ types:
       upload: DatasetZipDetails
       install?: DatasetZipDetails
   DatasetHyperlink:
+    displayName: Dataset Hyperlink
     type: object
     additionalProperties: false
     properties:
@@ -235,6 +251,7 @@ types:
         type: boolean
         default: false
   DatasetImportStatus:
+    displayName: Dataset Import Status
     description: |
       Import status of the dataset.
 
@@ -253,6 +270,7 @@ types:
       - invalid
       - failed
   DatasetInstallStatus:
+    displayName: Dataset Install Status
     type: string
     enum:
       - running
@@ -262,6 +280,7 @@ types:
       - ready-for-reinstall
       - missing-dependency
   DatasetInstallStatusEntry:
+    displayName: Dataset Install Target Status
     description: Entry in a list of install statuses for a dataset.
     type: object
     additionalProperties: false
@@ -318,7 +337,9 @@ types:
       organization: string
       accepted: boolean
   DatasetMetaBase:
+    displayName: Dataset Meta Base Fields
     type: object
+    additionalProperties: false
     properties:
       name: DatasetName
       summary: DatasetSummary
@@ -331,24 +352,25 @@ types:
       dependencies:
         type: DatasetDependency[]
         uniqueItems: true
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
       category?: DatasetCategory
-      description?: DatasetDescription
-      publications?:
-        type: DatasetPublication[]
+      contacts?:
+        type: DatasetContact[]
         uniqueItems: true
+      description?: DatasetDescription
       hyperlinks?:
         type: DatasetHyperlink[]
         uniqueItems: true
       organisms?:
         type: OrganismAbbreviation[]
         uniqueItems: true
-      contacts?:
-        type: DatasetContact[]
+      publications?:
+        type: DatasetPublication[]
         uniqueItems: true
-      properties?: DatasetPropertiesEDA | DatasetPropertiesGenomics
+      shortName?: DatasetShortName
+      shortAttribution?: DatasetShortAttribution
+      properties?: DatasetCharacteristics
   DatasetName:
+    displayName: Dataset Name
     description: User-provided name for the dataset.
     type: string
     minLength: 3
@@ -361,6 +383,7 @@ types:
       userId: UserId
       datasetId: VdiId
   DatasetOrigin:
+    displayName: Dataset Origin
     description: |
       String representing the origin of the dataset.  Examples include
       `direct-upload`, `nephele`, or `galaxy`.
@@ -368,6 +391,7 @@ types:
     minLength: 3
     maxLength: 256
   DatasetOwner:
+    displayName: Dataset Owner
     description: Details about the owner of a VDI dataset.
     type: object
     additionalProperties: false
@@ -412,6 +436,12 @@ types:
       contacts?:
         type: DatasetContact[]
         uniqueItems: true
+      properties?:
+        description: |-
+          When provided and non-empty, wholely replaces any previous dataset
+          characteristics value.  When provided as an empty object, removes the
+          dataset's characteristics.
+        type: DatasetCharacteristics
   DatasetPostMeta:
     type: DatasetMetaBase
     additionalProperties: false
@@ -465,25 +495,11 @@ types:
     additionalProperties: false
     properties:
       datasetId: VdiId
-  DatasetPropertiesEDA:
-    displayName: EDA Dataset Characteristics
-    description: Any-typed for compatibility with JaxRS and RAML.  Actual schema definition at https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.eda.json
-    type: any
-  DatasetPropertiesGenomics:
-    displayName: Genomics Dataset Characteristics
-    description: Any-typed for compatibility with JaxRS and RAML.  Actual schema definition at https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.genomics.json
-    type: any
   DatasetProxyPostMeta:
     type: DatasetMetaBase
     additionalProperties: false
     properties:
       datasetType: DatasetTypeInput
-      projects:
-        description: >-
-          DEPRECATED: Use `projectIds`
-        type: ProjectId[]
-        minItems: 1
-        uniqueItems: true
       visibility?:
         type: DatasetVisibility
         default: "private"
@@ -497,7 +513,7 @@ types:
     properties:
       meta:
         description: Metadata about the dataset being submitted.
-        type: DatasetPostMeta
+        type: DatasetProxyPostMeta
       file?:
         description: |
           Dataset file to upload.
@@ -511,6 +527,7 @@ types:
           This field is incompatible with the `file` field.
         type: string
   DatasetPublication:
+    displayName: Dataset Publication
     type: object
     additionalProperties: false
     properties:
@@ -526,6 +543,7 @@ types:
         type: boolean
         default: false
   DatasetPutMetadata:
+    displayName: Dataset Put Request Metadata
     type: DatasetPatchRequestBody
     additionalProperties: false
     properties:
@@ -557,6 +575,7 @@ types:
     properties:
       datasetId: VdiId
   DatasetRevision:
+    displayName: Dataset Revision
     description: Dataset revision history entry.
     type: object
     additionalProperties: false
@@ -569,10 +588,12 @@ types:
         description: URL to the file listing for the revision entry.
         type: string
   DatasetRevisionAction:
+    displayName: Dataset Revision Action
     type: string
     enum:
       - revise
   DatasetRevisionNote:
+    displayName: Dataset Revision Note
     description: Note providing a reason and/or description for the revision.
     type: string
     minLength: 10
@@ -671,7 +692,6 @@ types:
     enum:
       - private
       - protected
-      - controlled
       - public
   DatasetZipDetails:
     displayName: Archive File Info
@@ -865,6 +885,7 @@ types:
       message: Datastore connection lost
       requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
   ShareOffer:
+    displayName: Dataset Share Offer
     type: object
     additionalProperties: false
     properties:
@@ -889,6 +910,7 @@ types:
         minItems: 1
         uniqueItems: true
   ShareOfferRecipient:
+    displayName: Dataset Share Recipient
     type: object
     additionalProperties: false
     properties:

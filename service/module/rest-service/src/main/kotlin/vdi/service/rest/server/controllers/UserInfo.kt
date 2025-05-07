@@ -1,8 +1,10 @@
 package vdi.service.rest.server.controllers
 
+import jakarta.inject.Inject
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
+import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.resources.Users
 import vdi.service.rest.generated.resources.VdiDatasetsShareOffers
 import vdi.service.rest.generated.resources.VdiUsers
@@ -11,14 +13,14 @@ import vdi.service.rest.server.services.shares.lookupShares
 import vdi.service.rest.server.services.users.getUserMetadata
 
 @Authenticated(allowGuests = false)
-class UserInfo(@Context request: ContainerRequest)
+class UserInfo(@Context request: ContainerRequest, @Inject val uploadConfig: UploadConfig)
   : Users
   , VdiUsers               // Deprecated API
   , VdiDatasetsShareOffers // Deprecated API
   , ControllerBase(request)
 {
   override fun getUsersSelfMeta() =
-    Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(getUserMetadata(userID))!!
+    Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(getUserMetadata(uploadConfig))!!
 
   override fun getUsersSelfShareOffers(status: String?) =
     Users.GetUsersSelfShareOffersResponse

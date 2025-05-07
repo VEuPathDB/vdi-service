@@ -1,5 +1,8 @@
 package vdi.daemon.events.routing
 
+import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.modules.AbortCB
+
 /**
  * Constructs a new event router from the given configuration.
  *
@@ -7,5 +10,15 @@ package vdi.daemon.events.routing
  *
  * @return a new [EventRouter] instance.
  */
-fun EventRouter(abortCB: (String?) -> Nothing, config: EventRouterConfig = EventRouterConfig()): EventRouter =
+fun EventRouter(config: VDIConfig, abortCB: AbortCB): EventRouter =
+  EventRouterImpl(EventRouterConfig(config), abortCB)
+
+/**
+ * Constructs a new event router from the given configuration.
+ *
+ * @param config Configuration for the returned [EventRouter] module.
+ *
+ * @return a new [EventRouter] instance.
+ */
+fun EventRouter(config: EventRouterConfig, abortCB: AbortCB): EventRouter =
   EventRouterImpl(config, abortCB)

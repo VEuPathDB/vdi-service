@@ -9,6 +9,7 @@ dependencies {
   implementation(project(":lib:external:ldap"))
 
   implementation(libs.vdi.common)
+  implementation(libs.vdi.json)
 
   implementation(libs.db.pool)
   implementation(libs.db.driver.oracle)

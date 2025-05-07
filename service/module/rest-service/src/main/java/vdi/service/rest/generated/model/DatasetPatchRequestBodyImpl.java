@@ -18,7 +18,8 @@ import java.util.List;
     "publications",
     "hyperlinks",
     "organisms",
-    "contacts"
+    "contacts",
+    "properties"
 })
 public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.NAME)
@@ -56,6 +57,9 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
 
   @JsonProperty(JsonField.CONTACTS)
   private List<DatasetContact> contacts;
+
+  @JsonProperty(JsonField.PROPERTIES)
+  private com.fasterxml.jackson.databind.node.ObjectNode properties;
 
   @JsonProperty(JsonField.NAME)
   public String getName() {
@@ -175,5 +179,15 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.CONTACTS)
   public void setContacts(List<DatasetContact> contacts) {
     this.contacts = contacts;
+  }
+
+  @JsonProperty(JsonField.PROPERTIES)
+  public com.fasterxml.jackson.databind.node.ObjectNode getProperties() {
+    return this.properties;
+  }
+
+  @JsonProperty(JsonField.PROPERTIES)
+  public void setProperties(com.fasterxml.jackson.databind.node.ObjectNode properties) {
+    this.properties = properties;
   }
 }

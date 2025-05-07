@@ -2,6 +2,10 @@ package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
+import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
+import java.time.OffsetDateTime
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.JsonField as JF
 
@@ -14,54 +18,41 @@ import vdi.service.rest.generated.model.JsonField as JF
  */
 @Suppress("DuplicatedCode") // Overlap in generated API types
 internal fun DatasetPostMeta.cleanup() {
-  // Required Fields
-  name = name.cleanupString()
-  datasetType?.cleanup()
-  origin = origin.cleanupString()
-  dependencies = dependencies.cleanup(DatasetDependency::cleanup)
-  projects
-    ?.ifEmpty { null }
-    ?.asSequence()
-    ?.map { it?.trim() }
-    ?.distinct()
-    ?.toList()
-    ?: emptyList()
+  if (!projects.isNullOrEmpty()) {
+    projectIds = projects
+  }
 
-  // Optional Fields
-  shortName = shortName.cleanupString()
-  shortAttribution = shortAttribution.cleanupString()
-  category = category.cleanupString()
+  (this as DatasetMetaBase).cleanup()
+
+  datasetType?.cleanup()
   visibility = visibility ?: DatasetVisibility.PRIVATE
-  summary = summary.cleanupString()
-  description = description.cleanupString()
-  publications = publications.cleanup(DatasetPublication::cleanup)
-  hyperlinks = hyperlinks.cleanup(DatasetHyperlink::cleanup)
-  organisms = organisms
-    ?.ifEmpty { null }
-    ?.onEachIndexed { i, s -> organisms[i] = s.cleanupString() }
-    ?: emptyList()
-  contacts = contacts.cleanup(DatasetContact::cleanup)
-  // createdOn skipped, it's admin use only
 }
 
 internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
-  // required fields
-  name.validateName(JF.META..JF.NAME, errors)
-  datasetType.validate(JF.META..JF.DATASET_TYPE, projects, errors)
-  origin.validateOrigin(JF.META..JF.ORIGIN, errors)
-  dependencies.validate(JF.META..JF.DEPENDENCIES, errors)
-  projects.validateProjects(JF.META..JF.DEPENDENCIES, errors)
-
-  // optional fields
-  shortName.validateShortName(JF.META..JF.SHORT_NAME, errors)
-  shortAttribution.validateShortAttribution(JF.META..JF.SHORT_ATTRIBUTION, errors)
-  category.validateCategory(JF.META..JF.CATEGORY, errors)
+  datasetType.validate(JF.META..JF.DATASET_TYPE, projectIds, errors)
   // visibility -enum, no validation needed)
-  summary.validateSummary(JF.META..JF.SUMMARY, errors)
-  // description - no rules, no validation
-  publications.validate(JF.META..JF.PUBLICATIONS, errors)
-  hyperlinks.validate(JF.META..JF.HYPERLINKS, errors)
-  organisms.validateOrganisms(JF.META..JF.ORGANISMS, errors)
-  contacts.validate(JF.META..JF.CONTACTS, errors)
-  // createdOn - validation only needed for admin requests
+
+  (this as DatasetMetaBase).validate(errors)
 }
+
+internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
+  VDIDatasetMeta(
+    type             = datasetType.toInternal(),
+    projects         = projectIds.toSet(),
+    owner            = userID,
+    name             = name,
+    shortName        = shortName,
+    shortAttribution = shortAttribution,
+    category         = category,
+    summary          = summary,
+    description      = description,
+    visibility       = visibility?.toInternal() ?: VDIDatasetVisibility.Private,
+    origin           = origin,
+    sourceURL        = url,
+    created          = OffsetDateTime.now(),
+    dependencies     = dependencies.map(DatasetDependency::toInternal),
+    publications     = publications.map(DatasetPublication::toInternal),
+    hyperlinks       = hyperlinks.map(DatasetHyperlink::toInternal),
+    contacts         = contacts.map(DatasetContact::toInternal),
+    organisms        = organisms,
+  )

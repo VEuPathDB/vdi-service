@@ -5,8 +5,17 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.lib.db.app.model.InstallStatus
 import vdi.lib.db.app.model.InstallType
-import vdi.lib.db.app.sql.select.*
 import javax.sql.DataSource
+import vdi.lib.db.app.sql.dataset.selectDataset
+import vdi.lib.db.app.sql.dataset.selectDatasetsByInstallStatus
+import vdi.lib.db.app.sql.dataset_install_message.selectDatasetInstallMessage
+import vdi.lib.db.app.sql.dataset_install_message.selectDatasetInstallMessages
+import vdi.lib.db.app.sql.dataset_project.selectDatasetProjectLinks
+import vdi.lib.db.app.sql.dataset_project.testDatasetProjectLinkExists
+import vdi.lib.db.app.sql.dataset_visibility.selectDatasetVisibilityRecords
+import vdi.lib.db.app.sql.dataset_visibility.testDatasetVisibilityExists
+import vdi.lib.db.app.sql.sync_control.selectAllSyncControl
+import vdi.lib.db.app.sql.sync_control.selectSyncControl
 
 internal class AppDBAccessorImpl(
   override val project: ProjectID,

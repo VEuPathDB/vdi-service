@@ -4,17 +4,20 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.config.Options
 import org.veupathdb.lib.container.jaxrs.providers.DependencyProvider
 import org.veupathdb.lib.container.jaxrs.server.Server
+import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import vdi.lib.config.StackConfig
-import vdi.lib.config.core.ContainerCoreConfig
 import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.health.DependencySource
 import vdi.service.rest.s3.DatasetStore
 
-class RestService(private val config: StackConfig) : Server() {
+class RestService(config: StackConfig) : Server() {
   private val log = LoggerFactory.getLogger(javaClass)
+
+  private val options = ServiceConfig(config)
 
   init {
     DatasetStore.init(config.vdi.objectStore)
+    JaxRSMultipartUpload.maxFileUploadSize = options.uploads.maxUploadSize.toLong()
   }
 
   fun main(args: Array<String>) {
@@ -25,5 +28,5 @@ class RestService(private val config: StackConfig) : Server() {
 
   override fun newResourceConfig(opts: Options) = Resources(opts as ServiceConfig)
 
-  override fun newOptions() = ServiceConfig
+  override fun newOptions() = options
 }

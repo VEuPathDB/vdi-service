@@ -10,6 +10,7 @@ import java.time.OffsetDateTime
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
+import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPatchRequestBodyImpl
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.model.DatasetPutResponseBody
@@ -25,8 +26,9 @@ import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.util.Either
 
 internal fun <T: ControllerBase> T.putDataset(
-  datasetID: DatasetID,
-  request:   DatasetPutRequestBody,
+  datasetID:    DatasetID,
+  request:      DatasetPutRequestBody,
+  uploadConfig: UploadConfig,
 ): Either<DatasetPutResponseBody, PutDatasetsByVdiIdResponse> {
   // Ensure the dataset exists and is owned by the requesting user.
   val originalDataset = CacheDB().selectDataset(datasetID)
@@ -67,7 +69,7 @@ internal fun <T: ControllerBase> T.putDataset(
 
   val (tempDirectory, uploadFile) = CacheDB().initializeDataset(userID, newDatasetID, meta) {
     try {
-      fetchDatasetFile(request)
+      fetchDatasetFile(request, uploadConfig)
     } catch (e: Throwable) {
       CacheDB().withTransaction { t ->
         t.updateImportControl(datasetID, DatasetImportStatus.Failed)
@@ -78,7 +80,7 @@ internal fun <T: ControllerBase> T.putDataset(
     }
   }
 
-  submitUpload(newDatasetID, tempDirectory, uploadFile, meta)
+  submitUpload(newDatasetID, tempDirectory, uploadFile, meta, uploadConfig)
 
   return Either.ofLeft(vdi.service.rest.generated.model.DatasetPutResponseBodyImpl().apply { datasetId = newDatasetID.toString() })
 }
@@ -96,9 +98,9 @@ private fun DatasetID.incrementRevision() =
       ?: DatasetID("$raw.1")
   }
 
-private fun <T: ControllerBase> T.fetchDatasetFile(body: DatasetPutRequestBody): FileReference =
+private fun <T: ControllerBase> T.fetchDatasetFile(body: DatasetPutRequestBody, uploadConfig: UploadConfig): FileReference =
   body.file?.let {
     TempFiles.makeTempPath(it.name)
       .also { (_, tmpFile) -> it.copyTo(tmpFile.toFile(), true) }
       .let { (tmpDir, tmpFile) -> FileReference(tmpDir, tmpFile) }
-  } ?: downloadRemoteFile(body.url.toURL(), userID)
+  } ?: downloadRemoteFile(body.url.toURL(), uploadConfig)

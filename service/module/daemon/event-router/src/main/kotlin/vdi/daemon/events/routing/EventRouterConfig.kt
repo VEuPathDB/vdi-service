@@ -1,22 +1,18 @@
 package vdi.daemon.events.routing
 
-import org.veupathdb.vdi.lib.common.env.require
-import vdi.lib.env.EnvKey
-import vdi.lib.env.Environment
+import vdi.lib.config.vdi.VDIConfig
 import vdi.lib.kafka.router.KafkaRouterConfig
 import vdi.lib.rabbit.RabbitMQConfig
 
 data class EventRouterConfig(
   val rabbitConfig: RabbitMQConfig,
-  val s3Bucket: String,
-  val kafkaConfig: KafkaRouterConfig
+  val s3Bucket:     String,
+  val kafkaConfig:  KafkaRouterConfig
 ) {
-  constructor() : this(System.getenv())
-
-  constructor(env: Environment) : this(
-    rabbitConfig = RabbitMQConfig(env),
-    s3Bucket     = env.require(EnvKey.S3.BucketName),
-    kafkaConfig  = KafkaRouterConfig(env, "event-router")
+  constructor(config: VDIConfig): this(
+    RabbitMQConfig(config.rabbit.global),
+    config.objectStore.bucketName,
+    KafkaRouterConfig(config.daemons?.eventRouter?.kafkaProducerID ?: "event-router", config.kafka, config.lanes)
   )
 }
 

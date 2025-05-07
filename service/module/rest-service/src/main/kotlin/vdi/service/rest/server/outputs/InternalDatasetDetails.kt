@@ -5,7 +5,7 @@ import vdi.lib.db.cache.model.AdminDatasetDetailsRecord
 
 internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): InternalDatasetDetails =
   vdi.service.rest.generated.model.InternalDatasetDetailsImpl().also {
-    it.datasetType = DatasetTypeResponseBody(record.typeName, record.typeVersion)
+    it.datasetType = DatasetTypeOutput(record.typeName, record.typeVersion)
     it.owner = record.ownerID.toLong()
     it.isDeleted = record.isDeleted
     it.origin = record.origin

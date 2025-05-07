@@ -40,7 +40,7 @@ internal class DatasetShareReceiptFileImpl(
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
   ) {
-    if (s3Object.baseName != S3File.ShareReceipt) {
+    if (!S3File.ShareReceipt.resembles(s3Object.baseName)) {
       throw IllegalArgumentException(
         "Can only construct a share receipt from s3 object if object base name is "
           + S3File.ShareReceipt + ". Given path: " + s3Object.path

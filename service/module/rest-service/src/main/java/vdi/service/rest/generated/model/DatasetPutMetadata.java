@@ -80,6 +80,12 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   @JsonProperty(JsonField.CONTACTS)
   void setContacts(List<DatasetContact> contacts);
 
+  @JsonProperty(JsonField.PROPERTIES)
+  com.fasterxml.jackson.databind.node.ObjectNode getProperties();
+
+  @JsonProperty(JsonField.PROPERTIES)
+  void setProperties(com.fasterxml.jackson.databind.node.ObjectNode properties);
+
   @JsonProperty(JsonField.REVISION_NOTE)
   String getRevisionNote();
 

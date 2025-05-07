@@ -6,7 +6,7 @@ uses:
 types:
 
   DatasetDetails:
-    displayName: Dataset Get Response
+    displayName: Dataset Details
     description: |
       Details about a specific singular dataset.
     type: common.DatasetMetaBase
@@ -36,12 +36,14 @@ types:
       revisionHistory?: common.DatasetRevision[]
 
   ShareOffer:
+    displayName: Dataset Share Offer
     additionalProperties: false
     properties:
       recipient: ShareOfferRecipient
       status: common.ShareOfferAction
 
   ShareOfferRecipient:
+    displayName: Dataset Share Recipient
     additionalProperties: false
     properties:
       userId: common.UserId

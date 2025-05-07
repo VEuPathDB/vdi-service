@@ -2,7 +2,6 @@ package vdi.lib.config.common
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.veupathdb.vdi.lib.json.JSON
-import vdi.lib.config.vdi.DatasetPropertySchema
 
 internal object NullSchema : ObjectNode(JSON.nodeFactory) {
   private fun readResolve(): Any = NullSchema
