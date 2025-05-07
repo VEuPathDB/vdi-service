@@ -2,10 +2,10 @@ package vdi.lib.config
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
-import com.networknt.schema.*
+import com.networknt.schema.JsonSchemaFactory
+import com.networknt.schema.SpecVersion
 import org.veupathdb.vdi.lib.json.JSON
 import org.yaml.snakeyaml.Yaml
-import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.readText

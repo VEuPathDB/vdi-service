@@ -95,6 +95,7 @@ fun AppDBTransaction.purgeDatasetControlTables(datasetID: DatasetID) {
   deleteDatasetOrganisms(datasetID)
   deleteDatasetContacts(datasetID)
   deleteDatasetDependencies(datasetID)
+  deleteDatasetProperties(datasetID)
   deleteDatasetMeta(datasetID)
   deleteDataset(datasetID)
 }

@@ -245,6 +245,10 @@ internal class UpdateMetaTriggerHandlerImpl(
         if (meta.organisms.isNotEmpty())
           it.insertDatasetOrganisms(datasetID, meta.organisms)
 
+        it.deleteDatasetProperties(datasetID)
+        if (meta.properties != null)
+          it.insertDatasetProperties(datasetID, meta.properties!!)
+
         it.selectDatasetSyncControlRecord(datasetID) or {
           it.insertDatasetSyncControl(SyncControlRecord(
             datasetID     = datasetID,
