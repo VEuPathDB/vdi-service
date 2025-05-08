@@ -35,6 +35,15 @@
           "$ref": "#/$defs/port"
         }
       },
+      "examples": [
+        {
+          "host": "abc.def.com",
+          "port": 1234
+        },
+        {
+          "host": "abc.def.com"
+        }
+      ],
       "required": [
         "host"
       ]
@@ -71,9 +80,15 @@
     },
     "interpolatedValue": {
       "title": "Interpolated String",
-      "description": "String that will be interpolated using the service environment.",
+      "description": "String that will be interpolated using the service environment.\n\n* Any number of variables may be used.\n* Variables may include default values in the format `${env:VARIABLE_NAME:-DEFAULT_VALUE}`.\n* Variable default values may also include variables.",
       "type": "string",
-      "pattern": "^.*\\$\\{env:[^}]{3,}\\}.*$"
+      "pattern": "^.*\\$\\{env:[^}]{3,}\\}.*$",
+      "examples": [
+        "${env:FOO}",
+        "${env:FOO:-bar}",
+        "a ${env:VARIABLE} in the middle of a string",
+        "${env:RECURSIVE:-${env:DEFAULT:-${env:VALUE:-RESOLUTION}}}"
+      ]
     },
     "ldap": {
       "title": "LDAP Connection Configuration",
@@ -124,13 +139,19 @@
     },
     "database": {
       "title": "Database Connection Config",
-      "description": "Container core database connection configuration.",
       "type": "object",
       "allOf": [
         {
+          "title": "Basic Options",
           "properties": {
-            "username": { "type": "string" },
-            "password": { "type": "string" },
+            "username": {
+              "type": "string",
+              "minLength": 3
+            },
+            "password": {
+              "type": "string",
+              "minLength": 8
+            },
             "platform": {
               "enum": [
                 "oracle",
@@ -153,9 +174,11 @@
         {
           "oneOf": [
             {
+              "title": "LDAP Common Name",
               "properties": {
                 "lookupCn": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 3
                 }
               },
               "required": [
@@ -163,6 +186,7 @@
               ]
             },
             {
+              "title": "Direct Connection Config",
               "properties": {
                 "server": {
                   "title": "Database Host Details",

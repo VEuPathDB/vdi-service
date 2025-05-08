@@ -288,5 +288,6 @@ generate-service-docs:
 		&& generate-schema-doc \
 			--config expand_buttons \
 			--config examples_as_yaml \
+			--config no_link_to_reused_ref \
 			service/schema/config/stack-config.json \
 			$(OUTPUT_DOC_DIR)/config-schema.html
