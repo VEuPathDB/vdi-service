@@ -8,11 +8,11 @@ WORKDIR /workspace
 
 COPY ["settings.gradle.kts", "build.gradle.kts", "./"]
 COPY gradle/libs.versions.toml gradle/libs.versions.toml
+COPY buildSrc buildSrc
 
 RUN gradle --no-daemon download-dependencies
 
 COPY bootstrap bootstrap
-COPY buildSrc buildSrc
 COPY schema schema
 COPY lib lib
 COPY module module

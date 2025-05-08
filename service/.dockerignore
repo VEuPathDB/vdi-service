@@ -5,6 +5,7 @@ tmp/
 docs/
 .github/
 .bin/
+.kotlin/
 gradle/wrapper/
 venv/
 
