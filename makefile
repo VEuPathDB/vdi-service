@@ -280,7 +280,7 @@ generate-service-docs:
 		:service:build-config-schema-resource
 	@cp -rt $(OUTPUT_DOC_DIR) \
 		docs/vdi-api.html \
-		service/schema/* \
+		service/schema \
 		service/build/json-schema/*
 	@python -m venv venv
 	@. venv/bin/activate \
