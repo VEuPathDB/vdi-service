@@ -80,8 +80,8 @@ class ServiceConfig(config: StackConfig) : Options() {
       )
       is DirectDatabaseConnectionConfig -> DbOptionsImpl(
         null, // lookup cn
-        host.host,
-        host.port?.toInt(),
+        server.host,
+        server.port?.toInt(),
         dbName,
         username,
         password.unwrap(),

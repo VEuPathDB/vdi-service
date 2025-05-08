@@ -15,8 +15,8 @@ import vdi.lib.env.EnvKey
  */
 fun S3Config(conf: ObjectStoreConfig): S3Config =
   S3Config(
-    url       = conf.host.host,
-    port      = conf.host.port ?: 9000u,
+    url       = conf.server.host,
+    port      = conf.server.port ?: 9000u,
     secure    = conf.https ?: true,
     accessKey = conf.accessToken.unwrap(),
     secretKey = conf.secretKey.unwrap(),

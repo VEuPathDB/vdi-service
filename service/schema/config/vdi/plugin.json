@@ -5,7 +5,17 @@
   "type": "object",
   "properties": {
     "server": {
-      "$ref": "../common.json#/$defs/hostString"
+      "oneOf": [
+        {
+          "$ref": "../common.json#/$defs/hostString"
+        },
+        {
+          "$ref": "../common.json#/$defs/hostObject"
+        },
+        {
+          "$ref": "../common.json#/$defs/interpolatedValue"
+        }
+      ]
     },
     "displayName": {
       "type": "string"

@@ -111,7 +111,7 @@
     "cacheDb": {
       "type": "object",
       "properties": {
-        "host": {
+        "server": {
           "oneOf": [
             {
               "$ref": "../common.json#/$defs/hostString"
@@ -124,10 +124,10 @@
             }
           ]
         },
-        "user": {
+        "username": {
           "type": "string"
         },
-        "pass": {
+        "password": {
           "type": "string"
         },
         "name": {
@@ -142,9 +142,9 @@
         }
       },
       "required": [
-        "host",
-        "user",
-        "pass"
+        "server",
+        "username",
+        "password"
       ]
     }
   }

@@ -32,7 +32,7 @@ internal class DatabaseConnectionConfigDeserializer: StdDeserializer<DatabaseCon
         password = pass,
         platform = platform!!,
         poolSize = poolSize,
-        host     = HostAddress(obj["host"].textValue(), obj["port"].intValue().toUShort()),
+        server   = HostAddress(obj["host"].textValue(), obj["port"].intValue().toUShort()),
         dbName   = obj["dbName"].textValue(),
         schema   = obj["schema"]?.textValue(),
       )

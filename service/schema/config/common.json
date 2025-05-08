@@ -73,7 +73,7 @@
       "title": "Interpolated String",
       "description": "String that will be interpolated using the service environment.",
       "type": "string",
-      "pattern": "^.*\\$\\{env:\\w{3,64}\\}.*$"
+      "pattern": "^.*\\$\\{env:[^}]{3,}\\}.*$"
     },
     "ldap": {
       "title": "LDAP Connection Configuration",
@@ -88,14 +88,16 @@
               "type": "array",
               "items": {
                 "$ref": "#/$defs/hostString"
-              }
+              },
+              "unevaluatedItems": false
             },
             {
               "title": "Host Details",
               "type": "array",
               "items": {
                 "$ref": "#/$defs/hostObject"
-              }
+              },
+              "unevaluatedItems": false
             },
             {
               "$ref": "#/$defs/hostCsv"
@@ -162,7 +164,7 @@
             },
             {
               "properties": {
-                "host": {
+                "server": {
                   "title": "Database Host Details",
                   "oneOf": [
                     {
@@ -182,40 +184,7 @@
                 }
               },
               "required": [
-                "host",
-                "name",
-                "platform"
-              ]
-            },
-            {
-              "properties": {
-                "host": {
-                  "title": "Database Hostname",
-                  "type": "string",
-                  "format": "hostname"
-                },
-                "name": {
-                  "title": "Database/Userspace Name",
-                  "type": "string"
-                },
-                "port": {
-                  "oneOf": [
-                    {
-                      "enum": [
-                        5432,
-                        1521
-                      ]
-                    },
-                    {
-                      "type": "integer",
-                      "minimum": 1,
-                      "maximum": 65535
-                    }
-                  ]
-                }
-              },
-              "required": [
-                "host",
+                "server",
                 "name",
                 "platform"
               ]

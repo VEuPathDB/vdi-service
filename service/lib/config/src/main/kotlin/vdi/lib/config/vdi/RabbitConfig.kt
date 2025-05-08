@@ -7,5 +7,5 @@ data class RabbitConfig(
   val connection: RabbitConnectionConfig,
   val exchange: RabbitExchangeConfig,
   val queue: RabbitQueueConfig,
-  val routing: RabbitRoutingConfig,
+  val routing: RabbitRoutingConfig?,
 )

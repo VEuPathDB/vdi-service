@@ -5,7 +5,7 @@ import vdi.lib.config.common.HostAddress
 
 data class ObjectStoreConfig(
   val bucketName: String,
-  val host: HostAddress,
+  val server: HostAddress,
   val https: Boolean?,
   val accessToken: SecretString,
   val secretKey: SecretString,

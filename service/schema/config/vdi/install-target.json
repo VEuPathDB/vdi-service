@@ -38,10 +38,34 @@
       ]
     }
   },
-  "required": [
-    "targetName",
-    "controlDb",
-    "dataDb"
+  "allOf": [
+    {
+      "if": {
+        "oneOf": [
+          {
+            "properties": {
+              "enabled": {
+                "const": true
+              }
+            }
+          },
+          {
+            "not": {
+              "properties": {
+                "enabled": {}
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "required": [
+          "targetName",
+          "controlDb",
+          "dataDb"
+        ]
+      }
+    }
   ],
   "unevaluatedProperties": false
 }

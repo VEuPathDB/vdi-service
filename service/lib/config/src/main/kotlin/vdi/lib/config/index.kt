@@ -9,13 +9,13 @@ import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.readText
-import vdi.lib.config.common.interpolateFromEnv
+import vdi.lib.config.common.interpolateFrom
 
 fun StackConfig(path: Path): StackConfig {
   val validator = StackConfig::class.java.getResourceAsStream("/schema/config/stack-config.json")
     .use { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it)!! }
 
-  val json = JSON.convertValue<ObjectNode>(Yaml().load<Any>(path.readText().interpolateFromEnv()))
+  val json = JSON.convertValue<ObjectNode>(Yaml().load<Any>(path.readText().interpolateFrom(System.getenv())))
 
   validator.validate(json)
 

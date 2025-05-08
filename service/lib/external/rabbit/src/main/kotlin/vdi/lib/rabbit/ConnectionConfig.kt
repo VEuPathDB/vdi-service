@@ -15,7 +15,7 @@ data class ConnectionConfig(
   val connectionTimeout: Duration,
 ) {
   constructor(conf: RabbitConnectionConfig): this(
-    address = conf.host.toCommonType(DefaultPort),
+    address = conf.server.toCommonType(DefaultPort),
     username = conf.username,
     password = conf.password,
     connectionName = conf.name,

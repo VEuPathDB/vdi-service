@@ -31,7 +31,7 @@ ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
     JVM_ARGS=""
 
 COPY --from=prep /workspace/build/libs/service.jar /service.jar
-COPY service/bootstrap/startup.sh startup.sh
+COPY bootstrap/startup.sh startup.sh
 COPY ../config/production-config.yml /etc/vdi/config.yml
 
 CMD /startup.sh

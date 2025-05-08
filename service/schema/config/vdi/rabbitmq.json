@@ -24,8 +24,7 @@
   "required": [
     "connection",
     "exchange",
-    "queue",
-    "routing"
+    "queue"
   ],
   "additionalProperties": false,
   "$defs": {
@@ -36,7 +35,7 @@
           "type": "string",
           "default": "vdi"
         },
-        "host": {
+        "server": {
           "oneOf": [
             {
               "$ref": "../common.json#/$defs/hostString"
@@ -64,7 +63,7 @@
         }
       },
       "required": [
-        "host",
+        "server",
         "username",
         "password"
       ],

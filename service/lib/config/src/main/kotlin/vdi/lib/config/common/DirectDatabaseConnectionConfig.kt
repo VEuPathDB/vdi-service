@@ -8,6 +8,6 @@ class DirectDatabaseConnectionConfig(
   poolSize: UByte?,
   schema: String?,
   val platform: String,
-  val host: HostAddress,
+  val server: HostAddress,
   val dbName: String,
 ): DatabaseConnectionConfig(username, password, poolSize, schema)

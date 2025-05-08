@@ -6,7 +6,7 @@ import vdi.lib.config.common.HostAddress
 
 data class RabbitConnectionConfig(
   val name: String?,
-  val host: HostAddress,
+  val server: HostAddress,
   val username: String,
   val password: SecretString,
   val tls: Boolean?,
