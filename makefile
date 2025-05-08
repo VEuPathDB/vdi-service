@@ -128,11 +128,12 @@ _env-file-test:
 .PHONY: build-image
 build-image:
 	@$(CONTAINER_CMD) compose \
-      -f docker-compose.local.yml \
-      -f docker-compose.dev.yml \
+      -f compose/docker-compose.local.yml \
+      -f compose/docker-compose.dev.yml \
       build \
       --build-arg=GITHUB_USERNAME=${GITHUB_USERNAME} \
-      --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}
+      --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN} \
+      --build-arg=CONFIG_FILE=../config/halfway-config.yml
 
 # Prints the merged docker compose configuration.
 .PHONY: show-compose-config

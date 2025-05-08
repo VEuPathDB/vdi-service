@@ -84,7 +84,7 @@ services:
 
   service:
     build:
-      context: .
+      context: ../service
     depends_on:
     - cache-db
     - kafka
@@ -97,7 +97,7 @@ services:
     - plugin-genelist
     - plugin-isasimple
     - plugin-rnaseq
-    - plugin-wrangler
+#    - plugin-wrangler
     links:
     - rabbit-external
     - minio-external

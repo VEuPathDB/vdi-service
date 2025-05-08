@@ -2,6 +2,7 @@ FROM veupathdb/alpine-dev-base:jdk24-gradle8.14 AS prep
 
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
+ARG CONFIG_FILE="../config/production-config.yml"
 
 WORKDIR /workspace
 
@@ -32,6 +33,6 @@ ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
 
 COPY --from=prep /workspace/build/libs/service.jar /service.jar
 COPY bootstrap/startup.sh startup.sh
-COPY ../config/production-config.yml /etc/vdi/config.yml
+COPY ${CONFIG_FILE} /etc/vdi/config.yml
 
 CMD /startup.sh
