@@ -12,7 +12,7 @@ import kotlin.io.path.readText
 import vdi.lib.config.common.interpolateFrom
 
 fun StackConfig(path: Path): StackConfig {
-  val validator = StackConfig::class.java.getResourceAsStream("/schema/config/stack-config.json")
+  val validator = StackConfig::class.java.getResourceAsStream("/schema/config/full-config.json")
     .use { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it)!! }
 
   val json = JSON.convertValue<ObjectNode>(Yaml().load<Any>(path.readText().interpolateFrom(System.getenv())))
