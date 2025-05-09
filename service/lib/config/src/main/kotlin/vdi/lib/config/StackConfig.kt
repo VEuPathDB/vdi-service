@@ -7,8 +7,8 @@ import vdi.lib.config.vdi.VDIConfig
 
 @JsonIgnoreProperties("\$schema", "definitions")
 data class StackConfig(
-  @JsonProperty("containerCore")
+  @param:JsonProperty("containerCore")
+  @field:JsonProperty("containerCore")
   val core: ContainerCoreConfig?,
-  @JsonProperty("vdiConfig")
   val vdi: VDIConfig,
 )

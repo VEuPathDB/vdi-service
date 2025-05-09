@@ -9,6 +9,7 @@ class ProducerLaneConfig(
   workerCount: UByte?,
   eventChannel: String?,
   eventKey: String?,
-  @JsonProperty("kafkaProducerId")
+  @param:JsonProperty("kafkaProducerId")
+  @field:JsonProperty("kafkaProducerId")
   val kafkaProducerID: String?
 ): LaneConfigBase(kafkaConsumerID, memoryQueueSize, workerCount, eventChannel, eventKey)

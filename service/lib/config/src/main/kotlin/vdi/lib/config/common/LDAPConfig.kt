@@ -6,7 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 data class LDAPConfig(
   @JsonDeserialize(using = HostAddressListDeserializer::class)
   val servers: List<HostAddress>,
-  @JsonProperty("baseDn")
+  @param:JsonProperty("baseDn")
+  @field:JsonProperty("baseDn")
   val baseDN: String,
 )
 

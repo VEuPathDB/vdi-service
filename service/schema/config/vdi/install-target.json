@@ -16,21 +16,32 @@
     "dataTypes": {
       "title": "Supported Data Types",
       "description": "Optional list of data types that the install target supports.\n\nDefaults to supporting all data types from any plugins enabled for the install target.",
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 3
-      },
-      "unevaluatedItems": false,
-      "uniqueItems": true
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 3
+          },
+          "unevaluatedItems": false,
+          "uniqueItems": true
+        },
+        {
+          "type": "array",
+          "items": {
+            "const": "*"
+          },
+          "minItems": 1,
+          "maxItems": 1,
+          "unevaluatedItems": false
+        }
+      ]
     },
     "controlDb": {
-      "title": "Dataset Control Database/Schema",
-      "$ref": "../common.json#/$defs/database"
+      "title": "Dataset Control Database/Schema"
     },
     "dataDb": {
-      "title": "Dataset Data Database/Schema",
-      "$ref": "../common.json#/$defs/database"
+      "title": "Dataset Data Database/Schema"
     },
     "datasetPropertySchema": {
       "title": "Dataset Characteristics Validation Schema",
@@ -89,13 +100,21 @@
             "description": "The `enabled` field is omitted, using the default value of `true`.",
             "not": {
               "properties": {
-                "enabled": {}
+                "enabled": { }
               }
             }
           }
         ]
       },
       "then": {
+        "properties": {
+          "controlDb": {
+            "$ref": "../common.json#/$defs/database"
+          },
+          "dataDb": {
+            "$ref": "../common.json#/$defs/database"
+          }
+        },
         "required": [
           "targetName",
           "controlDb",

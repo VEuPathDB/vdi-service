@@ -10,10 +10,12 @@ data class InstallTargetConfig(
 
   val dataTypes: Set<String> = emptySet(),
 
-  @JsonProperty("controlDb")
+  @param:JsonProperty("controlDb")
+  @field:JsonProperty("controlDb")
   val controlDB: DatabaseConnectionConfig,
 
-  @JsonProperty("dataDb")
+  @param:JsonProperty("dataDb")
+  @field:JsonProperty("dataDb")
   val dataDB: DatabaseConnectionConfig,
 
   val datasetPropertySchema: DatasetPropertySchema = NullPropertySchema,

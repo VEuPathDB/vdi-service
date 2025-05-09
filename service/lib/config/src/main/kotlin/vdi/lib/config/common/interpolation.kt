@@ -1,3 +1,4 @@
+@file:JvmName("Interpolator")
 package vdi.lib.config.common
 
 import java.lang.StringBuilder
@@ -16,7 +17,7 @@ fun String.interpolateFrom(env: Map<String, String>): String {
     }
   }
 
-  val tail = when (val p = lastIndexOf('}')) {
+  val tail = when (val p = work.lastIndexOf('}')) {
     -1      -> return this
     in 0..7 -> return this
     else    -> {
@@ -36,7 +37,7 @@ fun String.interpolateFrom(env: Map<String, String>): String {
       }
       line
     }
-    .forEach(out::append)
+    .forEach(out::appendLine)
 
   out.append(tail)
 

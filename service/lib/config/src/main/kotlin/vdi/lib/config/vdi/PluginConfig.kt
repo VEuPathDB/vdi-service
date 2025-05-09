@@ -10,7 +10,8 @@ data class PluginConfig(
   val typeChangesEnabled: Boolean?,
   val customPath: String?,
   val installRoot: String?,
-  @JsonProperty("projectIds")
+  @param:JsonProperty("projectIds")
+  @field:JsonProperty("projectIds")
   val projectIDs: Set<String>?,
   val scripts: PluginScriptConfigs?,
 )

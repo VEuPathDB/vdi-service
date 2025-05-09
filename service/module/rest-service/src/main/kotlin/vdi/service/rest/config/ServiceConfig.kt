@@ -74,7 +74,7 @@ class ServiceConfig(config: StackConfig) : Options() {
         null, // db name
         username,
         password.unwrap(),
-        platform?.let(SupportedPlatform::toPlatform),
+        null, // platform
         poolSize?.toInt(),
         "app-db",
       )

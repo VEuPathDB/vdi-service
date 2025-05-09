@@ -38,7 +38,6 @@ private fun Map<String, Any>.appendDbInfo(entry: AppDBRegistryEntry): Map<String
 
   map["host"] = entry.host
   map["controlSchema"] = entry.ctlSchema
-  map["dataSchema"] = entry.dataSchema
 
   return map
 }

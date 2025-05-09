@@ -41,7 +41,7 @@ fun mockDatasetMeta(
     visibility?.also { on { this.visibility } doReturn it }
     owner?.also { on { this.owner } doReturn it }
     name?.also { on { this.name } doReturn it }
-    on { this.summary } doReturn summary
+    summary?.also { on { this.summary } doReturn it }
     on { this.description } doReturn description
     origin?.also { on { this.origin } doReturn it }
     on { this.sourceURL } doReturn sourceURL

@@ -2,22 +2,27 @@ package vdi.lib.db.app
 
 import java.sql.SQLException
 
-enum class AppDBPlatform(val platformString: String) {
-  Postgres("postgresql") {
-    val PostgresUniqueConstraintSQLState = "23505"
+enum class AppDBPlatform {
+  Postgres {
+    private val PostgresUniqueConstraintSQLState = "23505"
 
     override fun isUniqueConstraintViolation(e: Throwable): Boolean =
       (e is SQLException && e.sqlState == PostgresUniqueConstraintSQLState)
       || (e.cause?.let(::isUniqueConstraintViolation) ?: false)
   },
 
-  Oracle("oracle") {
-    val OracleUniqueConstraintErrorCode = 1
+  Oracle {
+    private val OracleUniqueConstraintErrorCode = 1
 
     override fun isUniqueConstraintViolation(e: Throwable): Boolean =
       (e is SQLException && e.errorCode == OracleUniqueConstraintErrorCode)
       || (e.cause?.let(::isUniqueConstraintViolation) ?: false)
   };
+
+  inline val port: UShort get() = when (this) {
+    Postgres -> 5432u
+    Oracle   -> 1521u
+  }
 
   companion object {
     fun fromString(value: String) =

@@ -152,13 +152,6 @@
               "type": "string",
               "minLength": 8
             },
-            "platform": {
-              "enum": [
-                "oracle",
-                "postgres"
-              ],
-              "default": null
-            },
             "poolSize": {
               "type": "integer",
               "minimum": 5,
@@ -205,6 +198,13 @@
                 "name": {
                   "title": "Database/Userspace Name",
                   "type": "string"
+                },
+                "platform": {
+                  "enum": [
+                    "oracle",
+                    "postgres"
+                  ],
+                  "default": null
                 }
               },
               "required": [

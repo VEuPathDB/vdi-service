@@ -1,9 +1,6 @@
-ifeq ($(shell command -v docker 2>&1 >/dev/null && echo 0),0)
 CONTAINER_CMD := docker --log-level ERROR
-else
-CONTAINER_CMD := podman
-endif
 
+COMPOSE_DIR   := compose
 COMPOSE_FILES := docker-compose.yml docker-compose.dev.yml docker-compose.ssh.yml
 
 SERVICES ?=
@@ -114,7 +111,7 @@ open-rabbit:
 
 .PHONY: _env-file-test
 _env-file-test:
-	@if [ ! -f .env ]; then echo "Missing .env file."; exit 1; fi
+	@if [ ! -f compose/.env ]; then echo "Missing .env file."; exit 1; fi
 
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
@@ -127,13 +124,15 @@ _env-file-test:
 # Builds the VDI service docker image.
 .PHONY: build-image
 build-image:
-	@$(CONTAINER_CMD) compose \
-      -f compose/docker-compose.local.yml \
-      -f compose/docker-compose.dev.yml \
-      build \
+	@$(CONTAINER_CMD) build \
+	  -t veupathdb/vdi-service:latest \
+	  -f service/Dockerfile \
       --build-arg=GITHUB_USERNAME=${GITHUB_USERNAME} \
       --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN} \
-      --build-arg=CONFIG_FILE=../config/halfway-config.yml
+      --build-arg=CONFIG_FILE=config/halfway-config.yml \
+      .
+
+MERGED_COMPOSE_FLAGS := $(foreach FILE,$(COMPOSE_FILES),-f $(COMPOSE_DIR)/$(FILE))
 
 # Prints the merged docker compose configuration.
 .PHONY: show-compose-config
@@ -270,8 +269,6 @@ OUTPUT_DOC_DIR := "build/generated-docs"
 
 .PHONY: generate-service-docs
 generate-service-docs:
-	@npm i -g raml2html
-	@npm i -g raml2html-modern-theme
 	@mkdir -p $(OUTPUT_DOC_DIR)/schema/data $(OUTPUT_DOC_DIR)/schema/config
 	@gradle \
 		--no-daemon \

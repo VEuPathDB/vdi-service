@@ -41,14 +41,15 @@ vdi:
 
   objectStore:
     bucketName: vdi-prod
-    host: ${env:S3_HOST}
+    server:
+      host: ${env:S3_HOST}
     accessToken: ${env:S3_ACCESS_TOKEN}
     secretKey: ${env:S3_SECRET_KEY}
 
   rabbit:
     global:
       connection:
-        host: ${env:GLOBAL_RABBIT_HOST}
+        server: ${env:GLOBAL_RABBIT_HOST}
         username: ${env:GLOBAL_RABBIT_USERNAME}
         password: ${env:GLOBAL_RABBIT_PASSWORD}
       exchange:
@@ -65,9 +66,9 @@ vdi:
     - PLAINTEXT://kafka:9092
 
   cacheDb:
-    user: vdi
-    pass: ${env:CACHE_DB_PASSWORD}
-    host: cache-db:5432
+    username: vdi
+    password: ${env:CACHE_DB_PASSWORD}
+    server: cache-db:5432
 
   plugins:
   - server: bigwig:80

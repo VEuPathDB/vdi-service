@@ -6,7 +6,8 @@ import vdi.lib.config.vdi.daemons.DaemonConfig
 import vdi.lib.config.vdi.lanes.LaneConfig
 
 data class VDIConfig(
-  @JsonProperty("cacheDb")
+  @param:JsonProperty("cacheDb")
+  @field:JsonProperty("cacheDb")
   val cacheDB: CacheDBConfig,
   val restService: RestServiceConfig,
   val daemons: DaemonConfig?,

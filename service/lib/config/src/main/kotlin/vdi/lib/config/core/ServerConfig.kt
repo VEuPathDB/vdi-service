@@ -3,7 +3,8 @@ package vdi.lib.config.core
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ServerConfig(
-  @JsonProperty("enableCors")
+  @param:JsonProperty("enableCors")
+  @field:JsonProperty("enableCors")
   val enableCORS: Boolean?,
   val bindPort: UShort?,
 )

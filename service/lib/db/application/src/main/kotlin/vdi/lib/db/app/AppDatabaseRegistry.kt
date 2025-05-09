@@ -4,19 +4,19 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import oracle.jdbc.OracleDriver
 import org.slf4j.LoggerFactory
-import org.veupathdb.lib.ldap.OracleNetDesc
-import org.veupathdb.vdi.lib.common.env.DBEnvGroup
-import org.veupathdb.vdi.lib.common.env.Environment
+import org.veupathdb.lib.ldap.NetDesc
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.SecretString
-import vdi.lib.db.app.health.DatabaseDependency
-import vdi.lib.env.EnvKey
-import vdi.lib.ldap.LDAP
-import vdi.lib.health.RemoteDependencies
 import javax.sql.DataSource
+import vdi.lib.config.common.DirectDatabaseConnectionConfig
+import vdi.lib.config.common.LDAPDatabaseConnectionConfig
+import vdi.lib.config.loadAndCacheStackConfig
+import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.db.app.health.DatabaseDependency
+import vdi.lib.health.RemoteDependencies
+import vdi.lib.ldap.LDAP
 
-@Suppress("NOTHING_TO_INLINE")
 object AppDatabaseRegistry {
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -27,11 +27,70 @@ object AppDatabaseRegistry {
 
   init {
     try {
-      init(System.getenv())
+      init(loadAndCacheStackConfig().vdi)
     } catch (e: Throwable) {
       isBroken = true
       throw e
     }
+  }
+
+  private fun init(config: VDIConfig) {
+    val builders = HashMap<String, AppDBRegistryCollection.Builder>(16)
+
+    config.installTargets.asSequence()
+      .filter { it.enabled }
+      .forEach {
+        val details = when (val db = it.controlDB) {
+          is DirectDatabaseConnectionConfig -> {
+            val platform = AppDBPlatform.fromString(db.platform)
+            ManualConnectDetails(
+              db.username,
+              db.password,
+              db.server.host,
+              db.server.port ?: platform.port,
+              db.dbName,
+              platform,
+              db.poolSize ?: DefaultPoolSize,
+            )
+          }
+          is LDAPDatabaseConnectionConfig -> {
+            LDAPConnectDetails(
+              db.username,
+              db.password,
+              db.lookupCN,
+              db.poolSize ?: DefaultPoolSize,
+            )
+          }
+        }
+
+        builders.computeIfAbsent(it.targetName) { AppDBRegistryCollection.Builder() }
+          .apply {
+            val entry = AppDBRegistryEntry(
+              it.targetName,
+              details.findHost(),
+              details.findPort(),
+              details.makeDataSource(),
+              it.controlDB.username,
+              details.platform
+            )
+
+            when (it.dataTypes.size) {
+              0 -> put(entry)
+              1 -> when (val dt = it.dataTypes.first()) {
+                "*"  -> put(entry)
+                else -> put(DataType.of(dt), entry)
+              }
+              else -> {
+                for (dt in it.dataTypes)
+                  put(DataType.of(dt), entry)
+              }
+            }
+
+            RemoteDependencies.register(DatabaseDependency(entry))
+          }
+      }
+
+    builders.forEach { (k, v) -> dataSources[k] = v.build() }
   }
 
   fun contains(key: ProjectID, dataType: DataType): Boolean = get(key, dataType) != null
@@ -67,164 +126,32 @@ object AppDatabaseRegistry {
   fun require(key: ProjectID, dataType: DataType): AppDBRegistryEntry =
     get(key, dataType)
       ?: throw IllegalStateException("required AppDB connection $key was not registered with AppDatabases")
-
-  internal fun init(env: Environment) {
-    val builders = HashMap<ProjectID, AppDBRegistryCollection.Builder>()
-
-    DBEnvGroup.fromEnvironment(env, EnvKey.AppDB.DBConnectionDataTypes)
-      .onEach { if (it.enabled == true) requireFullChunk(it) }
-      .forEach { parseChunk(it, builders) }
-
-    dataSources.clear()
-    builders.forEach { (k, v) -> dataSources[k] = v.build() }
-  }
-
-  private inline fun throwForMissingVar(envVar: String): Nothing =
-    throw IllegalStateException("one or more app database definition blocks in the service environment is missing its '$envVar' value")
-
-  private fun requireFullChunk(db: DBEnvGroup) {
-    db.connectionName ?: throwForMissingVar(EnvKey.AppDB.DBConnectionNamePrefix)
-    db.pass           ?: throwForMissingVar(EnvKey.AppDB.DBPassPrefix)
-    db.controlSchema  ?: throwForMissingVar(EnvKey.AppDB.DBControlSchemaPrefix)
-    db.dataSchema     ?: throwForMissingVar(EnvKey.AppDB.DBDataSchemaPrefix)
-
-    if (db.ldap == null) {
-      db.dbName ?: throwForMissingVar(EnvKey.AppDB.DBNamePrefix)
-      db.host   ?: throwForMissingVar(EnvKey.AppDB.DBHostPrefix)
-      db.port   ?: throwForMissingVar(EnvKey.AppDB.DBPortPrefix)
-    } else if (db.platform != null && AppDBPlatform.fromString(db.platform!!) == AppDBPlatform.Postgres) {
-      throw IllegalStateException("LDAP lookup is currently unsupported for postgres app databases")
-    }
-  }
-
-  private fun parseChunk(env: DBEnvGroup, builders: MutableMap<ProjectID, AppDBRegistryCollection.Builder>) {
-    if (env.enabled != true) {
-      log.info("Database {} is marked as disabled, skipping.", env.connectionName)
-      return
-    }
-
-    log.info(
-      """registering database {} with the following details:
-      Connection Name: {}
-      TNS: {}
-      Plugin Restrictions: {}
-      Host: {}
-      Port: {}
-      DB Name: {}
-      User/Schema: {}
-      Pool Size: {}""",
-      env.connectionName,
-      env.connectionName,
-      env.ldap,
-      env.extensions[EnvKey.AppDB.DBConnectionDataTypes],
-      env.host,
-      env.port,
-      env.dbName,
-      env.controlSchema,
-      env.poolSize ?: DefaultPoolSize,
-    )
-
-    val platform = env.platform?.let { AppDBPlatform.fromString(it) } ?: AppDBPlatform.Oracle
-
-    log.info("constructing a DataSource for database {} with platform {}", env.connectionName, platform)
-
-    val connectDetails: DbConnectDetails = try {
-      when (platform) {
-        AppDBPlatform.Oracle ->
-          if (env.ldap == null)
-            ManualConnectDetails(
-              name     = env.connectionName!!,
-              user     = env.controlSchema!!,
-              pw       = env.pass!!,
-              host     = env.host!!,
-              port     = env.port!!,
-              dbName   = env.dbName!!,
-              poolSize = env.poolSize ?: DefaultPoolSize,
-            )
-          else
-            LDAPConnectDetails(
-              name     = env.connectionName!!,
-              user     = env.controlSchema!!,
-              pw       = env.pass!!,
-              ldap     = env.ldap!!,
-              poolSize = env.poolSize ?: DefaultPoolSize,
-            )
-        AppDBPlatform.Postgres -> ManualConnectDetails(
-          name     = env.connectionName!!,
-          user     = env.controlSchema!!,
-          pw       = env.pass!!,
-          host     = env.host!!,
-          port     = env.port!!,
-          dbName   = env.dbName!!,
-          poolSize = env.poolSize ?: DefaultPoolSize,
-        )
-      }
-    } catch (e: Throwable) {
-      throw IllegalStateException("error encountered while attempting to create a JDBC connection for ${env.connectionName}", e)
-    }
-
-    builders.computeIfAbsent(env.connectionName!!) {
-      AppDBRegistryCollection.Builder()
-        .apply {
-          val entry = AppDBRegistryEntry(
-            env.connectionName!!,
-            connectDetails.findHost(),
-            connectDetails.findPort(),
-            connectDetails.makeDataSource(),
-            env.dataSchema!!,
-            env.controlSchema!!,
-            platform
-          )
-
-          when (val dt = env.extensions[EnvKey.AppDB.DBConnectionDataTypes]) {
-            null -> put(entry)
-            "*"  -> put(entry)
-            else -> {
-              val plugins = dt.splitToSequence(',')
-                .filter { it.isNotBlank() }
-                .map { it.trim() }
-                .toSet()
-
-              if (plugins.isEmpty()) {
-                put(entry)
-              } else if (plugins.contains("*")) {
-                if (plugins.size == 1)
-                  put(entry)
-                else
-                  throw IllegalStateException("Database connection config set for ${env.connectionName} specifies that it is both a fallback and data type restricted")
-              } else {
-                for (plugin in plugins)
-                  put(DataType.of(plugin), entry)
-              }
-            }
-          }
-
-          RemoteDependencies.register(DatabaseDependency(entry))
-        }
-    }
-  }
 }
 
 private interface DbConnectDetails {
+  val platform: AppDBPlatform
   fun makeDataSource(): DataSource
   fun findHost(): String
   fun findPort(): UShort
 }
 
 private class ManualConnectDetails(
-  val name: String,
   val user: String,
   val pw: SecretString,
   val host: String,
   val port: UShort,
   val dbName: String,
+  override val platform: AppDBPlatform,
   val poolSize: UByte,
 ) : DbConnectDetails {
 
   override fun makeDataSource(): DataSource {
     return HikariConfig()
       .apply {
-        jdbcUrl = makeJDBCPostgresConnectionString(host, port, dbName)
+        jdbcUrl = when (platform) {
+          AppDBPlatform.Oracle   -> makeJDBCOracleConnectionString(host, port, dbName)
+          AppDBPlatform.Postgres -> makeJDBCPostgresConnectionString(host, port, dbName)
+        }
         username = user
         password = pw.unwrap()
         maximumPoolSize = poolSize.toInt()
@@ -243,19 +170,24 @@ private class ManualConnectDetails(
 }
 
 private class LDAPConnectDetails(
-  val name: String,
   val user: String,
   val pw: SecretString,
   val ldap: String,
   val poolSize: UByte
 ) : DbConnectDetails {
 
-  val desc: OracleNetDesc by lazy { LDAP.requireSingularOracleNetDesc(ldap) }
+  val desc: NetDesc by lazy { LDAP.requireSingularNetDesc(ldap) }
+
+  override val platform
+    get() = AppDBPlatform.fromString(desc.platform.name)
 
   override fun makeDataSource(): DataSource {
     return HikariConfig()
       .apply {
-        jdbcUrl = makeJDBCOracleConnectionString(desc.host, desc.port, desc.serviceName)
+        jdbcUrl = when (platform) {
+          AppDBPlatform.Oracle   -> makeJDBCOracleConnectionString(desc.host, desc.port.toUShort(), desc.identifier)
+          AppDBPlatform.Postgres -> makeJDBCPostgresConnectionString(desc.host, desc.port.toUShort(), desc.identifier)
+        }
         username = user
         password = pw.unwrap()
         maximumPoolSize = poolSize.toInt()
@@ -269,7 +201,7 @@ private class LDAPConnectDetails(
   }
 
   override fun findPort(): UShort {
-    return desc.port
+    return desc.port.toUShort()
   }
 }
 

@@ -6,6 +6,7 @@ dependencies {
   api(project(":lib:db:common"))
 
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
   implementation(project(":lib:external:ldap"))
 
   implementation(libs.vdi.common)

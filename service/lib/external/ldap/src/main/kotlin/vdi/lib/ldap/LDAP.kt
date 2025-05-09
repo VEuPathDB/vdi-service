@@ -16,7 +16,7 @@ object LDAP {
   private inline val reqLDAP
     get() = ldap ?: throw IllegalStateException("ldap is not configured")
 
-  fun requireSingularOracleNetDesc(commonName: String) = reqLDAP.requireSingularOracleNetDesc(commonName)
+  fun requireSingularNetDesc(commonName: String) = reqLDAP.requireSingularNetDesc(commonName)
 
-  fun lookupOracleNetDesc(commonName: String) = reqLDAP.lookupOracleNetDesc(commonName)
+  fun lookupNetDesc(commonName: String) = reqLDAP.lookupNetDesc(commonName)
 }

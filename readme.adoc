@@ -16,12 +16,25 @@ endif::[]
 
 == Documentation Links
 
-* link:https://veupathdb.github.io/vdi-service/vdi-api.html[VDI Service API Doc]
-* link:https://veupathdb.github.io/vdi-service/design/1.0/design.html[Service Design Doc]
-* link:https://veupathdb.atlassian.net/wiki/spaces/UI/pages/36438144/VDI+User+Datasets+Design[Original Design Doc]
-* link:docs/env-vars.adoc[Environment Config Doc]
-* link:docs/local-dev-readme.adoc[Local Development Doc]
+=== Production Service
 
+* link:https://veupathdb.github.io/vdi-service/vdi-api.html[REST Service API Doc]
+* Configuration Schema Doc
+* Full Configuration Schema
+* Configuration Schema Root
+
+=== Development Docs
+
+.API
+* link:https://veupathdb.github.io/vdi-service/dev/vdi-api.html[REST Service API Doc]
+* link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.eda.json[EDA Dataset Characteristics Schema]
+* link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.genomics.json[Genomics Dataset Characteristics Schema]
+* link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.metaschema.json[Dataset Characteristiscs Metaschema]
+
+.Service Config
+* link:https://veupathdb.github.io/vdi-service/dev/config-schema.html[Configuration Schema Doc]
+* link:https://veupathdb.github.io/vdi-service/dev/schema/config/full-config.json[Full Configuration Schema]
+* link:https://veupathdb.github.io/vdi-service/dev/schema/config/stack-config.json[Configuration Schema Root]
 
 == Development
 

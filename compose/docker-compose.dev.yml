@@ -84,7 +84,8 @@ services:
 
   service:
     build:
-      context: ../service
+      context: ..
+      dockerfile: service/Dockerfile
     depends_on:
     - cache-db
     - kafka

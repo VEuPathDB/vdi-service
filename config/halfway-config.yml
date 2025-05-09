@@ -41,16 +41,20 @@ vdi:
 
   objectStore:
     bucketName: ${env:S3_BUCKET_NAME}
-    host: ${env:S3_HOST}
-    port: ${env:S3_PORT:-9000}
+    server: ${env:S3_HOST}:${env:S3_PORT:-9000}
     https: ${env:S3_USE_HTTPS:-true}
     accessToken: ${env:S3_ACCESS_TOKEN}
     secretKey: ${env:S3_SECRET_KEY}
 
+  daemons:
+    reconciler:
+      enabled: false
+
   rabbit:
     global:
       connection:
-        host: ${env:GLOBAL_RABBIT_HOST}
+        server:
+          host: ${env:GLOBAL_RABBIT_HOST}
         username: ${env:GLOBAL_RABBIT_USERNAME}
         password: ${env:GLOBAL_RABBIT_PASSWORD}
       exchange:
@@ -63,8 +67,6 @@ vdi:
   kafka:
     servers:
     - ${env:KAFKA_SERVERS:-kafka:9092}
-    listeners:
-    - ${env:KAFKA_ADVERTISED_LISTENERS:-PLAINTEXT://kafka:9092}
 
   cacheDb:
     username: ${env:CACHE_DB_USERNAME:-vdi}

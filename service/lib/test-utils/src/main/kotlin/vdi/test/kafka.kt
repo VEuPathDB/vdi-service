@@ -24,7 +24,7 @@ fun mockEventMessage(
 
 fun mockKafkaConsumer(
   pollDuration: Duration? = null,
-  topic: String? = null,
+  topic: MessageTopic? = null,
   onReceive: () -> List<KafkaMessage> = ::noParamList,
   onClose: Runnable = ::runnable,
 ): KafkaConsumer =
@@ -35,7 +35,7 @@ fun mockKafkaConsumer(
     on { close() } doAnswer { onClose() }
   }
 
-fun mockKafkaMessage(key: String? = null, value: String? = null): KafkaMessage =
+fun mockKafkaMessage(key: MessageKey? = null, value: String? = null): KafkaMessage =
   mock {
     on { this.key } doReturn key
     value?.also { on { this.value } doReturn it }
