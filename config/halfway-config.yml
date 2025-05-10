@@ -318,5 +318,5 @@ vdi:
       username: ${env:DB_CONNECTION_DATA_SCHEMA_UNIDB}
       password: ${env:DB_CONNECTION_PASS_UNIDB}
       lookupCn: ${env:DB_CONNECTION_LDAP_UNIDB}
-    enabled: ${env:DB_CONNECTION_ENABLED_UNIDB:-true}
+    enabled: ${env:DB_CONNECTION_ENABLED_UNIDB:-false}
 
