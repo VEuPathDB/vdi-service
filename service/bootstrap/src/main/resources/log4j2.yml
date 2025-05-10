@@ -6,21 +6,7 @@ Configuration:
     - name: Console_Appender
       target: SYSTEM_OUT
       PatternLayout:
-        # Possible Layouts:
-        # 2022-09-07T14:33:06.027 INFO  ClassName - message
-        # 2022-09-07T14:33:06.027 ERROR [wid:something] ClassName - message
-        # 2022-09-07T14:33:06.027 WARN  [rid:12345] ClassName - message
-        #
-        # Technically possible, but shouldn't ever happen:
-        # 2022-09-07T14:33:06.027 DEBUG [wid:something][rid:12345] ClassName - message
-        pattern: "\
-          %d{yyyy-MM-dd'T'HH:mm:ss.SSS} \
-          %highlight{%-5level}\
-          %notEmpty{ \
-            %notEmpty{[wid:%X{workerID}]}\
-            %notEmpty{[rid:%replace{%.5X{traceId}}{init0|term0}{}]}\
-          } \
-          %c{1} - %m%n"
+        pattern: "%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} (wid:%X{workerID}) [rid:%5X{traceId}] %-5level %c - %m%n}"
 
   Loggers:
     Root:

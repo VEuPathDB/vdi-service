@@ -5,13 +5,10 @@
 .settings/
 .kotlin/
 build/
-!buildSrc/src/main/kotlin/build/
 /vendor/
 /bin/
 /tmp/
 /*ssh*
-.vscode/
-/venv/
 
 .envrc
 merged-compose.yml

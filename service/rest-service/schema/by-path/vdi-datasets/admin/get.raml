@@ -1,0 +1,131 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../common.raml
+
+types:
+  BrokenDatasetListing:
+    displayName: Broken Dataset Listing
+    type: object
+    additionalProperties: false
+    properties:
+      details?: BrokenDatasetDetails[]
+      ids?: common.VDI-ID[]
+
+  BrokenDatasetDetails:
+    displayName: Broken Dataset Details
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: common.VDI-ID
+      owner: common.User-ID
+      datasetType: common.DatasetTypeInfo
+      projectIds: common.ProjectID[]
+      status: common.DatasetStatusInfo
+
+  BrokenImportListing:
+    displayName: Broken Import Listing
+    type: object
+    additionalProperties: false
+    properties:
+      meta: BrokenImportListingMeta
+      results: BrokenImportDetails[]
+
+  BrokenImportListingMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      count:
+        displayName: Result Count
+        description: Number of records in the result.
+        type: integer
+        required: true
+      before?: string
+      after?: string
+      user?: common.User-ID
+      limit?: integer
+      offset?: integer
+
+  BrokenImportDetails:
+    displayName: Broken Import Details
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: common.VDI-ID
+      owner: common.User-ID
+      datasetType: common.DatasetTypeInfo
+      projectIds: common.ProjectID[]
+      messages: string[]
+
+  AllDatasetsListResponse:
+    displayName: All Datasets Listing Response
+    type: object
+    additionalProperties: false
+    properties:
+      meta: AllDatasetsListMeta
+      results: AllDatasetsListEntry[]
+
+  AllDatasetsListMeta:
+    type: object
+    additionalProperties: false
+    properties:
+      count: integer
+      offset: integer
+      limit: integer
+      total: integer
+
+  AllDatasetsListEntry:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId: common.VDI-ID
+      owner: common.User-ID
+      datasetType: common.DatasetTypeInfo
+      visibility: common.DatasetVisibility
+      name: string
+      shortName?: string
+      shortAttribution?: string
+      category?: string
+      summary?: string
+      description?: string
+      sourceUrl?: string
+      origin: string
+      projectIds: common.ProjectID[]
+      status: common.DatasetStatusInfo
+      created: datetime
+      isDeleted: boolean
+
+  SyncControlRecord:
+    type: object
+    additionalProperties: false
+    properties:
+      sharesUpdateTime: datetime
+      dataUpdateTime: datetime
+      metaUpdateTime: datetime
+
+  InternalDatasetDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetType: common.DatasetTypeInfo
+      owner: common.User-ID
+      isDeleted: boolean
+      origin: string
+      created: datetime
+      inserted: datetime
+      name: string
+      shortName?: string
+      shortAttribution?: string
+      category?: string
+      summary?: string
+      description?: string
+      visibility: common.DatasetVisibility
+      sourceUrl?: string
+      projectIds: common.ProjectID[]
+      status: string
+      syncControl?: SyncControlRecord
+      uploadFiles?: string[]
+      installFiles?: string[]
+      importMessages: string[]
+
+

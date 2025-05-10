@@ -5,48 +5,39 @@ on:
     - main
     paths:
     - 'docs/vdi-api.html'
-    - 'service/schema/**'
 
 jobs:
   build:
     name: Build API Docs
     runs-on: ubuntu-latest
     steps:
-    - name: Install Java 21
-      uses: actions/setup-java@v4
+    - uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: corretto
-    - name: Install Gradle 8.14
-      uses: gradle/actions/setup-gradle@v4
-      with:
-        gradle-version: '8.14'
-    - name: Install NPM
-      uses: actions/setup-node@v4
-    - name: Install NPM Packages
-      run: npm i -g raml2html raml2html-modern-theme
-    - name: Checkout Project
+    - uses: gradle/actions/setup-gradle@v4
+    - uses: actions/setup-node@v4
+    - name: Checkout Feature
       uses: actions/checkout@v4
-    - name: Get Production Tag
-      run: |-
-        git clone --depth 1 -b prod https://github.com/VEuPathDB/tagger
-        cd tagger
-        echo version=$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
-        rm -rf .
-      id: prod_version
+      with:
+        ref: feature-data-updates
     - name: Build Branch Docs
-      run: make generate-service-docs OUTPUT_DOC_DIR=tmpdocs/dev/
+      run: make generate-service-docs OUTPUT_DOC_DIR=docs-for-upload
       env:
         GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-    - name: Build Production Docs
-      run: |-
-        mkdir tmpdocs/prod/
-        git checkout ${{ steps.prod_version.outputs.version }}
-        cp docs/vdi-api.html tmpdocs/prod/
-    - uses: actions/upload-pages-artifact@v3
+    - name: Checkout Main
+      uses: actions/checkout@v4
       with:
-        path: tmpdocs/
+        clean: 'false'
+    - name: Copy Docs
+      run: |
+        cp docs-for-upload/vdi-api.html docs-for-upload/vdi-api-feat.html
+        cp docs/vdi-api.html docs-for-upload
+    - name: Upload
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: docs-for-upload/
   deploy:
     name: Deploy API Docs
     runs-on: ubuntu-latest

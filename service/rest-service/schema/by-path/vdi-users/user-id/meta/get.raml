@@ -1,0 +1,28 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../../common.raml
+
+types:
+  UserMetadata:
+    type: object
+    additionalProperties: false
+    properties:
+      quota:
+        type: UserQuotaDetails
+        required: true
+
+  UserQuotaDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      limit:
+        description: Max number of bytes a user is allowed to upload.
+        type: integer
+        format: int64
+        required: true
+      usage:
+        description: Current number of bytes counted against the user's quota.
+        type: integer
+        format: int64
+        required: true

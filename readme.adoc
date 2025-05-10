@@ -14,147 +14,216 @@ ifndef::env-github[]
 :icons: font
 endif::[]
 
-== Documentation Links
+== Tagging, Deployment, and Branch Rules
 
-=== Production Service
+=== Branch Rules
 
-* link:https://veupathdb.github.io/vdi-service/vdi-api.html[REST Service API Doc]
-* Configuration Schema Doc
-* Full Configuration Schema
-* Configuration Schema Root
 
-=== Development Docs
+==== `qa`
 
-.API
-* link:https://veupathdb.github.io/vdi-service/dev/vdi-api.html[REST Service API Doc]
-* link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.eda.json[EDA Dataset Characteristics Schema]
-* link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.genomics.json[Genomics Dataset Characteristics Schema]
-* link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.metaschema.json[Dataset Characteristiscs Metaschema]
+The `qa` branch is to reflect what is currently on QA.  Code may only be pushed
+to this branch via pull request which depends on both approval and a successful
+workflow build of the code.
 
-.Service Config
-* link:https://veupathdb.github.io/vdi-service/dev/config-schema.html[Configuration Schema Doc]
-* link:https://veupathdb.github.io/vdi-service/dev/schema/config/full-config.json[Full Configuration Schema]
-* link:https://veupathdb.github.io/vdi-service/dev/schema/config/stack-config.json[Configuration Schema Root]
 
-== Development
+==== `production`
 
-=== Running the Stack
+The `production` branch should always reflect what is on production.  This
+branch is to remain locked until we are ready to move code from QA to
+production, at which point the following steps will be performed:
 
-. `make build` +
-Builds the VDI service docker image.
-. `make up` +
-Spins up the service.
-. `make down` +
-Shuts down the service and removes all the vdi-specific containers, volumes,
-and networks.
+. The `production` branch will be unlocked via the repository settings.
+. The `qa` branch will be merged into `production`
+. The `production` branch will be re-locked via the repository settings.
+
+[IMPORTANT]
+--
+These steps are *_not_* the service deployment steps, they are simply an outline
+of steps strictly related to getting the `production` branch up to date with the
+`qa` branch.  For deployment procedure steps see the <<Deployment>> section
+below.
+--
+
+
+==== `main`
+
+The `main` branch is for active development.  It is strongly advised that fixes
+and features be developed on branches forked from `main` and then merged back
+into `main` when complete to avoid conflict problems with other active
+development.
+
+
+=== Tagging
+
+Release tags `v*` are only to be made on the `production` branch.
+
+Other tags should be avoided.
+
+
+=== Deployment
+
+The following is a full list of steps necessary to perform a deployment of the
+QA VDI service code onto production.
+
+. Unlock the `production` branch via the repository settings.  This setting can
+  be found in the "Branches" menu under the "production" branch rule.  The
+  specific setting to uncheck is "Lock Branch".
+. Merge the `qa` branch into `production`.
+. Re-lock the `production` branch via the setting described in step 1.
+. Wait for the `production` branch to build in Jenkins.
+. Create a new release tag on the merge commit from `qa` to `production`.
+. Wait for the new tag to build in Jenkins.
+. Create a PR on the https://github.com/VEuPathDB/tagger[Tagger] repository,
+  forked from and targeting the `prod` branch, updating the `vdi-service` tag
+  to the new tag created in step 5.
+. Assign the PR to systems and notify them of the PR.
+
+[WARNING]
+--
+Steps 4 and 6 are necessary to avoid known issues with our current Jenkins build
+setup for containerized services.
+--
+
+
+
+== Links
+
+=== Documentation
+
+* link:https://veupathdb.github.io/vdi-service/vdi-api.html[VDI Service API Doc]
+* link:https://veupathdb.github.io/vdi-service/design/1.0/design.html[Service Design Doc]
+* link:https://veupathdb.atlassian.net/wiki/spaces/UI/pages/36438144/VDI+User+Datasets+Design[Original Design Doc]
+* link:docs/env-vars.adoc[Environment Config Doc]
+* link:docs/local-dev-readme.adoc[Local Development Doc]
+
+
+=== VDI Project Index
+
+==== Services
+
+* https://github.com/VEuPathDB/vdi-service[VDI Core Service]
+* https://github.com/VEuPathDB/vdi-plugin-handler-server[VDI Plugin Handler Service]
+
+==== Docker Images
+
+* https://github.com/VEuPathDB/vdi-internal-db[Cache DB Docker Image]
+* https://github.com/VEuPathDB/vdi-docker-handler-base[Plugin Handler Base]
+
+==== Libraries
+
+===== Service Libraries
+
+* https://github.com/VEuPathDB/vdi-component-common[Commons Library]
+* https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
+
+===== Plugin Libraries
+
+* https://github.com/VEuPathDB/lib-vdi-plugin-rnaseq[lib-rnaseq]
+* https://github.com/VEuPathDB/lib-vdi-plugin-study[lib-study]
+
+==== Plugins
+
+===== Production
+
+* https://github.com/VEuPathDB/vdi-plugin-bigwig[bigwig]
+* https://github.com/VEuPathDB/vdi-plugin-biom[biom]
+* https://github.com/VEuPathDB/vdi-plugin-isasimple[isasimple]
+* https://github.com/VEuPathDB/vdi-plugin-rnaseq[rnaseq]
+* https://github.com/VEuPathDB/vdi-plugin-genelist[genelist]
+
+===== Examples
+
+* https://github.com/VEuPathDB/vdi-handler-plugin-example[Example Plugin]
 
 
 == Repo Structure
 
-The VDI service repository is divided into 2 categories of subproject:
-link:lib/[libraries], and link:service[services].
+The VDI service repository is divided into 4 categories: components, daemons,
+lanes, and the core bootstrapper.
 
-The libraries are self-contained VDI-specific packages that are shared between
-different services that require a package's specific tools.
+Components are small shared libraries that contain code specific to a purpose
+that is not the core focus of the VDI service.
 
-Services, also referred to in code as modules, are independent processes that
-share a container/jvm for stack deployment convenience.
+Daemons are background processes that perform maintenance tasks such as dataset
+reconciliation or pruning old, soft-deleted datasets from S3.
 
-=== Services
+Lanes are event handlers that are tailored to individual event types, performing
+some process or processes on a dataset specified in the subscribed events.
 
-==== Lanes
+The bootstrapper is the core of the service, and the root level Gradle project.
+This piece is responsible for starting up and shutting down the various project
+modules.
+
+=== Internal Libs
+
+Shared library components used by one or more VDI daemons, lanes, the rest
+service, and/or the bootstrapper.
+
+* link:lib/app-db/[App DB Client]
+* link:lib/async/[Async Utilities]
+* link:lib/install-cleanup/[Broken Install Cleanup]
+* link:lib/cache-db/[Cache DB Client]
+* link:https://github.com/VEuPathDB/vdi-component-common[Commons]
+* link:lib/pruner[Dataset Pruner]
+* link:lib/dataset-reinstaller/[Dataset Reinstaller]
+* link:https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
+* link:lib/kafka[Kafka Client]
+* link:lib/ldap[LDAP Utilities]
+* link:lib/module-core/[Module Core]
+* link:lib/plugin-client[Plugin Server Client]
+* link:lib/plugin-mapping[Plugin Mapping]
+* link:lib/rabbit[Rabbit Client]
+* link:lib/s3[S3 Utilities]
+* link:lib/env/[Shared Env Constants & Utilities]
+* link:lib/test-utils[Unit Test Utilities]
+
+=== Daemons
+
+Background tasks that run unsupervised.
+
+* link:service/daemon/dataset-reinstaller/[Dataset Reinstaller]
+* link:service/daemon/event-router/[Event Router]
+* link:service/daemon/pruner/[Pruner]
+* link:service/daemon/reconciler/[Reconciler]
+
+=== Lanes
 
 Dataset event handlers.  Each lane is a separate process that subscribes to a
 Kafka channel and operates on datasets whose information is provided in the
 incoming events.
 
-* link:service/lane/hard-delete/[Hard Delete]
-* link:service/lane/import/[Import]
-* link:service/lane/install/[Install Data]
-* link:service/lane/reconciliation/[Reconciliation]
-* link:service/lane/sharing/[Share]
-* link:service/lane/soft-delete/[Soft Delete]
-* link:service/lane/update-meta/[Update Meta]
+* link:service/lane/hard-delete/[Hard Delete Event Handler]
+* link:service/lane/import/[Import Event Handler]
+* link:service/lane/install/[Install Data Event Handler]
+* link:service/lane/reconciliation/[Reconciliation Event Handler]
+* link:service/lane/sharing/[Share Event Handler]
+* link:service/lane/soft-delete/[Soft Delete Event Handler]
+* link:service/lane/update-meta/[Update Meta Event Handler]
 
-==== Rest Service
+
+=== Rest Service
 
 The rest service is the public API through which users and administrators
 communicate with and operate on the VDI system.
 
 * link:service/rest-service/[Rest API Service]
 
-==== Daemons
+=== Bootstrapper
 
-Independent background tasks.
-
-* link:service/daemon/event-router/[MinIO Event Router]
-* link:service/daemon/pruner/[Stale Object Pruner]
-* link:service/daemon/reconciler/[Dataset Reconciler]
-
-==== Bootstrapper
-
-The bootstrapper is responsible for starting up the service modules listed above
-and ensuring a full JVM shutdown if any service module crashes.
+The bootstrapper is the core of the service, and the root level Gradle project.
+This piece is responsible for starting up and shutting down the various project
+modules.
 
 * link:service/bootstrap/[Bootstrapper]
 
-=== Internal Libs
+== Development
 
-.link:lib/dataset/[Dataset Management]
-* link:lib/dataset/pruner[Dataset Pruner Implementation]
-* link:lib/dataset/reconciler/[Dataset Reconciler Implementation]
-* link:lib/dataset/reinstaller/[Dataset Reinstaller]
+=== Running the Stack
 
-.link:lib/db/[Database Interaction]
-* link:lib/db/application/[Application DB Client]
-* link:lib/db/internal/[Internal DB Client]
-* link:lib/db/common/[Shared DB Components]
-
-.link:lib/plugin/[Plugin Communication]
-* link:lib/plugin/client[Plugin HTTP Client]
-* link:lib/plugin/registry/[Enabled Plugin Mapping]
-
-.link:lib/external[External Service APIs]
-* link:lib/external/ldap[LDAP Utilities]
-* link:lib/external/rabbit[Rabbit Client]
-* link:lib/external/s3[MinIO Dataset Management Wrapper]
-
-.Misc
-* link:lib/async/[Async Utilities]
-* link:lib/common/[Universal Components]
-* link:lib/kafka[Kafka Client]
-* link:lib/module-core/[Service/Module Core API]
-* link:lib/test-utils[Unit Test Utilities]
-
-
-== VDI Project Repository Links
-
-.Services
-* https://github.com/VEuPathDB/vdi-service[VDI Core Service]
-* https://github.com/VEuPathDB/vdi-plugin-handler-server[VDI Plugin Handler Service]
-
-.Plugins
-* https://github.com/VEuPathDB/vdi-plugin-bigwig[bigWig]
-* https://github.com/VEuPathDB/vdi-plugin-biom[BIOM]
-* https://github.com/VEuPathDB/vdi-plugin-genelist[Gene List]
-* https://github.com/VEuPathDB/vdi-plugin-isasimple[ISA Study]
-* https://github.com/VEuPathDB/vdi-plugin-noop[NoOp]
-* https://github.com/VEuPathDB/vdi-plugin-wrangler[Phenotype]
-* https://github.com/VEuPathDB/vdi-plugin-rnaseq[RNA-Seq]
-
-.Docker Images
-* https://github.com/VEuPathDB/vdi-internal-db[Cache DB Docker Image]
-* https://github.com/VEuPathDB/docker-gus-apidb-base[Gus/ApiDB Schema Base] +
-[.small]#_Not explicitly part of VDI, but the base image for several plugins_#
-
-.Service Libraries
-* https://github.com/VEuPathDB/vdi-component-common[Commons Library]
-* https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
-
-.Plugin Libraries
-* https://github.com/VEuPathDB/lib-vdi-plugin-rnaseq[lib-rnaseq]
-* https://github.com/VEuPathDB/lib-vdi-plugin-study[lib-study]
-
-.Misc
-* https://github.com/VEuPathDB/vdi-handler-plugin-example[Example Plugin]
-* https://github.com/VEuPathDB/VdiSchema[VDI App DB Schema]
+. `make build` +
+  Builds the VDI service docker image.
+. `make up` +
+  Spins up the service.
+. `make down` +
+  Shuts down the service and removes all the vdi-specific containers, volumes,
+  and networks.

@@ -1,13 +1,12 @@
-.*
-
+.idea/
+.git/
 build/
-docs/
-gradle/wrapper/
 tmp/
-venv/
+docs/
+.github/
+.bin/
+gradle/wrapper/
 
-# TODO REMOVE THIS WHEN READY
-service/module/await-dependencies/
 
 readme.adoc
 *.env

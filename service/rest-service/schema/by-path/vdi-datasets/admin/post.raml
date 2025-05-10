@@ -1,0 +1,50 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../common.raml
+
+types:
+
+  AuthorizationKey:
+    displayName: RPC Authorization Key
+    description: |
+      A token unique to an RPC action that allows the action to be run via an
+      HTTP call.
+    type: string
+    minLength: 64
+    maxLength: 64
+    pattern: ^[0-9a-fA-F]{64}$
+
+  InstallCleanupRequest:
+    displayName: Install Cleanup Request
+    description: |
+      Object controlling the install cleanup process and what datasets it should
+      target.
+
+      Requesters should specify one of the fields `all` or `targets` to control
+      what datasets will be cleaned up.  If neither is specified the endpoint
+      will do nothing.
+    type: object
+    additionalProperties: false
+    properties:
+      all:
+        type: boolean
+        default: false
+        required: false
+      targets:
+        type: array
+        items:
+          type: InstallCleanupTarget
+        minItems: 1
+        uniqueItems: true
+        required: false
+
+  InstallCleanupTarget:
+    displayName: Install Cleanup Target
+    type: object
+    additionalProperties: false
+    properties:
+      datasetId:
+        type: common.VDI-ID
+      projectId:
+        type: common.ProjectID

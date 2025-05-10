@@ -1,0 +1,39 @@
+{
+  "EventName": "s3:ObjectCreated:Put",
+  "Key": "some-bucket/kotlin.svg",
+  "Records": [
+    {
+      "eventVersion": "2.0",
+      "eventSource": "minio:s3",
+      "awsRegion": "",
+      "eventTime": "2023-02-14T20:04:46.459Z",
+      "eventName": "s3:ObjectCreated:Put",
+      "userIdentity": { "principalId": "someToken" },
+      "requestParameters": { "principalId": "someToken", "region": "", "sourceIPAddress": "192.168.80.3" },
+      "responseElements": {
+        "content-length": "0",
+        "x-amz-request-id": "1743C98B4DDEADE8",
+        "x-minio-deployment-id": "f9d10b46-28a2-4ea3-8e76-d81c72f806cf",
+        "x-minio-origin-endpoint": "http://192.168.80.3:9000"
+      },
+      "s3": {
+        "s3SchemaVersion": "1.0",
+        "configurationId": "Config",
+        "bucket": {
+          "name": "some-bucket",
+          "ownerIdentity": { "principalId": "someToken" },
+          "arn": "arn:aws:s3:::some-bucket"
+        },
+        "object": {
+          "key": "kotlin.svg",
+          "size": 1947,
+          "eTag": "fe42529a71a6eaa74e7254926f1cfc5b",
+          "contentType": "image/svg+xml",
+          "userMetadata": { "content-type": "image/svg+xml" },
+          "sequencer": "1743C98B4E110262"
+        }
+      },
+      "source": { "host": "192.168.80.3", "port": "", "userAgent": "MinIO (linux; amd64) minio-go/v7.0.30" }
+    }
+  ]
+}
