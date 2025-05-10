@@ -32,7 +32,7 @@ ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
 
 COPY --from=prep ["/workspace/build/libs/service.jar", "/workspace/bootstrap/startup.sh", "/"]
 
-ARG CONFIG_FILE="config/production-config.yml"
+ARG CONFIG_FILE="config/halfway-config.yml"
 COPY ${CONFIG_FILE} /etc/vdi/config.yml
 
 CMD /startup.sh
