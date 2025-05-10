@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/lanes/update-meta.json",
+  "title": "Dataset Metadata Upsert Lane Config",
+  "type": "object",
+  "properties": {
+    "kafkaConsumerId": {
+      "$ref": "lane-common.json#/$defs/kafkaConsumerId",
+      "default": "update-meta-lane-receive"
+    },
+    "kafkaProducerId": {
+      "$ref": "lane-common.json#/$defs/kafkaProducerId",
+      "default": "update-meta-lane-send"
+    },
+    "inMemoryQueueSize": {
+      "$ref": "lane-common.json#/$defs/inMemoryQueueSize",
+      "default": 5
+    },
+    "workerCount": {
+      "$ref": "lane-common.json#/$defs/workerCount",
+      "default": 5
+    },
+    "eventChannel": {
+      "$ref": "lane-common.json#/$defs/eventChannel",
+      "default": "update-meta-triggers"
+    },
+    "eventKey": {
+      "$ref": "lane-common.json#/$defs/eventKey",
+      "default": "update-meta-trigger"
+    }
+  },
+  "unevaluatedProperties": false
+}

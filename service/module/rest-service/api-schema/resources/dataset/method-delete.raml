@@ -1,0 +1,21 @@
+#%RAML 1.0 Method
+
+displayName: Delete Dataset
+
+description: |
+  Marks the target dataset as deleted.
+  
+  Datasets that have been marked as deleted are still recoverable for a
+  short period of time before they are permanently deleted from the system.
+
+responses:
+  204:
+    description: Target dataset was marked as deleted.
+  401:
+    body: lib.UnauthorizedError
+  403:
+    body: lib.ForbiddenError
+  404:
+    body: lib.NotFoundError
+  500:
+    body: lib.ServerError

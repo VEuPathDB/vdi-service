@@ -1,0 +1,18 @@
+#%RAML 1.0 Resource
+
+displayName: Community Datasets
+
+get:
+  displayName: List Community Datasets
+
+  description: |
+    Returns a list of datasets that have been made "public" by the owner
+    setting the dataset visibilities to a setting other than `private`.
+
+  responses:
+    200:
+      body: lib.DatasetListEntry[]
+    401:
+      body: lib.UnauthorizedError
+    500:
+      body: lib.ServerError

@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/plugin.json",
+  "title": "VDI Plugin Config",
+  "type": "object",
+  "properties": {
+    "server": {
+      "oneOf": [
+        {
+          "$ref": "../common.json#/$defs/hostString"
+        },
+        {
+          "$ref": "../common.json#/$defs/hostObject"
+        },
+        {
+          "$ref": "../common.json#/$defs/interpolatedValue"
+        }
+      ]
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "dataTypes": {
+      "title": "Data Types",
+      "description": "Types and versions of dataset data handled by the plugin being defined.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dataType"
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "unevaluatedItems": false
+    },
+    "typeChangesEnabled": {
+      "description": "Whether datasets can be revised from this data type to another.",
+      "type": "boolean",
+      "default": false
+    },
+    "customPath": {
+      "title": "PATH Extension",
+      "description": "Allows adding additional paths to the PATH environment variable passed to plugin scripts on execution in the typical colon (`:`) divided format.\nLeading or trailing colon characters are not required.",
+      "type": "string",
+      "examples": [
+        "/opt/something/bin:/opt/other/bin"
+      ]
+    },
+    "installRoot": {
+      "title": "Dataset File Install Root",
+      "description": "The root mount path INSIDE THE CONTAINER which will contain the site build directory hierarchy into which dataset files will be installed.  The build directory itself MUST NOT be part of this path.",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        {
+          "$ref": "../common.json#/$defs/interpolatedValue"
+        }
+      ],
+      "default": "/datasets",
+      "examples": [
+        "/datasets"
+      ]
+    },
+    "projectIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common.json#/$defs/installTarget"
+      },
+      "unevaluatedItems": false
+    },
+    "scripts": {
+      "type": "object",
+      "properties": {
+        "checkCompatibility": {
+          "title": "Data Compatibility Test",
+          "$ref": "#/$defs/scriptConfig"
+        },
+        "dataCleaning": {
+          "title": "Data Import/Cleanup",
+          "$ref": "#/$defs/scriptConfig"
+        },
+        "dataInstall": {
+          "title": "Data Installation",
+          "$ref": "#/$defs/scriptConfig"
+        },
+        "metaUpdate": {
+          "title": "Dataset Metadata Upsert",
+          "$ref": "#/$defs/scriptConfig"
+        },
+        "uninstall": {
+          "title": "Dataset Uninstallation",
+          "$ref": "#/$defs/scriptConfig"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "server",
+    "displayName",
+    "dataTypes"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "scriptConfig": {
+      "type": "object",
+      "properties": {
+        "maxDuration": {
+          "title": "Maximum Script Execution Time",
+          "$ref": "../common.json#/$defs/duration"
+        },
+        "pathOverride": {
+          "title": "Script Path Override",
+          "$ref": "#/$defs/scriptPath"
+        }
+      },
+      "additionalProperties": false
+    },
+    "scriptPath": {
+      "type": "string",
+      "format": "uri-reference",
+      "examples": [
+        "/opt/vpdb/import.sh"
+      ]
+    },
+    "dataType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ]
+    }
+  }
+}

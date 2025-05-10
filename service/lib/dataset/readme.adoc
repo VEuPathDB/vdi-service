@@ -1,0 +1,21 @@
+= `:lib:dataset`
+
+VDI-internal libraries for performing actions on datasets that may be consumed
+by multiple VDI modules.
+
+.Projects
+--
+`:pruner`::
+Purges dataset traces from the object store after they have been marked as
+soft-deleted for longer than a configured retention window.
+
+`:reconciler`::
+Reconciles the state the object store with the install-target databases and/or
+the VDI stack-internal cache database to ensure the database records for all
+databases are correct and up-to-date with the object store data.
+
+`:reinstaller`::
+Provides tools to mark datasets that have failed installation due to an
+unexpected server error as ready for re-installation, and reinstall those
+datasets when ready.
+--

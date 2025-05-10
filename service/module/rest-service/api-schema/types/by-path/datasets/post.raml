@@ -1,0 +1,59 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../common.raml
+
+types:
+  DatasetPostRequestBody:
+    displayName: Dataset Post Request
+    description: |
+      HTTP POST request body requesting the creation of a dataset from the
+      components included in the request.
+
+      For a request to be considered valid, it must contain exactly 1 of the
+      optional parameters `file` or `url`.  If a request body contains both a
+      `file` and a `url` field value, the service will return a `400` error.
+    additionalProperties: false
+    properties:
+      meta:
+        description: Metadata about the dataset being submitted.
+        type: DatasetPostMeta
+      file?:
+        description: |
+          Dataset file to upload.
+
+          This field is incompatible with the `url` field.
+        type: file
+      url?:
+        description: |
+          URL to a dataset file to upload.
+
+          This field is incompatible with the `file` field.
+        type: string
+
+  DatasetPostMeta:
+    type: common.DatasetMetaBase
+    additionalProperties: false
+    properties:
+      datasetType: common.DatasetTypeInput
+      projects:
+        description: >-
+          DEPRECATED: Use `projectIds`
+        type: common.ProjectId[]
+        minItems: 1
+        uniqueItems: true
+      visibility?:
+        type: common.DatasetVisibility
+        default: "private"
+
+  DatasetPostResponseBody:
+    displayName: Dataset Post Response
+    description: |
+      Successful upload response.
+
+      This response does not mean the uploaded dataset has been made available
+      on the target site(s).  The upload must first be validated and installed
+      into the target sites before the dataset will become available for use.
+    additionalProperties: false
+    properties:
+      datasetId: common.VdiId

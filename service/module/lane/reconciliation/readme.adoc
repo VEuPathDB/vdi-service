@@ -1,0 +1,12 @@
+= Dataset Reconciliation Lane
+
+The reconciliation lane subscribes to an event channel for dataset
+reconciliation events, and determines if the target dataset needs to be updated
+in any downstream target system.
+
+If a dataset is found to be absent from the stack-internal cache database, this
+lane will create records for it.
+
+If a dataset is found to be out of sync with a target system, the reconciliation
+lane will fire additional events as necessary on the relevant event channels to
+trigger other lanes into action.
