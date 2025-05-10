@@ -16,6 +16,6 @@ waitFor cache-db cache-db "5432"
 waitFor rabbit "$GLOBAL_RABBIT_HOST" "${GLOBAL_RABBIT_PORT:-5672}"
 waitFor minio "$S3_HOST" "$S3_PORT"
 
-echo "starting service with JVM args: $JVM_MEM_ARGS $JVM_ARGS"
+echo "starting vdi service with JVM args: $JVM_MEM_ARGS $JVM_ARGS"
 
-exec java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /service.jar
+exec java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /vdi-service.jar

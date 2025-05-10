@@ -30,7 +30,7 @@ RUN apk add --no-cache tzdata \
 ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
     JVM_ARGS=""
 
-COPY --from=prep ["/workspace/build/libs/service.jar", "/workspace/bootstrap/startup.sh", "/"]
+COPY --from=prep ["/workspace/build/libs/vdi-service.jar", "/workspace/bootstrap/startup.sh", "/"]
 
 ARG CONFIG_FILE="config/production-config.yml"
 COPY ${CONFIG_FILE} /etc/vdi/config.yml
