@@ -1,9 +1,9 @@
 package vdi.lane.reconciliation.util
 
+import vdi.lane.reconciliation.ReconciliationContext
 import vdi.lib.db.app.AppDB
 import vdi.lib.db.app.AppDBAccessor
 import vdi.lib.db.app.model.DeleteFlag
-import vdi.lane.reconciliation.ReconciliationContext
 
 
 internal fun AppDB.isFullyUninstalled(ctx: ReconciliationContext): Boolean {

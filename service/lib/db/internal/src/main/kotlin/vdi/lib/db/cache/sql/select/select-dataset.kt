@@ -10,11 +10,7 @@ import vdi.lib.db.cache.model.DatasetRecordImpl
 import vdi.lib.db.cache.util.getDatasetVisibility
 import vdi.lib.db.cache.util.getImportStatus
 import vdi.lib.db.cache.util.getProjectIDList
-import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDateTime
-import vdi.lib.db.jdbc.getUserID
-import vdi.lib.db.jdbc.optDatasetID
-import vdi.lib.db.jdbc.setDatasetID
+import vdi.lib.db.jdbc.*
 
 // language=postgresql
 private val SQL = """

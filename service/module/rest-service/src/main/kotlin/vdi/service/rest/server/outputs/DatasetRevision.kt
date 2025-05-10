@@ -1,10 +1,8 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.rest.generated.model.DatasetRevision
-import vdi.service.rest.generated.model.DatasetRevisionAction
-import vdi.service.rest.generated.model.DatasetRevisionImpl
-import vdi.service.rest.util.defaultZone
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
+import vdi.service.rest.generated.model.DatasetRevision
+import vdi.service.rest.util.defaultZone
 
 
 /**

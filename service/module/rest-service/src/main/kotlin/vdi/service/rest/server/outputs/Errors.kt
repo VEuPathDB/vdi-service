@@ -11,7 +11,7 @@ fun BadRequestError(message: String): BadRequestError =
   BadRequestErrorImpl().also { it.message = message }
 
 inline fun <reified T: ResponseDelegate> BadRequestError.wrap(): T =
-  T::class.java.getDeclaredMethod("respond400WithApplicationJson")
+  T::class.java.getMethod("respond400WithApplicationJson", BadRequestError::class.java)
     .invoke(null, this) as T
 
 // endregion 400
@@ -22,7 +22,7 @@ fun ForbiddenError(message: String): ForbiddenError =
   ForbiddenErrorImpl().also { it.message = message }
 
 inline fun <reified T: ResponseDelegate> ForbiddenError.wrap(): T =
-  T::class.java.getDeclaredMethod("respond403WithApplicationJson")
+  T::class.java.getMethod("respond403WithApplicationJson", ForbiddenError::class.java)
     .invoke(null, this) as T
 
 // endregion 403
@@ -35,7 +35,7 @@ fun NotFoundError(message: String? = null): NotFoundError =
   NotFoundErrorImpl().also { it.message = message }
 
 inline fun <reified T: ResponseDelegate> NotFoundError.wrap(): T =
-  T::class.java.getDeclaredMethod("respond404WithApplicationJson")
+  T::class.java.getMethod("respond404WithApplicationJson", NotFoundError::class.java)
     .invoke(null, this) as T
 
 // endregion 404
@@ -46,7 +46,7 @@ fun ConflictError(message: String): ConflictError =
   ConflictErrorImpl().also { it.message = message }
 
 inline fun <reified T: ResponseDelegate> ConflictError.wrap(): T =
-  T::class.java.getDeclaredMethod("respond409WithApplicationJson")
+  T::class.java.getMethod("respond409WithApplicationJson", ConflictError::class.java)
     .invoke(null, this) as T
 
 // endregion 409
@@ -74,7 +74,7 @@ fun UnprocessableEntityError(x: UnprocessableEntityException): UnprocessableEnti
   }
 
 inline fun <reified T: ResponseDelegate> UnprocessableEntityError.wrap(): T =
-  T::class.java.getDeclaredMethod("respond422WithApplicationJson")
+  T::class.java.getDeclaredMethod("respond422WithApplicationJson", UnprocessableEntityError::class.java)
     .invoke(null, this) as T
 
 // endregion 422

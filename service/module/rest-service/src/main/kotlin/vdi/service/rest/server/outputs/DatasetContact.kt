@@ -1,8 +1,7 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.rest.generated.model.DatasetContact
-import vdi.service.rest.generated.model.DatasetContactImpl
 import org.veupathdb.vdi.lib.common.model.VDIDatasetContact
+import vdi.service.rest.generated.model.DatasetContact
 
 
 internal fun DatasetContact(contact: VDIDatasetContact): DatasetContact =

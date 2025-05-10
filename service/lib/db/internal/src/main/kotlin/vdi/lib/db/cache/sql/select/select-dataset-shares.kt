@@ -6,10 +6,10 @@ import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIShareOfferAction
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
+import java.sql.Connection
 import vdi.lib.db.cache.model.DatasetShare
 import vdi.lib.db.jdbc.getUserID
 import vdi.lib.db.jdbc.setDatasetID
-import java.sql.Connection
 
 // language=postgresql
 private const val SQL = """

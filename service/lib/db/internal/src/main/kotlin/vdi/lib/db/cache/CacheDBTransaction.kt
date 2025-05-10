@@ -6,9 +6,12 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
-import vdi.lib.db.cache.model.*
-import vdi.lib.db.model.SyncControlRecord
 import java.time.OffsetDateTime
+import vdi.lib.db.cache.model.Dataset
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.model.DatasetShareOffer
+import vdi.lib.db.cache.model.DatasetShareReceipt
+import vdi.lib.db.model.SyncControlRecord
 
 interface CacheDBTransaction : AutoCloseable {
 

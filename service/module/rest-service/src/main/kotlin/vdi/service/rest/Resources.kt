@@ -10,6 +10,9 @@ class Resources(opts: ServiceConfig) : ContainerResources(opts) {
   init {
     enableAuth()
 
+    if (opts.enableTrace)
+      enableJerseyTrace()
+
     register(object: AbstractBinder() {
       override fun configure() { bind(opts.uploads).to(UploadConfig::class.java) }
     })
@@ -25,5 +28,13 @@ class Resources(opts: ServiceConfig) : ContainerResources(opts) {
     DatasetSharePut::class.java,
     PluginInfo::class.java,
     UserInfo::class.java,
+
+    DeprecatedCommunityDatasets::class.java,
+    DeprecatedDatasetByID::class.java,
+    DeprecatedDatasetFiles::class.java,
+    DeprecatedDatasetList::class.java,
+    DeprecatedDatasetSharePut::class.java,
+    DeprecatedPluginInfo::class.java,
+    DeprecatedUserInfo::class.java,
   )
 }

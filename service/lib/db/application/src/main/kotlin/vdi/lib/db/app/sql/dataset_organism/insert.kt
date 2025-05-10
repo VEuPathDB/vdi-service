@@ -2,8 +2,8 @@ package vdi.lib.db.app.sql.dataset_organism
 
 import io.foxcapades.kdbc.withPreparedBatchUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
+import vdi.lib.db.jdbc.setDatasetID
 
 
 private fun sql(schema: String) =

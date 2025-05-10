@@ -7,9 +7,9 @@ import io.foxcapades.kdbc.map
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
-import vdi.lib.db.cache.model.DatasetImportStatus
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import vdi.lib.db.cache.model.DatasetImportStatus
 
 // region PreparedStatement
 

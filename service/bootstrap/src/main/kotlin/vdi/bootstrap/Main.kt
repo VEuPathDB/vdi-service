@@ -4,9 +4,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import vdi.lib.modules.VDIModule
-import vdi.service.rest.RestService
-import vdi.lib.db.cache.patchMetadataTable
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.thread
+import kotlin.concurrent.withLock
+import kotlin.system.exitProcess
 import vdi.daemon.events.routing.EventRouter
 import vdi.daemon.pruner.PrunerModule
 import vdi.daemon.reconciler.Reconciler
@@ -17,9 +18,10 @@ import vdi.lane.install.InstallDataTriggerHandler
 import vdi.lane.meta.UpdateMetaTriggerHandler
 import vdi.lane.reconciliation.ReconciliationEventHandler
 import vdi.lane.sharing.ShareTriggerHandler
-import kotlin.concurrent.thread
-import kotlin.system.exitProcess
 import vdi.lib.config.loadAndCacheStackConfig
+import vdi.lib.db.cache.patchMetadataTable
+import vdi.lib.modules.VDIModule
+import vdi.service.rest.RestService
 
 object Main {
 
@@ -46,18 +48,37 @@ object Main {
     // FIXME: REMOVE THIS ONCE THE EXTENDED METADATA PATCH HAS BEEN APPLIED TO PRODUCTION!!!!
     patchMetadataTable()
 
-    Runtime.getRuntime().addShutdownHook(Thread { shutdownModules(modules) })
+    val serviceLock = ReentrantLock()
+    val unlockCondition = serviceLock.newCondition()
+
+    Runtime.getRuntime().addShutdownHook(Thread {
+      serviceLock.withLock {
+        unlockCondition.signal()
+      }
+      shutdownModules(modules)
+    })
 
     thread {
       try {
         RestService(config).main(args)
-      } finally {
-        shutdownModules(modules)
+        serviceLock.withLock {
+          unlockCondition.await()
+        }
+      } catch (e: Throwable) {
+        log.error("rest service startup failed", e)
+        exitProcess(1)
       }
     }
 
     log.info("starting modules")
-    runBlocking(Dispatchers.IO) { modules.forEach { launch { it.start() } } }
+    runBlocking(Dispatchers.IO) { modules.forEach { launch {
+      try {
+        it.start()
+      } catch (e: Throwable) {
+        log.error("vdi module startup exception", e)
+        exitProcess(1)
+      }
+    } } }
   }
 
   /**

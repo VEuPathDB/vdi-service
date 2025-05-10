@@ -6,10 +6,10 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
-import vdi.lib.s3.files.*
-import vdi.lib.s3.paths.S3File
 import java.io.InputStream
 import java.time.OffsetDateTime
+import vdi.lib.s3.files.*
+import vdi.lib.s3.paths.S3File
 
 interface DatasetDirectory {
 

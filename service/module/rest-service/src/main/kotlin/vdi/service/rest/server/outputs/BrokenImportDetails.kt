@@ -1,8 +1,8 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.rest.generated.model.BrokenImportDetails
 import vdi.lib.db.cache.model.BrokenImportRecord
 import vdi.lib.plugin.registry.PluginRegistry
+import vdi.service.rest.generated.model.BrokenImportDetails
 
 fun BrokenImportDetails(record: BrokenImportRecord): BrokenImportDetails =
   vdi.service.rest.generated.model.BrokenImportDetailsImpl().apply {

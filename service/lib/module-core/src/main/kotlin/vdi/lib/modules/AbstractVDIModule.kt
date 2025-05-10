@@ -96,7 +96,7 @@ abstract class AbstractVDIModule(override val name: String, protected val abortC
     } catch (e: Throwable) {
       log.error("safeExec failed with error: $error", e)
       triggerShutdown()
-      throw Exception(error, e)
+      abortCB(e.message)
     }
 
   /**

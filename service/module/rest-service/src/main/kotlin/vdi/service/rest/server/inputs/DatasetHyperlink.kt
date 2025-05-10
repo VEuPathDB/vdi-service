@@ -1,9 +1,9 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
+import org.veupathdb.vdi.lib.common.model.VDIDatasetHyperlink
 import vdi.service.rest.generated.model.DatasetHyperlink
 import vdi.service.rest.generated.model.JsonField
-import org.veupathdb.vdi.lib.common.model.VDIDatasetHyperlink
 
 private const val UrlMinLength = 7
 private const val UrlMaxLength = 200

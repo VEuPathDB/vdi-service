@@ -3,8 +3,8 @@ package vdi.lib.db.cache.sql.insert
 import io.foxcapades.kdbc.withPreparedBatchUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
-import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
+import vdi.lib.db.jdbc.setDatasetID
 
 // language=postgresql
 private const val SQL = """
@@ -22,4 +22,4 @@ internal fun Connection.tryInsertInstallFiles(datasetID: DatasetID, files: Itera
     setString(2, it.filename)
     setLong(3, it.size.toLong())
   }
-    .reduce { a, b -> a + b }
+    .reduceOrNull { a, b -> a + b } ?: 0

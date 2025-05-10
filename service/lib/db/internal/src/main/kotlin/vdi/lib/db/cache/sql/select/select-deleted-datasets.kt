@@ -2,12 +2,12 @@ package vdi.lib.db.cache.sql.select
 
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withStatementResults
+import java.sql.Connection
 import vdi.lib.db.cache.model.DeletedDataset
 import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getUserID
-import java.sql.Connection
+import vdi.lib.db.jdbc.reqDatasetID
 
 // language=postgresql
 private const val SQL = """

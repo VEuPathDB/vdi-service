@@ -1,21 +1,15 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.rest.generated.model.DatasetListEntry
-import vdi.service.rest.generated.model.DatasetListEntryImpl
-import vdi.service.rest.generated.model.DatasetListShareUser
-import vdi.service.rest.generated.model.DatasetOwner
-import vdi.service.rest.generated.model.DatasetStatusInfo
-import vdi.service.rest.generated.model.DatasetTypeOutput
-import vdi.service.rest.generated.model.DatasetVisibility
-import vdi.service.rest.model.UserDetails
-import vdi.service.rest.util.defaultZone
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import java.time.OffsetDateTime
 import vdi.lib.db.app.model.InstallStatuses
 import vdi.lib.db.cache.model.DatasetFileSummary
 import vdi.lib.db.cache.model.DatasetRecord
 import vdi.lib.plugin.registry.PluginRegistry
-import java.time.OffsetDateTime
+import vdi.service.rest.generated.model.*
+import vdi.service.rest.model.UserDetails
+import vdi.service.rest.util.defaultZone
 
 @Suppress("DuplicatedCode") // overlap in separate API type fields
 internal fun DatasetListEntry(

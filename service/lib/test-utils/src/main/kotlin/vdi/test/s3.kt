@@ -7,11 +7,11 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
-import vdi.lib.s3.DatasetObjectStore
-import vdi.lib.s3.files.*
 import java.io.InputStream
 import java.time.OffsetDateTime
 import java.util.stream.Stream
+import vdi.lib.s3.DatasetObjectStore
+import vdi.lib.s3.files.*
 
 private sealed class DummyFileBase
   : DatasetDeleteFlagFile

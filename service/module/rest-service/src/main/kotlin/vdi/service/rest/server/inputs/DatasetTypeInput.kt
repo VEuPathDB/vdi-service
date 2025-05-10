@@ -1,12 +1,15 @@
 package vdi.service.rest.server.inputs
 
-import org.veupathdb.lib.request.validation.*
-import vdi.service.rest.generated.model.DatasetTypeInput
-import vdi.service.rest.generated.model.JsonField
+import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.checkNonBlank
+import org.veupathdb.lib.request.validation.rangeTo
+import org.veupathdb.lib.request.validation.require
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import vdi.lib.plugin.registry.PluginRegistry
+import vdi.service.rest.generated.model.DatasetTypeInput
+import vdi.service.rest.generated.model.JsonField
 
 fun DatasetTypeInput.cleanup() {
   name = name.cleanupString()

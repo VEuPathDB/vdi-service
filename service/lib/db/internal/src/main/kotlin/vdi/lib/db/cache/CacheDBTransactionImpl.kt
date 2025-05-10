@@ -7,7 +7,12 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
-import vdi.lib.db.cache.model.*
+import java.sql.Connection
+import java.time.OffsetDateTime
+import vdi.lib.db.cache.model.Dataset
+import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.lib.db.cache.model.DatasetShareOffer
+import vdi.lib.db.cache.model.DatasetShareReceipt
 import vdi.lib.db.cache.sql.delete.*
 import vdi.lib.db.cache.sql.insert.*
 import vdi.lib.db.cache.sql.update.*
@@ -16,8 +21,6 @@ import vdi.lib.db.cache.sql.upsert.upsertDatasetShareReceipt
 import vdi.lib.db.cache.sql.upsert.upsertImportControl
 import vdi.lib.db.cache.sql.upsert.upsertImportMessages
 import vdi.lib.db.model.SyncControlRecord
-import java.sql.Connection
-import java.time.OffsetDateTime
 
 internal class CacheDBTransactionImpl(private val connection: Connection) : CacheDBTransaction {
 

@@ -1,8 +1,10 @@
 package vdi.service.rest.server.inputs
 
-import org.veupathdb.lib.request.validation.*
-import vdi.service.rest.generated.model.DatasetDependency
+import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.reqCheckLength
+import org.veupathdb.lib.request.validation.require
 import org.veupathdb.vdi.lib.common.model.VDIDatasetDependency
+import vdi.service.rest.generated.model.DatasetDependency
 
 private const val IDMinLength = 3
 private const val IDMaxLength = 50

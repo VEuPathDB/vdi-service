@@ -6,6 +6,7 @@ import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
+import java.io.InputStream
 import vdi.lib.db.app.AppDB
 import vdi.lib.db.app.AppDatabaseRegistry
 import vdi.lib.db.app.model.DatasetInstallMessage
@@ -23,7 +24,6 @@ import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.lib.s3.DatasetDirectory
 import vdi.lib.s3.DatasetObjectStore
-import java.io.InputStream
 
 object DatasetReinstaller {
 

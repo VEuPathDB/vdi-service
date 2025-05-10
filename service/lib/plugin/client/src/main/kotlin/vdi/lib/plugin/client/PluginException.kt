@@ -3,7 +3,6 @@ package vdi.lib.plugin.client
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.lib.plugin.client.PluginException.Companion.new
 
 open class PluginException : Exception {
   val action: String

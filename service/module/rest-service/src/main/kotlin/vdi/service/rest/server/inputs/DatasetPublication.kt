@@ -1,9 +1,9 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
+import org.veupathdb.vdi.lib.common.model.VDIDatasetPublication
 import vdi.service.rest.generated.model.DatasetPublication
 import vdi.service.rest.generated.model.JsonField
-import org.veupathdb.vdi.lib.common.model.VDIDatasetPublication
 
 private const val CitationMinLength = 3
 private const val CitationMaxLength = 2000

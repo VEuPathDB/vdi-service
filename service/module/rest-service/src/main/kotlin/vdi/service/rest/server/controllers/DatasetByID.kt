@@ -1,26 +1,23 @@
 package vdi.service.rest.server.controllers
 
-import jakarta.inject.Inject
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.resources.DatasetsVdiId
 import vdi.service.rest.generated.resources.DatasetsVdiId.*
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles
-import vdi.service.rest.generated.resources.VdiDatasetsVdiId
 import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.server.services.dataset.*
-import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.service.rest.config.UploadConfig
 
 @Authenticated
-class DatasetByID(@Context request: ContainerRequest, @Inject val uploadConfig: UploadConfig)
+class DatasetByID(@Context request: ContainerRequest, @Context val uploadConfig: UploadConfig)
   : DatasetsVdiId
-  , VdiDatasetsVdiId // DEPRECATED API
   , ControllerBase(request)
 {
   @Authenticated(adminOverride = ALLOW_ALWAYS)
@@ -72,21 +69,4 @@ class DatasetByID(@Context request: ContainerRequest, @Inject val uploadConfig: 
       null -> adminDeleteDataset(DatasetID(vdiID))
       else -> userDeleteDataset(DatasetID(vdiID))
     }
-
-  // DEPRECATED API
-  // DEPRECATED API
-  // DEPRECATED API
-  // DEPRECATED API
-
-  override fun getVdiDatasetsByVdiId(vdiId: String) =
-    VdiDatasetsVdiId.GetVdiDatasetsByVdiIdResponse(getDatasetsByVdiId(vdiId))
-
-  override fun patchVdiDatasetsByVdiId(vdiId: String, entity: DatasetPatchRequestBody?) =
-    VdiDatasetsVdiId.PatchVdiDatasetsByVdiIdResponse(patchDatasetsByVdiId(vdiId, entity))
-
-  override fun putVdiDatasetsByVdiId(vdiId: String, entity: DatasetPutRequestBody?) =
-    VdiDatasetsVdiId.PutVdiDatasetsByVdiIdResponse(putDatasetsByVdiId(vdiId, entity))
-
-  override fun deleteVdiDatasetsByVdiId(vdiId: String) =
-    VdiDatasetsVdiId.DeleteVdiDatasetsByVdiIdResponse(deleteDatasetsByVdiId(vdiId))
 }

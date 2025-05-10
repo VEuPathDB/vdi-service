@@ -2,10 +2,10 @@ package vdi.lib.db.cache.sql.update
 
 import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.lib.db.jdbc.setDatasetID
-import vdi.lib.db.jdbc.setDateTime
 import java.sql.Connection
 import java.time.OffsetDateTime
+import vdi.lib.db.jdbc.setDatasetID
+import vdi.lib.db.jdbc.setDateTime
 
 // language=postgresql
 private const val SQL = """

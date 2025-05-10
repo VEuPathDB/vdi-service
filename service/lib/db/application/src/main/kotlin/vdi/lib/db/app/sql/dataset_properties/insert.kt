@@ -4,8 +4,8 @@ import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetProperties
 import org.veupathdb.vdi.lib.json.JSON
-import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
+import vdi.lib.db.jdbc.setDatasetID
 
 private fun sql(schema: String) =
 // language=oracle

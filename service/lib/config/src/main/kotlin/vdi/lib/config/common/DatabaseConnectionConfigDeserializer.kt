@@ -9,38 +9,37 @@ import org.veupathdb.vdi.lib.common.field.SecretString
 
 internal class DatabaseConnectionConfigDeserializer: StdDeserializer<DatabaseConnectionConfig>(DirectDatabaseConnectionConfig::class.java) {
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): DatabaseConnectionConfig {
-    val obj = p.codec.readTree<ObjectNode>(p)
+    return p.codec.readTree<ObjectNode>(p).deserialize()
+  }
 
-    if (obj["enabled"]?.booleanValue() == false)
-      return DirectDatabaseConnectionConfig("disabled", SecretString("disabled"), null, null, "disabled", HostAddress("disabled", null), "disabled")
+  companion object {
+    fun ObjectNode.deserialize(): DatabaseConnectionConfig {
+      val user = get("username").textValue()
+      val pass = SecretString(get("password").textValue())
 
-    val user = obj["username"].textValue()
-    val pass = SecretString(obj["password"].textValue())
+      val poolSize = get("poolSize")?.intValue()?.toUByte()
 
-    val poolSize = obj["poolSize"]?.intValue()?.toUByte()
+      return if ("lookupCn" in this) {
+        LDAPDatabaseConnectionConfig(
+          username = user,
+          password = pass,
+          poolSize = poolSize,
+          lookupCN = get("lookupCn").textValue(),
+          schema   = get("schema")?.textValue(),
+        )
+      } else {
+        val server = get("server") as ObjectNode
 
-
-
-    return if ("lookupCn" in obj) {
-      LDAPDatabaseConnectionConfig(
-        username = user,
-        password = pass,
-        poolSize = poolSize,
-        lookupCN = obj["lookupCn"].textValue(),
-        schema   = obj["schema"]?.textValue(),
-      )
-    } else {
-      val server = obj["server"] as ObjectNode
-
-      DirectDatabaseConnectionConfig(
-        username = user,
-        password = pass,
-        platform = obj["platform"].textValue(),
-        poolSize = poolSize,
-        server   = HostAddress(server["host"].textValue(), server["port"]?.intValue()?.toUShort()),
-        dbName   = obj["dbName"].textValue(),
-        schema   = obj["schema"]?.textValue(),
-      )
+        DirectDatabaseConnectionConfig(
+          username = user,
+          password = pass,
+          platform = get("platform").textValue(),
+          poolSize = poolSize,
+          server   = HostAddress(server["host"].textValue(), server["port"]?.intValue()?.toUShort()),
+          dbName   = get("dbName").textValue(),
+          schema   = get("schema")?.textValue(),
+        )
+      }
     }
   }
 }

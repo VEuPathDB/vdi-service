@@ -6,6 +6,9 @@ import org.veupathdb.lib.container.jaxrs.providers.DependencyProvider
 import org.veupathdb.lib.container.jaxrs.server.Server
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import vdi.lib.config.StackConfig
+import vdi.lib.db.app.AppDB
+import vdi.lib.db.cache.CacheDB
+import vdi.lib.install.InstallTargetRegistry
 import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.health.DependencySource
 import vdi.service.rest.s3.DatasetStore
@@ -16,6 +19,12 @@ class RestService(config: StackConfig) : Server() {
   private val options = ServiceConfig(config)
 
   init {
+    // Eager load classes for fail-fast
+    log.info("initializing dependencies")
+    InstallTargetRegistry
+    AppDB()
+    CacheDB()
+
     DatasetStore.init(config.vdi.objectStore)
     JaxRSMultipartUpload.maxFileUploadSize = options.uploads.maxUploadSize.toLong()
   }

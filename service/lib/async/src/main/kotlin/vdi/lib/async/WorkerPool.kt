@@ -49,9 +49,9 @@ class WorkerPool(
           val j = i + 1
           launch (CoroutineThreadContext(ThreadContextData(mapOf("workerID" to "$name-$j")))) {
             while (!shutdown.isTriggered()) {
-              val jobNumber = jobs.incAndGet()
 
               if (!queue.isEmpty) {
+                val jobNumber = jobs.incAndGet()
                 log.debug("executing job {}", jobNumber)
                 val job = safeReceive() ?: break
                 reportQueueSizeChange(-1) // Report one less job in queue.

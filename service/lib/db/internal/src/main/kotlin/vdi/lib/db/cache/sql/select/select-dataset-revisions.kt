@@ -7,12 +7,12 @@ import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevisionAction
+import java.sql.Connection
+import java.sql.ResultSet
 import vdi.lib.db.cache.model.DatasetRevisionRecord
 import vdi.lib.db.cache.model.DatasetRevisionRecordSet
 import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.setDatasetID
-import java.sql.Connection
-import java.sql.ResultSet
 
 /**
  * This slightly wonky looking query attempts to locate the revision records for
@@ -54,7 +54,7 @@ WITH
       NOT EXISTS (TABLE try1)
       AND original_id = (
         SELECT original_id
-        FROM dataset_revisions
+        FROM vdi.dataset_revisions
         WHERE revision_id = ?
       )
   )

@@ -1,7 +1,7 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.rest.generated.model.DatasetInstallStatus
 import vdi.lib.db.app.model.InstallStatus
+import vdi.service.rest.generated.model.DatasetInstallStatus
 
 fun DatasetInstallStatus(status: InstallStatus): DatasetInstallStatus =
   when (status) {

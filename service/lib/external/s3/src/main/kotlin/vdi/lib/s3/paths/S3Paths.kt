@@ -4,14 +4,7 @@ import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.lib.s3.paths.S3File.DeleteFlag
-import vdi.lib.s3.paths.S3File.ImportReadyZip
-import vdi.lib.s3.paths.S3File.InstallReadyZip
-import vdi.lib.s3.paths.S3File.RawUploadZip
-import vdi.lib.s3.paths.S3File.RevisionFlag
-import vdi.lib.s3.paths.S3File.ShareOffer
-import vdi.lib.s3.paths.S3File.ShareReceipt
-import vdi.lib.s3.paths.S3File.SharesDir
+import vdi.lib.s3.paths.S3File.*
 import vdi.lib.s3.util.PathBuilder
 
 

@@ -2,9 +2,9 @@ package vdi.lib.db.cache.sql.select
 
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.lib.db.cache.query.AdminAllDatasetsQuery
 import java.sql.Connection
 import java.sql.Types
+import vdi.lib.db.cache.query.AdminAllDatasetsQuery
 
 // language=postgresql
 private const val SQL_BASE = """

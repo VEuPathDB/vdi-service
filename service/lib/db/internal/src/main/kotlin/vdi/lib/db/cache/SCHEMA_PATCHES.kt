@@ -17,11 +17,10 @@ fun patchMetadataTable() {
       // language=postgresql
       stmt.execute("""
         CREATE TABLE IF NOT EXISTS vdi.dataset_revisions (
-          revision_id VARCHAR(12) PRIMARY KEY
-        , original_id VARCHAR(12) NOT NULL
-        , action      SMALLINT    NOT NULL
-        , timestamp   TIMESTAMPTZ NOT NULL
-        , CONSTRAINT revision_dedupe UNIQUE (revision_id, original_id)
+          revision_id VARCHAR(12) PRIMARY KEY -- new dataset ID
+        , original_id VARCHAR(12) NOT NULL    -- ORIGINAL dataset ID (not the immediate parent)
+        , action      SMALLINT    NOT NULL    -- Action enum ID
+        , timestamp   TIMESTAMPTZ NOT NULL    -- timestamp the revision was created
         )
       """.trimIndent())
 

@@ -1,11 +1,12 @@
 package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException
-import org.veupathdb.lib.request.validation.*
-import vdi.service.rest.generated.model.*
+import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.vdi.lib.common.field.UserID
-import org.veupathdb.vdi.lib.common.model.*
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import java.time.OffsetDateTime
+import vdi.service.rest.generated.model.*
 
 internal fun DatasetProxyPostRequestBody.cleanup() {
   meta?.cleanup()

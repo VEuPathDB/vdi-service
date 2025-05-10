@@ -11,7 +11,6 @@ import vdi.lib.db.cache.withTransaction
 import vdi.lib.logging.logger
 import vdi.service.rest.generated.model.DatasetShareReceipt
 import vdi.service.rest.generated.model.ShareReceiptAction
-import vdi.service.rest.generated.resources.DatasetsVdiIdSharesRecipientUserId.PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse as PutReceipt
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.outputs.BadRequestError
@@ -21,6 +20,7 @@ import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.util.Either
 import vdi.service.rest.util.leftOr
 import vdi.service.rest.util.mapLeft
+import vdi.service.rest.generated.resources.DatasetsVdiIdSharesRecipientUserId.PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse as PutReceipt
 
 fun <T: ControllerBase> T.putShareReceipt(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareReceipt): PutReceipt {
   val cacheDB = CacheDB()

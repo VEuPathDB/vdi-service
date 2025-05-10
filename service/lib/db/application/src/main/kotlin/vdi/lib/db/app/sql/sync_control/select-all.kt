@@ -2,15 +2,15 @@ package vdi.lib.db.app.sql.sync_control
 
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.common.util.CloseableIterator
-import vdi.lib.db.app.model.DeleteFlag
-import vdi.lib.db.model.ReconcilerTargetRecord
-import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.reqDatasetID
-import vdi.lib.db.jdbc.getDateTime
-import vdi.lib.db.jdbc.getUserID
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import vdi.lib.db.app.model.DeleteFlag
+import vdi.lib.db.jdbc.getDataType
+import vdi.lib.db.jdbc.getDateTime
+import vdi.lib.db.jdbc.getUserID
+import vdi.lib.db.jdbc.reqDatasetID
+import vdi.lib.db.model.ReconcilerTargetRecord
 
 private fun sql(schema: String) =
 // language=oracle

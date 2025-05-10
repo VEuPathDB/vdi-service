@@ -4,7 +4,6 @@ import org.gusdb.fgputil.db.platform.SupportedPlatform
 import org.veupathdb.lib.container.jaxrs.config.DbOptions
 import org.veupathdb.lib.container.jaxrs.config.DbOptionsImpl
 import org.veupathdb.lib.container.jaxrs.config.Options
-import java.lang.IllegalStateException
 import java.util.Optional
 import vdi.lib.config.StackConfig
 import vdi.lib.config.common.DatabaseConnectionConfig
@@ -15,6 +14,8 @@ class ServiceConfig(config: StackConfig) : Options() {
   private val coreConfig = config.core
 
   val uploads = UploadConfig(config.vdi.restService)
+
+  val enableTrace = config.vdi.restService?.enableJerseyTrace ?: false
 
   val projects = config.vdi.installTargets
     .map { it.targetName }

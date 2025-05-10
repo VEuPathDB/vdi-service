@@ -4,9 +4,9 @@ import io.foxcapades.kdbc.setUByte
 import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
+import java.sql.Connection
 import vdi.lib.db.jdbc.setDatasetID
 import vdi.lib.db.jdbc.setDateTime
-import java.sql.Connection
 
 // language=postgresql
 private const val SQL = """

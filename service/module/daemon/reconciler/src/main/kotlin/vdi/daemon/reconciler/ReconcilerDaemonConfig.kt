@@ -3,7 +3,6 @@ package vdi.daemon.reconciler
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import vdi.lib.config.loadAndCacheStackConfig
 import vdi.lib.config.vdi.daemons.ReconcilerConfig
 
 data class ReconcilerDaemonConfig(

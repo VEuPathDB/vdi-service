@@ -19,7 +19,7 @@ fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: Dataset
   val cacheDB = CacheDB()
 
   val dataset = cacheDB.selectDataset(datasetID)
-    ?: Static404.wrap()
+    ?: return Static404.wrap()
 
   if (dataset.isDeleted)
     return ForbiddenError("cannot update metadata on a deleted dataset").wrap()

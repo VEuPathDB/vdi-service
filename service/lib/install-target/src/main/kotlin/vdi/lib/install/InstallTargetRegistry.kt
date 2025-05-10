@@ -5,6 +5,7 @@ import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
 import org.veupathdb.vdi.lib.common.field.DataType
 import vdi.lib.config.loadAndCacheStackConfig
+import vdi.lib.err.StartupException
 
 object InstallTargetRegistry {
   private val registry = HashMap<String, InstallTarget>(20)
@@ -15,11 +16,14 @@ object InstallTargetRegistry {
 
     loadAndCacheStackConfig().vdi.installTargets.forEach {
       val schema = uniqueSchemata.computeIfAbsent(it.datasetPropertySchema.hashCode()) { _ ->
-        schemaFactory.getSchema(it.datasetPropertySchema.resolve())
+        schemaFactory.getSchema(it.datasetPropertySchema.resolve().apply {
+          // remove invalid JSON Schema keyword used for YAML anchors
+          remove("sharedDefinitions")
+        })
       }
 
       if (it.targetName in registry)
-        throw IllegalStateException("multiple install targets configured with the name ${it.targetName}")
+        throw StartupException("multiple install targets configured with the name ${it.targetName}")
 
       registry[it.targetName] = InstallTarget(
         it.enabled,

@@ -11,14 +11,14 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
-import vdi.lib.plugin.client.response.imp.*
-import vdi.lib.plugin.client.response.ind.*
-import vdi.lib.plugin.client.response.inm.*
-import vdi.lib.plugin.client.response.uni.*
 import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import vdi.lib.plugin.client.response.imp.*
+import vdi.lib.plugin.client.response.ind.*
+import vdi.lib.plugin.client.response.inm.*
+import vdi.lib.plugin.client.response.uni.*
 
 private const val JsonContentType = "application/json; charset=utf-8"
 

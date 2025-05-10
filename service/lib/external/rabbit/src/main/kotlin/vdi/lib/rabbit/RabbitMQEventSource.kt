@@ -4,11 +4,11 @@ import com.rabbitmq.client.Channel
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.util.HostAddress
-import vdi.lib.async.SuspendingSequence
-import vdi.lib.metrics.Metrics
-import vdi.lib.health.RemoteDependencies
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import vdi.lib.async.SuspendingSequence
+import vdi.lib.health.RemoteDependencies
+import vdi.lib.metrics.Metrics
 
 private const val MaxConnectionRetries = 5
 private val RetryDelay = 1.seconds

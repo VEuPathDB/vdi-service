@@ -20,8 +20,8 @@ import org.veupathdb.lib.s3.s34k.params.`object`.ObjectExistsParams
 import org.veupathdb.lib.s3.s34k.params.`object`.ObjectStatParams
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
-import vdi.lib.s3.DatasetObjectStore
 import java.time.OffsetDateTime
+import vdi.lib.s3.DatasetObjectStore
 
 class DatasetObjectStoreTest {
   private val TestUserID1 = UserID("111")

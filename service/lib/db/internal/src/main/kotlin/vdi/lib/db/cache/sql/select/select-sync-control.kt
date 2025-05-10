@@ -3,10 +3,10 @@ package vdi.lib.db.cache.sql.select
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import java.sql.Connection
 import vdi.lib.db.jdbc.getDateTime
 import vdi.lib.db.jdbc.setDatasetID
 import vdi.lib.db.model.SyncControlRecord
-import java.sql.Connection
 
 // language=postgresql
 private const val SQL = """

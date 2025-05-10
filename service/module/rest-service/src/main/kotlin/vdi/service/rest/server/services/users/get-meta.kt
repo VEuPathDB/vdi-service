@@ -1,13 +1,13 @@
 package vdi.service.rest.server.services.users
 
 import org.veupathdb.vdi.lib.common.field.UserID
+import vdi.lib.db.cache.CacheDB
+import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.UserMetadata
 import vdi.service.rest.generated.model.UserMetadataImpl
 import vdi.service.rest.generated.model.UserQuotaDetails
 import vdi.service.rest.generated.model.UserQuotaDetailsImpl
 import vdi.service.rest.s3.DatasetStore
-import vdi.lib.db.cache.CacheDB
-import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.server.controllers.ControllerBase
 
 fun <T: ControllerBase> T.getUserMetadata(uploadConfig: UploadConfig): UserMetadata =

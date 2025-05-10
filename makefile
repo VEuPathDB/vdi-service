@@ -181,6 +181,13 @@ logs:
 log-service:
 	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) service
 
+# Prints and tails the internal database container log output.
+#
+# Log following may be disabled by setting LOG_FLAGS to an empty string.
+.PHONY: log-database
+log-database:
+	@$(CONTAINER_CMD) compose $(MERGED_COMPOSE_FLAGS) logs $(LOG_FLAGS) cache-db
+
 # Prints and tails the example plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.

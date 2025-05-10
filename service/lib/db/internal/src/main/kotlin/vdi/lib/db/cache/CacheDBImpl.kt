@@ -3,19 +3,18 @@ package vdi.lib.db.cache
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.slf4j.LoggerFactory
-import org.veupathdb.vdi.lib.common.env.optUByte
-import org.veupathdb.vdi.lib.common.env.optUShort
-import org.veupathdb.vdi.lib.common.env.require
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import javax.sql.DataSource
+import vdi.lib.config.loadAndCacheStackConfig
 import vdi.lib.db.cache.health.DatabaseDependency
 import vdi.lib.db.cache.model.BrokenImportListQuery
 import vdi.lib.db.cache.model.DatasetListQuery
 import vdi.lib.db.cache.query.AdminAllDatasetsQuery
 import vdi.lib.db.cache.sql.select.*
-import vdi.lib.env.EnvKey
+import vdi.lib.err.StartupException
+import vdi.lib.health.Dependency
 import vdi.lib.health.RemoteDependencies
-import javax.sql.DataSource
 import org.postgresql.Driver as PostgresDriver
 
 internal object CacheDBImpl: CacheDB {
@@ -30,30 +29,29 @@ internal object CacheDBImpl: CacheDB {
     get() = dataSource.connection
 
   init {
-    val env = System.getenv()
+    dataSource = loadAndCacheStackConfig().vdi.cacheDB.let {
+      log.info("initializing datasource for cache-db")
 
-    val host     = env.require(EnvKey.CacheDB.Host)
-    val port     = env.optUShort(EnvKey.CacheDB.Port) ?: CacheDBConfigDefaults.Port
-    val name     = env.require(EnvKey.CacheDB.Name)
-    val username = env.require(EnvKey.CacheDB.Username)
-    val password = env.require(EnvKey.CacheDB.Password)
-    val poolSize = env.optUByte(EnvKey.CacheDB.PoolSize) ?: CacheDBConfigDefaults.PoolSize
+      details = CacheDBConnectionDetails(it)
 
-    log.info("initializing datasource for cache-db")
+      HikariConfig()
+        .apply {
+          jdbcUrl  = makeJDBCPostgresConnectionString(details.host, details.port, details.name)
+          username = it.username
+          password = it.password.unwrap()
+          maximumPoolSize = it.poolSize?.toInt() ?: 5
+          driverClassName = PostgresDriver::class.java.name
+        }
+        .let(::HikariDataSource)
+    }
 
-    val config = HikariConfig()
-      .also {
-        it.jdbcUrl = makeJDBCPostgresConnectionString(host, port, name)
-        it.username = username
-        it.password = password
-        it.maximumPoolSize = poolSize.toInt()
-        it.driverClassName = PostgresDriver::class.java.name
+    RemoteDependencies.register(DatabaseDependency(this).also {
+      when (it.checkStatus()) {
+        Dependency.Status.NotOk,
+        Dependency.Status.Unknown -> throw StartupException("could not connect to cache db")
+        else -> {}
       }
-
-    dataSource = HikariDataSource(config)
-    details    = CacheDBConnectionDetails(host, port, name)
-
-    RemoteDependencies.register(DatabaseDependency(this))
+    })
   }
 
   override fun selectDataset(datasetID: DatasetID) =
@@ -149,5 +147,6 @@ internal object CacheDBImpl: CacheDB {
 
   private fun makeJDBCPostgresConnectionString(host: String, port: UShort, name: String) =
     "jdbc:postgresql://$host:$port/$name"
+
 }
 

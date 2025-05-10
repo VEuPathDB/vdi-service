@@ -2,10 +2,10 @@ package vdi.lib.db.app.sql.dataset_install_message
 
 import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
 import vdi.lib.db.app.model.InstallType
 import vdi.lib.db.app.sql.setInstallType
+import vdi.lib.db.jdbc.setDatasetID
 
 private fun bulkSQL(schema: String) =
 // language=oracle

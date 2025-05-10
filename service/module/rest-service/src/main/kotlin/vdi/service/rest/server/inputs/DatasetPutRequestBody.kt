@@ -3,11 +3,11 @@ package vdi.service.rest.server.inputs
 import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.reqCheckLength
+import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.DatasetPutMetadata
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.model.JsonField
-import org.veupathdb.vdi.lib.common.field.ProjectID
 
 
 fun DatasetPutRequestBody.cleanup() {

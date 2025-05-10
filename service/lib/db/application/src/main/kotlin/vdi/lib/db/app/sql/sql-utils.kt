@@ -1,10 +1,10 @@
 package vdi.lib.db.app.sql
 
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import vdi.lib.db.app.model.DeleteFlag
 import vdi.lib.db.app.model.InstallStatus
 import vdi.lib.db.app.model.InstallType
-import java.sql.PreparedStatement
-import java.sql.ResultSet
 
 internal fun PreparedStatement.setDeleteFlag(index: Int, deleteFlag: DeleteFlag) = setInt(index, deleteFlag.value)
 

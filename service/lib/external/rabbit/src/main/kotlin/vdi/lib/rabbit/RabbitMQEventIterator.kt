@@ -3,10 +3,10 @@ package vdi.lib.rabbit
 import com.rabbitmq.client.Channel
 import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
+import kotlin.time.Duration
 import vdi.lib.async.SuspendingIterator
 import vdi.lib.async.Trigger
 import vdi.lib.metrics.Metrics
-import kotlin.time.Duration
 
 private const val MAX_LOGGABLE_MESSAGE_SIZE_BYTES = 1024 * 16
 

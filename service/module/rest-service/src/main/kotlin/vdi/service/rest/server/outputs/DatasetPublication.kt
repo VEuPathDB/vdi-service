@@ -1,8 +1,7 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.rest.generated.model.DatasetPublication
-import vdi.service.rest.generated.model.DatasetPublicationImpl
 import org.veupathdb.vdi.lib.common.model.VDIDatasetPublication
+import vdi.service.rest.generated.model.DatasetPublication
 
 
 internal fun VDIDatasetPublication.toExternal(): DatasetPublication =

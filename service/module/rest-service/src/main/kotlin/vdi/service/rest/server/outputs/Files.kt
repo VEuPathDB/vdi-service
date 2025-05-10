@@ -1,10 +1,8 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.rest.generated.model.DatasetFileDetails
-import vdi.service.rest.generated.model.DatasetFileDetailsImpl
-import vdi.service.rest.generated.model.DatasetZipDetails
-import vdi.service.rest.generated.model.DatasetZipDetailsImpl
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
+import vdi.service.rest.generated.model.DatasetFileDetails
+import vdi.service.rest.generated.model.DatasetZipDetails
 
 fun DatasetZipDetails(zipSize: Long, files: List<VDIDatasetFileInfo>): DatasetZipDetails =
   vdi.service.rest.generated.model.DatasetZipDetailsImpl().also {

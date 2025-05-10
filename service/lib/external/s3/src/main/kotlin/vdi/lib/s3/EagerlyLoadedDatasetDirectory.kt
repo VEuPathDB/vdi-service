@@ -8,11 +8,11 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
+import java.io.InputStream
 import vdi.lib.s3.exception.MalformedDatasetException
 import vdi.lib.s3.files.*
 import vdi.lib.s3.paths.S3DatasetPathFactory
 import vdi.lib.s3.paths.S3File
-import java.io.InputStream
 import vdi.lib.s3.paths.S3File.Companion.resembles
 
 /**

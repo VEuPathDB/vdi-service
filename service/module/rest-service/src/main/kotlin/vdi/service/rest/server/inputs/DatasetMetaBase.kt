@@ -1,16 +1,8 @@
 package vdi.service.rest.server.inputs
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.networknt.schema.ExecutionContext
 import com.networknt.schema.JsonSchema
-import com.networknt.schema.ValidationMessage
-import com.networknt.schema.ValidatorTypeCode
 import org.veupathdb.lib.request.validation.ValidationErrors
-import org.veupathdb.lib.request.validation.messageIndex
 import org.veupathdb.lib.request.validation.rangeTo
-import org.veupathdb.vdi.lib.json.JSON
 import vdi.lib.install.InstallTargetRegistry
 import vdi.service.rest.generated.model.*
 

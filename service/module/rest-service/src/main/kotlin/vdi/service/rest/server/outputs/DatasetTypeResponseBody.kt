@@ -1,11 +1,11 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.rest.generated.model.DatasetTypeOutput
-import vdi.service.rest.generated.model.DatasetTypeOutputImpl
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
 import vdi.lib.db.cache.model.DatasetRecord
 import vdi.lib.plugin.registry.PluginRegistry
+import vdi.service.rest.generated.model.DatasetTypeOutput
+import vdi.service.rest.generated.model.DatasetTypeOutputImpl
 
 
 internal fun DatasetTypeOutput(rec: DatasetRecord, typeName: String): DatasetTypeOutput =

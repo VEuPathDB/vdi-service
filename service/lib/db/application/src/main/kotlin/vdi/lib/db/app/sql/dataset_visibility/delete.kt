@@ -3,9 +3,9 @@ package vdi.lib.db.app.sql.dataset_visibility
 import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import java.sql.Connection
 import vdi.lib.db.jdbc.setDatasetID
 import vdi.lib.db.jdbc.setUserID
-import java.sql.Connection
 
 private fun sql(schema: String) =
 // language=oracle

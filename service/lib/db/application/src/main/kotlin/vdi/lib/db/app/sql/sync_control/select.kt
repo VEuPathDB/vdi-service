@@ -4,9 +4,9 @@ import io.foxcapades.kdbc.get
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import java.sql.Connection
 import vdi.lib.db.jdbc.setDatasetID
 import vdi.lib.db.model.SyncControlRecord
-import java.sql.Connection
 
 private fun sql(schema: String) =
 // language=oracle

@@ -9,7 +9,6 @@ import com.networknt.schema.SpecVersion
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.json.JSON
 import org.yaml.snakeyaml.Yaml
-import java.lang.IllegalStateException
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.readText

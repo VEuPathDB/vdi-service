@@ -3,19 +3,15 @@ package vdi.lib.db.cache.sql.select
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import java.sql.Connection
 import vdi.lib.db.cache.model.AdminDatasetDetailsRecord
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.util.getDatasetVisibility
 import vdi.lib.db.cache.util.getImportStatus
 import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.cache.util.getStringList
-import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.reqDatasetID
-import vdi.lib.db.jdbc.getDateTime
-import vdi.lib.db.jdbc.getUserID
+import vdi.lib.db.jdbc.*
 import vdi.lib.db.model.SyncControlRecord
-import java.sql.Connection
-import vdi.lib.db.jdbc.optDatasetID
 
 // language=postgresql
 private const val SQL_BASE = """

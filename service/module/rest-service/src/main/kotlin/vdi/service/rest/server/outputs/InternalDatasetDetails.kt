@@ -1,7 +1,7 @@
 package vdi.service.rest.server.outputs
 
-import vdi.service.rest.generated.model.InternalDatasetDetails
 import vdi.lib.db.cache.model.AdminDatasetDetailsRecord
+import vdi.service.rest.generated.model.InternalDatasetDetails
 
 internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): InternalDatasetDetails =
   vdi.service.rest.generated.model.InternalDatasetDetailsImpl().also {

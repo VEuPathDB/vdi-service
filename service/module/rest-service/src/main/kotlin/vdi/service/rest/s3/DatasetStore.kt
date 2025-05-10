@@ -14,10 +14,10 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetShareOffer
 import org.veupathdb.vdi.lib.common.model.VDIDatasetShareReceipt
 import org.veupathdb.vdi.lib.json.JSON
 import org.veupathdb.vdi.lib.json.toJSONString
-import vdi.lib.s3.paths.S3Paths
 import java.io.InputStream
 import vdi.lib.config.vdi.ObjectStoreConfig
 import vdi.lib.s3.paths.S3File
+import vdi.lib.s3.paths.S3Paths
 import vdi.lib.s3.util.S3Config
 
 object DatasetStore {

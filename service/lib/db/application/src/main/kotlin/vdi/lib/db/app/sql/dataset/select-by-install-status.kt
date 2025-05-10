@@ -4,6 +4,7 @@ import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import java.sql.Connection
 import vdi.lib.db.app.model.DatasetRecord
 import vdi.lib.db.app.model.InstallStatus
 import vdi.lib.db.app.model.InstallType
@@ -11,9 +12,8 @@ import vdi.lib.db.app.sql.getDeleteFlag
 import vdi.lib.db.app.sql.setInstallStatus
 import vdi.lib.db.app.sql.setInstallType
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getUserID
-import java.sql.Connection
+import vdi.lib.db.jdbc.reqDatasetID
 
 private fun sql(schema: String) =
 // language=oracle

@@ -17,7 +17,12 @@
       "type": "integer",
       "minimum": 1073741824,
       "default": 10737418240
+    },
+    "enableJerseyTrace": {
+      "title": "Enable Trace Response Headers",
+      "type": "boolean",
+      "default": false
     }
   },
-  "additionalProperties": false
+  "unevaluatedProperties": false
 }

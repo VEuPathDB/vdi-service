@@ -15,7 +15,7 @@ object ConfigSchemaCompiler {
   private lateinit var json: ObjectMapper
 
   fun init(task: Task, project: Project) {
-    val inputDir = project.file("schema/config/")
+    val inputDir = project.file("config/")
 
     rootSchema = inputDir.resolve("stack-config.json").toPath()
     outputFile = project.layout.buildDirectory.asFile.get().resolve("json-schema/schema/config/full-config.json")

@@ -5,8 +5,8 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
-import vdi.lib.db.model.SyncControlRecord
 import java.time.OffsetDateTime
+import vdi.lib.db.model.SyncControlRecord
 
 data class AdminDatasetDetailsRecord(
   override val datasetID: DatasetID,

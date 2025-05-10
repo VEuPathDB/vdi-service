@@ -22,7 +22,8 @@ description: |
   be used or the other.  Providing both fields will result in a 4xx range error
   response.
 
-body: lib.DatasetPostRequestBody
+body:
+  multipart/form-data: lib.DatasetPostRequestBody
 
 responses:
   201:

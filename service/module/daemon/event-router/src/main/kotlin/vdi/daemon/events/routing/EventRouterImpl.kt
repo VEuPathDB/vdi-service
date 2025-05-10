@@ -8,19 +8,20 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
+import vdi.daemon.events.routing.model.MinIOEvent
+import vdi.daemon.events.routing.model.MinIOEventAction
+import vdi.lib.discardException
 import vdi.lib.kafka.EventSource
 import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.kafka.router.KafkaRouterFactory
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
+import vdi.lib.orElse
 import vdi.lib.rabbit.RabbitMQEventIterator
 import vdi.lib.rabbit.RabbitMQEventSource
 import vdi.lib.s3.paths.DatasetShareFilePath
-import vdi.lib.s3.paths.toDatasetPathOrNull
-import vdi.daemon.events.routing.model.MinIOEvent
-import vdi.daemon.events.routing.model.MinIOEventAction
-import vdi.lib.orElse
 import vdi.lib.s3.paths.S3File
+import vdi.lib.s3.paths.toDatasetPathOrNull
 
 internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: AbortCB)
   : EventRouter
@@ -36,7 +37,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
       triggerShutdown()
       confirmShutdown()
       log.error("failed to create a RabbitMQEventSource", e)
-      throw e
+      abortCB(e.message)
     }
   }
 
@@ -47,7 +48,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
       triggerShutdown()
       confirmShutdown()
       log.error("failed to create a KafkaRouterFactory", e)
-      throw e
+      abortCB(e.message)
     }
   }
 
@@ -64,8 +65,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
   }
 
   override suspend fun onShutdown() {
-    es.close()
-    kr.close()
+    discardException(es::close)
+    discardException(kr::close)
   }
 
   private suspend fun runRouter(stream: RabbitMQEventIterator<MinIOEvent>) {
@@ -155,7 +156,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
     } catch (e: Throwable) {
       triggerShutdown()
       log.error("failed to send event message to Kafka", e)
-      throw e
+      abortCB(e.message)
     }
   }
 

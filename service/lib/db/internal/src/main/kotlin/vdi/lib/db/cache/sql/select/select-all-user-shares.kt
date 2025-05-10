@@ -5,14 +5,14 @@ import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIShareReceiptAction
+import java.sql.Connection
 import vdi.lib.db.cache.consts.OfferStatus
 import vdi.lib.db.cache.model.DatasetShareListEntry
 import vdi.lib.db.cache.util.getProjectIDList
 import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.getUserID
+import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.setUserID
-import java.sql.Connection
 
 // language=postgresql
 private const val SQL = """

@@ -2,10 +2,10 @@ package vdi.lib.db.app.sql.dataset
 
 import io.foxcapades.kdbc.withPreparedUpdate
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import java.sql.Connection
 import vdi.lib.db.app.model.DeleteFlag
 import vdi.lib.db.app.sql.setDeleteFlag
 import vdi.lib.db.jdbc.setDatasetID
-import java.sql.Connection
 
 private fun sql(schema: String) =
 // language=oracle

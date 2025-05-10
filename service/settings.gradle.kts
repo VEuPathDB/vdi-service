@@ -46,6 +46,7 @@ buildscript {
 }
 
 include(":bootstrap")
+include(":schema")
 
 include(":lib:async")
 include(":lib:common")
@@ -66,7 +67,7 @@ include(":lib:plugin:client")
 include(":lib:plugin:registry")
 include(":lib:test-utils")
 
-include(":module:rest-service")
+include(":module:await-dependencies")
 include(":module:daemon:event-router")
 include(":module:daemon:pruner")
 include(":module:daemon:reconciler")
@@ -77,3 +78,4 @@ include(":module:lane:reconciliation")
 include(":module:lane:sharing")
 include(":module:lane:soft-delete")
 include(":module:lane:update-meta")
+include(":module:rest-service")

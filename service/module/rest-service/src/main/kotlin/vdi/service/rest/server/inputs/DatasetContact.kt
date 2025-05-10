@@ -1,9 +1,9 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
+import org.veupathdb.vdi.lib.common.model.VDIDatasetContact
 import vdi.service.rest.generated.model.DatasetContact
 import vdi.service.rest.generated.model.JsonField
-import org.veupathdb.vdi.lib.common.model.VDIDatasetContact
 
 private const val NameMinLength = 3
 private const val NameMaxLength = 300

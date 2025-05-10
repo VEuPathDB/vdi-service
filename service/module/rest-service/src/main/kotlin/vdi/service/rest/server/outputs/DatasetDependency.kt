@@ -1,8 +1,8 @@
 package vdi.service.rest.server.outputs
 
+import org.veupathdb.vdi.lib.common.model.VDIDatasetDependency
 import vdi.service.rest.generated.model.DatasetDependency
 import vdi.service.rest.generated.model.DatasetDependencyImpl
-import org.veupathdb.vdi.lib.common.model.VDIDatasetDependency
 
 internal fun DatasetDependency(
   resourceIdentifier: String,

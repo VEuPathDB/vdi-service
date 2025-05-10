@@ -4,11 +4,11 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
+import java.io.InputStream
 import vdi.lib.plugin.client.response.imp.ImportResponse
 import vdi.lib.plugin.client.response.ind.InstallDataResponse
 import vdi.lib.plugin.client.response.inm.InstallMetaResponse
 import vdi.lib.plugin.client.response.uni.UninstallResponse
-import java.io.InputStream
 
 interface PluginHandlerClient {
 

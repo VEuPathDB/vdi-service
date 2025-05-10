@@ -5,10 +5,9 @@ import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.veupathdb.vdi.lib.common.util.HostAddress
-import vdi.lib.health.RemoteDependencies
-import java.util.*
-import kotlin.collections.HashSet
+import java.util.Properties
 import kotlin.time.Duration.Companion.seconds
+import vdi.lib.health.RemoteDependencies
 import org.apache.kafka.clients.consumer.KafkaConsumer as KConsumer
 import org.apache.kafka.clients.producer.KafkaProducer as KProducer
 
@@ -30,9 +29,9 @@ fun KafkaConsumer(topic: MessageTopic, config: KafkaConsumerConfig): KafkaConsum
     .apply {
       setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.servers.joinToString(",") { it.toString() })
       setProperty(ConsumerConfig.CLIENT_ID_CONFIG, config.clientID)
+      setProperty(ConsumerConfig.GROUP_ID_CONFIG, config.groupID)
 
       // Optional
-      config.groupID?.also { setProperty(ConsumerConfig.GROUP_ID_CONFIG, it) }
       config.fetchMinBytes?.also { setProperty(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, it.toString()) }
       config.heartbeatInterval?.inWholeMilliseconds?.also { setProperty(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, it.toString()) }
       config.sessionTimeout?.inWholeMilliseconds?.also { setProperty(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, it.toString()) }

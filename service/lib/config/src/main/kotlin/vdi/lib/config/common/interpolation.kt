@@ -1,8 +1,6 @@
 @file:JvmName("Interpolator")
 package vdi.lib.config.common
 
-import java.lang.StringBuilder
-
 private val pattern = Regex("\\$\\{(?i:env):(\\w+)(?::-([^}\$]+))?}")
 
 fun String.interpolateFrom(env: Map<String, String>): String {

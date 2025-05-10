@@ -5,12 +5,12 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
 import org.veupathdb.vdi.lib.common.util.HostAddress
-import vdi.lib.s3.paths.S3DatasetPathFactory
-import vdi.lib.health.RemoteDependencies
 import java.util.Spliterator
 import java.util.Spliterators
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
+import vdi.lib.health.RemoteDependencies
+import vdi.lib.s3.paths.S3DatasetPathFactory
 import vdi.lib.s3.paths.S3Paths
 
 internal class DatasetObjectStoreImpl(private val s3Bucket: S3Bucket) : DatasetObjectStore {

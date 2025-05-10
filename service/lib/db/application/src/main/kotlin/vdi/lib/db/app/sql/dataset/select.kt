@@ -3,13 +3,13 @@ package vdi.lib.db.app.sql.dataset
 import io.foxcapades.kdbc.usingResults
 import io.foxcapades.kdbc.withPreparedStatement
 import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.lib.db.app.model.DatasetRecord
-import vdi.lib.db.app.sql.*
-import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.reqDatasetID
-import vdi.lib.db.jdbc.getUserID
-import vdi.lib.db.jdbc.setDatasetID
 import java.sql.Connection
+import vdi.lib.db.app.model.DatasetRecord
+import vdi.lib.db.app.sql.getDeleteFlag
+import vdi.lib.db.jdbc.getDataType
+import vdi.lib.db.jdbc.getUserID
+import vdi.lib.db.jdbc.reqDatasetID
+import vdi.lib.db.jdbc.setDatasetID
 
 private fun sql(schema: String) =
 // language=oracle

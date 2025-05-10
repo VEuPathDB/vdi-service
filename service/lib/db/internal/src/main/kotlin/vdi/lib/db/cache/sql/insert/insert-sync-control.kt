@@ -1,10 +1,10 @@
 package vdi.lib.db.cache.sql.insert
 
 import io.foxcapades.kdbc.withPreparedUpdate
+import java.sql.Connection
 import vdi.lib.db.jdbc.setDatasetID
 import vdi.lib.db.jdbc.setDateTime
 import vdi.lib.db.model.SyncControlRecord
-import java.sql.Connection
 
 // language=postgresql
 private const val SQL = """

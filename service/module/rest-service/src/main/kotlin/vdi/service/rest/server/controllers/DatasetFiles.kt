@@ -4,18 +4,16 @@ import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
+import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.*
-import vdi.service.rest.generated.resources.VdiDatasetsVdiIdFiles
 import vdi.service.rest.server.services.dataset.*
-import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.service.rest.util.fold
 import vdi.service.rest.util.mapLeft
 
 @Authenticated(adminOverride = ALLOW_ALWAYS)
 class DatasetFiles(@Context request: ContainerRequest)
   : DatasetsVdiIdFiles
-  , VdiDatasetsVdiIdFiles // DEPRECATED API
   , ControllerBase(request)
 {
   override fun getDatasetsFilesByVdiId(rawID: String): GetDatasetsFilesByVdiIdResponse =
@@ -56,16 +54,4 @@ class DatasetFiles(@Context request: ContainerRequest)
           )
       }
       .fold()
-
-  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasetsFilesByVdiId(vdiId)"))
-  override fun getVdiDatasetsFilesByVdiId(vdiId: String) =
-    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesByVdiIdResponse(getDatasetsFilesByVdiId(vdiId))
-
-  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasetsFilesUploadByVdiId(vdiId)"))
-  override fun getVdiDatasetsFilesUploadByVdiId(vdiId: String) =
-    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesUploadByVdiIdResponse(getDatasetsFilesUploadByVdiId(vdiId))
-
-  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasetsFilesDataByVdiId(vdiId)"))
-  override fun getVdiDatasetsFilesDataByVdiId(vdiId: String) =
-    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesDataByVdiIdResponse(getDatasetsFilesDataByVdiId(vdiId))
 }

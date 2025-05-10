@@ -2,9 +2,9 @@ package vdi.lib.s3.files
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object
-import vdi.lib.s3.paths.S3File
 import java.io.InputStream
 import java.time.OffsetDateTime
+import vdi.lib.s3.paths.S3File
 
 internal class DatasetImportableFileImpl(
   path: String,

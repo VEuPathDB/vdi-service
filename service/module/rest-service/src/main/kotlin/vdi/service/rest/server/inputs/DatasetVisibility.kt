@@ -1,7 +1,7 @@
 package vdi.service.rest.server.inputs
 
-import vdi.service.rest.generated.model.DatasetVisibility
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
+import vdi.service.rest.generated.model.DatasetVisibility
 
 fun DatasetVisibility.toInternal() = when (this) {
   DatasetVisibility.PRIVATE    -> VDIDatasetVisibility.Private

@@ -1,7 +1,6 @@
 package vdi.service.rest.server.services.shares
 
 import jakarta.ws.rs.BadRequestException
-import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -14,7 +13,6 @@ import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.model.DatasetShareOfferImpl
 import vdi.lib.db.cache.model.DatasetShareReceiptImpl
 import vdi.lib.db.cache.withTransaction
-import vdi.lib.logging.logger
 import vdi.service.rest.generated.model.DatasetShareOffer
 import vdi.service.rest.generated.model.ShareOfferAction
 import vdi.service.rest.s3.DatasetStore

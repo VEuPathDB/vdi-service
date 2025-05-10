@@ -1,14 +1,16 @@
 package vdi.service.rest.server.controllers
 
-import jakarta.inject.Inject
 import jakarta.ws.rs.core.Context
 import kotlinx.coroutines.runBlocking
 import org.glassfish.jersey.server.ContainerRequest
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
+import org.veupathdb.vdi.lib.common.field.DatasetID
+import vdi.lib.db.cache.model.DatasetListQuery
+import vdi.lib.db.cache.model.DatasetOwnershipFilter
+import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.resources.Datasets
-import vdi.service.rest.generated.resources.VdiDatasets
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.BadRequestError
@@ -16,15 +18,10 @@ import vdi.service.rest.server.outputs.DatasetPostResponseBody
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.services.dataset.createDataset
 import vdi.service.rest.server.services.dataset.fetchUserDatasetList
-import org.veupathdb.vdi.lib.common.field.DatasetID
-import vdi.lib.db.cache.model.DatasetListQuery
-import vdi.lib.db.cache.model.DatasetOwnershipFilter
-import vdi.service.rest.config.UploadConfig
 
 @Authenticated(allowGuests = false)
-class DatasetList(@Context request: ContainerRequest, @Inject val uploadConfig: UploadConfig)
+class DatasetList(@Context request: ContainerRequest, @Context val uploadConfig: UploadConfig)
   : Datasets
-  , VdiDatasets // DEPRECATED API
   , ControllerBase(request)
 {
   private val log = LoggerFactory.getLogger(javaClass)
@@ -66,13 +63,5 @@ class DatasetList(@Context request: ContainerRequest, @Inject val uploadConfig: 
           .withLocation(request.absolutePath.toString().replaceAfterLast('/', datasetID.toString()))
       )
   }
-
-  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("getDatasets(projectId, ownership)"))
-  override fun getVdiDatasets(projectId: String?, ownership: String?) =
-    VdiDatasets.GetVdiDatasetsResponse(getDatasets(projectId, ownership))
-
-  @Deprecated("to be removed with API refactor", replaceWith = ReplaceWith("postDatasets(entity)"))
-  override fun postVdiDatasets(entity: DatasetPostRequestBody?) =
-    VdiDatasets.PostVdiDatasetsResponse(postDatasets(entity))
 }
 

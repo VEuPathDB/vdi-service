@@ -6,6 +6,8 @@ import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 import vdi.lib.db.app.AppDB
 import vdi.lib.db.app.AppDatabaseRegistry
 import vdi.lib.db.app.model.DeleteFlag
@@ -14,13 +16,11 @@ import vdi.lib.db.app.withTransaction
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.purgeDataset
 import vdi.lib.db.cache.withTransaction
+import vdi.lib.logging.logger
+import vdi.lib.metrics.Metrics
 import vdi.lib.s3.DatasetDirectory
 import vdi.lib.s3.DatasetObjectStore
 import vdi.lib.s3.paths.S3File
-import vdi.lib.logging.logger
-import vdi.lib.metrics.Metrics
-import java.time.OffsetDateTime
-import java.time.temporal.ChronoUnit
 import vdi.lib.s3.paths.S3Paths
 
 /**

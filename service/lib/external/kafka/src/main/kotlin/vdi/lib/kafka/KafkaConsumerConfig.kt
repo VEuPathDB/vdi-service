@@ -14,7 +14,7 @@ data class KafkaConsumerConfig(
   val fetchMinBytes: Int?,
 
   // group.id
-  val groupID: String?,
+  val groupID: String,
 
   // heartbeat.interval.ms
   val heartbeatInterval: Duration?,
@@ -84,7 +84,7 @@ data class KafkaConsumerConfig(
     servers                 = servers,
     clientID                = clientID,
     fetchMinBytes           = conf?.fetchMinBytes,
-    groupID                 = conf?.groupId,
+    groupID                 = conf?.groupId ?: DefaultGroupID,
     heartbeatInterval       = conf?.heartbeatInterval,
     sessionTimeout          = conf?.sessionTimeout,
     autoOffsetReset         = conf?.autoOffsetReset?.let(KafkaOffsetType::fromString),
@@ -104,5 +104,9 @@ data class KafkaConsumerConfig(
     retryBackoffTime        = conf?.retryBackoffTime,
     pollDuration            = conf?.pollDuration,
   )
+
+  private companion object {
+    inline val DefaultGroupID get() = "vdi-kafka-listeners"
+  }
 }
 

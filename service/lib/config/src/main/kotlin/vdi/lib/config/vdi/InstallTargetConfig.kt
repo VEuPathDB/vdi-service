@@ -1,8 +1,10 @@
 package vdi.lib.config.vdi
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import vdi.lib.config.common.DatabaseConnectionConfig
 
+@JsonDeserialize(using = InstallTargetConfigDeserializer::class)
 data class InstallTargetConfig(
   val enabled: Boolean = true,
 
@@ -20,4 +22,3 @@ data class InstallTargetConfig(
 
   val datasetPropertySchema: DatasetPropertySchema = NullPropertySchema,
 )
-

@@ -1,9 +1,6 @@
 package vdi.service.rest.server.controllers
 
-import jakarta.inject.Inject
 import jakarta.ws.rs.core.Context
-import vdi.lib.install.cleanup.InstallCleaner
-import vdi.lib.install.cleanup.ReinstallTarget
 import kotlinx.coroutines.runBlocking
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
@@ -12,12 +9,13 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.toUserID
-import vdi.lib.pruner.Pruner
+import vdi.lib.install.cleanup.InstallCleaner
+import vdi.lib.install.cleanup.ReinstallTarget
 import vdi.lib.install.retry.DatasetReinstaller
+import vdi.lib.pruner.Pruner
 import vdi.lib.reconciler.Reconciler
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetObjectPurgeRequestBody
-import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
 import vdi.service.rest.generated.model.InstallCleanupRequestBody
 import vdi.service.rest.generated.resources.AdminRpc
@@ -35,7 +33,7 @@ import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcInstallsClearFa
 @Authenticated(adminOverride = ALLOW_ALWAYS)
 class AdminRPC(
   @Context request: ContainerRequest,
-  @Inject val uploadConfig: UploadConfig,
+  @Context val uploadConfig: UploadConfig,
 ): AdminRpc, ControllerBase(request) {
 
   override fun postAdminRpcDatasetsProxyUpload(
@@ -82,7 +80,7 @@ class AdminRPC(
     }!!
 
   override fun postAdminRpcInstallsClearFailed(
-    skipRun: Boolean,
+    skipRun: Boolean?,
     entity: InstallCleanupRequestBody?
   ): InstallCleanupResponse {
     if (entity == null)
@@ -94,7 +92,7 @@ class AdminRPC(
       InstallCleaner.cleanTargets(entity.targets.map { ReinstallTarget(DatasetID(it.datasetId), it.projectId) })
     }
 
-    if (!skipRun)
+    if (skipRun != true)
       runBlocking { DatasetReinstaller.tryRun() }
 
     return InstallCleanupResponse.respond204()
