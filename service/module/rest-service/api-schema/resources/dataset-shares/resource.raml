@@ -1,0 +1,73 @@
+#%RAML 1.0 Resource
+
+displayName: Dataset Sharing
+
+uriParameters:
+  vdi-id:
+    type: lib.VdiId
+  recipient-user-id:
+    type: lib.UserId
+
+/offer:
+  displayName: Share Offers
+
+  put:
+    displayName: Offer to Share a Dataset
+    description: |
+      `PUT` a record that is either an offer to share a dataset with another
+      target user, or the revocation of an existing open share offer with a
+      target user.
+    body:
+      application/json:
+        type: lib.DatasetShareOffer
+        examples:
+          grant:
+            displayName: Grant Example
+            value:
+              action: grant
+          revoke:
+            displayName: Revoke Example
+            value:
+              action: revoke
+    responses:
+      204:
+        description: Share offer record was successfully (re)placed.
+      400:
+        body: lib.BadRequestError
+      401:
+        body: lib.UnauthorizedError
+      403:
+        body: lib.ForbiddenError
+      404:
+        body: lib.NotFoundError
+      422:
+        body: lib.UnprocessableEntityError
+      500:
+        body: lib.ServerError
+
+/receipt:
+  displayName: Share Receipts
+
+  put:
+    displayName: Receive a dataset Share
+    description: |
+      `PUT` a receipt of a dataset share offer, marking the share offer as
+      either `accepted` or `rejected`.
+    body:
+      application/json:
+        type: lib.DatasetShareReceipt
+    responses:
+      204:
+        description: Share offer receipt record was successfully created.
+      400:
+        body: lib.BadRequestError
+      401:
+        body: lib.UnauthorizedError
+      403:
+        body: lib.ForbiddenError
+      404:
+        body: lib.NotFoundError
+      422:
+        body: lib.UnprocessableEntityError
+      500:
+        body: lib.ServerError

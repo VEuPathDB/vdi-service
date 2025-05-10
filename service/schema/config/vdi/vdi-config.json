@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/vdi-config.json",
+  "title": "VDI Configuration Schema",
+  "type": "object",
+  "properties": {
+    "cacheDb": {
+      "$ref": "#/$defs/cacheDb"
+    },
+    "restService": {
+      "$ref": "rest-service.json"
+    },
+    "daemons": {
+      "type": "object",
+      "properties": {
+        "eventRouter": {
+          "$ref": "daemons/event-router.json"
+        },
+        "pruner": {
+          "$ref": "daemons/pruner.json"
+        },
+        "reconciler": {
+          "$ref": "daemons/reconciler.json"
+        }
+      },
+      "additionalProperties": false
+    },
+    "kafka": {
+      "$ref": "kafka.json"
+    },
+    "lanes": {
+      "type": "object",
+      "properties": {
+        "hardDelete": {
+          "$ref": "lanes/hard-delete.json"
+        },
+        "import": {
+          "$ref": "lanes/import.json"
+        },
+        "install": {
+          "$ref": "lanes/install.json"
+        },
+        "reconciliation": {
+          "$ref": "lanes/reconciliation.json"
+        },
+        "sharing": {
+          "$ref": "lanes/sharing.json"
+        },
+        "softDelete": {
+          "$ref": "lanes/soft-delete.json"
+        },
+        "updateMeta": {
+          "$ref": "lanes/update-meta.json"
+        }
+      }
+    },
+    "ldap": {
+      "$ref": "../common.json#/$defs/ldap"
+    },
+    "objectStore": {
+      "$ref": "object-store.json"
+    },
+    "plugins": {
+      "type": "array",
+      "items": {
+        "$ref": "plugin.json"
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "unevaluatedItems": false
+    },
+    "rabbit": {
+      "type": "object",
+      "properties": {
+        "global": {
+          "$ref": "rabbitmq.json"
+        }
+      },
+      "required": [
+        "global"
+      ],
+      "additionalProperties": false
+    },
+    "siteBuild": {
+      "type": "string",
+      "examples": [
+        "build-65"
+      ]
+    },
+    "installTargets": {
+      "type": "array",
+      "items": {
+        "$ref": "install-target.json"
+      },
+      "minItems": 1,
+      "unevaluatedItems": false,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "cacheDb",
+    "kafka",
+    "objectStore",
+    "plugins",
+    "rabbit",
+    "siteBuild",
+    "installTargets"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "cacheDb": {
+      "type": "object",
+      "properties": {
+        "server": {
+          "oneOf": [
+            {
+              "$ref": "../common.json#/$defs/hostString"
+            },
+            {
+              "$ref": "../common.json#/$defs/interpolatedValue"
+            },
+            {
+              "$ref": "../common.json#/$defs/hostObject"
+            }
+          ]
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "vdi"
+        },
+        "poolSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 255,
+          "default": 5
+        }
+      },
+      "required": [
+        "server",
+        "username",
+        "password"
+      ]
+    }
+  }
+}

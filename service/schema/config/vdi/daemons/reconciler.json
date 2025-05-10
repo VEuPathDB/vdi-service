@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/daemons/reconciler.json",
+  "title": "Dataset Reconciler Config",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "title": "Enable Automatic Reconciliation",
+      "description": "Whether the reconciler daemon should be active.\nFor developing or running locally against a shared install-target, this should likely be set to `false` to avoid accidentally breaking other developers' test data.",
+      "type": "boolean",
+      "default": true
+    },
+    "fullRunInterval": {
+      "title": "Full Reconciliation Interval",
+      "description": "Interval at which a full synchronization of all dataset install targets will be performed.",
+      "$ref": "../../common.json#/$defs/duration",
+      "default": "6h"
+    },
+    "slimRunInterval": {
+      "title": "Slim Reconciliation Interval",
+      "description": "Interval at which a synchronization of the internal cache database will be executed.  This is needed to accommodate for MinIO lacking the S3 event-on-replication feature.",
+      "$ref": "../../common.json#/$defs/duration",
+      "default": "5m"
+    },
+    "performDeletes": {
+      "title": "Uninstall Missing Datasets",
+      "description": "Whether the reconciler should attempt to uninstall datasets that are absent from the object store.\nWhen testing or running locally against a shared install-target, this should be set to `false` to avoid breaking other developers' test data.",
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "additionalProperties": false
+}

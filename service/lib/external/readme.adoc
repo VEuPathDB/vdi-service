@@ -1,0 +1,10 @@
+= `:lib:external`
+
+VDI-internal utility libraries for communicating with non-database services that
+are external to the VDI stack.
+
+These services include:
+
+* Global RabbitMQ instance
+* MinIO Object Store
+* LDAP Server

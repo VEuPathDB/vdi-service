@@ -1,0 +1,53 @@
+#%RAML 1.0 Library
+
+uses:
+  common: "../../common.raml"
+
+types:
+
+  DatasetListShareUser:
+    displayName: Dataset Listing Share Info
+    additionalProperties: false
+    properties:
+      userId: common.UserId
+      firstName: string
+      lastName: string
+      organization: string
+      accepted: boolean
+
+  DatasetListEntry:
+    displayName: Dataset Listing Item
+    description: Short entry with basic details about a dataset.
+    additionalProperties: false
+    properties:
+      datasetId: common.VdiId
+      owner: common.DatasetOwner
+      datasetType: common.DatasetTypeOutput
+      visibility: common.DatasetVisibility
+      name: common.DatasetName
+      origin: common.DatasetOrigin
+      projectIds:
+        description: |
+          Project IDs for projects the dataset record was submitted to.
+        type: common.ProjectId[]
+        uniqueItems: true
+        minItems: 1
+      status: common.DatasetStatusInfo
+      shares: DatasetListShareUser[]
+      fileCount:
+        description: Number of files uploaded for this dataset.
+        type: integer
+      fileSizeTotal:
+        description: |
+          Sum of the sizes of all the files uploaded for this dataset.
+        type: integer
+        format: int64
+      created: common.DatasetCreationDate
+
+      shortName?: common.DatasetShortName
+      shortAttribution?: common.DatasetShortAttribution
+      category?: common.DatasetCategory
+      summary?: common.DatasetSummary
+      description?: common.DatasetDescription
+      sourceUrl?: common.DatasetSourceUrl
+      originalId?: common.VdiId
