@@ -76,6 +76,7 @@ vdi:
   cacheDb:
     username: ${env:CACHE_DB_USERNAME:-vdi}
     password: ${env:CACHE_DB_PASSWORD}
+    name: ${env:CACHE_DB_NAME:-vdi}
     server: ${env:CACHE_DB_HOST:-cache-db}:${env:CACHE_DB_PORT:-5432}
 
   plugins:
