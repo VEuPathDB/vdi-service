@@ -19,7 +19,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: 'VEuPathDB/tagger'
-        ref: 'production'
+        ref: 'prod'
         token: '${{ secrets.GH_TOKEN }}'
     - name: Get Production Tag
       run: |-
