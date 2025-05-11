@@ -62,7 +62,9 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Build Dev Docs
-      run: make generate-service-docs OUTPUT_DOC_DIR=tmpdocs/dev/
+      run: |-
+        make generate-service-docs OUTPUT_DOC_DIR=tmpdocs/dev/
+        git checkout .
       env:
         GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
