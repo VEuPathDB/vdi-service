@@ -8,10 +8,37 @@ on:
     - 'service/schema/**'
 
 jobs:
+  prep:
+    name: Get Doc Target Versions
+    runs-on: ubuntu-latest
+    outputs:
+      prod_tag: ${{ steps.prod_version.version }}
+      qa_tag: ${{ steps.qa_version.version }}
+    steps:
+    - name: Clone Production Tagger
+      uses: actions/checkout@v4
+      with:
+        repository: 'VEuPathDB/tagger'
+        ref: 'production'
+    - name: Get Production Tag
+      run: |-
+        echo version=$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
+      id: prod_version
+    - name: Checkout QA
+      uses: actions/checkout@v4
+      with:
+        ref: 'qa'
+    - name: Get QA Tag
+      run: |-
+        echo version=$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
+      id: qa_version
+
   build:
     name: Build API Docs
     runs-on: ubuntu-latest
+    needs: prep
     steps:
+
     - name: Install Java 21
       uses: actions/setup-java@v4
       with:
@@ -21,37 +48,45 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
       with:
         gradle-version: '8.14'
+
     - name: Install NPM
       uses: actions/setup-node@v4
     - name: Install NPM Packages
       run: npm i -g raml2html raml2html-modern-theme
-    - name: Checkout Project
+
+    - name: Checkout Dev
       uses: actions/checkout@v4
-    - name: Get Production Tag
-      run: |-
-        git clone --depth 1 -b prod https://github.com/VEuPathDB/tagger
-        cd tagger
-        echo version=$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
-        rm -rf .
-      id: prod_version
-    - name: Build Branch Docs
+
+    - name: Build Dev Docs
       run: make generate-service-docs OUTPUT_DOC_DIR=tmpdocs/dev/
       env:
         GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-    - name: Build Production Docs
-      run: |-
-        mkdir tmpdocs/prod/
-        git checkout ${{ steps.prod_version.outputs.version }}
-        cp docs/vdi-api.html tmpdocs/prod/
+
+    - name: Checkout QA
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.prep.outputs.qa_tag }}
+    - name: Build QA Docs
+#      run: make generate-service-docs # TODO: when dev goes to QA use this instead of below
+      run: mkdir tmpdocs/qa/ && cp docs/vdi-api.html tmpdocs/qa/vdi-api.html
+
+    - name: Checkout Prod
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.prep.outputs.prod_tag }}
+    - name: Build Prod Docs
+      #      run: make generate-service-docs # TODO: when dev goes to PROD use this instead of below
+      run: mkdir tmpdocs/prod/ && cp docs/vdi-api.html tmpdocs/prod/vdi-api.html
+
     - uses: actions/upload-pages-artifact@v3
       with:
         path: tmpdocs/
+
   deploy:
     name: Deploy API Docs
     runs-on: ubuntu-latest
-    needs:
-    - build
+    needs: build
     permissions:
       pages: write
       id-token: write
