@@ -4,6 +4,7 @@ import io.prometheus.client.Histogram
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -42,7 +43,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
-  private val cacheDB = CacheDB()
+  private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
   private val appDB = AppDB()
 

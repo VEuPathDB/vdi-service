@@ -3,6 +3,7 @@ package vdi.lane.delete.soft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -38,7 +39,7 @@ internal class SoftDeleteTriggerHandlerImpl(
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val cacheDB = CacheDB()
+  private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
   private val appDB = AppDB()
 

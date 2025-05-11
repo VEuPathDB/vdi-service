@@ -3,6 +3,7 @@ package vdi.lane.sharing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -40,7 +41,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
 {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val cacheDB = CacheDB()
+  private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
   private val appDB = AppDB()
 

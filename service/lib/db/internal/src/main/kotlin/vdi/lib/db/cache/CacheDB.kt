@@ -10,8 +10,6 @@ import vdi.lib.db.cache.query.AdminAllDatasetsQuery
 import vdi.lib.db.model.ReconcilerTargetRecord
 import vdi.lib.db.model.SyncControlRecord
 
-fun CacheDB(): CacheDB = CacheDBImpl
-
 interface CacheDB {
 
   val details: CacheDBConnectionDetails

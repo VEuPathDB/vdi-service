@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.apache.logging.log4j.kotlin.logger
@@ -47,7 +48,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private val activeIDs = HashSet<DatasetID>(24)
 
-  private val cacheDB = CacheDB()
+  private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
   override suspend fun run() {
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)

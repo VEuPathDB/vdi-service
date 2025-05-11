@@ -23,41 +23,50 @@ definitions:
   - &edaDatasetProps /schema/data/dataset-characteristics.eda.json
 
 containerCore:
+  http:
+    enableCors: true
   authentication:
     oauth:
       clientId: ${env:OAUTH_CLIENT_ID}
       clientSecret: ${env:OAUTH_CLIENT_SECRET}
       url: https://eupathdb.org/oauth
-      keystoreFile: ${env:KEY_STORE_FILE}
-      keystorePass: ${env:KEY_STORE_PASS_PHRASE}
     adminToken: ${env:ADMIN_AUTH_TOKEN}
 
 vdi:
+  restService:
+    enableJerseyTrace: true
+
   siteBuild: ${env:SITE_BUILD}
 
   ldap:
     servers: ${env:LDAP_SERVER}
-    baseDn: ${env:DB_LOOKUP_BASE_DN}
+    baseDn: ou=applications,dc=apidb,dc=org
 
   objectStore:
-    bucketName: vdi-prod
+    bucketName: vdi
+    https: false
     server:
-      host: ${env:S3_HOST}
-    accessToken: ${env:S3_ACCESS_TOKEN}
-    secretKey: ${env:S3_SECRET_KEY}
+      host: minio-external
+    accessToken: minioUser
+    secretKey: minioPass
 
   rabbit:
     global:
       connection:
-        server: ${env:GLOBAL_RABBIT_HOST}
-        username: ${env:GLOBAL_RABBIT_USERNAME}
-        password: ${env:GLOBAL_RABBIT_PASSWORD}
+        server: rabbit-external
+        username: rabbitUser
+        password: rabbitPass
+        tls: false
       exchange:
         name: vdi-bucket-notifications
       queue:
         name: vdi-bucket-notifications
       routing:
         key: vdi-bucket-notifications
+
+  daemons:
+    reconciler:
+      enabled: false
 
   kafka:
     servers:
@@ -67,8 +76,8 @@ vdi:
 
   cacheDb:
     username: vdi
-    password: ${env:CACHE_DB_PASSWORD}
-    server: cache-db
+    password: pgPass
+    server: cache-db:5432
 
   plugins:
   - server: bigwig:80
@@ -118,177 +127,176 @@ vdi:
 
   installTargets:
   - targetName: AmoebaDB
-    enabled: ${env:AMOEBA_ENABLED:-false}
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:AMOEBA_LDAP}
+      lookupCn: ${env:LDAP_AMOEBA}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:AMOEBA_LDAP}
+      lookupCn: ${env:LDAP_AMOEBA}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: ClinEpiDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:CLINEPI_LDAP}
+      lookupCn: ${env:LDAP_CLINEPI}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:CLINEPI_LDAP}
+      lookupCn: ${env:LDAP_CLINEPI}
     datasetPropertySchema: *edaDatasetProps
 
   - targetName: CryptoDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:CRYPTO_LDAP}
+      lookupCn: ${env:LDAP_CRYPTO}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:CRYPTO_LDAP}
+      lookupCn: ${env:LDAP_CRYPTO}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: FungiDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:FUNGI_LDAP}
+      lookupCn: ${env:LDAP_FUNGI}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:FUNGI_LDAP}
+      lookupCn: ${env:LDAP_FUNGI}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: GiardiaDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:GIARDIA_LDAP}
+      lookupCn: ${env:LDAP_GIARDIA}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:GIARDIA_LDAP}
+      lookupCn: ${env:LDAP_GIARDIA}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: HostDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:HOST_LDAP}
+      lookupCn: ${env:LDAP_HOST}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:HOST_LDAP}
+      lookupCn: ${env:LDAP_HOST}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: MicrobiomeDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:MICROBIOME_LDAP}
+      lookupCn: ${env:LDAP_MICROBIOME}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:MICROBIOME_LDAP}
+      lookupCn: ${env:LDAP_MICROBIOME}
     datasetPropertySchema: *edaDatasetProps
 
   - targetName: MicrosporidiaDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:MICROSPORIDIA_LDAP}
+      lookupCn: ${env:LDAP_MICROSPORIDIA}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:MICROSPORIDIA_LDAP}
+      lookupCn: ${env:LDAP_MICROSPORIDIA}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: OrthoMCL
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:ORTHO_LDAP}
+      lookupCn: ${env:LDAP_ORTHO}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:ORTHO_LDAP}
+      lookupCn: ${env:LDAP_ORTHO}
 
   - targetName: PiroplasmaDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:PIROPLASMA_LDAP}
+      lookupCn: ${env:LDAP_PIROPLASMA}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:PIROPLASMA_LDAP}
+      lookupCn: ${env:LDAP_PIROPLASMA}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: PlasmoDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:PLASMO_LDAP}
+      lookupCn: ${env:LDAP_PLASMO}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:PLASMO_LDAP}
+      lookupCn: ${env:LDAP_PLASMO}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: ToxoDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:TOXO_LDAP}
+      lookupCn: ${env:LDAP_TOXO}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:TOXO_LDAP}
+      lookupCn: ${env:LDAP_TOXO}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: TrichDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:TRICH_LDAP}
+      lookupCn: ${env:LDAP_TRICH}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:TRICH_LDAP}
+      lookupCn: ${env:LDAP_TRICH}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: TriTrypDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:TRITRYP_LDAP}
+      lookupCn: ${env:LDAP_TRITRYP}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:TRITRYP_LDAP}
+      lookupCn: ${env:LDAP_TRITRYP}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: VectorBase
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:VECTOR_LDAP}
+      lookupCn: ${env:LDAP_VECTOR}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:VECTOR_LDAP}
+      lookupCn: ${env:LDAP_VECTOR}
     datasetPropertySchema: *genDatasetProps
 
   - targetName: VEuPathDB
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:UNIDB_LDAP}
+      lookupCn: ${env:LDAP_UNIDB}
     dataDb:
       username: *vdiDataSchema
       password: *vdiSchemaPass
-      lookupCn: ${env:UNIDB_LDAP}
+      lookupCn: ${env:LDAP_UNIDB}
 

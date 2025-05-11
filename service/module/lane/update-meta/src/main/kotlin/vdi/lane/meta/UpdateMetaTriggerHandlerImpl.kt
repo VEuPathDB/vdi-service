@@ -3,6 +3,7 @@ package vdi.lane.meta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
@@ -53,7 +54,7 @@ internal class UpdateMetaTriggerHandlerImpl(
 
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
-  private val cacheDB = CacheDB()
+  private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
   private val appDB = AppDB()
 
