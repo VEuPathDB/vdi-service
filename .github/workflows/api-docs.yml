@@ -70,6 +70,7 @@ jobs:
     - name: Checkout QA
       uses: actions/checkout@v4
       with:
+        clean: 'false'
         ref: ${{ needs.prep.outputs.qa_tag }}
     - name: Build QA Docs
 #      run: make generate-service-docs # TODO: when dev goes to QA use this instead of below
@@ -78,6 +79,7 @@ jobs:
     - name: Checkout Prod
       uses: actions/checkout@v4
       with:
+        clean: 'false'
         ref: ${{ needs.prep.outputs.prod_tag }}
     - name: Build Prod Docs
       #      run: make generate-service-docs # TODO: when dev goes to PROD use this instead of below
