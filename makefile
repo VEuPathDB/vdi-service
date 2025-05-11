@@ -295,7 +295,7 @@ generate-service-docs:
 	@cp -rt $(OUTPUT_DOC_DIR) \
 		docs/vdi-api.html \
 		service/schema \
-		service/build/json-schema/*
+		service/schema/build/json-schema/*
 	@python -m venv venv
 	@. venv/bin/activate \
 		&& pip install json-schema-for-humans \
