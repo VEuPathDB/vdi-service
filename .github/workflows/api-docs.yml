@@ -23,7 +23,7 @@ jobs:
         token: '${{ secrets.GH_TOKEN }}'
     - name: Get Production Tag
       run: |-
-        echo version=$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
+        echo version=v$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
       id: prod_version
 
     - name: Clone QA
@@ -34,7 +34,7 @@ jobs:
         token: '${{ secrets.GH_TOKEN }}'
     - name: Get QA Tag
       run: |-
-        echo version=$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
+        echo version=v$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
       id: qa_version
 
   build:
