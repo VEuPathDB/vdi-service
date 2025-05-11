@@ -40,8 +40,12 @@ endif::[]
 ==== Dev
 
 * link:https://veupathdb.github.io/vdi-service/dev/vdi-api.html[REST Service API Doc]
-* link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.eda.json[EDA Dataset Characteristics Schema]
-* link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.genomics.json[Genomics Dataset Characteristics Schema]
+* EDA Dataset Characteristics Schema
+** link:service/schema/data/dataset-characteristics.eda.yml[Source YAML Schema]
+** link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.eda.json[Compiled JSON Schema]
+* Genomics Dataset Characteristics Schema
+** link:service/schema/data/dataset-characteristics.genomics.yml[Source YAML Schema]
+** link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.genomics.json[Compiled JSON Schema]
 * link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.metaschema.json[Dataset Characteristiscs Metaschema]
 
 
