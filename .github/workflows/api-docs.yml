@@ -12,8 +12,8 @@ jobs:
     name: Get Doc Target Versions
     runs-on: ubuntu-latest
     outputs:
-      prod_tag: ${{ steps.prod_version.version }}
-      qa_tag: ${{ steps.qa_version.version }}
+      prod_tag: ${{ steps.prod_version.outputs.version }}
+      qa_tag: ${{ steps.qa_version.outputs.version }}
     steps:
     - name: Clone Production Tagger
       uses: actions/checkout@v4
@@ -42,11 +42,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: prep
     steps:
-    - name: Echo
-      run: |-
-        echo ${{ needs.prep.outputs.qa_tag }}
-        echo ${{ needs.prep.outputs.prod_tag }}
-
     - name: Install Java 21
       uses: actions/setup-java@v4
       with:
@@ -77,7 +72,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         clean: 'false'
-        ref: ${{ needs.prep.outputs.qa_tag }}
+        ref: '${{ needs.prep.outputs.qa_tag }}'
     - name: Build QA Docs
 #      run: make generate-service-docs # TODO: when dev goes to QA use this instead of below
       run: mkdir tmpdocs/qa/ && cp docs/vdi-api.html tmpdocs/qa/vdi-api.html
@@ -86,7 +81,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         clean: 'false'
-        ref: ${{ needs.prep.outputs.prod_tag }}
+        ref: '${{ needs.prep.outputs.prod_tag }}'
     - name: Build Prod Docs
       #      run: make generate-service-docs # TODO: when dev goes to PROD use this instead of below
       run: mkdir tmpdocs/prod/ && cp docs/vdi-api.html tmpdocs/prod/vdi-api.html
