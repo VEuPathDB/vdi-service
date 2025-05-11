@@ -20,6 +20,7 @@ jobs:
       with:
         repository: 'VEuPathDB/tagger'
         ref: 'production'
+        token: '${{ secrets.GH_TOKEN }}'
     - name: Get Production Tag
       run: |-
         echo version=$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
