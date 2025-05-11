@@ -9,13 +9,13 @@
       "items": {
         "oneOf": [
           {
-            "$ref": "../common.json#/$defs/hostString"
+            "$ref": "../common.json#/$defs/addressString"
           },
           {
             "$ref": "../common.json#/$defs/interpolatedValue"
           },
           {
-            "$ref": "../common.json#/$defs/hostObject"
+            "$ref": "../common.json#/$defs/addressObject"
           }
         ]
       },

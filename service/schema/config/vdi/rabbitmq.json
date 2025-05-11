@@ -32,20 +32,30 @@
       "type": "object",
       "properties": {
         "name": {
+          "title": "Connection Name",
+          "description": "Used in RabbitMQ error logging in the RabbitMQ instance as well as the RabbitMQ Java library.",
           "type": "string",
           "default": "vdi"
         },
         "server": {
+          "title": "RabbitMQ Server Details",
+          "description": "Port defaults to `5671` with TLS enabled, or `5672` with TLS disabled.",
           "oneOf": [
             {
-              "$ref": "../common.json#/$defs/hostString"
+              "$ref": "../common.json#/$defs/addressString"
             },
             {
               "$ref": "../common.json#/$defs/interpolatedValue"
             },
             {
-              "$ref": "../common.json#/$defs/hostObject"
+              "$ref": "../common.json#/$defs/addressObject"
             }
+          ],
+          "examples": [
+            "rabbit.site.com",
+            "rabbit.site.com:5671",
+            { "host": "rabbit.site.com" },
+            { "host": "rabbit.site.com", "port": "5672" }
           ]
         },
         "username": {

@@ -58,6 +58,7 @@ vdi:
       connection:
         server:
           host: ${env:GLOBAL_RABBIT_HOST}
+          port: ${env:GLOBAL_RABBIT_PORT:-5672}
         username: ${env:GLOBAL_RABBIT_USERNAME}
         password: ${env:GLOBAL_RABBIT_PASSWORD}
         tls: ${env:GLOBAL_RABBIT_USE_TLS:-true}

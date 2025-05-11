@@ -15,7 +15,7 @@ data class ConnectionConfig(
   val connectionTimeout: Duration,
 ) {
   constructor(conf: RabbitConnectionConfig): this(
-    address = conf.server.toCommonType(DefaultPort),
+    address = conf.server.toCommonType(if (conf.tls ?: DefaultUseTLS) DefaultTLSPort else DefaultStandardPort),
     username = conf.username,
     password = conf.password,
     connectionName = conf.name,
@@ -24,8 +24,10 @@ data class ConnectionConfig(
   )
 
   companion object {
-    inline val DefaultPort
+    inline val DefaultStandardPort
       get(): UShort = 5672u
+    inline val DefaultTLSPort
+      get(): UShort = 5671u
 
     inline val DefaultUseTLS
       get() = true
