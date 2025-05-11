@@ -25,10 +25,13 @@ jobs:
       run: |-
         echo version=$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
       id: prod_version
-    - name: Checkout QA
+
+    - name: Clone QA
       uses: actions/checkout@v4
       with:
+        repository: 'VEuPathDB/tagger'
         ref: 'qa'
+        token: '${{ secrets.GH_TOKEN }}'
     - name: Get QA Tag
       run: |-
         echo version=$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
