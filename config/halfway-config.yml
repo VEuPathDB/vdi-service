@@ -273,7 +273,8 @@ vdi:
       password: ${env:DB_CONNECTION_PASS_TOXO}
       lookupCn: ${env:DB_CONNECTION_LDAP_TOXO}
     datasetPropertySchema: *genDatasetProps
-    enabled: ${env:DB_CONNECTION_ENABLED_TOXO:-true}
+#    enabled: ${env:DB_CONNECTION_ENABLED_TOXO:-true}
+    enabled: false
 
   - targetName: ${env:DB_CONNECTION_NAME_TRICH:-TrichDB}
     controlDb:
