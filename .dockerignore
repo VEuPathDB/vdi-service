@@ -6,9 +6,6 @@ gradle/wrapper/
 tmp/
 venv/
 
-# TODO REMOVE THIS WHEN READY
-service/module/await-dependencies/
-
 readme.adoc
 *.env
 gradlew

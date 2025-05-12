@@ -58,7 +58,7 @@ jobs:
         ref: main
         output-dir: tmpdocs/dev
         gh-token: ${{ secrets.GH_TOKEN }}
-        gh-user: ${{ secrets.GH_USER }}
+        gh-user: ${{ secrets.GH_USERNAME }}
 
     - name: Build QA Docs
       uses: ./.github/actions/api-doc-build@main
@@ -66,7 +66,7 @@ jobs:
         ref: '${{ needs.prep.outputs.qa_tag }}'
         output-dir: tmpdocs/qa
         gh-token: ${{ secrets.GH_TOKEN }}
-        gh-user: ${{ secrets.GH_USER }}
+        gh-user: ${{ secrets.GH_USERNAME }}
 
     - name: Build Prod Docs
       uses: ./.github/actions/api-doc-build@main
@@ -74,7 +74,7 @@ jobs:
         ref: '${{ needs.prep.outputs.prod_tag }}'
         output-dir: tmpdocs/prod
         gh-token: ${{ secrets.GH_TOKEN }}
-        gh-user: ${{ secrets.GH_USER }}
+        gh-user: ${{ secrets.GH_USERNAME }}
 
     - uses: actions/upload-pages-artifact@v3
       with:
