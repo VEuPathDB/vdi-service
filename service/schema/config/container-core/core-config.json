@@ -24,7 +24,11 @@
         "oauth": {
           "$ref": "#/$defs/oauth"
         }
-      }
+      },
+      "required": [
+        "adminToken",
+        "oauth"
+      ]
     },
     "http": {
       "$ref": "#/$defs/http"
@@ -52,6 +56,9 @@
     }
   },
   "additionalProperties": false,
+  "required": [
+    "authentication"
+  ],
   "$defs": {
     "http": {
       "title": "HTTP Server Config",
