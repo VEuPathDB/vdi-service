@@ -32,22 +32,22 @@ runs:
     shell: bash
     run: gradle :service:generate-raml-docs
     env:
-      GITHUB_USERNAME: ${{ secrets.gh-user }}
-      GITHUB_TOKEN: ${{ secrets.gh-token }}
+      GITHUB_USERNAME: ${{ inputs.gh-user }}
+      GITHUB_TOKEN: ${{ inputs.gh-token }}
 
   - name: Compile Dataset Characteristics Schema
     shell: bash
     run: gradle :service:schema:build-dataset-schema-resources
     env:
-      GITHUB_USERNAME: ${{ secrets.gh-user }}
-      GITHUB_TOKEN: ${{ secrets.gh-token }}
+      GITHUB_USERNAME: ${{ inputs.gh-user }}
+      GITHUB_TOKEN: ${{ inputs.gh-token }}
 
   - name: Compile Service Config Schema
     shell: bash
     run: gradle :service:schema:build-config-schema-resource
     env:
-      GITHUB_USERNAME: ${{ secrets.gh-user }}
-      GITHUB_TOKEN: ${{ secrets.gh-token }}
+      GITHUB_USERNAME: ${{ inputs.gh-user }}
+      GITHUB_TOKEN: ${{ inputs.gh-token }}
 
   - name: Copy Gradle Outputs
     shell: bash
