@@ -1,3 +1,4 @@
+@file:JvmName("DatasetDependencyValidator")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
@@ -25,4 +26,8 @@ fun DatasetDependency.validate(jPath: String, index: Int, errors: ValidationErro
 }
 
 fun DatasetDependency.toInternal(): VDIDatasetDependency =
-  VDIDatasetDependency(resourceIdentifier, resourceVersion, resourceDisplayName)
+  VDIDatasetDependency(
+    identifier  = resourceIdentifier,
+    version     = resourceVersion,
+    displayName = resourceDisplayName
+  )

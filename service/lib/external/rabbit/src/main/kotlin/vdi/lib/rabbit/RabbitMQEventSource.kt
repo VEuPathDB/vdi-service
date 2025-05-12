@@ -2,12 +2,12 @@ package vdi.lib.rabbit
 
 import com.rabbitmq.client.Channel
 import kotlinx.coroutines.*
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.util.HostAddress
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import vdi.lib.async.SuspendingSequence
 import vdi.lib.health.RemoteDependencies
+import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 
 private const val MaxConnectionRetries = 5
@@ -34,7 +34,7 @@ class RabbitMQEventSource<T : Any>(private val config: RabbitMQConfig, mappingFu
     }
   }
 
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger
 
   private val fac = RabbitInstanceFactory(config)
 
@@ -93,7 +93,6 @@ class RabbitMQEventSource<T : Any>(private val config: RabbitMQConfig, mappingFu
   private suspend fun initChannel() {
     coroutineScope {
       withContext(Dispatchers.IO) {
-        log.debug("declaring RabbitMQ exchange {}", config.exchange.name)
         rabbit.getChannel().exchangeDeclare(
           config.exchange.name,
           config.exchange.type,
@@ -102,7 +101,6 @@ class RabbitMQEventSource<T : Any>(private val config: RabbitMQConfig, mappingFu
           config.exchange.arguments,
         )
 
-        log.debug("declaring RabbitMQ queue {}", config.queue.name)
         rabbit.getChannel().queueDeclare(
           config.queue.name,
           config.queue.durable,
@@ -111,7 +109,7 @@ class RabbitMQEventSource<T : Any>(private val config: RabbitMQConfig, mappingFu
           config.queue.arguments,
         )
 
-        log.debug("binding RabbitMQ queue {} to exchange {} with routing key {}", config.queue.name, config.exchange.name, config.routing.key)
+        log.info("binding RabbitMQ queue '{}' to exchange '{}' using key '{}'", config.queue.name, config.exchange.name, config.routing.key)
         rabbit.getChannel().queueBind(
           config.queue.name,
           config.exchange.name,

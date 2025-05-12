@@ -1,3 +1,4 @@
+@file:JvmName("DatasetPublicationValidator")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
@@ -12,8 +13,9 @@ private const val PubMedMaxLength = 30
 
 
 fun DatasetPublication.cleanup() {
-  citation = citation.cleanupString()
-  pubMedId = pubMedId.cleanupString()
+  citation  = citation.cleanupString()
+  pubMedId  = pubMedId.cleanupString()
+  isPrimary = isPrimary ?: false
 }
 
 fun Collection<DatasetPublication>.validate(jPath: String, errors: ValidationErrors) {
@@ -42,4 +44,4 @@ fun Collection<DatasetPublication>.validate(jPath: String, errors: ValidationErr
 }
 
 internal fun DatasetPublication.toInternal() =
-  VDIDatasetPublication(citation, pubMedId)
+  VDIDatasetPublication(pubMedId, citation, isPrimary)

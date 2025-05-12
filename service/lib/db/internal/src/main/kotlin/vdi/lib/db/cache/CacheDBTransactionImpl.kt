@@ -1,6 +1,5 @@
 package vdi.lib.db.cache
 
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -21,10 +20,11 @@ import vdi.lib.db.cache.sql.upsert.upsertDatasetShareReceipt
 import vdi.lib.db.cache.sql.upsert.upsertImportControl
 import vdi.lib.db.cache.sql.upsert.upsertImportMessages
 import vdi.lib.db.model.SyncControlRecord
+import vdi.lib.logging.logger
 
 internal class CacheDBTransactionImpl(private val connection: Connection) : CacheDBTransaction {
 
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger<CacheDBTransaction>()
 
   private var committed = false
 

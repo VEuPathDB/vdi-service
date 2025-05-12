@@ -1,3 +1,4 @@
+@file:JvmName("DatasetHyperlinkValidator")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
@@ -29,4 +30,9 @@ private fun DatasetHyperlink.validate(jPath: String, index: Int, errors: Validat
 }
 
 internal fun DatasetHyperlink.toInternal() =
-  VDIDatasetHyperlink(url, text, description, isPublication)
+  VDIDatasetHyperlink(
+    url           = url,
+    text          = text,
+    description   = description,
+    isPublication = isPublication
+  )

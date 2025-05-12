@@ -27,6 +27,7 @@ import vdi.lib.db.cache.model.DatasetImpl
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
 import vdi.lib.db.model.SyncControlRecord
+import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
@@ -40,9 +41,9 @@ import vdi.lib.s3.DatasetObjectStore
 
 internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig, abortCB: AbortCB)
   : ImportTriggerHandler
-  , AbstractVDIModule("import-trigger-handler", abortCB)
+  , AbstractVDIModule("import-trigger-handler", abortCB, logger<ImportTriggerHandler>())
 {
-  private val log = logger().delegate
+  private val kLogger = logger().delegate
 
   private val lock = Mutex()
 
@@ -62,13 +63,13 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
         while (!isShutDown())
           kc.fetchMessages(config.eventMsgKey)
             .forEach { (userID, datasetID, source) ->
-              log.info("received import job for dataset $userID/$datasetID from source $source")
+              kLogger.info("received import job for dataset $userID/$datasetID from source $source")
               wp.submit { tryHandleImportEvent(dm, userID, datasetID) }
             }
       }
     }
 
-    log.info("shutting down worker pool")
+    kLogger.info("shutting down worker pool")
     wp.stop()
     kc.close()
     confirmShutdown()
@@ -78,9 +79,9 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     try {
       handleImportEvent(dm, userID, datasetID)
     } catch (e: PluginException) {
-      e.log(log::error)
+      e.log(kLogger::error)
     } catch (e: Throwable) {
-      PluginException.import("N/A", userID, datasetID, cause = e).log(log::error)
+      PluginException.import("N/A", userID, datasetID, cause = e).log(kLogger::error)
     }
   }
 
@@ -91,7 +92,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     // If the dataset directory doesn't have all the necessary components, then
     // bail here.
     if (!datasetDir.isUsable(datasetID, userID)) {
-      log.debug("dataset dir for dataset {}/{} is not usable", userID, datasetID)
+      kLogger.debug("dataset dir for dataset {}/{} is not usable", userID, datasetID)
       return
     }
 
@@ -101,7 +102,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     // as in progress (add it to our set of active imports) and proceed.
     lock.withLock {
       if (datasetID in activeIDs) {
-        log.info("skipping import event for dataset {}/{} as it is already being processed", userID, datasetID)
+        kLogger.info("skipping import event for dataset {}/{} as it is already being processed", userID, datasetID)
         return
       }
 
@@ -129,32 +130,32 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     // exists, initializing the dataset if it doesn't yet exist.
     with(cacheDB.selectDataset(datasetID)) {
       if (isNull()) {
-        log.info("initializing dataset {}/{}", userID, datasetID)
+        kLogger.info("initializing dataset {}/{}", userID, datasetID)
         cacheDB.initializeDataset(datasetID, datasetMeta)
       } else {
         if (isDeleted) {
-          log.info("skipping import event for dataset {}/{} as it is marked as deleted in the cache db", userID, datasetID)
+          kLogger.info("skipping import event for dataset {}/{} as it is marked as deleted in the cache db", userID, datasetID)
           return
         }
-        log.info("Dataset already initialized. Handling import event.")
+        kLogger.info("Dataset already initialized. Handling import event.")
       }
     }
 
     val impStatus = cacheDB.selectImportControl(datasetID)!!
 
     if (impStatus != DatasetImportStatus.Queued) {
-      log.info("skipping import event for dataset {}/{} as it is already in status {}", userID, datasetID, impStatus)
+      kLogger.info("skipping import event for dataset {}/{} as it is already in status {}", userID, datasetID, impStatus)
       return
     }
 
     if (!datasetDir.hasImportReadyFile()) {
-      log.info("skipping import event for dataset {}/{} as the import-ready file doesn't exist yet", userID, datasetID)
+      kLogger.info("skipping import event for dataset {}/{} as the import-ready file doesn't exist yet", userID, datasetID)
       return
     }
 
     try {
       val handler = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version] ?:
-        return log.warn("attempted to import dataset {}/{} but no plugin is currently enabled for dataset type {}", userID, datasetID, datasetMeta.type)
+        return kLogger.warn("attempted to import dataset {}/{} but no plugin is currently enabled for dataset type {}", userID, datasetID, datasetMeta.type)
 
       processImportJob(handler, datasetMeta, userID, datasetID, datasetDir)
     } catch (e: Throwable) {
@@ -178,7 +179,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   ) {
     try {
       cacheDB.withTransaction {
-        log.info("attempting to insert import control record (if one does not exist) for dataset {}/{}", userID, datasetID)
+        kLogger.info("attempting to insert import control record (if one does not exist) for dataset {}/{}", userID, datasetID)
         it.upsertImportControl(datasetID, DatasetImportStatus.InProgress)
       }
 
@@ -238,7 +239,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     result: ImportSuccessResponse,
     dd: DatasetDirectory
   ) {
-    log.info("dataset handler server reports dataset {}/{} imported successfully in plugin {}", userID, datasetID, handler.displayName)
+    kLogger.info("dataset handler server reports dataset {}/{} imported successfully in plugin {}", userID, datasetID, handler.displayName)
 
     var warnings = emptyList<String>()
     var hasData = false
@@ -248,25 +249,25 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
       .forEach { (entry, stream) ->
         when (entry.name) {
           DatasetManifestFilename -> {
-            log.debug("writing manifest contents to object store for dataset {}/{}", userID, datasetID)
+            kLogger.debug("writing manifest contents to object store for dataset {}/{}", userID, datasetID)
 
             manifest = JSON.readValue(stream)
             dd.putManifestFile(manifest!!)
           }
 
           WarningsFileName -> {
-            log.debug("deserializing warnings for dataset {}/{}", userID, datasetID)
+            kLogger.debug("deserializing warnings for dataset {}/{}", userID, datasetID)
             warnings = JSON.readValue<WarningsFile>(stream).warnings
           }
 
           DataZipName -> {
-            log.debug("writing install-ready zip contents to object store for dataset {}/{}", userID, datasetID)
+            kLogger.debug("writing install-ready zip contents to object store for dataset {}/{}", userID, datasetID)
             dd.getInstallReadyFile().writeContents(stream)
             hasData = true
           }
 
           else -> {
-            log.error("unrecognized zip entry received from plugin server for dataset {}/{}: {}", userID, datasetID, entry.name)
+            kLogger.error("unrecognized zip entry received from plugin server for dataset {}/{}: {}", userID, datasetID, entry.name)
             stream.skip(Long.MAX_VALUE)
           }
         }
@@ -294,7 +295,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     datasetID: DatasetID,
     result: ImportBadRequestResponse
   ) {
-    log.error("plugin reports 400 error for dataset {}/{} in plugin {}: {}", userID, datasetID, handler.displayName, result.message)
+    kLogger.error("plugin reports 400 error for dataset {}/{} in plugin {}: {}", userID, datasetID, handler.displayName, result.message)
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
@@ -310,7 +311,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
     datasetID: DatasetID,
     result: ImportValidationErrorResponse
   ) {
-    log.info("plugin reports dataset {}/{} failed validation in plugin {}", userID, datasetID, handler.displayName)
+    kLogger.info("plugin reports dataset {}/{} failed validation in plugin {}", userID, datasetID, handler.displayName)
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
@@ -319,7 +320,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   }
 
   private fun handleImport500Result(handler: PluginHandler, userID: UserID, datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
-    log.error("plugin reports 500 for dataset {}/{} in plugin {}: {}", userID, datasetID, handler.displayName, result.message)
+    kLogger.error("plugin reports 500 for dataset {}/{} in plugin {}: {}", userID, datasetID, handler.displayName, result.message)
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
@@ -331,22 +332,22 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
   private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {
     if (!exists()) {
-      log.warn("got an import event for dataset {}/{} which no longer has a directory", userID, datasetID)
+      kLogger.warn("got an import event for dataset {}/{} which no longer has a directory", userID, datasetID)
       return false
     }
 
     if (hasDeleteFlag()) {
-      log.info("got an import event for dataset {}/{} which has a delete flag, ignoring it", userID, datasetID)
+      kLogger.info("got an import event for dataset {}/{} which has a delete flag, ignoring it", userID, datasetID)
       return false
     }
 
     if (!hasMetaFile()) {
-      log.info("got an import event for dataset {}/{} which does not yet have a {} file, ignoring it", userID, datasetID, DatasetMetaFilename)
+      kLogger.info("got an import event for dataset {}/{} which does not yet have a {} file, ignoring it", userID, datasetID, DatasetMetaFilename)
       return false
     }
 
     if (!hasImportReadyFile()) {
-      log.info("got an import event for dataset {}/{} which does not yet have a processed upload, ignoring it", userID, datasetID)
+      kLogger.info("got an import event for dataset {}/{} which does not yet have a processed upload, ignoring it", userID, datasetID)
       return false
     }
 

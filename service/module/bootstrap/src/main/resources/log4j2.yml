@@ -7,7 +7,7 @@ Configuration:
       target: SYSTEM_OUT
       PatternLayout:
         pattern: "\
-          %d{yyyy-MM-dd'T'HH:mm:ss.SSS} \
+          %d{yyyy-MM-dd HH:mm:ss.SSS} \
           %highlight{%-5level}\
           %notEmpty{ \
             %notEmpty{[wid:%X{workerID}]}\
@@ -18,24 +18,24 @@ Configuration:
       target: SYSTEM_OUT
       PatternLayout:
         pattern: "\
-          %d{yyyy-MM-dd'T'HH:mm:ss.SSS} \
+          %d{yyyy-MM-dd HH:mm:ss.SSS} \
           %highlight{%-5level}\
           %notEmpty{ \
             %notEmpty{[wid:%X{workerID}]}\
             %notEmpty{[rid:%replace{%.5X{traceId}}{init0|term0}{}]}\
           } \
           %c{-2} - %m%n"
-    - name: sub-3
+    - name: sub-2-mod
       target: SYSTEM_OUT
       PatternLayout:
         pattern: "\
-          %d{yyyy-MM-dd'T'HH:mm:ss.SSS} \
+          %d{yyyy-MM-dd HH:mm:ss.SSS} \
           %highlight{%-5level}\
           %notEmpty{ \
             %notEmpty{[wid:%X{workerID}]}\
             %notEmpty{[rid:%replace{%.5X{traceId}}{init0|term0}{}]}\
           } \
-          %c{-3} - %m%n"
+          ext.%c{-2} - %m%n"
     - name: externals
       target: SYSTEM_OUT
       PatternLayout:
@@ -47,7 +47,7 @@ Configuration:
         # Technically possible, but shouldn't ever happen:
         # 2022-09-07T14:33:06.027 DEBUG [wid:something][rid:12345] ClassName - message
         pattern: "\
-          %d{yyyy-MM-dd'T'HH:mm:ss.SSS} \
+          %d{yyyy-MM-dd HH:mm:ss.SSS} \
           %highlight{%-5level}\
           %notEmpty{ \
             %notEmpty{[wid:%X{workerID}]}\
@@ -65,12 +65,7 @@ Configuration:
       level: debug
       additivity: false
       AppenderRef:
-      - ref: sub-2
-    - name: vdi.lib
-      level: debug
-      additivity: false
-      AppenderRef:
-      - ref: sub-2
+      - ref: sub-1
     - name: vdi.service
       level: debug
       additivity: false
@@ -80,12 +75,12 @@ Configuration:
       level: debug
       additivity: false
       AppenderRef:
-      - ref: sub-3
+      - ref: sub-2-mod
     - name: org.veupathdb.lib
       level: info
       additivity: false
       AppenderRef:
-      - ref: sub-3
+      - ref: sub-2-mod
     - name: org.apache.kafka.clients
       level: error
       additivity: false

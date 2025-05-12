@@ -1,6 +1,6 @@
 package vdi.lib.modules
 
-import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Client
 import org.veupathdb.lib.s3.s34k.S3Config
@@ -22,9 +22,11 @@ import vdi.lib.s3.DatasetObjectStore
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-abstract class AbstractVDIModule(override val name: String, protected val abortCB: AbortCB) : VDIModule {
-  private val log = LoggerFactory.getLogger(javaClass)
-
+abstract class AbstractVDIModule(
+  override val name: String,
+  protected val abortCB: AbortCB,
+  protected val log: Logger,
+) : VDIModule {
   private val shutdownTrigger = Trigger()
 
   private val shutdownConfirm = Trigger()

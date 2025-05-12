@@ -1,7 +1,6 @@
 package vdi.lib.install.retry
 
 import kotlinx.coroutines.sync.Mutex
-import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -14,6 +13,7 @@ import vdi.lib.db.app.model.DatasetRecord
 import vdi.lib.db.app.model.InstallStatus
 import vdi.lib.db.app.model.InstallType
 import vdi.lib.db.app.withTransaction
+import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import vdi.lib.plugin.client.PluginRequestException
 import vdi.lib.plugin.client.response.ind.*
@@ -27,7 +27,7 @@ import vdi.lib.s3.DatasetObjectStore
 
 object DatasetReinstaller {
 
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger
 
   private val lock = Mutex()
 

@@ -1,3 +1,4 @@
+@file:JvmName("DatasetPutService")
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
@@ -11,7 +12,7 @@ import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
 import vdi.service.rest.config.UploadConfig
-import vdi.service.rest.generated.model.DatasetPatchRequestBodyImpl
+import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.model.DatasetPutResponseBody
 import vdi.service.rest.generated.resources.DatasetsVdiId.PutDatasetsByVdiIdResponse
@@ -44,7 +45,7 @@ internal fun <T: ControllerBase> T.putDataset(
     ?.let { return Either.ofRight(UnprocessableEntityError(it).wrap()) }
 
   // validate type change
-  val targetType = (request as DatasetPatchRequestBodyImpl).optValidateType {
+  val targetType = (request.meta as DatasetPatchRequestBody).optValidateType {
     return Either.ofRight(ForbiddenError("cannot change the type of ${it.displayName} datasets").wrap())
   }
 

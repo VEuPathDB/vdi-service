@@ -127,8 +127,8 @@ types:
 
       Actual schema definitions are available at:
 
-      * [EDA Schema](https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.eda.json)
-      * [Genomics Schema](https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.genomics.json)
+      * [EDA Schema](https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.eda.json)
+      * [Genomics Schema](https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.genomics.json)
     type: any
   DatasetContact:
     displayName: Dataset Contact
@@ -547,6 +547,7 @@ types:
     type: DatasetPatchRequestBody
     additionalProperties: false
     properties:
+      origin: DatasetOrigin
       revisionNote: DatasetRevisionNote
   DatasetPutRequestBody:
     displayName: Dataset Put Request

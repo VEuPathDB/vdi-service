@@ -1,17 +1,15 @@
 package vdi.daemon.reconciler
 
-import org.apache.logging.log4j.kotlin.logger
 import kotlin.time.Duration.Companion.milliseconds
+import vdi.lib.logging.logger
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractJobExecutor
 import vdi.lib.reconciler.Reconciler as Recon
 
 internal class ReconcilerImpl(private val config: ReconcilerDaemonConfig, abortCB: AbortCB)
   : Reconciler
-  , AbstractJobExecutor("reconciler", abortCB)
+  , AbstractJobExecutor("reconciler", abortCB, logger<Reconciler>())
 {
-  private val logger = logger().delegate
-
   private var lastSlimRun = 0L
 
   private var lastFullRun = 0L

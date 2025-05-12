@@ -1,15 +1,15 @@
 package vdi.lib.db.app
 
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.lib.db.app.model.InstallStatuses
 import vdi.lib.db.app.sql.dataset_install_message.selectInstallStatuses
+import vdi.lib.logging.logger
 
 internal object AppDBImpl : AppDB {
 
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger<AppDB>()
 
   override fun getDatasetStatuses(targets: Map<ProjectID, Collection<DatasetID>>): Map<DatasetID, Map<ProjectID, InstallStatuses>> {
     log.trace("getDatasetStatuses(targets={})", targets)

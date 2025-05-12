@@ -1,3 +1,4 @@
+@file:JvmName("DatasetDeleteService")
 package vdi.service.rest.server.services.dataset
 
 import jakarta.ws.rs.ForbiddenException

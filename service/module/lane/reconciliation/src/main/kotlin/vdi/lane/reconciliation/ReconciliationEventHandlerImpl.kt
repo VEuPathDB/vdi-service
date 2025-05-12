@@ -3,12 +3,12 @@ package vdi.lane.reconciliation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import java.util.concurrent.ConcurrentHashMap
 import vdi.lib.async.WorkerPool
 import vdi.lib.kafka.EventSource
+import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
@@ -18,10 +18,8 @@ internal class ReconciliationEventHandlerImpl(
   abortCB: AbortCB
 )
   : ReconciliationEventHandler
-  , AbstractVDIModule("reconciliation-event-handler", abortCB)
+  , AbstractVDIModule("reconciliation-event-handler", abortCB, logger<ReconciliationEventHandler>())
 {
-  private val log = LoggerFactory.getLogger(javaClass)
-
   private lateinit var reconciler: DatasetReconciler
 
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)

@@ -1,3 +1,4 @@
+@file:JvmName("DatasetPatchService")
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
@@ -69,3 +70,4 @@ private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
   || hyperlinks != null
   || organisms != null
   || contacts != null
+  || properties != null

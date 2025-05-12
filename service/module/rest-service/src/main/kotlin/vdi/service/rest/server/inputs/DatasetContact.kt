@@ -1,3 +1,4 @@
+@file:JvmName("DatasetContactValidator")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
@@ -60,4 +61,13 @@ internal fun Iterable<DatasetContact?>.validate(jPath: String, errors: Validatio
 }
 
 internal fun DatasetContact.toInternal() =
-  VDIDatasetContact(name, email, affiliation, city, state, country, address, isPrimary)
+  VDIDatasetContact(
+    name        = name,
+    email       = email,
+    affiliation = affiliation,
+    city        = city,
+    state       = state,
+    country     = country,
+    address     = address,
+    isPrimary   = isPrimary
+  )

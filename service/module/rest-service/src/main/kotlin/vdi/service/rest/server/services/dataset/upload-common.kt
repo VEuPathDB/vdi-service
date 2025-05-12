@@ -1,3 +1,4 @@
+@file:JvmName("DatasetUploadCommon")
 package vdi.service.rest.server.services.dataset
 
 import jakarta.ws.rs.BadRequestException

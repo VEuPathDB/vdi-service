@@ -4,7 +4,6 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.json.JSON
@@ -14,6 +13,7 @@ import vdi.lib.discardException
 import vdi.lib.kafka.EventSource
 import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.kafka.router.KafkaRouterFactory
+import vdi.lib.logging.logger
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
 import vdi.lib.orElse
@@ -25,13 +25,10 @@ import vdi.lib.s3.paths.toDatasetPathOrNull
 
 internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: AbortCB)
   : EventRouter
-  , AbstractVDIModule("event-router", abortCB)
+  , AbstractVDIModule("event-router", abortCB, logger<EventRouter>())
 {
-  private val log = LoggerFactory.getLogger(javaClass)
-
   private val es: RabbitMQEventSource<MinIOEvent> = runBlocking {
     try {
-      log.debug("Connecting to RabbitMQ: {}", config.rabbitConfig.connection.address)
       RabbitMQEventSource(config.rabbitConfig) { JSON.readValue<MinIOEvent>(it) }
     } catch (e: Throwable) {
       triggerShutdown()

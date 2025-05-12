@@ -19,6 +19,8 @@ SET
 , type_version = ?
 , is_deleted = ?
 , is_public = ?
+, accessibility = ?
+, days_for_approval = ?
 WHERE
   dataset_id = ?
 """
@@ -31,5 +33,7 @@ internal fun Connection.updateDataset(schema: String, dataset: DatasetRecord) {
     setDeleteFlag(4, dataset.deletionState)
     setBoolean(5, dataset.isPublic)
     setDatasetID(6, dataset.datasetID)
+    setString(7, dataset.accessibility.value)
+    setInt(8, dataset.daysForApproval)
   }
 }

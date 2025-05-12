@@ -13,15 +13,18 @@ private fun sql(schema: String) =
 """
 INSERT INTO
   ${schema}.dataset (
-    dataset_id
+    dataset_id        -- 1
   , owner
   , type_name
   , type_version
-  , is_deleted
+  , is_deleted        -- 5
   , is_public
+  , accessibility
+  , days_for_approval
+  , creation_date     -- 9
   )
 VALUES
-  (?, ?, ?, ?, ?, ?)
+  (?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 internal fun Connection.insertDataset(schema: String, dataset: DatasetRecord) {
@@ -32,5 +35,8 @@ internal fun Connection.insertDataset(schema: String, dataset: DatasetRecord) {
     setString(4, dataset.typeVersion)
     setDeleteFlag(5, dataset.deletionState)
     setBoolean(6, dataset.isPublic)
+    setString(7, dataset.accessibility.value)
+    setInt(8, dataset.daysForApproval)
+    setObject(9, dataset.creationDate?.toLocalDate())
   }
 }

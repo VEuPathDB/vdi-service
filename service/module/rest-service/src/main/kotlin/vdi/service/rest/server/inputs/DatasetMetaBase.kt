@@ -1,3 +1,4 @@
+@file:JvmName("DatasetMetaBaseValidator")
 package vdi.service.rest.server.inputs
 
 import com.networknt.schema.JsonSchema

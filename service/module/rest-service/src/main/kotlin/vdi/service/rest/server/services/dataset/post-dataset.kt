@@ -1,3 +1,4 @@
+@file:JvmName("DatasetPostService")
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException

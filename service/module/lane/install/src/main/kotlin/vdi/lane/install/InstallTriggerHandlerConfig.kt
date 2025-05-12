@@ -5,9 +5,10 @@ import org.veupathdb.lib.s3.s34k.fields.BucketName
 import vdi.lib.config.vdi.KafkaConfig
 import vdi.lib.config.vdi.ObjectStoreConfig
 import vdi.lib.config.vdi.VDIConfig
-import vdi.lib.config.vdi.lanes.ConsumerLaneConfig
 import vdi.lib.config.vdi.lanes.LaneConfig
+import vdi.lib.config.vdi.lanes.ProducerLaneConfig
 import vdi.lib.kafka.*
+import vdi.lib.kafka.router.KafkaRouterConfig
 import vdi.lib.kafka.router.RouterDefaults
 import vdi.lib.s3.util.S3Config
 import vdi.lib.s3.util.bucket
@@ -15,7 +16,8 @@ import vdi.lib.s3.util.bucket
 data class InstallTriggerHandlerConfig(
   val workerPoolSize: UByte,
   val jobQueueSize:   UByte,
-  val kafkaConfig:    KafkaConsumerConfig,
+  val consumerConfig: KafkaConsumerConfig,
+  val producerConfig: KafkaRouterConfig,
   val s3Config:       S3Config,
   val s3Bucket:       BucketName,
   val eventChannel:   MessageTopic,
@@ -23,10 +25,11 @@ data class InstallTriggerHandlerConfig(
 ) {
   constructor(conf: VDIConfig): this(conf.lanes?.install, conf.objectStore, conf.lanes, conf.kafka)
 
-  constructor(lane: ConsumerLaneConfig?, store: ObjectStoreConfig, lanes: LaneConfig?, kafka: KafkaConfig): this(
+  constructor(lane: ProducerLaneConfig?, store: ObjectStoreConfig, lanes: LaneConfig?, kafka: KafkaConfig): this(
     workerPoolSize = lane?.workerCount ?: WorkerCount,
     jobQueueSize   = lane?.inMemoryQueueSize ?: JobQueueSize,
-    kafkaConfig    = KafkaConsumerConfig(lane?.kafkaConsumerID ?: ConsumerID, kafka),
+    consumerConfig = KafkaConsumerConfig(lane?.kafkaConsumerID ?: ConsumerID, kafka),
+    producerConfig = KafkaRouterConfig(lane?.kafkaProducerID ?: ProducerID, kafka, lanes),
     s3Config       = S3Config(store),
     s3Bucket       = store.bucket,
     eventChannel   = lane?.eventChannel?.toMessageTopic() ?: EventChannel,

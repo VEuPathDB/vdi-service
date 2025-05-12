@@ -4,6 +4,8 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import vdi.lane.reconciliation.util.*
 import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.model.InstallStatus
+import vdi.lib.db.app.model.InstallType
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
@@ -149,6 +151,8 @@ internal class DatasetReconciler(
     // event here.
     if (!ctx.haveFiredImportEvent && syncStatus.installOutOfSync)
       fireInstallEvent(ctx)
+    else if (!syncStatus.installOutOfSync && ctx.meta.originalID != null && isInstalled(ctx))
+      ensureRevisionFlags(ctx)
   }
 
   private fun checkSyncStatus(ctx: ReconciliationContext): SyncIndicator {
@@ -206,6 +210,27 @@ internal class DatasetReconciler(
     cacheDB.updateImportStatus(ctx, DatasetImportStatus.Queued)
     cacheDB.dropImportMessages(ctx)
     fireImportEvent(ctx)
+  }
+
+  private fun isInstalled(ctx: ReconciliationContext) =
+    ctx.meta.projects.all {
+      (AppDB().accessor(it, ctx.meta.type.name) ?: return@all true)
+        .selectDatasetInstallMessage(ctx.datasetID, InstallType.Data)?.status == InstallStatus.Complete
+    }
+
+  private fun ensureRevisionFlags(ctx: ReconciliationContext) {
+    val targets = ArrayList<DatasetID>(ctx.meta.revisionHistory.size)
+    targets.add(ctx.meta.originalID!!)
+    ctx.meta.revisionHistory.asSequence()
+      .sortedByDescending { it.timestamp }
+      .drop(1) // don't mark latest/current revision as an old revision
+      .forEach { targets.add(it.revisionID) }
+
+    targets.forEach {
+      datasetManager.getDatasetDirectory(ctx.userID, it)
+        .getRevisedFlag()
+        .also { flag -> if (!flag.exists()) flag.touch() }
+    }
   }
 
   /**

@@ -11,29 +11,31 @@ internal class DatasetDeleteFlagFileImpl(
   existsChecker: () -> Boolean = { false },
   lastModifiedSupplier: () -> OffsetDateTime? = { null },
   loadObjectStream: () -> InputStream? = { null },
-  putObjectStream: (InputStream) -> Unit = { it.skip(Long.MAX_VALUE) }
+  putObjectStream: (InputStream) -> Unit = { it.skip(Long.MAX_VALUE) },
+  toucher: () -> Unit = {},
 )
-  : DatasetFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream, putObjectStream)
+  : DatasetFlagFileImpl(path, existsChecker, lastModifiedSupplier, loadObjectStream, putObjectStream, toucher)
   , DatasetDeleteFlagFile
 {
-
   constructor(
     bucket: S3Bucket,
     path: String,
-  ) : this(
+  ): this(
     path = path,
     // This looks weird, but we use list instead of stat since stat only returns seconds resolution, not milliseconds.
     lastModifiedSupplier = { bucket.objects.list(path).stream().findFirst().map { o -> o.lastModified }.orElse(null) },
     existsChecker = { path in bucket.objects },
     loadObjectStream = { bucket.objects.open(path)?.stream },
     putObjectStream = { bucket.objects.put(path, it) },
+    toucher = { bucket.objects.touch(path) },
   )
 
   constructor(s3Object: S3Object) : this(
     path = s3Object.path,
     lastModifiedSupplier = s3Object::lastModified,
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
-    loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream }
+    loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream },
+    toucher = { s3Object.bucket.objects.touch(s3Object.path) },
   ) {
     if (!S3File.DeleteFlag.resembles(s3Object.baseName)) {
       throw IllegalArgumentException(

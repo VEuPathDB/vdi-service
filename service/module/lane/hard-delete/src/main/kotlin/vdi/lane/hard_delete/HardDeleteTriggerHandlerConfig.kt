@@ -1,4 +1,4 @@
-package vdi.lane.delete.hard
+package vdi.lane.hard_delete
 
 import vdi.lib.config.vdi.KafkaConfig
 import vdi.lib.config.vdi.VDIConfig

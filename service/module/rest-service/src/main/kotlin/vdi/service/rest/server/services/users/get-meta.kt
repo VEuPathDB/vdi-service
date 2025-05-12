@@ -1,3 +1,4 @@
+@file:JvmName("UserMetaService")
 package vdi.service.rest.server.services.users
 
 import org.veupathdb.vdi.lib.common.field.UserID

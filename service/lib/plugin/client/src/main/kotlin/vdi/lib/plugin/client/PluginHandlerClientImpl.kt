@@ -3,7 +3,6 @@ package vdi.lib.plugin.client
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.foxcapades.lib.k.multipart.MultiPart
 import kotlinx.coroutines.future.await
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.intra.*
@@ -15,6 +14,7 @@ import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import vdi.lib.logging.logger
 import vdi.lib.plugin.client.response.imp.*
 import vdi.lib.plugin.client.response.ind.*
 import vdi.lib.plugin.client.response.inm.*
@@ -25,7 +25,7 @@ private const val JsonContentType = "application/json; charset=utf-8"
 
 internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig) : PluginHandlerClient {
 
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger<PluginHandlerClient>()
 
   private inline val baseUri
     get() = URI.create("http://${config.address.host}:${config.address.port}")

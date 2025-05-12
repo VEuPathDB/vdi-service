@@ -1,3 +1,4 @@
+@file:JvmName("DatasetLookupService")
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider

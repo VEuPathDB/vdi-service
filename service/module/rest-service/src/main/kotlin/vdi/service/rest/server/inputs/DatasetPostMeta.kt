@@ -1,3 +1,4 @@
+@file:JvmName("DatasetPostMetaValidator")
 package vdi.service.rest.server.inputs
 
 import com.fasterxml.jackson.module.kotlin.convertValue
@@ -7,6 +8,8 @@ import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.json.JSON
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.JsonField as JF
 
@@ -50,7 +53,7 @@ internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
     visibility       = visibility!!.toInternal(),
     origin           = origin,
     sourceURL        = url,
-    created          = OffsetDateTime.now(),
+    created          = OffsetDateTime.now(ZoneOffset.UTC),
     dependencies     = dependencies.map(DatasetDependency::toInternal),
     publications     = publications.map(DatasetPublication::toInternal),
     hyperlinks       = hyperlinks.map(DatasetHyperlink::toInternal),

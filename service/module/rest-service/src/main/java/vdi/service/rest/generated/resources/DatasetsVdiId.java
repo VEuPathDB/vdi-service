@@ -24,7 +24,7 @@ public interface DatasetsVdiId {
 
   @PUT
   @Produces("application/json")
-  @Consumes("application/json")
+  @Consumes("multipart/form-data")
   PutDatasetsByVdiIdResponse putDatasetsByVdiId(@PathParam("vdi-id") String vdiId,
       DatasetPutRequestBody entity);
 

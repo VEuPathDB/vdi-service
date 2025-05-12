@@ -1,10 +1,9 @@
-package vdi.lane.delete.soft
+package vdi.lane.soft_delete
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -19,6 +18,7 @@ import vdi.lib.db.app.withTransaction
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetRecord
 import vdi.lib.db.cache.withTransaction
+import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
@@ -35,10 +35,8 @@ internal class SoftDeleteTriggerHandlerImpl(
   abortCB: AbortCB
 )
   : SoftDeleteTriggerHandler
-  , AbstractVDIModule("soft-delete-trigger-handler", abortCB)
+  , AbstractVDIModule("soft-delete-trigger-handler", abortCB, logger<SoftDeleteTriggerHandler>())
 {
-  private val log = LoggerFactory.getLogger(javaClass)
-
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
   private val appDB = AppDB()

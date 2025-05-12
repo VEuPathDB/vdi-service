@@ -1,4 +1,4 @@
-package vdi.lane.delete.soft
+package vdi.lane.soft_delete
 
 import vdi.lib.modules.VDIModule
 

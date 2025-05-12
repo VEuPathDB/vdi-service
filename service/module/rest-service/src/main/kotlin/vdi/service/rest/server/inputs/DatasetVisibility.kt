@@ -1,3 +1,4 @@
+@file:JvmName("DatasetVisibilityInput")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility

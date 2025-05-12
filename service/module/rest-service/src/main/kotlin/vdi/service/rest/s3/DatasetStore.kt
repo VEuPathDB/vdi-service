@@ -68,27 +68,45 @@ object DatasetStore {
     bucket.objects.open(S3Paths.datasetInstallReadyFile(userID, datasetID))
 
   fun putDatasetMeta(userID: UserID, datasetID: DatasetID, meta: VDIDatasetMeta) {
-    bucket.objects[S3Paths.datasetMetaFile(userID, datasetID)] = meta.toJSONString().byteInputStream()
+    bucket.objects.put(S3Paths.datasetMetaFile(userID, datasetID)) {
+      contentType = "application/json"
+      stream = meta.toJSONString().byteInputStream()
+    }
   }
 
   fun putManifest(userID: UserID, datasetID: DatasetID, manifest: VDIDatasetManifest) {
-    bucket.objects[S3Paths.datasetManifestFile(userID, datasetID)] = manifest.toJSONString().byteInputStream()
+    bucket.objects.put(S3Paths.datasetManifestFile(userID, datasetID)) {
+      contentType = "application/json"
+      stream = manifest.toJSONString().byteInputStream()
+    }
   }
 
   fun putImportReadyZip(userID: UserID, datasetID: DatasetID, fn: () -> InputStream) {
-    fn().use { bucket.objects[S3Paths.datasetImportReadyFile(userID, datasetID)] = it }
+    fn().use { bucket.objects.put(S3Paths.datasetImportReadyFile(userID, datasetID)) {
+      contentType = "application/zip"
+      stream = it
+    } }
   }
 
   fun putShareOffer(userID: UserID, datasetID: DatasetID, recipientID: UserID, offer: VDIDatasetShareOffer) {
-    bucket.objects[S3Paths.datasetShareOfferFile(userID, datasetID, recipientID)] = offer.toJSONString().byteInputStream()
+    bucket.objects.put(S3Paths.datasetShareOfferFile(userID, datasetID, recipientID)) {
+      contentType = "application/json"
+      stream = offer.toJSONString().byteInputStream()
+    }
   }
 
   fun putShareReceipt(userID: UserID, datasetID: DatasetID, recipientID: UserID, receipt: VDIDatasetShareReceipt) {
-    bucket.objects[S3Paths.datasetShareReceiptFile(userID, datasetID, recipientID)] = receipt.toJSONString().byteInputStream()
+    bucket.objects.put(S3Paths.datasetShareReceiptFile(userID, datasetID, recipientID)) {
+      contentType = "application/json"
+      stream = receipt.toJSONString().byteInputStream()
+    }
   }
 
   fun putDeleteFlag(userID: UserID, datasetID: DatasetID) {
-    bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID)) { overwrite = true }
+    bucket.objects.touch(S3Paths.datasetDeleteFlagFile(userID, datasetID)) {
+      contentType = "text/plain"
+      overwrite = true
+    }
   }
 
   fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =

@@ -25,6 +25,7 @@ private sealed class DummyFileBase
   override fun exists() = false
   override fun lastModified() = null
   override fun writeContents(content: InputStream) = Unit
+  override fun touch() = Unit
 }
 
 private object DummyDatasetFile : DummyFileBase()

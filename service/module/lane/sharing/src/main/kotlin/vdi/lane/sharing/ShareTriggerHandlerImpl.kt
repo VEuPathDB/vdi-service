@@ -5,7 +5,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
@@ -37,10 +36,8 @@ import vdi.lib.s3.files.DatasetShare as S3Share
  */
 internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig, abortCB: AbortCB)
   : ShareTriggerHandler
-  , AbstractVDIModule("share-trigger-handler", abortCB)
+  , AbstractVDIModule("share-trigger-handler", abortCB, logger<ShareTriggerHandler>())
 {
-  private val log = LoggerFactory.getLogger(javaClass)
-
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
   private val appDB = AppDB()

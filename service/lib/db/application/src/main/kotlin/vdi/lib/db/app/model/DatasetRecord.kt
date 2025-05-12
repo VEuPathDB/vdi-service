@@ -3,6 +3,8 @@ package vdi.lib.db.app.model
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
+import java.time.OffsetDateTime
 
 /**
  * Represents a single record in the `vdi.datasets` table.
@@ -38,4 +40,8 @@ data class DatasetRecord(
    * Indicates whether the dataset is marked as public.
    */
   val isPublic: Boolean,
+
+  val accessibility: VDIDatasetVisibility,
+  val daysForApproval: Int,
+  val creationDate: OffsetDateTime?,
 )

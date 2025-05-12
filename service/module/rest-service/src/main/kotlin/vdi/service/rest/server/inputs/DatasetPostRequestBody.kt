@@ -1,3 +1,4 @@
+@file:JvmName("DatasetPostRequestValidator")
 package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException

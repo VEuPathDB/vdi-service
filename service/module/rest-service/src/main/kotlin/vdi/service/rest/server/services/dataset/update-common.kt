@@ -1,17 +1,21 @@
+@file:JvmName("DatasetUpdateCommon")
 @file:Suppress("NOTHING_TO_INLINE")
 package vdi.service.rest.server.services.dataset
 
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.module.kotlin.convertValue
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetProperties
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
+import org.veupathdb.vdi.lib.json.JSON
 import vdi.service.rest.generated.model.DatasetContact
 import vdi.service.rest.generated.model.DatasetHyperlink
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.DatasetPublication
 import vdi.service.rest.server.inputs.toInternal
-
 
 fun VDIDatasetMeta.applyPatch(
   userID: UserID,
@@ -39,6 +43,7 @@ fun VDIDatasetMeta.applyPatch(
     hyperlinks       = patch.hyperlinks.applyPatch(hyperlinks, DatasetHyperlink::toInternal),
     contacts         = patch.contacts.applyPatch(contacts, DatasetContact::toInternal),
     organisms        = patch.organisms.applyPatch(organisms),
+    properties       = patch.properties.applyPatch(properties),
     originalID       = originalID,
     revisionHistory  = revisionHistory,
   )
@@ -92,4 +97,11 @@ private inline fun <E, I> Collection<E>?.applyPatch(original: Collection<I>, tra
     isEmpty() -> emptyList()
     // non-null && non-empty == update value
     else -> map(translate)
+  }
+
+private inline fun ObjectNode?.applyPatch(original: VDIDatasetProperties?): VDIDatasetProperties? =
+  when {
+    this == null -> original
+    isEmpty      -> null
+    else         -> JSON.convertValue(this)
   }

@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
 import org.veupathdb.vdi.lib.common.OriginTimestamp
 import org.veupathdb.vdi.lib.common.field.DatasetID
@@ -31,6 +30,7 @@ import vdi.lib.db.model.SyncControlRecord
 import vdi.lib.kafka.EventMessage
 import vdi.lib.kafka.EventSource
 import vdi.lib.kafka.router.KafkaRouter
+import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
@@ -48,10 +48,8 @@ internal class UpdateMetaTriggerHandlerImpl(
   abortCB: AbortCB,
 )
   : UpdateMetaTriggerHandler
-  , AbstractVDIModule("update-meta-trigger-handler", abortCB)
+  , AbstractVDIModule("update-meta-trigger-handler", abortCB, logger<UpdateMetaTriggerHandler>())
 {
-  private val log = LoggerFactory.getLogger(javaClass)
-
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
@@ -353,12 +351,15 @@ internal class UpdateMetaTriggerHandlerImpl(
     log.debug("inserting dataset record for dataset {}/{} into app db for project {}", userID, datasetID, projectID)
 
     val record = DatasetRecord(
-      datasetID     = datasetID,
-      owner         = meta.owner,
-      typeName      = meta.type.name,
-      typeVersion   = meta.type.version,
-      deletionState = DeleteFlag.NotDeleted,
-      isPublic      = meta.visibility == VDIDatasetVisibility.Public
+      datasetID       = datasetID,
+      owner           = meta.owner,
+      typeName        = meta.type.name,
+      typeVersion     = meta.type.version,
+      deletionState   = DeleteFlag.NotDeleted,
+      isPublic        = meta.visibility == VDIDatasetVisibility.Public,
+      accessibility   = meta.visibility,
+      daysForApproval = -1,
+      creationDate    = meta.created,
     )
 
     // this stuff is not project specific!

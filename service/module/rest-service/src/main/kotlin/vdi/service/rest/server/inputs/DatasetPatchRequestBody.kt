@@ -1,3 +1,4 @@
+@file:JvmName("DatasetPatchRequestValidator")
 package vdi.service.rest.server.inputs
 
 import com.networknt.schema.JsonSchema
@@ -15,13 +16,12 @@ internal fun DatasetPatchRequestBody.cleanup() {
   category = category.cleanupString()
   summary = summary.cleanupString()
   description = description.cleanupString()
-  publications = publications.cleanup(DatasetPublication::cleanup)
-  hyperlinks = hyperlinks.cleanup(DatasetHyperlink::cleanup)
+  publications = publications?.cleanup(DatasetPublication::cleanup)
+  hyperlinks = hyperlinks?.cleanup(DatasetHyperlink::cleanup)
   organisms = organisms
     ?.ifEmpty { null }
     ?.onEachIndexed { i, s -> organisms[i] = s.cleanupString() }
-    ?: emptyList()
-  contacts = contacts.cleanup(DatasetContact::cleanup)
+  contacts = contacts?.cleanup(DatasetContact::cleanup)
   datasetType?.cleanup()
 }
 
@@ -33,10 +33,10 @@ internal fun DatasetPatchRequestBody.validate(projects: Iterable<ProjectID>, err
   category.validateCategory(JsonField.CATEGORY, errors)
   summary?.validateSummary(JsonField.SUMMARY, errors)
   // description (nothing to validate)
-  publications.validate(JsonField.PUBLICATIONS, errors)
-  hyperlinks.validate(JsonField.HYPERLINKS, errors)
-  organisms.validateOrganisms(JsonField.ORGANISMS, errors)
-  contacts.validate(JsonField.CONTACTS, errors)
+  publications?.validate(JsonField.PUBLICATIONS, errors)
+  hyperlinks?.validate(JsonField.HYPERLINKS, errors)
+  organisms?.validateOrganisms(JsonField.ORGANISMS, errors)
+  contacts?.validate(JsonField.CONTACTS, errors)
   // pass an empty list for projects because we don't have that information yet.
   datasetType?.validate(JsonField.DATASET_TYPE, projects, errors)
 

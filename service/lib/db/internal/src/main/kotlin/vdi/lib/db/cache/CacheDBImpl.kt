@@ -2,7 +2,6 @@ package vdi.lib.db.cache
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import javax.sql.DataSource
@@ -15,6 +14,7 @@ import vdi.lib.db.cache.sql.select.*
 import vdi.lib.err.StartupException
 import vdi.lib.health.Dependency
 import vdi.lib.health.RemoteDependencies
+import vdi.lib.logging.logger
 import org.postgresql.Driver as PostgresDriver
 
 internal object CacheDBImpl: CacheDB {
@@ -23,7 +23,7 @@ internal object CacheDBImpl: CacheDB {
 
   override val dataSource: DataSource
 
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger<CacheDB>()
 
   private val connection
     get() = dataSource.connection

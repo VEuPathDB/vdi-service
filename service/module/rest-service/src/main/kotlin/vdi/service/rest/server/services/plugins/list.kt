@@ -1,3 +1,4 @@
+@file:JvmName("PluginService")
 package vdi.service.rest.server.services.plugins
 
 import org.veupathdb.vdi.lib.common.field.DataType

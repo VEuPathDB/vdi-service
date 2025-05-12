@@ -87,6 +87,12 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   @JsonProperty(JsonField.PROPERTIES)
   void setProperties(com.fasterxml.jackson.databind.node.ObjectNode properties);
 
+  @JsonProperty(JsonField.ORIGIN)
+  String getOrigin();
+
+  @JsonProperty(JsonField.ORIGIN)
+  void setOrigin(String origin);
+
   @JsonProperty(JsonField.REVISION_NOTE)
   String getRevisionNote();
 

@@ -11,13 +11,13 @@ import kotlin.system.exitProcess
 import vdi.daemon.events.routing.EventRouter
 import vdi.daemon.pruner.PrunerModule
 import vdi.daemon.reconciler.Reconciler
-import vdi.lane.delete.hard.HardDeleteTriggerHandler
-import vdi.lane.delete.soft.SoftDeleteTriggerHandler
+import vdi.lane.hard_delete.HardDeleteTriggerHandler
 import vdi.lane.imports.ImportTriggerHandler
 import vdi.lane.install.InstallDataTriggerHandler
 import vdi.lane.meta.UpdateMetaTriggerHandler
 import vdi.lane.reconciliation.ReconciliationEventHandler
 import vdi.lane.sharing.ShareTriggerHandler
+import vdi.lane.soft_delete.SoftDeleteTriggerHandler
 import vdi.lib.config.loadAndCacheStackConfig
 import vdi.lib.db.cache.patchMetadataTable
 import vdi.lib.modules.VDIModule
@@ -25,7 +25,6 @@ import vdi.module.sleeper.AwaitDependencies
 import vdi.service.rest.RestService
 
 object Main {
-
   private val log = LoggerFactory.getLogger(javaClass)
 
   init {

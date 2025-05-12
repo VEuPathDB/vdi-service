@@ -5,11 +5,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.util.or
 import java.io.InputStream
 import java.sql.SQLException
@@ -17,6 +18,7 @@ import java.time.OffsetDateTime
 import java.util.concurrent.ConcurrentHashMap
 import vdi.lib.async.WorkerPool
 import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.isUniqueConstraintViolation
 import vdi.lib.db.app.model.DatasetInstallMessage
 import vdi.lib.db.app.model.DeleteFlag
 import vdi.lib.db.app.model.InstallStatus
@@ -24,6 +26,8 @@ import vdi.lib.db.app.model.InstallType
 import vdi.lib.db.app.withTransaction
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.withTransaction
+import vdi.lib.kafka.router.KafkaRouter
+import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
@@ -37,10 +41,8 @@ import vdi.lib.s3.DatasetObjectStore
 
 internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig, abortCB: AbortCB)
   : InstallDataTriggerHandler
-  , AbstractVDIModule("install-data-trigger-handler", abortCB)
+  , AbstractVDIModule("install-data-trigger-handler", abortCB, logger<InstallDataTriggerHandler>())
 {
-  private val log = LoggerFactory.getLogger(javaClass)
-
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
@@ -48,7 +50,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
   private val appDB = AppDB()
 
   override suspend fun run() {
-    val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
+    val kc = requireKafkaConsumer(config.eventChannel, config.consumerConfig)
+    val kr = requireKafkaRouter(config.producerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val wp = WorkerPool("install-data-workers", config.jobQueueSize, config.workerPoolSize) {
       Metrics.Install.queueSize.inc(it.toDouble())
@@ -60,7 +63,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           kc.fetchMessages(config.eventMsgKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received install job for dataset $userID/$datasetID from source $source")
-              wp.submit { tryInstallData(userID, datasetID, dm) }
+              wp.submit { tryInstallData(userID, datasetID, dm, kr) }
             }
       }
     }
@@ -70,7 +73,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     confirmShutdown()
   }
 
-  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore) {
+  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore, kr: KafkaRouter) {
     if (datasetsInProgress.add(datasetID)) {
       try {
         installData(userID, datasetID, dm)
@@ -176,8 +179,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
       cacheDB.withTransaction { it.updateDataSyncControl(datasetID, installableFileTimestamp) }
 
       // For each target project
-      meta.projects
-        .forEach { projectID ->
+      val success = meta.projects
+        .all { projectID ->
           // If the handler doesn't apply to the target project, again we
           // shouldn't be here, but we can bail out now with a warning.
           if (!handler.appliesToProject(projectID)) {
@@ -189,12 +192,15 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
               meta.type.version,
               projectID,
             )
-            return@forEach
+            return@all true
           }
 
           installData(userID, datasetID, projectID, dir, handler, installableFileTimestamp)
         }
-    } catch (e: vdi.lib.plugin.client.PluginException) {
+
+      if (success && meta.revisionHistory.isNotEmpty())
+        tryMarkRevised(userID, meta, dm)
+    } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
       throw PluginException.installData(handler.displayName, "N/A", userID, datasetID, cause = e)
@@ -219,7 +225,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     s3Dir: DatasetDirectory,
     handler: PluginHandler,
     installableFileTimestamp: OffsetDateTime,
-  ) {
+  ): Boolean {
     var timer: Histogram.Timer? = null
 
     try {
@@ -230,7 +236,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           datasetID,
           projectID
         )
-        return
+        return false
       }
 
       val dataset = appDB.selectDataset(datasetID) or {
@@ -240,7 +246,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           datasetID,
           projectID
         )
-        return
+        return false
       }
 
       if (dataset.deletionState != DeleteFlag.NotDeleted) {
@@ -250,7 +256,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           datasetID,
           projectID
         )
-        return
+        return false
       }
 
       val status = appDB.selectDatasetInstallMessage(datasetID, InstallType.Data)
@@ -270,8 +276,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
               )
             )
           } catch (e: SQLException) {
-            // Error code 1 == unique constraint violation: https://docs.oracle.com/en/database/oracle/oracle-database/19/errmg/ORA-00000.html
-            if (e.errorCode == 1) {
+            if (it.isUniqueConstraintViolation(e)) {
               log.info(
                 "Unique constraint violation when writing install data message for dataset {}/{}, assuming race condition and ignoring.",
                 userID,
@@ -285,7 +290,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         }
 
         if (race) {
-          return
+          return false
         }
       } else {
         if (status.status != InstallStatus.ReadyForReinstall) {
@@ -296,7 +301,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
             projectID,
             status.status
           )
-          return
+          return false
         }
       }
 
@@ -314,58 +319,73 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
       Metrics.Install.count.labels(dataset.typeName.toString(), dataset.typeVersion, response.responseCode.toString()).inc()
 
-      when (response.type) {
+      return when (response.type) {
         InstallDataResponseType.Success
-        -> handleSuccessResponse(
-          handler,
-          response as InstallDataSuccessResponse,
-          userID,
-          datasetID,
-          projectID,
-          installableFileTimestamp,
-        )
+        -> {
+          handleSuccessResponse(
+            handler,
+            response as InstallDataSuccessResponse,
+            userID,
+            datasetID,
+            projectID,
+            installableFileTimestamp,
+          )
+          true
+        }
 
         InstallDataResponseType.BadRequest
-        -> handleBadRequestResponse(
-          handler,
-          response as InstallDataBadRequestResponse,
-          userID,
-          datasetID,
-          projectID,
-          installableFileTimestamp,
-        )
+        -> {
+          handleBadRequestResponse(
+            handler,
+            response as InstallDataBadRequestResponse,
+            userID,
+            datasetID,
+            projectID,
+            installableFileTimestamp,
+          )
+          false
+        }
 
         InstallDataResponseType.ValidationFailure
-        -> handleValidationFailureResponse(
-          handler,
-          response as InstallDataValidationFailureResponse,
-          userID,
-          datasetID,
-          projectID,
-          installableFileTimestamp
-        )
+        -> {
+          handleValidationFailureResponse(
+            handler,
+            response as InstallDataValidationFailureResponse,
+            userID,
+            datasetID,
+            projectID,
+            installableFileTimestamp
+          )
+          false
+        }
 
         InstallDataResponseType.MissingDependencies
-        -> handleMissingDependenciesResponse(
-          handler,
-          response as InstallDataMissingDependenciesResponse,
-          userID,
-          datasetID,
-          projectID,
-          installableFileTimestamp
-        )
+        -> {
+          handleMissingDependenciesResponse(
+            handler,
+            response as InstallDataMissingDependenciesResponse,
+            userID,
+            datasetID,
+            projectID,
+            installableFileTimestamp
+          )
+          false
+        }
 
         InstallDataResponseType.UnexpectedError
-        -> handleUnexpectedErrorResponse(
-          handler,
-          response as InstallDataUnexpectedErrorResponse,
-          userID,
-          datasetID,
-          projectID,
-          installableFileTimestamp
-        )
+        -> {
+          handleUnexpectedErrorResponse(
+            handler,
+            response as InstallDataUnexpectedErrorResponse,
+            userID,
+            datasetID,
+            projectID,
+            installableFileTimestamp
+          )
+          false
+        }
       }
-    } catch (e: vdi.lib.plugin.client.PluginException) {
+    } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
       throw PluginException.installData(handler.displayName, projectID, userID, datasetID, cause = e)
@@ -533,4 +553,21 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         }
       }
     }
+
+  private fun tryMarkRevised(ownerID: UserID, meta: VDIDatasetMeta, dm: DatasetObjectStore) {
+    meta.revisionHistory.asSequence()
+      .sortedByDescending { it.timestamp }
+      .drop(1) // skip the newest/current revision
+      .map { dm.getDatasetDirectory(ownerID, it.revisionID) }
+      .forEach { tryMarkRevised(it) }
+
+    tryMarkRevised(dm.getDatasetDirectory(ownerID, meta.originalID!!))
+  }
+
+  private fun tryMarkRevised(dir: DatasetDirectory) {
+    dir.getRevisedFlag().also {
+      if (!it.exists())
+        it.touch()
+    }
+  }
 }

@@ -3,14 +3,14 @@ package vdi.lib.rabbit
 import com.rabbitmq.client.Channel
 import com.rabbitmq.client.Connection
 import kotlinx.coroutines.*
-import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.seconds
+import vdi.lib.logging.logger
 
 private const val MaxChannelRetries = 5
 private val RetryDelay = 1.seconds
 
 internal class RabbitInstance(private val con: Connection) {
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger
 
   private var rChan = runBlocking { retryChannel() }
 

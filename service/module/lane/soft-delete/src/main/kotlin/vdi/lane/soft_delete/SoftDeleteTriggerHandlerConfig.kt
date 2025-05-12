@@ -1,4 +1,4 @@
-package vdi.lane.delete.soft
+package vdi.lane.soft_delete
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName

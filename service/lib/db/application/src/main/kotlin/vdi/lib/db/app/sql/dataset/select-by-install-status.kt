@@ -4,7 +4,10 @@ import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import org.veupathdb.vdi.lib.common.field.ProjectID
+import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.time.ZoneId
 import vdi.lib.db.app.model.DatasetRecord
 import vdi.lib.db.app.model.InstallStatus
 import vdi.lib.db.app.model.InstallType
@@ -25,6 +28,9 @@ SELECT
 , ds.type_version
 , ds.is_deleted
 , ds.is_public
+, accessibility
+, days_for_approval
+, creation_date
 FROM
   ${schema}.dataset ds
   INNER JOIN ${schema}.dataset_install_message dsim
@@ -50,12 +56,18 @@ internal fun Connection.selectDatasetsByInstallStatus(
 
     withResults { map {
       DatasetRecord(
-        datasetID   = reqDatasetID("dataset_id"),
-        owner       = getUserID("owner"),
-        typeName    = getDataType("type_name"),
-        typeVersion = getString("type_version"),
-        deletionState   = getDeleteFlag("is_deleted"),
-        isPublic    = getBoolean("is_public"),
+        datasetID     = reqDatasetID("dataset_id"),
+        owner         = getUserID("owner"),
+        typeName      = getDataType("type_name"),
+        typeVersion   = getString("type_version"),
+        deletionState = getDeleteFlag("is_deleted"),
+        isPublic      = getBoolean("is_public"),
+        accessibility = getString("accessibility")?.let(VDIDatasetVisibility::fromString)
+          ?: if (getBoolean("is_public")) VDIDatasetVisibility.Public else VDIDatasetVisibility.Private,
+        daysForApproval = getInt("days_for_approval").let { if (wasNull()) -1 else it },
+        creationDate    = getObject("creation_date", LocalDateTime::class.java)
+          ?.atZone(ZoneId.systemDefault())
+          ?.toOffsetDateTime()
       )
     } }
   }

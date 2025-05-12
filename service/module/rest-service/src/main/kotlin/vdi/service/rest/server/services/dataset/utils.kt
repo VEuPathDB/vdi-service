@@ -1,3 +1,4 @@
+@file:JvmName("DatasetServiceUtils")
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.vdi.lib.common.field.UserID

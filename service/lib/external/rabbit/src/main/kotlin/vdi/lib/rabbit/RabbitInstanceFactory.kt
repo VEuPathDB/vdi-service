@@ -4,10 +4,10 @@ import com.rabbitmq.client.ConnectionFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
-import org.slf4j.LoggerFactory
+import vdi.lib.logging.logger
 
 internal class RabbitInstanceFactory(config: RabbitMQConfig) {
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger
 
   private val fac = ConnectionFactory()
     .apply {

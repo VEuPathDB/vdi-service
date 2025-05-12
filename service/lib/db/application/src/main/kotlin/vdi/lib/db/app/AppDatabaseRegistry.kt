@@ -31,8 +31,9 @@ object AppDatabaseRegistry {
 
       targets.asSequence()
         .filter {
-          it.enabled.also { enabled -> if (!enabled) logger.info("install target ${it.targetName} is disabled") }
+          it.enabled.also { enabled -> if (!enabled) logger.warn("install target ${it.targetName} is disabled") }
         }
+        .onEach { logger.info("install target ${it.targetName} is enabled") }
         .forEach { initTarget(it, builders) }
 
       builders.forEach { (k, v) -> dataSources[k] = v.build() }

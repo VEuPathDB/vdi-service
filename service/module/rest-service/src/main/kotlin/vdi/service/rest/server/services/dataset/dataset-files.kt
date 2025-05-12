@@ -1,3 +1,4 @@
+@file:JvmName("DatasetFileService")
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.s3.s34k.objects.StreamObject

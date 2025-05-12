@@ -2,16 +2,19 @@ package vdi.lib.modules
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-abstract class AbstractJobExecutor(name: String, abortCB: AbortCB, private val wakeInterval: Duration = 2.seconds)
+abstract class AbstractJobExecutor(
+  name: String,
+  abortCB: AbortCB,
+  log: Logger,
+  private val wakeInterval: Duration = 2.seconds
+)
   : VDIModule
-  , AbstractVDIModule(name, abortCB)
+  , AbstractVDIModule(name, abortCB, log)
 {
-  private val log = LoggerFactory.getLogger(javaClass)
-
   protected open suspend fun init() {}
 
   protected abstract suspend fun runJob()

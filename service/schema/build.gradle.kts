@@ -1,10 +1,10 @@
-import vdi.ConfigSchemaCompiler
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.networknt.schema.ExecutionContext
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
 import org.yaml.snakeyaml.Yaml
+import vdi.ConfigSchemaCompiler
 
 plugins {
   `java-library`

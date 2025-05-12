@@ -3,11 +3,11 @@ package vdi.service.rest.server.controllers
 import jakarta.ws.rs.core.Context
 import kotlinx.coroutines.runBlocking
 import org.glassfish.jersey.server.ContainerRequest
-import org.slf4j.LoggerFactory
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import vdi.lib.db.cache.model.DatasetListQuery
 import vdi.lib.db.cache.model.DatasetOwnershipFilter
+import vdi.lib.logging.logger
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.resources.Datasets
@@ -24,7 +24,7 @@ class DatasetList(@Context request: ContainerRequest, @Context val uploadConfig:
   : Datasets
   , ControllerBase(request)
 {
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger
 
   override fun getDatasets(projectId: String?, ownership: String?): Datasets.GetDatasetsResponse {
     // Parse the ownership filter field

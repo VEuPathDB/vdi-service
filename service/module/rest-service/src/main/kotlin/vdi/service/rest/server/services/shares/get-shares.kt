@@ -1,3 +1,5 @@
+@file:JvmMultifileClass
+@file:JvmName("DatasetShareService")
 package vdi.service.rest.server.services.shares
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider

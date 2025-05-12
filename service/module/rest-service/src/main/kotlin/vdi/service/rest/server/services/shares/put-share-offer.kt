@@ -1,3 +1,5 @@
+@file:JvmMultifileClass
+@file:JvmName("DatasetShareService")
 package vdi.service.rest.server.services.shares
 
 import jakarta.ws.rs.BadRequestException

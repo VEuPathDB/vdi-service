@@ -85,7 +85,7 @@ Feature Expansion::
 
 == Development
 
-=== Running the Stack Locally
+=== Run the Stack Locally
 
 ==== Configure Compose Environment
 
@@ -180,6 +180,30 @@ This build target requires the environment variables `GITHUB_USERNAME` and
 `GITHUB_TOKEN` be available in the running shell.  See the
 {confluence}/TECH/pages/108560402/Deploy+Containerized+Services+for+Local+Development[Confluence Container Guide]
 for additional information.
+
+=== Update Dataset Characteristics Schema
+
+.Optional: Lightweight Checkout
+[%collapsible]
+====
+Clones only the dataset characteristics schema files without pulling down the
+full repository source.
+
+[source, shell]
+----
+git clone git@github.com:VEuPathDB/vdi-service --depth 1 --filter tree:0 \
+  && cd vdi-service \
+  && git sparse-checkout set --no-cone /service/schema/data \
+  && git checkout
+----
+====
+
+The dataset characteristics validation schema files are JSON schema, written in
+YAML that live in the link:service/schema/data/[data schema directory].
+
+The schema files themselves are validated using the included metaschema JSON
+file, which may be plugged into many smart editors to automatically validate
+the dataset schema as it is being edited.
 
 
 == Repo Structure

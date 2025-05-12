@@ -1,10 +1,13 @@
+@file:JvmName("DatasetProxyPostMetaValidator")
 package vdi.service.rest.server.inputs
 
+import com.fasterxml.jackson.module.kotlin.convertValue
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
+import org.veupathdb.vdi.lib.json.JSON
 import java.time.OffsetDateTime
 import vdi.service.rest.generated.model.*
 
@@ -40,4 +43,5 @@ fun DatasetProxyPostMeta.toInternal(userID: UserID, url: String?) =
     hyperlinks       = hyperlinks.map(DatasetHyperlink::toInternal),
     contacts         = contacts.map(DatasetContact::toInternal),
     organisms        = organisms,
+    properties       = JSON.convertValue(properties)
   )

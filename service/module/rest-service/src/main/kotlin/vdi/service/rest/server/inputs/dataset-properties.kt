@@ -1,3 +1,4 @@
+@file:JvmName("DatasetPropertiesValidator")
 package vdi.service.rest.server.inputs
 
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -24,7 +25,12 @@ fun ObjectNode.validate(schema: JsonSchema, jPath: String, errors: ValidationErr
     val path = when (val loc = msg.instanceLocation.toString()) {
       "$"  -> jPath
       else -> jPath..loc.substring(2)
-    }..msg.property
+    }.let {
+      if (msg.property != null)
+        it..msg.property
+      else
+        it
+    }
 
     if (path in furtherProcessing) {
       furtherProcessing[path]!!.add(msg)

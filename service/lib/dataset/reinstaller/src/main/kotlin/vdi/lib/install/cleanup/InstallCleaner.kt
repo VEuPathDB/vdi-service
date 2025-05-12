@@ -1,6 +1,5 @@
 package vdi.lib.install.cleanup
 
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
@@ -11,10 +10,11 @@ import vdi.lib.db.app.model.InstallStatus
 import vdi.lib.db.app.model.InstallType
 import vdi.lib.db.app.withTransaction
 import vdi.lib.db.cache.CacheDB
+import vdi.lib.logging.logger
 
 object InstallCleaner {
 
-  private val log = LoggerFactory.getLogger(javaClass)
+  private val log = logger
 
   @Suppress("NOTHING_TO_INLINE")
   private inline fun msgFailedByProject(datasetID: DatasetID, projectID: ProjectID) =
