@@ -1,0 +1,27 @@
+name: API Doc Builder Environment Setup
+description: Setup API doc building environment.
+
+
+runs:
+  using: composite
+  steps:
+
+  - name: Install Java 21
+    uses: actions/setup-java@v4
+    with:
+      java-version: '21'
+      distribution: corretto
+
+  - name: Install Gradle 8.14
+    uses: gradle/actions/setup-gradle@v4
+    with:
+      gradle-version: '8.14'
+
+  - name: Install NPM
+    uses: actions/setup-node@v4
+
+  - name: Install NPM Packages
+    run: npm i -g raml2html raml2html-modern-theme
+
+  - name: Install Python Packages
+    run: pip install json-schema-for-humans
