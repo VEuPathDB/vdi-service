@@ -52,18 +52,18 @@ runs:
   - name: Copy Gradle Outputs
     shell: bash
     run: >-
-      cp -rt ${{ inputs.output-dir }}
-        docs/vdi-api.html
-        service/schema
+      cp -rt ${{ inputs.output-dir }} \
+        docs/vdi-api.html \
+        service/schema \
         service/schema/build/json-schema/*
 
   - name: Compile Config Schema Docs
     shell: bash
     run: >-
-      generate-schema-doc
-        --config expand_buttons
-        --config examples_as_yaml
-        --config no_link_to_reused_ref
-        service/schema/config/stack-config.json
+      generate-schema-doc \
+        --config expand_buttons \
+        --config examples_as_yaml \
+        --config no_link_to_reused_ref \
+        service/schema/config/stack-config.json \
         ${{ inputs.output-dir }}/config-schema.html
 
