@@ -45,10 +45,10 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Setup Environment
-      uses: ./.github/actions/api-doc-env@main
+      uses: ./.github/actions/api-doc-env
 
     - name: Build Dev Docs
-      uses: ./.github/actions/api-doc-build@main
+      uses: ./.github/actions/api-doc-build
       with:
         ref: main
         output-dir: tmpdocs/dev
