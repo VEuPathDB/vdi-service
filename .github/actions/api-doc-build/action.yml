@@ -19,6 +19,7 @@ runs:
   using: composite
   steps:
   - name: Ensure Workspace Dirs
+    shell: bash
     run: mkdir -p ${{ inputs.output-dir }}/schema/data ${{ inputs.output-dir }}/schema/config
 
   - name: Checkout Ref "${{ inputs.ref }}"
@@ -28,24 +29,28 @@ runs:
       ref: '${{ inputs.ref }}'
 
   - name: Compile RAML Docs
+    shell: bash
     run: gradle :service:generate-raml-docs
     env:
       GITHUB_USERNAME: ${{ secrets.gh-user }}
       GITHUB_TOKEN: ${{ secrets.gh-token }}
 
   - name: Compile Dataset Characteristics Schema
+    shell: bash
     run: gradle :service:schema:build-dataset-schema-resources
     env:
       GITHUB_USERNAME: ${{ secrets.gh-user }}
       GITHUB_TOKEN: ${{ secrets.gh-token }}
 
   - name: Compile Service Config Schema
+    shell: bash
     run: gradle :service:schema:build-config-schema-resource
     env:
       GITHUB_USERNAME: ${{ secrets.gh-user }}
       GITHUB_TOKEN: ${{ secrets.gh-token }}
 
   - name: Copy Gradle Outputs
+    shell: bash
     run: >-
       cp -rt ${{ inputs.output-dir }}
         docs/vdi-api.html
@@ -53,6 +58,7 @@ runs:
         service/schema/build/json-schema/*
 
   - name: Compile Config Schema Docs
+    shell: bash
     run: >-
       generate-schema-doc
         --config expand_buttons

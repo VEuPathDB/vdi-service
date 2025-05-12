@@ -21,7 +21,9 @@ runs:
     uses: actions/setup-node@v4
 
   - name: Install NPM Packages
+    shell: bash
     run: npm i -g raml2html raml2html-modern-theme
 
   - name: Install Python Packages
+    shell: bash
     run: pip install json-schema-for-humans

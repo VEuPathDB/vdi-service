@@ -6,6 +6,11 @@ on:
     paths:
     - 'docs/vdi-api.html'
     - 'service/schema/**'
+    - 'service/module/rest-service/api-schema/**'
+    - 'service/module/rest-service/*.raml'
+    - '.github/actions/api-doc-build/action.yml'
+    - '.github/actions/api-doc-env/action.yml'
+    - '.github/workflows/api-docs.yml'
 
 jobs:
   prep:
