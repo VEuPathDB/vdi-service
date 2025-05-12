@@ -9,9 +9,7 @@ import org.slf4j.LoggerFactory
 import java.net.Socket
 import kotlin.time.Duration
 import vdi.lib.config.StackConfig
-import vdi.lib.config.vdi.CacheDBConfig
-import vdi.lib.config.vdi.KafkaConfig
-import vdi.lib.config.vdi.VDIConfig
+import vdi.lib.config.vdi.*
 import vdi.lib.err.StartupException
 
 fun awaitDependencies(config: StackConfig) {
@@ -19,9 +17,12 @@ fun awaitDependencies(config: StackConfig) {
 }
 
 private suspend fun awaitVDI(config: VDIConfig, timeout: Duration, logger: Logger) {
-  awaitCacheDB(config.cacheDB, timeout, logger)
-  awaitKafka(config.kafka, timeout, logger)
-  await
+  coroutineScope {
+    launch { awaitCacheDB(config.cacheDB, timeout, logger) }
+    launch { awaitKafka(config.kafka, timeout, logger) }
+    launch { awaitRabbit(config.rabbit, timeout, logger) }
+    launch { awaitObjectStore(config.objectStore, timeout, logger) }
+  }
 }
 
 private suspend fun awaitCacheDB(config: CacheDBConfig, timeout: Duration, logger: Logger) {
@@ -40,7 +41,23 @@ private suspend fun awaitKafka(config: KafkaConfig, timeout: Duration, logger: L
   }
 }
 
-private inline suspend fun awaitNamed(name: String, logger: Logger, fn: () -> Unit) {
+private suspend fun awaitRabbit(config: RabbitConfigs, timeout: Duration, logger: Logger) {
+  awaitNamed("rabbit", logger) {
+    awaitRemote(
+      config.global.connection.server.host,
+      config.global.connection.server.port ?: if (config.global.connection.tls == false) 5672u else 5671u,
+      timeout
+    )
+  }
+}
+
+private suspend fun awaitObjectStore(config: ObjectStoreConfig, timeout: Duration, logger: Logger) {
+  awaitNamed("minio", logger) {
+    awaitRemote(config.server.host, config.server.port ?: 9000u, timeout)
+  }
+}
+
+private inline fun awaitNamed(name: String, logger: Logger, fn: () -> Unit) {
   logger.info("polling dependency {}", name)
   fn()
   logger.info("successfully polled dependency {}", name)

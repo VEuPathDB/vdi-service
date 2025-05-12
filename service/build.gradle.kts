@@ -65,7 +65,7 @@ dependencies {
 // Fat Jar Config
 tasks.shadowJar {
   exclude("**/Log4j2Plugins.dat")
-  archiveFileName.set("service.jar")
+  archiveFileName.set("vdi-service.jar")
 
   manifest {
     attributes["Main-Class"] = "vdi.bootstrap.Main"

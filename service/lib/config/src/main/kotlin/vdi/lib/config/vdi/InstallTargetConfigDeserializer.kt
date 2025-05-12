@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.module.kotlin.convertValue
 import org.veupathdb.vdi.lib.common.field.SecretString
 import org.veupathdb.vdi.lib.json.JSON
 import vdi.lib.config.common.DatabaseConnectionConfigDeserializer.Companion.deserialize
@@ -19,7 +20,7 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
     val dataTypes  = (obj["dataTypes"] as ArrayNode?)
       ?.let { it.mapTo(HashSet(it.size())) { e -> e.textValue() } }
       ?: emptySet()
-    val propSchema = JSON.convertValue(obj["datasetPropertySchema"], DatasetPropertySchema::class.java)
+    val propSchema = JSON.convertValue<DatasetPropertySchema?>(obj["datasetPropertySchema"])
 
 
     if (obj["enabled"]?.booleanValue() == false) {
@@ -40,7 +41,7 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
       dataTypes             = dataTypes,
       controlDB             = (obj["controlDb"] as ObjectNode).deserialize(),
       dataDB                = (obj["dataDb"] as ObjectNode).deserialize(),
-      datasetPropertySchema = propSchema
+      datasetPropertySchema = propSchema ?: NullPropertySchema
     )
   }
 }

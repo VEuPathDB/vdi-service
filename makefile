@@ -109,7 +109,7 @@ open-rabbit:
 
 .PHONY: _env-file-test
 _env-file-test:
-	@if [ ! -f compose/.env ]; then echo "Missing .env file."; exit 1; fi
+	@if [ ! -f .env ]; then echo "Missing .env file."; exit 1; fi
 
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #

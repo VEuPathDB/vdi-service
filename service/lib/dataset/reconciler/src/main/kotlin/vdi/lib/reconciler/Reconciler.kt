@@ -82,7 +82,7 @@ object Reconciler {
 
     coroutineScope {
       targets.forEach {
-        launch(CoroutineThreadContext(ThreadContextData(mapOf("workerID" to workerName(false, it))))) {
+        launch(CoroutineThreadContext(ThreadContextData(mapOf("workerID" to workerName(it))))) {
           ReconcilerInstance(it, datasetManager, kafkaRouter, false, config.deletesEnabled).reconcile()
         }
       }
@@ -102,7 +102,7 @@ object Reconciler {
     val target = CacheDBTarget()
 
     coroutineScope {
-      launch(CoroutineThreadContext(ThreadContextData(mapOf("workerID" to workerName(true, target))))) {
+      launch(CoroutineThreadContext(ThreadContextData(mapOf("workerID" to "slim-recon")))) {
         ReconcilerInstance(target, datasetManager, kafkaRouter, true, false).reconcile()
       }
     }
@@ -112,5 +112,5 @@ object Reconciler {
     return true
   }
 
-  private fun workerName(slim: Boolean, tgt: ReconcilerTarget) = if (slim) "slim-${tgt.name}" else "full-${tgt.name}"
+  private fun workerName(tgt: ReconcilerTarget) = "full-recon-${tgt.name}"
 }

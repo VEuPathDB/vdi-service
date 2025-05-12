@@ -9,6 +9,7 @@ import vdi.lib.config.StackConfig
 import vdi.lib.db.app.AppDB
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.install.InstallTargetRegistry
+import vdi.lib.plugin.registry.PluginRegistry
 import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.health.DependencySource
 import vdi.service.rest.s3.DatasetStore
@@ -22,6 +23,7 @@ class RestService(config: StackConfig) : Server() {
     // Eager load classes for fail-fast
     log.info("initializing dependencies")
     InstallTargetRegistry
+    PluginRegistry
     AppDB()
     CacheDB()
 

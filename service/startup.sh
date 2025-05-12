@@ -13,9 +13,9 @@ waitFor() {
 
 waitFor kafka kafka 9092
 waitFor cache-db cache-db "5432"
-waitFor rabbit "$GLOBAL_RABBIT_HOST" "${GLOBAL_RABBIT_PORT:-5672}"
-waitFor minio "$S3_HOST" "$S3_PORT"
+waitFor rabbit "${GLOBAL_RABBIT_HOST:-rabbit-external}" "${GLOBAL_RABBIT_PORT:-5672}"
+waitFor minio "${S3_HOST:-minio-external}" "${S3_PORT:-9000}"
 
 echo "starting service with JVM args: $JVM_MEM_ARGS $JVM_ARGS"
 
-exec java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /service.jar
+exec java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /opt/vdi/vdi-service.jar

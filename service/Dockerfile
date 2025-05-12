@@ -30,9 +30,10 @@ RUN apk add --no-cache tzdata \
 ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
     JVM_ARGS=""
 
-COPY --from=prep ["/workspace/build/libs/service.jar", "/workspace/bootstrap/startup.sh", "/"]
+COPY --from=prep ["/workspace/build/libs/vdi-service.jar", "/opt/vdi/"]
+COPY service/startup.sh /usr/bin/vdi-startup
 
 ARG CONFIG_FILE="config/halfway-config.yml"
 COPY ${CONFIG_FILE} /etc/vdi/config.yml
 
-CMD /startup.sh
+CMD vdi-startup
