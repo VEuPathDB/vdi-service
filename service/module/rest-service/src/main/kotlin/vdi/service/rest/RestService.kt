@@ -7,6 +7,7 @@ import org.veupathdb.lib.container.jaxrs.server.Server
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import vdi.lib.config.StackConfig
 import vdi.lib.db.app.AppDB
+import vdi.lib.db.app.AppDatabaseRegistry
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.install.InstallTargetRegistry
 import vdi.lib.plugin.registry.PluginRegistry
@@ -22,6 +23,7 @@ class RestService(config: StackConfig) : Server() {
   init {
     // Eager load classes for fail-fast
     log.info("initializing dependencies")
+    AppDatabaseRegistry
     InstallTargetRegistry
     PluginRegistry
     AppDB()
