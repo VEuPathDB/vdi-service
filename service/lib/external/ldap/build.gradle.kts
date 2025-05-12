@@ -9,7 +9,7 @@ dependencies {
   api(libs.ldap)
 
   implementation(libs.vdi.common)
-  implementation(libs.log.slf4j)
+  implementation(libs.log.slf4j.api)
 
   testImplementation(kotlin("test"))
 }

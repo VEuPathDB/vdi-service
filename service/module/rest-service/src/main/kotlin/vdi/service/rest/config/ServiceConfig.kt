@@ -21,49 +21,49 @@ class ServiceConfig(config: StackConfig) : Options() {
     .map { it.targetName }
 
   override fun getAdminAuthToken() =
-    Optional.ofNullable(coreConfig
-      ?.authentication
-      ?.adminToken
-      ?.unwrap())
+    Optional.of(coreConfig
+      .authentication
+      .adminToken
+      .unwrap())
 
   override fun getServerPort() =
-    Optional.ofNullable(coreConfig?.http?.bindPort?.toInt())
+    Optional.ofNullable(coreConfig.http?.bindPort?.toInt())
 
   override fun getCorsEnabled() =
-    coreConfig?.http?.enableCORS ?: false
+    coreConfig.http?.enableCORS ?: false
 
   override fun getOAuthUrl() =
-    Optional.ofNullable(coreConfig?.authentication?.oauth?.url)
+    Optional.of(coreConfig.authentication.oauth.url)
 
   override fun getOAuthClientId() =
-    Optional.ofNullable(coreConfig?.authentication?.oauth?.clientID)
+    Optional.of(coreConfig.authentication.oauth.clientID)
 
   override fun getOAuthClientSecret() =
-    Optional.ofNullable(coreConfig?.authentication?.oauth?.clientSecret?.unwrap())
+    Optional.of(coreConfig.authentication.oauth.clientSecret.unwrap())
 
   override fun getKeyStoreFile() =
-    Optional.ofNullable(coreConfig?.authentication?.oauth?.keystoreFile)
+    Optional.ofNullable(coreConfig.authentication.oauth.keystoreFile)
 
   override fun getKeyStorePassPhrase() =
-    Optional.ofNullable(coreConfig?.authentication?.oauth?.keystorePass?.unwrap())
+    Optional.ofNullable(coreConfig.authentication.oauth.keystorePass?.unwrap())
 
   override fun getAppDbOpts() =
-    coreConfig?.databases?.applicationDB.toDbOptions()
+    coreConfig.databases?.applicationDB.toDbOptions()
 
   override fun getAcctDbOpts() =
-    coreConfig?.databases?.accountDB.toDbOptions()
+    coreConfig.databases?.accountDB.toDbOptions()
 
   override fun getUserDbOpts() =
-    coreConfig?.databases?.userDB.toDbOptions()
+    coreConfig.databases?.userDB.toDbOptions()
 
   override fun getUserDbSchema(): String =
-    coreConfig?.databases?.userDB?.schema ?: super.getUserDbSchema()
+    coreConfig.databases?.userDB?.schema ?: super.getUserDbSchema()
 
   override fun getLdapServers() =
-    Optional.ofNullable(coreConfig?.ldap?.servers?.joinToString(",") { "${it.host}:${it.port ?: 389}" })
+    Optional.ofNullable(coreConfig.ldap?.servers?.joinToString(",") { "${it.host}:${it.port ?: 389}" })
 
   override fun getDbLookupBaseDn() =
-    Optional.ofNullable(coreConfig?.ldap?.baseDN)
+    Optional.ofNullable(coreConfig.ldap?.baseDN)
 
   private fun DatabaseConnectionConfig?.toDbOptions(): DbOptions =
     when (this) {

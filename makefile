@@ -182,7 +182,7 @@ COMPOSE_LOG_CMD := $(COMPOSE_CMD) logs $(LOG_FLAGS)
 # Specific services may be specified by using the SERVICES variable.
 .PHONY: logs
 logs:
-	$(COMPOSE_LOG_CMD) $(SERVICES)
+	@$(COMPOSE_LOG_CMD) $(SERVICES)
 
 # Prints and tails the core service container log output.
 #
@@ -209,71 +209,71 @@ log-plugin-example: logs
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-noop
-log-plugin-noop:
-	@$(COMPOSE_LOG_CMD) plugin-noop
+log-plugin-noop: SERVICES := plugin-noop
+log-plugin-noop: logs
 
 # Prints and tails the genelist plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-genelist
-log-plugin-genelist:
-	@$(COMPOSE_LOG_CMD) plugin-genelist
+log-plugin-genelist: SERVICE := plugin-genelist
+log-plugin-genelist: logs
 
 # Prints and tails the rnaseq plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-rnaseq
-log-plugin-rnaseq:
-	@$(COMPOSE_LOG_CMD) plugin-rnaseq
+log-plugin-rnaseq: SERVICE := plugin-rnaseq
+log-plugin-rnaseq: logs
 
 # Prints and tails the isasimple plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-isasimple
-log-plugin-isasimple:
-	@$(COMPOSE_LOG_CMD) plugin-isasimple
+log-plugin-isasimple: SERVICE := plugin-isasimple
+log-plugin-isasimple: logs
 
 # Prints and tails the biom plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-biom
-log-plugin-biom:
-	@$(COMPOSE_LOG_CMD) plugin-biom
+log-plugin-biom: SERVICE := plugin-biom
+log-plugin-biom: logs
 
 # Prints and tails the bigwig plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-bigwig
-log-plugin-bigwig:
-	@$(COMPOSE_LOG_CMD) plugin-bigwig
+log-plugin-bigwig: SERVICE := plugin-bigwig
+log-plugin-bigwig: logs
 
 # Prints and tails the phenotype plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-wrangler
-log-plugin-phenotype:
-	@$(COMPOSE_LOG_CMD) plugin-phenotype
+log-plugin-phenotype: SERVICE := plugin-phenotype
+log-plugin-phenotype: logs
 
 # Prints and tails the kafka log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-kafka
-log-kafka:
-	@$(COMPOSE_LOG_CMD) kafka
+log-kafka: SERVICE := kafka
+log-kafka: logs
 
 # Prints and tails the local minio container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-minio
-log-minio:
-	@$(COMPOSE_LOG_CMD) minio-external
+log-minio: SERVICE := minio-external
+log-minio: logs
 
 # Prints and tails the local rabbitmq container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-rabbit
-log-rabbit:
-	@$(COMPOSE_LOG_CMD) rabbit-external
+log-rabbit: SERVICE := rabbit-external
+log-rabbit: logs
 
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #

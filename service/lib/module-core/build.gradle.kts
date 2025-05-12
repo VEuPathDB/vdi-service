@@ -10,5 +10,5 @@ dependencies {
   implementation(libs.vdi.common)
   implementation(libs.s34k)
   implementation(libs.vdi.json)
-  implementation(libs.log.slf4j)
+  implementation(libs.log.slf4j.api)
 }

@@ -15,7 +15,7 @@ dependencies {
   implementation(libs.vdi.common)
   implementation(libs.vdi.json)
   implementation(libs.s34k)
-  implementation(libs.log.slf4j)
+  implementation(libs.log.slf4j.api)
 
   testImplementation(kotlin("test"))
   testImplementation(libs.junit.api)

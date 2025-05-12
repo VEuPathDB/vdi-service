@@ -59,11 +59,13 @@ allprojects {
 }
 
 dependencies {
-  implementation(project(":bootstrap"))
+  implementation(project(":module:bootstrap"))
 }
 
 // Fat Jar Config
 tasks.shadowJar {
+  dependencyFilter.exclude { it.moduleGroup == "commons-logging" }
+
   exclude("**/Log4j2Plugins.dat")
   archiveFileName.set("vdi-service.jar")
 

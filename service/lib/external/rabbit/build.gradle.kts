@@ -9,6 +9,6 @@ dependencies {
 
   implementation(libs.kt.coroutines)
   implementation(libs.vdi.common)
-  implementation(libs.log.slf4j)
+  implementation(libs.log.slf4j.api)
   implementation(libs.msg.rabbit)
 }

@@ -17,6 +17,6 @@ dependencies {
   implementation(libs.vdi.common)
   implementation(libs.s34k)
   implementation(libs.kt.coroutines)
-  implementation(libs.log.slf4j)
+  implementation(libs.log.slf4j.api)
   implementation(kotlin("stdlib-jdk8"))
 }

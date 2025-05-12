@@ -11,7 +11,6 @@ COPY service/buildSrc buildSrc
 
 RUN gradle --no-daemon download-dependencies
 
-COPY service/bootstrap bootstrap
 COPY service/schema schema
 COPY service/lib lib
 COPY service/module module
@@ -31,9 +30,8 @@ ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
     JVM_ARGS=""
 
 COPY --from=prep ["/workspace/build/libs/vdi-service.jar", "/opt/vdi/"]
-COPY service/startup.sh /usr/bin/vdi-startup
 
 ARG CONFIG_FILE="config/halfway-config.yml"
 COPY ${CONFIG_FILE} /etc/vdi/config.yml
 
-CMD vdi-startup
+CMD java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /opt/vdi/vdi-service.jar

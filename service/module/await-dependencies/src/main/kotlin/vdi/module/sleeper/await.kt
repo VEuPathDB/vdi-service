@@ -8,12 +8,16 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.Socket
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import vdi.lib.config.StackConfig
 import vdi.lib.config.vdi.*
 import vdi.lib.err.StartupException
 
-fun awaitDependencies(config: StackConfig) {
+private const val OverallTimeoutSeconds = 60
+
+suspend fun AwaitDependencies(config: StackConfig) {
   val logger = LoggerFactory.getLogger("Sleeper")
+  awaitVDI(config.vdi, OverallTimeoutSeconds.seconds, logger)
 }
 
 private suspend fun awaitVDI(config: VDIConfig, timeout: Duration, logger: Logger) {
@@ -60,7 +64,7 @@ private suspend fun awaitObjectStore(config: ObjectStoreConfig, timeout: Duratio
 private inline fun awaitNamed(name: String, logger: Logger, fn: () -> Unit) {
   logger.info("polling dependency {}", name)
   fn()
-  logger.info("successfully polled dependency {}", name)
+  logger.info("successfully pinged dependency {}", name)
 }
 
 private suspend fun awaitRemote(host: String, port: UShort, timeout: Duration) {

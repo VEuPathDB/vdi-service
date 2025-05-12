@@ -12,5 +12,5 @@ dependencies {
   implementation(libs.kt.coroutines)
   implementation(libs.vdi.common)
   implementation(libs.s34k)
-  implementation(libs.log.slf4j)
+  implementation(libs.log.slf4j.api)
 }

@@ -8,6 +8,7 @@ dependencies {
   implementation(project(":lib:config"))
   implementation(project(":lib:db:internal"))
   implementation(project(":lib:module-core"))
+  implementation(project(":module:await-dependencies"))
   implementation(project(":module:rest-service"))
   implementation(project(":module:daemon:event-router"))
   implementation(project(":module:daemon:reconciler"))
@@ -23,7 +24,9 @@ dependencies {
   implementation(libs.kt.coroutines)
   implementation(libs.container.core)
 
-  implementation(libs.log.slf4j)
+  implementation(libs.log.slf4j.api)
+  implementation(libs.log.slf4j.jcl)
+  implementation(libs.log.slf4j.jul)
   implementation(libs.log.log4j.api)
   implementation(libs.log.log4j.core)
   implementation(libs.log.log4j.slf4j)

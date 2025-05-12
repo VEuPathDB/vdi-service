@@ -23,7 +23,12 @@ containerService {
   }
 }
 
+configurations.all {
+  exclude(group = "commons-logging", module = "commons-logging")
+}
+
 dependencies {
+
   implementation(project(":lib:common"))
   implementation(project(":lib:config"))
   implementation(project(":lib:dataset:pruner"))
@@ -41,6 +46,7 @@ dependencies {
 
   implementation(libs.fgputil.db)
   implementation(libs.container.core)
+
   implementation(libs.container.multipart)
 
   implementation(libs.json.request.validation)
@@ -52,7 +58,8 @@ dependencies {
 
   implementation(libs.http.server.jersey)
 
-  implementation(libs.log.slf4j)
+  implementation(libs.log.slf4j.api)
+  implementation(libs.log.slf4j.jcl)
   implementation(libs.log.log4j.core)
   implementation(libs.log.log4j.slf4j)
 

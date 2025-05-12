@@ -21,15 +21,26 @@ import vdi.lane.sharing.ShareTriggerHandler
 import vdi.lib.config.loadAndCacheStackConfig
 import vdi.lib.db.cache.patchMetadataTable
 import vdi.lib.modules.VDIModule
+import vdi.module.sleeper.AwaitDependencies
 import vdi.service.rest.RestService
 
 object Main {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
+  init {
+    java.util.logging.LogManager.getLogManager().readConfiguration("""
+      handlers = org.slf4j.bridge.SLF4JBridgeHandler
+      .level = SEVERE
+    """.trimIndent().byteInputStream())
+  }
+
   @JvmStatic
   fun main(args: Array<String>) {
     val config = loadAndCacheStackConfig()
+
+    log.info("awaiting external dependencies")
+    runBlocking { AwaitDependencies(config) }
 
     log.info("initializing modules")
     val modules = listOf(

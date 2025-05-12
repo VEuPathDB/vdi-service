@@ -25,7 +25,9 @@ db-driver-postgres = { group = "org.postgresql",           name = "postgresql", 
 db-kotlin-extended = { group = "io.foxcapades.kt",         name = "kdbc",       version = "1.1.1"        }
 
 # Logging
-log-slf4j        = { group = "org.slf4j",                name = "slf4j-api",         version = "2.0.16" }
+log-slf4j-api    = { group = "org.slf4j",                name = "slf4j-api",         version = "2.0.17" }
+log-slf4j-jcl    = { group = "org.slf4j",                name = "jcl-over-slf4j",    version = "2.0.17" }
+log-slf4j-jul    = { group = "org.slf4j",                name = "jul-to-slf4j",      version = "2.0.17" }
 log-log4j-api    = { group = "org.apache.logging.log4j", name = "log4j-api",         version = "2.24.3" }
 log-log4j-core   = { group = "org.apache.logging.log4j", name = "log4j-core",        version = "2.24.3" }
 log-log4j-slf4j  = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version = "2.24.3" }

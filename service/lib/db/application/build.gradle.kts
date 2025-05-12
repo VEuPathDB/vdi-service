@@ -17,5 +17,5 @@ dependencies {
   implementation(libs.db.driver.postgres)
   implementation(libs.db.kotlin.extended)
 
-  implementation(libs.log.slf4j)
+  implementation(libs.log.slf4j.api)
 }

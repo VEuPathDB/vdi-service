@@ -9,6 +9,6 @@ dependencies {
   api(libs.vdi.json)
 
   implementation(libs.json.schema.validation)
-  implementation(libs.log.slf4j)
+  implementation(libs.log.slf4j.api)
   implementation(libs.yaml)
 }

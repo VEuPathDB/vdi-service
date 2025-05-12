@@ -45,7 +45,6 @@ buildscript {
   }
 }
 
-include(":bootstrap")
 include(":schema")
 
 include(":lib:async")
@@ -68,6 +67,7 @@ include(":lib:plugin:registry")
 include(":lib:test-utils")
 
 include(":module:await-dependencies")
+include(":module:bootstrap")
 include(":module:daemon:event-router")
 include(":module:daemon:pruner")
 include(":module:daemon:reconciler")
