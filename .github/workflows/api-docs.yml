@@ -61,7 +61,7 @@ jobs:
         gh-user: ${{ secrets.GH_USERNAME }}
 
     - name: Build QA Docs
-      uses: ./.github/actions/api-doc-build@main
+      uses: ./.github/actions/api-doc-build
       with:
         ref: '${{ needs.prep.outputs.qa_tag }}'
         output-dir: tmpdocs/qa
@@ -69,7 +69,7 @@ jobs:
         gh-user: ${{ secrets.GH_USERNAME }}
 
     - name: Build Prod Docs
-      uses: ./.github/actions/api-doc-build@main
+      uses: ./.github/actions/api-doc-build
       with:
         ref: '${{ needs.prep.outputs.prod_tag }}'
         output-dir: tmpdocs/prod
