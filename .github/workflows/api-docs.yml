@@ -60,21 +60,33 @@ jobs:
         gh-token: ${{ secrets.GH_TOKEN }}
         gh-user: ${{ secrets.GH_USERNAME }}
 
-    - name: Build QA Docs
-      uses: ./.github/actions/api-doc-build
+    - name: Checkout QA
+      uses: actions/checkout@v4
       with:
+        clean: 'false'
         ref: '${{ needs.prep.outputs.qa_tag }}'
-        output-dir: tmpdocs/qa
-        gh-token: ${{ secrets.GH_TOKEN }}
-        gh-user: ${{ secrets.GH_USERNAME }}
+    - name: Build QA Docs
+      run: mkdir tmpdocs/qa/ && cp docs/vdi-api.html tmpdocs/qa/vdi-api.html
+#      uses: ./.github/actions/api-doc-build
+#      with:
+#        ref: '${{ needs.prep.outputs.qa_tag }}'
+#        output-dir: tmpdocs/qa
+#        gh-token: ${{ secrets.GH_TOKEN }}
+#        gh-user: ${{ secrets.GH_USERNAME }}
 
-    - name: Build Prod Docs
-      uses: ./.github/actions/api-doc-build
+    - name: Checkout Prod
+      uses: actions/checkout@v4
       with:
+        clean: 'false'
         ref: '${{ needs.prep.outputs.prod_tag }}'
-        output-dir: tmpdocs/prod
-        gh-token: ${{ secrets.GH_TOKEN }}
-        gh-user: ${{ secrets.GH_USERNAME }}
+    - name: Build Prod Docs
+#      uses: ./.github/actions/api-doc-build
+#      with:
+#        ref: '${{ needs.prep.outputs.prod_tag }}'
+#        output-dir: tmpdocs/prod
+#        gh-token: ${{ secrets.GH_TOKEN }}
+#        gh-user: ${{ secrets.GH_USERNAME }}
+      run: mkdir tmpdocs/prod/ && cp docs/vdi-api.html tmpdocs/prod/vdi-api.html
 
     - uses: actions/upload-pages-artifact@v3
       with:
