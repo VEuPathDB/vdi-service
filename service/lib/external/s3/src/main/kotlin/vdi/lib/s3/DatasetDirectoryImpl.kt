@@ -22,93 +22,120 @@ internal class DatasetDirectoryImpl(
   override fun exists(): Boolean =
     bucket.objects.listSubPaths(pathFactory.datasetDir()).count > 0
 
-  override fun hasMetaFile() =
-    pathFactory.datasetMetaFile() in bucket.objects
-
-  override fun getMetaFile() =
-    DatasetMetaFileImpl(bucket, pathFactory.datasetMetaFile())
-
-  override fun putMetaFile(meta: VDIDatasetMeta) {
-    bucket.objects[pathFactory.datasetMetaFile()] = JSON.writeValueAsBytes(meta).inputStream()
-  }
 
   override fun deleteMetaFile() =
     bucket.objects.delete(pathFactory.datasetMetaFile())
 
-  override fun hasManifestFile() =
-    pathFactory.datasetManifestFile() in bucket.objects
+  override fun getMetaFile() =
+    DatasetMetaFileImpl(bucket, pathFactory.datasetMetaFile())
 
-  override fun getManifestFile() =
-    DatasetManifestFileImpl(bucket, pathFactory.datasetManifestFile())
+  override fun hasMetaFile() =
+    pathFactory.datasetMetaFile() in bucket.objects
 
-  override fun putManifestFile(manifest: VDIDatasetManifest) {
-    bucket.objects[pathFactory.datasetManifestFile()] = JSON.writeValueAsBytes(manifest).inputStream()
+  override fun putMetaFile(meta: VDIDatasetMeta) {
+    bucket.objects.put(pathFactory.datasetMetaFile()) {
+      contentType = "application/json"
+      stream = JSON.writeValueAsBytes(meta).inputStream()
+    }
   }
+
 
   override fun deleteManifestFile() =
     bucket.objects.delete(pathFactory.datasetManifestFile())
 
-  override fun hasDeleteFlag() =
-    pathFactory.datasetDeleteFlagFile() in bucket.objects
+  override fun getManifestFile() =
+    DatasetManifestFileImpl(bucket, pathFactory.datasetManifestFile())
 
-  override fun getDeleteFlag() =
-    DatasetDeleteFlagFileImpl(bucket, pathFactory.datasetDeleteFlagFile())
+  override fun hasManifestFile() =
+    pathFactory.datasetManifestFile() in bucket.objects
 
-  override fun putDeleteFlag() {
-    bucket.objects.touch(pathFactory.datasetDeleteFlagFile())
+  override fun putManifestFile(manifest: VDIDatasetManifest) {
+    bucket.objects.put(pathFactory.datasetManifestFile()) {
+      contentType = "application/json"
+      stream = JSON.writeValueAsBytes(manifest).inputStream()
+    }
   }
+
 
   override fun deleteDeleteFlag() =
     bucket.objects.delete(pathFactory.datasetDeleteFlagFile())
 
-  override fun hasUploadFile() =
-    pathFactory.datasetUploadZip() in bucket.objects
+  override fun getDeleteFlag() =
+    DatasetDeleteFlagFileImpl(bucket, pathFactory.datasetDeleteFlagFile())
 
-  override fun getUploadFile() =
-    DatasetRawUploadFileImpl(bucket, pathFactory.datasetUploadZip())
+  override fun hasDeleteFlag() =
+    pathFactory.datasetDeleteFlagFile() in bucket.objects
 
-  override fun putUploadFile(fn: () -> InputStream) =
-    fn().use { bucket.objects[pathFactory.datasetUploadZip()] = it.buffered() }
+  override fun putDeleteFlag() {
+    bucket.objects.touch(pathFactory.datasetDeleteFlagFile()) {
+      contentType = "text/plain"
+    }
+  }
+
 
   override fun deleteUploadFile() =
     bucket.objects.delete(pathFactory.datasetUploadZip())
 
-  override fun hasImportReadyFile() =
-    pathFactory.datasetImportReadyZip() in bucket.objects
+  override fun getUploadFile() =
+    DatasetRawUploadFileImpl(bucket, pathFactory.datasetUploadZip())
 
-  override fun getImportReadyFile() =
-    DatasetImportableFileImpl(bucket, pathFactory.datasetImportReadyZip())
+  override fun hasUploadFile() =
+    pathFactory.datasetUploadZip() in bucket.objects
 
-  override fun putImportReadyFile(fn: () -> InputStream) =
-    fn().use { bucket.objects[pathFactory.datasetImportReadyZip()] = it.buffered() }
+  override fun putUploadFile(fn: () -> InputStream): Unit =
+    fn().use { bucket.objects.put(pathFactory.datasetUploadZip()) {
+      contentType = "application/zip"
+      stream = it.buffered()
+    } }
+
 
   override fun deleteImportReadyFile() =
     bucket.objects.delete(pathFactory.datasetImportReadyZip())
 
-  override fun hasInstallReadyFile() =
-    pathFactory.datasetInstallReadyZip() in bucket.objects
+  override fun getImportReadyFile() =
+    DatasetImportableFileImpl(bucket, pathFactory.datasetImportReadyZip())
 
-  override fun getInstallReadyFile() =
-    DatasetInstallableFileImpl(bucket, pathFactory.datasetInstallReadyZip())
+  override fun hasImportReadyFile() =
+    pathFactory.datasetImportReadyZip() in bucket.objects
 
-  override fun putInstallReadyFile(fn: () -> InputStream) =
-    fn().use { bucket.objects[pathFactory.datasetInstallReadyZip()] = it.buffered() }
+  override fun putImportReadyFile(fn: () -> InputStream): Unit =
+    fn().use { bucket.objects.put(pathFactory.datasetImportReadyZip()) {
+      contentType = "application/zip"
+      stream = it.buffered()
+    } }
+
 
   override fun deleteInstallReadyFile() =
     bucket.objects.delete(pathFactory.datasetInstallReadyZip())
 
-  override fun hasRevisedFlag() =
-    pathFactory.datasetRevisedFlagFile() in bucket.objects
+  override fun getInstallReadyFile() =
+    DatasetInstallableFileImpl(bucket, pathFactory.datasetInstallReadyZip())
+
+  override fun hasInstallReadyFile() =
+    pathFactory.datasetInstallReadyZip() in bucket.objects
+
+  override fun putInstallReadyFile(fn: () -> InputStream): Unit =
+    fn().use { bucket.objects.put(pathFactory.datasetInstallReadyZip()) {
+      contentType = "application/zip"
+      stream = it.buffered()
+    } }
+
+
+  override fun deleteRevisedFlag() =
+    bucket.objects.delete(pathFactory.datasetRevisedFlagFile())
 
   override fun getRevisedFlag() =
     DatasetRevisionFlagFileImpl(bucket, pathFactory.datasetRevisedFlagFile())
 
+  override fun hasRevisedFlag() =
+    pathFactory.datasetRevisedFlagFile() in bucket.objects
+
   override fun putRevisedFlag() {
-    bucket.objects.touch(pathFactory.datasetRevisedFlagFile())
+    bucket.objects.touch(pathFactory.datasetRevisedFlagFile()) {
+      contentType = "text/plain"
+    }
   }
 
-  override fun deleteRevisedFlag() =
-    bucket.objects.delete(pathFactory.datasetRevisedFlagFile())
 
   override fun getShares(): Map<UserID, DatasetShare> {
     log.debug("looking up shares")
@@ -144,7 +171,13 @@ internal class DatasetDirectoryImpl(
   override fun putShare(recipientID: UserID, offer: VDIDatasetShareOffer, receipt: VDIDatasetShareReceipt) {
     log.debug("putting a new share for user {} with offer action {} and receipt action {} ", recipientID, offer.action, receipt.action)
 
-    bucket.objects.put(pathFactory.datasetShareOfferFile(recipientID), JSON.writeValueAsBytes(offer).inputStream())
-    bucket.objects.put(pathFactory.datasetShareReceiptFile(recipientID), JSON.writeValueAsBytes(receipt).inputStream())
+    bucket.objects.put(pathFactory.datasetShareOfferFile(recipientID)) {
+      contentType = "application/json"
+      stream = JSON.writeValueAsBytes(offer).inputStream()
+    }
+    bucket.objects.put(pathFactory.datasetShareReceiptFile(recipientID)) {
+      contentType = "application/json"
+      stream = JSON.writeValueAsBytes(receipt).inputStream()
+    }
   }
 }
