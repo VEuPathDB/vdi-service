@@ -1,7 +1,6 @@
 name: API Doc Builder Environment Setup
 description: Setup API doc building environment.
 
-
 runs:
   using: composite
   steps:

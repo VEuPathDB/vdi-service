@@ -92,6 +92,8 @@ jobs:
       with:
         path: tmpdocs/
 
+    - uses: actions/checkout@v4
+
   deploy:
     name: Deploy API Docs
     runs-on: ubuntu-latest
