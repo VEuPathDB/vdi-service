@@ -42,11 +42,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: prep
     steps:
+    - uses: actions/checkout@v4
+
     - name: Setup Environment
-      uses: ./.github/actions/api-doc-env.yml
+      uses: ./.github/actions/api-doc-env@main
 
     - name: Build Dev Docs
-      uses: ./.github/actions/api-doc-build.yml
+      uses: ./.github/actions/api-doc-build@main
       with:
         ref: main
         output-dir: tmpdocs/dev
@@ -54,7 +56,7 @@ jobs:
         gh-user: ${{ secrets.GH_USER }}
 
     - name: Build QA Docs
-      uses: ./.github/actions/api-doc-build.yml
+      uses: ./.github/actions/api-doc-build@main
       with:
         ref: '${{ needs.prep.outputs.qa_tag }}'
         output-dir: tmpdocs/qa
@@ -62,7 +64,7 @@ jobs:
         gh-user: ${{ secrets.GH_USER }}
 
     - name: Build Prod Docs
-      uses: ./.github/actions/api-doc-build.yml
+      uses: ./.github/actions/api-doc-build@main
       with:
         ref: '${{ needs.prep.outputs.prod_tag }}'
         output-dir: tmpdocs/prod
