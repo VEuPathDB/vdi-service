@@ -11,7 +11,7 @@ import vdi.lib.kafka.router.KafkaRouterConfig
 import vdi.lib.kafka.router.RouterDefaults
 import vdi.lib.s3.util.S3Config
 
-data class ReconciliationEventHandlerConfig(
+data class ReconciliationLaneConfig(
   val workerCount:    UByte,
   val jobQueueSize:   UByte,
   val kafkaInConfig:  KafkaConsumerConfig,

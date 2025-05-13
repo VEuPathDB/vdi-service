@@ -13,6 +13,4 @@ open class ReconcilerTargetRecord(
   metaUpdated: OffsetDateTime,
   val type: VDIDatasetType,
   val isUninstalled: Boolean,
-): SyncControlRecord(datasetID, sharesUpdated, dataUpdated, metaUpdated) {
-  fun getComparableID() = "$ownerID/$datasetID"
-}
+): SyncControlRecord(datasetID, sharesUpdated, dataUpdated, metaUpdated)

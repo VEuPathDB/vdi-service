@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 import vdi.lib.logging.logger
 
 internal class RabbitInstanceFactory(config: RabbitMQConfig) {
-  private val log = logger
+  private val log = logger()
 
   private val fac = ConnectionFactory()
     .apply {

@@ -11,7 +11,7 @@ import vdi.lib.kafka.router.RouterDefaults
 import vdi.lib.s3.util.S3Config
 import vdi.lib.s3.util.bucket
 
-data class ImportTriggerHandlerConfig(
+data class ImportLaneConfig(
   val workerCount:  UByte,
   val jobQueueSize: UByte,
 

@@ -5,19 +5,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.apache.logging.log4j.kotlin.CoroutineThreadContext
-import org.apache.logging.log4j.kotlin.ThreadContextData
-import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.lib.s3.s34k.S3Api
 import vdi.lib.db.app.AppDatabaseRegistry
 import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.kafka.router.KafkaRouterFactory
+import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.s3.DatasetObjectStore
 
 object Reconciler {
-  private val logger = logger().delegate
+  private val log = logger()
 
   private val config = ReconcilerConfig()
 
@@ -42,7 +40,7 @@ object Reconciler {
     runBlocking {
       active.withLock {
         if (AppDatabaseRegistry.isBroken) {
-          logger.error("refusing to start reconciler, app db registry is in a bad state")
+          log.error("refusing to start reconciler, app db registry is in a bad state")
           abortCB("app db registry in bad state")
         }
 
@@ -53,14 +51,14 @@ object Reconciler {
 
           datasetManager = DatasetObjectStore(bucket)
         } catch (e: Throwable) {
-          logger.error("failed to init dataset manager", e)
+          log.error("failed to init dataset manager", e)
           abortCB(e.message)
         }
 
         try {
           kafkaRouter = KafkaRouterFactory(config.kafkaRouterConfig).newKafkaRouter()
         } catch (e: Throwable) {
-          logger.error("failed to init kafka router", e)
+          log.error("failed to init kafka router", e)
           abortCB(e.message)
         }
       }
@@ -78,11 +76,12 @@ object Reconciler {
 
     val timer = Metrics.Reconciler.Full.reconcilerTimes.startTimer()
 
-    logger.info("running full reconciler for ${targets.size} targets")
+    log.info("running full reconciler for ${targets.size} targets")
 
+    log.info("beginning reconciliation")
     coroutineScope {
       targets.forEach {
-        launch(CoroutineThreadContext(ThreadContextData(mapOf("workerID" to workerName(it))))) {
+        launch {
           ReconcilerInstance(it, datasetManager, kafkaRouter, false, config.deletesEnabled).reconcile()
         }
       }
@@ -101,16 +100,12 @@ object Reconciler {
 
     val target = CacheDBTarget()
 
-    coroutineScope {
-      launch(CoroutineThreadContext(ThreadContextData(mapOf("workerID" to "slim-recon")))) {
-        ReconcilerInstance(target, datasetManager, kafkaRouter, true, false).reconcile()
-      }
-    }
+    ReconcilerInstance(target, datasetManager, kafkaRouter, slim = true, deletesEnabled = false).reconcile()
 
     timer.observeDuration()
 
     return true
   }
 
-  private fun workerName(tgt: ReconcilerTarget) = "full-recon-${tgt.name}"
+  private fun workerName(tgt: ReconcilerTarget) = "recon-${tgt.name}"
 }

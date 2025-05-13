@@ -133,8 +133,8 @@ internal object CacheDBImpl: CacheDB {
   override fun selectBrokenDatasetImports(query: BrokenImportListQuery) =
     connection.use { it.selectBrokenImports(query) }
 
-  override fun selectLatestRevision(datasetID: DatasetID) =
-    connection.use { it.selectLatestDatasetRevision(datasetID) }
+  override fun selectLatestRevision(datasetID: DatasetID, includeDeleted: Boolean) =
+    connection.use { it.selectLatestDatasetRevision(datasetID, includeDeleted) }
 
   override fun selectOriginalDatasetID(datasetID: DatasetID) =
     connection.use { it.selectOriginalDatasetID(datasetID) }

@@ -66,40 +66,24 @@ ORDER BY timestamp DESC
 """
 
 fun Connection.selectDatasetRevisions(datasetID: DatasetID) =
-  executeQuery(datasetID, false) {
-    var originalID: DatasetID? = null
-    val records = map {
-      if (originalID == null)
-        originalID = reqDatasetID("original_id")
-
-      VDIDatasetRevision(
-        revisionID   = reqDatasetID("revision_id"),
-        action       = VDIDatasetRevisionAction.fromID(it.getInt("action").toUByte()),
-        timestamp    = it["timestamp"],
-        revisionNote = ""
-      )
-    }
-
-    originalID?.let { DatasetRevisionRecordSet(it, records) }
-  }
-
-fun Connection.selectLatestDatasetRevision(datasetID: DatasetID) =
-  executeQuery(datasetID, true) {
-    if (next())
-      DatasetRevisionRecord(
-        revisionID   = reqDatasetID("revision_id"),
-        action       = VDIDatasetRevisionAction.fromID(getInt("action").toUByte()),
-        timestamp    = get("timestamp"),
-        revisionNote = "",
-        originalID   = reqDatasetID("original_id"),
-      )
-    else
-      null
-  }
-
-private inline fun <T> Connection.executeQuery(datasetID: DatasetID, limit: Boolean, fn: ResultSet.() -> T) =
-  withPreparedStatement(if (limit) "$SQL\nLIMIT 1" else SQL) {
+  withPreparedStatement(SQL) {
     setDatasetID(1, datasetID)
     setDatasetID(2, datasetID)
-    withResults(fn)
+
+    withResults {
+      var originalID: DatasetID? = null
+      val records = map {
+        if (originalID == null)
+          originalID = reqDatasetID("original_id")
+
+        VDIDatasetRevision(
+          revisionID = reqDatasetID("revision_id"),
+          action = VDIDatasetRevisionAction.fromID(it.getInt("action").toUByte()),
+          timestamp = it["timestamp"],
+          revisionNote = ""
+        )
+      }
+
+      originalID?.let { DatasetRevisionRecordSet(it, records) }
+    }
   }

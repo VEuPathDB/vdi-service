@@ -8,7 +8,7 @@ import vdi.lib.reconciler.Reconciler as Recon
 
 internal class ReconcilerImpl(private val config: ReconcilerDaemonConfig, abortCB: AbortCB)
   : Reconciler
-  , AbstractJobExecutor("reconciler", abortCB, logger<Reconciler>())
+  , AbstractJobExecutor(abortCB, logger<Reconciler>())
 {
   private var lastSlimRun = 0L
 
@@ -29,7 +29,7 @@ internal class ReconcilerImpl(private val config: ReconcilerDaemonConfig, abortC
 
         // If the reconciler thread is disabled, just log a reminder.
         if (!config.reconcilerEnabled) {
-          logger.info("full reconciler disabled by config")
+          log.info("full reconciler disabled by config")
         } else {
           Recon.runFull()
         }

@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.apache.logging.log4j.kotlin.logger
+import org.apache.logging.log4j.kotlin.loggerOf
 import org.veupathdb.lib.s3.s34k.errors.S34KError
 import org.veupathdb.vdi.lib.common.DatasetManifestFilename
 import org.veupathdb.vdi.lib.common.DatasetMetaFilename
@@ -39,11 +39,11 @@ import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.lib.s3.DatasetDirectory
 import vdi.lib.s3.DatasetObjectStore
 
-internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig, abortCB: AbortCB)
-  : ImportTriggerHandler
-  , AbstractVDIModule("import", abortCB, logger<ImportTriggerHandler>())
+internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: AbortCB)
+  : ImportLane
+  , AbstractVDIModule(abortCB, logger<ImportLane>())
 {
-  private val kLogger = logger().delegate
+  private val kLogger = loggerOf(ImportLane::class.java).delegate
 
   private val lock = Mutex()
 

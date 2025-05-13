@@ -12,4 +12,4 @@ import vdi.lib.modules.VDIModule
  *
  * @author Elizabeth Paige Harper - https://github.com/Foxcapades
  */
-sealed interface ShareTriggerHandler : VDIModule
+sealed interface ShareLane : VDIModule

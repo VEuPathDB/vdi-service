@@ -34,7 +34,7 @@ private fun VDep.Status.toCoreStatus() = when (this) {
 private class RemoteDependency(private val raw: VDep) : ExternalDependency(raw.name) {
   override fun close() {}
   override fun test(): TestResult {
-    logger.info("Checking health for external dependency {}", this.name)
+    logger().info("Checking health for external dependency {}", this.name)
     return if (pinger.isReachable(raw.urlString(), raw.port.toInt()))
       TestResult(this, true, raw.checkStatus().toCoreStatus(), raw.extra)
     else

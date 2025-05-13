@@ -1,6 +1,5 @@
 package vdi.lib.reconciler
 
-import org.apache.logging.log4j.kotlin.logger
 import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import java.time.OffsetDateTime
@@ -10,6 +9,7 @@ import vdi.lib.db.model.ReconcilerTargetRecord
 import vdi.lib.db.model.SyncControlRecord
 import vdi.lib.kafka.EventSource
 import vdi.lib.kafka.router.KafkaRouter
+import vdi.lib.logging.markedLogger
 import vdi.lib.metrics.Metrics
 import vdi.lib.s3.DatasetDirectory
 import vdi.lib.s3.DatasetObjectStore
@@ -29,7 +29,7 @@ internal class ReconcilerInstance(
   private val slim: Boolean,
   private val deletesEnabled: Boolean
 ) {
-  private val log = logger().delegate
+  private val log = markedLogger("Rec=${targetDB.name}")
 
   private var nextTargetDataset: ReconcilerTargetRecord? = null
 
@@ -59,11 +59,7 @@ internal class ReconcilerInstance(
   }
 
   private suspend fun tryReconcile() {
-    log.info("beginning reconciliation")
-
     targetDB.streamSortedSyncControlRecords().use { tryReconcile(datasetManager.streamAllDatasets().iterator(), it) }
-
-    log.info("completed reconciliation")
   }
 
   private suspend fun tryReconcile(
@@ -74,7 +70,6 @@ internal class ReconcilerInstance(
 
     // Iterate through datasets in S3.
     while (sourceIterator.hasNext()) {
-
       // Pop the next DatasetDirectory instance from the S3 stream.
       val sourceDatasetDir = sourceIterator.next()
 
@@ -86,7 +81,7 @@ internal class ReconcilerInstance(
       }
 
       // Owner ID is included as part of sort, so it must be included when comparing streams.
-      val comparableS3Id = "${sourceDatasetDir.ownerID}/${sourceDatasetDir.datasetID}"
+      val comparableS3Id = sourceDatasetDir.getComparableID()
       var comparableTargetId: String? = nextTargetDataset!!.getComparableID()
 
       // If install-target dataset stream is "ahead" of source stream, uninstall
@@ -104,6 +99,8 @@ internal class ReconcilerInstance(
       // Owner ID is included as part of sort, so it must be included when comparing streams.
       comparableTargetId = nextTargetDataset!!.getComparableID()
 
+      // If the object-store dataset ID is less than the ID we got from the
+      // target DB
       if (comparableS3Id < comparableTargetId) {
         // If the dataset is in the object store, but not in the install-target,
         // send an event.
@@ -152,9 +149,9 @@ internal class ReconcilerInstance(
         log.info(
           "Attempting to uninstall dataset {} because the next dataset in the object store stream ({}) has a" +
           " lexicographically greater ID. Presumably {} is not presently in the object store.",
-          comparableTargetId,
-          comparableS3Id,
-          comparableTargetId
+          comparableTargetId.substringBefore(".z"),
+          comparableS3Id.substringBefore(".z"),
+          comparableTargetId.substringBefore(".z")
         )
 
         tryUninstallDataset(targetDB, nextTargetDataset!!)
@@ -180,7 +177,7 @@ internal class ReconcilerInstance(
     if (nextTargetDataset!!.isUninstalled) {
       log.error(
         "dataset {} is marked as uninstalled in target {} but has no deletion flag present in MinIO",
-        comparableS3Id,
+        comparableS3Id.substringBefore(".z"),
         targetDB.name
       )
       return
@@ -223,7 +220,15 @@ internal class ReconcilerInstance(
     } catch (e: Exception) {
       // Swallow exception and alert if unable to delete. Reconciler can safely recover, but the dataset
       // may need a manual inspection.
-      log.error("failed to delete dataset ${record.ownerID}/${record.datasetID} of type ${record.type.name}:${record.type.version} from db ${targetDB.name}", e)
+      log.error(
+        "failed to delete dataset {}/{} of type {}:{} from db {}",
+        record.ownerID,
+        record.datasetID,
+        record.type.name,
+        record.type.version,
+        targetDB.name,
+        e,
+      )
     }
   }
 
@@ -292,4 +297,8 @@ internal class ReconcilerInstance(
   private inline fun <T> Iterator<T>.nextOrNull() =
     if (hasNext()) next() else null
 
+  private fun ReconcilerTargetRecord.getComparableID() = "$ownerID/$datasetID".appendZZZ()
+  private fun DatasetDirectory.getComparableID() = "$ownerID/$datasetID".appendZZZ()
+
+  private fun String.appendZZZ() = if (contains('.')) this else "$this.zzzz"
 }

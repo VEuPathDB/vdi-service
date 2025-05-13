@@ -21,6 +21,7 @@ import vdi.lib.db.cache.model.DatasetShareOfferImpl
 import vdi.lib.db.cache.model.DatasetShareReceiptImpl
 import vdi.lib.db.cache.withTransaction
 import vdi.lib.logging.logger
+import vdi.lib.logging.markedLogger
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
@@ -34,9 +35,9 @@ import vdi.lib.s3.files.DatasetShare as S3Share
  * This trigger handler processes trigger events for dataset shares being
  * created or removed.
  */
-internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig, abortCB: AbortCB)
-  : ShareTriggerHandler
-  , AbstractVDIModule("share", abortCB, logger<ShareTriggerHandler>())
+internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: AbortCB)
+  : ShareLane
+  , AbstractVDIModule(abortCB, logger<ShareLane>())
 {
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
@@ -45,7 +46,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("sync-shares", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool("shares", config.jobQueueSize, config.workerCount) {
       Metrics.shareQueueSize.inc(it.toDouble())
     }
 
@@ -66,7 +67,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   }
 
   private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore) {
-    val log = logger(datasetID, userID)
+    val log = markedLogger<ShareLane>(userID, datasetID)
     log.info("processing share trigger")
 
     val dataset = cacheDB.selectDataset(datasetID)

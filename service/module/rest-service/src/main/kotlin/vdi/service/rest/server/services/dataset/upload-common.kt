@@ -17,6 +17,7 @@ import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetFileInfo
 import org.veupathdb.vdi.lib.common.model.VDIDatasetManifest
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
+import java.io.File
 import java.net.MalformedURLException
 import java.net.URL
 import java.nio.file.Path
@@ -34,7 +35,7 @@ import vdi.lib.db.cache.model.DatasetImpl
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
 import vdi.lib.db.model.SyncControlRecord
-import vdi.lib.logging.logger
+import vdi.lib.logging.markedLogger
 import vdi.lib.metrics.Metrics
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.s3.DatasetStore
@@ -74,6 +75,18 @@ fun <T> CacheDB.initializeDataset(userID: UserID, datasetID: DatasetID, datasetM
 
 // region Dataset File Processing
 
+fun <T: ControllerBase> T.resolveDatasetFile(file: File?, url: String?, uploadConfig: UploadConfig): FileReference =
+  file?.let {
+    // IMPORTANT!!!
+    //
+    // We need our own copy of the upload file to process the upload
+    // asynchronously.  If we use the upload file managed by ContainerCore, that
+    // file will be deleted out from under us.
+    TempFiles.makeTempPath(it.name)
+      .also { (_, tmpFile) -> it.copyTo(tmpFile.toFile(), true) }
+      .let { (tmpDir, tmpFile) -> FileReference(tmpDir, tmpFile) }
+  } ?: downloadRemoteFile(url!!.toURL(), uploadConfig)
+
 private val WorkPool = Executors.newFixedThreadPool(10)
 
 @OptIn(ExperimentalPathApi::class)
@@ -103,22 +116,21 @@ fun <T: ControllerBase> T.uploadFiles(
   datasetMeta:   VDIDatasetMeta,
   uploadConfig:  UploadConfig,
 ) {
-  val logger = logger("minio-upload")
-
+  val logger = markedLogger(userID, datasetID)
   // Get a handle on the temp file that will be uploaded to the S3 store (MinIO)
   TempFiles.withTempDirectory { directory ->
     TempFiles.withTempPath { archive ->
       try {
-        logger.debug("{}/{}: verifying user storage quota is not exceeded", userID, datasetID)
+        logger.debug("verifying user storage quota is not exceeded")
         verifyFileSize(uploadFile, uploadConfig)
 
-        logger.debug("{}/{}: (re)packing input file", userID, datasetID)
+        logger.debug("(re)packing input file")
         val sizes = uploadFile.repack(into = archive, using = directory, logger = logger)
 
-        logger.debug("{}/{}: uploading manifest", userID, datasetID)
+        logger.debug("uploading manifest")
         DatasetStore.putManifest(userID, datasetID, VDIDatasetManifest(sizes, emptyList()))
 
-        logger.debug("{}/{}: uploading raw user data", userID, datasetID)
+        logger.debug("uploading raw user data")
         DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
 
         CacheDB().withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
@@ -144,7 +156,7 @@ fun <T: ControllerBase> T.uploadFiles(
   }
 
   try {
-    logger.debug("{}/{}: uploading dataset metadata", userID, datasetID)
+    logger.debug("uploading dataset metadata")
     DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
   } catch (e: Throwable) {
     logger.error("user dataset meta file upload to minio failed: ", e)
@@ -340,8 +352,6 @@ data class FileReference(
  */
 @OptIn(ExperimentalPathApi::class)
 fun <T: ControllerBase> T.downloadRemoteFile(url: URL, uploadConfig: UploadConfig): FileReference {
-  val logger = logger
-
   logger.info("attempting to download a remote file from {}", url)
 
   val response = try { url.fetchContent() }

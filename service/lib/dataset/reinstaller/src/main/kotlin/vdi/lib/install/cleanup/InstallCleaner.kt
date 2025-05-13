@@ -14,7 +14,7 @@ import vdi.lib.logging.logger
 
 object InstallCleaner {
 
-  private val log = logger
+  private val log = logger()
 
   @Suppress("NOTHING_TO_INLINE")
   private inline fun msgFailedByProject(datasetID: DatasetID, projectID: ProjectID) =

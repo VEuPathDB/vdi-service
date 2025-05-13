@@ -99,7 +99,7 @@ interface CacheDB {
    */
   fun selectAllSyncControlRecords(): CloseableIterator<ReconcilerTargetRecord>
 
-  fun selectLatestRevision(datasetID: DatasetID): DatasetRevisionRecord?
+  fun selectLatestRevision(datasetID: DatasetID, includeDeleted: Boolean = false): DatasetRevisionRecord?
 
   fun selectOriginalDatasetID(datasetID: DatasetID): DatasetID
 

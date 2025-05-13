@@ -6,7 +6,7 @@ import vdi.lib.config.vdi.lanes.ConsumerLaneConfig
 import vdi.lib.kafka.*
 import vdi.lib.kafka.router.RouterDefaults
 
-data class HardDeleteTriggerHandlerConfig(
+data class HardDeleteLaneConfig(
   val jobQueueSize:   UByte,
   val workerPoolSize: UByte,
   val kafkaConfig:    KafkaConsumerConfig,

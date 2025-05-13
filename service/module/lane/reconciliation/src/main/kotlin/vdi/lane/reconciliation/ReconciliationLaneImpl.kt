@@ -13,12 +13,12 @@ import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
 
-internal class ReconciliationEventHandlerImpl(
-  private val config: ReconciliationEventHandlerConfig,
+internal class ReconciliationLaneImpl(
+  private val config: ReconciliationLaneConfig,
   abortCB: AbortCB
 )
-  : ReconciliationEventHandler
-  , AbstractVDIModule("reconciliation", abortCB, logger<ReconciliationEventHandler>())
+  : ReconciliationLane
+  , AbstractVDIModule(abortCB, logger<ReconciliationLane>())
 {
   private lateinit var reconciler: DatasetReconciler
 
@@ -26,7 +26,7 @@ internal class ReconciliationEventHandlerImpl(
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaInConfig)
-    val wp = WorkerPool("reconciliation", config.workerCount, config.jobQueueSize) {
+    val wp = WorkerPool("recon", config.workerCount, config.jobQueueSize) {
       Metrics.ReconciliationHandler.queueSize.inc(it.toDouble())
     }
 

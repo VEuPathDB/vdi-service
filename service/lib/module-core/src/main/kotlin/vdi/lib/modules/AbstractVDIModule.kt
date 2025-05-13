@@ -23,7 +23,6 @@ import vdi.lib.s3.DatasetObjectStore
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
 abstract class AbstractVDIModule(
-  override val name: String,
   protected val abortCB: AbortCB,
   protected val log: Logger,
 ) : VDIModule {
@@ -35,25 +34,25 @@ abstract class AbstractVDIModule(
 
   final override suspend fun start() {
     if (!started) {
-      log.info("starting module {}", name)
+      log.info("module starting")
 
       started.set(true)
       try {
         run()
       } catch (e: Throwable) {
-        log.error("module $name execution failed", e)
+        log.error("module execution failed", e)
         abortCB(e.message)
       }
     }
   }
 
   final override suspend fun stop() {
-    log.info("shutting down module {}", name)
+    log.info("shutting down module")
 
     triggerShutdown()
     shutdownConfirm.await()
 
-    log.info("module {} shutdown confirmed", name)
+    log.info("module shutdown confirmed")
   }
 
   /**

@@ -34,7 +34,7 @@ class RabbitMQEventSource<T : Any>(private val config: RabbitMQConfig, mappingFu
     }
   }
 
-  private val log = logger
+  private val log = logger()
 
   private val fac = RabbitInstanceFactory(config)
 

@@ -8,8 +8,8 @@ import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractJobExecutor
 import vdi.lib.pruner.Pruner
 
-internal class PrunerModuleImpl(private val config: PrunerModuleConfig, abortCB: AbortCB) : PrunerModule,
-  AbstractJobExecutor("pruner", abortCB, logger<PrunerModule>(), config.wakeupInterval) {
+internal class DatasetPrunerImpl(private val config: DatasetPrunerConfig, abortCB: AbortCB) : DatasetPruner,
+  AbstractJobExecutor(abortCB, logger<DatasetPruner>(), config.wakeupInterval) {
 
   private var lastPrune = now()
 

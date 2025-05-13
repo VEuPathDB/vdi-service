@@ -3,8 +3,8 @@ package vdi.lane.meta
 import vdi.lib.config.vdi.VDIConfig
 import vdi.lib.modules.AbortCB
 
-fun UpdateMetaTriggerHandler(config: VDIConfig, abortCB: AbortCB): UpdateMetaTriggerHandler =
-  UpdateMetaTriggerHandlerImpl(UpdateMetaTriggerHandlerConfig(config), abortCB)
+fun UpdateMetaLane(config: VDIConfig, abortCB: AbortCB): UpdateMetaLane =
+  UpdateMetaLaneImpl(UpdateMetaLaneConfig(config), abortCB)
 
-fun UpdateMetaTriggerHandler(config: UpdateMetaTriggerHandlerConfig, abortCB: AbortCB): UpdateMetaTriggerHandler =
-  UpdateMetaTriggerHandlerImpl(config, abortCB)
+fun UpdateMetaLane(config: UpdateMetaLaneConfig, abortCB: AbortCB): UpdateMetaLane =
+  UpdateMetaLaneImpl(config, abortCB)

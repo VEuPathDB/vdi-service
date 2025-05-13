@@ -12,5 +12,5 @@ import vdi.lib.modules.VDIModule
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-interface ImportTriggerHandler : VDIModule
+interface ImportLane : VDIModule
 

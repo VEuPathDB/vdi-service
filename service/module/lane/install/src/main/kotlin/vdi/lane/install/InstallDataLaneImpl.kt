@@ -10,8 +10,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
-import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
-import org.veupathdb.vdi.lib.common.util.or
+import org.veupathdb.vdi.lib.common.util.orElse
 import java.io.InputStream
 import java.sql.SQLException
 import java.time.OffsetDateTime
@@ -26,7 +25,6 @@ import vdi.lib.db.app.model.InstallType
 import vdi.lib.db.app.withTransaction
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.withTransaction
-import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.logging.logger
 import vdi.lib.metrics.Metrics
 import vdi.lib.modules.AbortCB
@@ -39,9 +37,9 @@ import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.lib.s3.DatasetDirectory
 import vdi.lib.s3.DatasetObjectStore
 
-internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig, abortCB: AbortCB)
-  : InstallDataTriggerHandler
-  , AbstractVDIModule("install-data", abortCB, logger<InstallDataTriggerHandler>())
+internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, abortCB: AbortCB)
+  : InstallDataLane
+  , AbstractVDIModule(abortCB, logger<InstallDataLane>())
 {
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
@@ -51,9 +49,8 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.consumerConfig)
-    val kr = requireKafkaRouter(config.producerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("sync-data", config.jobQueueSize, config.workerPoolSize) {
+    val wp = WorkerPool("data", config.jobQueueSize, config.workerPoolSize) {
       Metrics.Install.queueSize.inc(it.toDouble())
     }
 
@@ -63,7 +60,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
           kc.fetchMessages(config.eventMsgKey)
             .forEach { (userID, datasetID, source) ->
               log.info("received install job for dataset $userID/$datasetID from source $source")
-              wp.submit { tryInstallData(userID, datasetID, dm, kr) }
+              wp.submit { tryInstallData(userID, datasetID, dm) }
             }
       }
     }
@@ -73,7 +70,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     confirmShutdown()
   }
 
-  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore, kr: KafkaRouter) {
+  private suspend fun tryInstallData(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore) {
     if (datasetsInProgress.add(datasetID)) {
       try {
         installData(userID, datasetID, dm)
@@ -229,7 +226,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     var timer: Histogram.Timer? = null
 
     try {
-      val appDB = appDB.accessor(projectID, handler.type) or {
+      val appDB = appDB.accessor(projectID, handler.type) orElse {
         log.info(
           "skipping install event for dataset {}/{} into project {} due to the target project being disabled.",
           userID,
@@ -239,7 +236,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
         return false
       }
 
-      val dataset = appDB.selectDataset(datasetID) or {
+      val dataset = appDB.selectDataset(datasetID) orElse  {
         log.info(
           "skipping install event for dataset {}/{} into project {} due to no dataset record being present",
           userID,

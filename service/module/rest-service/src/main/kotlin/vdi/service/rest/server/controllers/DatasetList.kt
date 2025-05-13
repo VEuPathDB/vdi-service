@@ -24,7 +24,7 @@ class DatasetList(@Context request: ContainerRequest, @Context val uploadConfig:
   : Datasets
   , ControllerBase(request)
 {
-  private val log = logger
+  private val log = logger()
 
   override fun getDatasets(projectId: String?, ownership: String?): Datasets.GetDatasetsResponse {
     // Parse the ownership filter field

@@ -10,7 +10,7 @@ private const val MaxChannelRetries = 5
 private val RetryDelay = 1.seconds
 
 internal class RabbitInstance(private val con: Connection) {
-  private val log = logger
+  private val log = logger()
 
   private var rChan = runBlocking { retryChannel() }
 

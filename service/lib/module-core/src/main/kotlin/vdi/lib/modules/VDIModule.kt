@@ -10,8 +10,6 @@ package vdi.lib.modules
  */
 interface VDIModule {
 
-  val name: String
-
   /**
    * Starts the service module.
    *

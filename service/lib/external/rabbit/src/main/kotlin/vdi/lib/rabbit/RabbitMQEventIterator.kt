@@ -17,7 +17,7 @@ class RabbitMQEventIterator<T>(
   private val mappingFunction: (ByteArray) -> T
 ) : SuspendingIterator<T> {
 
-  private val log = logger
+  private val log = logger()
 
   private val abort = Trigger()
 

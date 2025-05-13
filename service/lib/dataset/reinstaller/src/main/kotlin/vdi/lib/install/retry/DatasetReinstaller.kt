@@ -27,7 +27,7 @@ import vdi.lib.s3.DatasetObjectStore
 
 object DatasetReinstaller {
 
-  private val log = logger
+  private val log = logger()
 
   private val lock = Mutex()
 

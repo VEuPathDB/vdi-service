@@ -3,39 +3,28 @@ Configuration:
   status: error
   Appenders:
     Console:
-    - name: sub-1
+    - name: sub-0
       target: SYSTEM_OUT
       PatternLayout:
         pattern: "\
           %d{yyyy-MM-dd HH:mm:ss.SSS} \
-          %highlight{%-5level}\
-          %notEmpty{ \
-            %notEmpty{[wid:%X{workerID}]}\
-            %notEmpty{[rid:%replace{%.5X{traceId}}{init0|term0}{}]}\
-          } \
-          %c{-1} - %m%n"
-    - name: sub-2
+          %highlight{%-5level} \
+          T=%-3T \
+          %notEmpty{W=%X{workerID} }\
+          %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
+          %notEmpty{%marker }\
+          %c{1} - %m%n"
+    - name: sub-0-mod
       target: SYSTEM_OUT
       PatternLayout:
         pattern: "\
           %d{yyyy-MM-dd HH:mm:ss.SSS} \
-          %highlight{%-5level}\
-          %notEmpty{ \
-            %notEmpty{[wid:%X{workerID}]}\
-            %notEmpty{[rid:%replace{%.5X{traceId}}{init0|term0}{}]}\
-          } \
-          %c{-2} - %m%n"
-    - name: sub-2-mod
-      target: SYSTEM_OUT
-      PatternLayout:
-        pattern: "\
-          %d{yyyy-MM-dd HH:mm:ss.SSS} \
-          %highlight{%-5level}\
-          %notEmpty{ \
-            %notEmpty{[wid:%X{workerID}]}\
-            %notEmpty{[rid:%replace{%.5X{traceId}}{init0|term0}{}]}\
-          } \
-          ext.%c{-2} - %m%n"
+          %highlight{%-5level} \
+          T=%-3T \
+          %notEmpty{W=%X{workerID} }\
+          %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
+          %notEmpty{%marker }\
+          ext.%c{1} - %m%n"
     - name: externals
       target: SYSTEM_OUT
       PatternLayout:
@@ -48,12 +37,12 @@ Configuration:
         # 2022-09-07T14:33:06.027 DEBUG [wid:something][rid:12345] ClassName - message
         pattern: "\
           %d{yyyy-MM-dd HH:mm:ss.SSS} \
-          %highlight{%-5level}\
-          %notEmpty{ \
-            %notEmpty{[wid:%X{workerID}]}\
-            %notEmpty{[rid:%replace{%.5X{traceId}}{init0|term0}{}]}\
-          } \
-          %c{1.1.*} - %m%n"
+          %highlight{%-5level} \
+          T=%-3T \
+          %notEmpty{W=%X{workerID} }\
+          %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
+          %notEmpty{%marker }\
+          %c{1.1.1.*} - %m%n"
 
   Loggers:
     Root:
@@ -65,22 +54,17 @@ Configuration:
       level: debug
       additivity: false
       AppenderRef:
-      - ref: sub-1
-    - name: vdi.service
-      level: debug
-      additivity: false
-      AppenderRef:
-      - ref: sub-2
+      - ref: sub-0
     - name: org.veupathdb.vdi
       level: debug
       additivity: false
       AppenderRef:
-      - ref: sub-2-mod
+      - ref: sub-0-mod
     - name: org.veupathdb.lib
       level: info
       additivity: false
       AppenderRef:
-      - ref: sub-2-mod
+      - ref: sub-0-mod
     - name: org.apache.kafka.clients
       level: error
       additivity: false

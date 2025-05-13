@@ -11,7 +11,7 @@ import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
 import vdi.lib.kafka.EventSource
 import vdi.lib.kafka.router.KafkaRouter
-import vdi.lib.logging.logger
+import vdi.lib.logging.markedLogger
 import vdi.lib.metrics.Metrics
 import vdi.lib.s3.DatasetObjectStore
 
@@ -27,19 +27,16 @@ internal class DatasetReconciler(
   //       should fire an upload processing event.
 
   fun reconcile(userID: UserID, datasetID: DatasetID, source: EventSource) {
-    logger.info("beginning reconciliation for dataset {}/{}", userID, datasetID)
+    val logger = markedLogger(userID, datasetID)
+    logger.info("beginning reconciliation")
     try {
-      reconcile(ReconciliationContext(
-        datasetManager.getDatasetDirectory(userID, datasetID),
-        source,
-        logger(datasetID, userID)
-      ))
-      logger.info("reconciliation completed for dataset {}/{}", userID, datasetID)
+      reconcile(ReconciliationContext(datasetManager.getDatasetDirectory(userID, datasetID), source, logger))
+      logger.info("reconciliation completed")
     } catch (e: CriticalReconciliationError) {
-      logger.error("reconciliation failed for dataset {}/{}", userID, datasetID)
+      logger.error("reconciliation failed")
     } catch (e: Throwable) {
       Metrics.ReconciliationHandler.errors.inc()
-      logger.error("reconciliation failed for dataset $userID/$datasetID", e)
+      logger.error("reconciliation failed", e)
     }
   }
 

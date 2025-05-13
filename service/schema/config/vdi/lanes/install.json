@@ -8,10 +8,6 @@
       "$ref": "lane-common.json#/$defs/kafkaConsumerId",
       "default": "install-data-lane-receive"
     },
-    "kafkaProducerId": {
-      "$ref": "lane-common.json#/$defs/kafkaProducerId",
-      "default": "install-data-lane-send"
-    },
     "inMemoryQueueSize": {
       "$ref": "lane-common.json#/$defs/inMemoryQueueSize",
       "default": 5

@@ -9,7 +9,7 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetType
-import org.veupathdb.vdi.lib.common.util.or
+import org.veupathdb.vdi.lib.common.util.orElse
 import vdi.lib.async.WorkerPool
 import vdi.lib.db.app.AppDB
 import vdi.lib.db.app.AppDatabaseRegistry
@@ -30,12 +30,12 @@ import vdi.lib.plugin.client.response.uni.UninstallUnexpectedErrorResponse
 import vdi.lib.plugin.mapping.PluginHandler
 import vdi.lib.plugin.mapping.PluginHandlers
 
-internal class SoftDeleteTriggerHandlerImpl(
-  private val config: SoftDeleteTriggerHandlerConfig,
+internal class SoftDeleteLaneImpl(
+  private val config: SoftDeleteLaneConfig,
   abortCB: AbortCB
 )
-  : SoftDeleteTriggerHandler
-  , AbstractVDIModule("soft-delete", abortCB, logger<SoftDeleteTriggerHandler>())
+  : SoftDeleteLane
+  , AbstractVDIModule(abortCB, logger<SoftDeleteLane>())
 {
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
@@ -43,7 +43,7 @@ internal class SoftDeleteTriggerHandlerImpl(
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
-    val wp = WorkerPool("soft-delete", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool("soft-del", config.jobQueueSize, config.workerCount) {
       Metrics.softDeleteQueueSize.inc(it.toDouble())
     }
 
@@ -87,7 +87,7 @@ internal class SoftDeleteTriggerHandlerImpl(
       .startTimer()
 
     // Grab a plugin handler instance for this dataset type.
-    val handler = PluginHandlers[internalDBRecord.typeName, internalDBRecord.typeVersion] or {
+    val handler = PluginHandlers[internalDBRecord.typeName, internalDBRecord.typeVersion] orElse {
       log.error("no plugin handler found for dataset {}/{} type {}:{}", userID, datasetID, internalDBRecord.typeName, internalDBRecord.typeVersion)
       return
     }

@@ -9,15 +9,15 @@ import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
 import kotlin.system.exitProcess
 import vdi.daemon.events.routing.EventRouter
-import vdi.daemon.pruner.PrunerModule
+import vdi.daemon.pruner.DatasetPruner
 import vdi.daemon.reconciler.Reconciler
-import vdi.lane.hard_delete.HardDeleteTriggerHandler
-import vdi.lane.imports.ImportTriggerHandler
-import vdi.lane.install.InstallDataTriggerHandler
-import vdi.lane.meta.UpdateMetaTriggerHandler
-import vdi.lane.reconciliation.ReconciliationEventHandler
-import vdi.lane.sharing.ShareTriggerHandler
-import vdi.lane.soft_delete.SoftDeleteTriggerHandler
+import vdi.lane.hard_delete.HardDeleteLane
+import vdi.lane.imports.ImportLane
+import vdi.lane.install.InstallDataLane
+import vdi.lane.meta.UpdateMetaLane
+import vdi.lane.reconciliation.ReconciliationLane
+import vdi.lane.sharing.ShareLane
+import vdi.lane.soft_delete.SoftDeleteLane
 import vdi.lib.config.loadAndCacheStackConfig
 import vdi.lib.db.cache.patchMetadataTable
 import vdi.lib.modules.VDIModule
@@ -44,15 +44,15 @@ object Main {
     log.info("initializing modules")
     val modules = listOf(
       EventRouter(config.vdi, ::fatality),
-      HardDeleteTriggerHandler(config.vdi, ::fatality),
-      ImportTriggerHandler(config.vdi, ::fatality),
-      InstallDataTriggerHandler(config.vdi, ::fatality),
-      PrunerModule(config.vdi.daemons?.pruner, ::fatality),
-      ShareTriggerHandler(config.vdi, ::fatality),
-      SoftDeleteTriggerHandler(config.vdi, ::fatality),
-      UpdateMetaTriggerHandler(config.vdi, ::fatality),
+      HardDeleteLane(config.vdi, ::fatality),
+      ImportLane(config.vdi, ::fatality),
+      InstallDataLane(config.vdi, ::fatality),
+      DatasetPruner(config.vdi.daemons?.pruner, ::fatality),
+      ShareLane(config.vdi, ::fatality),
+      SoftDeleteLane(config.vdi, ::fatality),
+      UpdateMetaLane(config.vdi, ::fatality),
       Reconciler(config.vdi.daemons?.reconciler, ::fatality),
-      ReconciliationEventHandler(config.vdi, ::fatality),
+      ReconciliationLane(config.vdi, ::fatality),
     )
 
     // FIXME: REMOVE THIS ONCE THE EXTENDED METADATA PATCH HAS BEEN APPLIED TO PRODUCTION!!!!
@@ -80,7 +80,7 @@ object Main {
       }
     }
 
-    log.info("starting modules")
+    log.info("starting background modules")
     runBlocking(Dispatchers.IO) { modules.forEach { launch {
       try {
         it.start()

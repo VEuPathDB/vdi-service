@@ -107,7 +107,6 @@ fun mockReconcilerTargetRecord(
   sharesUpdated: OffsetDateTime? = null,
   dataUpdated: OffsetDateTime? = null,
   metaUpdated: OffsetDateTime? = null,
-  comparableID: String? = if (ownerID != null && datasetID != null) "$ownerID/$datasetID" else null,
 ): ReconcilerTargetRecord =
   mock {
     ownerID?.also { on { this.ownerID } doReturn it }
@@ -116,5 +115,4 @@ fun mockReconcilerTargetRecord(
     sharesUpdated?.also { on { this.sharesUpdated } doReturn it }
     dataUpdated?.also { on { this.dataUpdated } doReturn it }
     metaUpdated?.also { on { this.metaUpdated } doReturn it }
-    comparableID?.also { on { this.getComparableID() } doReturn it }
   }

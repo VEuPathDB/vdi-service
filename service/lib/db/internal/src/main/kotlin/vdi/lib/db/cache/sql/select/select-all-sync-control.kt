@@ -34,10 +34,10 @@ WITH results AS (
   -- coming from the object store
   , d.owner_id || '/' || (
     CASE
-      WHEN starts_with(right(d.dataset_id, 2), '.')
+      WHEN strpos(d.dataset_id, '.') > 0
         THEN d.dataset_id
       ELSE
-        d.dataset_id || '.zzz'
+        d.dataset_id || '.zzzz'
     END
   ) AS sort_id
   FROM
@@ -47,7 +47,17 @@ WITH results AS (
     LEFT JOIN vdi.import_control AS ic -- FIXME: part of the temp hack
       USING (dataset_id)
 )
-SELECT *
+SELECT
+  shares_update_time
+, data_update_time
+, meta_update_time
+, dataset_id
+, type_name
+, type_version
+, owner_id
+, is_deleted
+, inserted
+, status
 FROM results
 ORDER BY sort_id
 """
@@ -71,7 +81,7 @@ class TempHackCacheDBReconcilerTargetRecord(
 
   val inserted: OffsetDateTime,
   val importStatus: DatasetImportStatus,
-) : ReconcilerTargetRecord(ownerID, datasetID, sharesUpdated, dataUpdated, metaUpdated, type, isUninstalled)
+): ReconcilerTargetRecord(ownerID, datasetID, sharesUpdated, dataUpdated, metaUpdated, type, isUninstalled)
 
 class RecordIterator(
   val rs: ResultSet,

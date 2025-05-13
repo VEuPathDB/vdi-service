@@ -13,4 +13,4 @@ import vdi.lib.modules.VDIModule
  *
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-sealed interface SoftDeleteTriggerHandler : VDIModule
+sealed interface SoftDeleteLane : VDIModule

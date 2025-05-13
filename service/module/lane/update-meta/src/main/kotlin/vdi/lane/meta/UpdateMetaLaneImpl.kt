@@ -11,7 +11,7 @@ import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.model.VDIDatasetMeta
 import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
-import org.veupathdb.vdi.lib.common.util.or
+import org.veupathdb.vdi.lib.common.util.orElse
 import java.sql.SQLException
 import java.time.OffsetDateTime
 import java.util.concurrent.ConcurrentHashMap
@@ -43,12 +43,12 @@ import vdi.lib.plugin.mapping.PluginHandlers
 import vdi.lib.s3.DatasetDirectory
 import vdi.lib.s3.DatasetObjectStore
 
-internal class UpdateMetaTriggerHandlerImpl(
-  private val config: UpdateMetaTriggerHandlerConfig,
+internal class UpdateMetaLaneImpl(
+  private val config: UpdateMetaLaneConfig,
   abortCB: AbortCB,
 )
-  : UpdateMetaTriggerHandler
-  , AbstractVDIModule("update-meta", abortCB, logger<UpdateMetaTriggerHandler>())
+  : UpdateMetaLane
+  , AbstractVDIModule(abortCB, logger<UpdateMetaLane>())
 {
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
@@ -60,7 +60,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter(config.kafkaRouterConfig)
-    val wp = WorkerPool("sync-meta", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool("meta", config.jobQueueSize, config.workerCount) {
       Metrics.updateMetaQueueSize.inc(it.toDouble())
     }
 
@@ -201,7 +201,7 @@ internal class UpdateMetaTriggerHandlerImpl(
       return
     }
 
-    val appDb = appDB.accessor(projectID, ph.type) or {
+    val appDb = appDB.accessor(projectID, ph.type) orElse {
       log.info("skipping dataset {}/{}, project {} update meta due to target being disabled", userID, datasetID, projectID)
       return
     }
@@ -248,7 +248,7 @@ internal class UpdateMetaTriggerHandlerImpl(
         if (meta.properties != null)
           it.insertDatasetProperties(datasetID, meta.properties!!)
 
-        it.selectDatasetSyncControlRecord(datasetID) or {
+        it.selectDatasetSyncControlRecord(datasetID) orElse {
           it.insertDatasetSyncControl(SyncControlRecord(
             datasetID     = datasetID,
             sharesUpdated = OriginTimestamp,

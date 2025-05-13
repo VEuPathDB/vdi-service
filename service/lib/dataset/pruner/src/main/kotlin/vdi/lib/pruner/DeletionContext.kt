@@ -1,10 +1,10 @@
 package vdi.lib.pruner
 
 import vdi.lib.db.cache.model.DeletedDataset
-import vdi.lib.logging.logger
+import vdi.lib.logging.markedLogger
 
 internal data class DeletionContext(val dataset: DeletedDataset) {
-  val logger = logger<Pruner>(datasetID, ownerID)
+  val logger = markedLogger(dataset.ownerID, dataset.datasetID)
 
   lateinit var state: PrunableState
 

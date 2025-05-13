@@ -14,6 +14,7 @@ import vdi.lib.kafka.EventSource
 import vdi.lib.kafka.router.KafkaRouter
 import vdi.lib.kafka.router.KafkaRouterFactory
 import vdi.lib.logging.logger
+import vdi.lib.logging.markedLogger
 import vdi.lib.modules.AbortCB
 import vdi.lib.modules.AbstractVDIModule
 import vdi.lib.orElse
@@ -25,7 +26,7 @@ import vdi.lib.s3.paths.toDatasetPathOrNull
 
 internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: AbortCB)
   : EventRouter
-  , AbstractVDIModule("event-router", abortCB, logger<EventRouter>())
+  , AbstractVDIModule(abortCB, logger<EventRouter>())
 {
   private val es: RabbitMQEventSource<MinIOEvent> = runBlocking {
     try {
@@ -74,8 +75,6 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
   }
 
   private suspend fun processEvent(event: MinIOEvent) {
-    log.debug("received bucket event for object ${event.objectKey}")
-
     // Convert the event target object path to a VDPath instance (if possible)
     val path = event.objectKey.toDatasetPathOrNull().orElse {
       // If the event source object path was not for an object in the dataset
@@ -83,6 +82,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
       log.warn("received bucket event for unrecognized object: ${event.objectKey}")
       return
     }
+
+    val log = markedLogger<EventRouter>(path.userID, path.datasetID)
 
     // If the event action was a deletion of an object, then it was a hard
     // delete regardless of the file.  We only remove anything when we remove
@@ -93,14 +94,14 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
       if (event.records.any { it.source.userAgent == "Internal: [ILM-Expiry]" })
         return
 
-      log.debug("{}/{}: received hard delete event for object {}", path.userID, path.datasetID, event.objectKey)
+      log.debug("received hard delete event for object {}", event.objectKey)
       safeSend(path.userID, path.datasetID, kr::sendHardDeleteTrigger)
       return
     }
 
     when (path.file) {
       S3File.Metadata -> {
-        log.debug("{}/{}: received metadata event", path.userID, path.datasetID)
+        log.debug("received metadata event")
 
         safeSend(path.userID, path.datasetID, kr::sendUpdateMetaTrigger)
 
@@ -110,31 +111,31 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
 
       // data revision markers trigger dataset uninstallation
       S3File.RevisionFlag -> {
-        log.debug("{}/{}: received data revision event", path.userID, path.datasetID)
+        log.debug("received data revision event")
         safeSend(path.userID, path.datasetID, kr::sendSoftDeleteTrigger)
       }
 
       S3File.ImportReadyZip  -> {
-        log.debug("{}/{}: received import event", path.userID, path.datasetID)
+        log.debug("received import event")
         safeSend(path.userID, path.datasetID, kr::sendImportTrigger)
       }
 
       S3File.ShareOffer -> {
-        log.debug("{}/{}: received share offer event for recipient {}", path.userID, path.datasetID, (path as DatasetShareFilePath).recipientID)
+        log.debug("received share offer event for recipient {}", (path as DatasetShareFilePath).recipientID)
         safeSend(path.userID, path.datasetID, kr::sendShareTrigger)
       }
       S3File.ShareReceipt -> {
-        log.debug("{}/{}: received share receipt event for recipient {}", path.userID, path.datasetID, (path as DatasetShareFilePath).recipientID)
+        log.debug("received share receipt event for recipient {}", (path as DatasetShareFilePath).recipientID)
         safeSend(path.userID, path.datasetID, kr::sendShareTrigger)
       }
 
       S3File.InstallReadyZip -> {
-        log.debug("{}/{}: received install event", path.userID, path.datasetID)
+        log.debug("received install event")
         safeSend(path.userID, path.datasetID, kr::sendInstallTrigger)
       }
 
       S3File.DeleteFlag -> {
-        log.debug("{}/{}: received a soft delete event", path.userID, path.datasetID)
+        log.debug("received a soft delete event")
         safeSend(path.userID, path.datasetID, kr::sendSoftDeleteTrigger)
       }
 
@@ -152,7 +153,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
       fn(userID, datasetID, EventSource.ObjectStore)
     } catch (e: Throwable) {
       triggerShutdown()
-      log.error("failed to send event message to Kafka", e)
+      log.error("failed to send event message for {}/{}", userID, datasetID, e)
       abortCB(e.message)
     }
   }

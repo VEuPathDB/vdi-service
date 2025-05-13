@@ -1,4 +1,4 @@
-FROM veupathdb/alpine-dev-base:jdk24-gradle8.14 AS prep
+FROM veupathdb/alpine-dev-base:jdk24-gradle8.14 AS build
 
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
@@ -20,7 +20,7 @@ RUN gradle --no-daemon test shadowJar
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-FROM amazoncorretto:24-alpine3.20
+FROM amazoncorretto:24-alpine3.20 AS runtime
 
 RUN apk add --no-cache tzdata \
     && cp /usr/share/zoneinfo/America/New_York /etc/localtime \
@@ -29,7 +29,7 @@ RUN apk add --no-cache tzdata \
 ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
     JVM_ARGS=""
 
-COPY --from=prep ["/workspace/build/libs/vdi-service.jar", "/opt/vdi/"]
+COPY --from=build ["/workspace/build/libs/vdi-service.jar", "/opt/vdi/"]
 
 ARG CONFIG_FILE="config/halfway-config.yml"
 COPY ${CONFIG_FILE} /etc/vdi/config.yml

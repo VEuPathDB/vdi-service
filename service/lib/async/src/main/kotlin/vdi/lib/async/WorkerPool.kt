@@ -3,10 +3,10 @@ package vdi.lib.async
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import org.apache.logging.log4j.kotlin.logger
 import org.apache.logging.log4j.kotlin.loggingContext
 import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.milliseconds
-import vdi.lib.logging.logger
 
 class WorkerPool(
   private val name: String,
@@ -14,7 +14,7 @@ class WorkerPool(
   private val workerCount: UByte = 5u,
   private val reportQueueSizeChange: (Int) -> Unit = { }
 ) {
-  private val log      = logger
+  private val log      = logger().delegate
   private val shutdown = Trigger()
   private val queue    = Channel<Job>(jobQueueSize.toInt())
   private val count    = CountdownLatch(workerCount.toInt())
@@ -33,7 +33,7 @@ class WorkerPool(
     queue.close()
     shutdown.trigger()
     count.await()
-    log.debug("{} workers halted; worker pool {} shutdown complete", workerCount, name)
+    log.info("worker pool {} shutdown complete", name)
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -44,7 +44,7 @@ class WorkerPool(
       runBlocking(Dispatchers.IO) {
         repeat(workerCount.toInt()) { i ->
           val j = i + 1
-          launch (loggingContext(mapOf("workerID" to "$name exec $j"))) {
+          launch (loggingContext(mapOf("workerID" to "$name-$j"))) {
             while (!shutdown.isTriggered()) {
 
               if (!queue.isEmpty) {

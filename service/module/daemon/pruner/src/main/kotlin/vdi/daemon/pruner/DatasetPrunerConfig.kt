@@ -5,7 +5,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 import vdi.lib.config.vdi.daemons.PrunerConfig
 
-data class PrunerModuleConfig(
+data class DatasetPrunerConfig(
   val pruningInterval: Duration,
   val wakeupInterval: Duration,
 ) {

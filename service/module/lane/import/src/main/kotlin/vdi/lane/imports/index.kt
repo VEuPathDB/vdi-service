@@ -3,8 +3,8 @@ package vdi.lane.imports
 import vdi.lib.config.vdi.VDIConfig
 import vdi.lib.modules.AbortCB
 
-fun ImportTriggerHandler(config: VDIConfig, abortCB: AbortCB) =
-  ImportTriggerHandler(ImportTriggerHandlerConfig(config), abortCB)
+fun ImportLane(config: VDIConfig, abortCB: AbortCB) =
+  ImportLane(ImportLaneConfig(config), abortCB)
 
-fun ImportTriggerHandler(config: ImportTriggerHandlerConfig, abortCB: AbortCB): ImportTriggerHandler =
-  ImportTriggerHandlerImpl(config, abortCB)
+fun ImportLane(config: ImportLaneConfig, abortCB: AbortCB): ImportLane =
+  ImportLaneImpl(config, abortCB)

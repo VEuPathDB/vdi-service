@@ -48,6 +48,8 @@ import vdi.lib.s3.paths.S3Paths
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
 object Pruner {
+  private val logger = logger()
+
   /**
    * Files to be kept in the object store for maintaining dataset revision
    * history details.

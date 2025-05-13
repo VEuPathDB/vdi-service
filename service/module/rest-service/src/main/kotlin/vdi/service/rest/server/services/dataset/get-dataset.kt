@@ -9,7 +9,6 @@ import org.veupathdb.vdi.lib.common.model.VDIDatasetVisibility
 import vdi.lib.db.app.AppDB
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetShare
-import vdi.lib.logging.logger
 import vdi.lib.plugin.registry.PluginRegistry
 import vdi.service.rest.generated.model.DatasetDetails
 import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse
@@ -26,13 +25,13 @@ import vdi.service.rest.util.defaultZone
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
  * return user information.
  */
-fun adminGetDatasetByID(datasetID: DatasetID) =
+fun <T: ControllerBase> T.adminGetDatasetByID(datasetID: DatasetID) =
   getDatasetByID(null, datasetID, true)
 
 fun <T: ControllerBase> T.userGetDatasetByID(datasetID: DatasetID) =
   getDatasetByID(userID, datasetID, false)
 
-private fun getDatasetByID(
+private fun <T: ControllerBase> T.getDatasetByID(
   userID: UserID?,
   datasetID: DatasetID,
   includeDeleted: Boolean,
@@ -60,7 +59,7 @@ private fun getDatasetByID(
   val typeDisplayName = PluginRegistry[dataset.typeName, dataset.typeVersion]?.displayName
     .let {
       if (it == null) {
-        logger("getDatasetByID").error(
+        logger.error(
           "plugin is disabled for requested dataset {}/{} type {} (version {})",
           dataset.ownerID,
           dataset.datasetID,

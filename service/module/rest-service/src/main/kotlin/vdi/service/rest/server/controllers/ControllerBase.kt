@@ -7,8 +7,11 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.UserID
 import org.veupathdb.vdi.lib.common.field.toUserID
 import java.net.URI
+import vdi.lib.logging.logger
 
 sealed class ControllerBase(val request: ContainerRequest) {
+  val logger = logger()
+
   val urlBase by lazy { request.baseUri.let { URI(it.scheme, it.host, "", "") } }
 
   val maybeUser: UserInfo? by lazy { UserProvider.lookupUser(request).orElse(null) }

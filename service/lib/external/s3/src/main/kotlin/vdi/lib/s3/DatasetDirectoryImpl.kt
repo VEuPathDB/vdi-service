@@ -7,7 +7,7 @@ import org.veupathdb.vdi.lib.common.field.toUserIDOrNull
 import org.veupathdb.vdi.lib.common.model.*
 import org.veupathdb.vdi.lib.json.JSON
 import java.io.InputStream
-import vdi.lib.logging.logger
+import vdi.lib.logging.markedLogger
 import vdi.lib.s3.files.*
 import vdi.lib.s3.paths.S3DatasetPathFactory
 
@@ -17,7 +17,7 @@ internal class DatasetDirectoryImpl(
   private val bucket: S3Bucket,
   private val pathFactory: S3DatasetPathFactory,
 ) : DatasetDirectory {
-  private val log = logger(datasetID, ownerID)
+  private val log = markedLogger<DatasetDirectory>(ownerID, datasetID)
 
   override fun exists(): Boolean =
     bucket.objects.listSubPaths(pathFactory.datasetDir()).count > 0
