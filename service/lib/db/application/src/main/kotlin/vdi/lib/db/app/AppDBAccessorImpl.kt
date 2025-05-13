@@ -43,7 +43,7 @@ internal class AppDBAccessorImpl(
   override fun selectDatasetProjectLinks(datasetID: DatasetID) =
     con.use { it.selectDatasetProjectLinks(schema, datasetID) }
 
-  override fun streamAllSyncControlRecords() = con.selectAllSyncControl(schema)
+  override fun streamAllSyncControlRecords() = con.selectAllSyncControl(schema, platform)
 
   override fun testDatasetVisibilityExists(datasetID: DatasetID, userID: UserID) =
     con.use { it.testDatasetVisibilityExists(schema, datasetID, userID) }

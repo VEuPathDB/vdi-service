@@ -274,7 +274,7 @@ class AppDBTransactionImpl(
     connection.selectSyncControl(schema, datasetID)
 
   override fun streamAllSyncControlRecords() =
-    connection.selectAllSyncControl(schema)
+    connection.selectAllSyncControl(schema, platform)
 
   override fun updateSyncControlDataTimestamp(datasetID: DatasetID, timestamp: OffsetDateTime) {
     connection.updateSyncControlDataTimestamp(schema, datasetID, timestamp)
