@@ -38,6 +38,9 @@ private fun getDatasetByID(
   includeDeleted: Boolean,
 ): Either<DatasetDetails, GetDatasetsByVdiIdResponse> {
   // Lookup dataset that is owned by or shared with the current user
+  //
+  // NOTE: we don't look for the latest revision here as the controller will
+  //       call a different method for that if we return 404.
   val dataset = when {
     userID == null -> CacheDB().selectDataset(datasetID)
     else           -> lookupDatasetForUser(userID, datasetID)

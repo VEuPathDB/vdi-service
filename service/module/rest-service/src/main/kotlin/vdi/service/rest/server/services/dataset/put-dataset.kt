@@ -8,6 +8,7 @@ import org.veupathdb.vdi.lib.common.fs.TempFiles
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevision
 import org.veupathdb.vdi.lib.common.model.VDIDatasetRevisionAction
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import vdi.lib.db.cache.CacheDB
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
@@ -15,6 +16,7 @@ import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.model.DatasetPutResponseBody
+import vdi.service.rest.generated.model.DatasetPutResponseBodyImpl
 import vdi.service.rest.generated.resources.DatasetsVdiId.PutDatasetsByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
@@ -50,7 +52,14 @@ internal fun <T: ControllerBase> T.putDataset(
   }
 
   // add .{inc} to dataset id to create new id
-  val newDatasetID = datasetID.incrementRevision()
+  var newDatasetID = (CacheDB().selectLatestRevision(datasetID)
+    ?.revisionID
+    ?: datasetID)
+    .incrementRevision()
+
+  while (DatasetStore.getImportReadyZipSize(userID, newDatasetID) > -1L) {
+    newDatasetID = newDatasetID.incrementRevision()
+  }
 
   val meta = DatasetStore.getDatasetMeta(userID, datasetID)
     // apply meta changes
@@ -58,10 +67,10 @@ internal fun <T: ControllerBase> T.putDataset(
       userID          = userID,
       targetType      = targetType,
       patch           = request.meta,
-      originalID      = datasetID,
+      originalID      = it.originalID ?: datasetID,
       revisionHistory = it.revisionHistory + VDIDatasetRevision(
         action       = VDIDatasetRevisionAction.Revise,
-        timestamp    = OffsetDateTime.now(),
+        timestamp    = OffsetDateTime.now(ZoneOffset.UTC),
         revisionID   = newDatasetID,
         revisionNote = request.meta.revisionNote,
       ),
@@ -69,6 +78,7 @@ internal fun <T: ControllerBase> T.putDataset(
     ?: throw IllegalStateException("target dataset has no $DatasetMetaFilename file")
 
   val (tempDirectory, uploadFile) = CacheDB().initializeDataset(userID, newDatasetID, meta) {
+    it.tryInsertRevisionLink(meta.originalID ?: datasetID, meta.revisionHistory.last())
     try {
       fetchDatasetFile(request, uploadConfig)
     } catch (e: Throwable) {
@@ -83,7 +93,7 @@ internal fun <T: ControllerBase> T.putDataset(
 
   submitUpload(newDatasetID, tempDirectory, uploadFile, meta, uploadConfig)
 
-  return Either.ofLeft(vdi.service.rest.generated.model.DatasetPutResponseBodyImpl().apply { datasetId = newDatasetID.toString() })
+  return Either.ofLeft(DatasetPutResponseBodyImpl().apply { datasetId = newDatasetID.toString() })
 }
 
 /**

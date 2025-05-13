@@ -41,7 +41,7 @@ import vdi.lib.s3.DatasetObjectStore
 
 internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerHandlerConfig, abortCB: AbortCB)
   : InstallDataTriggerHandler
-  , AbstractVDIModule("install-data-trigger-handler", abortCB, logger<InstallDataTriggerHandler>())
+  , AbstractVDIModule("install-data", abortCB, logger<InstallDataTriggerHandler>())
 {
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
@@ -53,7 +53,7 @@ internal class InstallDataTriggerHandlerImpl(private val config: InstallTriggerH
     val kc = requireKafkaConsumer(config.eventChannel, config.consumerConfig)
     val kr = requireKafkaRouter(config.producerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("install-data-workers", config.jobQueueSize, config.workerPoolSize) {
+    val wp = WorkerPool("install-data", config.jobQueueSize, config.workerPoolSize) {
       Metrics.Install.queueSize.inc(it.toDouble())
     }
 

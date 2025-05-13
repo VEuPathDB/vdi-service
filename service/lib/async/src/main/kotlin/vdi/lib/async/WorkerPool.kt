@@ -3,12 +3,10 @@ package vdi.lib.async
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import org.apache.logging.log4j.kotlin.CoroutineThreadContext
-import org.apache.logging.log4j.kotlin.ThreadContextData
-import org.apache.logging.log4j.kotlin.logger
-import org.veupathdb.vdi.lib.common.util.AtomicULong
+import org.apache.logging.log4j.kotlin.loggingContext
 import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.milliseconds
+import vdi.lib.logging.logger
 
 class WorkerPool(
   private val name: String,
@@ -16,11 +14,10 @@ class WorkerPool(
   private val workerCount: UByte = 5u,
   private val reportQueueSizeChange: (Int) -> Unit = { }
 ) {
-  private val log      = logger().delegate
+  private val log      = logger
   private val shutdown = Trigger()
   private val queue    = Channel<Job>(jobQueueSize.toInt())
   private val count    = CountdownLatch(workerCount.toInt())
-  private val jobs     = AtomicULong()
 
   init {
     start()
@@ -41,25 +38,23 @@ class WorkerPool(
 
   @OptIn(ExperimentalCoroutinesApi::class)
   private fun start() {
-    log.info("starting worker pool {} with queue size {} and worker count {}", name, jobQueueSize, workerCount)
+    log.info("creating {} workers for pool {}", workerCount, name)
 
     thread {
       runBlocking(Dispatchers.IO) {
         repeat(workerCount.toInt()) { i ->
           val j = i + 1
-          launch (CoroutineThreadContext(ThreadContextData(mapOf("workerID" to "$name-$j")))) {
+          launch (loggingContext(mapOf("workerID" to "$name-worker-$j"))) {
             while (!shutdown.isTriggered()) {
 
               if (!queue.isEmpty) {
-                val jobNumber = jobs.incAndGet()
-                log.debug("executing job {}", jobNumber)
                 val job = safeReceive() ?: break
                 reportQueueSizeChange(-1) // Report one less job in queue.
 
                 try {
                   job()
                 } catch (e: Throwable) {
-                  log.error("job $jobNumber failed with exception:", e)
+                  log.error("job failed with exception:", e)
                 }
               } else {
                 delay(100.milliseconds)

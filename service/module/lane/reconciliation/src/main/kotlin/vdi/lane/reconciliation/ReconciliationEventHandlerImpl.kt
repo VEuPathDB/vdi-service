@@ -18,7 +18,7 @@ internal class ReconciliationEventHandlerImpl(
   abortCB: AbortCB
 )
   : ReconciliationEventHandler
-  , AbstractVDIModule("reconciliation-event-handler", abortCB, logger<ReconciliationEventHandler>())
+  , AbstractVDIModule("reconciliation", abortCB, logger<ReconciliationEventHandler>())
 {
   private lateinit var reconciler: DatasetReconciler
 
@@ -26,7 +26,7 @@ internal class ReconciliationEventHandlerImpl(
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaInConfig)
-    val wp = WorkerPool("reconciliation-workers", config.workerCount, config.jobQueueSize) {
+    val wp = WorkerPool("reconciliation", config.workerCount, config.jobQueueSize) {
       Metrics.ReconciliationHandler.queueSize.inc(it.toDouble())
     }
 

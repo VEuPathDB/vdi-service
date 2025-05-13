@@ -35,7 +35,7 @@ SELECT
 , dm.source_url
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = vd.dataset_id) AS projects
 , ic.status
-, r.revision_id
+, r.original_id
 FROM
   vdi.datasets vd
   INNER JOIN vdi.dataset_metadata AS dm

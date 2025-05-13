@@ -26,8 +26,13 @@ internal class DatasetDeleteFlagFileImpl(
     lastModifiedSupplier = { bucket.objects.list(path).stream().findFirst().map { o -> o.lastModified }.orElse(null) },
     existsChecker = { path in bucket.objects },
     loadObjectStream = { bucket.objects.open(path)?.stream },
-    putObjectStream = { bucket.objects.put(path, it) },
-    toucher = { bucket.objects.touch(path) },
+    putObjectStream = { bucket.objects.put(path) {
+      contentType = "text/plain"
+      stream = it
+    } },
+    toucher = { bucket.objects.touch(path) {
+      contentType = "text/plain"
+    } },
   )
 
   constructor(s3Object: S3Object) : this(
@@ -35,7 +40,6 @@ internal class DatasetDeleteFlagFileImpl(
     lastModifiedSupplier = s3Object::lastModified,
     existsChecker = { true }, // It definitely exists if loaded from an actual S3 object
     loadObjectStream = { s3Object.bucket.objects.open(s3Object.path)?.stream },
-    toucher = { s3Object.bucket.objects.touch(s3Object.path) },
   ) {
     if (!S3File.DeleteFlag.resembles(s3Object.baseName)) {
       throw IllegalArgumentException(

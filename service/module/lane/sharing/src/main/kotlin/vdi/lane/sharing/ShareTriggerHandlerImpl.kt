@@ -36,7 +36,7 @@ import vdi.lib.s3.files.DatasetShare as S3Share
  */
 internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerConfig, abortCB: AbortCB)
   : ShareTriggerHandler
-  , AbstractVDIModule("share-trigger-handler", abortCB, logger<ShareTriggerHandler>())
+  , AbstractVDIModule("share", abortCB, logger<ShareTriggerHandler>())
 {
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
@@ -45,7 +45,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("share-workers", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool("share", config.jobQueueSize, config.workerCount) {
       Metrics.shareQueueSize.inc(it.toDouble())
     }
 

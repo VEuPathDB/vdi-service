@@ -29,7 +29,10 @@ internal class DatasetShareOfferFileImpl(
     lastModifiedSupplier = { bucket.objects.list(path).stream().findFirst().map { o -> o.lastModified }.orElse(null) },
     existsChecker = { path in bucket.objects },
     loadObjectStream = { bucket.objects.open(path)?.stream },
-    putObjectStream = { bucket.objects.put(path, it) },
+    putObjectStream = { bucket.objects.put(path) {
+      contentType = "application/json"
+      stream = it
+    } },
   )
 
   /**

@@ -13,6 +13,7 @@ import vdi.lib.db.cache.model.DatasetRevisionRecord
 import vdi.lib.db.cache.model.DatasetRevisionRecordSet
 import vdi.lib.db.jdbc.reqDatasetID
 import vdi.lib.db.jdbc.setDatasetID
+import vdi.lib.logging.logger
 
 /**
  * This slightly wonky looking query attempts to locate the revision records for
@@ -61,7 +62,7 @@ WITH
 (TABLE try1)
 UNION ALL
 (TABLE try2)
-ORDER BY timestamp
+ORDER BY timestamp DESC
 """
 
 fun Connection.selectDatasetRevisions(datasetID: DatasetID) =
@@ -73,7 +74,7 @@ fun Connection.selectDatasetRevisions(datasetID: DatasetID) =
 
       VDIDatasetRevision(
         revisionID   = reqDatasetID("revision_id"),
-        action       = VDIDatasetRevisionAction.fromID(it["action"]),
+        action       = VDIDatasetRevisionAction.fromID(it.getInt("action").toUByte()),
         timestamp    = it["timestamp"],
         revisionNote = ""
       )
@@ -83,11 +84,11 @@ fun Connection.selectDatasetRevisions(datasetID: DatasetID) =
   }
 
 fun Connection.selectLatestDatasetRevision(datasetID: DatasetID) =
-  executeQuery(datasetID, false) {
+  executeQuery(datasetID, true) {
     if (next())
       DatasetRevisionRecord(
         revisionID   = reqDatasetID("revision_id"),
-        action       = VDIDatasetRevisionAction.fromID(get("action")),
+        action       = VDIDatasetRevisionAction.fromID(getInt("action").toUByte()),
         timestamp    = get("timestamp"),
         revisionNote = "",
         originalID   = reqDatasetID("original_id"),

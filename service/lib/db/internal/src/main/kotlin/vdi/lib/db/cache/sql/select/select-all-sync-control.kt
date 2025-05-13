@@ -18,24 +18,38 @@ import vdi.lib.db.model.ReconcilerTargetRecord
 
 // language=postgresql
 private const val SQL = """
-SELECT
-  s.shares_update_time
-, s.data_update_time
-, s.meta_update_time
-, s.dataset_id
-, d.type_name
-, d.type_version
-, d.owner_id
-, d.is_deleted
-, d.inserted -- FIXME: part of the temp hack
-, ic.status  -- FIXME: part of the temp hack
-FROM
-  vdi.sync_control AS s
-  INNER JOIN vdi.datasets AS d
-    USING (dataset_id)
-  LEFT JOIN vdi.import_control AS ic -- FIXME: part of the temp hack
-    USING (dataset_id)
-ORDER BY CONCAT(d.owner_id,'/',s.dataset_id)
+WITH results AS (
+  SELECT
+    s.shares_update_time
+  , s.data_update_time
+  , s.meta_update_time
+  , s.dataset_id
+  , d.type_name
+  , d.type_version
+  , d.owner_id
+  , d.is_deleted
+  , d.inserted -- FIXME: part of the temp hack
+  , ic.status  -- FIXME: part of the temp hack
+  -- Sort ID is needed to align the result rows with the object key stream
+  -- coming from the object store
+  , d.owner_id || '/' || (
+    CASE
+      WHEN starts_with(right(d.dataset_id, 2), '.')
+        THEN d.dataset_id
+      ELSE
+        d.dataset_id || '.zzz'
+    END
+  ) AS sort_id
+  FROM
+    vdi.sync_control AS s
+    INNER JOIN vdi.datasets AS d
+      USING (dataset_id)
+    LEFT JOIN vdi.import_control AS ic -- FIXME: part of the temp hack
+      USING (dataset_id)
+)
+SELECT *
+FROM results
+ORDER BY sort_id
 """
 
 internal fun Connection.selectAllSyncControl(): CloseableIterator<ReconcilerTargetRecord> {

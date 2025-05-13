@@ -5,6 +5,7 @@ import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import org.veupathdb.vdi.lib.common.field.DatasetID
+import vdi.lib.logging.logger
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.DatasetPutRequestBody
@@ -35,13 +36,16 @@ class DatasetByID(@Context request: ContainerRequest, @Context val uploadConfig:
           // If the dataset could not be found under the given dataset ID, then
           // check if it has been revised.  If there is a newer revision,
           // redirect to the new dataset ID endpoint.
-          it.unwrapRight()
-            .takeIf { it.status == 404 }
-            ?.let { getLatestRevision(vdiID, ::redirectURL) }
-            ?: it.unwrapRight()
+          it.unwrapRight().let { oRes ->
+            logger.warn("code = {}", oRes.status)
+            if (oRes.status == 404)
+              getLatestRevision(vdiID, ::redirectURL) ?: oRes
+            else
+              oRes
+          }.also { logger.warn("what = {} = {}", it.status, it.entity) }
         }
-      }
-    }
+      }.also { logger.warn("how = {} = {}", it.status, it.entity) }
+    }.also { logger.warn("butts = {} = {}", it.status, it.entity) }
 
   override fun patchDatasetsByVdiId(vdiID: String, entity: DatasetPatchRequestBody?) =
     entity?.let { body -> updateDatasetMeta(DatasetID(vdiID), body) }

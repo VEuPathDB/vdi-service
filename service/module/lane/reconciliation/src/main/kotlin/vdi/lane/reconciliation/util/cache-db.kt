@@ -72,14 +72,15 @@ internal fun CacheDB.tryInitDataset(ctx: ReconciliationContext, importStatus: Da
         "dataset has no import-ready file and is in an incomplete state due to the absence of the install-ready data and/or manifest"
       )
 
-    db.tryInsertSyncControl(
-      SyncControlRecord(
+    db.tryInsertSyncControl(SyncControlRecord(
       datasetID     = ctx.datasetID,
       sharesUpdated = OriginTimestamp,
       dataUpdated   = OriginTimestamp,
       metaUpdated   = OriginTimestamp,
-    )
-    )
+    ))
+
+    if (ctx.meta.originalID != null)
+      db.tryInsertRevisionLinks(ctx.meta.originalID!!, ctx.meta.revisionHistory)
 
     ctx.manifest?.also {
       db.tryInsertUploadFiles(ctx.datasetID, it.inputFiles)

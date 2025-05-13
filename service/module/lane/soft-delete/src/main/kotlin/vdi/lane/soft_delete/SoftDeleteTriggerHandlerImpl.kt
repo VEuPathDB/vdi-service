@@ -35,7 +35,7 @@ internal class SoftDeleteTriggerHandlerImpl(
   abortCB: AbortCB
 )
   : SoftDeleteTriggerHandler
-  , AbstractVDIModule("soft-delete-trigger-handler", abortCB, logger<SoftDeleteTriggerHandler>())
+  , AbstractVDIModule("soft-delete", abortCB, logger<SoftDeleteTriggerHandler>())
 {
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
@@ -43,7 +43,7 @@ internal class SoftDeleteTriggerHandlerImpl(
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
-    val wp = WorkerPool("soft-delete-workers", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool("soft-delete", config.jobQueueSize, config.workerCount) {
       Metrics.softDeleteQueueSize.inc(it.toDouble())
     }
 

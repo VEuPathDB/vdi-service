@@ -48,7 +48,7 @@ internal class UpdateMetaTriggerHandlerImpl(
   abortCB: AbortCB,
 )
   : UpdateMetaTriggerHandler
-  , AbstractVDIModule("update-meta-trigger-handler", abortCB, logger<UpdateMetaTriggerHandler>())
+  , AbstractVDIModule("update-meta", abortCB, logger<UpdateMetaTriggerHandler>())
 {
   private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(32)
 
@@ -60,7 +60,7 @@ internal class UpdateMetaTriggerHandlerImpl(
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter(config.kafkaRouterConfig)
-    val wp = WorkerPool("update-meta-workers", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool("update-meta", config.jobQueueSize, config.workerCount) {
       Metrics.updateMetaQueueSize.inc(it.toDouble())
     }
 

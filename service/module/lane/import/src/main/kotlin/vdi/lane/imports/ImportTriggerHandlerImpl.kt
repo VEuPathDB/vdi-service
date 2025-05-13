@@ -41,7 +41,7 @@ import vdi.lib.s3.DatasetObjectStore
 
 internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandlerConfig, abortCB: AbortCB)
   : ImportTriggerHandler
-  , AbstractVDIModule("import-trigger-handler", abortCB, logger<ImportTriggerHandler>())
+  , AbstractVDIModule("import", abortCB, logger<ImportTriggerHandler>())
 {
   private val kLogger = logger().delegate
 
@@ -54,7 +54,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
   override suspend fun run() {
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
-    val wp = WorkerPool("import-trigger-workers", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool("import", config.jobQueueSize, config.workerCount) {
       Metrics.Import.queueSize.inc(it.toDouble())
     }
 
@@ -262,7 +262,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
           DataZipName -> {
             kLogger.debug("writing install-ready zip contents to object store for dataset {}/{}", userID, datasetID)
-            dd.getInstallReadyFile().writeContents(stream)
+            dd.getImportReadyFile().writeContents(stream)
             hasData = true
           }
 

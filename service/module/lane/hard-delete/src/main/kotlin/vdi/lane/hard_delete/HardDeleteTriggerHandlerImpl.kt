@@ -9,7 +9,7 @@ import vdi.lib.modules.AbstractVDIModule
 
 internal class HardDeleteTriggerHandlerImpl(private val config: HardDeleteTriggerHandlerConfig, abortCB: AbortCB)
   : HardDeleteTriggerHandler
-  , AbstractVDIModule("hard-delete-trigger-handler", abortCB, logger<HardDeleteTriggerHandler>())
+  , AbstractVDIModule("hard-delete", abortCB, logger<HardDeleteTriggerHandler>())
 {
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)

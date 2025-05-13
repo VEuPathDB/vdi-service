@@ -17,7 +17,7 @@ internal value class LocalDatasetPropertySchema(private val path: Path): Dataset
     ?.let { JSON.readTree(it) as ObjectNode }
     ?: path.takeIf { it.isAbsolute }
       ?.let { DatasetPropertySchema::class.java.getResourceAsStream(it.toString()) }
-      ?.also { logger.info("loading '$it' from jar resources") }
+      ?.also { logger.info("loading '$path' from jar resources") }
       ?.use { JSON.readTree(it) as ObjectNode }
     ?: throw FileNotFoundException("data schema file '$path' not found in filesystem or jar resources")
 }

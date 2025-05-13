@@ -29,6 +29,7 @@ import kotlin.io.path.*
 import kotlin.math.max
 import kotlin.math.min
 import vdi.lib.db.cache.CacheDB
+import vdi.lib.db.cache.CacheDBTransaction
 import vdi.lib.db.cache.model.DatasetImpl
 import vdi.lib.db.cache.model.DatasetImportStatus
 import vdi.lib.db.cache.withTransaction
@@ -43,7 +44,7 @@ import vdi.service.rest.util.*
 
 // region Cache DB Interactions
 
-fun <T> CacheDB.initializeDataset(userID: UserID, datasetID: DatasetID, datasetMeta: VDIDatasetMeta, fn: () -> T): T =
+fun <T> CacheDB.initializeDataset(userID: UserID, datasetID: DatasetID, datasetMeta: VDIDatasetMeta, fn: (CacheDBTransaction) -> T): T =
   withTransaction {
     it.tryInsertDataset(DatasetImpl(
       datasetID = datasetID,
@@ -66,7 +67,7 @@ fun <T> CacheDB.initializeDataset(userID: UserID, datasetID: DatasetID, datasetM
       metaUpdated = OriginTimestamp
     ))
 
-    fn()
+    fn(it)
   }
 
 // endregion Cache DB Interactions
