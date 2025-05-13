@@ -297,8 +297,8 @@ internal class ReconcilerInstance(
   private inline fun <T> Iterator<T>.nextOrNull() =
     if (hasNext()) next() else null
 
-  private fun ReconcilerTargetRecord.getComparableID() = "$ownerID/$datasetID".appendZZZ()
-  private fun DatasetDirectory.getComparableID() = "$ownerID/$datasetID".appendZZZ()
+  private fun ReconcilerTargetRecord.getComparableID() = "$ownerID/$datasetID".appendZ()
+  private fun DatasetDirectory.getComparableID() = "$ownerID/$datasetID".appendZ()
 
-  private fun String.appendZZZ() = if (contains('.')) this else "$this.zzzz"
+  private fun String.appendZ() = if (contains('.')) this else "$this.z"
 }

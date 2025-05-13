@@ -37,7 +37,7 @@ WITH results AS (
       WHEN strpos(d.dataset_id, '.') > 0
         THEN d.dataset_id
       ELSE
-        d.dataset_id || '.zzzz'
+        d.dataset_id || '.z'
     END
   ) AS sort_id
   FROM
