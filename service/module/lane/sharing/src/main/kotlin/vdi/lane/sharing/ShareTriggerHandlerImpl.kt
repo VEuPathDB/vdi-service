@@ -45,7 +45,7 @@ internal class ShareTriggerHandlerImpl(private val config: ShareTriggerHandlerCo
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("share", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool("sync-shares", config.jobQueueSize, config.workerCount) {
       Metrics.shareQueueSize.inc(it.toDouble())
     }
 
