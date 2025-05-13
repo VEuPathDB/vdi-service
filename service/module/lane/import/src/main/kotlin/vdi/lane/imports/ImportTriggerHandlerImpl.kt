@@ -262,7 +262,7 @@ internal class ImportTriggerHandlerImpl(private val config: ImportTriggerHandler
 
           DataZipName -> {
             kLogger.debug("writing install-ready zip contents to object store for dataset {}/{}", userID, datasetID)
-            dd.getImportReadyFile().writeContents(stream)
+            dd.getInstallReadyFile().writeContents(stream)
             hasData = true
           }
 

@@ -52,9 +52,7 @@ internal fun <T: ControllerBase> T.putDataset(
   }
 
   // add .{inc} to dataset id to create new id
-  var newDatasetID = (CacheDB().selectLatestRevision(datasetID)
-    ?.revisionID
-    ?: datasetID)
+  var newDatasetID = (CacheDB().selectLatestRevision(datasetID)?.revisionID ?: datasetID)
     .incrementRevision()
 
   while (DatasetStore.getImportReadyZipSize(userID, newDatasetID) > -1L) {

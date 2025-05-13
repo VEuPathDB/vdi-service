@@ -35,5 +35,5 @@ sealed class ControllerBase(val request: ContainerRequest) {
     redirectURL(id.toString())
 
   fun redirectURL(id: String) =
-    request.baseUri.toString().replaceAfterLast('/', id)
+    request.absolutePath.resolve(id).toString()
 }

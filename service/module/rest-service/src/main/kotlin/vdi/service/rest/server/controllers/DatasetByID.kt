@@ -37,15 +37,14 @@ class DatasetByID(@Context request: ContainerRequest, @Context val uploadConfig:
           // check if it has been revised.  If there is a newer revision,
           // redirect to the new dataset ID endpoint.
           it.unwrapRight().let { oRes ->
-            logger.warn("code = {}", oRes.status)
             if (oRes.status == 404)
               getLatestRevision(vdiID, ::redirectURL) ?: oRes
             else
               oRes
-          }.also { logger.warn("what = {} = {}", it.status, it.entity) }
+          }
         }
-      }.also { logger.warn("how = {} = {}", it.status, it.entity) }
-    }.also { logger.warn("butts = {} = {}", it.status, it.entity) }
+      }
+    }
 
   override fun patchDatasetsByVdiId(vdiID: String, entity: DatasetPatchRequestBody?) =
     entity?.let { body -> updateDatasetMeta(DatasetID(vdiID), body) }
