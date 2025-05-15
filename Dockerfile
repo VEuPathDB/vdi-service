@@ -2,18 +2,19 @@ FROM veupathdb/alpine-dev-base:jdk24-gradle8.14 AS build
 
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
+ARG GIT_TAG=snapshot
 
 WORKDIR /workspace
 
-COPY ["service/settings.gradle.kts", "service/build.gradle.kts", "./"]
-COPY service/gradle/libs.versions.toml gradle/libs.versions.toml
-COPY service/buildSrc buildSrc
+COPY ["settings.gradle.kts", "build.gradle.kts", "./"]
+COPY gradle/libs.versions.toml ./gradle/
+COPY buildSrc ./buildSrc
 
 RUN gradle --no-daemon download-dependencies
 
-COPY service/schema schema
-COPY service/lib lib
-COPY service/module module
+COPY schema schema
+COPY lib lib
+COPY module module
 
 RUN gradle --no-daemon test shadowJar
 

@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import java.util.concurrent.locks.ReentrantLock
+import java.util.jar.Manifest
 import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
 import kotlin.system.exitProcess
@@ -27,11 +28,20 @@ import vdi.service.rest.RestService
 object Main {
   private val log = LoggerFactory.getLogger(javaClass)
 
+  private val gitTag: String
+
   init {
     java.util.logging.LogManager.getLogManager().readConfiguration("""
       handlers = org.slf4j.bridge.SLF4JBridgeHandler
       .level = SEVERE
     """.trimIndent().byteInputStream())
+
+    gitTag = javaClass.classLoader.getResourceAsStream("META-INF/MANIFEST.MF")
+      .use(::Manifest)
+      .mainAttributes
+      .getValue("Git-Tag")
+
+    log.info("Service Version: {}", gitTag)
   }
 
   @JvmStatic

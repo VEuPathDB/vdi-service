@@ -19,6 +19,6 @@ node('centos8') {
   }
 
   builder.buildContainers([
-    [ name: 'vdi-service', dockerfile: 'service/Dockerfile', buildArgs: [ GIT_TAG: tag ] ],
+    [ name: 'vdi-service', buildArgs: [ GIT_TAG: tag ] ],
   ])
 }

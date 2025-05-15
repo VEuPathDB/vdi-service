@@ -91,10 +91,11 @@ COMPOSE_CMD   := $(CONTAINER_CMD) compose --env-file=$(ENV_FILE) $(MERGED_COMPOS
 build-image:
 	@$(CONTAINER_CMD) build \
 	  -t veupathdb/vdi-service:latest \
-	  -f service/Dockerfile \
+	  -f Dockerfile \
       --build-arg=GITHUB_USERNAME=${GITHUB_USERNAME} \
       --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN} \
       --build-arg=CONFIG_FILE=config/local-dev-config.yml \
+      --build-arg=GIT_TAG=$(shell git describe --tags 2>/dev/null || echo "snapshot") \
       .
 
 # Prints the merged docker compose configuration.
@@ -248,13 +249,13 @@ generate-service-docs:
 	@mkdir -p $(OUTPUT_DOC_DIR)/schema/data $(OUTPUT_DOC_DIR)/schema/config
 	@gradle \
 		--no-daemon \
-		:service:generate-raml-docs \
-		:service:schema:build-dataset-schema-resources \
-		:service:schema:build-config-schema-resource
+		:generate-raml-docs \
+		:schema:build-dataset-schema-resources \
+		:schema:build-config-schema-resource
 	@cp -rt $(OUTPUT_DOC_DIR) \
 		docs/vdi-api.html \
-		service/schema \
-		service/schema/build/json-schema/*
+		schema \
+		schema/build/json-schema/*
 	@python -m venv venv
 	@. venv/bin/activate \
 		&& pip install json-schema-for-humans \
@@ -262,5 +263,5 @@ generate-service-docs:
 			--config expand_buttons \
 			--config examples_as_yaml \
 			--config no_link_to_reused_ref \
-			service/schema/config/stack-config.json \
+			schema/config/stack-config.json \
 			$(OUTPUT_DOC_DIR)/config-schema.html

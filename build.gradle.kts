@@ -71,6 +71,7 @@ tasks.shadowJar {
 
   manifest {
     attributes["Main-Class"] = "vdi.bootstrap.Main"
+    attributes["Git-Tag"] = System.getenv("GIT_TAG").takeUnless { it.isNullOrBlank() } ?: "snapshot"
   }
 }
 
