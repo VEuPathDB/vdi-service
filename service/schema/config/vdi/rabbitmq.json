@@ -8,18 +8,10 @@
       "$ref": "../common.json#/$defs/duration",
       "default": "1s"
     },
-    "connection": {
-      "$ref": "#/$defs/connection"
-    },
-    "exchange": {
-      "$ref": "#/$defs/exchange"
-    },
-    "queue": {
-      "$ref": "#/$defs/queue"
-    },
-    "routing": {
-      "$ref": "#/$defs/routing"
-    }
+    "connection": { "$ref": "#/$defs/connection" },
+    "exchange": { "$ref": "#/$defs/exchange" },
+    "queue": { "$ref": "#/$defs/queue" },
+    "routing": { "$ref": "#/$defs/routing" }
   },
   "required": [
     "connection",
@@ -41,15 +33,8 @@
           "title": "RabbitMQ Server Details",
           "description": "Port defaults to `5671` with TLS enabled, or `5672` with TLS disabled.",
           "oneOf": [
-            {
-              "$ref": "../common.json#/$defs/addressString"
-            },
-            {
-              "$ref": "../common.json#/$defs/interpolatedValue"
-            },
-            {
-              "$ref": "../common.json#/$defs/addressObject"
-            }
+            { "$ref": "../common.json#/$defs/addressString" },
+            { "$ref": "../common.json#/$defs/addressObject" }
           ],
           "examples": [
             "rabbit.site.com",
@@ -59,17 +44,20 @@
           ]
         },
         "username": {
-          "type": "string"
+          "type": "string",
+          "minLength": 3
         },
         "password": {
-          "type": "string"
+          "type": "string",
+          "minLength": 3
         },
         "tls": {
           "type": "boolean",
           "default": true
         },
         "timeout": {
-          "$ref": "../common.json#/$defs/duration"
+          "$ref": "../common.json#/$defs/duration",
+          "default": "10s"
         }
       },
       "required": [
@@ -83,7 +71,8 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "minLength": 3
         },
         "type": {
           "enum": [
@@ -103,21 +92,18 @@
         },
         "arguments": {
           "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+          "additionalProperties": { "type": "string" }
         }
       },
-      "required": [
-        "name"
-      ],
+      "required": [ "name" ],
       "additionalProperties": false
     },
     "queue": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "minLength": 3
         },
         "autoDelete": {
           "type": "boolean",
@@ -133,27 +119,22 @@
         },
         "arguments": {
           "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+          "additionalProperties": { "type": "string" }
         }
       },
-      "required": [
-        "name"
-      ],
+      "required": [ "name" ],
       "additionalProperties": false
     },
     "routing": {
       "type": "object",
       "properties": {
         "key": {
-          "type": "string"
+          "type": "string",
+          "minLength": 3
         },
         "arguments": {
           "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+          "additionalProperties": { "type": "string" }
         }
       },
       "additionalProperties": false

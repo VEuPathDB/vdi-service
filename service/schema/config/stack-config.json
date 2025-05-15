@@ -4,12 +4,8 @@
   "title": "VDI Stack Configuration Schema",
   "type": "object",
   "properties": {
-    "containerCore": {
-      "$ref": "container-core/core-config.json"
-    },
-    "vdi": {
-      "$ref": "vdi/vdi-config.json"
-    },
+    "containerCore": { "$ref": "container-core/core-config.json" },
+    "vdi": { "$ref": "vdi/vdi-config.json" },
     "definitions": {
       "title": "Shared Value Definitions",
       "description": "Object that may be used to hold common $defs that may be referenced elsewhere in the config file using YAML anchors and aliases.",

@@ -10,9 +10,7 @@
       "type": "boolean",
       "default": true
     },
-    "targetName": {
-      "$ref": "../common.json#/$defs/installTarget"
-    },
+    "targetName": { "$ref": "../common.json#/$defs/installTarget" },
     "dataTypes": {
       "title": "Supported Data Types",
       "description": "Optional list of data types that the install target supports.\n\nDefaults to supporting all data types from any plugins enabled for the install target.",
@@ -28,9 +26,7 @@
         },
         {
           "type": "array",
-          "items": {
-            "const": "*"
-          },
+          "items": { "const": "*" },
           "minItems": 1,
           "maxItems": 1,
           "unevaluatedItems": false
@@ -38,9 +34,11 @@
       ]
     },
     "controlDb": {
+      "$comment": "type defined in 'allOf' block below",
       "title": "Dataset Control Database/Schema"
     },
     "dataDb": {
+      "$comment": "type defined in 'allOf' block below",
       "title": "Dataset Data Database/Schema"
     },
     "datasetPropertySchema": {
@@ -58,9 +56,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "field"
-              ]
+              "required": [ "field" ]
             }
           ]
         },
@@ -73,6 +69,7 @@
           "title": "Local Schema File",
           "description": "Path to a local schema file.  If the path is absolute, and does not exist in the host filesystem, the service jar contents will be checked as well.",
           "type": "string",
+          "minLength": 6,
           "format": "uri-reference",
           "examples": [
             "/etc/vdi/mounted-filesystem-schema.json",
@@ -90,9 +87,7 @@
             "title": "Explicitly Enabled",
             "description": "The `enabled` field is explicitly set to `true`.",
             "properties": {
-              "enabled": {
-                "const": true
-              }
+              "enabled": { "const": true }
             }
           },
           {
@@ -108,12 +103,8 @@
       },
       "then": {
         "properties": {
-          "controlDb": {
-            "$ref": "../common.json#/$defs/database"
-          },
-          "dataDb": {
-            "$ref": "../common.json#/$defs/database"
-          }
+          "controlDb": { "$ref": "../common.json#/$defs/database" },
+          "dataDb": { "$ref": "../common.json#/$defs/database" }
         },
         "required": [
           "targetName",

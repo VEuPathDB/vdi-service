@@ -9,7 +9,6 @@ Configuration:
         pattern: "\
           %d{yyyy-MM-dd HH:mm:ss.SSS} \
           %highlight{%-5level} \
-          T=%-3T \
           %notEmpty{W=%X{workerID} }\
           %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
           %notEmpty{%marker }\
@@ -20,7 +19,6 @@ Configuration:
         pattern: "\
           %d{yyyy-MM-dd HH:mm:ss.SSS} \
           %highlight{%-5level} \
-          T=%-3T \
           %notEmpty{W=%X{workerID} }\
           %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
           %notEmpty{%marker }\
@@ -38,7 +36,6 @@ Configuration:
         pattern: "\
           %d{yyyy-MM-dd HH:mm:ss.SSS} \
           %highlight{%-5level} \
-          T=%-3T \
           %notEmpty{W=%X{workerID} }\
           %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
           %notEmpty{%marker }\

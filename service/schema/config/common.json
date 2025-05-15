@@ -7,24 +7,18 @@
       "type": "string",
       "pattern": "^(?:(?=[\\da-zA-Z.-]{1,253}(?::|,|$))([\\da-zA-Z][\\da-zA-Z-]{0,62}(?:\\.[\\da-zA-Z][\\da-zA-Z-]{0,62})*)(?::([1-9]\\d{0,3}|[1-5]\\d{4}|6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5])))))?(?:,(?=.+)|$))+$",
       "examples": [
-        "something:8080",
-        "foo.com:1234"
+        "something:8080,foo.com",
+        "foo.com,apple-service:9001"
       ]
     },
     "addressObject": {
       "title": "Address Config Object",
       "type": "object",
       "properties": {
-        "host": {
-          "oneOf": [
-            { "$ref": "#/$defs/host" },
-            { "$ref": "#/$defs/interpolatedValue" }
-          ]
-        },
+        "host": { "$ref": "#/$defs/host" },
         "port": {
           "oneOf": [
             { "$ref": "#/$defs/port" },
-            { "$ref": "#/$defs/interpolatedValue" },
             { "type": "null" }
           ]
         }
@@ -105,9 +99,6 @@
                     },
                     {
                       "$ref": "#/$defs/addressObject"
-                    },
-                    {
-                      "$ref": "#/$defs/interpolatedValue"
                     }
                   ]
                 },
@@ -172,18 +163,6 @@
         "VEuPathDB"
       ]
     },
-    "interpolatedValue": {
-      "title": "Interpolated String",
-      "description": "String that will be interpolated using the service environment.\n\n* Any number of variables may be used.\n* Variables may include default values in the format `${env:VARIABLE_NAME:-DEFAULT_VALUE}`.\n* Variable default values may also include variables.",
-      "type": "string",
-      "pattern": "^.*\\$\\{env:[^}]{3,}\\}.*$",
-      "examples": [
-        "${env:FOO}",
-        "${env:FOO:-bar}",
-        "a ${env:VARIABLE} in the middle of a string",
-        "${env:RECURSIVE:-${env:DEFAULT:-${env:VALUE:-RESOLUTION}}}"
-      ]
-    },
     "ldap": {
       "title": "LDAP Connection Configuration",
       "type": "object",
@@ -210,9 +189,6 @@
             },
             {
               "$ref": "#/$defs/addressCsv"
-            },
-            {
-              "$ref": "#/$defs/interpolatedValue"
             }
           ]
         },

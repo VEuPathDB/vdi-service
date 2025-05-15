@@ -6,15 +6,8 @@
   "properties": {
     "server": {
       "oneOf": [
-        {
-          "$ref": "../common.json#/$defs/addressString"
-        },
-        {
-          "$ref": "../common.json#/$defs/addressObject"
-        },
-        {
-          "$ref": "../common.json#/$defs/interpolatedValue"
-        }
+        { "$ref": "../common.json#/$defs/addressString" },
+        { "$ref": "../common.json#/$defs/addressObject" }
       ]
     },
     "displayName": {
@@ -24,9 +17,7 @@
       "title": "Data Types",
       "description": "Types and versions of dataset data handled by the plugin being defined.",
       "type": "array",
-      "items": {
-        "$ref": "#/$defs/dataType"
-      },
+      "items": { "$ref": "#/$defs/dataType" },
       "minItems": 1,
       "uniqueItems": true,
       "unevaluatedItems": false
@@ -40,22 +31,13 @@
       "title": "PATH Extension",
       "description": "Allows adding additional paths to the PATH environment variable passed to plugin scripts on execution in the typical colon (`:`) divided format.\nLeading or trailing colon characters are not required.",
       "type": "string",
-      "examples": [
-        "/opt/something/bin:/opt/other/bin"
-      ]
+      "examples": [ "/opt/something/bin:/opt/other/bin" ]
     },
     "installRoot": {
       "title": "Dataset File Install Root",
       "description": "The root mount path INSIDE THE CONTAINER which will contain the site build directory hierarchy into which dataset files will be installed.  The build directory itself MUST NOT be part of this path.",
-      "oneOf": [
-        {
-          "type": "string",
-          "format": "uri-reference"
-        },
-        {
-          "$ref": "../common.json#/$defs/interpolatedValue"
-        }
-      ],
+      "type": "string",
+      "format": "uri-reference",
       "default": "/datasets",
       "examples": [
         "/datasets"
@@ -63,9 +45,7 @@
     },
     "projectIds": {
       "type": "array",
-      "items": {
-        "$ref": "../common.json#/$defs/installTarget"
-      },
+      "items": { "$ref": "../common.json#/$defs/installTarget" },
       "unevaluatedItems": false
     },
     "scripts": {
@@ -119,24 +99,16 @@
     "scriptPath": {
       "type": "string",
       "format": "uri-reference",
-      "examples": [
-        "/opt/vpdb/import.sh"
-      ]
+      "examples": [ "/opt/vpdb/bin/import.sh" ]
     },
     "dataType": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
+        "name": { "type": "string" },
         "version": {
           "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "number"
-            }
+            { "type": "string" },
+            { "type": "number" }
           ]
         }
       },

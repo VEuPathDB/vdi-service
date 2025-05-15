@@ -7,64 +7,34 @@
     "cacheDb": {
       "$ref": "#/$defs/cacheDb"
     },
-    "restService": {
-      "$ref": "rest-service.json"
-    },
+    "restService": { "$ref": "rest-service.json" },
     "daemons": {
       "type": "object",
       "properties": {
-        "eventRouter": {
-          "$ref": "daemons/event-router.json"
-        },
-        "pruner": {
-          "$ref": "daemons/pruner.json"
-        },
-        "reconciler": {
-          "$ref": "daemons/reconciler.json"
-        }
+        "eventRouter": { "$ref": "daemons/event-router.json" },
+        "pruner": { "$ref": "daemons/pruner.json" },
+        "reconciler": { "$ref": "daemons/reconciler.json" }
       },
       "additionalProperties": false
     },
-    "kafka": {
-      "$ref": "kafka.json"
-    },
+    "kafka": { "$ref": "kafka.json" },
     "lanes": {
       "type": "object",
       "properties": {
-        "hardDelete": {
-          "$ref": "lanes/hard-delete.json"
-        },
-        "import": {
-          "$ref": "lanes/import.json"
-        },
-        "install": {
-          "$ref": "lanes/install.json"
-        },
-        "reconciliation": {
-          "$ref": "lanes/reconciliation.json"
-        },
-        "sharing": {
-          "$ref": "lanes/sharing.json"
-        },
-        "softDelete": {
-          "$ref": "lanes/soft-delete.json"
-        },
-        "updateMeta": {
-          "$ref": "lanes/update-meta.json"
-        }
+        "hardDelete": { "$ref": "lanes/hard-delete.json" },
+        "import": { "$ref": "lanes/import.json" },
+        "install": { "$ref": "lanes/install.json" },
+        "reconciliation": { "$ref": "lanes/reconciliation.json" },
+        "sharing": { "$ref": "lanes/sharing.json" },
+        "softDelete": { "$ref": "lanes/soft-delete.json" },
+        "updateMeta": { "$ref": "lanes/update-meta.json" }
       }
     },
-    "ldap": {
-      "$ref": "../common.json#/$defs/ldap"
-    },
-    "objectStore": {
-      "$ref": "object-store.json"
-    },
+    "ldap": { "$ref": "../common.json#/$defs/ldap" },
+    "objectStore": { "$ref": "object-store.json" },
     "plugins": {
       "type": "array",
-      "items": {
-        "$ref": "plugin.json"
-      },
+      "items": { "$ref": "plugin.json" },
       "minItems": 1,
       "uniqueItems": true,
       "unevaluatedItems": false
@@ -72,26 +42,21 @@
     "rabbit": {
       "type": "object",
       "properties": {
-        "global": {
-          "$ref": "rabbitmq.json"
-        }
+        "global": { "$ref": "rabbitmq.json" }
       },
-      "required": [
-        "global"
-      ],
+      "required": [ "global" ],
       "additionalProperties": false
     },
     "siteBuild": {
+      "title": "Site Build Directory Name",
+      "description": "Name of the parent directory containing the per-project dataset files subdirectories.\n\nThis directory name will be used to form paths such as `{siteBuild}/{installTarget}/{datasetId}`.",
       "type": "string",
-      "examples": [
-        "build-65"
-      ]
+      "examples": [ "build-65" ]
     },
     "installTargets": {
+      "title": "Dataset Installation Targets",
       "type": "array",
-      "items": {
-        "$ref": "install-target.json"
-      },
+      "items": { "$ref": "install-target.json" },
       "minItems": 1,
       "unevaluatedItems": false,
       "uniqueItems": true
@@ -113,31 +78,27 @@
       "properties": {
         "server": {
           "oneOf": [
-            {
-              "$ref": "../common.json#/$defs/addressString"
-            },
-            {
-              "$ref": "../common.json#/$defs/interpolatedValue"
-            },
-            {
-              "$ref": "../common.json#/$defs/addressObject"
-            }
+            { "$ref": "../common.json#/$defs/addressString" },
+            { "$ref": "../common.json#/$defs/addressObject" }
           ]
         },
         "username": {
-          "type": "string"
+          "type": "string",
+          "minLength": 3
         },
         "password": {
-          "type": "string"
+          "type": "string",
+          "minLength": 3
         },
         "name": {
           "type": "string",
+          "minLength": 3,
           "default": "vdi"
         },
         "poolSize": {
           "type": "integer",
           "minimum": 1,
-          "maximum": 255,
+          "maximum": 32,
           "default": 5
         }
       },

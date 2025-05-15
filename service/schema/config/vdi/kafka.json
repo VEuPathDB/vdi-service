@@ -8,29 +8,16 @@
       "type": "array",
       "items": {
         "oneOf": [
-          {
-            "$ref": "../common.json#/$defs/addressString"
-          },
-          {
-            "$ref": "../common.json#/$defs/interpolatedValue"
-          },
-          {
-            "$ref": "../common.json#/$defs/addressObject"
-          }
+          { "$ref": "../common.json#/$defs/addressString" },
+          { "$ref": "../common.json#/$defs/addressObject" }
         ]
       },
       "unevaluatedItems": false
     },
-    "consumers": {
-      "$ref": "#/$defs/consumers"
-    },
-    "producers": {
-      "$ref": "#/$defs/producers"
-    }
+    "consumers": { "$ref": "#/$defs/consumers" },
+    "producers": { "$ref": "#/$defs/producers" }
   },
-  "required": [
-    "servers"
-  ],
+  "required": [ "servers" ],
   "additionalProperties": false,
   "$defs": {
     "consumers": {

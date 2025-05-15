@@ -4,35 +4,22 @@
   "title": "Container Core Library Config",
   "type": "object",
   "properties": {
-    "ldap": {
-      "$ref": "../common.json#/$defs/ldap"
-    },
+    "ldap": { "$ref": "../common.json#/$defs/ldap" },
     "authentication": {
       "type": "object",
       "properties": {
         "adminToken": {
-          "oneOf": [
-            {
-              "type": "string",
-              "minLength": 32
-            },
-            {
-              "$ref": "../common.json#/$defs/interpolatedValue"
-            }
-          ]
+          "type": "string",
+          "minLength": 32
         },
-        "oauth": {
-          "$ref": "#/$defs/oauth"
-        }
+        "oauth": { "$ref": "#/$defs/oauth" }
       },
       "required": [
         "adminToken",
         "oauth"
       ]
     },
-    "http": {
-      "$ref": "#/$defs/http"
-    },
+    "http": { "$ref": "#/$defs/http" },
     "databases": {
       "type": "object",
       "properties": {
@@ -56,9 +43,7 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "authentication"
-  ],
+  "required": [ "authentication" ],
   "$defs": {
     "http": {
       "title": "HTTP Server Config",
@@ -81,25 +66,20 @@
       "type": "object",
       "properties": {
         "clientId": {
-          "type": "string"
+          "type": "string",
+          "minLength": 3
         },
         "clientSecret": {
-          "type": "string"
+          "type": "string",
+          "minLength": 3
         },
         "url": {
           "type": "string",
           "format": "uri"
         },
         "keystoreFile": {
-          "oneOf": [
-            {
-              "type": "string",
-              "format": "uri-reference"
-            },
-            {
-              "$ref": "../common.json#/$defs/interpolatedValue"
-            }
-          ]
+          "type": "string",
+          "format": "uri-reference"
         },
         "keystorePass": {
           "type": "string"

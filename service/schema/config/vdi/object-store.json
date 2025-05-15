@@ -9,15 +9,8 @@
     },
     "server": {
       "oneOf": [
-        {
-          "$ref": "../common.json#/$defs/addressString"
-        },
-        {
-          "$ref": "../common.json#/$defs/interpolatedValue"
-        },
-        {
-          "$ref": "../common.json#/$defs/addressObject"
-        }
+        { "$ref": "../common.json#/$defs/addressString" },
+        { "$ref": "../common.json#/$defs/addressObject" }
       ]
     },
     "https": {
@@ -25,10 +18,12 @@
       "default": true
     },
     "accessToken": {
-      "type": "string"
+      "type": "string",
+      "minLength": 8
     },
     "secretKey": {
-      "type": "string"
+      "type": "string",
+      "minLength": 8
     }
   },
   "required": [
