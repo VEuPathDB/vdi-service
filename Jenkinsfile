@@ -8,8 +8,15 @@ node('centos8') {
 
   builder.gitClone()
 
-  sh "git fetch --tags --depth=1 >/dev/null"
-  def tag = sh "git describe --tags 2>/dev/null || echo 'snapshot'"
+  sh "git fetch --tags --depth=1"
+  def tag = sh(
+    script: "git describe --tags",
+    returnStdout: true
+  )
+
+  if (tag.isEmpty()) {
+    tag = "snapshot"
+  }
 
   builder.buildContainers([
     [ name: 'vdi-service', dockerfile: 'service/Dockerfile', buildArgs: [ GIT_TAG: tag ] ],
