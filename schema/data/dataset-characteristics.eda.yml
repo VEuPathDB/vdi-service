@@ -97,6 +97,7 @@ properties:
       then:
         required:
         - agency
+    unevaluatedProperties: false
 
 required:
 - studyDesign
