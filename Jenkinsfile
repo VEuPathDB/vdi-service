@@ -8,7 +8,7 @@ node('centos8') {
 
   builder.gitClone()
 
-  sh "git checkout ${env.GIT_COMMIT}"
+  sh "git rev-parse HEAD | git checkout -"
   sh "git tags"
   def tag = sh(
     script: "git describe --tags",
