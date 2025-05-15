@@ -10,12 +10,13 @@ node('centos8') {
 
   sh "git rev-parse HEAD | git checkout -"
   sh "git tag"
+
+  print(env)
+
   def tag = sh(
     script: "git describe --tags",
     returnStdout: true
   )
-
-  print(env)
 
   if (tag.isEmpty()) {
     tag = "snapshot"
