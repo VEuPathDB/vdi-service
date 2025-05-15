@@ -30,21 +30,21 @@ runs:
 
   - name: Compile RAML Docs
     shell: bash
-    run: gradle :service:generate-raml-docs
+    run: gradle :generate-raml-docs
     env:
       GITHUB_USERNAME: ${{ inputs.gh-user }}
       GITHUB_TOKEN: ${{ inputs.gh-token }}
 
   - name: Compile Dataset Characteristics Schema
     shell: bash
-    run: gradle :service:schema:build-dataset-schema-resources
+    run: gradle :schema:build-dataset-schema-resources
     env:
       GITHUB_USERNAME: ${{ inputs.gh-user }}
       GITHUB_TOKEN: ${{ inputs.gh-token }}
 
   - name: Compile Service Config Schema
     shell: bash
-    run: gradle :service:schema:build-config-schema-resource
+    run: gradle :schema:build-config-schema-resource
     env:
       GITHUB_USERNAME: ${{ inputs.gh-user }}
       GITHUB_TOKEN: ${{ inputs.gh-token }}
@@ -54,8 +54,10 @@ runs:
     run: >-
       cp -rt ${{ inputs.output-dir }} \
         docs/vdi-api.html \
-        service/schema \
-        service/schema/build/json-schema/*
+        schema/build/json-schema/*
+      cp -rt ${{ inputs.output-dir }} \
+        schema/config \
+        schema/data
 
   - name: Compile Config Schema Docs
     shell: bash
@@ -64,6 +66,6 @@ runs:
         --config expand_buttons \
         --config examples_as_yaml \
         --config no_link_to_reused_ref \
-        service/schema/config/stack-config.json \
+        schema/config/stack-config.json \
         ${{ inputs.output-dir }}/config-schema.html
 

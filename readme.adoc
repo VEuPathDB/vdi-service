@@ -41,10 +41,10 @@ endif::[]
 
 * link:https://veupathdb.github.io/vdi-service/dev/vdi-api.html[REST Service API Doc]
 * EDA Dataset Characteristics Schema
-** link:service/schema/data/dataset-characteristics.eda.yml[Source YAML Schema]
+** link:schema/data/dataset-characteristics.eda.yml[Source YAML Schema]
 ** link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.eda.json[Compiled JSON Schema]
 * Genomics Dataset Characteristics Schema
-** link:service/schema/data/dataset-characteristics.genomics.yml[Source YAML Schema]
+** link:schema/data/dataset-characteristics.genomics.yml[Source YAML Schema]
 ** link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.genomics.json[Compiled JSON Schema]
 * link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.metaschema.json[Dataset Characteristiscs Metaschema]
 
@@ -193,13 +193,13 @@ full repository source.
 ----
 git clone git@github.com:VEuPathDB/vdi-service --depth 1 --filter tree:0 \
   && cd vdi-service \
-  && git sparse-checkout set --no-cone /service/schema/data \
+  && git sparse-checkout set --no-cone /schema/data \
   && git checkout
 ----
 ====
 
 The dataset characteristics validation schema files are JSON schema, written in
-YAML that live in the link:service/schema/data/[data schema directory].
+YAML that live in the link:schema/data/[data schema directory].
 
 The schema files themselves are validated using the included metaschema JSON
 file, which may be plugged into many smart editors to automatically validate
@@ -213,50 +213,6 @@ code, configuration, documentation, and deployment related files.  Most
 development tasks will be performed in the subprojects under the `./service`
 directory.
 
-=== Project Source
-
-The `./service` directory contains the VDI service source code and compiled Jar
-contents.
-
-A generally important detail about the project that makes the division of
-subprojects here more easily understandable is that the VDI container service is
-not a single application, but is actually 11 independent, self-contained
-applications running on a single JVM.
-
-The `./service` directory is divided up by category:
-
-[cols="2,8"]
-|===
-| link:service/bootstrap/[`bootstrap`]
-| Contains the root 'Main' class that is called when executing the compiled jar.
-This project is responsible for starting up the component processes that make up
-the VDI container service.
-
-| link:service/lib/[`lib`]
-| Contains shared code used by multiple component sub-applications.
-
-| link:service/module/[`module`]
-| Contains the source for the individual component sub-applications that make up
-the VDI container service.
-
-| link:service/schema/[`schema`]
-| Contains the JSON schema definitions for dataset metadata and the service
-configuration files.
-
-| link:service/gradle/[`gradle`]
-| Contains the Gradle dependency catalogue declaring the dependency versions for
-all libraries used by all VDI service sub-projects.
-
-| link:service/buildSrc/[`buildSrc`]
-| Source for gradle build extensions that are complex enough to warrant their
-own class and/or source file.
-|===
-
-
-[NOTE]
-Gradle tasks may be executed from this directory directly without the `:service`
-prefix that is required for tasks executed from the project root.
-
 === Service Components
 
 ==== Lanes
@@ -265,65 +221,65 @@ Dataset event handlers.  Each lane is a separate process that subscribes to a
 Kafka channel and operates on datasets whose information is provided in the
 incoming events.
 
-* link:service/module/lane/hard-delete/[Hard Delete]
-* link:service/module/lane/import/[Import]
-* link:service/module/lane/install/[Install Data]
-* link:service/module/lane/reconciliation/[Reconciliation]
-* link:service/module/lane/sharing/[Share]
-* link:service/module/lane/soft-delete/[Soft Delete]
-* link:service/module/lane/update-meta/[Update Meta]
+* link:module/lane/hard-delete/[Hard Delete]
+* link:module/lane/import/[Import]
+* link:module/lane/install/[Install Data]
+* link:module/lane/reconciliation/[Reconciliation]
+* link:module/lane/sharing/[Share]
+* link:module/lane/soft-delete/[Soft Delete]
+* link:module/lane/update-meta/[Update Meta]
 
 ==== Rest Service
 
 The rest service is the public API through which users and administrators
 communicate with and operate on the VDI system.
 
-* link:service/module/rest-service/[Rest API Service]
+* link:module/rest-service/[Rest API Service]
 
 ==== Daemons
 
 Independent background tasks.
 
-* link:service/module/daemon/event-router/[MinIO Event Router]
-* link:service/module/daemon/pruner/[Stale Object Pruner]
-* link:service/module/daemon/reconciler/[Dataset Reconciler]
+* link:module/daemon/event-router/[MinIO Event Router]
+* link:module/daemon/pruner/[Stale Object Pruner]
+* link:module/daemon/reconciler/[Dataset Reconciler]
 
 ==== Bootstrapper
 
 The bootstrapper is responsible for starting up the service modules listed above
 and ensuring a full JVM shutdown if any service module crashes.
 
-* link:service/bootstrap/[Bootstrapper]
+* link:module/bootstrap/[Bootstrapper]
 
 === Internal Libs
 
-.link:service/lib/dataset/[Dataset Management]
-* link:service/lib/dataset/pruner[Dataset Pruner Implementation]
-* link:service/lib/dataset/reconciler/[Dataset Reconciler Implementation]
-* link:service/lib/dataset/reinstaller/[Dataset Reinstaller]
+.link:lib/dataset/[Dataset Management]
+* link:lib/dataset/pruner[Dataset Pruner Implementation]
+* link:lib/dataset/reconciler/[Dataset Reconciler Implementation]
+* link:lib/dataset/reinstaller/[Dataset Reinstaller]
 
-.link:service/lib/db/[Database Interaction]
-* link:service/lib/db/application/[Application DB Client]
-* link:service/lib/db/internal/[Internal DB Client]
-* link:service/lib/db/common/[Shared DB Components]
+.link:lib/db/[Database Interaction]
+* link:lib/db/application/[Application DB Client]
+* link:lib/db/internal/[Internal DB Client]
+* link:lib/db/common/[Shared DB Components]
 
-.link:service/lib/plugin/[Plugin Communication]
-* link:service/lib/plugin/client[Plugin HTTP Client]
-* link:service/lib/plugin/registry/[Enabled Plugin Mapping]
+.link:lib/plugin/[Plugin Communication]
+* link:lib/plugin/client[Plugin HTTP Client]
+* link:lib/plugin/registry/[Enabled Plugin Mapping]
 
-.link:service/lib/external[External Service APIs]
-* link:service/lib/external/kafka[Kafka Client]
-* link:service/lib/external/ldap[LDAP Utilities]
-* link:service/lib/external/rabbit[Rabbit Client]
-* link:service/lib/external/s3[MinIO Dataset Management Wrapper]
+.link:lib/external[External Service APIs]
+* link:lib/external/kafka[Kafka Client]
+* link:lib/external/ldap[LDAP Utilities]
+* link:lib/external/rabbit[Rabbit Client]
+* link:lib/external/s3[MinIO Dataset Management Wrapper]
 
 .Misc
-* link:service/lib/async/[Async Utilities]
-* link:service/lib/common/[Universal Components]
-* link:service/lib/config/[Dumb Service Config POJOs]
-* link:service/lib/install-target/[Dataset Install Target Registry]
-* link:service/lib/module-core/[Service/Module Core API]
-* link:service/lib/test-utils[Unit Test Utilities]
+* link:lib/async/[Async Utilities]
+* link:lib/common/[Universal Components]
+* link:lib/config/[Dumb Service Config POJOs]
+* link:lib/install-target/[Dataset Install Target Registry]
+* link:lib/module-core/[Service/Module Core API]
+* link:lib/test-utils[Unit Test Utilities]
 
 
 == VDI Project Repository Links
