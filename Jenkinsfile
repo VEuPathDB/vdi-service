@@ -11,7 +11,7 @@ node('centos8') {
   sh "git rev-parse HEAD | git checkout -"
   sh "git tag"
 
-  print(env)
+  print(env.getEnvironment())
 
   def tag = sh(
     script: "git describe --tags",
