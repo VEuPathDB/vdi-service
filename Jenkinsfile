@@ -8,6 +8,7 @@ node('centos8') {
 
   builder.gitClone()
 
+  sh "git fetch --tags --depth=1"
   def tag = sh "git describe --tags || echo 'snapshot'"
 
   builder.buildContainers([
