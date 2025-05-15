@@ -8,7 +8,7 @@ node('centos8') {
 
   builder.gitClone()
 
-  sh "git pull --tags"
+  sh "git pull -f --tags"
   def tag = sh(
     script: "git describe --tags",
     returnStdout: true
