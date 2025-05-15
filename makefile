@@ -31,47 +31,6 @@ default:
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃                                                                          ┃ #
-# ┃     Stack Management Tasks                                               ┃ #
-# ┃                                                                          ┃ #
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
-
-ALPINE_DEV_BASE_TAG := jdk24-gradle8.14
-STACK_CONFIG_PATH := config/production-config.yml
-
-# Validates the VDI configuration file against the config JSON schema using the
-# VPDB java dev container.
-#
-# See: validate-config-local
-.PHONY: validate-config
-validate-config:
-	@echo "running validation in dev-build container"
-	@echo
-	@$(CONTAINER_CMD) run \
-	  --rm \
-	  --volume $$PWD/service/schema/config:/vdi/config/schema \
-	  --volume $$PWD/tools/config-validator:/vdi/config/validator \
-	  --volume $$PWD/config:/vdi/config \
-	  --workdir /vdi/config/validator \
-	  veupathdb/alpine-dev-base:jdk24-gradle8.14 \
-	  gradle validate-config \
-	    --quiet \
-	    -Pconfig-file=/vdi/$(STACK_CONFIG_PATH) \
-	    -Pschema-file=/vdi/config/schema/stack-config.json
-
-# Validates the VDI configuration file against the config JSON schema using a
-# local JVM.
-#
-# See: validate-config
-.PHONY: validate-config
-validate-config-local:
-	@gradle :config-validator:validate-config \
-	  --quiet \
-	  -Pconfig-file=$$PWD/$(STACK_CONFIG_PATH) \
-	  -Pschema-file=$$PWD/service/schema/config/stack-config.json
-
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
-# ┃                                                                          ┃ #
 # ┃     Development Tooling                                                  ┃ #
 # ┃                                                                          ┃ #
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #

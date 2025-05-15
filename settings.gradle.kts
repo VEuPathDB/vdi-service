@@ -17,4 +17,3 @@ dependencyResolutionManagement {
 }
 
 includeBuild("service")
-includeBuild("tools/config-validator")
