@@ -22,8 +22,8 @@ ARG GIT_TAG="unknown"
 ARG GIT_COMMIT="unknown"
 ARG GIT_BRANCH="unknown"
 ARG GIT_URL="unknown"
-ARG JENKINS_BUILD_ID="unknown"
-ARG JENKINS_BUILD_NUMBER="unknown"
+ARG BUILD_ID="unknown"
+ARG BUILD_NUMBER="unknown"
 ARG BUILD_TIME="unknown"
 
 RUN gradle --no-daemon \
@@ -31,8 +31,8 @@ RUN gradle --no-daemon \
     -Dbuild.git.commit="${GIT_COMMIT}" \
     -Dbuild.git.branch="${GIT_BRANCH}" \
     -Dbuild.git.url="${GIT_URL}" \
-    -Dbuild.ci.id="${JENKINS_BUILD_ID}" \
-    -Dbuild.ci.number="${JENKINS_BUILD_NUMBER}" \
+    -Dbuild.ci.id="${BUILD_ID}" \
+    -Dbuild.ci.number="${BUILD_NUMBER}" \
     -Dbuild.ci.timestamp="${BUILD_TIME}" \
     test shadowJar
 
