@@ -8,7 +8,7 @@ node('centos8') {
 
   builder.gitClone()
 
-  sh "git fetch --unshallow --tags"
+  sh "git fetch --unshallow --tags || echo ok"
 //   sh "git checkout ${builder.gitCommit()}"
 
   def tag = sh(
