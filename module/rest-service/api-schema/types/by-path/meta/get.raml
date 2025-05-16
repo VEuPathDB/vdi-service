@@ -1,0 +1,23 @@
+#%RAML 1.0 Library
+
+uses:
+  common: "../../common.raml"
+
+types:
+  ServiceMetadataResponseBody:
+    type: object
+    additionalProperties: false
+    properties:
+      buildInfo: ServiceMetadataBuildInfoOutput
+
+  ServiceMetadataBuildInfoOutput:
+    type: object
+    additionalProperties: false
+    properties:
+      gitTag: string
+      gitCommit: string
+      gitBranch: string
+      gitUrl: string
+      buildId: string
+      buildNumber: string
+      buildTime: string

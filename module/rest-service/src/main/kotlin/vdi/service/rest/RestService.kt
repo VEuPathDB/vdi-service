@@ -5,6 +5,7 @@ import org.veupathdb.lib.container.jaxrs.config.Options
 import org.veupathdb.lib.container.jaxrs.providers.DependencyProvider
 import org.veupathdb.lib.container.jaxrs.server.Server
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
+import vdi.lib.config.ManifestConfig
 import vdi.lib.config.StackConfig
 import vdi.lib.db.app.AppDB
 import vdi.lib.db.app.AppDatabaseRegistry
@@ -15,10 +16,10 @@ import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.health.DependencySource
 import vdi.service.rest.s3.DatasetStore
 
-class RestService(config: StackConfig) : Server() {
+class RestService(config: StackConfig, manifest: ManifestConfig) : Server() {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val options = ServiceConfig(config)
+  private val options = ServiceConfig(config, manifest)
 
   init {
     // Eager load classes for fail-fast

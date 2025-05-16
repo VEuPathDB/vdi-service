@@ -2,7 +2,7 @@ FROM veupathdb/alpine-dev-base:jdk24-gradle8.14 AS build
 
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
-ARG GIT_TAG=snapshot
+
 
 WORKDIR /workspace
 
@@ -16,7 +16,25 @@ COPY schema schema
 COPY lib lib
 COPY module module
 
-RUN gradle --no-daemon test shadowJar
+
+# Build Info
+ARG GIT_TAG="unknown"
+ARG GIT_COMMIT="unknown"
+ARG GIT_BRANCH="unknown"
+ARG GIT_URL="unknown"
+ARG JENKINS_BUILD_ID="unknown"
+ARG JENKINS_BUILD_NUMBER="unknown"
+ARG BUILD_TIME="unknown"
+
+RUN gradle --no-daemon \
+    -Dbuild.git.tag="${GIT_TAG}" \
+    -Dbuild.git.commit="${GIT_COMMIT}" \
+    -Dbuild.git.branch="${GIT_BRANCH}" \
+    -Dbuild.git.url="${GIT_URL}" \
+    -Dbuild.ci.id="${JENKINS_BUILD_ID}" \
+    -Dbuild.ci.number="${JENKINS_BUILD_NUMBER}" \
+    -Dbuild.ci.timestamp="${BUILD_TIME}" \
+    test shadowJar
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

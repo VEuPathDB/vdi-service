@@ -885,6 +885,22 @@ types:
       status: server-error
       message: Datastore connection lost
       requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3
+  ServiceMetadataBuildInfoOutput:
+    type: object
+    additionalProperties: false
+    properties:
+      gitTag: string
+      gitCommit: string
+      gitBranch: string
+      gitUrl: string
+      buildId: string
+      buildNumber: string
+      buildTime: string
+  ServiceMetadataResponseBody:
+    type: object
+    additionalProperties: false
+    properties:
+      buildInfo: ServiceMetadataBuildInfoOutput
   ShareOffer:
     displayName: Dataset Share Offer
     type: object

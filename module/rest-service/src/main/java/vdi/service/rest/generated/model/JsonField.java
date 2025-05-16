@@ -8,6 +8,9 @@ public final class JsonField {
   public static final String AFTER = "after";
   public static final String ALL = "all";
   public static final String BEFORE = "before";
+  public static final String BUILD_ID = "buildId";
+  public static final String BUILD_NUMBER = "buildNumber";
+  public static final String BUILD_TIME = "buildTime";
   public static final String CATEGORY = "category";
   public static final String CITATION = "citation";
   public static final String CITY = "city";
@@ -36,6 +39,10 @@ public final class JsonField {
   public static final String FILE_SIZE = "fileSize";
   public static final String FILE_SIZE_TOTAL = "fileSizeTotal";
   public static final String FIRST_NAME = "firstName";
+  public static final String GIT_BRANCH = "gitBranch";
+  public static final String GIT_COMMIT = "gitCommit";
+  public static final String GIT_TAG = "gitTag";
+  public static final String GIT_URL = "gitUrl";
   public static final String HYPERLINKS = "hyperlinks";
   public static final String IDS = "ids";
   public static final String IMPORT = "import";

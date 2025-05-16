@@ -1,6 +1,15 @@
+import com.networknt.schema.format.DateTimeFormat
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.ResolverStyle
+import java.time.format.SignStyle
+import java.time.temporal.ChronoField
 
 plugins {
   alias(libs.plugins.kotlin)
@@ -70,8 +79,24 @@ tasks.shadowJar {
   archiveFileName.set("vdi-service.jar")
 
   manifest {
-    attributes["Main-Class"] = "vdi.bootstrap.Main"
-    attributes["Git-Tag"] = System.getenv("GIT_TAG").takeUnless { it.isNullOrBlank() } ?: "snapshot"
+    attributes["Main-Class"]   = "vdi.bootstrap.Main"
+    attributes["Git-Tag"]      = properties["build.git.tag"] ?: "unknown"
+    attributes["Git-Commit"]   = properties["build.git.commit"] ?: "unknown"
+    attributes["Git-Branch"]   = properties["build.git.branch"] ?: "unknown"
+    attributes["Git-URL"]      = properties["build.git.url"] ?: "unknown"
+    attributes["Build-ID"]     = properties["build.ci.id"] ?: "unknown"
+    attributes["Build-Number"] = properties["build.ci.number"] ?: "unknown"
+    attributes["Build-Time"]   = properties["build.ci.timestamp"] ?: ZonedDateTime.now(ZoneOffset.UTC)
+      .format(DateTimeFormatterBuilder()
+        .append(DateTimeFormatter.ISO_LOCAL_DATE)
+        .appendLiteral(' ')
+        .appendValue(ChronoField.HOUR_OF_DAY, 2)
+        .appendLiteral(':')
+        .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+        .appendLiteral(':')
+        .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+        .appendOffsetId()
+        .toFormatter())
   }
 }
 

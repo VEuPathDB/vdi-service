@@ -5,12 +5,13 @@ import org.veupathdb.lib.container.jaxrs.config.DbOptions
 import org.veupathdb.lib.container.jaxrs.config.DbOptionsImpl
 import org.veupathdb.lib.container.jaxrs.config.Options
 import java.util.Optional
+import vdi.lib.config.ManifestConfig
 import vdi.lib.config.StackConfig
 import vdi.lib.config.common.DatabaseConnectionConfig
 import vdi.lib.config.common.DirectDatabaseConnectionConfig
 import vdi.lib.config.common.LDAPDatabaseConnectionConfig
 
-class ServiceConfig(config: StackConfig) : Options() {
+class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : Options() {
   private val coreConfig = config.core
 
   val uploads = UploadConfig(config.vdi.restService)

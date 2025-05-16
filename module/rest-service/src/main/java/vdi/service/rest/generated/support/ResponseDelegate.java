@@ -1,10 +1,19 @@
 package vdi.service.rest.generated.support;
 
-import jakarta.ws.rs.core.*;
-
 import java.lang.annotation.Annotation;
 import java.net.URI;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
 
 public class ResponseDelegate extends Response {
   public final Response delegate;
@@ -51,6 +60,11 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
+  public MultivaluedMap<String, Object> getHeaders() {
+    return this.delegate.getHeaders();
+  }
+
+  @Override
   public int getStatus() {
     return this.delegate.getStatus();
   }
@@ -61,17 +75,8 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public Object getEntity() {
-    return this.entity;}
-
-  @Override
   public Response.StatusType getStatusInfo() {
     return this.delegate.getStatusInfo();
-  }
-
-  @Override
-  public <T> T readEntity(Class<T> p0) {
-    return this.delegate.readEntity(p0);
   }
 
   @Override
@@ -87,6 +92,11 @@ public class ResponseDelegate extends Response {
   @Override
   public <T> T readEntity(Class<T> p0, Annotation[] p1) {
     return this.delegate.readEntity(p0,p1);
+  }
+
+  @Override
+  public <T> T readEntity(Class<T> p0) {
+    return this.delegate.readEntity(p0);
   }
 
   @Override
@@ -150,9 +160,8 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public MultivaluedMap<String, Object> getHeaders() {
-    return this.delegate.getHeaders();
-  }
+  public Object getEntity() {
+    return this.entity;}
 
   public static class HeaderBuilderBase {
     protected final Map<String, String> headerMap;

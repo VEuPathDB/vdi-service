@@ -1,8 +1,23 @@
 package vdi.service.rest.generated.resources;
 
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
-import vdi.service.rest.generated.model.*;
+import vdi.service.rest.generated.model.BadRequestError;
+import vdi.service.rest.generated.model.DatasetDetails;
+import vdi.service.rest.generated.model.DatasetPatchRequestBody;
+import vdi.service.rest.generated.model.DatasetPutRequestBody;
+import vdi.service.rest.generated.model.DatasetPutResponseBody;
+import vdi.service.rest.generated.model.ForbiddenError;
+import vdi.service.rest.generated.model.NotFoundError;
+import vdi.service.rest.generated.model.ServerError;
+import vdi.service.rest.generated.model.UnauthorizedError;
+import vdi.service.rest.generated.model.UnprocessableEntityError;
 import vdi.service.rest.generated.support.PATCH;
 import vdi.service.rest.generated.support.ResponseDelegate;
 

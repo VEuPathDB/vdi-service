@@ -1,12 +1,19 @@
 package vdi.service.rest.generated.resources;
 
-import jakarta.ws.rs.*;
+import java.util.List;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.Response;
-import vdi.service.rest.generated.model.*;
+import vdi.service.rest.generated.model.BadRequestError;
+import vdi.service.rest.generated.model.ServerError;
+import vdi.service.rest.generated.model.ShareOfferEntry;
+import vdi.service.rest.generated.model.UnauthorizedError;
+import vdi.service.rest.generated.model.UserMetadata;
 import vdi.service.rest.generated.support.ResponseDelegate;
-
-import java.util.List;
 
 @Path("/users")
 public interface Users {

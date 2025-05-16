@@ -38,14 +38,14 @@ default:
 
 .PHONY: build
 build:
-	@gradle :service:build
+	@gradle :build
 
 # Regenerates REST API documentation and JaxRS classes from the REST service
 # api.raml file
 .PHONY: raml-gen
 raml-gen:
-	@which node || (echo 'NodeJS not found on $$PATH'; exit 1)
-	@./gradlew -q :service:module:rest-service:generate-jaxrs :service:generate-raml-docs --rerun-tasks
+	@which node || nvm --version 2>/dev/null || (echo 'NodeJS not found on $$PATH'; exit 1)
+	@./gradlew -q :module:rest-service:generate-jaxrs :generate-raml-docs --rerun-tasks
 
 ####
 ##  Console Shortcuts

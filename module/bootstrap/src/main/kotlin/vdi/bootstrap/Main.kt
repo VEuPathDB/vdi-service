@@ -20,6 +20,7 @@ import vdi.lane.reconciliation.ReconciliationLane
 import vdi.lane.sharing.ShareLane
 import vdi.lane.soft_delete.SoftDeleteLane
 import vdi.lib.config.loadAndCacheStackConfig
+import vdi.lib.config.loadManifestConfig
 import vdi.lib.db.cache.patchMetadataTable
 import vdi.lib.modules.VDIModule
 import vdi.module.sleeper.AwaitDependencies
@@ -28,25 +29,19 @@ import vdi.service.rest.RestService
 object Main {
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val gitTag: String
-
   init {
     java.util.logging.LogManager.getLogManager().readConfiguration("""
       handlers = org.slf4j.bridge.SLF4JBridgeHandler
       .level = SEVERE
     """.trimIndent().byteInputStream())
-
-    gitTag = javaClass.classLoader.getResourceAsStream("META-INF/MANIFEST.MF")
-      .use(::Manifest)
-      .mainAttributes
-      .getValue("Git-Tag")
-
-    log.info("Service Version: {}", gitTag)
   }
 
   @JvmStatic
   fun main(args: Array<String>) {
+    val manifest = loadManifestConfig()
     val config = loadAndCacheStackConfig()
+    log.info("================================================================")
+    log.info("Starting VDI Service Version: {}", manifest.gitTag)
 
     log.info("awaiting external dependencies")
     runBlocking { AwaitDependencies(config) }
@@ -80,7 +75,7 @@ object Main {
 
     thread {
       try {
-        RestService(config).main(args)
+        RestService(config, manifest).main(args)
         serviceLock.withLock {
           unlockCondition.await()
         }

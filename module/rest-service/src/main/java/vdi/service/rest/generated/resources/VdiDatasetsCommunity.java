@@ -1,5 +1,6 @@
 package vdi.service.rest.generated.resources;
 
+import java.util.List;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -9,8 +10,6 @@ import vdi.service.rest.generated.model.DatasetListEntry;
 import vdi.service.rest.generated.model.ServerError;
 import vdi.service.rest.generated.model.UnauthorizedError;
 import vdi.service.rest.generated.support.ResponseDelegate;
-
-import java.util.List;
 
 @Path("/vdi-datasets/community")
 public interface VdiDatasetsCommunity {

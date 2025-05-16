@@ -1,3 +1,9 @@
 #%RAML 1.0 Resource
 
-displayName: Service Health Info
+displayName: Service Metadata
+description: Information about the running service.
+
+get:
+  responses:
+    200:
+      body: lib.ServiceMetadataResponseBody

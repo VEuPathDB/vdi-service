@@ -9,7 +9,7 @@ import vdi.lib.health.RemoteDependencies
 import vdi.lib.logging.logger
 import vdi.lib.health.Dependency as VDep
 
-internal class DependencySource : DependencySource {
+internal class DependencySource() : DependencySource {
   override fun iterator(): MutableIterator<Dependency> {
     return object : MutableIterator<Dependency> {
       private val raw = RemoteDependencies.iterator()

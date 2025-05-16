@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.json.JSON
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
+import java.util.jar.Manifest
 import kotlin.io.path.Path
 import kotlin.io.path.readText
 import vdi.lib.config.common.interpolateFrom
@@ -37,3 +38,8 @@ var cachedConfig: StackConfig? = null
 fun loadAndCacheStackConfig(path: Path = Path("/etc/vdi/config.yml")): StackConfig {
   return cachedConfig ?: StackConfig(path).also { cachedConfig = it }
 }
+
+fun loadManifestConfig() =
+  ManifestConfig::class.java.classLoader.getResourceAsStream("META-INF/MANIFEST.MF")
+    .use(::Manifest)
+    .let(::ManifestConfig)
