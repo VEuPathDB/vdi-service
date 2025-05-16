@@ -7,20 +7,5 @@ node('centos8') {
   def builder = new Builder(this)
 
   builder.gitClone()
-
-  sh "git fetch --unshallow --tags || echo ok"
-  sh "env"
-
-  def tag = sh(
-    script: "git describe --tags",
-    returnStdout: true
-  )
-
-  if (tag.isEmpty()) {
-    tag = "snapshot"
-  }
-
-  builder.buildContainers([
-    [ name: 'vdi-service', buildArgs: [ GIT_TAG: tag ] ],
-  ])
+  builder.buildContainers([ [ name: 'vdi-service' ] ])
 }
