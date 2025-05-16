@@ -17,7 +17,7 @@ object PluginHandlers {
     val tmpMap = HashMap<NameVersionPair, PluginHandler>(loadAndCacheStackConfig().vdi.plugins.size)
 
     loadAndCacheStackConfig().vdi.plugins.forEach { plug ->
-      val addr = plug.server.toCommonType(80u)
+      val addr = plug.server.toHostAddress(80u)
 
       RemoteDependencies.register("Plugin ${plug.displayName}", addr.host, addr.port)
 

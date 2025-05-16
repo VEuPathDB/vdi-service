@@ -1,7 +1,7 @@
 package vdi.lib.config.vdi
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import vdi.lib.config.common.LDAPConfig
+import org.veupathdb.vdi.lib.config.LDAPConfig
 import vdi.lib.config.vdi.daemons.DaemonConfig
 import vdi.lib.config.vdi.lanes.LaneConfig
 

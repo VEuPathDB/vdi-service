@@ -1,4 +1,4 @@
-package vdi.lib.config.common
+package vdi.lib.config.vdi
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.veupathdb.vdi.lib.json.JSON

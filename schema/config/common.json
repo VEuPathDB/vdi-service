@@ -199,7 +199,8 @@
       "required": [
         "servers",
         "baseDn"
-      ]
+      ],
+      "unevaluatedProperties": false
     },
     "port": {
       "title": "Connection Port",

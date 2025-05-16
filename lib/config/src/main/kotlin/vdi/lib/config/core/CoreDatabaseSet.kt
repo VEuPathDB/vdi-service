@@ -1,7 +1,7 @@
 package vdi.lib.config.core
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import vdi.lib.config.common.DatabaseConnectionConfig
+import org.veupathdb.vdi.lib.config.DatabaseConnectionConfig
 
 data class CoreDatabaseSet(
   @param:JsonProperty("accountDb")

@@ -2,7 +2,7 @@ package vdi.lib.config.vdi
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import vdi.lib.config.common.DatabaseConnectionConfig
+import org.veupathdb.vdi.lib.config.DatabaseConnectionConfig
 
 @JsonDeserialize(using = InstallTargetConfigDeserializer::class)
 data class InstallTargetConfig(
@@ -22,3 +22,4 @@ data class InstallTargetConfig(
 
   val datasetPropertySchema: DatasetPropertySchema = NullPropertySchema,
 )
+

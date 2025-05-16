@@ -13,7 +13,7 @@ import java.nio.file.Path
 import java.util.jar.Manifest
 import kotlin.io.path.Path
 import kotlin.io.path.readText
-import vdi.lib.config.common.interpolateFrom
+import org.veupathdb.vdi.lib.config.serde.interpolateFrom
 
 fun StackConfig(path: Path): StackConfig {
   val validator = StackConfig::class.java.getResourceAsStream("/schema/config/full-config.json")

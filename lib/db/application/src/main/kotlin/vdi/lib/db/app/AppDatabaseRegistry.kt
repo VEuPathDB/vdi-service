@@ -8,8 +8,8 @@ import org.veupathdb.vdi.lib.common.field.DataType
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import org.veupathdb.vdi.lib.common.field.SecretString
 import javax.sql.DataSource
-import vdi.lib.config.common.DirectDatabaseConnectionConfig
-import vdi.lib.config.common.LDAPDatabaseConnectionConfig
+import org.veupathdb.vdi.lib.config.DirectDatabaseConnectionConfig
+import org.veupathdb.vdi.lib.config.LDAPDatabaseConnectionConfig
 import vdi.lib.config.loadAndCacheStackConfig
 import vdi.lib.config.vdi.InstallTargetConfig
 import vdi.lib.db.app.health.DatabaseDependency
@@ -57,7 +57,7 @@ object AppDatabaseRegistry {
           db.poolSize ?: DefaultPoolSize,
         )
       }
-      is LDAPDatabaseConnectionConfig -> {
+      is LDAPDatabaseConnectionConfig   -> {
         LDAPConnectDetails(
           db.username,
           db.password,

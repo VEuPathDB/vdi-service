@@ -7,10 +7,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
 import org.veupathdb.vdi.lib.common.field.SecretString
+import org.veupathdb.vdi.lib.config.DirectDatabaseConnectionConfig
+import org.veupathdb.vdi.lib.config.PartialHostAddress
 import org.veupathdb.vdi.lib.json.JSON
-import vdi.lib.config.common.DatabaseConnectionConfigDeserializer.Companion.deserialize
-import vdi.lib.config.common.DirectDatabaseConnectionConfig
-import vdi.lib.config.common.HostAddress
+import org.veupathdb.vdi.lib.config.serde.DatabaseConnectionConfigDeserializer.Companion.deserialize
 
 internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetConfig>(InstallTargetConfig::class.java) {
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): InstallTargetConfig {
@@ -25,7 +25,7 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
 
     if (obj["enabled"]?.booleanValue() == false) {
       val dummyDB =
-        DirectDatabaseConnectionConfig("disabled", SecretString("disabled"), null, null, "disabled", HostAddress("disabled", null), "disabled")
+        DirectDatabaseConnectionConfig("disabled", SecretString("disabled"), null, null, "disabled", PartialHostAddress("disabled", null), "disabled")
 
       return InstallTargetConfig(
         enabled = false,

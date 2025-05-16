@@ -118,7 +118,6 @@ vdi:
 
   installTargets:
   - targetName: AmoebaDB
-    enabled: ${env:AMOEBA_ENABLED:-false}
     controlDb:
       username: *vdiControlSchema
       password: *vdiSchemaPass

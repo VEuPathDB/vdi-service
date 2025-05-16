@@ -61,7 +61,7 @@ data class KafkaProducerConfig(
   constructor(clientID: String): this(clientID, loadAndCacheStackConfig().vdi.kafka)
 
   constructor(clientID: String, conf: KafkaConfig)
-    : this(clientID, conf.servers.map { it.toCommonType(DefaultServerPort) }, conf.producers)
+    : this(clientID, conf.servers.map { it.toHostAddress(DefaultServerPort) }, conf.producers)
 
   constructor(clientID: String, servers: List<HostAddress>, conf: KafkaProducerConfig?) : this(
     servers                 = servers,

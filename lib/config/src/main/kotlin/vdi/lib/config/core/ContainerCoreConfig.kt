@@ -1,6 +1,6 @@
 package vdi.lib.config.core
 
-import vdi.lib.config.common.LDAPConfig
+import org.veupathdb.vdi.lib.config.LDAPConfig
 
 data class ContainerCoreConfig(
   val ldap: LDAPConfig?,

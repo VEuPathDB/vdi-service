@@ -7,9 +7,9 @@ import org.veupathdb.lib.container.jaxrs.config.Options
 import java.util.Optional
 import vdi.lib.config.ManifestConfig
 import vdi.lib.config.StackConfig
-import vdi.lib.config.common.DatabaseConnectionConfig
-import vdi.lib.config.common.DirectDatabaseConnectionConfig
-import vdi.lib.config.common.LDAPDatabaseConnectionConfig
+import org.veupathdb.vdi.lib.config.DatabaseConnectionConfig
+import org.veupathdb.vdi.lib.config.DirectDatabaseConnectionConfig
+import org.veupathdb.vdi.lib.config.LDAPDatabaseConnectionConfig
 
 class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : Options() {
   private val coreConfig = config.core
@@ -68,8 +68,8 @@ class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : O
 
   private fun DatabaseConnectionConfig?.toDbOptions(): DbOptions =
     when (this) {
-      null -> throw IllegalStateException("app db is not configured")
-      is LDAPDatabaseConnectionConfig -> DbOptionsImpl(
+      null                              -> throw IllegalStateException("app db is not configured")
+      is LDAPDatabaseConnectionConfig   -> DbOptionsImpl(
         lookupCN,
         null, // host
         null, // port

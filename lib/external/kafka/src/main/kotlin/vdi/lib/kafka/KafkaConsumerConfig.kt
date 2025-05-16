@@ -76,7 +76,7 @@ data class KafkaConsumerConfig(
 
   constructor(clientID: String, conf: KafkaConfig) : this(
     clientID,
-    conf.servers.map { it.toCommonType(DefaultServerPort) },
+    conf.servers.map { it.toHostAddress(DefaultServerPort) },
     conf.consumers,
   )
 
