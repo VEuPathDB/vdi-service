@@ -34,7 +34,6 @@ class RestService(config: StackConfig) : Server() {
   }
 
   fun main(args: Array<String>) {
-    log.info("starting rest-service module")
     DependencyProvider.getInstance().registerDependencySource(DependencySource())
     start(args)
   }
