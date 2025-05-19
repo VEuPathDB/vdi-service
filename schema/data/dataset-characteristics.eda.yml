@@ -76,7 +76,20 @@ properties:
     type: string
 
   years:
-    type: string
+    type: object
+    properties:
+      start:
+        type: integer
+        minimum: 1000
+        maximum: 9999
+      end:
+        type: integer
+        minimum: 1000
+        maximum: 9999
+    required:
+    - start
+    - end
+    unevaluatedProperties: false
 
   ages:
     type: string

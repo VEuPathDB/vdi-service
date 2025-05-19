@@ -41,7 +41,12 @@ object Main {
     MetaLogger.info("Starting VDI Service Version: {}", manifest.gitTag)
 
     MetaLogger.info("awaiting external dependencies")
-    runBlocking { AwaitDependencies(config) }
+    try {
+      runBlocking { AwaitDependencies(config) }
+    } catch (e: Throwable) {
+      MetaLogger.error("startup exception: ", e)
+      exitProcess(1)
+    }
 
     MetaLogger.info("initializing modules")
     val modules = try {
