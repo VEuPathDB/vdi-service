@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+  implementation(project(":lib:common"))
   implementation(project(":schema"))
 
   api(libs.vdi.common)

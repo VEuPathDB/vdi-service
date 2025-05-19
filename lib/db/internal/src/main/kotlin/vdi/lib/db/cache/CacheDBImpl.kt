@@ -14,7 +14,7 @@ import vdi.lib.db.cache.sql.select.*
 import vdi.lib.err.StartupException
 import vdi.lib.health.Dependency
 import vdi.lib.health.RemoteDependencies
-import vdi.lib.logging.logger
+import vdi.lib.logging.MetaLogger
 import org.postgresql.Driver as PostgresDriver
 
 internal object CacheDBImpl: CacheDB {
@@ -23,14 +23,12 @@ internal object CacheDBImpl: CacheDB {
 
   override val dataSource: DataSource
 
-  private val log = logger<CacheDB>()
-
   private val connection
     get() = dataSource.connection
 
   init {
     dataSource = loadAndCacheStackConfig().vdi.cacheDB.let {
-      log.info("initializing datasource for cache-db")
+      MetaLogger.info("initializing datasource for cache-db")
 
       details = CacheDBConnectionDetails(it)
 

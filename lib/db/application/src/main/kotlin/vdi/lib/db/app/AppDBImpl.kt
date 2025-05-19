@@ -8,12 +8,7 @@ import vdi.lib.db.app.sql.dataset_install_message.selectInstallStatuses
 import vdi.lib.logging.logger
 
 internal object AppDBImpl : AppDB {
-
-  private val log = logger<AppDB>()
-
   override fun getDatasetStatuses(targets: Map<ProjectID, Collection<DatasetID>>): Map<DatasetID, Map<ProjectID, InstallStatuses>> {
-    log.trace("getDatasetStatuses(targets={})", targets)
-
     val result = HashMap<DatasetID, MutableMap<ProjectID, InstallStatuses>>(100)
 
     for ((projectID, datasetIDs) in targets) {
@@ -33,8 +28,6 @@ internal object AppDBImpl : AppDB {
   }
 
   override fun getDatasetStatuses(target: DatasetID, projects: Collection<ProjectID>): Map<ProjectID, InstallStatuses> {
-    log.trace("getDatasetStatuses(target={}, projects={})", target, projects)
-
     val out = HashMap<ProjectID, InstallStatuses>(projects.size)
 
     for (projectID in projects) {

@@ -3,9 +3,7 @@ package vdi.bootstrap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.slf4j.LoggerFactory
 import java.util.concurrent.locks.ReentrantLock
-import java.util.jar.Manifest
 import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
 import kotlin.system.exitProcess
@@ -22,13 +20,12 @@ import vdi.lane.soft_delete.SoftDeleteLane
 import vdi.lib.config.loadAndCacheStackConfig
 import vdi.lib.config.loadManifestConfig
 import vdi.lib.db.cache.patchMetadataTable
+import vdi.lib.logging.MetaLogger
 import vdi.lib.modules.VDIModule
 import vdi.module.sleeper.AwaitDependencies
 import vdi.service.rest.RestService
 
 object Main {
-  private val log = LoggerFactory.getLogger(javaClass)
-
   init {
     java.util.logging.LogManager.getLogManager().readConfiguration("""
       handlers = org.slf4j.bridge.SLF4JBridgeHandler
@@ -40,13 +37,13 @@ object Main {
   fun main(args: Array<String>) {
     val manifest = loadManifestConfig()
     val config = loadAndCacheStackConfig()
-    log.info("================================================================")
-    log.info("Starting VDI Service Version: {}", manifest.gitTag)
+    MetaLogger.info("================================================================")
+    MetaLogger.info("Starting VDI Service Version: {}", manifest.gitTag)
 
-    log.info("awaiting external dependencies")
+    MetaLogger.info("awaiting external dependencies")
     runBlocking { AwaitDependencies(config) }
 
-    log.info("initializing modules")
+    MetaLogger.info("initializing modules")
     val modules = try {
       listOf(
         EventRouter(config.vdi, ::fatality),
@@ -61,7 +58,7 @@ object Main {
         ReconciliationLane(config.vdi, ::fatality),
       )
     } catch (e: Throwable) {
-      log.error("startup exception: ", e)
+      MetaLogger.error("startup exception: ", e)
       exitProcess(1)
     }
 
@@ -85,17 +82,17 @@ object Main {
           unlockCondition.await()
         }
       } catch (e: Throwable) {
-        log.error("rest service startup failed", e)
+        MetaLogger.error("rest service startup failed", e)
         exitProcess(1)
       }
     }
 
-    log.info("starting background modules")
+    MetaLogger.info("starting background modules")
     runBlocking(Dispatchers.IO) { modules.forEach { launch {
       try {
         it.start()
       } catch (e: Throwable) {
-        log.error("vdi module startup exception", e)
+        MetaLogger.error("vdi module startup exception", e)
         exitProcess(1)
       }
     } } }
@@ -105,7 +102,7 @@ object Main {
    * Log an error and shut down.
    */
   private fun fatality(message: String? = null): Nothing {
-    log.error(if (message == null)
+    MetaLogger.error(if (message == null)
       "one or more subprocesses encountered a fatal error requiring VDI be shut down"
     else
       "one or more subprocesses encountered a fatal error requiring VDI be shut down: $message")
@@ -113,8 +110,8 @@ object Main {
   }
 
   private fun shutdownModules(modules: List<VDIModule>) {
-    log.info("shutting down modules")
+    MetaLogger.info("shutting down modules")
     runBlocking { modules.forEach { launch { it.stop() } } }
-    log.info("modules shut down")
+    MetaLogger.info("modules shut down")
   }
 }

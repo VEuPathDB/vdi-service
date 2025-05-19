@@ -6,7 +6,6 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import com.networknt.schema.ExecutionContext
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
-import org.slf4j.LoggerFactory
 import org.veupathdb.vdi.lib.json.JSON
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
@@ -14,6 +13,7 @@ import java.util.jar.Manifest
 import kotlin.io.path.Path
 import kotlin.io.path.readText
 import org.veupathdb.vdi.lib.config.serde.interpolateFrom
+import vdi.lib.logging.MetaLogger
 
 fun StackConfig(path: Path): StackConfig {
   val validator = StackConfig::class.java.getResourceAsStream("/schema/config/full-config.json")
@@ -25,7 +25,7 @@ fun StackConfig(path: Path): StackConfig {
   validator.validate(json) { ctx: ExecutionContext -> ctx.executionConfig.formatAssertionsEnabled = true }
     ?.takeUnless { it.isEmpty() }
     ?.also {
-      LoggerFactory.getLogger("ConfigEntrypoint")
+      MetaLogger
         .error("service config validation failed:\n{}", JSON.writerWithDefaultPrettyPrinter().writeValueAsString(it))
       throw IllegalStateException("service config validation failed")
     }
