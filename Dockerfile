@@ -8,7 +8,7 @@ COPY gradle/libs.versions.toml ./gradle/
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
 
-RUN gradle download-dependencies
+RUN gradle --no-daemon download-dependencies
 
 COPY schema schema
 COPY lib lib
@@ -23,7 +23,7 @@ ARG BUILD_ID="unknown"
 ARG BUILD_NUMBER="unknown"
 ARG BUILD_TIME="unknown"
 
-RUN gradle \
+RUN gradle --no-daemon \
     -Pbuild.git.tag="${GIT_TAG}" \
     -Pbuild.git.commit="${GIT_COMMIT}" \
     -Pbuild.git.branch="${GIT_BRANCH}" \
