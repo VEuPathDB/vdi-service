@@ -16,7 +16,7 @@ import vdi.lib.db.app.health.DatabaseDependency
 import vdi.lib.err.StartupException
 import vdi.lib.health.RemoteDependencies
 import vdi.lib.ldap.LDAP
-import vdi.lib.logging.logger
+import vdi.lib.logging.MetaLogger
 
 object AppDatabaseRegistry {
   private val dataSources = HashMap<ProjectID, AppDBRegistryCollection>(12)
@@ -25,20 +25,19 @@ object AppDatabaseRegistry {
     private set
 
   init {
-    val logger   = logger<AppDB>()
     val builders = HashMap<String, AppDBRegistryCollection.Builder>(16)
     val targets  = loadAndCacheStackConfig().vdi.installTargets
 
     targets.asSequence()
       .filter {
-        it.enabled.also { enabled -> if (!enabled) logger.warn("install target ${it.targetName} is disabled") }
+        it.enabled.also { enabled -> if (!enabled) MetaLogger.warn("install target ${it.targetName} is disabled") }
       }
-      .onEach { logger.info("install target ${it.targetName} is enabled") }
+      .onEach { MetaLogger.info("install target ${it.targetName} is enabled") }
       .forEach {
         try {
           initTarget(it, builders)
         } catch (e: Throwable) {
-          logger.error("failed to init install target {}", it.targetName, e)
+          MetaLogger.error("failed to init install target {}", it.targetName, e)
           isBroken = true
           throw StartupException("failed to init install target ${it.targetName}", e)
         }

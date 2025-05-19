@@ -52,6 +52,11 @@ Configuration:
       additivity: false
       AppenderRef:
       - ref: sub-0
+    - name: init
+      level: debug
+      additivity: false
+      AppenderRef:
+      - ref: sub-0
     - name: org.veupathdb.vdi
       level: debug
       additivity: false

@@ -34,7 +34,7 @@ internal class RabbitInstance(private val con: Connection) {
     else
       return coroutineScope {
         withContext(Dispatchers.IO) {
-          log.info("attempt $attempt/$MaxChannelRetries to reopen rabbitmq channel")
+          log.info("attempt $attempt/$MaxChannelRetries to (re)open rabbitmq channel")
           try {
             con.createChannel()
           } catch (e: Throwable) {

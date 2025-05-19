@@ -5,7 +5,6 @@ import org.veupathdb.vdi.lib.common.field.DatasetID
 import org.veupathdb.vdi.lib.common.field.ProjectID
 import vdi.lib.db.app.model.InstallStatuses
 import vdi.lib.db.app.sql.dataset_install_message.selectInstallStatuses
-import vdi.lib.logging.logger
 
 internal object AppDBImpl : AppDB {
   override fun getDatasetStatuses(targets: Map<ProjectID, Collection<DatasetID>>): Map<DatasetID, Map<ProjectID, InstallStatuses>> {
