@@ -1,4 +1,6 @@
 CONTAINER_CMD := docker --log-level ERROR
+BUILD_PATHS := lib/ schema/ module/ gradle/libs.versions.toml settings.gradle.kts build.gradle.kts
+GIT_DIRTY := $(shell for p in $(BUILD_PATHS); do for m in $$(git status --porcelain | cut -c4-); do if [[ "$$m" =~ ^$$p ]]; then echo -n "$$m "; fi; done; done)
 
 SERVICES ?=
 
@@ -88,14 +90,22 @@ COMPOSE_CMD   := $(CONTAINER_CMD) compose --env-file=$(ENV_FILE) $(MERGED_COMPOS
 
 # Builds the VDI service docker image.
 .PHONY: build-image
+build-image: BUILD_ID := ${USER}-$(shell date +'%s' | cut -c5-)
+build-image: GIT_COMMIT := $(shell git rev-parse HEAD)
 build-image:
 	@$(CONTAINER_CMD) build \
 	  -t veupathdb/vdi-service:latest \
 	  -f Dockerfile \
-      --build-arg=GITHUB_USERNAME=${GITHUB_USERNAME} \
-      --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN} \
-      --build-arg=CONFIG_FILE=config/local-dev-config.yml \
-      --build-arg=GIT_TAG=$(shell git describe --tags 2>/dev/null || echo "snapshot") \
+      --build-arg="GITHUB_USERNAME=${GITHUB_USERNAME}" \
+      --build-arg="GITHUB_TOKEN=${GITHUB_TOKEN}" \
+      --build-arg="CONFIG_FILE=config/local-dev-config.yml" \
+      --build-arg="GIT_TAG=$(shell git describe --tags 2>/dev/null || echo "snapshot")" \
+      --build-arg="GIT_URL=$(shell git remote get-url origin | sed 's#:#/#;s#git@#https://#')" \
+      --build-arg="GIT_BRANCH=$(shell git branch --show-current)" \
+      --build-arg="GIT_COMMIT=$(GIT_COMMIT)$(if $(GIT_DIRTY),-dirty)" \
+      --build-arg="BUILD_TIME=$(shell date --rfc-3339=seconds --utc)" \
+      --build-arg="BUILD_ID=$(BUILD_ID)" \
+      --build-arg="BUILD_NUMBER=n/a" \
       .
 
 # Prints the merged docker compose configuration.

@@ -1,21 +1,18 @@
 FROM veupathdb/alpine-dev-base:jdk24-gradle8.14 AS build
 
-ARG GITHUB_USERNAME
-ARG GITHUB_TOKEN
-
-
 WORKDIR /workspace
 
 COPY ["settings.gradle.kts", "build.gradle.kts", "./"]
 COPY gradle/libs.versions.toml ./gradle/
-COPY buildSrc ./buildSrc
+
+ARG GITHUB_USERNAME
+ARG GITHUB_TOKEN
 
 RUN gradle --no-daemon download-dependencies
 
 COPY schema schema
 COPY lib lib
 COPY module module
-
 
 # Build Info
 ARG GIT_TAG="unknown"
@@ -53,4 +50,4 @@ COPY --from=build ["/workspace/build/libs/vdi-service.jar", "/opt/vdi/"]
 ARG CONFIG_FILE="config/halfway-config.yml"
 COPY ${CONFIG_FILE} /etc/vdi/config.yml
 
-CMD java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /opt/vdi/vdi-service.jar
+CMD ["sh", "-c", "java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /opt/vdi/vdi-service.jar"]
