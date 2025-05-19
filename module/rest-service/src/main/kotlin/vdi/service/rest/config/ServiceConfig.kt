@@ -28,7 +28,7 @@ class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : O
       .unwrap())
 
   override fun getServerPort() =
-    Optional.ofNullable(coreConfig.http?.bindPort?.toInt())
+    Optional.ofNullable(coreConfig.http?.bindPort?.toInt() ?: 80)
 
   override fun getCorsEnabled() =
     coreConfig.http?.enableCORS ?: false

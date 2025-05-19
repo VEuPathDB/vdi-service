@@ -27,13 +27,13 @@ ARG BUILD_NUMBER="unknown"
 ARG BUILD_TIME="unknown"
 
 RUN gradle --no-daemon \
-    -Dbuild.git.tag="${GIT_TAG}" \
-    -Dbuild.git.commit="${GIT_COMMIT}" \
-    -Dbuild.git.branch="${GIT_BRANCH}" \
-    -Dbuild.git.url="${GIT_URL}" \
-    -Dbuild.ci.id="${BUILD_ID}" \
-    -Dbuild.ci.number="${BUILD_NUMBER}" \
-    -Dbuild.ci.timestamp="${BUILD_TIME}" \
+    -Pbuild.git.tag="${GIT_TAG}" \
+    -Pbuild.git.commit="${GIT_COMMIT}" \
+    -Pbuild.git.branch="${GIT_BRANCH}" \
+    -Pbuild.git.url="${GIT_URL}" \
+    -Pbuild.ci.id="${BUILD_ID}" \
+    -Pbuild.ci.number="${BUILD_NUMBER}" \
+    -Pbuild.ci.timestamp="${BUILD_TIME}" \
     test shadowJar
 
 
