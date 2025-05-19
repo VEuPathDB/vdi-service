@@ -8,7 +8,7 @@ COPY gradle/libs.versions.toml ./gradle/
 ARG GITHUB_USERNAME
 ARG GITHUB_TOKEN
 
-RUN gradle --no-daemon download-dependencies
+RUN gradle download-dependencies
 
 COPY schema schema
 COPY lib lib
@@ -23,7 +23,7 @@ ARG BUILD_ID="unknown"
 ARG BUILD_NUMBER="unknown"
 ARG BUILD_TIME="unknown"
 
-RUN gradle --no-daemon \
+RUN gradle \
     -Pbuild.git.tag="${GIT_TAG}" \
     -Pbuild.git.commit="${GIT_COMMIT}" \
     -Pbuild.git.branch="${GIT_BRANCH}" \
@@ -31,7 +31,7 @@ RUN gradle --no-daemon \
     -Pbuild.ci.id="${BUILD_ID}" \
     -Pbuild.ci.number="${BUILD_NUMBER}" \
     -Pbuild.ci.timestamp="${BUILD_TIME}" \
-    test shadowJar
+    properties test shadowJar
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
