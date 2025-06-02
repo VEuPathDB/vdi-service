@@ -17,8 +17,8 @@ jobs:
         cache-read-only: false
     - name: Build
       run: |-
-        gradle --no-daemon :core:build :core:test
-        gradle --no-daemon :plugin-server:build :plugin-server:test
+        gradle :core:build :core:test
+        gradle :plugin-server:build :plugin-server:test
       env:
         GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

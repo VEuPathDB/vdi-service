@@ -18,7 +18,6 @@ jobs:
     - name: Get Server Version
       id: version
       run: |-
-        printf "gpr.user=%s\ngpr.key=%s" ${GH_USERNAME} ${GH_TOKEN} > gradle.properties
         version=$(set -o pipefail; gradle :plugin-server:properties | grep 'version: ' | cut -d' ' -f2)
         echo release=$version >> $GITHUB_OUTPUT
       env:
@@ -31,13 +30,16 @@ jobs:
         sha256sum service.jar | cut -b1-64 | tr -d '\n' > service.jar.sha256
         md5sum service.jar | cut -b1-32 | tr -d '\n' > service.jar.md5
         sed "s/##VERSION_TEMPLATE##/${{steps.version.outputs.release}}/" scripts/docker-download.sh > docker-download.sh
-    - name: Release
-      uses: softprops/action-gh-release@v2
-      with:
-        draft: false
-        files: |
-          service.jar
-          service.jar.sha256
-          service.jar.md5
-          docker-download.sh
-        generate_release_notes: true
+      env:
+        GH_USERNAME: ${{ secrets.GH_USERNAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+#    - name: Release
+#      uses: softprops/action-gh-release@v2
+#      with:
+#        draft: false
+#        files: |
+#          service.jar
+#          service.jar.sha256
+#          service.jar.md5
+#          docker-download.sh
+#        generate_release_notes: true
