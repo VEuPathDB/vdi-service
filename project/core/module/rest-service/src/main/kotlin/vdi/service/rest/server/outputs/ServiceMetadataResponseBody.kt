@@ -1,6 +1,6 @@
 package vdi.service.rest.server.outputs
 
-import vdi.core.config.ManifestConfig
+import vdi.config.raw.ManifestConfig
 import vdi.service.rest.generated.model.ServiceMetadataBuildInfoOutputImpl
 import vdi.service.rest.generated.model.ServiceMetadataResponseBody
 import vdi.service.rest.generated.model.ServiceMetadataResponseBodyImpl

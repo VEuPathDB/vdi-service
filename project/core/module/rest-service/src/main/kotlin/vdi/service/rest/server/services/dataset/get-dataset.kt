@@ -2,14 +2,14 @@
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
+import vdi.core.db.app.AppDB
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetShare
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.DatasetID
-import vdi.model.data.UserID
 import vdi.model.data.DatasetPublication
 import vdi.model.data.DatasetVisibility
-import vdi.lib.db.app.AppDB
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.DatasetShare
-import vdi.lib.plugin.registry.PluginRegistry
+import vdi.model.data.UserID
 import vdi.service.rest.generated.model.DatasetDetails
 import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse
 import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse.headersFor301
@@ -56,15 +56,14 @@ private fun <T: ControllerBase> T.getDatasetByID(
 
   val userDetails = getUserDetails(dataset.ownerID, shares, userID)
 
-  val typeDisplayName = PluginRegistry[dataset.typeName, dataset.typeVersion]?.displayName
+  val typeDisplayName = PluginRegistry[dataset.type]?.displayName
     .let {
       if (it == null) {
         logger.error(
-          "plugin is disabled for requested dataset {}/{} type {} (version {})",
+          "plugin is disabled for requested dataset {}/{} type {}",
           dataset.ownerID,
           dataset.datasetID,
-          dataset.typeName,
-          dataset.typeVersion,
+          dataset.type,
         )
         "disabled"
       } else {

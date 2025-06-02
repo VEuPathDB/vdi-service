@@ -1,7 +1,7 @@
 package vdi.daemon.reconciler
 
 import vdi.config.raw.vdi.daemons.ReconcilerConfig
-import vdi.lib.modules.AbortCB
+import vdi.core.modules.AbortCB
 
 fun Reconciler(config: ReconcilerConfig?, abortCB: AbortCB): Reconciler =
   ReconcilerImpl(ReconcilerDaemonConfig(config), abortCB)

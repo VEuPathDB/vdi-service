@@ -1,16 +1,17 @@
 package vdi.core.db.app.sql.sync_control
 
-import vdi.model.data.DatasetType
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import vdi.core.db.app.model.DeleteFlag
-import vdi.lib.db.app.TargetDBPlatform
-import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getDateTime
-import vdi.lib.db.jdbc.getUserID
-import vdi.lib.db.jdbc.reqDatasetID
-import vdi.lib.db.model.ReconcilerTargetRecord
+import vdi.core.db.jdbc.getDataType
+import vdi.core.db.jdbc.getDateTime
+import vdi.core.db.jdbc.getUserID
+import vdi.core.db.jdbc.reqDatasetID
+import vdi.core.db.model.ReconcilerTargetRecord
+import vdi.db.app.TargetDBPlatform
+import vdi.model.data.DatasetType
+import vdi.util.io.CloseableIterator
 
 private fun sql(schema: String, strpos: String) =
 // language=oracle

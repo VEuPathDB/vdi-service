@@ -1,7 +1,7 @@
 package vdi.lane.meta
 
 import vdi.config.raw.vdi.VDIConfig
-import vdi.lib.modules.AbortCB
+import vdi.core.modules.AbortCB
 
 fun UpdateMetaLane(config: VDIConfig, abortCB: AbortCB): UpdateMetaLane =
   UpdateMetaLaneImpl(UpdateMetaLaneConfig(config), abortCB)

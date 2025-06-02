@@ -1,8 +1,8 @@
 @file:JvmName("DatasetPostService")
 package vdi.service.rest.server.services.dataset
 
+import vdi.core.db.cache.CacheDB
 import vdi.model.data.DatasetID
-import vdi.lib.db.cache.CacheDB
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
@@ -26,4 +26,3 @@ fun <T: ControllerBase> T.createDataset(datasetID: DatasetID, entity: DatasetPro
 
   submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)
 }
-//

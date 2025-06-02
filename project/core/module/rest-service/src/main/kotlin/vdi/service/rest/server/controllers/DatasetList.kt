@@ -5,9 +5,9 @@ import kotlinx.coroutines.runBlocking
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import vdi.model.data.DatasetID
-import vdi.lib.db.cache.query.DatasetListQuery
-import vdi.lib.db.cache.model.DatasetOwnershipFilter
-import vdi.core.logging.logger
+import vdi.core.db.cache.query.DatasetListQuery
+import vdi.core.db.cache.model.DatasetOwnershipFilter
+import vdi.logging.logger
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.resources.Datasets
@@ -18,6 +18,7 @@ import vdi.service.rest.server.outputs.DatasetPostResponseBody
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.services.dataset.createDataset
 import vdi.service.rest.server.services.dataset.fetchUserDatasetList
+import vdi.service.rest.util.ShortID
 
 @Authenticated(allowGuests = false)
 class DatasetList(@Context request: ContainerRequest, @Context val uploadConfig: UploadConfig)
@@ -50,7 +51,7 @@ class DatasetList(@Context request: ContainerRequest, @Context val uploadConfig:
     }
 
     // Generate a new dataset ID.
-    val datasetID = runBlocking { DatasetID() }
+    val datasetID = runBlocking { DatasetID(ShortID.generate()) }
 
     log.info("issuing dataset ID {}", datasetID)
 

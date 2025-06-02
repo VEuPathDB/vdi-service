@@ -7,11 +7,11 @@ import vdi.config.raw.vdi.ObjectStoreConfig
 import vdi.config.raw.vdi.VDIConfig
 import vdi.config.raw.vdi.lanes.LaneConfig
 import vdi.config.raw.vdi.lanes.ProducerLaneConfig
-import vdi.lib.kafka.*
-import vdi.lib.kafka.router.KafkaRouterConfig
-import vdi.lib.kafka.router.RouterDefaults
-import vdi.lib.s3.util.S3Config
-import vdi.lib.s3.util.bucket
+import vdi.core.kafka.*
+import vdi.core.kafka.router.KafkaRouterConfig
+import vdi.core.kafka.router.RouterDefaults
+import vdi.core.s3.util.S3Config
+import vdi.core.s3.util.bucket
 
 data class UpdateMetaLaneConfig(
   val workerCount:         UByte,

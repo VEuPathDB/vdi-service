@@ -1,4 +1,4 @@
-package vdi.lib.plugin.client
+package vdi.core.plugin.client
 
 interface PluginHandlerClientResponse {
   val isSuccessResponse: Boolean

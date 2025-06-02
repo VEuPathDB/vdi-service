@@ -1,11 +1,11 @@
 package vdi.core.db.app.sql.dataset
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.model.data.DatasetID
 import java.sql.Connection
 import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.sql.setDeleteFlag
-import vdi.lib.db.jdbc.setDatasetID
+import vdi.core.db.jdbc.setDatasetID
+import vdi.model.data.DatasetID
 
 private fun sql(schema: String) =
 // language=oracle

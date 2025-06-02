@@ -16,7 +16,7 @@ import java.util.List;
     "visibility",
     "name",
     "origin",
-    "InstallTargets",
+    "installTargets",
     "status",
     "shares",
     "fileCount",

@@ -1,7 +1,7 @@
 package vdi.service.plugin.server.context
 
 import java.nio.file.Path
-import vdi.lib.db.app.TargetDatabaseDetails
+import vdi.db.app.TargetDatabaseDetails
 import vdi.model.api.internal.UninstallRequest
 import vdi.service.plugin.conf.ScriptConfiguration
 

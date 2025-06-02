@@ -8,22 +8,22 @@ import vdi.core.db.app.AppDB
 import vdi.core.db.app.AppDatabaseRegistry
 import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.withTransaction
-import vdi.core.logging.logger
+import vdi.logging.logger
 import vdi.core.metrics.Metrics
 import vdi.core.util.orElse
-import vdi.lib.async.WorkerPool
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.DatasetRecord
-import vdi.lib.db.cache.withTransaction
-import vdi.lib.modules.AbortCB
-import vdi.lib.modules.AbstractVDIModule
-import vdi.lib.plugin.client.PluginException
-import vdi.lib.plugin.client.PluginRequestException
-import vdi.lib.plugin.client.response.uni.UninstallBadRequestResponse
-import vdi.lib.plugin.client.response.uni.UninstallResponseType
-import vdi.lib.plugin.client.response.uni.UninstallUnexpectedErrorResponse
-import vdi.lib.plugin.mapping.PluginHandler
-import vdi.lib.plugin.mapping.PluginHandlers
+import vdi.core.async.WorkerPool
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetRecord
+import vdi.core.db.cache.withTransaction
+import vdi.core.modules.AbortCB
+import vdi.core.modules.AbstractVDIModule
+import vdi.core.plugin.client.PluginException
+import vdi.core.plugin.client.PluginRequestException
+import vdi.core.plugin.client.response.uni.UninstallBadRequestResponse
+import vdi.core.plugin.client.response.uni.UninstallResponseType
+import vdi.core.plugin.client.response.uni.UninstallUnexpectedErrorResponse
+import vdi.core.plugin.mapping.PluginHandler
+import vdi.core.plugin.mapping.PluginHandlers
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetType
 import vdi.model.data.InstallTargetID
@@ -86,7 +86,7 @@ internal class SoftDeleteLaneImpl(
       .startTimer()
 
     // Grab a plugin handler instance for this dataset type.
-    val handler = PluginHandlers[internalDBRecord.type.name, internalDBRecord.type.version] orElse {
+    val handler = PluginHandlers[internalDBRecord.type] orElse {
       log.error("no plugin handler found for dataset {}/{} type {}:{}", userID, datasetID, internalDBRecord.type.name, internalDBRecord.type.version)
       return
     }

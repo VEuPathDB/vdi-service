@@ -1,5 +1,5 @@
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
 }
 
 dependencies {
@@ -12,12 +12,11 @@ dependencies {
   implementation(project(":lib:external-s3"))
 
   implementation(common.config)
-  implementation(common.json)
   implementation(common.model)
+  implementation(common.logging)
 
   implementation(libs.s34k)
   implementation(libs.kt.coroutines)
-  implementation(libs.log.slf4j.api)
 
   testImplementation(kotlin("test"))
   testImplementation(project(":lib:test-utils"))

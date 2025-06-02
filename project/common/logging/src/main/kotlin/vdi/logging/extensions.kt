@@ -40,5 +40,5 @@ inline fun Any.markedLogger(datasetID: DatasetID, project: InstallTargetID): Log
 inline fun <reified T: Any> markedLogger(mark: String): Logger =
   MarkedLogger(mark, T::class)
 
-inline fun <reified T: Any> markedLogger(ownerID: String, datasetID: String): Logger =
+inline fun <reified T: Any> markedLogger(ownerID: UserID, datasetID: DatasetID): Logger =
   markedLogger<T>("D=$ownerID/$datasetID")

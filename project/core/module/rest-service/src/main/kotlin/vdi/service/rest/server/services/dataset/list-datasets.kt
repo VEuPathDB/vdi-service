@@ -2,14 +2,14 @@
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
+import vdi.core.db.app.AppDB
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetRecord
+import vdi.core.db.cache.query.DatasetListQuery
 import vdi.model.data.DatasetID
+import vdi.model.data.DatasetShareOffer
+import vdi.model.data.DatasetShareReceipt
 import vdi.model.data.UserID
-import vdi.model.data.VDIShareOfferAction
-import vdi.model.data.VDIShareReceiptAction
-import vdi.lib.db.app.AppDB
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.query.DatasetListQuery
-import vdi.lib.db.cache.model.DatasetRecord
 import vdi.service.rest.generated.model.DatasetListEntry
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.server.controllers.ControllerBase
@@ -39,7 +39,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
 
   // Append share recipient user IDs to the user IDs array
   shares.forEach { (_, v) -> v.asSequence()
-    .filter { it.offerStatus == VDIShareOfferAction.Grant }
+    .filter { it.offerStatus == DatasetShareOffer.Action.Grant }
     .forEach { userIDs.add(it.recipientID) }}
 
   // build a map for collecting project ID -> dataset ID collection mappings
@@ -92,11 +92,11 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
         null
       else
         shares[it.datasetID]?.asSequence()
-          ?.filter { share -> share.offerStatus == VDIShareOfferAction.Grant }
+          ?.filter { share -> share.offerStatus == DatasetShareOffer.Action.Grant }
           ?.map { sh ->
             DatasetListShareUser(
               userDetails.requireDetails(sh.recipientID),
-              sh.receiptStatus == VDIShareReceiptAction.Accept
+              sh.receiptStatus == DatasetShareReceipt.Action.Accept
             )
           }
           ?.toList()

@@ -1,7 +1,7 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
-import vdi.lib.install.InstallTargetRegistry
+import vdi.core.install.InstallTargetRegistry
 
 
 /* ┌────────────────────────────────────────────────────────────────────────┐ *\

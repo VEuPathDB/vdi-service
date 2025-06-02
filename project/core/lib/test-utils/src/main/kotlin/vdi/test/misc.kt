@@ -7,10 +7,10 @@ import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
 import vdi.model.data.UserID
 import vdi.model.data.*
-import org.veupathdb.vdi.lib.common.util.CloseableIterator
+import org.veupathdb.vdi.core.common.util.CloseableIterator
 import java.time.OffsetDateTime
-import vdi.lib.db.model.ReconcilerTargetRecord
-import vdi.lib.db.model.SyncControlRecord
+import vdi.core.db.model.ReconcilerTargetRecord
+import vdi.core.db.model.SyncControlRecord
 
 internal class ReconcilerStream(it: Iterable<ReconcilerTargetRecord>): CloseableIterator<ReconcilerTargetRecord> {
   private val raw = it.iterator()

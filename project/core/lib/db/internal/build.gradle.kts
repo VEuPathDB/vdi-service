@@ -1,5 +1,5 @@
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
 }
 
 dependencies {
@@ -7,12 +7,10 @@ dependencies {
 
   implementation(project(":lib:common"))
 
-  implementation(common.json)
   implementation(common.config)
   implementation(common.model)
+  implementation(common.logging)
   implementation(common.util)
-
-  implementation(libs.log.slf4j.api)
 
   implementation(libs.db.pool)
   implementation(libs.db.driver.postgres)

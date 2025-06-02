@@ -1,5 +1,4 @@
 [libraries]
-
 config = { module = "common:config" }
 json = { module = "common:json" }
 logging = { module = "common:logging" }

@@ -1,5 +1,5 @@
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
 }
 
 dependencies {
@@ -8,4 +8,5 @@ dependencies {
   implementation(libs.json.schema.validation)
 
   implementation(common.config)
+  implementation(common.model)
 }

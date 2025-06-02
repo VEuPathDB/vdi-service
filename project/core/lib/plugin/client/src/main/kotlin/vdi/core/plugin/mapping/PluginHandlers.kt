@@ -1,34 +1,31 @@
-package vdi.lib.plugin.mapping
+package vdi.core.plugin.mapping
 
 import vdi.model.data.DataType
-import vdi.core.config.loadAndCacheStackConfig
+import vdi.config.loadAndCacheStackConfig
 import vdi.core.health.RemoteDependencies
-import vdi.lib.plugin.client.PluginHandlerClient
-import vdi.lib.plugin.client.PluginHandlerClientConfig
-import vdi.lib.plugin.registry.PluginRegistry
+import vdi.core.plugin.client.PluginHandlerClient
+import vdi.core.plugin.client.PluginHandlerClientConfig
+import vdi.core.plugin.registry.PluginRegistry
+import vdi.model.data.DatasetType
 
 /**
  * Collection of [PluginHandler] instances mapped by dataset type name.
  */
 object PluginHandlers {
-  private val mapping: Map<NameVersionPair, PluginHandler>
+  private val mapping: Map<DatasetType, PluginHandler>
 
   init {
-    val tmpMap = HashMap<NameVersionPair, PluginHandler>(loadAndCacheStackConfig().vdi.plugins.size)
+    val tmpMap = HashMap<DatasetType, PluginHandler>(loadAndCacheStackConfig().vdi.plugins.size)
 
-    loadAndCacheStackConfig().vdi.plugins.forEach { plug ->
+    loadAndCacheStackConfig().vdi.plugins.forEach { (_, plug) ->
       val addr = plug.server.toHostAddress(80u)
 
       RemoteDependencies.register("Plugin ${plug.displayName}", addr.host, addr.port)
 
       plug.dataTypes.forEach { dt ->
-        val key = NameVersionPair(DataType.of(dt.name), dt.version)
+        val key = DatasetType(DataType.of(dt.name), dt.version)
 
-        tmpMap[key] = PluginHandlerImpl(
-          key.name,
-          PluginHandlerClient(PluginHandlerClientConfig(addr)),
-          PluginRegistry[key.name, dt.version]!!
-        )
+        tmpMap[key] = PluginHandlerImpl(key, PluginHandlerClient(PluginHandlerClientConfig(addr)), PluginRegistry[key]!!)
       }
     }
 
@@ -38,14 +35,9 @@ object PluginHandlers {
   /**
    * Tests whether this [PluginHandlers] instance contains a [PluginHandler] for
    * the given dataset type name.
-   *
-   * @param type Name of the dataset type to test for.
-   *
-   * @return `true` if this [PluginHandlers] instance contains a [PluginHandler]
-   * for the given dataset type, otherwise `false`.
    */
-  fun contains(type: DataType, version: String): Boolean =
-    NameVersionPair(type, version) in mapping
+  fun contains(type: DatasetType): Boolean =
+    type in mapping
 
   /**
    * Attempts to look up a [PluginHandler] for the given dataset type name.
@@ -56,8 +48,6 @@ object PluginHandlers {
    * @return The [PluginHandler] for the given dataset type, or `null` if no
    * such [PluginHandler] exists.
    */
-  operator fun get(type: DataType, version: String): PluginHandler? =
-    mapping[NameVersionPair(type, version)]
-
-  data class NameVersionPair(val name: DataType, val version: String)
+  operator fun get(type: DatasetType): PluginHandler? =
+    mapping[type]
 }

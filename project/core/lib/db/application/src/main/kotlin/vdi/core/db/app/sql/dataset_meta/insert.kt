@@ -1,11 +1,11 @@
 package vdi.core.db.app.sql.dataset_meta
 
 import io.foxcapades.kdbc.withPreparedUpdate
+import java.sql.Connection
+import vdi.core.db.app.MaxVarchar2Length
+import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetMetadata
-import java.sql.Connection
-import vdi.lib.db.app.MaxVarchar2Length
-import vdi.lib.db.jdbc.setDatasetID
 
 private fun sql(schema: String) =
 // language=oracle

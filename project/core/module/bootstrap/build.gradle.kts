@@ -1,5 +1,5 @@
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
 }
 
 dependencies {
@@ -20,14 +20,10 @@ dependencies {
   implementation(project(":module:lane-soft-delete"))
   implementation(project(":module:lane-update-meta"))
 
+  implementation(common.config)
+  implementation(common.logging)
+
   implementation(libs.kt.coroutines)
   implementation(libs.container.core)
-
-  implementation(libs.log.slf4j.api)
-  implementation(libs.log.slf4j.jcl)
-  implementation(libs.log.slf4j.jul)
-  implementation(libs.log.log4j.slf4j)
-  implementation(kotlin("stdlib-jdk8"))
-
-  implementation(common.config)
+  implementation(libs.bundles.logging)
 }

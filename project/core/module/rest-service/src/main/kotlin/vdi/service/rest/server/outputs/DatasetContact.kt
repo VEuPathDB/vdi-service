@@ -1,11 +1,11 @@
 package vdi.service.rest.server.outputs
 
 import vdi.model.data.DatasetContact
-import vdi.service.rest.generated.model.DatasetContact
+import vdi.service.rest.generated.model.DatasetContact as APIContact
 import vdi.service.rest.generated.model.DatasetContactImpl
 
 
-internal fun DatasetContact(contact: vdi.model.data.DatasetContact): DatasetContact =
+internal fun DatasetContact(contact: DatasetContact): APIContact =
   DatasetContactImpl().apply {
     name = contact.name
     email = contact.email

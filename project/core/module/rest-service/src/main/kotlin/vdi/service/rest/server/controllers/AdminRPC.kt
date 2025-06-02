@@ -8,12 +8,12 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import vdi.model.data.DatasetID
-import org.veupathdb.vdi.lib.common.field.toUserID
-import vdi.lib.install.cleanup.InstallCleaner
-import vdi.lib.install.cleanup.ReinstallTarget
-import vdi.lib.install.retry.DatasetReinstaller
-import vdi.lib.pruner.Pruner
-import vdi.lib.reconciler.Reconciler
+import vdi.model.data.toUserID
+import vdi.core.install.cleanup.InstallCleaner
+import vdi.core.install.cleanup.ReinstallTarget
+import vdi.core.install.retry.DatasetReinstaller
+import vdi.core.pruner.Pruner
+import vdi.core.reconciler.Reconciler
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetObjectPurgeRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
@@ -24,6 +24,7 @@ import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.*
 import vdi.service.rest.server.services.admin.rpc.purgeDataset
 import vdi.service.rest.server.services.dataset.createDataset
+import vdi.service.rest.util.ShortID
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcDatasetsProxyUploadResponse as ProxyUploadResponse
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcDatasetsPruneResponse as DatasetPruneResponse
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcDatasetsReconcileResponse as ReconcileResponse
@@ -58,7 +59,7 @@ class AdminRPC(
         return ForbiddenError("target user does not exist or is a guest user").wrap()
     }
 
-    val datasetID = runBlocking { DatasetID() }
+    val datasetID = runBlocking { DatasetID(ShortID.generate()) }
 
     createDataset(datasetID, entity, uploadConfig)
 

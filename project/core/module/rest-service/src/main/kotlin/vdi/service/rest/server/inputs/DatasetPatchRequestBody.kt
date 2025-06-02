@@ -5,7 +5,7 @@ import com.networknt.schema.JsonSchema
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
 import vdi.model.data.InstallTargetID
-import vdi.lib.install.InstallTargetRegistry
+import vdi.core.install.InstallTargetRegistry
 import vdi.service.rest.generated.model.*
 
 @Suppress("DuplicatedCode") // Overlap in generated API types

@@ -4,10 +4,10 @@ import org.slf4j.Logger
 import vdi.lane.reconciliation.util.require
 import vdi.lane.reconciliation.util.safeExec
 import vdi.lane.reconciliation.util.safeTest
-import vdi.lib.db.cache.model.DatasetImportStatus
-import vdi.lib.kafka.EventSource
-import vdi.lib.s3.DatasetDirectory
-import vdi.lib.s3.files.FileName
+import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.core.kafka.EventSource
+import vdi.core.s3.DatasetDirectory
+import vdi.core.s3.files.FileName
 
 internal class ReconciliationContext(
   val datasetDirectory: DatasetDirectory,
@@ -19,9 +19,6 @@ internal class ReconciliationContext(
 
   inline val datasetID
     get() = datasetDirectory.datasetID
-
-  inline val datasetRef
-    get() = "$userID/$datasetID"
 
   // eagerly load metadata to fail fast if absent
   val meta = safeExec("failed to load metadata") { datasetDirectory.getMetaFile().load() }

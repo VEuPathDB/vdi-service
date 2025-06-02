@@ -1,6 +1,4 @@
-plugins {
-  id("vdi.conventions")
-}
+plugins { id("build-conventions") }
 
 dependencies {
   implementation(project(":lib:common"))
@@ -13,4 +11,5 @@ dependencies {
   implementation(libs.log.slf4j.api)
 
   implementation(common.config)
+  implementation(common.logging)
 }

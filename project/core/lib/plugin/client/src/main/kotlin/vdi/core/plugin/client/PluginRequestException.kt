@@ -1,10 +1,10 @@
-package vdi.lib.plugin.client
+package vdi.core.plugin.client
 
 import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
 import vdi.model.data.UserID
 
-class PluginRequestException : PluginException {
+class PluginRequestException: PluginException {
   private constructor(
     action: String,
     plugin: String,

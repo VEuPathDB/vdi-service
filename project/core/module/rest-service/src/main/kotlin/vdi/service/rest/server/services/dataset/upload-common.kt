@@ -6,17 +6,6 @@ import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.WebApplicationException
 import org.slf4j.Logger
 import org.veupathdb.lib.container.jaxrs.errors.FailedDependencyException
-import org.veupathdb.vdi.lib.common.OriginTimestamp
-import org.veupathdb.vdi.lib.common.compression.Tar
-import org.veupathdb.vdi.lib.common.compression.Zip
-import org.veupathdb.vdi.lib.common.compression.Zip.getZipType
-import org.veupathdb.vdi.lib.common.compression.ZipType
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import org.veupathdb.vdi.lib.common.fs.TempFiles
-import vdi.model.data.DatasetFileInfo
-import vdi.model.data.DatasetManifest
-import vdi.model.data.DatasetMetadata
 import java.io.File
 import java.net.MalformedURLException
 import java.net.URL
@@ -29,19 +18,23 @@ import java.util.zip.ZipException
 import kotlin.io.path.*
 import kotlin.math.max
 import kotlin.math.min
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.CacheDBTransaction
-import vdi.lib.db.cache.model.DatasetImpl
-import vdi.lib.db.cache.model.DatasetImportStatus
-import vdi.lib.db.cache.withTransaction
-import vdi.lib.db.model.SyncControlRecord
-import vdi.core.logging.markedLogger
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.CacheDBTransaction
+import vdi.core.db.cache.model.DatasetImpl
+import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.core.db.cache.withTransaction
+import vdi.core.db.model.SyncControlRecord
 import vdi.core.metrics.Metrics
+import vdi.logging.markedLogger
+import vdi.model.OriginTimestamp
+import vdi.model.data.*
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.services.users.getCurrentQuotaUsage
 import vdi.service.rest.util.*
+import vdi.util.fs.TempFiles
+import vdi.util.zip.*
 
 // region Cache DB Interactions
 
@@ -54,8 +47,7 @@ fun <T> CacheDB.initializeDataset(
   withTransaction {
     it.tryInsertDataset(DatasetImpl(
       datasetID = datasetID,
-      typeName = datasetMeta.type.name,
-      typeVersion = datasetMeta.type.version,
+      type = datasetMeta.type,
       ownerID = userID,
       isDeleted = false,
       created = datasetMeta.created,
@@ -271,7 +263,7 @@ private fun Path.repack(into: Path, using: Path, logger: Logger): List<DatasetFi
  * @param into Path to the new archive that should be created.
  */
 private fun List<Path>.pack(into: Path): List<DatasetFileInfo> {
-  Zip.compress(into, this)
+  into.compress(this)
   return map { DatasetFileInfo(it.name, it.fileSize().toULong()) }
 }
 
@@ -302,7 +294,7 @@ private fun Path.repackZip(into: Path, using: Path, logger: Logger): List<Datase
 
   // Iterate through the zip entries
   try {
-    Zip.zipEntries(this)
+    this.zipEntries()
       .forEach { (entry, input) ->
 
         // If the zip entry contains a slash, we reject it (we don't presently
@@ -335,7 +327,7 @@ private fun Path.repackZip(into: Path, using: Path, logger: Logger): List<Datase
 
   logger.info("Compressing file from {} into {}", unpacked, into)
   // recompress the files as a tgz file
-  Zip.compress(into, unpacked)
+  into.compress(unpacked)
 
   return files
 }
@@ -372,14 +364,14 @@ private fun Path.repackTar(into: Path, using: Path, logger: Logger): List<Datase
   for (file in files)
     sizes.add(DatasetFileInfo(file.name, file.fileSize().toULong()))
 
-  Zip.compress(into, files)
+  into.compress(files)
 
   return sizes
 }
 
 private fun Path.repackRaw(into: Path, logger: Logger): List<DatasetFileInfo> {
   logger.trace("repacking raw file {} into {}", this, into)
-  Zip.compress(into, listOf(this))
+  into.compress(listOf(this))
   return listOf(DatasetFileInfo(name, fileSize().toULong()))
 }
 

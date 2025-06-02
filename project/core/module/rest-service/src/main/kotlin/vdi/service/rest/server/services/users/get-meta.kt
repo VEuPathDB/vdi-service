@@ -1,8 +1,8 @@
 @file:JvmName("UserMetaService")
 package vdi.service.rest.server.services.users
 
+import vdi.core.db.cache.CacheDB
 import vdi.model.data.UserID
-import vdi.lib.db.cache.CacheDB
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.UserMetadata
 import vdi.service.rest.generated.model.UserMetadataImpl

@@ -1,6 +1,6 @@
 package vdi.core.db.app
 
-import vdi.lib.db.app.FallbackDatasetType
+import vdi.db.app.FallbackDatasetType
 import vdi.model.data.DatasetType
 
 class AppDBRegistryCollection(

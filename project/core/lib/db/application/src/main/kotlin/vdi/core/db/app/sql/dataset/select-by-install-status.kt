@@ -3,8 +3,6 @@ package vdi.core.db.app.sql.dataset
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.model.data.InstallTargetID
-import vdi.model.data.DatasetVisibility
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -14,9 +12,12 @@ import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.sql.getDeleteFlag
 import vdi.core.db.app.sql.setInstallStatus
 import vdi.core.db.app.sql.setInstallType
-import vdi.lib.db.jdbc.getDataType
-import vdi.lib.db.jdbc.getUserID
-import vdi.lib.db.jdbc.reqDatasetID
+import vdi.core.db.jdbc.getDataType
+import vdi.core.db.jdbc.getUserID
+import vdi.core.db.jdbc.reqDatasetID
+import vdi.model.data.DatasetType
+import vdi.model.data.DatasetVisibility
+import vdi.model.data.InstallTargetID
 
 private fun sql(schema: String) =
 // language=oracle
@@ -58,8 +59,7 @@ internal fun Connection.selectDatasetsByInstallStatus(
       DatasetRecord(
         datasetID     = reqDatasetID("dataset_id"),
         owner         = getUserID("owner"),
-        typeName      = getDataType("type_name"),
-        typeVersion   = getString("type_version"),
+        type          = DatasetType(getDataType("type_name"), getString("type_version")),
         deletionState = getDeleteFlag("is_deleted"),
         isPublic      = getBoolean("is_public"),
         accessibility = getString("accessibility")?.let(DatasetVisibility::fromString)

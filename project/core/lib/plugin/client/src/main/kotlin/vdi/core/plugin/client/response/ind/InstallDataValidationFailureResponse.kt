@@ -1,4 +1,4 @@
-package vdi.lib.plugin.client.response.ind
+package vdi.core.plugin.client.response.ind
 
 sealed interface InstallDataValidationFailureResponse : InstallDataResponse {
   override val type: InstallDataResponseType

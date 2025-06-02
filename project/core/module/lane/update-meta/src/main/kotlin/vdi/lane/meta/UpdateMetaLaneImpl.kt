@@ -12,29 +12,29 @@ import vdi.core.db.app.AppDBTransaction
 import vdi.core.db.app.isUniqueConstraintViolation
 import vdi.core.db.app.model.*
 import vdi.core.db.app.withTransaction
-import vdi.core.logging.logger
+import vdi.logging.logger
 import vdi.core.metrics.Metrics
 import vdi.core.util.orElse
-import vdi.lib.async.WorkerPool
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.CacheDBTransaction
-import vdi.lib.db.cache.model.DatasetImpl
-import vdi.lib.db.cache.model.DatasetImportStatus
-import vdi.lib.db.cache.withTransaction
-import vdi.lib.db.model.SyncControlRecord
-import vdi.lib.kafka.EventMessage
-import vdi.lib.kafka.EventSource
-import vdi.lib.kafka.router.KafkaRouter
-import vdi.lib.modules.AbortCB
-import vdi.lib.modules.AbstractVDIModule
-import vdi.lib.plugin.client.PluginException
-import vdi.lib.plugin.client.PluginRequestException
-import vdi.lib.plugin.client.response.inm.InstallMetaResponseType
-import vdi.lib.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
-import vdi.lib.plugin.mapping.PluginHandler
-import vdi.lib.plugin.mapping.PluginHandlers
-import vdi.lib.s3.DatasetDirectory
-import vdi.lib.s3.DatasetObjectStore
+import vdi.core.async.WorkerPool
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.CacheDBTransaction
+import vdi.core.db.cache.model.DatasetImpl
+import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.core.db.cache.withTransaction
+import vdi.core.db.model.SyncControlRecord
+import vdi.core.kafka.EventMessage
+import vdi.core.kafka.EventSource
+import vdi.core.kafka.router.KafkaRouter
+import vdi.core.modules.AbortCB
+import vdi.core.modules.AbstractVDIModule
+import vdi.core.plugin.client.PluginException
+import vdi.core.plugin.client.PluginRequestException
+import vdi.core.plugin.client.response.inm.InstallMetaResponseType
+import vdi.core.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
+import vdi.core.plugin.mapping.PluginHandler
+import vdi.core.plugin.mapping.PluginHandlers
+import vdi.core.s3.DatasetDirectory
+import vdi.core.s3.DatasetObjectStore
 import vdi.model.DatasetMetaFilename
 import vdi.model.OriginTimestamp
 import vdi.model.data.*
@@ -154,12 +154,10 @@ internal class UpdateMetaLaneImpl(
         db.updateMetaSyncControl(datasetID, metaTimestamp)
       }
 
-    if (!PluginHandlers.contains(datasetMeta.type.name, datasetMeta.type.version)) {
+    val ph = PluginHandlers[datasetMeta.type] orElse {
       log.error("dataset {}/{} declares a type of {}:{} which is unknown to the vdi service", userID, datasetID, datasetMeta.type.name, datasetMeta.type.version)
       return
     }
-
-    val ph = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version]!!
 
     datasetMeta.installTargets
       .forEach { projectID -> tryUpdateTargetMeta(ph, datasetMeta, metaTimestamp, datasetID, projectID, userID) }
@@ -288,7 +286,7 @@ internal class UpdateMetaLaneImpl(
           userID,
           datasetID,
           installTarget,
-          result as vdi.lib.plugin.client.response.inm.InstallMetaBadRequestResponse,
+          result as vdi.core.plugin.client.response.inm.InstallMetaBadRequestResponse,
         )
 
         InstallMetaResponseType.UnexpectedError -> handleUnexpectedErrorResponse(
@@ -349,8 +347,7 @@ internal class UpdateMetaLaneImpl(
     val record = DatasetRecord(
       datasetID       = datasetID,
       owner           = meta.owner,
-      typeName        = meta.type.name,
-      typeVersion     = meta.type.version,
+      type            = meta.type,
       deletionState   = DeleteFlag.NotDeleted,
       isPublic        = meta.visibility == DatasetVisibility.Public,
       accessibility   = meta.visibility,
@@ -399,7 +396,7 @@ internal class UpdateMetaLaneImpl(
     userID: UserID,
     datasetID: DatasetID,
     installTarget: InstallTargetID,
-    res: vdi.lib.plugin.client.response.inm.InstallMetaBadRequestResponse
+    res: vdi.core.plugin.client.response.inm.InstallMetaBadRequestResponse
   ) {
     log.error(
       "dataset handler server reports 400 error for meta-install on dataset {}/{}, project {} via plugin {}",

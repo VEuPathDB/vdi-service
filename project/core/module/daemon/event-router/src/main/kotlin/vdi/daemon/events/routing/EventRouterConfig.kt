@@ -1,8 +1,8 @@
 package vdi.daemon.events.routing
 
 import vdi.config.raw.vdi.VDIConfig
-import vdi.lib.kafka.router.KafkaRouterConfig
-import vdi.lib.rabbit.RabbitMQConfig
+import vdi.core.kafka.router.KafkaRouterConfig
+import vdi.core.rabbit.RabbitMQConfig
 
 data class EventRouterConfig(
   val rabbitConfig: RabbitMQConfig,
@@ -10,7 +10,7 @@ data class EventRouterConfig(
   val kafkaConfig:  KafkaRouterConfig
 ) {
   constructor(config: VDIConfig): this(
-    RabbitMQConfig(config.rabbit.global),
+    RabbitMQConfig(config.rabbit),
     config.objectStore.bucketName,
     KafkaRouterConfig(config.daemons?.eventRouter?.kafkaProducerID ?: "event-router", config.kafka, config.lanes)
   )

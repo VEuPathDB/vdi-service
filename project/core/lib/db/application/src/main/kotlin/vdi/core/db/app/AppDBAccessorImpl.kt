@@ -1,8 +1,5 @@
 package vdi.core.db.app
 
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
 import javax.sql.DataSource
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
@@ -16,7 +13,10 @@ import vdi.core.db.app.sql.dataset_visibility.selectDatasetVisibilityRecords
 import vdi.core.db.app.sql.dataset_visibility.testDatasetVisibilityExists
 import vdi.core.db.app.sql.sync_control.selectAllSyncControl
 import vdi.core.db.app.sql.sync_control.selectSyncControl
-import vdi.lib.db.app.TargetDBPlatform
+import vdi.db.app.TargetDBPlatform
+import vdi.model.data.DatasetID
+import vdi.model.data.InstallTargetID
+import vdi.model.data.UserID
 
 internal class AppDBAccessorImpl(
   override val project: InstallTargetID,

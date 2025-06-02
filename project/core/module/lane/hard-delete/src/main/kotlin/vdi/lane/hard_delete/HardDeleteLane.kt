@@ -1,6 +1,6 @@
 package vdi.lane.hard_delete
 
-import vdi.lib.modules.VDIModule
+import vdi.core.modules.VDIModule
 
 /**
  * Hard Delete Trigger Handler

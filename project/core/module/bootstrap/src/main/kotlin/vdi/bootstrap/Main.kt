@@ -7,6 +7,10 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
 import kotlin.system.exitProcess
+import vdi.config.loadAndCacheStackConfig
+import vdi.config.loadManifestConfig
+import vdi.core.db.cache.patchMetadataTable
+import vdi.core.modules.VDIModule
 import vdi.daemon.events.routing.EventRouter
 import vdi.daemon.pruner.DatasetPruner
 import vdi.daemon.reconciler.Reconciler
@@ -17,11 +21,7 @@ import vdi.lane.meta.UpdateMetaLane
 import vdi.lane.reconciliation.ReconciliationLane
 import vdi.lane.sharing.ShareLane
 import vdi.lane.soft_delete.SoftDeleteLane
-import vdi.core.config.loadAndCacheStackConfig
-import vdi.core.config.loadManifestConfig
-import vdi.lib.db.cache.patchMetadataTable
-import vdi.core.logging.MetaLogger
-import vdi.lib.modules.VDIModule
+import vdi.logging.MetaLogger
 import vdi.module.sleeper.AwaitDependencies
 import vdi.service.rest.RestService
 

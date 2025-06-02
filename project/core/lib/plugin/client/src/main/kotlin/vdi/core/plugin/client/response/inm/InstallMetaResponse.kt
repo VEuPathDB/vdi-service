@@ -1,6 +1,6 @@
-package vdi.lib.plugin.client.response.inm
+package vdi.core.plugin.client.response.inm
 
-import vdi.lib.plugin.client.PluginHandlerClientResponse
+import vdi.core.plugin.client.PluginHandlerClientResponse
 
 /**
  * Install Meta Client Response

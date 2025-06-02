@@ -1,4 +1,4 @@
-package vdi.lib.plugin.client
+package vdi.core.plugin.client
 
 import java.net.http.HttpClient
 import vdi.model.field.HostAddress

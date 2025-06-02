@@ -1,9 +1,9 @@
 package vdi.core.db.app.sql.dataset_project
 
 import io.foxcapades.kdbc.withPreparedBatchUpdate
+import java.sql.Connection
 import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
-import java.sql.Connection
 
 private fun sql(schema: String) =
 // language=oracle

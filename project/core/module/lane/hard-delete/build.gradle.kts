@@ -1,5 +1,5 @@
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
 }
 
 dependencies {
@@ -7,9 +7,8 @@ dependencies {
   implementation(project(":lib:external-kafka"))
   implementation(project(":lib:module-core"))
 
-  implementation(common.json)
   implementation(common.config)
+  implementation(common.logging)
 
-  implementation(libs.log.slf4j.api)
   implementation(libs.kt.coroutines)
 }

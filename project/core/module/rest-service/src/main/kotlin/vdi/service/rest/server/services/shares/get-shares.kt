@@ -3,10 +3,10 @@
 package vdi.service.rest.server.services.shares
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetShareListEntry
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.UserID
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.DatasetShareListEntry
-import vdi.lib.plugin.registry.PluginRegistry
 import vdi.service.rest.generated.model.ShareOfferEntry
 import vdi.service.rest.model.ShareFilterStatus
 import vdi.service.rest.model.UserDetails
@@ -57,14 +57,14 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
     .toMap()
 
   return shares.map {
-    val typeDisplayName = PluginRegistry[it.typeName, it.typeVersion]?.displayName
-      ?: throw IllegalStateException("unregistered dataset type: ${it.typeName}:${it.typeVersion}")
+    val typeDisplayName = PluginRegistry[it.type]?.displayName
+      ?: throw IllegalStateException("unregistered dataset type: ${it.type}")
 
     ShareOfferEntry(
       datasetID              = it.datasetID,
       shareStatus            = ShareFilterStatus.Open,
-      datasetTypeName        = it.typeName,
-      datasetTypeVersion     = it.typeVersion,
+      datasetTypeName        = it.type.name,
+      datasetTypeVersion     = it.type.version,
       datasetTypeDisplayName = typeDisplayName,
       owner                  = owners[it.ownerID] ?: throw IllegalStateException("unknown dataset owner ${it.ownerID}"),
       installTargets         = it.projects

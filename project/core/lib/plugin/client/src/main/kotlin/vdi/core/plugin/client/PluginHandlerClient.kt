@@ -1,14 +1,14 @@
-package vdi.lib.plugin.client
+package vdi.core.plugin.client
 
 import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
 import vdi.model.data.DatasetMetadata
 import vdi.model.data.DatasetType
 import java.io.InputStream
-import vdi.lib.plugin.client.response.imp.ImportResponse
-import vdi.lib.plugin.client.response.ind.InstallDataResponse
-import vdi.lib.plugin.client.response.inm.InstallMetaResponse
-import vdi.lib.plugin.client.response.uni.UninstallResponse
+import vdi.core.plugin.client.response.imp.ImportResponse
+import vdi.core.plugin.client.response.ind.InstallDataResponse
+import vdi.core.plugin.client.response.inm.InstallMetaResponse
+import vdi.core.plugin.client.response.uni.UninstallResponse
 
 interface PluginHandlerClient {
 

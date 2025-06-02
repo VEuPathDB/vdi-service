@@ -1,7 +1,7 @@
 package vdi.service.rest.server.controllers
 
 import jakarta.ws.rs.core.Context
-import vdi.core.config.ManifestConfig
+import vdi.config.raw.ManifestConfig
 import vdi.service.rest.generated.resources.MetaInfo
 import vdi.service.rest.server.outputs.ServiceMetadataResponseBody
 

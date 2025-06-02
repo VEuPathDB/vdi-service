@@ -1,4 +1,4 @@
-package vdi.lib.plugin.client.response.uni
+package vdi.core.plugin.client.response.uni
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
@@ -20,6 +20,6 @@ enum class UninstallResponseType(
       ?: throw IllegalArgumentException("unrecognized UninstallResponseType code: $code")
 
     @JvmStatic
-    fun fromCodeOrNull(code: Int) = values().firstOrNull { it.code == code }
+    fun fromCodeOrNull(code: Int) = entries.firstOrNull { it.code == code }
   }
 }

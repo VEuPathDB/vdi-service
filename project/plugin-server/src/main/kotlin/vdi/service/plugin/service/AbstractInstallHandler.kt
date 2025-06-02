@@ -1,8 +1,8 @@
 package vdi.service.plugin.service
 
 import org.slf4j.Logger
-import vdi.lib.db.app.TargetDatabaseDetails
-import vdi.lib.db.app.dbiName
+import vdi.db.app.TargetDatabaseDetails
+import vdi.db.app.dbiName
 import vdi.service.plugin.consts.ScriptEnvKey
 import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.script.ScriptExecutor

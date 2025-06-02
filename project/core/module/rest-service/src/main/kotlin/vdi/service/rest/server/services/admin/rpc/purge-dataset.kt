@@ -1,7 +1,7 @@
 package vdi.service.rest.server.services.admin.rpc
 
 import vdi.model.data.DatasetID
-import org.veupathdb.vdi.lib.common.field.toUserID
+import vdi.model.data.toUserID
 import vdi.service.rest.generated.model.DatasetObjectPurgeRequestBody
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcObjectStorePurgeDatasetResponse
 import vdi.service.rest.s3.DatasetStore

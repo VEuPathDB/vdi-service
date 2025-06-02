@@ -1,5 +1,8 @@
 plugins { `kotlin-dsl` }
 
+group = "vdi"
+version = "1.0"
+
 repositories {
   gradlePluginPortal()
   mavenCentral()

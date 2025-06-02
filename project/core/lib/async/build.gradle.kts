@@ -1,6 +1,4 @@
-plugins {
-  id("vdi.conventions")
-}
+plugins { id("build-conventions") }
 
 dependencies {
   implementation(project(":lib:common"))

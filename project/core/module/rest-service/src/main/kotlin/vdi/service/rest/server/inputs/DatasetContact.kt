@@ -3,8 +3,7 @@ package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
 import vdi.model.data.DatasetContact
-import vdi.model.data.DatasetContact
-import vdi.service.rest.generated.model.DatasetContact
+import vdi.service.rest.generated.model.DatasetContact as APIContact
 import vdi.service.rest.generated.model.JsonField
 
 private const val NameMinLength = 3
@@ -17,7 +16,7 @@ private const val StateMaxLength = 200
 private const val CountryMaxLength = 200
 private const val AddressMaxLength = 1000
 
-internal fun DatasetContact.cleanup() {
+internal fun APIContact.cleanup() {
   isPrimary   = isPrimary ?: false
   name        = name.cleanupString()
   email       = email.cleanupString()
@@ -28,7 +27,7 @@ internal fun DatasetContact.cleanup() {
   address     = address.cleanupString()
 }
 
-private fun DatasetContact.validate(jPath: String, index: Int, errors: ValidationErrors) {
+private fun APIContact.validate(jPath: String, index: Int, errors: ValidationErrors) {
   name.reqCheckLength(jPath..JsonField.NAME, index, NameMinLength, NameMaxLength, errors)
 
   email.optCheckLength(jPath..JsonField.EMAIL, index, EmailMinLength, EmailMaxLength, errors)
@@ -39,7 +38,7 @@ private fun DatasetContact.validate(jPath: String, index: Int, errors: Validatio
   address.optCheckMaxLength(jPath..JsonField.ADDRESS, index, AddressMaxLength, errors)
 }
 
-internal fun Iterable<DatasetContact?>.validate(jPath: String, errors: ValidationErrors) {
+internal fun Iterable<APIContact?>.validate(jPath: String, errors: ValidationErrors) {
   var primaries = 0
   forEachIndexed { i, c ->
     c.require(jPath, i, errors) {
@@ -61,7 +60,7 @@ internal fun Iterable<DatasetContact?>.validate(jPath: String, errors: Validatio
   }
 }
 
-internal fun DatasetContact.toInternal() =
+internal fun APIContact.toInternal() =
   DatasetContact(
     name        = name,
     email       = email,

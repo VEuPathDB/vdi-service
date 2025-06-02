@@ -1,5 +1,5 @@
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
 }
 
 dependencies {
@@ -9,10 +9,11 @@ dependencies {
   implementation(project(":lib:external-rabbit"))
   implementation(project(":lib:external-s3"))
 
-  implementation(common.json)
   implementation(common.config)
+  implementation(common.json)
+  implementation(common.logging)
+  implementation(common.model)
+
   implementation(libs.kt.coroutines)
   implementation(libs.log.slf4j.api)
-
-  implementation(kotlin("stdlib-jdk8"))
 }

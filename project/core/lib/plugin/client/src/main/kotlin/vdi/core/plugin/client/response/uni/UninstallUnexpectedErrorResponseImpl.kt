@@ -1,4 +1,3 @@
-package vdi.lib.plugin.client.response.uni
+package vdi.core.plugin.client.response.uni
 
-internal data class UninstallUnexpectedErrorResponseImpl(override val message: String)
-  : UninstallUnexpectedErrorResponse
+internal data class UninstallUnexpectedErrorResponseImpl(override val message: String): UninstallUnexpectedErrorResponse

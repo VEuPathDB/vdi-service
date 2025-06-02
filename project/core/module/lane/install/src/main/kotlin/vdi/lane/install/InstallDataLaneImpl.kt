@@ -14,7 +14,7 @@ import java.io.InputStream
 import java.sql.SQLException
 import java.time.OffsetDateTime
 import java.util.concurrent.ConcurrentHashMap
-import vdi.lib.async.WorkerPool
+import vdi.core.async.WorkerPool
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.isUniqueConstraintViolation
 import vdi.core.db.app.model.DatasetInstallMessage
@@ -22,20 +22,20 @@ import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.withTransaction
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.withTransaction
-import vdi.core.logging.logger
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.withTransaction
+import vdi.logging.logger
 import vdi.core.metrics.Metrics
 import vdi.core.util.orElse
-import vdi.lib.modules.AbortCB
-import vdi.lib.modules.AbstractVDIModule
-import vdi.lib.plugin.client.PluginException
-import vdi.lib.plugin.client.PluginRequestException
-import vdi.lib.plugin.client.response.ind.*
-import vdi.lib.plugin.mapping.PluginHandler
-import vdi.lib.plugin.mapping.PluginHandlers
-import vdi.lib.s3.DatasetDirectory
-import vdi.lib.s3.DatasetObjectStore
+import vdi.core.modules.AbortCB
+import vdi.core.modules.AbstractVDIModule
+import vdi.core.plugin.client.PluginException
+import vdi.core.plugin.client.PluginRequestException
+import vdi.core.plugin.client.response.ind.*
+import vdi.core.plugin.mapping.PluginHandler
+import vdi.core.plugin.mapping.PluginHandlers
+import vdi.core.s3.DatasetDirectory
+import vdi.core.s3.DatasetObjectStore
 
 internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, abortCB: AbortCB)
   : InstallDataLane
@@ -157,7 +157,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     val meta = dir.getMetaFile().load()!!
 
     // Get a handler instance for the target dataset type.
-    val handler = PluginHandlers[meta.type.name, meta.type.version]
+    val handler = PluginHandlers[meta.type]
 
     // If there is no handler for the target type, we shouldn't have gotten
     // here, but we can bail now to prevent issues.
@@ -258,7 +258,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
 
       val status = appDB.selectDatasetInstallMessage(datasetID, InstallType.Data)
 
-      timer = Metrics.Install.duration.labels(dataset.typeName.toString(), dataset.typeVersion).startTimer()
+      timer = Metrics.Install.duration.labels(dataset.type.name.toString(), dataset.type.version).startTimer()
 
       if (status == null) {
         var race = false
@@ -314,7 +314,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
         throw PluginRequestException.installData(handler.displayName, installTarget, userID, datasetID, cause = e)
       }
 
-      Metrics.Install.count.labels(dataset.typeName.toString(), dataset.typeVersion, response.responseCode.toString()).inc()
+      Metrics.Install.count.labels(dataset.type.name.toString(), dataset.type.version, response.responseCode.toString()).inc()
 
       return when (response.type) {
         InstallDataResponseType.Success

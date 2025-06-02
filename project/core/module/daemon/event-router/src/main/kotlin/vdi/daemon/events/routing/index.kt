@@ -1,7 +1,7 @@
 package vdi.daemon.events.routing
 
 import vdi.config.raw.vdi.VDIConfig
-import vdi.lib.modules.AbortCB
+import vdi.core.modules.AbortCB
 
 /**
  * Constructs a new event router from the given configuration.

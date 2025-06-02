@@ -1,8 +1,8 @@
 package vdi.core.db.app.sql.dataset_hyperlink
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.model.data.DatasetID
 import java.sql.Connection
+import vdi.model.data.DatasetID
 
 private fun sql(schema: String) =
 // language=oracle

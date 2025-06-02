@@ -3,10 +3,10 @@ package vdi.service.rest.server.services.dataset
 
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.NotFoundException
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.withTransaction
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.withTransaction
 import vdi.service.rest.generated.resources.DatasetsVdiId
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase

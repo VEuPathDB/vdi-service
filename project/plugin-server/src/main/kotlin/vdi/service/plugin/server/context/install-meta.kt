@@ -2,18 +2,19 @@ package vdi.service.plugin.server.context
 
 import com.fasterxml.jackson.core.JacksonException
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.ktor.http.*
-import io.ktor.server.application.*
+import io.ktor.http.ContentType
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.UnsupportedMediaTypeException
-import io.ktor.server.request.*
+import io.ktor.server.request.contentType
+import io.ktor.server.request.receiveStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import vdi.model.api.internal.InstallMetaRequest
 import vdi.json.JSON
-import vdi.util.io.BoundedInputStream
+import vdi.model.api.internal.InstallMetaRequest
 import vdi.service.plugin.model.ApplicationContext
 import vdi.util.fs.TempFiles
+import vdi.util.io.BoundedInputStream
 
 // Max allowed size of the post body: 32KiB
 private const val MAX_INPUT_BYTES = 32768uL

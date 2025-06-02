@@ -1,11 +1,11 @@
 package vdi.core.db.app.sql.dataset_install_message
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.model.data.DatasetID
 import java.sql.Connection
 import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.sql.setInstallType
-import vdi.lib.db.jdbc.setDatasetID
+import vdi.core.db.jdbc.setDatasetID
+import vdi.model.data.DatasetID
 
 private fun bulkSQL(schema: String) =
 // language=oracle

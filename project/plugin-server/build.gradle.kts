@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
   alias(libs.plugins.shadow)
 }
 

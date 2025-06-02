@@ -6,12 +6,12 @@ import kotlinx.coroutines.launch
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
 import java.util.concurrent.ConcurrentHashMap
-import vdi.lib.async.WorkerPool
-import vdi.lib.kafka.EventSource
-import vdi.core.logging.logger
+import vdi.core.async.WorkerPool
+import vdi.core.kafka.EventSource
+import vdi.logging.logger
 import vdi.core.metrics.Metrics
-import vdi.lib.modules.AbortCB
-import vdi.lib.modules.AbstractVDIModule
+import vdi.core.modules.AbortCB
+import vdi.core.modules.AbstractVDIModule
 
 internal class ReconciliationLaneImpl(
   private val config: ReconciliationLaneConfig,

@@ -1,5 +1,5 @@
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
 }
 
 dependencies {
@@ -7,10 +7,10 @@ dependencies {
 
   implementation(common.config)
   implementation(common.json)
+  implementation(common.logging)
   implementation(common.model)
 
   implementation(libs.s34k)
-  implementation(libs.log.slf4j.api)
 
   testImplementation(kotlin("test"))
   testImplementation(libs.junit.api)

@@ -1,6 +1,6 @@
-package vdi.lib.plugin.client.response.uni
+package vdi.core.plugin.client.response.uni
 
-sealed interface UninstallBadRequestResponse : UninstallResponse {
+sealed interface UninstallBadRequestResponse: UninstallResponse {
   override val type: UninstallResponseType
     get() = UninstallResponseType.BadRequest
 

@@ -1,13 +1,21 @@
 package vdi.service.plugin.server
 
-import io.ktor.server.application.*
-import io.ktor.server.metrics.micrometer.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.server.application.Application
+import io.ktor.server.application.call
+import io.ktor.server.application.install
+import io.ktor.server.metrics.micrometer.MicrometerMetrics
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
 import vdi.model.api.internal.Endpoint
-import vdi.service.plugin.server.errors.withExceptionMapping
 import vdi.service.plugin.model.ApplicationContext
-import vdi.service.plugin.server.controller.*
+import vdi.service.plugin.server.controller.handleImportRequest
+import vdi.service.plugin.server.controller.handleInstallDataRequest
+import vdi.service.plugin.server.controller.handleInstallMetaRequest
+import vdi.service.plugin.server.controller.handleUninstallRequest
+import vdi.service.plugin.server.errors.withExceptionMapping
 
 fun Application.configureServer(appCtx: ApplicationContext) {
 

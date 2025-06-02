@@ -1,4 +1,4 @@
-package vdi.lib.plugin.client.response.imp
+package vdi.core.plugin.client.response.imp
 
 import java.io.InputStream
 

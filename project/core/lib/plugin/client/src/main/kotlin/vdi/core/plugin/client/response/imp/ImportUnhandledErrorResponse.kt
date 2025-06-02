@@ -1,4 +1,4 @@
-package vdi.lib.plugin.client.response.imp
+package vdi.core.plugin.client.response.imp
 
 sealed interface ImportUnhandledErrorResponse : ImportResponse {
   override val type: ImportResponseType

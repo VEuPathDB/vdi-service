@@ -1,14 +1,15 @@
 package vdi.service.plugin.util
 
 import com.fasterxml.jackson.core.JacksonException
-import io.ktor.http.content.*
-import io.ktor.util.*
-import io.ktor.utils.io.jvm.javaio.*
+import io.ktor.http.content.PartData
+import io.ktor.http.content.streamProvider
+import io.ktor.util.asStream
+import io.ktor.utils.io.jvm.javaio.toInputStream
 import org.slf4j.LoggerFactory
-import vdi.json.JSON
 import java.io.InputStream
 import java.io.InputStreamReader
 import kotlin.reflect.KClass
+import vdi.json.JSON
 import vdi.util.io.BoundedInputStream
 
 private const val MaxSizeToLoadInMemory = 16384uL

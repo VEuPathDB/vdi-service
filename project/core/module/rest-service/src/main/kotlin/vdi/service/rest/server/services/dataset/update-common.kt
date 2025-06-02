@@ -4,14 +4,8 @@ package vdi.service.rest.server.services.dataset
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.model.data.DatasetMeta
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetProperties
-import vdi.model.data.DatasetRevision
-import vdi.model.data.DatasetType
 import vdi.json.JSON
+import vdi.model.data.*
 import vdi.service.rest.generated.model.DatasetContact
 import vdi.service.rest.generated.model.DatasetHyperlink
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
@@ -25,9 +19,9 @@ fun DatasetMetadata.applyPatch(
   originalID: DatasetID? = this.originalID,
   revisionHistory: List<DatasetRevision> = this.revisionHistory,
 ) =
-  DatasetMeta(
+  DatasetMetadata(
     type             = targetType ?: type,
-    installTargets         = installTargets,
+    installTargets   = installTargets,
     visibility       = patch.visibility?.toInternal() ?: visibility,
     owner            = userID,
     name             = patch.name ?: name,

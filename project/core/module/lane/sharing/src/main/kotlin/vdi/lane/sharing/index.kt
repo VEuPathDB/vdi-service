@@ -1,7 +1,7 @@
 package vdi.lane.sharing
 
 import vdi.config.raw.vdi.VDIConfig
-import vdi.lib.modules.AbortCB
+import vdi.core.modules.AbortCB
 
 fun ShareLane(config: VDIConfig, abortCB: AbortCB): ShareLane =
   ShareLane(ShareLaneConfig(config), abortCB)

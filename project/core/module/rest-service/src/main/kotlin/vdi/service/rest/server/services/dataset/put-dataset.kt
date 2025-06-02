@@ -1,17 +1,16 @@
 @file:JvmName("DatasetPutService")
 package vdi.service.rest.server.services.dataset
 
-import org.veupathdb.vdi.lib.common.DatasetMetaFilename
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import vdi.core.db.app.AppDB
+import vdi.core.db.app.model.InstallStatus
+import vdi.core.db.app.model.InstallType
+import vdi.core.db.cache.CacheDB
+import vdi.model.DatasetMetaFilename
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetMetadata
 import vdi.model.data.DatasetRevision
-import vdi.model.data.DatasetRevisionAction
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
-import vdi.lib.db.app.AppDB
-import vdi.lib.db.app.model.InstallStatus
-import vdi.lib.db.app.model.InstallType
-import vdi.lib.db.cache.CacheDB
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.DatasetPutRequestBody
@@ -77,7 +76,7 @@ internal fun <T: ControllerBase> T.putDataset(
     patch           = request.details,
     originalID      = it.originalID ?: datasetID,
     revisionHistory = it.revisionHistory + DatasetRevision(
-      action       = DatasetRevisionAction.Revise,
+      action       = DatasetRevision.Action.Revise,
       timestamp    = OffsetDateTime.now(ZoneOffset.UTC),
       revisionID   = newDatasetID,
       revisionNote = request.details.revisionNote,
@@ -109,7 +108,7 @@ private fun DatasetID.incrementRevision() =
 
 private fun isRevisionBlocker(datasetID: DatasetID, meta: DatasetMetadata) =
   meta.installTargets.any { target ->
-    AppDB().accessor(target, meta.type.name)!!
+    AppDB().accessor(target, meta.type)!!
       .selectDatasetInstallMessages(datasetID)
       .associate { it.installType to it.status }
       .let { when {

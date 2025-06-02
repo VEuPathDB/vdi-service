@@ -69,7 +69,7 @@ private suspend fun ApplicationCall.withParsedRequest(
 
   details!!.also { deets ->
     deets.validate()
-    fn(ImportContext(deets.vdiID, workspace, appCtx.config.customPath, deets, payload!!, appCtx.config.importScript))
+    fn(ImportContext(workspace, appCtx.config.customPath, deets, payload!!, appCtx.config.importScript))
   }
 }
 

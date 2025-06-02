@@ -1,6 +1,6 @@
-package vdi.lib.plugin.client.response.imp
+package vdi.core.plugin.client.response.imp
 
-import vdi.lib.plugin.client.PluginHandlerClientResponse
+import vdi.core.plugin.client.PluginHandlerClientResponse
 
 /**
  * Import Client Response

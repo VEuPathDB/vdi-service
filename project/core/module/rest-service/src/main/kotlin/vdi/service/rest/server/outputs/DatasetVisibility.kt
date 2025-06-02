@@ -1,10 +1,10 @@
 package vdi.service.rest.server.outputs
 
 import vdi.model.data.DatasetVisibility
-import vdi.service.rest.generated.model.DatasetVisibility
+import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
 
-fun DatasetVisibility(vis: vdi.model.data.DatasetVisibility) = when (vis) {
-  DatasetVisibility.Private   -> DatasetVisibility.PRIVATE
-  DatasetVisibility.Protected -> DatasetVisibility.PROTECTED
-  DatasetVisibility.Public    -> DatasetVisibility.PUBLIC
+fun DatasetVisibility(vis: DatasetVisibility) = when (vis) {
+  DatasetVisibility.Private   -> APIVisibility.PRIVATE
+  DatasetVisibility.Protected -> APIVisibility.PROTECTED
+  DatasetVisibility.Public    -> APIVisibility.PUBLIC
 }

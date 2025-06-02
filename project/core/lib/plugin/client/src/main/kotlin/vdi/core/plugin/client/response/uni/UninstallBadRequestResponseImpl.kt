@@ -1,3 +1,3 @@
-package vdi.lib.plugin.client.response.uni
+package vdi.core.plugin.client.response.uni
 
-internal data class UninstallBadRequestResponseImpl(override val message: String) : UninstallBadRequestResponse
+internal data class UninstallBadRequestResponseImpl(override val message: String): UninstallBadRequestResponse

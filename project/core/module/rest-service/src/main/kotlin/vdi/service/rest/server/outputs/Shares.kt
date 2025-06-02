@@ -3,22 +3,22 @@ package vdi.service.rest.server.outputs
 import vdi.model.data.DataType
 import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
-import vdi.model.data.VDIShareOfferAction
+import vdi.model.data.DatasetShareOffer
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.model.ShareFilterStatus
 import vdi.service.rest.model.UserDetails
 
 
-internal fun ShareOffer(user: UserDetails, action: VDIShareOfferAction): ShareOffer =
+internal fun ShareOffer(user: UserDetails, action: DatasetShareOffer.Action): ShareOffer =
   ShareOfferImpl().also {
     it.recipient = ShareOfferRecipient(user)
     it.status    = ShareOfferAction(action)
   }
 
-fun ShareOfferAction(action: VDIShareOfferAction): ShareOfferAction =
+fun ShareOfferAction(action: DatasetShareOffer.Action): ShareOfferAction =
   when (action) {
-    VDIShareOfferAction.Grant  -> ShareOfferAction.GRANT
-    VDIShareOfferAction.Revoke -> ShareOfferAction.REVOKE
+    DatasetShareOffer.Action.Grant  -> ShareOfferAction.GRANT
+    DatasetShareOffer.Action.Revoke -> ShareOfferAction.REVOKE
   }
 
 internal fun ShareOfferEntry(

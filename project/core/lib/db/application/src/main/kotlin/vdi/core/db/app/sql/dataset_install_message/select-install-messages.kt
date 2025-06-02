@@ -2,13 +2,13 @@ package vdi.core.db.app.sql.dataset_install_message
 
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.model.data.DatasetID
 import java.sql.Connection
 import vdi.core.db.app.model.DatasetInstallMessage
 import vdi.core.db.app.sql.getInstallStatus
 import vdi.core.db.app.sql.getInstallType
-import vdi.lib.db.jdbc.getDateTime
-import vdi.lib.db.jdbc.setDatasetID
+import vdi.core.db.jdbc.getDateTime
+import vdi.core.db.jdbc.setDatasetID
+import vdi.model.data.DatasetID
 
 private fun sql(schema: String) =
 // language=oracle

@@ -3,10 +3,10 @@ package vdi.core.db.app
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import vdi.core.db.app.health.DatabaseDependency
-import vdi.lib.db.app.InstallTargetRegistry
-import vdi.lib.db.app.TargetDBPlatform
-import vdi.lib.db.app.TargetDatabaseDetails
 import vdi.core.health.RemoteDependencies
+import vdi.db.app.InstallTargetRegistry
+import vdi.db.app.TargetDBPlatform
+import vdi.db.app.TargetDatabaseDetails
 import vdi.model.data.DatasetType
 import vdi.model.data.InstallTargetID
 

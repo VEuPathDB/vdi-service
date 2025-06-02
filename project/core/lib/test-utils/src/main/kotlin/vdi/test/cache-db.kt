@@ -8,13 +8,13 @@ import vdi.model.data.DatasetFileInfo
 import vdi.model.data.DatasetMetadata
 import vdi.model.data.DatasetVisibility
 import java.time.OffsetDateTime
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.CacheDBTransaction
-import vdi.lib.db.cache.model.*
-import vdi.lib.db.cache.query.AdminAllDatasetsQuery
-import vdi.lib.db.cache.query.DatasetListQuery
-import vdi.lib.db.model.ReconcilerTargetRecord
-import vdi.lib.db.model.SyncControlRecord
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.CacheDBTransaction
+import vdi.core.db.cache.model.*
+import vdi.core.db.cache.query.AdminAllDatasetsQuery
+import vdi.core.db.cache.query.DatasetListQuery
+import vdi.core.db.model.ReconcilerTargetRecord
+import vdi.core.db.model.SyncControlRecord
 
 fun mockCacheDB(
   onSelectDataset: DSGetter<DatasetRecord?> = ::oneParamNull,

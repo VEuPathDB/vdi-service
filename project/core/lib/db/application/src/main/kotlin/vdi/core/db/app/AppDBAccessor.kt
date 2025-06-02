@@ -1,12 +1,12 @@
 package vdi.core.db.app
 
+import vdi.core.db.app.model.*
+import vdi.core.db.model.ReconcilerTargetRecord
+import vdi.core.db.model.SyncControlRecord
+import vdi.db.app.TargetDBPlatform
 import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
 import vdi.model.data.UserID
-import vdi.lib.db.app.TargetDBPlatform
-import vdi.core.db.app.model.*
-import vdi.lib.db.model.ReconcilerTargetRecord
-import vdi.lib.db.model.SyncControlRecord
 import vdi.util.io.CloseableIterator
 
 interface AppDBAccessor {

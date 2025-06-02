@@ -1,7 +1,7 @@
 package vdi.lane.reconciliation
 
 import vdi.config.raw.vdi.VDIConfig
-import vdi.lib.modules.AbortCB
+import vdi.core.modules.AbortCB
 
 fun ReconciliationLane(config: VDIConfig, abortCB: AbortCB) =
   ReconciliationLane(ReconciliationLaneConfig(config), abortCB)

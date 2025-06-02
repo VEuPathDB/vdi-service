@@ -6,7 +6,7 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
-import org.veupathdb.vdi.lib.common.field.toUserID
+import vdi.model.data.toUserID
 import vdi.service.rest.generated.model.DatasetShareOffer
 import vdi.service.rest.generated.model.DatasetShareReceipt
 import vdi.service.rest.generated.resources.DatasetsVdiIdSharesRecipientUserId

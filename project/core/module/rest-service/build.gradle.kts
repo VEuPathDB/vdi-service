@@ -4,7 +4,7 @@ import org.veupathdb.lib.gradle.container.tasks.jaxrs.GenerateJaxRS
 import org.veupathdb.lib.gradle.container.tasks.raml.GenerateRamlDocs
 
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
   alias(libs.plugins.vpdb)
 }
 
@@ -112,8 +112,11 @@ dependencies {
   implementation(project(":lib:install-target"))
   implementation(project(":lib:plugin-registry"))
 
-  implementation(common.json)
   implementation(common.config)
+  implementation(common.json)
+  implementation(common.logging)
+  implementation(common.model)
+  implementation(common.util)
 
   implementation(libs.fgputil.db)
   implementation(libs.container.core)
@@ -128,10 +131,6 @@ dependencies {
   implementation(libs.kt.coroutines)
 
   implementation(libs.http.server.jersey)
-
-  implementation(libs.log.slf4j.api)
-  implementation(libs.log.slf4j.jcl)
-  implementation(libs.log.log4j.slf4j)
 
   implementation(libs.prometheus.client)
   implementation(libs.prometheus.common)

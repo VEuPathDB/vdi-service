@@ -1,4 +1,4 @@
-package vdi.lib.plugin.client
+package vdi.core.plugin.client
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.foxcapades.lib.k.multipart.MultiPart
@@ -13,15 +13,12 @@ import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import vdi.core.logging.logger
-import vdi.lib.plugin.client.response.imp.*
-import vdi.lib.plugin.client.response.ind.*
-import vdi.lib.plugin.client.response.inm.*
-import vdi.lib.plugin.client.response.uni.*
+import vdi.logging.logger
+import vdi.core.plugin.client.response.imp.*
+import vdi.core.plugin.client.response.ind.*
+import vdi.core.plugin.client.response.inm.*
+import vdi.core.plugin.client.response.uni.*
 import vdi.model.api.internal.*
-
-private const val JsonContentType = "application/json; charset=utf-8"
-
 
 internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig) : PluginHandlerClient {
 
@@ -36,18 +33,19 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val multipart = MultiPart.createBody {
       withPart {
         fieldName = FormField.Details
-        contentType("application/json; charset=utf-8")
+        contentType(ContentType.JSON)
         withBody(ImportRequest(datasetID, ImportCounter.nextIndex(), meta).toJSONString())
       }
 
       withPart {
         fieldName = FormField.Payload
-        fileName  = "upload.tgz"
+        fileName  = "import-ready.zip"
+        contentType(ContentType.Zip)
         withBody(upload)
       }
     }
 
-    val uri = resolve(EP.Import)
+    val uri = resolve(Endpoint.Import)
 
     log.debug("submitting import POST request to {} for dataset {}", uri, datasetID)
 
@@ -80,7 +78,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
   }
 
   override suspend fun postInstallMeta(datasetID: DatasetID, installTarget: InstallTargetID, meta: DatasetMetadata): InstallMetaResponse {
-    val uri = resolve(EP.InstallMeta)
+    val uri = resolve(Endpoint.InstallMeta)
 
     log.debug("submitting install-meta POST request to {} for project {} for dataset {}", uri, installTarget, datasetID)
 
@@ -118,30 +116,31 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val multipart = MultiPart.createBody {
       withPart {
         fieldName = FormField.Details
-        contentType(JsonContentType)
+        contentType(ContentType.JSON)
         withBody(InstallDataRequest(datasetID, installTarget).toJSONString())
       }
 
       withPart {
         fieldName = FormField.Metadata
-        contentType(JsonContentType)
+        contentType(ContentType.JSON)
         withBody(meta)
       }
 
       withPart {
         fieldName = FormField.Manifest
-        contentType(JsonContentType)
+        contentType(ContentType.JSON)
         withBody(manifest)
       }
 
       withPart {
         fieldName = FormField.Payload
         fileName = "install-ready.zip"
+        contentType(ContentType.Zip)
         withBody(payload)
       }
     }
 
-    val uri = resolve(EP.InstallData)
+    val uri = resolve(Endpoint.InstallData)
 
     log.debug("submitting install-data POST request to {} for project {} for dataset {}", uri, installTarget, datasetID)
 
@@ -180,7 +179,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
   }
 
   override suspend fun postUninstall(datasetID: DatasetID, installTarget: InstallTargetID, type: DatasetType): UninstallResponse {
-    val uri = resolve(EP.Uninstall)
+    val uri = resolve(Endpoint.Uninstall)
 
     log.debug("submitting uninstall POST request to {} for project {} for dataset {} (type {})", uri, installTarget, datasetID, type.name)
 

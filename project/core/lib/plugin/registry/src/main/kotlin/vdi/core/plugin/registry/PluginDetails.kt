@@ -1,4 +1,4 @@
-package vdi.lib.plugin.registry
+package vdi.core.plugin.registry
 
 import vdi.model.data.InstallTargetID
 

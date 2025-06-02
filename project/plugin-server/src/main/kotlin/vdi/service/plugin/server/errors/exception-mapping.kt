@@ -1,11 +1,12 @@
 package vdi.service.plugin.server.errors
 
-import io.ktor.http.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.UnsupportedMediaTypeException
-import io.ktor.server.response.*
+import io.ktor.server.response.respondText
 import io.ktor.util.pipeline.PipelineContext
 import org.slf4j.LoggerFactory
 import vdi.json.toJSONString

@@ -1,16 +1,13 @@
 package vdi.core.db.app
 
-import vdi.model.OriginTimestamp
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
-import vdi.model.data.*
 import java.time.OffsetDateTime
 import vdi.core.db.app.model.DatasetInstallMessage
 import vdi.core.db.app.model.DatasetRecord
 import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.model.InstallType
-import vdi.lib.db.model.SyncControlRecord
+import vdi.core.db.model.SyncControlRecord
+import vdi.model.OriginTimestamp
+import vdi.model.data.*
 
 interface AppDBTransaction : AppDBAccessor, AutoCloseable {
 

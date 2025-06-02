@@ -3,9 +3,9 @@ package vdi.lane.hard_delete
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import vdi.core.logging.logger
-import vdi.lib.modules.AbortCB
-import vdi.lib.modules.AbstractVDIModule
+import vdi.logging.logger
+import vdi.core.modules.AbortCB
+import vdi.core.modules.AbstractVDIModule
 
 internal class HardDeleteLaneImpl(private val config: HardDeleteLaneConfig, abortCB: AbortCB)
   : HardDeleteLane

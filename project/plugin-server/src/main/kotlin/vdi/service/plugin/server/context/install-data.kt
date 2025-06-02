@@ -26,10 +26,7 @@ private const val INSTALL_DETAILS_MAX_SIZE = 1024uL
 
 @Suppress("DuplicatedCode")
 @OptIn(ExperimentalContracts::class)
-suspend fun ApplicationCall.withInstallDataContext(
-  appCtx: ApplicationContext,
-  fn: suspend (installCtx: InstallDataContext) -> Unit
-) {
+suspend fun ApplicationCall.withInstallDataContext(appCtx: ApplicationContext, fn: suspend (InstallDataContext) -> Unit) {
   contract { callsInPlace(fn, InvocationKind.EXACTLY_ONCE) }
 
   if (!request.contentType().match(ContentType.MultiPart.FormData))

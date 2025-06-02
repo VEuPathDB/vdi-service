@@ -16,9 +16,9 @@ import vdi.json.JSON
 import vdi.json.toJSONString
 import java.io.InputStream
 import vdi.config.raw.vdi.ObjectStoreConfig
-import vdi.lib.s3.paths.ImportReadyFileName
-import vdi.lib.s3.paths.S3Paths
-import vdi.lib.s3.util.S3Config
+import vdi.core.s3.files.FileName
+import vdi.core.s3.paths.S3Paths
+import vdi.core.s3.util.S3Config
 
 object DatasetStore {
   private lateinit var client: S3Client
@@ -51,7 +51,7 @@ object DatasetStore {
 
         out.computeIfAbsent(datasetID) { 0 }
 
-        if (it.path.endsWith(ImportReadyFileName))
+        if (it.path.endsWith(FileName.ImportReadyFile))
           out[datasetID] = it.size
       }
 

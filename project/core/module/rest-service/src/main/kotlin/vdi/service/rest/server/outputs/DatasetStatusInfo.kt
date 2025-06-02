@@ -1,8 +1,8 @@
 package vdi.service.rest.server.outputs
 
 import vdi.model.data.InstallTargetID
-import vdi.lib.db.app.model.InstallStatuses
-import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.core.db.app.model.InstallStatuses
+import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.service.rest.generated.model.DatasetStatusInfo
 import vdi.service.rest.generated.model.DatasetStatusInfoImpl
 

@@ -3,7 +3,7 @@ package vdi.service.rest
 import org.glassfish.jersey.internal.inject.AbstractBinder
 import org.glassfish.jersey.server.ServerProperties
 import org.veupathdb.lib.container.jaxrs.server.ContainerResources
-import vdi.core.config.ManifestConfig
+import vdi.config.raw.ManifestConfig
 import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.server.controllers.*

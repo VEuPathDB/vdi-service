@@ -3,10 +3,10 @@ package vdi.service.rest.server.outputs
 import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
 import java.time.OffsetDateTime
-import vdi.lib.db.app.model.InstallStatuses
-import vdi.lib.db.cache.model.DatasetFileSummary
-import vdi.lib.db.cache.model.DatasetRecord
-import vdi.lib.plugin.registry.PluginRegistry
+import vdi.core.db.app.model.InstallStatuses
+import vdi.core.db.cache.model.DatasetFileSummary
+import vdi.core.db.cache.model.DatasetRecord
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.util.defaultZone
@@ -59,8 +59,8 @@ internal fun DatasetRecord.toExternal(
   fileInfo: DatasetFileSummary?,
   shares: List<DatasetListShareUser>?,
 ): DatasetListEntry {
-  val typeDisplayName = PluginRegistry[typeName, typeVersion]?.displayName
-    ?: throw IllegalStateException("plugin missing: ${typeName}:${typeVersion}")
+  val typeDisplayName = PluginRegistry[type]?.displayName
+    ?: throw IllegalStateException("plugin missing: $type")
 
   return DatasetListEntry(
     datasetID        = datasetID,

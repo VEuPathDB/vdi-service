@@ -1,4 +1,4 @@
-package vdi.lib.plugin.client
+package vdi.core.plugin.client
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex

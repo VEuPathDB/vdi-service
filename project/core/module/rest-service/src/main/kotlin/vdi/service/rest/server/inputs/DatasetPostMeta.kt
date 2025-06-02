@@ -5,10 +5,10 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
 import vdi.model.data.UserID
-import vdi.model.data.DatasetMeta
 import vdi.json.JSON
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import vdi.model.data.DatasetMetadata
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.JsonField as JF
 
@@ -29,15 +29,13 @@ internal fun DatasetPostMeta.cleanup() {
 
 internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
   datasetType.validate(JF.META..JF.DATASET_TYPE, installTargets, errors)
-  // visibility -enum, no validation needed)
-
   (this as DatasetMetaBase).validate(errors)
 }
 
 internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
-  DatasetMeta(
+  DatasetMetadata(
     type             = datasetType.toInternal(),
-    installTargets         = installTargets.toSet(),
+    installTargets   = installTargets.toSet(),
     owner            = userID,
     name             = name,
     shortName        = shortName,

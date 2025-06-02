@@ -6,14 +6,14 @@ import vdi.lane.reconciliation.util.*
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.DatasetImportStatus
-import vdi.lib.db.cache.withTransaction
-import vdi.lib.kafka.EventSource
-import vdi.lib.kafka.router.KafkaRouter
-import vdi.core.logging.markedLogger
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.core.db.cache.withTransaction
+import vdi.core.kafka.EventSource
+import vdi.core.kafka.router.KafkaRouter
+import vdi.logging.markedLogger
 import vdi.core.metrics.Metrics
-import vdi.lib.s3.DatasetObjectStore
+import vdi.core.s3.DatasetObjectStore
 
 internal class DatasetReconciler(
   private val cacheDB: CacheDB = CacheDB(),

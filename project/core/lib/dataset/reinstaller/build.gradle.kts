@@ -1,5 +1,5 @@
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
 }
 
 dependencies {
@@ -14,4 +14,6 @@ dependencies {
   implementation(libs.log.slf4j.api)
 
   implementation(common.config)
+  implementation(common.logging)
+  implementation(common.model)
 }

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
-import org.veupathdb.vdi.lib.common.OriginTimestamp
+import org.veupathdb.vdi.core.common.OriginTimestamp
 import vdi.model.data.DataType
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
@@ -16,10 +16,10 @@ import vdi.model.data.DatasetVisibility
 import java.time.OffsetDateTime
 import java.util.UUID
 import kotlin.random.Random
-import vdi.lib.db.app.model.DeleteFlag
-import vdi.lib.db.cache.model.DatasetImportStatus
-import vdi.lib.db.model.SyncControlRecord
-import vdi.lib.kafka.EventSource
+import vdi.core.db.app.model.DeleteFlag
+import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.core.db.model.SyncControlRecord
+import vdi.core.kafka.EventSource
 import vdi.test.*
 
 private val userID = UserID(123456)

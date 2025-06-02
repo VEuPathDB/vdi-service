@@ -4,9 +4,9 @@ import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.model.DatasetRecord
 import vdi.core.db.app.sql.setDeleteFlag
-import vdi.lib.db.jdbc.setDataType
-import vdi.lib.db.jdbc.setDatasetID
-import vdi.lib.db.jdbc.setUserID
+import vdi.core.db.jdbc.setDataType
+import vdi.core.db.jdbc.setDatasetID
+import vdi.core.db.jdbc.setUserID
 
 private fun sql(schema: String) =
 // language=oracle
@@ -28,8 +28,8 @@ WHERE
 internal fun Connection.updateDataset(schema: String, dataset: DatasetRecord) {
   withPreparedUpdate(sql(schema)) {
     setUserID(1, dataset.owner)
-    setDataType(2, dataset.typeName)
-    setString(3, dataset.typeVersion)
+    setDataType(2, dataset.type.name)
+    setString(3, dataset.type.version)
     setDeleteFlag(4, dataset.deletionState)
     setBoolean(5, dataset.isPublic)
     setDatasetID(6, dataset.datasetID)

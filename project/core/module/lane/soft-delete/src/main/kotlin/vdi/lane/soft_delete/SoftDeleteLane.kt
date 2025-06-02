@@ -1,6 +1,6 @@
 package vdi.lane.soft_delete
 
-import vdi.lib.modules.VDIModule
+import vdi.core.modules.VDIModule
 
 /**
  * Soft Delete Trigger Handling Module

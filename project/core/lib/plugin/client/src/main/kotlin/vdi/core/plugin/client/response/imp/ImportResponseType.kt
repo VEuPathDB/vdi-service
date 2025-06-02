@@ -1,4 +1,4 @@
-package vdi.lib.plugin.client.response.imp
+package vdi.core.plugin.client.response.imp
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue

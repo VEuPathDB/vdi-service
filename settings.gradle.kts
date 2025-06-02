@@ -1,7 +1,5 @@
 rootProject.name = "vdi"
 
-includeBuild("project/conventions")
-
 includeBuild("project/core")
 
 includeBuild("project/common") {

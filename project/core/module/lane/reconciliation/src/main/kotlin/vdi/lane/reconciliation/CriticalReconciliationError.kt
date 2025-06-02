@@ -1,3 +1,3 @@
 package vdi.lane.reconciliation
 
-internal class CriticalReconciliationError : Exception()
+internal class CriticalReconciliationError: Exception()

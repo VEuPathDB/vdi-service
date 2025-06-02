@@ -1,10 +1,10 @@
 package vdi.daemon.reconciler
 
 import kotlin.time.Duration.Companion.milliseconds
-import vdi.core.logging.logger
-import vdi.lib.modules.AbortCB
-import vdi.lib.modules.AbstractJobExecutor
-import vdi.lib.reconciler.Reconciler as Recon
+import vdi.logging.logger
+import vdi.core.modules.AbortCB
+import vdi.core.modules.AbstractJobExecutor
+import vdi.core.reconciler.Reconciler as Recon
 
 internal class ReconcilerImpl(private val config: ReconcilerDaemonConfig, abortCB: AbortCB)
   : Reconciler

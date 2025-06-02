@@ -10,8 +10,8 @@ import vdi.model.data.DatasetShareReceipt
 import java.io.InputStream
 import java.time.OffsetDateTime
 import java.util.stream.Stream
-import vdi.lib.s3.DatasetObjectStore
-import vdi.lib.s3.files.*
+import vdi.core.s3.DatasetObjectStore
+import vdi.core.s3.files.*
 
 private sealed class DummyFileBase
   : DatasetDeleteFlagFile
@@ -84,7 +84,7 @@ fun mockDatasetDirectory(
   onPutShare: Con<UserID> = ::consumer,
 
   onGetLatestShareTimestamp: (OffsetDateTime) -> OffsetDateTime = { it },
-): vdi.lib.s3.DatasetDirectory =
+): vdi.core.s3.DatasetDirectory =
   mock {
     ownerID?.also { on { this.ownerID } doReturn it }
     datasetID?.also { on { this.datasetID } doReturn it }
@@ -134,9 +134,9 @@ fun mockDatasetDirectory(
   }
 
 fun mockDatasetManager(
-  onGetDatasetDirectory: BiFn<UserID, DatasetID, vdi.lib.s3.DatasetDirectory> = { u, d -> mockDatasetDirectory(ownerID = u, datasetID = d) },
+  onGetDatasetDirectory: BiFn<UserID, DatasetID, vdi.core.s3.DatasetDirectory> = { u, d -> mockDatasetDirectory(ownerID = u, datasetID = d) },
   onListDatasets: Fn<UserID, List<DatasetID>> = ::oneParamList,
-  onStreamAllDatasets: Pro<Stream<vdi.lib.s3.DatasetDirectory>> = { Stream.empty() },
+  onStreamAllDatasets: Pro<Stream<vdi.core.s3.DatasetDirectory>> = { Stream.empty() },
   onListUsers: Pro<List<UserID>> = ::noParamList,
 ): DatasetObjectStore =
   mock {

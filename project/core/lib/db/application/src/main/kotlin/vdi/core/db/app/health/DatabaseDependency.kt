@@ -2,10 +2,10 @@ package vdi.core.db.app.health
 
 import org.slf4j.LoggerFactory
 import vdi.core.db.app.TargetDatabaseReference
-import vdi.lib.db.app.TargetDBPlatform
-import vdi.lib.db.app.TargetDatabaseDetails
 import vdi.core.health.Dependency
 import vdi.core.health.StaticDependency
+import vdi.db.app.TargetDBPlatform
+import vdi.db.app.TargetDatabaseDetails
 
 class DatabaseDependency(
   private val connection: TargetDatabaseReference,

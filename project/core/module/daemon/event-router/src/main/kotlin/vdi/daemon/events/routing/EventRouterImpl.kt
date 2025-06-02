@@ -11,20 +11,20 @@ import vdi.json.JSON
 import vdi.daemon.events.routing.model.MinIOEvent
 import vdi.daemon.events.routing.model.MinIOEventAction
 import vdi.core.util.discardException
-import vdi.lib.kafka.EventSource
-import vdi.lib.kafka.router.KafkaRouter
-import vdi.lib.kafka.router.KafkaRouterFactory
-import vdi.core.logging.logger
-import vdi.core.logging.markedLogger
-import vdi.lib.modules.AbortCB
-import vdi.lib.modules.AbstractVDIModule
+import vdi.core.kafka.EventSource
+import vdi.core.kafka.router.KafkaRouter
+import vdi.core.kafka.router.KafkaRouterFactory
+import vdi.logging.logger
+import vdi.logging.markedLogger
+import vdi.core.modules.AbortCB
+import vdi.core.modules.AbstractVDIModule
 import vdi.core.util.orElse
-import vdi.lib.rabbit.RabbitMQEventIterator
-import vdi.lib.rabbit.RabbitMQEventSource
-import vdi.lib.s3.files.DataFileType
-import vdi.lib.s3.files.FlagFileType
-import vdi.lib.s3.files.MetaFileType
-import vdi.lib.s3.paths.*
+import vdi.core.rabbit.RabbitMQEventIterator
+import vdi.core.rabbit.RabbitMQEventSource
+import vdi.core.s3.files.DataFileType
+import vdi.core.s3.files.FlagFileType
+import vdi.core.s3.files.MetaFileType
+import vdi.core.s3.paths.*
 
 internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: AbortCB)
   : EventRouter
@@ -89,7 +89,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
 
     when (event.eventType.action) {
       MinIOEventAction.DELETE -> event.processDeleteEvent(path, log)
-      MinIOEventAction.CREATE -> event.processPutEvent(path, log)
+      MinIOEventAction.CREATE -> processPutEvent(path, log)
     }
   }
 
@@ -108,7 +108,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
     return
   }
 
-  private suspend fun MinIOEvent.processPutEvent(path: DatasetPath<*>, log: Logger) {
+  private suspend fun processPutEvent(path: DatasetPath<*>, log: Logger) {
     log.debug("demuxing put event for {}", path)
 
     when (path) {

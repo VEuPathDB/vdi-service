@@ -3,8 +3,8 @@ package vdi.lane.hard_delete
 import vdi.config.raw.kafka.KafkaConfig
 import vdi.config.raw.vdi.VDIConfig
 import vdi.config.raw.vdi.lanes.ConsumerLaneConfig
-import vdi.lib.kafka.*
-import vdi.lib.kafka.router.RouterDefaults
+import vdi.core.kafka.*
+import vdi.core.kafka.router.RouterDefaults
 
 data class HardDeleteLaneConfig(
   val jobQueueSize:   UByte,

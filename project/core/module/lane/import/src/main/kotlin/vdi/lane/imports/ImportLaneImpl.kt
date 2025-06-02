@@ -10,28 +10,29 @@ import kotlinx.coroutines.sync.withLock
 import org.apache.logging.log4j.kotlin.loggerOf
 import org.veupathdb.lib.s3.s34k.errors.S34KError
 import java.time.OffsetDateTime
-import vdi.core.logging.logger
+import vdi.logging.logger
 import vdi.core.metrics.Metrics
 import vdi.json.JSON
-import vdi.lib.async.WorkerPool
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.CacheDBTransaction
-import vdi.lib.db.cache.model.DatasetImpl
-import vdi.lib.db.cache.model.DatasetImportStatus
-import vdi.lib.db.cache.withTransaction
-import vdi.lib.db.model.SyncControlRecord
-import vdi.lib.modules.AbortCB
-import vdi.lib.modules.AbstractVDIModule
-import vdi.lib.plugin.client.PluginException
-import vdi.lib.plugin.client.PluginRequestException
-import vdi.lib.plugin.client.response.imp.*
-import vdi.lib.plugin.mapping.PluginHandler
-import vdi.lib.plugin.mapping.PluginHandlers
-import vdi.lib.s3.DatasetDirectory
-import vdi.lib.s3.DatasetObjectStore
+import vdi.core.async.WorkerPool
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.CacheDBTransaction
+import vdi.core.db.cache.model.DatasetImpl
+import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.core.db.cache.withTransaction
+import vdi.core.db.model.SyncControlRecord
+import vdi.core.modules.AbortCB
+import vdi.core.modules.AbstractVDIModule
+import vdi.core.plugin.client.PluginException
+import vdi.core.plugin.client.PluginRequestException
+import vdi.core.plugin.client.response.imp.*
+import vdi.core.plugin.mapping.PluginHandler
+import vdi.core.plugin.mapping.PluginHandlers
+import vdi.core.s3.DatasetDirectory
+import vdi.core.s3.DatasetObjectStore
 import vdi.model.DatasetManifestFilename
 import vdi.model.DatasetMetaFilename
 import vdi.model.OriginTimestamp
+import vdi.model.api.internal.FileName
 import vdi.model.api.internal.WarningResponse
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetManifest
@@ -154,7 +155,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     }
 
     try {
-      val handler = PluginHandlers[datasetMeta.type.name, datasetMeta.type.version] ?:
+      val handler = PluginHandlers[datasetMeta.type] ?:
         return kLogger.warn("attempted to import dataset {}/{} but no plugin is currently enabled for dataset type {}", userID, datasetID, datasetMeta.type)
 
       processImportJob(handler, datasetMeta, userID, datasetID, datasetDir)
@@ -255,12 +256,12 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
             dd.putManifestFile(manifest!!)
           }
 
-          WarningsFileName -> {
+          FileName.WarningsFile -> {
             kLogger.debug("deserializing warnings for dataset {}/{}", userID, datasetID)
             warnings = JSON.readValue<WarningResponse>(stream).warnings.toList()
           }
 
-          DataZipName -> {
+          FileName.DataFile -> {
             kLogger.debug("writing install-ready zip contents to object store for dataset {}/{}", userID, datasetID)
             dd.getInstallReadyFile().writeContents(stream)
             hasData = true

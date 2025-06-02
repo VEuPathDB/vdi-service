@@ -1,7 +1,7 @@
 package vdi.daemon.pruner
 
 import vdi.config.raw.vdi.daemons.PrunerConfig
-import vdi.lib.modules.AbortCB
+import vdi.core.modules.AbortCB
 
 /**
  * Constructs a new [DatasetPruner] instance with the given (or defaulted)

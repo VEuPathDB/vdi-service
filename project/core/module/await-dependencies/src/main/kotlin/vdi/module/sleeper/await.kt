@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory
 import java.net.Socket
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import vdi.core.config.StackConfig
+import vdi.config.raw.StackConfig
+import vdi.config.raw.kafka.KafkaConfig
+import vdi.config.raw.rabbit.RabbitConfig
 import vdi.config.raw.vdi.*
 import vdi.core.err.StartupException
 
@@ -45,11 +47,11 @@ private suspend fun awaitKafka(config: KafkaConfig, timeout: Duration, logger: L
   }
 }
 
-private suspend fun awaitRabbit(config: RabbitConfigs, timeout: Duration, logger: Logger) {
+private suspend fun awaitRabbit(config: RabbitConfig, timeout: Duration, logger: Logger) {
   awaitNamed("rabbit", logger) {
     awaitRemote(
-      config.global.connection.server.host,
-      config.global.connection.server.port ?: if (config.global.connection.tls == false) 5672u else 5671u,
+      config.connection.server.host,
+      config.connection.server.port ?: if (config.connection.tls == false) 5672u else 5671u,
       timeout
     )
   }

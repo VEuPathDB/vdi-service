@@ -1,8 +1,9 @@
 package vdi.service.plugin.server
 
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.response.respondText
 import vdi.json.toJSONString
 
 suspend inline fun ApplicationCall.respond204() =

@@ -5,8 +5,8 @@ import java.sql.Connection
 import vdi.core.db.app.model.DatasetInstallMessage
 import vdi.core.db.app.sql.setInstallStatus
 import vdi.core.db.app.sql.setInstallType
-import vdi.lib.db.jdbc.setDatasetID
-import vdi.lib.db.jdbc.setDateTime
+import vdi.core.db.jdbc.setDatasetID
+import vdi.core.db.jdbc.setDateTime
 
 private fun sql(schema: String) =
 // language=oracle

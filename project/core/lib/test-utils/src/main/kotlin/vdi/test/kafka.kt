@@ -7,9 +7,9 @@ import org.mockito.kotlin.mock
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
 import kotlin.time.Duration
-import vdi.lib.kafka.*
-import vdi.lib.kafka.router.KafkaRouter
-import vdi.lib.kafka.router.KafkaRouterFactory
+import vdi.core.kafka.*
+import vdi.core.kafka.router.KafkaRouter
+import vdi.core.kafka.router.KafkaRouterFactory
 
 fun mockEventMessage(
   userID: UserID? = null,

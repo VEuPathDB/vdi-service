@@ -1,6 +1,6 @@
-package vdi.lib.plugin.client.response.uni
+package vdi.core.plugin.client.response.uni
 
-import vdi.lib.plugin.client.PluginHandlerClientResponse
+import vdi.core.plugin.client.PluginHandlerClientResponse
 
 /**
  * Uninstall Client Response
@@ -11,7 +11,7 @@ import vdi.lib.plugin.client.PluginHandlerClientResponse
  * * [UninstallBadRequestResponse]
  * * [UninstallUnexpectedErrorResponse]
  */
-sealed interface UninstallResponse : PluginHandlerClientResponse {
+sealed interface UninstallResponse: PluginHandlerClientResponse {
   override val isSuccessResponse: Boolean
     get() = type == UninstallResponseType.Success
 

@@ -1,5 +1,5 @@
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
 }
 
 dependencies {
@@ -10,8 +10,7 @@ dependencies {
 
 
   implementation(libs.kt.coroutines)
-  implementation(libs.log.slf4j.api)
-  implementation(kotlin("stdlib-jdk8"))
 
   implementation(common.config)
+  implementation(common.logging)
 }

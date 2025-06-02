@@ -2,11 +2,11 @@ package vdi.core.db.app.sql.dataset_visibility
 
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
+import java.sql.Connection
+import vdi.core.db.jdbc.setDatasetID
+import vdi.core.db.jdbc.setUserID
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
-import java.sql.Connection
-import vdi.lib.db.jdbc.setDatasetID
-import vdi.lib.db.jdbc.setUserID
 
 private fun sql(schema: String) =
 // language=oracle

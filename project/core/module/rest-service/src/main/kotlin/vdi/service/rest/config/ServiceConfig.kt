@@ -5,11 +5,11 @@ import org.veupathdb.lib.container.jaxrs.config.DbOptions
 import org.veupathdb.lib.container.jaxrs.config.DbOptionsImpl
 import org.veupathdb.lib.container.jaxrs.config.Options
 import java.util.Optional
-import vdi.core.config.ManifestConfig
-import vdi.core.config.StackConfig
-import org.veupathdb.vdi.core.config.DatabaseConnectionConfig
-import org.veupathdb.vdi.core.config.DirectDatabaseConnectionConfig
-import org.veupathdb.vdi.core.config.LDAPDatabaseConnectionConfig
+import vdi.config.raw.ManifestConfig
+import vdi.config.raw.StackConfig
+import vdi.config.raw.db.DatabaseConnectionConfig
+import vdi.config.raw.db.DirectDatabaseConnectionConfig
+import vdi.config.raw.db.LDAPDatabaseConnectionConfig
 
 class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : Options() {
   private val coreConfig = config.core
@@ -25,7 +25,7 @@ class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : O
     Optional.of(coreConfig
       .authentication
       .adminToken
-      .unwrap())
+      .asString)
 
   override fun getServerPort() =
     Optional.ofNullable(coreConfig.http?.bindPort?.toInt() ?: 80)
@@ -40,13 +40,13 @@ class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : O
     Optional.of(coreConfig.authentication.oauth.clientID)
 
   override fun getOAuthClientSecret() =
-    Optional.of(coreConfig.authentication.oauth.clientSecret.unwrap())
+    Optional.of(coreConfig.authentication.oauth.clientSecret.asString)
 
   override fun getKeyStoreFile() =
     Optional.ofNullable(coreConfig.authentication.oauth.keystoreFile)
 
   override fun getKeyStorePassPhrase() =
-    Optional.ofNullable(coreConfig.authentication.oauth.keystorePass?.unwrap())
+    Optional.ofNullable(coreConfig.authentication.oauth.keystorePass?.asString)
 
   override fun getAppDbOpts() =
     coreConfig.databases?.applicationDB.toDbOptions()
@@ -75,7 +75,7 @@ class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : O
         null, // port
         null, // db name
         username,
-        password.unwrap(),
+        password.asString,
         null, // platform
         poolSize?.toInt(),
         "app-db",
@@ -86,7 +86,7 @@ class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : O
         server.port?.toInt(),
         dbName,
         username,
-        password.unwrap(),
+        password.asString,
         SupportedPlatform.toPlatform(platform),
         poolSize?.toInt(),
         "app-db"

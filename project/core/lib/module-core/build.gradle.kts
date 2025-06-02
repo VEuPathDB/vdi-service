@@ -1,5 +1,5 @@
 plugins {
-  id("vdi.conventions")
+  id("build-conventions")
 }
 
 dependencies {
@@ -8,6 +8,8 @@ dependencies {
   implementation(project(":lib:external-s3"))
 
   implementation(libs.s34k)
-  implementation(common.json)
   implementation(libs.log.slf4j.api)
+
+  implementation(common.json)
+  implementation(common.util)
 }

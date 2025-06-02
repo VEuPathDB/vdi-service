@@ -1,7 +1,6 @@
 package vdi.service.rest.generated.model;
 
 public final class JsonField {
-  public static final String INSTALL_TARGETS = "InstallTargets";
   public static final String ACCEPTED = "accepted";
   public static final String ACTION = "action";
   public static final String ADDRESS = "address";

@@ -1,13 +1,13 @@
 package vdi.service.rest.server.outputs
 
-import vdi.lib.db.cache.model.AdminDatasetDetailsRecord
+import vdi.core.db.cache.model.AdminDatasetDetailsRecord
 import vdi.service.rest.generated.model.InternalDatasetDetails
 import vdi.service.rest.generated.model.InternalDatasetDetailsImpl
 import vdi.service.rest.generated.model.SyncControlRecordImpl
 
 internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): InternalDatasetDetails =
   InternalDatasetDetailsImpl().also {
-    it.datasetType = DatasetTypeOutput(record.typeName, record.typeVersion)
+    it.datasetType = record.type.toExternal()
     it.owner = record.ownerID.toLong()
     it.isDeleted = record.isDeleted
     it.origin = record.origin

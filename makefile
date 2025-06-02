@@ -30,3 +30,9 @@ build-plugin-server:
 .PHONY: build-core-server
 build-core-server:
 	@$(GRADLE) :core:build
+
+.PHONY: raml-gen
+raml-gen:
+	@which node || nvm --version 2>/dev/null || (echo 'NodeJS not found on $$PATH'; exit 1)
+	@$(GRADLE) -q :core:module:rest-service:generate-jaxrs :core:generate-raml-docs --rerun-tasks
+

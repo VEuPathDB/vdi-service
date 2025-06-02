@@ -5,15 +5,17 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
 import vdi.model.data.UserID
-import vdi.model.data.DatasetMeta
 import vdi.json.JSON
 import java.time.OffsetDateTime
+import vdi.model.data.DatasetMetadata
+import vdi.model.data.DatasetVisibility
 import vdi.service.rest.generated.model.*
+import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
 
 fun DatasetProxyPostMeta.cleanup() {
   (this as DatasetMetaBase).cleanup()
   datasetType?.cleanup()
-  visibility = visibility ?: DatasetVisibility.PRIVATE
+  visibility = visibility ?: APIVisibility.PRIVATE
 }
 
 fun DatasetProxyPostMeta.validate(errors: ValidationErrors) {
@@ -23,9 +25,9 @@ fun DatasetProxyPostMeta.validate(errors: ValidationErrors) {
 }
 
 fun DatasetProxyPostMeta.toInternal(userID: UserID, url: String?) =
-  DatasetMeta(
+  DatasetMetadata(
     type             = datasetType.toInternal(),
-    installTargets         = installTargets.toSet(),
+    installTargets  = installTargets.toSet(),
     owner            = userID,
     name             = name,
     shortName        = shortName,

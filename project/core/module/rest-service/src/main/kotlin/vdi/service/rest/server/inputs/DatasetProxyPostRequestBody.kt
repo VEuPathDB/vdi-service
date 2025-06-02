@@ -4,7 +4,7 @@ package vdi.service.rest.server.inputs
 import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
 import vdi.model.data.UserID
-import vdi.model.data.DatasetMeta
+import vdi.model.data.DatasetMetadata
 import vdi.model.data.DatasetVisibility
 import java.time.OffsetDateTime
 import vdi.service.rest.generated.model.*
@@ -40,9 +40,9 @@ fun DatasetProxyPostRequestBody.validate(): ValidationErrors {
 }
 
 internal fun DatasetProxyPostRequestBody.toDatasetMeta(userID: UserID) =
-  DatasetMeta(
+  DatasetMetadata(
     type             = details.datasetType.toInternal(),
-    installTargets         = details.installTargets.toSet(),
+    installTargets   = details.installTargets.toSet(),
     owner            = userID,
     name             = details.name,
     shortName        = details.shortName,

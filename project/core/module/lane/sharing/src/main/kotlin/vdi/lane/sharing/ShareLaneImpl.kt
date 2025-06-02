@@ -8,21 +8,21 @@ import org.slf4j.Logger
 import java.sql.SQLException
 import java.time.OffsetDateTime
 import vdi.core.db.app.*
-import vdi.core.logging.logger
-import vdi.core.logging.markedLogger
+import vdi.logging.logger
+import vdi.logging.markedLogger
 import vdi.core.metrics.Metrics
-import vdi.lib.async.WorkerPool
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.DatasetRecord
-import vdi.lib.db.cache.model.ShareOfferRecord
-import vdi.lib.db.cache.model.ShareReceiptRecord
-import vdi.lib.db.cache.withTransaction
-import vdi.lib.modules.AbortCB
-import vdi.lib.modules.AbstractVDIModule
-import vdi.lib.s3.DatasetObjectStore
-import vdi.lib.s3.files.DatasetShare
+import vdi.core.async.WorkerPool
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetRecord
+import vdi.core.db.cache.model.ShareOfferRecord
+import vdi.core.db.cache.model.ShareReceiptRecord
+import vdi.core.db.cache.withTransaction
+import vdi.core.modules.AbortCB
+import vdi.core.modules.AbstractVDIModule
+import vdi.core.s3.DatasetObjectStore
+import vdi.core.s3.files.DatasetShare
 import vdi.model.data.*
-import vdi.lib.s3.files.DatasetShare as S3Share
+import vdi.core.s3.files.DatasetShare as S3Share
 
 /**
  * Share Trigger Event Handler

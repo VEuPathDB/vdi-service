@@ -1,9 +1,5 @@
 package vdi.core.db.app
 
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
-import vdi.model.data.*
 import java.sql.Connection
 import java.sql.SQLException
 import java.time.OffsetDateTime
@@ -29,8 +25,9 @@ import vdi.core.db.app.sql.dataset_publication.deleteDatasetPublications
 import vdi.core.db.app.sql.dataset_publication.insertDatasetPublications
 import vdi.core.db.app.sql.dataset_visibility.*
 import vdi.core.db.app.sql.sync_control.*
-import vdi.lib.db.app.TargetDBPlatform
-import vdi.lib.db.model.SyncControlRecord
+import vdi.core.db.model.SyncControlRecord
+import vdi.db.app.TargetDBPlatform
+import vdi.model.data.*
 
 class AppDBTransactionImpl(
   override val project: InstallTargetID,

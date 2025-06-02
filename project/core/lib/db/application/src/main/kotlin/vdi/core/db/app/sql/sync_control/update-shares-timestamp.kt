@@ -1,11 +1,11 @@
 package vdi.core.db.app.sql.sync_control
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.model.data.DatasetID
 import java.sql.Connection
 import java.time.OffsetDateTime
-import vdi.lib.db.jdbc.setDatasetID
-import vdi.lib.db.jdbc.setDateTime
+import vdi.core.db.jdbc.setDatasetID
+import vdi.core.db.jdbc.setDateTime
+import vdi.model.data.DatasetID
 
 private fun sql(schema: String) =
 // language=oracle

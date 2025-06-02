@@ -2,11 +2,11 @@
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.s3.s34k.objects.StreamObject
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetRecord
 import vdi.model.data.DatasetID
-import vdi.model.data.UserID
 import vdi.model.data.DatasetVisibility
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.DatasetRecord
+import vdi.model.data.UserID
 import vdi.service.rest.generated.model.DatasetFileListingImpl
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore

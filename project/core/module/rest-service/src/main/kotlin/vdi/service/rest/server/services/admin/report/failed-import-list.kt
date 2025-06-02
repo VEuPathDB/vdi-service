@@ -1,9 +1,9 @@
 package vdi.service.rest.server.services.admin.report
 
-import org.veupathdb.vdi.lib.common.field.toUserID
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.BrokenImportListQuery
-import vdi.lib.db.cache.model.SortOrder
+import vdi.model.data.toUserID
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.BrokenImportListQuery
+import vdi.core.db.cache.model.SortOrder
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort
 import vdi.service.rest.generated.model.BrokenImportListingImpl
@@ -62,6 +62,6 @@ private fun AdminReportsImportsFailedGetSort.toInternal(): BrokenImportListQuery
 
 private fun AdminReportsImportsFailedGetOrder.toInternal(): SortOrder =
   when (this) {
-    AdminReportsImportsFailedGetOrder.ASC -> SortOrder.ASCENDING
-    AdminReportsImportsFailedGetOrder.DESC -> SortOrder.DESCENDING
+    AdminReportsImportsFailedGetOrder.ASC -> SortOrder.Ascending
+    AdminReportsImportsFailedGetOrder.DESC -> SortOrder.Descending
   }

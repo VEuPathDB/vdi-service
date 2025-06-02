@@ -9,12 +9,12 @@ import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
 import vdi.model.data.UserID
 import java.time.OffsetDateTime
-import vdi.lib.db.app.AppDB
-import vdi.lib.db.app.AppDBAccessor
-import vdi.lib.db.app.AppDBTransaction
-import vdi.lib.db.app.model.*
-import vdi.lib.db.model.ReconcilerTargetRecord
-import vdi.lib.db.model.SyncControlRecord
+import vdi.core.db.app.AppDB
+import vdi.core.db.app.AppDBAccessor
+import vdi.core.db.app.AppDBTransaction
+import vdi.core.db.app.model.*
+import vdi.core.db.model.ReconcilerTargetRecord
+import vdi.core.db.model.SyncControlRecord
 
 fun mockAppDB(
   accessor: (InstallTargetID, DataType) -> AppDBAccessor? = ::twoParamNull,

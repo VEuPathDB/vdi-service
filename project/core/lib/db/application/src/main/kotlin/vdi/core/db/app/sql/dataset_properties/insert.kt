@@ -1,11 +1,11 @@
 package vdi.core.db.app.sql.dataset_properties
 
 import io.foxcapades.kdbc.withPreparedUpdate
+import java.sql.Connection
+import vdi.core.db.jdbc.setDatasetID
+import vdi.json.JSON
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetProperties
-import vdi.json.JSON
-import java.sql.Connection
-import vdi.lib.db.jdbc.setDatasetID
 
 private fun sql(schema: String) =
 // language=oracle

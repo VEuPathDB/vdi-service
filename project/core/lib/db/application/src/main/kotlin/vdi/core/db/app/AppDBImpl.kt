@@ -1,10 +1,10 @@
 package vdi.core.db.app
 
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.app.sql.dataset_install_message.selectInstallStatuses
+import vdi.model.data.DatasetID
 import vdi.model.data.DatasetType
+import vdi.model.data.InstallTargetID
 
 internal object AppDBImpl : AppDB {
   override fun getDatasetStatuses(targets: Map<InstallTargetID, Collection<DatasetID>>): Map<DatasetID, Map<InstallTargetID, InstallStatuses>> {

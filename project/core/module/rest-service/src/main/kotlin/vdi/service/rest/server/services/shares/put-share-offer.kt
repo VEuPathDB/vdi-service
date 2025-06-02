@@ -4,27 +4,25 @@ package vdi.service.rest.server.services.shares
 
 import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.NotFoundException
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.core.db.cache.model.ShareOfferRecord
+import vdi.core.db.cache.model.ShareReceiptRecord
+import vdi.core.db.cache.withTransaction
 import vdi.model.data.DatasetID
-import vdi.model.data.UserID
 import vdi.model.data.DatasetShareOffer
 import vdi.model.data.DatasetShareReceipt
-import vdi.model.data.VDIShareOfferAction
-import vdi.model.data.VDIShareReceiptAction
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.DatasetImportStatus
-import vdi.lib.db.cache.model.DatasetShareOfferImpl
-import vdi.lib.db.cache.model.DatasetShareReceiptImpl
-import vdi.lib.db.cache.withTransaction
-import vdi.service.rest.generated.model.DatasetShareOffer
+import vdi.model.data.UserID
 import vdi.service.rest.generated.model.ShareOfferAction
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.outputs.ForbiddenError
 import vdi.service.rest.server.outputs.NotFoundError
 import vdi.service.rest.server.outputs.wrap
+import vdi.service.rest.generated.model.DatasetShareOffer as APIShare
 import vdi.service.rest.generated.resources.DatasetsVdiIdSharesRecipientUserId.PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse as PutOffer
 
-fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareOffer): PutOffer {
+fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entity: APIShare): PutOffer {
   val dataset = CacheDB().selectDataset(datasetID) ?: throw NotFoundException()
 
   // If the dataset has been deleted, then it isn't sharable, throw a 403.
@@ -43,13 +41,13 @@ fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entity: Datase
     dataset.ownerID,
     datasetID,
     recipientID,
-    DatasetShareReceipt(VDIShareReceiptAction.Accept)
+    DatasetShareReceipt(DatasetShareReceipt.Action.Accept)
   )
 
   return PutOffer.respond204()
 }
 
-fun <T: ControllerBase> T.putShareOffer(datasetID: DatasetID, recipientID: UserID, entity: DatasetShareOffer): PutOffer {
+fun <T: ControllerBase> T.putShareOffer(datasetID: DatasetID, recipientID: UserID, entity: APIShare): PutOffer {
   val ownerID = userID // For clarity
 
   // Lookup the target dataset or throw a 404 if it doesn't exist.
@@ -85,7 +83,7 @@ fun <T: ControllerBase> T.putShareOffer(datasetID: DatasetID, recipientID: UserI
 
     // Write or overwrite the share offer object.
     DatasetStore.putShareOffer(ownerID, datasetID, recipientID, internal)
-    it.upsertDatasetShareOffer(DatasetShareOfferImpl(datasetID, recipientID, internal.action))
+    it.upsertDatasetShareOffer(ShareOfferRecord(datasetID, recipientID, internal.action))
 
     if (existingShareReceipt == null) {
       // We automatically accept share offers on behalf of the recipient user.  The
@@ -94,20 +92,20 @@ fun <T: ControllerBase> T.putShareOffer(datasetID: DatasetID, recipientID: UserI
         ownerID,
         datasetID,
         recipientID,
-        DatasetShareReceipt(VDIShareReceiptAction.Accept)
+        DatasetShareReceipt(DatasetShareReceipt.Action.Accept)
       )
 
-      it.upsertDatasetShareReceipt(DatasetShareReceiptImpl(datasetID, recipientID, VDIShareReceiptAction.Accept))
+      it.upsertDatasetShareReceipt(ShareReceiptRecord(datasetID, recipientID, DatasetShareReceipt.Action.Accept))
     }
   }
 
   return PutOffer.respond204()
 }
 
-private fun DatasetShareOffer.toInternal() =
-  vdi.model.data.DatasetShareOffer(when (action) {
+private fun APIShare.toInternal() =
+  DatasetShareOffer(when (action) {
     null                    -> throw BadRequestException("share action is required")
-    ShareOfferAction.GRANT  -> VDIShareOfferAction.Grant
-    ShareOfferAction.REVOKE -> VDIShareOfferAction.Revoke
+    ShareOfferAction.GRANT  -> DatasetShareOffer.Action.Grant
+    ShareOfferAction.REVOKE -> DatasetShareOffer.Action.Revoke
   })
 

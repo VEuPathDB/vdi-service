@@ -11,6 +11,7 @@ import vdi.json.JSON
 import vdi.model.DatasetManifestFilename
 import vdi.model.DatasetMetaFilename
 import vdi.model.OriginTimestamp
+import vdi.model.api.internal.FileName
 import vdi.model.data.DatasetFileInfo
 import vdi.model.data.DatasetManifest
 import vdi.service.plugin.consts.ExitStatus
@@ -59,7 +60,7 @@ class ImportHandler(context: ImportContext, executor: ScriptExecutor, metrics: S
     val inputFiles   = unpackInput()
     val warnings     = executeScript()
     val outputFiles  = collectOutputFiles()
-    val dataFilesZip = workspace.resolve(DataZipName)
+    val dataFilesZip = workspace.resolve(FileName.DataFile)
       .also { it.compress(outputFiles) }
 
     inputDirectory.deleteRecursively()
@@ -206,7 +207,7 @@ class ImportHandler(context: ImportContext, executor: ScriptExecutor, metrics: S
       .apply { outputStream().use { JSON.writeValue(it, scriptContext.request.meta) } }
 
   private fun writeWarningFile(warnings: Collection<String>) =
-    outputDirectory.resolve(WarningFileName)
+    outputDirectory.resolve(FileName.WarningsFile)
       .createFile()
       .apply { outputStream().use { JSON.writeValue(it, WarningsFile(warnings)) } }
 

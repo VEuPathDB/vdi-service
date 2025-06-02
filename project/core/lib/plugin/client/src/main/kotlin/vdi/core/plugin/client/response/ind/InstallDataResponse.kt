@@ -1,6 +1,6 @@
-package vdi.lib.plugin.client.response.ind
+package vdi.core.plugin.client.response.ind
 
-import vdi.lib.plugin.client.PluginHandlerClientResponse
+import vdi.core.plugin.client.PluginHandlerClientResponse
 
 /**
  * Install Data Client Response

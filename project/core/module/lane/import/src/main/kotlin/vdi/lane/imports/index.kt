@@ -1,7 +1,7 @@
 package vdi.lane.imports
 
 import vdi.config.raw.vdi.VDIConfig
-import vdi.lib.modules.AbortCB
+import vdi.core.modules.AbortCB
 
 fun ImportLane(config: VDIConfig, abortCB: AbortCB) =
   ImportLane(ImportLaneConfig(config), abortCB)

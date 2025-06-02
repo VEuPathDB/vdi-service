@@ -1,53 +1,51 @@
-package vdi.lib.plugin.registry
+package vdi.core.plugin.registry
 
+import vdi.model.data.DatasetType
+import vdi.config.loadAndCacheStackConfig
+import vdi.config.parse.ConfigurationException
 import vdi.model.data.DataType
-import vdi.core.config.loadAndCacheStackConfig
-import vdi.config.raw.vdi.PluginConfig
 
-object PluginRegistry : Iterable<Triple<DataType, String, PluginDetails>> {
-  private val mapping = HashMap<KeyPair, PluginDetails>(8)
+object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
+  private val mapping: Map<DatasetType, PluginDetails>
 
   init {
-    init(loadAndCacheStackConfig().vdi.plugins)
-  }
+    val conflicts = HashMap<DatasetType, List<String>>(1)
 
-  @Suppress("MemberVisibilityCanBePrivate")
-  fun init(plugins: Iterable<PluginConfig>) {
-    // Only needed for testing, but doesn't hurt anything in general.
-    mapping.clear()
+    mapping = loadAndCacheStackConfig().vdi.plugins.values
+      .asSequence()
+      .flatMap { plug ->
+        val details = PluginDetails(
+          plug.displayName,
+          plug.projectIDs?.toList() ?: emptyList(),
+          plug.typeChangesEnabled ?: false,
+        )
 
-    plugins.forEach { plug ->
-      val details = PluginDetails(
-        plug.displayName,
-        plug.projectIDs?.toList() ?: emptyList(),
-        plug.typeChangesEnabled ?: false,
-      )
-
-      plug.dataTypes.forEach { dt ->
-        val kp = KeyPair(DataType.of(dt.name), dt.version)
-
-        if (kp in mapping)
-          throw IllegalStateException("bad config: multiple plugins declare data type $kp")
-
-        mapping[kp] = details
+        plug.dataTypes.asSequence()
+          .map { DatasetType(DataType.of(it.name), it.version) }
+          .onEach {
+            if (it in conflicts)
+              conflicts[it] = conflicts[it]!! + plug.displayName
+            else
+              conflicts[it] = listOf(plug.displayName)
+          }
+          .map { it to details }
       }
-    }
+      .toMap()
+
+    conflicts.asSequence()
+      .filter { (_, v) -> v.size > 1 }
+      .map { (k, v) -> "multiple plugins declare type $k: ${v.joinToString(", ")}" }
+      .joinToString("\n")
+      .takeUnless { it.isBlank() }
+      ?.also { throw ConfigurationException(it) }
   }
 
-  fun contains(type: DataType, version: String) =
-    KeyPair(type, version) in mapping
+  fun contains(type: DatasetType) = type in mapping
 
-  operator fun get(type: DataType, version: String) =
-    mapping[KeyPair(type, version)]
+  operator fun get(type: DatasetType) = mapping[type]
 
-  operator fun get(type: String, version: String) =
-    mapping[KeyPair(DataType.of(type), version)]
-
-  override fun iterator() =
-    asSequence().iterator()
+  override fun iterator() = asSequence().iterator()
 
   fun asSequence() =
-    sequence { mapping.forEach { (k, v) -> yield(Triple(k.type, k.version, v)) } }
-
-  private data class KeyPair(val type: DataType, val version: String)
+    sequence { mapping.forEach { (k, v) -> yield(k to v) } }
 }

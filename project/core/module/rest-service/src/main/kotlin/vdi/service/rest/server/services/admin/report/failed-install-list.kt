@@ -2,13 +2,13 @@ package vdi.service.rest.server.services.admin.report
 
 import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
-import vdi.lib.db.app.AppDB
-import vdi.lib.db.app.AppDatabaseRegistry
-import vdi.lib.db.app.model.DatasetRecord
-import vdi.lib.db.app.model.InstallStatus
-import vdi.lib.db.app.model.InstallStatuses
-import vdi.lib.db.app.model.InstallType
-import vdi.lib.db.cache.model.DatasetImportStatus
+import vdi.core.db.app.AppDB
+import vdi.core.db.app.AppDatabaseRegistry
+import vdi.core.db.app.model.DatasetRecord
+import vdi.core.db.app.model.InstallStatus
+import vdi.core.db.app.model.InstallStatuses
+import vdi.core.db.app.model.InstallType
+import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.service.rest.generated.model.BrokenDatasetInstallDetails
 import vdi.service.rest.generated.model.BrokenDatasetInstallDetailsImpl
 import vdi.service.rest.generated.model.BrokenDatasetInstallReportBodyImpl
@@ -16,6 +16,7 @@ import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstalls
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse.respond200WithApplicationJson
 import vdi.service.rest.server.outputs.DatasetStatusInfo
 import vdi.service.rest.server.outputs.DatasetTypeOutput
+import vdi.service.rest.server.outputs.toExternal
 
 /**
  * Lists datasets across all registered projects that are in the broken install
@@ -111,9 +112,9 @@ private fun DatasetRecord.toDetails(
   statuses: Map<InstallTargetID, InstallStatuses>,
 ) =
   BrokenDatasetInstallDetailsImpl().also { out ->
-    out.datasetId   = datasetID.toString()
-    out.owner       = owner.toLong()
-    out.datasetType = DatasetTypeOutput(typeName, typeVersion)
-    out.projectIds  = projects.toList()
-    out.status      = DatasetStatusInfo(DatasetImportStatus.Complete, statuses)
+    out.datasetId      = datasetID.toString()
+    out.owner          = owner.toLong()
+    out.datasetType    = type.toExternal()
+    out.installTargets = projects.toList()
+    out.status         = DatasetStatusInfo(DatasetImportStatus.Complete, statuses)
   }

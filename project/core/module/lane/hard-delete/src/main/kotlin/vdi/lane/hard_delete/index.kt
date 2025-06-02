@@ -1,7 +1,7 @@
 package vdi.lane.hard_delete
 
 import vdi.config.raw.vdi.VDIConfig
-import vdi.lib.modules.AbortCB
+import vdi.core.modules.AbortCB
 
 fun HardDeleteLane(
   config: VDIConfig,

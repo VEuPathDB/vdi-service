@@ -2,19 +2,19 @@ package vdi.service.rest.server.services.admin.report
 
 import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
-import vdi.lib.db.app.AppDB
-import vdi.lib.db.app.model.InstallStatuses
-import vdi.lib.db.cache.CacheDB
-import vdi.lib.db.cache.model.AdminAllDatasetsRow
-import vdi.lib.db.cache.query.AdminAllDatasetsQuery
+import vdi.core.db.app.AppDB
+import vdi.core.db.app.model.InstallStatuses
+import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.AdminAllDatasetsRow
+import vdi.core.db.cache.query.AdminAllDatasetsQuery
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse.respond200WithApplicationJson
 import vdi.service.rest.server.inputs.toSafeLimit
 import vdi.service.rest.server.inputs.toSafeOffset
 import vdi.service.rest.server.outputs.DatasetStatusInfo
-import vdi.service.rest.server.outputs.DatasetTypeOutput
 import vdi.service.rest.server.outputs.DatasetVisibility
+import vdi.service.rest.server.outputs.toExternal
 import vdi.service.rest.util.defaultZone
 
 internal fun listAllDatasets(
@@ -92,7 +92,7 @@ private fun AllDatasetsListEntry(
   AllDatasetsListEntryImpl().also {
     it.datasetId = row.datasetID.toString()
     it.owner = row.ownerID.toLong()
-    it.datasetType = DatasetTypeOutput(row.typeName, row.typeVersion)
+    it.datasetType = row.type.toExternal()
     it.visibility = DatasetVisibility(row.visibility)
     it.name = row.name
     it.shortName = row.shortName
@@ -101,7 +101,7 @@ private fun AllDatasetsListEntry(
     it.description = row.description
     it.sourceUrl = row.sourceURL
     it.origin = row.origin
-    it.projectIds = row.projects
+    it.installTargets = row.projects
     it.status = DatasetStatusInfo(row.importStatus, statuses)
     it.created = row.created.defaultZone()
     it.isDeleted = row.isDeleted

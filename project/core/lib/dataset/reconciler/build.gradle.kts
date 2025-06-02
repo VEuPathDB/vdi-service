@@ -1,6 +1,4 @@
-plugins {
-  id("vdi.conventions")
-}
+plugins { id("build-conventions") }
 
 dependencies {
   implementation(project(":lib:common"))
@@ -17,6 +15,9 @@ dependencies {
   implementation(libs.kt.coroutines)
 
   implementation(common.config)
+  implementation(common.db.target)
+  implementation(common.logging)
+  implementation(common.util)
 
   testImplementation(kotlin("test"))
   testImplementation(libs.junit.api)

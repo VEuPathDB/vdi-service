@@ -1,11 +1,12 @@
 package vdi.service.plugin.server.context
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.ktor.http.*
-import io.ktor.server.application.*
+import io.ktor.http.ContentType
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.UnsupportedMediaTypeException
-import io.ktor.server.request.*
+import io.ktor.server.request.contentType
+import io.ktor.server.request.receiveStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import vdi.json.JSON
@@ -29,6 +30,7 @@ suspend fun ApplicationCall.withUninstallContext(
       request        = body,
       installPath    = appCtx.pathFactory.makePath(body.installTarget, body.vdiID),
       databaseConfig = it,
+      scriptConfig   = appCtx.config.uninstallScript,
     ))
   } }
 }

@@ -6,7 +6,7 @@ import org.veupathdb.lib.container.jaxrs.health.Dependency.TestResult
 import org.veupathdb.lib.container.jaxrs.health.DependencySource
 import org.veupathdb.lib.container.jaxrs.health.ExternalDependency
 import vdi.core.health.RemoteDependencies
-import vdi.core.logging.logger
+import vdi.logging.logger
 import vdi.core.health.Dependency as VDep
 
 internal class DependencySource() : DependencySource {

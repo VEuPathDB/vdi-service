@@ -1,4 +1,4 @@
-package vdi.lib.plugin.client.response.inm
+package vdi.core.plugin.client.response.inm
 
 sealed interface InstallMetaUnexpectedErrorResponse : InstallMetaResponse {
   override val type: InstallMetaResponseType

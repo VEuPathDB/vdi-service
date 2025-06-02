@@ -1,12 +1,12 @@
 package vdi.core.plugin.mapping
 
-import vdi.model.data.DataType
 import vdi.model.data.InstallTargetID
-import vdi.lib.plugin.client.PluginHandlerClient
-import vdi.lib.plugin.registry.PluginDetails
+import vdi.core.plugin.client.PluginHandlerClient
+import vdi.core.plugin.registry.PluginDetails
+import vdi.model.data.DatasetType
 
 internal class PluginHandlerImpl(
-  override val type: DataType,
+  override val type: DatasetType,
   override val client: PluginHandlerClient,
   private val details: PluginDetails
 ) : PluginHandler {

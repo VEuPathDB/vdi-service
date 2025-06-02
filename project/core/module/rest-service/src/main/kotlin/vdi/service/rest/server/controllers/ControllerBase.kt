@@ -5,9 +5,9 @@ import org.veupathdb.lib.container.jaxrs.model.UserInfo
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
-import org.veupathdb.vdi.lib.common.field.toUserID
+import vdi.model.data.toUserID
 import java.net.URI
-import vdi.core.logging.logger
+import vdi.logging.logger
 
 sealed class ControllerBase(val request: ContainerRequest) {
   val logger = logger()

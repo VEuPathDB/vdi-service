@@ -1,6 +1,6 @@
 package vdi.lane.reconciliation
 
-import vdi.lib.modules.VDIModule
+import vdi.core.modules.VDIModule
 
 /**
  * Reconciliation Event Handler
