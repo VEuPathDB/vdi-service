@@ -1,0 +1,202 @@
+openapi: "3.1.0"
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+
+info:
+  title: VEuPathDB Dataset Installer
+  version: "1.7.0"
+  license:
+    name: Apache 2.0
+    identifier: Apache-2.0
+
+servers:
+- description: Active Instance
+  url: https://veupathdb.org/vdi
+- description: UGA Instance
+  url: https://w1.veupathdb.org/vdi
+- description: UPenn Instance
+  url: https://w2.veupathdb.org/vdi
+
+tags:
+- name: dataset
+  description: Dataset resource API operations.
+
+paths:
+  /datasets:
+    get:
+      tags: [ dataset ]
+      operationId: getDatasetList
+      summary: List Datasets
+      parameters:
+      - name: project_id
+        # language=markdown
+        description: |-
+          Project ID filter.
+
+          ID of the VEuPathDB project that results should be filtered to.
+
+          This means only datasets that are relevant to the project ID given
+          will be returned.
+
+          Additionally, this controls the sites on which the dataset
+          installation status will be checked. Meaning, if this parameter is
+          specified and set to, for example, `PlasmoDB`, the status block in the
+          response objects will only include installation status details for
+          `PlasmoDB` and not any other sites that the dataset may have been
+          installed into.
+
+          This is desirable for UI-based client use to improve request
+          processing time by the service.
+        in: query
+        required: false
+        schema: { $ref: "api-schema/types/common/fields/install-target.json" }
+      - name: ownership
+        in: query
+        required: false
+        # language=markdown
+        description: |-
+          Ownership status filter.
+
+          Enum of:
+
+          * `any`
+          * `owned`
+          * `shared`
+
+          If set to `any` the results are not filtered.
+
+          If set to `owned`, the results will be filtered to only results that
+          are owned by the requesting user.
+
+          If set to `shared`, the results will be filtered to only results that
+          are shared with the requesting user.
+        schema:
+          type: string
+          enum:
+          - any
+          - owned
+          - shared
+          default: any
+      # language=markdown
+      description: |-
+        Returns a list of datasets available to the requesting user, optionally
+        filtered by query parameters.
+
+        Results are sorted by creation date in reverse order. This means the
+        most recently created datasets will be first and the oldest dataset will
+        be last in the list.
+      responses:
+        "200":
+          description: List of objects containing basic dataset details.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "api-schema/types/responses/datasets/list-datasets.json" }
+        "400": { $ref: "#/components/responses/400" }
+        "401": { $ref: "#/components/responses/401" }
+        "500": { $ref: "#/components/responses/500" }
+
+    post:
+      tags: [ dataset ]
+      operationId: createDataset
+      summary: Create New Dataset
+      # language=markdown
+      description: |-
+        `multipart/form-data` HTTP `POST` request to upload a new dataset.
+
+        Note, the root of the body description below is of the multipart form data
+        fields and not of a literal JSON object.
+      
+        The `meta` field, however, _is_ expected to be a JSON object.
+      
+        The `file` field may be one of:
+      
+        * a raw data file to import
+        * a `.zip` file containing one or more files to import
+        * a `.tar.gz` or `.tgz` file containing one or more files to import.
+      
+        The `url` field may point to a file that is one of the allowed upload types.
+      
+        The `url` and `file` fields cannot both be used at the same time, one must
+        be used or the other.  Providing both fields will result in a 4xx range error
+        response.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { $ref: "api-schema/types/requests/datasets/create-dataset.json" }
+      responses:
+        201:
+          description: Dataset successfully submitted for processing.
+          headers:
+            Location: { $ref: "#/components/headers/location" }
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  datasetId: { $ref: "api-schema/types/common/dataset/dataset-id.json" }
+                required:
+                - datasetId
+                unevaluatedProperties: false
+        204:
+          description: Nothing
+          headers:
+            Location: { $ref: "#/components/headers/location" }
+
+  /datasets/{dataset-id}:
+    parameters:
+    - $ref: "#/components/parameters/datasetId"
+    get:
+      tags: [ dataset ]
+      operationId: getDataset
+      responses:
+        200:
+          description: "Dataset details response."
+          content:
+            application/json:
+              schema: { $ref: "api-schema/types/responses/datasets/get-by-id.json" }
+        301:
+          # language=markdown
+          description: |-
+            Target dataset has been moved by replacement with a new dataset ID.
+          headers:
+            Location: { $ref: "#/components/headers/location" }
+        401: { $ref: "#/components/responses/401" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
+
+
+components:
+  parameters:
+    datasetId:
+      name: "dataset-id"
+      in: path
+      required: true
+      schema: { $ref: "api-schema/types/common/dataset/dataset-id.json" }
+  headers:
+    location:
+      schema:
+        type: string
+        format: uri
+  responses:
+    400:
+      description: Bad Request Error
+      content:
+        application/json:
+          schema: { $ref: "api-schema/types/common/errors/400.json" }
+    401:
+      description: Unauthorized Error
+      content:
+        application/json:
+          schema: { $ref: "api-schema/types/common/errors/401.json" }
+    404:
+      description: Not Found Error
+      content:
+        application/json:
+          schema: { $ref: "api-schema/types/common/errors/404.json" }
+    500:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema: { $ref: "api-schema/types/common/errors/500.json" }

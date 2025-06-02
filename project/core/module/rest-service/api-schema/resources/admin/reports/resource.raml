@@ -1,0 +1,204 @@
+#%RAML 1.0 Resource
+
+displayName: Admin Reports
+
+/datasets:
+  displayName: Dataset Info
+  /list-all:
+    displayName: List All
+    get:
+      is: [ PaginatedList ]
+      description: |
+        Lists all datasets known to VDI via the internal cache database.
+
+        Providing a `limit` query param value of `-1` indicates that ALL records
+        should be returned.  In this case, the `offset` parameter will be
+        ignored.
+
+        **Example - List All Live Datasets**
+        ```sh
+        curl --header "Admin-Token: ${VDI_ADMIN_TOKEN}" \
+             "${VDI_INSTANCE}/admin/reports/datasets/list-all?limit=-1" \
+             > results.json
+        ```
+
+        **Example - Paginated by Project**
+        ```sh
+        curl --header "Admin-Token: ${VDI_ADMIN_TOKEN}" \
+             "${VDI_INSTANCE}/admin/reports/datasets/list-all?offset=100&install_target=PlasmoDB" \
+             > results.json
+        ```
+      queryParameters:
+        install_target?:
+          description: |
+            Filter results by install target project ID.
+
+            This field is not case sensitive.
+          type: string
+        include_deleted?:
+          description: |
+            Controls whether datasets that have been marked as deleted should be
+            included in the results.
+          type: boolean
+          default: false
+      securedBy:
+      - AdminToken
+      responses:
+        200:
+          body: lib.AllDatasetsListResponse
+        500:
+          body: lib.ServerError
+
+  /{vdi-id}:
+    displayName: Internal Dataset Details
+    uriParameters:
+      vdi-id: lib.VdiId
+    get:
+      description: |
+        **Example**
+        ```sh
+        curl --header "Admin-Token: ${VDI_ADMIN_TOKEN}" \
+             "${VDI_INSTANCE}/admin/reports/datasets/123dk37h" \
+             > details.json
+        ```
+      securedBy:
+      - AdminToken
+      responses:
+        200:
+          body: lib.InternalDatasetDetails
+        400:
+          body: lib.BadRequestError
+        404:
+          body: lib.NotFoundError
+        500:
+          body: lib.ServerError
+
+/imports:
+  displayName: Dataset Imports
+  /failed:
+    displayName: Failed Imports
+    get:
+      displayName: List
+      is: [ PaginatedList ]
+      description: |
+        Lists datasets that failed to import.
+
+        **Note**: A failed import is different from an invalid import.  Failed
+        imports are caused by process bugs or errors, invalid imports are caused
+        by bad user input.
+
+        **Example - List All**
+        ```sh
+        curl --header "Admin-Token: ${VDI_ADMIN_TOKEN}" \
+             "${VDI_INSTANCE}/admin/reports/imports/failed?limit=-1" \
+             > failed-imports.json
+        ```
+      queryParameters:
+        user?:
+          description: |
+            Filters results to only records owned by the target user.
+          type: lib.UserId
+        before?:
+          description: |
+            Filters results to only records created before the given datetime.
+          type: lib.PartialDate
+        after?:
+          description: |
+            Filter results to only records created after the given datetime.
+          type: lib.PartialDate
+        sort?:
+          description: Sorting field.
+          enum:
+          - date
+          default: date
+        order?:
+          description: Sort order.
+          enum:
+          - asc
+          - desc
+          default: desc
+      securedBy:
+      - AdminToken
+      responses:
+        200:
+          body: lib.BrokenImportListing
+        400:
+          body: lib.BadRequestError
+        500:
+          body: lib.ServerError
+
+/installs:
+  displayName: Dataset Installs
+  /failed:
+    displayName: Failed Install Report
+    get:
+      description: |
+        Lists datasets that failed installation due to a non-user error, such as
+        a system outage or service bug.
+
+        The returned report may be either a list of dataset ID strings, or a
+        list of dataset detail objects depending on the provided `expanded`
+        query parameter value.  By default, dataset detail objects are returned.
+
+        **Example - Dataset ID List**
+        ```sh
+        curl --header "Admin-Token: ${VDI_ADMIN_TOKEN}" \
+             "${VDI_INSTANCE}/admin/reports/installs/failed?expanded=false" \
+             > failed-installs.json
+        ```
+
+        **Example - Detailed Dataset List**
+        ```sh
+        curl --header "Admin-Token: ${VDI_ADMIN_TOKEN}" \
+             "${VDI_INSTANCE}/admin/reports/installs/failed" \
+             > failed-installs.json
+        ```
+      queryParameters:
+        expanded?:
+          description: |
+            Whether the returned broken dataset install list should be expanded
+            to include additional details about each dataset or should be just
+            a simple list of dataset IDs.
+          type: boolean
+          default: true
+      securedBy:
+      - AdminToken
+      responses:
+        200:
+          body: lib.BrokenDatasetInstallReportBody
+        500:
+          body: lib.ServerError
+
+/object-store:
+  displayName: MinIO
+  /list-all:
+    displayName: Full Contents List
+    get:
+      description: |
+        Lists all the objects currently in the object store backing VDI.
+
+        This endpoint returns the data in TSV format with the following
+        columns for each object in the store:
+
+        * Key/path
+        * Size (in bytes)
+        * Last modified date
+
+        **Example**
+        ```sh
+        curl --header "Admin-Token: ${VDI_ADMIN_TOKEN}" \
+             "${VDI_INSTANCE}/admin/reports/object-store/list-all" \
+             > minio-objects.tsv
+        ```
+      securedBy:
+      - AdminToken
+      responses:
+        200:
+          body:
+            text/plain:
+              type: any
+              example: |
+                /foo/bar/fizz	342345	2023-08-13T15:34:04.0342Z
+                /foo/bar/buzz	32125	2023-08-13T15:34:06.1254Z
+        500:
+          body: lib.ServerError

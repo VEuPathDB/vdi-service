@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset Publication",
+  "properties": {
+    "pubMedId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 30
+    },
+    "citation": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 2000
+    },
+    "isPrimary": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "pubMedId"
+  ],
+  "unevaluatedProperties": false
+}

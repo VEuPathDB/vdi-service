@@ -1,0 +1,43 @@
+#%RAML 1.0 Method
+
+displayName: Replace Dataset
+
+description: |
+  Uploads a new dataset data revision to replace the existing target dataset.
+
+  This method is effectively a modification of the `PATCH` request rules for the
+  metadata body to add the required field `revisionNote`.
+
+  This means that omitting fields from the request or setting them to `null`
+  will tell VDI to use the original dataset's values for those fields.
+
+
+body:
+  multipart/form-data: lib.DatasetPutRequestBody
+
+responses:
+  201:
+    description: Replacement dataset request has been accepted for processing.
+    headers:
+      Location:
+        type: string
+        description: URL to the new dataset resource.
+        required: true
+    body: lib.DatasetPutResponseBody
+  400:
+    body: lib.BadRequestError
+  401:
+    body: lib.UnauthorizedError
+  403:
+    body: lib.ForbiddenError
+  404:
+    body: lib.NotFoundError
+  422:
+    description: |
+      Unprocessable Entity.
+
+      Request body was syntactically valid JSON, however the body failed
+      validation.
+    body: lib.UnprocessableEntityError
+  500:
+    body: lib.ServerError

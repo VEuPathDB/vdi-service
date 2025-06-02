@@ -336,12 +336,12 @@ services:
 #      MICROBIOME_LDAP: ${MICROBIOME_LDAP}
 #      UNIDB_LDAP: ${UNIDB_LDAP}
 
-  plugin-phenotype:
+  plugin-wrangler:
     image: veupathdb/vdi-plugin-wrangler:${VDI_PLUGIN_WRANGLER_TAG:-latest}
     networks:
       internal:
         aliases:
-        - phenotype
+        - wrangler
       monitoring-ext: { }
     labels:
       prometheus.scrape_enabled: "true"

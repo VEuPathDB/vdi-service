@@ -5,7 +5,7 @@
       "title": "Study Type Definition",
       "type": "object",
       "properties": {
-        "displayName": {
+        "type": {
           "type": "string",
           "minLength": 3
         },
@@ -21,7 +21,7 @@
         }
       },
       "required": [
-        "displayName",
+        "type",
         "designs"
       ]
     },

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Error Status",
+  "type": "string",
+  "enum": [
+    "bad-request",
+    "unauthorized",
+    "forbidden",
+    "not-found",
+    "bad-method",
+    "conflict",
+    "gone",
+    "invalid-input",
+    "failed-dependency",
+    "server-error"
+  ],
+  "x-enum-varnames": [
+    "BadRequest",
+    "Unauthorized",
+    "Forbidden",
+    "NotFound",
+    "MethodNotAllowed",
+    "Conflict",
+    "Gone",
+    "Unprocessable",
+    "FailedDependency",
+    "ServerError"
+  ]
+}

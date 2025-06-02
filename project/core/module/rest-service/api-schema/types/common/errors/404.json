@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Not Found Error",
+  "allOf": [
+    { "$ref": "error.json" },
+    { "examples": [ { "status": "not-found" } ] }
+  ],
+  "x-discriminator-value": "not-found"
+}

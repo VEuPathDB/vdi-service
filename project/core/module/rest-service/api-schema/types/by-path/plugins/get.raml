@@ -1,0 +1,19 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../common.raml
+
+types:
+  PluginListItem:
+    displayName: Plugin Info
+    additionalProperties: false
+    properties:
+      displayName: string
+      typeName: string
+      typeVersion: string
+      projects?:
+        description: |
+          Projects that this plugin is restricted to.  An empty or absent list
+          indicates that the plugin has no project restrictions and may be used
+          on any site.
+        type: common.InstallTargetID[]

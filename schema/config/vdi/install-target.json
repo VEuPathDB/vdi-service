@@ -17,12 +17,10 @@
       "oneOf": [
         {
           "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 3
-          },
+          "items": { "$ref": "plugin.json#/$defs/dataType" },
           "unevaluatedItems": false,
-          "uniqueItems": true
+          "uniqueItems": true,
+          "minItems": 1
         },
         {
           "type": "array",
@@ -31,7 +29,8 @@
           "maxItems": 1,
           "unevaluatedItems": false
         }
-      ]
+      ],
+      "default": [ "*" ]
     },
     "controlDb": {
       "$comment": "type defined in 'allOf' block below",

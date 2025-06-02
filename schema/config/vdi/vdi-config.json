@@ -33,10 +33,9 @@
     "ldap": { "$ref": "../common.json#/$defs/ldap" },
     "objectStore": { "$ref": "object-store.json" },
     "plugins": {
-      "type": "array",
-      "items": { "$ref": "plugin.json" },
-      "minItems": 1,
-      "uniqueItems": true,
+      "type": "object",
+      "additionalProperties": { "$ref": "plugin.json" },
+      "minProperties": 1,
       "unevaluatedItems": false
     },
     "rabbit": {

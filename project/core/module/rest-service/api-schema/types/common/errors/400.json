@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bad Request Error",
+  "allOf": [
+    { "$ref": "error.json" },
+    {
+      "required": [ "message" ],
+      "examples": [ {
+        "status": "bad-request",
+        "message": "could not parse request body as json"
+      } ]
+    }
+  ],
+  "x-discriminator-value": "bad-request"
+}

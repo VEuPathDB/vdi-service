@@ -1,0 +1,72 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../common.raml
+
+types:
+  DatasetObjectPurgeRequestBody:
+    displayName: Dataset Object Purge Request
+    additionalProperties: false
+    properties:
+      userId: common.UserId
+      datasetId: common.VdiId
+
+  InstallCleanupRequestBody:
+    displayName: Install Cleanup Request
+    description: |
+      Object controlling the install cleanup process and what datasets it should
+      target.
+
+      Requesters should specify one of the fields `all` or `targets` to control
+      what datasets will be cleaned up.  If neither is specified, the endpoint
+      will just run the reinstaller, unless `skip-run` is set, in which case the
+      endpoint will do nothing.
+    additionalProperties: false
+    properties:
+      all?:
+        type: boolean
+        default: false
+      targets?:
+        type: InstallCleanupTarget[]
+        minItems: 1
+        uniqueItems: true
+
+  InstallCleanupTarget:
+    displayName: Install Cleanup Target
+    additionalProperties: false
+    properties:
+      datasetId: common.VdiId
+      installTarget: common.InstallTargetID
+
+  DatasetProxyPostRequestBody:
+    displayName: Dataset Proxy Post Request
+    additionalProperties: false
+    properties:
+      details:
+        description: Metadata about the dataset being submitted.
+        type: DatasetProxyPostMeta
+      dataFiles?:
+        description: |-
+          Dataset files to upload.
+
+          This field is incompatible with the `url` field.
+        type: file[]
+      url?:
+        description: |-
+          URL to a dataset file to upload.
+
+          This field is incompatible with the `file` field.
+        type: string
+      docFiles?:
+        description: |-
+          Files containing additional dataset documentation or meta info that is
+          not part of the data itself.
+        type: file[]
+
+  DatasetProxyPostMeta:
+    type: DatasetPostMeta
+    additionalProperties: false
+    properties:
+      createdOn?:
+        displayName: Creation Date
+        type: datetime

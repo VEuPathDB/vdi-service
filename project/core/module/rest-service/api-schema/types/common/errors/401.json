@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unauthorized Request Error",
+  "allOf": [
+    { "$ref": "error.json" },
+    { "examples": [ { "status": "unauthorized" } ] }
+  ],
+  "x-discriminator-value": "unauthorized"
+}

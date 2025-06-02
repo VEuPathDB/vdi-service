@@ -20,13 +20,13 @@ sharedDefinitions:
   # Study Type Definitions
   studyTypes:
 
-  - displayName: &experimentalDisplayName Experimental
+  - type: &experimentalDisplayName Experimental
     designs: &experimentalDesigns
     - Cluster-randomized controlled trial
     - Quasi-experimental study
     - Randomized controlled/clinical trial
 
-  - displayName: &observationalDisplayName Observational
+  - type: &observationalDisplayName Observational
     designs: &observationalDesigns
     - Case series study
     - Case-control study
@@ -36,11 +36,11 @@ sharedDefinitions:
     - Panel study
     - Surveillance study
 
-  - displayName: &otherDisplayName n/a
+  - type: &otherDisplayName n/a
     designs: &otherDesigns
     - Other
 
-  - displayName: &reviewDisplayName Review
+  - type: &reviewDisplayName Review
     designs: &reviewDesigns
     - Meta-analysis
 
@@ -67,46 +67,50 @@ properties:
     type: string
 
   diseases:
-    type: array
-    items:
-      type: string
-      minLength: 3
-    unevaluatedItems: false
-    uniqueItems: true
+    type: string
 
   sampleTypes:
-    type: array
-    items:
-      type: string
-      minLength: 3
-    unevaluatedItems: false
-    uniqueItems: true
+    type: string
 
   countries:
-    type: array
-    items:
-      type: string
-      minLength: 3
-      maxLength: 64
-    unevaluatedItems: false
-    uniqueItems: true
+    type: string
 
   years:
-    type: array
-    items:
-      type: integer
-      minimum: 1800
-      exclusiveMaximum: 3000
-    unevaluatedItems: false
-    uniqueItems: true
+    type: object
+    properties:
+      start:
+        type: integer
+        minimum: 1000
+        maximum: 9999
+      end:
+        type: integer
+        minimum: 1000
+        maximum: 9999
+    required:
+    - start
+    - end
+    unevaluatedProperties: false
 
   ages:
-    type: array
-    items:
-      type: string
-      minLength: 1
-    unevaluatedItems: false
-    uniqueItems: true
+    type: string
+
+  funding:
+    type: object
+    properties:
+      agency:
+        type: string
+        minLength: 3
+      awardNumber:
+        type: string
+        minLength: 3
+    allOf:
+    - if:
+        properties:
+          awardNumber: {}
+      then:
+        required:
+        - agency
+    unevaluatedProperties: false
 
 required:
 - studyDesign

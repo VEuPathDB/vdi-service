@@ -1,0 +1,37 @@
+package vdi.lib.db.cache.sql.update
+
+import io.foxcapades.kdbc.withPreparedUpdate
+import vdi.model.data.DatasetID
+import vdi.model.data.DatasetMetadata
+import java.sql.Connection
+import vdi.lib.db.cache.util.setDatasetVisibility
+import vdi.lib.db.jdbc.setDatasetID
+
+// language=postgresql
+private const val SQL = """
+UPDATE
+  vdi.dataset_metadata
+SET
+  name = ?
+, short_name = ?
+, short_attribution = ?
+, summary = ?
+, description = ?
+, visibility = ?
+WHERE
+  dataset_id = ?
+"""
+
+internal fun Connection.updateDatasetMeta(
+  datasetID: DatasetID,
+  meta: DatasetMetadata,
+) =
+  withPreparedUpdate(SQL) {
+    setString(1, meta.name)
+    setString(2, meta.shortName)
+    setString(3, meta.shortAttribution)
+    setString(5, meta.summary)
+    setString(6, meta.description)
+    setDatasetVisibility(7, meta.visibility)
+    setDatasetID(8, datasetID)
+  }

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset Contact",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 300
+    },
+    "isPrimary": {
+      "type": "boolean",
+      "default": false
+    },
+    "email": {
+      "description": "**IMPORTANT**: Required if `isPrimary == true`.",
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 4000
+    },
+    "affiliation": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "city": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "state": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "country": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "address": {
+      "type": "string",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "name",
+    "affiliation"
+  ],
+  "unevaluatedProperties": false,
+  "if": {
+    "properties": {
+      "isPrimary": {
+        "const": true
+      }
+    },
+    "required": [
+      "isPrimary"
+    ]
+  },
+  "then": {
+    "required": [
+      "name",
+      "email",
+      "affiliation"
+    ]
+  }
+}
