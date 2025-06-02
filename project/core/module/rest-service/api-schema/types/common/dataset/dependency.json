@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset Dependency",
+  "type": "object",
+  "properties": {
+    "resourceIdentifier": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 50
+    },
+    "resourceDisplayName": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 100
+    },
+    "resourceVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50
+    }
+  },
+  "required": [
+    "resourceIdentifier",
+    "resourceDisplayName",
+    "resourceVersion"
+  ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset ID",
+  "description": "Randomly generated identifier for a dataset, optionally suffixed with a revision counter.",
+  "type": "string",
+  "minLength": 11,
+  "maxLength": 16,
+  "pattern": "^\\w{11,16}(?:\\.\\d+)?$",
+  "examples": [ "VZI4Ztg5Yc1d9", "VZI4Ztg5Yc1d9.1", "VZI4Ztg5Yc1d9.22" ]
+}

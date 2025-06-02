@@ -1,0 +1,9 @@
+[libraries]
+config = { module = "common:config" }
+json = { module = "common:json" }
+logging = { module = "common:logging" }
+model = { module = "common:model" }
+db-target = { module = "common:target-db" }
+util = { module = "common:util" }
+
+schema = { module = "vdi:schemata"}

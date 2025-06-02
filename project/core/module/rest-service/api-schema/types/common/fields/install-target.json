@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Install Target",
+  "type": "string",
+  "enum": [
+    "AmoebaDB",
+    "ClinEpiDB",
+    "CryptoDB",
+    "FungiDB",
+    "GiardiaDB",
+    "HostDB",
+    "MicrobiomeDB",
+    "MicrosporidiaDB",
+    "OrthoMCL",
+    "PiroplasmaDB",
+    "PlasmoDB",
+    "ToxoDB",
+    "TrichDB",
+    "TriTrypDB",
+    "VectorBase",
+    "VEuPathDB"
+  ]
+}

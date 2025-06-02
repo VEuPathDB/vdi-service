@@ -1,4 +1,5 @@
 version: 2
+
 updates:
 - package-ecosystem: gradle
   directories:
@@ -19,10 +20,12 @@ updates:
     log4j:
       patterns:
       - org.apache.logging.*
+
 - package-ecosystem: docker
   directory: "/"
   schedule:
     interval: monthly
+
 registries:
   github-packages:
     type: maven-repository

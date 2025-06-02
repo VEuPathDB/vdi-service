@@ -1,0 +1,44 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../common.raml
+
+types:
+  DatasetPutMetadata:
+    displayName: Dataset Put Request Metadata
+    type: DatasetPatchRequestBody
+    additionalProperties: false
+    properties:
+      origin: common.DatasetOrigin
+      revisionNote: common.DatasetRevisionNote
+
+  DatasetPutRequestBody:
+    displayName: Dataset Put Request
+    additionalProperties: false
+    properties:
+      details:
+        description: Metadata about the dataset being submitted.
+        type: DatasetPutMetadata
+      dataFiles?:
+        description: |
+          Dataset files to upload.
+
+          This field is incompatible with the `url` field.
+        type: file[]
+      url?:
+        description: |
+          URL to a dataset file to upload.
+
+          This field is incompatible with the `file` field.
+        type: string
+      docFiles?:
+        description: |-
+          Files containing additional dataset documentation or meta info that is
+          not part of the data itself.
+        type: file[]
+
+  DatasetPutResponseBody:
+    displayName: Dataset Put Response
+    additionalProperties: false
+    properties:
+      datasetId: common.VdiId

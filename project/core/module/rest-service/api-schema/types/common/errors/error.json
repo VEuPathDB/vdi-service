@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "API Error",
+  "type": "object",
+  "properties": {
+    "status": { "$ref": "error-status.json" },
+    "message": { "type": "string" }
+  },
+  "required": [ "status" ],
+  "unevaluatedProperties": false,
+  "discriminator": {
+    "propertyName": "status"
+  }
+}

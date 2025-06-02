@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Base Dataset Metadata",
+  "type": "object",
+  "properties": {
+    "name": { "$ref": "../dataset/name.json" },
+    "summary": { "$ref": "../dataset/summary.json" },
+    "origin": { "$ref": "../dataset/origin.json" },
+    "installTargets": { "$ref": "../fields/install-target-set.json" },
+    "description": { "$ref": "../dataset/description.json" },
+    "shortName": { "$ref": "../dataset/short-name.json" },
+    "shortAttribution": { "$ref": "../dataset/short-attribution.json" },
+    "properties": {
+      "type": "object",
+      "unevaluatedProperties": true
+    },
+    "dependencies": {
+      "type": "array",
+      "items": { "$ref": "../dataset/dependency.json" },
+      "uniqueItems": true,
+      "unevaluatedItems": false
+    },
+    "contacts": {
+      "type": "array",
+      "items": { "$ref": "../dataset/contact.json" },
+      "uniqueItems": true,
+      "contains": { "properties": { "isPrimary": { "const": true } } },
+      "maxContains": 1,
+      "unevaluatedItems": false
+    },
+    "hyperlinks": {
+      "type": "array",
+      "items": { "$ref": "../dataset/hyperlink.json" },
+      "uniqueItems": true,
+      "unevaluatedItems": false
+    },
+    "organisms": {
+      "type": "array",
+      "items": { "$ref": "../dataset/organism-abbreviation.json" },
+      "uniqueItems": true,
+      "unevaluatedItems": false
+    },
+    "publications": {
+      "type": "array",
+      "items": { "$ref": "../dataset/publication.json" },
+      "uniqueItems": true,
+      "unevaluatedItems": false
+    }
+  },
+  "required": [
+    "name",
+    "summary",
+    "origin",
+    "installTargets"
+  ],
+  "unevaluatedProperties": false
+}

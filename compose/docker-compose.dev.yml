@@ -25,9 +25,9 @@ services:
     image: veupathdb/minio-mc
     depends_on:
       minio-external:
-        condition: service_healthy
+        condition: service_started
       rabbit-external:
-        condition: service_healthy
+        condition: service_started
     networks:
     - internal
     entrypoint: >
@@ -36,7 +36,7 @@ services:
       mc alias set minioc http://minio-external:9000 minioUser minioPass;
       mc mb minioc/vdi;
       mc policy set public minioc/vdi;
-      mc event add minioc/vdi arn:minio:sqs::RABBIT:amqp --event put,delete;
+      mc event add minioc/vdi arn:minio:sqs::RABBIT:amqp --event put,delete,replica;
       exit 0;
       "
 
@@ -52,13 +52,6 @@ services:
     networks:
     - internal
     - rabbitmq
-    healthcheck:
-      test: nc -zv localhost:9000 || exit 1
-      start_period: 15s
-      start_interval: 5s
-      interval: 60s
-      timeout: 5s
-      retries: 3
     environment:
       MINIO_ROOT_USER: minioUser
       MINIO_ROOT_PASSWORD: minioPass
@@ -92,27 +85,39 @@ services:
       target: /datasets
 
     environment:
+#      LDAP_SERVER: ${LDAP_SERVER:?}
+#      ORACLE_BASE_DN: ${DB_LOOKUP_BASE_DN:?}
+#      CUSTOM_PATH: ${PLUGIN_HANDLER_NOOP_CUSTOM_PATH}
+#      SITE_BUILD: ${SITE_BUILD:?}
+#      DATASET_INSTALL_ROOT: /datasets
+#
+#      AMOEBA_LDAP: ${AMOEBA_LDAP}
+#      CLINEPI_LDAP: ${CLINEPI_LDAP}
+#      CRYPTO_LDAP: ${CRYPTO_LDAP}
+#      FUNGI_LDAP: ${FUNGI_LDAP}
+#      GIARDIA_LDAP: ${GIARDIA_LDAP}
+#      HOST_LDAP: ${HOST_LDAP}
+#      MICROBIOME_LDAP: ${MICROBIOME_LDAP}
+#      MICROSPORIDIA_LDAP: ${MICROSPORIDIA_LDAP}
+#      ORTHO_LDAP: ${ORTHO_LDAP}
+#      PIROPLASMA_LDAP: ${PIROPLASMA_LDAP}
+#      PLASMO_LDAP: ${PLASMO_LDAP}
+#      TOXO_LDAP: ${TOXO_LDAP}
+#      TRICH_LDAP: ${TRICH_LDAP}
+#      TRITRYP_LDAP: ${TRITRYP_LDAP}
+#      VECTOR_LDAP: ${VECTOR_LDAP}
       LDAP_SERVER: ${LDAP_SERVER:?}
       ORACLE_BASE_DN: ${DB_LOOKUP_BASE_DN:?}
-      CUSTOM_PATH: ${PLUGIN_HANDLER_NOOP_CUSTOM_PATH}
+      CUSTOM_PATH: ${PLUGIN_HANDLER_GENELIST_CUSTOM_PATH}
       SITE_BUILD: ${SITE_BUILD:?}
       DATASET_INSTALL_ROOT: /datasets
 
-      AMOEBA_LDAP: ${AMOEBA_LDAP}
-      CLINEPI_LDAP: ${CLINEPI_LDAP}
-      CRYPTO_LDAP: ${CRYPTO_LDAP}
-      FUNGI_LDAP: ${FUNGI_LDAP}
-      GIARDIA_LDAP: ${GIARDIA_LDAP}
-      HOST_LDAP: ${HOST_LDAP}
-      MICROBIOME_LDAP: ${MICROBIOME_LDAP}
-      MICROSPORIDIA_LDAP: ${MICROSPORIDIA_LDAP}
-      ORTHO_LDAP: ${ORTHO_LDAP}
-      PIROPLASMA_LDAP: ${PIROPLASMA_LDAP}
-      PLASMO_LDAP: ${PLASMO_LDAP}
-      TOXO_LDAP: ${TOXO_LDAP}
-      TRICH_LDAP: ${TRICH_LDAP}
-      TRITRYP_LDAP: ${TRITRYP_LDAP}
-      VECTOR_LDAP: ${VECTOR_LDAP}
+      DB_CONNECTION_ENABLED_MICROBIOME: true
+      DB_CONNECTION_NAME_MICROBIOME: MicrobiomeDB
+      DB_CONNECTION_LDAP_MICROBIOME: eda-inc
+      DB_CONNECTION_PASS_MICROBIOME: nothing
+      DB_CONNECTION_DATA_SCHEMA_MICROBIOME: vdi_dev_control_n
+      DB_CONNECTION_CONTROL_SCHEMA_MICROBIOME: vdi_dev_data_n
 
   rabbit-external:
     image: rabbitmq:3.11.13-management-alpine
@@ -124,28 +129,21 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: rabbitUser
       RABBITMQ_DEFAULT_PASS: rabbitPass
-    healthcheck:
-      test: [ CMD, curl, -f, http://localhost:15672 ]
-      start_period: 20s
-      start_interval: 3s
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
   service:
     build:
       context: ../
-      dockerfile: service/Dockerfile
+      dockerfile: Dockerfile
       args:
         GITHUB_USERNAME: ${GITHUB_USERNAME}
         GITHUB_TOKEN: ${GITHUB_TOKEN}
     depends_on:
       minio-external:
-        condition: service_healthy
+        condition: service_started
       minio-create-buckets:
         condition: service_completed_successfully
       rabbit-external:
-        condition: service_healthy
+        condition: service_started
     links:
     - rabbit-external
     - minio-external

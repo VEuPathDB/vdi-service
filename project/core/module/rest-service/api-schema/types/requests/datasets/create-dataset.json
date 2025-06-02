@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Create Dataset Request",
+  "description": "HTTP POST request body requesting the creation of a dataset from the components included in the request.\n\nFor a request to be considered valid, it must contain exactly 1 of the optional parameters `file` or `url`.  If a request body contains both a `file` and a `url` field value, the service will return a `400` error.",
+  "type": "object",
+  "properties": {
+    "details": { "$ref": "#/$defs/meta" },
+    "metaFiles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/file" },
+      "unevaluatedItems": false
+    }
+  },
+  "required": [ "details" ],
+  "oneOf": [
+    {
+      "title": "Create Dataset File Upload",
+      "type": "object",
+      "properties": {
+        "dataFiles": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/file" },
+          "minItems": 1,
+          "unevaluatedItems": false
+        }
+      },
+      "required": [ "dataFiles" ]
+    },
+    {
+      "title": "Create Dataset URL Upload",
+      "type": "object",
+      "properties": {
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "iri"
+          },
+          "minItems": 1,
+          "unevaluatedItems": false
+        }
+      },
+      "required": [ "urls" ]
+    }
+  ],
+  "$defs": {
+    "base": {
+      "title": "Base Create Dataset Request",
+      "type": "object",
+      "properties": {
+      },
+      "required": [ "details" ]
+    },
+    "meta": {
+      "title": "Dataset Post Meta",
+      "description": "Metadata about the dataset being submitted.",
+      "type": "object",
+      "properties": {
+        "datasetType": { "$ref": "../../common/dataset/data-type-short.json" },
+        "installTargets": { "$ref": "../../common/fields/install-target-set.json" },
+        "visibility": {
+          "$ref": "../../common/dataset/visibility.json",
+          "default": "private"
+        }
+      },
+      "unevaluatedProperties": false,
+      "required": [ "datasetType" ]
+    },
+    "file": {
+      "title": "Upload File",
+      "type": "file"
+    }
+  }
+}

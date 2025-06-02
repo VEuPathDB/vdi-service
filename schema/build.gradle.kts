@@ -9,6 +9,8 @@ plugins {
   `java-library`
 }
 
+java.targetCompatibility = JavaVersion.VERSION_21
+
 val jsonSchemaBuildDir = layout.buildDirectory.dir("json-schema").get().asFile
 
 sourceSets.main {
@@ -148,8 +150,9 @@ tasks.register("build-dataset-schema-resources") {
           ctx.executionConfig.formatAssertionsEnabled = true
         }
           .takeUnless { it.isEmpty() }
-          ?.also {
-            System.err.println(json.writerWithDefaultPrettyPrinter().writeValueAsString(it))
+          ?.also { msgs ->
+            System.err.println(json.writerWithDefaultPrettyPrinter().writeValueAsString(msgs))
+            System.err.println("\n\n$it validation failed!")
             throw IllegalStateException("invalid dataset property schema")
           }
 

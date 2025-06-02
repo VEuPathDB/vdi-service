@@ -2,13 +2,10 @@
 
 build/
 docs/
-gradle/wrapper/
-tmp/
-venv/
+api-schema/
 
-readme.adoc
 *.env
-gradlew
-gradlew.bat
-LICENSE
-docker-compose.*
+*.raml
+
+Dockerfile
+makefile

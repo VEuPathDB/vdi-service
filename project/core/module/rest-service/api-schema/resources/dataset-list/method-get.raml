@@ -1,0 +1,84 @@
+#%RAML 1.0 Method
+
+displayName: List Datasets
+
+description: |
+  Returns a list of datasets available to the requesting user, optionally
+  filtered by query parameters.
+
+  Results are sorted by creation date in reverse order.  This means the most
+  recently created datasets will be first and the oldest dataset will be last in
+  the list.
+
+queryParameters:
+  install_target:
+    displayName: Project ID Filter
+    description: |
+      ID of the VEuPathDB project that results should be filtered to.
+
+      This means only datasets that are relevant to the project ID given will be
+      returned.
+
+      Additionally, this controls the sites on which the dataset installation
+      status will be checked.  Meaning, if this parameter is specified and set
+      to, for example, `PlasmoDB`, the status block in the response objects will
+      only include installation status details for `PlasmoDB` and not any other
+      sites that the dataset may have been installed into.
+
+      This is desirable for UI-based client use to improve request processing
+      time by the service.
+    type: lib.InstallTargetID
+    example: PlasmoDB
+    required: false
+    default: null
+
+  ownership:
+    displayName: Dataset Ownership Filter
+    description: |
+      Ownership status filter.
+
+      Enum of:
+
+      * `any`
+      * `owned`
+      * `shared`
+
+      If set to `any` the results are not filtered.
+
+      If set to `owned`, the results will be filtered to only results that
+      are owned by the requesting user.
+
+      If set to `shared`, the results will be filtered to only results that
+      are shared with the requesting user.
+    type: string
+    default: any
+    required: false
+
+responses:
+  200:
+    body:
+      application/json:
+        type: lib.DatasetListEntry[]
+  400:
+    description: One or more request query parameters were not valid.
+    body:
+      application/json:
+        type: lib.BadRequestError
+        example:
+          status: bad-request
+          message: Invalid install_target value.
+  401:
+    body:
+      application/json:
+        type: lib.UnauthorizedError
+        example:
+          status: unauthorized
+          message: Users must be logged in to access this resource.
+  500:
+    body:
+      application/json:
+        type: lib.ServerError
+        example:
+          status: server-error
+          message: Dataset store is unreachable
+          requestId: b296c3d9-4032-41b1-906e-c97ccfc447e3

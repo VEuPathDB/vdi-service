@@ -71,50 +71,57 @@ vdi:
     server: cache-db
 
   plugins:
-  - server: bigwig:80
-    displayName: bigWig
-    dataTypes:
-    - name: bigwigfiles
-      version: 1.0
-    projectIds: *genomicsProjects
-  - server: biom:80
-    displayName: BIOM
-    dataTypes:
-    - name: biom
-      version: 1.0
-    projectIds:
-    - MicrobiomeDB
-  - server: genelist:80
-    displayName: Gene List
-    dataTypes:
-    - name: lightweight
-      version: 1.0
-    projectIds: *genomicsProjects
-  - server: isasimple:80
-    displayName: ISA Study
-    dataTypes:
-    - name: isasimple
-      version: 1.0
-    projectIds:
-    - ClinEpiDB
-  - server: noop:80
-    displayName: Lightweight
-    dataTypes:
-    - name: lightweight
-      version: 1.0
-    typeChangesEnabled: true
-  - server: phenotype:80
-    displayName: Phenotype
-    dataTypes:
-    - name: phenotype
-      version: 1.0
-    projectIds: *genomicsProjects
-  - server: rnaseq:80
-    displayName: RNA-Seq
-    dataTypes:
-    - name: rnaseq
-      version: 1.0
-    projectIds: *genomicsProjects
+    bigwig:
+      server: bigwig:80
+      displayName: bigWig
+      dataTypes:
+      - name: bigwigfiles
+        version: 1.0
+      projectIds: *genomicsProjects
+    biom:
+      server: biom:80
+      displayName: BIOM
+      dataTypes:
+      - name: biom
+        version: 1.0
+      projectIds:
+      - MicrobiomeDB
+    genelist:
+      server: genelist:80
+      displayName: Gene List
+      dataTypes:
+      - name: lightweight
+        version: 1.0
+      projectIds: *genomicsProjects
+    isasimple:
+      server: isasimple:80
+      displayName: ISA Study
+      dataTypes:
+      - name: isasimple
+        version: 1.0
+      projectIds:
+      - ClinEpiDB
+    noop:
+      server: noop:80
+      displayName: Lightweight
+      dataTypes:
+      - name: lightweight
+        version: 1.0
+      typeChangesEnabled: true
+    phenotype:
+      server: wrangler:80
+      displayName: Phenotype
+      dataTypes:
+      - name: phenotype
+        version: 1.0
+      projectIds: *genomicsProjects
+    rnaseq:
+      server: rnaseq:80
+      displayName: RNA-Seq
+      dataTypes:
+      - name: rnaseq
+        version: 1.0
+      projectIds: *genomicsProjects
 
   installTargets:
   - targetName: AmoebaDB

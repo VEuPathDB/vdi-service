@@ -1,0 +1,41 @@
+name: Plugin Server Release
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: corretto
+    - uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-read-only: false
+    - name: Get Server Version
+      id: version
+      run: |-
+        echo "release=$(gradle :plugin-server:properties | grep 'version: ' | cut -d' ' -f2)" >> $GITHUB_OUTPUT
+    - name: Build
+      run: |-
+        gradle :plugin-server:test :plugin-server:shadowJar
+        mv -t . service/build/libs/service.jar
+        sha256sum service.jar | cut -b1-64 | tr -d '\n' > service.jar.sha256
+        md5sum service.jar | cut -b1-32 | tr -d '\n' > service.jar.md5
+        sed "s/##VERSION_TEMPLATE##/${{steps.version.outputs.release}}/" scripts/docker-download.sh > docker-download.sh
+      env:
+        GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: false
+        files: |
+          service.jar
+          service.jar.sha256
+          service.jar.md5
+          docker-download.sh
+        generate_release_notes: true

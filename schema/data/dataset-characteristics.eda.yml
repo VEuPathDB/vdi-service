@@ -3,7 +3,6 @@ type: object
 
 title: EDA Dataset Characteristics
 
-
 # Reusable Value Definitions
 #
 # Values here are intended to be given anchors for reuse further down in the
@@ -20,13 +19,13 @@ sharedDefinitions:
   # Study Type Definitions
   studyTypes:
 
-  - displayName: &experimentalDisplayName Experimental
+  - type: &experimentalDisplayName Experimental
     designs: &experimentalDesigns
     - Cluster-randomized controlled trial
     - Quasi-experimental study
     - Randomized controlled/clinical trial
 
-  - displayName: &observationalDisplayName Observational
+  - type: &observationalDisplayName Observational
     designs: &observationalDesigns
     - Case series study
     - Case-control study
@@ -36,11 +35,11 @@ sharedDefinitions:
     - Panel study
     - Surveillance study
 
-  - displayName: &otherDisplayName n/a
+  - type: &otherDisplayName n/a
     designs: &otherDesigns
     - Other
 
-  - displayName: &reviewDisplayName Review
+  - type: &reviewDisplayName Review
     designs: &reviewDesigns
     - Meta-analysis
 

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Install Target Set",
+  "type": "array",
+  "items": { "$ref": "install-target.json" },
+  "minItems": 1,
+  "uniqueItems": true,
+  "unevaluatedItems": false
+}
