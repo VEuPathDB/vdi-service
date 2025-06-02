@@ -1,0 +1,11 @@
+.*
+
+build/
+docs/
+api-schema/
+
+*.env
+*.raml
+
+Dockerfile
+makefile

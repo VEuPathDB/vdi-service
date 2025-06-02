@@ -91,7 +91,7 @@ containerService {
 sourceSets {
   main {
     kotlin {
-      srcDir("src/generated/kotlin")
+//      srcDir("src/generated/kotlin")
     }
   }
 }

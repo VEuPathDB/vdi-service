@@ -1,3 +1,5 @@
+name: PR Build Check
+
 on:
   pull_request_target:
     types:
@@ -22,8 +24,8 @@ jobs:
         cache-read-only: false
     - name: Build
       run: |
-        printf "gpr.user=%s\ngpr.key=%s" ${GH_USERNAME} ${GH_TOKEN} > gradle.properties; \
-        ./gradlew --no-daemon clean build test
+        gradle :core:build :core:test
+        gradle :plugin-server:build :plugin-server:test
       env:
-        GH_USERNAME: ${{ secrets.GH_USERNAME }}
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

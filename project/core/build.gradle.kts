@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 
 plugins {
-  id("build-conventions") version "1.0"
+  id("build-conventions")
   alias(libs.plugins.shadow)
 }
 

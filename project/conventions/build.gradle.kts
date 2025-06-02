@@ -1,7 +1,6 @@
-plugins { `kotlin-dsl` }
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-group = "vdi"
-version = "1.0"
+plugins { `kotlin-dsl` }
 
 repositories {
   gradlePluginPortal()
@@ -13,7 +12,7 @@ dependencies {
 }
 
 kotlin {
-  jvmToolchain(21)
+  compilerOptions.jvmTarget = JvmTarget.JVM_21
 }
 
 fun plugin(plugin: Provider<PluginDependency>) =

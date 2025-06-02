@@ -93,9 +93,9 @@ COMPOSE_CMD   := $(CONTAINER_CMD) compose --env-file=$(ENV_FILE) $(MERGED_COMPOS
 build-image: BUILD_ID := ${USER}-$(shell date +'%s' | cut -c5-)
 build-image: GIT_COMMIT := $(shell git rev-parse HEAD)
 build-image:
-	@$(CONTAINER_CMD) build \
+	@cd ../.. && $(CONTAINER_CMD) build \
 	  -t veupathdb/vdi-service:latest \
-	  -f Dockerfile \
+	  -f project/core/Dockerfile \
       --build-arg="GITHUB_USERNAME=${GITHUB_USERNAME}" \
       --build-arg="GITHUB_TOKEN=${GITHUB_TOKEN}" \
       --build-arg="CONFIG_FILE=config/local-dev-config.yml" \

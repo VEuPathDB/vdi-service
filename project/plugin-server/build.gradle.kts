@@ -1,9 +1,9 @@
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
 plugins {
   id("build-conventions")
   alias(libs.plugins.shadow)
 }
+
+version = "8.2.0-beta.5"
 
 dependencies {
   implementation(common.db.target)
@@ -32,15 +32,11 @@ tasks.jar {
 }
 
 tasks.shadowJar {
-  exclude(
-    "**/Log4j2Plugins.dat"
-  )
+  exclude("**/Log4j2Plugins.dat")
   archiveFileName.set("service.jar")
 
   manifest {
-    attributes(mapOf(
-      "Main-Class" to "vdi.MainKt"
-    ))
+    attributes(mapOf("Main-Class" to "vdi.MainKt"))
   }
 }
 

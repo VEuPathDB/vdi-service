@@ -13,7 +13,8 @@ includeBuild("project/common") {
   }
 }
 
-includeBuild("project/plugin-server")
+if (file("project/plugin-server").exists())
+  includeBuild("project/plugin-server")
 
 includeBuild("schema") {
   dependencySubstitution { substitute(module("vdi:schemata")).using(project(":")) }
