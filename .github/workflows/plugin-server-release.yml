@@ -18,8 +18,8 @@ jobs:
     - name: Get Server Version
       id: version
       run: |-
-        printf "gpr.user=%s\ngpr.key=%s" ${GH_USERNAME} ${GH_TOKEN} > gradle.properties; \
-        version=$(gradle :plugin-server:properties | grep 'version: ' | cut -d' ' -f2)
+        printf "gpr.user=%s\ngpr.key=%s" ${GH_USERNAME} ${GH_TOKEN} > projects/plugin-server/gradle.properties
+        version=$(set -o pipefail; gradle :plugin-server:properties | grep 'version: ' | cut -d' ' -f2)
         echo release=$version >> $GITHUB_OUTPUT
       env:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
