@@ -65,6 +65,9 @@ properties:
   host:
     type: string
 
+  pathogen:
+    type: string
+
   diseases:
     type: string
 
