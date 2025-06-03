@@ -5,6 +5,17 @@ plugins {
 
 version = "8.2.0-beta.5"
 
+repositories {
+  maven {
+    name = "GitHubPackages"
+    url  = uri("https://maven.pkg.github.com/veupathdb/maven-packages")
+    credentials {
+      username = if (extra.has("github.username")) extra["github.username"] as String else System.getenv("GH_USERNAME")
+      password = if (extra.has("github.token")) extra["github.token"] as String else System.getenv("GH_TOKEN")
+    }
+  }
+}
+
 dependencies {
   implementation(common.db.target)
   implementation(common.config)
@@ -20,7 +31,6 @@ dependencies {
   implementation(libs.ktor.netty)
   implementation(libs.ktor.metrics)
 
-  implementation(libs.log.slf4j.api)
   implementation(libs.log.log4j.slf4j)
 
   testImplementation(libs.bundles.testing)
@@ -37,32 +47,5 @@ tasks.shadowJar {
 
   manifest {
     attributes(mapOf("Main-Class" to "vdi.MainKt"))
-  }
-}
-
-tasks.register("generate-raml-docs") {
-  doLast {
-    val outputFile = rootDir.resolve("docs/http-api.html")
-    outputFile.delete()
-    outputFile.createNewFile()
-
-    outputFile.outputStream().use { out ->
-      with(
-        ProcessBuilder(
-          "raml2html",
-          "api.raml",
-          "--theme", "raml2html-modern-theme"
-        )
-          .directory(projectDir)
-          .start()
-      ) {
-        inputStream.transferTo(out)
-        errorStream.transferTo(System.err)
-
-        if (waitFor() != 0) {
-          throw RuntimeException("raml2html process failed")
-        }
-      }
-    }
   }
 }
