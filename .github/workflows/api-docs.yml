@@ -31,7 +31,7 @@ jobs:
       with:
         cache-read-only: false
     - name: Install Python
-      uses: actions/setup-python@5.6
+      uses: actions/setup-python@5
       with:
         python-version: '3.13'
     - name: Install Schema Doc Generator
