@@ -22,19 +22,18 @@ jobs:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |-
-        env
         version=$(set -o pipefail; gradle :plugin-server:properties | grep 'version: ' | cut -d' ' -f2)
         echo release=$version >> $GITHUB_OUTPUT
     - name: Build
+      env:
+        GH_USERNAME: ${{ secrets.GH_USERNAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |-
         gradle :plugin-server:test :plugin-server:shadowJar
         mv -t . project/plugin-server/build/libs/service.jar
         sha256sum service.jar | cut -b1-64 | tr -d '\n' > service.jar.sha256
         md5sum service.jar | cut -b1-32 | tr -d '\n' > service.jar.md5
         sed "s/##VERSION_TEMPLATE##/${{steps.version.outputs.release}}/" scripts/docker-download.sh > docker-download.sh
-      env:
-        GH_USERNAME: ${{ secrets.GH_USERNAME }}
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 #    - name: Release
 #      uses: softprops/action-gh-release@v2
 #      with:

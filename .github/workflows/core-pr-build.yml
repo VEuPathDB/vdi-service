@@ -23,10 +23,9 @@ jobs:
       with:
         cache-read-only: false
     - name: Build
-      run: |
-        printf "gpr.user=%s\ngpr.key=%s" ${GH_USERNAME} ${GH_TOKEN} > gradle.properties; \
-        gradle :core:build :core:test
-        gradle :plugin-server:build :plugin-server:test
       env:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        gradle :core:build :core:test
+        gradle :plugin-server:build :plugin-server:test
