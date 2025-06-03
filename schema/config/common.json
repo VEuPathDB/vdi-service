@@ -16,12 +16,7 @@
       "type": "object",
       "properties": {
         "host": { "$ref": "#/$defs/host" },
-        "port": {
-          "oneOf": [
-            { "$ref": "#/$defs/port" },
-            { "type": "null" }
-          ]
-        }
+        "port": { "$ref": "#/$defs/port" }
       },
       "unevaluatedProperties": false,
       "examples": [
@@ -75,6 +70,7 @@
           ]
         },
         {
+          "title": "Connection Details",
           "oneOf": [
             {
               "title": "LDAP Common Name",

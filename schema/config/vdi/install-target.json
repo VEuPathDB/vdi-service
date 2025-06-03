@@ -16,6 +16,7 @@
       "description": "Optional list of data types that the install target supports.\n\nDefaults to supporting all data types from any plugins enabled for the install target.",
       "oneOf": [
         {
+          "title": "Specific Data Types",
           "type": "array",
           "items": { "$ref": "plugin.json#/$defs/dataType" },
           "unevaluatedItems": false,
@@ -23,6 +24,7 @@
           "minItems": 1
         },
         {
+          "title": "Catch-All",
           "type": "array",
           "items": { "const": "*" },
           "minItems": 1,
