@@ -252,7 +252,7 @@ log-rabbit: logs
 # ┃                                                                          ┃ #
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
-OUTPUT_DOC_DIR := "build/generated-docs"
+DOC_BUILD_DIR := "build/generated-docs"
 
 .PHONY: generate-service-docs
 generate-service-docs:

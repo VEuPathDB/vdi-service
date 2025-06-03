@@ -11,7 +11,8 @@ plugins {
 
 java.targetCompatibility = JavaVersion.VERSION_21
 
-val jsonSchemaBuildDir = layout.buildDirectory.dir("json-schema").get().asFile
+val jsonSchemaBuildDir = findProperty("SCHEMA_BUILD_DIR")?.let { File(it as String) }
+  ?: layout.buildDirectory.dir("json-schema").get().asFile
 
 sourceSets.main {
   resources.srcDir(jsonSchemaBuildDir)
@@ -100,6 +101,7 @@ tasks.register("build-config-schema-resource") {
       remove("\$schema")
     })
   }
+
   doLast {
     val cache = HashMap<File, Pair<String, Set<IntRange>>>(32)
     val buffer = StringBuilder(16384)

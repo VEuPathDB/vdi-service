@@ -36,3 +36,18 @@ raml-gen:
 	@which node || nvm --version 2>/dev/null || (echo 'NodeJS not found on $$PATH'; exit 1)
 	@$(GRADLE) -q :core:module:rest-service:generate-jaxrs :core:generate-raml-docs --rerun-tasks
 
+DOC_BUILD_DIR := build/generated-docs
+.PHONY: build-docs
+build-docs:
+	@rm -rf $(DOC_BUILD_DIR)
+	@mkdir -p $(DOC_BUILD_DIR)
+	@gradle -P DOC_BUILD_DIR=$(DOC_BUILD_DIR)/core -P DOC_FILE_NAME=index.html :core:generate-raml-docs
+	@gradle -P SCHEMA_BUILD_DIR=$(DOC_BUILD_DIR) \
+		:schema:build-dataset-schema-resources \
+		:schema:build-config-schema-resource
+	@generate-schema-doc \
+		--config expand_buttons \
+		--config examples_as_yaml \
+		--config no_link_to_reused_ref \
+		$(DOC_BUILD_DIR)/schema/config/full-config.json \
+		$(DOC_BUILD_DIR)/schema/config/index.html

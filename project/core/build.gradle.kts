@@ -59,8 +59,10 @@ tasks.register("download-dependencies") {
 }
 
 tasks.register("generate-raml-docs") {
-  val mainDocsDir  = rootDir.parentFile.resolve("docs")
-  val mainDocsFile = mainDocsDir.resolve("vdi-api.html")
+  val mainDocsDir  = findProperty("DOC_BUILD_DIR")?.let { File(it as String) }
+    ?: rootDir.parentFile.resolve("docs")
+  val mainDocsFile = findProperty("DOC_FILE_NAME")?.let{ mainDocsDir.resolve(it as String) }
+    ?: mainDocsDir.resolve("vdi-api.html")
 
   val restModule  = project(":module:rest-service")
   val restDocsDir = restModule.projectDir.resolve("docs")
@@ -88,26 +90,5 @@ tasks.register("generate-raml-docs") {
 
     // drop the empty inner docs dir
     restDocsDir.deleteRecursively()
-  }
-}
-
-tasks.register("compile-design-doc") {
-  doLast {
-    val command = arrayOf(
-      "asciidoctor",
-      "--backend", "html5",
-      "--out-file", "docs/design/1.0/design.html",
-      "docs/design/1.0/design.adoc"
-    )
-
-    println("Running ASCIIDoctor")
-    println(command.joinToString(" "))
-
-    with(ProcessBuilder(*command).start()) {
-      errorStream.bufferedReader().use { it.lines().forEach(::println) }
-      if (waitFor() != 0) {
-        throw RuntimeException("ASCIIDoctor command execution failed.")
-      }
-    }
   }
 }

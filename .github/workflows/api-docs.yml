@@ -1,101 +1,64 @@
+name: VDI API Docs
+
 on:
   workflow_dispatch: {}
-  push:
-    branches:
-    - main
-    paths:
-    - 'docs/vdi-api.html'
-    - 'service/schema/**'
-    - 'service/module/rest-service/api-schema/**'
-    - 'service/module/rest-service/*.raml'
-    - '.github/actions/api-doc-build/action.yml'
-    - '.github/actions/api-doc-env/action.yml'
-    - '.github/workflows/api-docs.yml'
+#  push:
+#    branches:
+#    - main
+#    paths:
+#    - 'docs/vdi-api.html'
+#    - 'service/schema/**'
+#    - 'service/module/rest-service/api-schema/**'
+#    - 'service/module/rest-service/*.raml'
+#    - '.github/actions/api-doc-build/action.yml'
+#    - '.github/actions/api-doc-env/action.yml'
+#    - '.github/workflows/api-docs.yml'
 
 jobs:
-  prep:
-    name: Get Doc Target Versions
-    runs-on: ubuntu-latest
-    outputs:
-      prod_tag: ${{ steps.prod_version.outputs.version }}
-      qa_tag: ${{ steps.qa_version.outputs.version }}
-    steps:
-    - name: Clone Production Tagger
-      uses: actions/checkout@v4
-      with:
-        repository: 'VEuPathDB/tagger'
-        ref: 'prod'
-        token: '${{ secrets.GH_TOKEN }}'
-    - name: Get Production Tag
-      run: |-
-        echo version=v$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
-      id: prod_version
-
-    - name: Clone QA
-      uses: actions/checkout@v4
-      with:
-        repository: 'VEuPathDB/tagger'
-        ref: 'qa'
-        token: '${{ secrets.GH_TOKEN }}'
-    - name: Get QA Tag
-      run: |-
-        echo version=v$(grep vdi-service versions.yml | awk '{ print $2 }') >> "$GITHUB_OUTPUT"
-      id: qa_version
-
   build:
-    name: Build API Docs
+    name: Build
     runs-on: ubuntu-latest
-    needs: prep
+    env:
+      DOC_BUILD_DIR: ${{github.workspace}}/build/generated-docs
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup Environment
-      uses: ./.github/actions/api-doc-env
-
-    - name: Build Dev Docs
-      uses: ./.github/actions/api-doc-build
+    - name: Install Java
+      uses: actions/setup-java@v4
       with:
-        ref: main
-        output-dir: tmpdocs/dev
-        gh-token: ${{ secrets.GH_TOKEN }}
-        gh-user: ${{ secrets.GH_USERNAME }}
-
-    - name: Checkout QA
+        java-version: '24'
+        distribution: corretto
+    - name: Install Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-read-only: false
+    - name: Install Python
+      uses: actions/setup-python@5.6
+      with:
+        python-version: '3.13'
+    - name: Install Schema Doc Generator
+      run: pip install git+https://github.com/Foxcapades/json-schema-for-humans
+    - name: Clone Repo
       uses: actions/checkout@v4
-      with:
-        clean: 'false'
-        ref: '${{ needs.prep.outputs.qa_tag }}'
-    - name: Build QA Docs
-      run: mkdir tmpdocs/qa/ && cp docs/vdi-api.html tmpdocs/qa/vdi-api.html
-#      uses: ./.github/actions/api-doc-build
-#      with:
-#        ref: '${{ needs.prep.outputs.qa_tag }}'
-#        output-dir: tmpdocs/qa
-#        gh-token: ${{ secrets.GH_TOKEN }}
-#        gh-user: ${{ secrets.GH_USERNAME }}
-
-    - name: Checkout Prod
-      uses: actions/checkout@v4
-      with:
-        clean: 'false'
-        ref: '${{ needs.prep.outputs.prod_tag }}'
-    - name: Build Prod Docs
-#      uses: ./.github/actions/api-doc-build
-#      with:
-#        ref: '${{ needs.prep.outputs.prod_tag }}'
-#        output-dir: tmpdocs/prod
-#        gh-token: ${{ secrets.GH_TOKEN }}
-#        gh-user: ${{ secrets.GH_USERNAME }}
-      run: mkdir tmpdocs/prod/ && cp docs/vdi-api.html tmpdocs/prod/vdi-api.html
-
+    - name: Generate Server Docs
+      run: gradle -P DOC_BUILD_DIR=$DOC_BUILD_DIR/core -P DOC_FILE_NAME=index.html :core:generate-raml-docs
+    - name: Merge and Convert JSON Schema
+      run: |-
+        gradle -P SCHEMA_BUILD_DIR=$DOC_BUILD_DIR/core \
+          :schema:build-dataset-schema-resources \
+          :schema:build-config-schema-resource
+    - name: Generate Configuration Docs
+      run: >-
+        generate-schema-doc \
+          --config expand_buttons \
+          --config examples_as_yaml \
+          --config no_link_to_reused_ref \
+          $DOC_BUILD_DIR/schema/config/full-config.json \
+          $DOC_BUILD_DIR/schema/config/index.html
     - uses: actions/upload-pages-artifact@v3
       with:
-        path: tmpdocs/
-
-    - uses: actions/checkout@v4
+        path: ${{ env.DOC_BUILD_DIR }}
 
   deploy:
-    name: Deploy API Docs
+    name: Deploy
     runs-on: ubuntu-latest
     needs: build
     permissions:
@@ -105,5 +68,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-    - name: Deploy
+    - name: Deploy to GitHub Pages
       uses: actions/deploy-pages@v4
