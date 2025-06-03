@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.com.fasterxml.jackson.databind.ObjectMapper
-
 plugins {
   id("build-conventions")
   alias(libs.plugins.shadow)
@@ -9,10 +7,6 @@ version = "8.2.0-beta.5"
 
 repositories {
   maven {
-    System.getenv().forEach { (k, v) ->
-      System.err.println("$k  =  $v")
-    }
-
     name = "GitHubPackages"
     url  = uri("https://maven.pkg.github.com/veupathdb/maven-packages")
     credentials {

@@ -1,10 +1,16 @@
 package vdi.json
 
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.json.JsonMapper
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
+import java.nio.file.Path
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 
@@ -17,10 +23,22 @@ import java.util.TimeZone
  * @since 1.0.0
  */
 val JSON = JsonMapper.builder()
-  .addModule(ParameterNamesModule())
-  .addModule(Jdk8Module())
   .addModule(JavaTimeModule())
-  .addModule(KotlinModule.Builder().build())
+  .addModule(Jdk8Module())
+  .addModule(KotlinModule.Builder()
+    .enable(KotlinFeature.SingletonSupport)
+    .build())
+  .addModule(ParameterNamesModule())
+  .addModule(SimpleModule().apply {
+    addSerializer(Path::class.java, object : JsonSerializer<Path>() {
+      override fun serialize(value: Path?, generator: JsonGenerator, serializer: SerializerProvider) {
+        if (value == null)
+          generator.writeNull()
+        else
+          generator.writeString(value.toString())
+      }
+    })
+  })
   .build()!!
   .also {
     it.dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
