@@ -23,28 +23,42 @@ jobs:
     steps:
     - name: Clone Repo
       uses: actions/checkout@v4
+
     - name: Install Java
       uses: actions/setup-java@v4
       with:
-        java-version: '24'
+        java-version: '21'
         distribution: corretto
+
     - name: Install Gradle
       uses: gradle/actions/setup-gradle@v4
       with:
         cache-read-only: false
+
     - name: Install Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.13'
+
     - name: Install Schema Doc Generator
       run: pip install git+https://github.com/Foxcapades/json-schema-for-humans
+
+    - name: Install NPM
+      uses: actions/setup-node@v4
+
+    - name: Install NPM Packages
+      shell: bash
+      run: npm i -g raml2html raml2html-modern-theme
+
     - name: Generate Server Docs
       run: gradle -P DOC_BUILD_DIR=$DOC_BUILD_DIR/core -P DOC_FILE_NAME=index.html :core:generate-raml-docs
+
     - name: Merge and Convert JSON Schema
       run: |-
         gradle -P SCHEMA_BUILD_DIR=$DOC_BUILD_DIR/core \
           :schema:build-dataset-schema-resources \
           :schema:build-config-schema-resource
+
     - name: Generate Configuration Docs
       run: >-
         generate-schema-doc \
@@ -53,6 +67,7 @@ jobs:
           --config no_link_to_reused_ref \
           $DOC_BUILD_DIR/schema/config/full-config.json \
           $DOC_BUILD_DIR/schema/config/index.html
+
     - uses: actions/upload-pages-artifact@v3
       with:
         path: ${{ env.DOC_BUILD_DIR }}
