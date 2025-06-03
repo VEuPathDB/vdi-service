@@ -21,6 +21,8 @@ jobs:
     env:
       DOC_BUILD_DIR: ${{github.workspace}}/build/generated-docs
     steps:
+    - name: Clone Repo
+      uses: actions/checkout@v4
     - name: Install Java
       uses: actions/setup-java@v4
       with:
@@ -36,8 +38,6 @@ jobs:
         python-version: '3.13'
     - name: Install Schema Doc Generator
       run: pip install git+https://github.com/Foxcapades/json-schema-for-humans
-    - name: Clone Repo
-      uses: actions/checkout@v4
     - name: Generate Server Docs
       run: gradle -P DOC_BUILD_DIR=$DOC_BUILD_DIR/core -P DOC_FILE_NAME=index.html :core:generate-raml-docs
     - name: Merge and Convert JSON Schema
