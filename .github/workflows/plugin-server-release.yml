@@ -15,14 +15,16 @@ jobs:
     - uses: gradle/actions/setup-gradle@v4
       with:
         cache-read-only: false
+
     - name: Get Server Version
       id: version
-      run: |-
-        version=$(set -o pipefail; gradle :plugin-server:properties | grep 'version: ' | cut -d' ' -f2)
-        echo release=$version >> $GITHUB_OUTPUT
       env:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |-
+        env
+        version=$(set -o pipefail; gradle :plugin-server:properties | grep 'version: ' | cut -d' ' -f2)
+        echo release=$version >> $GITHUB_OUTPUT
     - name: Build
       run: |-
         gradle :plugin-server:test :plugin-server:shadowJar
