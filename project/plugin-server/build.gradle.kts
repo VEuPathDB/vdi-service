@@ -9,7 +9,9 @@ version = "8.2.0-beta.5"
 
 repositories {
   maven {
-    ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(System.err, System.getenv())
+    System.getenv().forEach { (k, v) ->
+      System.err.println("$k  =  $v")
+    }
 
     name = "GitHubPackages"
     url  = uri("https://maven.pkg.github.com/veupathdb/maven-packages")
