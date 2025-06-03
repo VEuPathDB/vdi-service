@@ -36,7 +36,7 @@ raml-gen:
 	@which node || nvm --version 2>/dev/null || (echo 'NodeJS not found on $$PATH'; exit 1)
 	@$(GRADLE) -q :core:module:rest-service:generate-jaxrs :core:generate-raml-docs --rerun-tasks
 
-DOC_BUILD_DIR := build/generated-docs
+DOC_BUILD_DIR := ${PWD}/build/generated-docs
 .PHONY: build-docs
 build-docs:
 	@rm -rf $(DOC_BUILD_DIR)
