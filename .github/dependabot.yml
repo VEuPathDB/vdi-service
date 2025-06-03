@@ -2,9 +2,6 @@ version: 2
 
 updates:
 - package-ecosystem: gradle
-  directories:
-  - service/
-  - tools/validator/
   registries:
   - github-packages
   schedule:
