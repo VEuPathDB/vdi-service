@@ -2,17 +2,13 @@ FROM veupathdb/alpine-dev-base:jdk24-gradle8.14 AS build
 
 WORKDIR /workspace
 
-
-COPY ["settings.gradle.kts", "build.gradle.kts", "./"]
-COPY ["gradle/libs.versions.toml", "gradle/common.versions.toml",  "gradle/"]
-
-COPY project/common project/common
-COPY project/conventions project/conventions
-COPY project/core project/core
+COPY settings.gradle.kts .
+COPY gradle gradle
+COPY project project
 COPY schema schema
 
-ARG GITHUB_USERNAME
-ARG GITHUB_TOKEN
+ARG GH_USERNAME
+ARG GH_TOKEN
 
 RUN gradle --no-daemon :core:download-dependencies
 

@@ -4,8 +4,8 @@ import org.veupathdb.lib.gradle.container.tasks.jaxrs.GenerateJaxRS
 import org.veupathdb.lib.gradle.container.tasks.raml.GenerateRamlDocs
 
 plugins {
-  id("build-conventions")
   alias(libs.plugins.vpdb)
+  id("build-conventions")
 }
 
 buildscript {

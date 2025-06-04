@@ -1,11 +1,42 @@
-.*
+# Global Exclusions
+**/build/
+**/docs/
+gradle/*
+!gradle/libs.versions.toml
+!gradle/common.versions.toml
+node_modules/
 
-build/
-docs/
-api-schema/
+**/gradlew
+**/gradlew.bat
+**/readme.adoc
+**/license
+**/makefile
+**/Dockerfile
 
-*.env
-*.raml
+**/.*
+!.dockerignore
+**/*.jar
+**/*.log
+**/*.env
+**/*.raml
 
-Dockerfile
-makefile
+
+# /
+/compose/
+tmp/
+venv/
+
+/Jenkinsfile
+/build.gradle.kts
+/*.yml
+
+
+# /project
+project/plugin-server/
+
+# /project/core
+/project/core/api-schema/
+
+/project/core/openapi.yml
+/project/core/models.json
+/project/core/operations.json

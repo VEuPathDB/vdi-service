@@ -49,19 +49,6 @@ raml-gen:
 	@which node || nvm --version 2>/dev/null || (echo 'NodeJS not found on $$PATH'; exit 1)
 	@./gradlew -q :module:rest-service:generate-jaxrs :generate-raml-docs --rerun-tasks
 
-####
-##  Console Shortcuts
-####
-
-# Opens the local-dev minio web console.
-.PHONY: open-minio
-open-minio:
-	@sensible-browser http://localhost:9001
-
-# Opens the local-dev rabbitmq web console.
-.PHONY: open-rabbit
-open-rabbit:
-	@sensible-browser http://localhost:9002
 
 ####
 ##  Helpers
@@ -96,8 +83,8 @@ build-image:
 	@cd ../.. && $(CONTAINER_CMD) build \
 	  -t veupathdb/vdi-service:latest \
 	  -f project/core/Dockerfile \
-      --build-arg="GITHUB_USERNAME=${GITHUB_USERNAME}" \
-      --build-arg="GITHUB_TOKEN=${GITHUB_TOKEN}" \
+      --build-arg="GH_USERNAME=${GITHUB_USERNAME}" \
+      --build-arg="GH_TOKEN=${GITHUB_TOKEN}" \
       --build-arg="CONFIG_FILE=config/local-dev-config.yml" \
       --build-arg="GIT_TAG=$(shell git describe --tags 2>/dev/null || echo "snapshot")" \
       --build-arg="GIT_URL=$(shell git remote get-url origin | sed 's#:#/#;s#git@#https://#')" \

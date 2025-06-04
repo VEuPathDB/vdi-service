@@ -16,6 +16,7 @@
 *.bak
 *.swp
 *~
+*.log
 
 # Compiled outputs
 *.jar

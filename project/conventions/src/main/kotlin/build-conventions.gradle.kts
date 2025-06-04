@@ -7,11 +7,11 @@ plugins { kotlin("jvm") }
 repositories {
   mavenCentral()
   maven {
-    name = "GitHubPackages"
+    name = "Internal Packages"
     url  = uri("https://maven.pkg.github.com/veupathdb/maven-packages")
     credentials {
-      username = if (extra.has("gpr.user")) extra["gpr.user"] as String? else System.getenv("GITHUB_USERNAME")
-      password = if (extra.has("gpr.key")) extra["gpr.key"] as String? else System.getenv("GITHUB_TOKEN")
+      username = if (extra.has("github.username")) extra["github.username"] as String? else System.getenv("GH_USERNAME")
+      password = if (extra.has("github.token")) extra["github.token"] as String? else System.getenv("GH_TOKEN")
     }
   }
 }

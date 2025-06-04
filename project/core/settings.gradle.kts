@@ -7,20 +7,6 @@ dependencyResolutionManagement {
     create("libs") { from(files("../../gradle/libs.versions.toml")) }
     create("common") { from(files("../../gradle/common.versions.toml")) }
   }
-
-  repositories {
-    mavenLocal()
-    mavenCentral()
-    gradlePluginPortal()
-    maven {
-      name = "GitHubPackages"
-      url  = uri("https://maven.pkg.github.com/veupathdb/maven-packages")
-      credentials {
-        username = if (extra.has("github.username")) extra["github.username"] as String else System.getenv("GH_USERNAME")
-        password = if (extra.has("github.token")) extra["github.token"] as String else System.getenv("GH_TOKEN")
-      }
-    }
-  }
 }
 
 pluginManagement {
