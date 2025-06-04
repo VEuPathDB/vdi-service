@@ -1,6 +1,7 @@
 @file:JvmName("EntryPoint")
 package vdi.config
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.networknt.schema.ExecutionContext
@@ -16,6 +17,7 @@ import vdi.config.parse.serde.interpolateFrom
 import vdi.config.raw.ManifestConfig
 import vdi.config.raw.StackConfig
 import vdi.logging.MetaLogger
+import vdi.model.field.SecretString
 
 fun StackConfig(path: Path): StackConfig {
   val validator = StackConfig::class.java.getResourceAsStream("/schema/config/full-config.json")
@@ -32,7 +34,16 @@ fun StackConfig(path: Path): StackConfig {
       throw IllegalStateException("service config validation failed")
     }
 
-  return JSON.convertValue(json)
+  try {
+    return JSON.convertValue(json)
+  } catch (e: IllegalArgumentException) {
+    when (val ex = e.cause) {
+      is MismatchedInputException -> if (ex.targetType == SecretString::class.java) {
+        throw IllegalArgumentException(ex.message!!.replace(Regex("\\('.+'\\)"), "('***')"))
+      }
+    }
+    throw e
+  }
 }
 
 var cachedConfig: StackConfig? = null
