@@ -42,9 +42,32 @@ dataset characteristics.
 * link:schema/data/dataset-characteristics.eda.yml[EDA Dataset Characteristics]
 
 
-// == Development
+== Development
 
-// === Repository Structure
+=== Repository Structure
+
+.Stack Management
+[unstyled]
+* link:config/[Stack Configuration Files]
+* link:compose/[Docker Compose Files]
+* link:schema/config/[Stack Config JSON Schema]
+
+.Component Source
+[unstyled]
+* link:project/conventions/[Gradle Build Conventions]
+* link:project/common/[Shared Components]
+* link:project/core/[Core VDI Service Components]
+* link:project/plugin-server/[VDI Plugin Handler Server]
+
+
+=== Core VDI Service
+
+==== Container Image Build
+
+[source, shell]
+----
+./gradlew build-image
+----
 
 ////
 
