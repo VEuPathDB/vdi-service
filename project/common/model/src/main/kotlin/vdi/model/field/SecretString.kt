@@ -1,7 +1,8 @@
 package vdi.model.field
 
-import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonValue
 
-data class SecretString(@get:JsonIgnore val asString: String) {
+data class SecretString(val asString: String) {
+  @JsonValue
   override fun toString() = "***"
 }
