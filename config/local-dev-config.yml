@@ -1,4 +1,4 @@
-$schema: https://veupathdb.github.io/vdi-service/schema/config/stack-config.json
+$schema: https://veupathdb.github.io/vdi-service/schema/config/full-config.json
 
 definitions:
   genomicsProjects: &genomicsProjects
@@ -16,8 +16,8 @@ definitions:
   - VectorBase
   - VEuPathDB
   vdiSchemaPass: &vdiSchemaPass ${env:VDI_APPDB_SCHEMA_PASS}
-  vdiControlSchema: &vdiControlSchema vdi_control_prod_${env:LOCATION_INDICATOR}
-  vdiDataSchema: &vdiDataSchema vdi_datasets_prod_${env:LOCATION_INDICATOR}
+  vdiControlSchema: &vdiControlSchema vdi_control_dev_${env:LOCATION_INDICATOR}
+  vdiDataSchema: &vdiDataSchema vdi_datasets_dev_${env:LOCATION_INDICATOR}
   datasetPropertiesJsonSchemaFiles:
   - &genDatasetProps /schema/data/dataset-characteristics.genomics.json
   - &edaDatasetProps /schema/data/dataset-characteristics.eda.json
@@ -79,55 +79,63 @@ vdi:
     server: cache-db:5432
 
   plugins:
-  - server: bigwig:80
-    displayName: bigWig
-    dataTypes:
-    - name: bigwigfiles
-      version: 1.0
-    projectIds: *genomicsProjects
-  - server: biom:80
-    displayName: BIOM
-    dataTypes:
-    - name: biom
-      version: 1.0
-    projectIds:
-    - MicrobiomeDB
-  - server: example:80
-    displayName: Example
-    dataTypes:
-    - name: noop
-      version: 1.0
-  - server: genelist:80
-    displayName: Gene List
-    dataTypes:
-    - name: genelist
-      version: 1.0
-    projectIds: *genomicsProjects
-  - server: isasimple:80
-    displayName: ISA Study
-    dataTypes:
-    - name: isasimple
-      version: 1.0
-    projectIds:
-    - ClinEpiDB
-  - server: noop:80
-    displayName: Lightweight
-    dataTypes:
-    - name: lightweight
-      version: 1.0
-    typeChangesEnabled: true
-  - server: phenotype:80
-    displayName: Phenotype
-    dataTypes:
-    - name: phenotype
-      version: 1.0
-    projectIds: *genomicsProjects
-  - server: rnaseq:80
-    displayName: RNA-Seq
-    dataTypes:
-    - name: rnaseq
-      version: 1.0
-    projectIds: *genomicsProjects
+    bigwig:
+      server: bigwig:80
+      displayName: bigWig
+      dataTypes:
+      - name: bigwigfiles
+        version: 1.0
+      projectIds: *genomicsProjects
+    biom:
+      server: biom:80
+      displayName: BIOM
+      dataTypes:
+      - name: biom
+        version: 1.0
+      projectIds:
+      - MicrobiomeDB
+    example:
+      server: example:80
+      displayName: Example
+      dataTypes:
+      - name: noop
+        version: 1.0
+    genelist:
+      server: genelist:80
+      displayName: Gene List
+      dataTypes:
+      - name: genelist
+        version: 1.0
+      projectIds: *genomicsProjects
+    isasimple:
+      server: isasimple:80
+      displayName: ISA Study
+      dataTypes:
+      - name: isasimple
+        version: 1.0
+      projectIds:
+      - ClinEpiDB
+    noop:
+      server: noop:80
+      displayName: Lightweight
+      dataTypes:
+      - name: lightweight
+        version: 1.0
+      typeChangesEnabled: true
+    phenotype:
+      server: wrangler:80
+      displayName: Phenotype
+      dataTypes:
+      - name: phenotype
+        version: 1.0
+      projectIds: *genomicsProjects
+    rnaseq:
+      server: rnaseq:80
+      displayName: RNA-Seq
+      dataTypes:
+      - name: rnaseq
+        version: 1.0
+      projectIds: *genomicsProjects
 
   installTargets:
   - targetName: AmoebaDB
