@@ -26,7 +26,7 @@ internal class ReconciliationLaneImpl(
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaInConfig)
-    val wp = WorkerPool("recon", config.workerCount, config.jobQueueSize) {
+    val wp = WorkerPool.create<ReconciliationLane>(config.workerCount, config.jobQueueSize) {
       Metrics.ReconciliationHandler.queueSize.inc(it.toDouble())
     }
 

@@ -41,7 +41,7 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("shares", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool.create<ShareLane>(config.jobQueueSize, config.workerCount) {
       Metrics.shareQueueSize.inc(it.toDouble())
     }
 

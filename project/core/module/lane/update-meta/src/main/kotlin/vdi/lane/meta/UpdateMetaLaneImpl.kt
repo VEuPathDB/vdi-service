@@ -56,7 +56,7 @@ internal class UpdateMetaLaneImpl(
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter(config.kafkaRouterConfig)
-    val wp = WorkerPool("meta", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool.create<UpdateMetaLane>(config.jobQueueSize, config.workerCount) {
       Metrics.updateMetaQueueSize.inc(it.toDouble())
     }
 

@@ -50,7 +50,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.consumerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
-    val wp = WorkerPool("data", config.jobQueueSize, config.workerPoolSize) {
+    val wp = WorkerPool.create<InstallDataLane>(config.jobQueueSize, config.workerPoolSize) {
       Metrics.Install.queueSize.inc(it.toDouble())
     }
 

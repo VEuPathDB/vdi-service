@@ -42,7 +42,7 @@ internal class SoftDeleteLaneImpl(
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
-    val wp = WorkerPool("soft-del", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool.create<SoftDeleteLane>(config.jobQueueSize, config.workerCount) {
       Metrics.softDeleteQueueSize.inc(it.toDouble())
     }
 

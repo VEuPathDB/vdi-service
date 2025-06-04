@@ -55,7 +55,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
   override suspend fun run() {
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
-    val wp = WorkerPool("import", config.jobQueueSize, config.workerCount) {
+    val wp = WorkerPool.create<ImportLane>(config.jobQueueSize, config.workerCount) {
       Metrics.Import.queueSize.inc(it.toDouble())
     }
 

@@ -6,13 +6,14 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import org.apache.logging.log4j.kotlin.logger
 import org.apache.logging.log4j.kotlin.loggingContext
 import kotlin.concurrent.thread
+import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.milliseconds
 
 class WorkerPool(
-  private val name: String,
   private val jobQueueSize: UByte,
   private val workerCount: UByte = 5u,
-  private val reportQueueSizeChange: (Int) -> Unit = { }
+  private val reportQueueSizeChange: (Int) -> Unit = { },
+  private val owner: KClass<*>,
 ) {
   private val log      = logger().delegate
   private val shutdown = Trigger()
@@ -29,22 +30,22 @@ class WorkerPool(
   }
 
   suspend fun stop() {
-    log.debug("worker pool {} received shutdown signal", name)
+    log.debug("{} worker pool received shutdown signal", owner.simpleName)
     queue.close()
     shutdown.trigger()
     count.await()
-    log.info("worker pool {} shutdown complete", name)
+    log.info("{} worker pool shutdown complete", owner.simpleName)
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
   private fun start() {
-    log.info("creating {} workers for pool {}", workerCount, name)
+    log.info("creating {} workers for {}", workerCount, owner.simpleName)
 
     thread {
       runBlocking(Dispatchers.IO) {
         repeat(workerCount.toInt()) { i ->
           val j = i + 1
-          launch (loggingContext(mapOf("workerID" to "$name-$j"))) {
+          launch (loggingContext(mapOf("workerID" to "${owner.simpleName}-$j"))) {
             while (!shutdown.isTriggered()) {
 
               if (!queue.isEmpty) {
@@ -74,5 +75,10 @@ class WorkerPool(
     } catch (e: ClosedReceiveChannelException) {
       null
     }
+
+  companion object {
+    inline fun <reified T: Any> create(jobQueueSize: UByte, workerCount: UByte = 5u, noinline reportQueueSizeChange: (Int) -> Unit = { }) =
+      WorkerPool(jobQueueSize, workerCount, reportQueueSizeChange, T::class)
+  }
 }
 
