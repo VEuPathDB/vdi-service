@@ -33,7 +33,7 @@ internal fun Connection.tryInsertDatasetMeta(datasetID: DatasetID, meta: Dataset
     setString(3, meta.name)
     setString(4, meta.shortName)
     setString(5, meta.shortAttribution)
-    setString(7, meta.summary)
-    setString(8, meta.description)
-    setString(9, meta.sourceURL)
+    setString(6, meta.summary)
+    setString(7, meta.description)
+    setString(8, meta.sourceURL)
   }

@@ -30,8 +30,8 @@ internal fun Connection.updateDatasetMeta(
     setString(1, meta.name)
     setString(2, meta.shortName)
     setString(3, meta.shortAttribution)
-    setString(5, meta.summary)
-    setString(6, meta.description)
-    setDatasetVisibility(7, meta.visibility)
-    setDatasetID(8, datasetID)
+    setString(4, meta.summary)
+    setString(5, meta.description)
+    setDatasetVisibility(6, meta.visibility)
+    setDatasetID(7, datasetID)
   }

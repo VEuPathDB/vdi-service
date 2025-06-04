@@ -16,8 +16,8 @@ tasks {
     ?: throw Exception("github token not set")
 
   fun generateCommand(censor: Boolean): List<String> {
-    val ghUsername = if (censor) "\${GH_USERNAME}" else getGitHubUsername()
-    val ghToken = if (censor) "\${GH_TOKEN}" else getGithubPassword()
+    val ghUsername = if (censor) "\"\${GH_USERNAME}\"" else getGitHubUsername()
+    val ghToken = if (censor) "\"\${GH_TOKEN}\"" else getGithubPassword()
 
     val tag = with(ProcessBuilder("git", "describe", "--tags").start()) {
       when (waitFor()) {
@@ -50,6 +50,7 @@ tasks {
         .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
         .appendOffsetId()
         .toFormatter())
+      .let { if (censor) "\"$it\"" else it }
 
     val buildID = System.getProperty("user.name") + (System.currentTimeMillis()/1000).toString().substring(5)
 
@@ -57,7 +58,6 @@ tasks {
       "docker", "build",
       "--tag=veupathdb/vdi-service:latest",
       "--file=project/core/Dockerfile",
-      "--progress=plain",
       "--build-arg=GH_USERNAME=${ghUsername}",
       "--build-arg=GH_TOKEN=${ghToken}",
       "--build-arg=CONFIG_FILE=config/local-dev-config.yml",
@@ -74,9 +74,9 @@ tasks {
 
   register("build-image-cmd") {
     doLast {
-      System.err.println()
-      System.err.println(generateCommand(true).joinToString(" "))
-      System.err.println()
+      println()
+      println(generateCommand(true).joinToString(" \\\n  "))
+      println()
     }
   }
 

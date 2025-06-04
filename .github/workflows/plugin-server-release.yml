@@ -2,6 +2,9 @@ name: Plugin Server Release
 
 on:
   workflow_dispatch: {}
+  push:
+    tags:
+    - v*
 
 jobs:
   publish:
@@ -23,7 +26,9 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |-
         version=$(set -o pipefail; gradle :plugin-server:properties | grep 'version: ' | cut -d' ' -f2)
+        isBeta=$(echo $foo | grep -qv '-'; echo $?)
         echo release=$version >> $GITHUB_OUTPUT
+        echo isBeta=$isBeta >> $GITHUB_OUTPUT
     - name: Build
       env:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
@@ -34,13 +39,14 @@ jobs:
         sha256sum service.jar | cut -b1-64 | tr -d '\n' > service.jar.sha256
         md5sum service.jar | cut -b1-32 | tr -d '\n' > service.jar.md5
         sed "s/##VERSION_TEMPLATE##/${{steps.version.outputs.release}}/" scripts/docker-download.sh > docker-download.sh
-#    - name: Release
-#      uses: softprops/action-gh-release@v2
-#      with:
-#        draft: false
-#        files: |
-#          service.jar
-#          service.jar.sha256
-#          service.jar.md5
-#          docker-download.sh
-#        generate_release_notes: true
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: ${{steps.version.outputs.isBeta == 1}}
+        files: |
+          service.jar
+          service.jar.sha256
+          service.jar.md5
+          docker-download.sh
+        generate_release_notes: true

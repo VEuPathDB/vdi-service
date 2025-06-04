@@ -27,8 +27,8 @@ internal fun Connection.updateDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(1, meta.name)
     setString(2, meta.shortName)
     setString(3, meta.shortAttribution)
-    setString(5, meta.summary.take(MaxVarchar2Length))
-    setString(6, meta.description)
-    setDatasetID(7, datasetID)
+    setString(4, meta.summary.take(MaxVarchar2Length))
+    setString(5, meta.description)
+    setDatasetID(6, datasetID)
   }
 }

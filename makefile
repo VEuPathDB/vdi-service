@@ -2,9 +2,6 @@ GRADLE := $(shell command -v gradle || echo "./gradlew")
 
 .PHONY: default
 default:
-	@echo
-	@echo "Available Commands:"
-	@echo
 	@awk '{ \
 	  if ($$1 == "#") { \
 	    $$1=""; \
@@ -21,45 +18,46 @@ default:
 	  } else {\
 	    ht="" \
 	  } \
-	}' <(grep -B10 '.PHONY' makefile | grep -v '[═║@]\|default\|__' | grep -E '^[.#]|$$' | grep -v '_')
+	}' <(grep -B10 '.PHONY' makefile | grep -v '[═║@]\|default\|__' | grep -E '^[.#]|$$' | grep -v '_') | less
 
 #
 # Local Builds
 #
 
-.PHONY: build-plugin-server
-build-plugin-server:
-	@$(GRADLE) :plugin-server:build
-
-.PHONY: build-core-server
-build-core-server:
-	@$(GRADLE) :core:build
-
+# Generate JaxRS-based java classes from the service's RAML API specification
 .PHONY: raml-gen
 raml-gen:
 	@which node || nvm --version 2>/dev/null || (echo 'NodeJS not found on $$PATH'; exit 1)
 	@$(GRADLE) -q :core:module:rest-service:generate-jaxrs :core:generate-raml-docs --rerun-tasks
 
 DOC_BUILD_DIR := ${PWD}/build/generated-docs
-.PHONY: build-docs
-build-docs:
-	@rm -rf $(DOC_BUILD_DIR)
-	@mkdir -p $(DOC_BUILD_DIR)
-	@gradle -P DOC_BUILD_DIR=$(DOC_BUILD_DIR)/core -P DOC_FILE_NAME=index.html :core:generate-raml-docs
-	@gradle -P SCHEMA_BUILD_DIR=$(DOC_BUILD_DIR) \
-		:schema:build-dataset-schema-resources \
-		:schema:build-config-schema-resource
-	@generate-schema-doc \
-		--config expand_buttons \
-		--config examples_as_yaml \
-		--config no_link_to_reused_ref \
-		$(DOC_BUILD_DIR)/schema/config/full-config.json \
-		$(DOC_BUILD_DIR)/schema/config/index.html
 
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     Project Build Tasks                                                  ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
-#
-# Stack Management
-#
+# Builds the VDI plugin server shadow jar.
+.PHONY: build-plugin-server
+build-plugin-server:
+	@$(GRADLE) :plugin-server:build
+
+# Builds the VDI core server shadow jar.
+.PHONY: build-core-server
+build-core-server:
+	@$(GRADLE) :core:build
+
+# Builds the VDI core server Docker image.
+.PHONY: build-image
+build-image:
+	@$(GRADLE) -q build-image-cmd | tee >(bash)
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     Stack Management                                                     ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
 ENV_FILE := ${PWD}/.env
 COMPOSE_DIR   := compose
@@ -73,14 +71,22 @@ compose-up: _env-file-test $(MERGE_TARGET)
 	@if [ -z "${SSH_AUTH_SOCK}" ]; then echo "SSH agent does not appear to be correctly running"; exit 1; fi
 	@$(COMPOSE_CMD) up -d $(SERVICES)
 
+# Stops the stack and deletes any stack-specific state.
+.PHONY: compose-down
+compose-down: _env-file-test $(MERGE_TARGET)
+	@$(COMPOSE_CMD) down -v $(SERVICES)
+
 .PHONY: _env-file-test
 _env-file-test:
 	@if [ ! -f .env ]; then echo "Missing .env file."; exit 1; fi
 
-#
-# Stack Logging
-#
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     Stack Logging                                                        ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
+_IS_TTY := $(shell [ -t 0 ] && echo true)
 ifdef _IS_TTY
 LOG_FLAGS ?= -f
 endif

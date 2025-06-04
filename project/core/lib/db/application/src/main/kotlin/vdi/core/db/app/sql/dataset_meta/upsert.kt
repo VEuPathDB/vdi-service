@@ -36,14 +36,14 @@ internal fun Connection.upsertDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(2, meta.name)
     setString(3, meta.shortName)
     setString(4, meta.shortAttribution)
-    setString(6, meta.summary.take(MaxVarchar2Length))
-    setString(7, meta.description)
+    setString(5, meta.summary.take(MaxVarchar2Length))
+    setString(6, meta.description)
 
     // update
-    setString(8, meta.name)
-    setString(9, meta.shortName)
-    setString(10, meta.shortAttribution)
-    setString(12, meta.summary.take(MaxVarchar2Length))
-    setString(13, meta.description)
+    setString(7, meta.name)
+    setString(8, meta.shortName)
+    setString(9, meta.shortAttribution)
+    setString(10, meta.summary.take(MaxVarchar2Length))
+    setString(11, meta.description)
   }
 }

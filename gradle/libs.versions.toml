@@ -75,7 +75,7 @@ log-log4j-kotlin = { group = "org.apache.logging.log4j", name = "log4j-api-kotli
 # HTTP
 http-client-multipart = { group = "io.foxcapades.lib", name = "k-multipart",   version = "1.2.1" }
 http-server-jersey = { group = "org.glassfish.jersey.core", name = "jersey-server", version = "3.1.10" }
-container-core = { group = "org.veupathdb.lib", name = "jaxrs-container-core", version = "9.5.0" }
+container-core = { group = "org.veupathdb.lib", name = "jaxrs-container-core", version = "9.6.0" }
 container-multipart = { group = "org.veupathdb.lib", name = "multipart-jackson-pojo", version = "1.1.7" }
 json-request-validation     = { group = "org.veupathdb.lib", name = "jpath-request-validation", version = "0.1.0" }
 

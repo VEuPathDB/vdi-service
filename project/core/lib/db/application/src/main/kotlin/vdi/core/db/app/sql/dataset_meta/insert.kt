@@ -30,7 +30,7 @@ internal fun Connection.insertDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(2, meta.name)
     setString(3, meta.shortName)
     setString(4, meta.shortAttribution)
-    setString(6, meta.summary.take(MaxVarchar2Length))
-    setString(7, meta.description)
+    setString(5, meta.summary.take(MaxVarchar2Length))
+    setString(6, meta.description)
   }
 }

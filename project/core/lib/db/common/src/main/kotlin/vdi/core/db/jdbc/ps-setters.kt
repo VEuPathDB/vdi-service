@@ -15,7 +15,7 @@ import java.time.OffsetDateTime
  * @param datasetID Dataset ID to set to the target parameter.
  */
 fun PreparedStatement.setDatasetID(index: Int, datasetID: DatasetID) =
-  setString(index, datasetID.toString())
+  setString(index, datasetID.asString)
 
 /**
  * Sets the designated parameter to the given [UserID] value.

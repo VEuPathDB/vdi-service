@@ -20,6 +20,8 @@ value class DatasetID(val asString: String) {
     get() = asString.substringBefore('.')
 
   fun nextRevision() = DatasetID("$rootID.${revisionCounter+1}")
+
+  override fun toString() = asString
 }
 
 @Suppress("NOTHING_TO_INLINE")
