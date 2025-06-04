@@ -33,7 +33,12 @@ JSON schema files for use with editor validation & autocomplete.
 * https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.eda.json[EDA Dataset Characteristics Schema]
 * https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.metaschema.json[Dataset Characteristics Metaschema]
 
+=== Dataset Characteristics Definitions
 
+Editable YAML schema files that define the valid properties that may appear in
+dataset characteristics.
+
+* link:schema/data/dataset-characteristics.eda.yml[EDA Dataset Characteristics]
 
 ////
 
