@@ -22,23 +22,29 @@ tasks.shadowJar {
 
   manifest {
     attributes["Main-Class"]   = "vdi.bootstrap.Main"
-    attributes["Git-Tag"]      = properties["build.git.tag"] ?: "unknown"
-    attributes["Git-Commit"]   = properties["build.git.commit"] ?: "unknown"
-    attributes["Git-Branch"]   = properties["build.git.branch"] ?: "unknown"
-    attributes["Git-URL"]      = properties["build.git.url"] ?: "unknown"
-    attributes["Build-ID"]     = properties["build.ci.id"] ?: "unknown"
-    attributes["Build-Number"] = properties["build.ci.number"] ?: "unknown"
-    attributes["Build-Time"]   = properties["build.ci.timestamp"] ?: ZonedDateTime.now(ZoneOffset.UTC)
-      .format(DateTimeFormatterBuilder()
-        .append(DateTimeFormatter.ISO_LOCAL_DATE)
-        .appendLiteral(' ')
-        .appendValue(ChronoField.HOUR_OF_DAY, 2)
-        .appendLiteral(':')
-        .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-        .appendLiteral(':')
-        .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-        .appendOffsetId()
-        .toFormatter())
+
+    attributes(
+      mapOf(
+        "Git-Tag" to (findProperty("build.git.tag") as String? ?: "unknown"),
+        "Git-Commit" to (findProperty("build.git.commit") as String? ?: "unknown"),
+        "Git-Branch" to (findProperty("build.git.branch") as String? ?: "unknown"),
+        "Git-URL" to (findProperty("build.git.url") as String? ?: "unknown"),
+        "Build-ID" to (findProperty("build.ci.id") as String? ?: "unknown"),
+        "Build-Number" to (findProperty("build.ci.number") as String? ?: "unknown"),
+        "Build-Time" to (findProperty("build.ci.timestamp") as String? ?: ZonedDateTime.now(ZoneOffset.UTC)
+          .format(DateTimeFormatterBuilder()
+            .append(DateTimeFormatter.ISO_LOCAL_DATE)
+            .appendLiteral(' ')
+            .appendValue(ChronoField.HOUR_OF_DAY, 2)
+            .appendLiteral(':')
+            .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+            .appendLiteral(':')
+            .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+            .appendOffsetId()
+            .toFormatter()))
+      ),
+      "build-info"
+    )
   }
 }
 

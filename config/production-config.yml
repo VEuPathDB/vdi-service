@@ -1,4 +1,4 @@
-$schema: https://veupathdb.github.io/vdi-service/schema/config/stack-config.json
+$schema: https://veupathdb.github.io/vdi-service/schema/config/full-config.json
 
 definitions:
   genomicsProjects: &genomicsProjects
