@@ -2,8 +2,12 @@ FROM veupathdb/alpine-dev-base:jdk24-gradle8.14 AS build
 
 WORKDIR /workspace
 
-COPY settings.gradle.kts .
 COPY gradle gradle
+COPY project/conventions project/conventions
+
+RUN cd project/conventions && gradle build
+
+COPY settings.gradle.kts .
 COPY project project
 COPY schema schema
 
