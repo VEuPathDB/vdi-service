@@ -38,7 +38,13 @@ JSON schema files for use with editor validation & autocomplete.
 Editable YAML schema files that define the valid properties that may appear in
 dataset characteristics.
 
+[unstyled]
 * link:schema/data/dataset-characteristics.eda.yml[EDA Dataset Characteristics]
+
+
+// == Development
+
+// === Repository Structure
 
 ////
 
