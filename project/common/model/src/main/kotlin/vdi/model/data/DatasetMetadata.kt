@@ -1,9 +1,11 @@
 package vdi.model.data
 
 import com.fasterxml.jackson.annotation.JsonAlias
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.OffsetDateTime
 
+@JsonIgnoreProperties("category")
 data class DatasetMetadata(
   @field:JsonProperty(JsonKey.Type)
   val type: DatasetType,

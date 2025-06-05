@@ -25,7 +25,7 @@ data class DatasetContact(
   val address: String?,
 
   @field:JsonProperty(JsonKey.IsPrimary)
-  val isPrimary: Boolean,
+  val isPrimary: Boolean = false,
 ) {
   object JsonKey {
     const val Name        = "name"

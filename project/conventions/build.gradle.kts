@@ -9,6 +9,7 @@ repositories {
 
 dependencies {
   implementation(plugin(libs.plugins.kotlin))
+  implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
 }
 
 kotlin {

@@ -23,9 +23,3 @@ value class DatasetID(val asString: String) {
 
   override fun toString() = asString
 }
-
-@Suppress("NOTHING_TO_INLINE")
-inline fun String.toDatasetID() = DatasetID(this)
-
-@Deprecated("wat", replaceWith = ReplaceWith("toDatasetID"))
-fun String.toDatasetIDOrNull() = toDatasetID()
