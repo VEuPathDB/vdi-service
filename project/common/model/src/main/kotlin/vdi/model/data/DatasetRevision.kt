@@ -6,16 +6,16 @@ import com.fasterxml.jackson.annotation.JsonValue
 import java.time.OffsetDateTime
 
 open class DatasetRevision(
-  @JsonProperty(JsonKey.Action)
+  @field:JsonProperty(JsonKey.Action)
   val action: Action,
 
-  @JsonProperty(JsonKey.Timestamp)
+  @field:JsonProperty(JsonKey.Timestamp)
   val timestamp: OffsetDateTime,
 
-  @JsonProperty(JsonKey.RevisionID)
+  @field:JsonProperty(JsonKey.RevisionID)
   val revisionID: DatasetID,
 
-  @JsonProperty(JsonKey.RevisionNote)
+  @field:JsonProperty(JsonKey.RevisionNote)
   val revisionNote: String
 ) {
   object JsonKey {

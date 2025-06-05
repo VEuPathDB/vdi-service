@@ -5,65 +5,65 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.OffsetDateTime
 
 data class DatasetMetadata(
-  @JsonProperty(JsonKey.Type)
+  @field:JsonProperty(JsonKey.Type)
   val type: DatasetType,
 
-  @JsonProperty(JsonKey.InstallTargets)
-  @JsonAlias(JsonKey.Projects)
+  @field:JsonProperty(JsonKey.InstallTargets)
+  @field:JsonAlias("projects")
   val installTargets: Set<InstallTargetID>,
 
-  @JsonProperty(JsonKey.Visibility)
+  @field:JsonProperty(JsonKey.Visibility)
   val visibility: DatasetVisibility,
 
-  @JsonProperty(JsonKey.Owner)
+  @field:JsonProperty(JsonKey.Owner)
   val owner: UserID,
 
-  @JsonProperty(JsonKey.Name)
+  @field:JsonProperty(JsonKey.Name)
   val name: String,
 
-  @JsonProperty(JsonKey.ShortName)
+  @field:JsonProperty(JsonKey.ShortName)
   val shortName: String?,
 
-  @JsonProperty(JsonKey.Summary)
+  @field:JsonProperty(JsonKey.Summary)
   val summary: String,
 
-  @JsonProperty(JsonKey.Description)
+  @field:JsonProperty(JsonKey.Description)
   val description: String?,
 
-  @JsonProperty(JsonKey.ShortAttribution)
+  @field:JsonProperty(JsonKey.ShortAttribution)
   val shortAttribution: String?,
 
-  @JsonProperty(JsonKey.Origin)
+  @field:JsonProperty(JsonKey.Origin)
   val origin: String,
 
-  @JsonProperty(JsonKey.SourceURL)
+  @field:JsonProperty(JsonKey.SourceURL)
   val sourceURL: String?,
 
-  @JsonProperty(JsonKey.Created)
+  @field:JsonProperty(JsonKey.Created)
   val created: OffsetDateTime,
 
-  @JsonProperty(JsonKey.Dependencies)
+  @field:JsonProperty(JsonKey.Dependencies)
   val dependencies: Collection<DatasetDependency> = emptyList(),
 
-  @JsonProperty(JsonKey.Publications)
+  @field:JsonProperty(JsonKey.Publications)
   val publications: Collection<DatasetPublication> = emptyList(),
 
-  @JsonProperty(JsonKey.Hyperlinks)
+  @field:JsonProperty(JsonKey.Hyperlinks)
   val hyperlinks: Collection<DatasetHyperlink> = emptyList(),
 
-  @JsonProperty(JsonKey.Organisms)
+  @field:JsonProperty(JsonKey.Organisms)
   val organisms: Collection<String> = emptyList(),
 
-  @JsonProperty(JsonKey.Contacts)
+  @field:JsonProperty(JsonKey.Contacts)
   val contacts: Collection<DatasetContact> = emptyList(),
 
-  @JsonProperty(JsonKey.OriginalID)
+  @field:JsonProperty(JsonKey.OriginalID)
   val originalID: DatasetID? = null,
 
-  @JsonProperty(JsonKey.RevisionHistory)
+  @field:JsonProperty(JsonKey.RevisionHistory)
   val revisionHistory: List<DatasetRevision> = emptyList(),
 
-  @JsonProperty(JsonKey.Properties)
+  @field:JsonProperty(JsonKey.Properties)
   val properties: DatasetProperties? = null,
 ) {
   object JsonKey {
@@ -78,7 +78,6 @@ data class DatasetMetadata(
     const val Origin           = "origin"
     const val OriginalID       = "originalId"
     const val Owner            = "owner"
-    const val Projects         = "projects"
     const val Properties       = "properties"
     const val Publications     = "publications"
     const val RevisionHistory  = "revisionHistory"

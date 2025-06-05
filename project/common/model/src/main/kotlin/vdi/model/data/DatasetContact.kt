@@ -3,28 +3,28 @@ package vdi.model.data
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class DatasetContact(
-  @JsonProperty(JsonKey.Name)
+  @field:JsonProperty(JsonKey.Name)
   val name: String,
 
-  @JsonProperty(JsonKey.Email)
+  @field:JsonProperty(JsonKey.Email)
   val email: String?,
 
-  @JsonProperty(JsonKey.Affiliation)
+  @field:JsonProperty(JsonKey.Affiliation)
   val affiliation: String?,
 
-  @JsonProperty(JsonKey.City)
+  @field:JsonProperty(JsonKey.City)
   val city: String?,
 
-  @JsonProperty(JsonKey.State)
+  @field:JsonProperty(JsonKey.State)
   val state: String?,
 
-  @JsonProperty(JsonKey.Country)
+  @field:JsonProperty(JsonKey.Country)
   val country: String?,
 
-  @JsonProperty(JsonKey.Address)
+  @field:JsonProperty(JsonKey.Address)
   val address: String?,
 
-  @JsonProperty(JsonKey.IsPrimary)
+  @field:JsonProperty(JsonKey.IsPrimary)
   val isPrimary: Boolean,
 ) {
   object JsonKey {

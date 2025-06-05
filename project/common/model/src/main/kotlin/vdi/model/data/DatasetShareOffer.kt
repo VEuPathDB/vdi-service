@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonValue
 
 open class DatasetShareOffer(
-  @JsonProperty("action")
+  @field:JsonProperty("action")
   val action: Action
 ) {
   enum class Action {

@@ -9,7 +9,7 @@ import vdi.core.db.model.SyncControlRecord
 import vdi.model.OriginTimestamp
 import vdi.model.data.*
 
-interface AppDBTransaction : AppDBAccessor, AutoCloseable {
+interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // region dataset
 

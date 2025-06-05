@@ -3,10 +3,8 @@ package vdi.core.db.app
 import vdi.db.app.FallbackDatasetType
 import vdi.model.data.DatasetType
 
-class AppDBRegistryCollection(
-  private val byKey: Map<DatasetType, TargetDatabaseReference>,
-) : Iterable<Pair<DatasetType, TargetDatabaseReference>> {
-
+class AppDBRegistryCollection(private val byKey: Map<DatasetType, TargetDatabaseReference>)
+: Iterable<Pair<DatasetType, TargetDatabaseReference>> {
   fun keys(): Iterable<DatasetType> = byKey.keys
 
   operator fun get(dataType: DatasetType) =

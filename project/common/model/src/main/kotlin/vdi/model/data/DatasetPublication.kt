@@ -3,13 +3,13 @@ package vdi.model.data
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class DatasetPublication(
-  @JsonProperty(JsonKey.PubMedID)
+  @field:JsonProperty(JsonKey.PubMedID)
   val pubmedID: String,
 
-  @JsonProperty(JsonKey.Citation)
+  @field:JsonProperty(JsonKey.Citation)
   val citation: String?,
 
-  @JsonProperty(JsonKey.IsPrimary)
+  @field:JsonProperty(JsonKey.IsPrimary)
   val isPrimary: Boolean,
 ) {
   object JsonKey {

@@ -1,5 +1,11 @@
 rootProject.name = "vdi"
 
+dependencyResolutionManagement {
+  repositories {
+    mavenCentral()
+  }
+}
+
 includeBuild("project/core")
 
 includeBuild("project/common") {

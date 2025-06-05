@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class DatasetType @JsonCreator constructor(
-  @JsonProperty(JsonKey.Name)
+  @field:JsonProperty(JsonKey.Name)
   val name: DataType,
 
-  @JsonProperty(JsonKey.Version)
+  @field:JsonProperty(JsonKey.Version)
   val version: String,
 ) {
   object JsonKey {
