@@ -26,10 +26,14 @@ val libs = the<LibrariesForLibs>()
 dependencies {
   testImplementation(kotlin("test"))
   testImplementation(libs.bundles.testing)
+  testRuntimeOnly(libs.junit.launcher)
+  testRuntimeOnly(libs.junit.compat)
   testRuntimeOnly(libs.junit.engine)
 }
 
 tasks.withType<Test> {
+  useJUnitPlatform()
+
   testLogging {
     events(
       TestLogEvent.FAILED,

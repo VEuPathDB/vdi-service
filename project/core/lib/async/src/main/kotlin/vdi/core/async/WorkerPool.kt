@@ -45,7 +45,7 @@ class WorkerPool(
       runBlocking(Dispatchers.IO) {
         repeat(workerCount.toInt()) { i ->
           val j = i + 1
-          launch (loggingContext(mapOf("workerID" to "${owner.simpleName}-$j"))) {
+          launch (loggingContext(mapOf("workerID" to "${owner.simpleName}[$j]"))) {
             while (!shutdown.isTriggered()) {
 
               if (!queue.isEmpty) {

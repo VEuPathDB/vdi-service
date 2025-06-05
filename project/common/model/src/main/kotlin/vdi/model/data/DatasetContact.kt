@@ -7,22 +7,22 @@ data class DatasetContact(
   val name: String,
 
   @field:JsonProperty(JsonKey.Email)
-  val email: String?,
+  val email: String? = null,
 
   @field:JsonProperty(JsonKey.Affiliation)
-  val affiliation: String?,
+  val affiliation: String? = null,
 
   @field:JsonProperty(JsonKey.City)
-  val city: String?,
+  val city: String? = null,
 
   @field:JsonProperty(JsonKey.State)
-  val state: String?,
+  val state: String? = null,
 
   @field:JsonProperty(JsonKey.Country)
-  val country: String?,
+  val country: String? = null,
 
   @field:JsonProperty(JsonKey.Address)
-  val address: String?,
+  val address: String? = null,
 
   @field:JsonProperty(JsonKey.IsPrimary)
   val isPrimary: Boolean = false,

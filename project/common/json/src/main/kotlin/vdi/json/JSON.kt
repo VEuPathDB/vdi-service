@@ -1,5 +1,6 @@
 package vdi.json
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
@@ -28,6 +29,7 @@ val JSON = JsonMapper.builder()
   .addModule(KotlinModule.Builder()
     .enable(KotlinFeature.SingletonSupport)
     .build())
+  .serializationInclusion(JsonInclude.Include.NON_DEFAULT)
   .addModule(ParameterNamesModule())
   .addModule(SimpleModule().apply {
     addSerializer(Path::class.java, object : JsonSerializer<Path>() {
