@@ -85,16 +85,16 @@ paths:
         most recently created datasets will be first and the oldest dataset will
         be last in the list.
       responses:
-        "200":
+        200:
           description: List of objects containing basic dataset details.
           content:
             application/json:
               schema:
                 type: array
                 items: { $ref: "api-schema/types/responses/datasets/list-datasets.json" }
-        "400": { $ref: "#/components/responses/400" }
-        "401": { $ref: "#/components/responses/401" }
-        "500": { $ref: "#/components/responses/500" }
+        400: { $ref: "#/components/responses/400" }
+        401: { $ref: "#/components/responses/401" }
+        500: { $ref: "#/components/responses/500" }
 
     post:
       tags: [ dataset ]
@@ -144,9 +144,30 @@ paths:
           headers:
             Location: { $ref: "#/components/headers/location" }
 
+  /datasets/community:
+    get:
+      tags: [ dataset ]
+      operationId: getCommunityDatasetList
+      summary: List Community Datasets
+      # language=markdown
+      description: |-
+        Returns a list of datasets that have been made "public" by the owner
+        setting the dataset visibilities to a setting other than `private`.
+      responses:
+        200:
+          description: List of community datasets.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "api-schema/types/responses/datasets/list-datasets.json" }
+        401: { $ref: "#/components/responses/401" }
+        500: { $ref: "#/components/responses/500" }
+
   /datasets/{dataset-id}:
     parameters:
     - $ref: "#/components/parameters/datasetId"
+
     get:
       tags: [ dataset ]
       operationId: getDataset
@@ -166,6 +187,103 @@ paths:
         404: { $ref: "#/components/responses/404" }
         500: { $ref: "#/components/responses/500" }
 
+  /datasets/{dataset-id}/files:
+    parameters:
+    - $ref: "#/components/parameters/datasetId"
+
+    get:
+      tags: [ dataset ]
+      operationId: getDatasetFileIndex
+      responses:
+        200:
+          description: Dataset file index
+          content:
+            application/json:
+              schema: { $ref: "api-schema/types/responses/datasets/dataset-file-index.json" }
+        401: { $ref: "#/components/responses/401" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
+
+  /datasets/{dataset-id}/files/upload:
+    parameters:
+    - $ref: "#/components/parameters/datasetId"
+    get:
+      deprecated: true
+      summary: Get User Upload File
+      # language=markdown
+      description: |-
+        Deprecated in favor of referencing the specific desired file by name
+        using the `/datasets/{dataset-id}/files/{file-name}` endpoint.
+      parameters:
+      - name: attachment
+        required: false
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        200: { $ref: '#/components/responses/File' }
+        401: { $ref: "#/components/responses/401" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
+
+  /datasets/{dataset-id}/files/data:
+    parameters:
+    - $ref: "#/components/parameters/datasetId"
+    get:
+      deprecated: true
+      summary: Get Preprocessed Data
+      # language=markdown
+      description: |-
+        Deprecated in favor of referencing the specific desired file by name
+        using the `/datasets/{dataset-id}/files/{file-name}` endpoint.
+      parameters:
+      - name: attachment
+        required: false
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        200: { $ref: '#/components/responses/File' }
+        401: { $ref: "#/components/responses/401" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
+
+  /datasets/{dataset-id}/files/{file-name}:
+    parameters:
+    - $ref: "#/components/parameters/datasetId"
+    - name: file-name
+      required: true
+      in: path
+      schema:
+        type: string
+    get:
+      parameters:
+      - name: attachment
+        required: false
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        200: { $ref: '#/components/responses/File' }
+        401: { $ref: "#/components/responses/401" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
+
+  /datasets/{vdi-id}/shares:
+    parameters:
+    - $ref: "#/components/parameters/datasetId"
+
+  /datasets/{vdi-id}/shares/{recipient-user-id}:
+    parameters:
+    - $ref: "#/components/parameters/datasetId"
+    - name: recipient-user-id
+      in: path
+      required: true
+      schema: { $ref: "api-schema/types/common/wdk/user-id.json" }
+
 
 components:
   parameters:
@@ -180,6 +298,21 @@ components:
         type: string
         format: uri
   responses:
+    File:
+      description: File contents
+      headers:
+        # language=markdown
+        Content-Disposition:
+          required: false
+          schema:
+            type: string
+            examples:
+            - attachment; filename="1234567-upload.zip"
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: file
     400:
       description: Bad Request Error
       content:

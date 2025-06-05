@@ -63,7 +63,7 @@ Configuration:
       AppenderRef:
       - ref: sub-0-mod
     - name: org.veupathdb.lib
-      level: debug
+      level: info
       additivity: false
       AppenderRef:
       - ref: sub-0-mod

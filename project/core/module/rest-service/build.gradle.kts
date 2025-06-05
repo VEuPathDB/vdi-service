@@ -44,8 +44,13 @@ tasks.withType<GenerateTask> {
 
   inlineSchemaNameMappings = mapOf(
     "WDK_User_Info_1" to "WDK_User_Info",
-    "Dataset_Type_Details_1" to "Dataset_Type_Details"
+    "Dataset_Type_Details_1" to "Dataset_Type_Details",
+    "Dataset_List_Item_1" to "Dataset_List_Item",
+    "Dataset_Visibility_1" to "Dataset_Visibility",
+//    "Dataset_File_Archive_allOf" to "Dataset_File_Archive",
   )
+
+  ignoreFileOverride = "$projectDir/.openapi-generator-ignore"
 
   globalProperties = mapOf(
     "apis"        to "",

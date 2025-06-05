@@ -30,17 +30,12 @@
       "title": "Create Dataset URL Upload",
       "type": "object",
       "properties": {
-        "urls": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "iri"
-          },
-          "minItems": 1,
-          "unevaluatedItems": false
+        "url": {
+          "type": "string",
+          "format": "iri"
         }
       },
-      "required": [ "urls" ]
+      "required": [ "url" ]
     }
   ],
   "$defs": {
@@ -68,7 +63,8 @@
     },
     "file": {
       "title": "Upload File",
-      "type": "file"
+      "type": "string",
+      "format": "binary"
     }
   }
 }
