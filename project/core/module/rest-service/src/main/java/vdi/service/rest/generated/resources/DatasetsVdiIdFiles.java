@@ -1,11 +1,16 @@
 package vdi.service.rest.generated.resources;
 
+import java.io.File;
+import jakarta.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
+import vdi.service.rest.generated.model.BadRequestError;
 import vdi.service.rest.generated.model.DatasetFileListing;
 import vdi.service.rest.generated.model.NotFoundError;
 import vdi.service.rest.generated.model.ServerError;
@@ -56,6 +61,13 @@ public interface DatasetsVdiIdFiles {
   })
   GetDatasetsFilesDocumentsByVdiIdAndFileNameResponse getDatasetsFilesDocumentsByVdiIdAndFileName(
       @PathParam("vdi-id") String vdiId, @PathParam("file-name") String fileName);
+
+  @PUT
+  @Path("/documents/{file-name}")
+  @Produces("application/json")
+  @Consumes("application/octet-stream")
+  PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse putDatasetsFilesDocumentsByVdiIdAndFileName(
+      @PathParam("vdi-id") String vdiId, @PathParam("file-name") String fileName, File entity);
 
   class GetDatasetsFilesByVdiIdResponse extends ResponseDelegate {
     public GetDatasetsFilesByVdiIdResponse(Response response, Object entity) {
@@ -267,6 +279,53 @@ public interface DatasetsVdiIdFiles {
         headerMap.put("Content-Disposition", String.valueOf(p));;
         return this;
       }
+    }
+  }
+
+  class PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse extends ResponseDelegate {
+    public PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse(Response response, Object entity) {
+      super(response, entity);
+    }
+
+    public PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse(Response response) {
+      super(response);
+    }
+
+    public PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
+    }
+
+    public static PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse respond204() {
+      Response.ResponseBuilder responseBuilder = Response.status(204);
+      return new PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse(responseBuilder.build());
+    }
+
+    public static PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse respond400WithApplicationJson(
+        BadRequestError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(400).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse(responseBuilder.build(), entity);
+    }
+
+    public static PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse respond401WithApplicationJson(
+        UnauthorizedError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse(responseBuilder.build(), entity);
+    }
+
+    public static PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse respond404WithApplicationJson(
+        NotFoundError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse(responseBuilder.build(), entity);
+    }
+
+    public static PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse respond500WithApplicationJson(
+        ServerError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse(responseBuilder.build(), entity);
     }
   }
 }

@@ -95,3 +95,17 @@ get:
         body: lib.NotFoundError
       500:
         body: lib.ServerError
+  put:
+    displayName: Put Document
+    body:
+      application/octet-stream: file
+    responses:
+      204:
+      400:
+        body: lib.BadRequestError
+      401:
+        body: lib.UnauthorizedError
+      404:
+        body: lib.NotFoundError
+      500:
+        body: lib.ServerError

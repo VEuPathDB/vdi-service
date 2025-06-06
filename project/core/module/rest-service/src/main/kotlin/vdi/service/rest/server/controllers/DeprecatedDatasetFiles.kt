@@ -1,9 +1,11 @@
 package vdi.service.rest.server.controllers
 
+import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
+import java.io.File
 import vdi.model.data.DatasetID
 import vdi.service.rest.generated.resources.VdiDatasetsVdiIdFiles
 import vdi.service.rest.server.services.dataset.*
@@ -51,12 +53,15 @@ class DeprecatedDatasetFiles(@Context request: ContainerRequest): VdiDatasetsVdi
       }
       .fold())
 
-  override fun getVdiDatasetsFilesDocumentsByVdiIdAndFileName(
-    vdiId: String,
-    fileName: String
-  ) =
+  override fun getVdiDatasetsFilesDocumentsByVdiIdAndFileName(vdiId: String, fileName: String) =
     VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesDocumentsByVdiIdAndFileNameResponse(when (maybeUser) {
       null -> getUserDocumentForAdmin(DatasetID(vdiId), fileName)
       else -> getUserDocumentForUser(DatasetID(vdiId), fileName)
+    }.delegate)
+
+  override fun putVdiDatasetsFilesDocumentsByVdiIdAndFileName(vdiId: String, fileName: String, entity: File?) =
+    VdiDatasetsVdiIdFiles.PutVdiDatasetsFilesDocumentsByVdiIdAndFileNameResponse(when (maybeUser) {
+      null -> throw ForbiddenException("only users may put document files")
+      else -> putUserDocument(DatasetID(vdiId), fileName, entity)
     }.delegate)
 }
