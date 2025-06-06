@@ -3,7 +3,6 @@ package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
 import java.net.URI
-import java.net.URISyntaxException
 import vdi.model.data.DatasetHyperlink
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.DatasetHyperlink as APIHyperlink
@@ -27,9 +26,9 @@ internal fun Iterable<APIHyperlink?>.validate(jPath: String, errors: ValidationE
 private fun APIHyperlink.validate(jPath: String, index: Int, errors: ValidationErrors) {
   url.reqCheckLength(jPath..JsonField.URL, index, UrlMinLength, UrlMaxLength, errors)
   try {
-    URI(url)
-  } catch (e: URISyntaxException) {
-    errors.add((jPath..JsonField.URL)..index, e.reason)
+    URI(url).toURL()
+  } catch (e: IllegalArgumentException) {
+    errors.add((jPath..JsonField.URL)..index, "invalid URL value")
   }
 
   text.reqCheckLength(jPath..JsonField.TEXT, index, TextMinLength, TextMaxLength, errors)

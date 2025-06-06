@@ -4,11 +4,7 @@ package vdi.service.rest.server.inputs
 import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
 import java.net.URI
-import java.net.URISyntaxException
 import vdi.model.data.UserID
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetVisibility
-import java.time.OffsetDateTime
 import vdi.service.rest.generated.model.*
 
 internal fun DatasetProxyPostRequestBody.cleanup() {
@@ -36,8 +32,8 @@ fun DatasetProxyPostRequestBody.validate(): ValidationErrors {
       throw BadRequestException("must provide an upload file or url to a source file")
 
     try {
-      URI(url)
-    } catch (e: URISyntaxException) {
+      URI(url).toURL()
+    } catch (e: IllegalArgumentException) {
       throw BadRequestException("invalid source URL")
     }
   } else if (url != null) {
