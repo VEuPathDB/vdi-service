@@ -2,6 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.List;
 
 @JsonDeserialize(
     as = DatasetFileListingImpl.class
@@ -18,4 +19,10 @@ public interface DatasetFileListing {
 
   @JsonProperty(JsonField.INSTALL)
   void setInstall(DatasetZipDetails install);
+
+  @JsonProperty(JsonField.DOCUMENTS)
+  List<DatasetFileDetails> getDocuments();
+
+  @JsonProperty(JsonField.DOCUMENTS)
+  void setDocuments(List<DatasetFileDetails> documents);
 }

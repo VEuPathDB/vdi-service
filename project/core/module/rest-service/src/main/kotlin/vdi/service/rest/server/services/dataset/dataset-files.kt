@@ -11,6 +11,7 @@ import vdi.service.rest.generated.model.DatasetFileListingImpl
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.outputs.DatasetFileDetails
 import vdi.service.rest.server.outputs.DatasetZipDetails
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.wrap
@@ -70,6 +71,8 @@ private fun listDatasetFiles(owner: UserID, vdiId: DatasetID) =
     install = DatasetStore.getInstallReadyZipSize(owner, vdiId)
       .takeUnless { it < 0 }
       ?.let { DatasetZipDetails(it, CacheDB().selectInstallFiles(vdiId)) }
+    documents = DatasetStore.listDocumentFiles(owner, vdiId)
+      .map { DatasetFileDetails(it.baseName, it.size) }
   }
 
 // endregion List Files
@@ -82,7 +85,7 @@ private fun listDatasetFiles(owner: UserID, vdiId: DatasetID) =
  * * it has been shared with the target user
  * * it has been marked as public
  */
-private fun lookupVisibleDataset(userID: UserID, datasetID: DatasetID): DatasetRecord? =
+fun lookupVisibleDataset(userID: UserID, datasetID: DatasetID): DatasetRecord? =
   CacheDB().selectDatasetForUser(userID, datasetID) // owned or shared
     ?: CacheDB().selectDataset(datasetID)
       ?.takeIf { it.visibility == DatasetVisibility.Public }

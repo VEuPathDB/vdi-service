@@ -54,4 +54,10 @@ class DatasetFiles(@Context request: ContainerRequest)
           )
       }
       .fold()
+
+  override fun getDatasetsFilesDocumentsByVdiIdAndFileName(vdiId: String, fileName: String) =
+    when (maybeUser) {
+      null -> getUserDocumentForAdmin(DatasetID(vdiId), fileName)
+      else -> getUserDocumentForUser(DatasetID(vdiId), fileName)
+    }
 }

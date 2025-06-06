@@ -17,3 +17,9 @@ fun DatasetFileDetails(file: DatasetFileInfo): DatasetFileDetails =
     it.fileName = file.name
     it.fileSize = file.size.toLong()
   }
+
+fun DatasetFileDetails(name: String, size: Long): DatasetFileDetails =
+  DatasetFileDetailsImpl().also {
+    it.fileName = name
+    it.fileSize = size
+  }

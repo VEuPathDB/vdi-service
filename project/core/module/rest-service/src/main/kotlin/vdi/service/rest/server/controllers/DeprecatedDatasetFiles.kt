@@ -50,4 +50,13 @@ class DeprecatedDatasetFiles(@Context request: ContainerRequest): VdiDatasetsVdi
           )
       }
       .fold())
+
+  override fun getVdiDatasetsFilesDocumentsByVdiIdAndFileName(
+    vdiId: String,
+    fileName: String
+  ) =
+    VdiDatasetsVdiIdFiles.GetVdiDatasetsFilesDocumentsByVdiIdAndFileNameResponse(when (maybeUser) {
+      null -> getUserDocumentForAdmin(DatasetID(vdiId), fileName)
+      else -> getUserDocumentForUser(DatasetID(vdiId), fileName)
+    }.delegate)
 }

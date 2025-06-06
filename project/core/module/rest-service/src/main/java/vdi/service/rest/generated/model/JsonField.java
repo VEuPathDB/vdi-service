@@ -31,6 +31,7 @@ public final class JsonField {
   public static final String DETAILS = "details";
   public static final String DISPLAY_NAME = "displayName";
   public static final String DOC_FILES = "docFiles";
+  public static final String DOCUMENTS = "documents";
   public static final String EMAIL = "email";
   public static final String ERRORS = "errors";
   public static final String FILE_COUNT = "fileCount";

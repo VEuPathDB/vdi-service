@@ -72,3 +72,26 @@ get:
         body: lib.NotFoundError
       500:
         body: lib.ServerError
+
+/documents/{file-name}:
+  displayName: Additional Meta Files
+  uriParameters:
+    file-name:
+  get:
+    displayName: Get Document
+    responses:
+      200:
+        headers:
+          Content-Disposition:
+            description: Content disposition of `attachment` with a filename.
+            type: string
+            example: attachment; filename="1234567-data.zip"
+        body:
+          application/octet-stream:
+            type: any
+      401:
+        body: lib.UnauthorizedError
+      404:
+        body: lib.NotFoundError
+      500:
+        body: lib.ServerError
