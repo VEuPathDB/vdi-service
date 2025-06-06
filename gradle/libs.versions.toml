@@ -77,7 +77,7 @@ http-client-multipart = { group = "io.foxcapades.lib", name = "k-multipart",   v
 http-server-jersey = { group = "org.glassfish.jersey.core", name = "jersey-server", version = "3.1.10" }
 container-core = { group = "org.veupathdb.lib", name = "jaxrs-container-core", version = "9.6.0" }
 container-multipart = { group = "org.veupathdb.lib", name = "multipart-jackson-pojo", version = "1.1.7" }
-json-request-validation     = { group = "org.veupathdb.lib", name = "jpath-request-validation", version = "0.1.0" }
+json-request-validation     = { group = "org.veupathdb.lib", name = "jpath-request-validation", version = "0.1.1" }
 
 # Database
 fgputil-db = { group = "org.gusdb", name = "fgputil-db", version = "2.16.0-jakarta" }

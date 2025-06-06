@@ -29,7 +29,7 @@ private fun APIHyperlink.validate(jPath: String, index: Int, errors: ValidationE
   try {
     URI(url)
   } catch (e: URISyntaxException) {
-    errors.add(jPath..JsonField.URL, e.reason)
+    errors.add((jPath..JsonField.URL)..index, e.reason)
   }
 
   text.reqCheckLength(jPath..JsonField.TEXT, index, TextMinLength, TextMaxLength, errors)
