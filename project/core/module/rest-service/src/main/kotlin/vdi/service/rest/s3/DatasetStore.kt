@@ -19,7 +19,6 @@ import vdi.config.raw.vdi.ObjectStoreConfig
 import vdi.core.s3.files.FileName
 import vdi.core.s3.paths.S3Paths
 import vdi.core.s3.util.S3Config
-import vdi.service.rest.generated.model.DatasetFileDetails
 
 object DatasetStore {
   private lateinit var client: S3Client
@@ -113,11 +112,14 @@ object DatasetStore {
   fun getDocumentFile(userID: UserID, datasetID: DatasetID, filename: String) =
     bucket.objects.open(S3Paths.datasetDocumentFile(userID, datasetID, filename))
 
-  fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
-    bucket.objects.list(prefix = S3Paths.datasetDir(userID, datasetID))
+  fun putDocumentFile(userID: UserID, datasetID: DatasetID, filename: String, fn: () -> InputStream) =
+    fn().use { bucket.objects[S3Paths.datasetDocumentFile(userID, datasetID, filename)] = it }
 
   fun listDocumentFiles(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
     bucket.objects.list(prefix = S3Paths.datasetDocumentsDir(userID, datasetID))
+
+  fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
+    bucket.objects.list(prefix = S3Paths.datasetDir(userID, datasetID))
 
   fun streamAll() = bucket.objects.streamAll().stream()
 

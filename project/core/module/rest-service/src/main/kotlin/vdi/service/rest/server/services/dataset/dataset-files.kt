@@ -73,6 +73,7 @@ private fun listDatasetFiles(owner: UserID, vdiId: DatasetID) =
       ?.let { DatasetZipDetails(it, CacheDB().selectInstallFiles(vdiId)) }
     documents = DatasetStore.listDocumentFiles(owner, vdiId)
       .map { DatasetFileDetails(it.baseName, it.size) }
+      .takeUnless { it.isEmpty() }
   }
 
 // endregion List Files

@@ -201,12 +201,8 @@ fun <T: ControllerBase> T.uploadFiles(
   if (uploadRefs.meta.isNotEmpty()) {
     logger.debug("uploading dataset meta files")
     try {
-      TempFiles.withTempPath { docsZip ->
-        if (uploadRefs.meta.size == 1)
-          TempFiles.withTempDirectory { dir -> uploadRefs.meta[0].repack(into = docsZip, using = dir, logger = logger) }
-        else
-          DatasetStore.putImportReadyZip(userID, datasetID, docsZip::inputStream)
-      }
+      for (path in uploadRefs.meta)
+        DatasetStore.putDocumentFile(userID, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
       logger.error("dataset additional document file(s) upload to minio failed:", e)
       throw e
