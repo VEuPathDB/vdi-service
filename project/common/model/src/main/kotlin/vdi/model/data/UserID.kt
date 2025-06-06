@@ -17,7 +17,7 @@ sealed interface UserID {
   override fun toString(): String
 }
 
-class UserIDDeserializer : JsonDeserializer<UserID>() {
+class UserIDDeserializer: JsonDeserializer<UserID>() {
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): UserID {
     val node = p.codec.readTree<JsonNode>(p)
 
@@ -30,8 +30,8 @@ class UserIDDeserializer : JsonDeserializer<UserID>() {
   }
 }
 
-class UserIDSerializer : JsonSerializer<UserID>() {
+class UserIDSerializer: JsonSerializer<UserID>() {
   override fun serialize(value: UserID, gen: JsonGenerator, serializers: SerializerProvider) {
-    gen.writeString(value.toString())
+    gen.writeNumber(value.toLong())
   }
 }

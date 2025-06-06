@@ -44,4 +44,4 @@ fun Collection<APIPublication>.validate(jPath: String, errors: ValidationErrors)
 }
 
 internal fun APIPublication.toInternal() =
-  DatasetPublication(pubMedId, citation, isPrimary)
+  DatasetPublication(pubMedId, isPrimary, citation)

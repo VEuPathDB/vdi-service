@@ -25,6 +25,18 @@ open class DatasetRevision(
     const val Timestamp    = "timestamp"
   }
 
+  override fun toString() = "DatasetRevision(action=$action, timestamp=$timestamp, revisionID=$revisionID, revisionNote=$revisionNote)"
+
+  override fun equals(other: Any?): Boolean {
+    return other is DatasetRevision && (
+      other === this || (
+        other.action == this.action
+        && other.timestamp == this.timestamp
+        && other.revisionID == this.revisionID
+        && other.revisionNote == this.revisionNote
+      ))
+  }
+
   /**
    * Represents the type of action taken to update a VDI dataset's data.
    *

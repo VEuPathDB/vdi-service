@@ -6,7 +6,7 @@ import vdi.service.rest.generated.model.DatasetHyperlinkImpl
 
 internal fun DatasetHyperlink(internal: DatasetHyperlink): APIHyperlink =
   DatasetHyperlinkImpl().apply {
-    url = internal.url
+    url = internal.url.toString()
     text = internal.text
     description = internal.description
     isPublication = internal.isPublication

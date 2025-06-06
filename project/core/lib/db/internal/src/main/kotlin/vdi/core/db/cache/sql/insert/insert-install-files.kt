@@ -19,7 +19,7 @@ ON CONFLICT
 internal fun Connection.tryInsertInstallFiles(datasetID: DatasetID, files: Iterable<DatasetFileInfo>) =
   withPreparedBatchUpdate(SQL, files) {
     setDatasetID(1, datasetID)
-    setString(2, it.filename)
+    setString(2, it.name)
     setLong(3, it.size.toLong())
   }
     .reduceOrNull { a, b -> a + b } ?: 0

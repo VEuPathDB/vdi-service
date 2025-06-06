@@ -25,21 +25,21 @@ fun DatasetMetadata.applyPatch(
     visibility       = patch.visibility?.toInternal() ?: visibility,
     owner            = userID,
     name             = patch.name ?: name,
-    shortName        = patch.shortName.applyPatch(shortName),
-    shortAttribution = patch.shortAttribution.applyPatch(shortAttribution),
     summary          = patch.summary ?: summary,
-    description      = patch.description.applyPatch(description),
     origin           = origin,
-    dependencies     = dependencies,
-    sourceURL        = sourceURL,
     created          = created,
+    shortName        = patch.shortName.applyPatch(shortName),
+    description      = patch.description.applyPatch(description),
+    shortAttribution = patch.shortAttribution.applyPatch(shortAttribution),
+    sourceURL        = sourceURL,
+    dependencies     = dependencies,
     publications     = patch.publications.applyPatch(publications, DatasetPublication::toInternal),
     hyperlinks       = patch.hyperlinks.applyPatch(hyperlinks, DatasetHyperlink::toInternal),
+    organisms        = patch.organisms.applyPatch(organisms).toSet(),
     contacts         = patch.contacts.applyPatch(contacts, DatasetContact::toInternal),
-    organisms        = patch.organisms.applyPatch(organisms),
-    properties       = patch.properties.applyPatch(properties),
     originalID       = originalID,
     revisionHistory  = revisionHistory,
+    properties       = patch.properties.applyPatch(properties),
   )
 
 /**
@@ -83,7 +83,7 @@ private inline fun <T> Collection<T>?.applyPatch(original: Collection<T>): Colle
  * 2. If the input is empty, clear the field.
  * 3. If the input has content, use the input.
  */
-private inline fun <E, I> Collection<E>?.applyPatch(original: Collection<I>, translate: (E) -> I): Collection<I> =
+private inline fun <E, I> List<E>?.applyPatch(original: List<I>, translate: (E) -> I): List<I> =
   when {
     // null input == don't update
     this == null -> original

@@ -3,6 +3,7 @@ package vdi.model.data
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.net.URI
 import java.time.OffsetDateTime
 
 @JsonIgnoreProperties("category")
@@ -23,41 +24,41 @@ data class DatasetMetadata(
   @field:JsonProperty(JsonKey.Name)
   val name: String,
 
-  @field:JsonProperty(JsonKey.ShortName)
-  val shortName: String?,
-
   @field:JsonProperty(JsonKey.Summary)
   val summary: String,
-
-  @field:JsonProperty(JsonKey.Description)
-  val description: String?,
-
-  @field:JsonProperty(JsonKey.ShortAttribution)
-  val shortAttribution: String?,
 
   @field:JsonProperty(JsonKey.Origin)
   val origin: String,
 
-  @field:JsonProperty(JsonKey.SourceURL)
-  val sourceURL: String?,
-
   @field:JsonProperty(JsonKey.Created)
   val created: OffsetDateTime,
 
+  @field:JsonProperty(JsonKey.ShortName)
+  val shortName: String? = null,
+
+  @field:JsonProperty(JsonKey.Description)
+  val description: String? = null,
+
+  @field:JsonProperty(JsonKey.ShortAttribution)
+  val shortAttribution: String? = null,
+
+  @field:JsonProperty(JsonKey.SourceURL)
+  val sourceURL: URI? = null,
+
   @field:JsonProperty(JsonKey.Dependencies)
-  val dependencies: Collection<DatasetDependency> = emptyList(),
+  val dependencies: List<DatasetDependency> = emptyList(),
 
   @field:JsonProperty(JsonKey.Publications)
-  val publications: Collection<DatasetPublication> = emptyList(),
+  val publications: List<DatasetPublication> = emptyList(),
 
   @field:JsonProperty(JsonKey.Hyperlinks)
-  val hyperlinks: Collection<DatasetHyperlink> = emptyList(),
+  val hyperlinks: List<DatasetHyperlink> = emptyList(),
 
   @field:JsonProperty(JsonKey.Organisms)
-  val organisms: Collection<String> = emptyList(),
+  val organisms: Set<String> = emptySet(),
 
   @field:JsonProperty(JsonKey.Contacts)
-  val contacts: Collection<DatasetContact> = emptyList(),
+  val contacts: List<DatasetContact> = emptyList(),
 
   @field:JsonProperty(JsonKey.OriginalID)
   val originalID: DatasetID? = null,

@@ -105,7 +105,9 @@ deque = { module = "io.k-libs:deque", version = "0.9.0" }
 #
 
 # JUnit5
-junit-api      = { module = "org.junit.jupiter:junit-jupiter-api",        version.ref = "junit" }
+junit-api      = { module = "org.junit.jupiter:junit-jupiter-api",    version.ref = "junit" }
+junit-params   = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+
 junit-engine   = { module = "org.junit.jupiter:junit-jupiter-engine",     version.ref = "junit" }
 junit-compat   = { module = "org.junit.vintage:junit-vintage-engine",     version.ref = "junit" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version     = "1.13.0" }
@@ -118,4 +120,4 @@ mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version = "5.4.
 [bundles]
 jackson = ["json-jackson-core", "json-jackson-annotations", "json-jackson-databind", "json-jackson-datetime", "json-jackson-kotlin", "json-jackson-options", "json-jackson-parameters"]
 logging = ["log-slf4j-api", "log-slf4j-jcl", "log-slf4j-jul", "log-log4j-slf4j", "log-log4j-api", "log-log4j-core"]
-testing = ["junit-api", "mockito-core", "mockito-junit", "mockito-kotlin"]
+testing = ["junit-api", "junit-params", "mockito-core", "mockito-junit", "mockito-kotlin"]

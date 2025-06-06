@@ -1,19 +1,20 @@
 package vdi.model.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.net.URI
 
 data class DatasetHyperlink(
   @field:JsonProperty(JsonKey.URL)
-  val url: String,
+  val url: URI,
 
   @field:JsonProperty(JsonKey.Text)
   val text: String,
 
   @field:JsonProperty(JsonKey.Description)
-  val description: String?,
+  val description: String? = null,
 
   @field:JsonProperty(JsonKey.IsPublication)
-  val isPublication: Boolean
+  val isPublication: Boolean = false,
 ) {
   object JsonKey {
     const val URL           = "url"

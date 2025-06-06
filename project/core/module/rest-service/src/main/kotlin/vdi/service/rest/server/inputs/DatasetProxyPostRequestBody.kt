@@ -3,6 +3,8 @@ package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
+import java.net.URI
+import java.net.URISyntaxException
 import vdi.model.data.UserID
 import vdi.model.data.DatasetMetadata
 import vdi.model.data.DatasetVisibility
@@ -32,6 +34,12 @@ fun DatasetProxyPostRequestBody.validate(): ValidationErrors {
   if (dataFiles == null) {
     if (url == null)
       throw BadRequestException("must provide an upload file or url to a source file")
+
+    try {
+      URI(url)
+    } catch (e: URISyntaxException) {
+      throw BadRequestException("invalid source URL")
+    }
   } else if (url != null) {
     throw BadRequestException("cannot provide both an upload file and a source file URL")
   }
@@ -40,22 +48,4 @@ fun DatasetProxyPostRequestBody.validate(): ValidationErrors {
 }
 
 internal fun DatasetProxyPostRequestBody.toDatasetMeta(userID: UserID) =
-  DatasetMetadata(
-    type             = details.datasetType.toInternal(),
-    installTargets   = details.installTargets.toSet(),
-    owner            = userID,
-    name             = details.name,
-    shortName        = details.shortName,
-    shortAttribution = details.shortAttribution,
-    summary          = details.summary,
-    description      = details.description,
-    visibility       = details.visibility?.toInternal() ?: DatasetVisibility.Private,
-    origin           = details.origin,
-    sourceURL        = url,
-    created          = details.createdOn ?: OffsetDateTime.now(),
-    dependencies     = details.dependencies.map(DatasetDependency::toInternal),
-    publications     = details.publications.map(DatasetPublication::toInternal),
-    hyperlinks       = details.hyperlinks.map(DatasetHyperlink::toInternal),
-    contacts         = details.contacts.map(DatasetContact::toInternal),
-    organisms        = details.organisms,
-  )
+  details.toInternal(userID, url)

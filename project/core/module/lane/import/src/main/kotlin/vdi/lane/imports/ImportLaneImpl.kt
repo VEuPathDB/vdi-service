@@ -284,7 +284,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
         transaction.upsertImportMessages(datasetID, warnings.joinToString("\n"))
       }
 
-      transaction.tryInsertInstallFiles(datasetID, manifest!!.dataFiles)
+      transaction.tryInsertInstallFiles(datasetID, manifest!!.installReadyFiles)
       transaction.updateDataSyncControl(datasetID, dd.getInstallReadyTimestamp() ?: OffsetDateTime.now())
       transaction.updateImportControl(datasetID, DatasetImportStatus.Complete)
     }

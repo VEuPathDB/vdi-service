@@ -213,8 +213,8 @@ class ImportHandler(context: ImportContext, executor: ScriptExecutor, metrics: S
 
   private fun buildManifest(inputFiles: Collection<Pair<Path, Long>>, outputFiles: Collection<Path>) =
     DatasetManifest(
-      inputFiles = inputFiles.map { DatasetFileInfo(it.first.name, it.second.toULong()) },
-      dataFiles  = outputFiles.map { DatasetFileInfo(it.name, it.fileSize().toULong()) },
+      userUploadFiles = inputFiles.map { DatasetFileInfo(it.first.name, it.second.toULong()) },
+      installReadyFiles  = outputFiles.map { DatasetFileInfo(it.name, it.fileSize().toULong()) },
     )
 
   class EmptyInputError : RuntimeException("input archive contained no files")

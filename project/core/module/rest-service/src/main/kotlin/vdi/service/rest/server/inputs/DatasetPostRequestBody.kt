@@ -3,8 +3,11 @@ package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
+import java.net.URI
+import java.net.URISyntaxException
 import vdi.model.data.UserID
 import vdi.service.rest.generated.model.DatasetPostRequestBody
+import vdi.service.rest.generated.model.JsonField
 
 fun DatasetPostRequestBody.cleanup() {
   details?.cleanup()
@@ -26,9 +29,15 @@ fun DatasetPostRequestBody.validate(): ValidationErrors {
 
   // If there is no file or URL, then the request body was incomplete.
   // If there is a file AND URL, then the request body is invalid.
-  if (details == null) {
+  if (dataFiles == null) {
     if (url == null)
       throw BadRequestException("must provide an upload file or url to a source file")
+
+    try {
+      URI(url)
+    } catch (e: URISyntaxException) {
+      throw BadRequestException("invalid source URL")
+    }
   } else if (url != null) {
     throw BadRequestException("cannot provide both an upload file and a source file URL")
   }

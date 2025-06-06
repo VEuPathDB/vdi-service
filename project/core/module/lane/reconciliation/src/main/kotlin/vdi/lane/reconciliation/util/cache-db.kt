@@ -82,8 +82,8 @@ internal fun CacheDB.tryInitDataset(ctx: ReconciliationContext, importStatus: Da
       db.tryInsertRevisionLinks(ctx.meta.originalID!!, ctx.meta.revisionHistory)
 
     ctx.manifest?.also {
-      db.tryInsertUploadFiles(ctx.datasetID, it.inputFiles)
-      db.tryInsertInstallFiles(ctx.datasetID, it.dataFiles)
+      db.tryInsertUploadFiles(ctx.datasetID, it.userUploadFiles)
+      db.tryInsertInstallFiles(ctx.datasetID, it.installReadyFiles)
     }
   }
 }

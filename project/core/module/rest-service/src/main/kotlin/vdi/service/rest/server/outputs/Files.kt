@@ -14,6 +14,6 @@ fun DatasetZipDetails(zipSize: Long, files: List<DatasetFileInfo>): DatasetZipDe
 
 fun DatasetFileDetails(file: DatasetFileInfo): DatasetFileDetails =
   DatasetFileDetailsImpl().also {
-    it.fileName = file.filename
+    it.fileName = file.name
     it.fileSize = file.size.toLong()
   }
