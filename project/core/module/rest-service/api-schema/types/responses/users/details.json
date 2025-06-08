@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "User Details",
+  "properties": {
+    "quota": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "title": "Upload Limit",
+          "description": "Max amount of data a user may upload, counted in bytes.",
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 18446744073709551615,
+          "x-unsigned": true
+        },
+        "usage": {
+          "title": "Current Usage",
+          "description": "Currently used storage amount, measured in bytes.",
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 18446744073709551615,
+          "x-unsigned": true
+        }
+      },
+      "required": [ "limit", "usage" ],
+      "unevaluatedProperties": false
+    }
+  },
+  "required": [ "quota" ],
+  "unevaluatedProperties": false
+}

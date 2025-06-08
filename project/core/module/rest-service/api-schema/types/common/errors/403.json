@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Forbidden Request Error",
+  "description": "Error response for a request that the service has deemed forbidden due to user permissions or system state.",
+  "allOf": [
+    { "$ref": "error.json" },
+    { "examples": [ { "status": "forbidden" } ] }
+  ],
+  "x-discriminator-value": "forbidden"
+}

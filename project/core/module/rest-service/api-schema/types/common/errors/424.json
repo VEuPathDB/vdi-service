@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Failed Dependency Error",
+  "allOf": [
+    { "$ref": "error.json" },
+    {
+      "type": "object",
+      "properties": {
+        "dependency": {
+          "type": "string"
+        }
+      },
+      "required": [ "dependency" ],
+      "unevaluatedProperties": false
+    },
+    { "examples": [ { "status": "failed-dependency" } ] }
+  ],
+  "x-discriminator-value": "failed-dependency"
+}

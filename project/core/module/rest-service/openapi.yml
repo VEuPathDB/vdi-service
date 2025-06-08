@@ -139,10 +139,11 @@ paths:
                 required:
                 - datasetId
                 unevaluatedProperties: false
-        204:
-          description: Nothing
-          headers:
-            Location: { $ref: "#/components/headers/location" }
+        400: { $ref: "#/components/responses/400" }
+        401: { $ref: "#/components/responses/401" }
+        422: { $ref: "#/components/responses/422" }
+        424: { $ref: "#/components/responses/424" }
+        500: { $ref: "#/components/responses/500" }
 
   /datasets/community:
     get:
@@ -192,7 +193,7 @@ paths:
     - $ref: "#/components/parameters/datasetId"
 
     get:
-      tags: [ dataset ]
+      tags: [ "dataset", "file" ]
       operationId: getDatasetFileIndex
       responses:
         200:
@@ -204,16 +205,12 @@ paths:
         404: { $ref: "#/components/responses/404" }
         500: { $ref: "#/components/responses/500" }
 
-  /datasets/{dataset-id}/files/upload:
+  /datasets/{dataset-id}/files/importReady:
     parameters:
     - $ref: "#/components/parameters/datasetId"
     get:
-      deprecated: true
+      tags: [ "dataset", "file" ]
       summary: Get User Upload File
-      # language=markdown
-      description: |-
-        Deprecated in favor of referencing the specific desired file by name
-        using the `/datasets/{dataset-id}/files/{file-name}` endpoint.
       parameters:
       - name: attachment
         required: false
@@ -227,16 +224,12 @@ paths:
         404: { $ref: "#/components/responses/404" }
         500: { $ref: "#/components/responses/500" }
 
-  /datasets/{dataset-id}/files/data:
+  /datasets/{dataset-id}/files/installReady:
     parameters:
     - $ref: "#/components/parameters/datasetId"
     get:
-      deprecated: true
+      tags: [ "dataset", "file" ]
       summary: Get Preprocessed Data
-      # language=markdown
-      description: |-
-        Deprecated in favor of referencing the specific desired file by name
-        using the `/datasets/{dataset-id}/files/{file-name}` endpoint.
       parameters:
       - name: attachment
         required: false
@@ -250,7 +243,7 @@ paths:
         404: { $ref: "#/components/responses/404" }
         500: { $ref: "#/components/responses/500" }
 
-  /datasets/{dataset-id}/files/{file-name}:
+  /datasets/{dataset-id}/files/documents/{file-name}:
     parameters:
     - $ref: "#/components/parameters/datasetId"
     - name: file-name
@@ -259,6 +252,7 @@ paths:
       schema:
         type: string
     get:
+      tags: [ "dataset", "file" ]
       parameters:
       - name: attachment
         required: false
@@ -272,18 +266,113 @@ paths:
         404: { $ref: "#/components/responses/404" }
         500: { $ref: "#/components/responses/500" }
 
-  /datasets/{vdi-id}/shares:
+  /datasets/{dataset-id}/shares/:
     parameters:
     - $ref: "#/components/parameters/datasetId"
+    get:
+      tags: [ "dataset", "share" ]
+      summary: Get Share Details
+      responses:
+        200:
+          description: Share Details
+          content:
+            application/json:
+              schema: { $ref: "api-schema/types/responses/datasets/shares/list.json" }
+        401: { $ref: "#/components/responses/401" }
+        403: { $ref: "#/components/responses/403" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
 
-  /datasets/{vdi-id}/shares/{recipient-user-id}:
+  /datasets/{dataset-id}/shares/{recipient-user-id}:
     parameters:
     - $ref: "#/components/parameters/datasetId"
-    - name: recipient-user-id
-      in: path
-      required: true
-      schema: { $ref: "api-schema/types/common/wdk/user-id.json" }
+    - $ref: "#/components/parameters/shareRecipientId"
+    get:
+      tags: [ "dataset", "share" ]
+      summary: Get Share Details
+      responses:
+        200:
+          description: Share Details
+          content:
+            application/json:
+              schema: { $ref: "api-schema/types/responses/datasets/shares/details.json" }
+        401: { $ref: "#/components/responses/401" }
+        403: { $ref: "#/components/responses/403" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
 
+  /datasets/{dataset-id}/shares/{recipient-user-id}/offer:
+    parameters:
+    - $ref: "#/components/parameters/datasetId"
+    - $ref: "#/components/parameters/shareRecipientId"
+    put:
+      tags: [ "dataset", "share" ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "api-schema/types/requests/datasets/shares/offer.json" }
+      responses:
+        204: { description: "Success" }
+        400: { $ref: "#/components/responses/400" }
+        401: { $ref: "#/components/responses/401" }
+        403: { $ref: "#/components/responses/403" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
+
+  /datasets/{dataset-id}/shares/{recipient-user-id}/receipt:
+    parameters:
+    - $ref: "#/components/parameters/datasetId"
+    - $ref: "#/components/parameters/shareRecipientId"
+    put:
+      tags: [ "dataset", "share" ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "api-schema/types/requests/datasets/shares/receipt.json" }
+      responses:
+        204: { description: "Success" }
+        400: { $ref: "#/components/responses/400" }
+        401: { $ref: "#/components/responses/401" }
+        403: { $ref: "#/components/responses/403" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
+
+
+  /users/{user-id}:
+    parameters:
+    - $ref: "#/components/parameters/userId"
+    get:
+      tags: [ "user" ]
+      summary: Get User Details
+      responses:
+        200:
+          description: User Details
+          content:
+            application/json:
+              schema: { $ref: "api-schema/types/responses/users/details.json" }
+        401: { $ref: "#/components/responses/401" }
+        403: { $ref: "#/components/responses/403" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
+
+  /users/{user-id}/shares:
+    parameters:
+    - $ref: "#/components/parameters/userId"
+    get:
+      summary: Get User Share Info
+      tags: [ "user", "share" ]
+      responses:
+        200:
+          description: User Share Listing
+          content:
+            application/json:
+              schema: { $ref: "api-schema/types/responses/users/share-list.json" }
+        401: { $ref: "#/components/responses/401" }
+        403: { $ref: "#/components/responses/403" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
 
 components:
   parameters:
@@ -292,6 +381,23 @@ components:
       in: path
       required: true
       schema: { $ref: "api-schema/types/common/dataset/dataset-id.json" }
+    shareRecipientId:
+      name: recipient-user-id
+      in: path
+      required: true
+      schema: { $ref: "api-schema/types/common/wdk/user-id.json" }
+    userId:
+      name: user-id
+      in: path
+      required: true
+      # language=markdown
+      description: |-
+        Either the WDK user ID of a target user, or the value `me`.
+      schema:
+        type: string
+        minLength: 2
+        # language=regexp
+        pattern: ^me|\d{3,12}$
   headers:
     location:
       schema:
@@ -323,11 +429,26 @@ components:
       content:
         application/json:
           schema: { $ref: "api-schema/types/common/errors/401.json" }
+    403:
+      description: Forbidden Error
+      content:
+        application/json:
+          schema: { $ref: "api-schema/types/common/errors/403.json" }
     404:
       description: Not Found Error
       content:
         application/json:
           schema: { $ref: "api-schema/types/common/errors/404.json" }
+    422:
+      description: Unprocessable Entity Error
+      content:
+        application/json:
+          schema: { $ref: "api-schema/types/common/errors/422.json" }
+    424:
+      description: Failed Dependency Error
+      content:
+        application/json:
+          schema: { $ref: "api-schema/types/common/errors/424.json" }
     500:
       description: Internal Server Error
       content:

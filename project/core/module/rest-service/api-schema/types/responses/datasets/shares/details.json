@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Share Details",
+  "type": "object",
+  "properties": {
+    "recipient": { "$ref": "../../../common/wdk/user-details.json" },
+    "action": { "$ref": "../../../common/dataset/share/offer-action.json" }
+  },
+  "required": [ "recipient", "action" ],
+  "unevaluatedProperties": false
+}

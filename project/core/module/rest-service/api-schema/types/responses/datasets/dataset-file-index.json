@@ -3,20 +3,15 @@
   "type": "object",
   "title": "Dataset File Index",
   "properties": {
-    "dataFiles": {
-      "type": "object",
-      "additionalProperties": { "$ref": "#/$defs/archive" },
-      "unevaluatedProperties": false,
-      "minProperties": 1
-    },
-    "metaFiles": {
-      "type": "object",
-      "additionalProperties": { "$ref": "#/$defs/file" },
-      "unevaluatedProperties": false,
-      "minProperties": 0
+    "importReady": { "$ref": "#/$defs/archive" },
+    "installReady": { "$ref": "#/$defs/archive" },
+    "documents": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/file" },
+      "unevaluatedItems": false
     }
   },
-  "required": [ "dataFiles" ],
+  "required": [ "importReady" ],
   "unevaluatedProperties": false,
   "$defs": {
     "archive": {

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unprocessable Entity Error",
+  "description": "Error response for a request whose content was syntactically valid, but failed request validation.",
+  "allOf": [
+    { "$ref": "error.json" },
+    {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "object",
+          "properties": {
+            "general": {
+              "description": "Errors that are not specific to a specific field.",
+              "type": "array",
+              "items": { "type": "string" },
+              "uniqueItems": true,
+              "unevaluatedItems": false
+            },
+            "byKey": {
+              "description": "Field specific errors.  Error arrays are keyed on a JSON Path to the field the errors are for.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": { "type": "string" },
+                "uniqueItems": true,
+                "unevaluatedItems": false
+              },
+              "unevaluatedProperties": false
+            }
+          },
+          "unevaluatedProperties": false
+        }
+      },
+      "required": [ "errors" ],
+      "unevaluatedProperties": false
+    },
+    { "examples": [ {
+      "status": "invalid-input",
+      "byKey": {
+        "$.installTargets[1]": [ "unrecognized install target" ]
+      }
+    } ] }
+  ],
+  "x-discriminator-value": "invalid-input"
+}

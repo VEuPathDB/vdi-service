@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "User Share Listing",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "recipient": { "$ref": "../../../common/wdk/user-id.json" },
+      "action": { "$ref": "../../../common/dataset/share/offer-action.json" }
+    },
+    "required": [ "recipient", "action" ],
+    "unevaluatedProperties": false
+  },
+  "uniqueItems": false
+}
