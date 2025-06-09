@@ -11,6 +11,6 @@
       "required": [ "containerCore" ],
       "unevaluatedProperties": false
     },
-    { "$ref": "vdi-config.json" }
+    { "$ref": "plugin-config.json" }
   ]
 }

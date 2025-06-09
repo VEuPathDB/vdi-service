@@ -188,8 +188,13 @@ types:
     type: DatasetMetaBase
     additionalProperties: false
     properties:
+      created: DatasetCreationDate
       datasetId: VdiId
+      datasetType: DatasetTypeOutput
       owner: DatasetOwner
+      status: DatasetStatusInfo
+      visibility: DatasetVisibility
+
       importMessages?:
         description: |
           Log lines from the import process.
@@ -201,11 +206,6 @@ types:
           Array of share offers that have been created by the owner of this
           dataset to share it with other users.
         type: ShareOffer[]
-      # Meta Fields
-      datasetType: DatasetTypeOutput
-      visibility: DatasetVisibility
-      status: DatasetStatusInfo
-      created: DatasetCreationDate
       sourceUrl?: DatasetSourceUrl
       originalId?: VdiId
       revisionHistory?: DatasetRevision[]
@@ -292,20 +292,9 @@ types:
     type: object
     additionalProperties: false
     properties:
+      created: DatasetCreationDate
       datasetId: VdiId
-      owner: DatasetOwner
       datasetType: DatasetTypeOutput
-      visibility: DatasetVisibility
-      name: DatasetName
-      origin: DatasetOrigin
-      installTargets:
-        description: |
-          Project IDs for projects the dataset record was submitted to.
-        type: InstallTargetID[]
-        uniqueItems: true
-        minItems: 1
-      status: DatasetStatusInfo
-      shares: DatasetListShareUser[]
       fileCount:
         description: Number of files uploaded for this dataset.
         type: integer
@@ -314,13 +303,25 @@ types:
           Sum of the sizes of all the files uploaded for this dataset.
         type: integer
         format: int64
-      created: DatasetCreationDate
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
+      installTargets:
+        description: |
+          Project IDs for projects the dataset record was submitted to.
+        type: InstallTargetID[]
+        uniqueItems: true
+        minItems: 1
+      name: DatasetName
+      origin: DatasetOrigin
+      owner: DatasetOwner
+      status: DatasetStatusInfo
       summary: DatasetSummary
+      visibility: DatasetVisibility
+
       description?: DatasetDescription
-      sourceUrl?: DatasetSourceUrl
       originalId?: VdiId
+      shares?: DatasetListShareUser[]
+      sourceUrl?: DatasetSourceUrl
+      shortAttribution?: DatasetShortAttribution
+      shortName?: DatasetShortName
   DatasetListShareUser:
     displayName: Dataset Listing Share Info
     type: object
