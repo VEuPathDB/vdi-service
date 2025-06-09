@@ -130,7 +130,7 @@ tasks {
 
   register("build-plugin-config-schema-resource") {
     val outputFile = jsonSchemaBuildDir.resolve("schema/config/plugin-config.json")
-    val rootSchema = inputDir.resolve("vdi-config.json")
+    val rootSchema = inputDir.resolve("plugin-config.json")
 
     inputs.dir(inputDir)
     outputs.file(outputFile)
