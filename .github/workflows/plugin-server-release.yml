@@ -1,7 +1,6 @@
 name: Plugin Server Release
 
 on:
-  workflow_dispatch: {}
   push:
     tags:
     - v*
@@ -10,26 +9,22 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@v4
+
+    - name: Checkout Revision
+      uses: actions/checkout@v4
+
+    - name: Install Java
+      uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: corretto
-    - uses: gradle/actions/setup-gradle@v4
+
+    - name: Install Gradle
+      uses: gradle/actions/setup-gradle@v4
       with:
         cache-read-only: false
 
-    - name: Get Server Version
-      id: version
-      env:
-        GH_USERNAME: ${{ secrets.GH_USERNAME }}
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |-
-        version=$(set -o pipefail; gradle :plugin-server:properties | grep 'version: ' | cut -d' ' -f2)
-        isBeta=$(echo $foo | grep -qv '-'; echo $?)
-        echo release=$version >> $GITHUB_OUTPUT
-        echo isBeta=$isBeta >> $GITHUB_OUTPUT
-    - name: Build
+    - name: Run Gradle Build
       env:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -40,13 +35,18 @@ jobs:
         md5sum service.jar | cut -b1-32 | tr -d '\n' > service.jar.md5
         sed "s/##VERSION_TEMPLATE##/${{steps.version.outputs.release}}/" scripts/docker-download.sh > docker-download.sh
 
+    - name: Create Server Archive
+      run: |-
+        mkdir -p tmp/etc/vdi
+        cp project/plugin-server/build/libs/service.jar tmp
+        cp project/plugin-server/startup.sh tmp
+        cp config/halfway-config.yml tmp/etc/vdi/config.yml
+        cd tmp
+        tar -czf plugin-server.tar.gz *
+
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
-        draft: ${{steps.version.outputs.isBeta == 1}}
-        files: |
-          service.jar
-          service.jar.sha256
-          service.jar.md5
-          docker-download.sh
+        draft: ${{contains(github.ref_name, '-')}}
+        files: tmp/plugin-server.tar.gz
         generate_release_notes: true
