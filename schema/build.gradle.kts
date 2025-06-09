@@ -19,7 +19,7 @@ sourceSets.main {
 tasks.processResources { dependsOn(
   ":build-plugin-config-schema-resource",
   ":build-stack-config-schema-resource",
-  "build-dataset-schema-resources",
+  ":build-dataset-schema-resources",
 ) }
 
 tasks.clean { delete(jsonSchemaBuildDir) }
@@ -135,7 +135,7 @@ tasks {
     inputs.dir(inputDir)
     outputs.file(outputFile)
 
-    json.writeValue(outputFile, buildMergedSchema(rootSchema))
+    doLast { json.writeValue(outputFile, buildMergedSchema(rootSchema)) }
   }
 
   register("build-stack-config-schema-resource") {
@@ -145,7 +145,7 @@ tasks {
     inputs.dir(inputDir)
     outputs.file(outputFile)
 
-    json.writeValue(outputFile, buildMergedSchema(rootSchema))
+    doLast { json.writeValue(outputFile, buildMergedSchema(rootSchema)) }
   }
 }
 
