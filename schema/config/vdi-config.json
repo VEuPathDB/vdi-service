@@ -4,6 +4,7 @@
   "title": "VDI Plugin Configuration Schema",
   "type": "object",
   "properties": {
+    "containerCore": {},
     "vdi": { "$ref": "vdi/vdi-config.json" },
     "definitions": {
       "title": "Shared Value Definitions",
