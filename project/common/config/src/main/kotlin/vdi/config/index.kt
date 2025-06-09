@@ -19,8 +19,8 @@ import vdi.config.raw.StackConfig
 import vdi.logging.MetaLogger
 import vdi.model.field.SecretString
 
-fun StackConfig(path: Path): StackConfig {
-  val validator = StackConfig::class.java.getResourceAsStream("/schema/config/full-config.json")
+fun StackConfig(path: Path, schema: Path): StackConfig {
+  val validator = StackConfig::class.java.getResourceAsStream(schema.toString())
     .use { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it)!! }
 
   val json = JSON.convertValue<ObjectNode>(Yaml().load<Any>(path.readText().interpolateFrom(System.getenv())))
@@ -48,8 +48,11 @@ fun StackConfig(path: Path): StackConfig {
 
 var cachedConfig: StackConfig? = null
 
-fun loadAndCacheStackConfig(path: Path = Path(System.getenv("VDI_CONFIG_PATH") ?: "/etc/vdi/config.yml")) =
-  cachedConfig ?: StackConfig(path).also { cachedConfig = it }
+fun loadAndCacheStackConfig(
+  path: Path = Path(System.getenv("VDI_CONFIG_PATH") ?: "/etc/vdi/config.yml"),
+  schema: Path = Path("/schema/config/full-config.json")
+) =
+  cachedConfig ?: StackConfig(path, schema).also { cachedConfig = it }
 
 fun loadManifestConfig() =
   ManifestConfig::class.java.classLoader.getResourceAsStream("META-INF/MANIFEST.MF")

@@ -57,7 +57,7 @@ jobs:
       run: |-
         gradle -P SCHEMA_BUILD_DIR=$DOC_BUILD_DIR \
           :schema:build-dataset-schema-resources \
-          :schema:build-config-schema-resource
+          :schema:build-config-schema-resources
 
     - name: Generate Configuration Docs
       run: >-
@@ -66,7 +66,13 @@ jobs:
           --config examples_as_yaml \
           --config no_link_to_reused_ref \
           $DOC_BUILD_DIR/schema/config/full-config.json \
-          $DOC_BUILD_DIR/schema/config/index.html
+          $DOC_BUILD_DIR/schema/config/full-config.html
+        generate-schema-doc \
+          --config expand_buttons \
+          --config examples_as_yaml \
+          --config no_link_to_reused_ref \
+          $DOC_BUILD_DIR/schema/config/plugin-config.json \
+          $DOC_BUILD_DIR/schema/config/plugin-config.html
 
     - uses: actions/upload-pages-artifact@v3
       with:

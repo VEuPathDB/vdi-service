@@ -22,7 +22,8 @@ endif::[]
 
 [unstyled]
 * https://veupathdb.github.io/vdi-service/core/[HTTP API]
-* https://veupathdb.github.io/vdi-service/schema/config/[Service Stack Config]
+* https://veupathdb.github.io/vdi-service/schema/config/full-config.html[Full Stack Config]
+* https://veupathdb.github.io/vdi-service/schema/config/plugin-config.html[Plugin Config]
 
 === Schema
 

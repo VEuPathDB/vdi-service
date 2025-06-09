@@ -4,6 +4,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import kotlin.io.path.Path
 import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.script.ScriptExecutorImpl
 import vdi.config.loadAndCacheStackConfig
@@ -17,7 +18,7 @@ import vdi.service.plugin.util.DatasetPathFactory
 
 fun main() {
   MetaLogger.info("loading configuration")
-  val config = loadAndCacheStackConfig().vdi
+  val config = loadAndCacheStackConfig(schema = Path("/schema/config/plugin-config.json")).vdi
   val plugin = System.getenv("PLUGIN_ID")?.let(config.plugins::get)
     ?: throw IllegalStateException("could not match PLUGIN_ID to plugin configuration")
 

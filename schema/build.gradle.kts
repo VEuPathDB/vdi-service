@@ -5,9 +5,7 @@ import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
 import org.yaml.snakeyaml.Yaml
 
-plugins {
-  `java-library`
-}
+plugins { `java-library` }
 
 java.targetCompatibility = JavaVersion.VERSION_21
 
@@ -18,22 +16,18 @@ sourceSets.main {
   resources.srcDir(jsonSchemaBuildDir)
 }
 
-tasks.processResources { dependsOn("build-config-schema-resource", "build-dataset-schema-resources") }
+tasks.processResources { dependsOn(
+  ":build-plugin-config-schema-resource",
+  ":build-stack-config-schema-resource",
+  "build-dataset-schema-resources",
+) }
 
 tasks.clean { delete(jsonSchemaBuildDir) }
 
-tasks.register("build-config-schema-resource") {
+tasks {
   val json = ObjectMapper()
-
   val inputDir = file("config/")
-
-  val outputFile = jsonSchemaBuildDir.resolve("schema/config/full-config.json")
-  val rootSchema = inputDir.resolve("stack-config.json")
-
   val refRegex = Regex("\"\\\$ref\":\\s*\"([^\"]+)\"")
-
-  inputs.dir(inputDir)
-  outputs.file(outputFile)
 
   fun File.load() =
     readText().let { raw ->
@@ -58,7 +52,14 @@ tasks.register("build-config-schema-resource") {
       }
   }
 
-  fun processResult(thisRefKey: String, path: File, res: Pair<String, Set<IntRange>>, buffer: StringBuilder, rootDefs: ObjectNode): ObjectNode {
+  fun processResult(
+    thisRefKey: String,
+    path: File,
+    res: Pair<String, Set<IntRange>>,
+    buffer: StringBuilder,
+    rootDefs: ObjectNode,
+    rootSchema: File,
+  ): ObjectNode {
     var lastPos = 0
 
     for (range in res.second) {
@@ -93,33 +94,66 @@ tasks.register("build-config-schema-resource") {
     return parsed
   }
 
-  fun processResult(path: File, res: Pair<String, Set<IntRange>>, fixedJsonString: StringBuilder, rootDefs: ObjectNode) {
+  fun processResult(
+    path: File,
+    res: Pair<String, Set<IntRange>>,
+    fixedJsonString: StringBuilder,
+    rootDefs: ObjectNode,
+    rootSchema: File,
+  ) {
     val thisRefKey = path.relativeTo(rootSchema.parentFile).toPath().joinToString(";")
-    rootDefs.set<ObjectNode>(thisRefKey, processResult(thisRefKey, path, res, fixedJsonString, rootDefs)
+    rootDefs.set<ObjectNode>(thisRefKey, processResult(thisRefKey, path, res, fixedJsonString, rootDefs, rootSchema)
       .apply {
-      remove("\$defs")
-      remove("\$schema")
-    })
+        remove("\$defs")
+        remove("\$schema")
+      })
   }
 
-  doLast {
+  fun buildMergedSchema(rootSchema: File): ObjectNode {
     val cache = HashMap<File, Pair<String, Set<IntRange>>>(32)
     val buffer = StringBuilder(16384)
 
     rootSchema.resolve(cache)
 
     val rootDefs = json.createObjectNode()!!
-    val rootJson = processResult("", rootSchema, cache.remove(rootSchema)!!, buffer, rootDefs)
+    val rootJson = processResult("", rootSchema, cache.remove(rootSchema)!!, buffer, rootDefs, rootSchema)
 
     if (rootJson.has("\$defs"))
       (rootJson.get("\$defs") as ObjectNode).setAll<ObjectNode>(rootDefs)
     else
       rootJson.set<ObjectNode>("\$defs", rootDefs)
 
-    cache.forEach { (path, res) -> processResult(path, res, buffer, rootDefs) }
+    cache.forEach { (path, res) -> processResult(path, res, buffer, rootDefs, rootSchema) }
 
-    json.writeValue(outputFile, rootJson)
+    return rootJson
   }
+
+  register("build-plugin-config-schema-resource") {
+    val outputFile = jsonSchemaBuildDir.resolve("schema/config/plugin-config.json")
+    val rootSchema = inputDir.resolve("vdi-config.json")
+
+    inputs.dir(inputDir)
+    outputs.file(outputFile)
+
+    json.writeValue(outputFile, buildMergedSchema(rootSchema))
+  }
+
+  register("build-stack-config-schema-resource") {
+    val outputFile = jsonSchemaBuildDir.resolve("schema/config/full-config.json")
+    val rootSchema = inputDir.resolve("stack-config.json")
+
+    inputs.dir(inputDir)
+    outputs.file(outputFile)
+
+    json.writeValue(outputFile, buildMergedSchema(rootSchema))
+  }
+}
+
+tasks.register("build-config-schema-resources") {
+  dependsOn(
+    ":build-plugin-config-schema-resource",
+    ":build-stack-config-schema-resource",
+  )
 }
 
 tasks.register("build-dataset-schema-resources") {
