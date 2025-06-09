@@ -29,7 +29,7 @@ jobs:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |-
-        gradle :plugin-server:test :plugin-server:shadowJar
+        gradle --no-daemon :plugin-server:test :plugin-server:shadowJar
         mv -t . project/plugin-server/build/libs/service.jar
         sha256sum service.jar | cut -b1-64 | tr -d '\n' > service.jar.sha256
         md5sum service.jar | cut -b1-32 | tr -d '\n' > service.jar.md5
