@@ -19,8 +19,29 @@ import vdi.config.raw.StackConfig
 import vdi.logging.MetaLogger
 import vdi.model.field.SecretString
 
+const val DefaultConfigPath = "/etc/vdi/config.yml"
+
 fun StackConfig(path: Path, schema: Path): StackConfig {
   MetaLogger.debug("attempting to load config '{}' and schema '{}'", path, schema)
+  return loadAndCastConfig(path, schema)
+}
+
+inline fun <reified T: Any> loadAndCastConfig(
+  path: Path = Path(System.getenv("VDI_CONFIG_PATH") ?: DefaultConfigPath),
+  schema: Path,
+): T =
+  try {
+    JSON.convertValue(loadAndValidateConfig(path, schema))
+  } catch (e: IllegalArgumentException) {
+    when (val ex = e.cause) {
+      is MismatchedInputException -> if (ex.targetType == SecretString::class.java) {
+        throw IllegalArgumentException(ex.message!!.replace(Regex("\\('.+'\\)"), "('***')"))
+      }
+    }
+    throw e
+  }
+
+fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
   val validator = StackConfig::class.java.getResourceAsStream(schema.toString())
     .use { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it)!! }
 
@@ -35,22 +56,13 @@ fun StackConfig(path: Path, schema: Path): StackConfig {
       throw IllegalStateException("service config validation failed")
     }
 
-  try {
-    return JSON.convertValue(json)
-  } catch (e: IllegalArgumentException) {
-    when (val ex = e.cause) {
-      is MismatchedInputException -> if (ex.targetType == SecretString::class.java) {
-        throw IllegalArgumentException(ex.message!!.replace(Regex("\\('.+'\\)"), "('***')"))
-      }
-    }
-    throw e
-  }
+  return json
 }
 
 var cachedConfig: StackConfig? = null
 
 fun loadAndCacheStackConfig(
-  path: Path = Path(System.getenv("VDI_CONFIG_PATH") ?: "/etc/vdi/config.yml"),
+  path: Path = Path(System.getenv("VDI_CONFIG_PATH") ?: DefaultConfigPath),
   schema: Path = Path("/schema/config/full-config.json")
 ) =
   cachedConfig ?: StackConfig(path, schema).also { cachedConfig = it }
