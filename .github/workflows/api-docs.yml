@@ -54,6 +54,9 @@ jobs:
       run: gradle -P DOC_BUILD_DIR=$DOC_BUILD_DIR/core -P DOC_FILE_NAME=index.html :core:generate-raml-docs
 
     - name: Merge and Convert JSON Schema
+      env:
+        GH_USERNAME: ${{ secrets.GH_USERNAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |-
         gradle -P SCHEMA_BUILD_DIR=$DOC_BUILD_DIR \
           :schema:build-dataset-schema-resources \
