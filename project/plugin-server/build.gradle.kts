@@ -46,6 +46,6 @@ tasks.shadowJar {
   archiveFileName.set("service.jar")
 
   manifest {
-    attributes(mapOf("Main-Class" to "vdi.MainKt"))
+    attributes(mapOf("Main-Class" to "vdi.service.plugin.MainKt"))
   }
 }
