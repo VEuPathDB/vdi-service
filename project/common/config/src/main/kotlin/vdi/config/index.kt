@@ -20,6 +20,7 @@ import vdi.logging.MetaLogger
 import vdi.model.field.SecretString
 
 fun StackConfig(path: Path, schema: Path): StackConfig {
+  MetaLogger.debug("attempting to load config '{}' and schema '{}'", path, schema)
   val validator = StackConfig::class.java.getResourceAsStream(schema.toString())
     .use { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it)!! }
 
