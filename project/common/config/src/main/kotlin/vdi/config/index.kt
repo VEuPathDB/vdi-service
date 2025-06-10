@@ -32,7 +32,7 @@ inline fun <reified T: Any> loadAndCastConfig(path: Path = makeDefaultConfigPath
         throw ConfigurationException(ex.message!!.replace(Regex("\\('.+'\\)"), "('***')"))
       }
     }
-    throw ConfigurationException(e.message ?: "")
+    throw ConfigurationException(e)
   }
 
 fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
