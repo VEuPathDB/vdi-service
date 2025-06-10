@@ -36,7 +36,7 @@ inline fun <reified T: Any> loadAndCastConfig(path: Path = makeDefaultConfigPath
   }
 
 fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
-  val validator = Path::class.java.getResourceAsStream(schema.toString())
+  val validator = object {}.javaClass.getResourceAsStream(schema.toString())
     .use { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it)!! }
 
   val json = JSON.convertValue<ObjectNode>(Yaml().load<Any>(path.readText().interpolateFrom(System.getenv())))
