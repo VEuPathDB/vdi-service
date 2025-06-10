@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
 import javax.sql.DataSource
-import vdi.config.loadAndCacheStackConfig
+import vdi.core.config.loadAndCacheStackConfig
 import vdi.core.db.cache.health.DatabaseDependency
 import vdi.core.db.cache.model.BrokenImportListQuery
 import vdi.core.db.cache.query.DatasetListQuery

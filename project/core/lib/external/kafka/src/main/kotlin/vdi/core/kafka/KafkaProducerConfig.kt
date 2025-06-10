@@ -1,9 +1,9 @@
 package vdi.core.kafka
 
 import kotlin.time.Duration
-import vdi.config.loadAndCacheStackConfig
-import vdi.config.raw.kafka.KafkaConfig
-import vdi.config.raw.kafka.KafkaProducerConfig
+import vdi.core.config.loadAndCacheStackConfig
+import vdi.core.config.kafka.KafkaConfig
+import vdi.core.config.kafka.KafkaProducerConfig
 import vdi.model.field.HostAddress
 
 data class KafkaProducerConfig(

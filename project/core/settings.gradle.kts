@@ -29,6 +29,7 @@ pluginManagement {
 arrayOf(
   "async",
   "common",
+  "config",
   "dataset/pruner",
   "dataset/reconciler",
   "dataset/reinstaller",

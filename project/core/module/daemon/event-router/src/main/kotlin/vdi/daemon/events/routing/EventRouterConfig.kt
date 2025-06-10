@@ -1,6 +1,6 @@
 package vdi.daemon.events.routing
 
-import vdi.config.raw.vdi.VDIConfig
+import vdi.core.config.vdi.VDIConfig
 import vdi.core.kafka.router.KafkaRouterConfig
 import vdi.core.rabbit.RabbitMQConfig
 

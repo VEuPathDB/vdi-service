@@ -6,7 +6,7 @@ import org.veupathdb.lib.container.jaxrs.config.DbOptionsImpl
 import org.veupathdb.lib.container.jaxrs.config.Options
 import java.util.Optional
 import vdi.config.raw.ManifestConfig
-import vdi.config.raw.StackConfig
+import vdi.core.config.StackConfig
 import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
 import vdi.config.raw.db.LDAPDatabaseConnectionConfig

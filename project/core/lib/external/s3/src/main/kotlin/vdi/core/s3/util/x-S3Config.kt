@@ -2,7 +2,7 @@ package vdi.core.s3.util
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import vdi.config.raw.vdi.ObjectStoreConfig
+import vdi.core.config.vdi.ObjectStoreConfig
 
 /**
  * @param conf Object store configuration parsed from YAML stack config.

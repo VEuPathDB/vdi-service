@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
   implementation(project(":lib:db-common"))
   implementation(project(":lib:db-internal"))
   implementation(project(":lib:plugin-client"))
@@ -11,7 +12,6 @@ dependencies {
   implementation(project(":lib:module-core"))
   implementation(project(":lib:external-s3"))
 
-  implementation(common.config)
   implementation(common.json)
   implementation(common.logging)
   implementation(common.model)

@@ -7,8 +7,8 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
 import kotlin.system.exitProcess
-import vdi.config.loadAndCacheStackConfig
-import vdi.config.loadManifestConfig
+import vdi.core.config.loadAndCacheStackConfig
+import vdi.core.config.loadManifestConfig
 import vdi.core.db.cache.patchMetadataTable
 import vdi.core.modules.VDIModule
 import vdi.daemon.events.routing.EventRouter

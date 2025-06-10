@@ -3,7 +3,7 @@ package vdi.daemon.pruner
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
-import vdi.config.raw.vdi.daemons.PrunerConfig
+import vdi.core.config.vdi.daemons.PrunerConfig
 
 data class DatasetPrunerConfig(
   val pruningInterval: Duration,

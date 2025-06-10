@@ -4,9 +4,9 @@ plugins {
 
 dependencies {
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
 
   implementation(libs.json.schema.validation)
 
-  implementation(common.config)
   implementation(common.model)
 }

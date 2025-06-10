@@ -107,6 +107,7 @@ configurations.all {
 
 dependencies {
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
   implementation(project(":lib:dataset-pruner"))
   implementation(project(":lib:dataset-reconciler"))
   implementation(project(":lib:dataset-reinstaller"))
@@ -117,7 +118,6 @@ dependencies {
   implementation(project(":lib:install-target"))
   implementation(project(":lib:plugin-registry"))
 
-  implementation(common.config)
   implementation(common.json)
   implementation(common.logging)
   implementation(common.model)

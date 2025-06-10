@@ -5,7 +5,7 @@ import org.veupathdb.lib.container.jaxrs.providers.DependencyProvider
 import org.veupathdb.lib.container.jaxrs.server.Server
 import org.veupathdb.lib.jaxrs.raml.multipart.JaxRSMultipartUpload
 import vdi.config.raw.ManifestConfig
-import vdi.config.raw.StackConfig
+import vdi.core.config.StackConfig
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.AppDatabaseRegistry
 import vdi.core.db.cache.CacheDB

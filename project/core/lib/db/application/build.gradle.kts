@@ -6,11 +6,11 @@ dependencies {
   api(project(":lib:db-common"))
 
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
 
   implementation(common.db.target)
   implementation(common.model)
   implementation(common.json)
-  implementation(common.config)
   implementation(common.util)
 
   implementation(libs.db.pool)

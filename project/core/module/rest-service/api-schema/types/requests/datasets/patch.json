@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset Patch Request Body",
+  "type": "object",
+  "properties": {
+    "name": { "$ref": "../../common/dataset/name.json" },
+    "type": { "$ref": "../../common/dataset/data-type-short.json" },
+    "shortName": { "$ref": "../../common/dataset/short-name.json" },
+    "shortAttribution": { "$ref": "../../common/dataset/short-attribution.json" },
+    "visibility": { "$ref": "../../common/dataset/visibility.json" },
+    "summary": { "$ref": "../../common/dataset/summary.json" },
+    "description": { "$ref": "../../common/dataset/description.json" },
+    "publications": { "$ref": "../../common/dataset/publication-array.json" },
+    "hyperlinks": { "$ref": "../../common/dataset/hyperlink-array.json" },
+    "organisms": { "$ref": "../../common/dataset/organism-array.json" },
+    "contacts": { "$ref": "../../common/dataset/contact-array.json" },
+    "properties": { "$ref": "../../common/dataset/characteristics.json" }
+  },
+  "unevaluatedProperties": false
+}

@@ -15,7 +15,7 @@ import vdi.model.data.DatasetShareReceipt
 import vdi.json.JSON
 import vdi.json.toJSONString
 import java.io.InputStream
-import vdi.config.raw.vdi.ObjectStoreConfig
+import vdi.core.config.vdi.ObjectStoreConfig
 import vdi.core.s3.files.FileName
 import vdi.core.s3.paths.S3Paths
 import vdi.core.s3.util.S3Config

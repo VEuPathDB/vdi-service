@@ -9,7 +9,7 @@ import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.script.ScriptExecutorImpl
 import vdi.config.loadAndCastConfig
 import vdi.logging.MetaLogger
-import vdi.service.plugin.conf.PluginConfig
+import vdi.service.plugin.conf.PluginServerConfig
 import vdi.service.plugin.conf.ServiceConfiguration
 import vdi.service.plugin.consts.ConfigDefault
 import vdi.service.plugin.model.ApplicationContext
@@ -19,7 +19,7 @@ import vdi.service.plugin.util.DatasetPathFactory
 
 fun main() {
   MetaLogger.info("loading configuration")
-  val config = loadAndCastConfig<PluginConfig>(schema = Path("/schema/config/plugin-config.json")).vdi
+  val config = loadAndCastConfig<PluginServerConfig>(schema = Path("/schema/config/plugin-config.json")).vdi
   val plugin = System.getenv("PLUGIN_ID")?.let(config.plugins::get)
     ?: throw IllegalStateException("could not match PLUGIN_ID to plugin configuration")
 

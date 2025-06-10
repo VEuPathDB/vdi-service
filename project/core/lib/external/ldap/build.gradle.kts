@@ -4,5 +4,5 @@ plugins {
 
 dependencies {
   api(libs.ldap)
-  implementation(common.config)
+  implementation(project(":lib:config"))
 }

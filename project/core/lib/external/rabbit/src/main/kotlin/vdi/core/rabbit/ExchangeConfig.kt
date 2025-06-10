@@ -1,6 +1,6 @@
 package vdi.core.rabbit
 
-import vdi.config.raw.rabbit.RabbitExchangeConfig
+import vdi.core.config.rabbit.RabbitExchangeConfig
 
 data class ExchangeConfig(
   val name: String,

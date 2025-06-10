@@ -9,10 +9,10 @@ import org.slf4j.LoggerFactory
 import java.net.Socket
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import vdi.config.raw.StackConfig
-import vdi.config.raw.kafka.KafkaConfig
-import vdi.config.raw.rabbit.RabbitConfig
-import vdi.config.raw.vdi.*
+import vdi.core.config.StackConfig
+import vdi.core.config.kafka.KafkaConfig
+import vdi.core.config.rabbit.RabbitConfig
+import vdi.core.config.vdi.*
 import vdi.core.err.StartupException
 
 private const val OverallTimeoutSeconds = 60

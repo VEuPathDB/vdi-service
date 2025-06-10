@@ -95,7 +95,6 @@ paths:
         400: { $ref: "#/components/responses/400" }
         401: { $ref: "#/components/responses/401" }
         500: { $ref: "#/components/responses/500" }
-
     post:
       tags: [ dataset ]
       operationId: createDataset
@@ -168,7 +167,6 @@ paths:
   /datasets/{dataset-id}:
     parameters:
     - $ref: "#/components/parameters/datasetId"
-
     get:
       tags: [ dataset ]
       operationId: getDataset
@@ -181,17 +179,58 @@ paths:
         301:
           # language=markdown
           description: |-
-            Target dataset has been moved by replacement with a new dataset ID.
+            Target dataset has been revised and has a new dataset ID.
           headers:
             Location: { $ref: "#/components/headers/location" }
         401: { $ref: "#/components/responses/401" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
+    patch:
+      tags: [ "dataset" ]
+      operationId: updateDataset
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "api-schema/types/requests/datasets/patch.json" }
+      responses:
+        204: { $ref: "#/components/responses/204" }
+        400: { $ref: "#/components/responses/400" }
+        401: { $ref: "#/components/responses/401" }
+        403: { $ref: "#/components/responses/403" }
+        404: { $ref: "#/components/responses/404" }
+        422: { $ref: "#/components/responses/422" }
+        500: { $ref: "#/components/responses/500" }
+    put:
+      tags: [ "dataset" ]
+      operationId: reviseDataset
+      requestBody:
+        content:
+          application/json:
+      responses:
+        201:
+          description: Revision accepted for processing.
+          headers:
+            Location: { $ref: "#/components/headers/location" }
+        400: { $ref: "#/components/responses/400" }
+        401: { $ref: "#/components/responses/401" }
+        403: { $ref: "#/components/responses/403" }
+        404: { $ref: "#/components/responses/404" }
+        422: { $ref: "#/components/responses/422" }
+        424: { $ref: "#/components/responses/424"}
+        500: { $ref: "#/components/responses/500" }
+    delete:
+      tags: [ "dataset" ]
+      operationId: deleteDataset
+      responses:
+        204: { $ref: "#/components/responses/204" }
+        401: { $ref: "#/components/responses/401" }
+        403: { $ref: "#/components/responses/403" }
         404: { $ref: "#/components/responses/404" }
         500: { $ref: "#/components/responses/500" }
 
   /datasets/{dataset-id}/files:
     parameters:
     - $ref: "#/components/parameters/datasetId"
-
     get:
       tags: [ "dataset", "file" ]
       operationId: getDatasetFileIndex
@@ -263,6 +302,22 @@ paths:
       responses:
         200: { $ref: '#/components/responses/File' }
         401: { $ref: "#/components/responses/401" }
+        404: { $ref: "#/components/responses/404" }
+        500: { $ref: "#/components/responses/500" }
+    put:
+      tags: [ "dataset", "file"]
+      requestBody:
+        description: New document file.
+        content:
+          "*/*":
+            schema:
+              type: string
+              format: binary
+      responses:
+        204: { description: "Document replaced" }
+        400: { $ref: "#/components/responses/400" }
+        401: { $ref: "#/components/responses/401" }
+        403: { $ref: "#/components/responses/403" }
         404: { $ref: "#/components/responses/404" }
         500: { $ref: "#/components/responses/500" }
 
@@ -419,6 +474,8 @@ components:
           schema:
             type: string
             format: file
+    204:
+      description: Success
     400:
       description: Bad Request Error
       content:

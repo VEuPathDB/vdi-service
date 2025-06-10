@@ -1,6 +1,6 @@
 package vdi.lane.install
 
-import vdi.config.raw.vdi.VDIConfig
+import vdi.core.config.vdi.VDIConfig
 import vdi.core.modules.AbortCB
 
 

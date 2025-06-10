@@ -10,39 +10,33 @@ import com.networknt.schema.SpecVersion
 import vdi.json.JSON
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
-import java.util.jar.Manifest
 import kotlin.io.path.Path
 import kotlin.io.path.readText
+import vdi.config.parse.ConfigurationException
 import vdi.config.parse.serde.interpolateFrom
-import vdi.config.raw.ManifestConfig
-import vdi.config.raw.StackConfig
 import vdi.logging.MetaLogger
 import vdi.model.field.SecretString
 
 const val DefaultConfigPath = "/etc/vdi/config.yml"
 
-fun StackConfig(path: Path, schema: Path): StackConfig {
-  MetaLogger.debug("attempting to load config '{}' and schema '{}'", path, schema)
-  return loadAndCastConfig(path, schema)
-}
+const val DefaultFullStackSchemaPath = "/schema/config/full-config.json"
 
-inline fun <reified T: Any> loadAndCastConfig(
-  path: Path = Path(System.getenv("VDI_CONFIG_PATH") ?: DefaultConfigPath),
-  schema: Path,
-): T =
+fun makeDefaultConfigPath() = Path(System.getenv("VDI_CONFIG_PATH") ?: DefaultConfigPath)
+
+inline fun <reified T: Any> loadAndCastConfig(path: Path = makeDefaultConfigPath(), schema: Path): T =
   try {
     JSON.convertValue(loadAndValidateConfig(path, schema))
   } catch (e: IllegalArgumentException) {
     when (val ex = e.cause) {
       is MismatchedInputException -> if (ex.targetType == SecretString::class.java) {
-        throw IllegalArgumentException(ex.message!!.replace(Regex("\\('.+'\\)"), "('***')"))
+        throw ConfigurationException(ex.message!!.replace(Regex("\\('.+'\\)"), "('***')"))
       }
     }
-    throw e
+    throw ConfigurationException(e.message ?: "")
   }
 
 fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
-  val validator = StackConfig::class.java.getResourceAsStream(schema.toString())
+  val validator = Path::class.java.getResourceAsStream(schema.toString())
     .use { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it)!! }
 
   val json = JSON.convertValue<ObjectNode>(Yaml().load<Any>(path.readText().interpolateFrom(System.getenv())))
@@ -53,21 +47,8 @@ fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
     ?.also {
       MetaLogger
         .error("service config validation failed:\n{}", JSON.writerWithDefaultPrettyPrinter().writeValueAsString(it))
-      throw IllegalStateException("service config validation failed")
+      throw ConfigurationException("service config validation failed")
     }
 
   return json
 }
-
-var cachedConfig: StackConfig? = null
-
-fun loadAndCacheStackConfig(
-  path: Path = Path(System.getenv("VDI_CONFIG_PATH") ?: DefaultConfigPath),
-  schema: Path = Path("/schema/config/full-config.json")
-) =
-  cachedConfig ?: StackConfig(path, schema).also { cachedConfig = it }
-
-fun loadManifestConfig() =
-  ManifestConfig::class.java.classLoader.getResourceAsStream("META-INF/MANIFEST.MF")
-    .use(::Manifest)
-    .let(::ManifestConfig)

@@ -2,7 +2,7 @@ package vdi.core.rabbit
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import vdi.config.raw.rabbit.RabbitConfig
+import vdi.core.config.rabbit.RabbitConfig
 
 data class RabbitMQConfig(
   val connection: ConnectionConfig,

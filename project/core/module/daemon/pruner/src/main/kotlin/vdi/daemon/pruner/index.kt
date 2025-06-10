@@ -1,6 +1,6 @@
 package vdi.daemon.pruner
 
-import vdi.config.raw.vdi.daemons.PrunerConfig
+import vdi.core.config.vdi.daemons.PrunerConfig
 import vdi.core.modules.AbortCB
 
 /**

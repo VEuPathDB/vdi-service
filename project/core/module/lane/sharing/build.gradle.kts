@@ -4,13 +4,13 @@ plugins {
 
 dependencies {
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
   implementation(project(":lib:db-application"))
   implementation(project(":lib:db-internal"))
   implementation(project(":lib:external-kafka"))
   implementation(project(":lib:module-core"))
   implementation(project(":lib:external-s3"))
 
-  implementation(common.config)
   implementation(common.model)
   implementation(common.logging)
 

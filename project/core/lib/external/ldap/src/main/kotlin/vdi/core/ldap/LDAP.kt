@@ -3,7 +3,7 @@ package vdi.core.ldap
 import org.veupathdb.lib.ldap.LDAP
 import org.veupathdb.lib.ldap.LDAPConfig
 import org.veupathdb.lib.ldap.LDAPHost
-import vdi.config.loadAndCacheStackConfig
+import vdi.core.config.loadAndCacheStackConfig
 
 object LDAP {
   private val ldap: LDAP? = loadAndCacheStackConfig().vdi.ldap?.let {

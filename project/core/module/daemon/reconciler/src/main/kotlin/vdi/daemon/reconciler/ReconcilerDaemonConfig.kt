@@ -3,7 +3,7 @@ package vdi.daemon.reconciler
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import vdi.config.raw.vdi.daemons.ReconcilerConfig
+import vdi.core.config.vdi.daemons.ReconcilerConfig
 
 data class ReconcilerDaemonConfig(
   val reconcilerEnabled: Boolean,

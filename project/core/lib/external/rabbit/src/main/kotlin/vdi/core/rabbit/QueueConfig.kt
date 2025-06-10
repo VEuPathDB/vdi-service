@@ -1,6 +1,6 @@
 package vdi.core.rabbit
 
-import vdi.config.raw.rabbit.RabbitQueueConfig
+import vdi.core.config.rabbit.RabbitQueueConfig
 
 data class QueueConfig(
   val name: String,

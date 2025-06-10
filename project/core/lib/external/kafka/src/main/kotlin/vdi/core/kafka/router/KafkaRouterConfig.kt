@@ -1,9 +1,9 @@
 package vdi.core.kafka.router
 
-import vdi.config.raw.StackConfig
-import vdi.config.loadAndCacheStackConfig
-import vdi.config.raw.kafka.KafkaConfig
-import vdi.config.raw.vdi.lanes.LaneConfig
+import vdi.core.config.StackConfig
+import vdi.core.config.kafka.KafkaConfig
+import vdi.core.config.loadAndCacheStackConfig
+import vdi.core.config.vdi.lanes.LaneConfig
 import vdi.core.kafka.KafkaProducerConfig
 import vdi.core.kafka.toMessageKey
 import vdi.core.kafka.toMessageTopic

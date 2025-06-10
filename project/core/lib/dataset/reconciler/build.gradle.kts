@@ -2,6 +2,7 @@ plugins { id("build-conventions") }
 
 dependencies {
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
   implementation(project(":lib:db-application"))
   implementation(project(":lib:db-common"))
   implementation(project(":lib:db-internal"))
@@ -14,7 +15,6 @@ dependencies {
   implementation(libs.log.log4j.kotlin)
   implementation(libs.kt.coroutines)
 
-  implementation(common.config)
   implementation(common.db.target)
   implementation(common.logging)
   implementation(common.util)

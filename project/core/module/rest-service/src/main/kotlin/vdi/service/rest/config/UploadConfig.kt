@@ -1,9 +1,9 @@
 package vdi.service.rest.config
 
-import vdi.config.raw.vdi.RestServiceConfig
+import vdi.core.config.vdi.RestServiceConfig
 
 data class UploadConfig(val maxUploadSize: ULong, val userMaxStorageSize: ULong) {
-  constructor(config: RestServiceConfig?): this(
+  constructor(config: vdi.core.config.vdi.RestServiceConfig?): this(
     maxUploadSize      = config?.maxUploadSize ?: MaxUploadSize,
     userMaxStorageSize = config?.userMaxStorageSize ?: MaxStorageSize,
   )

@@ -3,7 +3,7 @@ package vdi.core.install
 import com.networknt.schema.JsonSchema
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
-import vdi.config.loadAndCacheStackConfig
+import vdi.core.config.loadAndCacheStackConfig
 import vdi.config.parse.ConfigurationException
 
 object InstallTargetRegistry {

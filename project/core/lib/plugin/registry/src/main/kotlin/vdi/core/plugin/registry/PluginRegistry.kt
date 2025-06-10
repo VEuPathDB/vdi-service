@@ -1,7 +1,7 @@
 package vdi.core.plugin.registry
 
 import vdi.model.data.DatasetType
-import vdi.config.loadAndCacheStackConfig
+import vdi.core.config.loadAndCacheStackConfig
 import vdi.config.parse.ConfigurationException
 import vdi.model.data.DataType
 

@@ -1,7 +1,7 @@
 package vdi.core.plugin.mapping
 
 import vdi.model.data.DataType
-import vdi.config.loadAndCacheStackConfig
+import vdi.core.config.loadAndCacheStackConfig
 import vdi.core.health.RemoteDependencies
 import vdi.core.plugin.client.PluginHandlerClient
 import vdi.core.plugin.client.PluginHandlerClientConfig

@@ -4,10 +4,9 @@ plugins {
 
 dependencies {
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
   implementation(project(":lib:plugin-registry"))
 
-
-  implementation(common.config)
   implementation(common.json)
   implementation(common.logging)
   implementation(common.model)

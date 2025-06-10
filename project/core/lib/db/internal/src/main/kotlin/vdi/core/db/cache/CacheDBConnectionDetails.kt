@@ -1,7 +1,7 @@
 package vdi.core.db.cache
 
 import org.postgresql.PGProperty
-import vdi.config.raw.vdi.CacheDBConfig
+import vdi.core.config.vdi.CacheDBConfig
 
 data class CacheDBConnectionDetails(
   val host: String,

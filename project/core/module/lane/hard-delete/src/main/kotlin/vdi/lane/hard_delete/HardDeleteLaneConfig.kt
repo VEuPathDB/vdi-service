@@ -1,8 +1,8 @@
 package vdi.lane.hard_delete
 
-import vdi.config.raw.kafka.KafkaConfig
-import vdi.config.raw.vdi.VDIConfig
-import vdi.config.raw.vdi.lanes.ConsumerLaneConfig
+import vdi.core.config.kafka.KafkaConfig
+import vdi.core.config.vdi.VDIConfig
+import vdi.core.config.vdi.lanes.ConsumerLaneConfig
 import vdi.core.kafka.*
 import vdi.core.kafka.router.RouterDefaults
 

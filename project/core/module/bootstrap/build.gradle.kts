@@ -5,6 +5,7 @@ plugins {
 dependencies {
 
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
   implementation(project(":lib:db-internal"))
   implementation(project(":lib:module-core"))
   implementation(project(":module:await-dependencies"))

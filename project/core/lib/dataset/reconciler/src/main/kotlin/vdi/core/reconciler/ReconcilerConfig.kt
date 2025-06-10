@@ -2,8 +2,8 @@ package vdi.core.reconciler
 
 import org.veupathdb.lib.s3.s34k.S3Config
 import org.veupathdb.lib.s3.s34k.fields.BucketName
-import vdi.config.loadAndCacheStackConfig
-import vdi.config.raw.vdi.VDIConfig
+import vdi.core.config.loadAndCacheStackConfig
+import vdi.core.config.vdi.VDIConfig
 import vdi.core.kafka.router.KafkaRouterConfig
 import vdi.core.s3.util.S3Config
 

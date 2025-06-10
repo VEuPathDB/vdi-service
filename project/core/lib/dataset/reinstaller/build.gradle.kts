@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
   implementation(project(":lib:common"))
+  implementation(project(":lib:config"))
   implementation(project(":lib:db-application"))
   implementation(project(":lib:db-internal"))
   implementation(project(":lib:plugin-client"))
@@ -13,7 +14,6 @@ dependencies {
   implementation(libs.kt.coroutines)
   implementation(libs.log.slf4j.api)
 
-  implementation(common.config)
   implementation(common.logging)
   implementation(common.model)
 }

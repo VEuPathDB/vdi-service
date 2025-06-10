@@ -2,7 +2,7 @@ package vdi.core.rabbit
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import vdi.config.raw.rabbit.RabbitConnectionConfig
+import vdi.core.config.rabbit.RabbitConnectionConfig
 import vdi.model.field.HostAddress
 import vdi.model.field.SecretString
 
