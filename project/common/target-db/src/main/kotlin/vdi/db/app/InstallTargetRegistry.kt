@@ -15,7 +15,7 @@ object InstallTargetRegistry {
   private val registry: Map<InstallTargetID, InstallTargetInstanceRegistry>
 
   init {
-    val config = loadAndCastConfig<ShortVDIConfig>(schema = Path(DefaultFullStackSchemaPath))
+    val config = loadAndCastConfig<ShortStackConfig>(schema = Path(DefaultFullStackSchemaPath)).vdi
     val ldap = config.ldap?.let { raw -> LDAP(LDAPConfig(
       hosts  = raw.servers.map { LDAPHost(it.host, it.port ?: 389u) },
       baseDN = raw.baseDN
