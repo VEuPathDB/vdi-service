@@ -1,6 +1,7 @@
 package vdi.util.zip
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
+import org.apache.commons.compress.archivers.zip.ZipFile
 import java.io.FileNotFoundException
 import java.io.InputStream
 import java.nio.file.Path
@@ -186,14 +187,14 @@ fun Path.getZipType(): ZipType {
  * the target zip file.
  */
 fun InputStream.zipEntries(maxBytes: Long = 10737418240L): Sequence<Pair<ZipEntry, InputStream>> = sequence {
-  val stream = ZipArchiveInputStream(this@zipEntries)
-  var entry  = stream.nextEntry
+  ZipFile.builder().setInputStream(this@zipEntries).get().use {
+    var byteCount = 0L
+    for (entry in it.entries) {
+      byteCount += entry.size
+      if (entry.size > maxBytes || byteCount > maxBytes)
+        throw IllegalStateException("attempted to decompress more than $maxBytes bytes from a given zip stream")
 
-  while (entry != null) {
-    if (stream.uncompressedCount > maxBytes || entry.size > maxBytes)
-      throw IllegalStateException("attempted to decompress more than $maxBytes bytes from a given zip stream")
-
-    yield(entry to UncloseableInputStream(stream))
-    entry = stream.nextEntry
+      yield(entry to it.getInputStream(entry))
+    }
   }
 }
