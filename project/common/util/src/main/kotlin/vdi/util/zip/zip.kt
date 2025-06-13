@@ -1,6 +1,5 @@
 package vdi.util.zip
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import org.apache.commons.compress.archivers.zip.ZipFile
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -10,7 +9,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.*
-import vdi.util.io.UncloseableInputStream
 
 private val SingleZipHeader  = byteArrayOf(0x50, 0x4B, 0x03, 0x04)
 private val EmptyZipHeader   = byteArrayOf(0x50, 0x4B, 0x05, 0x06)
