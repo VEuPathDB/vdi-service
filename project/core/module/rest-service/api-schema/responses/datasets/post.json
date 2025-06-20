@@ -1,0 +1,12 @@
+{
+  "$schema": "https://foxcapades.github.io/oai-schema/3.1.1/2025-02-13/response.json",
+  "description": "Dataset successfully submitted for processing.",
+  "headers": {
+    "Location": { "$ref": "../../headers/location.json" }
+  },
+  "content": {
+    "application/json": {
+      "schema": { "$ref": "../../types/responses/datasets/dataset-create-success.json" }
+    }
+  }
+}

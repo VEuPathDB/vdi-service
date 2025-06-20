@@ -1,0 +1,8 @@
+{
+  "$schema": "https://foxcapades.github.io/oai-schema/3.1.1/2025-02-13/request-body.json",
+  "content": {
+    "application/json": {
+      "schema": { "$ref": "../../../types/requests/datasets/patch.json" }
+    }
+  }
+}

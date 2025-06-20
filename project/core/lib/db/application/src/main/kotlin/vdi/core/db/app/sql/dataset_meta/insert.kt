@@ -20,7 +20,7 @@ INSERT INTO
   , description
   )
 VALUES
-  (?, ?, ?, , ?, ?)
+  (?, ?, ?, ?, ?, ?)
 """
 
 internal fun Connection.insertDatasetMeta(schema: String, datasetID: DatasetID, meta: DatasetMetadata) {

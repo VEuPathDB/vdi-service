@@ -9,6 +9,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.*
+import vdi.util.fs.TempFiles
 
 private val SingleZipHeader  = byteArrayOf(0x50, 0x4B, 0x03, 0x04)
 private val EmptyZipHeader   = byteArrayOf(0x50, 0x4B, 0x05, 0x06)
@@ -185,14 +186,18 @@ fun Path.getZipType(): ZipType {
  * the target zip file.
  */
 fun InputStream.zipEntries(maxBytes: Long = 10737418240L): Sequence<Pair<ZipEntry, InputStream>> = sequence {
-  ZipFile.builder().setInputStream(this@zipEntries).get().use {
-    var byteCount = 0L
-    for (entry in it.entries) {
-      byteCount += entry.size
-      if (entry.size > maxBytes || byteCount > maxBytes)
-        throw IllegalStateException("attempted to decompress more than $maxBytes bytes from a given zip stream")
+  TempFiles.withTempFile { tmp ->
+    tmp.outputStream().buffered().use { transferTo(it); it.flush() }
 
-      yield(entry to it.getInputStream(entry))
+    ZipFile.builder().setFile(tmp.toFile()).get().use {
+      var byteCount = 0L
+      for (entry in it.entries) {
+        byteCount += entry.size
+        if (entry.size > maxBytes || byteCount > maxBytes)
+          throw IllegalStateException("attempted to decompress more than $maxBytes bytes from a given zip stream")
+
+        yield(entry to it.getInputStream(entry))
+      }
     }
   }
 }

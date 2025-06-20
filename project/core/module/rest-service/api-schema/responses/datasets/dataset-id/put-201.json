@@ -1,0 +1,7 @@
+{
+  "$schema": "https://foxcapades.github.io/oai-schema/3.1.1/2025-02-13/response.json",
+  "description": "Revision accepted for processing.",
+  "headers": {
+    "Location": { "$ref": "../../../headers/location.json" }
+  }
+}
