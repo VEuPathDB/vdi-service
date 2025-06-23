@@ -26,6 +26,13 @@ fun patchMetadataTable() {
       // Add index to data revisioning table
       // language=postgresql
       stmt.execute("CREATE INDEX IF NOT EXISTS dataset_revisions_original_id ON vdi.dataset_revisions (original_id)")
+
+      // language=postgresql
+      stmt.execute("""
+        ALTER TABLE vdi.dataset_revisions
+          ALTER COLUMN revision_id TYPE varchar(16)
+        , ALTER COLUMN original_id TYPE varchar(16)
+      """.trimIndent())
     }
   }
 }
