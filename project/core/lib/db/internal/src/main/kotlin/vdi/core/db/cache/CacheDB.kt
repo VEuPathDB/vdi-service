@@ -45,8 +45,6 @@ interface CacheDB {
 
   fun selectInstallFileCount(datasetID: DatasetID): Int
 
-  fun selectInstallFileSummaries(datasetIDs: List<DatasetID>): Map<DatasetID, DatasetFileSummary>
-
   fun selectUploadFileCount(datasetID: DatasetID): Int
 
   fun selectUploadFileSummaries(datasetIDs: List<DatasetID>): Map<DatasetID, DatasetFileSummary>

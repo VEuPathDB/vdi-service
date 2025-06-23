@@ -10,11 +10,33 @@ import vdi.core.db.cache.health.DatabaseDependency
 import vdi.core.db.cache.model.BrokenImportListQuery
 import vdi.core.db.cache.query.DatasetListQuery
 import vdi.core.db.cache.query.AdminAllDatasetsQuery
-import vdi.core.db.cache.sql.select.*
+import vdi.core.db.cache.sql.dataset_revisions.selectDatasetRevisions
+import vdi.core.db.cache.sql.dataset_revisions.selectLatestDatasetRevision
+import vdi.core.db.cache.sql.dataset_revisions.selectOriginalDatasetID
+import vdi.core.db.cache.sql.dataset_share_offers.selectAllSharesFor
+import vdi.core.db.cache.sql.datasets.selectNonPrivateDatasets
+import vdi.core.db.cache.sql.dataset_share_offers.selectOpenSharesFor
+import vdi.core.db.cache.sql.dataset_share_offers.selectSharesFor
+import vdi.core.db.cache.sql.datasets.*
+import vdi.core.db.cache.sql.datasets.selectDataset
+import vdi.core.db.cache.sql.datasets.selectDatasetForUser
+import vdi.core.db.cache.sql.datasets.selectDeletedDatasets
+import vdi.core.db.cache.sql.import_control.selectBrokenImports
+import vdi.core.db.cache.sql.import_control.selectImportControl
+import vdi.core.db.cache.sql.import_messages.selectImportMessages
+import vdi.core.db.cache.sql.install_files.selectInstallFileCount
+import vdi.core.db.cache.sql.install_files.selectInstallFiles
+import vdi.core.db.cache.sql.sync_control.selectAllSyncControl
+import vdi.core.db.cache.sql.sync_control.selectSyncControl
+import vdi.core.db.cache.sql.upload_files.selectUploadFileCount
+import vdi.core.db.cache.sql.upload_files.selectUploadFileSummaries
+import vdi.core.db.cache.sql.upload_files.selectUploadFiles
 import vdi.core.err.StartupException
 import vdi.core.health.Dependency
 import vdi.core.health.RemoteDependencies
 import vdi.logging.MetaLogger
+import vdi.model.data.DatasetShareOffer
+import vdi.model.data.DatasetShareReceipt
 import org.postgresql.Driver as PostgresDriver
 
 internal object CacheDBImpl: CacheDB {
@@ -73,9 +95,6 @@ internal object CacheDBImpl: CacheDB {
   override fun selectInstallFileCount(datasetID: DatasetID) =
     connection.use { it.selectInstallFileCount(datasetID) }
 
-  override fun selectInstallFileSummaries(datasetIDs: List<DatasetID>) =
-    connection.use { it.selectInstallFileSummaries(datasetIDs) }
-
   override fun selectUploadFileCount(datasetID: DatasetID) =
     connection.use { it.selectUploadFileCount(datasetID) }
 
@@ -116,10 +135,10 @@ internal object CacheDBImpl: CacheDB {
     connection.use { it.selectOpenSharesFor(recipientID) }
 
   override fun selectAcceptedSharesForUser(recipientID: UserID) =
-    connection.use { it.selectAcceptedSharesFor(recipientID) }
+    connection.use { it.selectSharesFor(recipientID, DatasetShareOffer.Action.Grant, DatasetShareReceipt.Action.Accept) }
 
   override fun selectRejectedSharesForUser(recipientID: UserID) =
-    connection.use { it.selectRejectedSharesFor(recipientID) }
+    connection.use { it.selectSharesFor(recipientID, DatasetShareOffer.Action.Grant, DatasetShareReceipt.Action.Reject) }
 
   override fun selectAllSharesForUser(recipientID: UserID) =
     connection.use { it.selectAllSharesFor(recipientID) }

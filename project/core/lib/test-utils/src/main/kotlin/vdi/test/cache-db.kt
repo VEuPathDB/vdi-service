@@ -24,7 +24,6 @@ fun mockCacheDB(
   onSelectAllDatasets: (AdminAllDatasetsQuery) -> List<AdminAllDatasetsRow> = ::oneParamList,
   onSelectAdminDetails: DSGetter<AdminDatasetDetailsRecord?> = ::oneParamNull,
   onSelectInstallFileCount: DSGetter<Int> = { 0 },
-  onSelectInstallFileSummaries: (List<DatasetID>) -> Map<DatasetID, DatasetFileSummary> = ::oneParamMap,
   onSelectUploadFileCount: DSGetter<Int> = { 0 },
   onSelectUploadFileSummaries: (List<DatasetID>) -> Map<DatasetID, DatasetFileSummary> = ::oneParamMap,
   onSelectDatasetList: (DatasetListQuery) -> List<DatasetRecord> = ::oneParamList,
@@ -54,7 +53,6 @@ fun mockCacheDB(
     on { selectAdminDatasetDetails(any()) } doAnswer { onSelectAdminDetails(it.getArgument(0)) }
     on { selectInstallFileCount(any()) } doAnswer { onSelectInstallFileCount(it.getArgument(0)) }
     on { selectUploadFileCount(any()) } doAnswer { onSelectUploadFileCount(it.getArgument(0)) }
-    on { selectInstallFileSummaries(any()) } doAnswer { onSelectInstallFileSummaries(it.getArgument(0)) }
     on { selectUploadFileSummaries(any()) } doAnswer { onSelectUploadFileSummaries(it.getArgument(0)) }
     on { selectDatasetList(any()) } doAnswer { onSelectDatasetList(it.getArgument(0)) }
     on { selectDatasetForUser(any(), any()) } doAnswer { onSelectDatasetForUser(it.getArgument(0), it.getArgument(1)) }

@@ -4,7 +4,7 @@ import vdi.model.data.DatasetID
 import vdi.model.data.UserID
 import java.time.OffsetDateTime
 import vdi.core.db.cache.model.DatasetImportStatus
-import vdi.core.db.cache.sql.select.TempHackCacheDBReconcilerTargetRecord
+import vdi.core.db.cache.sql.sync_control.TempHackCacheDBReconcilerTargetRecord
 import vdi.core.db.model.ReconcilerTargetRecord
 import vdi.core.db.model.SyncControlRecord
 import vdi.core.kafka.EventSource
