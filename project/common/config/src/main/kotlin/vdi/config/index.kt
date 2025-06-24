@@ -36,6 +36,9 @@ inline fun <reified T: Any> loadAndCastConfig(path: Path = makeDefaultConfigPath
   }
 
 fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
+  MetaLogger.info("loading config from $path")
+  MetaLogger.info("loading config schema from $path")
+
   val validator = object {}.javaClass.getResourceAsStream(schema.toString())
     .let { it ?: throw ConfigurationException("failed to load config schema $schema") }
     .use { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it)!! }
