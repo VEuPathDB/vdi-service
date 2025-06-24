@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.23">
+<title>Plugin Script Definition &amp; Expectations</title>
+<style>
+/* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
+
+@import url(//fonts.googleapis.com/css?family=Noto+Sans);
+@import url(https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor@2.0/data/stylesheets/asciidoctor-default.css); /* Default asciidoc style framework - important */
+
+/* CUSTOMISATIONS */
+/* Change the values in root for quick customisation. If you want even more fine grain... venture further. */
+:root{
+--maincolor:#282c34;
+--primarycolor:#f39c12;
+--secondarycolor:#03a9f4;
+--tertiarycolor:#4db6ac;
+--sidebarbackground:#21252b;
+--linkcolor:#f44336;
+--linkcoloralternate:#ff9800;
+--white:#FFFFFF;
+}
+
+/* Text styles */
+
+body{font-family: "Noto Sans",sans-serif;background-color: var(--maincolor);color:var(--white);}
+
+h1{color:var(--primarycolor) !important;font-family:"Noto Sans",sans-serif;}
+h2,h3,h4,h5,h6{color:var(--secondarycolor) !important;font-family:"Noto Sans",sans-serif;}
+.title{color:var(--white) !important;font-family:"Noto Sans",sans-serif;font-style: normal; font-weight: normal;}
+p{font-family: "Noto Sans",sans-serif ! important}
+#toc.toc2 a:link{color:var(--linkcolor);}
+blockquote{color:var(--tertiarycolor) !important}
+.quoteblock{color:var(--white)}
+code{color:var(--linkcoloralternate);background-color: var(--sidebarbackground) !important}
+
+
+/* Table styles */
+th{background-color: var(--maincolor);color:var(--white) !important;}
+td{background-color: var(--maincolor);color: var(--linkcoloralternate) !important}
+
+
+#toc.toc2{background-color:var(--sidebarbackground);}
+#toctitle{color:var(--white);}
+
+/* Responsiveness fixes */
+video {
+  max-width: 100%;
+}
+
+@media all and (max-width: 600px) {
+  table {
+    width: 55vw!important;
+    font-size: 3vw;
+  }
+}
+
+.exampleblock > .content {
+  background-color: var(--maincolor);
+}
+
+a {
+  color: var(--secondarycolor);
+}
+
+.admonitionblock td.icon .icon-tip::before {
+  text-shadow: none;
+  color: var(--white);
+}
+.admonitionblock td.icon .icon-note::before {
+  color: var(--tertiarycolor);
+}
+.admonitionblock td.icon .icon-important::before {
+  color: var(--linkcolor);
+}
+/*.admonitionblock td.icon .icon-caution::before {
+  color: var(--linkcoloralternate);
+}*/
+.admonitionblock td.icon .icon-warning::before {
+  color: var(--primarycolor);
+}
+
+#preamble > .sectionbody > .paragraph:first-of-type p {
+  color: var(--white);
+}
+
+.quoteblock blockquote::before {
+  color: var(--primarycolor);
+}
+.quoteblock .attribution cite, .verseblock .attribution cite {
+  color: var(--white);
+}
+.verseblock pre {
+  color: var(--white);
+}
+.quoteblock blockquote, .quoteblock blockquote p {
+  color: var(--white);
+}
+
+.sidebarblock {
+  background: var(--sidebarbackground);
+}
+.literalblock pre, .listingblock pre:not(.highlight), .listingblock pre[class="highlight"], .listingblock pre[class^="highlight "], .listingblock pre.CodeRay, .listingblock pre.prettyprint {
+  background: var(--sidebarbackground);
+  color: var(--white);
+}
+
+#header .details {
+  color: var(--white);
+}
+#header .details span.email a {
+  color: var(--linkcoloralternate);
+}
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+pre.pygments .hll { background-color: #6e7681 }
+pre.pygments { background: #1d2331; color: #d4d2c8 }
+pre.pygments .tok-c { color: #7e8aa1 } /* Comment */
+pre.pygments .tok-err { color: #f88f7f } /* Error */
+pre.pygments .tok-esc { color: #d4d2c8 } /* Escape */
+pre.pygments .tok-g { color: #d4d2c8 } /* Generic */
+pre.pygments .tok-k { color: #FFAD66 } /* Keyword */
+pre.pygments .tok-l { color: #D5FF80 } /* Literal */
+pre.pygments .tok-n { color: #d4d2c8 } /* Name */
+pre.pygments .tok-o { color: #FFAD66 } /* Operator */
+pre.pygments .tok-x { color: #d4d2c8 } /* Other */
+pre.pygments .tok-p { color: #d4d2c8 } /* Punctuation */
+pre.pygments .tok-ch { color: #f88f7f; font-style: italic } /* Comment.Hashbang */
+pre.pygments .tok-cm { color: #7e8aa1 } /* Comment.Multiline */
+pre.pygments .tok-cp { color: #FFAD66; font-weight: bold } /* Comment.Preproc */
+pre.pygments .tok-cpf { color: #7e8aa1 } /* Comment.PreprocFile */
+pre.pygments .tok-c1 { color: #7e8aa1 } /* Comment.Single */
+pre.pygments .tok-cs { color: #7e8aa1; font-style: italic } /* Comment.Special */
+pre.pygments .tok-gd { color: #f88f7f; background-color: #3d1e20 } /* Generic.Deleted */
+pre.pygments .tok-ge { color: #d4d2c8; font-style: italic } /* Generic.Emph */
+pre.pygments .tok-ges { color: #d4d2c8 } /* Generic.EmphStrong */
+pre.pygments .tok-gr { color: #f88f7f } /* Generic.Error */
+pre.pygments .tok-gh { color: #d4d2c8 } /* Generic.Heading */
+pre.pygments .tok-gi { color: #6ad4af; background-color: #19362c } /* Generic.Inserted */
+pre.pygments .tok-go { color: #7e8aa1 } /* Generic.Output */
+pre.pygments .tok-gp { color: #d4d2c8 } /* Generic.Prompt */
+pre.pygments .tok-gs { color: #d4d2c8; font-weight: bold } /* Generic.Strong */
+pre.pygments .tok-gu { color: #d4d2c8 } /* Generic.Subheading */
+pre.pygments .tok-gt { color: #f88f7f } /* Generic.Traceback */
+pre.pygments .tok-kc { color: #FFAD66 } /* Keyword.Constant */
+pre.pygments .tok-kd { color: #FFAD66 } /* Keyword.Declaration */
+pre.pygments .tok-kn { color: #FFAD66 } /* Keyword.Namespace */
+pre.pygments .tok-kp { color: #FFAD66 } /* Keyword.Pseudo */
+pre.pygments .tok-kr { color: #FFAD66 } /* Keyword.Reserved */
+pre.pygments .tok-kt { color: #73D0FF } /* Keyword.Type */
+pre.pygments .tok-ld { color: #D5FF80 } /* Literal.Date */
+pre.pygments .tok-m { color: #DFBFFF } /* Literal.Number */
+pre.pygments .tok-s { color: #D5FF80 } /* Literal.String */
+pre.pygments .tok-na { color: #FFD173 } /* Name.Attribute */
+pre.pygments .tok-nb { color: #FFD173 } /* Name.Builtin */
+pre.pygments .tok-nc { color: #73D0FF } /* Name.Class */
+pre.pygments .tok-no { color: #FFD173 } /* Name.Constant */
+pre.pygments .tok-nd { color: #7e8aa1; font-weight: bold; font-style: italic } /* Name.Decorator */
+pre.pygments .tok-ni { color: #95E6CB } /* Name.Entity */
+pre.pygments .tok-ne { color: #73D0FF } /* Name.Exception */
+pre.pygments .tok-nf { color: #FFD173 } /* Name.Function */
+pre.pygments .tok-nl { color: #d4d2c8 } /* Name.Label */
+pre.pygments .tok-nn { color: #d4d2c8 } /* Name.Namespace */
+pre.pygments .tok-nx { color: #d4d2c8 } /* Name.Other */
+pre.pygments .tok-py { color: #FFD173 } /* Name.Property */
+pre.pygments .tok-nt { color: #5CCFE6 } /* Name.Tag */
+pre.pygments .tok-nv { color: #d4d2c8 } /* Name.Variable */
+pre.pygments .tok-ow { color: #FFAD66 } /* Operator.Word */
+pre.pygments .tok-pm { color: #d4d2c8 } /* Punctuation.Marker */
+pre.pygments .tok-w { color: #d4d2c8 } /* Text.Whitespace */
+pre.pygments .tok-mb { color: #DFBFFF } /* Literal.Number.Bin */
+pre.pygments .tok-mf { color: #DFBFFF } /* Literal.Number.Float */
+pre.pygments .tok-mh { color: #DFBFFF } /* Literal.Number.Hex */
+pre.pygments .tok-mi { color: #DFBFFF } /* Literal.Number.Integer */
+pre.pygments .tok-mo { color: #DFBFFF } /* Literal.Number.Oct */
+pre.pygments .tok-sa { color: #F29E74 } /* Literal.String.Affix */
+pre.pygments .tok-sb { color: #D5FF80 } /* Literal.String.Backtick */
+pre.pygments .tok-sc { color: #D5FF80 } /* Literal.String.Char */
+pre.pygments .tok-dl { color: #D5FF80 } /* Literal.String.Delimiter */
+pre.pygments .tok-sd { color: #7e8aa1 } /* Literal.String.Doc */
+pre.pygments .tok-s2 { color: #D5FF80 } /* Literal.String.Double */
+pre.pygments .tok-se { color: #95E6CB } /* Literal.String.Escape */
+pre.pygments .tok-sh { color: #D5FF80 } /* Literal.String.Heredoc */
+pre.pygments .tok-si { color: #95E6CB } /* Literal.String.Interpol */
+pre.pygments .tok-sx { color: #95E6CB } /* Literal.String.Other */
+pre.pygments .tok-sr { color: #95E6CB } /* Literal.String.Regex */
+pre.pygments .tok-s1 { color: #D5FF80 } /* Literal.String.Single */
+pre.pygments .tok-ss { color: #DFBFFF } /* Literal.String.Symbol */
+pre.pygments .tok-bp { color: #5CCFE6 } /* Name.Builtin.Pseudo */
+pre.pygments .tok-fm { color: #FFD173 } /* Name.Function.Magic */
+pre.pygments .tok-vc { color: #d4d2c8 } /* Name.Variable.Class */
+pre.pygments .tok-vg { color: #d4d2c8 } /* Name.Variable.Global */
+pre.pygments .tok-vi { color: #d4d2c8 } /* Name.Variable.Instance */
+pre.pygments .tok-vm { color: #d4d2c8 } /* Name.Variable.Magic */
+pre.pygments .tok-il { color: #DFBFFF } /* Literal.Number.Integer.Long */
+</style>
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>Plugin Script Definition &amp; Expectations</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_plugin_scripts">Plugin Scripts</a>
+<ul class="sectlevel2">
+<li><a href="#_import_preprocessing_validation">Import (Preprocessing &amp; Validation)</a></li>
+<li><a href="#_metadata_installation">Metadata Installation</a></li>
+<li><a href="#_data_compatibility_checks">Data Compatibility Checks</a></li>
+<li><a href="#_data_installation">Data Installation</a></li>
+<li><a href="#_dataset_uninstallation">Dataset Uninstallation</a></li>
+</ul>
+</li>
+<li><a href="#_base_environment">Base Environment</a>
+<ul class="sectlevel2">
+<li><a href="#_script_working_directory">Script Working Directory</a></li>
+<li><a href="#_dataset_installation_filesystem">Dataset Installation Filesystem</a></li>
+<li><a href="#_variables">Variables</a></li>
+</ul>
+</li>
+<li><a href="#_additional_details">Additional Details</a>
+<ul class="sectlevel2">
+<li><a href="#_logging_from_plugin_scripts">Logging from Plugin Scripts</a></li>
+<li><a href="#_reserved_file_names">Reserved File Names</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_plugin_scripts">Plugin Scripts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following sections describe the purpose and inputs/outputs of the plugin
+scripts executed by the VDI plugin handler server.</p>
+</div>
+<div class="paragraph">
+<p>Each section&#8217;s "Inputs" subsection includes the contents of the <a href="#_base_environment">Base Environment</a>
+section in addition to its own contents.</p>
+</div>
+<div class="sect2">
+<h3 id="_import_preprocessing_validation">Import (Preprocessing &amp; Validation)</h3>
+<div class="paragraph">
+<p>The import script is responsible for performing initial validation and any
+necessary format transformation of a target dataset&#8217;s data.  The output of the
+import script is expected to be file(s) in the format required for installation
+into the dataset&#8217;s installation target(s).</p>
+</div>
+<div class="paragraph">
+<p>On execution, the import script will be given a directory containing the initial
+upload files, and an empty directory into which the import script will place the
+output "install ready" files.  All dataset-specific files that are required to
+install a dataset must be placed in this directory.</p>
+</div>
+<div class="sect3">
+<h4 id="_inputs">Inputs</h4>
+<div class="sect4">
+<h5 id="_cli">CLI</h5>
+<div class="olist arabic">
+<div class="title">Positional Arguments</div>
+<ol class="arabic">
+<li>
+<p>Path to input directory</p>
+</li>
+<li>
+<p>Path to output directory</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="title">Invocation Scheme</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="shell"><span></span>import<span class="tok-w"> </span><span class="tok-o">{</span>input-dir-path<span class="tok-o">}</span><span class="tok-w"> </span><span class="tok-o">{</span>output-dir-path<span class="tok-o">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_environment">Environment</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 80%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">Variable</th>
+<th class="tableblock halign-center valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VDI_ID</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Unique VDI dataset ID.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VDI_IMPORT_ID</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Generated database-identifier-safe ID value for the import.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_files">Files</h5>
+<div class="paragraph">
+<p>The input directory will contain all uploaded files for the dataset, along with
+a JSON file containing the dataset&#8217;s metadata which will be named
+<code>vdi-meta.json</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The <code>vdi-meta.json</code> file should not be copied to the import script&#8217;s output
+directory.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_outputs">Outputs</h4>
+<div class="sect4">
+<h5 id="_messages">Messages</h5>
+<div class="paragraph">
+<p>In addition to the script status logging that is expected on <code>STDERR</code>, <code>STDOUT</code>
+may also be used in import scripts to pass messages, such as warnings or error
+text, back to the dataset owner.</p>
+</div>
+<div class="paragraph">
+<p>Each line that is written to <code>STDOUT</code> will become an individual message visible
+to the dataset owner on import process completion, regardless of status.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_exit_codes">Exit Codes</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 8%;">
+<col style="width: 92%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Success.  Data was valid, install-ready files were produced.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Invalid input.  Data failed validation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>&gt;= 2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unexpected process error.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_files_2">Files</h5>
+<div class="paragraph">
+<p>Data files that have been validated and/or reformatted, and are now in an
+install-ready state MUST be placed in the output directory.  On successful
+import script completion, these files will be pushed into the VDI object store
+for eventual installation into the dataset&#8217;s target project(s).</p>
+</div>
+<div class="paragraph">
+<p>The output directory should not contain any files that are not a part of the
+install-ready data.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_metadata_installation">Metadata Installation</h3>
+<div class="paragraph">
+<p>The meta installation script is responsible for performing any 'extra' metadata
+installation steps that are not already handled by the core VDI service.</p>
+</div>
+<div class="sect3">
+<h4 id="_inputs_2">Inputs</h4>
+<div class="sect4">
+<h5 id="_cli_2">CLI</h5>
+<div class="olist arabic">
+<div class="title">Positional Arguments</div>
+<ol class="arabic">
+<li>
+<p>VDI dataset ID</p>
+</li>
+<li>
+<p>Path to the target dataset&#8217;s <code>vdi-meta.json</code> file.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="title">Invocation Scheme</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="shell"><span></span>install-meta<span class="tok-w"> </span><span class="tok-o">{</span>vdi-id<span class="tok-o">}</span><span class="tok-w"> </span><span class="tok-o">{</span>path-to-meta-json<span class="tok-o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Invocation Example</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="shell"><span></span>install-meta<span class="tok-w"> </span>ttN4s4Idk90kU<span class="tok-w"> </span>/tmp/d1c10dc5-55df-4ee9-89c6-2669caf6c73a/vdi-meta.json</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_environment_2">Environment</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 80%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">Variable</th>
+<th class="tableblock halign-center valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VDI_ID</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Unique VDI dataset ID.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DATA_FILES</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Path to the dataset&#8217;s filesystem installation directory.<br>
+<strong>SEE WARNING</strong>: <a href="#install-dir-warn">Installation Path Existence</a></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PROJECT_ID</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Dataset installation target.  E.g.PlasmoDB</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_HOST</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database hostname.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PORT</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database port.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_NAME</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database name.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_USER</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database credentials username.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PASS</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database credentials password.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_SCHEMA</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database schema name.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PLATFORM</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database platform (<code>Postgres</code> or <code>Oracle</code>)</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_outputs_2">Outputs</h4>
+<div class="sect4">
+<h5 id="_exit_codes_2">Exit Codes</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 8%;">
+<col style="width: 92%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Success.  Metadata was installed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>&gt;= 1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unexpected process error.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_data_compatibility_checks">Data Compatibility Checks</h3>
+<div class="paragraph">
+<p>The check compatibility script is called before attempting a dataset
+installation to ensure the dataset&#8217;s declared dependencies are already available
+in the dataset&#8217;s install target.</p>
+</div>
+<div class="sect3">
+<h4 id="_inputs_3">Inputs</h4>
+<div class="sect4">
+<h5 id="_input_stream">Input Stream</h5>
+<div class="paragraph">
+<p>The check compatibility script accepts its primary input on <code>STDIN</code>.  The input
+will be a stream of all the dataset&#8217;s declared dependencies as tab-delimited
+2-column lines containing each dependency&#8217;s identifier and version.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Input</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="tabular"><span></span>identifier1	version1
+identifier2	version2
+identifier3	version3</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_environment_3">Environment</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 80%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">Variable</th>
+<th class="tableblock halign-center valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VDI_ID</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Unique VDI dataset ID.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DATA_FILES</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Path to the dataset&#8217;s filesystem installation directory.<br>
+<strong>SEE WARNING</strong>: <a href="#install-dir-warn">Installation Path Existence</a></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PROJECT_ID</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Dataset installation target.  E.g.PlasmoDB</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_HOST</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database hostname.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PORT</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database port.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_NAME</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database name.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_USER</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database credentials username.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PASS</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database credentials password.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_SCHEMA</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database schema name.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PLATFORM</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database platform (<code>Postgres</code> or <code>Oracle</code>)</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_outputs_3">Outputs</h4>
+<div class="sect4">
+<h5 id="_messages_2">Messages</h5>
+<div class="paragraph">
+<p>In addition to the script status logging that is expected on <code>STDERR</code>, <code>STDOUT</code>
+may also be used by the check-compatibility script to pass messages back to the
+dataset owner.</p>
+</div>
+<div class="paragraph">
+<p>Each line that is written to <code>STDOUT</code> will become an individual message visible
+to the dataset owner on installation process completion, regardless of status.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_exit_codes_3">Exit Codes</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 8%;">
+<col style="width: 92%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compatible - Required dependencies are met.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Incompatible - Required dependencies are not met.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>&gt;= 2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unexpected process error.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_data_installation">Data Installation</h3>
+<div class="paragraph">
+<p>The install-data script is responsible for installing dataset data into any
+locations required for that data&#8217;s use in the installation target, such as the
+target project&#8217;s app database, or the project&#8217;s filesystem.</p>
+</div>
+<div class="sect3">
+<h4 id="_inputs_4">Inputs</h4>
+<div class="sect4">
+<h5 id="_cli_3">CLI</h5>
+<div class="olist arabic">
+<div class="title">Positional Arguments</div>
+<ol class="arabic">
+<li>
+<p>VDI dataset ID</p>
+</li>
+<li>
+<p>Path to directory containing install-ready files.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="title">Invocation Scheme</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="shell"><span></span>install-data<span class="tok-w"> </span><span class="tok-o">{</span>vdi-id<span class="tok-o">}</span><span class="tok-w"> </span><span class="tok-o">{</span>path-to-dataset-files<span class="tok-o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Invocation Example</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="shell"><span></span>install-data<span class="tok-w"> </span>ttN4s4Idk90kU<span class="tok-w"> </span>/tmp/d1c10dc5-55df-4ee9-89c6-2669caf6c73a</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_environment_4">Environment</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 80%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">Variable</th>
+<th class="tableblock halign-center valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VDI_ID</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Unique VDI dataset ID.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DATA_FILES</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Path to the dataset&#8217;s filesystem installation directory.<br>
+<strong>SEE WARNING</strong>: <a href="#install-dir-warn">Installation Path Existence</a></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PROJECT_ID</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Dataset installation target.  E.g.PlasmoDB</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_HOST</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database hostname.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PORT</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database port.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_NAME</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database name.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_USER</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database credentials username.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PASS</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database credentials password.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_SCHEMA</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database schema name.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PLATFORM</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database platform (<code>Postgres</code> or <code>Oracle</code>)</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_files_3">Files</h5>
+<div class="paragraph">
+<p>The directory whose path is provided as a CLI positional argument will contain
+the install-ready files that were generated by the import script execution.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_outputs_4">Outputs</h4>
+<div class="sect4">
+<h5 id="_messages_3">Messages</h5>
+<div class="paragraph">
+<p>In addition to the script status logging that is expected on <code>STDERR</code>, <code>STDOUT</code>
+may also be used by the install-data script to pass messages back to the dataset
+owner.</p>
+</div>
+<div class="paragraph">
+<p>Each line that is written to <code>STDOUT</code> will become an individual message visible
+to the dataset owner on installation process completion, regardless of status.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_exit_codes_4">Exit Codes</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 8%;">
+<col style="width: 92%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Success</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Failure due to target-specific validation error.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>&gt;= 2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unexpected process error.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dataset_uninstallation">Dataset Uninstallation</h3>
+<div class="paragraph">
+<p>The dataset uninstallation script is responsible for removing all dataset data
+and 'extra' metadata (installed by <code>install-meta</code>) to purge traces of the
+dataset from the target system.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+This process should not assume a successful or complete installation, and will
+be called to purge traces of datasets for which initial installation, or
+a prior uninstall attempt failed.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_inputs_5">Inputs</h4>
+<div class="sect4">
+<h5 id="_cli_4">CLI</h5>
+<div class="olist arabic">
+<div class="title">Positional Arguments</div>
+<ol class="arabic">
+<li>
+<p>VDI Dataset ID</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="title">Invocation Scheme</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="shell"><span></span>uninstall<span class="tok-w"> </span><span class="tok-o">{</span>vdi-id<span class="tok-o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Invocation Example</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="shell"><span></span>uninstall<span class="tok-w"> </span>ttN4s4Idk90kU</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_environment_5">Environment</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 80%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">Variable</th>
+<th class="tableblock halign-center valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VDI_ID</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Unique VDI dataset ID.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DATA_FILES</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Path to the dataset&#8217;s filesystem installation directory.<br>
+<strong>SEE WARNING</strong>: <a href="#install-dir-warn">Installation Path Existence</a></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PROJECT_ID</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Dataset installation target.  E.g.PlasmoDB</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_HOST</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database hostname.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PORT</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database port.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_NAME</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database name.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_USER</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database credentials username.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PASS</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database credentials password.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_SCHEMA</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database schema name.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DB_PLATFORM</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Installation target database platform (<code>Postgres</code> or <code>Oracle</code>)</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_outputs_5">Outputs</h4>
+
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_base_environment">Base Environment</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_script_working_directory">Script Working Directory</h3>
+<div class="paragraph">
+<p>Each script invocation is executed in its own working directory which may be
+used to create temporary files that will be removed on script completion.  This
+directory may be used by simply making relative references when creating file
+handles and paths.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dataset_installation_filesystem">Dataset Installation Filesystem</h3>
+<div class="paragraph">
+<p>Plugin scripts may be given paths to dataset installation directories on the
+host filesystem in order to install or uninstall data.</p>
+</div>
+<div id="install-dir-warn" class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Dataset file installation directories are <em>NOT</em> created by the plugin server.
+If a plugin intends to install dataset artifacts into the filesystem, it MUST
+ensure the existence of that directory beforehand, creating it when necessary.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_variables">Variables</h3>
+<div class="paragraph">
+<p>All plugin scripts will be executed in an environment containing any of the
+following variables that are present in the server execution environment.  Check
+the specific plugin&#8217;s definition to see what variables are available.</p>
+</div>
+<div class="ulist">
+<div class="title">OS Level</div>
+<ul>
+<li>
+<p><code>HOSTNAME</code></p>
+</li>
+<li>
+<p><code>JAVA_HOME</code></p>
+</li>
+<li>
+<p><code>LANG</code></p>
+</li>
+<li>
+<p><code>LD_LIBRARY_PATH</code></p>
+</li>
+<li>
+<p><code>ORACLE_HOME</code></p>
+</li>
+<li>
+<p><code>PATH</code></p>
+</li>
+<li>
+<p><code>TZ</code></p>
+</li>
+</ul>
+</div>
+<div class="ulist">
+<div class="title">Plugin Specific</div>
+<ul>
+<li>
+<p><code>GUS_HOME</code></p>
+</li>
+<li>
+<p><code>PROJECT_HOME</code></p>
+</li>
+<li>
+<p><code>PYTHONPATH</code></p>
+</li>
+<li>
+<p><code>SITE_BUILD</code></p>
+</li>
+<li>
+<p><code>TEMPLATE_DB_NAME</code></p>
+</li>
+<li>
+<p><code>TEMPLATE_DB_USER</code></p>
+</li>
+<li>
+<p><code>TEMPLATE_DB_PASS</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_additional_details">Additional Details</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_logging_from_plugin_scripts">Logging from Plugin Scripts</h3>
+<div class="paragraph">
+<p>Plugin scripts are expected to log debug and process messages to <code>STDERR</code>, the
+use of <code>STDOUT</code> is used exclusively for writing messages that will be returned
+to the dataset owner.  All messages logged to <code>STDOUT</code> MUST be treated as
+publicly visible and MUST never contain credentials, PII, or any other protected
+information.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reserved_file_names">Reserved File Names</h3>
+<div class="paragraph">
+<p>The following file names are reserved for use by VDI.  A plugin script creating
+a file a reserved name will be handled as a runtime error.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>vdi-meta.json</code></p>
+</li>
+<li>
+<p><code>vdi-manifest.json</code></p>
+</li>
+<li>
+<p><code>warnings.json</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2025-06-23 17:18:46 -0400
+</div>
+</div>
+</body>
+</html>

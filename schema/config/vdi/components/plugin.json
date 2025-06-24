@@ -6,8 +6,8 @@
   "properties": {
     "server": {
       "oneOf": [
-        { "$ref": "../common.json#/$defs/addressString" },
-        { "$ref": "../common.json#/$defs/addressObject" }
+        { "$ref": "../../common.json#/$defs/addressString" },
+        { "$ref": "../../common.json#/$defs/addressObject" }
       ]
     },
     "displayName": {
@@ -45,7 +45,7 @@
     },
     "projectIds": {
       "type": "array",
-      "items": { "$ref": "../common.json#/$defs/installTarget" },
+      "items": { "$ref": "../../common.json#/$defs/installTarget" },
       "unevaluatedItems": false
     },
     "scripts": {
@@ -87,7 +87,7 @@
       "properties": {
         "maxDuration": {
           "title": "Maximum Script Execution Time",
-          "$ref": "../common.json#/$defs/duration"
+          "$ref": "../../common.json#/$defs/duration"
         },
         "pathOverride": {
           "title": "Script Path Override",

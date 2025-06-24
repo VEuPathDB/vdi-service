@@ -6,19 +6,19 @@
   "properties": {
     "retentionWindow": {
       "title": "Deleted Dataset Retention Window",
-      "$ref": "../../common.json#/$defs/duration",
+      "$ref": "../../../common.json#/$defs/duration",
       "default": "30d"
     },
     "pruneInterval": {
       "title": "Pruning Interval",
       "description": "Interval at which the dataset pruner will prune deleted datasets that have been marked as deleted for longer than the configured retention window.",
-      "$ref": "../../common.json#/$defs/duration",
+      "$ref": "../../../common.json#/$defs/duration",
       "default": "6h"
     },
     "wakeInterval": {
       "title": "Wakeup Interval",
       "description": "Interval at which the pruner will wake up and check for a service shutdown signal.",
-      "$ref": "../../common.json#/$defs/duration",
+      "$ref": "../../../common.json#/$defs/duration",
       "default": "2s"
     }
   },

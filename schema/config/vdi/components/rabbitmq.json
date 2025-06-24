@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "pollInterval": {
-      "$ref": "../common.json#/$defs/duration",
+      "$ref": "../../common.json#/$defs/duration",
       "default": "1s"
     },
     "connection": { "$ref": "#/$defs/connection" },
@@ -33,8 +33,8 @@
           "title": "RabbitMQ Server Details",
           "description": "Port defaults to `5671` with TLS enabled, or `5672` with TLS disabled.",
           "oneOf": [
-            { "$ref": "../common.json#/$defs/addressString" },
-            { "$ref": "../common.json#/$defs/addressObject" }
+            { "$ref": "../../common.json#/$defs/addressString" },
+            { "$ref": "../../common.json#/$defs/addressObject" }
           ],
           "examples": [
             "rabbit.site.com",
@@ -56,7 +56,7 @@
           "default": true
         },
         "timeout": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "10s"
         }
       },

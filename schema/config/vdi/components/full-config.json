@@ -30,7 +30,7 @@
         "updateMeta": { "$ref": "lanes/update-meta.json" }
       }
     },
-    "ldap": { "$ref": "../common.json#/$defs/ldap" },
+    "ldap": { "$ref": "../../common.json#/$defs/ldap" },
     "objectStore": { "$ref": "object-store.json" },
     "plugins": {
       "type": "object",
@@ -61,24 +61,15 @@
       "uniqueItems": true
     }
   },
-  "required": [
-    "cacheDb",
-    "kafka",
-    "objectStore",
-    "plugins",
-    "rabbit",
-    "siteBuild",
-    "installTargets"
-  ],
-  "additionalProperties": false,
+  "unevaluatedProperties": false,
   "$defs": {
     "cacheDb": {
       "type": "object",
       "properties": {
         "server": {
           "oneOf": [
-            { "$ref": "../common.json#/$defs/addressString" },
-            { "$ref": "../common.json#/$defs/addressObject" }
+            { "$ref": "../../common.json#/$defs/addressString" },
+            { "$ref": "../../common.json#/$defs/addressObject" }
           ]
         },
         "username": {

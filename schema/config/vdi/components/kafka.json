@@ -8,8 +8,8 @@
       "type": "array",
       "items": {
         "oneOf": [
-          { "$ref": "../common.json#/$defs/addressString" },
-          { "$ref": "../common.json#/$defs/addressObject" }
+          { "$ref": "../../common.json#/$defs/addressString" },
+          { "$ref": "../../common.json#/$defs/addressObject" }
         ]
       },
       "unevaluatedItems": false
@@ -24,7 +24,7 @@
       "type": "object",
       "properties": {
         "autoCommitInterval": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "5s"
         },
         "autoOffsetReset": {
@@ -36,7 +36,7 @@
           "default": "earliest"
         },
         "connectionsMaxIdle": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "9m"
         },
         "groupId": {
@@ -48,7 +48,7 @@
           "default": null
         },
         "defaultApiTimeout": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "1m"
         },
         "enableAutoCommit": {
@@ -66,11 +66,11 @@
           "default": 1
         },
         "heartbeatInterval": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "3s"
         },
         "maxPollInterval": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "5m"
         },
         "maxPollRecords": {
@@ -79,7 +79,7 @@
           "default": 500
         },
         "pollDuration": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "2s"
         },
         "receiveBufferSize": {
@@ -88,19 +88,19 @@
           "default": 65536
         },
         "reconnectBackoffMaxTime": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "1s"
         },
         "reconnectBackoffTime": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "50ms"
         },
         "requestTimeout": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "30s"
         },
         "retryBackoffTime": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "100ms"
         },
         "sendBufferSize": {
@@ -109,7 +109,7 @@
           "default": 131072
         },
         "sessionTimeout": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "45s"
         }
       },
@@ -145,19 +145,19 @@
           "default": 16384
         },
         "connectionsMaxIdle": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "9m"
         },
         "deliveryTimeout": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "2m"
         },
         "lingerTime": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "5ms"
         },
         "maxBlockingTimeout": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "1m"
         },
         "maxRequestSize": {
@@ -171,7 +171,7 @@
           "minimum": -1
         },
         "requestTimeout": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "30s"
         },
         "sendBufferSize": {
@@ -180,15 +180,15 @@
           "default": 131072
         },
         "reconnectBackoffMaxTime": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "1s"
         },
         "reconnectBackoffTime": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "50ms"
         },
         "retryBackoffTime": {
-          "$ref": "../common.json#/$defs/duration",
+          "$ref": "../../common.json#/$defs/duration",
           "default": "100ms"
         }
       },

@@ -17,9 +17,10 @@ sourceSets.main {
 }
 
 tasks.processResources { dependsOn(
-  ":build-plugin-config-schema-resource",
-  ":build-stack-config-schema-resource",
-  ":build-dataset-schema-resources",
+  ":compile-plugin-schema",
+  ":compile-core-schema",
+  ":compile-app-db-schema",
+  ":compile-dataset-schema",
 ) }
 
 tasks.clean { delete(jsonSchemaBuildDir) }
@@ -128,7 +129,17 @@ tasks {
     return rootJson
   }
 
-  register("build-plugin-config-schema-resource") {
+  register("compile-app-db-schema") {
+    val outputFile = jsonSchemaBuildDir.resolve("schema/config/app-db-config.json")
+    val rootSchema = inputDir.resolve("install-target-config.json")
+
+    inputs.dir(inputDir)
+    outputs.file(outputFile)
+
+    doLast { json.writeValue(outputFile, buildMergedSchema(rootSchema)) }
+  }
+
+  register("compile-plugin-schema") {
     val outputFile = jsonSchemaBuildDir.resolve("schema/config/plugin-config.json")
     val rootSchema = inputDir.resolve("plugin-config.json")
 
@@ -138,9 +149,9 @@ tasks {
     doLast { json.writeValue(outputFile, buildMergedSchema(rootSchema)) }
   }
 
-  register("build-stack-config-schema-resource") {
+  register("compile-core-schema") {
     val outputFile = jsonSchemaBuildDir.resolve("schema/config/full-config.json")
-    val rootSchema = inputDir.resolve("stack-config.json")
+    val rootSchema = inputDir.resolve("core-config.json")
 
     inputs.dir(inputDir)
     outputs.file(outputFile)
@@ -149,14 +160,15 @@ tasks {
   }
 }
 
-tasks.register("build-config-schema-resources") {
+tasks.register("compile-config-schema") {
   dependsOn(
-    ":build-plugin-config-schema-resource",
-    ":build-stack-config-schema-resource",
+    ":compile-plugin-schema",
+    ":compile-core-schema",
+    ":compile-app-db-schema",
   )
 }
 
-tasks.register("build-dataset-schema-resources") {
+tasks.register("compile-dataset-schema") {
   val outputDir = jsonSchemaBuildDir.resolve("schema/data/")
   val schemaSourceDir = file("data/")
 

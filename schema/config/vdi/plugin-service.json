@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/vdi-config.json",
+  "title": "VDI Plugin Configuration Schema",
+  "allOf": [
+    { "$ref": "components/full-config.json" },
+    { "required": [
+      "plugins",
+      "siteBuild",
+      "installTargets"
+    ] }
+  ]
+}

@@ -13,13 +13,13 @@
     "fullRunInterval": {
       "title": "Full Reconciliation Interval",
       "description": "Interval at which a full synchronization of all dataset install targets will be performed.",
-      "$ref": "../../common.json#/$defs/duration",
+      "$ref": "../../../common.json#/$defs/duration",
       "default": "6h"
     },
     "slimRunInterval": {
       "title": "Slim Reconciliation Interval",
       "description": "Interval at which a synchronization of the internal cache database will be executed.  This is needed to accommodate for MinIO lacking the S3 event-on-replication feature.",
-      "$ref": "../../common.json#/$defs/duration",
+      "$ref": "../../../common.json#/$defs/duration",
       "default": "5m"
     },
     "performDeletes": {
