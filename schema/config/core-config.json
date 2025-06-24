@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "containerCore": { "$ref": "container-core/core-config.json" },
-    "vdi": { "$ref": "vdi/components/full-config.json" },
+    "vdi": { "$ref": "vdi/core-service.json" },
     "definitions": {
       "title": "Shared Value Definitions",
       "description": "Object that may be used to hold common $defs that may be referenced elsewhere in the config file using YAML anchors and aliases.",
