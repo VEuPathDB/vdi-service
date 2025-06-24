@@ -91,6 +91,7 @@ ifdef _IS_TTY
 LOG_FLAGS ?= -f
 endif
 
+SERVICES :=
 COMPOSE_LOG_CMD := $(COMPOSE_CMD) logs $(LOG_FLAGS)
 
 # Prints and watches the full compose stack log output.
@@ -134,61 +135,61 @@ log-plugin-noop: logs
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-genelist
-log-plugin-genelist: SERVICE := plugin-genelist
+log-plugin-genelist: SERVICES := plugin-genelist
 log-plugin-genelist: logs
 
 # Prints and tails the rnaseq plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-rnaseq
-log-plugin-rnaseq: SERVICE := plugin-rnaseq
+log-plugin-rnaseq: SERVICES := plugin-rnaseq
 log-plugin-rnaseq: logs
 
 # Prints and tails the isasimple plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-isasimple
-log-plugin-isasimple: SERVICE := plugin-isasimple
+log-plugin-isasimple: SERVICES := plugin-isasimple
 log-plugin-isasimple: logs
 
 # Prints and tails the biom plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-biom
-log-plugin-biom: SERVICE := plugin-biom
+log-plugin-biom: SERVICES := plugin-biom
 log-plugin-biom: logs
 
 # Prints and tails the bigwig plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-bigwig
-log-plugin-bigwig: SERVICE := plugin-bigwig
+log-plugin-bigwig: SERVICES := plugin-bigwig
 log-plugin-bigwig: logs
 
 # Prints and tails the phenotype plugin container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-plugin-wrangler
-log-plugin-phenotype: SERVICE := plugin-phenotype
+log-plugin-phenotype: SERVICES := plugin-phenotype
 log-plugin-phenotype: logs
 
 # Prints and tails the kafka log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-kafka
-log-kafka: SERVICE := kafka
+log-kafka: SERVICES := kafka
 log-kafka: logs
 
 # Prints and tails the local minio container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-minio
-log-minio: SERVICE := minio-external
+log-minio: SERVICES := minio-external
 log-minio: logs
 
 # Prints and tails the local rabbitmq container log output.
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-rabbit
-log-rabbit: SERVICE := rabbit-external
+log-rabbit: SERVICES := rabbit-external
 log-rabbit: logs

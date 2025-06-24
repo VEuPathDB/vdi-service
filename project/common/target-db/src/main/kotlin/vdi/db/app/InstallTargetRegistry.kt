@@ -4,7 +4,6 @@ import org.veupathdb.lib.ldap.LDAP
 import org.veupathdb.lib.ldap.LDAPConfig
 import org.veupathdb.lib.ldap.LDAPHost
 import kotlin.io.path.Path
-import vdi.config.DefaultFullStackSchemaPath
 import vdi.config.loadAndCastConfig
 import vdi.logging.MetaLogger
 import vdi.model.data.DataType
@@ -12,10 +11,12 @@ import vdi.model.data.DatasetType
 import vdi.model.data.InstallTargetID
 
 object InstallTargetRegistry {
+  private const val SchemaPath = "/schema/config/app-db-config.json"
+
   private val registry: Map<InstallTargetID, InstallTargetInstanceRegistry>
 
   init {
-    val config = loadAndCastConfig<ShortStackConfig>(schema = Path(DefaultFullStackSchemaPath)).vdi
+    val config = loadAndCastConfig<ShortStackConfig>(schema = Path(SchemaPath)).vdi
     val ldap = config.ldap?.let { raw -> LDAP(LDAPConfig(
       hosts  = raw.servers.map { LDAPHost(it.host, it.port ?: 389u) },
       baseDN = raw.baseDN
