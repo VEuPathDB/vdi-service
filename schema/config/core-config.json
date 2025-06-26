@@ -19,6 +19,5 @@
   "required": [
     "containerCore",
     "vdi"
-  ],
-  "additionalProperties": false
+  ]
 }
