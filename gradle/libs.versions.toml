@@ -10,7 +10,7 @@ junit = "5.13.0"
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-shadow = { id = "com.gradleup.shadow", version = "8.3.6" }
+shadow = { id = "com.gradleup.shadow", version = "8.3.7" }
 
 vpdb = { id = "org.veupathdb.lib.gradle.container.container-utils", version = "6.4.2" }
 
