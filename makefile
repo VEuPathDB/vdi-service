@@ -61,7 +61,7 @@ build-image:
 
 ENV_FILE := ${PWD}/.env
 COMPOSE_DIR   := compose
-COMPOSE_FILES := docker-compose.yml docker-compose.dev.yml docker-compose.ssh.yml
+COMPOSE_FILES := docker-compose.old.yml docker-compose.dev.yml docker-compose.ssh.yml
 MERGED_COMPOSE_FLAGS := $(foreach FILE,$(COMPOSE_FILES),-f $(COMPOSE_DIR)/$(FILE))
 COMPOSE_CMD   := docker compose --env-file=$(ENV_FILE) $(MERGED_COMPOSE_FLAGS)
 

@@ -3,8 +3,6 @@ plugins {
   alias(libs.plugins.shadow)
 }
 
-version = "8.2.0-beta.5"
-
 repositories {
   maven {
     name = "GitHubPackages"
