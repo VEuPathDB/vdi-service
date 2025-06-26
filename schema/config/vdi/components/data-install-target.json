@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/install-target.json",
+  "title": "Dataset Installation Target",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "title": "Enabled",
+      "description": "Whether the install target should be enabled for use in the VDI service.",
+      "type": "boolean",
+      "default": true
+    },
+    "targetName": { "$ref": "../../common.json#/$defs/installTarget" },
+    "dataTypes": {
+      "title": "Supported Data Types",
+      "description": "Optional list of data types that the install target supports.\n\nDefaults to supporting all data types from any plugins enabled for the install target.",
+      "oneOf": [
+        {
+          "title": "Specific Data Types",
+          "type": "array",
+          "items": { "$ref": "plugin.json#/$defs/dataType" },
+          "unevaluatedItems": false,
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        {
+          "title": "Catch-All",
+          "type": "array",
+          "items": { "const": "*" },
+          "minItems": 1,
+          "maxItems": 1,
+          "unevaluatedItems": false
+        }
+      ],
+      "default": [ "*" ]
+    },
+    "dataDb": {
+      "$comment": "type defined in 'allOf' block below",
+      "title": "Dataset Data Database/Schema"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "oneOf": [
+          {
+            "title": "Explicitly Enabled",
+            "description": "The `enabled` field is explicitly set to `true`.",
+            "properties": {
+              "enabled": { "const": true }
+            }
+          },
+          {
+            "title": "Enabled by Default",
+            "description": "The `enabled` field is omitted, using the default value of `true`.",
+            "not": {
+              "properties": {
+                "enabled": { }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "dataDb": { "$ref": "../../common.json#/$defs/database" }
+        },
+        "required": [
+          "targetName",
+          "dataDb"
+        ]
+      }
+    }
+  ]
+}
