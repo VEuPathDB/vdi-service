@@ -20,7 +20,7 @@
     "installTargets": {
       "title": "Dataset Installation Targets",
       "type": "array",
-      "items": { "$ref": "components/data-install-target.json" },
+      "items": { "$ref": "components/install-target.json" },
       "minItems": 1,
       "unevaluatedItems": false,
       "uniqueItems": true
