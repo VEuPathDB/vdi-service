@@ -20,7 +20,7 @@ updates:
       - org.apache.logging.*
 
 - package-ecosystem: docker
-  directory: "/"
+  directory: "/project/core"
   schedule:
     interval: monthly
 
