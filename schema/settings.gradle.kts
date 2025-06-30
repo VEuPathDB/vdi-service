@@ -13,6 +13,6 @@ buildscript {
   }
 
   dependencies {
-    classpath("com.networknt:json-schema-validator:1.5.7")
+    classpath("com.networknt:json-schema-validator:1.5.8")
   }
 }
