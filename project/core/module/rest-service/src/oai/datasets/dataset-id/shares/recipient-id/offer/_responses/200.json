@@ -1,0 +1,8 @@
+{
+  "description": "Share offer details",
+  "content": {
+    "application/json": {
+      "schema": { "$ref": "../../../_types/offer.json" }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "description": "List of community datasets.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "type": "array",
+        "items": { "$ref": "../../_types/get-list-entry.json" }
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "description": "Target dataset has been revised and has a new dataset ID.",
+  "headers": {
+    "Location": { "$ref": "../../../_common/_headers/location.json" }
+  }
+}

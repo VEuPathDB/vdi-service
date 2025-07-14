@@ -1,0 +1,7 @@
+{
+  "name": "enabled",
+  "in": "query",
+  "required": false,
+  "description": "Filter results by enabled status.",
+  "schema": { "type": "boolean" }
+}

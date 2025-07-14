@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VDI Service Health",
+  "type": "object",
+  "properties": {
+    "healthy": {
+      "type": "boolean"
+    },
+    "status": {
+      "description": "DEPRECATED - Use \"healthy\" boolean property.",
+      "type": "string",
+      "enum": [ "health", "unhealthy" ]
+    },
+    "dependencies": {
+      "title": "Service Dependencies",
+      "description": "External or server resources required by the service to function properly.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/dependencyStatus" },
+      "unevaluatedItems": false
+    },
+    "buildInfo": { "$ref": "#/$defs/buildInfo" },
+    "stats": { "$ref": "#/$defs/stats" }
+  },
+  "required": [ "healthy", "status", "dependencies", "info" ],
+  "unevaluatedProperties": false,
+  "$defs": {
+    "dependencyStatus": {
+      "title": "Service Dependency Status",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "reachable": { "type": "boolean" }
+      },
+      "required": [ "name", "reachable" ],
+      "unevaluatedProperties": false
+    },
+    "buildInfo": {
+      "title": "Service Build Info",
+      "type": "object",
+      "properties": {
+        "gitTag": { "type": "string" },
+        "gitCommit": { "type": "string" },
+        "gitBranch": { "type": "string" },
+        "gitUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "buildId": { "type": "string" },
+        "buildNumber": { "type": "string" },
+        "buildTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "gitTag",
+        "gitCommit",
+        "gitBranch",
+        "gitUrl",
+        "buildId",
+        "buildNumber",
+        "buildTime"
+      ],
+      "unevaluatedProperties": false
+    },
+    "stats": {
+      "title": "Service Uptime Info",
+      "type": "object",
+      "properties": {
+        "threads": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "uptime": {
+          "type": "string",
+          "format": "duration"
+        },
+        "uptimeMillis": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1,
+          "x-unsigned": true
+        }
+      },
+      "required": [
+        "threads",
+        "uptime",
+        "uptimeMillis"
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

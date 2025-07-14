@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset Revision Explanation",
+  "description": "Note providing a reason and/or description for the revision.",
+  "type": "string",
+  "minLength": 10,
+  "maxLength": 4096
+}

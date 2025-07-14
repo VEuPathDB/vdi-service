@@ -1,7 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Not Found Error",
-  "content": {
-    "application/json": { "$ref": "../../types/common/errors/404.json" }
-  }
-}

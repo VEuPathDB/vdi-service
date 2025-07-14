@@ -1,7 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Failed Dependency Error",
-  "content": {
-    "application/json": { "$ref": "../../types/common/errors/424.json" }
-  }
-}

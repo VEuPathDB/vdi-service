@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset Share Listing",
+  "type": "object",
+  "patternProperties": {
+    "^\\d+$": { "$ref": "details.json" }
+  },
+  "unevaluatedProperties": false
+}

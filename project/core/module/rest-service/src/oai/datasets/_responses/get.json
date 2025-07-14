@@ -1,0 +1,11 @@
+{
+  "description": "List of objects containing basic dataset details",
+  "content": {
+    "application/json": {
+      "schema": {
+        "type": "array",
+        "items": { "$ref": "../_types/get-list-entry.json" }
+      }
+    }
+  }
+}

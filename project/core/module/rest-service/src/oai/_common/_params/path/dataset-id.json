@@ -1,0 +1,6 @@
+{
+  "name": "dataset-id",
+  "in": "path",
+  "required": true,
+  "schema": { "$ref": "../../_types/dataset/dataset-id.json" }
+}

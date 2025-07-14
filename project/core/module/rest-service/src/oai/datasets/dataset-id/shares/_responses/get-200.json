@@ -1,0 +1,10 @@
+{
+  "description": "Dataset Share List Response.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "$ref": "../_types/share-list.json"
+      }
+    }
+  }
+}

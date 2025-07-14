@@ -1,0 +1,11 @@
+{
+  "description": "Dataset successfully submitted for processing.",
+  "headers": {
+    "Location": { "$ref": "../../_common/_headers/location.json" }
+  },
+  "content": {
+    "application/json": {
+      "schema": { "$ref": "../_types/post-response-content.json" }
+    }
+  }
+}

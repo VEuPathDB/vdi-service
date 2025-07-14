@@ -1,0 +1,6 @@
+{
+  "description": "Revision accepted for processing.",
+  "headers": {
+    "Location": { "$ref": "../../../_common/_headers/location.json" }
+  }
+}

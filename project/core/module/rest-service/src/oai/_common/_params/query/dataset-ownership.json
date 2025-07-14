@@ -1,0 +1,15 @@
+{
+  "name": "ownership",
+  "in": "query",
+  "required": false,
+  "description": "Filter results by dataset ownership type.\n\nEnum of:\n\n* `any`\n* `owned`\n* `shared`\n\nIf set to `any` the results are not filtered.\n\nIf set to `owned`, the results will be filtered to only results that\nare owned by the requesting user.\n\nIf set to `shared`, the results will be filtered to only results that\nare shared with the requesting user.",
+  "schema": {
+    "type": "string",
+    "enum": [
+      "any",
+      "owned",
+      "shared"
+    ],
+    "default": "any"
+  }
+}

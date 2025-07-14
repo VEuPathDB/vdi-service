@@ -18,64 +18,26 @@ servers:
 
 tags:
 - name: dataset
-  description: Dataset resource API operations.
+  description: Datasets.
+- name: file
+  description: Dataset files.
+- name: share
+  description: Dataset sharing.
+- name: user
+  description: Users.
+- name: meta
+  description: Service meta.
 
 paths:
+
   /datasets:
     get:
       tags: [ dataset ]
       operationId: getDatasetList
       summary: List Datasets
       parameters:
-      - name: project_id
-        # language=markdown
-        description: |-
-          Project ID filter.
-
-          ID of the VEuPathDB project that results should be filtered to.
-
-          This means only datasets that are relevant to the project ID given
-          will be returned.
-
-          Additionally, this controls the sites on which the dataset
-          installation status will be checked. Meaning, if this parameter is
-          specified and set to, for example, `PlasmoDB`, the status block in the
-          response objects will only include installation status details for
-          `PlasmoDB` and not any other sites that the dataset may have been
-          installed into.
-
-          This is desirable for UI-based client use to improve request
-          processing time by the service.
-        in: query
-        required: false
-        schema: { $ref: "api-schema/types/common/fields/install-target.json" }
-      - name: ownership
-        in: query
-        required: false
-        # language=markdown
-        description: |-
-          Ownership status filter.
-
-          Enum of:
-
-          * `any`
-          * `owned`
-          * `shared`
-
-          If set to `any` the results are not filtered.
-
-          If set to `owned`, the results will be filtered to only results that
-          are owned by the requesting user.
-
-          If set to `shared`, the results will be filtered to only results that
-          are shared with the requesting user.
-        schema:
-          type: string
-          enum:
-          - any
-          - owned
-          - shared
-          default: any
+      - $ref: "src/oai/_common/_params/query/install-target-datasets.json"
+      - $ref: "src/oai/_common/_params/query/dataset-ownership.json"
       # language=markdown
       description: |-
         Returns a list of datasets available to the requesting user, optionally
@@ -85,10 +47,10 @@ paths:
         most recently created datasets will be first and the oldest dataset will
         be last in the list.
       responses:
-        200: { $ref: "api-schema/responses/datasets/get.json"}
-        400: { $ref: "api-schema/responses/common/400.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        200: { $ref: "src/oai/datasets/_responses/get.json"}
+        400: { $ref: "src/oai/_common/_responses/400.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
     post:
       tags: [ dataset ]
       operationId: createDataset
@@ -117,81 +79,88 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: { $ref: "api-schema/types/requests/datasets/create-dataset.json" }
+            schema: { $ref: "src/oai/datasets/_types/post-body.json" }
       responses:
-        201: { $ref: "api-schema/responses/datasets/post.json" }
-        400: { $ref: "api-schema/responses/common/400.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        422: { $ref: "api-schema/responses/common/422.json" }
-        424: { $ref: "api-schema/responses/common/424.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        201: { $ref: "src/oai/datasets/_responses/post.json" }
+        400: { $ref: "src/oai/_common/_responses/400.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        422: { $ref: "src/oai/_common/_responses/422.json" }
+        424: { $ref: "src/oai/_common/_responses/424.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
   /datasets/community:
     get:
       tags: [ dataset ]
       operationId: getCommunityDatasetList
       summary: List Community Datasets
+      parameters:
+      - $ref: "src/oai/_common/_params/query/install-target-datasets.json"
       # language=markdown
       description: |-
         Returns a list of datasets that have been made "public" by the owner
         setting the dataset visibilities to a setting other than `private`.
       responses:
-        200: { $ref: "api-schema/responses/datasets/community/get.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        200: { $ref: "src/oai/datasets/community/_responses/get.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
-  /datasets/{dataset-id}:
+  /datasets/dataset-id:
     parameters:
-    - $ref: "#/components/parameters/datasetId"
+    - $ref: "src/oai/_common/_params/path/dataset-id.json"
     get:
       tags: [ dataset ]
       operationId: getDataset
       responses:
-        200: { $ref: "api-schema/responses/datasets/dataset-id/get-200.json" }
-        301: { $ref: "api-schema/responses/datasets/dataset-id/get-301.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        200: { $ref: "src/oai/datasets/dataset-id/_responses/get-200.json" }
+        301: { $ref: "src/oai/datasets/dataset-id/_responses/get-301.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
     patch:
       tags: [ "dataset" ]
       operationId: updateDataset
-      requestBody: { $ref: "api-schema/requests/datasets/patch.json" }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "src/oai/datasets/dataset-id/_types/patch-body.json" }
       responses:
-        204: { $ref: "api-schema/responses/common/204.json" }
-        400: { $ref: "api-schema/responses/common/400.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        403: { $ref: "api-schema/responses/common/403.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        422: { $ref: "api-schema/responses/common/422.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        204: { $ref: "src/oai/_common/_responses/204.json" }
+        400: { $ref: "src/oai/_common/_responses/400.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        422: { $ref: "src/oai/_common/_responses/422.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
     put:
       tags: [ "dataset" ]
       operationId: reviseDataset
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
+            schema: { $ref: "src/oai/datasets/dataset-id/_types/put-body.json" }
       responses:
-        201: { $ref: "api-schema/responses/datasets/dataset-id/put-201.json" }
-        400: { $ref: "api-schema/responses/common/400.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        403: { $ref: "api-schema/responses/common/403.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        422: { $ref: "api-schema/responses/common/422.json" }
-        424: { $ref: "api-schema/responses/common/424.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        201: { $ref: "src/oai/datasets/dataset-id/_responses/put-201.json" }
+        400: { $ref: "src/oai/_common/_responses/400.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        422: { $ref: "src/oai/_common/_responses/422.json" }
+        424: { $ref: "src/oai/_common/_responses/424.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
     delete:
       tags: [ "dataset" ]
       operationId: deleteDataset
       responses:
-        204: { $ref: "api-schema/responses/common/204.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        403: { $ref: "api-schema/responses/common/403.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        204: { $ref: "src/oai/_common/_responses/204.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
-  /datasets/{dataset-id}/files:
+  /datasets/dataset-id/files:
     parameters:
-    - $ref: "#/components/parameters/datasetId"
+    - $ref: "src/oai/_common/_params/path/dataset-id.json"
     get:
       tags: [ "dataset", "file" ]
       operationId: getDatasetFileIndex
@@ -200,104 +169,67 @@ paths:
           description: Dataset file index
           content:
             application/json:
-              schema: { $ref: "api-schema/types/responses/datasets/dataset-file-index.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+              schema: { $ref: "src/oai/datasets/dataset-id/files/_types/dataset-file-index.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
-  /datasets/{dataset-id}/files/importReady:
+  /datasets/dataset-id/files/importReady:
     parameters:
-    - $ref: "#/components/parameters/datasetId"
+    - $ref: "src/oai/_common/_params/path/dataset-id.json"
     get:
       tags: [ "dataset", "file" ]
       operationId: getImportReadyFile
       summary: Get User Upload File
-      parameters:
-      - name: attachment
-        required: false
-        in: query
-        schema:
-          type: boolean
-          default: true
       responses:
-        200: { $ref: '#/components/responses/File' }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        200: { $ref: 'src/oai/_common/_responses/file.json' }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
-  /datasets/{dataset-id}/files/installReady:
+  /datasets/dataset-id/files/installReady:
     parameters:
-    - $ref: "#/components/parameters/datasetId"
+    - $ref: "src/oai/_common/_params/path/dataset-id.json"
     get:
       tags: [ "dataset", "file" ]
       operationId: getInstallReadyFile
       summary: Get Preprocessed Data
-      parameters:
-      - name: attachment
-        required: false
-        in: query
-        schema:
-          type: boolean
-          default: true
       responses:
-        200: { $ref: '#/components/responses/File' }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        200: { $ref: 'src/oai/_common/_responses/file.json' }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
-  /studies:
-    get:
-      tags: [ "study" ]
-      operationId: getStudies
-    post:
-      tags: [ "study" ]
-      operationId: createStudy
-
-  /studies/community:
-    get:
-      tags: [ "study" ]
-      operationId: getCommunityStudies
-
-  /studies/{study-id}:
+  /datasets/dataset-id/files/documents:
     parameters:
-    - $ref: "#/components/parameters/studyId"
+    - $ref: "src/oai/_common/_params/path/dataset-id.json"
     get:
-      tags: [ "study" ]
-      operationId: getStudy
-    patch:
-      tags: [ "study" ]
-      operationId: updateStudy
-    delete:
-      tags: [ "study" ]
-      operationId: deleteStudy
-
-  /studies/{study-id}/documents/:
-    parameters:
-    - $ref: "#/components/parameters/studyId"
-    get:
-      tags: [ "study", "file" ]
-      operationId: getStudyDocumentIndex
+      tags: [ "dataset", "file" ]
+      operationId: getDocumentList
+      summary: Get list of dataset meta documents.
       responses:
-        200:
-          description: Document List
-          content:
-            application/json:
-              schema: { $ref: "api-schema/types/responses/studies/document-file-listing.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        200: { $ref: 'src/oai/datasets/dataset-id/files/documents/_responses/get-200.json' }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
-  /studies/{study-id}/documents/{file-name}:
+  /datasets/dataset-id/files/documents/{file-name}:
     parameters:
-    - $ref: "#/components/parameters/studyId"
+    - $ref: "src/oai/_common/_params/path/dataset-id.json"
     - name: file-name
-      required: true
       in: path
+      required: true
       schema:
         type: string
+        minLength: 1
     get:
-      tags: [ "study", "file" ]
-      operationId: getStudyDocument
+      tags: [ "dataset", "file" ]
+      operationId: getDocumentFile
+      summary: Get dataset meta document file.
       parameters:
       - name: attachment
         required: false
@@ -306,180 +238,188 @@ paths:
           type: boolean
           default: true
       responses:
-        200: { $ref: '#/components/responses/File' }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        200: { $ref: 'src/oai/_common/_responses/file.json' }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
     put:
-      tags: [ "study", "file"]
+      tags: [ "dataset", "file" ]
+      operationId: putDocumentFile
+      summary: Upload dataset meta document file.
       requestBody:
-        description: New document file.
+        required: true
         content:
           "*/*":
             schema:
               type: string
               format: binary
       responses:
-        204: { description: "Document replaced" }
-        400: { $ref: "api-schema/responses/common/400.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        403: { $ref: "api-schema/responses/common/403.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        204: { $ref: "src/oai/_common/_responses/204.json" }
+        400: { $ref: "src/oai/_common/_responses/400.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
-
-  /studies/{study-id}/shares:
+  /datasets/dataset-id/shares:
     parameters:
-    - $ref: "#/components/parameters/studyId"
+    - $ref: "src/oai/_common/_params/path/dataset-id.json"
     get:
-      tags: [ "study", "share" ]
-      summary: Get Share Details
+      tags: [ "dataset", "share" ]
+      operationId: getDatasetShareList
+      summary: Get Dataset Share List
       responses:
-        200:
-          description: Share Details
-          content:
-            application/json:
-              schema: { $ref: "api-schema/types/responses/studies/shares/list.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        403: { $ref: "api-schema/responses/common/403.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        200: { $ref: "src/oai/datasets/dataset-id/shares/_responses/get-200.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
-  /studies/{study-id}/shares/{recipient-user-id}:
+  /datasets/dataset-id/shares/recipient-id:
     parameters:
-    - $ref: "#/components/parameters/studyId"
-    - $ref: "#/components/parameters/shareRecipientId"
+    - $ref: "src/oai/_common/_params/path/dataset-id.json"
+    - $ref: "src/oai/_common/_params/path/share-recipient-id.json"
     get:
-      tags: [ "study", "share" ]
-      summary: Get Share Details
+      tags: [ "dataset", "share" ]
+      operationId: getDatasetShare
+      summary: Get Dataset Share for Recipient
       responses:
-        200:
-          description: Share Details
-          content:
-            application/json:
-              schema: { $ref: "api-schema/types/responses/studies/shares/details.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        403: { $ref: "api-schema/responses/common/403.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
-
-  /studies/{study-id}/shares/{recipient-user-id}/offer:
-    parameters:
-    - $ref: "#/components/parameters/studyId"
-    - $ref: "#/components/parameters/shareRecipientId"
-    put:
-      tags: [ "study", "share" ]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "api-schema/types/requests/studies/shares/offer.json" }
-      responses:
-        204: { description: "Success" }
-        400: { $ref: "api-schema/responses/common/400.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        403: { $ref: "api-schema/responses/common/403.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        422: { $ref: "api-schema/responses/common/422.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
-
-  /studies/{study-id}/shares/{recipient-user-id}/receipt:
-    parameters:
-    - $ref: "#/components/parameters/datasetId"
-    - $ref: "#/components/parameters/shareRecipientId"
+        200: { $ref: "src/oai/datasets/dataset-id/shares/recipient-id/_responses/200.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
     put:
       tags: [ "dataset", "share" ]
+      operationId: putDatasetShare
+      summary: Put Dataset Share for Recipient
       requestBody:
-        required: true
         content:
           application/json:
-            schema: { $ref: "api-schema/types/requests/studies/shares/receipt.json" }
+            schema: { $ref: "src/oai/datasets/dataset-id/shares/_types/details.json" }
       responses:
-        204: { description: "Success" }
-        400: { $ref: "api-schema/responses/common/400.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        403: { $ref: "api-schema/responses/common/403.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        422: { $ref: "api-schema/responses/common/422.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        204: { $ref: "src/oai/_common/_responses/204.json" }
+        400: { $ref: "src/oai/_common/_responses/400.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        422: { $ref: "src/oai/_common/_responses/422.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
-
-  /users/{user-id}:
+  /datasets/dataset-id/shares/recipient-id/offer:
     parameters:
-    - $ref: "#/components/parameters/userId"
+    - $ref: "src/oai/_common/_params/path/dataset-id.json"
+    - $ref: "src/oai/_common/_params/path/share-recipient-id.json"
+    get:
+      tags: [ "dataset", "share" ]
+      operationId: getDatasetShareOffer
+      summary: Get dataset share offer
+      responses:
+        200: { $ref: "src/oai/datasets/dataset-id/shares/recipient-id/offer/_responses/200.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
+    put:
+      tags: [ "dataset", "share" ]
+      operationId: putDatasetShareOffer
+      summary: Put dataset share offer
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "src/oai/datasets/dataset-id/shares/_types/offer.json" }
+      responses:
+        204: { $ref: "src/oai/_common/_responses/204.json" }
+        400: { $ref: "src/oai/_common/_responses/400.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        422: { $ref: "src/oai/_common/_responses/422.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
+
+  /datasets/dataset-id/shares/recipient-id/receipt:
+    parameters:
+    - $ref: "src/oai/_common/_params/path/dataset-id.json"
+    - $ref: "src/oai/_common/_params/path/share-recipient-id.json"
+    get:
+      tags: [ "dataset", "share" ]
+      operationId: getDatasetShareReceipt
+      summary: Get dataset share receipt
+      responses:
+        200: { $ref: "src/oai/datasets/dataset-id/shares/recipient-id/receipt/_responses/200.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
+    put:
+      tags: [ "dataset", "share" ]
+      operationId: putDatasetShareReceipt
+      summary: Put dataset share receipt
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "src/oai/datasets/dataset-id/shares/_types/receipt.json" }
+      responses:
+        204: { $ref: "src/oai/_common/_responses/204.json" }
+        400: { $ref: "src/oai/_common/_responses/400.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        422: { $ref: "src/oai/_common/_responses/422.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
+
+  /health:
+    get:
+      tags: [ "meta" ]
+      operationId: getServiceHealth
+      summary: Service Health
+      description: Displays information about the health of the service.
+      responses:
+        200: { $ref: "src/oai/health/_responses/get-200.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
+
+  /plugins:
+    get:
+      tags: [ "meta" ]
+      operationId: getPlugins
+      summary: List Plugins
+      # language=markdown
+      description: >-
+        Returns a list of the plugins currently registered with the VDI service.
+          
+        The plugin list may be optionally filtered by install-target and/or
+        enabled status.
+      parameters:
+      - $ref: "src/oai/_common/_params/query/install-target-datasets.json"
+      - $ref: "src/oai/plugins/_params/enabled.json"
+      responses:
+        200: { $ref: "src/oai/plugins/_responses/get.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
+
+  /users/user-id:
+    parameters:
+    - $ref: "src/oai/_common/_params/path/user-id.json"
     get:
       tags: [ "user" ]
       summary: Get User Details
+      operationId: getUserInfo
       responses:
-        200:
-          description: User Details
-          content:
-            application/json:
-              schema: { $ref: "api-schema/types/responses/users/details.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        403: { $ref: "api-schema/responses/common/403.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
+        200: { $ref: "src/oai/users/user-id/_responses/get.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }
 
-  /users/{user-id}/shares:
+  /users/user-id/shares:
     parameters:
-    - $ref: "#/components/parameters/userId"
+    - $ref: "src/oai/_common/_params/path/user-id.json"
     get:
       summary: Get User Share Info
       tags: [ "user", "share" ]
+      operationId: getUserShares
       responses:
-        200:
-          description: User Share Listing
-          content:
-            application/json:
-              schema: { $ref: "api-schema/types/responses/users/share-list.json" }
-        401: { $ref: "api-schema/responses/common/401.json" }
-        403: { $ref: "api-schema/responses/common/403.json" }
-        404: { $ref: "api-schema/responses/common/404.json" }
-        500: { $ref: "api-schema/responses/common/500.json" }
-
-components:
-  parameters:
-    datasetId:
-      name: "dataset-id"
-      in: path
-      required: true
-      schema: { $ref: "api-schema/types/common/dataset/dataset-id.json" }
-    studyId:
-      name: "study-id"
-      in: path
-      required: true
-      schema: { $ref: "api-schema/types/common/study/study-id.json" }
-    shareRecipientId:
-      name: recipient-user-id
-      in: path
-      required: true
-      schema: { $ref: "api-schema/types/common/wdk/user-id.json" }
-    userId:
-      name: user-id
-      in: path
-      required: true
-      # language=markdown
-      description: |-
-        Either the WDK user ID of a target user, or the value `me`.
-      schema:
-        type: string
-        minLength: 2
-        # language=regexp
-        pattern: ^me|\d{3,12}$
-  responses:
-    File:
-      description: File contents
-      headers:
-        # language=markdown
-        Content-Disposition:
-          required: false
-          schema:
-            type: string
-            examples:
-            - attachment; filename="1234567-upload.zip"
-      content:
-        application/octet-stream:
-          schema:
-            type: string
-            format: file
+        200: { $ref: "src/oai/users/user-id/shares/_responses/200.json" }
+        401: { $ref: "src/oai/_common/_responses/401.json" }
+        403: { $ref: "src/oai/_common/_responses/403.json" }
+        404: { $ref: "src/oai/_common/_responses/404.json" }
+        500: { $ref: "src/oai/_common/_responses/500.json" }

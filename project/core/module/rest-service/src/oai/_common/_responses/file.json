@@ -1,0 +1,20 @@
+{
+  "description": "File contents",
+  "headers": {
+    "Content-Disposition": {
+      "required": false,
+      "schema": {
+        "type": "string",
+        "examples": [ "attachment; filename=\"1234567-upload.zip\"" ]
+      }
+    }
+  },
+  "content": {
+    "*/*": {
+      "schema": {
+        "type": "string",
+        "format": "file"
+      }
+    }
+  }
+}

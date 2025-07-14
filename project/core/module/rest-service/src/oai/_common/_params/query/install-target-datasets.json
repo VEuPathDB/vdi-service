@@ -1,0 +1,7 @@
+{
+  "name": "install-target",
+  "in": "query",
+  "required": false,
+  "description": "Project ID filter.\n\nID of the VEuPathDB project that results should be filtered to.\n\nThis means only datasets that are relevant to the project ID given\nwill be returned.\n\nAdditionally, this controls the sites on which the dataset\ninstallation status will be checked. Meaning, if this parameter is\nspecified and set to, for example, `PlasmoDB`, the status block in the\nresponse objects will only include installation status details for\n`PlasmoDB` and not any other sites that the dataset may have been\ninstalled into.",
+  "schema": { "$ref": "../../_types/install-target.json" }
+}

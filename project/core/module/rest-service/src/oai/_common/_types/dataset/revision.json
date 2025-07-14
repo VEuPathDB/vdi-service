@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset Revision",
+  "description": "Dataset revision history entry.",
+  "properties": {
+    "action": { "$ref": "#/$defs/revisionAction" },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revisionId": { "$ref": "dataset-id.json" },
+    "revisionNote": { "$ref": "revision-note.json" },
+    "fileListUrl": {
+      "description": "URL of the file listing API endpoint for the revision entry.",
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "unevaluatedProperties": false,
+  "$defs": {
+    "revisionAction": {
+      "title": "Dataset Revision Action",
+      "type": "string",
+      "enum": [
+        "revise"
+      ]
+    }
+  }
+}

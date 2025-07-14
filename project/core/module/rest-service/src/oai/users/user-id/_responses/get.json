@@ -1,0 +1,8 @@
+{
+  "description": "User Details",
+  "content": {
+    "application/json": {
+      "schema": { "$ref": "../_types/details.json" }
+    }
+  }
+}

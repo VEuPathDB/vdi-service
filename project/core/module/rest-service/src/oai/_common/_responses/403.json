@@ -1,0 +1,6 @@
+{
+  "description": "Forbidden Error",
+  "content": {
+    "application/json": { "schema": { "$ref": "../_types/error/403.json" } }
+  }
+}

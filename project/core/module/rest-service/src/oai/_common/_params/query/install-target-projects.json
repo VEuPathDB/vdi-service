@@ -1,0 +1,7 @@
+{
+  "name": "install-target",
+  "in": "query",
+  "required": false,
+  "description": "Project ID filter.\n\nFilters plugins to only those applicable to the given install target.",
+  "schema": { "$ref": "../../_types/install-target.json" }
+}

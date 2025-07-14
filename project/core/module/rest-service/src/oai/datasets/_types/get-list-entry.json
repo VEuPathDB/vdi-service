@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset List Item",
+  "description": "Short entry with basic details about a dataset.",
+  "type": "object",
+  "properties": {
+    "datasetId": { "$ref": "../../_common/_types/dataset/dataset-id.json" },
+    "name": { "$ref": "../../_common/_types/dataset/name.json" },
+    "owner": { "$ref": "../../_common/_types/wdk/user-details.json" },
+    "summary": { "$ref": "../../_common/_types/dataset/summary.json" },
+    "description": { "$ref": "../../_common/_types/dataset/description.json" },
+    "sourceUrl": { "$ref": "../../_common/_types/dataset/source-url.json" },
+    "originalId": { "$ref": "../../_common/_types/dataset/dataset-id.json" },
+    "dataType": { "$ref": "../../_common/_types/dataset/data-type.json" },
+    "visibility": { "$ref": "../../_common/_types/dataset/visibility.json" },
+    "installTargets": { "$ref": "../../_common/_types/install-target-set.json" },
+    "status": { "$ref": "../../_common/_types/dataset/status-info.json" },
+    "shares": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/datasetListShareUser"
+      },
+      "uniqueItems": true,
+      "unevaluatedItems": false
+    },
+    "fileCount": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Number of files uploaded for this dataset."
+    },
+    "fileSizeTotal": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Sum of the sizes of all the files uploaded for this dataset.\n"
+    },
+    "created": { "$ref": "../../_common/_types/dataset/creation-date.json" },
+    "shortName": { "$ref": "../../_common/_types/dataset/short-name.json" },
+    "shortAttribution": { "$ref": "../../_common/_types/dataset/short-attribution.json" }
+  },
+  "unevaluatedProperties": false,
+  "required": [
+    "datasetId",
+    "name",
+    "owner",
+    "summary",
+    "dataType",
+    "visibility",
+    "installTargets",
+    "status",
+    "fileCount",
+    "fileSizeTotal",
+    "created"
+  ],
+  "$defs": {
+    "datasetListShareUser": {
+      "title": "Dataset List Share Info",
+      "type": "object",
+      "properties": {
+        "userId": { "$ref": "../../_common/_types/wdk/user-id.json" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "organization": { "type": "string" },
+        "accepted": { "type": "boolean" }
+      },
+      "unevaluatedProperties": false,
+      "required": [
+        "userId",
+        "firstName",
+        "lastName",
+        "organization",
+        "accepted"
+      ]
+    }
+  }
+}

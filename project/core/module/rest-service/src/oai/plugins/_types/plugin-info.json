@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VDI Plugin Details",
+  "type": "object",
+  "properties": {
+    "displayName": { "type": "string" },
+    "enabled": { "type": "boolean" },
+    "dataTypes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/dataType" },
+      "unevaluatedItems": false,
+      "minItems": 1
+    },
+    "installTargets": { "$ref": "../../_common/_types/install-target-set.json" }
+  },
+  "required": [
+    "displayName",
+    "dataTypes",
+    "enabled"
+  ],
+  "unevaluatedProperties": false,
+  "$defs": {
+    "dataType": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" }
+      },
+      "required": [ "name", "version" ],
+      "unevaluatedProperties": false
+    }
+  }
+}

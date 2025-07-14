@@ -1,0 +1,6 @@
+{
+  "description": "Bad Request Error",
+  "content": {
+    "application/json": { "schema": { "$ref": "../_types/error/400.json" } }
+  }
+}

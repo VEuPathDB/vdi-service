@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Create Dataset Success Response",
+  "type": "object",
+  "properties": {
+    "datasetId": { "$ref": "../../_common/_types/dataset/dataset-id.json" }
+  },
+  "required": [ "datasetId" ],
+  "unevaluatedProperties": false
+}

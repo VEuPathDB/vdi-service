@@ -1,0 +1,6 @@
+{
+  "description": "Failed Dependency Error",
+  "content": {
+    "application/json": { "schema": { "$ref": "../_types/error/424.json" } }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "user-id",
+  "description": "Either the WDK user ID of a target user, or the value `me`.",
+  "in": "path",
+  "required": true,
+  "schema": {
+    "type": "string",
+    "minLength": 2,
+    "pattern": "^me|\\d{3,12}$"
+  }
+}

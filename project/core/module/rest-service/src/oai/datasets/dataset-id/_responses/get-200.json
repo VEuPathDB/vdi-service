@@ -1,0 +1,10 @@
+{
+  "description": "Dataset details response.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "$ref": "../_types/get-response-content.json"
+      }
+    }
+  }
+}

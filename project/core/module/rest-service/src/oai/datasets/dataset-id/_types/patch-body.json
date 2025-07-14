@@ -1,0 +1,19 @@
+{
+  "title": "Dataset Patch Request Body",
+  "type": "object",
+  "properties": {
+    "name": { "$ref": "../../../_common/_types/dataset/name.json" },
+    "datasetType": { "$ref": "../../../_common/_types/dataset/data-type-short.json" },
+    "shortName": { "$ref": "../../../_common/_types/dataset/short-name.json" },
+    "shortAttribution": { "$ref": "../../../_common/_types/dataset/short-attribution.json" },
+    "visibility": { "$ref": "../../../_common/_types/dataset/visibility.json" },
+    "summary": { "$ref": "../../../_common/_types/dataset/summary.json" },
+    "description": { "$ref": "../../../_common/_types/dataset/description.json" },
+    "publications": { "$ref": "../../../_common/_types/dataset/publication-array.json" },
+    "hyperlinks": { "$ref": "../../../_common/_types/dataset/hyperlink-array.json" },
+    "organisms": { "$ref": "../../../_common/_types/dataset/organism-array.json" },
+    "contacts": { "$ref": "../../../_common/_types/dataset/contact-array.json" },
+    "properties": { "$ref": "../../../_common/_types/dataset/characteristics.json" }
+  },
+  "unevaluatedProperties": false
+}

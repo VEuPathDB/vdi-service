@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "Dataset Put Request Body",
+  "properties": {
+    "details": { "$ref": "#/$defs/meta" },
+    "metaFiles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/file" },
+      "unevaluatedItems": false
+    }
+  },
+  "unevaluatedProperties": false,
+  "required": [ "details" ],
+  "oneOf": [
+    {
+      "title": "Create Dataset File Upload",
+      "type": "object",
+      "properties": {
+        "dataFiles": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/file" },
+          "minItems": 1,
+          "unevaluatedItems": false
+        }
+      },
+      "required": [ "dataFiles" ]
+    },
+    {
+      "title": "Create Dataset URL Upload",
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "iri"
+        }
+      },
+      "required": [ "url" ]
+    }
+  ],
+  "$defs": {
+    "base": {
+      "title": "Base Create Dataset Request",
+      "type": "object",
+      "properties": {
+      },
+      "required": [ "details" ]
+    },
+    "meta": {
+      "title": "Dataset Put Meta",
+      "description": "Metadata about the dataset being submitted.",
+      "type": "object",
+      "properties": {
+        "origin": { "$ref": "../../../_common/_types/dataset/origin.json" },
+        "revisionNote": { "$ref": "../../../_common/_types/dataset/revision-note.json" }
+      },
+      "unevaluatedProperties": false,
+      "required": [ "datasetType" ],
+      "allOf": [ { "$ref": "patch-body.json" } ]
+    },
+    "file": {
+      "title": "Upload File",
+      "type": "string",
+      "format": "binary"
+    }
+  }
+}

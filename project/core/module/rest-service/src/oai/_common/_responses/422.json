@@ -1,0 +1,6 @@
+{
+  "description": "Unprocessable Entity Error",
+  "content": {
+    "application/json": { "schema": { "$ref": "../_types/error/422.json" } }
+  }
+}

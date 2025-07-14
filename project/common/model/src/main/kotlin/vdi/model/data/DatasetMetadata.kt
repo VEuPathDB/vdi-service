@@ -68,6 +68,12 @@ data class DatasetMetadata(
 
   @field:JsonProperty(JsonKey.Properties)
   val properties: DatasetProperties? = null,
+
+  @field:JsonProperty(JsonKey.Project)
+  val project: String? = null,
+
+  @field:JsonProperty(JsonKey.Program)
+  val program: String? = null,
 ) {
   object JsonKey {
     const val Contacts         = "contacts"
@@ -81,6 +87,8 @@ data class DatasetMetadata(
     const val Origin           = "origin"
     const val OriginalID       = "originalId"
     const val Owner            = "owner"
+    const val Program          = "program"
+    const val Project          = "project"
     const val Properties       = "properties"
     const val Publications     = "publications"
     const val RevisionHistory  = "revisionHistory"

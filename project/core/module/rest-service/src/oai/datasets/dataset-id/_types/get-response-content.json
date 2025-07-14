@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dataset Get Response",
+  "description": "Details about a singular dataset.",
+  "type": "object",
+  "properties": {
+    "datasetId": { "$ref": "../../../_common/_types/dataset/dataset-id.json" },
+    "owner": { "$ref": "../../../_common/_types/wdk/user-details.json" },
+    "datasetType": { "$ref": "../../../_common/_types/dataset/data-type.json" },
+    "visibility": { "$ref": "../../../_common/_types/dataset/visibility.json" },
+    "shares": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/datasetShareOffer" },
+      "uniqueItems": true,
+      "unevaluatedItems": false
+    },
+    "created": { "$ref": "../../../_common/_types/dataset/creation-date.json" },
+    "sourceUrl": { "$ref": "../../../_common/_types/dataset/source-url.json" },
+    "originalId": { "$ref": "../../../_common/_types/dataset/dataset-id.json" },
+    "revisionHistory": {
+      "type": "array",
+      "items": { "$ref": "../../../_common/_types/dataset/revision.json" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "unevaluatedItems": false
+    }
+  },
+  "required": [
+    "datasetId",
+    "owner",
+    "datasetType",
+    "visibility",
+    "created"
+  ],
+  "dependentRequired": {
+    "originalId": ["revisionHistory"],
+    "revisionHistory": ["originalId"]
+  },
+  "allOf": [ { "$ref": "../../../_common/_types/dataset/base-meta.json" } ],
+  "unevaluatedProperties": false,
+  "$defs": {
+    "datasetShareOffer": {
+      "title": "Dataset Share Offer",
+      "type": "object",
+      "properties": {
+        "recipient": {
+          "$ref": "../../../_common/_types/wdk/user-id.json"
+        },
+        "status": {
+          "$ref": "../../../_common/_types/dataset/share/offer-action.json"
+        }
+      },
+      "required": [
+        "recipient",
+        "status"
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

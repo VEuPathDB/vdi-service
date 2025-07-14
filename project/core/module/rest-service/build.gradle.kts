@@ -21,9 +21,10 @@ apply { plugin("org.openapi.generator") }
 
 tasks.withType<GenerateTask> {
   val newSrcPath = "src/generated/kotlin"
+  val newResPath = "src/generated/resources"
 
-  apiPackage = "vdi.service.rest.generated.api"
-  modelPackage = "vdi.service.rest.generated.model"
+  apiPackage = "vdi.service.rest.gen.api"
+  modelPackage = "vdi.service.rest.gen.model"
   generatorName = "vpdb"
 
   inputSpec = "$projectDir/openapi.yml"
@@ -33,6 +34,7 @@ tasks.withType<GenerateTask> {
     "dateLibrary" to "java8",
     "enumPropertyNaming" to "PascalCase",
     "sourceFolder" to newSrcPath,
+    "resourceFolder" to newResPath,
     "debugModels" to "$projectDir/models.json",
     "debugOperations" to "$projectDir/operations.json",
   )
@@ -42,13 +44,7 @@ tasks.withType<GenerateTask> {
     "meta" to "datasetMeta",
   )
 
-  inlineSchemaNameMappings = mapOf(
-    "WDK_User_Info_1" to "WDK_User_Info",
-    "Dataset_Type_Details_1" to "Dataset_Type_Details",
-    "Dataset_List_Item_1" to "Dataset_List_Item",
-    "Dataset_Visibility_1" to "Dataset_Visibility",
-//    "Dataset_File_Archive_allOf" to "Dataset_File_Archive",
-  )
+  skipOperationExample = true
 
   ignoreFileOverride = "$projectDir/.openapi-generator-ignore"
 
@@ -68,6 +64,7 @@ tasks.withType<GenerateTask> {
 
   doFirst {
     file(newSrcPath).deleteRecursively()
+    file(newResPath).deleteRecursively()
   }
 }
 
@@ -96,7 +93,7 @@ containerService {
 sourceSets {
   main {
     kotlin {
-//      srcDir("src/generated/kotlin")
+      srcDir("src/generated/kotlin")
     }
   }
 }

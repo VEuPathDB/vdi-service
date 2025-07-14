@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "Dataset Share Receipt",
+  "properties": {
+    "action": { "$ref": "../../../../_common/_types/dataset/share/receipt-action.json" }
+  },
+  "required": [ "action" ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "User Share Listing",
+  "properties": {
+    "outgoing": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/shareOffer" },
+      "unevaluatedItems": false,
+      "uniqueItems": true
+    },
+    "incoming": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/shareReceipt" },
+      "unevaluatedItems": false,
+      "uniqueItems": true
+    }
+  },
+  "unevaluatedProperties": false,
+  "$defs": {
+    "shareOffer": {
+      "type": "object",
+      "title": "Outgoing Share",
+      "properties": {
+        "recipient": { "$ref": "../../../../_common/_types/wdk/user-id.json" },
+        "datasetId": { "$ref": "../../../../_common/_types/dataset/dataset-id.json" },
+        "action": { "$ref": "../../../../_common/_types/dataset/share/offer-action.json" }
+      },
+      "required": [
+        "recipient",
+        "datasetId",
+        "action"
+      ],
+      "unevaluatedProperties": false
+    },
+    "shareReceipt": {
+      "type": "object",
+      "title": "Incoming Share",
+      "properties": {
+        "owner": { "$ref": "../../../../_common/_types/wdk/user-id.json" },
+        "datasetId": { "$ref": "../../../../_common/_types/dataset/dataset-id.json" },
+        "action": { "$ref": "../../../../_common/_types/dataset/share/receipt-action.json" }
+      },
+      "required": [
+        "owner",
+        "datasetId",
+        "action"
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

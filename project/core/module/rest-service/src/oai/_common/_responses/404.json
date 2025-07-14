@@ -1,0 +1,6 @@
+{
+  "description": "Not Found Error",
+  "content": {
+    "application/json": { "schema": { "$ref": "../_types/error/404.json" } }
+  }
+}

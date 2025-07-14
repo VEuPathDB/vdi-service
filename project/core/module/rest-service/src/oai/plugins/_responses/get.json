@@ -1,0 +1,13 @@
+{
+  "description": "Plugin list response.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "type": "array",
+        "items": { "$ref": "../_types/plugin-info.json" },
+        "unevaluatedItems": false,
+        "minItems": 1
+      }
+    }
+  }
+}

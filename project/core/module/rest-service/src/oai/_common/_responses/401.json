@@ -1,0 +1,6 @@
+{
+  "description": "Unauthorized Error",
+  "content": {
+    "application/json": { "schema": { "$ref": "../_types/error/401.json" } }
+  }
+}

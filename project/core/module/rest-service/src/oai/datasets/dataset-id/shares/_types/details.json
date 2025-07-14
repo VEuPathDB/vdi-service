@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "Dataset Share Details",
+  "properties": {
+    "offer": { "$ref": "../_types/offer.json" },
+    "receipt": { "$ref": "../_types/receipt.json" }
+  },
+  "required": [ "offer" ],
+  "unevaluatedProperties": false
+}

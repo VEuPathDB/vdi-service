@@ -1,0 +1,6 @@
+{
+  "name": "recipient-id",
+  "in": "path",
+  "required": true,
+  "schema": { "$ref": "../../_types/wdk/user-id.json" }
+}

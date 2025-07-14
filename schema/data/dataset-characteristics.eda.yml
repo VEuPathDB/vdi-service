@@ -172,3 +172,4 @@ allOf:
 
 # Error on unrecognized input.
 unevaluatedProperties: false
+
