@@ -30,8 +30,14 @@ fun <T: ControllerBase> T.createDataset(
   dataFiles: List<File>?,
   url: URI?,
 ): UnionCreateDatasetResponse {
-  if (dataFiles == null && url == null)
+  if (dataFiles == null && url == null) {
+    logger.debug("bad request: no data file or url provided")
     return UnionCreateDatasetResponse.json400(BadRequestError("must provide either data files or a download source url"))
+  }
+
+
+
+
 
 }
 
