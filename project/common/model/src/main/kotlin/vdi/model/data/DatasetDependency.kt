@@ -3,16 +3,16 @@ package vdi.model.data
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class DatasetDependency(
-  @field:JsonProperty(JsonKey.Identifier)
+  @field:JsonProperty(Identifier)
   val identifier: String,
 
-  @field:JsonProperty(JsonKey.Version)
+  @field:JsonProperty(Version)
   val version: String,
 
-  @field:JsonProperty(JsonKey.DisplayName)
+  @field:JsonProperty(DisplayName)
   val displayName: String,
 ) {
-  object JsonKey {
+  companion object JsonKey {
     const val Identifier  = "resourceIdentifier"
     const val Version     = "resourceVersion"
     const val DisplayName = "resourceDisplayName"
