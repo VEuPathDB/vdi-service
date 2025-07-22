@@ -9,23 +9,24 @@ open class DatasetRevision(
   @field:JsonProperty(JsonKey.Action)
   val action: Action,
 
-  @field:JsonProperty(JsonKey.Timestamp)
+  @field:JsonProperty(Timestamp)
   val timestamp: OffsetDateTime,
 
-  @field:JsonProperty(JsonKey.RevisionID)
+  @field:JsonProperty(RevisionID)
   val revisionID: DatasetID,
 
-  @field:JsonProperty(JsonKey.RevisionNote)
+  @field:JsonProperty(RevisionNote)
   val revisionNote: String
 ) {
-  object JsonKey {
+  companion object JsonKey {
     const val Action       = "action"
     const val RevisionID   = "revisionId"
     const val RevisionNote = "revisionNote"
     const val Timestamp    = "timestamp"
   }
 
-  override fun toString() = "DatasetRevision(action=$action, timestamp=$timestamp, revisionID=$revisionID, revisionNote=$revisionNote)"
+  override fun toString() =
+    "DatasetRevision(action=$action, timestamp=$timestamp, revisionID=$revisionID, revisionNote=$revisionNote)"
 
   override fun equals(other: Any?): Boolean {
     return other is DatasetRevision && (
@@ -35,6 +36,14 @@ open class DatasetRevision(
         && other.revisionID == this.revisionID
         && other.revisionNote == this.revisionNote
       ))
+  }
+
+  override fun hashCode(): Int {
+    var result = action.hashCode()
+    result = 31 * result + timestamp.hashCode()
+    result = 31 * result + revisionID.hashCode()
+    result = 31 * result + revisionNote.hashCode()
+    return result
   }
 
   /**

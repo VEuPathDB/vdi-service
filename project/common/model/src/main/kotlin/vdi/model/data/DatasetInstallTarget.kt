@@ -10,7 +10,7 @@ data class DatasetInstallTarget(
   val targetID: InstallTargetID,
 
   @field:JsonProperty(BuildInfo)
-  val buildInfo: String?
+  val buildInfo: String? = null,
 ) {
   companion object JsonKey {
     const val TargetID = "targetId"

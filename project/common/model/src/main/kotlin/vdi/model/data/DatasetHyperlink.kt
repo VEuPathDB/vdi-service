@@ -6,14 +6,14 @@ import java.net.URI
 
 @JsonIgnoreProperties("text", "isPublication")
 data class DatasetHyperlink(
-  @field:JsonProperty(JsonKey.URL)
+  @field:JsonProperty(URL)
   val url: URI,
 
-  @field:JsonProperty(JsonKey.Description)
+  @field:JsonProperty(Description)
   val description: String? = null,
 ) {
-  object JsonKey {
-    const val URL           = "url"
-    const val Description   = "description"
+  companion object JsonKey {
+    const val URL         = "url"
+    const val Description = "description"
   }
 }

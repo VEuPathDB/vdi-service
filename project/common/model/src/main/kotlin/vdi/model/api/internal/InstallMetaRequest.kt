@@ -11,13 +11,21 @@ import vdi.model.data.InstallTargetID
  * VDI service to a plugin server.
  */
 data class InstallMetaRequest(
-  @JsonProperty(JSONKeys.VDIID)
+  @field:JsonProperty(VDIID)
   val vdiID: DatasetID,
 
-  @JsonAlias(JSONKeys.ProjectID)
-  @JsonProperty(JSONKeys.InstallTarget)
+  @field:JsonAlias(Legacy_ProjectID)
+  @field:JsonProperty(InstallTarget)
   val installTarget: InstallTargetID,
 
-  @JsonProperty(JSONKeys.Meta)
+  @field:JsonProperty(Meta)
   val meta: DatasetMetadata,
-)
+) {
+  companion object JsonKey {
+    const val InstallTarget = "installTarget"
+    const val Meta          = "meta"
+    const val VDIID         = "vdiID"
+
+    const val Legacy_ProjectID = "projectID"
+  }
+}
