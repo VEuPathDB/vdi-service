@@ -151,21 +151,15 @@ tasks.register("raml-docs") {
   dependsOn("merge-raml")
 
   inputs.sourceFiles.files.addAll(listOf(
-    file("deprecated-api.raml"),
     file("api.raml"),
     file("api-schema/library.raml")
   ))
   outputs.files("docs/api.html", "src/main/resources/api.html")
 
   doFirst {
-    val originalFile = containerService.raml.rootApiDefinition
-    containerService.raml.rootApiDefinition = file("deprecated-api.raml")
-
     with(tasks.getByName<GenerateRamlDocs>(GenerateRamlDocs.TaskName)) {
       execute()
     }
-
-    containerService.raml.rootApiDefinition = originalFile
   }
 }
 

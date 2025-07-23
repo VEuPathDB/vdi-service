@@ -8,13 +8,9 @@ data class DatasetOrganism(
 
   @field:JsonProperty(Strain)
   val strain: String,
-
-  @field:JsonProperty(Genome)
-  val referenceGenome: String,
 ) {
   companion object JsonKey {
     const val Species = "species"
     const val Strain  = "strain"
-    const val Genome  = "referenceGenome"
   }
 }

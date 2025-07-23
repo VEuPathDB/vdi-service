@@ -50,6 +50,9 @@ data class DatasetMetadata(
   @field:JsonProperty(Dependencies)
   val dependencies: List<DatasetDependency> = emptyList(),
 
+  @field:JsonProperty(ReferenceGenome)
+  val referenceGenome: String? = null,
+
   @field:JsonProperty(Publications)
   val publications: List<DatasetPublication> = emptyList(),
 
@@ -130,6 +133,7 @@ data class DatasetMetadata(
     const val ProjectName         = "projectName"
     const val Properties          = "properties"
     const val Publications        = "publications"
+    const val ReferenceGenome     = "referenceGenome"
     const val RelatedStudies      = "relatedStudies"
     const val RevisionHistory     = "revisionHistory"
     const val SharesSamples       = "sharesSamples"
