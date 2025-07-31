@@ -56,9 +56,6 @@ data class DatasetMetadata(
   @field:JsonProperty(Publications)
   val publications: List<DatasetPublication> = emptyList(),
 
-  @field:JsonProperty(Hyperlinks)
-  val hyperlinks: List<DatasetHyperlink> = emptyList(),
-
   @field:JsonProperty(Contacts)
   val contacts: List<DatasetContact> = emptyList(),
 
@@ -67,12 +64,6 @@ data class DatasetMetadata(
 
   @field:JsonProperty(RevisionHistory)
   val revisionHistory: List<DatasetRevision> = emptyList(),
-
-  @field:JsonProperty(StudyDesign)
-  val studyDesign: String? = null,
-
-  @field:JsonProperty(StudyType)
-  val studyType: String? = null,
 
   /**
    * An organizational framework that supports coordinated studies with shared
@@ -94,17 +85,11 @@ data class DatasetMetadata(
   @field:JsonProperty(RelatedStudies)
   val relatedStudies: Set<URI> = emptySet(),
 
-  /**
-   * Diseases or health conditions.
-   */
-  @field:JsonProperty(Diseases)
-  val diseases: Set<String> = emptySet(),
-
   @field:JsonProperty(PathogenOrganisms)
   val pathogenOrganisms: Set<PathogenOrganism> = emptySet(),
 
-  @field:JsonProperty(FieldSample)
-  val fieldSampleOverview: DatasetFieldSample? = null,
+  @field:JsonProperty(StudyCharacteristics)
+  val studyCharacteristics: StudyCharacteristics? = null,
 
   @field:JsonProperty(ExternalIdentifiers)
   val externalIdentifiers: ExternalDatasetIdentifiers? = null,
@@ -113,38 +98,34 @@ data class DatasetMetadata(
   val funding: Set<DatasetFundingAward> = emptySet()
 ) {
   companion object JsonKey {
-    const val Contacts            = "contacts"
-    const val Created             = "created"
-    const val Dependencies        = "dependencies"
-    const val Description         = "description"
-    const val Diseases            = "diseases"
-    const val ExternalIdentifiers = "externalIdentifiers"
-    const val FieldSample         = "fieldSampleOverview"
-    const val Funding             = "funding"
-    const val Hyperlinks          = "hyperlinks"
-    const val InstallTargets      = "installTargets"
-    const val Name                = "name"
-    const val Organisms           = "organisms"
-    const val Origin              = "origin"
-    const val OriginalID          = "originalId"
-    const val Owner               = "owner"
-    const val PathogenOrganisms   = "pathogenOrganisms"
-    const val ProgramName         = "programName"
-    const val ProjectName         = "projectName"
-    const val Properties          = "properties"
-    const val Publications        = "publications"
-    const val ReferenceGenome     = "referenceGenome"
-    const val RelatedStudies      = "relatedStudies"
-    const val RevisionHistory     = "revisionHistory"
-    const val SharesSamples       = "sharesSamples"
-    const val ShortAttribution    = "shortAttribution"
-    const val ShortName           = "shortName"
-    const val SourceURL           = "sourceUrl"
-    const val StudyDesign         = "studyDesign"
-    const val StudyType           = "studyType"
-    const val Summary             = "summary"
-    const val Type                = "type"
-    const val Visibility          = "visibility"
+    const val Contacts             = "contacts"
+    const val Created              = "created"
+    const val Dependencies         = "dependencies"
+    const val Description          = "description"
+    const val ExternalIdentifiers  = "externalIdentifiers"
+    const val Funding              = "funding"
+    const val InstallTargets       = "installTargets"
+    const val Name                 = "name"
+    const val Organisms            = "organisms"
+    const val Origin               = "origin"
+    const val OriginalID           = "originalId"
+    const val Owner                = "owner"
+    const val PathogenOrganisms    = "pathogenOrganisms"
+    const val ProgramName          = "programName"
+    const val ProjectName          = "projectName"
+    const val Properties           = "properties"
+    const val Publications         = "publications"
+    const val ReferenceGenome      = "referenceGenome"
+    const val RelatedStudies       = "relatedStudies"
+    const val RevisionHistory      = "revisionHistory"
+    const val SharesSamples        = "sharesSamples"
+    const val ShortAttribution     = "shortAttribution"
+    const val ShortName            = "shortName"
+    const val SourceURL            = "sourceUrl"
+    const val StudyCharacteristics = "studyCharacteristics"
+    const val Summary              = "summary"
+    const val Type                 = "type"
+    const val Visibility           = "visibility"
 
     // Legacy fields: no longer used, but may still exist in metadata for older
     // datasets.

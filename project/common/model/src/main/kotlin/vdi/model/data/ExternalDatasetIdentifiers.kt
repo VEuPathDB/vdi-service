@@ -7,7 +7,7 @@ data class ExternalDatasetIdentifiers(
   val dois: Set<DOIReference> = emptySet(),
 
   @field:JsonProperty(Hyperlinks)
-  val hyperlinks: Set<AdditionalHyperlink> = emptySet(),
+  val hyperlinks: Set<DatasetHyperlink> = emptySet(),
 
   @field:JsonProperty(BioprojectIDs)
   val bioprojectIDs: Set<BioprojectIDReference> = emptySet(),

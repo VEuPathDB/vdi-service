@@ -29,7 +29,7 @@ class Resources(opts: ServiceConfig) : ContainerResources(opts) {
     })
   }
 
-  override fun resources() = arrayOf<Any>(
+  override fun resources() = arrayOf<Class<*>>(
     AdminReports::class.java,
     AdminRPC::class.java,
     CommunityDatasets::class.java,
@@ -40,13 +40,5 @@ class Resources(opts: ServiceConfig) : ContainerResources(opts) {
     MetaInfo::class.java,
     PluginInfo::class.java,
     UserInfo::class.java,
-
-    DeprecatedCommunityDatasets::class.java,
-    DeprecatedDatasetByID::class.java,
-    DeprecatedDatasetFiles::class.java,
-    DeprecatedDatasetList::class.java,
-    DeprecatedDatasetSharePut::class.java,
-    DeprecatedPluginInfo::class.java,
-    DeprecatedUserInfo::class.java,
   )
 }
