@@ -13,11 +13,11 @@
       "minLength": 3,
       "maxLength": 300
     },
-    "description?": {
+    "description": {
       "type": "string",
       "maxLength": 4000
     },
-    "isPublication?": {
+    "isPublication": {
       "type": "boolean",
       "default": false
     }

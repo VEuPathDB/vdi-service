@@ -6,7 +6,7 @@
     "details": { "$ref": "#/$defs/meta" },
     "metaFiles": {
       "type": "array",
-      "items": { "$ref": "#/$defs/file" },
+      "items": { "$ref": "#/$defs/putFile" },
       "unevaluatedItems": false
     }
   },
@@ -19,7 +19,7 @@
       "properties": {
         "dataFiles": {
           "type": "array",
-          "items": { "$ref": "#/$defs/file" },
+          "items": { "$ref": "#/$defs/putFile" },
           "minItems": 1,
           "unevaluatedItems": false
         }
@@ -58,7 +58,7 @@
       "required": [ "datasetType" ],
       "allOf": [ { "$ref": "patch-body.json" } ]
     },
-    "file": {
+    "putFile": {
       "title": "Upload File",
       "type": "string",
       "format": "binary"

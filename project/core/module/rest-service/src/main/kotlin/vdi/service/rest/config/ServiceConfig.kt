@@ -6,10 +6,10 @@ import org.veupathdb.lib.container.jaxrs.config.DbOptionsImpl
 import org.veupathdb.lib.container.jaxrs.config.Options
 import java.util.Optional
 import vdi.config.raw.ManifestConfig
-import vdi.core.config.StackConfig
 import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
 import vdi.config.raw.db.LDAPDatabaseConnectionConfig
+import vdi.core.config.StackConfig
 
 class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : Options() {
   private val coreConfig = config.core
@@ -20,6 +20,10 @@ class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : O
 
   val projects = config.vdi.installTargets
     .map { it.targetName }
+
+  val jsonSchemaPath = config.core.jsonSchemaPath ?: "/schema/rest-api"
+
+  val generatedSourcePackage = config.core.generatedSourcePackage ?: "org.veupathdb.rest.generated"
 
   override fun getAdminAuthToken() =
     Optional.of(coreConfig

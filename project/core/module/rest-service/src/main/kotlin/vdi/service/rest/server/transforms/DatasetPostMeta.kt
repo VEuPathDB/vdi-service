@@ -8,7 +8,7 @@ fun DatasetPostMeta.toDatasetMeta(): DatasetMetadata {
   return DatasetMetadata(
     type = datasetType.toDatasetType(),
     installTargets = installTargets.mapTo(HashSet(installTargets.size)) { it.value },
-    visibility = visibility,
+    visibility = TODO(),
     owner = TODO(),
     name = TODO(),
     summary = TODO(),

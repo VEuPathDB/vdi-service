@@ -7,7 +7,7 @@
     "details": { "$ref": "#/$defs/meta" },
     "metaFiles": {
       "type": "array",
-      "items": { "$ref": "#/$defs/file" },
+      "items": { "$ref": "#/$defs/postFile" },
       "unevaluatedItems": false
     }
   },
@@ -20,7 +20,7 @@
       "properties": {
         "dataFiles": {
           "type": "array",
-          "items": { "$ref": "#/$defs/file" },
+          "items": { "$ref": "#/$defs/postFile" },
           "minItems": 1,
           "unevaluatedItems": false
         }
@@ -56,7 +56,7 @@
       "required": [ "datasetType", "installTargets" ],
       "contentMediaType": "application/json"
     },
-    "file": {
+    "postFile": {
       "title": "Upload File",
       "type": "string",
       "format": "file",

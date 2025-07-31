@@ -77,8 +77,6 @@ COMPOSE_CMD   := $(CONTAINER_CMD) compose --env-file=$(ENV_FILE) $(MERGED_COMPOS
 
 # Builds the VDI service docker image.
 .PHONY: build-image
-build-image: BUILD_ID := ${USER}-$(shell date +'%s' | cut -c5-)
-build-image: GIT_COMMIT := $(shell git rev-parse HEAD)
 build-image:
 	@cd ../.. && $(CONTAINER_CMD) build \
 	  -t veupathdb/vdi-service:latest \
@@ -89,9 +87,9 @@ build-image:
       --build-arg="GIT_TAG=$(shell git describe --tags 2>/dev/null || echo "snapshot")" \
       --build-arg="GIT_URL=$(shell git remote get-url origin | sed 's#:#/#;s#git@#https://#')" \
       --build-arg="GIT_BRANCH=$(shell git branch --show-current)" \
-      --build-arg="GIT_COMMIT=$(GIT_COMMIT)$(if $(GIT_DIRTY),-dirty)" \
+      --build-arg="GIT_COMMIT=$(shell git rev-parse HEAD)$(if $(GIT_DIRTY),-dirty)" \
       --build-arg="BUILD_TIME=$(shell date --rfc-3339=seconds --utc)" \
-      --build-arg="BUILD_ID=$(BUILD_ID)" \
+      --build-arg="BUILD_ID=${USER}-$(shell date +'%s' | cut -c5-)" \
       --build-arg="BUILD_NUMBER=n/a" \
       .
 
@@ -145,8 +143,8 @@ logs:
 #
 # Log following may be disabled by setting LOG_FLAGS to an empty string.
 .PHONY: log-service
-log-service: SERVICES := service
-log-service: logs
+log-service:
+	@$(MAKE) SERVICES=service logs
 
 # Prints and tails the internal database container log output.
 #

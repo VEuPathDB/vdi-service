@@ -5,12 +5,14 @@
   "properties": {
     "name": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "maxLength": 256
     },
     "size": {
       "type": "integer",
       "format": "uint64",
-      "minimum": 0
+      "minimum": 0,
+      "maximum": 18446744073709551615
     }
   },
   "required": [ "name", "size" ],

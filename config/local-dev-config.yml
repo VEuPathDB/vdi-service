@@ -32,6 +32,7 @@ containerCore:
       clientSecret: ${env:OAUTH_CLIENT_SECRET}
       url: https://eupathdb.org/oauth
     adminToken: ${env:ADMIN_AUTH_TOKEN}
+  generatedSourcePackage: "vdi.service.rest.gen"
 
 vdi:
   restService:

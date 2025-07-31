@@ -23,23 +23,18 @@ fun <T: ControllerBase> T.createDataset(datasetID: DatasetID, entity: DatasetPos
   submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)
 }
 
-fun <T: ControllerBase> T.createDataset(
-  datasetID: DatasetID,
-  details: DatasetPostMeta,
-  metaFiles: List<File>?,
-  dataFiles: List<File>?,
-  url: URI?,
-): UnionCreateDatasetResponse {
-  if (dataFiles == null && url == null) {
-    logger.debug("bad request: no data file or url provided")
-    return UnionCreateDatasetResponse.json400(BadRequestError("must provide either data files or a download source url"))
-  }
-
-
-
-
-
-}
+//fun <T: ControllerBase> T.createDataset(
+//  datasetID: DatasetID,
+//  details: DatasetPostMeta,
+//  metaFiles: List<File>?,
+//  dataFiles: List<File>?,
+//  url: URI?,
+//): UnionCreateDatasetResponse {
+//  if (dataFiles == null && url == null) {
+//    logger.debug("bad request: no data file or url provided")
+//    return UnionCreateDatasetResponse.json400(BadRequestError("must provide either data files or a download source url"))
+//  }
+//}
 
 fun <T: ControllerBase> T.createDataset(datasetID: DatasetID, entity: DatasetProxyPostRequestBody, uploadConfig: UploadConfig) {
   val datasetMeta = entity.toDatasetMeta(userID)

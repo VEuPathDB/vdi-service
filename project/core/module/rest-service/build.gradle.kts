@@ -95,6 +95,9 @@ sourceSets {
     kotlin {
       srcDir("src/generated/kotlin")
     }
+    resources {
+      srcDir("src/generated/resources")
+    }
   }
 }
 
@@ -133,6 +136,7 @@ dependencies {
   implementation(libs.kt.coroutines)
 
   implementation(libs.http.server.jersey)
+  implementation(libs.http.server.multipart)
 
   implementation(libs.prometheus.client)
   implementation(libs.prometheus.common)

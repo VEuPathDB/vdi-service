@@ -40,6 +40,16 @@
           ]
         }
       }
+    },
+    "generatedSourcePackage": {
+      "description": "Root package where generated REST API source files are located.",
+      "type": "string",
+      "format": "uri-reference"
+    },
+    "jsonSchemaPath": {
+      "description": "Path to the REST API JSON schema resource files within the service jar file.",
+      "type": "string",
+      "format": "uri-reference"
     }
   },
   "additionalProperties": false,

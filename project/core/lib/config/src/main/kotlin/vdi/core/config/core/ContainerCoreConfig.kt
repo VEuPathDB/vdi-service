@@ -8,4 +8,6 @@ data class ContainerCoreConfig(
   val authentication: AuthenticationConfig,
   val http: ServerConfig?,
   val databases: CoreDatabaseSet?,
+  val jsonSchemaPath: String?,
+  val generatedSourcePackage: String?
 )

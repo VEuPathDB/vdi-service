@@ -7,7 +7,7 @@
     "installReady": { "$ref": "#/$defs/archive" },
     "documents": {
       "type": "array",
-      "items": { "$ref": "#/$defs/file" },
+      "items": { "$ref": "../../../../_common/_types/file-info.json" },
       "unevaluatedItems": false
     }
   },
@@ -16,47 +16,19 @@
   "$defs": {
     "archive": {
       "title": "Dataset File Archive",
-      "allOf": [
-        { "$ref": "#/$defs/file" },
-        {
-          "type": "object",
-          "properties": {
-            "contents": {
-              "type": "array",
-              "items": { "$ref": "#/$defs/file" },
-              "minItems": 1,
-              "uniqueItems": true,
-              "unevaluatedItems": false
-            }
-          },
-          "required": [ "contents" ]
-        }
-      ],
-      "unevaluatedProperties": false
-    },
-    "file": {
-      "title": "Dataset File",
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256
-        },
-        "size": { "$ref": "#/$defs/fileSize" }
+        "contents": {
+          "type": "array",
+          "items": { "$ref": "../../../../_common/_types/file-info.json" },
+          "minItems": 1,
+          "uniqueItems": true,
+          "unevaluatedItems": false
+        }
       },
-      "unevaluatedProperties": false,
-      "required": [
-        "name",
-        "size"
-      ]
-    },
-    "fileSize": {
-      "type": "integer",
-      "format": "int64",
-      "minimum": 0,
-      "maximum": 18446744073709551615,
-      "x-unsigned": true
+      "required": [ "contents" ],
+      "allOf": [ { "$ref": "../../../../_common/_types/file-info.json" } ],
+      "unevaluatedProperties": false
     }
   }
 }

@@ -40,67 +40,67 @@ object Main {
     MetaLogger.info("================================================================")
     MetaLogger.info("Starting VDI Service Version: {}", manifest.gitTag)
 
-    MetaLogger.info("awaiting external dependencies")
-    try {
-      runBlocking { AwaitDependencies(config) }
-    } catch (e: Throwable) {
-      MetaLogger.error("startup exception: ", e)
-      exitProcess(1)
-    }
+//    MetaLogger.info("awaiting external dependencies")
+//    try {
+//      runBlocking { AwaitDependencies(config) }
+//    } catch (e: Throwable) {
+//      MetaLogger.error("startup exception: ", e)
+//      exitProcess(1)
+//    }
+//
+//    MetaLogger.info("initializing modules")
+//    val modules = try {
+//      listOf(
+//        EventRouter(config.vdi, ::fatality),
+//        HardDeleteLane(config.vdi, ::fatality),
+//        ImportLane(config.vdi, ::fatality),
+//        InstallDataLane(config.vdi, ::fatality),
+//        DatasetPruner(config.vdi.daemons?.pruner, ::fatality),
+//        ShareLane(config.vdi, ::fatality),
+//        SoftDeleteLane(config.vdi, ::fatality),
+//        UpdateMetaLane(config.vdi, ::fatality),
+//        Reconciler(config.vdi.daemons?.reconciler, ::fatality),
+//        ReconciliationLane(config.vdi, ::fatality),
+//      )
+//    } catch (e: Throwable) {
+//      MetaLogger.error("startup exception: ", e)
+//      exitProcess(1)
+//    }
+//
+//    // FIXME: REMOVE THIS ONCE THE EXTENDED METADATA PATCH HAS BEEN APPLIED TO PRODUCTION!!!!
+//    patchMetadataTable()
+//
+//    val serviceLock = ReentrantLock()
+//    val unlockCondition = serviceLock.newCondition()
+//
+//    Runtime.getRuntime().addShutdownHook(Thread {
+//      serviceLock.withLock {
+//        unlockCondition.signal()
+//      }
+//      shutdownModules(modules)
+//    })
 
-    MetaLogger.info("initializing modules")
-    val modules = try {
-      listOf(
-        EventRouter(config.vdi, ::fatality),
-        HardDeleteLane(config.vdi, ::fatality),
-        ImportLane(config.vdi, ::fatality),
-        InstallDataLane(config.vdi, ::fatality),
-        DatasetPruner(config.vdi.daemons?.pruner, ::fatality),
-        ShareLane(config.vdi, ::fatality),
-        SoftDeleteLane(config.vdi, ::fatality),
-        UpdateMetaLane(config.vdi, ::fatality),
-        Reconciler(config.vdi.daemons?.reconciler, ::fatality),
-        ReconciliationLane(config.vdi, ::fatality),
-      )
-    } catch (e: Throwable) {
-      MetaLogger.error("startup exception: ", e)
-      exitProcess(1)
-    }
-
-    // FIXME: REMOVE THIS ONCE THE EXTENDED METADATA PATCH HAS BEEN APPLIED TO PRODUCTION!!!!
-    patchMetadataTable()
-
-    val serviceLock = ReentrantLock()
-    val unlockCondition = serviceLock.newCondition()
-
-    Runtime.getRuntime().addShutdownHook(Thread {
-      serviceLock.withLock {
-        unlockCondition.signal()
-      }
-      shutdownModules(modules)
-    })
-
-    thread {
-      try {
+//    thread {
+//      try {
         RestService(config, manifest).main(args)
-        serviceLock.withLock {
-          unlockCondition.await()
-        }
-      } catch (e: Throwable) {
-        MetaLogger.error("rest service startup failed", e)
-        exitProcess(1)
-      }
-    }
+//        serviceLock.withLock {
+//          unlockCondition.await()
+//        }
+//      } catch (e: Throwable) {
+//        MetaLogger.error("rest service startup failed", e)
+//        exitProcess(1)
+//      }
+//    }
 
     MetaLogger.info("starting background modules")
-    runBlocking(Dispatchers.IO) { modules.forEach { launch {
-      try {
-        it.start()
-      } catch (e: Throwable) {
-        MetaLogger.error("vdi module startup exception", e)
-        exitProcess(1)
-      }
-    } } }
+//    runBlocking(Dispatchers.IO) { modules.forEach { launch {
+//      try {
+//        it.start()
+//      } catch (e: Throwable) {
+//        MetaLogger.error("vdi module startup exception", e)
+//        exitProcess(1)
+//      }
+//    } } }
   }
 
   /**

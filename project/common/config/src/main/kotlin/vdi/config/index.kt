@@ -36,8 +36,12 @@ inline fun <reified T: Any> loadAndCastConfig(path: Path = makeDefaultConfigPath
   }
 
 fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
-  MetaLogger.info("loading config from $path")
-  MetaLogger.info("loading config schema from $schema")
+  val stack = Thread.currentThread()
+    .stackTrace
+    .first { it.fileName?.let { f -> f.startsWith("index.kt") || f.contains(".java") } == false }
+
+  MetaLogger.info("loading config from $path -- ${stack.fileName}:${stack.lineNumber}")
+  MetaLogger.info("loading config schema from $schema -- ${stack.fileName}:${stack.lineNumber}")
 
   val validator = object {}.javaClass.getResourceAsStream(schema.toString())
     .let { it ?: throw ConfigurationException("failed to load config schema $schema") }

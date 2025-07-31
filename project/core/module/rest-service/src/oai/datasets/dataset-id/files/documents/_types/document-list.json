@@ -3,33 +3,7 @@
   "title": "Dataset Document Index",
   "type": "array",
   "items": {
-    "items": { "$ref": "#/$defs/file" },
+    "items": { "$ref": "../../../../../_common/_types/file-info.json" },
     "unevaluatedItems": false
-  },
-  "$defs": {
-    "file": {
-      "title": "Dataset File",
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256
-        },
-        "size": { "$ref": "#/$defs/fileSize" }
-      },
-      "unevaluatedProperties": false,
-      "required": [
-        "name",
-        "size"
-      ]
-    },
-    "fileSize": {
-      "type": "integer",
-      "format": "int64",
-      "minimum": 0,
-      "maximum": 18446744073709551615,
-      "x-unsigned": true
-    }
   }
 }
