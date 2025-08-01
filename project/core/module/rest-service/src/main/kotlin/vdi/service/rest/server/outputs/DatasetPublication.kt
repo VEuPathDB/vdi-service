@@ -8,5 +8,5 @@ import vdi.service.rest.generated.model.DatasetPublicationImpl
 internal fun DatasetPublication.toExternal(): APIPublication =
   DatasetPublicationImpl().also {
     it.citation = citation
-    it.pubMedId = pubmedID
+    it.pubMedId = identifier
   }

@@ -19,29 +19,66 @@ types:
     displayName: Dataset Contact
     additionalProperties: false
     properties:
-      name:
+      firstName?:
+        # language=markdown
+        description: >-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
+        minLength: 1
+        maxLength: 300
+      middleName?:
         type: string
-        minLength: 3
+        minLength: 1
+        maxLength: 300
+      lastName?:
+        # language=markdown
+        description: >-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
+        type: string
+        minLength: 1
         maxLength: 300
       isPrimary?:
+        description: Only one contact may be marked as primary.
         type: boolean
         default: false
       email?:
+        # language=markdown
         description: >-
-          **IMPORTANT**: Required if `isPrimary == true`.
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
         type: string
         minLength: 5
         maxLength: 4000
       affiliation?:
+        title: Organization
+        # language=markdown
+        description: >-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
         type: string
         maxLength: 4000
+      country?:
+        # language=markdown
+        description: >-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
+        type: string
+        maxLength: 200
       city?:
         type: string
         maxLength: 200
       state?:
-        type: string
-        maxLength: 200
-      country?:
         type: string
         maxLength: 200
       address?:
@@ -142,38 +179,48 @@ types:
     displayName: Dataset Meta Base Fields
     type: object
     properties:
-      # Fields that are different based on child type (and thus omitted here):
-      # - datasetType (different format for post/get)
-      # - visibility  (optional in post, required in get)
-      # - sourceUrl   (only in get)
-      #
-
-      # Required Fields
-      name: DatasetName
-      summary: DatasetSummary
-      origin: DatasetOrigin
+      # type: (different based on subtype)
       installTargets:
         description: IDs of the projects this dataset is being submitted to.
-        type: InstallTargetID[]
+        type: InstallTarget[]
         minItems: 1
         uniqueItems: true
+      # visibility: (optional in POST subtype, required in GET subtype)
+      # owner: (only present in responses, requests get this from the user session)
+      name: DatasetName
+      summary: DatasetSummary
+      description?: DatasetDescription
+      origin: DatasetOrigin
+      # created: (only present in responses and admin override requests)
+      # sourceUrl: (only present in responses)
       dependencies:
         type: DatasetDependency[]
         uniqueItems: true
-
-      # Optional Fields
+      publications?:
+        type: DatasetPublication[]
+        uniqueItems: true
       contacts?:
         type: DatasetContact[]
         uniqueItems: true
-      description?: DatasetDescription
+      projectName?:
+        # language=markdown
+        description: >-
+          Required if:
+          * Install target is MBio or ClinEpi
+        type: DatasetProjectName
+      programName?:
+        description: >-
+          Required if:
+          * Install target is MBio or ClinEpi
+        type: DatasetProgramName
+
+
+      # Optional Fields
       hyperlinks?:
         type: DatasetHyperlink[]
         uniqueItems: true
       organisms?:
         type: OrganismAbbreviation[]
-        uniqueItems: true
-      publications?:
-        type: DatasetPublication[]
         uniqueItems: true
       shortName?: DatasetShortName
       shortAttribution?: DatasetShortAttribution
@@ -209,19 +256,36 @@ types:
       email?: string
       organization?: string
 
+  DatasetProjectName:
+    displayName: Project Name
+    type: string
+    minLength: 1
+    maxLength: 256
+
+  DatasetProgramName:
+    displayName: Program Name
+    type: string
+    minLength: 1
+    maxLength: 256
+
   DatasetPublication:
     displayName: Dataset Publication
     additionalProperties: false
     properties:
-      pubMedId:
+      identifier:
         type: string
         minLength: 3
         maxLength: 30
+      type?:
+        type: string
+        enum: [ pmid, doi ]
+        default: pmid
       citation?:
         type: string
         minLength: 3
         maxLength: 2000
       isPrimary?:
+        description: Only one publication may be marked as primary.
         type: boolean
         default: false
 
@@ -341,6 +405,14 @@ types:
       * `2022-03-15T16:30:12+04:00`
       * `2022-03-15T16:30:12.123Z`
       * `2022-03-15T16:30:12.123-06:00`
+
+  InstallTarget:
+    type: object
+    properties:
+      targetId: InstallTargetID
+      buildInfo:
+        type: string
+        required: false
 
   InstallTargetID:
     description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".

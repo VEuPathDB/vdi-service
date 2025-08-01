@@ -57,17 +57,3 @@ traits:
 /admin/rpc: !include api-schema/resources/admin/rpc/resource.raml
 
 /meta-info: !include api-schema/resources/meta/resource.raml
-
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
-# ┃  DEPRECATED ENDPOINT PATHS                                               ┃ #
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
-
-/vdi-datasets: !include api-schema/resources/dataset-list/resource.raml
-/vdi-datasets/{vdi-id}: !include api-schema/resources/dataset/resource.raml
-/vdi-datasets/{vdi-id}/files: !include api-schema/resources/dataset-files/resource.raml
-/vdi-datasets/{vdi-id}/shares/{recipient-user-id}: !include api-schema/resources/dataset-shares/resource.raml
-/vdi-datasets/community: !include api-schema/resources/community-datasets/resource.raml
-/vdi-datasets/share-offers: !include api-schema/resources/users/self/share-offers/resource.raml
-/vdi-plugins: !include api-schema/resources/plugins/resource.raml
-/vdi-users: !include api-schema/resources/users/resource.raml

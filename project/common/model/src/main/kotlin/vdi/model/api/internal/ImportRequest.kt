@@ -9,7 +9,13 @@ import vdi.model.data.DatasetMetadata
  * service to a plugin server.
  */
 data class ImportRequest(
-  @JsonProperty(JSONKeys.VDIID) val vdiID: DatasetID,
-  @JsonProperty(JSONKeys.JobID) val importIndex: UShort,
-  @JsonProperty(JSONKeys.Meta)  val meta: DatasetMetadata,
-)
+  @field:JsonProperty(VDIID) val vdiID: DatasetID,
+  @field:JsonProperty(JobID) val importIndex: UShort,
+  @field:JsonProperty(Meta)  val meta: DatasetMetadata,
+) {
+  companion object JsonKey {
+    const val VDIID = "vdiID"
+    const val JobID = "jobID"
+    const val Meta  = "meta"
+  }
+}

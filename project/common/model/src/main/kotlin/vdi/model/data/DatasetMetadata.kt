@@ -6,97 +6,128 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.net.URI
 import java.time.OffsetDateTime
 
-@JsonIgnoreProperties("category")
+@JsonIgnoreProperties(
+  DatasetMetadata.Legacy_Category,
+  DatasetMetadata.Legacy_Organisms,
+  DatasetMetadata.Legacy_ShortName,
+  DatasetMetadata.Legacy_ShortAttribution,
+)
 data class DatasetMetadata(
-  @field:JsonProperty(JsonKey.Type)
+  @field:JsonProperty(Type)
   val type: DatasetType,
 
-  @field:JsonProperty(JsonKey.InstallTargets)
-  @field:JsonAlias("projects")
-  val installTargets: Set<InstallTargetID>,
+  @field:JsonAlias(Legacy_Projects)
+  @field:JsonProperty(InstallTargets)
+  val installTargets: Set<DatasetInstallTarget>,
 
-  @field:JsonProperty(JsonKey.Visibility)
+  @field:JsonProperty(Visibility)
   val visibility: DatasetVisibility,
 
-  @field:JsonProperty(JsonKey.Owner)
+  @field:JsonProperty(Owner)
   val owner: UserID,
 
-  @field:JsonProperty(JsonKey.Name)
+  /**
+   * Dataset/Study name.
+   */
+  @field:JsonProperty(Name)
   val name: String,
 
-  @field:JsonProperty(JsonKey.Summary)
+  @field:JsonProperty(Summary)
   val summary: String,
 
-  @field:JsonProperty(JsonKey.Origin)
-  val origin: String,
-
-  @field:JsonProperty(JsonKey.Created)
-  val created: OffsetDateTime,
-
-  @field:JsonProperty(JsonKey.ShortName)
-  val shortName: String? = null,
-
-  @field:JsonProperty(JsonKey.Description)
+  @field:JsonProperty(Description)
   val description: String? = null,
 
-  @field:JsonProperty(JsonKey.ShortAttribution)
-  val shortAttribution: String? = null,
+  @field:JsonProperty(Origin)
+  val origin: String,
 
-  @field:JsonProperty(JsonKey.SourceURL)
+  @field:JsonProperty(Created)
+  val created: OffsetDateTime,
+
+  @field:JsonProperty(SourceURL)
   val sourceURL: URI? = null,
 
-  @field:JsonProperty(JsonKey.Dependencies)
+  /**
+   * Reference Genome
+   */
+  @field:JsonProperty(Dependencies)
   val dependencies: List<DatasetDependency> = emptyList(),
 
-  @field:JsonProperty(JsonKey.Publications)
+  @field:JsonProperty(Publications)
   val publications: List<DatasetPublication> = emptyList(),
 
-  @field:JsonProperty(JsonKey.Hyperlinks)
-  val hyperlinks: List<DatasetHyperlink> = emptyList(),
-
-  @field:JsonProperty(JsonKey.Organisms)
-  val organisms: Set<String> = emptySet(),
-
-  @field:JsonProperty(JsonKey.Contacts)
+  @field:JsonProperty(Contacts)
   val contacts: List<DatasetContact> = emptyList(),
 
-  @field:JsonProperty(JsonKey.OriginalID)
-  val originalID: DatasetID? = null,
+  /**
+   * An organizational framework that supports coordinated studies with shared
+   * objectives.
+   */
+  @field:JsonProperty(ProjectName)
+  val projectName: String? = null,
 
-  @field:JsonProperty(JsonKey.RevisionHistory)
-  val revisionHistory: List<DatasetRevision> = emptyList(),
+  /**
+   * A global consortium of independent research centers collaborating under a
+   * common theme, such as "ICEMR".
+   */
+  @field:JsonProperty(ProgramName)
+  val programName: String? = null,
 
-  @field:JsonProperty(JsonKey.Properties)
-  val properties: DatasetProperties? = null,
+  @field:JsonProperty(RelatedStudies)
+  val relatedStudies: List<RelatedStudy> = emptyList(),
 
-  @field:JsonProperty(JsonKey.Project)
-  val project: String? = null,
+  @field:JsonProperty(ExperimentalOrganism)
+  val experimentalOrganism: DatasetOrganism? = null,
 
-  @field:JsonProperty(JsonKey.Program)
-  val program: String? = null,
+  @field:JsonProperty(HostOrganism)
+  val hostOrganism: DatasetOrganism? = null,
+
+  @field:JsonProperty(StudyCharacteristics)
+  val studyCharacteristics: StudyCharacteristics? = null,
+
+  @field:JsonProperty(ExternalIdentifiers)
+  val externalIdentifiers: ExternalDatasetIdentifiers? = null,
+
+  @field:JsonProperty(Funding)
+  val funding: Set<DatasetFundingAward> = emptySet(),
+
+  @field:JsonProperty(RevisionHistory)
+  val revisionHistory: DatasetRevisionHistory? = null,
 ) {
-  object JsonKey {
-    const val Contacts         = "contacts"
-    const val Created          = "created"
-    const val Dependencies     = "dependencies"
-    const val Description      = "description"
-    const val Hyperlinks       = "hyperlinks"
-    const val InstallTargets   = "installTargets"
-    const val Name             = "name"
-    const val Organisms        = "organisms"
-    const val Origin           = "origin"
-    const val OriginalID       = "originalId"
-    const val Owner            = "owner"
-    const val Program          = "program"
-    const val Project          = "project"
-    const val Properties       = "properties"
-    const val Publications     = "publications"
-    const val RevisionHistory  = "revisionHistory"
-    const val ShortAttribution = "shortAttribution"
-    const val ShortName        = "shortName"
-    const val SourceURL        = "sourceUrl"
-    const val Summary          = "summary"
-    const val Type             = "type"
-    const val Visibility       = "visibility"
+  companion object JsonKey {
+    const val Contacts             = "contacts"
+    const val Created              = "created"
+    const val Dependencies         = "dependencies"
+    const val Description          = "description"
+    const val ExperimentalOrganism = "experimentalOrganism"
+    const val ExternalIdentifiers  = "externalIdentifiers"
+    const val Funding              = "funding"
+    const val HostOrganism         = "hostOrganism"
+    const val InstallTargets       = "installTargets"
+    const val Name                 = "name"
+    const val Organisms            = "organisms"
+    const val Origin               = "origin"
+    const val Owner                = "owner"
+    const val ProgramName          = "programName"
+    const val ProjectName          = "projectName"
+    const val Properties           = "properties"
+    const val Publications         = "publications"
+    const val RelatedStudies       = "relatedStudies"
+    const val RevisionHistory      = "revisionHistory"
+    const val ShortAttribution     = "shortAttribution"
+    const val ShortName            = "shortName"
+    const val SourceURL            = "sourceUrl"
+    const val StudyCharacteristics = "studyCharacteristics"
+    const val Summary              = "summary"
+    const val Type                 = "type"
+    const val Visibility           = "visibility"
+
+    // Legacy fields: no longer used, but may still exist in metadata for older
+    // datasets.
+    const val Legacy_Category         = "category"
+    const val Legacy_Organisms        = "organisms"
+    const val Legacy_Projects         = "projects"
+    const val Legacy_ShortAttribution = "shortAttribution"
+    const val Legacy_ShortName        = "shortName"
   }
 }

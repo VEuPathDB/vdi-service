@@ -11,11 +11,11 @@ import vdi.model.data.InstallTargetID
  * service to a plugin server.
  */
 data class UninstallRequest(
-  @JsonProperty(JSONKeys.VDIID)
+  @field:JsonProperty(VDIID)
   val vdiID: DatasetID,
 
-  @JsonProperty(JSONKeys.InstallTarget)
-  @JsonAlias(JSONKeys.ProjectID)
+  @field:JsonAlias(Legacy_ProjectID)
+  @field:JsonProperty(InstallTarget)
   val installTarget: InstallTargetID,
 
   /**
@@ -26,6 +26,14 @@ data class UninstallRequest(
    *
    * @since v14.0.0
    */
-  @JsonProperty(JSONKeys.Type)
+  @field:JsonProperty(Type)
   val type: DatasetType,
-)
+) {
+  companion object JsonKey {
+    const val InstallTarget = "installTarget"
+    const val Type          = "type"
+    const val VDIID         = "vdiID"
+
+    const val Legacy_ProjectID = "projectID"
+  }
+}

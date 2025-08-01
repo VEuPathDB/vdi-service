@@ -27,7 +27,7 @@ internal fun Connection.insertDatasetPublications(
 ) {
   withPreparedBatchUpdate(sql(schema), publications) {
     setDatasetID(1, datasetID)
-    setString(2, it.pubmedID)
+    setString(2, it.identifier)
     setString(3, it.citation)
   }
 }

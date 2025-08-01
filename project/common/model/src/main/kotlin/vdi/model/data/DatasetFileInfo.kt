@@ -5,16 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 
 data class DatasetFileInfo(
-  @field:JsonProperty(JsonKey.Name)
-  @field:JsonAlias("filename")
+  @field:JsonProperty(Name)
+  @field:JsonAlias(Legacy_FileName)
   val name: String,
 
-  @field:JsonProperty(JsonKey.Size)
-  @field:JsonAlias("fileSize")
+  @field:JsonProperty(Size)
+  @field:JsonAlias(Legacy_FileSize)
   val size: ULong,
 ) {
-  object JsonKey {
+  companion object JsonKey {
     const val Name = "name"
     const val Size = "size"
+
+    const val Legacy_FileName = "filename"
+    const val Legacy_FileSize = "fileSize"
   }
 }
