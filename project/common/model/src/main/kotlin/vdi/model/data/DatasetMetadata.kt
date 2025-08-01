@@ -47,23 +47,17 @@ data class DatasetMetadata(
   @field:JsonProperty(SourceURL)
   val sourceURL: URI? = null,
 
+  /**
+   * Reference Genome
+   */
   @field:JsonProperty(Dependencies)
   val dependencies: List<DatasetDependency> = emptyList(),
-
-  @field:JsonProperty(ReferenceGenome)
-  val referenceGenome: String? = null,
 
   @field:JsonProperty(Publications)
   val publications: List<DatasetPublication> = emptyList(),
 
   @field:JsonProperty(Contacts)
   val contacts: List<DatasetContact> = emptyList(),
-
-  @field:JsonProperty(OriginalID)
-  val originalID: DatasetID? = null,
-
-  @field:JsonProperty(RevisionHistory)
-  val revisionHistory: List<DatasetRevision> = emptyList(),
 
   /**
    * An organizational framework that supports coordinated studies with shared
@@ -79,14 +73,14 @@ data class DatasetMetadata(
   @field:JsonProperty(ProgramName)
   val programName: String? = null,
 
-  @field:JsonProperty(SharesSamples)
-  val sharesSamples: Boolean = false,
-
   @field:JsonProperty(RelatedStudies)
-  val relatedStudies: Set<URI> = emptySet(),
+  val relatedStudies: List<RelatedStudy> = emptyList(),
 
-  @field:JsonProperty(PathogenOrganisms)
-  val pathogenOrganisms: Set<PathogenOrganism> = emptySet(),
+  @field:JsonProperty(ExperimentalOrganism)
+  val experimentalOrganism: DatasetOrganism? = null,
+
+  @field:JsonProperty(HostOrganism)
+  val hostOrganism: DatasetOrganism? = null,
 
   @field:JsonProperty(StudyCharacteristics)
   val studyCharacteristics: StudyCharacteristics? = null,
@@ -95,30 +89,31 @@ data class DatasetMetadata(
   val externalIdentifiers: ExternalDatasetIdentifiers? = null,
 
   @field:JsonProperty(Funding)
-  val funding: Set<DatasetFundingAward> = emptySet()
+  val funding: Set<DatasetFundingAward> = emptySet(),
+
+  @field:JsonProperty(RevisionHistory)
+  val revisionHistory: DatasetRevisionHistory? = null,
 ) {
   companion object JsonKey {
     const val Contacts             = "contacts"
     const val Created              = "created"
     const val Dependencies         = "dependencies"
     const val Description          = "description"
+    const val ExperimentalOrganism = "experimentalOrganism"
     const val ExternalIdentifiers  = "externalIdentifiers"
     const val Funding              = "funding"
+    const val HostOrganism         = "hostOrganism"
     const val InstallTargets       = "installTargets"
     const val Name                 = "name"
     const val Organisms            = "organisms"
     const val Origin               = "origin"
-    const val OriginalID           = "originalId"
     const val Owner                = "owner"
-    const val PathogenOrganisms    = "pathogenOrganisms"
     const val ProgramName          = "programName"
     const val ProjectName          = "projectName"
     const val Properties           = "properties"
     const val Publications         = "publications"
-    const val ReferenceGenome      = "referenceGenome"
     const val RelatedStudies       = "relatedStudies"
     const val RevisionHistory      = "revisionHistory"
-    const val SharesSamples        = "sharesSamples"
     const val ShortAttribution     = "shortAttribution"
     const val ShortName            = "shortName"
     const val SourceURL            = "sourceUrl"
