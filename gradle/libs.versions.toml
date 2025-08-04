@@ -34,7 +34,7 @@ log-log4j-core   = { group = "org.apache.logging.log4j", name = "log4j-core",   
 # LDAP
 ldap = { group = "org.veupathdb.lib", name = "ldap-utils",   version = "2.0.1" }
 
-compression = { module = "org.apache.commons:commons-compress", version = "1.27.1" }
+compression = { module = "org.apache.commons:commons-compress", version = "1.28.0" }
 
 
 # Serialization Formats
