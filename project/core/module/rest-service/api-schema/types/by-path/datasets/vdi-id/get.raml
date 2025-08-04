@@ -13,7 +13,14 @@ types:
     additionalProperties: false
     properties:
       datasetId: common.VdiId
+
+      type: common.DatasetTypeOutput
+      visibility: common.DatasetVisibility
       owner: common.DatasetOwner
+      created: common.DatasetCreationDate
+      sourceUrl?: common.DatasetSourceUrl
+      revisionHistory?: common.RevisionHistory
+
       importMessages?:
         description: |
           Log lines from the import process.
@@ -26,14 +33,7 @@ types:
           dataset to share it with other users.
         type: ShareOffer[]
 
-      # Meta Fields
-      datasetType: common.DatasetTypeOutput
-      visibility: common.DatasetVisibility
       status: common.DatasetStatusInfo
-      created: common.DatasetCreationDate
-      sourceUrl?: common.DatasetSourceUrl
-      originalId?: common.VdiId
-      revisionHistory?: common.DatasetRevision[]
 
   ShareOffer:
     displayName: Dataset Share Offer

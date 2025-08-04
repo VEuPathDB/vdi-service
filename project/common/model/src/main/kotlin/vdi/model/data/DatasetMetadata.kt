@@ -89,7 +89,7 @@ data class DatasetMetadata(
   val externalIdentifiers: ExternalDatasetIdentifiers? = null,
 
   @field:JsonProperty(Funding)
-  val funding: Set<DatasetFundingAward> = emptySet(),
+  val funding: List<DatasetFundingAward> = emptyList(),
 
   @field:JsonProperty(RevisionHistory)
   val revisionHistory: DatasetRevisionHistory? = null,

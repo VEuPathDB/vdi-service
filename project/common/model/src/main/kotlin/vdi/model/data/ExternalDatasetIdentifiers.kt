@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ExternalDatasetIdentifiers(
   @field:JsonProperty(DOIs)
-  val dois: Set<DOIReference> = emptySet(),
+  val dois: List<DOIReference> = emptyList(),
 
   @field:JsonProperty(Hyperlinks)
-  val hyperlinks: Set<DatasetHyperlink> = emptySet(),
+  val hyperlinks: List<DatasetHyperlink> = emptyList(),
 
   @field:JsonProperty(BioprojectIDs)
-  val bioprojectIDs: Set<BioprojectIDReference> = emptySet(),
+  val bioprojectIDs: List<BioprojectIDReference> = emptyList(),
 ) {
   companion object {
     const val DOIs          = "dois"

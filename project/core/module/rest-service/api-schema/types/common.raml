@@ -4,16 +4,12 @@ uses:
   error: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.3.0/libraries/errors.raml
 
 types:
-  DatasetCharacteristics:
-    displayName: Dataset Characteristics
-    description: |-
-      Any-typed for compatibility with JaxRS and RAML.
-
-      Actual schema definitions are available at:
-
-      * [EDA Schema](https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.eda.json)
-      * [Genomics Schema](https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.genomics.json)
-    type: any
+  BioprojectIDReference:
+    type: object
+    additionalProperties: false
+    properties:
+      id: string
+      description?: string
 
   DatasetContact:
     displayName: Dataset Contact
@@ -112,6 +108,19 @@ types:
     type: string
     description: Longform description of the dataset.
 
+  DatasetFundingAward:
+    type: object
+    additionalProperties: false
+    properties:
+      agency:
+        type: string
+        minLength: 3
+        maxLength: 256
+      awardNumber:
+        type: string
+        minLength: 3
+        maxLength: 64
+
   DatasetHyperlink:
     displayName: Dataset Hyperlink
     type: object
@@ -121,16 +130,9 @@ types:
         type: string
         minLength: 7
         maxLength: 200
-      text:
-        type: string
-        minLength: 3
-        maxLength: 300
       description?:
         type: string
         maxLength: 4000
-      isPublication?:
-        type: boolean
-        default: false
 
   DatasetImportStatus:
     displayName: Dataset Import Status
@@ -177,12 +179,19 @@ types:
 
   DatasetMetaBase:
     displayName: Dataset Meta Base Fields
+    # language=markdown
+    description: |
+      Field definitions common to all dataset metadata representations
+      throughout the VDI REST API endpoints.
+      
+      Metadata fields that are omitted from this type are subtype dependent
+      on API context.
     type: object
     properties:
       # type: (different based on subtype)
       installTargets:
         description: IDs of the projects this dataset is being submitted to.
-        type: InstallTarget[]
+        type: InstallTargetID[]
         minItems: 1
         uniqueItems: true
       # visibility: (optional in POST subtype, required in GET subtype)
@@ -213,18 +222,23 @@ types:
           Required if:
           * Install target is MBio or ClinEpi
         type: DatasetProgramName
-
-
-      # Optional Fields
-      hyperlinks?:
-        type: DatasetHyperlink[]
+      relatedStudies?:
+        type: RelatedStudy[]
         uniqueItems: true
-      organisms?:
-        type: OrganismAbbreviation[]
+      experimentalOrganism?:
+        # language=markdown
+        description: >-
+          Required for Genomics, VectorBase, and Microbiome.
+
+          Optional for ClinEpi.
+        type: DatasetOrganism
+      hostOrganism?: DatasetOrganism
+      studyCharacteristics?: StudyCharacteristics
+      externalIdentifiers?: ExternalIdentifiers
+      funding?:
+        type: DatasetFundingAward[]
         uniqueItems: true
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      properties?: DatasetCharacteristics
+      # revisionHistory: (only present in response types)
     additionalProperties: false
 
   DatasetName:
@@ -233,6 +247,13 @@ types:
     description: User-provided name for the dataset.
     minLength: 3
     maxLength: 1024
+
+  DatasetOrganism:
+    type: object
+    additionalProperties: false
+    properties:
+      species: string
+      strain: string
 
   DatasetOrigin:
     displayName: Dataset Origin
@@ -313,16 +334,6 @@ types:
     enum:
     - revise
 
-  DatasetShortAttribution:
-    type: string
-    minLength: 3
-    maxLength: 300
-
-  DatasetShortName:
-    type: string
-    minLength: 3
-    maxLength: 300
-
   DatasetSourceUrl:
     description: |
       URL of the dataset data source, if the dataset was uploaded via URL.
@@ -374,15 +385,29 @@ types:
     - protected
     - public
 
-  OrganismAbbreviation:
-    type: string
-    minLength: 3
-    maxLength: 200
+  DOIReference:
+    type: object
+    additionalProperties: false
+    properties:
+      doi: string
+      description?: string
+
+  ExternalIdentifiers:
+    type: object
+    additionalProperties: false
+    properties:
+      dois:
+        type: DOIReference[]
+        uniqueItems: true
+      hyperlinks:
+        type: DatasetHyperlink[]
+        uniqueItems: true
+      bioprojectIds:
+        type: BioprojectIDReference[]
+        uniqueItems: true
 
   PartialDate:
     displayName: Partial Datetime
-    type: string
-    minLength: 4
     description: |
       Subset of the RFC3339 format, requiring at least the 4 digit year, and may
       include additional precision, part by part.  Each part must be 'complete'
@@ -403,20 +428,78 @@ types:
       * `2022-03-15T16:30:12+04:00`
       * `2022-03-15T16:30:12.123Z`
       * `2022-03-15T16:30:12.123-06:00`
-
-  InstallTarget:
-    type: object
-    properties:
-      targetId: InstallTargetID
-      buildInfo:
-        type: string
-        required: false
+    type: string
+    minLength: 4
 
   InstallTargetID:
     description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".
     type: string
     minLength: 5
     maxLength: 32
+
+  JSONPatchAction:
+    type: object
+    additionalProperties: false
+    properties:
+      op:
+        displayName: Operation
+        type: string
+        enum:
+        - add
+        - remove
+        - replace
+        - move
+        - copy
+        - test
+      path:
+        displayName: Target Field Path
+        description: JSON Pointer https://www.rfc-editor.org/rfc/rfc6901
+        type: string
+      value?:
+        displayName: Field Value
+        # language=markdown
+        description: |
+          Must match the type of the record field being patched.
+            
+          Only used with `add`, `replace`, and `test` operations.
+        type: any
+      from?:
+        displayName: Source Field Path
+        # language=markdown
+        description: |
+          JSON Pointer https://www.rfc-editor.org/rfc/rfc6901
+          
+          Only used with `copy` and `move` operations.
+        type: string
+
+  RelatedStudy:
+    type: object
+    additionalProperties: false
+    properties:
+      studyUri: string
+      sharesRecords: boolean
+
+  RevisionHistory:
+    type: object
+    additionalProperties: false
+    properties:
+      originalId: VdiId
+      revisions: DatasetRevision[]
+
+  SampleYearRange:
+    type: object
+    additionalProperties: false
+    properties:
+      start:
+        type: integer
+        format: int16
+        minimum: 1000
+        maximum: 9999
+      end:
+        type: integer
+        format: int16
+        minimum: 1000
+        maximum: 9999
 
   ShareOfferAction:
     type: string
@@ -429,6 +512,21 @@ types:
     enum:
     - accept
     - reject
+
+  StudyCharacteristics:
+    type: object
+    additionalProperties: false
+    properties:
+      studyDesign?:
+        description: Required for ClinEpi
+        type: string
+      studyType?:
+        description: Required for ClinEpi
+        type: string
+      countries?:
+        type: string[]
+        uniqueItems: true
+      years?: SampleYearRange
 
   UserId:
     description: VEuPathDB User ID
