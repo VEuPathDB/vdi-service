@@ -1,8 +1,0 @@
-$schema: "https://json-schema.org/draft/2020-12/schema"
-
-title: Failed Install Report
-
-type: object
-unevaluatedProperties: false
-
-properties:

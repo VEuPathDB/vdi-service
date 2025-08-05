@@ -8,6 +8,7 @@ displayName: Admin Reports
     displayName: List All
     get:
       is: [ PaginatedList ]
+      # language=markdown
       description: |
         Lists all datasets known to VDI via the internal cache database.
 
@@ -30,12 +31,14 @@ displayName: Admin Reports
         ```
       queryParameters:
         install_target?:
+          # language=markdown
           description: |
             Filter results by install target project ID.
 
             This field is not case sensitive.
           type: string
         include_deleted?:
+          # language=markdown
           description: |
             Controls whether datasets that have been marked as deleted should be
             included in the results.
@@ -54,6 +57,7 @@ displayName: Admin Reports
     uriParameters:
       vdi-id: lib.VdiId
     get:
+      # language=markdown
       description: |
         **Example**
         ```sh
@@ -80,6 +84,7 @@ displayName: Admin Reports
     get:
       displayName: List
       is: [ PaginatedList ]
+      # language=markdown
       description: |
         Lists datasets that failed to import.
 
@@ -95,14 +100,17 @@ displayName: Admin Reports
         ```
       queryParameters:
         user?:
+          # language=markdown
           description: |
             Filters results to only records owned by the target user.
           type: lib.UserId
         before?:
+          # language=markdown
           description: |
             Filters results to only records created before the given datetime.
           type: lib.PartialDate
         after?:
+          # language=markdown
           description: |
             Filter results to only records created after the given datetime.
           type: lib.PartialDate
@@ -132,6 +140,7 @@ displayName: Admin Reports
   /failed:
     displayName: Failed Install Report
     get:
+      # language=markdown
       description: |
         Lists datasets that failed installation due to a non-user error, such as
         a system outage or service bug.
@@ -155,6 +164,7 @@ displayName: Admin Reports
         ```
       queryParameters:
         expanded?:
+          # language=markdown
           description: |
             Whether the returned broken dataset install list should be expanded
             to include additional details about each dataset or should be just
@@ -174,6 +184,7 @@ displayName: Admin Reports
   /list-all:
     displayName: Full Contents List
     get:
+      # language=markdown
       description: |
         Lists all the objects currently in the object store backing VDI.
 

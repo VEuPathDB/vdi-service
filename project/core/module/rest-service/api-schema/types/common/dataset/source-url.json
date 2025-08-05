@@ -1,6 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "URL of the dataset data source, if the dataset was uploaded via URL.",
-  "type": "string",
-  "format": "uri"
-}

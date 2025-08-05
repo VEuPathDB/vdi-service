@@ -6,6 +6,7 @@ uses:
 types:
   DatasetPostRequestBody:
     displayName: Dataset Post Request
+    # language=markdown
     description: |-
       HTTP POST request body requesting the creation of a dataset from the
       components included in the request.
@@ -19,18 +20,21 @@ types:
         description: Metadata about the dataset being submitted.
         type: DatasetPostMeta
       dataFiles?:
+        # language=markdown
         description: |
           Dataset files to upload.
 
           This field is incompatible with the `url` field.
         type: file[]
       url?:
+        # language=markdown
         description: |
           URL to a dataset file to upload.
 
           This field is incompatible with the `file` field.
         type: string
       docFiles?:
+        # language=markdown
         description: |-
           Files containing additional dataset documentation or meta info that is
           not part of the data itself.
@@ -40,7 +44,7 @@ types:
     type: common.DatasetMetaBase
     additionalProperties: false
     properties:
-      datasetType: common.DatasetTypeInput
+      type: common.DatasetTypeInput
       installTargets:
         type: common.InstallTargetID[]
         minItems: 1
@@ -51,6 +55,7 @@ types:
 
   DatasetPostResponseBody:
     displayName: Dataset Post Response
+    # language=markdown
     description: |
       Successful upload response.
 

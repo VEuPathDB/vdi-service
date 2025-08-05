@@ -1,8 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Dataset Hyperlink List",
-  "type": "array",
-  "items": { "$ref": "hyperlink.json" },
-  "uniqueItems": true,
-  "unevaluatedItems": false
-}

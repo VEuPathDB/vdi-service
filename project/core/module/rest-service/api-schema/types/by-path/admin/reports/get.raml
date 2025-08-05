@@ -40,8 +40,8 @@ types:
       before?: string
       after?: string
       user?: common.UserId
-      limit?: integer
-      offset?: integer
+      limit: integer
+      offset: integer
 
   BrokenImportDetails:
     displayName: Broken Import Details
@@ -87,9 +87,7 @@ types:
       status: common.DatasetStatusInfo
       created: common.DatasetCreationDate
       isDeleted: boolean
-      shortName?: common.DatasetShortName
-      shortAttribution?: common.DatasetShortAttribution
-      summary?: common.DatasetSummary
+      summary: common.DatasetSummary
       description?: common.DatasetDescription
       sourceUrl?: common.DatasetSourceUrl
 
@@ -117,9 +115,7 @@ types:
       status: string
       importMessages: string[]
       visibility: common.DatasetVisibility
-      shortName?: common.DatasetShortName
-      shortAttribution?: common.DatasetShortAttribution
-      summary?: common.DatasetSummary
+      summary: common.DatasetSummary
       description?: common.DatasetDescription
       sourceUrl?: common.DatasetSourceUrl
       syncControl?: SyncControlRecord

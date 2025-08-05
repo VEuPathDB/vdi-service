@@ -8,6 +8,7 @@ displayName: Admin RPC
   /proxy-upload:
     displayName: Proxy Upload
     post:
+      # language=markdown
       description: |
         Upload a dataset on behalf of a target user.
 
@@ -36,12 +37,14 @@ displayName: Admin RPC
       headers:
         User-ID:
           displayName: Target User ID
+          # language=markdown
           description: |
             ID of the target user on whose behalf a dataset is being uploaded
           type: lib.UserId
           required: true
       body:
         multipart/form-data:
+          # language=markdown
           description: |
             `multipart/form-data` HTTP `POST` request to upload a new dataset.
 
@@ -67,6 +70,7 @@ displayName: Admin RPC
   /prune:
     displayName: Force Dataset Pruning
     post:
+      # language=markdown
       description: |
         Permanently delete jobs that were soft deleted more than 24 hours prior
         to the execution of this task.
@@ -80,6 +84,7 @@ displayName: Admin RPC
       queryParameters:
         age_cutoff?:
           displayName: Retention Window Override
+          # language=markdown
           description: |
             When given, overrides the configured dataset retention duration,
             and instead prunes all datasets that were soft-deleted before this
@@ -106,6 +111,7 @@ displayName: Admin RPC
   /reconcile:
     displayName: Execute Reconciler
     post:
+      # language=markdown
       description: |
         Triggers a full reconciliation run if one is not already in progress.
 
@@ -131,6 +137,7 @@ displayName: Admin RPC
   /clear-failed:
     displayName: Clear and Reinstall Failed
     post:
+      # language=markdown
       description: |
         Marks all or target datasets that are in a status of installation
         failure into a `ready-for-reinstall` status then runs the dataset
@@ -193,6 +200,7 @@ displayName: Admin RPC
   /purge-dataset:
     displayName: Purge Dataset
     post:
+      # language=markdown
       description: |
         Removes a dataset from the object store and internal postgres database.
 

@@ -1,7 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "type": "string",
-  "description": "Longform description of the dataset.",
-  "minLength": 1,
-  "maxLength": 52428800
-}

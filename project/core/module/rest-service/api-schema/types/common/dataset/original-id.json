@@ -1,5 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "ID of the first revision of the data for the dataset.\n\nThis field is only present if the dataset has a revision history.",
-  "$ref": "dataset-id.json"
-}

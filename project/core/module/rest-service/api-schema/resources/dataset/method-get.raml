@@ -2,6 +2,7 @@
 
 displayName: Dataset Details
 
+# language=markdown
 description: |
   Fetch details about a dataset and its status(es).
 
@@ -13,6 +14,7 @@ responses:
     description: Target dataset was located and returned.
     body: lib.DatasetDetails
   301:
+    # language=markdown
     description: |
       Target dataset has been moved by replacement with the a new VDI ID.
     headers:
