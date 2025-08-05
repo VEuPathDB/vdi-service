@@ -8,6 +8,12 @@ import java.util.List;
     as = DatasetPostMetaImpl.class
 )
 public interface DatasetPostMeta extends DatasetMetaBase {
+  @JsonProperty(JsonField.INSTALL_TARGETS)
+  List<String> getInstallTargets();
+
+  @JsonProperty(JsonField.INSTALL_TARGETS)
+  void setInstallTargets(List<String> installTargets);
+
   @JsonProperty(JsonField.NAME)
   String getName();
 
@@ -20,17 +26,17 @@ public interface DatasetPostMeta extends DatasetMetaBase {
   @JsonProperty(JsonField.SUMMARY)
   void setSummary(String summary);
 
+  @JsonProperty(JsonField.DESCRIPTION)
+  String getDescription();
+
+  @JsonProperty(JsonField.DESCRIPTION)
+  void setDescription(String description);
+
   @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
 
   @JsonProperty(JsonField.ORIGIN)
   void setOrigin(String origin);
-
-  @JsonProperty(JsonField.INSTALL_TARGETS)
-  List<String> getInstallTargets();
-
-  @JsonProperty(JsonField.INSTALL_TARGETS)
-  void setInstallTargets(List<String> installTargets);
 
   @JsonProperty(JsonField.DEPENDENCIES)
   List<DatasetDependency> getDependencies();
@@ -38,59 +44,71 @@ public interface DatasetPostMeta extends DatasetMetaBase {
   @JsonProperty(JsonField.DEPENDENCIES)
   void setDependencies(List<DatasetDependency> dependencies);
 
-  @JsonProperty(JsonField.CONTACTS)
-  List<DatasetContact> getContacts();
-
-  @JsonProperty(JsonField.CONTACTS)
-  void setContacts(List<DatasetContact> contacts);
-
-  @JsonProperty(JsonField.DESCRIPTION)
-  String getDescription();
-
-  @JsonProperty(JsonField.DESCRIPTION)
-  void setDescription(String description);
-
-  @JsonProperty(JsonField.HYPERLINKS)
-  List<DatasetHyperlink> getHyperlinks();
-
-  @JsonProperty(JsonField.HYPERLINKS)
-  void setHyperlinks(List<DatasetHyperlink> hyperlinks);
-
-  @JsonProperty(JsonField.ORGANISMS)
-  List<String> getOrganisms();
-
-  @JsonProperty(JsonField.ORGANISMS)
-  void setOrganisms(List<String> organisms);
-
   @JsonProperty(JsonField.PUBLICATIONS)
   List<DatasetPublication> getPublications();
 
   @JsonProperty(JsonField.PUBLICATIONS)
   void setPublications(List<DatasetPublication> publications);
 
-  @JsonProperty(JsonField.SHORT_NAME)
-  String getShortName();
+  @JsonProperty(JsonField.CONTACTS)
+  List<DatasetContact> getContacts();
 
-  @JsonProperty(JsonField.SHORT_NAME)
-  void setShortName(String shortName);
+  @JsonProperty(JsonField.CONTACTS)
+  void setContacts(List<DatasetContact> contacts);
 
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  String getShortAttribution();
+  @JsonProperty(JsonField.PROJECT_NAME)
+  String getProjectName();
 
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  void setShortAttribution(String shortAttribution);
+  @JsonProperty(JsonField.PROJECT_NAME)
+  void setProjectName(String projectName);
 
-  @JsonProperty(JsonField.PROPERTIES)
-  com.fasterxml.jackson.databind.node.ObjectNode getProperties();
+  @JsonProperty(JsonField.PROGRAM_NAME)
+  String getProgramName();
 
-  @JsonProperty(JsonField.PROPERTIES)
-  void setProperties(com.fasterxml.jackson.databind.node.ObjectNode properties);
+  @JsonProperty(JsonField.PROGRAM_NAME)
+  void setProgramName(String programName);
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  DatasetTypeInput getDatasetType();
+  @JsonProperty(JsonField.RELATED_STUDIES)
+  List<RelatedStudy> getRelatedStudies();
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  void setDatasetType(DatasetTypeInput datasetType);
+  @JsonProperty(JsonField.RELATED_STUDIES)
+  void setRelatedStudies(List<RelatedStudy> relatedStudies);
+
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
+  DatasetOrganism getExperimentalOrganism();
+
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
+  void setExperimentalOrganism(DatasetOrganism experimentalOrganism);
+
+  @JsonProperty(JsonField.HOST_ORGANISM)
+  DatasetOrganism getHostOrganism();
+
+  @JsonProperty(JsonField.HOST_ORGANISM)
+  void setHostOrganism(DatasetOrganism hostOrganism);
+
+  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
+  StudyCharacteristics getStudyCharacteristics();
+
+  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
+  void setStudyCharacteristics(StudyCharacteristics studyCharacteristics);
+
+  @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
+  ExternalIdentifiers getExternalIdentifiers();
+
+  @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
+  void setExternalIdentifiers(ExternalIdentifiers externalIdentifiers);
+
+  @JsonProperty(JsonField.FUNDING)
+  List<DatasetFundingAward> getFunding();
+
+  @JsonProperty(JsonField.FUNDING)
+  void setFunding(List<DatasetFundingAward> funding);
+
+  @JsonProperty(JsonField.TYPE)
+  DatasetTypeInput getType();
+
+  @JsonProperty(JsonField.TYPE)
+  void setType(DatasetTypeInput type);
 
   @JsonProperty(
       value = JsonField.VISIBILITY,

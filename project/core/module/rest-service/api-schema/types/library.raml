@@ -24,9 +24,7 @@ types:
       status: DatasetStatusInfo
       created: DatasetCreationDate
       isDeleted: boolean
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      summary?: DatasetSummary
+      summary: DatasetSummary
       description?: DatasetDescription
       sourceUrl?: DatasetSourceUrl
   AllDatasetsListMeta:
@@ -52,6 +50,12 @@ types:
     example:
       status: bad-request
       message: malformed JSON
+  BioprojectIDReference:
+    type: object
+    additionalProperties: false
+    properties:
+      id: string
+      description?: string
   BrokenDatasetInstallDetails:
     type: object
     additionalProperties: false
@@ -100,8 +104,8 @@ types:
       before?: string
       after?: string
       user?: UserId
-      limit?: integer
-      offset?: integer
+      limit: integer
+      offset: integer
   ConflictError:
     displayName: Conflict
     description: |
@@ -114,43 +118,53 @@ types:
     example:
       status: conflict
       message: Target resource already exists and cannot be overwritten.
-  DatasetCharacteristics:
-    displayName: Dataset Characteristics
-    description: |-
-      Any-typed for compatibility with JaxRS and RAML.
-
-      Actual schema definitions are available at:
-
-      * [EDA Schema](https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.eda.json)
-      * [Genomics Schema](https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.genomics.json)
-    type: any
+  DOIReference:
+    type: object
+    additionalProperties: false
+    properties:
+      doi: string
+      description?: string
   DatasetContact:
     displayName: Dataset Contact
     type: object
     additionalProperties: false
     properties:
-      name:
+      firstName?:
+        description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
         type: string
-        minLength: 3
+        minLength: 1
+        maxLength: 300
+      middleName?:
+        type: string
+        minLength: 1
+        maxLength: 300
+      lastName?:
+        description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
+        type: string
+        minLength: 1
         maxLength: 300
       isPrimary?:
+        description: Only one contact may be marked as primary.
         type: boolean
         default: false
       email?:
-        description: '**IMPORTANT**: Required if `isPrimary == true`.'
+        description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
         type: string
         minLength: 5
         maxLength: 4000
       affiliation?:
+        displayName: Organization
+        description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
         type: string
         maxLength: 4000
+      country?:
+        description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
+        type: string
+        maxLength: 200
       city?:
         type: string
         maxLength: 200
       state?:
-        type: string
-        maxLength: 200
-      country?:
         type: string
         maxLength: 200
       address?:
@@ -188,13 +202,13 @@ types:
     type: DatasetMetaBase
     additionalProperties: false
     properties:
-      created: DatasetCreationDate
       datasetId: VdiId
-      datasetType: DatasetTypeOutput
-      owner: DatasetOwner
-      status: DatasetStatusInfo
+      type: DatasetTypeOutput
       visibility: DatasetVisibility
-
+      owner: DatasetOwner
+      created: DatasetCreationDate
+      sourceUrl?: DatasetSourceUrl
+      revisionHistory?: RevisionHistory
       importMessages?:
         description: |
           Log lines from the import process.
@@ -206,9 +220,7 @@ types:
           Array of share offers that have been created by the owner of this
           dataset to share it with other users.
         type: ShareOffer[]
-      sourceUrl?: DatasetSourceUrl
-      originalId?: VdiId
-      revisionHistory?: DatasetRevision[]
+      status: DatasetStatusInfo
   DatasetFileDetails:
     displayName: Decompressed File Info
     type: object
@@ -227,6 +239,18 @@ types:
       upload: DatasetZipDetails
       install?: DatasetZipDetails
       documents?: DatasetFileDetails[]
+  DatasetFundingAward:
+    type: object
+    additionalProperties: false
+    properties:
+      agency:
+        type: string
+        minLength: 3
+        maxLength: 256
+      awardNumber:
+        type: string
+        minLength: 3
+        maxLength: 64
   DatasetHyperlink:
     displayName: Dataset Hyperlink
     type: object
@@ -236,16 +260,9 @@ types:
         type: string
         minLength: 7
         maxLength: 200
-      text:
-        type: string
-        minLength: 3
-        maxLength: 300
       description?:
         type: string
         maxLength: 4000
-      isPublication?:
-        type: boolean
-        default: false
   DatasetImportStatus:
     displayName: Dataset Import Status
     description: |
@@ -292,9 +309,20 @@ types:
     type: object
     additionalProperties: false
     properties:
-      created: DatasetCreationDate
       datasetId: VdiId
+      owner: DatasetOwner
       datasetType: DatasetTypeOutput
+      visibility: DatasetVisibility
+      name: DatasetName
+      origin: DatasetOrigin
+      installTargets:
+        description: |
+          Project IDs for projects the dataset record was submitted to.
+        type: InstallTargetID[]
+        uniqueItems: true
+        minItems: 1
+      status: DatasetStatusInfo
+      shares: DatasetListShareUser[]
       fileCount:
         description: Number of files uploaded for this dataset.
         type: integer
@@ -303,25 +331,11 @@ types:
           Sum of the sizes of all the files uploaded for this dataset.
         type: integer
         format: int64
-      installTargets:
-        description: |
-          Project IDs for projects the dataset record was submitted to.
-        type: InstallTargetID[]
-        uniqueItems: true
-        minItems: 1
-      name: DatasetName
-      origin: DatasetOrigin
-      owner: DatasetOwner
-      status: DatasetStatusInfo
+      created: DatasetCreationDate
       summary: DatasetSummary
-      visibility: DatasetVisibility
-
       description?: DatasetDescription
-      originalId?: VdiId
-      shares?: DatasetListShareUser[]
       sourceUrl?: DatasetSourceUrl
-      shortAttribution?: DatasetShortAttribution
-      shortName?: DatasetShortName
+      originalId?: VdiId
   DatasetListShareUser:
     displayName: Dataset Listing Share Info
     type: object
@@ -334,36 +348,53 @@ types:
       accepted: boolean
   DatasetMetaBase:
     displayName: Dataset Meta Base Fields
+    description: |
+      Field definitions common to all dataset metadata representations
+      throughout the VDI REST API endpoints.
+
+      Metadata fields that are omitted from this type are subtype dependent
+      on API context.
     type: object
     additionalProperties: false
     properties:
-      name: DatasetName
-      summary: DatasetSummary
-      origin: DatasetOrigin
       installTargets:
         description: IDs of the projects this dataset is being submitted to.
         type: InstallTargetID[]
         minItems: 1
         uniqueItems: true
+      name: DatasetName
+      summary: DatasetSummary
+      description?: DatasetDescription
+      origin: DatasetOrigin
       dependencies:
         type: DatasetDependency[]
-        uniqueItems: true
-      contacts?:
-        type: DatasetContact[]
-        uniqueItems: true
-      description?: DatasetDescription
-      hyperlinks?:
-        type: DatasetHyperlink[]
-        uniqueItems: true
-      organisms?:
-        type: OrganismAbbreviation[]
         uniqueItems: true
       publications?:
         type: DatasetPublication[]
         uniqueItems: true
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      properties?: DatasetCharacteristics
+      contacts?:
+        type: DatasetContact[]
+        uniqueItems: true
+      projectName?:
+        description: 'Required if: * Install target is MBio or ClinEpi'
+        type: DatasetProjectName
+      programName?:
+        description: 'Required if: * Install target is MBio or ClinEpi'
+        type: DatasetProgramName
+      relatedStudies?:
+        type: RelatedStudy[]
+        uniqueItems: true
+      experimentalOrganism?:
+        description: |-
+          Required for Genomics, VectorBase, and Microbiome.
+          Optional for ClinEpi.
+        type: DatasetOrganism
+      hostOrganism?: DatasetOrganism
+      studyCharacteristics?: StudyCharacteristics
+      externalIdentifiers?: ExternalIdentifiers
+      funding?:
+        type: DatasetFundingAward[]
+        uniqueItems: true
   DatasetName:
     displayName: Dataset Name
     description: User-provided name for the dataset.
@@ -377,6 +408,12 @@ types:
     properties:
       userId: UserId
       datasetId: VdiId
+  DatasetOrganism:
+    type: object
+    additionalProperties: false
+    properties:
+      species: string
+      strain: string
   DatasetOrigin:
     displayName: Dataset Origin
     description: |
@@ -403,44 +440,25 @@ types:
 
       Fields that are omitted will be ignored when updating the target dataset
       record.
-    type: object
-    additionalProperties: false
-    properties:
-      name?: DatasetName
-      datasetType?:
-        description: |
-          Only allowed when transitioning from a none-type dataset into an
-          actual dataset type.
-        type: DatasetTypeInput
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      visibility?: DatasetVisibility
-      summary?: DatasetSummary
-      description?: DatasetDescription
-      publications?:
-        type: DatasetPublication[]
-        uniqueItems: true
-      hyperlinks?:
-        type: DatasetHyperlink[]
-        uniqueItems: true
-      organisms?:
-        type: array
-        uniqueItems: true
-        items: OrganismAbbreviation
-      contacts?:
-        type: DatasetContact[]
-        uniqueItems: true
-      properties?:
-        description: |-
-          When provided and non-empty, wholely replaces any previous dataset
-          characteristics value.  When provided as an empty object, removes the
-          dataset's characteristics.
-        type: DatasetCharacteristics
+
+      Fields that may be modified by `PATCH` operations (in JSON Pointer
+      notation):
+
+      * /contacts
+      * /description
+      * /externalIdentifiers
+      * /funding
+      * /name
+      * /publications
+      * /studyCharacteristics
+      * /summary
+      * /visibility
+    type: JSONPatchAction[]
   DatasetPostMeta:
     type: DatasetMetaBase
     additionalProperties: false
     properties:
-      datasetType: DatasetTypeInput
+      type: DatasetTypeInput
       installTargets:
         type: InstallTargetID[]
         minItems: 1
@@ -492,6 +510,16 @@ types:
     additionalProperties: false
     properties:
       datasetId: VdiId
+  DatasetProgramName:
+    displayName: Program Name
+    type: string
+    minLength: 1
+    maxLength: 256
+  DatasetProjectName:
+    displayName: Project Name
+    type: string
+    minLength: 1
+    maxLength: 256
   DatasetProxyPostMeta:
     type: DatasetPostMeta
     additionalProperties: false
@@ -529,24 +557,32 @@ types:
     type: object
     additionalProperties: false
     properties:
-      pubMedId:
+      identifier:
         type: string
         minLength: 3
         maxLength: 30
+      type?:
+        type: string
+        default: pmid
+        enum:
+          - pmid
+          - doi
       citation?:
         type: string
         minLength: 3
         maxLength: 2000
       isPrimary?:
+        description: Only one publication may be marked as primary.
         type: boolean
         default: false
   DatasetPutMetadata:
     displayName: Dataset Put Request Metadata
-    type: DatasetPatchRequestBody
+    type: object
     additionalProperties: false
     properties:
       origin: DatasetOrigin
       revisionNote: DatasetRevisionNote
+      patch: JSONPatchAction[]
   DatasetPutRequestBody:
     displayName: Dataset Put Request
     type: object
@@ -643,14 +679,6 @@ types:
           A value of `reject` means that the dataset that a share was
           offered for should become unavailable to the rejecting user.
         type: ShareReceiptAction
-  DatasetShortAttribution:
-    type: string
-    minLength: 3
-    maxLength: 300
-  DatasetShortName:
-    type: string
-    minLength: 3
-    maxLength: 300
   DatasetSourceUrl:
     description: |
       URL of the dataset data source, if the dataset was uploaded via URL.
@@ -728,6 +756,19 @@ types:
       - invalid-input
       - failed-dependency
       - server-error
+  ExternalIdentifiers:
+    type: object
+    additionalProperties: false
+    properties:
+      dois:
+        type: DOIReference[]
+        uniqueItems: true
+      hyperlinks:
+        type: DatasetHyperlink[]
+        uniqueItems: true
+      bioprojectIds:
+        type: BioprojectIDReference[]
+        uniqueItems: true
   FailedDependencyError:
     displayName: Failed Dependency Error
     type: Error
@@ -811,14 +852,41 @@ types:
       status: string
       importMessages: string[]
       visibility: DatasetVisibility
-      shortName?: DatasetShortName
-      shortAttribution?: DatasetShortAttribution
-      summary?: DatasetSummary
+      summary: DatasetSummary
       description?: DatasetDescription
       sourceUrl?: DatasetSourceUrl
       syncControl?: SyncControlRecord
       uploadFiles?: string[]
       installFiles?: string[]
+  JSONPatchAction:
+    type: object
+    additionalProperties: false
+    properties:
+      op:
+        displayName: Operation
+        type: string
+        enum:
+          - add
+          - remove
+          - replace
+          - move
+          - copy
+          - test
+      path:
+        displayName: Target Field Path
+        description: JSON Pointer https://www.rfc-editor.org/rfc/rfc6901
+        type: string
+      value?:
+        displayName: Field Value
+        description: "Must match the type of the record field being patched.\n  \nOnly used with `add`, `replace`, and `test` operations.\n"
+        type: any
+      from?:
+        displayName: Source Field Path
+        description: |
+          JSON Pointer https://www.rfc-editor.org/rfc/rfc6901
+
+          Only used with `copy` and `move` operations.
+        type: string
   MethodNotAllowedError:
     displayName: Method Not Allowed
     description: |
@@ -837,10 +905,6 @@ types:
     example:
       status: not-found
       message: the requested resource could not be found
-  OrganismAbbreviation:
-    type: string
-    minLength: 3
-    maxLength: 200
   PartialDate:
     displayName: Partial Datetime
     description: |
@@ -873,12 +937,38 @@ types:
       displayName: string
       typeName: string
       typeVersion: string
-      projects?:
+      installTargets?:
         description: |
           Projects that this plugin is restricted to.  An empty or absent list
           indicates that the plugin has no project restrictions and may be used
           on any site.
         type: InstallTargetID[]
+  RelatedStudy:
+    type: object
+    additionalProperties: false
+    properties:
+      studyUri: string
+      sharesRecords: boolean
+  RevisionHistory:
+    type: object
+    additionalProperties: false
+    properties:
+      originalId: VdiId
+      revisions: DatasetRevision[]
+  SampleYearRange:
+    type: object
+    additionalProperties: false
+    properties:
+      start:
+        type: integer
+        format: int16
+        minimum: 1000
+        maximum: 9999
+      end:
+        type: integer
+        format: int16
+        minimum: 1000
+        maximum: 9999
   ServerError:
     displayName: Internal Server Error
     type: Error
@@ -925,7 +1015,7 @@ types:
       datasetId: VdiId
       owner: DatasetOwner
       shareStatus: ShareOfferStatus
-      datasetType: DatasetTypeOutput
+      type: DatasetTypeOutput
       installTargets:
         type: InstallTargetID[]
         minItems: 1
@@ -952,6 +1042,20 @@ types:
     enum:
       - accept
       - reject
+  StudyCharacteristics:
+    type: object
+    additionalProperties: false
+    properties:
+      studyDesign?:
+        description: Required for ClinEpi
+        type: string
+      studyType?:
+        description: Required for ClinEpi
+        type: string
+      countries?:
+        type: string[]
+        uniqueItems: true
+      years?: SampleYearRange
   SyncControlRecord:
     type: object
     additionalProperties: false

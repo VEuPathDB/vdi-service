@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.time.OffsetDateTime;
+import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -14,42 +14,63 @@ import java.time.OffsetDateTime;
     "metaUpdateTime"
 })
 public class SyncControlRecordImpl implements SyncControlRecord {
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+  )
+  @JsonDeserialize(
+      using = TimestampDeserializer.class
+  )
   @JsonProperty(JsonField.SHARES_UPDATE_TIME)
-  private OffsetDateTime sharesUpdateTime;
+  private Date sharesUpdateTime;
 
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+  )
+  @JsonDeserialize(
+      using = TimestampDeserializer.class
+  )
   @JsonProperty(JsonField.DATA_UPDATE_TIME)
-  private OffsetDateTime dataUpdateTime;
+  private Date dataUpdateTime;
 
   @JsonProperty(JsonField.META_UPDATE_TIME)
-  private OffsetDateTime metaUpdateTime;
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+  )
+  @JsonDeserialize(
+      using = TimestampDeserializer.class
+  )
+  private Date metaUpdateTime;
 
   @JsonProperty(JsonField.SHARES_UPDATE_TIME)
-  public OffsetDateTime getSharesUpdateTime() {
+  public Date getSharesUpdateTime() {
     return this.sharesUpdateTime;
   }
 
   @JsonProperty(JsonField.SHARES_UPDATE_TIME)
-  public void setSharesUpdateTime(OffsetDateTime sharesUpdateTime) {
+  public void setSharesUpdateTime(Date sharesUpdateTime) {
     this.sharesUpdateTime = sharesUpdateTime;
   }
 
   @JsonProperty(JsonField.DATA_UPDATE_TIME)
-  public OffsetDateTime getDataUpdateTime() {
+  public Date getDataUpdateTime() {
     return this.dataUpdateTime;
   }
 
   @JsonProperty(JsonField.DATA_UPDATE_TIME)
-  public void setDataUpdateTime(OffsetDateTime dataUpdateTime) {
+  public void setDataUpdateTime(Date dataUpdateTime) {
     this.dataUpdateTime = dataUpdateTime;
   }
 
   @JsonProperty(JsonField.META_UPDATE_TIME)
-  public OffsetDateTime getMetaUpdateTime() {
+  public Date getMetaUpdateTime() {
     return this.metaUpdateTime;
   }
 
   @JsonProperty(JsonField.META_UPDATE_TIME)
-  public void setMetaUpdateTime(OffsetDateTime metaUpdateTime) {
+  public void setMetaUpdateTime(Date metaUpdateTime) {
     this.metaUpdateTime = metaUpdateTime;
   }
 }

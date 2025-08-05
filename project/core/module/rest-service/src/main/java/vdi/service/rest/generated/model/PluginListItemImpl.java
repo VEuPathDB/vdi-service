@@ -10,7 +10,7 @@ import java.util.List;
     "displayName",
     "typeName",
     "typeVersion",
-    "projects"
+    "installTargets"
 })
 public class PluginListItemImpl implements PluginListItem {
   @JsonProperty(JsonField.DISPLAY_NAME)
@@ -22,8 +22,8 @@ public class PluginListItemImpl implements PluginListItem {
   @JsonProperty(JsonField.TYPE_VERSION)
   private String typeVersion;
 
-  @JsonProperty(JsonField.PROJECTS)
-  private List<String> projects;
+  @JsonProperty(JsonField.INSTALL_TARGETS)
+  private List<String> installTargets;
 
   @JsonProperty(JsonField.DISPLAY_NAME)
   public String getDisplayName() {
@@ -55,13 +55,13 @@ public class PluginListItemImpl implements PluginListItem {
     this.typeVersion = typeVersion;
   }
 
-  @JsonProperty(JsonField.PROJECTS)
-  public List<String> getProjects() {
-    return this.projects;
+  @JsonProperty(JsonField.INSTALL_TARGETS)
+  public List<String> getInstallTargets() {
+    return this.installTargets;
   }
 
-  @JsonProperty(JsonField.PROJECTS)
-  public void setProjects(List<String> projects) {
-    this.projects = projects;
+  @JsonProperty(JsonField.INSTALL_TARGETS)
+  public void setInstallTargets(List<String> installTargets) {
+    this.installTargets = installTargets;
   }
 }

@@ -7,11 +7,23 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = DatasetPublicationImpl.class
 )
 public interface DatasetPublication {
-  @JsonProperty(JsonField.PUB_MED_ID)
-  String getPubMedId();
+  @JsonProperty(JsonField.IDENTIFIER)
+  String getIdentifier();
 
-  @JsonProperty(JsonField.PUB_MED_ID)
-  void setPubMedId(String pubMedId);
+  @JsonProperty(JsonField.IDENTIFIER)
+  void setIdentifier(String identifier);
+
+  @JsonProperty(
+      value = JsonField.TYPE,
+      defaultValue = "pmid"
+  )
+  TypeType getType();
+
+  @JsonProperty(
+      value = JsonField.TYPE,
+      defaultValue = "pmid"
+  )
+  void setType(TypeType type);
 
   @JsonProperty(JsonField.CITATION)
   String getCitation();
@@ -23,11 +35,25 @@ public interface DatasetPublication {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  Boolean getIsPrimary();
+  boolean getIsPrimary();
 
   @JsonProperty(
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  void setIsPrimary(Boolean isPrimary);
+  void setIsPrimary(boolean isPrimary);
+
+  enum TypeType {
+    @JsonProperty("pmid")
+    PMID("pmid"),
+
+    @JsonProperty("doi")
+    DOI("doi");
+
+    private String name;
+
+    TypeType(String name) {
+      this.name = name;
+    }
+  }
 }

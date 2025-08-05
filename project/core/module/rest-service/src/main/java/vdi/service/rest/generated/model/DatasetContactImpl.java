@@ -6,24 +6,32 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "name",
+    "firstName",
+    "middleName",
+    "lastName",
     "isPrimary",
     "email",
     "affiliation",
+    "country",
     "city",
     "state",
-    "country",
     "address"
 })
 public class DatasetContactImpl implements DatasetContact {
-  @JsonProperty(JsonField.NAME)
-  private String name;
+  @JsonProperty(JsonField.FIRST_NAME)
+  private String firstName;
+
+  @JsonProperty(JsonField.MIDDLE_NAME)
+  private String middleName;
+
+  @JsonProperty(JsonField.LAST_NAME)
+  private String lastName;
 
   @JsonProperty(
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  private Boolean isPrimary;
+  private boolean isPrimary;
 
   @JsonProperty(JsonField.EMAIL)
   private String email;
@@ -31,33 +39,53 @@ public class DatasetContactImpl implements DatasetContact {
   @JsonProperty(JsonField.AFFILIATION)
   private String affiliation;
 
+  @JsonProperty(JsonField.COUNTRY)
+  private String country;
+
   @JsonProperty(JsonField.CITY)
   private String city;
 
   @JsonProperty(JsonField.STATE)
   private String state;
 
-  @JsonProperty(JsonField.COUNTRY)
-  private String country;
-
   @JsonProperty(JsonField.ADDRESS)
   private String address;
 
-  @JsonProperty(JsonField.NAME)
-  public String getName() {
-    return this.name;
+  @JsonProperty(JsonField.FIRST_NAME)
+  public String getFirstName() {
+    return this.firstName;
   }
 
-  @JsonProperty(JsonField.NAME)
-  public void setName(String name) {
-    this.name = name;
+  @JsonProperty(JsonField.FIRST_NAME)
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  @JsonProperty(JsonField.MIDDLE_NAME)
+  public String getMiddleName() {
+    return this.middleName;
+  }
+
+  @JsonProperty(JsonField.MIDDLE_NAME)
+  public void setMiddleName(String middleName) {
+    this.middleName = middleName;
+  }
+
+  @JsonProperty(JsonField.LAST_NAME)
+  public String getLastName() {
+    return this.lastName;
+  }
+
+  @JsonProperty(JsonField.LAST_NAME)
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
   }
 
   @JsonProperty(
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  public Boolean getIsPrimary() {
+  public boolean getIsPrimary() {
     return this.isPrimary;
   }
 
@@ -65,7 +93,7 @@ public class DatasetContactImpl implements DatasetContact {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  public void setIsPrimary(Boolean isPrimary) {
+  public void setIsPrimary(boolean isPrimary) {
     this.isPrimary = isPrimary;
   }
 
@@ -89,6 +117,16 @@ public class DatasetContactImpl implements DatasetContact {
     this.affiliation = affiliation;
   }
 
+  @JsonProperty(JsonField.COUNTRY)
+  public String getCountry() {
+    return this.country;
+  }
+
+  @JsonProperty(JsonField.COUNTRY)
+  public void setCountry(String country) {
+    this.country = country;
+  }
+
   @JsonProperty(JsonField.CITY)
   public String getCity() {
     return this.city;
@@ -107,16 +145,6 @@ public class DatasetContactImpl implements DatasetContact {
   @JsonProperty(JsonField.STATE)
   public void setState(String state) {
     this.state = state;
-  }
-
-  @JsonProperty(JsonField.COUNTRY)
-  public String getCountry() {
-    return this.country;
-  }
-
-  @JsonProperty(JsonField.COUNTRY)
-  public void setCountry(String country) {
-    this.country = country;
   }
 
   @JsonProperty(JsonField.ADDRESS)

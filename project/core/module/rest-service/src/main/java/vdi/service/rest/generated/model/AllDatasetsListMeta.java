@@ -8,26 +8,26 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 )
 public interface AllDatasetsListMeta {
   @JsonProperty(JsonField.COUNT)
-  Integer getCount();
+  int getCount();
 
   @JsonProperty(JsonField.COUNT)
-  void setCount(Integer count);
+  void setCount(int count);
 
   @JsonProperty(JsonField.OFFSET)
-  Integer getOffset();
+  int getOffset();
 
   @JsonProperty(JsonField.OFFSET)
-  void setOffset(Integer offset);
+  void setOffset(int offset);
 
   @JsonProperty(JsonField.LIMIT)
-  Integer getLimit();
+  int getLimit();
 
   @JsonProperty(JsonField.LIMIT)
-  void setLimit(Integer limit);
+  void setLimit(int limit);
 
   @JsonProperty(JsonField.TOTAL)
-  Integer getTotal();
+  int getTotal();
 
   @JsonProperty(JsonField.TOTAL)
-  void setTotal(Integer total);
+  void setTotal(int total);
 }

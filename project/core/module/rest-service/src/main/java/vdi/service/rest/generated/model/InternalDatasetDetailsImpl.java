@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -21,8 +21,6 @@ import java.util.List;
     "status",
     "importMessages",
     "visibility",
-    "shortName",
-    "shortAttribution",
     "summary",
     "description",
     "sourceUrl",
@@ -35,19 +33,33 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   private DatasetTypeOutput datasetType;
 
   @JsonProperty(JsonField.OWNER)
-  private Long owner;
+  private long owner;
 
   @JsonProperty(JsonField.IS_DELETED)
-  private Boolean isDeleted;
+  private boolean isDeleted;
 
   @JsonProperty(JsonField.ORIGIN)
   private String origin;
 
   @JsonProperty(JsonField.CREATED)
-  private OffsetDateTime created;
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+  )
+  @JsonDeserialize(
+      using = TimestampDeserializer.class
+  )
+  private Date created;
 
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+  )
+  @JsonDeserialize(
+      using = TimestampDeserializer.class
+  )
   @JsonProperty(JsonField.INSERTED)
-  private OffsetDateTime inserted;
+  private Date inserted;
 
   @JsonProperty(JsonField.NAME)
   private String name;
@@ -63,12 +75,6 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
 
   @JsonProperty(JsonField.VISIBILITY)
   private DatasetVisibility visibility;
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  private String shortName;
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  private String shortAttribution;
 
   @JsonProperty(JsonField.SUMMARY)
   private String summary;
@@ -99,22 +105,22 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   }
 
   @JsonProperty(JsonField.OWNER)
-  public Long getOwner() {
+  public long getOwner() {
     return this.owner;
   }
 
   @JsonProperty(JsonField.OWNER)
-  public void setOwner(Long owner) {
+  public void setOwner(long owner) {
     this.owner = owner;
   }
 
   @JsonProperty(JsonField.IS_DELETED)
-  public Boolean getIsDeleted() {
+  public boolean getIsDeleted() {
     return this.isDeleted;
   }
 
   @JsonProperty(JsonField.IS_DELETED)
-  public void setIsDeleted(Boolean isDeleted) {
+  public void setIsDeleted(boolean isDeleted) {
     this.isDeleted = isDeleted;
   }
 
@@ -129,22 +135,22 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   }
 
   @JsonProperty(JsonField.CREATED)
-  public OffsetDateTime getCreated() {
+  public Date getCreated() {
     return this.created;
   }
 
   @JsonProperty(JsonField.CREATED)
-  public void setCreated(OffsetDateTime created) {
+  public void setCreated(Date created) {
     this.created = created;
   }
 
   @JsonProperty(JsonField.INSERTED)
-  public OffsetDateTime getInserted() {
+  public Date getInserted() {
     return this.inserted;
   }
 
   @JsonProperty(JsonField.INSERTED)
-  public void setInserted(OffsetDateTime inserted) {
+  public void setInserted(Date inserted) {
     this.inserted = inserted;
   }
 
@@ -196,26 +202,6 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   @JsonProperty(JsonField.VISIBILITY)
   public void setVisibility(DatasetVisibility visibility) {
     this.visibility = visibility;
-  }
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  public String getShortName() {
-    return this.shortName;
-  }
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  public void setShortName(String shortName) {
-    this.shortName = shortName;
-  }
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  public String getShortAttribution() {
-    return this.shortAttribution;
-  }
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  public void setShortAttribution(String shortAttribution) {
-    this.shortAttribution = shortAttribution;
   }
 
   @JsonProperty(JsonField.SUMMARY)

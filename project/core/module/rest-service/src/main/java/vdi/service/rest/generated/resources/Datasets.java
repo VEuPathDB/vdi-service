@@ -1,15 +1,15 @@
 package vdi.service.rest.generated.resources;
 
 import java.util.List;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.GenericEntity;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.Response;
 import vdi.service.rest.generated.model.BadRequestError;
 import vdi.service.rest.generated.model.DatasetListEntry;
 import vdi.service.rest.generated.model.DatasetPostRequestBody;
@@ -35,16 +35,12 @@ public interface Datasets {
   PostDatasetsResponse postDatasets(DatasetPostRequestBody entity);
 
   class GetDatasetsResponse extends ResponseDelegate {
-    public GetDatasetsResponse(Response response, Object entity) {
+    private GetDatasetsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    public GetDatasetsResponse(Response response) {
+    private GetDatasetsResponse(Response response) {
       super(response);
-    }
-
-    public GetDatasetsResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static GetDatasetsResponse respond200WithApplicationJson(List<DatasetListEntry> entity) {
@@ -74,16 +70,12 @@ public interface Datasets {
   }
 
   class PostDatasetsResponse extends ResponseDelegate {
-    public PostDatasetsResponse(Response response, Object entity) {
+    private PostDatasetsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    public PostDatasetsResponse(Response response) {
+    private PostDatasetsResponse(Response response) {
       super(response);
-    }
-
-    public PostDatasetsResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static HeadersFor201 headersFor201() {

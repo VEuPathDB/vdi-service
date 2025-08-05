@@ -1,12 +1,12 @@
 package vdi.service.rest.generated.resources;
 
 import java.util.List;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.GenericEntity;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.Response;
 import vdi.service.rest.generated.model.PluginListItem;
 import vdi.service.rest.generated.model.ServerError;
 import vdi.service.rest.generated.model.UnauthorizedError;
@@ -21,16 +21,12 @@ public interface Plugins {
   GetPluginsResponse getPlugins(@QueryParam("project") String project);
 
   class GetPluginsResponse extends ResponseDelegate {
-    public GetPluginsResponse(Response response, Object entity) {
+    private GetPluginsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    public GetPluginsResponse(Response response) {
+    private GetPluginsResponse(Response response) {
       super(response);
-    }
-
-    public GetPluginsResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static GetPluginsResponse respond200WithApplicationJson(List<PluginListItem> entity) {

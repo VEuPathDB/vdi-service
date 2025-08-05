@@ -26,9 +26,9 @@ public interface PluginListItem {
   @JsonProperty(JsonField.TYPE_VERSION)
   void setTypeVersion(String typeVersion);
 
-  @JsonProperty(JsonField.PROJECTS)
-  List<String> getProjects();
+  @JsonProperty(JsonField.INSTALL_TARGETS)
+  List<String> getInstallTargets();
 
-  @JsonProperty(JsonField.PROJECTS)
-  void setProjects(List<String> projects);
+  @JsonProperty(JsonField.INSTALL_TARGETS)
+  void setInstallTargets(List<String> installTargets);
 }

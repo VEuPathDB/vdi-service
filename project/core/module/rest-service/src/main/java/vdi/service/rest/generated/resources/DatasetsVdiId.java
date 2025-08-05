@@ -1,13 +1,13 @@
 package vdi.service.rest.generated.resources;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import vdi.service.rest.generated.model.BadRequestError;
 import vdi.service.rest.generated.model.DatasetDetails;
 import vdi.service.rest.generated.model.DatasetPatchRequestBody;
@@ -48,16 +48,12 @@ public interface DatasetsVdiId {
   DeleteDatasetsByVdiIdResponse deleteDatasetsByVdiId(@PathParam("vdi-id") String vdiId);
 
   class GetDatasetsByVdiIdResponse extends ResponseDelegate {
-    public GetDatasetsByVdiIdResponse(Response response, Object entity) {
+    private GetDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    public GetDatasetsByVdiIdResponse(Response response) {
+    private GetDatasetsByVdiIdResponse(Response response) {
       super(response);
-    }
-
-    public GetDatasetsByVdiIdResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static GetDatasetsByVdiIdResponse respond200WithApplicationJson(DatasetDetails entity) {
@@ -107,16 +103,12 @@ public interface DatasetsVdiId {
   }
 
   class DeleteDatasetsByVdiIdResponse extends ResponseDelegate {
-    public DeleteDatasetsByVdiIdResponse(Response response, Object entity) {
+    private DeleteDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    public DeleteDatasetsByVdiIdResponse(Response response) {
+    private DeleteDatasetsByVdiIdResponse(Response response) {
       super(response);
-    }
-
-    public DeleteDatasetsByVdiIdResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static DeleteDatasetsByVdiIdResponse respond204() {
@@ -153,16 +145,12 @@ public interface DatasetsVdiId {
   }
 
   class PutDatasetsByVdiIdResponse extends ResponseDelegate {
-    public PutDatasetsByVdiIdResponse(Response response, Object entity) {
+    private PutDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    public PutDatasetsByVdiIdResponse(Response response) {
+    private PutDatasetsByVdiIdResponse(Response response) {
       super(response);
-    }
-
-    public PutDatasetsByVdiIdResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static HeadersFor201 headersFor201() {
@@ -227,16 +215,12 @@ public interface DatasetsVdiId {
   }
 
   class PatchDatasetsByVdiIdResponse extends ResponseDelegate {
-    public PatchDatasetsByVdiIdResponse(Response response, Object entity) {
+    private PatchDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    public PatchDatasetsByVdiIdResponse(Response response) {
+    private PatchDatasetsByVdiIdResponse(Response response) {
       super(response);
-    }
-
-    public PatchDatasetsByVdiIdResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static PatchDatasetsByVdiIdResponse respond204() {

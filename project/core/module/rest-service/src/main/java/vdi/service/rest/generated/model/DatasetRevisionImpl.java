@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.time.OffsetDateTime;
+import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -19,8 +19,15 @@ public class DatasetRevisionImpl implements DatasetRevision {
   @JsonProperty(JsonField.ACTION)
   private DatasetRevisionAction action;
 
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+  )
+  @JsonDeserialize(
+      using = TimestampDeserializer.class
+  )
   @JsonProperty(JsonField.TIMESTAMP)
-  private OffsetDateTime timestamp;
+  private Date timestamp;
 
   @JsonProperty(JsonField.REVISION_ID)
   private String revisionId;
@@ -42,12 +49,12 @@ public class DatasetRevisionImpl implements DatasetRevision {
   }
 
   @JsonProperty(JsonField.TIMESTAMP)
-  public OffsetDateTime getTimestamp() {
+  public Date getTimestamp() {
     return this.timestamp;
   }
 
   @JsonProperty(JsonField.TIMESTAMP)
-  public void setTimestamp(OffsetDateTime timestamp) {
+  public void setTimestamp(Date timestamp) {
     this.timestamp = timestamp;
   }
 

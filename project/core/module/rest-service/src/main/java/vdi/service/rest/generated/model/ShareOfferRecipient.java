@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 )
 public interface ShareOfferRecipient {
   @JsonProperty(JsonField.USER_ID)
-  Long getUserId();
+  long getUserId();
 
   @JsonProperty(JsonField.USER_ID)
-  void setUserId(Long userId);
+  void setUserId(long userId);
 
   @JsonProperty(JsonField.FIRST_NAME)
   String getFirstName();

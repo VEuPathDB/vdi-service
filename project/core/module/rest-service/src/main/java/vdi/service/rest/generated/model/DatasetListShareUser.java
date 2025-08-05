@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 )
 public interface DatasetListShareUser {
   @JsonProperty(JsonField.USER_ID)
-  Long getUserId();
+  long getUserId();
 
   @JsonProperty(JsonField.USER_ID)
-  void setUserId(Long userId);
+  void setUserId(long userId);
 
   @JsonProperty(JsonField.FIRST_NAME)
   String getFirstName();
@@ -32,8 +32,8 @@ public interface DatasetListShareUser {
   void setOrganization(String organization);
 
   @JsonProperty(JsonField.ACCEPTED)
-  Boolean getAccepted();
+  boolean getAccepted();
 
   @JsonProperty(JsonField.ACCEPTED)
-  void setAccepted(Boolean accepted);
+  void setAccepted(boolean accepted);
 }

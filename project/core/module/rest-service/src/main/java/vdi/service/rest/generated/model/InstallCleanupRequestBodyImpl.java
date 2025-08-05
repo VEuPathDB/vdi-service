@@ -15,7 +15,7 @@ public class InstallCleanupRequestBodyImpl implements InstallCleanupRequestBody 
       value = JsonField.ALL,
       defaultValue = "false"
   )
-  private Boolean all;
+  private boolean all;
 
   @JsonProperty(JsonField.TARGETS)
   private List<InstallCleanupTarget> targets;
@@ -24,7 +24,7 @@ public class InstallCleanupRequestBodyImpl implements InstallCleanupRequestBody 
       value = JsonField.ALL,
       defaultValue = "false"
   )
-  public Boolean getAll() {
+  public boolean getAll() {
     return this.all;
   }
 
@@ -32,7 +32,7 @@ public class InstallCleanupRequestBodyImpl implements InstallCleanupRequestBody 
       value = JsonField.ALL,
       defaultValue = "false"
   )
-  public void setAll(Boolean all) {
+  public void setAll(boolean all) {
     this.all = all;
   }
 

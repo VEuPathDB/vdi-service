@@ -1,9 +1,9 @@
 package vdi.service.rest.generated.resources;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import vdi.service.rest.generated.model.ServiceMetadataResponseBody;
 import vdi.service.rest.generated.support.ResponseDelegate;
 
@@ -16,16 +16,12 @@ public interface MetaInfo {
   GetMetaInfoResponse getMetaInfo();
 
   class GetMetaInfoResponse extends ResponseDelegate {
-    public GetMetaInfoResponse(Response response, Object entity) {
+    private GetMetaInfoResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    public GetMetaInfoResponse(Response response) {
+    private GetMetaInfoResponse(Response response) {
       super(response);
-    }
-
-    public GetMetaInfoResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static GetMetaInfoResponse respond200WithApplicationJson(

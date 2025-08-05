@@ -2,7 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 
 @JsonDeserialize(
@@ -64,34 +64,22 @@ public interface DatasetListEntry {
   void setShares(List<DatasetListShareUser> shares);
 
   @JsonProperty(JsonField.FILE_COUNT)
-  Integer getFileCount();
+  int getFileCount();
 
   @JsonProperty(JsonField.FILE_COUNT)
-  void setFileCount(Integer fileCount);
+  void setFileCount(int fileCount);
 
   @JsonProperty(JsonField.FILE_SIZE_TOTAL)
-  Long getFileSizeTotal();
+  long getFileSizeTotal();
 
   @JsonProperty(JsonField.FILE_SIZE_TOTAL)
-  void setFileSizeTotal(Long fileSizeTotal);
+  void setFileSizeTotal(long fileSizeTotal);
 
   @JsonProperty(JsonField.CREATED)
-  OffsetDateTime getCreated();
+  Date getCreated();
 
   @JsonProperty(JsonField.CREATED)
-  void setCreated(OffsetDateTime created);
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  String getShortName();
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  void setShortName(String shortName);
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  String getShortAttribution();
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  void setShortAttribution(String shortAttribution);
+  void setCreated(Date created);
 
   @JsonProperty(JsonField.SUMMARY)
   String getSummary();

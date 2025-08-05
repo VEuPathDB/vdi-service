@@ -12,13 +12,9 @@ public enum ShareOfferStatus {
   @JsonProperty("rejected")
   REJECTED("rejected");
 
-  public final String value;
-
-  public String getValue() {
-    return this.value;
-  }
+  private String name;
 
   ShareOfferStatus(String name) {
-    this.value = name;
+    this.name = name;
   }
 }

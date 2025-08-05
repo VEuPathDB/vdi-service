@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = ServerErrorImpl.class
 )
 public interface ServerError extends Error {
-  ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.SERVERERROR;
+  String _DISCRIMINATOR_TYPE_NAME = "server-error";
 
   @JsonProperty(JsonField.STATUS)
   ErrorType getStatus();

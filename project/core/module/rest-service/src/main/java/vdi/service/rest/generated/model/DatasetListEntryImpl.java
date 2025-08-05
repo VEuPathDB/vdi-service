@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -22,8 +22,6 @@ import java.util.List;
     "fileCount",
     "fileSizeTotal",
     "created",
-    "shortName",
-    "shortAttribution",
     "summary",
     "description",
     "sourceUrl",
@@ -58,19 +56,20 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   private List<DatasetListShareUser> shares;
 
   @JsonProperty(JsonField.FILE_COUNT)
-  private Integer fileCount;
+  private int fileCount;
 
   @JsonProperty(JsonField.FILE_SIZE_TOTAL)
-  private Long fileSizeTotal;
+  private long fileSizeTotal;
 
   @JsonProperty(JsonField.CREATED)
-  private OffsetDateTime created;
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  private String shortName;
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  private String shortAttribution;
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+  )
+  @JsonDeserialize(
+      using = TimestampDeserializer.class
+  )
+  private Date created;
 
   @JsonProperty(JsonField.SUMMARY)
   private String summary;
@@ -175,53 +174,33 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   }
 
   @JsonProperty(JsonField.FILE_COUNT)
-  public Integer getFileCount() {
+  public int getFileCount() {
     return this.fileCount;
   }
 
   @JsonProperty(JsonField.FILE_COUNT)
-  public void setFileCount(Integer fileCount) {
+  public void setFileCount(int fileCount) {
     this.fileCount = fileCount;
   }
 
   @JsonProperty(JsonField.FILE_SIZE_TOTAL)
-  public Long getFileSizeTotal() {
+  public long getFileSizeTotal() {
     return this.fileSizeTotal;
   }
 
   @JsonProperty(JsonField.FILE_SIZE_TOTAL)
-  public void setFileSizeTotal(Long fileSizeTotal) {
+  public void setFileSizeTotal(long fileSizeTotal) {
     this.fileSizeTotal = fileSizeTotal;
   }
 
   @JsonProperty(JsonField.CREATED)
-  public OffsetDateTime getCreated() {
+  public Date getCreated() {
     return this.created;
   }
 
   @JsonProperty(JsonField.CREATED)
-  public void setCreated(OffsetDateTime created) {
+  public void setCreated(Date created) {
     this.created = created;
-  }
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  public String getShortName() {
-    return this.shortName;
-  }
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  public void setShortName(String shortName) {
-    this.shortName = shortName;
-  }
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  public String getShortAttribution() {
-    return this.shortAttribution;
-  }
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  public void setShortAttribution(String shortAttribution) {
-    this.shortAttribution = shortAttribution;
   }
 
   @JsonProperty(JsonField.SUMMARY)

@@ -6,13 +6,20 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "pubMedId",
+    "identifier",
+    "type",
     "citation",
     "isPrimary"
 })
 public class DatasetPublicationImpl implements DatasetPublication {
-  @JsonProperty(JsonField.PUB_MED_ID)
-  private String pubMedId;
+  @JsonProperty(JsonField.IDENTIFIER)
+  private String identifier;
+
+  @JsonProperty(
+      value = JsonField.TYPE,
+      defaultValue = "pmid"
+  )
+  private DatasetPublication.TypeType type;
 
   @JsonProperty(JsonField.CITATION)
   private String citation;
@@ -21,16 +28,32 @@ public class DatasetPublicationImpl implements DatasetPublication {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  private Boolean isPrimary;
+  private boolean isPrimary;
 
-  @JsonProperty(JsonField.PUB_MED_ID)
-  public String getPubMedId() {
-    return this.pubMedId;
+  @JsonProperty(JsonField.IDENTIFIER)
+  public String getIdentifier() {
+    return this.identifier;
   }
 
-  @JsonProperty(JsonField.PUB_MED_ID)
-  public void setPubMedId(String pubMedId) {
-    this.pubMedId = pubMedId;
+  @JsonProperty(JsonField.IDENTIFIER)
+  public void setIdentifier(String identifier) {
+    this.identifier = identifier;
+  }
+
+  @JsonProperty(
+      value = JsonField.TYPE,
+      defaultValue = "pmid"
+  )
+  public DatasetPublication.TypeType getType() {
+    return this.type;
+  }
+
+  @JsonProperty(
+      value = JsonField.TYPE,
+      defaultValue = "pmid"
+  )
+  public void setType(DatasetPublication.TypeType type) {
+    this.type = type;
   }
 
   @JsonProperty(JsonField.CITATION)
@@ -47,7 +70,7 @@ public class DatasetPublicationImpl implements DatasetPublication {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  public Boolean getIsPrimary() {
+  public boolean getIsPrimary() {
     return this.isPrimary;
   }
 
@@ -55,7 +78,7 @@ public class DatasetPublicationImpl implements DatasetPublication {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  public void setIsPrimary(Boolean isPrimary) {
+  public void setIsPrimary(boolean isPrimary) {
     this.isPrimary = isPrimary;
   }
 }

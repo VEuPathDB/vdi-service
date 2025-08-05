@@ -2,7 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 
 @JsonDeserialize(
@@ -16,10 +16,10 @@ public interface AllDatasetsListEntry {
   void setDatasetId(String datasetId);
 
   @JsonProperty(JsonField.OWNER)
-  Long getOwner();
+  long getOwner();
 
   @JsonProperty(JsonField.OWNER)
-  void setOwner(Long owner);
+  void setOwner(long owner);
 
   @JsonProperty(JsonField.DATASET_TYPE)
   DatasetTypeOutput getDatasetType();
@@ -58,28 +58,16 @@ public interface AllDatasetsListEntry {
   void setStatus(DatasetStatusInfo status);
 
   @JsonProperty(JsonField.CREATED)
-  OffsetDateTime getCreated();
+  Date getCreated();
 
   @JsonProperty(JsonField.CREATED)
-  void setCreated(OffsetDateTime created);
+  void setCreated(Date created);
 
   @JsonProperty(JsonField.IS_DELETED)
-  Boolean getIsDeleted();
+  boolean getIsDeleted();
 
   @JsonProperty(JsonField.IS_DELETED)
-  void setIsDeleted(Boolean isDeleted);
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  String getShortName();
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  void setShortName(String shortName);
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  String getShortAttribution();
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  void setShortAttribution(String shortAttribution);
+  void setIsDeleted(boolean isDeleted);
 
   @JsonProperty(JsonField.SUMMARY)
   String getSummary();

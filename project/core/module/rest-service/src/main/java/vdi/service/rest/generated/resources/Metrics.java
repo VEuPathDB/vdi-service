@@ -1,9 +1,9 @@
 package vdi.service.rest.generated.resources;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import vdi.service.rest.generated.support.ResponseDelegate;
 
 @Path("/metrics")
@@ -15,16 +15,12 @@ public interface Metrics {
   GetMetricsResponse getMetrics();
 
   class GetMetricsResponse extends ResponseDelegate {
-    public GetMetricsResponse(Response response, Object entity) {
+    private GetMetricsResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    public GetMetricsResponse(Response response) {
+    private GetMetricsResponse(Response response) {
       super(response);
-    }
-
-    public GetMetricsResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static GetMetricsResponse respond200WithTextPlain(Object entity) {

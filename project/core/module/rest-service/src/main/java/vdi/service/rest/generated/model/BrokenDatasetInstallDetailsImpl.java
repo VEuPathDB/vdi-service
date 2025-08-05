@@ -18,7 +18,7 @@ public class BrokenDatasetInstallDetailsImpl implements BrokenDatasetInstallDeta
   private String datasetId;
 
   @JsonProperty(JsonField.OWNER)
-  private Long owner;
+  private long owner;
 
   @JsonProperty(JsonField.DATASET_TYPE)
   private DatasetTypeOutput datasetType;
@@ -40,12 +40,12 @@ public class BrokenDatasetInstallDetailsImpl implements BrokenDatasetInstallDeta
   }
 
   @JsonProperty(JsonField.OWNER)
-  public Long getOwner() {
+  public long getOwner() {
     return this.owner;
   }
 
   @JsonProperty(JsonField.OWNER)
-  public void setOwner(Long owner) {
+  public void setOwner(long owner) {
     this.owner = owner;
   }
 

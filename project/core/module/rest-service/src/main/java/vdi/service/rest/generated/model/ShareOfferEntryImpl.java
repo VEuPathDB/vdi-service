@@ -10,7 +10,7 @@ import java.util.List;
     "datasetId",
     "owner",
     "shareStatus",
-    "datasetType",
+    "type",
     "installTargets"
 })
 public class ShareOfferEntryImpl implements ShareOfferEntry {
@@ -23,8 +23,8 @@ public class ShareOfferEntryImpl implements ShareOfferEntry {
   @JsonProperty(JsonField.SHARE_STATUS)
   private ShareOfferStatus shareStatus;
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeOutput datasetType;
+  @JsonProperty(JsonField.TYPE)
+  private DatasetTypeOutput type;
 
   @JsonProperty(JsonField.INSTALL_TARGETS)
   private List<String> installTargets;
@@ -59,14 +59,14 @@ public class ShareOfferEntryImpl implements ShareOfferEntry {
     this.shareStatus = shareStatus;
   }
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeOutput getDatasetType() {
-    return this.datasetType;
+  @JsonProperty(JsonField.TYPE)
+  public DatasetTypeOutput getType() {
+    return this.type;
   }
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeOutput datasetType) {
-    this.datasetType = datasetType;
+  @JsonProperty(JsonField.TYPE)
+  public void setType(DatasetTypeOutput type) {
+    this.type = type;
   }
 
   @JsonProperty(JsonField.INSTALL_TARGETS)

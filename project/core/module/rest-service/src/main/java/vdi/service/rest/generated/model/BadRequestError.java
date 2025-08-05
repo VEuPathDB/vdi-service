@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = BadRequestErrorImpl.class
 )
 public interface BadRequestError extends Error {
-  ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.BADREQUEST;
+  String _DISCRIMINATOR_TYPE_NAME = "bad-request";
 
   @JsonProperty(JsonField.STATUS)
   ErrorType getStatus();

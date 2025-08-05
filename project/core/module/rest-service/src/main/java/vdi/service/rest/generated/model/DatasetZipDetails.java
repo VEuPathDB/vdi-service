@@ -9,10 +9,10 @@ import java.util.List;
 )
 public interface DatasetZipDetails {
   @JsonProperty(JsonField.ZIP_SIZE)
-  Long getZipSize();
+  long getZipSize();
 
   @JsonProperty(JsonField.ZIP_SIZE)
-  void setZipSize(Long zipSize);
+  void setZipSize(long zipSize);
 
   @JsonProperty(JsonField.CONTENTS)
   List<DatasetFileDetails> getContents();

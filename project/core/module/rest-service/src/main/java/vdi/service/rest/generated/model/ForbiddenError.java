@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = ForbiddenErrorImpl.class
 )
 public interface ForbiddenError extends Error {
-  ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.FORBIDDEN;
+  String _DISCRIMINATOR_TYPE_NAME = "forbidden";
 
   @JsonProperty(JsonField.STATUS)
   ErrorType getStatus();

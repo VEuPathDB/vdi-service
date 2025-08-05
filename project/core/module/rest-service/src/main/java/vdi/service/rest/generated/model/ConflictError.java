@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = ConflictErrorImpl.class
 )
 public interface ConflictError extends Error {
-  ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.CONFLICT;
+  String _DISCRIMINATOR_TYPE_NAME = "conflict";
 
   @JsonProperty(JsonField.STATUS)
   ErrorType getStatus();

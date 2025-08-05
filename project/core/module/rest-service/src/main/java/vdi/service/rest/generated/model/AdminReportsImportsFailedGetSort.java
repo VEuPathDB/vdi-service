@@ -6,13 +6,9 @@ public enum AdminReportsImportsFailedGetSort {
   @JsonProperty("date")
   DATE("date");
 
-  public final String value;
-
-  public String getValue() {
-    return this.value;
-  }
+  private String name;
 
   AdminReportsImportsFailedGetSort(String name) {
-    this.value = name;
+    this.name = name;
   }
 }

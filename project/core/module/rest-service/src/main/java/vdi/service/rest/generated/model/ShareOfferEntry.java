@@ -26,11 +26,11 @@ public interface ShareOfferEntry {
   @JsonProperty(JsonField.SHARE_STATUS)
   void setShareStatus(ShareOfferStatus shareStatus);
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  DatasetTypeOutput getDatasetType();
+  @JsonProperty(JsonField.TYPE)
+  DatasetTypeOutput getType();
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  void setDatasetType(DatasetTypeOutput datasetType);
+  @JsonProperty(JsonField.TYPE)
+  void setType(DatasetTypeOutput type);
 
   @JsonProperty(JsonField.INSTALL_TARGETS)
   List<String> getInstallTargets();

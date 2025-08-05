@@ -1,11 +1,11 @@
 package vdi.service.rest.generated.resources;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import vdi.service.rest.generated.model.BadRequestError;
 import vdi.service.rest.generated.model.DatasetShareOffer;
 import vdi.service.rest.generated.model.DatasetShareReceipt;
@@ -33,7 +33,7 @@ public interface DatasetsVdiIdSharesRecipientUserId {
   @Produces("application/json")
   @Consumes("application/json")
   PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse putDatasetsSharesOfferByVdiIdAndRecipientUserId(
-      @PathParam("vdi-id") String vdiId, @PathParam("recipient-user-id") Long recipientUserId,
+      @PathParam("vdi-id") String vdiId, @PathParam("recipient-user-id") long recipientUserId,
       DatasetShareOffer entity);
 
   @PUT
@@ -41,21 +41,17 @@ public interface DatasetsVdiIdSharesRecipientUserId {
   @Produces("application/json")
   @Consumes("application/json")
   PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse putDatasetsSharesReceiptByVdiIdAndRecipientUserId(
-      @PathParam("vdi-id") String vdiId, @PathParam("recipient-user-id") Long recipientUserId,
+      @PathParam("vdi-id") String vdiId, @PathParam("recipient-user-id") long recipientUserId,
       DatasetShareReceipt entity);
 
   class PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse extends ResponseDelegate {
-    public PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(Response response,
+    private PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(Response response,
         Object entity) {
       super(response, entity);
     }
 
-    public PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(Response response) {
+    private PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(Response response) {
       super(response);
-    }
-
-    public PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static PutDatasetsSharesOfferByVdiIdAndRecipientUserIdResponse respond204() {
@@ -107,17 +103,13 @@ public interface DatasetsVdiIdSharesRecipientUserId {
   }
 
   class PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse extends ResponseDelegate {
-    public PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(Response response,
+    private PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(Response response,
         Object entity) {
       super(response, entity);
     }
 
-    public PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(Response response) {
+    private PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(Response response) {
       super(response);
-    }
-
-    public PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse(ResponseDelegate response) {
-      super(response.delegate, response.entity);
     }
 
     public static PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse respond204() {

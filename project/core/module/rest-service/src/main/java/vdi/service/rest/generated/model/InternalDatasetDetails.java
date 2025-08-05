@@ -2,7 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 
 @JsonDeserialize(
@@ -16,16 +16,16 @@ public interface InternalDatasetDetails {
   void setDatasetType(DatasetTypeOutput datasetType);
 
   @JsonProperty(JsonField.OWNER)
-  Long getOwner();
+  long getOwner();
 
   @JsonProperty(JsonField.OWNER)
-  void setOwner(Long owner);
+  void setOwner(long owner);
 
   @JsonProperty(JsonField.IS_DELETED)
-  Boolean getIsDeleted();
+  boolean getIsDeleted();
 
   @JsonProperty(JsonField.IS_DELETED)
-  void setIsDeleted(Boolean isDeleted);
+  void setIsDeleted(boolean isDeleted);
 
   @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
@@ -34,16 +34,16 @@ public interface InternalDatasetDetails {
   void setOrigin(String origin);
 
   @JsonProperty(JsonField.CREATED)
-  OffsetDateTime getCreated();
+  Date getCreated();
 
   @JsonProperty(JsonField.CREATED)
-  void setCreated(OffsetDateTime created);
+  void setCreated(Date created);
 
   @JsonProperty(JsonField.INSERTED)
-  OffsetDateTime getInserted();
+  Date getInserted();
 
   @JsonProperty(JsonField.INSERTED)
-  void setInserted(OffsetDateTime inserted);
+  void setInserted(Date inserted);
 
   @JsonProperty(JsonField.NAME)
   String getName();
@@ -74,18 +74,6 @@ public interface InternalDatasetDetails {
 
   @JsonProperty(JsonField.VISIBILITY)
   void setVisibility(DatasetVisibility visibility);
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  String getShortName();
-
-  @JsonProperty(JsonField.SHORT_NAME)
-  void setShortName(String shortName);
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  String getShortAttribution();
-
-  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  void setShortAttribution(String shortAttribution);
 
   @JsonProperty(JsonField.SUMMARY)
   String getSummary();

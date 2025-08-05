@@ -6,11 +6,12 @@ uses:
 types:
   DatasetPutMetadata:
     displayName: Dataset Put Request Metadata
-    type: DatasetPatchRequestBody
+    type: object
     additionalProperties: false
     properties:
       origin: common.DatasetOrigin
       revisionNote: common.DatasetRevisionNote
+      patch: JSONPatchAction[]
 
   DatasetPutRequestBody:
     displayName: Dataset Put Request
@@ -20,18 +21,21 @@ types:
         description: Metadata about the dataset being submitted.
         type: DatasetPutMetadata
       dataFiles?:
+        # language=markdown
         description: |
           Dataset files to upload.
 
           This field is incompatible with the `url` field.
         type: file[]
       url?:
+        # language=markdown
         description: |
           URL to a dataset file to upload.
 
           This field is incompatible with the `file` field.
         type: string
       docFiles?:
+        # language=markdown
         description: |-
           Files containing additional dataset documentation or meta info that is
           not part of the data itself.

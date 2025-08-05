@@ -63,24 +63,24 @@ public class HealthResponseImpl implements HealthResponse {
   })
   public static class InfoTypeImpl implements HealthResponse.InfoType {
     @JsonProperty("threads")
-    private Integer threads;
+    private int threads;
 
     @JsonProperty("uptime")
     private String uptime;
 
     @JsonProperty("uptimeMillis")
-    private Long uptimeMillis;
+    private long uptimeMillis;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new ExcludingMap();
 
     @JsonProperty("threads")
-    public Integer getThreads() {
+    public int getThreads() {
       return this.threads;
     }
 
     @JsonProperty("threads")
-    public void setThreads(Integer threads) {
+    public void setThreads(int threads) {
       this.threads = threads;
     }
 
@@ -95,12 +95,12 @@ public class HealthResponseImpl implements HealthResponse {
     }
 
     @JsonProperty("uptimeMillis")
-    public Long getUptimeMillis() {
+    public long getUptimeMillis() {
       return this.uptimeMillis;
     }
 
     @JsonProperty("uptimeMillis")
-    public void setUptimeMillis(Long uptimeMillis) {
+    public void setUptimeMillis(long uptimeMillis) {
       this.uptimeMillis = uptimeMillis;
     }
 
