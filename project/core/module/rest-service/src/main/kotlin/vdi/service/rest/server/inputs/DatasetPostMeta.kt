@@ -1,12 +1,11 @@
 @file:JvmName("DatasetPostMetaValidator")
+
 package vdi.service.rest.server.inputs
 
-import com.fasterxml.jackson.module.kotlin.convertValue
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
 import java.net.URI
 import vdi.model.data.UserID
-import vdi.json.JSON
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import vdi.model.data.DatasetMetadata
@@ -24,33 +23,36 @@ import vdi.service.rest.generated.model.JsonField as JF
 internal fun DatasetPostMeta.cleanup() {
   (this as DatasetMetaBase).cleanup()
 
-  datasetType?.cleanup()
+  type?.cleanup()
   visibility = visibility ?: DatasetVisibility.PRIVATE
 }
 
 internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
-  datasetType.validate(JF.META..JF.DATASET_TYPE, installTargets, errors)
+  type.validate(JF.META..JF.DATASET_TYPE, installTargets, errors)
   (this as DatasetMetaBase).validate(errors)
 }
 
 internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
   DatasetMetadata(
-    type             = datasetType.toInternal(),
-    installTargets   = installTargets.toSet(),
-    visibility       = visibility!!.toInternal(),
-    owner            = userID,
-    name             = name,
-    summary          = summary,
-    origin           = origin,
-    created          = OffsetDateTime.now(ZoneOffset.UTC),
-    shortName        = shortName,
-    description      = description,
-    shortAttribution = shortAttribution,
-    sourceURL        = url?.let(URI::create),
-    dependencies     = dependencies.map(DatasetDependency::toInternal),
-    publications     = publications.map(DatasetPublication::toInternal),
-    hyperlinks       = hyperlinks.map(DatasetHyperlink::toInternal),
-    organisms        = organisms.toSet(),
-    contacts         = contacts.map(DatasetContact::toInternal),
-    properties       = JSON.convertValue(properties)
+    type = type.toInternal(),
+    installTargets = installTargets.toSet(),
+    visibility = visibility!!.toInternal(),
+    owner = userID,
+    name = name,
+    summary = summary,
+    description = description,
+    origin = origin,
+    created = OffsetDateTime.now(ZoneOffset.UTC),
+    sourceURL = url?.let(URI::create),
+    dependencies = dependencies.map(DatasetDependency::toInternal),
+    publications = publications.map(DatasetPublication::toInternal),
+    contacts = contacts.map(DatasetContact::toInternal),
+    projectName = projectName,
+    programName = programName,
+    relatedStudies = relatedStudies.map(RelatedStudy::toInternal),
+    experimentalOrganism = experimentalOrganism.toInternal(),
+    hostOrganism = hostOrganism.toInternal(),
+    studyCharacteristics = studyCharacteristics.toInternal(),
+    externalIdentifiers = externalIdentifiers.toInternal(),
+    funding = funding.toInternal(),
   )

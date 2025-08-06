@@ -18,7 +18,7 @@ data class DatasetMetadata(
 
   @field:JsonAlias(Legacy_Projects)
   @field:JsonProperty(InstallTargets)
-  val installTargets: Set<DatasetInstallTarget>,
+  val installTargets: Set<InstallTargetID>,
 
   @field:JsonProperty(Visibility)
   val visibility: DatasetVisibility,

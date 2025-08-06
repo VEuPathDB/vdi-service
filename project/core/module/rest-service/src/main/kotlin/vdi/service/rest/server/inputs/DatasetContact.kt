@@ -17,18 +17,25 @@ private const val CountryMaxLength = 200
 private const val AddressMaxLength = 1000
 
 internal fun APIContact.cleanup() {
+  firstName   = firstName.cleanupString()
+  middleName  = middleName.cleanupString()
+  lastName    = lastName.cleanupString()
+
   isPrimary   = isPrimary ?: false
-  name        = name.cleanupString()
+
   email       = email.cleanupString()
   affiliation = affiliation.cleanupString()
+  country     = country.cleanupString()
+
   city        = city.cleanupString()
   state       = state.cleanupString()
-  country     = country.cleanupString()
   address     = address.cleanupString()
 }
 
 private fun APIContact.validate(jPath: String, index: Int, errors: ValidationErrors) {
-  name.reqCheckLength(jPath..JsonField.NAME, index, NameMinLength, NameMaxLength, errors)
+  firstName.reqCheckLength(jPath..JsonField.FIRST_NAME, index, NameMinLength, NameMaxLength, errors)
+  middleName.optCheckLength(jPath..JsonField.MIDDLE_NAME, index, NameMinLength, NameMaxLength, errors)
+  lastName.reqCheckLength(jPath..JsonField.LAST_NAME, index, NameMinLength, NameMaxLength, errors)
 
   email.optCheckLength(jPath..JsonField.EMAIL, index, EmailMinLength, EmailMaxLength, errors)
   affiliation.optCheckMaxLength(jPath..JsonField.AFFILIATION, index, AffiliationMaxLength, errors)
@@ -62,7 +69,9 @@ internal fun Iterable<APIContact?>.validate(jPath: String, errors: ValidationErr
 
 internal fun APIContact.toInternal() =
   DatasetContact(
-    name        = name,
+    firstName   = firstName,
+    middleName  = middleName,
+    lastName    = lastName,
     email       = email,
     affiliation = affiliation,
     city        = city,

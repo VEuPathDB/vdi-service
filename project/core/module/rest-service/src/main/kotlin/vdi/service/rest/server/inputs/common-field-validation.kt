@@ -22,18 +22,6 @@ fun String?.validateSummary(jPath: String, errors: ValidationErrors) =
   reqCheckLength(jPath, SummaryMinLength, SummaryMaxLength, errors)
 
 
-private const val ShortNameMinLength = 3
-private const val ShortNameMaxLength = 300
-fun String?.validateShortName(jPath: String, errors: ValidationErrors) =
-  optCheckLength(jPath, ShortNameMinLength, ShortNameMaxLength, errors)
-
-
-private const val ShortAttributionMinLength = 3
-private const val ShortAttributionMaxLength = 300
-fun String?.validateShortAttribution(jPath: String, errors: ValidationErrors) =
-  optCheckLength(jPath, ShortAttributionMinLength, ShortAttributionMaxLength, errors)
-
-
 private const val OriginMinLength = 3
 private const val OriginMaxLength = 256
 fun String?.validateOrigin(jPath: String, errors: ValidationErrors) =
@@ -45,14 +33,6 @@ fun String?.validateOrigin(jPath: String, errors: ValidationErrors) =
  * │   Scalar Collection Type Validations                                   │ *
  * │                                                                        │ *
 \* └────────────────────────────────────────────────────────────────────────┘ */
-
-
-// Based on App DB vdi_control_*.dataset_organism table
-private const val OrganismAbbrevMaxLength = 20
-private const val OrganismAbbrevMinLength = 3
-
-fun Iterable<String?>.validateOrganisms(jPath: String, errors: ValidationErrors) =
-  forEachIndexed { i, l -> l.reqCheckLength(jPath, i, OrganismAbbrevMinLength, OrganismAbbrevMaxLength, errors) }
 
 fun Collection<String?>?.validateProjects(jPath: String, errors: ValidationErrors) {
   requireNonEmpty(jPath, errors) { forEachIndexed { i, p ->

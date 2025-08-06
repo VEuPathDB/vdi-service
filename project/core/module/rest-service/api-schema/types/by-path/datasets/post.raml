@@ -45,10 +45,6 @@ types:
     additionalProperties: false
     properties:
       type: common.DatasetTypeInput
-      installTargets:
-        type: common.InstallTargetID[]
-        minItems: 1
-        uniqueItems: true
       visibility?:
         type: common.DatasetVisibility
         default: "private"

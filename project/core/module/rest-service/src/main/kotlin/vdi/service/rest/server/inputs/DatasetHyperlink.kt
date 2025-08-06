@@ -15,9 +15,7 @@ private const val DescriptionMaxLength = 4000
 
 internal fun APIHyperlink.cleanup() {
   url = url.cleanupString()
-  text = text.cleanupString()
   description = description.cleanupString()
-  isPublication = isPublication ?: false
 }
 
 internal fun Iterable<APIHyperlink?>.validate(jPath: String, errors: ValidationErrors) =
@@ -25,21 +23,18 @@ internal fun Iterable<APIHyperlink?>.validate(jPath: String, errors: ValidationE
 
 private fun APIHyperlink.validate(jPath: String, index: Int, errors: ValidationErrors) {
   url.reqCheckLength(jPath..JsonField.URL, index, UrlMinLength, UrlMaxLength, errors)
+
   try {
     URI(url).toURL()
   } catch (e: IllegalArgumentException) {
     errors.add((jPath..JsonField.URL)..index, "invalid URL value")
   }
 
-  text.reqCheckLength(jPath..JsonField.TEXT, index, TextMinLength, TextMaxLength, errors)
-
   description.optCheckMaxLength(jPath..JsonField.DESCRIPTION, index, DescriptionMaxLength, errors)
 }
 
 internal fun APIHyperlink.toInternal() =
   DatasetHyperlink(
-    url           = URI.create(url),
-    text          = text,
-    description   = description,
-    isPublication = isPublication
+    url         = URI.create(url),
+    description = description,
   )

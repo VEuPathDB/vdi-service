@@ -1,17 +1,12 @@
 @file:JvmName("DatasetMetaBaseValidator")
 package vdi.service.rest.server.inputs
 
-import com.networknt.schema.JsonSchema
 import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.optCheckLength
 import org.veupathdb.lib.request.validation.rangeTo
-import vdi.core.install.InstallTargetRegistry
 import vdi.service.rest.generated.model.*
 
 fun DatasetMetaBase.cleanup() {
-  // Required Fields
-  name = name.cleanupString()
-  dependencies = dependencies.cleanup(DatasetDependency::cleanup)
-  origin = origin.cleanupString()
   installTargets
     ?.ifEmpty { null }
     ?.asSequence()
@@ -19,56 +14,41 @@ fun DatasetMetaBase.cleanup() {
     ?.distinct()
     ?.toList()
     ?: emptyList()
-  summary = summary.cleanupString()
 
-  // Optional Fields
-  contacts = contacts.cleanup(DatasetContact::cleanup)
+  name        = name.cleanupString()
+  summary     = summary.cleanupString()
   description = description.cleanupString()
-  hyperlinks = hyperlinks.cleanup(DatasetHyperlink::cleanup)
-  organisms = organisms
-    ?.ifEmpty { null }
-    ?.onEachIndexed { i, s -> organisms[i] = s.cleanupString() }
-    ?: emptyList()
-  publications = publications.cleanup(DatasetPublication::cleanup)
-  shortName = shortName.cleanupString()
-  shortAttribution = shortAttribution.cleanupString()
+  origin      = origin.cleanupString()
+  projectName = projectName.cleanupString()
+  programName = programName.cleanupString()
+
+  experimentalOrganism = experimentalOrganism.cleanup()
+  hostOrganism         = hostOrganism.cleanup()
+  studyCharacteristics = studyCharacteristics.cleanup()
+  externalIdentifiers  = externalIdentifiers.cleanup()
+
+  dependencies   = dependencies.cleanup(DatasetDependency::cleanup)
+  publications   = publications.cleanup(DatasetPublication::cleanup)
+  contacts       = contacts.cleanup(DatasetContact::cleanup)
+  relatedStudies = relatedStudies.cleanup(RelatedStudy::cleanup)
+  funding        = funding.cleanup(DatasetFundingAward::cleanup)
 }
 
 fun DatasetMetaBase.validate(errors: ValidationErrors) {
-  // Required Fields
+  installTargets.validateProjects(JsonField.META..JsonField.DEPENDENCIES, errors)
   name.validateName(JsonField.META..JsonField.NAME, errors)
   summary.validateSummary(JsonField.META..JsonField.SUMMARY, errors)
+  // description - no validation
   origin.validateOrigin(JsonField.META..JsonField.ORIGIN, errors)
-  installTargets.validateProjects(JsonField.META..JsonField.DEPENDENCIES, errors)
   dependencies.validate(JsonField.META..JsonField.DEPENDENCIES, errors)
-
-  // Optional Fields
-  contacts.validate(JsonField.META..JsonField.CONTACTS, errors)
-  // description - no rules, no validation
-  hyperlinks.validate(JsonField.META..JsonField.HYPERLINKS, errors)
-  organisms.validateOrganisms(JsonField.META..JsonField.ORGANISMS, errors)
   publications.validate(JsonField.META..JsonField.PUBLICATIONS, errors)
-  shortName.validateShortName(JsonField.META..JsonField.SHORT_NAME, errors)
-  shortAttribution.validateShortAttribution(JsonField.META..JsonField.SHORT_ATTRIBUTION, errors)
-
-  validateProperties(errors)
-}
-
-private fun DatasetMetaBase.validateProperties(errors: ValidationErrors) {
-  var owner: String? = null
-  var schema: JsonSchema? = null
-
-  installTargets.forEachIndexed { i, it ->
-    when {
-      schema == null -> {
-        owner = it
-        schema = InstallTargetRegistry[it]!!.propertySchema
-      }
-      schema !== InstallTargetRegistry[it]!!.propertySchema -> {
-        errors.add(JsonField.INSTALL_TARGETS..i, "install target $it property schema is incompatible with install target $owner")
-      }
-    }
-  }
-
-  properties?.also { props -> schema?.also { props.validate(it, JsonField.PROPERTIES, errors) } }
+  contacts.validate(JsonField.META..JsonField.CONTACTS, errors)
+  projectName.optCheckLength(JsonField.META..JsonField.PROJECT_NAME, 1, 256, errors)
+  programName.optCheckLength(JsonField.META..JsonField.PROGRAM_NAME, 1, 256, errors)
+  relatedStudies.validate(JsonField.META..JsonField.RELATED_STUDIES, errors)
+  experimentalOrganism.validate(JsonField.META..JsonField.EXPERIMENTAL_ORGANISM, errors)
+  hostOrganism.validate(JsonField.META..JsonField.HOST_ORGANISM, errors)
+  studyCharacteristics.validate(JsonField.META..JsonField.STUDY_CHARACTERISTICS, errors)
+  externalIdentifiers.validate(JsonField.META..JsonField.EXTERNAL_IDENTIFIERS, errors)
+  funding.validate(JsonField.META..JsonField.FUNDING, errors)
 }
