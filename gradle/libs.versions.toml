@@ -46,7 +46,7 @@ json-jackson-parameters  = { module = "com.fasterxml.jackson.module:jackson-modu
 json-jackson-datetime    = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
 json-jackson-options     = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8", version.ref = "jackson" }
 
-json-schema-validation = { module = "com.networknt:json-schema-validator", version = "1.5.7"}
+json-schema-validation = { module = "com.networknt:json-schema-validator", version = "1.5.8"}
 
 yaml = { module = "org.yaml:snakeyaml", version = "2.4" }
 
