@@ -35,13 +35,13 @@ public interface DatasetPublication {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  boolean getIsPrimary();
+  Boolean getIsPrimary();
 
   @JsonProperty(
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  void setIsPrimary(boolean isPrimary);
+  void setIsPrimary(Boolean isPrimary);
 
   enum TypeType {
     @JsonProperty("pmid")
@@ -50,10 +50,14 @@ public interface DatasetPublication {
     @JsonProperty("doi")
     DOI("doi");
 
-    private String name;
+    public final String value;
+
+    public String getValue() {
+      return this.value;
+    }
 
     TypeType(String name) {
-      this.name = name;
+      this.value = name;
     }
   }
 }

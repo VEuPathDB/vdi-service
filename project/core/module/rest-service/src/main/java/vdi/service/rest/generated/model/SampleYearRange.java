@@ -8,14 +8,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 )
 public interface SampleYearRange {
   @JsonProperty(JsonField.START)
-  short getStart();
+  Short getStart();
 
   @JsonProperty(JsonField.START)
-  void setStart(short start);
+  void setStart(Short start);
 
   @JsonProperty(JsonField.END)
-  short getEnd();
+  Short getEnd();
 
   @JsonProperty(JsonField.END)
-  void setEnd(short end);
+  void setEnd(Short end);
 }

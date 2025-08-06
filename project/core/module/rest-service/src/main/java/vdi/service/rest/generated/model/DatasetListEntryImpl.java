@@ -5,14 +5,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "datasetId",
     "owner",
-    "datasetType",
+    "type",
     "visibility",
     "name",
     "origin",
@@ -34,8 +34,8 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty(JsonField.OWNER)
   private DatasetOwner owner;
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetTypeOutput datasetType;
+  @JsonProperty(JsonField.TYPE)
+  private DatasetTypeOutput type;
 
   @JsonProperty(JsonField.VISIBILITY)
   private DatasetVisibility visibility;
@@ -56,20 +56,13 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   private List<DatasetListShareUser> shares;
 
   @JsonProperty(JsonField.FILE_COUNT)
-  private int fileCount;
+  private Integer fileCount;
 
   @JsonProperty(JsonField.FILE_SIZE_TOTAL)
-  private long fileSizeTotal;
+  private Long fileSizeTotal;
 
   @JsonProperty(JsonField.CREATED)
-  @JsonFormat(
-      shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-  )
-  @JsonDeserialize(
-      using = TimestampDeserializer.class
-  )
-  private Date created;
+  private OffsetDateTime created;
 
   @JsonProperty(JsonField.SUMMARY)
   private String summary;
@@ -103,14 +96,14 @@ public class DatasetListEntryImpl implements DatasetListEntry {
     this.owner = owner;
   }
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetTypeOutput getDatasetType() {
-    return this.datasetType;
+  @JsonProperty(JsonField.TYPE)
+  public DatasetTypeOutput getType() {
+    return this.type;
   }
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetTypeOutput datasetType) {
-    this.datasetType = datasetType;
+  @JsonProperty(JsonField.TYPE)
+  public void setType(DatasetTypeOutput type) {
+    this.type = type;
   }
 
   @JsonProperty(JsonField.VISIBILITY)
@@ -174,32 +167,32 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   }
 
   @JsonProperty(JsonField.FILE_COUNT)
-  public int getFileCount() {
+  public Integer getFileCount() {
     return this.fileCount;
   }
 
   @JsonProperty(JsonField.FILE_COUNT)
-  public void setFileCount(int fileCount) {
+  public void setFileCount(Integer fileCount) {
     this.fileCount = fileCount;
   }
 
   @JsonProperty(JsonField.FILE_SIZE_TOTAL)
-  public long getFileSizeTotal() {
+  public Long getFileSizeTotal() {
     return this.fileSizeTotal;
   }
 
   @JsonProperty(JsonField.FILE_SIZE_TOTAL)
-  public void setFileSizeTotal(long fileSizeTotal) {
+  public void setFileSizeTotal(Long fileSizeTotal) {
     this.fileSizeTotal = fileSizeTotal;
   }
 
   @JsonProperty(JsonField.CREATED)
-  public Date getCreated() {
+  public OffsetDateTime getCreated() {
     return this.created;
   }
 
   @JsonProperty(JsonField.CREATED)
-  public void setCreated(Date created) {
+  public void setCreated(OffsetDateTime created) {
     this.created = created;
   }
 

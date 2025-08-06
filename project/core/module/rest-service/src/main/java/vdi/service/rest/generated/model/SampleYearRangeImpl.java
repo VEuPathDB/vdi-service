@@ -11,28 +11,28 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class SampleYearRangeImpl implements SampleYearRange {
   @JsonProperty(JsonField.START)
-  private short start;
+  private Short start;
 
   @JsonProperty(JsonField.END)
-  private short end;
+  private Short end;
 
   @JsonProperty(JsonField.START)
-  public short getStart() {
+  public Short getStart() {
     return this.start;
   }
 
   @JsonProperty(JsonField.START)
-  public void setStart(short start) {
+  public void setStart(Short start) {
     this.start = start;
   }
 
   @JsonProperty(JsonField.END)
-  public short getEnd() {
+  public Short getEnd() {
     return this.end;
   }
 
   @JsonProperty(JsonField.END)
-  public void setEnd(short end) {
+  public void setEnd(Short end) {
     this.end = end;
   }
 }

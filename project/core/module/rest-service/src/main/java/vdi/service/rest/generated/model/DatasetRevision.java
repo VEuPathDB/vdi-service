@@ -2,7 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 @JsonDeserialize(
     as = DatasetRevisionImpl.class
@@ -15,10 +15,10 @@ public interface DatasetRevision {
   void setAction(DatasetRevisionAction action);
 
   @JsonProperty(JsonField.TIMESTAMP)
-  Date getTimestamp();
+  OffsetDateTime getTimestamp();
 
   @JsonProperty(JsonField.TIMESTAMP)
-  void setTimestamp(Date timestamp);
+  void setTimestamp(OffsetDateTime timestamp);
 
   @JsonProperty(JsonField.REVISION_ID)
   String getRevisionId();

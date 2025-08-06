@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = GoneErrorImpl.class
 )
 public interface GoneError extends Error {
-  String _DISCRIMINATOR_TYPE_NAME = "gone";
+  ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.GONE;
 
   @JsonProperty(JsonField.STATUS)
   ErrorType getStatus();

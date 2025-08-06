@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = FailedDependencyErrorImpl.class
 )
 public interface FailedDependencyError extends Error {
-  String _DISCRIMINATOR_TYPE_NAME = "failed-dependency";
+  ErrorType _DISCRIMINATOR_TYPE_NAME = ErrorType.FAILEDDEPENDENCY;
 
   @JsonProperty(JsonField.STATUS)
   ErrorType getStatus();

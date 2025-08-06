@@ -2,27 +2,27 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 @JsonDeserialize(
     as = SyncControlRecordImpl.class
 )
 public interface SyncControlRecord {
   @JsonProperty(JsonField.SHARES_UPDATE_TIME)
-  Date getSharesUpdateTime();
+  OffsetDateTime getSharesUpdateTime();
 
   @JsonProperty(JsonField.SHARES_UPDATE_TIME)
-  void setSharesUpdateTime(Date sharesUpdateTime);
+  void setSharesUpdateTime(OffsetDateTime sharesUpdateTime);
 
   @JsonProperty(JsonField.DATA_UPDATE_TIME)
-  Date getDataUpdateTime();
+  OffsetDateTime getDataUpdateTime();
 
   @JsonProperty(JsonField.DATA_UPDATE_TIME)
-  void setDataUpdateTime(Date dataUpdateTime);
+  void setDataUpdateTime(OffsetDateTime dataUpdateTime);
 
   @JsonProperty(JsonField.META_UPDATE_TIME)
-  Date getMetaUpdateTime();
+  OffsetDateTime getMetaUpdateTime();
 
   @JsonProperty(JsonField.META_UPDATE_TIME)
-  void setMetaUpdateTime(Date metaUpdateTime);
+  void setMetaUpdateTime(OffsetDateTime metaUpdateTime);
 }

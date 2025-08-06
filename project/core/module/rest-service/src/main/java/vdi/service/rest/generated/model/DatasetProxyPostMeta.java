@@ -2,7 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonDeserialize(
@@ -124,8 +124,8 @@ public interface DatasetProxyPostMeta extends DatasetPostMeta {
   void setVisibility(DatasetVisibility visibility);
 
   @JsonProperty(JsonField.CREATED_ON)
-  Date getCreatedOn();
+  OffsetDateTime getCreatedOn();
 
   @JsonProperty(JsonField.CREATED_ON)
-  void setCreatedOn(Date createdOn);
+  void setCreatedOn(OffsetDateTime createdOn);
 }

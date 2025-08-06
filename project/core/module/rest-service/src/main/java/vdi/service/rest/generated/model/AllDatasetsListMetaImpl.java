@@ -13,54 +13,54 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class AllDatasetsListMetaImpl implements AllDatasetsListMeta {
   @JsonProperty(JsonField.COUNT)
-  private int count;
+  private Integer count;
 
   @JsonProperty(JsonField.OFFSET)
-  private int offset;
+  private Integer offset;
 
   @JsonProperty(JsonField.LIMIT)
-  private int limit;
+  private Integer limit;
 
   @JsonProperty(JsonField.TOTAL)
-  private int total;
+  private Integer total;
 
   @JsonProperty(JsonField.COUNT)
-  public int getCount() {
+  public Integer getCount() {
     return this.count;
   }
 
   @JsonProperty(JsonField.COUNT)
-  public void setCount(int count) {
+  public void setCount(Integer count) {
     this.count = count;
   }
 
   @JsonProperty(JsonField.OFFSET)
-  public int getOffset() {
+  public Integer getOffset() {
     return this.offset;
   }
 
   @JsonProperty(JsonField.OFFSET)
-  public void setOffset(int offset) {
+  public void setOffset(Integer offset) {
     this.offset = offset;
   }
 
   @JsonProperty(JsonField.LIMIT)
-  public int getLimit() {
+  public Integer getLimit() {
     return this.limit;
   }
 
   @JsonProperty(JsonField.LIMIT)
-  public void setLimit(int limit) {
+  public void setLimit(Integer limit) {
     this.limit = limit;
   }
 
   @JsonProperty(JsonField.TOTAL)
-  public int getTotal() {
+  public Integer getTotal() {
     return this.total;
   }
 
   @JsonProperty(JsonField.TOTAL)
-  public void setTotal(int total) {
+  public void setTotal(Integer total) {
     this.total = total;
   }
 }

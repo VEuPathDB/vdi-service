@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -33,33 +33,19 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   private DatasetTypeOutput datasetType;
 
   @JsonProperty(JsonField.OWNER)
-  private long owner;
+  private Long owner;
 
   @JsonProperty(JsonField.IS_DELETED)
-  private boolean isDeleted;
+  private Boolean isDeleted;
 
   @JsonProperty(JsonField.ORIGIN)
   private String origin;
 
   @JsonProperty(JsonField.CREATED)
-  @JsonFormat(
-      shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-  )
-  @JsonDeserialize(
-      using = TimestampDeserializer.class
-  )
-  private Date created;
+  private OffsetDateTime created;
 
-  @JsonFormat(
-      shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-  )
-  @JsonDeserialize(
-      using = TimestampDeserializer.class
-  )
   @JsonProperty(JsonField.INSERTED)
-  private Date inserted;
+  private OffsetDateTime inserted;
 
   @JsonProperty(JsonField.NAME)
   private String name;
@@ -105,22 +91,22 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   }
 
   @JsonProperty(JsonField.OWNER)
-  public long getOwner() {
+  public Long getOwner() {
     return this.owner;
   }
 
   @JsonProperty(JsonField.OWNER)
-  public void setOwner(long owner) {
+  public void setOwner(Long owner) {
     this.owner = owner;
   }
 
   @JsonProperty(JsonField.IS_DELETED)
-  public boolean getIsDeleted() {
+  public Boolean getIsDeleted() {
     return this.isDeleted;
   }
 
   @JsonProperty(JsonField.IS_DELETED)
-  public void setIsDeleted(boolean isDeleted) {
+  public void setIsDeleted(Boolean isDeleted) {
     this.isDeleted = isDeleted;
   }
 
@@ -135,22 +121,22 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   }
 
   @JsonProperty(JsonField.CREATED)
-  public Date getCreated() {
+  public OffsetDateTime getCreated() {
     return this.created;
   }
 
   @JsonProperty(JsonField.CREATED)
-  public void setCreated(Date created) {
+  public void setCreated(OffsetDateTime created) {
     this.created = created;
   }
 
   @JsonProperty(JsonField.INSERTED)
-  public Date getInserted() {
+  public OffsetDateTime getInserted() {
     return this.inserted;
   }
 
   @JsonProperty(JsonField.INSERTED)
-  public void setInserted(Date inserted) {
+  public void setInserted(OffsetDateTime inserted) {
     this.inserted = inserted;
   }
 

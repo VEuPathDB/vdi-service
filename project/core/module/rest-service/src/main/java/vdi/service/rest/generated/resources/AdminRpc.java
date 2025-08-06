@@ -1,13 +1,13 @@
 package vdi.service.rest.generated.resources;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response;
 import vdi.service.rest.generated.model.BadRequestError;
 import vdi.service.rest.generated.model.ConflictError;
 import vdi.service.rest.generated.model.DatasetObjectPurgeRequestBody;
@@ -38,7 +38,7 @@ public interface AdminRpc {
   @Produces("application/json")
   @Consumes("multipart/form-data")
   PostAdminRpcDatasetsProxyUploadResponse postAdminRpcDatasetsProxyUpload(
-      @HeaderParam("User-ID") long userID, DatasetProxyPostRequestBody entity);
+      @HeaderParam("User-ID") Long userID, DatasetProxyPostRequestBody entity);
 
   @POST
   @Path("/datasets/prune")
@@ -56,7 +56,7 @@ public interface AdminRpc {
   @Produces("application/json")
   @Consumes("application/json")
   PostAdminRpcInstallsClearFailedResponse postAdminRpcInstallsClearFailed(
-      @QueryParam("skip-run") @DefaultValue("false") boolean skipRun,
+      @QueryParam("skip-run") @DefaultValue("false") Boolean skipRun,
       InstallCleanupRequestBody entity);
 
   @POST
@@ -67,12 +67,16 @@ public interface AdminRpc {
       DatasetObjectPurgeRequestBody entity);
 
   class PostAdminRpcDatasetsProxyUploadResponse extends ResponseDelegate {
-    private PostAdminRpcDatasetsProxyUploadResponse(Response response, Object entity) {
+    public PostAdminRpcDatasetsProxyUploadResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostAdminRpcDatasetsProxyUploadResponse(Response response) {
+    public PostAdminRpcDatasetsProxyUploadResponse(Response response) {
       super(response);
+    }
+
+    public PostAdminRpcDatasetsProxyUploadResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PostAdminRpcDatasetsProxyUploadResponse respond200WithApplicationJson(
@@ -112,12 +116,16 @@ public interface AdminRpc {
   }
 
   class PostAdminRpcDatasetsPruneResponse extends ResponseDelegate {
-    private PostAdminRpcDatasetsPruneResponse(Response response, Object entity) {
+    public PostAdminRpcDatasetsPruneResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostAdminRpcDatasetsPruneResponse(Response response) {
+    public PostAdminRpcDatasetsPruneResponse(Response response) {
       super(response);
+    }
+
+    public PostAdminRpcDatasetsPruneResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PostAdminRpcDatasetsPruneResponse respond204() {
@@ -141,12 +149,16 @@ public interface AdminRpc {
   }
 
   class PostAdminRpcDatasetsReconcileResponse extends ResponseDelegate {
-    private PostAdminRpcDatasetsReconcileResponse(Response response, Object entity) {
+    public PostAdminRpcDatasetsReconcileResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostAdminRpcDatasetsReconcileResponse(Response response) {
+    public PostAdminRpcDatasetsReconcileResponse(Response response) {
       super(response);
+    }
+
+    public PostAdminRpcDatasetsReconcileResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PostAdminRpcDatasetsReconcileResponse respond204() {
@@ -170,12 +182,16 @@ public interface AdminRpc {
   }
 
   class PostAdminRpcInstallsClearFailedResponse extends ResponseDelegate {
-    private PostAdminRpcInstallsClearFailedResponse(Response response, Object entity) {
+    public PostAdminRpcInstallsClearFailedResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostAdminRpcInstallsClearFailedResponse(Response response) {
+    public PostAdminRpcInstallsClearFailedResponse(Response response) {
       super(response);
+    }
+
+    public PostAdminRpcInstallsClearFailedResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PostAdminRpcInstallsClearFailedResponse respond204() {
@@ -199,12 +215,16 @@ public interface AdminRpc {
   }
 
   class PostAdminRpcObjectStorePurgeDatasetResponse extends ResponseDelegate {
-    private PostAdminRpcObjectStorePurgeDatasetResponse(Response response, Object entity) {
+    public PostAdminRpcObjectStorePurgeDatasetResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private PostAdminRpcObjectStorePurgeDatasetResponse(Response response) {
+    public PostAdminRpcObjectStorePurgeDatasetResponse(Response response) {
       super(response);
+    }
+
+    public PostAdminRpcObjectStorePurgeDatasetResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static PostAdminRpcObjectStorePurgeDatasetResponse respond204() {

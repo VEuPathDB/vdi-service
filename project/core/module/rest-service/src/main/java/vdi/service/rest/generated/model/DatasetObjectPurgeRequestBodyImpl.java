@@ -11,18 +11,18 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class DatasetObjectPurgeRequestBodyImpl implements DatasetObjectPurgeRequestBody {
   @JsonProperty(JsonField.USER_ID)
-  private long userId;
+  private Long userId;
 
   @JsonProperty(JsonField.DATASET_ID)
   private String datasetId;
 
   @JsonProperty(JsonField.USER_ID)
-  public long getUserId() {
+  public Long getUserId() {
     return this.userId;
   }
 
   @JsonProperty(JsonField.USER_ID)
-  public void setUserId(long userId) {
+  public void setUserId(Long userId) {
     this.userId = userId;
   }
 

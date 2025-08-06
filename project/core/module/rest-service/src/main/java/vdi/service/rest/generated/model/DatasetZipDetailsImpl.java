@@ -12,18 +12,18 @@ import java.util.List;
 })
 public class DatasetZipDetailsImpl implements DatasetZipDetails {
   @JsonProperty(JsonField.ZIP_SIZE)
-  private long zipSize;
+  private Long zipSize;
 
   @JsonProperty(JsonField.CONTENTS)
   private List<DatasetFileDetails> contents;
 
   @JsonProperty(JsonField.ZIP_SIZE)
-  public long getZipSize() {
+  public Long getZipSize() {
     return this.zipSize;
   }
 
   @JsonProperty(JsonField.ZIP_SIZE)
-  public void setZipSize(long zipSize) {
+  public void setZipSize(Long zipSize) {
     this.zipSize = zipSize;
   }
 

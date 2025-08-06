@@ -15,10 +15,10 @@ public interface BrokenImportDetails {
   void setDatasetId(String datasetId);
 
   @JsonProperty(JsonField.OWNER)
-  long getOwner();
+  Long getOwner();
 
   @JsonProperty(JsonField.OWNER)
-  void setOwner(long owner);
+  void setOwner(Long owner);
 
   @JsonProperty(JsonField.DATASET_TYPE)
   DatasetTypeOutput getDatasetType();

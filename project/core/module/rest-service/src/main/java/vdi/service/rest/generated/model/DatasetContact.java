@@ -29,13 +29,13 @@ public interface DatasetContact {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  boolean getIsPrimary();
+  Boolean getIsPrimary();
 
   @JsonProperty(
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  void setIsPrimary(boolean isPrimary);
+  void setIsPrimary(Boolean isPrimary);
 
   @JsonProperty(JsonField.EMAIL)
   String getEmail();

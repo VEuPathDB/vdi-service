@@ -2,7 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonDeserialize(
@@ -130,10 +130,10 @@ public interface DatasetDetails extends DatasetMetaBase {
   void setOwner(DatasetOwner owner);
 
   @JsonProperty(JsonField.CREATED)
-  Date getCreated();
+  OffsetDateTime getCreated();
 
   @JsonProperty(JsonField.CREATED)
-  void setCreated(Date created);
+  void setCreated(OffsetDateTime created);
 
   @JsonProperty(JsonField.SOURCE_URL)
   String getSourceUrl();

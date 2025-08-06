@@ -31,7 +31,7 @@ public class DatasetContactImpl implements DatasetContact {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  private boolean isPrimary;
+  private Boolean isPrimary;
 
   @JsonProperty(JsonField.EMAIL)
   private String email;
@@ -85,7 +85,7 @@ public class DatasetContactImpl implements DatasetContact {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  public boolean getIsPrimary() {
+  public Boolean getIsPrimary() {
     return this.isPrimary;
   }
 
@@ -93,7 +93,7 @@ public class DatasetContactImpl implements DatasetContact {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  public void setIsPrimary(boolean isPrimary) {
+  public void setIsPrimary(Boolean isPrimary) {
     this.isPrimary = isPrimary;
   }
 

@@ -41,7 +41,7 @@ get:
             type: string
             example: attachment; filename="1234567-upload.zip"
         body:
-          application/octet-stream:
+          application/zip:
             type: any
       401:
         body: lib.UnauthorizedError
@@ -50,14 +50,14 @@ get:
       500:
         body: lib.ServerError
 
-/data:
+/install:
   displayName: Install-Ready Data
   get:
     displayName: Get Data File
     # language=markdown
     description: |
       Returns a zip file containing the processed files that were/would be
-      installed into the VEuPathDB project site on successful install
+      installed into the VEuPathDB project site on successful installation
       processing.
     responses:
       200:
@@ -88,7 +88,7 @@ get:
           Content-Disposition:
             description: Content disposition of `attachment` with a filename.
             type: string
-            example: attachment; filename="1234567-data.zip"
+            example: attachment; filename="1234567.pdf"
         body:
           application/octet-stream:
             type: any

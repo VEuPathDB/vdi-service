@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class ShareOfferRecipientImpl implements ShareOfferRecipient {
   @JsonProperty(JsonField.USER_ID)
-  private long userId;
+  private Long userId;
 
   @JsonProperty(JsonField.FIRST_NAME)
   private String firstName;
@@ -29,12 +29,12 @@ public class ShareOfferRecipientImpl implements ShareOfferRecipient {
   private String email;
 
   @JsonProperty(JsonField.USER_ID)
-  public long getUserId() {
+  public Long getUserId() {
     return this.userId;
   }
 
   @JsonProperty(JsonField.USER_ID)
-  public void setUserId(long userId) {
+  public void setUserId(Long userId) {
     this.userId = userId;
   }
 

@@ -1,12 +1,12 @@
 package vdi.service.rest.generated.resources;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response;
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder;
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort;
 import vdi.service.rest.generated.model.AllDatasetsListResponse;
@@ -39,9 +39,9 @@ public interface AdminReports {
   @Produces("application/json")
   GetAdminReportsDatasetsListAllResponse getAdminReportsDatasetsListAll(
       @QueryParam("install_target") String installTarget,
-      @QueryParam("include_deleted") @DefaultValue("false") boolean includeDeleted,
-      @QueryParam("limit") @DefaultValue("100") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset);
+      @QueryParam("include_deleted") @DefaultValue("false") Boolean includeDeleted,
+      @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset);
 
   @GET
   @Path("/datasets/{vdi-id}")
@@ -52,18 +52,18 @@ public interface AdminReports {
   @GET
   @Path("/imports/failed")
   @Produces("application/json")
-  GetAdminReportsImportsFailedResponse getAdminReportsImportsFailed(@QueryParam("user") long user,
+  GetAdminReportsImportsFailedResponse getAdminReportsImportsFailed(@QueryParam("user") Long user,
       @QueryParam("before") String before, @QueryParam("after") String after,
       @QueryParam("sort") @DefaultValue("date") AdminReportsImportsFailedGetSort sort,
       @QueryParam("order") @DefaultValue("desc") AdminReportsImportsFailedGetOrder order,
-      @QueryParam("limit") @DefaultValue("100") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset);
+      @QueryParam("limit") @DefaultValue("100") Integer limit,
+      @QueryParam("offset") @DefaultValue("0") Integer offset);
 
   @GET
   @Path("/installs/failed")
   @Produces("application/json")
   GetAdminReportsInstallsFailedResponse getAdminReportsInstallsFailed(
-      @QueryParam("expanded") @DefaultValue("true") boolean expanded);
+      @QueryParam("expanded") @DefaultValue("true") Boolean expanded);
 
   @GET
   @Path("/object-store/list-all")
@@ -74,12 +74,16 @@ public interface AdminReports {
   GetAdminReportsObjectStoreListAllResponse getAdminReportsObjectStoreListAll();
 
   class GetAdminReportsDatasetsListAllResponse extends ResponseDelegate {
-    private GetAdminReportsDatasetsListAllResponse(Response response, Object entity) {
+    public GetAdminReportsDatasetsListAllResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetAdminReportsDatasetsListAllResponse(Response response) {
+    public GetAdminReportsDatasetsListAllResponse(Response response) {
       super(response);
+    }
+
+    public GetAdminReportsDatasetsListAllResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetAdminReportsDatasetsListAllResponse respond200WithApplicationJson(
@@ -98,12 +102,16 @@ public interface AdminReports {
   }
 
   class GetAdminReportsDatasetsByVdiIdResponse extends ResponseDelegate {
-    private GetAdminReportsDatasetsByVdiIdResponse(Response response, Object entity) {
+    public GetAdminReportsDatasetsByVdiIdResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetAdminReportsDatasetsByVdiIdResponse(Response response) {
+    public GetAdminReportsDatasetsByVdiIdResponse(Response response) {
       super(response);
+    }
+
+    public GetAdminReportsDatasetsByVdiIdResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetAdminReportsDatasetsByVdiIdResponse respond200WithApplicationJson(
@@ -136,12 +144,16 @@ public interface AdminReports {
   }
 
   class GetAdminReportsImportsFailedResponse extends ResponseDelegate {
-    private GetAdminReportsImportsFailedResponse(Response response, Object entity) {
+    public GetAdminReportsImportsFailedResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetAdminReportsImportsFailedResponse(Response response) {
+    public GetAdminReportsImportsFailedResponse(Response response) {
       super(response);
+    }
+
+    public GetAdminReportsImportsFailedResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetAdminReportsImportsFailedResponse respond200WithApplicationJson(
@@ -167,12 +179,16 @@ public interface AdminReports {
   }
 
   class GetAdminReportsInstallsFailedResponse extends ResponseDelegate {
-    private GetAdminReportsInstallsFailedResponse(Response response, Object entity) {
+    public GetAdminReportsInstallsFailedResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetAdminReportsInstallsFailedResponse(Response response) {
+    public GetAdminReportsInstallsFailedResponse(Response response) {
       super(response);
+    }
+
+    public GetAdminReportsInstallsFailedResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetAdminReportsInstallsFailedResponse respond200WithApplicationJson(
@@ -191,12 +207,16 @@ public interface AdminReports {
   }
 
   class GetAdminReportsObjectStoreListAllResponse extends ResponseDelegate {
-    private GetAdminReportsObjectStoreListAllResponse(Response response, Object entity) {
+    public GetAdminReportsObjectStoreListAllResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetAdminReportsObjectStoreListAllResponse(Response response) {
+    public GetAdminReportsObjectStoreListAllResponse(Response response) {
       super(response);
+    }
+
+    public GetAdminReportsObjectStoreListAllResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetAdminReportsObjectStoreListAllResponse respond200WithTextPlain(Object entity) {

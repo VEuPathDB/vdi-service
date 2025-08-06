@@ -33,9 +33,13 @@ public enum ErrorType {
   @JsonProperty("server-error")
   SERVERERROR("server-error");
 
-  private String name;
+  public final String value;
+
+  public String getValue() {
+    return this.value;
+  }
 
   ErrorType(String name) {
-    this.name = name;
+    this.value = name;
   }
 }

@@ -13,25 +13,7 @@ get:
         Optional parameter that may be used to filter the results of this
         endpoint to only those that are allowed to be used with the target
         project.
-
-        Valid values (non-case-sensitive):
-
-        - AmoebaDB
-        - ClinEpiDB
-        - CryptoDB
-        - FungiDB
-        - GiardiaDB
-        - HostDB
-        - MicrobiomeDB
-        - MicrosporidiaDB
-        - PiroplasmaDB
-        - PlasmoDB
-        - ToxoDB
-        - TrichDB
-        - TriTrypDB
-        - VectorBase
-        - VEuPathDB
-      type: string
+      type: lib.InstallTargetID
       required: false
   responses:
     200:

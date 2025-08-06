@@ -28,7 +28,7 @@ public class DatasetPublicationImpl implements DatasetPublication {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  private boolean isPrimary;
+  private Boolean isPrimary;
 
   @JsonProperty(JsonField.IDENTIFIER)
   public String getIdentifier() {
@@ -70,7 +70,7 @@ public class DatasetPublicationImpl implements DatasetPublication {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  public boolean getIsPrimary() {
+  public Boolean getIsPrimary() {
     return this.isPrimary;
   }
 
@@ -78,7 +78,7 @@ public class DatasetPublicationImpl implements DatasetPublication {
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
   )
-  public void setIsPrimary(boolean isPrimary) {
+  public void setIsPrimary(Boolean isPrimary) {
     this.isPrimary = isPrimary;
   }
 }

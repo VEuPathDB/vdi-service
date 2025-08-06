@@ -14,18 +14,17 @@ types:
       action:
         # language=markdown
         description: |
-          What action to take with the dataset share offer.
+          Action to take with the dataset share offer.
 
           Either `grant` or `revoke`.
 
-          A value of `grant` means the share should be offered to the user
-          if they do not already have the dataset, or continue to be
-          allowed if they already have access to the dataset.
+          A value of `grant` means the share should be offered to the user if
+          they do not already have the dataset, or continue to be allowed if
+          they already have access to the dataset.
 
           A value of `revoke` means the share should not be offered to the
-          target user if they do not already have the dataset, or the
-          sharing should be stopped if the user did already have access to
-          the dataset.
+          target user if they do not already have the dataset, or the sharing
+          should be stopped if the user did already have access to the dataset.
         type: common.ShareOfferAction
 
   DatasetShareReceipt:
@@ -38,13 +37,13 @@ types:
       action:
         # language=markdown
         description: |
-          What action to take with acknowledging a dataset share offer.
+          Action to take with acknowledging a dataset share offer.
 
           Either `accept` or `reject`.
 
-          A value of `accept` means that the dataset that a share was
-          offered for should become available to the accepting user.
+          A value of `accept` means that the dataset that a share was offered
+          for should become available to the accepting user.
 
-          A value of `reject` means that the dataset that a share was
-          offered for should become unavailable to the rejecting user.
+          A value of `reject` means that the dataset that a share was offered
+          for should become unavailable to the rejecting user.
         type: common.ShareReceiptAction

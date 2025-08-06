@@ -21,9 +21,13 @@ public enum DatasetInstallStatus {
   @JsonProperty("missing-dependency")
   MISSINGDEPENDENCY("missing-dependency");
 
-  private String name;
+  public final String value;
+
+  public String getValue() {
+    return this.value;
+  }
 
   DatasetInstallStatus(String name) {
-    this.name = name;
+    this.value = name;
   }
 }

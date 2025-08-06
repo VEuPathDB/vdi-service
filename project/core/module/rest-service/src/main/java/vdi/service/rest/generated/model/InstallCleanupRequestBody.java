@@ -12,13 +12,13 @@ public interface InstallCleanupRequestBody {
       value = JsonField.ALL,
       defaultValue = "false"
   )
-  boolean getAll();
+  Boolean getAll();
 
   @JsonProperty(
       value = JsonField.ALL,
       defaultValue = "false"
   )
-  void setAll(boolean all);
+  void setAll(Boolean all);
 
   @JsonProperty(JsonField.TARGETS)
   List<InstallCleanupTarget> getTargets();

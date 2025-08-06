@@ -50,10 +50,14 @@ public interface JSONPatchAction {
     @JsonProperty("test")
     TEST("test");
 
-    private String name;
+    public final String value;
+
+    public String getValue() {
+      return this.value;
+    }
 
     OpType(String name) {
-      this.name = name;
+      this.value = name;
     }
   }
 }

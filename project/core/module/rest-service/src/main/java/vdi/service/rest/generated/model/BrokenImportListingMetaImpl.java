@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class BrokenImportListingMetaImpl implements BrokenImportListingMeta {
   @JsonProperty(JsonField.COUNT)
-  private int count;
+  private Integer count;
 
   @JsonProperty(JsonField.BEFORE)
   private String before;
@@ -24,21 +24,21 @@ public class BrokenImportListingMetaImpl implements BrokenImportListingMeta {
   private String after;
 
   @JsonProperty(JsonField.USER)
-  private long user;
+  private Long user;
 
   @JsonProperty(JsonField.LIMIT)
-  private int limit;
+  private Integer limit;
 
   @JsonProperty(JsonField.OFFSET)
-  private int offset;
+  private Integer offset;
 
   @JsonProperty(JsonField.COUNT)
-  public int getCount() {
+  public Integer getCount() {
     return this.count;
   }
 
   @JsonProperty(JsonField.COUNT)
-  public void setCount(int count) {
+  public void setCount(Integer count) {
     this.count = count;
   }
 
@@ -63,32 +63,32 @@ public class BrokenImportListingMetaImpl implements BrokenImportListingMeta {
   }
 
   @JsonProperty(JsonField.USER)
-  public long getUser() {
+  public Long getUser() {
     return this.user;
   }
 
   @JsonProperty(JsonField.USER)
-  public void setUser(long user) {
+  public void setUser(Long user) {
     this.user = user;
   }
 
   @JsonProperty(JsonField.LIMIT)
-  public int getLimit() {
+  public Integer getLimit() {
     return this.limit;
   }
 
   @JsonProperty(JsonField.LIMIT)
-  public void setLimit(int limit) {
+  public void setLimit(Integer limit) {
     this.limit = limit;
   }
 
   @JsonProperty(JsonField.OFFSET)
-  public int getOffset() {
+  public Integer getOffset() {
     return this.offset;
   }
 
   @JsonProperty(JsonField.OFFSET)
-  public void setOffset(int offset) {
+  public void setOffset(Integer offset) {
     this.offset = offset;
   }
 }

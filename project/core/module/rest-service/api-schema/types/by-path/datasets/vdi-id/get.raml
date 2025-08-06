@@ -7,8 +7,7 @@ types:
 
   DatasetDetails:
     displayName: Dataset Details
-    description: |
-      Details about a specific singular dataset.
+    description: Details about a specific singular dataset.
     type: common.DatasetMetaBase
     additionalProperties: false
     properties:
@@ -22,12 +21,14 @@ types:
       revisionHistory?: common.RevisionHistory
 
       importMessages?:
+        # language=markdown
         description: |
           Log lines from the import process.
 
           These messages will be warnings and/or validation errors.
         type: string[]
       shares?:
+        # language=markdown
         description: |
           Array of share offers that have been created by the owner of this
           dataset to share it with other users.

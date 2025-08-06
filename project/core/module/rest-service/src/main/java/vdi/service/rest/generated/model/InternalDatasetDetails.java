@@ -2,7 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonDeserialize(
@@ -16,16 +16,16 @@ public interface InternalDatasetDetails {
   void setDatasetType(DatasetTypeOutput datasetType);
 
   @JsonProperty(JsonField.OWNER)
-  long getOwner();
+  Long getOwner();
 
   @JsonProperty(JsonField.OWNER)
-  void setOwner(long owner);
+  void setOwner(Long owner);
 
   @JsonProperty(JsonField.IS_DELETED)
-  boolean getIsDeleted();
+  Boolean getIsDeleted();
 
   @JsonProperty(JsonField.IS_DELETED)
-  void setIsDeleted(boolean isDeleted);
+  void setIsDeleted(Boolean isDeleted);
 
   @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
@@ -34,16 +34,16 @@ public interface InternalDatasetDetails {
   void setOrigin(String origin);
 
   @JsonProperty(JsonField.CREATED)
-  Date getCreated();
+  OffsetDateTime getCreated();
 
   @JsonProperty(JsonField.CREATED)
-  void setCreated(Date created);
+  void setCreated(OffsetDateTime created);
 
   @JsonProperty(JsonField.INSERTED)
-  Date getInserted();
+  OffsetDateTime getInserted();
 
   @JsonProperty(JsonField.INSERTED)
-  void setInserted(Date inserted);
+  void setInserted(OffsetDateTime inserted);
 
   @JsonProperty(JsonField.NAME)
   String getName();

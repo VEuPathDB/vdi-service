@@ -14,7 +14,7 @@ public class RelatedStudyImpl implements RelatedStudy {
   private String studyUri;
 
   @JsonProperty(JsonField.SHARES_RECORDS)
-  private boolean sharesRecords;
+  private Boolean sharesRecords;
 
   @JsonProperty(JsonField.STUDY_URI)
   public String getStudyUri() {
@@ -27,12 +27,12 @@ public class RelatedStudyImpl implements RelatedStudy {
   }
 
   @JsonProperty(JsonField.SHARES_RECORDS)
-  public boolean getSharesRecords() {
+  public Boolean getSharesRecords() {
     return this.sharesRecords;
   }
 
   @JsonProperty(JsonField.SHARES_RECORDS)
-  public void setSharesRecords(boolean sharesRecords) {
+  public void setSharesRecords(Boolean sharesRecords) {
     this.sharesRecords = sharesRecords;
   }
 }

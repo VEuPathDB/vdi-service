@@ -8,14 +8,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 )
 public interface UserQuotaDetails {
   @JsonProperty(JsonField.LIMIT)
-  long getLimit();
+  Long getLimit();
 
   @JsonProperty(JsonField.LIMIT)
-  void setLimit(long limit);
+  void setLimit(Long limit);
 
   @JsonProperty(JsonField.USAGE)
-  long getUsage();
+  Long getUsage();
 
   @JsonProperty(JsonField.USAGE)
-  void setUsage(long usage);
+  void setUsage(Long usage);
 }

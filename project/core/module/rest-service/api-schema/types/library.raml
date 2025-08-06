@@ -197,8 +197,7 @@ types:
     type: string
   DatasetDetails:
     displayName: Dataset Details
-    description: |
-      Details about a specific singular dataset.
+    description: Details about a specific singular dataset.
     type: DatasetMetaBase
     additionalProperties: false
     properties:
@@ -210,12 +209,14 @@ types:
       sourceUrl?: DatasetSourceUrl
       revisionHistory?: RevisionHistory
       importMessages?:
+        # language=markdown
         description: |
           Log lines from the import process.
 
           These messages will be warnings and/or validation errors.
         type: string[]
       shares?:
+        # language=markdown
         description: |
           Array of share offers that have been created by the owner of this
           dataset to share it with other users.
@@ -311,7 +312,7 @@ types:
     properties:
       datasetId: VdiId
       owner: DatasetOwner
-      datasetType: DatasetTypeOutput
+      type: DatasetTypeOutput
       visibility: DatasetVisibility
       name: DatasetName
       origin: DatasetOrigin
@@ -327,8 +328,7 @@ types:
         description: Number of files uploaded for this dataset.
         type: integer
       fileSizeTotal:
-        description: |
-          Sum of the sizes of all the files uploaded for this dataset.
+        description: Sum of the sizes of all the files uploaded for this dataset.
         type: integer
         format: int64
       created: DatasetCreationDate
@@ -435,7 +435,7 @@ types:
       organization?: string
   DatasetPatchRequestBody:
     displayName: Dataset Patch Request
-    description: |
+    description: |-
       Request to update the metadata for a dataset.
 
       Fields that are omitted will be ignored when updating the target dataset
@@ -444,15 +444,15 @@ types:
       Fields that may be modified by `PATCH` operations (in JSON Pointer
       notation):
 
-      * /contacts
-      * /description
-      * /externalIdentifiers
-      * /funding
-      * /name
-      * /publications
-      * /studyCharacteristics
-      * /summary
-      * /visibility
+      * `/contacts`
+      * `/description`
+      * `/externalIdentifiers`
+      * `/funding`
+      * `/name`
+      * `/publications`
+      * `/studyCharacteristics`
+      * `/summary`
+      * `/visibility`
     type: JSONPatchAction[]
   DatasetPostMeta:
     type: DatasetMetaBase
@@ -482,13 +482,13 @@ types:
         description: Metadata about the dataset being submitted.
         type: DatasetPostMeta
       dataFiles?:
-        description: |
+        description: |-
           Dataset files to upload.
 
           This field is incompatible with the `url` field.
         type: file[]
       url?:
-        description: |
+        description: |-
           URL to a dataset file to upload.
 
           This field is incompatible with the `file` field.
@@ -500,7 +500,7 @@ types:
         type: file[]
   DatasetPostResponseBody:
     displayName: Dataset Post Response
-    description: |
+    description: |-
       Successful upload response.
 
       This response does not mean the uploaded dataset has been made available
@@ -592,13 +592,13 @@ types:
         description: Metadata about the dataset being submitted.
         type: DatasetPutMetadata
       dataFiles?:
-        description: |
+        description: |-
           Dataset files to upload.
 
           This field is incompatible with the `url` field.
         type: file[]
       url?:
-        description: |
+        description: |-
           URL to a dataset file to upload.
 
           This field is incompatible with the `file` field.
@@ -647,18 +647,17 @@ types:
     properties:
       action:
         description: |
-          What action to take with the dataset share offer.
+          Action to take with the dataset share offer.
 
           Either `grant` or `revoke`.
 
-          A value of `grant` means the share should be offered to the user
-          if they do not already have the dataset, or continue to be
-          allowed if they already have access to the dataset.
+          A value of `grant` means the share should be offered to the user if
+          they do not already have the dataset, or continue to be allowed if
+          they already have access to the dataset.
 
           A value of `revoke` means the share should not be offered to the
-          target user if they do not already have the dataset, or the
-          sharing should be stopped if the user did already have access to
-          the dataset.
+          target user if they do not already have the dataset, or the sharing
+          should be stopped if the user did already have access to the dataset.
         type: ShareOfferAction
   DatasetShareReceipt:
     displayName: Dataset Share Receipt
@@ -669,15 +668,15 @@ types:
     properties:
       action:
         description: |
-          What action to take with acknowledging a dataset share offer.
+          Action to take with acknowledging a dataset share offer.
 
           Either `accept` or `reject`.
 
-          A value of `accept` means that the dataset that a share was
-          offered for should become available to the accepting user.
+          A value of `accept` means that the dataset that a share was offered
+          for should become available to the accepting user.
 
-          A value of `reject` means that the dataset that a share was
-          offered for should become unavailable to the rejecting user.
+          A value of `reject` means that the dataset that a share was offered
+          for should become unavailable to the rejecting user.
         type: ShareReceiptAction
   DatasetSourceUrl:
     description: |
@@ -938,7 +937,7 @@ types:
       typeName: string
       typeVersion: string
       installTargets?:
-        description: |
+        description: |-
           Projects that this plugin is restricted to.  An empty or absent list
           indicates that the plugin has no project restrictions and may be used
           on any site.

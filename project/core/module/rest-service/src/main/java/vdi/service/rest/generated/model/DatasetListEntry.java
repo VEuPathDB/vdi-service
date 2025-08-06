@@ -2,7 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonDeserialize(
@@ -21,11 +21,11 @@ public interface DatasetListEntry {
   @JsonProperty(JsonField.OWNER)
   void setOwner(DatasetOwner owner);
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  DatasetTypeOutput getDatasetType();
+  @JsonProperty(JsonField.TYPE)
+  DatasetTypeOutput getType();
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  void setDatasetType(DatasetTypeOutput datasetType);
+  @JsonProperty(JsonField.TYPE)
+  void setType(DatasetTypeOutput type);
 
   @JsonProperty(JsonField.VISIBILITY)
   DatasetVisibility getVisibility();
@@ -64,22 +64,22 @@ public interface DatasetListEntry {
   void setShares(List<DatasetListShareUser> shares);
 
   @JsonProperty(JsonField.FILE_COUNT)
-  int getFileCount();
+  Integer getFileCount();
 
   @JsonProperty(JsonField.FILE_COUNT)
-  void setFileCount(int fileCount);
+  void setFileCount(Integer fileCount);
 
   @JsonProperty(JsonField.FILE_SIZE_TOTAL)
-  long getFileSizeTotal();
+  Long getFileSizeTotal();
 
   @JsonProperty(JsonField.FILE_SIZE_TOTAL)
-  void setFileSizeTotal(long fileSizeTotal);
+  void setFileSizeTotal(Long fileSizeTotal);
 
   @JsonProperty(JsonField.CREATED)
-  Date getCreated();
+  OffsetDateTime getCreated();
 
   @JsonProperty(JsonField.CREATED)
-  void setCreated(Date created);
+  void setCreated(OffsetDateTime created);
 
   @JsonProperty(JsonField.SUMMARY)
   String getSummary();

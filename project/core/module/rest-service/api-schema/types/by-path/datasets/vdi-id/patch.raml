@@ -6,7 +6,8 @@ uses:
 types:
   DatasetPatchRequestBody:
     displayName: Dataset Patch Request
-    description: |
+    # language=markdown
+    description: |-
       Request to update the metadata for a dataset.
 
       Fields that are omitted will be ignored when updating the target dataset
@@ -15,13 +16,13 @@ types:
       Fields that may be modified by `PATCH` operations (in JSON Pointer
       notation):
       
-      * /contacts
-      * /description
-      * /externalIdentifiers
-      * /funding
-      * /name
-      * /publications
-      * /studyCharacteristics
-      * /summary
-      * /visibility
+      * `/contacts`
+      * `/description`
+      * `/externalIdentifiers`
+      * `/funding`
+      * `/name`
+      * `/publications`
+      * `/studyCharacteristics`
+      * `/summary`
+      * `/visibility`
     type: JSONPatchAction[]

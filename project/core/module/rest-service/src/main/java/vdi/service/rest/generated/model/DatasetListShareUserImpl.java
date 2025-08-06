@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class DatasetListShareUserImpl implements DatasetListShareUser {
   @JsonProperty(JsonField.USER_ID)
-  private long userId;
+  private Long userId;
 
   @JsonProperty(JsonField.FIRST_NAME)
   private String firstName;
@@ -26,15 +26,15 @@ public class DatasetListShareUserImpl implements DatasetListShareUser {
   private String organization;
 
   @JsonProperty(JsonField.ACCEPTED)
-  private boolean accepted;
+  private Boolean accepted;
 
   @JsonProperty(JsonField.USER_ID)
-  public long getUserId() {
+  public Long getUserId() {
     return this.userId;
   }
 
   @JsonProperty(JsonField.USER_ID)
-  public void setUserId(long userId) {
+  public void setUserId(Long userId) {
     this.userId = userId;
   }
 
@@ -69,12 +69,12 @@ public class DatasetListShareUserImpl implements DatasetListShareUser {
   }
 
   @JsonProperty(JsonField.ACCEPTED)
-  public boolean getAccepted() {
+  public Boolean getAccepted() {
     return this.accepted;
   }
 
   @JsonProperty(JsonField.ACCEPTED)
-  public void setAccepted(boolean accepted) {
+  public void setAccepted(Boolean accepted) {
     this.accepted = accepted;
   }
 }

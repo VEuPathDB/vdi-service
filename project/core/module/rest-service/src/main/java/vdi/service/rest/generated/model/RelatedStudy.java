@@ -14,8 +14,8 @@ public interface RelatedStudy {
   void setStudyUri(String studyUri);
 
   @JsonProperty(JsonField.SHARES_RECORDS)
-  boolean getSharesRecords();
+  Boolean getSharesRecords();
 
   @JsonProperty(JsonField.SHARES_RECORDS)
-  void setSharesRecords(boolean sharesRecords);
+  void setSharesRecords(Boolean sharesRecords);
 }

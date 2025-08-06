@@ -22,7 +22,7 @@ types:
     properties:
       datasetId: common.VdiId
       owner: common.DatasetOwner
-      datasetType: common.DatasetTypeOutput
+      type: common.DatasetTypeOutput
       visibility: common.DatasetVisibility
       name: common.DatasetName
       origin: common.DatasetOrigin
@@ -38,7 +38,7 @@ types:
         description: Number of files uploaded for this dataset.
         type: integer
       fileSizeTotal:
-        description: |
+        description: |-
           Sum of the sizes of all the files uploaded for this dataset.
         type: integer
         format: int64

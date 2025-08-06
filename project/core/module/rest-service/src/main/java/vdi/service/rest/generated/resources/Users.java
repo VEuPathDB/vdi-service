@@ -1,18 +1,19 @@
 package vdi.service.rest.generated.resources;
 
 import java.util.List;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.GenericEntity;
+import jakarta.ws.rs.core.Response;
 import vdi.service.rest.generated.model.BadRequestError;
 import vdi.service.rest.generated.model.ServerError;
 import vdi.service.rest.generated.model.ShareOfferEntry;
 import vdi.service.rest.generated.model.UnauthorizedError;
 import vdi.service.rest.generated.model.UserMetadata;
+import vdi.service.rest.generated.model.UsersSelfShareOffersGetStatus;
 import vdi.service.rest.generated.support.ResponseDelegate;
 
 @Path("/users")
@@ -32,15 +33,19 @@ public interface Users {
   @Path("/self/share-offers")
   @Produces("application/json")
   GetUsersSelfShareOffersResponse getUsersSelfShareOffers(
-      @QueryParam("status") @DefaultValue("open") String status);
+      @QueryParam("status") @DefaultValue("open") UsersSelfShareOffersGetStatus status);
 
   class GetUsersSelfMetaResponse extends ResponseDelegate {
-    private GetUsersSelfMetaResponse(Response response, Object entity) {
+    public GetUsersSelfMetaResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetUsersSelfMetaResponse(Response response) {
+    public GetUsersSelfMetaResponse(Response response) {
       super(response);
+    }
+
+    public GetUsersSelfMetaResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetUsersSelfMetaResponse respond200WithApplicationJson(UserMetadata entity) {
@@ -63,12 +68,16 @@ public interface Users {
   }
 
   class GetUsersSelfShareOffersResponse extends ResponseDelegate {
-    private GetUsersSelfShareOffersResponse(Response response, Object entity) {
+    public GetUsersSelfShareOffersResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    private GetUsersSelfShareOffersResponse(Response response) {
+    public GetUsersSelfShareOffersResponse(Response response) {
       super(response);
+    }
+
+    public GetUsersSelfShareOffersResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
     }
 
     public static GetUsersSelfShareOffersResponse respond200WithApplicationJson(

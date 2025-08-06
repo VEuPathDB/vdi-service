@@ -2,7 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum ShareOfferStatus {
+public enum UsersSelfShareOffersGetStatus {
   @JsonProperty("open")
   OPEN("open"),
 
@@ -10,7 +10,10 @@ public enum ShareOfferStatus {
   ACCEPTED("accepted"),
 
   @JsonProperty("rejected")
-  REJECTED("rejected");
+  REJECTED("rejected"),
+
+  @JsonProperty("all")
+  ALL("all");
 
   public final String value;
 
@@ -18,7 +21,7 @@ public enum ShareOfferStatus {
     return this.value;
   }
 
-  ShareOfferStatus(String name) {
+  UsersSelfShareOffersGetStatus(String name) {
     this.value = name;
   }
 }

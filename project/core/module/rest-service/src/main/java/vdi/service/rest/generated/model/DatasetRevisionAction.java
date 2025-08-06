@@ -6,9 +6,13 @@ public enum DatasetRevisionAction {
   @JsonProperty("revise")
   REVISE("revise");
 
-  private String name;
+  public final String value;
+
+  public String getValue() {
+    return this.value;
+  }
 
   DatasetRevisionAction(String name) {
-    this.name = name;
+    this.value = name;
   }
 }
