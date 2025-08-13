@@ -10,28 +10,28 @@ data class StudyCharacteristics(
   val studyType: String? = null,
 
   @field:JsonProperty(Countries)
-  val countries: Set<String> = emptySet(),
+  val countries: List<String> = emptyList(),
 
   @field:JsonProperty(Years)
   val years: SampleYearRange? = null,
 
   @field:JsonProperty(StudySpecies)
-  val studySpecies: Set<String> = emptySet(),
+  val studySpecies: List<String> = emptyList(),
 
   /**
    * Diseases or health conditions.
    */
   @field:JsonProperty(Diseases)
-  val diseases: Set<String> = emptySet(),
+  val diseases: List<String> = emptyList(),
 
   @field:JsonProperty(AssociatedFactors)
-  val associatedFactors: Set<String> = emptySet(),
+  val associatedFactors: List<String> = emptyList(),
 
   @field:JsonProperty(ParticipantAges)
   val participantAges: String? = null,
 
   @field:JsonProperty(SampleTypes)
-  val sampleTypes: Set<String> = emptySet(),
+  val sampleTypes: List<String> = emptyList(),
 ) {
   companion object JsonKey {
     const val AssociatedFactors = "associatedFactors"

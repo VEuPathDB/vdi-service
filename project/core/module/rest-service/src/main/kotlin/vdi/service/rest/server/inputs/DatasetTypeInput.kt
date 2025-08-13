@@ -12,9 +12,9 @@ import vdi.core.plugin.registry.PluginRegistry
 import vdi.service.rest.generated.model.DatasetTypeInput
 import vdi.service.rest.generated.model.JsonField
 
-fun DatasetTypeInput.cleanup() {
-  name = name.cleanupString()
-  version = version.cleanupString()
+fun DatasetTypeInput?.cleanup() = this?.apply {
+  cleanupString(::getName)
+  cleanupString(::getVersion)
 }
 
 fun DatasetTypeInput?.validate(jPath: String, projects: Iterable<InstallTargetID>, errors: ValidationErrors) =

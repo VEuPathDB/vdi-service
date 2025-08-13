@@ -29,7 +29,7 @@ internal fun DatasetPostMeta.cleanup() {
 
 internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
   type.validate(JF.META..JF.DATASET_TYPE, installTargets, errors)
-  (this as DatasetMetaBase).validate(errors)
+  (this as DatasetMetaBase).validate(visibility == DatasetVisibility.PUBLIC, errors)
 }
 
 internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
@@ -44,15 +44,15 @@ internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
     origin = origin,
     created = OffsetDateTime.now(ZoneOffset.UTC),
     sourceURL = url?.let(URI::create),
-    dependencies = dependencies.map(DatasetDependency::toInternal),
-    publications = publications.map(DatasetPublication::toInternal),
-    contacts = contacts.map(DatasetContact::toInternal),
+    dependencies = dependencies.toInternalDistinct(DatasetDependency::toInternal),
+    publications = publications.toInternalDistinct(DatasetPublication::toInternal),
+    contacts = contacts.toInternalDistinct(DatasetContact::toInternal),
     projectName = projectName,
     programName = programName,
-    relatedStudies = relatedStudies.map(RelatedStudy::toInternal),
+    relatedStudies = relatedStudies.toInternalDistinct(RelatedStudy::toInternal),
     experimentalOrganism = experimentalOrganism.toInternal(),
     hostOrganism = hostOrganism.toInternal(),
     studyCharacteristics = studyCharacteristics.toInternal(),
     externalIdentifiers = externalIdentifiers.toInternal(),
-    funding = funding.toInternal(),
+    funding = funding.toInternalDistinct(DatasetFundingAward::toInternal),
   )

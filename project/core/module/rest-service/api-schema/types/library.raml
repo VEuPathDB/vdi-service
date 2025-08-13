@@ -122,7 +122,9 @@ types:
     type: object
     additionalProperties: false
     properties:
-      doi: string
+      doi:
+        type: string
+        pattern: '^(?:doi:)?\d+(\.\d+)+/.+$'
       description?: string
   DatasetContact:
     displayName: Dataset Contact
@@ -156,10 +158,12 @@ types:
         displayName: Organization
         description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
         type: string
+        minLength: 3
         maxLength: 4000
       country?:
         description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
         type: string
+        minLength: 3
         maxLength: 200
       city?:
         type: string
@@ -957,13 +961,13 @@ types:
       start:
         type: integer
         format: int16
-        minimum: 1000
-        maximum: 9999
+        minimum: 1500
+        maximum: 2500
       end:
         type: integer
         format: int16
-        minimum: 1000
-        maximum: 9999
+        minimum: 1500
+        maximum: 2500
   ServerError:
     displayName: Internal Server Error
     type: Error
@@ -1051,6 +1055,20 @@ types:
         type: string[]
         uniqueItems: true
       years?: SampleYearRange
+      studySpecies?:
+        type: string[]
+        uniqueItems: true
+      diseases?:
+        description: Diseases or health conditions
+        type: string[]
+        uniqueItems: true
+      associatedFactors?:
+        type: string[]
+        uniqueItems: true
+      participantAges?: string
+      sampleTypes?:
+        type: string[]
+        uniqueItems: true
   SyncControlRecord:
     type: object
     additionalProperties: false

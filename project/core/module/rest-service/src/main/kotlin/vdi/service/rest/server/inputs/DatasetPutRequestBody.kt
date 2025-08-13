@@ -5,7 +5,7 @@ import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.reqCheckLength
 import vdi.model.data.InstallTargetID
-import vdi.service.rest.generated.model.DatasetPatchRequestBody
+import vdi.service.rest.generated.model.Dataset
 import vdi.service.rest.generated.model.DatasetPutMetadata
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.model.JsonField

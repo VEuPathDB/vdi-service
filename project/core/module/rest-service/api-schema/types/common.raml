@@ -8,7 +8,10 @@ types:
     type: object
     additionalProperties: false
     properties:
-      id: string
+      id:
+        type: string
+        minLength: 4
+        maxLength: 64
       description?: string
 
   DatasetContact:
@@ -73,12 +76,15 @@ types:
         maxLength: 200
       city?:
         type: string
+        minLength: 3
         maxLength: 200
       state?:
         type: string
+        minLength: 3
         maxLength: 200
       address?:
         type: string
+        minLength: 5
         maxLength: 1000
 
   DatasetCreationDate:
@@ -389,7 +395,10 @@ types:
     type: object
     additionalProperties: false
     properties:
-      doi: string
+      doi:
+        type: string
+        minLength: 6
+        maxLength: 128
       description?: string
 
   ExternalIdentifiers:
@@ -493,13 +502,13 @@ types:
       start:
         type: integer
         format: int16
-        minimum: 1000
-        maximum: 9999
+        minimum: 1500
+        maximum: 2500
       end:
         type: integer
         format: int16
-        minimum: 1000
-        maximum: 9999
+        minimum: 1500
+        maximum: 2500
 
   ShareOfferAction:
     type: string
@@ -524,9 +533,46 @@ types:
         description: Required for ClinEpi
         type: string
       countries?:
-        type: string[]
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
         uniqueItems: true
       years?: SampleYearRange
+      studySpecies?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      diseases?:
+        description: Diseases or health conditions
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      associatedFactors?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      participantAges?:
+        type: string
+        minLength: 1
+        maxLength: 128
+      sampleTypes?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
 
   UserId:
     description: VEuPathDB User ID

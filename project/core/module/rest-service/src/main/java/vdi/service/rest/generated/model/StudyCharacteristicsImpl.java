@@ -10,7 +10,12 @@ import java.util.List;
     "studyDesign",
     "studyType",
     "countries",
-    "years"
+    "years",
+    "studySpecies",
+    "diseases",
+    "associatedFactors",
+    "participantAges",
+    "sampleTypes"
 })
 public class StudyCharacteristicsImpl implements StudyCharacteristics {
   @JsonProperty(JsonField.STUDY_DESIGN)
@@ -24,6 +29,21 @@ public class StudyCharacteristicsImpl implements StudyCharacteristics {
 
   @JsonProperty(JsonField.YEARS)
   private SampleYearRange years;
+
+  @JsonProperty(JsonField.STUDY_SPECIES)
+  private List<String> studySpecies;
+
+  @JsonProperty(JsonField.DISEASES)
+  private List<String> diseases;
+
+  @JsonProperty(JsonField.ASSOCIATED_FACTORS)
+  private List<String> associatedFactors;
+
+  @JsonProperty(JsonField.PARTICIPANT_AGES)
+  private String participantAges;
+
+  @JsonProperty(JsonField.SAMPLE_TYPES)
+  private List<String> sampleTypes;
 
   @JsonProperty(JsonField.STUDY_DESIGN)
   public String getStudyDesign() {
@@ -63,5 +83,55 @@ public class StudyCharacteristicsImpl implements StudyCharacteristics {
   @JsonProperty(JsonField.YEARS)
   public void setYears(SampleYearRange years) {
     this.years = years;
+  }
+
+  @JsonProperty(JsonField.STUDY_SPECIES)
+  public List<String> getStudySpecies() {
+    return this.studySpecies;
+  }
+
+  @JsonProperty(JsonField.STUDY_SPECIES)
+  public void setStudySpecies(List<String> studySpecies) {
+    this.studySpecies = studySpecies;
+  }
+
+  @JsonProperty(JsonField.DISEASES)
+  public List<String> getDiseases() {
+    return this.diseases;
+  }
+
+  @JsonProperty(JsonField.DISEASES)
+  public void setDiseases(List<String> diseases) {
+    this.diseases = diseases;
+  }
+
+  @JsonProperty(JsonField.ASSOCIATED_FACTORS)
+  public List<String> getAssociatedFactors() {
+    return this.associatedFactors;
+  }
+
+  @JsonProperty(JsonField.ASSOCIATED_FACTORS)
+  public void setAssociatedFactors(List<String> associatedFactors) {
+    this.associatedFactors = associatedFactors;
+  }
+
+  @JsonProperty(JsonField.PARTICIPANT_AGES)
+  public String getParticipantAges() {
+    return this.participantAges;
+  }
+
+  @JsonProperty(JsonField.PARTICIPANT_AGES)
+  public void setParticipantAges(String participantAges) {
+    this.participantAges = participantAges;
+  }
+
+  @JsonProperty(JsonField.SAMPLE_TYPES)
+  public List<String> getSampleTypes() {
+    return this.sampleTypes;
+  }
+
+  @JsonProperty(JsonField.SAMPLE_TYPES)
+  public void setSampleTypes(List<String> sampleTypes) {
+    this.sampleTypes = sampleTypes;
   }
 }

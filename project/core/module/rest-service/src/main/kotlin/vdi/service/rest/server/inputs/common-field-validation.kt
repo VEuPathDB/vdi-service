@@ -10,22 +10,18 @@ import vdi.core.install.InstallTargetRegistry
  * │                                                                        │ *
 \* └────────────────────────────────────────────────────────────────────────┘ */
 
-private const val NameMinLength = 3
-private const val NameMaxLength = 1024
+private val NameLengthRange = 3..1024
 fun String?.validateName(jPath: String, errors: ValidationErrors) =
-  reqCheckLength(jPath, NameMinLength, NameMaxLength, errors)
+  reqCheckLength(jPath, NameLengthRange, errors)
 
-
-private const val SummaryMinLength = 3
-private const val SummaryMaxLength = 4000 // max size for varchar in oracle
+private val SummaryLengthRange = 3..4000 // max size for varchar in oracle
 fun String?.validateSummary(jPath: String, errors: ValidationErrors) =
-  reqCheckLength(jPath, SummaryMinLength, SummaryMaxLength, errors)
+  reqCheckLength(jPath, SummaryLengthRange, errors)
 
 
-private const val OriginMinLength = 3
-private const val OriginMaxLength = 256
+private val OriginLengthRange = 3..256
 fun String?.validateOrigin(jPath: String, errors: ValidationErrors) =
-  reqCheckLength(jPath, OriginMinLength, OriginMaxLength, errors)
+  reqCheckLength(jPath, OriginLengthRange, errors)
 
 
 /* ┌────────────────────────────────────────────────────────────────────────┐ *\
@@ -33,6 +29,10 @@ fun String?.validateOrigin(jPath: String, errors: ValidationErrors) =
  * │   Scalar Collection Type Validations                                   │ *
  * │                                                                        │ *
 \* └────────────────────────────────────────────────────────────────────────┘ */
+
+fun Collection<String?>.reqEntriesCheckLength(jPath: String, length: IntRange, errors: ValidationErrors) {
+  this.forEachIndexed { i, s -> s.reqCheckLength(jPath, i, length.first, length.last, errors) }
+}
 
 fun Collection<String?>?.validateProjects(jPath: String, errors: ValidationErrors) {
   requireNonEmpty(jPath, errors) { forEachIndexed { i, p ->

@@ -8,6 +8,7 @@ public final class JsonField {
   public static final String AFTER = "after";
   public static final String AGENCY = "agency";
   public static final String ALL = "all";
+  public static final String ASSOCIATED_FACTORS = "associatedFactors";
   public static final String AWARD_NUMBER = "awardNumber";
   public static final String BEFORE = "before";
   public static final String BIOPROJECT_IDS = "bioprojectIds";
@@ -33,6 +34,7 @@ public final class JsonField {
   public static final String DEPENDENCY = "dependency";
   public static final String DESCRIPTION = "description";
   public static final String DETAILS = "details";
+  public static final String DISEASES = "diseases";
   public static final String DISPLAY_NAME = "displayName";
   public static final String DOC_FILES = "docFiles";
   public static final String DOCUMENTS = "documents";
@@ -87,6 +89,7 @@ public final class JsonField {
   public static final String ORIGIN = "origin";
   public static final String ORIGINAL_ID = "originalId";
   public static final String OWNER = "owner";
+  public static final String PARTICIPANT_AGES = "participantAges";
   public static final String PATCH = "patch";
   public static final String PATH = "path";
   public static final String PROGRAM_NAME = "programName";
@@ -104,6 +107,7 @@ public final class JsonField {
   public static final String REVISION_ID = "revisionId";
   public static final String REVISION_NOTE = "revisionNote";
   public static final String REVISIONS = "revisions";
+  public static final String SAMPLE_TYPES = "sampleTypes";
   public static final String SHARE_STATUS = "shareStatus";
   public static final String SHARES = "shares";
   public static final String SHARES_RECORDS = "sharesRecords";
@@ -116,6 +120,7 @@ public final class JsonField {
   public static final String STRAIN = "strain";
   public static final String STUDY_CHARACTERISTICS = "studyCharacteristics";
   public static final String STUDY_DESIGN = "studyDesign";
+  public static final String STUDY_SPECIES = "studySpecies";
   public static final String STUDY_TYPE = "studyType";
   public static final String STUDY_URI = "studyUri";
   public static final String SUMMARY = "summary";
