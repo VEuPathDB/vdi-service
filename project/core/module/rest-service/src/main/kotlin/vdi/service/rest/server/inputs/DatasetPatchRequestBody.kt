@@ -13,6 +13,8 @@ internal fun DatasetPatchRequestBody.cleanup() {
   type?.value?.cleanup()
   name?.apply { cleanupString(::getValue) }
   summary?.apply { cleanupString(::getValue) }
+  description?.apply { cleanupString(::getValue) }
+  publications?.apply { cleanupList(::getValue, DatasetPublication?::cleanup) }
 
 
   name = name.cleanupString()
