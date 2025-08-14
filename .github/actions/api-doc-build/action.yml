@@ -35,16 +35,9 @@ runs:
       GITHUB_USERNAME: ${{ inputs.gh-user }}
       GITHUB_TOKEN: ${{ inputs.gh-token }}
 
-  - name: Compile Dataset Characteristics Schema
-    shell: bash
-    run: gradle :schema:build-dataset-schema-resources
-    env:
-      GITHUB_USERNAME: ${{ inputs.gh-user }}
-      GITHUB_TOKEN: ${{ inputs.gh-token }}
-
   - name: Compile Service Config Schema
     shell: bash
-    run: gradle :schema:build-config-schema-resource
+    run: gradle :schema:compile-config-schema
     env:
       GITHUB_USERNAME: ${{ inputs.gh-user }}
       GITHUB_TOKEN: ${{ inputs.gh-token }}

@@ -15,18 +15,19 @@ internal fun DatasetPatchRequestBody.cleanup() {
   summary?.apply { cleanupString(::getValue) }
   description?.apply { cleanupString(::getValue) }
   publications?.apply { cleanupList(::getValue, DatasetPublication?::cleanup) }
+  contacts?.apply { cleanupList(::getValue, DatasetContact?::cleanup) }
+  projectName?.apply { cleanupString(::getValue) }
+  programName?.apply { cleanupString(::getValue) }
+  relatedStudies?.apply { cleanupList(::getValue, RelatedStudy?::cleanup) }
+  studyCharacteristics?.apply {
+    studyDesign?.apply { cleanupString(::getValue) }
+    studyType?.apply { cleanupString(::getValue) }
+    countries?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
+    years?.clea
+  }
 
 
-  name = name.cleanupString()
-  shortName = shortName.cleanupString()
-  shortAttribution = shortAttribution.cleanupString()
-  summary = summary.cleanupString()
-  description = description.cleanupString()
-  publications = publications?.cleanup(DatasetPublication::cleanup)
-  hyperlinks = hyperlinks?.cleanup(DatasetHyperlink::cleanup)
-  organisms = organisms
-    ?.ifEmpty { null }
-    ?.onEachIndexed { i, s -> organisms[i] = s.cleanupString() }
+
   contacts = contacts?.cleanup(DatasetContact::cleanup)
   datasetType?.cleanup()
 }

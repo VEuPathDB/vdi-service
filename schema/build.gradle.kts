@@ -153,12 +153,12 @@ tasks {
 
     doLast { json.writeValue(outputFile, buildMergedSchema(rootSchema)) }
   }
-}
 
-tasks.register("compile-config-schema") {
-  dependsOn(
-    ":compile-plugin-schema",
-    ":compile-core-schema",
-    ":compile-app-db-schema",
-  )
+  register("compile-config-schema") {
+    dependsOn(
+      ":compile-plugin-schema",
+      ":compile-core-schema",
+      ":compile-app-db-schema",
+    )
+  }
 }
