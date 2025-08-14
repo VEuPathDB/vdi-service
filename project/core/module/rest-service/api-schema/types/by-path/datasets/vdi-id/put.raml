@@ -6,12 +6,11 @@ uses:
 types:
   DatasetPutMetadata:
     displayName: Dataset Put Request Metadata
-    type: object
+    type: DatasetPatchRequestBody
     additionalProperties: false
     properties:
       origin: common.DatasetOrigin
       revisionNote: common.DatasetRevisionNote
-      patch: JSONPatchAction[]
 
   DatasetPutRequestBody:
     displayName: Dataset Put Request

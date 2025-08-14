@@ -12,17 +12,256 @@ types:
 
       Fields that are omitted will be ignored when updating the target dataset
       record.
-      
-      Fields that may be modified by `PATCH` operations (in JSON Pointer
-      notation):
-      
-      * `/contacts`
-      * `/description`
-      * `/externalIdentifiers`
-      * `/funding`
-      * `/name`
-      * `/publications`
-      * `/studyCharacteristics`
-      * `/summary`
-      * `/visibility`
-    type: JSONPatchAction[]
+    type: object
+    additionalProperties: false
+    properties:
+      datasetType?:
+        # language=markdown
+        description: |-
+          If present, the only valid action is `replace`.
+          
+          Only permitted when transitioning from a none-type dataset into an
+          actual dataset type.
+        type: PropertyPatch
+        properties:
+          value: common.DatasetTypeInput
+        additionalProperties: false
+
+      # installTargets: immutable
+
+      visibility?:
+        # language=markdown
+        description: If present, the only valid action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: common.DatasetVisibility
+        additionalProperties: false
+
+      # owner: immutable
+
+      name?:
+        # language=markdown
+        description: If present, the only valid action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: common.DatasetName
+        additionalProperties: false
+
+      summary?:
+        # language=markdown
+        description: If present, the only valid action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: common.DatasetSummary
+        additionalProperties: false
+
+      description?:
+        type: PropertyPatch
+        properties:
+          value: common.DatasetDescription
+        additionalProperties: false
+
+      # origin: immutable
+      # created: immutable
+      # sourceUrl: immutable
+      # dependencies: immutable
+
+      publications?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: common.DatasetPublication[]
+            uniqueItems: true
+        additionalProperties: false
+
+      contacts?:
+        # language=markdown
+        description: |-
+          If the dataset visibility is not `private`, the only valid action is
+          `replace`.
+        type: PropertyPatch
+        properties:
+          value:
+            type: common.DatasetContact[]
+            uniqueItems: true
+        additionalProperties: false
+
+      projectName?:
+        # language=markdown
+        description: |-
+          If the install targets array contains MicrobiomeDB or ClinEpiDB, the
+          only valid action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: common.DatasetProjectName
+        additionalProperties: false
+
+      programName?:
+        # language=markdown
+        description:
+          If the install targets array contains MicrobiomeDB or ClinEpiDB, the
+          only valid action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: common.DatasetProgramName
+        additionalProperties: false
+
+      relatedStudies?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: common.RelatedStudy[]
+            uniqueItems: true
+        additionalProperties: false
+
+      # experimentalOrganism: immutable
+
+      # hostOrganism: immutable
+
+      studyCharacteristics?: StudyCharacteristicsPatch
+
+      externalIdentifiers?: ExternalIdentifiersPatch
+
+      funding?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: common.DatasetFundingAward[]
+            uniqueItems: true
+        additionalProperties: false
+
+  ExternalIdentifiersPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      dois?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: common.DOIReference[]
+            uniqueItems: true
+        additionalProperties: false
+      hyperlinks?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: common.DatasetHyperlink[]
+            uniqueItems: true
+        additionalProperties: false
+      bioprojectIds?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: common.BioprojectIDReference[]
+            uniqueItems: true
+        additionalProperties: false
+
+  PatchAction:
+    type: string
+    enum:
+    - remove
+    - replace
+
+  PropertyPatch:
+    type: object
+    properties:
+      action: PatchAction
+
+  StudyCharacteristicsPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      studyDesign?:
+        # language=markdown
+        description: |-
+          If the install targets array contains ClinEpiDB, the only valid
+          action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: string
+        additionalProperties: false
+
+      studyType?:
+        # language=markdown
+        description: |-
+          If the install targets array contains ClinEpiDB, the only valid
+          action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: string
+        additionalProperties: false
+
+      countries?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+
+      years?:
+        type: PropertyPatch
+        properties:
+          value: SampleYearRange
+        additionalProperties: false
+
+      studySpecies?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+
+      diseases?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+
+      associatedFactors?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+
+      participantAges?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: string
+            minLength: 1
+            maxLength: 128
+        additionalProperties: false
+
+      sampleTypes?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false

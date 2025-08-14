@@ -405,13 +405,13 @@ types:
     type: object
     additionalProperties: false
     properties:
-      dois:
+      dois?:
         type: DOIReference[]
         uniqueItems: true
-      hyperlinks:
+      hyperlinks?:
         type: DatasetHyperlink[]
         uniqueItems: true
-      bioprojectIds:
+      bioprojectIds?:
         type: BioprojectIDReference[]
         uniqueItems: true
 
@@ -445,41 +445,6 @@ types:
     type: string
     minLength: 5
     maxLength: 32
-
-  JSONPatchAction:
-    type: object
-    additionalProperties: false
-    properties:
-      op:
-        displayName: Operation
-        type: string
-        enum:
-        - add
-        - remove
-        - replace
-        - move
-        - copy
-        - test
-      path:
-        displayName: Target Field Path
-        description: JSON Pointer https://www.rfc-editor.org/rfc/rfc6901
-        type: string
-      value?:
-        displayName: Field Value
-        # language=markdown
-        description: |
-          Must match the type of the record field being patched.
-            
-          Only used with `add`, `replace`, and `test` operations.
-        type: any
-      from?:
-        displayName: Source Field Path
-        # language=markdown
-        description: |
-          JSON Pointer https://www.rfc-editor.org/rfc/rfc6901
-          
-          Only used with `copy` and `move` operations.
-        type: string
 
   RelatedStudy:
     type: object

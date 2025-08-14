@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 
 @JsonDeserialize(
-    as = DatasetPutMetadataImpl.class
+    as = DatasetPatchRequestBodyImpl.class
 )
-public interface DatasetPutMetadata extends DatasetPatchRequestBody {
+public interface DatasetPatchRequestBody {
   @JsonProperty(JsonField.DATASET_TYPE)
   DatasetTypeType getDatasetType();
 
@@ -86,20 +86,8 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   @JsonProperty(JsonField.FUNDING)
   void setFunding(FundingType funding);
 
-  @JsonProperty(JsonField.ORIGIN)
-  String getOrigin();
-
-  @JsonProperty(JsonField.ORIGIN)
-  void setOrigin(String origin);
-
-  @JsonProperty(JsonField.REVISION_NOTE)
-  String getRevisionNote();
-
-  @JsonProperty(JsonField.REVISION_NOTE)
-  void setRevisionNote(String revisionNote);
-
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.SummaryTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.SummaryTypeImpl.class
   )
   interface SummaryType extends PropertyPatch {
     @JsonProperty("action")
@@ -116,7 +104,7 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.FundingTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.FundingTypeImpl.class
   )
   interface FundingType extends PropertyPatch {
     @JsonProperty("action")
@@ -133,7 +121,7 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.VisibilityTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.VisibilityTypeImpl.class
   )
   interface VisibilityType extends PropertyPatch {
     @JsonProperty("action")
@@ -150,7 +138,7 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.ProgramNameTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.ProgramNameTypeImpl.class
   )
   interface ProgramNameType extends PropertyPatch {
     @JsonProperty("action")
@@ -167,7 +155,7 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.NameTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.NameTypeImpl.class
   )
   interface NameType extends PropertyPatch {
     @JsonProperty("action")
@@ -184,7 +172,7 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.DescriptionTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.DescriptionTypeImpl.class
   )
   interface DescriptionType extends PropertyPatch {
     @JsonProperty("action")
@@ -201,7 +189,7 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.DatasetTypeTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.DatasetTypeTypeImpl.class
   )
   interface DatasetTypeType extends PropertyPatch {
     @JsonProperty("action")
@@ -218,7 +206,7 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.ProjectNameTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.ProjectNameTypeImpl.class
   )
   interface ProjectNameType extends PropertyPatch {
     @JsonProperty("action")
@@ -235,7 +223,7 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.ContactsTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.ContactsTypeImpl.class
   )
   interface ContactsType extends PropertyPatch {
     @JsonProperty("action")
@@ -252,7 +240,7 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.RelatedStudiesTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.RelatedStudiesTypeImpl.class
   )
   interface RelatedStudiesType extends PropertyPatch {
     @JsonProperty("action")
@@ -269,7 +257,7 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.PublicationsTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.PublicationsTypeImpl.class
   )
   interface PublicationsType extends PropertyPatch {
     @JsonProperty("action")

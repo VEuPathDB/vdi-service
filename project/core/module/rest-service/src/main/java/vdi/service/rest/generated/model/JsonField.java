@@ -51,7 +51,6 @@ public final class JsonField {
   public static final String FILE_SIZE = "fileSize";
   public static final String FILE_SIZE_TOTAL = "fileSizeTotal";
   public static final String FIRST_NAME = "firstName";
-  public static final String FROM = "from";
   public static final String FUNDING = "funding";
   public static final String GIT_BRANCH = "gitBranch";
   public static final String GIT_COMMIT = "gitCommit";
@@ -84,14 +83,11 @@ public final class JsonField {
   public static final String NAME = "name";
   public static final String OFFSET = "offset";
   public static final String ONLINE = "online";
-  public static final String OP = "op";
   public static final String ORGANIZATION = "organization";
   public static final String ORIGIN = "origin";
   public static final String ORIGINAL_ID = "originalId";
   public static final String OWNER = "owner";
   public static final String PARTICIPANT_AGES = "participantAges";
-  public static final String PATCH = "patch";
-  public static final String PATH = "path";
   public static final String PROGRAM_NAME = "programName";
   public static final String PROJECT_NAME = "projectName";
   public static final String PUBLICATIONS = "publications";
@@ -137,7 +133,6 @@ public final class JsonField {
   public static final String USAGE = "usage";
   public static final String USER = "user";
   public static final String USER_ID = "userId";
-  public static final String VALUE = "value";
   public static final String VERSION = "version";
   public static final String VISIBILITY = "visibility";
   public static final String YEARS = "years";

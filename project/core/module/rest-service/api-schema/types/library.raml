@@ -449,20 +449,89 @@ types:
 
       Fields that are omitted will be ignored when updating the target dataset
       record.
+    type: object
+    additionalProperties: false
+    properties:
+      datasetType?:
+        description: |-
+          If present, the only valid action is `replace`.
 
-      Fields that may be modified by `PATCH` operations (in JSON Pointer
-      notation):
-
-      * `/contacts`
-      * `/description`
-      * `/externalIdentifiers`
-      * `/funding`
-      * `/name`
-      * `/publications`
-      * `/studyCharacteristics`
-      * `/summary`
-      * `/visibility`
-    type: JSONPatchAction[]
+          Only permitted when transitioning from a none-type dataset into an
+          actual dataset type.
+        type: PropertyPatch
+        properties:
+          value: DatasetTypeInput
+        additionalProperties: false
+      visibility?:
+        description: If present, the only valid action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: DatasetVisibility
+        additionalProperties: false
+      name?:
+        description: If present, the only valid action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: DatasetName
+        additionalProperties: false
+      summary?:
+        description: If present, the only valid action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: DatasetSummary
+        additionalProperties: false
+      description?:
+        type: PropertyPatch
+        properties:
+          value: DatasetDescription
+        additionalProperties: false
+      publications?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: DatasetPublication[]
+            uniqueItems: true
+        additionalProperties: false
+      contacts?:
+        description: |-
+          If the dataset visibility is not `private`, the only valid action is
+          `replace`.
+        type: PropertyPatch
+        properties:
+          value:
+            type: DatasetContact[]
+            uniqueItems: true
+        additionalProperties: false
+      projectName?:
+        description: |-
+          If the install targets array contains MicrobiomeDB or ClinEpiDB, the
+          only valid action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: DatasetProjectName
+        additionalProperties: false
+      programName?:
+        description: If the install targets array contains MicrobiomeDB or ClinEpiDB, the only valid action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: DatasetProgramName
+        additionalProperties: false
+      relatedStudies?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: RelatedStudy[]
+            uniqueItems: true
+        additionalProperties: false
+      studyCharacteristics?: StudyCharacteristicsPatch
+      externalIdentifiers?: ExternalIdentifiersPatch
+      funding?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: DatasetFundingAward[]
+            uniqueItems: true
+        additionalProperties: false
   DatasetPostMeta:
     type: DatasetMetaBase
     additionalProperties: false
@@ -582,12 +651,11 @@ types:
         default: false
   DatasetPutMetadata:
     displayName: Dataset Put Request Metadata
-    type: object
+    type: DatasetPatchRequestBody
     additionalProperties: false
     properties:
       origin: DatasetOrigin
       revisionNote: DatasetRevisionNote
-      patch: JSONPatchAction[]
   DatasetPutRequestBody:
     displayName: Dataset Put Request
     type: object
@@ -764,15 +832,40 @@ types:
     type: object
     additionalProperties: false
     properties:
-      dois:
+      dois?:
         type: DOIReference[]
         uniqueItems: true
-      hyperlinks:
+      hyperlinks?:
         type: DatasetHyperlink[]
         uniqueItems: true
-      bioprojectIds:
+      bioprojectIds?:
         type: BioprojectIDReference[]
         uniqueItems: true
+  ExternalIdentifiersPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      dois?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: DOIReference[]
+            uniqueItems: true
+        additionalProperties: false
+      hyperlinks?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: DatasetHyperlink[]
+            uniqueItems: true
+        additionalProperties: false
+      bioprojectIds?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: BioprojectIDReference[]
+            uniqueItems: true
+        additionalProperties: false
   FailedDependencyError:
     displayName: Failed Dependency Error
     type: Error
@@ -862,35 +955,6 @@ types:
       syncControl?: SyncControlRecord
       uploadFiles?: string[]
       installFiles?: string[]
-  JSONPatchAction:
-    type: object
-    additionalProperties: false
-    properties:
-      op:
-        displayName: Operation
-        type: string
-        enum:
-          - add
-          - remove
-          - replace
-          - move
-          - copy
-          - test
-      path:
-        displayName: Target Field Path
-        description: JSON Pointer https://www.rfc-editor.org/rfc/rfc6901
-        type: string
-      value?:
-        displayName: Field Value
-        description: "Must match the type of the record field being patched.\n  \nOnly used with `add`, `replace`, and `test` operations.\n"
-        type: any
-      from?:
-        displayName: Source Field Path
-        description: |
-          JSON Pointer https://www.rfc-editor.org/rfc/rfc6901
-
-          Only used with `copy` and `move` operations.
-        type: string
   MethodNotAllowedError:
     displayName: Method Not Allowed
     description: |
@@ -933,6 +997,11 @@ types:
       * `2022-03-15T16:30:12.123-06:00`
     type: string
     minLength: 4
+  PatchAction:
+    type: string
+    enum:
+      - remove
+      - replace
   PluginListItem:
     displayName: Plugin Info
     type: object
@@ -947,6 +1016,10 @@ types:
           indicates that the plugin has no project restrictions and may be used
           on any site.
         type: InstallTargetID[]
+  PropertyPatch:
+    type: object
+    properties:
+      action: PatchAction
   RelatedStudy:
     type: object
     additionalProperties: false
@@ -1097,6 +1170,94 @@ types:
           type: string
           minLength: 3
           maxLength: 128
+  StudyCharacteristicsPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      studyDesign?:
+        description: |-
+          If the install targets array contains ClinEpiDB, the only valid
+          action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: string
+        additionalProperties: false
+      studyType?:
+        description: |-
+          If the install targets array contains ClinEpiDB, the only valid
+          action is `replace`.
+        type: PropertyPatch
+        properties:
+          value: string
+        additionalProperties: false
+      countries?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+      years?:
+        type: PropertyPatch
+        properties:
+          value: SampleYearRange
+        additionalProperties: false
+      studySpecies?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+      diseases?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+      associatedFactors?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+      participantAges?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: string
+            minLength: 1
+            maxLength: 128
+        additionalProperties: false
+      sampleTypes?:
+        type: PropertyPatch
+        properties:
+          value:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
   SyncControlRecord:
     type: object
     additionalProperties: false

@@ -19,40 +19,38 @@ import java.util.List;
     "relatedStudies",
     "studyCharacteristics",
     "externalIdentifiers",
-    "funding",
-    "origin",
-    "revisionNote"
+    "funding"
 })
-public class DatasetPutMetadataImpl implements DatasetPutMetadata {
+public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetPutMetadata.DatasetTypeType datasetType;
+  private DatasetPatchRequestBody.DatasetTypeType datasetType;
 
   @JsonProperty(JsonField.VISIBILITY)
-  private DatasetPutMetadata.VisibilityType visibility;
+  private DatasetPatchRequestBody.VisibilityType visibility;
 
   @JsonProperty(JsonField.NAME)
-  private DatasetPutMetadata.NameType name;
+  private DatasetPatchRequestBody.NameType name;
 
   @JsonProperty(JsonField.SUMMARY)
-  private DatasetPutMetadata.SummaryType summary;
+  private DatasetPatchRequestBody.SummaryType summary;
 
   @JsonProperty(JsonField.DESCRIPTION)
-  private DatasetPutMetadata.DescriptionType description;
+  private DatasetPatchRequestBody.DescriptionType description;
 
   @JsonProperty(JsonField.PUBLICATIONS)
-  private DatasetPutMetadata.PublicationsType publications;
+  private DatasetPatchRequestBody.PublicationsType publications;
 
   @JsonProperty(JsonField.CONTACTS)
-  private DatasetPutMetadata.ContactsType contacts;
+  private DatasetPatchRequestBody.ContactsType contacts;
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  private DatasetPutMetadata.ProjectNameType projectName;
+  private DatasetPatchRequestBody.ProjectNameType projectName;
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  private DatasetPutMetadata.ProgramNameType programName;
+  private DatasetPatchRequestBody.ProgramNameType programName;
 
   @JsonProperty(JsonField.RELATED_STUDIES)
-  private DatasetPutMetadata.RelatedStudiesType relatedStudies;
+  private DatasetPatchRequestBody.RelatedStudiesType relatedStudies;
 
   @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
   private StudyCharacteristicsPatch studyCharacteristics;
@@ -61,111 +59,105 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   private ExternalIdentifiersPatch externalIdentifiers;
 
   @JsonProperty(JsonField.FUNDING)
-  private DatasetPutMetadata.FundingType funding;
-
-  @JsonProperty(JsonField.ORIGIN)
-  private String origin;
-
-  @JsonProperty(JsonField.REVISION_NOTE)
-  private String revisionNote;
+  private DatasetPatchRequestBody.FundingType funding;
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetPutMetadata.DatasetTypeType getDatasetType() {
+  public DatasetPatchRequestBody.DatasetTypeType getDatasetType() {
     return this.datasetType;
   }
 
   @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetPutMetadata.DatasetTypeType datasetType) {
+  public void setDatasetType(DatasetPatchRequestBody.DatasetTypeType datasetType) {
     this.datasetType = datasetType;
   }
 
   @JsonProperty(JsonField.VISIBILITY)
-  public DatasetPutMetadata.VisibilityType getVisibility() {
+  public DatasetPatchRequestBody.VisibilityType getVisibility() {
     return this.visibility;
   }
 
   @JsonProperty(JsonField.VISIBILITY)
-  public void setVisibility(DatasetPutMetadata.VisibilityType visibility) {
+  public void setVisibility(DatasetPatchRequestBody.VisibilityType visibility) {
     this.visibility = visibility;
   }
 
   @JsonProperty(JsonField.NAME)
-  public DatasetPutMetadata.NameType getName() {
+  public DatasetPatchRequestBody.NameType getName() {
     return this.name;
   }
 
   @JsonProperty(JsonField.NAME)
-  public void setName(DatasetPutMetadata.NameType name) {
+  public void setName(DatasetPatchRequestBody.NameType name) {
     this.name = name;
   }
 
   @JsonProperty(JsonField.SUMMARY)
-  public DatasetPutMetadata.SummaryType getSummary() {
+  public DatasetPatchRequestBody.SummaryType getSummary() {
     return this.summary;
   }
 
   @JsonProperty(JsonField.SUMMARY)
-  public void setSummary(DatasetPutMetadata.SummaryType summary) {
+  public void setSummary(DatasetPatchRequestBody.SummaryType summary) {
     this.summary = summary;
   }
 
   @JsonProperty(JsonField.DESCRIPTION)
-  public DatasetPutMetadata.DescriptionType getDescription() {
+  public DatasetPatchRequestBody.DescriptionType getDescription() {
     return this.description;
   }
 
   @JsonProperty(JsonField.DESCRIPTION)
-  public void setDescription(DatasetPutMetadata.DescriptionType description) {
+  public void setDescription(DatasetPatchRequestBody.DescriptionType description) {
     this.description = description;
   }
 
   @JsonProperty(JsonField.PUBLICATIONS)
-  public DatasetPutMetadata.PublicationsType getPublications() {
+  public DatasetPatchRequestBody.PublicationsType getPublications() {
     return this.publications;
   }
 
   @JsonProperty(JsonField.PUBLICATIONS)
-  public void setPublications(DatasetPutMetadata.PublicationsType publications) {
+  public void setPublications(DatasetPatchRequestBody.PublicationsType publications) {
     this.publications = publications;
   }
 
   @JsonProperty(JsonField.CONTACTS)
-  public DatasetPutMetadata.ContactsType getContacts() {
+  public DatasetPatchRequestBody.ContactsType getContacts() {
     return this.contacts;
   }
 
   @JsonProperty(JsonField.CONTACTS)
-  public void setContacts(DatasetPutMetadata.ContactsType contacts) {
+  public void setContacts(DatasetPatchRequestBody.ContactsType contacts) {
     this.contacts = contacts;
   }
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  public DatasetPutMetadata.ProjectNameType getProjectName() {
+  public DatasetPatchRequestBody.ProjectNameType getProjectName() {
     return this.projectName;
   }
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  public void setProjectName(DatasetPutMetadata.ProjectNameType projectName) {
+  public void setProjectName(DatasetPatchRequestBody.ProjectNameType projectName) {
     this.projectName = projectName;
   }
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  public DatasetPutMetadata.ProgramNameType getProgramName() {
+  public DatasetPatchRequestBody.ProgramNameType getProgramName() {
     return this.programName;
   }
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  public void setProgramName(DatasetPutMetadata.ProgramNameType programName) {
+  public void setProgramName(DatasetPatchRequestBody.ProgramNameType programName) {
     this.programName = programName;
   }
 
   @JsonProperty(JsonField.RELATED_STUDIES)
-  public DatasetPutMetadata.RelatedStudiesType getRelatedStudies() {
+  public DatasetPatchRequestBody.RelatedStudiesType getRelatedStudies() {
     return this.relatedStudies;
   }
 
   @JsonProperty(JsonField.RELATED_STUDIES)
-  public void setRelatedStudies(DatasetPutMetadata.RelatedStudiesType relatedStudies) {
+  public void setRelatedStudies(DatasetPatchRequestBody.RelatedStudiesType relatedStudies) {
     this.relatedStudies = relatedStudies;
   }
 
@@ -190,33 +182,13 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonProperty(JsonField.FUNDING)
-  public DatasetPutMetadata.FundingType getFunding() {
+  public DatasetPatchRequestBody.FundingType getFunding() {
     return this.funding;
   }
 
   @JsonProperty(JsonField.FUNDING)
-  public void setFunding(DatasetPutMetadata.FundingType funding) {
+  public void setFunding(DatasetPatchRequestBody.FundingType funding) {
     this.funding = funding;
-  }
-
-  @JsonProperty(JsonField.ORIGIN)
-  public String getOrigin() {
-    return this.origin;
-  }
-
-  @JsonProperty(JsonField.ORIGIN)
-  public void setOrigin(String origin) {
-    this.origin = origin;
-  }
-
-  @JsonProperty(JsonField.REVISION_NOTE)
-  public String getRevisionNote() {
-    return this.revisionNote;
-  }
-
-  @JsonProperty(JsonField.REVISION_NOTE)
-  public void setRevisionNote(String revisionNote) {
-    this.revisionNote = revisionNote;
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -224,7 +196,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class SummaryTypeImpl implements DatasetPutMetadata.SummaryType {
+  public static class SummaryTypeImpl implements DatasetPatchRequestBody.SummaryType {
     @JsonProperty("action")
     private PatchAction action;
 
@@ -257,7 +229,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class FundingTypeImpl implements DatasetPutMetadata.FundingType {
+  public static class FundingTypeImpl implements DatasetPatchRequestBody.FundingType {
     @JsonProperty("action")
     private PatchAction action;
 
@@ -290,7 +262,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class VisibilityTypeImpl implements DatasetPutMetadata.VisibilityType {
+  public static class VisibilityTypeImpl implements DatasetPatchRequestBody.VisibilityType {
     @JsonProperty("action")
     private PatchAction action;
 
@@ -323,7 +295,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class ProgramNameTypeImpl implements DatasetPutMetadata.ProgramNameType {
+  public static class ProgramNameTypeImpl implements DatasetPatchRequestBody.ProgramNameType {
     @JsonProperty("action")
     private PatchAction action;
 
@@ -356,7 +328,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class NameTypeImpl implements DatasetPutMetadata.NameType {
+  public static class NameTypeImpl implements DatasetPatchRequestBody.NameType {
     @JsonProperty("action")
     private PatchAction action;
 
@@ -389,7 +361,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class DescriptionTypeImpl implements DatasetPutMetadata.DescriptionType {
+  public static class DescriptionTypeImpl implements DatasetPatchRequestBody.DescriptionType {
     @JsonProperty("action")
     private PatchAction action;
 
@@ -422,7 +394,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class DatasetTypeTypeImpl implements DatasetPutMetadata.DatasetTypeType {
+  public static class DatasetTypeTypeImpl implements DatasetPatchRequestBody.DatasetTypeType {
     @JsonProperty("action")
     private PatchAction action;
 
@@ -455,7 +427,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class ProjectNameTypeImpl implements DatasetPutMetadata.ProjectNameType {
+  public static class ProjectNameTypeImpl implements DatasetPatchRequestBody.ProjectNameType {
     @JsonProperty("action")
     private PatchAction action;
 
@@ -488,7 +460,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class ContactsTypeImpl implements DatasetPutMetadata.ContactsType {
+  public static class ContactsTypeImpl implements DatasetPatchRequestBody.ContactsType {
     @JsonProperty("action")
     private PatchAction action;
 
@@ -521,7 +493,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class RelatedStudiesTypeImpl implements DatasetPutMetadata.RelatedStudiesType {
+  public static class RelatedStudiesTypeImpl implements DatasetPatchRequestBody.RelatedStudiesType {
     @JsonProperty("action")
     private PatchAction action;
 
@@ -554,7 +526,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class PublicationsTypeImpl implements DatasetPutMetadata.PublicationsType {
+  public static class PublicationsTypeImpl implements DatasetPatchRequestBody.PublicationsType {
     @JsonProperty("action")
     private PatchAction action;
 

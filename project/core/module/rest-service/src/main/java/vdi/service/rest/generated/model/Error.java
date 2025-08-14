@@ -19,8 +19,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     @JsonSubTypes.Type(vdi.service.rest.generated.model.UnauthorizedError.class),
     @JsonSubTypes.Type(vdi.service.rest.generated.model.MethodNotAllowedError.class),
     @JsonSubTypes.Type(vdi.service.rest.generated.model.BadRequestError.class),
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.GoneError.class),
     @JsonSubTypes.Type(vdi.service.rest.generated.model.FailedDependencyError.class),
-    @JsonSubTypes.Type(java.lang.String.class),
     @JsonSubTypes.Type(vdi.service.rest.generated.model.Error.class)
 })
 @JsonDeserialize(
