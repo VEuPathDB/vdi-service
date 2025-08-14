@@ -16,7 +16,6 @@ tasks.processResources { dependsOn(
   ":compile-plugin-schema",
   ":compile-core-schema",
   ":compile-app-db-schema",
-  ":compile-dataset-schema",
 ) }
 
 tasks.clean { delete(jsonSchemaBuildDir) }
