@@ -10,26 +10,46 @@ import vdi.service.rest.generated.model.DatasetPublication as APIPublication
 private val CitationLengthRange = 3..2000
 private val PubMedLengthRange = 3..30
 
+private val PubMedIDPattern = Regex("^\\d+$")
+
 
 fun APIPublication?.cleanup() = this?.apply {
-  cleanupString(::getIdentifier)
+  cleanup(::getIdentifier) { it.cleanup()?.run {
+    if (startsWith("pmid:", true)) {
+      // if the identifier starts with 'pmid:' then we can assume that type if
+      // the user didn't provide one.
+      ensureNotNull(::getType, TypeType.PMID)
+      substring(5)
+    } else if (startsWith("doi:", true)) {
+      // if the identifier starts with 'pmid:' then we can assume that type if
+      // the user didn't provide one.
+      ensureNotNull(::getType, TypeType.DOI)
+      substring(4)
+    } else {
+      this
+    }
+  } }
   cleanupString(::getCitation)
-
-  // trim off id prefix if present
-  if (identifier?.startsWith("pmid:", true) == true)
-    identifier = identifier.substring(5)
-  else if (identifier?.startsWith("doi:", true) == true)
-    identifier = identifier.substring(4)
-
-  type = type ?: TypeType.PMID
-  isPrimary = isPrimary ?: false
+  ensureNotNull(::getType, TypeType.PMID)
+  ensureNotNull(::getIsPrimary, false)
 }
 
 fun APIPublication.validate(jPath: String, index: Int, errors: ValidationErrors) {
   identifier.require(jPath, index, errors) {
     when (type!!) {
-      TypeType.PMID -> identifier.checkLength(jPath..JsonField.IDENTIFIER, index, PubMedLengthRange, errors)
-      TypeType.DOI  -> identifier.checkLength(jPath..JsonField.IDENTIFIER, index, DOIValidLengthRange, errors)
+      TypeType.PMID -> {
+        val path = jPath..JsonField.IDENTIFIER
+        if (identifier.checkLength(path, index, PubMedLengthRange, errors))
+          if (!PubMedIDPattern.matches(identifier))
+            errors.add(path..index, "invalid PMID format")
+      }
+
+      TypeType.DOI -> {
+        val path = jPath..JsonField.DOI
+        if (identifier.checkLength(jPath..JsonField.IDENTIFIER, index, DOIValidLengthRange, errors))
+          if (!DOIPattern.matches(identifier))
+            errors.add(path..index, "invalid DOI format")
+      }
     }
   }
 

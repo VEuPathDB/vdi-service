@@ -23,8 +23,8 @@ import vdi.service.rest.generated.model.JsonField as JF
 internal fun DatasetPostMeta.cleanup() {
   (this as DatasetMetaBase).cleanup()
 
-  type?.cleanup()
-  visibility = visibility ?: DatasetVisibility.PRIVATE
+  cleanup(::getType, DatasetTypeInput?::cleanup)
+  ensureNotNull(::getVisibility, DatasetVisibility.PRIVATE)
 }
 
 internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
@@ -34,25 +34,25 @@ internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
 
 internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
   DatasetMetadata(
-    type = type.toInternal(),
-    installTargets = installTargets.toSet(),
-    visibility = visibility!!.toInternal(),
-    owner = userID,
-    name = name,
-    summary = summary,
-    description = description,
-    origin = origin,
-    created = OffsetDateTime.now(ZoneOffset.UTC),
-    sourceURL = url?.let(URI::create),
-    dependencies = dependencies.toInternalDistinct(DatasetDependency::toInternal),
-    publications = publications.toInternalDistinct(DatasetPublication::toInternal),
-    contacts = contacts.toInternalDistinct(DatasetContact::toInternal),
-    projectName = projectName,
-    programName = programName,
-    relatedStudies = relatedStudies.toInternalDistinct(RelatedStudy::toInternal),
+    type                 = type.toInternal(),
+    installTargets       = installTargets.toSet(),
+    visibility           = visibility.toInternal(),
+    owner                = userID,
+    name                 = name,
+    summary              = summary,
+    description          = description,
+    origin               = origin,
+    created              = OffsetDateTime.now(ZoneOffset.UTC),
+    sourceURL            = url?.let(URI::create),
+    dependencies         = dependencies.toInternalDistinct(DatasetDependency::toInternal),
+    publications         = publications.toInternalDistinct(DatasetPublication::toInternal),
+    contacts             = contacts.toInternalDistinct(DatasetContact::toInternal),
+    projectName          = projectName,
+    programName          = programName,
+    relatedStudies       = relatedStudies.toInternalDistinct(RelatedStudy::toInternal),
     experimentalOrganism = experimentalOrganism.toInternal(),
-    hostOrganism = hostOrganism.toInternal(),
+    hostOrganism         = hostOrganism.toInternal(),
     studyCharacteristics = studyCharacteristics.toInternal(),
-    externalIdentifiers = externalIdentifiers.toInternal(),
-    funding = funding.toInternalDistinct(DatasetFundingAward::toInternal),
+    externalIdentifiers  = externalIdentifiers.toInternal(),
+    funding              = funding.toInternalDistinct(DatasetFundingAward::toInternal),
   )

@@ -10,13 +10,10 @@ import vdi.service.rest.generated.model.DatasetDependency as APIDependency
 private val IDLengthRange = 3..50
 private val VersionLengthRange = 1..50
 
-fun APIDependency?.cleanup(): APIDependency? {
-  if (this != null) {
-    cleanupString(::getResourceIdentifier)
-    cleanupString(::getResourceVersion)
-    cleanupString(::getResourceDisplayName)
-  }
-  return this
+fun APIDependency?.cleanup() = this?.apply {
+  cleanupString(::getResourceIdentifier)
+  cleanupString(::getResourceVersion)
+  cleanupString(::getResourceDisplayName)
 }
 
 fun List<APIDependency>.validate(jPath: String, errors: ValidationErrors) =

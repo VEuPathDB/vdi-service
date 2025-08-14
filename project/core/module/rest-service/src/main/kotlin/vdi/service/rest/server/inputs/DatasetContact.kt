@@ -19,13 +19,10 @@ internal fun APIContact?.cleanup() = this?.apply {
   cleanupString(::getFirstName)
   cleanupString(::getMiddleName)
   cleanupString(::getLastName)
-
-  isPrimary   = isPrimary ?: false
-
+  ensureNotNull(::getIsPrimary, false)
   cleanupString(::getEmail)
   cleanupString(::getAffiliation)
   cleanupString(::getCountry)
-
   cleanupString(::getCity)
   cleanupString(::getState)
   cleanupString(::getAddress)

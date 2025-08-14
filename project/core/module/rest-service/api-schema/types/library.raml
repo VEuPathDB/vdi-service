@@ -54,7 +54,10 @@ types:
     type: object
     additionalProperties: false
     properties:
-      id: string
+      id:
+        type: string
+        minLength: 4
+        maxLength: 64
       description?: string
   BrokenDatasetInstallDetails:
     type: object
@@ -124,7 +127,8 @@ types:
     properties:
       doi:
         type: string
-        pattern: '^(?:doi:)?\d+(\.\d+)+/.+$'
+        minLength: 6
+        maxLength: 128
       description?: string
   DatasetContact:
     displayName: Dataset Contact
@@ -158,21 +162,22 @@ types:
         displayName: Organization
         description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
         type: string
-        minLength: 3
         maxLength: 4000
       country?:
         description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
         type: string
-        minLength: 3
         maxLength: 200
       city?:
         type: string
+        minLength: 3
         maxLength: 200
       state?:
         type: string
+        minLength: 3
         maxLength: 200
       address?:
         type: string
+        minLength: 5
         maxLength: 1000
   DatasetCreationDate:
     displayName: Dataset Creation Date
@@ -1052,23 +1057,46 @@ types:
         description: Required for ClinEpi
         type: string
       countries?:
-        type: string[]
+        type: array
         uniqueItems: true
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
       years?: SampleYearRange
       studySpecies?:
-        type: string[]
+        type: array
         uniqueItems: true
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
       diseases?:
         description: Diseases or health conditions
-        type: string[]
+        type: array
         uniqueItems: true
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
       associatedFactors?:
-        type: string[]
+        type: array
         uniqueItems: true
-      participantAges?: string
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+      participantAges?:
+        type: string
+        minLength: 1
+        maxLength: 128
       sampleTypes?:
-        type: string[]
+        type: array
         uniqueItems: true
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
   SyncControlRecord:
     type: object
     additionalProperties: false

@@ -130,6 +130,7 @@ dependencies {
 
   implementation(libs.json.request.validation)
   implementation(libs.json.schema.validation)
+  implementation(libs.json.patch.tools)
 
   implementation(libs.s34k)
 

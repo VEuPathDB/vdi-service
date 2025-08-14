@@ -5,21 +5,31 @@ import kotlin.reflect.KFunction1
 import kotlin.reflect.KFunction2
 import kotlin.reflect.full.declaredMemberFunctions
 
-internal inline fun <T> List<T>?.cleanup(fn: T.() -> Unit) =
-  this?.ifEmpty { null }
-    ?.onEach(fn)
-    ?: emptyList()
-
-internal fun <I: Any> Any.cleanupList(property: String, fn: (I?) -> I?) =
-  cleanup<List<I?>>(property) { it?.map(fn) ?: emptyList() }
-
+/**
+ * Applies the given cleanup function to the values in the list provided by
+ * [getter] before replacing the original list with a new list containing the
+ * non-null cleaned values by way of the parent object's matching 'setter'
+ * method.
+ *
+ * Values for which the given cleanup function maps to `null` will be omitted
+ * from the new list.
+ *
+ * @receiver Parent object of the given [getter] that will be used in calls to
+ * the getter as well as its matching setter.
+ *
+ * @param getter Getter method for the list property to clean.
+ *
+ * @param fn Cleanup function that will be applied to each value in the list
+ * returned by getter.
+ */
 internal fun <T: Any, I: Any> T.cleanupList(getter: KFunction0<List<I?>?>, fn: (I?) -> I?) =
   cleanup(getter) { it?.mapNotNull(fn)?.ifEmpty { emptyList() } ?: emptyList() }
 
 /**
  * Applies the given cleanup function to the values in the list provided by
- * [getter] before replacing the original list with a new, distinct list of
- * values using the parent object's matching 'setter' method.
+ * [getter] before replacing the original list with a new list containing the
+ * distinct, non-null cleaned values by way of the parent object's matching
+ * 'setter' method.
  *
  * Note: Types generated from RAML specifications do not implement [equals] or
  * [hashCode], and thus cannot be meaningfully tested to ensure uniqueness.  For
@@ -44,8 +54,8 @@ internal fun <T: Any, I: Any> T.cleanupDistinctList(getter: KFunction0<List<I?>?
       ?: emptyList()
   }
 
-internal fun String?.cleanup() =
-  this?.trim()
+internal fun String?.cleanup(emptyToNull: Boolean = true) =
+  this?.trim()?.run { if (emptyToNull && isEmpty()) null else this }
 
 @Suppress("UNCHECKED_CAST")
 internal inline fun <T: Any, O: Any> T.cleanup(getter: KFunction0<O?>, fn: (O?) -> O?) {
@@ -87,6 +97,9 @@ internal fun Any.cleanupString(property: String) {
   cleanup<String>(property) { it?.trim() }
 }
 
+internal fun <T: Any, V: Any> T.ensureNotNull(getter: KFunction0<V?>, value: V) =
+  cleanup(getter) { it ?: value }
+
 /**
  * Trim and replace the target string property if it is not `null`.  If
  * [nullOutBlanks] is `true`, blank strings will be replaced with `null`
@@ -107,7 +120,7 @@ internal fun Any.cleanupString(property: String) {
 internal fun <T: Any> T.cleanupString(getter: KFunction0<String?>, nullOutBlanks: Boolean = true) =
   cleanup(getter) {
     it?.trim()
-      ?.run { if (nullOutBlanks) takeUnless { s -> s.isBlank() } else this }
+      ?.run { if (nullOutBlanks && isEmpty()) null else this }
   }
 
 

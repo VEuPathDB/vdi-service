@@ -11,7 +11,8 @@ import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.RelatedStudy as APIRelatedStudy
 
 fun APIRelatedStudy?.cleanup() = this?.apply {
-  cleanupString(JsonField.STUDY_URI)
+  cleanupString(::getStudyUri)
+  sharesRecords = sharesRecords ?: false
 }
 
 fun APIRelatedStudy.validate(jPath: String, index: Int, errors: ValidationErrors) {
