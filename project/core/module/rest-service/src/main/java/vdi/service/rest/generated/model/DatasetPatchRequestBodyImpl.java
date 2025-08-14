@@ -7,7 +7,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "datasetType",
+    "type",
     "visibility",
     "name",
     "summary",
@@ -22,8 +22,8 @@ import java.util.List;
     "funding"
 })
 public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
-  @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetPatchRequestBody.DatasetTypeType datasetType;
+  @JsonProperty(JsonField.TYPE)
+  private DatasetPatchRequestBody.TypeType type;
 
   @JsonProperty(JsonField.VISIBILITY)
   private DatasetPatchRequestBody.VisibilityType visibility;
@@ -61,14 +61,14 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.FUNDING)
   private DatasetPatchRequestBody.FundingType funding;
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetPatchRequestBody.DatasetTypeType getDatasetType() {
-    return this.datasetType;
+  @JsonProperty(JsonField.TYPE)
+  public DatasetPatchRequestBody.TypeType getType() {
+    return this.type;
   }
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetPatchRequestBody.DatasetTypeType datasetType) {
-    this.datasetType = datasetType;
+  @JsonProperty(JsonField.TYPE)
+  public void setType(DatasetPatchRequestBody.TypeType type) {
+    this.type = type;
   }
 
   @JsonProperty(JsonField.VISIBILITY)
@@ -394,7 +394,7 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
       "action",
       "value"
   })
-  public static class DatasetTypeTypeImpl implements DatasetPatchRequestBody.DatasetTypeType {
+  public static class TypeTypeImpl implements DatasetPatchRequestBody.TypeType {
     @JsonProperty("action")
     private PatchAction action;
 

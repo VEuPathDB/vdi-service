@@ -452,7 +452,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetType?:
+      type?:
         description: |-
           If present, the only valid action is `replace`.
 
@@ -460,35 +460,35 @@ types:
           actual dataset type.
         type: PropertyPatch
         properties:
-          value: DatasetTypeInput
+          value?: DatasetTypeInput
         additionalProperties: false
       visibility?:
         description: If present, the only valid action is `replace`.
         type: PropertyPatch
         properties:
-          value: DatasetVisibility
+          value?: DatasetVisibility
         additionalProperties: false
       name?:
         description: If present, the only valid action is `replace`.
         type: PropertyPatch
         properties:
-          value: DatasetName
+          value?: DatasetName
         additionalProperties: false
       summary?:
         description: If present, the only valid action is `replace`.
         type: PropertyPatch
         properties:
-          value: DatasetSummary
+          value?: DatasetSummary
         additionalProperties: false
       description?:
         type: PropertyPatch
         properties:
-          value: DatasetDescription
+          value?: DatasetDescription
         additionalProperties: false
       publications?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: DatasetPublication[]
             uniqueItems: true
         additionalProperties: false
@@ -498,7 +498,7 @@ types:
           `replace`.
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: DatasetContact[]
             uniqueItems: true
         additionalProperties: false
@@ -508,18 +508,18 @@ types:
           only valid action is `replace`.
         type: PropertyPatch
         properties:
-          value: DatasetProjectName
+          value?: DatasetProjectName
         additionalProperties: false
       programName?:
         description: If the install targets array contains MicrobiomeDB or ClinEpiDB, the only valid action is `replace`.
         type: PropertyPatch
         properties:
-          value: DatasetProgramName
+          value?: DatasetProgramName
         additionalProperties: false
       relatedStudies?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: RelatedStudy[]
             uniqueItems: true
         additionalProperties: false
@@ -528,7 +528,7 @@ types:
       funding?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: DatasetFundingAward[]
             uniqueItems: true
         additionalProperties: false
@@ -848,21 +848,21 @@ types:
       dois?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: DOIReference[]
             uniqueItems: true
         additionalProperties: false
       hyperlinks?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: DatasetHyperlink[]
             uniqueItems: true
         additionalProperties: false
       bioprojectIds?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: BioprojectIDReference[]
             uniqueItems: true
         additionalProperties: false
@@ -1018,6 +1018,7 @@ types:
         type: InstallTargetID[]
   PropertyPatch:
     type: object
+    additionalProperties: false
     properties:
       action: PatchAction
   RelatedStudy:
@@ -1180,7 +1181,7 @@ types:
           action is `replace`.
         type: PropertyPatch
         properties:
-          value: string
+          value?: string
         additionalProperties: false
       studyType?:
         description: |-
@@ -1188,12 +1189,12 @@ types:
           action is `replace`.
         type: PropertyPatch
         properties:
-          value: string
+          value?: string
         additionalProperties: false
       countries?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: array
             items:
               type: string
@@ -1204,12 +1205,12 @@ types:
       years?:
         type: PropertyPatch
         properties:
-          value: SampleYearRange
+          value?: SampleYearRange
         additionalProperties: false
       studySpecies?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: array
             items:
               type: string
@@ -1220,7 +1221,7 @@ types:
       diseases?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: array
             items:
               type: string
@@ -1231,7 +1232,7 @@ types:
       associatedFactors?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: array
             items:
               type: string
@@ -1242,7 +1243,7 @@ types:
       participantAges?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: string
             minLength: 1
             maxLength: 128
@@ -1250,7 +1251,7 @@ types:
       sampleTypes?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: array
             items:
               type: string

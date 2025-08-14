@@ -8,11 +8,11 @@ import java.util.List;
     as = DatasetPutMetadataImpl.class
 )
 public interface DatasetPutMetadata extends DatasetPatchRequestBody {
-  @JsonProperty(JsonField.DATASET_TYPE)
-  DatasetTypeType getDatasetType();
+  @JsonProperty(JsonField.TYPE)
+  TypeType getType();
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  void setDatasetType(DatasetTypeType datasetType);
+  @JsonProperty(JsonField.TYPE)
+  void setType(TypeType type);
 
   @JsonProperty(JsonField.VISIBILITY)
   VisibilityType getVisibility();
@@ -201,9 +201,9 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPutMetadataImpl.DatasetTypeTypeImpl.class
+      as = DatasetPutMetadataImpl.TypeTypeImpl.class
   )
-  interface DatasetTypeType extends PropertyPatch {
+  interface TypeType extends PropertyPatch {
     @JsonProperty("action")
     PatchAction getAction();
 

@@ -15,7 +15,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      datasetType?:
+      type?:
         # language=markdown
         description: |-
           If present, the only valid action is `replace`.
@@ -24,7 +24,7 @@ types:
           actual dataset type.
         type: PropertyPatch
         properties:
-          value: common.DatasetTypeInput
+          value?: common.DatasetTypeInput
         additionalProperties: false
 
       # installTargets: immutable
@@ -34,7 +34,7 @@ types:
         description: If present, the only valid action is `replace`.
         type: PropertyPatch
         properties:
-          value: common.DatasetVisibility
+          value?: common.DatasetVisibility
         additionalProperties: false
 
       # owner: immutable
@@ -44,7 +44,7 @@ types:
         description: If present, the only valid action is `replace`.
         type: PropertyPatch
         properties:
-          value: common.DatasetName
+          value?: common.DatasetName
         additionalProperties: false
 
       summary?:
@@ -52,13 +52,13 @@ types:
         description: If present, the only valid action is `replace`.
         type: PropertyPatch
         properties:
-          value: common.DatasetSummary
+          value?: common.DatasetSummary
         additionalProperties: false
 
       description?:
         type: PropertyPatch
         properties:
-          value: common.DatasetDescription
+          value?: common.DatasetDescription
         additionalProperties: false
 
       # origin: immutable
@@ -69,7 +69,7 @@ types:
       publications?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: common.DatasetPublication[]
             uniqueItems: true
         additionalProperties: false
@@ -81,7 +81,7 @@ types:
           `replace`.
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: common.DatasetContact[]
             uniqueItems: true
         additionalProperties: false
@@ -93,7 +93,7 @@ types:
           only valid action is `replace`.
         type: PropertyPatch
         properties:
-          value: common.DatasetProjectName
+          value?: common.DatasetProjectName
         additionalProperties: false
 
       programName?:
@@ -103,13 +103,13 @@ types:
           only valid action is `replace`.
         type: PropertyPatch
         properties:
-          value: common.DatasetProgramName
+          value?: common.DatasetProgramName
         additionalProperties: false
 
       relatedStudies?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: common.RelatedStudy[]
             uniqueItems: true
         additionalProperties: false
@@ -125,7 +125,7 @@ types:
       funding?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: common.DatasetFundingAward[]
             uniqueItems: true
         additionalProperties: false
@@ -137,21 +137,21 @@ types:
       dois?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: common.DOIReference[]
             uniqueItems: true
         additionalProperties: false
       hyperlinks?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: common.DatasetHyperlink[]
             uniqueItems: true
         additionalProperties: false
       bioprojectIds?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: common.BioprojectIDReference[]
             uniqueItems: true
         additionalProperties: false
@@ -166,6 +166,7 @@ types:
     type: object
     properties:
       action: PatchAction
+    additionalProperties: false
 
   StudyCharacteristicsPatch:
     type: object
@@ -178,7 +179,7 @@ types:
           action is `replace`.
         type: PropertyPatch
         properties:
-          value: string
+          value?: string
         additionalProperties: false
 
       studyType?:
@@ -188,13 +189,13 @@ types:
           action is `replace`.
         type: PropertyPatch
         properties:
-          value: string
+          value?: string
         additionalProperties: false
 
       countries?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: array
             items:
               type: string
@@ -206,13 +207,13 @@ types:
       years?:
         type: PropertyPatch
         properties:
-          value: SampleYearRange
+          value?: SampleYearRange
         additionalProperties: false
 
       studySpecies?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: array
             items:
               type: string
@@ -224,7 +225,7 @@ types:
       diseases?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: array
             items:
               type: string
@@ -236,7 +237,7 @@ types:
       associatedFactors?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: array
             items:
               type: string
@@ -248,7 +249,7 @@ types:
       participantAges?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: string
             minLength: 1
             maxLength: 128
@@ -257,7 +258,7 @@ types:
       sampleTypes?:
         type: PropertyPatch
         properties:
-          value:
+          value?:
             type: array
             items:
               type: string

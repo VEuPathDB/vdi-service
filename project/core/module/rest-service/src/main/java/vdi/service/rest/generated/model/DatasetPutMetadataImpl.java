@@ -7,7 +7,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "datasetType",
+    "type",
     "visibility",
     "name",
     "summary",
@@ -24,8 +24,8 @@ import java.util.List;
     "revisionNote"
 })
 public class DatasetPutMetadataImpl implements DatasetPutMetadata {
-  @JsonProperty(JsonField.DATASET_TYPE)
-  private DatasetPutMetadata.DatasetTypeType datasetType;
+  @JsonProperty(JsonField.TYPE)
+  private DatasetPutMetadata.TypeType type;
 
   @JsonProperty(JsonField.VISIBILITY)
   private DatasetPutMetadata.VisibilityType visibility;
@@ -69,14 +69,14 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.REVISION_NOTE)
   private String revisionNote;
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  public DatasetPutMetadata.DatasetTypeType getDatasetType() {
-    return this.datasetType;
+  @JsonProperty(JsonField.TYPE)
+  public DatasetPutMetadata.TypeType getType() {
+    return this.type;
   }
 
-  @JsonProperty(JsonField.DATASET_TYPE)
-  public void setDatasetType(DatasetPutMetadata.DatasetTypeType datasetType) {
-    this.datasetType = datasetType;
+  @JsonProperty(JsonField.TYPE)
+  public void setType(DatasetPutMetadata.TypeType type) {
+    this.type = type;
   }
 
   @JsonProperty(JsonField.VISIBILITY)
@@ -422,7 +422,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
       "action",
       "value"
   })
-  public static class DatasetTypeTypeImpl implements DatasetPutMetadata.DatasetTypeType {
+  public static class TypeTypeImpl implements DatasetPutMetadata.TypeType {
     @JsonProperty("action")
     private PatchAction action;
 
