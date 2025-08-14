@@ -59,8 +59,7 @@ jobs:
     - name: Merge and Convert JSON Schema
       run: |-
         gradle -P SCHEMA_BUILD_DIR=$DOC_BUILD_DIR \
-          :schema:build-dataset-schema-resources \
-          :schema:build-config-schema-resources
+          :schema:compile-config-schema
 
     - name: Generate Configuration Docs
       run: >-

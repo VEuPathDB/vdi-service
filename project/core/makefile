@@ -247,8 +247,7 @@ generate-service-docs:
 	@gradle \
 		--no-daemon \
 		:generate-raml-docs \
-		:schema:build-dataset-schema-resources \
-		:schema:build-config-schema-resource
+		:schema:compile-config-schema
 	@cp -rt $(OUTPUT_DOC_DIR) \
 		docs/vdi-api.html \
 		schema \
