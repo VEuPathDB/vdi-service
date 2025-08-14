@@ -42,42 +42,11 @@
       "$comment": "type defined in 'allOf' block below",
       "title": "Dataset Data Database/Schema"
     },
-    "datasetPropertySchema": {
-      "title": "Dataset Characteristics Validation Schema",
-      "description": "JSON schema used to validate dataset characteristics in the metadata for datasets being installed into this configured target.\n\nIf omitted, datasets for this install target are not permitted to have characteristics fields.",
-      "oneOf": [
-        {
-          "title": "Inline Schema Definition",
-          "$ref": "https://json-schema.org/draft/2020-12/schema",
-          "examples": [
-            {
-              "type": "object",
-              "properties": {
-                "field": {
-                  "type": "string"
-                }
-              },
-              "required": [ "field" ]
-            }
-          ]
-        },
-        {
-          "title": "Remote Schema File",
-          "type": "string",
-          "pattern": "^(https?)?://([0-9a-zA-Z][\\w-]+(?:\\.[0-9a-zA-Z][\\w-]*)*)((?:/[\\w%.~-]+)+)(\\?.+)?$"
-        },
-        {
-          "title": "Local Schema File",
-          "description": "Path to a local schema file.  If the path is absolute, and does not exist in the host filesystem, the service jar contents will be checked as well.",
-          "type": "string",
-          "minLength": 6,
-          "format": "uri-reference",
-          "examples": [
-            "/etc/vdi/mounted-filesystem-schema.json",
-            "/schema/data/jar-resource-schema.json"
-          ]
-        }
-      ]
+    "metaValidation": {
+      "description": "Additional dataset metadata rules that apply to datasets for this install target.\n\nKeys to this object are expected to be valid JSONPath query expressions (ref rfc9535) that will be used to locate the fields to validate.\n\nValues are JSON schema definitions that will be used to validate the values located at the target json path.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/metaValidationRule" },
+      "unevaluatedProperties": false
     }
   },
   "allOf": [
@@ -115,5 +84,22 @@
       }
     }
   ],
-  "unevaluatedProperties": false
+  "unevaluatedProperties": false,
+  "$defs": {
+    "metaValidationRule": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "description": "Whether the a value must exist at the JSONPath defined by the object key mapped to this rule.",
+          "type": "boolean",
+          "default": false
+        },
+        "schema": {
+          "$ref": "https://json-schema.org/draft/2020-12/schema"
+        }
+      },
+      "minProperties": 1,
+      "unevaluatedProperties": false
+    }
+  }
 }

@@ -10,7 +10,7 @@ import vdi.service.rest.generated.model.*
 
 @Suppress("DuplicatedCode") // Overlap in generated API types
 internal fun DatasetPatchRequestBody.cleanup() {
-  type?.value?.cleanup()
+  type?.apply { cleanup(::getValue, DatasetTypeInput?::cleanup) }
   name?.apply { cleanupString(::getValue) }
   summary?.apply { cleanupString(::getValue) }
   description?.apply { cleanupString(::getValue) }
@@ -23,17 +23,26 @@ internal fun DatasetPatchRequestBody.cleanup() {
     studyDesign?.apply { cleanupString(::getValue) }
     studyType?.apply { cleanupString(::getValue) }
     countries?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
-    years?.clea
+    years?.apply { cleanup(::getValue, SampleYearRange?::cleanup) }
+    studySpecies?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
+    diseases?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
+    associatedFactors?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
+    participantAges?.apply { cleanupString(::getValue) }
+    sampleTypes?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
   }
-
-
-
-  contacts = contacts?.cleanup(DatasetContact::cleanup)
-  datasetType?.cleanup()
+  externalIdentifiers?.apply {
+    dois?.apply { cleanupList(::getValue, DOIReference?::cleanup) }
+    hyperlinks?.apply { cleanupList(::getValue, DatasetHyperlink?::cleanup) }
+    bioprojectIds?.apply { cleanupList(::getValue, BioprojectIDReference?::cleanup) }
+  }
+  funding?.apply { cleanupList(::getValue, DatasetFundingAward?::cleanup) }
 }
 
 @Suppress("DuplicatedCode")
-internal fun DatasetPatchRequestBody.validate(projects: Iterable<InstallTargetID>, errors: ValidationErrors = ValidationErrors()): ValidationErrors {
+internal fun DatasetPatchRequestBody.validate(
+  projects: Iterable<InstallTargetID>,
+  errors: ValidationErrors = ValidationErrors()
+): ValidationErrors {
   name?.validateName(JsonField.NAME, errors)
   shortName.validateShortName(JsonField.SHORT_NAME, errors)
   shortAttribution.validateShortAttribution(JsonField.SHORT_ATTRIBUTION, errors)

@@ -2,7 +2,6 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
-import vdi.model.data.SampleYearRange
 import vdi.model.data.StudyCharacteristics
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.SampleYearRange as APIYearRange
@@ -17,14 +16,13 @@ private val AssociatedFactorValidLength = CommonLengthRange
 private val ParticipantAgeValidLength = CommonLengthRange
 private val SampleTypeValidLength = CommonLengthRange
 
-private const val MinYear: Short = 1500
-private const val MaxYear: Short = 2500
 
 
 fun APIStudyCharacteristics?.cleanup() = this?.also {
   cleanupString(::getStudyDesign)
   cleanupString(::getStudyType)
   cleanupDistinctList(::getCountries, String?::cleanup)
+  cleanup(::getYears, APIYearRange?::cleanup)
   cleanupDistinctList(::getStudySpecies, String?::cleanup)
   cleanupDistinctList(::getDiseases, String?::cleanup)
   cleanupDistinctList(::getAssociatedFactors, String?::cleanup)
@@ -43,12 +41,7 @@ fun APIStudyCharacteristics?.validate(jPath: String, errors: ValidationErrors) {
 
     countries?.reqEntriesCheckLength(jPath..JsonField.COUNTRIES, CountryValidLength, errors)
 
-    years?.also {
-      val path = jPath..JsonField.YEARS
-
-      it.start.reqCheckInRange(path, MinYear, MaxYear, errors)
-      it.end.reqCheckInRange(path, MinYear, MaxYear, errors)
-    }
+    years?.validate(jPath..JsonField.YEARS, errors)
 
     studySpecies?.reqEntriesCheckLength(jPath..JsonField.STUDY_SPECIES, StudySpeciesValidLength, errors)
     diseases?.reqEntriesCheckLength(jPath..JsonField.DISEASES, DiseaseValidLength, errors)
@@ -70,5 +63,3 @@ fun APIStudyCharacteristics.toInternal() =
     participantAges   = participantAges,
     sampleTypes       = sampleTypes,
   )
-
-private fun APIYearRange.toInternal() = SampleYearRange(start, end)
