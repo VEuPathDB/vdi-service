@@ -4,7 +4,6 @@ package vdi.service.rest.server.inputs
 import org.veupathdb.lib.request.validation.*
 import vdi.model.data.BioprojectIDReference
 import vdi.service.rest.generated.model.BioprojectIDReferenceImpl
-import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.BioprojectIDReference as APIBioReference
 
 private val IDLengthRange = 4..64

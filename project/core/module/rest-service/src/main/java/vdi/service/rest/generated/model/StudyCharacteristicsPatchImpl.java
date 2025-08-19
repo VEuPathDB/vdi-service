@@ -137,26 +137,10 @@ public class StudyCharacteristicsPatchImpl implements StudyCharacteristicsPatch 
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class AssociatedFactorsTypeImpl implements StudyCharacteristicsPatch.AssociatedFactorsType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<String> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<String> getValue() {
@@ -170,26 +154,10 @@ public class StudyCharacteristicsPatchImpl implements StudyCharacteristicsPatch 
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class StudyTypeTypeImpl implements StudyCharacteristicsPatch.StudyTypeType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -203,26 +171,10 @@ public class StudyCharacteristicsPatchImpl implements StudyCharacteristicsPatch 
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class SampleTypesTypeImpl implements StudyCharacteristicsPatch.SampleTypesType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<String> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<String> getValue() {
@@ -236,26 +188,10 @@ public class StudyCharacteristicsPatchImpl implements StudyCharacteristicsPatch 
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class StudyDesignTypeImpl implements StudyCharacteristicsPatch.StudyDesignType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -269,26 +205,10 @@ public class StudyCharacteristicsPatchImpl implements StudyCharacteristicsPatch 
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class StudySpeciesTypeImpl implements StudyCharacteristicsPatch.StudySpeciesType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<String> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<String> getValue() {
@@ -302,26 +222,10 @@ public class StudyCharacteristicsPatchImpl implements StudyCharacteristicsPatch 
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class DiseasesTypeImpl implements StudyCharacteristicsPatch.DiseasesType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<String> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<String> getValue() {
@@ -335,26 +239,10 @@ public class StudyCharacteristicsPatchImpl implements StudyCharacteristicsPatch 
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class CountriesTypeImpl implements StudyCharacteristicsPatch.CountriesType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<String> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<String> getValue() {
@@ -368,26 +256,10 @@ public class StudyCharacteristicsPatchImpl implements StudyCharacteristicsPatch 
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class ParticipantAgesTypeImpl implements StudyCharacteristicsPatch.ParticipantAgesType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -401,26 +273,10 @@ public class StudyCharacteristicsPatchImpl implements StudyCharacteristicsPatch 
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class YearsTypeImpl implements StudyCharacteristicsPatch.YearsType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private SampleYearRange value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public SampleYearRange getValue() {

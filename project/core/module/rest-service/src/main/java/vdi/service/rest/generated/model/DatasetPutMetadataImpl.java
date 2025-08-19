@@ -220,26 +220,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class SummaryTypeImpl implements DatasetPutMetadata.SummaryType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -253,26 +237,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class FundingTypeImpl implements DatasetPutMetadata.FundingType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<DatasetFundingAward> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<DatasetFundingAward> getValue() {
@@ -286,26 +254,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class VisibilityTypeImpl implements DatasetPutMetadata.VisibilityType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private DatasetVisibility value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public DatasetVisibility getValue() {
@@ -319,26 +271,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class ProgramNameTypeImpl implements DatasetPutMetadata.ProgramNameType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -352,26 +288,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class NameTypeImpl implements DatasetPutMetadata.NameType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -385,26 +305,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class DescriptionTypeImpl implements DatasetPutMetadata.DescriptionType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -418,26 +322,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class TypeTypeImpl implements DatasetPutMetadata.TypeType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private DatasetTypeInput value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public DatasetTypeInput getValue() {
@@ -451,26 +339,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class ProjectNameTypeImpl implements DatasetPutMetadata.ProjectNameType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -484,26 +356,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class ContactsTypeImpl implements DatasetPutMetadata.ContactsType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<DatasetContact> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<DatasetContact> getValue() {
@@ -517,26 +373,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class RelatedStudiesTypeImpl implements DatasetPutMetadata.RelatedStudiesType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<RelatedStudy> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<RelatedStudy> getValue() {
@@ -550,26 +390,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class PublicationsTypeImpl implements DatasetPutMetadata.PublicationsType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<DatasetPublication> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<DatasetPublication> getValue() {

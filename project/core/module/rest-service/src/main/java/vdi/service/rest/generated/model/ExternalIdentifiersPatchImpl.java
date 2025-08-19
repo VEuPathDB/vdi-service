@@ -52,26 +52,10 @@ public class ExternalIdentifiersPatchImpl implements ExternalIdentifiersPatch {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class BioprojectIdsTypeImpl implements ExternalIdentifiersPatch.BioprojectIdsType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<BioprojectIDReference> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<BioprojectIDReference> getValue() {
@@ -85,26 +69,10 @@ public class ExternalIdentifiersPatchImpl implements ExternalIdentifiersPatch {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class DoisTypeImpl implements ExternalIdentifiersPatch.DoisType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<DOIReference> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<DOIReference> getValue() {
@@ -118,26 +86,10 @@ public class ExternalIdentifiersPatchImpl implements ExternalIdentifiersPatch {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class HyperlinksTypeImpl implements ExternalIdentifiersPatch.HyperlinksType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<DatasetHyperlink> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<DatasetHyperlink> getValue() {

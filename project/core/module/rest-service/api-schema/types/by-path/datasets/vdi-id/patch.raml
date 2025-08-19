@@ -12,6 +12,10 @@ types:
 
       Fields that are omitted will be ignored when updating the target dataset
       record.
+        
+      Fields that are present, with a `value` of `null` indicate the intent to
+      remove the field from the dataset metadata.  All other values provided
+      will be used to replace the existing dataset metadata value.
     type: object
     additionalProperties: false
     properties:
@@ -22,7 +26,7 @@ types:
           
           Only permitted when transitioning from a none-type dataset into an
           actual dataset type.
-        type: PropertyPatch
+        type: object
         properties:
           value?: common.DatasetTypeInput
         additionalProperties: false
@@ -32,7 +36,7 @@ types:
       visibility?:
         # language=markdown
         description: If present, the only valid action is `replace`.
-        type: PropertyPatch
+        type: object
         properties:
           value?: common.DatasetVisibility
         additionalProperties: false
@@ -42,7 +46,7 @@ types:
       name?:
         # language=markdown
         description: If present, the only valid action is `replace`.
-        type: PropertyPatch
+        type: object
         properties:
           value?: common.DatasetName
         additionalProperties: false
@@ -50,13 +54,13 @@ types:
       summary?:
         # language=markdown
         description: If present, the only valid action is `replace`.
-        type: PropertyPatch
+        type: object
         properties:
           value?: common.DatasetSummary
         additionalProperties: false
 
       description?:
-        type: PropertyPatch
+        type: object
         properties:
           value?: common.DatasetDescription
         additionalProperties: false
@@ -67,7 +71,7 @@ types:
       # dependencies: immutable
 
       publications?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: common.DatasetPublication[]
@@ -79,7 +83,7 @@ types:
         description: |-
           If the dataset visibility is not `private`, the only valid action is
           `replace`.
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: common.DatasetContact[]
@@ -91,7 +95,7 @@ types:
         description: |-
           If the install targets array contains MicrobiomeDB or ClinEpiDB, the
           only valid action is `replace`.
-        type: PropertyPatch
+        type: object
         properties:
           value?: common.DatasetProjectName
         additionalProperties: false
@@ -101,13 +105,13 @@ types:
         description:
           If the install targets array contains MicrobiomeDB or ClinEpiDB, the
           only valid action is `replace`.
-        type: PropertyPatch
+        type: object
         properties:
           value?: common.DatasetProgramName
         additionalProperties: false
 
       relatedStudies?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: common.RelatedStudy[]
@@ -123,7 +127,7 @@ types:
       externalIdentifiers?: ExternalIdentifiersPatch
 
       funding?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: common.DatasetFundingAward[]
@@ -135,38 +139,26 @@ types:
     additionalProperties: false
     properties:
       dois?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: common.DOIReference[]
             uniqueItems: true
         additionalProperties: false
       hyperlinks?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: common.DatasetHyperlink[]
             uniqueItems: true
         additionalProperties: false
       bioprojectIds?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: common.BioprojectIDReference[]
             uniqueItems: true
         additionalProperties: false
-
-  PatchAction:
-    type: string
-    enum:
-    - remove
-    - replace
-
-  PropertyPatch:
-    type: object
-    properties:
-      action: PatchAction
-    additionalProperties: false
 
   StudyCharacteristicsPatch:
     type: object
@@ -177,7 +169,7 @@ types:
         description: |-
           If the install targets array contains ClinEpiDB, the only valid
           action is `replace`.
-        type: PropertyPatch
+        type: object
         properties:
           value?: string
         additionalProperties: false
@@ -187,13 +179,13 @@ types:
         description: |-
           If the install targets array contains ClinEpiDB, the only valid
           action is `replace`.
-        type: PropertyPatch
+        type: object
         properties:
           value?: string
         additionalProperties: false
 
       countries?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: array
@@ -205,13 +197,13 @@ types:
         additionalProperties: false
 
       years?:
-        type: PropertyPatch
+        type: object
         properties:
           value?: SampleYearRange
         additionalProperties: false
 
       studySpecies?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: array
@@ -223,7 +215,7 @@ types:
         additionalProperties: false
 
       diseases?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: array
@@ -235,7 +227,7 @@ types:
         additionalProperties: false
 
       associatedFactors?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: array
@@ -247,7 +239,7 @@ types:
         additionalProperties: false
 
       participantAges?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: string
@@ -256,7 +248,7 @@ types:
         additionalProperties: false
 
       sampleTypes?:
-        type: PropertyPatch
+        type: object
         properties:
           value?:
             type: array

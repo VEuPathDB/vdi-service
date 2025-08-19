@@ -192,26 +192,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class SummaryTypeImpl implements DatasetPatchRequestBody.SummaryType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -225,26 +209,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class FundingTypeImpl implements DatasetPatchRequestBody.FundingType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<DatasetFundingAward> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<DatasetFundingAward> getValue() {
@@ -258,26 +226,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class VisibilityTypeImpl implements DatasetPatchRequestBody.VisibilityType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private DatasetVisibility value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public DatasetVisibility getValue() {
@@ -291,26 +243,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class ProgramNameTypeImpl implements DatasetPatchRequestBody.ProgramNameType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -324,26 +260,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class NameTypeImpl implements DatasetPatchRequestBody.NameType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -357,26 +277,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class DescriptionTypeImpl implements DatasetPatchRequestBody.DescriptionType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -390,26 +294,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class TypeTypeImpl implements DatasetPatchRequestBody.TypeType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private DatasetTypeInput value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public DatasetTypeInput getValue() {
@@ -423,26 +311,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class ProjectNameTypeImpl implements DatasetPatchRequestBody.ProjectNameType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private String value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public String getValue() {
@@ -456,26 +328,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class ContactsTypeImpl implements DatasetPatchRequestBody.ContactsType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<DatasetContact> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<DatasetContact> getValue() {
@@ -489,26 +345,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class RelatedStudiesTypeImpl implements DatasetPatchRequestBody.RelatedStudiesType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<RelatedStudy> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<RelatedStudy> getValue() {
@@ -522,26 +362,10 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder({
-      "action",
-      "value"
-  })
+  @JsonPropertyOrder("value")
   public static class PublicationsTypeImpl implements DatasetPatchRequestBody.PublicationsType {
-    @JsonProperty("action")
-    private PatchAction action;
-
     @JsonProperty("value")
     private List<DatasetPublication> value;
-
-    @JsonProperty("action")
-    public PatchAction getAction() {
-      return this.action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(PatchAction action) {
-      this.action = action;
-    }
 
     @JsonProperty("value")
     public List<DatasetPublication> getValue() {

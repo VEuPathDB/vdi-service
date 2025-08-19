@@ -1,11 +1,12 @@
 @file:JvmName("DatasetPatchRequestValidator")
 package vdi.service.rest.server.inputs
 
-import com.networknt.schema.JsonSchema
 import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.checkLength
 import org.veupathdb.lib.request.validation.rangeTo
-import vdi.model.data.InstallTargetID
-import vdi.core.install.InstallTargetRegistry
+import org.veupathdb.lib.request.validation.require
+import vdi.model.data.DatasetMetadata
+import vdi.model.data.StudyCharacteristics
 import vdi.service.rest.generated.model.*
 
 @Suppress("DuplicatedCode") // Overlap in generated API types
@@ -15,10 +16,12 @@ internal fun DatasetPatchRequestBody.cleanup() {
   summary?.apply { cleanupString(::getValue) }
   description?.apply { cleanupString(::getValue) }
   publications?.apply { cleanupList(::getValue, DatasetPublication?::cleanup) }
+
   contacts?.apply { cleanupList(::getValue, DatasetContact?::cleanup) }
   projectName?.apply { cleanupString(::getValue) }
   programName?.apply { cleanupString(::getValue) }
   relatedStudies?.apply { cleanupList(::getValue, RelatedStudy?::cleanup) }
+
   studyCharacteristics?.apply {
     studyDesign?.apply { cleanupString(::getValue) }
     studyType?.apply { cleanupString(::getValue) }
@@ -30,6 +33,7 @@ internal fun DatasetPatchRequestBody.cleanup() {
     participantAges?.apply { cleanupString(::getValue) }
     sampleTypes?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
   }
+
   externalIdentifiers?.apply {
     dois?.apply { cleanupList(::getValue, DOIReference?::cleanup) }
     hyperlinks?.apply { cleanupList(::getValue, DatasetHyperlink?::cleanup) }
@@ -40,39 +44,88 @@ internal fun DatasetPatchRequestBody.cleanup() {
 
 @Suppress("DuplicatedCode")
 internal fun DatasetPatchRequestBody.validate(
-  projects: Iterable<InstallTargetID>,
+  original: DatasetMetadata,
   errors: ValidationErrors = ValidationErrors()
 ): ValidationErrors {
-  name?.validateName(JsonField.NAME, errors)
-  shortName.validateShortName(JsonField.SHORT_NAME, errors)
-  shortAttribution.validateShortAttribution(JsonField.SHORT_ATTRIBUTION, errors)
-  summary?.validateSummary(JsonField.SUMMARY, errors)
+  type?.value?.validate(JsonField.DATASET_TYPE, original.installTargets, errors)
+  name?.value?.checkLength(JsonField.NAME, NameLengthRange, errors)
+  summary?.value?.checkLength(JsonField.SUMMARY, SummaryLengthRange, errors)
   // description (nothing to validate)
-  publications?.validate(JsonField.PUBLICATIONS, errors)
-  hyperlinks?.validate(JsonField.HYPERLINKS, errors)
-  organisms?.validateOrganisms(JsonField.ORGANISMS, errors)
-  contacts?.validate(JsonField.CONTACTS, errors)
-  // pass an empty list for projects because we don't have that information yet.
-  datasetType?.validate(JsonField.DATASET_TYPE, projects, errors)
+  publications?.value?.validate(JsonField.PUBLICATIONS, errors)
 
-  properties?.takeUnless { it.isEmpty }?.also { props ->
-    var owner: String? = null
-    var schema: JsonSchema? = null
+  contacts?.value?.validate(JsonField.CONTACTS, strict, errors)
+  projectName?.value?.checkLength(JsonField.PROJECT_NAME, ProjectNameLengthRange, errors)
+  programName?.value?.checkLength(JsonField.PROGRAM_NAME, ProgramNameLengthRange, errors)
+  relatedStudies?.value?.validate(JsonField.RELATED_STUDIES, errors)
 
-    projects.forEachIndexed { i, it ->
-      when {
-        schema == null                                        -> {
-          owner = it
-          schema = InstallTargetRegistry[it]!!.propertySchema
-        }
-        schema !== InstallTargetRegistry[it]!!.propertySchema -> {
-          errors.add(JsonField.INSTALL_TARGETS..i, "install target $it property schema is incompatible with install target $owner")
-        }
+  studyCharacteristics?.validate(errors)
+  externalIdentifiers?.validate(errors)
+
+  funding?.value?.validate(JsonField.FUNDING, errors)
+
+  return errors
+}
+
+private fun StudyCharacteristicsPatch.validate(original: StudyCharacteristics, errors: ValidationErrors) {
+
+  // If the client is attempting to change the study design value
+  if (studyDesign != null) {
+    when {
+      // If the client explicitly set the study design value to null
+      studyDesign.value == null || studyDesign.action == PatchAction.REMOVE -> {
+        // then the study type must also be set to null (study type requires study design)
+        if (studyType == null || studyType.value != null)
+          errors.add(JsonField.STUDY_CHARACTERISTICS..JsonField.STUDY_TYPE, "cannot remove study design without also removing study type")
+      }
+
+      // If the study design has been set, AND no study type value was provided
+      studyType == null -> {
+        // then the original must already have a study type value
+        original.studyType.require(JsonField.STUDY_CHARACTERISTICS..JsonField.STUDY_TYPE, errors) {}
+      }
+
+      // If the study design has been set, AND the client is trying to remove out the study type value.
+      studyType.value == null || studyType.action == PatchAction.REMOVE -> {
+        // No.
+        errors.add(JsonField.STUDY_CHARACTERISTICS..JsonField.STUDY_TYPE)
       }
     }
 
-    schema?.also { props.validate(it, JsonField.PROPERTIES, errors) }
+  // If the client is attempting to change the study type value
+  } else if (studyType != null) {
+    when {
+      // we already know the client didn't attempt to change the study design
+      // value by virtue of being in this else block.
+      studyType.value == null || studyType.action == PatchAction.REMOVE -> {
+        null.require(JsonField.STUDY_CHARACTERISTICS..JsonField.STUDY_DESIGN, errors) {}
+      }
+
+      // If the client is attempting to change the study type value without also
+      // providing a study design value
+      else -> {
+        // then the action is only valid if we already had a study design value.
+        original.studyDesign.require(JsonField.STUDY_CHARACTERISTICS..JsonField.STUDY_DESIGN, errors) {}
+      }
+    }
   }
 
-  return errors
+
+
+    } else if (studyType == null) {
+
+      // AND the current stored state also has no study type value, then a study
+      // type value is required to be provided.
+
+    } else {}
+  }
+
+  if (studyDesign != null) {
+    if (stud)
+
+    if (original.studyType == null && )
+  }
+}
+
+private fun ExternalIdentifiersPatch.validate(errors: ValidationErrors) {
+
 }

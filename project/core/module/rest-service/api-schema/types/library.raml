@@ -444,11 +444,7 @@ types:
       organization?: string
   DatasetPatchRequestBody:
     displayName: Dataset Patch Request
-    description: |-
-      Request to update the metadata for a dataset.
-
-      Fields that are omitted will be ignored when updating the target dataset
-      record.
+    description: "Request to update the metadata for a dataset.\n\nFields that are omitted will be ignored when updating the target dataset\nrecord.\n  \nFields that are present, with a `value` of `null` indicate the intent to\nremove the field from the dataset metadata.  All other values provided\nwill be used to replace the existing dataset metadata value."
     type: object
     additionalProperties: false
     properties:
@@ -458,80 +454,80 @@ types:
 
           Only permitted when transitioning from a none-type dataset into an
           actual dataset type.
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?: DatasetTypeInput
-        additionalProperties: false
       visibility?:
         description: If present, the only valid action is `replace`.
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?: DatasetVisibility
-        additionalProperties: false
       name?:
         description: If present, the only valid action is `replace`.
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?: DatasetName
-        additionalProperties: false
       summary?:
         description: If present, the only valid action is `replace`.
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?: DatasetSummary
-        additionalProperties: false
       description?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?: DatasetDescription
-        additionalProperties: false
       publications?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: DatasetPublication[]
             uniqueItems: true
-        additionalProperties: false
       contacts?:
         description: |-
           If the dataset visibility is not `private`, the only valid action is
           `replace`.
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: DatasetContact[]
             uniqueItems: true
-        additionalProperties: false
       projectName?:
         description: |-
           If the install targets array contains MicrobiomeDB or ClinEpiDB, the
           only valid action is `replace`.
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?: DatasetProjectName
-        additionalProperties: false
       programName?:
         description: If the install targets array contains MicrobiomeDB or ClinEpiDB, the only valid action is `replace`.
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?: DatasetProgramName
-        additionalProperties: false
       relatedStudies?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: RelatedStudy[]
             uniqueItems: true
-        additionalProperties: false
       studyCharacteristics?: StudyCharacteristicsPatch
       externalIdentifiers?: ExternalIdentifiersPatch
       funding?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: DatasetFundingAward[]
             uniqueItems: true
-        additionalProperties: false
   DatasetPostMeta:
     type: DatasetMetaBase
     additionalProperties: false
@@ -846,26 +842,26 @@ types:
     additionalProperties: false
     properties:
       dois?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: DOIReference[]
             uniqueItems: true
-        additionalProperties: false
       hyperlinks?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: DatasetHyperlink[]
             uniqueItems: true
-        additionalProperties: false
       bioprojectIds?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: BioprojectIDReference[]
             uniqueItems: true
-        additionalProperties: false
   FailedDependencyError:
     displayName: Failed Dependency Error
     type: Error
@@ -997,11 +993,6 @@ types:
       * `2022-03-15T16:30:12.123-06:00`
     type: string
     minLength: 4
-  PatchAction:
-    type: string
-    enum:
-      - remove
-      - replace
   PluginListItem:
     displayName: Plugin Info
     type: object
@@ -1016,11 +1007,6 @@ types:
           indicates that the plugin has no project restrictions and may be used
           on any site.
         type: InstallTargetID[]
-  PropertyPatch:
-    type: object
-    additionalProperties: false
-    properties:
-      action: PatchAction
   RelatedStudy:
     type: object
     additionalProperties: false
@@ -1179,86 +1165,86 @@ types:
         description: |-
           If the install targets array contains ClinEpiDB, the only valid
           action is `replace`.
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?: string
-        additionalProperties: false
       studyType?:
         description: |-
           If the install targets array contains ClinEpiDB, the only valid
           action is `replace`.
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?: string
-        additionalProperties: false
       countries?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: array
+            uniqueItems: true
             items:
               type: string
               minLength: 3
               maxLength: 128
-            uniqueItems: true
-        additionalProperties: false
       years?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?: SampleYearRange
-        additionalProperties: false
       studySpecies?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: array
+            uniqueItems: true
             items:
               type: string
               minLength: 3
               maxLength: 128
-            uniqueItems: true
-        additionalProperties: false
       diseases?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: array
+            uniqueItems: true
             items:
               type: string
               minLength: 3
               maxLength: 128
-            uniqueItems: true
-        additionalProperties: false
       associatedFactors?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: array
+            uniqueItems: true
             items:
               type: string
               minLength: 3
               maxLength: 128
-            uniqueItems: true
-        additionalProperties: false
       participantAges?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: string
             minLength: 1
             maxLength: 128
-        additionalProperties: false
       sampleTypes?:
-        type: PropertyPatch
+        type: object
+        additionalProperties: false
         properties:
           value?:
             type: array
+            uniqueItems: true
             items:
               type: string
               minLength: 3
               maxLength: 128
-            uniqueItems: true
-        additionalProperties: false
   SyncControlRecord:
     type: object
     additionalProperties: false

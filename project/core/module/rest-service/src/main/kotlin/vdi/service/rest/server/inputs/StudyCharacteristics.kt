@@ -30,25 +30,23 @@ fun APIStudyCharacteristics?.cleanup() = this?.also {
   cleanupDistinctList(::getSampleTypes, String?::cleanup)
 }
 
-fun APIStudyCharacteristics?.validate(jPath: String, errors: ValidationErrors) {
-  if (this != null) {
-    if (studyDesign != null) {
-      errors.require(jPath..JsonField.STUDY_TYPE, errors) {}
-    } else if (studyType != null) {
-      // if study design is null, study type must also be null
-      errors.add(jPath..JsonField.STUDY_TYPE, "must not be set without a \"${JsonField.STUDY_DESIGN}\" value")
-    }
-
-    countries?.reqEntriesCheckLength(jPath..JsonField.COUNTRIES, CountryValidLength, errors)
-
-    years?.validate(jPath..JsonField.YEARS, errors)
-
-    studySpecies?.reqEntriesCheckLength(jPath..JsonField.STUDY_SPECIES, StudySpeciesValidLength, errors)
-    diseases?.reqEntriesCheckLength(jPath..JsonField.DISEASES, DiseaseValidLength, errors)
-    associatedFactors?.reqEntriesCheckLength(jPath..JsonField.ASSOCIATED_FACTORS, AssociatedFactorValidLength, errors)
-    participantAges?.checkLength(jPath..JsonField.PARTICIPANT_AGES, ParticipantAgeValidLength, errors)
-    sampleTypes?.reqEntriesCheckLength(jPath..JsonField.SAMPLE_TYPES, SampleTypeValidLength, errors)
+fun APIStudyCharacteristics.validate(jPath: String, errors: ValidationErrors) {
+  if (studyDesign != null) {
+    studyType.require(jPath..JsonField.STUDY_TYPE, errors) {}
+  } else if (studyType != null) {
+    // if study design is null, study type must also be null
+    errors.add(jPath..JsonField.STUDY_TYPE, "must not be set without a \"${JsonField.STUDY_DESIGN}\" value")
   }
+
+  countries?.reqEntriesCheckLength(jPath..JsonField.COUNTRIES, CountryValidLength, errors)
+
+  years?.validate(jPath..JsonField.YEARS, errors)
+
+  studySpecies?.reqEntriesCheckLength(jPath..JsonField.STUDY_SPECIES, StudySpeciesValidLength, errors)
+  diseases?.reqEntriesCheckLength(jPath..JsonField.DISEASES, DiseaseValidLength, errors)
+  associatedFactors?.reqEntriesCheckLength(jPath..JsonField.ASSOCIATED_FACTORS, AssociatedFactorValidLength, errors)
+  participantAges?.checkLength(jPath..JsonField.PARTICIPANT_AGES, ParticipantAgeValidLength, errors)
+  sampleTypes?.reqEntriesCheckLength(jPath..JsonField.SAMPLE_TYPES, SampleTypeValidLength, errors)
 }
 
 fun APIStudyCharacteristics.toInternal() =

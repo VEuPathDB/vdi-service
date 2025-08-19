@@ -1,7 +1,7 @@
+@file:JvmName("InputCleanupUtils")
 package vdi.service.rest.server.inputs
 
 import kotlin.reflect.KFunction0
-import kotlin.reflect.KFunction1
 import kotlin.reflect.KFunction2
 import kotlin.reflect.full.declaredMemberFunctions
 
@@ -54,9 +54,41 @@ internal fun <T: Any, I: Any> T.cleanupDistinctList(getter: KFunction0<List<I?>?
       ?: emptyList()
   }
 
+/**
+ * Trims whitespaces from the beginning and end of the input string, if it is
+ * not `null`, returning either the trimmed form or `null`.
+ *
+ * Optionally, converts empty strings to `null`.  This is the default behavior.
+ *
+ * @receiver Nullable string value to trim.
+ *
+ * @param emptyToNull Whether the input string value should be replaced with
+ * `null` if it is empty after being trimmed.
+ *
+ * @return Either the input string, if present, with the whitespace trimmed from
+ * both the right and left sides, or `null` if the receiver value was `null` or
+ * if [emptyToNull] is `true` and the receiver value trimmed down to an empty
+ * string.
+ */
 internal fun String?.cleanup(emptyToNull: Boolean = true) =
   this?.trim()?.run { if (emptyToNull && isEmpty()) null else this }
 
+/**
+ * Applies an arbitrary 'cleanup' transform function to the value returned by
+ * the provided [getter], then sets the cleaned value back to the receiver
+ * object using the property's matching setter function.
+ *
+ * The setter function is assumed to exist with the same name as the getter but
+ * with the prefix "get" replaced with "set".
+ *
+ * @receiver Parent object to which the property and [getter] belong.  This
+ * value is used when retrieving and calling the setter function.
+ *
+ * @param getter Property getter method reference.
+ *
+ * @param fn "Cleanup" transform function, whose output will be used to replace
+ * the original property value.
+ */
 @Suppress("UNCHECKED_CAST")
 internal inline fun <T: Any, O: Any> T.cleanup(getter: KFunction0<O?>, fn: (O?) -> O?) {
   val setter = getter.name.replaceFirst('g', 's')
@@ -66,37 +98,18 @@ internal inline fun <T: Any, O: Any> T.cleanup(getter: KFunction0<O?>, fn: (O?) 
   fn(getter())?.also { setter(this, it) }
 }
 
-
-@Suppress("UNCHECKED_CAST")
-internal fun <I: Any> Any.cleanup(property: String, fn: (I?) -> I?) {
-  val gName: String
-  val sName: String
-
-  with(property.substring(0, 1).uppercase() + property.substring(1)) {
-    gName = "get$this"
-    sName = "set$this"
-  }
-
-  var getter: KFunction1<Any, I?>? = null
-  var setter: KFunction2<Any, I?, Unit>? = null
-
-  for (f in this::class.declaredMemberFunctions) {
-    if (f.name == gName)
-      getter = f as KFunction1<Any, I?>
-    else if (f.name == sName)
-      setter = f as KFunction2<Any, I?, Unit>
-    if (getter != null && setter != null)
-      break
-  }
-
-  fn(requireFunc(getter, gName).call(this))
-    ?.also { requireFunc(setter, sName).call(this, it) }
-}
-
-internal fun Any.cleanupString(property: String) {
-  cleanup<String>(property) { it?.trim() }
-}
-
+/**
+ * Ensures the property of the receiver instance, represented by the given
+ * [getter] is not `null`, setting the property to the given default [value] if
+ * it is.
+ *
+ * @receiver Parent object to which the target property and [getter] belong.
+ *
+ * @param getter Getter method used to retrieve the current property value.
+ *
+ * @param value Default/fallback value to set if the current instance property
+ * is `null`.
+ */
 internal fun <T: Any, V: Any> T.ensureNotNull(getter: KFunction0<V?>, value: V) =
   cleanup(getter) { it ?: value }
 
@@ -122,7 +135,3 @@ internal fun <T: Any> T.cleanupString(getter: KFunction0<String?>, nullOutBlanks
     it?.trim()
       ?.run { if (nullOutBlanks && isEmpty()) null else this }
   }
-
-
-private fun <T> Any.requireFunc(func: T?, name: String) =
-  func ?: throw IllegalStateException("${this::class.simpleName} does not have a member method $name")

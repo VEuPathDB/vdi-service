@@ -13,26 +13,6 @@ import vdi.core.install.InstallTargetRegistry
 
 /* ┌────────────────────────────────────────────────────────────────────────┐ *\
  * │                                                                        │ *
- * │   Simple Type Validations                                              │ *
- * │                                                                        │ *
-\* └────────────────────────────────────────────────────────────────────────┘ */
-
-private val NameLengthRange = 3..1024
-fun String?.validateName(jPath: String, errors: ValidationErrors) =
-  reqCheckLength(jPath, NameLengthRange, errors)
-
-private val SummaryLengthRange = 3..4000 // max size for varchar in oracle
-fun String?.validateSummary(jPath: String, errors: ValidationErrors) =
-  reqCheckLength(jPath, SummaryLengthRange, errors)
-
-
-private val OriginLengthRange = 3..256
-fun String?.validateOrigin(jPath: String, errors: ValidationErrors) =
-  reqCheckLength(jPath, OriginLengthRange, errors)
-
-
-/* ┌────────────────────────────────────────────────────────────────────────┐ *\
- * │                                                                        │ *
  * │   Scalar Collection Type Validations                                   │ *
  * │                                                                        │ *
 \* └────────────────────────────────────────────────────────────────────────┘ */

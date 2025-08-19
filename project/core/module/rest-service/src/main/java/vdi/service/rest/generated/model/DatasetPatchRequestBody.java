@@ -89,13 +89,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.SummaryTypeImpl.class
   )
-  interface SummaryType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface SummaryType {
     @JsonProperty("value")
     String getValue();
 
@@ -106,13 +100,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.FundingTypeImpl.class
   )
-  interface FundingType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface FundingType {
     @JsonProperty("value")
     List<DatasetFundingAward> getValue();
 
@@ -123,13 +111,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.VisibilityTypeImpl.class
   )
-  interface VisibilityType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface VisibilityType {
     @JsonProperty("value")
     DatasetVisibility getValue();
 
@@ -140,13 +122,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.ProgramNameTypeImpl.class
   )
-  interface ProgramNameType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface ProgramNameType {
     @JsonProperty("value")
     String getValue();
 
@@ -157,13 +133,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.NameTypeImpl.class
   )
-  interface NameType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface NameType {
     @JsonProperty("value")
     String getValue();
 
@@ -174,13 +144,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.DescriptionTypeImpl.class
   )
-  interface DescriptionType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface DescriptionType {
     @JsonProperty("value")
     String getValue();
 
@@ -191,13 +155,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.TypeTypeImpl.class
   )
-  interface TypeType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface TypeType {
     @JsonProperty("value")
     DatasetTypeInput getValue();
 
@@ -208,13 +166,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.ProjectNameTypeImpl.class
   )
-  interface ProjectNameType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface ProjectNameType {
     @JsonProperty("value")
     String getValue();
 
@@ -225,13 +177,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.ContactsTypeImpl.class
   )
-  interface ContactsType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface ContactsType {
     @JsonProperty("value")
     List<DatasetContact> getValue();
 
@@ -242,13 +188,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.RelatedStudiesTypeImpl.class
   )
-  interface RelatedStudiesType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface RelatedStudiesType {
     @JsonProperty("value")
     List<RelatedStudy> getValue();
 
@@ -259,13 +199,7 @@ public interface DatasetPatchRequestBody {
   @JsonDeserialize(
       as = DatasetPatchRequestBodyImpl.PublicationsTypeImpl.class
   )
-  interface PublicationsType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface PublicationsType {
     @JsonProperty("value")
     List<DatasetPublication> getValue();
 

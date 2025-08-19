@@ -65,13 +65,7 @@ public interface StudyCharacteristicsPatch {
   @JsonDeserialize(
       as = StudyCharacteristicsPatchImpl.AssociatedFactorsTypeImpl.class
   )
-  interface AssociatedFactorsType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface AssociatedFactorsType {
     @JsonProperty("value")
     List<String> getValue();
 
@@ -82,13 +76,7 @@ public interface StudyCharacteristicsPatch {
   @JsonDeserialize(
       as = StudyCharacteristicsPatchImpl.StudyTypeTypeImpl.class
   )
-  interface StudyTypeType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface StudyTypeType {
     @JsonProperty("value")
     String getValue();
 
@@ -99,13 +87,7 @@ public interface StudyCharacteristicsPatch {
   @JsonDeserialize(
       as = StudyCharacteristicsPatchImpl.SampleTypesTypeImpl.class
   )
-  interface SampleTypesType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface SampleTypesType {
     @JsonProperty("value")
     List<String> getValue();
 
@@ -116,13 +98,7 @@ public interface StudyCharacteristicsPatch {
   @JsonDeserialize(
       as = StudyCharacteristicsPatchImpl.StudyDesignTypeImpl.class
   )
-  interface StudyDesignType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface StudyDesignType {
     @JsonProperty("value")
     String getValue();
 
@@ -133,13 +109,7 @@ public interface StudyCharacteristicsPatch {
   @JsonDeserialize(
       as = StudyCharacteristicsPatchImpl.StudySpeciesTypeImpl.class
   )
-  interface StudySpeciesType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface StudySpeciesType {
     @JsonProperty("value")
     List<String> getValue();
 
@@ -150,13 +120,7 @@ public interface StudyCharacteristicsPatch {
   @JsonDeserialize(
       as = StudyCharacteristicsPatchImpl.DiseasesTypeImpl.class
   )
-  interface DiseasesType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface DiseasesType {
     @JsonProperty("value")
     List<String> getValue();
 
@@ -167,13 +131,7 @@ public interface StudyCharacteristicsPatch {
   @JsonDeserialize(
       as = StudyCharacteristicsPatchImpl.CountriesTypeImpl.class
   )
-  interface CountriesType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface CountriesType {
     @JsonProperty("value")
     List<String> getValue();
 
@@ -184,13 +142,7 @@ public interface StudyCharacteristicsPatch {
   @JsonDeserialize(
       as = StudyCharacteristicsPatchImpl.ParticipantAgesTypeImpl.class
   )
-  interface ParticipantAgesType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface ParticipantAgesType {
     @JsonProperty("value")
     String getValue();
 
@@ -201,13 +153,7 @@ public interface StudyCharacteristicsPatch {
   @JsonDeserialize(
       as = StudyCharacteristicsPatchImpl.YearsTypeImpl.class
   )
-  interface YearsType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface YearsType {
     @JsonProperty("value")
     SampleYearRange getValue();
 

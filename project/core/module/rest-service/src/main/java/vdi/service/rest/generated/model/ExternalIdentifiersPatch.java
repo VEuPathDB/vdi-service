@@ -29,13 +29,7 @@ public interface ExternalIdentifiersPatch {
   @JsonDeserialize(
       as = ExternalIdentifiersPatchImpl.BioprojectIdsTypeImpl.class
   )
-  interface BioprojectIdsType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface BioprojectIdsType {
     @JsonProperty("value")
     List<BioprojectIDReference> getValue();
 
@@ -46,13 +40,7 @@ public interface ExternalIdentifiersPatch {
   @JsonDeserialize(
       as = ExternalIdentifiersPatchImpl.DoisTypeImpl.class
   )
-  interface DoisType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface DoisType {
     @JsonProperty("value")
     List<DOIReference> getValue();
 
@@ -63,13 +51,7 @@ public interface ExternalIdentifiersPatch {
   @JsonDeserialize(
       as = ExternalIdentifiersPatchImpl.HyperlinksTypeImpl.class
   )
-  interface HyperlinksType extends PropertyPatch {
-    @JsonProperty("action")
-    PatchAction getAction();
-
-    @JsonProperty("action")
-    void setAction(PatchAction action);
-
+  interface HyperlinksType {
     @JsonProperty("value")
     List<DatasetHyperlink> getValue();
 
