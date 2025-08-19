@@ -1,4 +1,6 @@
 @file:JvmName("StudyCharacteristicsApiExtensions")
+@file:Suppress("NOTHING_TO_INLINE")
+
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
@@ -48,6 +50,24 @@ fun APIStudyCharacteristics.validate(jPath: String, errors: ValidationErrors) {
   participantAges?.checkLength(jPath..JsonField.PARTICIPANT_AGES, ParticipantAgeValidLength, errors)
   sampleTypes?.reqEntriesCheckLength(jPath..JsonField.SAMPLE_TYPES, SampleTypeValidLength, errors)
 }
+
+fun List<String>.validateSampleTypes(jPath: String, errors: ValidationErrors) =
+  reqEntriesCheckLength(jPath..JsonField.SAMPLE_TYPES, SampleTypeValidLength, errors)
+
+fun String.validateParticipantAges(jPath: String, errors: ValidationErrors) =
+  checkLength(jPath..JsonField.PARTICIPANT_AGES, ParticipantAgeValidLength, errors)
+
+fun List<String>.validateCountries(jPath: String, errors: ValidationErrors) =
+  reqEntriesCheckLength(jPath..JsonField.COUNTRIES, CountryValidLength, errors)
+
+fun List<String>.validateStudySpecies(jPath: String, errors: ValidationErrors) =
+  reqEntriesCheckLength(jPath..JsonField.STUDY_SPECIES, StudySpeciesValidLength, errors)
+
+fun List<String>.validateDiseases(jPath: String, errors: ValidationErrors) =
+  reqEntriesCheckLength(jPath..JsonField.DISEASES, DiseaseValidLength, errors)
+
+fun List<String>.validateAssociatedFactors(jPath: String, errors: ValidationErrors) =
+  reqEntriesCheckLength(jPath..JsonField.ASSOCIATED_FACTORS, AssociatedFactorValidLength, errors)
 
 fun APIStudyCharacteristics.toInternal() =
   StudyCharacteristics(

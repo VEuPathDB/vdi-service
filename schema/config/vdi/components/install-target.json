@@ -43,8 +43,10 @@
       "title": "Dataset Data Database/Schema"
     },
     "metaValidation": {
-      "description": "Additional JSON schema validation to apply to metadata for this install target.",
-      "$ref": "https://json-schema.org/draft/2020-12/schema"
+      "description": "Additional dataset metadata rules that apply to datasets for this install target.\n\nKeys to this object are expected to be valid JSONPath query expressions (ref rfc9535) that will be used to locate the fields to validate.\n\nValues are JSON schema definitions that will be used to validate the values located at the target json path.",
+      "type": "object",
+      "additionalProperties": { "$ref": "validation.json" },
+      "unevaluatedProperties": false
     }
   },
   "allOf": [

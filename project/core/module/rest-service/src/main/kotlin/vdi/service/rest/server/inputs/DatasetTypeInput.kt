@@ -1,10 +1,7 @@
 @file:JvmName("DatasetTypeValidator")
 package vdi.service.rest.server.inputs
 
-import org.veupathdb.lib.request.validation.ValidationErrors
-import org.veupathdb.lib.request.validation.checkNonBlank
-import org.veupathdb.lib.request.validation.rangeTo
-import org.veupathdb.lib.request.validation.require
+import org.veupathdb.lib.request.validation.*
 import vdi.model.data.DataType
 import vdi.model.data.InstallTargetID
 import vdi.model.data.DatasetType
@@ -20,8 +17,8 @@ fun DatasetTypeInput?.cleanup() = this?.apply {
 fun DatasetTypeInput?.validate(jPath: String, projects: Iterable<InstallTargetID>, errors: ValidationErrors) =
   require(jPath, errors) {
     if (
-      name.checkNonBlank(jPath..JsonField.NAME, errors)
-      && version.checkNonBlank(jPath..JsonField.VERSION, errors)
+      name.reqCheckMinLength(jPath..JsonField.NAME, 1, errors)
+      && version.reqCheckMinLength(jPath..JsonField.VERSION, 1, errors)
     ) {
       val details = PluginRegistry[toInternal()]
         ?: return errors.add(jPath, "unrecognized or unavailable dataset type")

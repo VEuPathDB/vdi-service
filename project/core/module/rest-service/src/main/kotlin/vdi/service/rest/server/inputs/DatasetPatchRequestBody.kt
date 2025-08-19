@@ -5,11 +5,14 @@ import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.checkLength
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.require
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.DatasetMetadata
+import vdi.model.data.DatasetVisibility
 import vdi.model.data.StudyCharacteristics
 import vdi.service.rest.generated.model.*
+import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
+import vdi.service.rest.generated.model.JsonField as JF
 
-@Suppress("DuplicatedCode") // Overlap in generated API types
 internal fun DatasetPatchRequestBody.cleanup() {
   type?.apply { cleanup(::getValue, DatasetTypeInput?::cleanup) }
   name?.apply { cleanupString(::getValue) }
@@ -42,52 +45,115 @@ internal fun DatasetPatchRequestBody.cleanup() {
   funding?.apply { cleanupList(::getValue, DatasetFundingAward?::cleanup) }
 }
 
-@Suppress("DuplicatedCode")
 internal fun DatasetPatchRequestBody.validate(
   original: DatasetMetadata,
   errors: ValidationErrors = ValidationErrors()
 ): ValidationErrors {
-  type?.value?.validate(JsonField.DATASET_TYPE, original.installTargets, errors)
-  name?.value?.checkLength(JsonField.NAME, NameLengthRange, errors)
-  summary?.value?.checkLength(JsonField.SUMMARY, SummaryLengthRange, errors)
+  var isPublic = original.visibility != DatasetVisibility.Private
+
+  visibility?.apply { value.requireAnd(JF.VISIBILITY, errors) {
+    if (this != APIVisibility.PRIVATE)
+      isPublic = true
+  } }
+
+  type?.apply {
+    value.requireAnd(JF.DATASET_TYPE, errors) {
+      validate(JF.DATASET_TYPE, original.installTargets, errors)
+
+      val handler = PluginRegistry[original.type]
+
+      if (handler == null)
+        errors.add(JF.DATASET_TYPE, "original dataset type is disabled")
+      else if (!handler.changesEnabled)
+        errors.add(JF.DATASET_TYPE, "cannot change dataset type from ${original.type}")
+    }
+  }
+
+  name?.apply { value.requireAnd(JF.NAME, errors) { checkLength(JF.NAME, NameLengthRange, errors) } }
+
+  summary?.apply { value.requireAnd(JF.SUMMARY, errors) {
+    checkLength(JF.SUMMARY, SummaryLengthRange, errors)
+  } }
+
   // description (nothing to validate)
-  publications?.value?.validate(JsonField.PUBLICATIONS, errors)
+  publications?.value?.validate(JF.PUBLICATIONS, errors)
 
-  contacts?.value?.validate(JsonField.CONTACTS, strict, errors)
-  projectName?.value?.checkLength(JsonField.PROJECT_NAME, ProjectNameLengthRange, errors)
-  programName?.value?.checkLength(JsonField.PROGRAM_NAME, ProgramNameLengthRange, errors)
-  relatedStudies?.value?.validate(JsonField.RELATED_STUDIES, errors)
+  contacts?.apply {
+    if (isPublic) {
+      // Contacts are required for public datasets.
+      value.requireAnd(JF.CONTACTS)
+    }
+  }
 
-  studyCharacteristics?.validate(errors)
+  contacts?.value?.validate(JF.CONTACTS, isPublic, errors)
+  projectName?.value?.checkLength(JF.PROJECT_NAME, ProjectNameLengthRange, errors)
+  programName?.value?.checkLength(JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
+  relatedStudies?.value?.validate(JF.RELATED_STUDIES, errors)
+
+  studyCharacteristics?.validate(original.studyCharacteristics, errors)
   externalIdentifiers?.validate(errors)
 
-  funding?.value?.validate(JsonField.FUNDING, errors)
+  funding?.value?.validate(JF.FUNDING, errors)
 
   return errors
 }
 
-private fun StudyCharacteristicsPatch.validate(original: StudyCharacteristics, errors: ValidationErrors) {
+private inline fun <T: Any> T?.requireAnd(jPath: String, errors: ValidationErrors, validator: T.() -> Unit) {
+  if (this == null)
+    errors.add(jPath, "field cannot be unset")
+  else
+    validator(this)
+}
+
+
+internal fun DatasetPatchRequestBody.applyPatch(original: DatasetMetadata) =
+  DatasetMetadata(
+    type = type?.value?.toInternal() ?: original.type,
+    installTargets = original.installTargets,
+    visibility = visibility?.value?.toInternal() ?: original.visibility,
+    owner = original.owner,
+    name = name?.value ?: original.name,
+    summary = summary?.value ?: original.summary,
+    description = description?.value ?: original.description,
+    origin = TODO(),
+    created = TODO(),
+    sourceURL = TODO(),
+    dependencies = TODO(),
+    publications = TODO(),
+    contacts = TODO(),
+    projectName = TODO(),
+    programName = TODO(),
+    relatedStudies = TODO(),
+    experimentalOrganism = TODO(),
+    hostOrganism = TODO(),
+    studyCharacteristics = TODO(),
+    externalIdentifiers = TODO(),
+    funding = TODO(),
+    revisionHistory = TODO()
+  )
+
+private fun StudyCharacteristicsPatch.validate(original: StudyCharacteristics?, errors: ValidationErrors) {
 
   // If the client is attempting to change the study design value
   if (studyDesign != null) {
     when {
       // If the client explicitly set the study design value to null
-      studyDesign.value == null || studyDesign.action == PatchAction.REMOVE -> {
+      studyDesign.value == null -> {
         // then the study type must also be set to null (study type requires study design)
         if (studyType == null || studyType.value != null)
-          errors.add(JsonField.STUDY_CHARACTERISTICS..JsonField.STUDY_TYPE, "cannot remove study design without also removing study type")
+          errors.add(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE, "cannot remove study design without also removing study type")
       }
 
       // If the study design has been set, AND no study type value was provided
       studyType == null -> {
         // then the original must already have a study type value
-        original.studyType.require(JsonField.STUDY_CHARACTERISTICS..JsonField.STUDY_TYPE, errors) {}
+        original?.studyType.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE, errors) {}
       }
 
       // If the study design has been set, AND the client is trying to remove out the study type value.
-      studyType.value == null || studyType.action == PatchAction.REMOVE -> {
+      studyType.value == null -> {
         // No.
-        errors.add(JsonField.STUDY_CHARACTERISTICS..JsonField.STUDY_TYPE)
+        errors.add(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE)
       }
     }
 
@@ -96,36 +162,32 @@ private fun StudyCharacteristicsPatch.validate(original: StudyCharacteristics, e
     when {
       // we already know the client didn't attempt to change the study design
       // value by virtue of being in this else block.
-      studyType.value == null || studyType.action == PatchAction.REMOVE -> {
-        null.require(JsonField.STUDY_CHARACTERISTICS..JsonField.STUDY_DESIGN, errors) {}
+      studyType.value == null -> {
+        null.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
       }
 
       // If the client is attempting to change the study type value without also
       // providing a study design value
       else -> {
         // then the action is only valid if we already had a study design value.
-        original.studyDesign.require(JsonField.STUDY_CHARACTERISTICS..JsonField.STUDY_DESIGN, errors) {}
+        original?.studyDesign.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
       }
     }
   }
 
+  countries?.value?.validateCountries(JF.STUDY_CHARACTERISTICS, errors)
 
+  years?.value?.validate(JF.STUDY_CHARACTERISTICS..JF.YEARS, errors)
 
-    } else if (studyType == null) {
-
-      // AND the current stored state also has no study type value, then a study
-      // type value is required to be provided.
-
-    } else {}
-  }
-
-  if (studyDesign != null) {
-    if (stud)
-
-    if (original.studyType == null && )
-  }
+  studySpecies?.value?.validateStudySpecies(JF.STUDY_CHARACTERISTICS, errors)
+  diseases?.value?.validateDiseases(JF.STUDY_CHARACTERISTICS, errors)
+  associatedFactors?.value?.validateAssociatedFactors(JF.STUDY_CHARACTERISTICS, errors)
+  participantAges?.value?.validateParticipantAges(JF.STUDY_CHARACTERISTICS, errors)
+  sampleTypes?.value?.validateSampleTypes(JF.STUDY_CHARACTERISTICS, errors)
 }
 
 private fun ExternalIdentifiersPatch.validate(errors: ValidationErrors) {
-
+  dois?.value?.validate(JF.EXTERNAL_IDENTIFIERS..JF.DOIS, errors)
+  hyperlinks?.value?.validate(JF.EXTERNAL_IDENTIFIERS..JF.HYPERLINKS, errors)
+  bioprojectIds?.value?.validate(JF.EXTERNAL_IDENTIFIERS..JF.BIOPROJECT_IDS, errors)
 }
