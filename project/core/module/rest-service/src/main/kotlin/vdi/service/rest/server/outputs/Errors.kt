@@ -29,7 +29,7 @@ inline fun <reified T: ResponseDelegate> ForbiddenError.wrap(): T =
 
 // region 404
 
-object Static404 : NotFoundErrorImpl()
+object Static404: NotFoundErrorImpl()
 
 fun NotFoundError(message: String? = null): NotFoundError =
   NotFoundErrorImpl().also { it.message = message }

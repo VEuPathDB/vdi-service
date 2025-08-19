@@ -9,6 +9,9 @@ sealed interface Either<L, R> {
   fun unwrapRight(): R
 
   companion object {
+    fun <L, R> left(value: L): Either<L, R> = LeftEither(value)
+    fun <L, R> right(value: R): Either<L, R> = RightEither(value)
+
     fun <L, R> ofLeft(value: L): Either<L, R> = LeftEither(value)
     fun <L, R> ofRight(value: R): Either<L, R> = RightEither(value)
   }

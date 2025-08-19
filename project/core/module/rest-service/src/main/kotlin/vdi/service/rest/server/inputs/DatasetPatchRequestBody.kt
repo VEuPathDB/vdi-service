@@ -8,6 +8,7 @@ import org.veupathdb.lib.request.validation.require
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.DatasetMetadata
 import vdi.model.data.DatasetVisibility
+import vdi.model.data.ExternalDatasetIdentifiers
 import vdi.model.data.StudyCharacteristics
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
@@ -81,11 +82,16 @@ internal fun DatasetPatchRequestBody.validate(
   contacts?.apply {
     if (isPublic) {
       // Contacts are required for public datasets.
-      value.requireAnd(JF.CONTACTS)
+      value.requireAnd(JF.CONTACTS, errors) {
+        validate(JF.CONTACTS, true, errors)
+        if (size < 0)
+          errors.add(JF.CONTACTS, "must provide at least one contact for non-private datasets")
+      }
+    } else {
+      value?.validate(JF.CONTACTS, false, errors)
     }
   }
 
-  contacts?.value?.validate(JF.CONTACTS, isPublic, errors)
   projectName?.value?.checkLength(JF.PROJECT_NAME, ProjectNameLengthRange, errors)
   programName?.value?.checkLength(JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
   relatedStudies?.value?.validate(JF.RELATED_STUDIES, errors)
@@ -108,28 +114,47 @@ private inline fun <T: Any> T?.requireAnd(jPath: String, errors: ValidationError
 
 internal fun DatasetPatchRequestBody.applyPatch(original: DatasetMetadata) =
   DatasetMetadata(
-    type = type?.value?.toInternal() ?: original.type,
-    installTargets = original.installTargets,
-    visibility = visibility?.value?.toInternal() ?: original.visibility,
-    owner = original.owner,
-    name = name?.value ?: original.name,
-    summary = summary?.value ?: original.summary,
-    description = description?.value ?: original.description,
-    origin = TODO(),
-    created = TODO(),
-    sourceURL = TODO(),
-    dependencies = TODO(),
-    publications = TODO(),
-    contacts = TODO(),
-    projectName = TODO(),
-    programName = TODO(),
-    relatedStudies = TODO(),
-    experimentalOrganism = TODO(),
-    hostOrganism = TODO(),
-    studyCharacteristics = TODO(),
-    externalIdentifiers = TODO(),
-    funding = TODO(),
-    revisionHistory = TODO()
+    type            = type?.value?.toInternal() ?: original.type,
+    installTargets  = original.installTargets,
+    visibility      = visibility?.value?.toInternal() ?: original.visibility,
+    owner           = original.owner,
+    name            = name?.value ?: original.name,
+    summary         = summary?.value ?: original.summary,
+    description     = description.mapIfPresent(original.description) { value },
+    origin          = original.origin,
+    created         = original.created,
+    sourceURL       = original.sourceURL,
+    dependencies    = original.dependencies,
+    projectName     = projectName.mapIfPresent(original.projectName) { value },
+    programName     = programName.mapIfPresent(original.programName) { value },
+    hostOrganism    = original.hostOrganism,
+    revisionHistory = original.revisionHistory,
+
+    experimentalOrganism = original.experimentalOrganism,
+
+    publications = publications.mapIfPresent(original.publications) {
+      value?.toInternalDistinct(DatasetPublication::toInternal) ?: emptyList()
+    },
+
+    contacts = contacts.mapIfPresent(original.contacts) {
+      value?.toInternalDistinct(DatasetContact::toInternal) ?: emptyList()
+    },
+
+    relatedStudies = relatedStudies.mapIfPresent(original.relatedStudies) {
+      value?.toInternalDistinct(RelatedStudy::toInternal) ?: emptyList()
+    },
+
+    studyCharacteristics = studyCharacteristics.mapIfPresent(original.studyCharacteristics) {
+      applyPatch(original.studyCharacteristics)
+    },
+
+    externalIdentifiers = externalIdentifiers.mapIfPresent(original.externalIdentifiers) {
+      applyPatch(original.externalIdentifiers)
+    },
+
+    funding = funding.mapIfPresent(original.funding) {
+      value?.toInternalDistinct(DatasetFundingAward::toInternal) ?: emptyList()
+    },
   )
 
 private fun StudyCharacteristicsPatch.validate(original: StudyCharacteristics?, errors: ValidationErrors) {
@@ -191,3 +216,54 @@ private fun ExternalIdentifiersPatch.validate(errors: ValidationErrors) {
   hyperlinks?.value?.validate(JF.EXTERNAL_IDENTIFIERS..JF.HYPERLINKS, errors)
   bioprojectIds?.value?.validate(JF.EXTERNAL_IDENTIFIERS..JF.BIOPROJECT_IDS, errors)
 }
+
+private fun StudyCharacteristicsPatch.applyPatch(original: StudyCharacteristics?) =
+  StudyCharacteristics(
+    studyDesign       = studyDesign.mapIfPresent(original?.studyDesign) { value },
+    studyType         = studyType.mapIfPresent(original?.studyType) { value },
+    countries         = countries.mapIfPresent(original?.countries) { value } ?: emptyList(),
+    years             = years.mapIfPresent(original?.years) { value?.toInternal() },
+    studySpecies      = studySpecies.mapIfPresent(original?.studySpecies) { value } ?: emptyList(),
+    diseases          = diseases.mapIfPresent(original?.diseases) { value } ?: emptyList(),
+    associatedFactors = associatedFactors.mapIfPresent(original?.associatedFactors) { value } ?: emptyList(),
+    participantAges   = participantAges.mapIfPresent(original?.participantAges) { value },
+    sampleTypes       = sampleTypes?.mapIfPresent(original?.sampleTypes) { value } ?: emptyList()
+  )
+
+private fun ExternalIdentifiersPatch.applyPatch(original: ExternalDatasetIdentifiers?) =
+  ExternalDatasetIdentifiers(
+    dois = dois.mapIfPresent(original?.dois) {
+      value?.toInternalDistinct(DOIReference::toInternal)
+    } ?: emptyList(),
+
+    hyperlinks = hyperlinks.mapIfPresent(original?.hyperlinks) {
+      value?.toInternalDistinct(DatasetHyperlink::toInternal)
+    } ?: emptyList(),
+
+    bioprojectIDs = bioprojectIds.mapIfPresent(original?.bioprojectIDs) {
+      value?.toInternalDistinct(BioprojectIDReference::toInternal)
+    } ?: emptyList()
+  )
+
+
+/**
+ * Applies the given mapping function to the receiver value, if it is not null,
+ * otherwise returns the given fallback value.
+ *
+ * Used to apply either the patch input replacement
+ *
+ * @receiver Nullable patch value container instance.
+ *
+ * @param fallback Fallback/original value to use when the patch container is
+ * null.
+ *
+ * @param fn Mapping function to apply to convert the patch value into the type
+ * expected by the consumer.
+ *
+ * @return The result of [fn] if the receiver is not null, otherwise [fallback].
+ */
+private inline fun <R: Any, O> R?.mapIfPresent(fallback: O, fn: R.() -> O) =
+  if (this == null)
+    fallback
+  else
+    fn(this)

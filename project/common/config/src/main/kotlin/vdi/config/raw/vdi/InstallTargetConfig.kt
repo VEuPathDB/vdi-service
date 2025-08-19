@@ -2,9 +2,8 @@ package vdi.config.raw.vdi
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.networknt.schema.JsonSchema
 import vdi.config.raw.db.DatabaseConnectionConfig
-import vdi.config.raw.vdi.characteristics.DatasetPropertySchema
-import vdi.config.raw.vdi.characteristics.NullPropertySchema
 import vdi.config.raw.vdi.serde.InstallTargetConfigDeserializer
 import vdi.model.data.DatasetType
 
@@ -24,6 +23,6 @@ data class InstallTargetConfig(
   @field:JsonProperty("dataDb")
   val dataDB: DatabaseConnectionConfig,
 
-  val datasetPropertySchema: DatasetPropertySchema = NullPropertySchema,
+  val metaValidation: JsonSchema? = null,
 )
 

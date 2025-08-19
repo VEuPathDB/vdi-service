@@ -5,19 +5,14 @@ import java.util.jar.Attributes
 import java.util.jar.Manifest
 
 data class ManifestConfig(
-  @get:JsonGetter("gitTag")
   val gitTag: String,
-  @get:JsonGetter("gitCommit")
   val gitCommit: String,
-  @get:JsonGetter("gitBranch")
   val gitBranch: String,
   @get:JsonGetter("gitUrl")
   val gitURL: String,
   @get:JsonGetter("buildId")
   val buildID: String,
-  @get:JsonGetter("buildNumber")
   val buildNumber: String,
-  @get:JsonGetter("buildTime")
   val buildTime: String,
 ) {
   constructor(manifest: Manifest): this(manifest.mainAttributes)
