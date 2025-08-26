@@ -1,0 +1,316 @@
+= VDI Internal Database
+
+Internal PostgreSQL database for tracking VDI datasets.
+
+Based on: https://hub.docker.com/_/postgres
+
+== Configuration
+
+=== Environment Variables
+
+[source, shell]
+----
+# Required
+POSTGRES_PASSWORD=
+
+# Optional
+POSTGRES_USER=
+POSTGRES_DB=
+POSTGRES_INITDB_ARGS=
+POSTGRES_INITDB_WALDIR=
+POSTGRES_HOST_AUTH_METHOD=
+PGDATA=
+----
+
+== Structure
+
+=== Overall
+
+[%header, cols="3m,7"]
+|===
+| Table | Purpose
+
+| <<vdi_datasets,vdi.datasets>>
+| Root VDI dataset tracking table.
+
+| <<vdi_dataset_files,vdi.dataset_files>>
+| Listing of data files belonging to a target dataset.
+
+| <<vdi_dataset_projects,vdi.dataset_projects>>
+| Listing of projects that a dataset belongs to.
+
+| <<vdi_dataset_metadata,vdi.dataset_metadata>>
+| User provided metadata about a target dataset.
+
+| <<vdi_sync_control,vdi.sync_control>>
+| Timestamps for determining whether a dataset has been updated since it was
+  last synchronized.
+
+| <<vdi_dataset_share_offers,vdi.dataset_share_offers>>
+| Share offers from a dataset owner to a target recipient.
+
+| <<vdi_dataset_share_receipts,vdi.dataset_share_receipts>>
+| Share receipts from a share offer recipient.
+
+| <<vdi_import_control,vdi.import_control>>
+| Dataset import status tracking.
+
+| <<vdi_import_messages,vdi.import_messages>>
+| Messages generated while attempting to import a dataset.
+|===
+
+=== Tables
+
+[#vdi_datasets]
+==== `vdi.datasets`
+
+Primary dataset registration table.  All dataset foreign keys link here.
+
+===== Columns
+
+[%header, cols="1m,1m,2a"]
+|===
+| Column       | Type        | Description
+| dataset_id   | CHAR(32)    | ID of the dataset.
+| type_name    | VARCHAR     | Name of the dataset type.
+| type_version | VARCHAR     | Version for the dataset type.
+| owner_id     | VARCHAR     | External ID of the user that owns the dataset.
+| is_deleted   | BOOLEAN     | Whether the dataset has been marked as deleted.
+| created      | TIMESTAMPTZ | Timestamp of when the dataset was created.
+|===
+
+===== Constraints
+
+[%header, cols="1m,3m"]
+|===
+| Column(s)    | Constraint(s)
+| dataset_id   | PRIMARY KEY NOT NULL
+| type_name    | NOT NULL
+| type_version | NOT NULL
+| owner_id     | NOT NULL
+| is_deleted   | NOT NULL
+| created      | NOT NULL
+|===
+
+[#vdi_dataset_files]
+==== `vdi.dataset_files`
+
+Listing table for imported dataset data files for each dataset.
+
+===== Columns
+
+[%header, cols="1m,1m,2a"]
+|===
+| Column     | Type     | Description
+| dataset_id | CHAR(32) | ID of the target dataset.
+| file_name  | VARCHAR  | Name of the dataset data file.
+|===
+
+===== Constraints
+
+[%header, cols="1m,3m"]
+|===
+| Column(s)               | Constraint(s)
+| dataset_id              | NOT NULL REFERENCES vdi.datasets.dataset_id
+| file_name               | NOT NULL
+| (dataset_id, file_name) | UNIQUE
+|===
+
+[#vdi_dataset_projects]
+==== `vdi.dataset_projects`
+
+Listing table for dataset links to target VEuPathDB projects.
+
+===== Columns
+
+[%header, cols="1m,1m,2a"]
+|===
+| Column     | Type     | Description
+| dataset_id | CHAR(32) | ID of the target dataset.
+| project_id | VARCHAR  | Name of the dataset type.
+|===
+
+===== Constraints
+
+[%header, cols="1m,3m"]
+|===
+| Column(s)                | Constraint(s)
+| dataset_id               | NOT NULL REFERENCES vdi.datasets.dataset_id
+| project_id               | NOT NULL
+| (dataset_id, project_id) | UNIQUE
+|===
+
+[#vdi_dataset_metadata]
+==== `vdi.dataset_metadata`
+
+Mutable user metadata about a target dataset.
+
+===== Columns
+
+[%header, cols="1m,1m,2a"]
+|===
+| Column      | Type     | Description
+| dataset_id  | CHAR(32) | ID of the target dataset.
+| name        | VARCHAR  | Name for the dataset.
+| summary     | VARCHAR  | Short summary of the dataset to be rendered as part of the dataset listing table in the site UI.
+| description | VARCHAR  | Long description of the dataset.
+|===
+
+===== Constraints
+
+[%header, cols="1m,3m"]
+|===
+| Column(s)  | Constraint(s)
+| dataset_id | NOT NULL UNIQUE REFERENCES vdi.datasets.dataset_id
+| name       | NOT NULL
+|===
+
+[#vdi_sync_control]
+==== `vdi.sync_control`
+
+===== Columns
+
+[%header, cols="1m,1m,2a"]
+|===
+| Column             | Type        | Description
+| dataset_id         | CHAR(32)    | ID of the target dataset.
+| shares_update_time | TIMESTAMPTZ | Timestamp of the latest share in S3.
+| data_update_time   | TIMESTAMPTZ | Timestamp of the latest data file in S3.
+| meta_update_time   | TIMESTAMPTZ | Timestamp of the latest `meta.json` update in S3.
+|===
+
+===== Constraints
+
+[%header, cols="1m,3m"]
+|===
+| Column(s)          | Constraint(s)
+| dataset_id         | NOT NULL UNIQUE REFERENCES vdi.datasets.dataset_id
+| shares_update_time | NOT NULL
+| data_update_time   | NOT NULL
+| meta_update_time   | NOT NULL
+|===
+
+[#vdi_dataset_share_offers]
+==== `vdi.dataset_share_offers`
+
+===== Columns
+
+[%header, cols="1m,1m,2a"]
+|===
+| Column | Type | Description
+
+| dataset_id
+| CHAR(32)
+| ID of the target dataset.
+
+| recipient_id
+| VARCHAR
+| External user ID of the share recipient.
+
+| status
+| VARCHAR
+| Enum:
+
+* `granted`
+* `revoked`
+|===
+
+===== Constraints
+
+[%header, cols="1m,3m"]
+|===
+| Column(s)                  | Constraint(s)
+| dataset_id                 | NOT NULL REFERENCES vdi.datasets.dataset_id
+| recipient_id               | NOT NULL
+| status                     | NOT NULL
+| (dataset_id, recipient_id) | UNIQUE
+|===
+
+[#vdi_dataset_share_receipts]
+==== `vdi.dataset_share_receipts`
+
+===== Columns
+
+[%header, cols="1m,1m,2a"]
+|===
+| Column | Type | Description
+
+| dataset_id
+| CHAR(32)
+| ID of the target dataset.
+
+| recipient_id
+| VARCHAR
+| External user ID of the share recipient.
+
+| status
+| VARCHAR
+| Enum:
+
+* `accepted`
+* `rejected`
+|===
+
+===== Constraints
+
+[%header, cols="1m,3m"]
+|===
+| Column(s)                  | Constraint(s)
+| dataset_id                 | NOT NULL REFERENCES vdi.datasets.dataset_id
+| recipient_id               | NOT NULL
+| status                     | NOT NULL
+| (dataset_id, recipient_id) | UNIQUE
+|===
+
+[#vdi_import_control]
+==== `vdi.import_control`
+
+===== Columns
+
+[%header, cols="1m,1m,2a"]
+|===
+| Column | Type | Description
+
+| dataset_id
+| CHAR(32)
+| ID of the target dataset.
+
+| status
+| VARCHAR
+| Enum:
+
+* `awaiting-import`
+* `importing`
+* `imported`
+* `import-failed`
+|===
+
+===== Constraints
+
+[%header, cols="1m,3m"]
+|===
+| Column(s)  | Constraint(s)
+| dataset_id | NOT NULL UNIQUE REFERENCES vdi.datasets.dataset_id
+| status     | NOT NULL
+|===
+
+[#vdi_import_messages]
+==== `vdi.import_messages`
+
+===== Columns
+
+[%header, cols="1m,1m,2a"]
+|===
+| Column     | Type     | Description
+| dataset_id | CHAR(32) | ID of the target dataset.
+| message    | VARCHAR  | Import warning or error message.
+|===
+
+===== Constraints
+
+[%header, cols="1m,3m"]
+|===
+| Column(s)  | Constraint(s)
+| dataset_id | NOT NULL UNIQUE REFERENCES vdi.datasets.dataset_id
+| message    | NOT NULL
+|===
