@@ -8,6 +8,13 @@ import vdi.service.rest.generated.model.DatasetTypeOutput as APIType
 import vdi.service.rest.generated.model.DatasetTypeOutputImpl
 
 
+internal fun DatasetTypeOutput(type: DatasetType) =
+  DatasetTypeOutputImpl().also {
+    it.name        = type.name.toString()
+    it.version     = type.version
+    it.displayName = PluginRegistry[type]?.displayName ?: type.name.toString()
+  }
+
 internal fun DatasetTypeOutput(rec: DatasetRecord, typeName: String) =
   DatasetTypeOutput(rec.type, typeName)
 

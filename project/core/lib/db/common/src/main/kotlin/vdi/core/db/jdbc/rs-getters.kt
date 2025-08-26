@@ -6,8 +6,7 @@ import vdi.model.data.UserID
 import java.sql.ResultSet
 import java.time.OffsetDateTime
 
-
-fun ResultSet.reqDatasetID(column: String) = DatasetID(getString(column))
+fun ResultSet.reqDatasetID(column: String = "dataset_id") = DatasetID(getString(column))
 
 fun ResultSet.reqDatasetID(column: Int) = DatasetID(getString(column))
 

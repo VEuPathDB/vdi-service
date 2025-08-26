@@ -7,12 +7,14 @@ import vdi.service.rest.generated.model.DatasetContactImpl
 
 internal fun DatasetContact(contact: DatasetContact): APIContact =
   DatasetContactImpl().apply {
-    name = contact.name
-    email = contact.email
+    firstName   = contact.firstName
+    middleName  = contact.middleName
+    lastName    = contact.lastName
+    email       = contact.email
     affiliation = contact.affiliation
-    city = contact.city
-    state = contact.state
-    country = contact.country
-    address = contact.address
-    isPrimary = contact.isPrimary
+    city        = contact.city
+    state       = contact.state
+    country     = contact.country
+    address     = contact.address
+    isPrimary   = contact.isPrimary
   }

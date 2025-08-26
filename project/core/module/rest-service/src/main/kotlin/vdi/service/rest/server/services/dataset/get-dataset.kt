@@ -19,7 +19,8 @@ import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.outputs.*
 import vdi.service.rest.util.Either
-import vdi.service.rest.util.defaultZone
+import vdi.service.rest.util.Either.Companion.left
+import vdi.service.rest.util.Either.Companion.right
 
 /**
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
@@ -43,10 +44,10 @@ private fun <T: ControllerBase> T.getDatasetByID(
   val dataset = when {
     userID == null -> CacheDB().selectDataset(datasetID)
     else           -> lookupDatasetForUser(userID, datasetID)
-  } ?: return Either.ofRight(Static404.wrap())
+  } ?: return right(Static404.wrap())
 
   if (!includeDeleted && userID != null && dataset.isDeleted)
-    return Either.ofRight(Static404.wrap())
+    return right(Static404.wrap())
 
   val shares = if (dataset.ownerID == userID) {
     CacheDB().selectSharesForDataset(datasetID)
@@ -79,35 +80,14 @@ private fun <T: ControllerBase> T.getDatasetByID(
     ?.associateBy { it.revisionID }
     ?: emptyMap()
 
-  return Either.ofLeft(DatasetDetails(
-    datasetID        = datasetID,
-    owner            = DatasetOwner(userDetails.requireDetails(dataset.ownerID)),
-    datasetType      = DatasetTypeOutput(dataset, typeDisplayName),
-    name             = dataset.name,
-    origin           = dataset.origin,
-    installTargets   = dataset.projects,
-    visibility       = DatasetVisibility(dataset.visibility),
-    status           = DatasetStatusInfo(
-      dataset.importStatus,
-      AppDB().getDatasetStatuses(dataset.datasetID, dataset.projects)
-    ),
-    created          = dataset.created.defaultZone(),
-    dependencies     = metaJson?.dependencies?.let(::DatasetDependencies) ?: emptyList(),
-    shortName        = dataset.shortName,
-    shortAttribution = dataset.shortAttribution,
-    summary          = dataset.summary,
-    description      = dataset.description,
-    sourceURL        = dataset.sourceURL,
-    importMessages   = CacheDB().selectImportMessages(datasetID),
-    shares           = shares.mapNotNull { s ->
-      s.offerStatus?.let { ShareOffer(userDetails.requireDetails(s.recipientID), it)
-    } },
-    publications     = metaJson?.publications?.map(DatasetPublication::toExternal),
-    hyperlinks       = metaJson?.hyperlinks?.map(::DatasetHyperlink),
-    organisms        = metaJson?.organisms?.toList(),
-    contacts         = metaJson?.contacts?.map(::DatasetContact),
-    originalID       = revisions?.originalID,
-    revisionHistory  = revisions?.records?.map { DatasetRevision(it, revisionIndex[it.revisionID]?.revisionNote) }
+  return left(DatasetDetails(
+    datasetID      = datasetID,
+    meta           = TODO(),
+    importStatus   = TODO(),
+    importMessages = TODO(),
+    shares         = TODO(),
+    installs       = TODO(),
+    userInfo       = TODO()
   ))
 }
 

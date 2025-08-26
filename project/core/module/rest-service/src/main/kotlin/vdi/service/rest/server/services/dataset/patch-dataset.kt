@@ -8,8 +8,6 @@ import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.withTransaction
 import vdi.core.install.InstallTargetRegistry
 import vdi.json.JSON
-import vdi.json.toJSONString
-import vdi.model.DatasetMetaFilename
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetMetadata
 import vdi.model.data.UserID
