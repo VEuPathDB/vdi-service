@@ -33,3 +33,7 @@ if (file("project/plugin-server").exists())
 includeBuild("schema") {
   dependencySubstitution { substitute(module("vdi:schemata")).using(project(":")) }
 }
+
+includeBuild("stack-db/migrations") {
+  dependencySubstitution { substitute(module("db:migrations")).using(project(":")) }
+}

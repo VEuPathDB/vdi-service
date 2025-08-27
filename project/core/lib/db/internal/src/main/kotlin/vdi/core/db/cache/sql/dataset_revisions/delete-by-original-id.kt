@@ -13,5 +13,10 @@ WHERE
   original_id = ?
 """
 
+/**
+ * Deletes dataset revision records with the given original/root dataset ID.
+ *
+ * @return The number of records deleted.
+ */
 internal fun Connection.deleteDatasetRevisions(datasetID: DatasetID) =
   withPreparedUpdate(SQL) { setDatasetID(1, datasetID) }

@@ -59,6 +59,7 @@ arrayOf(
   "daemon/event-router",
   "daemon/pruner",
   "daemon/reconciler",
+  "database-migrator",
   "lane/hard-delete",
   "lane/import",
   "lane/install",

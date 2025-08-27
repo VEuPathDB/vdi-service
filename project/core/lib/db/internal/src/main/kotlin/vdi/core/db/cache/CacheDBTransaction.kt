@@ -13,11 +13,18 @@ import vdi.core.db.cache.model.ShareOfferRecord
 import vdi.core.db.cache.model.ShareReceiptRecord
 import vdi.core.db.model.SyncControlRecord
 
-interface CacheDBTransaction : AutoCloseable {
+interface CacheDBTransaction: CacheDB, AutoCloseable {
 
-  fun deleteShareOffer(datasetID: DatasetID, recipientID: UserID)
+  // region Delete
 
-  fun deleteShareReceipt(datasetID: DatasetID, recipientID: UserID)
+  /**
+   * Deletes the `vdi.datasets` table entry for a target dataset identified by
+   * the given [DatasetID].
+   *
+   * @param datasetID ID of the target dataset whose `vdi.datasets` record
+   * should be deleted.
+   */
+  fun deleteDataset(datasetID: DatasetID)
 
   /**
    * Deletes the `vdi.dataset_metadata` table entry for a target dataset
@@ -35,7 +42,9 @@ interface CacheDBTransaction : AutoCloseable {
    * @param datasetID ID of the target dataset whose `vdi.dataset_projects`
    * records should be deleted.
    */
-  fun deleteDatasetProjects(datasetID: DatasetID)
+  fun deleteInstallTargetLinks(datasetID: DatasetID)
+
+  fun deleteShareOffer(datasetID: DatasetID, recipientID: UserID)
 
   /**
    * Deletes all entries in the `vdi.dataset_share_offers` table for a target
@@ -44,7 +53,9 @@ interface CacheDBTransaction : AutoCloseable {
    * @param datasetID ID of the target dataset whose `vdi.dataset_share_offers`
    * records should be deleted.
    */
-  fun deleteDatasetShareOffers(datasetID: DatasetID)
+  fun deleteShareOffers(datasetID: DatasetID)
+
+  fun deleteShareReceipt(datasetID: DatasetID, recipientID: UserID)
 
   /**
    * Deletes all entries in the `vdi.dataset_share_receipts` table for a target
@@ -53,16 +64,7 @@ interface CacheDBTransaction : AutoCloseable {
    * @param datasetID ID of the target dataset whose
    * `vdi.dataset_share_receipts` records should be deleted.
    */
-  fun deleteDatasetShareReceipts(datasetID: DatasetID)
-
-  /**
-   * Deletes the `vdi.datasets` table entry for a target dataset identified by
-   * the given [DatasetID].
-   *
-   * @param datasetID ID of the target dataset whose `vdi.datasets` record
-   * should be deleted.
-   */
-  fun deleteDataset(datasetID: DatasetID)
+  fun deleteShareReceipts(datasetID: DatasetID)
 
   /**
    * Deletes the `vdi.import_control` table entry for a target dataset
@@ -97,9 +99,11 @@ interface CacheDBTransaction : AutoCloseable {
 
   fun deleteRevisions(originalID: DatasetID)
 
+  // endregion Delete
+
+  // region Try Insert
 
   fun tryInsertUploadFiles(datasetID: DatasetID, files: Iterable<DatasetFileInfo>)
-
 
   /**
    * Attempts to insert a dataset record for the given dataset details, aborting
@@ -156,6 +160,8 @@ interface CacheDBTransaction : AutoCloseable {
 
   // endregion Try-Insert
 
+  // region Update
+
   fun updateImportControl(datasetID: DatasetID, status: DatasetImportStatus)
 
   fun updateDatasetMeta(datasetID: DatasetID, meta: DatasetMetadata)
@@ -199,6 +205,16 @@ interface CacheDBTransaction : AutoCloseable {
    */
   fun updateShareSyncControl(datasetID: DatasetID, timestamp: OffsetDateTime)
 
+  /**
+   * Updates the soft delete marker flag for the target dataset to the given
+   * value.
+   */
+  fun updateDatasetDeleted(datasetID: DatasetID, deleted: Boolean)
+
+  // endregion Update
+
+  // region Upsert
+
   fun upsertDatasetShareOffer(row: ShareOfferRecord)
 
   fun upsertDatasetShareReceipt(row: ShareReceiptRecord)
@@ -207,7 +223,7 @@ interface CacheDBTransaction : AutoCloseable {
 
   fun upsertImportMessages(datasetID: DatasetID, messages: String)
 
-  fun updateDatasetDeleted(datasetID: DatasetID, deleted: Boolean)
+  // endregion Upsert
 
   fun commit()
 

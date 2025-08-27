@@ -79,18 +79,18 @@ internal class CacheDBTransactionImpl(private val connection: Connection) : Cach
       log.debug("deleted metadata for dataset {}", datasetID)
   }
 
-  override fun deleteDatasetProjects(datasetID: DatasetID) {
+  override fun deleteInstallTargetLinks(datasetID: DatasetID) {
     if (con.deleteDatasetProjects(datasetID) > 0)
       log.debug("deleted project links for dataset {}", datasetID)
   }
 
-  override fun deleteDatasetShareOffers(datasetID: DatasetID) {
+  override fun deleteShareOffers(datasetID: DatasetID) {
     val count = con.deleteDatasetShareOffers(datasetID)
     if (count > 0)
       log.debug("deleted {} share offers for dataset {}", count, datasetID)
   }
 
-  override fun deleteDatasetShareReceipts(datasetID: DatasetID) {
+  override fun deleteShareReceipts(datasetID: DatasetID) {
     val count = con.deleteDatasetShareReceipts(datasetID)
     if (count > 0)
       log.debug("deleted {} share receipts for dataset {}", count, datasetID)

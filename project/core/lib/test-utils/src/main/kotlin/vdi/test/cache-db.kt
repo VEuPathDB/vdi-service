@@ -111,11 +111,11 @@ fun mockCacheDBTransaction(
   mock {
     on { deleteDataset(any()) } doAnswer { onDeleteDataset(it.getArgument(0)) }
     on { deleteDatasetMetadata(any()) } doAnswer { onDeleteMeta(it.getArgument(0)) }
-    on { deleteDatasetProjects(any()) } doAnswer { onDeleteProjects(it.getArgument(0)) }
+    on { deleteInstallTargetLinks(any()) } doAnswer { onDeleteProjects(it.getArgument(0)) }
     on { deleteShareOffer(any(), any()) } doAnswer { onDeleteShareOffer(it.getArgument(0), it.getArgument(1)) }
     on { deleteShareReceipt(any(), any()) } doAnswer { onDeleteShareReceipt(it.getArgument(0), it.getArgument(1)) }
-    on { deleteDatasetShareOffers(any()) } doAnswer { onDeleteShareOffers(it.getArgument(0)) }
-    on { deleteDatasetShareReceipts(any()) } doAnswer { onDeleteShareReceipts(it.getArgument(0)) }
+    on { deleteShareOffers(any()) } doAnswer { onDeleteShareOffers(it.getArgument(0)) }
+    on { deleteShareReceipts(any()) } doAnswer { onDeleteShareReceipts(it.getArgument(0)) }
     on { deleteImportControl(any()) } doAnswer { onDeleteImportControl(it.getArgument(0)) }
     on { deleteImportMessages(any()) } doAnswer { onDeleteImportMessages(it.getArgument(0)) }
     on { deleteSyncControl(any()) } doAnswer { onDeleteSyncControl(it.getArgument(0)) }

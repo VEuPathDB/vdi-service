@@ -1,14 +1,12 @@
 package vdi.core.db.cache
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.model.data.DatasetFileInfo
 import javax.sql.DataSource
 import vdi.core.db.cache.model.*
 import vdi.core.db.cache.query.AdminAllDatasetsQuery
 import vdi.core.db.cache.query.DatasetListQuery
 import vdi.core.db.model.ReconcilerTargetRecord
 import vdi.core.db.model.SyncControlRecord
+import vdi.model.data.*
 import vdi.util.io.CloseableIterator
 
 interface CacheDB {
@@ -22,6 +20,8 @@ interface CacheDB {
    * dataset was found.
    */
   fun selectDataset(datasetID: DatasetID): DatasetRecord?
+
+  fun selectPublications(datasetID: DatasetID): List<DatasetPublication>
 
   /**
    * Fetches the list of install-ready files produced by the import process for
@@ -102,7 +102,7 @@ interface CacheDB {
 
   fun selectOriginalDatasetID(datasetID: DatasetID): DatasetID
 
-  fun selectRevisions(datasetID: DatasetID): DatasetRevisionRecordSet?
+  fun selectRevisions(datasetID: DatasetID): DatasetRevisionHistory?
 
   fun selectBrokenDatasetImports(query: BrokenImportListQuery): List<BrokenImportRecord>
 

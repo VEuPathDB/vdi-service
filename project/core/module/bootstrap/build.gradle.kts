@@ -13,6 +13,7 @@ dependencies {
   implementation(project(":module:daemon-event-router"))
   implementation(project(":module:daemon-reconciler"))
   implementation(project(":module:daemon-pruner"))
+  implementation(project(":module:database-migrator"))
   implementation(project(":module:lane-hard-delete"))
   implementation(project(":module:lane-import"))
   implementation(project(":module:lane-install"))

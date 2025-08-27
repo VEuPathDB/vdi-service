@@ -11,17 +11,16 @@ import vdi.core.db.jdbc.setDatasetID
 private const val SQL = """
 INSERT INTO
   vdi.dataset_metadata (
-    dataset_id
+    dataset_id    -- 1
   , visibility
   , name
-  , short_name
-  , short_attribution
   , summary
+  , project_name  -- 5
+  , program_name
   , description
-  , source_url
   )
 VALUES
-  (?, ?, ?, ?, ?, ?, ?, ?)
+  (?, ?, ?, ?, ?, ?, ?)
 ON CONFLICT (dataset_id)
   DO NOTHING
 """
@@ -31,9 +30,8 @@ internal fun Connection.tryInsertDatasetMeta(datasetID: DatasetID, meta: Dataset
     setDatasetID(1, datasetID)
     setDatasetVisibility(2, meta.visibility)
     setString(3, meta.name)
-    setString(4, meta.shortName)
-    setString(5, meta.shortAttribution)
-    setString(6, meta.summary)
+    setString(4, meta.summary)
+    setString(5, meta.projectName)
+    setString(6, meta.programName)
     setString(7, meta.description)
-    setString(8, meta.sourceURL?.toString())
   }

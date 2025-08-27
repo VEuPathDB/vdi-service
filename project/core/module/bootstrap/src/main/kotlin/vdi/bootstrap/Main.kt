@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.locks.ReentrantLock
+import java.util.logging.LogManager
 import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
 import kotlin.system.exitProcess
@@ -22,27 +23,34 @@ import vdi.lane.reconciliation.ReconciliationLane
 import vdi.lane.sharing.ShareLane
 import vdi.lane.soft_delete.SoftDeleteLane
 import vdi.logging.MetaLogger
+import vdi.module.migrations.migrateInternalDatabase
 import vdi.module.sleeper.AwaitDependencies
 import vdi.service.rest.RestService
 
 object Main {
   init {
-    java.util.logging.LogManager.getLogManager().readConfiguration("""
-      handlers = org.slf4j.bridge.SLF4JBridgeHandler
-      .level = SEVERE
-    """.trimIndent().byteInputStream())
+    LogManager.getLogManager()
+      .readConfiguration("handlers = org.slf4j.bridge.SLF4JBridgeHandler.level = SEVERE".byteInputStream())
   }
 
   @JvmStatic
   fun main(args: Array<String>) {
     val manifest = loadManifestConfig()
     val config = loadAndCacheStackConfig()
-    MetaLogger.info("================================================================")
-    MetaLogger.info("Starting VDI Service Version: {}", manifest.gitTag)
+    MetaLogger.info("=".repeat(80))
+    MetaLogger.info("starting VDI service version: {}", manifest.gitTag)
 
     MetaLogger.info("awaiting external dependencies")
     try {
       runBlocking { AwaitDependencies(config) }
+    } catch (e: Throwable) {
+      MetaLogger.error("startup exception: ", e)
+      exitProcess(1)
+    }
+
+    // Apply internal database migrations
+    try {
+      migrateInternalDatabase(config.vdi.cacheDB)
     } catch (e: Throwable) {
       MetaLogger.error("startup exception: ", e)
       exitProcess(1)
@@ -107,10 +115,10 @@ object Main {
    * Log an error and shut down.
    */
   private fun fatality(message: String? = null): Nothing {
-    MetaLogger.error(if (message == null)
+    MetaLogger.error(
       "one or more subprocesses encountered a fatal error requiring VDI be shut down"
-    else
-      "one or more subprocesses encountered a fatal error requiring VDI be shut down: $message")
+      + if (message == null) "" else ": $message"
+    )
     exitProcess(1)
   }
 

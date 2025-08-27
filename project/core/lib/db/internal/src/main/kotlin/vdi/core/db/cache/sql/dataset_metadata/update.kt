@@ -12,14 +12,14 @@ private const val SQL = """
 UPDATE
   vdi.dataset_metadata
 SET
-  name = ?
-, short_name = ?
-, short_attribution = ?
+  visibility = ?    -- 1
+, name = ?
 , summary = ?
+, project_name = ?
+, program_name = ?  -- 5
 , description = ?
-, visibility = ?
 WHERE
-  dataset_id = ?
+  dataset_id = ?    -- 7
 """
 
 internal fun Connection.updateDatasetMeta(
@@ -27,11 +27,11 @@ internal fun Connection.updateDatasetMeta(
   meta: DatasetMetadata,
 ) =
   withPreparedUpdate(SQL) {
-    setString(1, meta.name)
-    setString(2, meta.shortName)
-    setString(3, meta.shortAttribution)
-    setString(4, meta.summary)
-    setString(5, meta.description)
-    setDatasetVisibility(6, meta.visibility)
+    setDatasetVisibility(1, meta.visibility)
+    setString(2, meta.name)
+    setString(3, meta.summary)
+    setString(4, meta.projectName)
+    setString(5, meta.programName)
+    setString(6, meta.description)
     setDatasetID(7, datasetID)
   }
