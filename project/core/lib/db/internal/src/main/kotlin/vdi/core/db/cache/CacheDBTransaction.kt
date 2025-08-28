@@ -174,6 +174,10 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
    */
   fun deleteRevisions(originalID: DatasetID): Int
 
+  fun deletePublication(datasetID: DatasetID, publicationID: String): Boolean
+
+  fun deletePublications(datasetID: DatasetID): Int
+
   // endregion Delete
 
   // region Try Insert

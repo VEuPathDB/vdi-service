@@ -18,7 +18,8 @@ import java.util.Map;
     "type",
     "name",
     "summary",
-    "created"
+    "created",
+    "relatedBy"
 })
 public class RelatedDatasetInfoImpl implements RelatedDatasetInfo {
   @JsonProperty(JsonField.DATASET_ID)
@@ -38,6 +39,9 @@ public class RelatedDatasetInfoImpl implements RelatedDatasetInfo {
 
   @JsonProperty(JsonField.CREATED)
   private OffsetDateTime created;
+
+  @JsonProperty(JsonField.RELATED_BY)
+  private ImplicitRelation relatedBy;
 
   @JsonIgnore
   private Map<String, Object> additionalProperties = new ExcludingMap();
@@ -100,6 +104,16 @@ public class RelatedDatasetInfoImpl implements RelatedDatasetInfo {
   @JsonProperty(JsonField.CREATED)
   public void setCreated(OffsetDateTime created) {
     this.created = created;
+  }
+
+  @JsonProperty(JsonField.RELATED_BY)
+  public ImplicitRelation getRelatedBy() {
+    return this.relatedBy;
+  }
+
+  @JsonProperty(JsonField.RELATED_BY)
+  public void setRelatedBy(ImplicitRelation relatedBy) {
+    this.relatedBy = relatedBy;
   }
 
   @JsonAnyGetter

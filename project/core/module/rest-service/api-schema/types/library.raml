@@ -640,16 +640,8 @@ types:
     type: object
     additionalProperties: false
     properties:
-      identifier:
-        type: string
-        minLength: 3
-        maxLength: 30
-      type?:
-        type: string
-        default: pmid
-        enum:
-          - pmid
-          - doi
+      identifier: DatasetPublicationIdentifier
+      type?: DatasetPublicationType
       citation?:
         type: string
         minLength: 3
@@ -658,6 +650,16 @@ types:
         description: Only one publication may be marked as primary.
         type: boolean
         default: false
+  DatasetPublicationIdentifier:
+    type: string
+    minLength: 3
+    maxLength: 30
+  DatasetPublicationType:
+    type: string
+    default: pmid
+    enum:
+      - pmid
+      - doi
   DatasetPutMetadata:
     displayName: Dataset Put Request Metadata
     type: DatasetPatchRequestBody
@@ -908,6 +910,17 @@ types:
     example:
       status: gone
       message: The target resource or its dependencies no longer exists.
+  ImplicitRelation:
+    type: object
+    additionalProperties: false
+    discriminator: type
+    properties:
+      type:
+        type: string
+        enum:
+          - publication
+          - program-name
+          - project-name
   InstallCleanupRequestBody:
     displayName: Install Cleanup Request
     description: |
@@ -1035,6 +1048,22 @@ types:
       name: DatasetName
       summary: DatasetSummary
       created: DatasetCreationDate
+      relatedBy: ImplicitRelation
+  RelationByProgramName:
+    type: ImplicitRelation
+    discriminatorValue: program-name
+    additionalProperties: false
+  RelationByProjectName:
+    type: ImplicitRelation
+    discriminatorValue: project-name
+    additionalProperties: false
+  RelationByPublication:
+    type: ImplicitRelation
+    discriminatorValue: publication
+    properties:
+      identifier: DatasetPublicationIdentifier
+      type: DatasetPublicationType
+    additionalProperties: false
   RevisionHistory:
     type: object
     additionalProperties: false

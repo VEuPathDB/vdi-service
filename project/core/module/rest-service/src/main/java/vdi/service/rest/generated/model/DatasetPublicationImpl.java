@@ -15,11 +15,8 @@ public class DatasetPublicationImpl implements DatasetPublication {
   @JsonProperty(JsonField.IDENTIFIER)
   private String identifier;
 
-  @JsonProperty(
-      value = JsonField.TYPE,
-      defaultValue = "pmid"
-  )
-  private DatasetPublication.TypeType type;
+  @JsonProperty(JsonField.TYPE)
+  private DatasetPublicationType type;
 
   @JsonProperty(JsonField.CITATION)
   private String citation;
@@ -40,19 +37,13 @@ public class DatasetPublicationImpl implements DatasetPublication {
     this.identifier = identifier;
   }
 
-  @JsonProperty(
-      value = JsonField.TYPE,
-      defaultValue = "pmid"
-  )
-  public DatasetPublication.TypeType getType() {
+  @JsonProperty(JsonField.TYPE)
+  public DatasetPublicationType getType() {
     return this.type;
   }
 
-  @JsonProperty(
-      value = JsonField.TYPE,
-      defaultValue = "pmid"
-  )
-  public void setType(DatasetPublication.TypeType type) {
+  @JsonProperty(JsonField.TYPE)
+  public void setType(DatasetPublicationType type) {
     this.type = type;
   }
 

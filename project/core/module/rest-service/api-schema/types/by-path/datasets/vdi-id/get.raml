@@ -55,6 +55,34 @@ types:
       name: common.DatasetName
       summary: common.DatasetSummary
       created: common.DatasetCreationDate
+      relatedBy: ImplicitRelation
+
+  ImplicitRelation:
+    type: object
+    discriminator: type
+    properties:
+      type:
+        type: string
+        enum: [ "publication", "program-name", "project-name"]
+    additionalProperties: false
+
+  RelationByPublication:
+    type: ImplicitRelation
+    discriminatorValue: publication
+    properties:
+      identifier: common.DatasetPublicationIdentifier
+      type: common.DatasetPublicationType
+    additionalProperties: false
+
+  RelationByProgramName:
+    type: ImplicitRelation
+    discriminatorValue: program-name
+    additionalProperties: false
+
+  RelationByProjectName:
+    type: ImplicitRelation
+    discriminatorValue: project-name
+    additionalProperties: false
 
   ShareOffer:
     displayName: Dataset Share Offer

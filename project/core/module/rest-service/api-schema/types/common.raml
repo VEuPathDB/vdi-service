@@ -302,14 +302,8 @@ types:
     displayName: Dataset Publication
     additionalProperties: false
     properties:
-      identifier:
-        type: string
-        minLength: 3
-        maxLength: 30
-      type?:
-        type: string
-        enum: [ pmid, doi ]
-        default: pmid
+      identifier: DatasetPublicationIdentifier
+      type?: DatasetPublicationType
       citation?:
         type: string
         minLength: 3
@@ -318,6 +312,16 @@ types:
         description: Only one publication may be marked as primary.
         type: boolean
         default: false
+
+  DatasetPublicationIdentifier:
+    type: string
+    minLength: 3
+    maxLength: 30
+
+  DatasetPublicationType:
+    type: string
+    enum: [ pmid, doi ]
+    default: pmid
 
   DatasetRevision:
     displayName: Dataset Revision

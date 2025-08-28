@@ -15,6 +15,11 @@ WHERE
 
 /**
  * Deletes all the publication records associated with the given dataset ID.
+ *
+ * @param datasetID ID of the dataset for which all publication records should
+ * be deleted.
+ *
+ * @return The number of records deleted as a result of this function call.
  */
-internal fun Connection.deleteDatasetPublications(datasetID: DatasetID) =
+internal fun Connection.deleteAllPublicationsForDataset(datasetID: DatasetID) =
   withPreparedUpdate(SQL) { setDatasetID(1, datasetID) }

@@ -47,6 +47,12 @@ public interface RelatedDatasetInfo {
   @JsonProperty(JsonField.CREATED)
   void setCreated(OffsetDateTime created);
 
+  @JsonProperty(JsonField.RELATED_BY)
+  ImplicitRelation getRelatedBy();
+
+  @JsonProperty(JsonField.RELATED_BY)
+  void setRelatedBy(ImplicitRelation relatedBy);
+
   @JsonAnyGetter
   Map<String, Object> getAdditionalProperties();
 

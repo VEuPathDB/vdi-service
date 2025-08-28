@@ -13,17 +13,11 @@ public interface DatasetPublication {
   @JsonProperty(JsonField.IDENTIFIER)
   void setIdentifier(String identifier);
 
-  @JsonProperty(
-      value = JsonField.TYPE,
-      defaultValue = "pmid"
-  )
-  TypeType getType();
+  @JsonProperty(JsonField.TYPE)
+  DatasetPublicationType getType();
 
-  @JsonProperty(
-      value = JsonField.TYPE,
-      defaultValue = "pmid"
-  )
-  void setType(TypeType type);
+  @JsonProperty(JsonField.TYPE)
+  void setType(DatasetPublicationType type);
 
   @JsonProperty(JsonField.CITATION)
   String getCitation();
@@ -42,22 +36,4 @@ public interface DatasetPublication {
       defaultValue = "false"
   )
   void setIsPrimary(Boolean isPrimary);
-
-  enum TypeType {
-    @JsonProperty("pmid")
-    PMID("pmid"),
-
-    @JsonProperty("doi")
-    DOI("doi");
-
-    public final String value;
-
-    public String getValue() {
-      return this.value;
-    }
-
-    TypeType(String name) {
-      this.value = name;
-    }
-  }
 }
