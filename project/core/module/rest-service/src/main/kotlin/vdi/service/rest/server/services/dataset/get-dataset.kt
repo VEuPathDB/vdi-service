@@ -4,10 +4,11 @@ package vdi.service.rest.server.services.dataset
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import vdi.core.db.app.AppDB
 import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetShare
-import vdi.core.plugin.registry.PluginRegistry
+import vdi.core.db.cache.model.RelatedDataset
 import vdi.model.data.DatasetID
-import vdi.model.data.DatasetPublication
+import vdi.model.data.DatasetMetadata
 import vdi.model.data.DatasetVisibility
 import vdi.model.data.UserID
 import vdi.service.rest.generated.model.DatasetDetails
@@ -49,6 +50,9 @@ private fun <T: ControllerBase> T.getDatasetByID(
   if (!includeDeleted && userID != null && dataset.isDeleted)
     return right(Static404.wrap())
 
+  val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, dataset.datasetID)
+    ?: return right(TooEarlyError().wrap())
+
   val shares = if (dataset.ownerID == userID) {
     CacheDB().selectSharesForDataset(datasetID)
   } else {
@@ -57,37 +61,22 @@ private fun <T: ControllerBase> T.getDatasetByID(
 
   val userDetails = getUserDetails(dataset.ownerID, shares, userID)
 
-  val typeDisplayName = PluginRegistry[dataset.type]?.displayName
-    .let {
-      if (it == null) {
-        logger.error(
-          "plugin is disabled for requested dataset {}/{} type {}",
-          dataset.ownerID,
-          dataset.datasetID,
-          dataset.type,
-        )
-        "disabled"
-      } else {
-        it
-      }
-    }
+  val importStatus = CacheDB().selectImportControl(datasetID)
 
-  val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, dataset.datasetID)
-
-  val revisions = CacheDB().selectRevisions(datasetID)
-
-  val revisionIndex = metaJson?.revisionHistory
-    ?.associateBy { it.revisionID }
-    ?: emptyMap()
+  val installs = if (importStatus == DatasetImportStatus.Complete)
+    AppDB().getDatasetStatuses(datasetID, metaJson.installTargets)
+  else
+    emptyMap()
 
   return left(DatasetDetails(
-    datasetID      = datasetID,
-    meta           = TODO(),
-    importStatus   = TODO(),
-    importMessages = TODO(),
-    shares         = TODO(),
-    installs       = TODO(),
-    userInfo       = TODO()
+    datasetID       = datasetID,
+    meta            = metaJson,
+    importStatus    = importStatus,
+    importMessages  = CacheDB().selectImportMessages(datasetID),
+    shares          = shares,
+    installs        = installs,
+    userInfo        = userDetails,
+    relatedDatasets = getRelatedDatasets(datasetID, metaJson)
   ))
 }
 
@@ -114,3 +103,8 @@ private fun getUserDetails(ownerID: UserID, shares: Collection<DatasetShare>, re
     .asSequence()
     .map { (id, user) -> UserDetails(UserID(id), user.firstName, user.lastName, user.email, user.organization) }
     .associateBy { it.userID }
+
+private fun getRelatedDatasets(datasetID: DatasetID, meta: DatasetMetadata): Sequence<RelatedDataset> =
+  (meta.projectName?.let { CacheDB().selectDatasetsByProjectName(meta.owner, it) } ?: emptyList()).asSequence() +
+  (meta.programName?.let { CacheDB().selectDatasetsByProgramName(meta.owner, it) } ?: emptyList()).asSequence() +
+  CacheDB().selectDatasetsByCommonPublication(datasetID)

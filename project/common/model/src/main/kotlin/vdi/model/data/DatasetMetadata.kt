@@ -73,8 +73,8 @@ data class DatasetMetadata(
   @field:JsonProperty(ProgramName)
   val programName: String? = null,
 
-  @field:JsonProperty(RelatedStudies)
-  val relatedStudies: List<RelatedStudy> = emptyList(),
+  @field:JsonProperty(LinkedDatasets)
+  val linkedDatasets: List<LinkedDataset> = emptyList(),
 
   @field:JsonProperty(ExperimentalOrganism)
   val experimentalOrganism: DatasetOrganism? = null,
@@ -110,7 +110,7 @@ data class DatasetMetadata(
     const val ProgramName          = "programName"
     const val ProjectName          = "projectName"
     const val Publications         = "publications"
-    const val RelatedStudies       = "relatedStudies"
+    const val LinkedDatasets       = "linkedDatasets"
     const val RevisionHistory      = "revisionHistory"
     const val SourceURL            = "sourceUrl"
     const val StudyCharacteristics = "studyCharacteristics"

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     property = "status"
 )
 @JsonSubTypes({
+    @JsonSubTypes.Type(vdi.service.rest.generated.model.TooEarlyError.class),
     @JsonSubTypes.Type(vdi.service.rest.generated.model.ConflictError.class),
     @JsonSubTypes.Type(vdi.service.rest.generated.model.ServerError.class),
     @JsonSubTypes.Type(vdi.service.rest.generated.model.ForbiddenError.class),

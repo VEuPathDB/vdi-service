@@ -838,6 +838,7 @@ types:
       - gone
       - invalid-input
       - failed-dependency
+      - too-early
       - server-error
   ExternalIdentifiers:
     type: object
@@ -913,14 +914,15 @@ types:
   ImplicitRelation:
     type: object
     additionalProperties: false
-    discriminator: type
+    discriminator: relationType
     properties:
-      type:
-        type: string
-        enum:
-          - publication
-          - program-name
-          - project-name
+      relationType: ImplicitRelationType
+  ImplicitRelationType:
+    type: string
+    enum:
+      - publication
+      - program-name
+      - project-name
   InstallCleanupRequestBody:
     displayName: Install Cleanup Request
     description: |
@@ -1041,9 +1043,9 @@ types:
         type: InstallTargetID[]
   RelatedDatasetInfo:
     type: object
+    additionalProperties: false
     properties:
       datasetId: VdiId
-      owner: DatasetOwner
       type: DatasetTypeOutput
       name: DatasetName
       summary: DatasetSummary
@@ -1303,6 +1305,13 @@ types:
       sharesUpdateTime: datetime
       dataUpdateTime: datetime
       metaUpdateTime: datetime
+  TooEarlyError:
+    displayName: Too Early Error
+    type: Error
+    discriminatorValue: too-early
+    example:
+      status: too-early
+      message: The requested resource is not yet available.
   UnauthorizedError:
     displayName: Unauthorized
     description: |

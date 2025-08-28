@@ -30,6 +30,9 @@ public enum ErrorType {
   @JsonProperty("failed-dependency")
   FAILEDDEPENDENCY("failed-dependency"),
 
+  @JsonProperty("too-early")
+  TOOEARLY("too-early"),
+
   @JsonProperty("server-error")
   SERVERERROR("server-error");
 

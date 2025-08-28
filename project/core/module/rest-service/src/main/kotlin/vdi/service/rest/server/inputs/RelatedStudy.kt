@@ -6,7 +6,6 @@ import org.veupathdb.lib.request.validation.reqCheckLength
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.require
 import java.net.URI
-import vdi.model.data.RelatedStudy
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.RelatedStudy as APIRelatedStudy
 

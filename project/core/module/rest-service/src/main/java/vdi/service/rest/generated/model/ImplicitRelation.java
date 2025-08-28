@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = "type"
+    property = "relationType"
 )
 @JsonSubTypes({
     @JsonSubTypes.Type(vdi.service.rest.generated.model.RelationByPublication.class),
@@ -20,29 +20,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = ImplicitRelationImpl.class
 )
 public interface ImplicitRelation {
-  ImplicitRelation.TypeType _DISCRIMINATOR_TYPE_NAME = null;
+  ImplicitRelationType _DISCRIMINATOR_TYPE_NAME = null;
 
-  @JsonProperty(JsonField.TYPE)
-  TypeType getType();
-
-  enum TypeType {
-    @JsonProperty("publication")
-    PUBLICATION("publication"),
-
-    @JsonProperty("program-name")
-    PROGRAMNAME("program-name"),
-
-    @JsonProperty("project-name")
-    PROJECTNAME("project-name");
-
-    public final String value;
-
-    public String getValue() {
-      return this.value;
-    }
-
-    TypeType(String name) {
-      this.value = name;
-    }
-  }
+  @JsonProperty(JsonField.RELATION_TYPE)
+  ImplicitRelationType getRelationType();
 }

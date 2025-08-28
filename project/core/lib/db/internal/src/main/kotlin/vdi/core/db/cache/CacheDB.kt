@@ -106,5 +106,11 @@ interface CacheDB {
 
   fun selectBrokenDatasetImports(query: BrokenImportListQuery): List<BrokenImportRecord>
 
+  fun selectDatasetsByProjectName(ownerID: UserID, projectName: String): List<RelatedDataset>
+
+  fun selectDatasetsByProgramName(ownerID: UserID, programName: String): List<RelatedDataset>
+
+  fun selectDatasetsByCommonPublication(rootDatasetID: DatasetID): List<RelatedDataset>
+
   fun openTransaction(): CacheDBTransaction
 }

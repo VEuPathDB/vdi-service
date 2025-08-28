@@ -2,6 +2,7 @@ package vdi.core.db.cache
 
 import java.sql.Connection
 import vdi.core.db.cache.model.BrokenImportListQuery
+import vdi.core.db.cache.model.RelatedDataset
 import vdi.core.db.cache.query.AdminAllDatasetsQuery
 import vdi.core.db.cache.query.DatasetListQuery
 import vdi.core.db.cache.sql.dataset_publications.selectPublicationsForDataset
@@ -27,93 +28,107 @@ import vdi.model.data.*
 sealed class CacheDBImplBase: CacheDB {
   protected abstract val connection: Connection
 
+  protected abstract fun <T> runQuery(fn: Connection.() -> T): T
+
   override fun selectAcceptedSharesForUser(recipientID: UserID) =
-    connection.use { it.selectSharesFor(recipientID, DatasetShareOffer.Action.Grant, DatasetShareReceipt.Action.Accept) }
+    runQuery { selectSharesFor(recipientID, DatasetShareOffer.Action.Grant, DatasetShareReceipt.Action.Accept) }
 
   override fun selectAdminAllDatasets(query: AdminAllDatasetsQuery) =
-    connection.use { it.selectAdminAllDatasets(query) }
+    runQuery { selectAdminAllDatasets(query) }
 
   override fun selectAdminAllDatasetCount(query: AdminAllDatasetsQuery) =
-    connection.use { it.selectAdminAllDatasetCount(query) }
+    runQuery { selectAdminAllDatasetCount(query) }
 
   override fun selectAdminDatasetDetails(datasetID: DatasetID) =
-    connection.use { it.selectAdminDatasetDetails(datasetID) }
+    runQuery { selectAdminDatasetDetails(datasetID) }
 
   override fun selectDataset(datasetID: DatasetID) =
-    connection.use { it.selectDataset(datasetID) }
+    runQuery { selectDataset(datasetID) }
+
+  override fun selectDatasetsByProjectName(ownerID: UserID, projectName: String) =
+    runQuery { selectDatasetsByProjectName(ownerID, projectName) }
+
+  override fun selectDatasetsByProgramName(ownerID: UserID, programName: String) =
+    runQuery { selectDatasetsByProgramName(ownerID, programName) }
+
+  override fun selectDatasetsByCommonPublication(rootDatasetID: DatasetID) =
+    runQuery { selectDatasetsByCommonPublication(rootDatasetID) }
 
   override fun selectDatasetForUser(userID: UserID, datasetID: DatasetID) =
-    connection.use { it.selectDatasetForUser(userID, datasetID) }
+    runQuery { selectDatasetForUser(userID, datasetID) }
 
   override fun selectDatasetList(query: DatasetListQuery) =
-    connection.use { it.selectDatasetList(query) }
+    runQuery { selectDatasetList(query) }
 
   override fun selectInstallFiles(datasetID: DatasetID) =
-    connection.use { it.selectInstallFiles(datasetID) }
+    runQuery { selectInstallFiles(datasetID) }
 
   override fun selectInstallFileCount(datasetID: DatasetID) =
-    connection.use { it.selectInstallFileCount(datasetID) }
+    runQuery { selectInstallFileCount(datasetID) }
 
   override fun selectNonPrivateDatasets() =
-    connection.use { it.selectNonPrivateDatasets() }
+    runQuery { selectNonPrivateDatasets() }
 
   override fun selectPublications(datasetID: DatasetID): List<DatasetPublication> =
-    connection.use { it.selectPublicationsForDataset(datasetID) }
+    runQuery { selectPublicationsForDataset(datasetID) }
+
+  override fun selectRelatedDatasets(ownerID: UserID, datasetID: DatasetID): List<RelatedDataset> =
+    runQuery { selectRelatedDatasets() }
 
   override fun selectUploadFiles(datasetID: DatasetID) =
-    connection.use { it.selectUploadFiles(datasetID) }
+    runQuery { selectUploadFiles(datasetID) }
 
   override fun selectUndeletedDatasetIDsForUser(userID: UserID) =
-    connection.use { it.selectUndeletedDatasetIDsForUser(userID) }
+    runQuery { selectUndeletedDatasetIDsForUser(userID) }
 
   override fun selectUploadFileCount(datasetID: DatasetID) =
-    connection.use { it.selectUploadFileCount(datasetID) }
+    runQuery { selectUploadFileCount(datasetID) }
 
   override fun selectUploadFileSummaries(datasetIDs: List<DatasetID>) =
-    connection.use { it.selectUploadFileSummaries(datasetIDs) }
+    runQuery { selectUploadFileSummaries(datasetIDs) }
 
   override fun selectSharesForDataset(datasetID: DatasetID) =
-    connection.use { it.selectSharesFor(datasetID) }
+    runQuery { selectSharesFor(datasetID) }
 
   override fun selectSharesForDatasets(datasetIDs: List<DatasetID>) =
-    connection.use { it.selectSharesFor(datasetIDs) }
+    runQuery { selectSharesFor(datasetIDs) }
 
   override fun selectImportControl(datasetID: DatasetID) =
-    connection.use { it.selectImportControl(datasetID) }
+    runQuery { selectImportControl(datasetID) }
 
   override fun selectImportMessages(datasetID: DatasetID) =
-    connection.use { it.selectImportMessages(datasetID) }
+    runQuery { selectImportMessages(datasetID) }
 
   override fun selectSyncControl(datasetID: DatasetID) =
-    connection.use { it.selectSyncControl(datasetID) }
+    runQuery { selectSyncControl(datasetID) }
 
   override fun selectDeletedDatasets() =
-    connection.use { it.selectDeletedDatasets() }
+    runQuery { selectDeletedDatasets() }
 
   override fun selectOpenSharesForUser(recipientID: UserID) =
-    connection.use { it.selectOpenSharesFor(recipientID) }
+    runQuery { selectOpenSharesFor(recipientID) }
 
   override fun selectRejectedSharesForUser(recipientID: UserID) =
-    connection.use { it.selectSharesFor(recipientID, DatasetShareOffer.Action.Grant, DatasetShareReceipt.Action.Reject) }
+    runQuery { selectSharesFor(recipientID, DatasetShareOffer.Action.Grant, DatasetShareReceipt.Action.Reject) }
 
   override fun selectAllSharesForUser(recipientID: UserID) =
-    connection.use { it.selectAllSharesFor(recipientID) }
+    runQuery { selectAllSharesFor(recipientID) }
 
   // NOTE: THE CALLER IS RESPONSIBLE FOR CLOSING THE CONNECTION!
   override fun selectAllSyncControlRecords() =
     connection.selectAllSyncControl()
 
   override fun selectBrokenDatasetImports(query: BrokenImportListQuery) =
-    connection.use { it.selectBrokenImports(query) }
+    runQuery { selectBrokenImports(query) }
 
   override fun selectLatestRevision(datasetID: DatasetID, includeDeleted: Boolean) =
-    connection.use { it.selectLatestDatasetRevision(datasetID, includeDeleted) }
+    runQuery { selectLatestDatasetRevision(datasetID, includeDeleted) }
 
   override fun selectOriginalDatasetID(datasetID: DatasetID) =
-    connection.use { it.selectOriginalDatasetID(datasetID) }
+    runQuery { selectOriginalDatasetID(datasetID) }
 
   override fun selectRevisions(datasetID: DatasetID) =
-    connection.use { it.selectDatasetRevisions(datasetID) }
+    runQuery { selectDatasetRevisions(datasetID) }
 
   override fun openTransaction(): CacheDBTransaction =
     CacheDBTransactionImpl(connection.apply { autoCommit = false })

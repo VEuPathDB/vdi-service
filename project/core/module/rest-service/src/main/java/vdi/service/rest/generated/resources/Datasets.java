@@ -86,13 +86,13 @@ public interface Datasets {
       super(response.delegate, response.entity);
     }
 
-    public static HeadersFor201 headersFor201() {
-      return new HeadersFor201();
+    public static HeadersFor202 headersFor202() {
+      return new HeadersFor202();
     }
 
-    public static PostDatasetsResponse respond201WithApplicationJson(DatasetPostResponseBody entity,
-        HeadersFor201 headers) {
-      Response.ResponseBuilder responseBuilder = Response.status(201).header("Content-Type", "application/json");
+    public static PostDatasetsResponse respond202WithApplicationJson(DatasetPostResponseBody entity,
+        HeadersFor202 headers) {
+      Response.ResponseBuilder responseBuilder = Response.status(202).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       headers.toResponseBuilder(responseBuilder);
       return new PostDatasetsResponse(responseBuilder.build(), entity);
@@ -129,11 +129,11 @@ public interface Datasets {
       return new PostDatasetsResponse(responseBuilder.build(), entity);
     }
 
-    public static class HeadersFor201 extends HeaderBuilderBase {
-      private HeadersFor201() {
+    public static class HeadersFor202 extends HeaderBuilderBase {
+      private HeadersFor202() {
       }
 
-      public HeadersFor201 withLocation(final String p) {
+      public HeadersFor202 withLocation(final String p) {
         headerMap.put("Location", String.valueOf(p));;
         return this;
       }

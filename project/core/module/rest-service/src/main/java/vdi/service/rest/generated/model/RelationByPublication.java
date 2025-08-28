@@ -9,14 +9,20 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = RelationByPublicationImpl.class
 )
 public interface RelationByPublication extends ImplicitRelation {
-  DatasetPublicationType _DISCRIMINATOR_TYPE_NAME = DatasetPublicationType.PUBLICATION;
+  ImplicitRelationType _DISCRIMINATOR_TYPE_NAME = ImplicitRelationType.PUBLICATION;
 
-  @JsonProperty(JsonField.TYPE)
-  DatasetPublicationType getType();
+  @JsonProperty(JsonField.RELATION_TYPE)
+  ImplicitRelationType getRelationType();
 
   @JsonProperty(JsonField.IDENTIFIER)
   String getIdentifier();
 
   @JsonProperty(JsonField.IDENTIFIER)
   void setIdentifier(String identifier);
+
+  @JsonProperty(JsonField.TYPE)
+  DatasetPublicationType getType();
+
+  @JsonProperty(JsonField.TYPE)
+  void setType(DatasetPublicationType type);
 }

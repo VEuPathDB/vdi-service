@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder("type")
+@JsonPropertyOrder("relationType")
 public class ImplicitRelationImpl implements ImplicitRelation {
-  @JsonProperty(JsonField.TYPE)
-  private final ImplicitRelation.TypeType type = _DISCRIMINATOR_TYPE_NAME;
+  @JsonProperty(JsonField.RELATION_TYPE)
+  private final ImplicitRelationType relationType = _DISCRIMINATOR_TYPE_NAME;
 
-  @JsonProperty(JsonField.TYPE)
-  public ImplicitRelation.TypeType getType() {
-    return this.type;
+  @JsonProperty(JsonField.RELATION_TYPE)
+  public ImplicitRelationType getRelationType() {
+    return this.relationType;
   }
 }

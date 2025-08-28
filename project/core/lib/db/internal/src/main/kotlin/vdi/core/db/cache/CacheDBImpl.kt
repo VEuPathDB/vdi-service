@@ -34,6 +34,8 @@ internal object CacheDBImpl: CacheDB, CacheDBImplBase() {
   override val connection: Connection
     get() = dataSource.connection
 
+  override fun <T> runQuery(fn: Connection.() -> T): T = connection.use(fn)
+
   init {
     RemoteDependencies.register(DatabaseDependency(this).also {
       when (it.checkStatus()) {

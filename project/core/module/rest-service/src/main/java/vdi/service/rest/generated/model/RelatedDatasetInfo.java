@@ -1,11 +1,8 @@
 package vdi.service.rest.generated.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.OffsetDateTime;
-import java.util.Map;
 
 @JsonDeserialize(
     as = RelatedDatasetInfoImpl.class
@@ -16,12 +13,6 @@ public interface RelatedDatasetInfo {
 
   @JsonProperty(JsonField.DATASET_ID)
   void setDatasetId(String datasetId);
-
-  @JsonProperty(JsonField.OWNER)
-  DatasetOwner getOwner();
-
-  @JsonProperty(JsonField.OWNER)
-  void setOwner(DatasetOwner owner);
 
   @JsonProperty(JsonField.TYPE)
   DatasetTypeOutput getType();
@@ -52,10 +43,4 @@ public interface RelatedDatasetInfo {
 
   @JsonProperty(JsonField.RELATED_BY)
   void setRelatedBy(ImplicitRelation relatedBy);
-
-  @JsonAnyGetter
-  Map<String, Object> getAdditionalProperties();
-
-  @JsonAnySetter
-  void setAdditionalProperties(String key, Object value);
 }

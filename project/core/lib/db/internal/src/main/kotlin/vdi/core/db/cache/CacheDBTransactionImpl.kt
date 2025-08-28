@@ -12,6 +12,8 @@ import vdi.core.db.cache.sql.dataset_metadata.tryInsertDatasetMeta
 import vdi.core.db.cache.sql.dataset_metadata.updateDatasetMeta
 import vdi.core.db.cache.sql.dataset_projects.deleteDatasetProjects
 import vdi.core.db.cache.sql.dataset_projects.tryInsertDatasetProjects
+import vdi.core.db.cache.sql.dataset_publications.deleteAllPublicationsForDataset
+import vdi.core.db.cache.sql.dataset_publications.deleteDatasetPublication
 import vdi.core.db.cache.sql.dataset_revisions.deleteDatasetRevisions
 import vdi.core.db.cache.sql.dataset_revisions.tryInsertDatasetRevision
 import vdi.core.db.cache.sql.dataset_revisions.tryInsertDatasetRevisions
@@ -42,7 +44,7 @@ import vdi.model.data.*
 
 internal class CacheDBTransactionImpl(
   override val dataSource: DataSource,
-  override val connection: Connection,
+  private val con: Connection,
   override val details: CacheDBConnectionDetails,
 ): CacheDBTransaction, CacheDBImplBase() {
   private val log = logger<CacheDBTransaction>()
@@ -51,154 +53,164 @@ internal class CacheDBTransactionImpl(
 
   private var closed = false
 
-  private val con
+  override val connection
     get() = if (committed || closed)
       throw IllegalStateException("cannot execute queries on a connection that has already been closed or committed")
     else
-      connection
+      con
+
+  override fun <T> runQuery(fn: Connection.() -> T): T = connection.fn()
 
   // region Delete
 
   override fun deleteShareOffer(datasetID: DatasetID, recipientID: UserID) =
-    con.deleteShareOffer(datasetID, recipientID).also { if (it)
+    runQuery { deleteShareOffer(datasetID, recipientID) }.also { if (it)
       log.debug("deleted share offer for dataset {}, recipient {}", datasetID, recipientID) }
 
   override fun deleteShareReceipt(datasetID: DatasetID, recipientID: UserID) =
-    con.deleteShareReceipt(datasetID, recipientID).also { if (it)
+    runQuery { deleteShareReceipt(datasetID, recipientID) }.also { if (it)
       log.debug("deleted share receipt for dataset {}, recipient {}", datasetID, recipientID) }
 
   override fun deleteDatasetMetadata(datasetID: DatasetID) =
-    con.deleteDatasetMetadata(datasetID).also { if (it)
+    runQuery { deleteDatasetMetadata(datasetID) }.also { if (it)
       log.debug("deleted metadata for dataset {}", datasetID) }
 
   override fun deleteInstallTargetLinks(datasetID: DatasetID) =
-    con.deleteDatasetProjects(datasetID).also { if (it > 0)
+    runQuery { deleteDatasetProjects(datasetID) }.also { if (it > 0)
       log.debug("deleted {} install target links for dataset {}", it, datasetID) }
 
   override fun deleteShareOffers(datasetID: DatasetID) =
-    con.deleteDatasetShareOffers(datasetID).also { if (it > 0)
+    runQuery { deleteDatasetShareOffers(datasetID) }.also { if (it > 0)
       log.debug("deleted {} share offers for dataset {}", it, datasetID) }
 
   override fun deleteShareReceipts(datasetID: DatasetID) =
-    con.deleteDatasetShareReceipts(datasetID).also { if (it > 0)
+    runQuery { deleteDatasetShareReceipts(datasetID) }.also { if (it > 0)
       log.debug("deleted {} share receipts for dataset {}", it, datasetID) }
 
   override fun deleteDataset(datasetID: DatasetID) =
-    con.deleteDataset(datasetID).also { if (it > 0)
+    runQuery { deleteDataset(datasetID) }.also { if (it > 0)
       log.info("deleted {} records for dataset {}", it, datasetID) }
 
   override fun deleteImportControl(datasetID: DatasetID) =
-    (con.deleteImportControl(datasetID) > 0).also { if (it)
+    (runQuery { deleteImportControl(datasetID) } > 0).also { if (it)
       log.debug("deleted import control record for dataset {}", datasetID) }
 
   override fun deleteImportMessages(datasetID: DatasetID) =
-    con.deleteImportMessages(datasetID).also { if (it > 0)
+    runQuery { deleteImportMessages(datasetID) }.also { if (it > 0)
       log.debug("deleted {} import messages for dataset {}", it, datasetID) }
 
   override fun deleteSyncControl(datasetID: DatasetID) =
-    (con.deleteSyncControl(datasetID) > 0).also { if (it)
+    (runQuery { deleteSyncControl(datasetID) } > 0).also { if (it)
       log.debug("deleted sync control record for dataset {}", datasetID) }
 
   override fun deleteInstallFiles(datasetID: DatasetID) =
-    con.deleteInstallFiles(datasetID).also { if (it > 0)
+    runQuery { deleteInstallFiles(datasetID) }.also { if (it > 0)
       log.debug("deleted {} install files for dataset {}", it, datasetID) }
 
   override fun deleteUploadFiles(datasetID: DatasetID) =
-    con.deleteUploadFiles(datasetID).also { if (it > 0)
+    runQuery { deleteUploadFiles(datasetID) }.also { if (it > 0)
       log.debug("deleted {} upload files for dataset {}", it, datasetID) }
 
   override fun deleteRevisions(originalID: DatasetID) =
-    con.deleteDatasetRevisions(originalID).also { if (it > 0)
+    runQuery { deleteDatasetRevisions(originalID) }.also { if (it > 0)
       log.debug("deleted {} revisions for dataset {}", it, originalID) }
+
+  override fun deletePublication(datasetID: DatasetID, publicationID: String) =
+    (runQuery { deleteDatasetPublication(datasetID, publicationID) } > 0).also { if (it)
+      log.debug("deleted publication {} reference from dataset {}", publicationID, datasetID) }
+
+  override fun deletePublications(datasetID: DatasetID) =
+    runQuery { deleteAllPublicationsForDataset(datasetID) }.also { if (it > 0)
+      log.debug("deleted {} publication references from dataset {}", it, datasetID) }
 
   // endregion Delete
 
   // region Try-Insert
 
   override fun tryInsertDataset(row: Dataset) =
-    (con.tryInsertDatasetRecord(row) > 0).also { if (it)
+    (runQuery { tryInsertDatasetRecord(row) } > 0).also { if (it)
       log.debug("inserted dataset record for dataset {}", row.datasetID) }
 
   override fun tryInsertInstallFiles(datasetID: DatasetID, files: Iterable<DatasetFileInfo>) =
-    con.tryInsertInstallFiles(datasetID, files).also { if (it > 0)
+    runQuery { tryInsertInstallFiles(datasetID, files) }.also { if (it > 0)
       log.debug("inserted {} dataset install files for dataset {}", it, datasetID) }
 
   override fun tryInsertUploadFiles(datasetID: DatasetID, files: Iterable<DatasetFileInfo>) =
-    con.tryInsertUploadFiles(datasetID, files).also { if (it > 0)
+    runQuery { tryInsertUploadFiles(datasetID, files) }.also { if (it > 0)
       log.debug("inserted {} dataset upload files for dataset {}", it, datasetID) }
 
   override fun tryInsertDatasetMeta(datasetID: DatasetID, meta: DatasetMetadata) =
-    (con.tryInsertDatasetMeta(datasetID, meta) > 0).also { if (it)
+    (runQuery { tryInsertDatasetMeta(datasetID, meta) } > 0).also { if (it)
       log.debug("inserted metadata for dataset {}", datasetID) }
 
   override fun tryInsertDatasetProjects(datasetID: DatasetID, projects: Iterable<InstallTargetID>) =
-    con.tryInsertDatasetProjects(datasetID, projects).also { if (it > 0)
+    runQuery { tryInsertDatasetProjects(datasetID, projects) }.also { if (it > 0)
       log.debug("inserted {} install target links for dataset {}", it, datasetID) }
 
   override fun tryInsertImportControl(datasetID: DatasetID, status: DatasetImportStatus) =
-    (con.tryInsertImportControl(datasetID, status) > 0).also { if (it)
+    (runQuery { tryInsertImportControl(datasetID, status) } > 0).also { if (it)
       log.debug("inserted import control record for dataset {}", datasetID) }
 
   override fun tryInsertSyncControl(record: SyncControlRecord) =
-    (con.tryInsertSyncControl(record) > 0).also { if (it)
+    (runQuery { tryInsertSyncControl(record) } > 0).also { if (it)
       log.debug("inserted sync control record for dataset {}", record.datasetID) }
 
   override fun tryInsertImportMessages(datasetID: DatasetID, messages: Iterable<String>) =
-    con.tryInsertImportMessages(datasetID, messages).also { if (it > 0)
+    runQuery { tryInsertImportMessages(datasetID, messages) }.also { if (it > 0)
       log.debug("inserted {} import messages for dataset {}", it, datasetID) }
 
   override fun tryInsertRevisionLink(originalID: DatasetID, revision: DatasetRevision) =
-    (con.tryInsertDatasetRevision(originalID, revision) > 0).also { if (it)
+    (runQuery { tryInsertDatasetRevision(originalID, revision) } > 0).also { if (it)
       log.debug("inserted revision link from dataset {} to revision {}", originalID, revision.revisionID) }
 
   override fun tryInsertRevisionLinks(originalID: DatasetID, revisions: Iterable<DatasetRevision>) =
-    con.tryInsertDatasetRevisions(originalID, revisions).also { if (it > 0)
+    runQuery { tryInsertDatasetRevisions(originalID, revisions) }.also { if (it > 0)
       log.debug("inserted {} revision links for dataset {}", it, originalID) }
 
   // endregion Try-Insert
 
   override fun updateImportControl(datasetID: DatasetID, status: DatasetImportStatus) =
-    (con.updateDatasetImportStatus(datasetID, status) > 0).also { if (it)
+    (runQuery { updateDatasetImportStatus(datasetID, status) } > 0).also { if (it)
       log.debug("updated import status for dataset {} to status {}", datasetID, status) }
 
   override fun updateDatasetDeleted(datasetID: DatasetID, deleted: Boolean) =
-    (con.updateDatasetDeleteFlag(datasetID, deleted) > 0).also { if (it)
+    (runQuery { updateDatasetDeleteFlag(datasetID, deleted) } > 0).also { if (it)
       log.debug("updating dataset deleted flag for dataset {} to {}", datasetID, deleted) }
 
   override fun updateDatasetMeta(datasetID: DatasetID, meta: DatasetMetadata) =
-    (con.updateDatasetMeta(datasetID, meta) > 0).also { if (it)
+    (runQuery { updateDatasetMeta(datasetID, meta) } > 0).also { if (it)
       log.debug("updated metadata for dataset {}", datasetID) }
 
   override fun updateMetaSyncControl(datasetID: DatasetID, timestamp: OffsetDateTime) =
-    (con.updateSyncControlMeta(datasetID, timestamp) > 0).also { if (it)
+    (runQuery { updateSyncControlMeta(datasetID, timestamp) } > 0).also { if (it)
       log.debug("updated sync control record meta timestamp for dataset {}", datasetID) }
 
   override fun updateDataSyncControl(datasetID: DatasetID, timestamp: OffsetDateTime) =
-    (con.updateSyncControlData(datasetID, timestamp) > 0).also { if (it)
+    (runQuery { updateSyncControlData(datasetID, timestamp) } > 0).also { if (it)
       log.debug("updated sync control record data timestamp for dataset {}", datasetID) }
 
   override fun updateShareSyncControl(datasetID: DatasetID, timestamp: OffsetDateTime) =
-    (con.updateSyncControlShare(datasetID, timestamp) > 0).also { if (it)
+    (runQuery { updateSyncControlShare(datasetID, timestamp) } > 0).also { if (it)
       log.debug("updated sync control record share timestamp for dataset {}", datasetID) }
 
   override fun upsertDatasetShareOffer(row: ShareOfferRecord) {
     log.debug("upserting share offer action {} for dataset {}, recipient {}", row.action, row.datasetID, row.recipientID)
-    con.upsertDatasetShareOffer(row.datasetID, row.recipientID, row.action)
+    runQuery { upsertDatasetShareOffer(row.datasetID, row.recipientID, row.action) }
   }
 
   override fun upsertDatasetShareReceipt(row: ShareReceiptRecord) {
     log.debug("upserting share receipt action {} for dataset {}, recipient {}", row.action, row.datasetID, row.recipientID)
-    con.upsertDatasetShareReceipt(row.datasetID, row.recipientID, row.action)
+    runQuery { upsertDatasetShareReceipt(row.datasetID, row.recipientID, row.action) }
   }
 
   override fun upsertImportControl(datasetID: DatasetID, status: DatasetImportStatus) {
     log.debug("upserting import control record for dataset {} for status {}", datasetID, status)
-    con.upsertImportControl(datasetID, status)
+    runQuery { upsertImportControl(datasetID, status) }
   }
 
   override fun upsertImportMessages(datasetID: DatasetID, messages: String) {
     log.debug("upserting import messages for dataset {}", datasetID)
-    con.upsertImportMessages(datasetID, messages)
+    runQuery { upsertImportMessages(datasetID, messages) }
   }
 
   override fun commit() {

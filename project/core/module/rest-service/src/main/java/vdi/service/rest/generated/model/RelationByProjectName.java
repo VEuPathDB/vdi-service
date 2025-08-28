@@ -9,29 +9,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = RelationByProjectNameImpl.class
 )
 public interface RelationByProjectName extends ImplicitRelation {
-  RelationByProjectName.TypeType _DISCRIMINATOR_TYPE_NAME = RelationByProjectName.TypeType.PROJECTNAME;
+  ImplicitRelationType _DISCRIMINATOR_TYPE_NAME = ImplicitRelationType.PROJECTNAME;
 
-  @JsonProperty(JsonField.TYPE)
-  TypeType getType();
-
-  enum TypeType {
-    @JsonProperty("publication")
-    PUBLICATION("publication"),
-
-    @JsonProperty("program-name")
-    PROGRAMNAME("program-name"),
-
-    @JsonProperty("project-name")
-    PROJECTNAME("project-name");
-
-    public final String value;
-
-    public String getValue() {
-      return this.value;
-    }
-
-    TypeType(String name) {
-      this.value = name;
-    }
-  }
+  @JsonProperty(JsonField.RELATION_TYPE)
+  ImplicitRelationType getRelationType();
 }

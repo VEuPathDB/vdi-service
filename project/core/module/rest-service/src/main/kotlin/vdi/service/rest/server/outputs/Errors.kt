@@ -78,3 +78,13 @@ inline fun <reified T: ResponseDelegate> UnprocessableEntityError.wrap(): T =
     .invoke(null, this) as T
 
 // endregion 422
+
+// region 425
+
+fun TooEarlyError(message: String = "the requested resource is not yet available"): TooEarlyError =
+  TooEarlyErrorImpl().also { it.message = message }
+
+inline fun <reified T: ResponseDelegate> TooEarlyError.wrap(): T =
+  T::class.java.getDeclaredMethod("respond424WithApplicationJson", TooEarlyError::class.java)
+    .invoke(null, this) as T
+

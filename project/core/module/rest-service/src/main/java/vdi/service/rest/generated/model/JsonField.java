@@ -97,6 +97,7 @@ public final class JsonField {
   public static final String RECIPIENT = "recipient";
   public static final String RELATED_BY = "relatedBy";
   public static final String RELATED_DATASETS = "relatedDatasets";
+  public static final String RELATION_TYPE = "relationType";
   public static final String REQUEST_ID = "requestId";
   public static final String RESOURCE_DISPLAY_NAME = "resourceDisplayName";
   public static final String RESOURCE_IDENTIFIER = "resourceIdentifier";

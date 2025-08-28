@@ -140,7 +140,7 @@ internal fun DatasetPatchRequestBody.applyPatch(original: DatasetMetadata) =
       value?.toInternalDistinct(DatasetContact::toInternal) ?: emptyList()
     },
 
-    relatedStudies = relatedStudies.mapIfPresent(original.relatedStudies) {
+    linkedDatasets = relatedStudies.mapIfPresent(original.linkedDatasets) {
       value?.toInternalDistinct(RelatedStudy::toInternal) ?: emptyList()
     },
 

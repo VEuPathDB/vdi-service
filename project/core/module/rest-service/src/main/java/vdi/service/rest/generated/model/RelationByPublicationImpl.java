@@ -8,19 +8,23 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName("publication")
 @JsonPropertyOrder({
-    "type",
-    "identifier"
+    "relationType",
+    "identifier",
+    "type"
 })
 public class RelationByPublicationImpl implements RelationByPublication {
-  @JsonProperty(JsonField.TYPE)
-  private final DatasetPublicationType type = _DISCRIMINATOR_TYPE_NAME;
+  @JsonProperty(JsonField.RELATION_TYPE)
+  private final ImplicitRelationType relationType = _DISCRIMINATOR_TYPE_NAME;
 
   @JsonProperty(JsonField.IDENTIFIER)
   private String identifier;
 
   @JsonProperty(JsonField.TYPE)
-  public DatasetPublicationType getType() {
-    return this.type;
+  private DatasetPublicationType type;
+
+  @JsonProperty(JsonField.RELATION_TYPE)
+  public ImplicitRelationType getRelationType() {
+    return this.relationType;
   }
 
   @JsonProperty(JsonField.IDENTIFIER)
@@ -31,5 +35,15 @@ public class RelationByPublicationImpl implements RelationByPublication {
   @JsonProperty(JsonField.IDENTIFIER)
   public void setIdentifier(String identifier) {
     this.identifier = identifier;
+  }
+
+  @JsonProperty(JsonField.TYPE)
+  public DatasetPublicationType getType() {
+    return this.type;
+  }
+
+  @JsonProperty(JsonField.TYPE)
+  public void setType(DatasetPublicationType type) {
+    this.type = type;
   }
 }

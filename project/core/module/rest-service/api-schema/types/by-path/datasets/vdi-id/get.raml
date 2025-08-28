@@ -50,21 +50,23 @@ types:
     type: object
     properties:
       datasetId: common.VdiId
-      owner: common.DatasetOwner
       type: common.DatasetTypeOutput
       name: common.DatasetName
       summary: common.DatasetSummary
       created: common.DatasetCreationDate
       relatedBy: ImplicitRelation
+    additionalProperties: false
 
   ImplicitRelation:
     type: object
-    discriminator: type
+    discriminator: relationType
     properties:
-      type:
-        type: string
-        enum: [ "publication", "program-name", "project-name"]
+      relationType: ImplicitRelationType
     additionalProperties: false
+
+  ImplicitRelationType:
+    type: string
+    enum: [ "publication", "program-name", "project-name"]
 
   RelationByPublication:
     type: ImplicitRelation
