@@ -29,30 +29,6 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
   fun deleteDataset(datasetID: DatasetID): Int
 
   /**
-   * Deletes the `vdi.dataset_metadata` table entry for a target dataset
-   * identified by the given [DatasetID].
-   *
-   * @param datasetID ID of the target dataset whose `vdi.dataset_metadata`
-   * record should be deleted.
-   *
-   * @return A flag indicating whether a record was actually deleted as a result
-   * of this method call.
-   */
-  fun deleteDatasetMetadata(datasetID: DatasetID): Boolean
-
-  /**
-   * Deletes all entries in the `vdi.dataset_projects` table for a target
-   * dataset identified by the given [DatasetID].
-   *
-   * @param datasetID ID of the target dataset whose `vdi.dataset_projects`
-   * records should be deleted.
-   *
-   * @return The number of records that were deleted as a result of this method
-   * call.
-   */
-  fun deleteInstallTargetLinks(datasetID: DatasetID): Int
-
-  /**
    * Deletes a singular share offer record for a target dataset/recipient user
    * combination.
    *
@@ -65,18 +41,6 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
    * of this method call.
    */
   fun deleteShareOffer(datasetID: DatasetID, recipientID: UserID): Boolean
-
-  /**
-   * Deletes all entries in the `vdi.dataset_share_offers` table for a target
-   * dataset identified by the given [DatasetID].
-   *
-   * @param datasetID ID of the target dataset whose `vdi.dataset_share_offers`
-   * records should be deleted.
-   *
-   * @return The number of records that were deleted as a result of this method
-   * call.
-   */
-  fun deleteShareOffers(datasetID: DatasetID): Int
 
   /**
    * Deletes a singular share receipt record for a target dataset/recipient user
@@ -93,30 +57,6 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
   fun deleteShareReceipt(datasetID: DatasetID, recipientID: UserID): Boolean
 
   /**
-   * Deletes all entries in the `vdi.dataset_share_receipts` table for a target
-   * dataset identified by the given [DatasetID].
-   *
-   * @param datasetID ID of the target dataset whose
-   * `vdi.dataset_share_receipts` records should be deleted.
-   *
-   * @return The number of records that were deleted as a result of this method
-   * call.
-   */
-  fun deleteShareReceipts(datasetID: DatasetID): Int
-
-  /**
-   * Deletes the `vdi.import_control` table entry for a target dataset
-   * identified by the given [DatasetID].
-   *
-   * @param datasetID ID of the target dataset whose `vdi.import_control` record
-   * should be deleted.
-   *
-   * @return A flag indicating whether a record was actually deleted as a result
-   * of this method call.
-   */
-  fun deleteImportControl(datasetID: DatasetID): Boolean
-
-  /**
    * Deletes the `vdi.import_messages` table entry for a target dataset
    * identified by the given [DatasetID].
    *
@@ -127,40 +67,6 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
    * call.
    */
   fun deleteImportMessages(datasetID: DatasetID): Int
-
-  /**
-   * Deletes the `vdi.sync_control` table entry for a target dataset identified
-   * by the given [DatasetID].
-   *
-   * @param datasetID ID of the target dataset whose `vdi.sync_control` record
-   * should be deleted.
-   *
-   * @return A flag indicating whether a record was actually deleted as a result
-   * of this method call.
-   */
-  fun deleteSyncControl(datasetID: DatasetID): Boolean
-
-  /**
-   * Deletes installable file metadata cache records for a target dataset.
-   *
-   * @param datasetID ID of the dataset whose installable file metadata records
-   * should be deleted.
-   *
-   * @return The number of records that were deleted as a result of this method
-   * call.
-   */
-  fun deleteInstallFiles(datasetID: DatasetID): Int
-
-  /**
-   * Deletes user upload file metadata cache records for a target dataset.
-   *
-   * @param datasetID ID of the dataset whose upload file metadata records
-   * should be deleted.
-   *
-   * @return The number of records that were deleted as a result of this method
-   * call.
-   */
-  fun deleteUploadFiles(datasetID: DatasetID): Int
 
   /**
    * Deletes the entire revision history record for a dataset by using the
@@ -175,8 +81,6 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
   fun deleteRevisions(originalID: DatasetID): Int
 
   fun deletePublication(datasetID: DatasetID, publicationID: String): Boolean
-
-  fun deletePublications(datasetID: DatasetID): Int
 
   // endregion Delete
 

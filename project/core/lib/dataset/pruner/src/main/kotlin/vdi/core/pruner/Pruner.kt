@@ -14,7 +14,6 @@ import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.purgeDatasetControlTables
 import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
-import vdi.core.db.cache.purgeDataset
 import vdi.core.db.cache.withTransaction
 import vdi.logging.logger
 import vdi.core.metrics.Metrics
@@ -106,6 +105,7 @@ object Pruner {
    * @return `true` if the Pruner is currently executing a prune job, otherwise
    * `false`.
    */
+  @Suppress("unused")
   fun isLocked() = lock.isLocked
 
   private fun doPruning() {
@@ -297,7 +297,13 @@ object Pruner {
    */
   private fun DeletionContext.deleteFromCacheDB(retainRevisions: Boolean) {
     logger.debug("deleting cache DB records")
-    cacheDB.withTransaction { it.purgeDataset(datasetID, retainRevisions) }
+    cacheDB.withTransaction {
+      if (!retainRevisions) {
+        it.deleteRevisions(it.selectOriginalDatasetID(datasetID))
+      }
+
+      it.deleteDataset(datasetID)
+    }
   }
 
   // endregion Shared Pruning Functionality
@@ -325,14 +331,14 @@ object Pruner {
       return
     }
 
-    for (revision in revisions.records) {
+    for (revision in revisions.revisions) {
       // make sure the older revision records are removed from the cache db
       // just in case
       ctx.safely("failed to remove obsolete revision {} records from cache db", revision.revisionID) {
         ctx.logger.info("removing obsolete revision records for {} from cache db", revision.revisionID)
         // retainRevisionHistory is set to true here as the history has
         // already been deleted so we can avoid the extra query
-        cacheDB.withTransaction { it.purgeDataset(revision.revisionID, true) }
+        ctx.deleteFromCacheDB(true)
       }
 
       ctx.safely("failed to remove obsolete revision {} data from object store", revision.revisionID) {

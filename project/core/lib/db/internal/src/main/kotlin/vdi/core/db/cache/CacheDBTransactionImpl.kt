@@ -7,36 +7,32 @@ import vdi.core.db.cache.model.Dataset
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.ShareOfferRecord
 import vdi.core.db.cache.model.ShareReceiptRecord
-import vdi.core.db.cache.sql.dataset_metadata.deleteDatasetMetadata
 import vdi.core.db.cache.sql.dataset_metadata.tryInsertDatasetMeta
 import vdi.core.db.cache.sql.dataset_metadata.updateDatasetMeta
-import vdi.core.db.cache.sql.dataset_projects.deleteDatasetProjects
 import vdi.core.db.cache.sql.dataset_projects.tryInsertDatasetProjects
 import vdi.core.db.cache.sql.dataset_publications.deleteAllPublicationsForDataset
 import vdi.core.db.cache.sql.dataset_publications.deleteDatasetPublication
 import vdi.core.db.cache.sql.dataset_revisions.deleteDatasetRevisions
 import vdi.core.db.cache.sql.dataset_revisions.tryInsertDatasetRevision
 import vdi.core.db.cache.sql.dataset_revisions.tryInsertDatasetRevisions
-import vdi.core.db.cache.sql.dataset_share_offers.deleteDatasetShareOffers
 import vdi.core.db.cache.sql.dataset_share_offers.deleteShareOffer
 import vdi.core.db.cache.sql.dataset_share_offers.upsertDatasetShareOffer
-import vdi.core.db.cache.sql.dataset_share_receipts.deleteDatasetShareReceipts
 import vdi.core.db.cache.sql.dataset_share_receipts.deleteShareReceipt
 import vdi.core.db.cache.sql.dataset_share_receipts.upsertDatasetShareReceipt
 import vdi.core.db.cache.sql.datasets.deleteDataset
 import vdi.core.db.cache.sql.datasets.tryInsertDatasetRecord
 import vdi.core.db.cache.sql.datasets.updateDatasetDeleteFlag
-import vdi.core.db.cache.sql.import_control.deleteImportControl
 import vdi.core.db.cache.sql.import_control.tryInsertImportControl
 import vdi.core.db.cache.sql.import_control.updateDatasetImportStatus
 import vdi.core.db.cache.sql.import_control.upsertImportControl
 import vdi.core.db.cache.sql.import_messages.deleteImportMessages
 import vdi.core.db.cache.sql.import_messages.tryInsertImportMessages
 import vdi.core.db.cache.sql.import_messages.upsertImportMessages
-import vdi.core.db.cache.sql.install_files.deleteInstallFiles
 import vdi.core.db.cache.sql.install_files.tryInsertInstallFiles
-import vdi.core.db.cache.sql.sync_control.*
-import vdi.core.db.cache.sql.upload_files.deleteUploadFiles
+import vdi.core.db.cache.sql.sync_control.tryInsertSyncControl
+import vdi.core.db.cache.sql.sync_control.updateSyncControlData
+import vdi.core.db.cache.sql.sync_control.updateSyncControlMeta
+import vdi.core.db.cache.sql.sync_control.updateSyncControlShare
 import vdi.core.db.cache.sql.upload_files.tryInsertUploadFiles
 import vdi.core.db.model.SyncControlRecord
 import vdi.logging.logger
@@ -71,45 +67,13 @@ internal class CacheDBTransactionImpl(
     runQuery { deleteShareReceipt(datasetID, recipientID) }.also { if (it)
       log.debug("deleted share receipt for dataset {}, recipient {}", datasetID, recipientID) }
 
-  override fun deleteDatasetMetadata(datasetID: DatasetID) =
-    runQuery { deleteDatasetMetadata(datasetID) }.also { if (it)
-      log.debug("deleted metadata for dataset {}", datasetID) }
-
-  override fun deleteInstallTargetLinks(datasetID: DatasetID) =
-    runQuery { deleteDatasetProjects(datasetID) }.also { if (it > 0)
-      log.debug("deleted {} install target links for dataset {}", it, datasetID) }
-
-  override fun deleteShareOffers(datasetID: DatasetID) =
-    runQuery { deleteDatasetShareOffers(datasetID) }.also { if (it > 0)
-      log.debug("deleted {} share offers for dataset {}", it, datasetID) }
-
-  override fun deleteShareReceipts(datasetID: DatasetID) =
-    runQuery { deleteDatasetShareReceipts(datasetID) }.also { if (it > 0)
-      log.debug("deleted {} share receipts for dataset {}", it, datasetID) }
-
   override fun deleteDataset(datasetID: DatasetID) =
     runQuery { deleteDataset(datasetID) }.also { if (it > 0)
       log.info("deleted {} records for dataset {}", it, datasetID) }
 
-  override fun deleteImportControl(datasetID: DatasetID) =
-    (runQuery { deleteImportControl(datasetID) } > 0).also { if (it)
-      log.debug("deleted import control record for dataset {}", datasetID) }
-
   override fun deleteImportMessages(datasetID: DatasetID) =
     runQuery { deleteImportMessages(datasetID) }.also { if (it > 0)
       log.debug("deleted {} import messages for dataset {}", it, datasetID) }
-
-  override fun deleteSyncControl(datasetID: DatasetID) =
-    (runQuery { deleteSyncControl(datasetID) } > 0).also { if (it)
-      log.debug("deleted sync control record for dataset {}", datasetID) }
-
-  override fun deleteInstallFiles(datasetID: DatasetID) =
-    runQuery { deleteInstallFiles(datasetID) }.also { if (it > 0)
-      log.debug("deleted {} install files for dataset {}", it, datasetID) }
-
-  override fun deleteUploadFiles(datasetID: DatasetID) =
-    runQuery { deleteUploadFiles(datasetID) }.also { if (it > 0)
-      log.debug("deleted {} upload files for dataset {}", it, datasetID) }
 
   override fun deleteRevisions(originalID: DatasetID) =
     runQuery { deleteDatasetRevisions(originalID) }.also { if (it > 0)

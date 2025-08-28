@@ -8,18 +8,7 @@ import vdi.core.db.jdbc.setUserID
 import vdi.model.data.UserID
 
 // language=postgresql
-private const val MULTI_SQL = """
-DELETE FROM
-  vdi.dataset_share_offers
-WHERE
-  dataset_id = ?
-"""
-
-internal fun Connection.deleteDatasetShareOffers(datasetID: DatasetID) =
-  withPreparedUpdate(MULTI_SQL) { setDatasetID(1, datasetID) }
-
-// language=postgresql
-private const val SINGLE_SQL = """
+private const val SQL = """
 DELETE FROM
   vdi.dataset_share_offers
 WHERE
@@ -28,7 +17,7 @@ WHERE
 """
 
 internal fun Connection.deleteShareOffer(datasetID: DatasetID, recipientID: UserID) =
-  withPreparedUpdate(SINGLE_SQL) {
+  withPreparedUpdate(SQL) {
     setDatasetID(1, datasetID)
     setUserID(2, recipientID)
   } > 0

@@ -2,7 +2,6 @@ package vdi.core.db.cache
 
 import java.sql.Connection
 import vdi.core.db.cache.model.BrokenImportListQuery
-import vdi.core.db.cache.model.RelatedDataset
 import vdi.core.db.cache.query.AdminAllDatasetsQuery
 import vdi.core.db.cache.query.DatasetListQuery
 import vdi.core.db.cache.sql.dataset_publications.selectPublicationsForDataset
@@ -25,7 +24,7 @@ import vdi.core.db.cache.sql.upload_files.selectUploadFileSummaries
 import vdi.core.db.cache.sql.upload_files.selectUploadFiles
 import vdi.model.data.*
 
-sealed class CacheDBImplBase: CacheDB {
+internal sealed class CacheDBImplBase: CacheDB {
   protected abstract val connection: Connection
 
   protected abstract fun <T> runQuery(fn: Connection.() -> T): T
@@ -71,9 +70,6 @@ sealed class CacheDBImplBase: CacheDB {
 
   override fun selectPublications(datasetID: DatasetID): List<DatasetPublication> =
     runQuery { selectPublicationsForDataset(datasetID) }
-
-  override fun selectRelatedDatasets(ownerID: UserID, datasetID: DatasetID): List<RelatedDataset> =
-    runQuery { selectRelatedDatasets() }
 
   override fun selectUploadFiles(datasetID: DatasetID) =
     runQuery { selectUploadFiles(datasetID) }
@@ -131,7 +127,7 @@ sealed class CacheDBImplBase: CacheDB {
     runQuery { selectDatasetRevisions(datasetID) }
 
   override fun openTransaction(): CacheDBTransaction =
-    CacheDBTransactionImpl(connection.apply { autoCommit = false })
+    CacheDBTransactionImpl(dataSource, connection.apply { autoCommit = false }, details)
 
   protected fun makeJDBCPostgresConnectionString(host: String, port: UShort, name: String) =
     "jdbc:postgresql://$host:$port/$name"

@@ -7,11 +7,16 @@ internal typealias DSGetter<T> = (DatasetID) -> T
 
 internal typealias DSConsumer = (DatasetID) -> Unit
 
+internal typealias DSMultiUpdate = (DatasetID) -> Int
+
+internal typealias DSSingleUpdate = (DatasetID) -> Boolean
+
 internal typealias DSSync = (DatasetID, OffsetDateTime) -> Unit
 
 internal typealias Runnable = () -> Unit
 
 internal typealias Con<T> = (T) -> Unit
+internal typealias BiCon<A, B> = (A, B) -> Unit
 
 internal typealias Pro<T> = () -> T
 
@@ -40,3 +45,9 @@ internal fun <I1, I2, O> twoParamList(i1: I1, i2: I2): List<O> = emptyList()
 internal fun <I, K, V> oneParamMap(i: I): Map<K, V> = emptyMap()
 
 internal fun <I1, I2, K, V> twoParamMap(i1: I1, i2: I2): Map<K, V> = emptyMap()
+
+internal fun <I> multiUpdate(i: I): Int = 0
+internal fun <A, B> multiUpdate(a: A, b: B): Int = 0
+
+internal fun <I> singleUpdate(i: I): Boolean = false
+internal fun <A, B> singleUpdate(a: A, b: B): Boolean = false
