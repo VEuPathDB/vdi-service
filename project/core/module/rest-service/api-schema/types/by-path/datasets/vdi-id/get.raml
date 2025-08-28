@@ -20,6 +20,16 @@ types:
       sourceUrl?: common.DatasetSourceUrl
       revisionHistory?: common.RevisionHistory
 
+      relatedDatasets?:
+        displayName: Implicitly Related Datasets
+        # language=markdown
+        description: |-
+          Datasets that are implicitly related to the dataset represented by
+          this object by way of sharing a common project name or program name,
+          or by having one or more publications in common.
+        type: RelatedDatasetInfo[]
+        uniqueItems: true
+
       importMessages?:
         # language=markdown
         description: |
@@ -35,6 +45,16 @@ types:
         type: ShareOffer[]
 
       status: common.DatasetStatusInfo
+
+  RelatedDatasetInfo:
+    type: object
+    properties:
+      datasetId: common.VdiId
+      owner: common.DatasetOwner
+      type: common.DatasetTypeOutput
+      name: common.DatasetName
+      summary: common.DatasetSummary
+      created: common.DatasetCreationDate
 
   ShareOffer:
     displayName: Dataset Share Offer

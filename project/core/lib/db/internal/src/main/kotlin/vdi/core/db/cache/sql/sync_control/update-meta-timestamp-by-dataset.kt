@@ -28,17 +28,10 @@ WHERE
  *
  * @param timestamp New timestamp for the meta field in the target sync control
  * record.
- *
- * @return `true` if one or more rows were updated, `false` if no rows were
- * updated.
- *
- * `false` indicates that either the target dataset sync control record does not
- * exist, or that the given [timestamp] value was before or equal to the value
- * that was already set in the existing sync control record.
  */
 internal fun Connection.updateSyncControlMeta(datasetID: DatasetID, timestamp: OffsetDateTime) =
   withPreparedUpdate(SQL) {
     setDateTime(1, timestamp)
     setDatasetID(2, datasetID)
     setDateTime(3, timestamp)
-  } > 0
+  }

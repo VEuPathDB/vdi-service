@@ -228,8 +228,13 @@ types:
           Required if:
           * Install target is MBio or ClinEpi
         type: DatasetProgramName
-      relatedStudies?:
-        type: RelatedStudy[]
+      linkedDatasets?:
+        displayName: Explicitly Related Datasets
+        # language=markdown
+        description: |-
+          Other studies or datasets that the user is explicitly indicating are
+          related to the dataset represented by this metadata object.
+        type: LinkedDataset[]
         uniqueItems: true
       experimentalOrganism?:
         # language=markdown
@@ -446,11 +451,11 @@ types:
     minLength: 5
     maxLength: 32
 
-  RelatedStudy:
+  LinkedDataset:
     type: object
     additionalProperties: false
     properties:
-      studyUri: string
+      datasetUri: string
       sharesRecords: boolean
 
   RevisionHistory:

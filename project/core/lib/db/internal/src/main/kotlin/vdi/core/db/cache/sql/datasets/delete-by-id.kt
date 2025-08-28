@@ -1,6 +1,6 @@
 package vdi.core.db.cache.sql.datasets
 
-import io.foxcapades.kdbc.withPreparedUpdate
+import io.foxcapades.kdbc.withPreparedStatement
 import vdi.model.data.DatasetID
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
@@ -14,4 +14,13 @@ WHERE
 """
 
 internal fun Connection.deleteDataset(datasetID: DatasetID) =
-  withPreparedUpdate(SQL) { setDatasetID(1, datasetID) } > 0
+  withPreparedStatement(SQL) {
+    setDatasetID(1, datasetID)
+
+    var count = executeUpdate()
+    while (moreResults) {
+      count += updateCount
+    }
+
+    count
+  }

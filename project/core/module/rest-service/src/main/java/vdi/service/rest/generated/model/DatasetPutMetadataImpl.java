@@ -16,7 +16,7 @@ import java.util.List;
     "contacts",
     "projectName",
     "programName",
-    "relatedStudies",
+    "linkedDatasets",
     "studyCharacteristics",
     "externalIdentifiers",
     "funding",
@@ -51,8 +51,8 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.PROGRAM_NAME)
   private DatasetPutMetadata.ProgramNameType programName;
 
-  @JsonProperty(JsonField.RELATED_STUDIES)
-  private DatasetPutMetadata.RelatedStudiesType relatedStudies;
+  @JsonProperty(JsonField.LINKED_DATASETS)
+  private DatasetPutMetadata.LinkedDatasetsType linkedDatasets;
 
   @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
   private StudyCharacteristicsPatch studyCharacteristics;
@@ -159,14 +159,14 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
     this.programName = programName;
   }
 
-  @JsonProperty(JsonField.RELATED_STUDIES)
-  public DatasetPutMetadata.RelatedStudiesType getRelatedStudies() {
-    return this.relatedStudies;
+  @JsonProperty(JsonField.LINKED_DATASETS)
+  public DatasetPutMetadata.LinkedDatasetsType getLinkedDatasets() {
+    return this.linkedDatasets;
   }
 
-  @JsonProperty(JsonField.RELATED_STUDIES)
-  public void setRelatedStudies(DatasetPutMetadata.RelatedStudiesType relatedStudies) {
-    this.relatedStudies = relatedStudies;
+  @JsonProperty(JsonField.LINKED_DATASETS)
+  public void setLinkedDatasets(DatasetPutMetadata.LinkedDatasetsType linkedDatasets) {
+    this.linkedDatasets = linkedDatasets;
   }
 
   @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
@@ -374,17 +374,17 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonPropertyOrder("value")
-  public static class RelatedStudiesTypeImpl implements DatasetPutMetadata.RelatedStudiesType {
+  public static class LinkedDatasetsTypeImpl implements DatasetPutMetadata.LinkedDatasetsType {
     @JsonProperty("value")
-    private List<RelatedStudy> value;
+    private List<LinkedDataset> value;
 
     @JsonProperty("value")
-    public List<RelatedStudy> getValue() {
+    public List<LinkedDataset> getValue() {
       return this.value;
     }
 
     @JsonProperty("value")
-    public void setValue(List<RelatedStudy> value) {
+    public void setValue(List<LinkedDataset> value) {
       this.value = value;
     }
   }

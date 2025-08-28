@@ -6,24 +6,24 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "studyUri",
+    "datasetUri",
     "sharesRecords"
 })
-public class RelatedStudyImpl implements RelatedStudy {
-  @JsonProperty(JsonField.STUDY_URI)
-  private String studyUri;
+public class LinkedDatasetImpl implements LinkedDataset {
+  @JsonProperty(JsonField.DATASET_URI)
+  private String datasetUri;
 
   @JsonProperty(JsonField.SHARES_RECORDS)
   private Boolean sharesRecords;
 
-  @JsonProperty(JsonField.STUDY_URI)
-  public String getStudyUri() {
-    return this.studyUri;
+  @JsonProperty(JsonField.DATASET_URI)
+  public String getDatasetUri() {
+    return this.datasetUri;
   }
 
-  @JsonProperty(JsonField.STUDY_URI)
-  public void setStudyUri(String studyUri) {
-    this.studyUri = studyUri;
+  @JsonProperty(JsonField.DATASET_URI)
+  public void setDatasetUri(String datasetUri) {
+    this.datasetUri = datasetUri;
   }
 
   @JsonProperty(JsonField.SHARES_RECORDS)

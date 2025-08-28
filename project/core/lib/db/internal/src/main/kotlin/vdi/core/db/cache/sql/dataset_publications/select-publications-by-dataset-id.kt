@@ -33,7 +33,7 @@ WHERE
  *
  * @return A read-only list of zero or more dataset publication records.
  */
-internal fun Connection.selectDatasetPublicationsForDataset(datasetID: DatasetID) =
+internal fun Connection.selectPublicationsForDataset(datasetID: DatasetID) =
   withPreparedStatement(SQL) {
     setDatasetID(1, datasetID)
 

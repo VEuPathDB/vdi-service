@@ -217,6 +217,15 @@ types:
       created: DatasetCreationDate
       sourceUrl?: DatasetSourceUrl
       revisionHistory?: RevisionHistory
+      relatedDatasets?:
+        displayName: Implicitly Related Datasets
+        # language=markdown
+        description: |-
+          Datasets that are implicitly related to the dataset represented by
+          this object by way of sharing a common project name or program name,
+          or by having one or more publications in common.
+        type: RelatedDatasetInfo[]
+        uniqueItems: true
       importMessages?:
         # language=markdown
         description: |
@@ -390,8 +399,12 @@ types:
       programName?:
         description: 'Required if: * Install target is MBio or ClinEpi'
         type: DatasetProgramName
-      relatedStudies?:
-        type: RelatedStudy[]
+      linkedDatasets?:
+        displayName: Explicitly Related Datasets
+        description: |-
+          Other studies or datasets that the user is explicitly indicating are
+          related to the dataset represented by this metadata object.
+        type: LinkedDataset[]
         uniqueItems: true
       experimentalOrganism?:
         description: |-
@@ -512,12 +525,12 @@ types:
         additionalProperties: false
         properties:
           value?: DatasetProgramName
-      relatedStudies?:
+      linkedDatasets?:
         type: object
         additionalProperties: false
         properties:
           value?:
-            type: RelatedStudy[]
+            type: LinkedDataset[]
             uniqueItems: true
       studyCharacteristics?: StudyCharacteristicsPatch
       externalIdentifiers?: ExternalIdentifiersPatch
@@ -951,6 +964,12 @@ types:
       syncControl?: SyncControlRecord
       uploadFiles?: string[]
       installFiles?: string[]
+  LinkedDataset:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetUri: string
+      sharesRecords: boolean
   MethodNotAllowedError:
     displayName: Method Not Allowed
     description: |
@@ -1007,12 +1026,15 @@ types:
           indicates that the plugin has no project restrictions and may be used
           on any site.
         type: InstallTargetID[]
-  RelatedStudy:
+  RelatedDatasetInfo:
     type: object
-    additionalProperties: false
     properties:
-      studyUri: string
-      sharesRecords: boolean
+      datasetId: VdiId
+      owner: DatasetOwner
+      type: DatasetTypeOutput
+      name: DatasetName
+      summary: DatasetSummary
+      created: DatasetCreationDate
   RevisionHistory:
     type: object
     additionalProperties: false

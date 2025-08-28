@@ -30,6 +30,7 @@ public final class JsonField {
   public static final String DATA_UPDATE_TIME = "dataUpdateTime";
   public static final String DATASET_ID = "datasetId";
   public static final String DATASET_TYPE = "datasetType";
+  public static final String DATASET_URI = "datasetUri";
   public static final String DEPENDENCIES = "dependencies";
   public static final String DEPENDENCY = "dependency";
   public static final String DESCRIPTION = "description";
@@ -73,6 +74,7 @@ public final class JsonField {
   public static final String IS_PRIMARY = "isPrimary";
   public static final String LAST_NAME = "lastName";
   public static final String LIMIT = "limit";
+  public static final String LINKED_DATASETS = "linkedDatasets";
   public static final String MESSAGE = "message";
   public static final String MESSAGES = "messages";
   public static final String META = "meta";
@@ -93,7 +95,7 @@ public final class JsonField {
   public static final String PUBLICATIONS = "publications";
   public static final String REACHABLE = "reachable";
   public static final String RECIPIENT = "recipient";
-  public static final String RELATED_STUDIES = "relatedStudies";
+  public static final String RELATED_DATASETS = "relatedDatasets";
   public static final String REQUEST_ID = "requestId";
   public static final String RESOURCE_DISPLAY_NAME = "resourceDisplayName";
   public static final String RESOURCE_IDENTIFIER = "resourceIdentifier";
@@ -118,7 +120,6 @@ public final class JsonField {
   public static final String STUDY_DESIGN = "studyDesign";
   public static final String STUDY_SPECIES = "studySpecies";
   public static final String STUDY_TYPE = "studyType";
-  public static final String STUDY_URI = "studyUri";
   public static final String SUMMARY = "summary";
   public static final String SYNC_CONTROL = "syncControl";
   public static final String TARGETS = "targets";

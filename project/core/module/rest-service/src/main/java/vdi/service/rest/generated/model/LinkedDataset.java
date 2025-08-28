@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize(
-    as = RelatedStudyImpl.class
+    as = LinkedDatasetImpl.class
 )
-public interface RelatedStudy {
-  @JsonProperty(JsonField.STUDY_URI)
-  String getStudyUri();
+public interface LinkedDataset {
+  @JsonProperty(JsonField.DATASET_URI)
+  String getDatasetUri();
 
-  @JsonProperty(JsonField.STUDY_URI)
-  void setStudyUri(String studyUri);
+  @JsonProperty(JsonField.DATASET_URI)
+  void setDatasetUri(String datasetUri);
 
   @JsonProperty(JsonField.SHARES_RECORDS)
   Boolean getSharesRecords();

@@ -110,11 +110,11 @@ types:
           value?: common.DatasetProgramName
         additionalProperties: false
 
-      relatedStudies?:
+      linkedDatasets?:
         type: object
         properties:
           value?:
-            type: common.RelatedStudy[]
+            type: common.LinkedDataset[]
             uniqueItems: true
         additionalProperties: false
 

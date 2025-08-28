@@ -69,11 +69,11 @@ public interface DatasetDetails extends DatasetMetaBase {
   @JsonProperty(JsonField.PROGRAM_NAME)
   void setProgramName(String programName);
 
-  @JsonProperty(JsonField.RELATED_STUDIES)
-  List<RelatedStudy> getRelatedStudies();
+  @JsonProperty(JsonField.LINKED_DATASETS)
+  List<LinkedDataset> getLinkedDatasets();
 
-  @JsonProperty(JsonField.RELATED_STUDIES)
-  void setRelatedStudies(List<RelatedStudy> relatedStudies);
+  @JsonProperty(JsonField.LINKED_DATASETS)
+  void setLinkedDatasets(List<LinkedDataset> linkedDatasets);
 
   @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
   DatasetOrganism getExperimentalOrganism();
@@ -146,6 +146,12 @@ public interface DatasetDetails extends DatasetMetaBase {
 
   @JsonProperty(JsonField.REVISION_HISTORY)
   void setRevisionHistory(RevisionHistory revisionHistory);
+
+  @JsonProperty(JsonField.RELATED_DATASETS)
+  List<RelatedDatasetInfo> getRelatedDatasets();
+
+  @JsonProperty(JsonField.RELATED_DATASETS)
+  void setRelatedDatasets(List<RelatedDatasetInfo> relatedDatasets);
 
   @JsonProperty(JsonField.IMPORT_MESSAGES)
   List<String> getImportMessages();

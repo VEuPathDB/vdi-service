@@ -10,6 +10,7 @@ import java.sql.Connection
 import vdi.core.db.cache.model.DatasetRevisionRecordSet
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.jdbc.setDatasetID
+import vdi.model.data.DatasetRevisionHistory
 
 /**
  * This slightly wonky looking query attempts to locate the revision records for
@@ -80,6 +81,6 @@ fun Connection.selectDatasetRevisions(datasetID: DatasetID) =
         )
       }
 
-      originalID?.let { DatasetRevisionRecordSet(it, records) }
+      originalID?.let { DatasetRevisionHistory(it, records) }
     }
   }

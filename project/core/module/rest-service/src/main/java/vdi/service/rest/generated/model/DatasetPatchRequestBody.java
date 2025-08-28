@@ -62,11 +62,11 @@ public interface DatasetPatchRequestBody {
   @JsonProperty(JsonField.PROGRAM_NAME)
   void setProgramName(ProgramNameType programName);
 
-  @JsonProperty(JsonField.RELATED_STUDIES)
-  RelatedStudiesType getRelatedStudies();
+  @JsonProperty(JsonField.LINKED_DATASETS)
+  LinkedDatasetsType getLinkedDatasets();
 
-  @JsonProperty(JsonField.RELATED_STUDIES)
-  void setRelatedStudies(RelatedStudiesType relatedStudies);
+  @JsonProperty(JsonField.LINKED_DATASETS)
+  void setLinkedDatasets(LinkedDatasetsType linkedDatasets);
 
   @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
   StudyCharacteristicsPatch getStudyCharacteristics();
@@ -186,14 +186,14 @@ public interface DatasetPatchRequestBody {
   }
 
   @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.RelatedStudiesTypeImpl.class
+      as = DatasetPatchRequestBodyImpl.LinkedDatasetsTypeImpl.class
   )
-  interface RelatedStudiesType {
+  interface LinkedDatasetsType {
     @JsonProperty("value")
-    List<RelatedStudy> getValue();
+    List<LinkedDataset> getValue();
 
     @JsonProperty("value")
-    void setValue(List<RelatedStudy> value);
+    void setValue(List<LinkedDataset> value);
   }
 
   @JsonDeserialize(
