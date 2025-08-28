@@ -1,0 +1,28 @@
+= Internal Database Migrator
+
+Service startup module that ensures the stack-internal database is up to date
+with the latest schema definition, applying any of the defined migration scripts
+necessary to bring the database up to date.
+
+== Migration Scripts
+
+This tool expects the database migration scripts to be available as resources
+included in the service jar file under the path prefix `db-migrations/`.  Each
+migration is represented by an integer version value which is specified by the
+name of the subdirectory containing the migration scripts.  For example, the
+path `db-migrations/002` is expected to contain the migration scripts that will
+be executed to bring the database up to version 2 (if necessary).
+
+Individual scripts contained within each migration version directory will be
+executed in ascending order by file name.
+
+.Example Migration Directory
+[source]
+----
+db-migrations/
+    |- 002/
+    |    |- 01-some-script.sql
+    |    |- 02-another-script.sql
+    |- 003/
+         |- 01-more-script.sql
+----

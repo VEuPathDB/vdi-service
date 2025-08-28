@@ -1,0 +1,4 @@
+= Bootstrapper
+
+Initialization wrapper that starts the independent VDI modules and shuts them
+down on request or on critical internal error.
