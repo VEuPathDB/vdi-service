@@ -1,0 +1,38 @@
+= VDI REST Service
+
+== Development Info
+
+=== Responsibilities by Application Layer
+
+==== 1. Controllers (JAX-RS)
+
+Controller/resource classes serve as context injection containers for Jersey's
+reflection-based functionality, granting access to necessary context to the
+controller methods.
+
+Controller methods are responsible for:
+
+. Basic, non-domain-specific request-validation (such as ensuring params are
+  not `null`).
+. Deciding which service method(s) to call
+. Passing necessary params and context to service method(s)
+. Translating errors or wrapping generated model types in JAX-RS Response
+  instances as needed.
+
+
+==== 2. Service Methods (JAX-RS ⮂ VDI)
+
+Service methods are responsible for:
+
+. Lightweight, non-I/O input validation to ensure compatibility with model types
+. Translating between generated RAML types and VDI types
+. Orchestrating required model processes to fulfill the service request
+
+
+==== 3. Model (VDI)
+
+Model methods are responsible for:
+
+. Performing data-driven input validation
+. Operating with/on data sources
+. Interacting with other external VPDB resources

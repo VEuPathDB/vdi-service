@@ -12,6 +12,7 @@ import vdi.core.db.cache.sql.dataset_metadata.updateDatasetMeta
 import vdi.core.db.cache.sql.dataset_projects.tryInsertDatasetProjects
 import vdi.core.db.cache.sql.dataset_publications.deleteAllPublicationsForDataset
 import vdi.core.db.cache.sql.dataset_publications.deleteDatasetPublication
+import vdi.core.db.cache.sql.dataset_publications.tryInsertPublications
 import vdi.core.db.cache.sql.dataset_revisions.deleteDatasetRevisions
 import vdi.core.db.cache.sql.dataset_revisions.tryInsertDatasetRevision
 import vdi.core.db.cache.sql.dataset_revisions.tryInsertDatasetRevisions
@@ -130,6 +131,10 @@ internal class CacheDBTransactionImpl(
   override fun tryInsertRevisionLinks(originalID: DatasetID, revisions: Iterable<DatasetRevision>) =
     runQuery { tryInsertDatasetRevisions(originalID, revisions) }.also { if (it > 0)
       log.debug("inserted {} revision links for dataset {}", it, originalID) }
+
+  override fun tryInsertPublications(datasetID: DatasetID, publications: Iterable<DatasetPublication>) =
+    runQuery { tryInsertPublications(datasetID, publications) }.also { if (it > 0)
+      log.debug("inserted {} publication records for dataset {}", it, datasetID) }
 
   // endregion Try-Insert
 

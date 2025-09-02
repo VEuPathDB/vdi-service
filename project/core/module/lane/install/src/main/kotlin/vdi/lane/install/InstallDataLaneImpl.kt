@@ -195,7 +195,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
           installData(userID, datasetID, projectID, dir, handler, installableFileTimestamp)
         }
 
-      if (success && meta.revisionHistory.isNotEmpty())
+      if (success && meta.revisionHistory != null)
         tryMarkRevised(userID, meta, dm)
     } catch (e: PluginException) {
       throw e
@@ -552,13 +552,13 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     }
 
   private fun tryMarkRevised(ownerID: UserID, meta: DatasetMetadata, dm: DatasetObjectStore) {
-    meta.revisionHistory.asSequence()
+    meta.revisionHistory!!.revisions
+      .asSequence()
       .sortedByDescending { it.timestamp }
-      .drop(1) // skip the newest/current revision
       .map { dm.getDatasetDirectory(ownerID, it.revisionID) }
       .forEach { tryMarkRevised(it) }
 
-    tryMarkRevised(dm.getDatasetDirectory(ownerID, meta.originalID!!))
+    tryMarkRevised(dm.getDatasetDirectory(ownerID, meta.revisionHistory!!.originalID))
   }
 
   private fun tryMarkRevised(dir: DatasetDirectory) {

@@ -12,9 +12,10 @@ INSERT INTO
   vdi.dataset_publications (dataset_id, publication_type, publication_id)
 VALUES
   (?, ?, ?)
+ON CONFLICT DO NOTHING
 """
 
-internal fun Connection.insertDatasetPublications(datasetID: DatasetID, publications: Iterable<DatasetPublication>) =
+internal fun Connection.tryInsertPublications(datasetID: DatasetID, publications: Iterable<DatasetPublication>) =
   withPreparedBatchUpdate(SQL, publications) {
     setDatasetID(1, datasetID)
     setInt(2, it.type.ordinal)

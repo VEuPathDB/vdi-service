@@ -1,6 +1,5 @@
 package vdi.service.rest.server.controllers
 
-import jakarta.ws.rs.core.UriBuilder
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.model.UserInfo
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider

@@ -162,7 +162,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     } catch (e: Throwable) {
       cacheDB.withTransaction { tran ->
         tran.updateImportControl(datasetID, DatasetImportStatus.Failed)
-        tran.tryInsertImportMessages(datasetID, "Process error: ${e.message}")
+        tran.tryInsertImportMessages(datasetID, listOf("process error: ${e.message}"))
       }
 
       throw e as? PluginException ?: PluginException.import("N/A", userID, datasetID, cause = e)

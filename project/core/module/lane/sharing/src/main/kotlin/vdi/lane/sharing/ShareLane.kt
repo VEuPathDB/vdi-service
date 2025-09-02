@@ -12,4 +12,4 @@ import vdi.core.modules.VDIModule
  *
  * @author Elizabeth Paige Harper - https://github.com/Foxcapades
  */
-sealed interface ShareLane : VDIModule
+sealed interface ShareLane: VDIModule

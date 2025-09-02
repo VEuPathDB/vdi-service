@@ -148,7 +148,7 @@ internal class DatasetReconciler(
     // event here.
     if (!ctx.haveFiredImportEvent && syncStatus.installOutOfSync)
       fireInstallEvent(ctx)
-    else if (!syncStatus.installOutOfSync && ctx.meta.originalID != null && isInstalled(ctx))
+    else if (!syncStatus.installOutOfSync && ctx.meta.revisionHistory != null && isInstalled(ctx))
       ensureRevisionFlags(ctx)
   }
 
@@ -216,11 +216,10 @@ internal class DatasetReconciler(
     }
 
   private fun ensureRevisionFlags(ctx: ReconciliationContext) {
-    val targets = ArrayList<DatasetID>(ctx.meta.revisionHistory.size)
-    targets.add(ctx.meta.originalID!!)
-    ctx.meta.revisionHistory.asSequence()
+    val targets = ArrayList<DatasetID>(ctx.meta.revisionHistory!!.revisions.size)
+    ctx.meta.revisionHistory!!.revisions
+      .asSequence()
       .sortedByDescending { it.timestamp }
-      .drop(1) // don't mark latest/current revision as an old revision
       .forEach { targets.add(it.revisionID) }
 
     targets.forEach {

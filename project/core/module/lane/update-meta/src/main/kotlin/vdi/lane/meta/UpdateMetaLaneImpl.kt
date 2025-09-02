@@ -147,12 +147,16 @@ internal class UpdateMetaLaneImpl(
     }
 
     cacheDB.withTransaction { db ->
-        // 1. Update meta info
-        db.updateDatasetMeta(datasetID, datasetMeta)
+      // 1. Update meta info
+      db.updateDatasetMeta(datasetID, datasetMeta)
 
-        // 2. Update meta timestamp
-        db.updateMetaSyncControl(datasetID, metaTimestamp)
-      }
+      // 2. Sync Publications
+      db.deletePublications(datasetID)
+      db.tryInsertPublications(datasetID, datasetMeta.publications)
+
+      // 3. Update meta timestamp
+      db.updateMetaSyncControl(datasetID, metaTimestamp)
+    }
 
     val ph = PluginHandlers[datasetMeta.type] orElse {
       log.error("dataset {}/{} declares a type of {}:{} which is unknown to the vdi service", userID, datasetID, datasetMeta.type.name, datasetMeta.type.version)

@@ -1,17 +1,12 @@
 package vdi.core.db.cache
 
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
-import vdi.model.data.DatasetFileInfo
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetRevision
 import java.time.OffsetDateTime
 import vdi.core.db.cache.model.Dataset
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.ShareOfferRecord
 import vdi.core.db.cache.model.ShareReceiptRecord
 import vdi.core.db.model.SyncControlRecord
+import vdi.model.data.*
 
 interface CacheDBTransaction: CacheDB, AutoCloseable {
 
@@ -81,6 +76,16 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
   fun deleteRevisions(originalID: DatasetID): Int
 
   fun deletePublication(datasetID: DatasetID, publicationID: String): Boolean
+
+  /**
+   * Deletes all publication records associated with a target dataset.
+   *
+   * @param datasetID ID of the target dataset.
+   *
+   * @return The number of records that were deleted as a result of this method
+   * call.
+   */
+  fun deletePublications(datasetID: DatasetID): Int
 
   // endregion Delete
 
@@ -214,6 +219,19 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
    * this method call.
    */
   fun tryInsertRevisionLinks(originalID: DatasetID, revisions: Iterable<DatasetRevision>): Int
+
+  /**
+   * Attempts to insert dataset publications records for a target dataset,
+   * skipping any conflicting rows.
+   *
+   * @param datasetID ID of the first dataset upload in the revision history.
+   *
+   * @param publications Publication records to insert.
+   *
+   * @return The number of records that were actually inserted as a result of
+   * this method call.
+   */
+  fun tryInsertPublications(datasetID: DatasetID, publications: Iterable<DatasetPublication>): Int
 
   // endregion Try-Insert
 
