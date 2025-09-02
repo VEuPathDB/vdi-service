@@ -49,7 +49,7 @@ json-jackson-options     = { module = "com.fasterxml.jackson.datatype:jackson-da
 json-schema-validation = { module = "com.networknt:json-schema-validator", version = "1.5.7" }
 json-patch-tools = { group = "com.github.java-json-tools", name = "json-patch", version = "1.13" }
 
-yaml = { module = "org.yaml:snakeyaml", version = "2.4" }
+yaml = { module = "org.yaml:snakeyaml", version = "2.5" }
 
 
 #
