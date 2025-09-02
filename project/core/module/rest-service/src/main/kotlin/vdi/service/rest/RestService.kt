@@ -16,7 +16,7 @@ import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.health.DependencySource
 import vdi.service.rest.s3.DatasetStore
 
-class RestService(config: StackConfig, manifest: ManifestConfig) : Server() {
+class RestService(config: StackConfig, manifest: ManifestConfig): Server() {
   private val options = ServiceConfig(config, manifest)
 
   init {

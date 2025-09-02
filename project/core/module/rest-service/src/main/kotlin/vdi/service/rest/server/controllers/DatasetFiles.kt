@@ -1,8 +1,8 @@
 package vdi.service.rest.server.controllers
 
-import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.core.Context
+import jakarta.ws.rs.core.StreamingOutput
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
@@ -32,8 +32,8 @@ class DatasetFiles(@Context request: ContainerRequest)
     }
       .mapLeft { obj ->
         GetDatasetsFilesUploadByVdiIdResponse
-          .respond200WithApplicationOctetStream(
-            { obj.stream.use { inp -> inp.transferTo(it) } },
+          .respond200WithApplicationZip(
+            StreamingOutput { obj.stream.use { inp -> inp.transferTo(it) } },
             GetDatasetsFilesUploadByVdiIdResponse
               .headersFor200()
               .withContentDisposition("attachment; filename=\"$rawID-upload.zip\"")
@@ -42,16 +42,16 @@ class DatasetFiles(@Context request: ContainerRequest)
       .fold()
   }
 
-  override fun getDatasetsFilesDataByVdiId(rawID: String): GetDatasetsFilesDataByVdiIdResponse =
+  override fun getDatasetsFilesInstallByVdiId(rawID: String): GetDatasetsFilesInstallByVdiIdResponse =
     when (maybeUser) {
       null -> getInstallReadyZipForAdmin(DatasetID(rawID))
       else -> getInstallReadyZipForUser(DatasetID(rawID))
     }
       .mapLeft { so ->
-        GetDatasetsFilesDataByVdiIdResponse
-          .respond200WithApplicationOctetStream(
-            { so.stream.use { inp -> inp.transferTo(it) } },
-            GetDatasetsFilesDataByVdiIdResponse
+        GetDatasetsFilesInstallByVdiIdResponse
+          .respond200WithApplicationZip(
+            StreamingOutput { so.stream.use { inp -> inp.transferTo(it) } },
+            GetDatasetsFilesInstallByVdiIdResponse
               .headersFor200()
               .withContentDisposition("attachment; filename=\"$rawID-data.zip\"")
           )

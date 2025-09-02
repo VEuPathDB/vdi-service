@@ -67,7 +67,7 @@ get:
             type: string
             example: attachment; filename="1234567-data.zip"
         body:
-          application/octet-stream:
+          application/zip:
             type: any
       401:
         body: lib.UnauthorizedError

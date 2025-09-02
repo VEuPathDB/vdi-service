@@ -9,7 +9,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
 import vdi.service.rest.generated.model.BadRequestError;
 import vdi.service.rest.generated.model.DatasetFileListing;
 import vdi.service.rest.generated.model.NotFoundError;
@@ -47,8 +46,8 @@ public interface DatasetsVdiIdFiles {
   @GET
   @Path("/install")
   @Produces({
-      "application/octet-stream",
-      "application/json"
+      "application/json",
+      "application/zip"
   })
   GetDatasetsFilesInstallByVdiIdResponse getDatasetsFilesInstallByVdiId(
       @PathParam("vdi-id") String vdiId);
@@ -185,9 +184,9 @@ public interface DatasetsVdiIdFiles {
       return new HeadersFor200();
     }
 
-    public static GetDatasetsFilesInstallByVdiIdResponse respond200WithApplicationOctetStream(
-        StreamingOutput entity, HeadersFor200 headers) {
-      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/octet-stream");
+    public static GetDatasetsFilesInstallByVdiIdResponse respond200WithApplicationZip(Object entity,
+        HeadersFor200 headers) {
+      Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/zip");
       responseBuilder.entity(entity);
       headers.toResponseBuilder(responseBuilder);
       return new GetDatasetsFilesInstallByVdiIdResponse(responseBuilder.build(), entity);

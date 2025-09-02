@@ -29,7 +29,10 @@ class DatasetByID(@Context request: ContainerRequest, @Context val uploadConfig:
       }.let {
         if (it.isLeft) {
           it.unwrapLeft()
-            .apply { revisionHistory?.forEach { e -> e.fileListUrl = createURL(DatasetsVdiIdFiles.ROOT_PATH.replace(VDI_ID_VAR, e.revisionId)) } }
+            .apply {
+              revisionHistory
+                ?.revisions
+                ?.forEach { e -> e.fileListUrl = createURL(DatasetsVdiIdFiles.ROOT_PATH.replace(VDI_ID_VAR, e.revisionId)) } }
             .let(GetDatasetsByVdiIdResponse::respond200WithApplicationJson)
         } else {
           // If the dataset could not be found under the given dataset ID, then
@@ -55,9 +58,9 @@ class DatasetByID(@Context request: ContainerRequest, @Context val uploadConfig:
       ?.let {
         if (it.isLeft)
           it.unwrapLeft()
-            .let { body -> PutDatasetsByVdiIdResponse.respond201WithApplicationJson(
+            .let { body -> PutDatasetsByVdiIdResponse.respond202WithApplicationJson(
               body,
-              PutDatasetsByVdiIdResponse.headersFor201()
+              PutDatasetsByVdiIdResponse.headersFor202()
                 .withLocation(ROOT_PATH.replace(VDI_ID_VAR, body.datasetId))
             ) }
         else
