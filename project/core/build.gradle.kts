@@ -15,7 +15,7 @@ dependencies {
 
 // Fat Jar Config
 tasks.shadowJar {
-  dependencyFilter.exclude { it.moduleGroup == "commons-logging" }
+//  dependencyFilter.exclude { it.moduleGroup == "commons-logging" }
 
   exclude("**/Log4j2Plugins.dat")
   archiveFileName.set("vdi-service.jar")

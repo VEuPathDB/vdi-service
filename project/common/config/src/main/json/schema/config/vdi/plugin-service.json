@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/vdi-config.json",
+  "title": "VDI Plugin Configuration Schema",
+  "type": "object",
+  "properties": {
+    "ldap": { "$ref": "../common.json#/$defs/ldap" },
+    "plugins": {
+      "type": "object",
+      "additionalProperties": { "$ref": "components/plugin.json" },
+      "minProperties": 1,
+      "unevaluatedItems": false
+    },
+    "siteBuild": {
+      "title": "Site Build Directory Name",
+      "description": "Name of the parent directory containing the per-project dataset files subdirectories.\n\nThis directory name will be used to form paths such as `{siteBuild}/{installTarget}/{datasetId}`.",
+      "type": "string",
+      "examples": [ "build-65" ]
+    },
+    "installTargets": {
+      "title": "Dataset Installation Targets",
+      "type": "array",
+      "items": { "$ref": "components/install-target.json" },
+      "minItems": 1,
+      "unevaluatedItems": false,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "plugins",
+    "siteBuild",
+    "installTargets"
+  ]
+}

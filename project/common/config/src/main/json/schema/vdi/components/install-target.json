@@ -8,7 +8,7 @@
       "title": "Enabled",
       "description": "Whether the install target should be enabled for use in the VDI service.",
       "type": "boolean",
-      "default": true,
+      "default": true
     },
     "targetName": { "$ref": "../../common.json#/$defs/installTarget" },
     "dataTypes": {

@@ -17,10 +17,13 @@ inputs:
 
 runs:
   using: composite
+  env:
+    SCHEMA_PROJECT_DIR: project/common/config
+
   steps:
   - name: Ensure Workspace Dirs
     shell: bash
-    run: mkdir -p ${{ inputs.output-dir }}/schema/data ${{ inputs.output-dir }}/schema/config
+    run: mkdir -p ${{ inputs.output-dir }}/schema/config
 
   - name: Checkout Ref "${{ inputs.ref }}"
     uses: actions/checkout@v4
@@ -37,7 +40,7 @@ runs:
 
   - name: Compile Service Config Schema
     shell: bash
-    run: gradle :schema:compile-config-schema
+    run: gradle :commons:config:compile-config-schema
     env:
       GITHUB_USERNAME: ${{ inputs.gh-user }}
       GITHUB_TOKEN: ${{ inputs.gh-token }}
@@ -47,10 +50,9 @@ runs:
     run: >-
       cp -rt ${{ inputs.output-dir }} \
         docs/vdi-api.html \
-        schema/build/json-schema/*
+        ${{ env.SCHEMA_PROJECT_DIR }}/build/json-schema/*
       cp -rt ${{ inputs.output-dir }}/schema \
-        schema/config \
-        schema/data
+        ${{ env.SCHEMA_PROJECT_DIR }}/src/main/json/schema/config/core-config.json
 
   - name: Compile Config Schema Docs
     shell: bash
@@ -59,6 +61,6 @@ runs:
         --config expand_buttons \
         --config examples_as_yaml \
         --config no_link_to_reused_ref \
-        schema/config/stack-config.json \
+        ${{ env.SCHEMA_PROJECT_DIR }}/src/main/json/schema/config/core-config.json \
         ${{ inputs.output-dir }}/config-schema.html
 

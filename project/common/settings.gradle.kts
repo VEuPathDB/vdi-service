@@ -17,3 +17,20 @@ project(":json").projectDir = file("json")
 project(":logging").projectDir = file("logging")
 project(":model").projectDir = file("model")
 project(":util").projectDir = file("util")
+
+pluginManagement {
+  repositories {
+    mavenCentral()
+    gradlePluginPortal()
+  }
+}
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath("com.networknt:json-schema-validator:1.5.7")
+  }
+}

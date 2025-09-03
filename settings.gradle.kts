@@ -30,10 +30,6 @@ includeBuild("project/common") {
 if (file("project/plugin-server").exists())
   includeBuild("project/plugin-server")
 
-includeBuild("schema") {
-  dependencySubstitution { substitute(module("vdi:schemata")).using(project(":")) }
-}
-
 includeBuild("stack-db/migrations") {
   dependencySubstitution { substitute(module("db:migrations")).using(project(":")) }
 }

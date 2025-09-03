@@ -40,7 +40,7 @@ compression = { module = "org.apache.commons:commons-compress", version = "1.28.
 # Serialization Formats
 json-jackson-core        = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
 json-jackson-databind    = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-json-jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
+json-jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations",  version = "2.20" }# version.ref = "jackson" }
 json-jackson-kotlin      = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 json-jackson-parameters  = { module = "com.fasterxml.jackson.module:jackson-module-parameter-names", version.ref = "jackson" }
 json-jackson-datetime    = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }

@@ -54,12 +54,15 @@ jobs:
       env:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: gradle -P DOC_BUILD_DIR=$DOC_BUILD_DIR/core -P DOC_FILE_NAME=index.html :core:generate-raml-docs
+      run: >-
+        gradle -P DOC_BUILD_DIR=$DOC_BUILD_DIR/core \
+               -P DOC_FILE_NAME=index.html \
+               :core:generate-raml-docs
 
     - name: Merge and Convert JSON Schema
       run: |-
         gradle -P SCHEMA_BUILD_DIR=$DOC_BUILD_DIR \
-          :schema:compile-config-schema
+          :commons:config:compile-config-schema
 
     - name: Generate Configuration Docs
       run: >-
