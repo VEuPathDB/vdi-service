@@ -1,4 +1,4 @@
-@file:JvmName("DatasetDependencyValidator")
+@file:JvmName("DatasetDependencyInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors

@@ -1,4 +1,4 @@
-@file:JvmName("DatasetProxyPostRequestValidator")
+@file:JvmName("DatasetProxyPostRequestInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException

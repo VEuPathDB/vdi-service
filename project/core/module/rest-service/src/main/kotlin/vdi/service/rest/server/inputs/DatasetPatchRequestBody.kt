@@ -1,4 +1,4 @@
-@file:JvmName("DatasetPatchRequestValidator")
+@file:JvmName("DatasetPatchRequestInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
@@ -24,7 +24,7 @@ internal fun DatasetPatchRequestBody.cleanup() {
   contacts?.apply { cleanupList(::getValue, DatasetContact?::cleanup) }
   projectName?.apply { cleanupString(::getValue) }
   programName?.apply { cleanupString(::getValue) }
-  relatedStudies?.apply { cleanupList(::getValue, RelatedStudy?::cleanup) }
+  linkedDatasets?.apply { cleanupList(::getValue, LinkedDataset?::cleanup) }
 
   studyCharacteristics?.apply {
     studyDesign?.apply { cleanupString(::getValue) }
@@ -70,7 +70,7 @@ internal fun DatasetPatchRequestBody.validate(
     }
   }
 
-  name?.apply { value.requireAnd(JF.NAME, errors) { checkLength(JF.NAME, NameLengthRange, errors) } }
+  name?.apply { value.requireAnd(JF.NAME, errors) { checkLength(JF.NAME, DatasetNameLengthRange, errors) } }
 
   summary?.apply { value.requireAnd(JF.SUMMARY, errors) {
     checkLength(JF.SUMMARY, SummaryLengthRange, errors)
@@ -94,7 +94,7 @@ internal fun DatasetPatchRequestBody.validate(
 
   projectName?.value?.checkLength(JF.PROJECT_NAME, ProjectNameLengthRange, errors)
   programName?.value?.checkLength(JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
-  relatedStudies?.value?.validate(JF.RELATED_STUDIES, errors)
+  linkedDatasets?.value?.validate(JF.LINKED_DATASETS, errors)
 
   studyCharacteristics?.validate(original.studyCharacteristics, errors)
   externalIdentifiers?.validate(errors)
@@ -140,8 +140,8 @@ internal fun DatasetPatchRequestBody.applyPatch(original: DatasetMetadata) =
       value?.toInternalDistinct(DatasetContact::toInternal) ?: emptyList()
     },
 
-    linkedDatasets = relatedStudies.mapIfPresent(original.linkedDatasets) {
-      value?.toInternalDistinct(RelatedStudy::toInternal) ?: emptyList()
+    linkedDatasets = linkedDatasets.mapIfPresent(original.linkedDatasets) {
+      value?.toInternalDistinct(LinkedDataset::toInternal) ?: emptyList()
     },
 
     studyCharacteristics = studyCharacteristics.mapIfPresent(original.studyCharacteristics) {

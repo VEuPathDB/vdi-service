@@ -4,8 +4,8 @@ import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import vdi.service.rest.config.UploadConfig
+import vdi.service.rest.generated.model.UsersSelfShareOffersGetStatus
 import vdi.service.rest.generated.resources.Users
-import vdi.service.rest.model.ShareFilterStatus
 import vdi.service.rest.server.services.shares.lookupShares
 import vdi.service.rest.server.services.users.getUserMetadata
 
@@ -17,7 +17,7 @@ class UserInfo(@Context request: ContainerRequest, @Context val uploadConfig: Up
   override fun getUsersSelfMeta() =
     Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(getUserMetadata(uploadConfig))!!
 
-  override fun getUsersSelfShareOffers(status: String?) =
+  override fun getUsersSelfShareOffers(status: UsersSelfShareOffersGetStatus?): Users.GetUsersSelfShareOffersResponse =
     Users.GetUsersSelfShareOffersResponse
-      .respond200WithApplicationJson(lookupShares(userID, status?.let(ShareFilterStatus::fromString) ?: ShareFilterStatus.Open))!!
+      .respond200WithApplicationJson(lookupShares(userID, status ?: UsersSelfShareOffersGetStatus.OPEN))!!
 }

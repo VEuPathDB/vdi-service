@@ -1,4 +1,4 @@
-@file:JvmName("ExternalIdentifiersApiExtensions")
+@file:JvmName("ExternalIdentifiersInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors

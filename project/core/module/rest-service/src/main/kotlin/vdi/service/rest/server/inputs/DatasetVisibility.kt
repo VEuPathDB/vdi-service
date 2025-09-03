@@ -1,4 +1,4 @@
-@file:JvmName("DatasetVisibilityInput")
+@file:JvmName("DatasetVisibilityInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import vdi.model.data.DatasetVisibility

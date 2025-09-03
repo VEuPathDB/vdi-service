@@ -1,4 +1,4 @@
-@file:JvmName("DatasetContactValidator")
+@file:JvmName("DatasetContactInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
@@ -6,7 +6,7 @@ import vdi.model.data.DatasetContact
 import vdi.service.rest.generated.model.DatasetContact as APIContact
 import vdi.service.rest.generated.model.JsonField
 
-private val NameLengthRange = 3..300
+private val ContactNameLengthRange = 3..300
 private val EmailLengthRange = 5..1024
 private val AffiliationLengthRange = 3..4000
 private val CountryLengthRange = Range3To200
@@ -41,9 +41,9 @@ private fun APIContact.validate(
     else
       String::checkLength
 
-  firstName.strictValidator(jPath..JsonField.FIRST_NAME, index, NameLengthRange, errors)
-  middleName?.checkLength(jPath..JsonField.MIDDLE_NAME, index, NameLengthRange, errors)
-  lastName.strictValidator(jPath..JsonField.LAST_NAME, index, NameLengthRange, errors)
+  firstName.strictValidator(jPath..JsonField.FIRST_NAME, index, ContactNameLengthRange, errors)
+  middleName?.checkLength(jPath..JsonField.MIDDLE_NAME, index, ContactNameLengthRange, errors)
+  lastName.strictValidator(jPath..JsonField.LAST_NAME, index, ContactNameLengthRange, errors)
   email.strictValidator(jPath..JsonField.EMAIL, index, EmailLengthRange, errors)
   affiliation.strictValidator(jPath..JsonField.AFFILIATION, index, AffiliationLengthRange, errors)
   country.strictValidator(jPath..JsonField.COUNTRY, index, CountryLengthRange, errors)

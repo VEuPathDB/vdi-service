@@ -1,4 +1,4 @@
-@file:JvmName("DOIReferenceApiExtensions")
+@file:JvmName("DOIReferenceInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors

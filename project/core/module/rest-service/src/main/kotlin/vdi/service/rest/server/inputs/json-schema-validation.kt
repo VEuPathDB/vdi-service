@@ -1,4 +1,4 @@
-@file:JvmName("JsonSchemaValidator")
+@file:JvmName("JsonSchemaInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import com.fasterxml.jackson.databind.node.ArrayNode

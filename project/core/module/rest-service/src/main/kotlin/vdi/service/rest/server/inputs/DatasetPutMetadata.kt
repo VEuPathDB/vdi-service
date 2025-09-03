@@ -1,4 +1,4 @@
-@file:JvmName("DatasetPutMetadataApiExtensions")
+@file:JvmName("DatasetPutMetadataInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors

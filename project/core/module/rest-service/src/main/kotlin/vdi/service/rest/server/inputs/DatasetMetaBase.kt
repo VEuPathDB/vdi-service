@@ -1,4 +1,4 @@
-@file:JvmName("DatasetMetaBaseValidator")
+@file:JvmName("DatasetMetaBaseInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
@@ -7,7 +7,7 @@ import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.reqCheckLength
 import vdi.service.rest.generated.model.*
 
-val NameLengthRange = 3..1024
+val DatasetNameLengthRange = 3..1024
 val OriginLengthRange = 3..256
 val ProgramNameLengthRange = 1..256
 val ProjectNameLengthRange = ProgramNameLengthRange
@@ -24,7 +24,7 @@ fun DatasetMetaBase.cleanup() {
   cleanupDistinctList(::getContacts, DatasetContact?::cleanup)
   cleanupString(::getProjectName)
   cleanupString(::getProgramName)
-  cleanupDistinctList(::getRelatedStudies, RelatedStudy?::cleanup)
+  cleanupDistinctList(::getLinkedDatasets, LinkedDataset?::cleanup)
   cleanup(::getExperimentalOrganism, DatasetOrganism?::cleanup)
   cleanup(::getHostOrganism, DatasetOrganism?::cleanup)
   cleanup(::getStudyCharacteristics, StudyCharacteristics?::cleanup)
@@ -34,7 +34,7 @@ fun DatasetMetaBase.cleanup() {
 
 fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
   installTargets.validateProjects(JsonField.META..JsonField.INSTALL_TARGETS, errors)
-  name.reqCheckLength(JsonField.META..JsonField.NAME, NameLengthRange, errors)
+  name.reqCheckLength(JsonField.META..JsonField.NAME, DatasetNameLengthRange, errors)
   summary.reqCheckLength(JsonField.META..JsonField.SUMMARY, SummaryLengthRange, errors)
   // description - no validation
   origin.reqCheckLength(JsonField.META..JsonField.ORIGIN, OriginLengthRange, errors)
@@ -43,7 +43,7 @@ fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
   contacts.validate(JsonField.META..JsonField.CONTACTS, strict, errors)
   projectName?.checkLength(JsonField.META..JsonField.PROJECT_NAME, ProjectNameLengthRange, errors)
   programName?.checkLength(JsonField.META..JsonField.PROGRAM_NAME, ProgramNameLengthRange, errors)
-  relatedStudies.validate(JsonField.META..JsonField.RELATED_STUDIES, errors)
+  linkedDatasets.validate(JsonField.META..JsonField.LINKED_DATASETS, errors)
   experimentalOrganism.validate(JsonField.META..JsonField.EXPERIMENTAL_ORGANISM, errors)
   hostOrganism.validate(JsonField.META..JsonField.HOST_ORGANISM, errors)
   studyCharacteristics?.validate(JsonField.META..JsonField.STUDY_CHARACTERISTICS, errors)

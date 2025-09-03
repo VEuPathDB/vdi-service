@@ -1,4 +1,4 @@
-@file:JvmName("DatasetPutRequestBodyApiExtensions")
+@file:JvmName("DatasetPutRequestBodyInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException

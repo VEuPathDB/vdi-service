@@ -1,4 +1,4 @@
-@file:JvmName("DatasetProxyPostMetaValidator")
+@file:JvmName("DatasetProxyPostMetaInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
@@ -34,7 +34,7 @@ fun DatasetProxyPostMeta.toInternal(userID: UserID, url: String?) =
     contacts             = contacts.toInternalDistinct(DatasetContact::toInternal),
     projectName          = projectName,
     programName          = programName,
-    linkedDatasets       = relatedStudies.toInternalDistinct(RelatedStudy::toInternal),
+    linkedDatasets       = linkedDatasets.toInternalDistinct(LinkedDataset::toInternal),
     experimentalOrganism = experimentalOrganism?.toInternal(),
     hostOrganism         = hostOrganism?.toInternal(),
     studyCharacteristics = studyCharacteristics?.toInternal(),

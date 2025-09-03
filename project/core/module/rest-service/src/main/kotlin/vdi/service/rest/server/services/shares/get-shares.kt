@@ -8,7 +8,8 @@ import vdi.core.db.cache.model.DatasetShareListEntry
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.UserID
 import vdi.service.rest.generated.model.ShareOfferEntry
-import vdi.service.rest.model.ShareFilterStatus
+import vdi.service.rest.generated.model.ShareOfferStatus
+import vdi.service.rest.generated.model.UsersSelfShareOffersGetStatus
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.server.outputs.ShareOfferEntry
 
@@ -23,12 +24,12 @@ import vdi.service.rest.server.outputs.ShareOfferEntry
  * @return A list of zero or more [ShareOfferEntry] instance for the shares
  * matching the target filter.
  */
-internal fun lookupShares(userID: UserID, status: ShareFilterStatus): List<ShareOfferEntry> =
+internal fun lookupShares(userID: UserID, status: UsersSelfShareOffersGetStatus): List<ShareOfferEntry> =
   when (status) {
-    ShareFilterStatus.Open     -> lookupOpenShares(userID)
-    ShareFilterStatus.Accepted -> lookupAcceptedShares(userID)
-    ShareFilterStatus.Rejected -> lookupRejectedShares(userID)
-    ShareFilterStatus.All      -> lookupAllShares(userID)
+    UsersSelfShareOffersGetStatus.OPEN     -> lookupOpenShares(userID)
+    UsersSelfShareOffersGetStatus.ACCEPTED -> lookupAcceptedShares(userID)
+    UsersSelfShareOffersGetStatus.REJECTED -> lookupRejectedShares(userID)
+    UsersSelfShareOffersGetStatus.ALL      -> lookupAllShares(userID)
   }
 
 private fun lookupOpenShares(userID: UserID): List<ShareOfferEntry> =
@@ -62,7 +63,7 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
 
     ShareOfferEntry(
       datasetID              = it.datasetID,
-      shareStatus            = ShareFilterStatus.Open,
+      shareStatus            = ShareOfferStatus.OPEN,
       datasetTypeName        = it.type.name,
       datasetTypeVersion     = it.type.version,
       datasetTypeDisplayName = typeDisplayName,

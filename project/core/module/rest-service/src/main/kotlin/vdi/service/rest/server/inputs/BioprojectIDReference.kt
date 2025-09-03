@@ -1,4 +1,4 @@
-@file:JvmName("BioprojectIDReferenceApiExtensions")
+@file:JvmName("BioprojectIDInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*

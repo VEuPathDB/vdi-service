@@ -1,6 +1,4 @@
-@file:JvmName("StudyCharacteristicsApiExtensions")
-@file:Suppress("NOTHING_TO_INLINE")
-
+@file:JvmName("StudyCharacteristicsInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
@@ -17,7 +15,6 @@ private val DiseaseValidLength = CommonLengthRange
 private val AssociatedFactorValidLength = CommonLengthRange
 private val ParticipantAgeValidLength = CommonLengthRange
 private val SampleTypeValidLength = CommonLengthRange
-
 
 
 fun APIStudyCharacteristics?.cleanup() = this?.also {

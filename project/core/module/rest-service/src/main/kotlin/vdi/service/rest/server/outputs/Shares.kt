@@ -5,7 +5,6 @@ import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
 import vdi.model.data.DatasetShareOffer
 import vdi.service.rest.generated.model.*
-import vdi.service.rest.model.ShareFilterStatus
 import vdi.service.rest.model.UserDetails
 
 
@@ -23,7 +22,7 @@ fun ShareOfferAction(action: DatasetShareOffer.Action): ShareOfferAction =
 
 internal fun ShareOfferEntry(
   datasetID: DatasetID,
-  shareStatus: ShareFilterStatus,
+  shareStatus: ShareOfferStatus,
   datasetTypeName: DataType,
   datasetTypeVersion: String,
   datasetTypeDisplayName: String,
@@ -33,7 +32,7 @@ internal fun ShareOfferEntry(
   ShareOfferEntryImpl()
     .also {
       it.datasetId = datasetID.toString()
-      it.shareStatus = ShareOfferStatus(shareStatus)
+      it.shareStatus = shareStatus
       it.type = DatasetTypeOutput(datasetTypeName, datasetTypeVersion, datasetTypeDisplayName)
       it.owner = DatasetOwner(owner)
       it.installTargets = installTargets
@@ -46,12 +45,4 @@ fun ShareOfferRecipient(user: UserDetails): ShareOfferRecipient =
     it.lastName = user.lastName
     it.email = user.email
     it.organization = user.organization
-  }
-
-internal fun ShareOfferStatus(status: ShareFilterStatus): ShareOfferStatus =
-  when (status) {
-    ShareFilterStatus.Open     -> ShareOfferStatus.OPEN
-    ShareFilterStatus.Accepted -> ShareOfferStatus.ACCEPTED
-    ShareFilterStatus.Rejected -> ShareOfferStatus.REJECTED
-    ShareFilterStatus.All      -> throw IllegalArgumentException("cannot convert ShareStatus.All to IO type")
   }
