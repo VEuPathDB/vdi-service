@@ -50,7 +50,7 @@ internal fun DatasetDetails(
     this.importMessages  = importMessages
     this.shares          = shares.map { ShareOffer(userInfo[it.recipientID]!!, it.offerStatus!!) }
     status               = importStatus?.let { DatasetStatusInfo(it, installs) }
-    linkedDatasets       = meta.linkedDatasets.map(::LinkedDataset)
+    linkedDatasets       = meta.linkedDatasets.map(::vdi.service.rest.server.outputs.LinkedDataset)
     this.relatedDatasets = relatedDatasets.map(::RelatedDatasetInfo).toList()
   }
 

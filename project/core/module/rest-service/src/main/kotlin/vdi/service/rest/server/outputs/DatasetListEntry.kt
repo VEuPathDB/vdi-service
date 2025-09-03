@@ -25,8 +25,6 @@ internal fun DatasetListEntry(
   fileCount: Int,
   fileSizeTotal: Long,
   created: OffsetDateTime,
-  shortName: String?,
-  shortAttribution: String?,
   summary: String?,
   description: String?,
   sourceURL: String?,
@@ -35,7 +33,7 @@ internal fun DatasetListEntry(
   DatasetListEntryImpl().also {
     it.datasetId = datasetID.toString()
     it.owner = owner
-    it.datasetType = datasetType
+    it.type = datasetType
     it.visibility = visibility
     it.name = name
     it.origin = origin
@@ -45,8 +43,6 @@ internal fun DatasetListEntry(
     it.fileCount = fileCount
     it.fileSizeTotal = fileSizeTotal
     it.created = created
-    it.shortName = shortName
-    it.shortAttribution = shortAttribution
     it.summary = summary
     it.description = description
     it.sourceUrl = sourceURL
@@ -69,14 +65,12 @@ internal fun DatasetRecord.toExternal(
     visibility       = DatasetVisibility(visibility),
     name             = name,
     origin           = origin,
-    installTargets       = projects,
+    installTargets   = projects,
     status           = DatasetStatusInfo(importStatus, statuses ?: emptyMap()),
     shares           = shares ?: emptyList(),
     fileCount        = fileInfo?.count?.toInt() ?: 0,
     fileSizeTotal    = fileInfo?.size?.toLong() ?: 0,
     created          = created.defaultZone(),
-    shortName        = shortName,
-    shortAttribution = shortAttribution,
     summary          = summary,
     description      = description,
     sourceURL        = sourceURL,

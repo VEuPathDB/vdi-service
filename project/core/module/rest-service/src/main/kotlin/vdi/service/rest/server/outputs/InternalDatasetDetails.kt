@@ -14,8 +14,6 @@ internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): Internal
     it.created = record.created
     it.inserted = record.inserted
     it.name = record.name
-    it.shortName = record.shortName
-    it.shortAttribution = record.shortAttribution
     it.summary = record.summary
     it.description = record.description
     it.visibility = DatasetVisibility(record.visibility)

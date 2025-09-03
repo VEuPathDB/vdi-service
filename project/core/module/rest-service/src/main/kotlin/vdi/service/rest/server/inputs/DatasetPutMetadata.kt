@@ -2,8 +2,9 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.checkLength
 import org.veupathdb.lib.request.validation.reqCheckLength
-import vdi.model.data.InstallTargetID
+import vdi.model.data.DatasetMetadata
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.DatasetPutMetadata
 import vdi.service.rest.generated.model.JsonField
@@ -21,9 +22,9 @@ fun DatasetPutMetadata.cleanup() {
   cleanupString(::getRevisionNote)
 }
 
-fun DatasetPutMetadata.validate(projects: Iterable<InstallTargetID>, errors: ValidationErrors) {
-  (this as DatasetPatchRequestBody).validate(projects, errors)
+fun DatasetPutMetadata.validate(original: DatasetMetadata, errors: ValidationErrors) {
+  (this as DatasetPatchRequestBody).validate(original, errors)
 
-  origin.validateOrigin(JsonField.ORIGIN, errors)
+  origin?.checkLength(JsonField.ORIGIN, OriginLengthRange, errors)
   revisionNote.reqCheckLength(JsonField.REVISION_NOTE, RevisionNoteLengthRange, errors)
 }

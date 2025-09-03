@@ -9,16 +9,15 @@ import vdi.service.rest.generated.model.DatasetRevision as APIRevision
 import vdi.service.rest.generated.model.RevisionHistory
 import vdi.service.rest.generated.model.RevisionHistoryImpl
 
-internal fun RevisionHistory(revs: DatasetRevisionHistory, fileList: URI): RevisionHistory =
+internal fun RevisionHistory(revs: DatasetRevisionHistory): RevisionHistory =
   RevisionHistoryImpl().also { response ->
     response.originalId = revs.originalID.toString()
-    response.revisions  = revs.revisions.map { DatasetRevision(it, fileList) }
+    response.revisions  = revs.revisions.map(::DatasetRevision)
   }
 
-private fun DatasetRevision(rev: DatasetRevision, fileList: URI): APIRevision =
+private fun DatasetRevision(rev: DatasetRevision): APIRevision =
   DatasetRevisionImpl().also {
     it.action       = DatasetRevisionAction(rev.action)
-    it.fileListUrl  = fileList.toString()
     it.revisionId   = rev.revisionID.toString()
     it.revisionNote = rev.revisionNote
     it.timestamp    = rev.timestamp
