@@ -10,7 +10,8 @@ import vdi.service.rest.server.controllers.*
 
 class Resources(opts: ServiceConfig) : ContainerResources(opts) {
   init {
-    enableAuth()
+    if (opts.authEnabled)
+      enableAuth()
 
     property(ServerProperties.WADL_FEATURE_DISABLE, true)
     property(ServerProperties.BV_FEATURE_DISABLE, true)

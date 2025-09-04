@@ -11,8 +11,10 @@ import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
 import vdi.config.raw.db.LDAPDatabaseConnectionConfig
 
-class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : Options() {
+class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig): Options() {
   private val coreConfig = config.core
+
+  val authEnabled = config.core.authentication?.authEnabled ?: true
 
   val uploads = UploadConfig(config.vdi.restService)
 
@@ -22,10 +24,10 @@ class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : O
     .map { it.targetName }
 
   override fun getAdminAuthToken() =
-    Optional.of(coreConfig
+    Optional.ofNullable(coreConfig
       .authentication
-      .adminToken
-      .asString)
+      ?.adminToken
+      ?.asString)
 
   override fun getServerPort() =
     Optional.ofNullable(coreConfig.http?.bindPort?.toInt() ?: 80)
@@ -34,19 +36,19 @@ class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig) : O
     coreConfig.http?.enableCORS ?: false
 
   override fun getOAuthUrl() =
-    Optional.of(coreConfig.authentication.oauth.url)
+    Optional.ofNullable(coreConfig.authentication?.oauth?.url)
 
   override fun getOAuthClientId() =
-    Optional.of(coreConfig.authentication.oauth.clientID)
+    Optional.ofNullable(coreConfig.authentication?.oauth?.clientID)
 
   override fun getOAuthClientSecret() =
-    Optional.of(coreConfig.authentication.oauth.clientSecret.asString)
+    Optional.ofNullable(coreConfig.authentication?.oauth?.clientSecret?.asString)
 
   override fun getKeyStoreFile() =
-    Optional.ofNullable(coreConfig.authentication.oauth.keystoreFile)
+    Optional.ofNullable(coreConfig.authentication?.oauth?.keystoreFile)
 
   override fun getKeyStorePassPhrase() =
-    Optional.ofNullable(coreConfig.authentication.oauth.keystorePass?.asString)
+    Optional.ofNullable(coreConfig.authentication?.oauth?.keystorePass?.asString)
 
   override fun getAppDbOpts() =
     coreConfig.databases?.applicationDB.toDbOptions()

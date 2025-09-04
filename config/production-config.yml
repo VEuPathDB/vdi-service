@@ -18,34 +18,11 @@ definitions:
   vdiSchemaPass: &vdiSchemaPass ${env:VDI_APPDB_SCHEMA_PASS}
   vdiControlSchema: &vdiControlSchema vdi_control_prod_${env:LOCATION_INDICATOR}
   vdiDataSchema: &vdiDataSchema vdi_datasets_prod_${env:LOCATION_INDICATOR}
-  projectNameValidation: &projectNameValidation
-    required: true
-  programNameValidation: &programNameValidation
-    schema:
-      # ensure we have a program name when project name is "other"
-      if:
-        properties:
-          projectName:
-            const: "other"
-      then:
-        required: [ programName ]
-  contactsRules:
-    contactArrayLen: &ruleContactCount
-      schema:
-        minItems: 1
-    contactFields: &ruleContactFields
-      schema:
-        required:
-        - firstName
-        - lastName
-        - email
-        - affiliation
-        - country
-
 
 
 containerCore:
   authentication:
+    authEnabled: true
     oauth:
       clientId: ${env:OAUTH_CLIENT_ID}
       clientSecret: ${env:OAUTH_CLIENT_SECRET}
@@ -191,30 +168,6 @@ vdi:
       then:
         required: [ programName ]
 
-      $:
-        schema:
-          # ensure we have a program name when project name is "other"
-          if:
-            properties:
-              projectName:
-                const: "other"
-          then:
-            required: [ programName ]
-      $.projectName: { required: true }
-      $.contacts:
-        schema: { minItems: 1 }
-      $.contacts[*]:
-        schema:
-          items:
-            required:
-            - firstName
-            - lastName
-            - email
-            - affiliation
-            - country
-      $.studyCharacteristics.studyDesign: { required: true }
-      $.studyCharacteristics.studyType: { required: true }
-
   - targetName: CryptoDB
     controlDb:
       username: *vdiControlSchema
@@ -265,10 +218,26 @@ vdi:
       password: *vdiSchemaPass
       lookupCn: ${env:MICROBIOME_LDAP}
     metaValidation:
-      $: *programNameValidation
-      $.projectName: *projectNameValidation
-      $.contacts: *ruleContactCount
-      $.contacts[*]: *ruleContactFields
+      properties:
+        contacts:
+          items:
+            required:
+            - firstName
+            - lastName
+            - email
+            - affiliation
+            - country
+          minItems: 1
+      required:
+      - projectName
+      - contacts
+      # ensure we have a program name when project name is "other"
+      if:
+        properties:
+          projectName:
+            const: "other"
+      then:
+        required: [ programName ]
 
   - targetName: MicrosporidiaDB
     controlDb:

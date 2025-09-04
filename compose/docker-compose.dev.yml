@@ -130,6 +130,12 @@ services:
       RABBITMQ_DEFAULT_USER: rabbitUser
       RABBITMQ_DEFAULT_PASS: rabbitPass
 
+  phony-app-db:
+    build:
+      context: dev/
+      dockerfile: phony-app-db.dockerfile
+
+
   service:
     build:
       context: ../
