@@ -32,7 +32,7 @@ object InstallTargetRegistry {
           name            = c.targetName,
           installDatabase = c.dataDB.resolve(ldap),
           controlDatabase = c.controlDB.resolve(ldap),
-          propertySchema  = c.datasetPropertySchema.resolve(),
+          metaValidation  = c.metaValidation,
         ).let { tgt ->
           c.targetName to InstallTargetInstanceRegistry(registry = when {
             c.dataTypes.isEmpty() -> mapOf(FallbackDatasetType to tgt)

@@ -9,7 +9,7 @@ import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.jdbc.setDateTime
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 INSERT INTO
   ${schema}.dataset_install_message (

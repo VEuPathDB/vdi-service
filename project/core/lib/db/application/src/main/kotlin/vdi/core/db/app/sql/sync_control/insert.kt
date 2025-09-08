@@ -7,7 +7,7 @@ import vdi.core.db.jdbc.setDateTime
 import vdi.core.db.model.SyncControlRecord
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 INSERT INTO
   ${schema}.sync_control (

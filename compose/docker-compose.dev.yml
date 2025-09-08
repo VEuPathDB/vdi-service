@@ -85,10 +85,10 @@ services:
       target: /datasets
 
     environment:
-#      LDAP_SERVER: ${LDAP_SERVER:?}
-#      ORACLE_BASE_DN: ${DB_LOOKUP_BASE_DN:?}
+#      LDAP_SERVER: ${LDAP_SERVER}
+#      ORACLE_BASE_DN: ${DB_LOOKUP_BASE_DN}
 #      CUSTOM_PATH: ${PLUGIN_HANDLER_NOOP_CUSTOM_PATH}
-#      SITE_BUILD: ${SITE_BUILD:?}
+#      SITE_BUILD: ${SITE_BUILD}
 #      DATASET_INSTALL_ROOT: /datasets
 #
 #      AMOEBA_LDAP: ${AMOEBA_LDAP}
@@ -106,10 +106,10 @@ services:
 #      TRICH_LDAP: ${TRICH_LDAP}
 #      TRITRYP_LDAP: ${TRITRYP_LDAP}
 #      VECTOR_LDAP: ${VECTOR_LDAP}
-      LDAP_SERVER: ${LDAP_SERVER:?}
-      ORACLE_BASE_DN: ${DB_LOOKUP_BASE_DN:?}
+      LDAP_SERVER: ${LDAP_SERVER}
+      ORACLE_BASE_DN: ${DB_LOOKUP_BASE_DN}
       CUSTOM_PATH: ${PLUGIN_HANDLER_GENELIST_CUSTOM_PATH}
-      SITE_BUILD: ${SITE_BUILD:?}
+      SITE_BUILD: ${SITE_BUILD}
       DATASET_INSTALL_ROOT: /datasets
 
       DB_CONNECTION_ENABLED_MICROBIOME: true
@@ -131,15 +131,23 @@ services:
       RABBITMQ_DEFAULT_PASS: rabbitPass
 
   phony-app-db:
+    image: phony-app-db
     build:
       context: dev/
       dockerfile: phony-app-db.dockerfile
-
+    ports:
+    - "1521:5432"
+    networks:
+    - internal
+    environment:
+      POSTGRES_DB: vdi
+      POSTGRES_USER: testUsername
+      POSTGRES_PASSWORD: testPassword
 
   service:
     build:
       context: ../
-      dockerfile: Dockerfile
+      dockerfile: project/core/Dockerfile
       args:
         GITHUB_USERNAME: ${GITHUB_USERNAME}
         GITHUB_TOKEN: ${GITHUB_TOKEN}

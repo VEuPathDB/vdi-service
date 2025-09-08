@@ -2,7 +2,7 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
-import vdi.model.data.StudyCharacteristics
+import vdi.model.data.DatasetCharacteristics
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.SampleYearRange as APIYearRange
 import vdi.service.rest.generated.model.StudyCharacteristics as APIStudyCharacteristics
@@ -67,7 +67,7 @@ fun List<String>.validateAssociatedFactors(jPath: String, errors: ValidationErro
   reqEntriesCheckLength(jPath..JsonField.ASSOCIATED_FACTORS, AssociatedFactorValidLength, errors)
 
 fun APIStudyCharacteristics.toInternal() =
-  StudyCharacteristics(
+  DatasetCharacteristics(
     studyDesign  = studyDesign,
     studyType    = studyType,
     countries    = countries,

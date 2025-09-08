@@ -13,7 +13,7 @@ import org.veupathdb.lib.request.validation.messageIndex
 import org.veupathdb.lib.request.validation.rangeTo
 import vdi.json.JSON
 
-fun ObjectNode.validate(schema: JsonSchema, jPath: String, errors: ValidationErrors) {
+fun ObjectNode.validate(schema: JsonSchema, errors: ValidationErrors) {
   val result = schema.validate(this) { ctx: ExecutionContext -> ctx.executionConfig.formatAssertionsEnabled = true }
 
   if (result.isEmpty())
@@ -23,8 +23,8 @@ fun ObjectNode.validate(schema: JsonSchema, jPath: String, errors: ValidationErr
 
   result.forEach { msg ->
     val path = when (val loc = msg.instanceLocation.toString()) {
-      "$"  -> jPath
-      else -> jPath..loc.substring(2)
+      "$"  -> ""
+      else -> loc.substring(2)
     }.let {
       if (msg.property != null)
         it..msg.property

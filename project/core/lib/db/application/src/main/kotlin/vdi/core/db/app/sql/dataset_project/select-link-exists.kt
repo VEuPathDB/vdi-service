@@ -8,7 +8,7 @@ import vdi.model.data.DatasetID
 import vdi.model.data.InstallTargetID
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 SELECT
   1

@@ -15,7 +15,7 @@ import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
 
 private fun sqlStatusPrefix(schema: String) =
-// language=oracle
+// language=postgresql
 """
 SELECT
   dataset_id
@@ -28,7 +28,7 @@ WHERE
   dataset_id IN (
 """
 
-// language=oracle
+// language=postgresql
 private const val SQL_GET_STATUSES_SUFFIX = """
   )
 """

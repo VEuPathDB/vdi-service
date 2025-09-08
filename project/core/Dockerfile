@@ -9,7 +9,7 @@ RUN cd project/conventions && gradle build
 
 COPY settings.gradle.kts .
 COPY project project
-COPY schema schema
+COPY stack-db stack-db
 
 ARG GH_USERNAME
 ARG GH_TOKEN

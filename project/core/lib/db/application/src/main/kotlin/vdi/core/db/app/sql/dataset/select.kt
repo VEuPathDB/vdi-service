@@ -11,20 +11,22 @@ import vdi.core.db.jdbc.getDataType
 import vdi.core.db.jdbc.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.jdbc.setDatasetID
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetType
 import vdi.model.data.DatasetVisibility
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 SELECT
   dataset_id
 , owner
 , type_name
 , type_version
-, is_deleted
-, is_public
+, category
+, deleted_status
+-- is_public is redundant
 , accessibility
 , days_for_approval
 , creation_date
@@ -40,20 +42,22 @@ internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): Dat
 
     usingResults { rs ->
       if (!rs.next())
-        null
-      else
-        DatasetRecord(
-          datasetID       = rs.reqDatasetID("dataset_id"),
-          owner           = rs.getUserID("owner"),
-          type            = DatasetType(rs.getDataType("type_name"), rs.getString("type_version")),
-          deletionState   = rs.getDeleteFlag("is_deleted"),
-          isPublic        = rs.getBoolean("is_public"),
-          accessibility   = rs.getString("accessibility")?.let(DatasetVisibility::fromString)
-            ?: if (rs.getBoolean("is_public")) DatasetVisibility.Public else DatasetVisibility.Private,
-          daysForApproval = rs.getInt("days_for_approval").let { if (rs.wasNull()) -1 else it },
-          creationDate    = rs.getObject("creation_date", LocalDateTime::class.java)
-            ?.atZone(ZoneId.systemDefault())
-            ?.toOffsetDateTime()
-        )
+        return@usingResults null
+
+      val type = DatasetType(rs.getDataType("type_name"), rs.getString("type_version"))
+
+      DatasetRecord(
+        datasetID       = rs.reqDatasetID("dataset_id"),
+        owner           = rs.getUserID("owner"),
+        type            = type,
+        category        = PluginRegistry.categoryOrNullFor(type) ?: rs.getString("category"),
+        deletionState   = rs.getDeleteFlag("is_deleted"),
+        accessibility   = rs.getString("accessibility")?.let(DatasetVisibility::fromString)
+          ?: if (rs.getBoolean("is_public")) DatasetVisibility.Public else DatasetVisibility.Private,
+        daysForApproval = rs.getInt("days_for_approval").let { if (rs.wasNull()) -1 else it },
+        creationDate    = rs.getObject("creation_date", LocalDateTime::class.java)
+          .atZone(ZoneId.systemDefault())
+          .toOffsetDateTime()
+      )
     }
   }

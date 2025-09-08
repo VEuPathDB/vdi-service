@@ -1,17 +1,10 @@
 package vdi.model.data
 
 import com.fasterxml.jackson.annotation.JsonAlias
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.net.URI
 import java.time.OffsetDateTime
 
-@JsonIgnoreProperties(
-  DatasetMetadata.Legacy_Category,
-  DatasetMetadata.Legacy_Organisms,
-  DatasetMetadata.Legacy_ShortName,
-  DatasetMetadata.Legacy_ShortAttribution,
-)
 data class DatasetMetadata(
   @field:JsonProperty(Type)
   val type: DatasetType,
@@ -59,6 +52,9 @@ data class DatasetMetadata(
   @field:JsonProperty(Contacts)
   val contacts: List<DatasetContact> = emptyList(),
 
+  @field:JsonProperty(ShortAttribution)
+  val shortAttribution: String? = null,
+
   /**
    * An organizational framework that supports coordinated studies with shared
    * objectives.
@@ -82,8 +78,8 @@ data class DatasetMetadata(
   @field:JsonProperty(HostOrganism)
   val hostOrganism: DatasetOrganism? = null,
 
-  @field:JsonProperty(StudyCharacteristics)
-  val studyCharacteristics: StudyCharacteristics? = null,
+  @field:JsonProperty(Characteristics)
+  val characteristics: DatasetCharacteristics? = null,
 
   @field:JsonProperty(ExternalIdentifiers)
   val externalIdentifiers: ExternalDatasetIdentifiers? = null,
@@ -112,18 +108,15 @@ data class DatasetMetadata(
     const val Publications         = "publications"
     const val LinkedDatasets       = "linkedDatasets"
     const val RevisionHistory      = "revisionHistory"
+    const val ShortAttribution     = "shortAttribution"
     const val SourceURL            = "sourceUrl"
-    const val StudyCharacteristics = "studyCharacteristics"
+    const val Characteristics      = "datasetCharacteristics"
     const val Summary              = "summary"
     const val Type                 = "type"
     const val Visibility           = "visibility"
 
     // Legacy fields: no longer used, but may still exist in metadata for older
     // datasets.
-    const val Legacy_Category         = "category"
-    const val Legacy_Organisms        = "organisms"
-    const val Legacy_Projects         = "projects"
-    const val Legacy_ShortAttribution = "shortAttribution"
-    const val Legacy_ShortName        = "shortName"
+    const val Legacy_Projects = "projects"
   }
 }

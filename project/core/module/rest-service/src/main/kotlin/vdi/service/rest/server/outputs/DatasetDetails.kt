@@ -41,7 +41,7 @@ internal fun DatasetDetails(
     programName          = meta.programName
     experimentalOrganism = meta.experimentalOrganism?.let(::DatasetOrganism)
     hostOrganism         = meta.hostOrganism?.let(::DatasetOrganism)
-    studyCharacteristics = meta.studyCharacteristics?.let(::StudyCharacteristics)
+    studyCharacteristics = meta.characteristics?.let(::StudyCharacteristics)
     externalIdentifiers  = meta.externalIdentifiers?.let(::ExternalIdentifiers)
     funding              = meta.funding.map(::DatasetFundingAward)
     created              = meta.created

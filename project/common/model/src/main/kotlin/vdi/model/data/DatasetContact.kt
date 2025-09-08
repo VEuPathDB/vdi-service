@@ -21,17 +21,8 @@ data class DatasetContact(
   @field:JsonProperty(Affiliation)
   val affiliation: String? = null,
 
-  @field:JsonProperty(City)
-  val city: String? = null,
-
-  @field:JsonProperty(State)
-  val state: String? = null,
-
   @field:JsonProperty(Country)
   val country: String? = null,
-
-  @field:JsonProperty(Address)
-  val address: String? = null,
 
   @field:JsonProperty(IsPrimary)
   val isPrimary: Boolean = false,
@@ -42,10 +33,7 @@ data class DatasetContact(
     const val LastName    = "lastName"
     const val Email       = "email"
     const val Affiliation = "affiliation"
-    const val City        = "city"
-    const val State       = "state"
     const val Country     = "country"
-    const val Address     = "address"
     const val IsPrimary   = "isPrimary"
 
     const val Legacy_Name = "name"

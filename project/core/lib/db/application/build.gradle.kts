@@ -7,6 +7,7 @@ dependencies {
 
   implementation(project(":lib:common"))
   implementation(project(":lib:config"))
+  implementation(project(":lib:plugin-registry"))
 
   implementation(common.db.target)
   implementation(common.model)

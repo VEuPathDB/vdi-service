@@ -2,7 +2,7 @@ package vdi.model.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class StudyCharacteristics(
+data class DatasetCharacteristics(
   @field:JsonProperty(StudyDesign)
   val studyDesign: String? = null,
 

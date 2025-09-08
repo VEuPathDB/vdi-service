@@ -6,6 +6,7 @@ import io.foxcapades.kdbc.withResults
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.time.ZoneId
+import javax.swing.UIManager.getString
 import vdi.core.db.app.model.DatasetRecord
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
@@ -15,20 +16,21 @@ import vdi.core.db.app.sql.setInstallType
 import vdi.core.db.jdbc.getDataType
 import vdi.core.db.jdbc.getUserID
 import vdi.core.db.jdbc.reqDatasetID
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.DatasetType
 import vdi.model.data.DatasetVisibility
 import vdi.model.data.InstallTargetID
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 SELECT
   ds.dataset_id
 , ds.owner
 , ds.type_name
 , ds.type_version
-, ds.is_deleted
-, ds.is_public
+, ds.category
+, ds.deleted_status
 , accessibility
 , days_for_approval
 , creation_date
@@ -56,18 +58,20 @@ internal fun Connection.selectDatasetsByInstallStatus(
     setString(3, installTarget)
 
     withResults { map {
+      val type = DatasetType(getDataType("type_name"), getString("type_version"))
+
       DatasetRecord(
         datasetID     = reqDatasetID("dataset_id"),
         owner         = getUserID("owner"),
-        type          = DatasetType(getDataType("type_name"), getString("type_version")),
+        type          = type,
+        category      = PluginRegistry.categoryOrNullFor(type) ?: getString("category"),
         deletionState = getDeleteFlag("is_deleted"),
-        isPublic      = getBoolean("is_public"),
         accessibility = getString("accessibility")?.let(DatasetVisibility::fromString)
           ?: if (getBoolean("is_public")) DatasetVisibility.Public else DatasetVisibility.Private,
         daysForApproval = getInt("days_for_approval").let { if (wasNull()) -1 else it },
         creationDate    = getObject("creation_date", LocalDateTime::class.java)
-          ?.atZone(ZoneId.systemDefault())
-          ?.toOffsetDateTime()
+          .atZone(ZoneId.systemDefault())
+          .toOffsetDateTime()
       )
     } }
   }

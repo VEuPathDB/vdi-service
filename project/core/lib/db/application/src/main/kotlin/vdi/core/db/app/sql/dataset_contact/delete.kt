@@ -5,7 +5,7 @@ import java.sql.Connection
 import vdi.model.data.DatasetID
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 DELETE FROM
   ${schema}.dataset_contact

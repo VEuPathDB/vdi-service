@@ -8,4 +8,5 @@ dependencies {
 
   implementation(libs.ldap)
   implementation(libs.json.jackson.databind)
+  implementation(libs.json.schema.validation)
 }

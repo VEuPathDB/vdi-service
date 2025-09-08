@@ -8,7 +8,7 @@ import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
 
 private fun bulkSQL(schema: String) =
-// language=oracle
+// language=postgresql
   """
 DELETE FROM
   ${schema}.dataset_install_message
@@ -22,7 +22,7 @@ internal fun Connection.deleteInstallMessages(schema: String, datasetID: Dataset
 //
 
 private fun singleSQL(schema: String) =
-// language=oracle
+// language=postgresql
   """
 DELETE FROM
   ${schema}.dataset_install_message

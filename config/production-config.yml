@@ -76,6 +76,7 @@ vdi:
       dataTypes:
       - name: bigwigfiles
         version: 1.0
+        category: foo
       projectIds: *genomicsProjects
     biom:
       server: biom:80
@@ -89,8 +90,9 @@ vdi:
       server: genelist:80
       displayName: Gene List
       dataTypes:
-      - name: lightweight
+      - name: genelist
         version: 1.0
+        category: foo
       projectIds: *genomicsProjects
     isasimple:
       server: isasimple:80
@@ -98,6 +100,7 @@ vdi:
       dataTypes:
       - name: isasimple
         version: 1.0
+        category: foo
       projectIds:
       - ClinEpiDB
     noop:
@@ -106,6 +109,7 @@ vdi:
       dataTypes:
       - name: lightweight
         version: 1.0
+        category: foo
       typeChangesEnabled: true
     phenotype:
       server: wrangler:80
@@ -113,6 +117,7 @@ vdi:
       dataTypes:
       - name: phenotype
         version: 1.0
+        category: foo
       projectIds: *genomicsProjects
     rnaseq:
       server: rnaseq:80
@@ -120,6 +125,7 @@ vdi:
       dataTypes:
       - name: rnaseq
         version: 1.0
+        category: foo
       projectIds: *genomicsProjects
 
   installTargets:

@@ -9,7 +9,7 @@ import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 SELECT
   project_id

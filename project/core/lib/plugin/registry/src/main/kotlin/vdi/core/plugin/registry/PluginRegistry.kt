@@ -7,9 +7,11 @@ import vdi.model.data.DataType
 
 object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
   private val mapping: Map<DatasetType, PluginDetails>
+  private val categories: Map<DatasetType, String>
 
   init {
     val conflicts = HashMap<DatasetType, List<String>>(1)
+    val tmpCats   = HashMap<DatasetType, String>(12)
 
     mapping = loadAndCacheStackConfig().vdi.plugins.values
       .asSequence()
@@ -38,9 +40,16 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
       .joinToString("\n")
       .takeUnless { it.isBlank() }
       ?.also { throw ConfigurationException(it) }
+
+    categories = HashMap<DatasetType, String>(tmpCats.size)
+      .apply { putAll(tmpCats) }
   }
 
   fun contains(type: DatasetType) = type in mapping
+
+  fun categoryFor(type: DatasetType) = categories[type] ?: throw MissingDataTypeCategoryException(type)
+
+  fun categoryOrNullFor(type: DatasetType) = categories[type]
 
   operator fun get(type: DatasetType) = mapping[type]
 

@@ -51,6 +51,14 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // endregion dataset
 
+  // region dataset_associated_factor
+  // endregion dataset_associated_factor
+
+  // region dataset_bioproject_id
+  // endregion dataset_bioproject_id
+
+  // region dataset_characteristics
+  // endregion dataset_characteristics
 
   // region dataset_contact
 
@@ -60,6 +68,8 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // endregion dataset_contact
 
+  // region dataset_country
+  // endregion dataset_country
 
   // region dataset_dependency
 
@@ -69,6 +79,14 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // endregion dataset_dependency
 
+  // region dataset_disease
+  // endregion dataset_disease
+
+  // region dataset_doi
+  // endregion dataset_doi
+
+  // region dataset_funding_award
+  // endregion dataset_funding_award
 
   // region dataset_hyperlink
 
@@ -77,7 +95,6 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
   fun insertDatasetHyperlinks(datasetID: DatasetID, hyperlinks: Collection<DatasetHyperlink>)
 
   // endregion dataset_hyperlink
-
 
   // region dataset_install_message
 
@@ -124,6 +141,8 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // endregion dataset_install_message
 
+  // region dataset_link
+  // endregion dataset_link
 
   // region dataset_meta
 
@@ -154,15 +173,13 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // endregion dataset_meta
 
-
   // region dataset_organism
 
   fun deleteDatasetOrganisms(datasetID: DatasetID)
 
-  fun insertDatasetOrganisms(datasetID: DatasetID, organisms: Collection<String>)
+  fun insertDatasetOrganism(datasetID: DatasetID, organism: DatasetOrganism)
 
   // endregion dataset_organism
-
 
   // region dataset_project
 
@@ -211,16 +228,6 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // endregion dataset_project
 
-
-  // region dataset_properties
-
-  fun deleteDatasetProperties(datasetID: DatasetID)
-
-  fun insertDatasetProperties(datasetID: DatasetID, properties: DatasetProperties)
-
-  // endregion dataset_properties
-
-
   // region dataset_publication
 
   fun deleteDatasetPublications(datasetID: DatasetID)
@@ -229,6 +236,11 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // endregion dataset_publication
 
+  // region dataset_sample_type
+  // endregion dataset_sample_type
+
+  // region dataset_species
+  // endregion dataset_species
 
   // region dataset_visibility
 
@@ -270,7 +282,6 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
   fun insertDatasetVisibility(datasetID: DatasetID, userID: UserID)
 
   // endregion dataset_visibility
-
 
   // region sync_control
 

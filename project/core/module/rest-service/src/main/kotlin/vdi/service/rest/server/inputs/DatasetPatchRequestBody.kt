@@ -9,7 +9,7 @@ import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.DatasetMetadata
 import vdi.model.data.DatasetVisibility
 import vdi.model.data.ExternalDatasetIdentifiers
-import vdi.model.data.StudyCharacteristics
+import vdi.model.data.DatasetCharacteristics
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
 import vdi.service.rest.generated.model.JsonField as JF
@@ -96,7 +96,7 @@ internal fun DatasetPatchRequestBody.validate(
   programName?.value?.checkLength(JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
   linkedDatasets?.value?.validate(JF.LINKED_DATASETS, errors)
 
-  studyCharacteristics?.validate(original.studyCharacteristics, errors)
+  studyCharacteristics?.validate(original.characteristics, errors)
   externalIdentifiers?.validate(errors)
 
   funding?.value?.validate(JF.FUNDING, errors)
@@ -144,8 +144,8 @@ internal fun DatasetPatchRequestBody.applyPatch(original: DatasetMetadata) =
       value?.toInternalDistinct(LinkedDataset::toInternal) ?: emptyList()
     },
 
-    studyCharacteristics = studyCharacteristics.mapIfPresent(original.studyCharacteristics) {
-      applyPatch(original.studyCharacteristics)
+    characteristics = studyCharacteristics.mapIfPresent(original.characteristics) {
+      applyPatch(original.characteristics)
     },
 
     externalIdentifiers = externalIdentifiers.mapIfPresent(original.externalIdentifiers) {
@@ -157,7 +157,7 @@ internal fun DatasetPatchRequestBody.applyPatch(original: DatasetMetadata) =
     },
   )
 
-private fun StudyCharacteristicsPatch.validate(original: StudyCharacteristics?, errors: ValidationErrors) {
+private fun StudyCharacteristicsPatch.validate(original: DatasetCharacteristics?, errors: ValidationErrors) {
 
   // If the client is attempting to change the study design value
   if (studyDesign != null) {
@@ -217,8 +217,8 @@ private fun ExternalIdentifiersPatch.validate(errors: ValidationErrors) {
   bioprojectIds?.value?.validate(JF.EXTERNAL_IDENTIFIERS..JF.BIOPROJECT_IDS, errors)
 }
 
-private fun StudyCharacteristicsPatch.applyPatch(original: StudyCharacteristics?) =
-  StudyCharacteristics(
+private fun StudyCharacteristicsPatch.applyPatch(original: DatasetCharacteristics?) =
+  DatasetCharacteristics(
     studyDesign       = studyDesign.mapIfPresent(original?.studyDesign) { value },
     studyType         = studyType.mapIfPresent(original?.studyType) { value },
     countries         = countries.mapIfPresent(original?.countries) { value } ?: emptyList(),

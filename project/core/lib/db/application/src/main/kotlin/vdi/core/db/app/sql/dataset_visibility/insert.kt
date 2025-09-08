@@ -8,7 +8,7 @@ import vdi.model.data.DatasetID
 import vdi.model.data.UserID
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 INSERT INTO
   ${schema}.dataset_visibility (

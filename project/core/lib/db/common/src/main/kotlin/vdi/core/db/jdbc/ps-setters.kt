@@ -17,6 +17,9 @@ import java.time.OffsetDateTime
 fun PreparedStatement.setDatasetID(index: Int, datasetID: DatasetID) =
   setString(index, datasetID.asString)
 
+operator fun PreparedStatement.set(index: Int, datasetID: DatasetID) =
+  setString(index, datasetID.asString)
+
 /**
  * Sets the designated parameter to the given [UserID] value.
  *
@@ -26,6 +29,7 @@ fun PreparedStatement.setDatasetID(index: Int, datasetID: DatasetID) =
  */
 fun PreparedStatement.setUserID(index: Int, userID: UserID) =
   setString(index, userID.toString())
+
 
 fun PreparedStatement.setDateTime(index: Int, dateTime: OffsetDateTime) =
   setObject(index, dateTime)

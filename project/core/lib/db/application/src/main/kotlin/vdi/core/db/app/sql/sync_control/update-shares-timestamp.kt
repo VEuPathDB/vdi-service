@@ -8,7 +8,7 @@ import vdi.core.db.jdbc.setDateTime
 import vdi.model.data.DatasetID
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 UPDATE
   ${schema}.sync_control

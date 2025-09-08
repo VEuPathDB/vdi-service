@@ -8,7 +8,7 @@ import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 UPDATE
   ${schema}.dataset
@@ -18,9 +18,8 @@ WHERE
   dataset_id = ?
 """
 
-internal fun Connection.updateDatasetDeletedFlag(schema: String, datasetID: DatasetID, deleteFlag: DeleteFlag) {
+internal fun Connection.updateDatasetDeletedFlag(schema: String, datasetID: DatasetID, deleteFlag: DeleteFlag) =
   withPreparedUpdate(sql(schema)) {
     setDeleteFlag(1, deleteFlag)
     setDatasetID(2, datasetID)
   }
-}

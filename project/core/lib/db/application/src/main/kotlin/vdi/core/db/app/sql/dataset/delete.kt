@@ -6,7 +6,7 @@ import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 DELETE FROM
   ${schema}.dataset
