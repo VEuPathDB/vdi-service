@@ -34,8 +34,9 @@ func appendEnvArgs(args []string) []string {
 }
 
 func prepCommand(path string, composeArgs []string, task string, taskArgs []string) *exec.Cmd {
-	realArgs := make([]string, 1, len(composeArgs)+len(taskArgs)+1)
+	realArgs := make([]string, 2, len(composeArgs)+len(taskArgs)+1)
 	realArgs[0] = "compose"
+	realArgs[1] = "--env-file=../.env"
 	realArgs = append(realArgs, composeArgs...)
 	realArgs = append(realArgs, task)
 	realArgs = append(realArgs, taskArgs...)

@@ -14,6 +14,8 @@ func DefaultBuild() {
 }
 
 func CustomizedBuild(path string, files []string) {
+	// ensurePrerequisites() prereqs don't apply to build step
+
 	envArgs := appendEnvArgs(make([]string, 0, 4))
 
 	if err := prepCommand(path, makeFileArgs(files), CmdBuild, envArgs).Run(); err != nil {

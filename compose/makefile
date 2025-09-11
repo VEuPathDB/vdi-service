@@ -1,6 +1,4 @@
-PROJECT_ROOT := ${PWD}/../
-ENV_FILE := $(PROJECT_ROOT)/.env
-ADDITIONAL_FILES := docker-compose.ssh.yml
+ENV_FILE := ${PWD}/.env
 SERVICES :=
 OPTIONS :=
 COMMAND := --help
@@ -34,11 +32,14 @@ stop: compose
 restart: COMMAND := restart
 restart: compose
 
+.PHONY: logs
+logs: COMMAND := logs
+logs: compose
+
 .PHONY: compose
-compose: $(ENV_FILE) $(addprefix $(PROJECT_ROOT),$(PREREQUISITE_FILES))
+compose: $(ENV_FILE)
 	@docker compose \
 		--env-file $< \
 		-f docker-compose.yml \
 		-f docker-compose.dev.yml \
-		$(addprefix -f ,$(filter-out $<, $^)) \
 		$(COMMAND) $(OPTIONS) $(SERVICES)

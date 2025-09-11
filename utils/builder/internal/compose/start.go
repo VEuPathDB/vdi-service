@@ -14,6 +14,8 @@ func DefaultStart() {
 }
 
 func CustomizedStart(path string, files []string) {
+	ensurePrerequisites()
+
 	if err := prepCommand(path, makeFileArgs(files), CmdStart, []string{}).Run(); err != nil {
 		var tmp *exec.ExitError
 		if errors.As(err, &tmp) {

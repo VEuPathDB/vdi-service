@@ -14,6 +14,8 @@ func DefaultStop() {
 }
 
 func CustomizedStop(path string, files []string) {
+	ensurePrerequisites()
+
 	if err := prepCommand(path, makeFileArgs(files), CmdStop, []string{}).Run(); err != nil {
 		var tmp *exec.ExitError
 		if errors.As(err, &tmp) {

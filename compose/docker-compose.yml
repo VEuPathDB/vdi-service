@@ -176,6 +176,13 @@ services:
         aliases:
         - biom
       monitoring-ext: {}
+    healthcheck:
+      test: nc -zv localhost:80
+      start_period: 15s
+      start_interval: 3s
+      interval: 1m
+      retries: 3
+      timeout: 2s
     labels:
       prometheus.scrape_enabled: "true"
       com.centurylinklabs.watchtower.enable: "${PLUGIN_BIOM_WATCHTOWER:-true}"
@@ -219,6 +226,13 @@ services:
         aliases:
         - genelist
       monitoring-ext: {}
+    healthcheck:
+      test: nc -zv localhost:80
+      start_period: 15s
+      start_interval: 3s
+      interval: 1m
+      retries: 3
+      timeout: 2s
     labels:
       prometheus.scrape_enabled: "true"
       com.centurylinklabs.watchtower.enable: "${PLUGIN_GENELIST_WATCHTOWER:-true}"
@@ -257,6 +271,13 @@ services:
         aliases:
         - isasimple
       monitoring-ext: {}
+    healthcheck:
+      test: nc -zv localhost:80
+      start_period: 15s
+      start_interval: 3s
+      interval: 1m
+      retries: 3
+      timeout: 2s
     labels:
       prometheus.scrape_enabled: "true"
       com.centurylinklabs.watchtower.enable: "${PLUGIN_ISASIMPLE_WATCHTOWER:-true}"
@@ -343,6 +364,13 @@ services:
         aliases:
         - wrangler
       monitoring-ext: { }
+    healthcheck:
+      test: nc -zv localhost:80
+      start_period: 15s
+      start_interval: 3s
+      interval: 1m
+      retries: 3
+      timeout: 2s
     labels:
       prometheus.scrape_enabled: "true"
       com.centurylinklabs.watchtower.enable: "${PLUGIN_WRANGLER_WATCHTOWER:-true}"
@@ -386,6 +414,13 @@ services:
         aliases:
         - rnaseq
       monitoring-ext: {}
+    healthcheck:
+      test: nc -zv localhost:80
+      start_period: 15s
+      start_interval: 3s
+      interval: 1m
+      retries: 3
+      timeout: 2s
     labels:
       prometheus.scrape_enabled: "true"
       com.centurylinklabs.watchtower.enable: "${PLUGIN_RNASEQ_WATCHTOWER:-true}"

@@ -91,7 +91,6 @@ LOG_FLAGS ?= -f
 endif
 
 SERVICES :=
-COMPOSE_LOG_CMD := $(COMPOSE_CMD) logs $(LOG_FLAGS)
 
 # Prints and watches the full compose stack log output.
 #
@@ -100,7 +99,7 @@ COMPOSE_LOG_CMD := $(COMPOSE_CMD) logs $(LOG_FLAGS)
 # Specific services may be specified by using the SERVICES variable.
 .PHONY: logs
 logs:
-	@$(COMPOSE_LOG_CMD) $(SERVICES)
+	@$(MAKE) -C compose logs SERVICES=$(SERVICES)
 
 # Prints and tails the core service container log output.
 #

@@ -8,6 +8,9 @@ networks:
   traefik:
     external: false
 
+volumes:
+  phony-app-db-volume: {}
+
 services:
   cache-db:
     ports:
@@ -72,18 +75,22 @@ services:
 
   plugin-example:
     image: veupathdb/vdi-plugin-example:${VDI_PLUGIN_EXAMPLE_TAG:-latest}
-
     networks:
       internal:
         aliases:
         - example
       monitoring-ext: {}
-
+    healthcheck:
+      test: nc -zv localhost:80
+      start_period: 15s
+      start_interval: 3s
+      interval: 1m
+      retries: 3
+      timeout: 2s
     volumes:
     - type: bind
       source: ${DATASET_INSTALL_DIR_LOCAL_PATH}
       target: /datasets
-
     environment:
 #      LDAP_SERVER: ${LDAP_SERVER}
 #      ORACLE_BASE_DN: ${DB_LOOKUP_BASE_DN}
@@ -143,6 +150,15 @@ services:
       POSTGRES_DB: vdi
       POSTGRES_USER: testUsername
       POSTGRES_PASSWORD: testPassword
+    healthcheck:
+      test: "pg_isready -U testUsername -d vdi"
+      start_period: 30s
+      start_interval: 3s
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    volumes:
+    - phony-app-db-volume:/var/lib/postgresql/data
 
   service:
     build:
@@ -158,6 +174,20 @@ services:
         condition: service_completed_successfully
       rabbit-external:
         condition: service_started
+      phony-app-db:
+        condition: service_healthy
+      plugin-bigwig:
+        condition: service_healthy
+      plugin-biom:
+        condition: service_healthy
+      plugin-genelist:
+        condition: service_healthy
+      plugin-isasimple:
+        condition: service_healthy
+      plugin-rnaseq:
+        condition: service_healthy
+      plugin-wrangler:
+        condition: service_healthy
     links:
     - rabbit-external
     - minio-external
@@ -185,3 +215,33 @@ services:
       traefik.http.routers.vdi-dev.tls: "false"
       traefik.http.routers.vdi-dev.entrypoints: "local"
       traefik.docker.network: "traefik"
+
+  plugin-bigwig:
+    depends_on:
+      phony-app-db:
+        condition: service_healthy
+
+  plugin-biom:
+    depends_on:
+      phony-app-db:
+        condition: service_healthy
+
+  plugin-genelist:
+    depends_on:
+      phony-app-db:
+        condition: service_healthy
+
+  plugin-isasimple:
+    depends_on:
+      phony-app-db:
+        condition: service_healthy
+
+  plugin-wrangler:
+    depends_on:
+      phony-app-db:
+        condition: service_healthy
+
+  plugin-rnaseq:
+    depends_on:
+      phony-app-db:
+        condition: service_healthy

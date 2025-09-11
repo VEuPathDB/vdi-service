@@ -14,6 +14,8 @@ func DefaultDown() {
 }
 
 func CustomizedDown(path string, files, services []string) {
+	ensurePrerequisites()
+
 	taskArgs := append(make([]string, 0, len(services)+2), "--remove-orphans", "--volumes")
 	taskArgs = append(taskArgs, services...)
 
