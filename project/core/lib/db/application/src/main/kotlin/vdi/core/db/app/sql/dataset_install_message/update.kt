@@ -3,6 +3,7 @@ package vdi.core.db.app.sql.dataset_install_message
 import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.model.DatasetInstallMessage
+import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.setInstallStatus
 import vdi.core.db.app.sql.setInstallType
 import vdi.core.db.jdbc.setDatasetID
@@ -12,7 +13,7 @@ private fun sql(schema: String) =
 // language=postgresql
 """
 UPDATE
-  ${schema}.dataset_install_message
+  ${schema}.${Table.InstallMessage}
 SET
   status = ?
 , message = ?

@@ -2,6 +2,7 @@ package vdi.core.db.app.sql.sync_control
 
 import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
+import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.jdbc.setDateTime
 import vdi.core.db.model.SyncControlRecord
@@ -10,7 +11,7 @@ private fun sql(schema: String) =
 // language=postgresql
 """
 INSERT INTO
-  ${schema}.sync_control (
+  ${schema}.${Table.SyncControl} (
     dataset_id
   , shares_update_time
   , data_update_time

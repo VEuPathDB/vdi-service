@@ -3,6 +3,12 @@ package vdi.service.rest.generated.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum DatasetRevisionAction {
+  @JsonProperty("create")
+  CREATE("create"),
+
+  @JsonProperty("extend")
+  EXTEND("extend"),
+
   @JsonProperty("revise")
   REVISE("revise");
 

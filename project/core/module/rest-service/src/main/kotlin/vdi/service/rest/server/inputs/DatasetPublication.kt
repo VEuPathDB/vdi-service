@@ -80,6 +80,9 @@ fun Collection<APIPublication>.validate(jPath: String, errors: ValidationErrors)
 fun APIPublication.toInternal() =
   DatasetPublication(identifier, type.toInternal(), citation, isPrimary)
 
+fun List<APIPublication>.toInternal() =
+  map { DatasetPublication(it.identifier, it.type.toInternal(), it.citation, it.isPrimary) }
+
 fun DatasetPublicationType .toInternal() =
   when (this) {
     DatasetPublicationType.PMID -> DatasetPublication.PublicationType.PubMed

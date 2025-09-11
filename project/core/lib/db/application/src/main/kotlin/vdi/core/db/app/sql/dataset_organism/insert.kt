@@ -4,6 +4,7 @@ import io.foxcapades.kdbc.set
 import io.foxcapades.kdbc.usingPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.model.OrganismType
+import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.set
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetOrganism
@@ -13,7 +14,7 @@ private fun sql(schema: String) =
 // language=postgresql
   """
 INSERT INTO
-  ${schema}.dataset_organism (
+  ${schema}.${Table.Organisms} (
     dataset_id
   , organism_type
   , species

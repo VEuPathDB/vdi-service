@@ -4,6 +4,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import vdi.core.db.app.model.DeleteFlag
+import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.getDataType
 import vdi.core.db.jdbc.getDateTime
 import vdi.core.db.jdbc.getUserID
@@ -37,8 +38,8 @@ WITH results AS (
     END
   ) AS sort_id
   FROM
-    ${schema}.sync_control s
-    INNER JOIN ${schema}.dataset d
+    ${schema}.${Table.SyncControl} s
+    INNER JOIN ${schema}.${Table.Dataset} d
       ON s.dataset_id = d.dataset_id
 )
 SELECT

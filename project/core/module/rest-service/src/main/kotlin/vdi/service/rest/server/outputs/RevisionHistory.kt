@@ -1,6 +1,5 @@
 package vdi.service.rest.server.outputs
 
-import java.net.URI
 import vdi.model.data.DatasetRevision
 import vdi.model.data.DatasetRevisionHistory
 import vdi.service.rest.generated.model.DatasetRevisionAction
@@ -26,5 +25,6 @@ private fun DatasetRevision(rev: DatasetRevision): APIRevision =
 private fun DatasetRevisionAction(action: DatasetRevision.Action) =
   when (action) {
     DatasetRevision.Action.Revise -> DatasetRevisionAction.REVISE
-    DatasetRevision.Action.Extend -> throw IllegalStateException()
+    DatasetRevision.Action.Create -> DatasetRevisionAction.CREATE
+    DatasetRevision.Action.Extend -> DatasetRevisionAction.EXTEND
   }

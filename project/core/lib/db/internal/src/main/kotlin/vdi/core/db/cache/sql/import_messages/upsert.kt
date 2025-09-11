@@ -1,6 +1,6 @@
 package vdi.core.db.cache.sql.import_messages
 
-import io.foxcapades.kdbc.withPreparedUpdate
+import io.foxcapades.kdbc.withPreparedBatchUpdate
 import vdi.model.data.DatasetID
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
@@ -14,14 +14,12 @@ INSERT INTO
   )
 VALUES
   (?, ?)
-ON CONFLICT (dataset_id) DO UPDATE
-SET
-  message = ?
+ON CONFLICT (dataset_id)
+  DO NOTHING
 """
 
-internal fun Connection.upsertImportMessages(datasetID: DatasetID, messages: String) =
-  withPreparedUpdate(SQL) {
+internal fun Connection.upsertImportMessages(datasetID: DatasetID, messages: Iterable<String>) =
+  withPreparedBatchUpdate(SQL, messages) {
     setDatasetID(1, datasetID)
-    setString(2, messages)
-    setString(3, messages)
-  }
+    setString(2, it)
+  }.reduceOrNull(Int::plus) ?: 0

@@ -22,7 +22,9 @@ import java.util.List;
     "isDeleted",
     "summary",
     "description",
-    "sourceUrl"
+    "sourceUrl",
+    "shortName",
+    "shortAttribution"
 })
 public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty(JsonField.DATASET_ID)
@@ -63,6 +65,12 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
 
   @JsonProperty(JsonField.SOURCE_URL)
   private String sourceUrl;
+
+  @JsonProperty(JsonField.SHORT_NAME)
+  private String shortName;
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  private String shortAttribution;
 
   @JsonProperty(JsonField.DATASET_ID)
   public String getDatasetId() {
@@ -192,5 +200,25 @@ public class AllDatasetsListEntryImpl implements AllDatasetsListEntry {
   @JsonProperty(JsonField.SOURCE_URL)
   public void setSourceUrl(String sourceUrl) {
     this.sourceUrl = sourceUrl;
+  }
+
+  @JsonProperty(JsonField.SHORT_NAME)
+  public String getShortName() {
+    return this.shortName;
+  }
+
+  @JsonProperty(JsonField.SHORT_NAME)
+  public void setShortName(String shortName) {
+    this.shortName = shortName;
+  }
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  public String getShortAttribution() {
+    return this.shortAttribution;
+  }
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  public void setShortAttribution(String shortAttribution) {
+    this.shortAttribution = shortAttribution;
   }
 }

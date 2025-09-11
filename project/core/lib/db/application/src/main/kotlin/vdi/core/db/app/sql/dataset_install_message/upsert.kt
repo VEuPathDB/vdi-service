@@ -3,12 +3,13 @@ package vdi.core.db.app.sql.dataset_install_message
 import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.model.DatasetInstallMessage
+import vdi.core.db.app.sql.Table
 
 private fun sql(schema: String) =
 // language=postgresql
 """
 INSERT INTO
-  ${schema}.dataset_install_message (
+  ${schema}.${Table.InstallMessage} (
     dataset_id
   , install_type
   , status

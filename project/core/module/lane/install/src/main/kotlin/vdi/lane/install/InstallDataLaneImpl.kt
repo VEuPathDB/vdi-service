@@ -6,10 +6,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.veupathdb.lib.s3.s34k.errors.S34KError
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
-import vdi.model.data.DatasetMetadata
 import java.io.InputStream
 import java.sql.SQLException
 import java.time.OffsetDateTime
@@ -36,6 +32,7 @@ import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.plugin.mapping.PluginHandlers
 import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
+import vdi.model.data.*
 
 internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, abortCB: AbortCB)
   : InstallDataLane
@@ -175,25 +172,34 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
 
       cacheDB.withTransaction { it.updateDataSyncControl(datasetID, installableFileTimestamp) }
 
-      // For each target project
-      val success = meta.installTargets
-        .all { projectID ->
-          // If the handler doesn't apply to the target project, again we
-          // shouldn't be here, but we can bail out now with a warning.
-          if (!handler.appliesToProject(projectID)) {
-            log.warn(
-              "skipping install data event for dataset {}/{}: handler for type {}:{} does not apply to project {}",
+      val success = dir.buildInstallBundle { metaStream, manifestStream, uploadStream ->
+        meta.installTargets
+          .all { projectID ->
+            // If the handler doesn't apply to the target project, again we
+            // shouldn't be here, but we can bail out now with a warning.
+            if (!handler.appliesToProject(projectID)) {
+              log.warn(
+                "skipping install data event for dataset {}/{}: handler for type {}:{} does not apply to project {}",
+                userID,
+                datasetID,
+                meta.type.name,
+                meta.type.version,
+                projectID,
+              )
+              return@all true
+            }
+
+            handler.installData(
               userID,
               datasetID,
-              meta.type.name,
-              meta.type.version,
               projectID,
+              installableFileTimestamp,
+              metaStream,
+              manifestStream,
+              uploadStream,
             )
-            return@all true
           }
-
-          installData(userID, datasetID, projectID, dir, handler, installableFileTimestamp)
-        }
+      }
 
       if (success && meta.revisionHistory != null)
         tryMarkRevised(userID, meta, dm)
@@ -215,18 +221,19 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
    * This method calls out to the handler server and deals with the response
    * status that it gets in reply.
    */
-  private suspend fun installData(
-    userID:    UserID,
+  private suspend fun PluginHandler.installData(
+    userID: UserID,
     datasetID: DatasetID,
     installTarget: InstallTargetID,
-    s3Dir: DatasetDirectory,
-    handler: PluginHandler,
     installableFileTimestamp: OffsetDateTime,
+    meta: InputStream,
+    manifest: InputStream,
+    data: InputStream,
   ): Boolean {
     var timer: Histogram.Timer? = null
 
     try {
-      val appDB = appDB.accessor(installTarget, handler.type) orElse {
+      val appDB = appDB.accessor(installTarget, type) orElse {
         log.info(
           "skipping install event for dataset {}/{} into project {} due to the target project being disabled.",
           userID,
@@ -262,7 +269,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
 
       if (status == null) {
         var race = false
-        this.appDB.withTransaction(installTarget, handler.type) {
+        this@InstallDataLaneImpl.appDB.withTransaction(installTarget, type) {
           try {
             it.insertDatasetInstallMessage(
               DatasetInstallMessage(
@@ -302,25 +309,19 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
         }
       }
 
-      // FIXME: MOVE THE ZIP CREATION OUTSIDE OF THE PROJECT LOOP TO AVOID
-      //        RECREATING IT FOR EACH TARGET.
       val response = try {
-        withInstallBundle(s3Dir) { meta, manifest, data ->
-          handler.client.postInstallData(datasetID, installTarget, meta, manifest, data)
-        }
+        client.postInstallData(datasetID, installTarget, meta, manifest, data)
       } catch (e: S34KError) { // Don't mix up minio errors with request errors.
-        throw PluginException.installData(handler.displayName, installTarget, userID, datasetID, cause = e)
+        throw PluginException.installData(displayName, installTarget, userID, datasetID, cause = e)
       } catch (e: Throwable) {
-        throw PluginRequestException.installData(handler.displayName, installTarget, userID, datasetID, cause = e)
+        throw PluginRequestException.installData(displayName, installTarget, userID, datasetID, cause = e)
       }
 
       Metrics.Install.count.labels(dataset.type.name.toString(), dataset.type.version, response.responseCode.toString()).inc()
 
       return when (response.type) {
-        InstallDataResponseType.Success
-        -> {
+        InstallDataResponseType.Success -> {
           handleSuccessResponse(
-            handler,
             response as InstallDataSuccessResponse,
             userID,
             datasetID,
@@ -330,10 +331,8 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
           true
         }
 
-        InstallDataResponseType.BadRequest
-        -> {
+        InstallDataResponseType.BadRequest -> {
           handleBadRequestResponse(
-            handler,
             response as InstallDataBadRequestResponse,
             userID,
             datasetID,
@@ -343,10 +342,8 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
           false
         }
 
-        InstallDataResponseType.ValidationFailure
-        -> {
+        InstallDataResponseType.ValidationFailure -> {
           handleValidationFailureResponse(
-            handler,
             response as InstallDataValidationFailureResponse,
             userID,
             datasetID,
@@ -356,10 +353,8 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
           false
         }
 
-        InstallDataResponseType.MissingDependencies
-        -> {
+        InstallDataResponseType.MissingDependencies -> {
           handleMissingDependenciesResponse(
-            handler,
             response as InstallDataMissingDependenciesResponse,
             userID,
             datasetID,
@@ -369,10 +364,8 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
           false
         }
 
-        InstallDataResponseType.UnexpectedError
-        -> {
+        InstallDataResponseType.UnexpectedError -> {
           handleUnexpectedErrorResponse(
-            handler,
             response as InstallDataUnexpectedErrorResponse,
             userID,
             datasetID,
@@ -385,14 +378,13 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.installData(handler.displayName, installTarget, userID, datasetID, cause = e)
+      throw PluginException.installData(displayName, installTarget, userID, datasetID, cause = e)
     } finally {
       timer?.observeDuration()
     }
   }
 
-  private fun handleSuccessResponse(
-    handler: PluginHandler,
+  private fun PluginHandler.handleSuccessResponse(
     res: InstallDataSuccessResponse,
     userID: UserID,
     datasetID: DatasetID,
@@ -404,10 +396,10 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       userID,
       datasetID,
       installTarget,
-      handler.displayName,
+      displayName,
     )
 
-    appDB.withTransaction(installTarget, handler.type) {
+    appDB.withTransaction(installTarget, type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -419,8 +411,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     }
   }
 
-  private fun handleBadRequestResponse(
-    handler: PluginHandler,
+  private fun PluginHandler.handleBadRequestResponse(
     res: InstallDataBadRequestResponse,
     userID: UserID,
     datasetID: DatasetID,
@@ -432,11 +423,11 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       userID,
       datasetID,
       installTarget,
-      handler.displayName,
+      displayName,
       res.message,
     )
 
-    appDB.withTransaction(installTarget, handler.type) {
+    appDB.withTransaction(installTarget, type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -447,11 +438,10 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       ))
     }
 
-    throw PluginException.installData(handler.displayName, installTarget, userID, datasetID, res.message)
+    throw PluginException.installData(displayName, installTarget, userID, datasetID, res.message)
   }
 
-  private fun handleValidationFailureResponse(
-    handler: PluginHandler,
+  private fun PluginHandler.handleValidationFailureResponse(
     res: InstallDataValidationFailureResponse,
     userID: UserID,
     datasetID: DatasetID,
@@ -463,10 +453,10 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       userID,
       datasetID,
       installTarget,
-      handler,
+      this,
     )
 
-    appDB.withTransaction(installTarget, handler.type) {
+    appDB.withTransaction(installTarget, type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -478,8 +468,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     }
   }
 
-  private fun handleMissingDependenciesResponse(
-    handler: PluginHandler,
+  private fun PluginHandler.handleMissingDependenciesResponse(
     res: InstallDataMissingDependenciesResponse,
     userID: UserID,
     datasetID: DatasetID,
@@ -491,10 +480,10 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       userID,
       datasetID,
       installTarget,
-      handler.displayName,
+      displayName,
     )
 
-    appDB.withTransaction(installTarget, handler.type) {
+    appDB.withTransaction(installTarget, type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -509,8 +498,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
   /**
    * Handles an unexpected error response from the handler service.
    */
-  private fun handleUnexpectedErrorResponse(
-    handler: PluginHandler,
+  private fun PluginHandler.handleUnexpectedErrorResponse(
     res: InstallDataUnexpectedErrorResponse,
     userID: UserID,
     datasetID: DatasetID,
@@ -522,10 +510,10 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       userID,
       datasetID,
       installTarget,
-      handler.displayName,
+      displayName,
     )
 
-    appDB.withTransaction(installTarget, handler.type) {
+    appDB.withTransaction(installTarget, type) {
       it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
@@ -536,16 +524,15 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       ))
     }
 
-    throw PluginException.installData(handler.displayName, installTarget, userID, datasetID, res.message)
+    throw PluginException.installData(displayName, installTarget, userID, datasetID, res.message)
   }
 
-  private suspend fun <T> withInstallBundle(
-    s3Dir: DatasetDirectory,
+  private suspend fun <T> DatasetDirectory.buildInstallBundle(
     fn: suspend (meta: InputStream, manifest: InputStream, upload: InputStream) -> T
   ) =
-    s3Dir.getMetaFile().loadContents()!!.use { meta ->
-      s3Dir.getManifestFile().loadContents()!!.use { manifest ->
-        s3Dir.getInstallReadyFile().loadContents()!!.use { data ->
+    getMetaFile().loadContents()!!.use { meta ->
+      getManifestFile().loadContents()!!.use { manifest ->
+        getInstallReadyFile().loadContents()!!.use { data ->
           fn(meta, manifest, data)
         }
       }

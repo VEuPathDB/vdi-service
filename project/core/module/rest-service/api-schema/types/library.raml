@@ -27,6 +27,8 @@ types:
       summary: DatasetSummary
       description?: DatasetDescription
       sourceUrl?: DatasetSourceUrl
+      shortName?: ShortName
+      shortAttribution?: ShortAttribution
   AllDatasetsListMeta:
     type: object
     additionalProperties: false
@@ -121,6 +123,16 @@ types:
     example:
       status: conflict
       message: Target resource already exists and cannot be overwritten.
+  ContactsPatch:
+    description: |-
+      If the dataset visibility is not `private`, the only valid action is
+      `replace`.
+    type: object
+    additionalProperties: false
+    properties:
+      value?:
+        type: DatasetContact[]
+        uniqueItems: true
   DOIReference:
     type: object
     additionalProperties: false
@@ -130,6 +142,145 @@ types:
         minLength: 6
         maxLength: 128
       description?: string
+  DatasetCharacteristics:
+    type: object
+    additionalProperties: false
+    properties:
+      studyDesign?:
+        description: Required for ClinEpi
+        type: string
+      studyType?:
+        description: Required for ClinEpi
+        type: string
+      countries?:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+      years?: SampleYearRange
+      studySpecies?:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+      diseases?:
+        description: Diseases or health conditions
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+      associatedFactors?:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+      participantAges?:
+        type: string
+        minLength: 1
+        maxLength: 128
+      sampleTypes?:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+  DatasetCharacteristicsPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      studyDesign?:
+        description: |-
+          If the install targets array contains ClinEpiDB, the only valid
+          action is `replace`.
+        type: object
+        additionalProperties: false
+        properties:
+          value?: string
+      studyType?:
+        description: |-
+          If the install targets array contains ClinEpiDB, the only valid
+          action is `replace`.
+        type: object
+        additionalProperties: false
+        properties:
+          value?: string
+      countries?:
+        type: object
+        additionalProperties: false
+        properties:
+          value?:
+            type: array
+            uniqueItems: true
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+      years?:
+        type: object
+        additionalProperties: false
+        properties:
+          value?: SampleYearRange
+      studySpecies?:
+        type: object
+        additionalProperties: false
+        properties:
+          value?:
+            type: array
+            uniqueItems: true
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+      diseases?:
+        type: object
+        additionalProperties: false
+        properties:
+          value?:
+            type: array
+            uniqueItems: true
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+      associatedFactors?:
+        type: object
+        additionalProperties: false
+        properties:
+          value?:
+            type: array
+            uniqueItems: true
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+      participantAges?:
+        type: object
+        additionalProperties: false
+        properties:
+          value?:
+            type: string
+            minLength: 1
+            maxLength: 128
+      sampleTypes?:
+        type: object
+        additionalProperties: false
+        properties:
+          value?:
+            type: array
+            uniqueItems: true
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
   DatasetContact:
     displayName: Dataset Contact
     type: object
@@ -167,18 +318,6 @@ types:
         description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
         type: string
         maxLength: 200
-      city?:
-        type: string
-        minLength: 3
-        maxLength: 200
-      state?:
-        type: string
-        minLength: 3
-        maxLength: 200
-      address?:
-        type: string
-        minLength: 5
-        maxLength: 1000
   DatasetCreationDate:
     displayName: Dataset Creation Date
     description: Timestamp of the creation of the dataset
@@ -412,11 +551,12 @@ types:
           Optional for ClinEpi.
         type: DatasetOrganism
       hostOrganism?: DatasetOrganism
-      studyCharacteristics?: StudyCharacteristics
+      characteristics?: DatasetCharacteristics
       externalIdentifiers?: ExternalIdentifiers
       funding?:
         type: DatasetFundingAward[]
         uniqueItems: true
+      shortAttribution?: ShortAttribution
   DatasetName:
     displayName: Dataset Name
     description: User-provided name for the dataset.
@@ -461,86 +601,22 @@ types:
     type: object
     additionalProperties: false
     properties:
-      type?:
-        description: |-
-          If present, the only valid action is `replace`.
-
-          Only permitted when transitioning from a none-type dataset into an
-          actual dataset type.
-        type: object
-        additionalProperties: false
-        properties:
-          value?: DatasetTypeInput
-      visibility?:
-        description: If present, the only valid action is `replace`.
-        type: object
-        additionalProperties: false
-        properties:
-          value?: DatasetVisibility
-      name?:
-        description: If present, the only valid action is `replace`.
-        type: object
-        additionalProperties: false
-        properties:
-          value?: DatasetName
-      summary?:
-        description: If present, the only valid action is `replace`.
-        type: object
-        additionalProperties: false
-        properties:
-          value?: DatasetSummary
-      description?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?: DatasetDescription
-      publications?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: DatasetPublication[]
-            uniqueItems: true
-      contacts?:
-        description: |-
-          If the dataset visibility is not `private`, the only valid action is
-          `replace`.
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: DatasetContact[]
-            uniqueItems: true
-      projectName?:
-        description: |-
-          If the install targets array contains MicrobiomeDB or ClinEpiDB, the
-          only valid action is `replace`.
-        type: object
-        additionalProperties: false
-        properties:
-          value?: DatasetProjectName
-      programName?:
-        description: If the install targets array contains MicrobiomeDB or ClinEpiDB, the only valid action is `replace`.
-        type: object
-        additionalProperties: false
-        properties:
-          value?: DatasetProgramName
-      linkedDatasets?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: LinkedDataset[]
-            uniqueItems: true
-      studyCharacteristics?: StudyCharacteristicsPatch
+      type?: DatasetTypePatch
+      visibility?: VisibilityPatch
+      name?: StringPatch
+      summary?: StringPatch
+      description?: StringPatch
+      publications?: PublicationsPatch
+      contacts?: ContactsPatch
+      projectName?: StringPatch
+      programName?: StringPatch
+      linkedDatasets?: LinkedDatasetPatch
+      experimentalOrganism?: OrganismPatch
+      hostOrganism?: OrganismPatch
+      characteristics?: DatasetCharacteristicsPatch
       externalIdentifiers?: ExternalIdentifiersPatch
-      funding?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: DatasetFundingAward[]
-            uniqueItems: true
+      funding?: FundingPatch
+      shortAttribution?: StringPatch
   DatasetPostMeta:
     type: DatasetMetaBase
     additionalProperties: false
@@ -715,6 +791,8 @@ types:
     displayName: Dataset Revision Action
     type: string
     enum:
+      - create
+      - extend
       - revise
   DatasetRevisionNote:
     displayName: Dataset Revision Note
@@ -804,6 +882,16 @@ types:
       displayName:
         type: string
         minLength: 3
+  DatasetTypePatch:
+    description: |-
+      If present, the only valid action is `replace`.
+
+      Only permitted when transitioning from a none-type dataset into an
+      actual dataset type.
+    type: object
+    additionalProperties: false
+    properties:
+      value?: DatasetTypeInput
   DatasetVisibility:
     type: string
     enum:
@@ -901,6 +989,13 @@ types:
     example:
       status: forbidden
       message: the current user is not permitted to perform this action
+  FundingPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value?:
+        type: DatasetFundingAward[]
+        uniqueItems: true
   GoneError:
     displayName: Gone
     description: |
@@ -985,6 +1080,13 @@ types:
     properties:
       datasetUri: string
       sharesRecords: boolean
+  LinkedDatasetPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value?:
+        type: LinkedDataset[]
+        uniqueItems: true
   MethodNotAllowedError:
     displayName: Method Not Allowed
     description: |
@@ -1003,6 +1105,11 @@ types:
     example:
       status: not-found
       message: the requested resource could not be found
+  OrganismPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value?: DatasetOrganism
   PartialDate:
     displayName: Partial Datetime
     description: |
@@ -1041,6 +1148,13 @@ types:
           indicates that the plugin has no project restrictions and may be used
           on any site.
         type: InstallTargetID[]
+  PublicationsPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value?:
+        type: DatasetPublication[]
+        uniqueItems: true
   RelatedDatasetInfo:
     type: object
     additionalProperties: false
@@ -1159,145 +1273,19 @@ types:
     enum:
       - accept
       - reject
-  StudyCharacteristics:
+  ShortAttribution:
+    type: string
+    minLength: 3
+    maxLength: 40
+  ShortName:
+    type: string
+    minLength: 3
+    maxLength: 20
+  StringPatch:
     type: object
     additionalProperties: false
     properties:
-      studyDesign?:
-        description: Required for ClinEpi
-        type: string
-      studyType?:
-        description: Required for ClinEpi
-        type: string
-      countries?:
-        type: array
-        uniqueItems: true
-        items:
-          type: string
-          minLength: 3
-          maxLength: 128
-      years?: SampleYearRange
-      studySpecies?:
-        type: array
-        uniqueItems: true
-        items:
-          type: string
-          minLength: 3
-          maxLength: 128
-      diseases?:
-        description: Diseases or health conditions
-        type: array
-        uniqueItems: true
-        items:
-          type: string
-          minLength: 3
-          maxLength: 128
-      associatedFactors?:
-        type: array
-        uniqueItems: true
-        items:
-          type: string
-          minLength: 3
-          maxLength: 128
-      participantAges?:
-        type: string
-        minLength: 1
-        maxLength: 128
-      sampleTypes?:
-        type: array
-        uniqueItems: true
-        items:
-          type: string
-          minLength: 3
-          maxLength: 128
-  StudyCharacteristicsPatch:
-    type: object
-    additionalProperties: false
-    properties:
-      studyDesign?:
-        description: |-
-          If the install targets array contains ClinEpiDB, the only valid
-          action is `replace`.
-        type: object
-        additionalProperties: false
-        properties:
-          value?: string
-      studyType?:
-        description: |-
-          If the install targets array contains ClinEpiDB, the only valid
-          action is `replace`.
-        type: object
-        additionalProperties: false
-        properties:
-          value?: string
-      countries?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: array
-            uniqueItems: true
-            items:
-              type: string
-              minLength: 3
-              maxLength: 128
-      years?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?: SampleYearRange
-      studySpecies?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: array
-            uniqueItems: true
-            items:
-              type: string
-              minLength: 3
-              maxLength: 128
-      diseases?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: array
-            uniqueItems: true
-            items:
-              type: string
-              minLength: 3
-              maxLength: 128
-      associatedFactors?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: array
-            uniqueItems: true
-            items:
-              type: string
-              minLength: 3
-              maxLength: 128
-      participantAges?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: string
-            minLength: 1
-            maxLength: 128
-      sampleTypes?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: array
-            uniqueItems: true
-            items:
-              type: string
-              minLength: 3
-              maxLength: 128
+      value: string
   SyncControlRecord:
     type: object
     additionalProperties: false
@@ -1374,4 +1362,10 @@ types:
     description: VDI dataset identifier
     type: string
     pattern: ^[a-zA-Z0-9_-]+$
+  VisibilityPatch:
+    description: If present, the only valid action is `replace`.
+    type: object
+    additionalProperties: false
+    properties:
+      value?: DatasetVisibility
 

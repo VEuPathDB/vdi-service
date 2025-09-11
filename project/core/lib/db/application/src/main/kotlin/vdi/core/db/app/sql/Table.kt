@@ -1,0 +1,26 @@
+package vdi.core.db.app.sql
+
+internal object Table {
+  const val Dataset           = "dataset"
+  const val AssociatedFactors = "dataset_associated_factor"
+  const val BioprojectIDs     = "dataset_bioproject_id"
+  const val Characteristics   = "dataset_characteristics"
+  const val Contacts          = "dataset_contact"
+  const val Countries         = "dataset_country"
+  const val Dependencies      = "dataset_dependency"
+  const val Diseases          = "dataset_disease"
+  const val DOIs              = "dataset_doi"
+  const val FundingAwards     = "dataset_funding_award"
+  const val Hyperlinks        = "dataset_hyperlink"
+  const val InstallActivity   = "dataset_install_activity"
+  const val InstallMessage    = "dataset_install_message"
+  const val Links             = "dataset_link"
+  const val Meta              = "dataset_meta"
+  const val Organisms         = "dataset_organism"
+  const val Projects          = "dataset_project"
+  const val Publications      = "dataset_publication"
+  const val SampleTypes       = "dataset_sample_type"
+  const val Species          = "dataset_species"
+  const val Visibility        = "dataset_visibility"
+  const val SyncControl       = "sync_control"
+}

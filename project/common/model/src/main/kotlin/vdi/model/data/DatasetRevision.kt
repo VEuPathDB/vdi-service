@@ -73,6 +73,8 @@ open class DatasetRevision(
      * data in the original dataset.
      */
     Extend(1u, "extend"),
+
+    Create(2u, "create"),
     ;
 
     override fun toString() = stringValue

@@ -79,7 +79,7 @@ private fun DatasetPatchRequestBody.validateAndApply(
   if (validators.isNotEmpty()) {
     val serialized = JSON.convertValue<ObjectNode>(newMetadata)
     for (schema in validators) {
-      serialized.validate(schema, "", errors)
+      serialized.validate(schema, errors)
     }
   }
 
@@ -99,7 +99,7 @@ private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
   || contacts != null
   || projectName != null
   || programName != null
-  || relatedStudies != null
-  || studyCharacteristics != null
+  || linkedDatasets != null
+  || characteristics != null
   || externalIdentifiers != null
   || funding != null

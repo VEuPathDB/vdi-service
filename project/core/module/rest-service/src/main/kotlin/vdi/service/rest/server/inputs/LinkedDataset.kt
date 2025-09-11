@@ -32,3 +32,5 @@ fun List<APILinkedDataset?>.validate(jPath: String, errors: ValidationErrors) =
   forEachIndexed { i, row -> row.require(jPath, i, errors) { validate(jPath, i, errors) } }
 
 fun APILinkedDataset.toInternal() = LinkedDataset(URI(datasetUri), sharesRecords)
+
+fun Iterable<APILinkedDataset>.toInternal() = map(APILinkedDataset::toInternal)

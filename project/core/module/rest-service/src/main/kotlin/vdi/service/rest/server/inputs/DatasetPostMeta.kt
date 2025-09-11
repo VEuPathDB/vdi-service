@@ -52,7 +52,7 @@ internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
     linkedDatasets       = linkedDatasets.toInternalDistinct(LinkedDataset::toInternal),
     experimentalOrganism = experimentalOrganism.toInternal(),
     hostOrganism         = hostOrganism.toInternal(),
-    characteristics = studyCharacteristics.toInternal(),
+    characteristics      = characteristics.toInternal(),
     externalIdentifiers  = externalIdentifiers.toInternal(),
     funding              = funding.toInternalDistinct(DatasetFundingAward::toInternal),
   )

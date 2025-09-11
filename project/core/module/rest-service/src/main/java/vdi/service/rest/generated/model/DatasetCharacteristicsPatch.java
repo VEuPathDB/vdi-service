@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 
 @JsonDeserialize(
-    as = StudyCharacteristicsPatchImpl.class
+    as = DatasetCharacteristicsPatchImpl.class
 )
-public interface StudyCharacteristicsPatch {
+public interface DatasetCharacteristicsPatch {
   @JsonProperty(JsonField.STUDY_DESIGN)
   StudyDesignType getStudyDesign();
 
@@ -63,7 +63,7 @@ public interface StudyCharacteristicsPatch {
   void setSampleTypes(SampleTypesType sampleTypes);
 
   @JsonDeserialize(
-      as = StudyCharacteristicsPatchImpl.AssociatedFactorsTypeImpl.class
+      as = DatasetCharacteristicsPatchImpl.AssociatedFactorsTypeImpl.class
   )
   interface AssociatedFactorsType {
     @JsonProperty("value")
@@ -74,7 +74,7 @@ public interface StudyCharacteristicsPatch {
   }
 
   @JsonDeserialize(
-      as = StudyCharacteristicsPatchImpl.StudyTypeTypeImpl.class
+      as = DatasetCharacteristicsPatchImpl.StudyTypeTypeImpl.class
   )
   interface StudyTypeType {
     @JsonProperty("value")
@@ -85,7 +85,7 @@ public interface StudyCharacteristicsPatch {
   }
 
   @JsonDeserialize(
-      as = StudyCharacteristicsPatchImpl.SampleTypesTypeImpl.class
+      as = DatasetCharacteristicsPatchImpl.SampleTypesTypeImpl.class
   )
   interface SampleTypesType {
     @JsonProperty("value")
@@ -96,7 +96,7 @@ public interface StudyCharacteristicsPatch {
   }
 
   @JsonDeserialize(
-      as = StudyCharacteristicsPatchImpl.StudyDesignTypeImpl.class
+      as = DatasetCharacteristicsPatchImpl.StudyDesignTypeImpl.class
   )
   interface StudyDesignType {
     @JsonProperty("value")
@@ -107,7 +107,7 @@ public interface StudyCharacteristicsPatch {
   }
 
   @JsonDeserialize(
-      as = StudyCharacteristicsPatchImpl.StudySpeciesTypeImpl.class
+      as = DatasetCharacteristicsPatchImpl.StudySpeciesTypeImpl.class
   )
   interface StudySpeciesType {
     @JsonProperty("value")
@@ -118,7 +118,7 @@ public interface StudyCharacteristicsPatch {
   }
 
   @JsonDeserialize(
-      as = StudyCharacteristicsPatchImpl.DiseasesTypeImpl.class
+      as = DatasetCharacteristicsPatchImpl.DiseasesTypeImpl.class
   )
   interface DiseasesType {
     @JsonProperty("value")
@@ -129,7 +129,7 @@ public interface StudyCharacteristicsPatch {
   }
 
   @JsonDeserialize(
-      as = StudyCharacteristicsPatchImpl.CountriesTypeImpl.class
+      as = DatasetCharacteristicsPatchImpl.CountriesTypeImpl.class
   )
   interface CountriesType {
     @JsonProperty("value")
@@ -140,7 +140,7 @@ public interface StudyCharacteristicsPatch {
   }
 
   @JsonDeserialize(
-      as = StudyCharacteristicsPatchImpl.ParticipantAgesTypeImpl.class
+      as = DatasetCharacteristicsPatchImpl.ParticipantAgesTypeImpl.class
   )
   interface ParticipantAgesType {
     @JsonProperty("value")
@@ -151,7 +151,7 @@ public interface StudyCharacteristicsPatch {
   }
 
   @JsonDeserialize(
-      as = StudyCharacteristicsPatchImpl.YearsTypeImpl.class
+      as = DatasetCharacteristicsPatchImpl.YearsTypeImpl.class
   )
   interface YearsType {
     @JsonProperty("value")

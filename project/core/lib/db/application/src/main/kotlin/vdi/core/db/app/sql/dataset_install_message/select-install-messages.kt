@@ -4,6 +4,7 @@ import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import java.sql.Connection
 import vdi.core.db.app.model.DatasetInstallMessage
+import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.getInstallStatus
 import vdi.core.db.app.sql.getInstallType
 import vdi.core.db.jdbc.getDateTime
@@ -19,7 +20,7 @@ SELECT
 , message
 , updated
 FROM
-  ${schema}.dataset_install_message
+  ${schema}.${Table.InstallMessage}
 WHERE
   dataset_id = ?
 """

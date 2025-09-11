@@ -9,6 +9,7 @@ dependencies {
   implementation(project(":lib:db-common"))
   implementation(project(":lib:db-internal"))
   implementation(project(":lib:plugin-client"))
+  implementation(project(":lib:plugin-registry"))
   implementation(project(":lib:external-kafka"))
   implementation(project(":lib:module-core"))
   implementation(project(":lib:external-s3"))

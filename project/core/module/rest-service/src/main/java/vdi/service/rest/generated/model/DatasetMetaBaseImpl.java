@@ -20,9 +20,10 @@ import java.util.List;
     "linkedDatasets",
     "experimentalOrganism",
     "hostOrganism",
-    "studyCharacteristics",
+    "characteristics",
     "externalIdentifiers",
-    "funding"
+    "funding",
+    "shortAttribution"
 })
 public class DatasetMetaBaseImpl implements DatasetMetaBase {
   @JsonProperty(JsonField.INSTALL_TARGETS)
@@ -64,14 +65,17 @@ public class DatasetMetaBaseImpl implements DatasetMetaBase {
   @JsonProperty(JsonField.HOST_ORGANISM)
   private DatasetOrganism hostOrganism;
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  private StudyCharacteristics studyCharacteristics;
+  @JsonProperty(JsonField.CHARACTERISTICS)
+  private DatasetCharacteristics characteristics;
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
   private ExternalIdentifiers externalIdentifiers;
 
   @JsonProperty(JsonField.FUNDING)
   private List<DatasetFundingAward> funding;
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  private String shortAttribution;
 
   @JsonProperty(JsonField.INSTALL_TARGETS)
   public List<String> getInstallTargets() {
@@ -203,14 +207,14 @@ public class DatasetMetaBaseImpl implements DatasetMetaBase {
     this.hostOrganism = hostOrganism;
   }
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  public StudyCharacteristics getStudyCharacteristics() {
-    return this.studyCharacteristics;
+  @JsonProperty(JsonField.CHARACTERISTICS)
+  public DatasetCharacteristics getCharacteristics() {
+    return this.characteristics;
   }
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  public void setStudyCharacteristics(StudyCharacteristics studyCharacteristics) {
-    this.studyCharacteristics = studyCharacteristics;
+  @JsonProperty(JsonField.CHARACTERISTICS)
+  public void setCharacteristics(DatasetCharacteristics characteristics) {
+    this.characteristics = characteristics;
   }
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
@@ -231,5 +235,15 @@ public class DatasetMetaBaseImpl implements DatasetMetaBase {
   @JsonProperty(JsonField.FUNDING)
   public void setFunding(List<DatasetFundingAward> funding) {
     this.funding = funding;
+  }
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  public String getShortAttribution() {
+    return this.shortAttribution;
+  }
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  public void setShortAttribution(String shortAttribution) {
+    this.shortAttribution = shortAttribution;
   }
 }

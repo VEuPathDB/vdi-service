@@ -29,3 +29,6 @@ fun List<APIDOIReference>.validate(jPath: String, errors: ValidationErrors) =
   forEachIndexed { i, doi -> doi.require(jPath, i, errors) { validate(jPath, i, errors) } }
 
 fun APIDOIReference.toInternal() = DOIReference(doi, description)
+
+fun Iterable<APIDOIReference>.toInternal() =
+  map { DOIReference(it.doi, it.description) }

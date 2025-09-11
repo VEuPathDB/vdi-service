@@ -86,4 +86,16 @@ public interface AllDatasetsListEntry {
 
   @JsonProperty(JsonField.SOURCE_URL)
   void setSourceUrl(String sourceUrl);
+
+  @JsonProperty(JsonField.SHORT_NAME)
+  String getShortName();
+
+  @JsonProperty(JsonField.SHORT_NAME)
+  void setShortName(String shortName);
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  String getShortAttribution();
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  void setShortAttribution(String shortAttribution);
 }

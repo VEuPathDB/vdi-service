@@ -19,148 +19,36 @@ types:
     type: object
     additionalProperties: false
     properties:
-      type?:
-        # language=markdown
-        description: |-
-          If present, the only valid action is `replace`.
-          
-          Only permitted when transitioning from a none-type dataset into an
-          actual dataset type.
-        type: object
-        properties:
-          value?: common.DatasetTypeInput
-        additionalProperties: false
-
-      # installTargets: immutable
-
-      visibility?:
-        # language=markdown
-        description: If present, the only valid action is `replace`.
-        type: object
-        properties:
-          value?: common.DatasetVisibility
-        additionalProperties: false
-
-      # owner: immutable
-
-      name?:
-        # language=markdown
-        description: If present, the only valid action is `replace`.
-        type: object
-        properties:
-          value?: common.DatasetName
-        additionalProperties: false
-
-      summary?:
-        # language=markdown
-        description: If present, the only valid action is `replace`.
-        type: object
-        properties:
-          value?: common.DatasetSummary
-        additionalProperties: false
-
-      description?:
-        type: object
-        properties:
-          value?: common.DatasetDescription
-        additionalProperties: false
-
-      # origin: immutable
-      # created: immutable
-      # sourceUrl: immutable
-      # dependencies: immutable
-
-      publications?:
-        type: object
-        properties:
-          value?:
-            type: common.DatasetPublication[]
-            uniqueItems: true
-        additionalProperties: false
-
-      contacts?:
-        # language=markdown
-        description: |-
-          If the dataset visibility is not `private`, the only valid action is
-          `replace`.
-        type: object
-        properties:
-          value?:
-            type: common.DatasetContact[]
-            uniqueItems: true
-        additionalProperties: false
-
-      projectName?:
-        # language=markdown
-        description: |-
-          If the install targets array contains MicrobiomeDB or ClinEpiDB, the
-          only valid action is `replace`.
-        type: object
-        properties:
-          value?: common.DatasetProjectName
-        additionalProperties: false
-
-      programName?:
-        # language=markdown
-        description:
-          If the install targets array contains MicrobiomeDB or ClinEpiDB, the
-          only valid action is `replace`.
-        type: object
-        properties:
-          value?: common.DatasetProgramName
-        additionalProperties: false
-
-      linkedDatasets?:
-        type: object
-        properties:
-          value?:
-            type: common.LinkedDataset[]
-            uniqueItems: true
-        additionalProperties: false
-
-      # experimentalOrganism: immutable
-
-      # hostOrganism: immutable
-
-      studyCharacteristics?: StudyCharacteristicsPatch
-
+      type?: DatasetTypePatch
+      visibility?: VisibilityPatch
+      name?: StringPatch
+      summary?: StringPatch
+      description?: StringPatch
+      publications?: PublicationsPatch
+      contacts?: ContactsPatch
+      projectName?: StringPatch
+      programName?: StringPatch
+      linkedDatasets?: LinkedDatasetPatch
+      experimentalOrganism?: OrganismPatch
+      hostOrganism?: OrganismPatch
+      characteristics?: DatasetCharacteristicsPatch
       externalIdentifiers?: ExternalIdentifiersPatch
+      funding?: FundingPatch
+      shortAttribution?: StringPatch
 
-      funding?:
-        type: object
-        properties:
-          value?:
-            type: common.DatasetFundingAward[]
-            uniqueItems: true
-        additionalProperties: false
-
-  ExternalIdentifiersPatch:
+  ContactsPatch:
+    # language=markdown
+    description: |-
+      If the dataset visibility is not `private`, the only valid action is
+      `replace`.
     type: object
-    additionalProperties: false
     properties:
-      dois?:
-        type: object
-        properties:
-          value?:
-            type: common.DOIReference[]
-            uniqueItems: true
-        additionalProperties: false
-      hyperlinks?:
-        type: object
-        properties:
-          value?:
-            type: common.DatasetHyperlink[]
-            uniqueItems: true
-        additionalProperties: false
-      bioprojectIds?:
-        type: object
-        properties:
-          value?:
-            type: common.BioprojectIDReference[]
-            uniqueItems: true
-        additionalProperties: false
+      value?:
+        type: common.DatasetContact[]
+        uniqueItems: true
+    additionalProperties: false
 
-  StudyCharacteristicsPatch:
+  DatasetCharacteristicsPatch:
     type: object
     additionalProperties: false
     properties:
@@ -258,3 +146,85 @@ types:
               maxLength: 128
             uniqueItems: true
         additionalProperties: false
+
+  DatasetTypePatch:
+    # language=markdown
+    description: |-
+      If present, the only valid action is `replace`.
+
+      Only permitted when transitioning from a none-type dataset into an
+      actual dataset type.
+    type: object
+    properties:
+      value?: common.DatasetTypeInput
+    additionalProperties: false
+
+  ExternalIdentifiersPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      dois?:
+        type: object
+        properties:
+          value?:
+            type: common.DOIReference[]
+            uniqueItems: true
+        additionalProperties: false
+      hyperlinks?:
+        type: object
+        properties:
+          value?:
+            type: common.DatasetHyperlink[]
+            uniqueItems: true
+        additionalProperties: false
+      bioprojectIds?:
+        type: object
+        properties:
+          value?:
+            type: common.BioprojectIDReference[]
+            uniqueItems: true
+        additionalProperties: false
+
+  FundingPatch:
+    type: object
+    properties:
+      value?:
+        type: common.DatasetFundingAward[]
+        uniqueItems: true
+    additionalProperties: false
+
+  LinkedDatasetPatch:
+    type: object
+    properties:
+      value?:
+        type: common.LinkedDataset[]
+        uniqueItems: true
+    additionalProperties: false
+
+  OrganismPatch:
+    type: object
+    properties:
+      value?: common.DatasetOrganism
+    additionalProperties: false
+
+  PublicationsPatch:
+    type: object
+    properties:
+      value?:
+        type: common.DatasetPublication[]
+        uniqueItems: true
+    additionalProperties: false
+
+  StringPatch:
+    type: object
+    properties:
+      value: string
+    additionalProperties: false
+
+  VisibilityPatch:
+    # language=markdown
+    description: If present, the only valid action is `replace`.
+    type: object
+    properties:
+      value?: common.DatasetVisibility
+    additionalProperties: false

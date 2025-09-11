@@ -6,10 +6,10 @@ import io.foxcapades.kdbc.withResults
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.time.ZoneId
-import javax.swing.UIManager.getString
 import vdi.core.db.app.model.DatasetRecord
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
+import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.getDeleteFlag
 import vdi.core.db.app.sql.setInstallStatus
 import vdi.core.db.app.sql.setInstallType
@@ -35,10 +35,10 @@ SELECT
 , days_for_approval
 , creation_date
 FROM
-  ${schema}.dataset ds
-  INNER JOIN ${schema}.dataset_install_message dsim
+  ${schema}.${Table.Dataset} ds
+  INNER JOIN ${schema}.${Table.InstallMessage} dsim
     ON ds.dataset_id = dsim.dataset_id
-  INNER JOIN ${schema}.dataset_project dsp
+  INNER JOIN ${schema}.${Table.Projects} dsp
     ON ds.dataset_id = dsp.dataset_id
 WHERE
   dsim.install_type = ?

@@ -4,6 +4,7 @@ import io.foxcapades.kdbc.get
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import java.sql.Connection
+import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.model.SyncControlRecord
 import vdi.model.data.DatasetID
@@ -16,7 +17,7 @@ SELECT
 , data_update_time
 , meta_update_time
 FROM
-  ${schema}.sync_control
+  ${schema}.${Table.SyncControl}
 WHERE
   dataset_id = ?
 """

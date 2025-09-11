@@ -5,6 +5,7 @@ import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import java.sql.Connection
 import vdi.core.db.app.model.DatasetProjectLinkRecord
+import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
 
@@ -14,7 +15,7 @@ private fun sql(schema: String) =
 SELECT
   project_id
 FROM
-  ${schema}.dataset_project
+  ${schema}.${Table.Projects}
 WHERE
   dataset_id = ?
 """

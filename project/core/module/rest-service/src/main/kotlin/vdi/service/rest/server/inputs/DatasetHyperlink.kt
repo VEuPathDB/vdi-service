@@ -7,8 +7,7 @@ import vdi.model.data.DatasetHyperlink
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.DatasetHyperlink as APIHyperlink
 
-private val UrlLengthRange = 7..200
-private const val DescriptionMaxLength = 4000
+private val UrlLengthRange = 7..2000
 
 internal fun APIHyperlink?.cleanup() = this?.apply {
   cleanupString(::getUrl)
@@ -26,9 +25,10 @@ private fun APIHyperlink.validate(jPath: String, index: Int, errors: ValidationE
   } catch (e: IllegalArgumentException) {
     errors.add((jPath..JsonField.URL)..index, "invalid URL value")
   }
-
-  description?.checkMaxLength(jPath..JsonField.DESCRIPTION, index, DescriptionMaxLength, errors)
 }
 
 internal fun APIHyperlink.toInternal() =
   DatasetHyperlink(URI.create(url), description)
+
+internal fun Iterable<APIHyperlink>.toInternal() =
+  map { DatasetHyperlink(URI.create(it.url), it.description) }

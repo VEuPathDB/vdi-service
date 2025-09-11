@@ -281,7 +281,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     // Record the status update to the cache DB
     cacheDB.withTransaction { transaction ->
       if (warnings.isNotEmpty()) {
-        transaction.upsertImportMessages(datasetID, warnings.joinToString("\n"))
+        transaction.upsertImportMessages(datasetID, warnings)
       }
 
       transaction.tryInsertInstallFiles(datasetID, manifest!!.installReadyFiles)
@@ -300,7 +300,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
-      it.upsertImportMessages(datasetID, result.message)
+      it.upsertImportMessages(datasetID, listOf(result.message))
     }
 
     throw PluginException.import(handler.displayName, userID, datasetID, result.message)
@@ -316,7 +316,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
-      it.upsertImportMessages(datasetID, result.warnings.joinToString("\n"))
+      it.upsertImportMessages(datasetID, result.warnings)
     }
   }
 
@@ -325,7 +325,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
-      it.upsertImportMessages(datasetID, result.message)
+      it.upsertImportMessages(datasetID, listOf(result.message))
     }
 
     throw PluginException.import(handler.displayName, userID, datasetID, result.message)

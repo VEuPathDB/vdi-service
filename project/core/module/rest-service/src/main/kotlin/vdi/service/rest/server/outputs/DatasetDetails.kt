@@ -41,7 +41,7 @@ internal fun DatasetDetails(
     programName          = meta.programName
     experimentalOrganism = meta.experimentalOrganism?.let(::DatasetOrganism)
     hostOrganism         = meta.hostOrganism?.let(::DatasetOrganism)
-    studyCharacteristics = meta.characteristics?.let(::StudyCharacteristics)
+    characteristics      = meta.characteristics?.let(::DatasetCharacteristics)
     externalIdentifiers  = meta.externalIdentifiers?.let(::ExternalIdentifiers)
     funding              = meta.funding.map(::DatasetFundingAward)
     created              = meta.created
@@ -50,7 +50,7 @@ internal fun DatasetDetails(
     this.importMessages  = importMessages
     this.shares          = shares.map { ShareOffer(userInfo[it.recipientID]!!, it.offerStatus!!) }
     status               = importStatus?.let { DatasetStatusInfo(it, installs) }
-    linkedDatasets       = meta.linkedDatasets.map(::vdi.service.rest.server.outputs.LinkedDataset)
+    linkedDatasets       = meta.linkedDatasets.map(::LinkedDataset)
     this.relatedDatasets = relatedDatasets.map(::RelatedDatasetInfo).toList()
   }
 

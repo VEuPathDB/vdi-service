@@ -3,7 +3,6 @@ package vdi.service.rest.generated.model;
 public final class JsonField {
   public static final String ACCEPTED = "accepted";
   public static final String ACTION = "action";
-  public static final String ADDRESS = "address";
   public static final String AFFILIATION = "affiliation";
   public static final String AFTER = "after";
   public static final String AGENCY = "agency";
@@ -15,8 +14,8 @@ public final class JsonField {
   public static final String BUILD_ID = "buildId";
   public static final String BUILD_NUMBER = "buildNumber";
   public static final String BUILD_TIME = "buildTime";
+  public static final String CHARACTERISTICS = "characteristics";
   public static final String CITATION = "citation";
-  public static final String CITY = "city";
   public static final String CONTACTS = "contacts";
   public static final String CONTENTS = "contents";
   public static final String COUNT = "count";
@@ -112,13 +111,13 @@ public final class JsonField {
   public static final String SHARES = "shares";
   public static final String SHARES_RECORDS = "sharesRecords";
   public static final String SHARES_UPDATE_TIME = "sharesUpdateTime";
+  public static final String SHORT_ATTRIBUTION = "shortAttribution";
+  public static final String SHORT_NAME = "shortName";
   public static final String SOURCE_URL = "sourceUrl";
   public static final String SPECIES = "species";
   public static final String START = "start";
-  public static final String STATE = "state";
   public static final String STATUS = "status";
   public static final String STRAIN = "strain";
-  public static final String STUDY_CHARACTERISTICS = "studyCharacteristics";
   public static final String STUDY_DESIGN = "studyDesign";
   public static final String STUDY_SPECIES = "studySpecies";
   public static final String STUDY_TYPE = "studyType";

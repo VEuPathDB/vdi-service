@@ -3,6 +3,7 @@ package vdi.core.db.app.sql.dataset_contact
 import io.foxcapades.kdbc.set
 import io.foxcapades.kdbc.withPreparedBatchUpdate
 import java.sql.Connection
+import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.set
 import vdi.model.data.DatasetContact
 import vdi.model.data.DatasetID
@@ -12,7 +13,7 @@ private fun sql(schema: String) =
 // language=postgresql
   """
 INSERT INTO
-  ${schema}.dataset_contact (
+  ${schema}.${Table.Contacts} (
     dataset_id
   , is_primary
   , first_name
@@ -30,7 +31,7 @@ internal fun Connection.insertDatasetContacts(
   schema: String,
   datasetID: DatasetID,
   contacts: Iterable<DatasetContact>,
-) {
+) =
   withPreparedBatchUpdate(sql(schema), contacts) {
     set(1, datasetID)
     set(2, it.isPrimary)
@@ -40,5 +41,5 @@ internal fun Connection.insertDatasetContacts(
     set(6, it.email)
     set(7, it.affiliation)
     set(8, it.country)
-  }
-}
+  }.reduceOrNull(Int::plus) ?: 0
+

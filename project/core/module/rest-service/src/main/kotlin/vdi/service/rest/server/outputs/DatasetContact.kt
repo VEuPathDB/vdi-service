@@ -12,9 +12,6 @@ internal fun DatasetContact(contact: DatasetContact): APIContact =
     lastName    = contact.lastName
     email       = contact.email
     affiliation = contact.affiliation
-    city        = contact.city
-    state       = contact.state
     country     = contact.country
-    address     = contact.address
     isPrimary   = contact.isPrimary
   }

@@ -10,7 +10,6 @@ import kotlin.concurrent.withLock
 import kotlin.system.exitProcess
 import vdi.core.config.loadAndCacheStackConfig
 import vdi.core.config.loadManifestConfig
-import vdi.core.db.cache.patchMetadataTable
 import vdi.core.modules.VDIModule
 import vdi.daemon.events.routing.EventRouter
 import vdi.daemon.pruner.DatasetPruner
@@ -74,9 +73,6 @@ object Main {
       MetaLogger.error("startup exception: ", e)
       exitProcess(1)
     }
-
-    // FIXME: REMOVE THIS ONCE THE EXTENDED METADATA PATCH HAS BEEN APPLIED TO PRODUCTION!!!!
-    patchMetadataTable()
 
     val serviceLock = ReentrantLock()
     val unlockCondition = serviceLock.newCondition()

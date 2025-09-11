@@ -58,9 +58,9 @@ class DatasetList(@Context request: ContainerRequest, @Context val uploadConfig:
     createDataset(datasetID, entity, uploadConfig)
 
     return Datasets.PostDatasetsResponse
-      .respond201WithApplicationJson(
+      .respond202WithApplicationJson(
         DatasetPostResponseBody(datasetID),
-        Datasets.PostDatasetsResponse.headersFor201()
+        Datasets.PostDatasetsResponse.headersFor202()
           .withLocation(request.absolutePath.toString().replaceAfterLast('/', datasetID.toString()))
       )
   }

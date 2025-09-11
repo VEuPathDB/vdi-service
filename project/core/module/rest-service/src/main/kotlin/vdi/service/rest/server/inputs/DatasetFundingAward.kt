@@ -25,3 +25,5 @@ fun APIAwardReference.toInternal() =
 
 fun List<APIAwardReference>.validate(jPath: String, errors: ValidationErrors) =
   forEachIndexed { i, award -> award.require(jPath, i, errors) { validate(jPath, i, errors) } }
+
+fun Iterable<APIAwardReference>.toInternal() = map(APIAwardReference::toInternal)

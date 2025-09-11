@@ -3,6 +3,7 @@ package vdi.core.db.app.sql.dataset
 import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.model.DatasetRecord
+import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.setDeleteFlag
 import vdi.core.db.jdbc.setDataType
 import vdi.core.db.jdbc.setDatasetID
@@ -12,7 +13,7 @@ private fun sql(schema: String) =
 // language=postgresql
 """
 UPDATE
-  ${schema}.dataset
+  ${schema}.${Table.Dataset}
 SET
   owner = ?              -- 1  dataset owner
 , type_name = ?          -- 2  data type name

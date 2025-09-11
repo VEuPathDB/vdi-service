@@ -54,22 +54,4 @@ public interface DatasetContact {
 
   @JsonProperty(JsonField.COUNTRY)
   void setCountry(String country);
-
-  @JsonProperty(JsonField.CITY)
-  String getCity();
-
-  @JsonProperty(JsonField.CITY)
-  void setCity(String city);
-
-  @JsonProperty(JsonField.STATE)
-  String getState();
-
-  @JsonProperty(JsonField.STATE)
-  void setState(String state);
-
-  @JsonProperty(JsonField.ADDRESS)
-  String getAddress();
-
-  @JsonProperty(JsonField.ADDRESS)
-  void setAddress(String address);
 }

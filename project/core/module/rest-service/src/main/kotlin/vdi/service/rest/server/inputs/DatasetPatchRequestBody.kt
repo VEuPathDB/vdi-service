@@ -6,11 +6,17 @@ import org.veupathdb.lib.request.validation.checkLength
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.require
 import vdi.core.plugin.registry.PluginRegistry
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetVisibility
-import vdi.model.data.ExternalDatasetIdentifiers
+import vdi.model.data.*
 import vdi.model.data.DatasetCharacteristics
 import vdi.service.rest.generated.model.*
+import vdi.service.rest.generated.model.BioprojectIDReference
+import vdi.service.rest.generated.model.DOIReference
+import vdi.service.rest.generated.model.DatasetContact
+import vdi.service.rest.generated.model.DatasetFundingAward
+import vdi.service.rest.generated.model.DatasetHyperlink
+import vdi.service.rest.generated.model.DatasetPublication
+import vdi.service.rest.generated.model.LinkedDataset
+import vdi.service.rest.generated.model.SampleYearRange
 import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
 import vdi.service.rest.generated.model.JsonField as JF
 
@@ -26,7 +32,7 @@ internal fun DatasetPatchRequestBody.cleanup() {
   programName?.apply { cleanupString(::getValue) }
   linkedDatasets?.apply { cleanupList(::getValue, LinkedDataset?::cleanup) }
 
-  studyCharacteristics?.apply {
+  characteristics?.apply {
     studyDesign?.apply { cleanupString(::getValue) }
     studyType?.apply { cleanupString(::getValue) }
     countries?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
@@ -61,12 +67,14 @@ internal fun DatasetPatchRequestBody.validate(
     value.requireAnd(JF.DATASET_TYPE, errors) {
       validate(JF.DATASET_TYPE, original.installTargets, errors)
 
-      val handler = PluginRegistry[original.type]
+      val originalHandler = PluginRegistry[original.type]
 
-      if (handler == null)
+      if (originalHandler == null)
         errors.add(JF.DATASET_TYPE, "original dataset type is disabled")
-      else if (!handler.changesEnabled)
+      else if (!originalHandler.changesEnabled)
         errors.add(JF.DATASET_TYPE, "cannot change dataset type from ${original.type}")
+      else if (PluginRegistry[DatasetType(DataType.of(name), version)] == null)
+        errors.add(JF.DATASET_TYPE, "no installers available for given dataset type")
     }
   }
 
@@ -96,8 +104,8 @@ internal fun DatasetPatchRequestBody.validate(
   programName?.value?.checkLength(JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
   linkedDatasets?.value?.validate(JF.LINKED_DATASETS, errors)
 
-  studyCharacteristics?.validate(original.characteristics, errors)
-  externalIdentifiers?.validate(errors)
+  characteristics?.validate(original.characteristics, errors)
+  externalIdentifiers?.validate(JF.EXTERNAL_IDENTIFIERS, errors)
 
   funding?.value?.validate(JF.FUNDING, errors)
 
@@ -112,52 +120,39 @@ private inline fun <T: Any> T?.requireAnd(jPath: String, errors: ValidationError
 }
 
 
-internal fun DatasetPatchRequestBody.applyPatch(original: DatasetMetadata) =
+internal fun DatasetPatchRequestBody.applyPatch(
+  original: DatasetMetadata,
+  revisionHistory: DatasetRevisionHistory? = original.revisionHistory,
+) =
   DatasetMetadata(
-    type            = type?.value?.toInternal() ?: original.type,
-    installTargets  = original.installTargets,
-    visibility      = visibility?.value?.toInternal() ?: original.visibility,
-    owner           = original.owner,
-    name            = name?.value ?: original.name,
-    summary         = summary?.value ?: original.summary,
-    description     = description.mapIfPresent(original.description) { value },
-    origin          = original.origin,
-    created         = original.created,
-    sourceURL       = original.sourceURL,
-    dependencies    = original.dependencies,
-    projectName     = projectName.mapIfPresent(original.projectName) { value },
-    programName     = programName.mapIfPresent(original.programName) { value },
-    hostOrganism    = original.hostOrganism,
-    revisionHistory = original.revisionHistory,
-
-    experimentalOrganism = original.experimentalOrganism,
-
-    publications = publications.mapIfPresent(original.publications) {
-      value?.toInternalDistinct(DatasetPublication::toInternal) ?: emptyList()
-    },
-
-    contacts = contacts.mapIfPresent(original.contacts) {
-      value?.toInternalDistinct(DatasetContact::toInternal) ?: emptyList()
-    },
-
-    linkedDatasets = linkedDatasets.mapIfPresent(original.linkedDatasets) {
-      value?.toInternalDistinct(LinkedDataset::toInternal) ?: emptyList()
-    },
-
-    characteristics = studyCharacteristics.mapIfPresent(original.characteristics) {
-      applyPatch(original.characteristics)
-    },
-
-    externalIdentifiers = externalIdentifiers.mapIfPresent(original.externalIdentifiers) {
-      applyPatch(original.externalIdentifiers)
-    },
-
-    funding = funding.mapIfPresent(original.funding) {
-      value?.toInternalDistinct(DatasetFundingAward::toInternal) ?: emptyList()
-    },
+    type                 = type?.toInternal() ?: original.type,
+    installTargets       = original.installTargets,
+    visibility           = visibility.unsafePatch(original.visibility, vdi.service.rest.generated.model.DatasetVisibility::toInternal),
+    owner                = original.owner,
+    name                 = name.unsafePatch(original.name),
+    summary              = summary.unsafePatch(original.summary),
+    origin               = original.origin,
+    created              = original.created,
+    description          = description.unsafePatch(original.description),
+    shortAttribution     = shortAttribution.unsafePatch(original.shortAttribution),
+    sourceURL            = original.sourceURL,
+    dependencies         = original.dependencies,
+    publications         = publications.unsafePatch(original.publications, List<DatasetPublication>::toInternal),
+    externalIdentifiers  = externalIdentifiers.applyPatch(original.externalIdentifiers),
+    contacts             = contacts.unsafePatch(original.contacts, Iterable<DatasetContact>::toInternal),
+    revisionHistory      = revisionHistory,
+    projectName          = projectName.unsafePatch(original.projectName),
+    programName          = programName.unsafePatch(original.programName),
+    linkedDatasets       = linkedDatasets.unsafePatch(original.linkedDatasets, Iterable<LinkedDataset>::toInternal),
+    experimentalOrganism = experimentalOrganism.unsafePatch(original.experimentalOrganism),
+    hostOrganism         = hostOrganism.unsafePatch(original.hostOrganism),
+    characteristics      = characteristics.applyPatch(original.characteristics),
+    funding              = funding.unsafePatch(original.funding, Iterable<DatasetFundingAward>::toInternal),
   )
 
-private fun StudyCharacteristicsPatch.validate(original: DatasetCharacteristics?, errors: ValidationErrors) {
+fun DatasetTypePatch.toInternal() = DatasetType(DataType.of(value.name), value.version)
+
+private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristics?, errors: ValidationErrors) {
 
   // If the client is attempting to change the study design value
   if (studyDesign != null) {
@@ -166,19 +161,19 @@ private fun StudyCharacteristicsPatch.validate(original: DatasetCharacteristics?
       studyDesign.value == null -> {
         // then the study type must also be set to null (study type requires study design)
         if (studyType == null || studyType.value != null)
-          errors.add(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE, "cannot remove study design without also removing study type")
+          errors.add(JF.CHARACTERISTICS..JF.STUDY_TYPE, "cannot remove study design without also removing study type")
       }
 
       // If the study design has been set, AND no study type value was provided
       studyType == null -> {
         // then the original must already have a study type value
-        original?.studyType.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE, errors) {}
+        original?.studyType.require(JF.CHARACTERISTICS..JF.STUDY_TYPE, errors) {}
       }
 
       // If the study design has been set, AND the client is trying to remove out the study type value.
       studyType.value == null -> {
         // No.
-        errors.add(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE)
+        errors.add(JF.CHARACTERISTICS..JF.STUDY_TYPE)
       }
     }
 
@@ -188,82 +183,25 @@ private fun StudyCharacteristicsPatch.validate(original: DatasetCharacteristics?
       // we already know the client didn't attempt to change the study design
       // value by virtue of being in this else block.
       studyType.value == null -> {
-        null.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
+        null.require(JF.CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
       }
 
       // If the client is attempting to change the study type value without also
       // providing a study design value
       else -> {
         // then the action is only valid if we already had a study design value.
-        original?.studyDesign.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
+        original?.studyDesign.require(JF.CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
       }
     }
   }
 
-  countries?.value?.validateCountries(JF.STUDY_CHARACTERISTICS, errors)
+  countries?.value?.validateCountries(JF.CHARACTERISTICS, errors)
 
-  years?.value?.validate(JF.STUDY_CHARACTERISTICS..JF.YEARS, errors)
+  years?.value?.validate(JF.CHARACTERISTICS..JF.YEARS, errors)
 
-  studySpecies?.value?.validateStudySpecies(JF.STUDY_CHARACTERISTICS, errors)
-  diseases?.value?.validateDiseases(JF.STUDY_CHARACTERISTICS, errors)
-  associatedFactors?.value?.validateAssociatedFactors(JF.STUDY_CHARACTERISTICS, errors)
-  participantAges?.value?.validateParticipantAges(JF.STUDY_CHARACTERISTICS, errors)
-  sampleTypes?.value?.validateSampleTypes(JF.STUDY_CHARACTERISTICS, errors)
+  studySpecies?.value?.validateStudySpecies(JF.CHARACTERISTICS, errors)
+  diseases?.value?.validateDiseases(JF.CHARACTERISTICS, errors)
+  associatedFactors?.value?.validateAssociatedFactors(JF.CHARACTERISTICS, errors)
+  participantAges?.value?.validateParticipantAges(JF.CHARACTERISTICS, errors)
+  sampleTypes?.value?.validateSampleTypes(JF.CHARACTERISTICS, errors)
 }
-
-private fun ExternalIdentifiersPatch.validate(errors: ValidationErrors) {
-  dois?.value?.validate(JF.EXTERNAL_IDENTIFIERS..JF.DOIS, errors)
-  hyperlinks?.value?.validate(JF.EXTERNAL_IDENTIFIERS..JF.HYPERLINKS, errors)
-  bioprojectIds?.value?.validate(JF.EXTERNAL_IDENTIFIERS..JF.BIOPROJECT_IDS, errors)
-}
-
-private fun StudyCharacteristicsPatch.applyPatch(original: DatasetCharacteristics?) =
-  DatasetCharacteristics(
-    studyDesign       = studyDesign.mapIfPresent(original?.studyDesign) { value },
-    studyType         = studyType.mapIfPresent(original?.studyType) { value },
-    countries         = countries.mapIfPresent(original?.countries) { value } ?: emptyList(),
-    years             = years.mapIfPresent(original?.years) { value?.toInternal() },
-    studySpecies      = studySpecies.mapIfPresent(original?.studySpecies) { value } ?: emptyList(),
-    diseases          = diseases.mapIfPresent(original?.diseases) { value } ?: emptyList(),
-    associatedFactors = associatedFactors.mapIfPresent(original?.associatedFactors) { value } ?: emptyList(),
-    participantAges   = participantAges.mapIfPresent(original?.participantAges) { value },
-    sampleTypes       = sampleTypes?.mapIfPresent(original?.sampleTypes) { value } ?: emptyList()
-  )
-
-private fun ExternalIdentifiersPatch.applyPatch(original: ExternalDatasetIdentifiers?) =
-  ExternalDatasetIdentifiers(
-    dois = dois.mapIfPresent(original?.dois) {
-      value?.toInternalDistinct(DOIReference::toInternal)
-    } ?: emptyList(),
-
-    hyperlinks = hyperlinks.mapIfPresent(original?.hyperlinks) {
-      value?.toInternalDistinct(DatasetHyperlink::toInternal)
-    } ?: emptyList(),
-
-    bioprojectIDs = bioprojectIds.mapIfPresent(original?.bioprojectIDs) {
-      value?.toInternalDistinct(BioprojectIDReference::toInternal)
-    } ?: emptyList()
-  )
-
-
-/**
- * Applies the given mapping function to the receiver value, if it is not null,
- * otherwise returns the given fallback value.
- *
- * Used to apply either the patch input replacement
- *
- * @receiver Nullable patch value container instance.
- *
- * @param fallback Fallback/original value to use when the patch container is
- * null.
- *
- * @param fn Mapping function to apply to convert the patch value into the type
- * expected by the consumer.
- *
- * @return The result of [fn] if the receiver is not null, otherwise [fallback].
- */
-private inline fun <R: Any, O> R?.mapIfPresent(fallback: O, fn: R.() -> O) =
-  if (this == null)
-    fallback
-  else
-    fn(this)

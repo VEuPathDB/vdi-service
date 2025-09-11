@@ -3,6 +3,7 @@ package vdi.core.db.app.sql.dataset_visibility
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import java.sql.Connection
+import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.jdbc.setUserID
 import vdi.model.data.DatasetID
@@ -14,7 +15,7 @@ private fun sql(schema: String) =
 SELECT
   1
 FROM
-  ${schema}.dataset_visibility
+  ${schema}.${Table.Visibility}
 WHERE
   dataset_id = ?
   AND user_id = ?

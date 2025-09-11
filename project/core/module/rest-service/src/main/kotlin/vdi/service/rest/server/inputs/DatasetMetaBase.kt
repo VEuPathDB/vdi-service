@@ -27,7 +27,7 @@ fun DatasetMetaBase.cleanup() {
   cleanupDistinctList(::getLinkedDatasets, LinkedDataset?::cleanup)
   cleanup(::getExperimentalOrganism, DatasetOrganism?::cleanup)
   cleanup(::getHostOrganism, DatasetOrganism?::cleanup)
-  cleanup(::getStudyCharacteristics, StudyCharacteristics?::cleanup)
+  cleanup(::getCharacteristics, DatasetCharacteristics?::cleanup)
   cleanup(::getExternalIdentifiers, ExternalIdentifiers?::cleanup)
   cleanupDistinctList(::getFunding, DatasetFundingAward?::cleanup)
 }
@@ -46,7 +46,7 @@ fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
   linkedDatasets.validate(JsonField.META..JsonField.LINKED_DATASETS, errors)
   experimentalOrganism.validate(JsonField.META..JsonField.EXPERIMENTAL_ORGANISM, errors)
   hostOrganism.validate(JsonField.META..JsonField.HOST_ORGANISM, errors)
-  studyCharacteristics?.validate(JsonField.META..JsonField.STUDY_CHARACTERISTICS, errors)
+  characteristics?.validate(JsonField.META..JsonField.CHARACTERISTICS, errors)
   externalIdentifiers.validate(JsonField.META..JsonField.EXTERNAL_IDENTIFIERS, errors)
   funding.validate(JsonField.META..JsonField.FUNDING, errors)
 }

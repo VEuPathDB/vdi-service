@@ -6,6 +6,7 @@ import io.foxcapades.kdbc.withResults
 import java.sql.Connection
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.app.model.InstallType
+import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.getInstallStatus
 import vdi.core.db.app.sql.getInstallType
 import vdi.core.db.jdbc.setDatasetID
@@ -20,7 +21,7 @@ SELECT
 , status
 , message
 FROM
-  ${schema}.dataset_install_message
+  ${schema}.${Table.InstallMessage}
 WHERE
   dataset_id = ?
 """

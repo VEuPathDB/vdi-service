@@ -17,7 +17,7 @@ import java.util.List;
     "participantAges",
     "sampleTypes"
 })
-public class StudyCharacteristicsImpl implements StudyCharacteristics {
+public class DatasetCharacteristicsImpl implements DatasetCharacteristics {
   @JsonProperty(JsonField.STUDY_DESIGN)
   private String studyDesign;
 

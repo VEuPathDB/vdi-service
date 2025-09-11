@@ -21,14 +21,14 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
    *
    * @param datasetID ID of the target dataset that should be deleted.
    */
-  fun deleteDataset(datasetID: DatasetID)
+  fun deleteDataset(datasetID: DatasetID): Boolean
 
   /**
    * Inserts a new dataset record.
    *
    * @param dataset Dataset record to insert.
    */
-  fun insertDataset(dataset: DatasetRecord)
+  fun upsertDataset(dataset: DatasetRecord)
 
   /**
    * Updates a dataset record to the new values set in the given [DatasetRecord]
@@ -37,7 +37,7 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
    * @param dataset Dataset record containing the new values to set on the row
    * in the database.
    */
-  fun updateDataset(dataset: DatasetRecord)
+  fun updateDataset(dataset: DatasetRecord): Boolean
 
   /**
    * Updates the deleted flag for a target dataset record to the given value.
@@ -47,52 +47,87 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
    *
    * @param deleteFlag The new value for the deleted flag.
    */
-  fun updateDatasetDeletedFlag(datasetID: DatasetID, deleteFlag: DeleteFlag)
+  fun updateDatasetDeletedFlag(datasetID: DatasetID, deleteFlag: DeleteFlag): Boolean
 
   // endregion dataset
 
   // region dataset_associated_factor
+
+  fun deleteAssociatedFactors(datasetID: DatasetID): Int
+
+  fun insertAssociatedFactors(datasetID: DatasetID, factors: Iterable<String>): Int
+
   // endregion dataset_associated_factor
 
   // region dataset_bioproject_id
+
+  fun deleteBioprojectIDs(datasetID: DatasetID): Int
+
+  fun insertBioprojectIDs(datasetID: DatasetID, ids: Iterable<BioprojectIDReference>): Int
+
   // endregion dataset_bioproject_id
 
   // region dataset_characteristics
+
+  fun deleteCharacteristics(datasetID: DatasetID): Boolean
+
+  fun insertCharacteristics(datasetID: DatasetID, characteristics: DatasetCharacteristics): Boolean
+
   // endregion dataset_characteristics
 
   // region dataset_contact
 
-  fun deleteDatasetContacts(datasetID: DatasetID)
+  fun deleteContacts(datasetID: DatasetID): Int
 
-  fun insertDatasetContacts(datasetID: DatasetID, contacts: Collection<DatasetContact>)
+  fun insertDatasetContacts(datasetID: DatasetID, contacts: Iterable<DatasetContact>): Int
 
   // endregion dataset_contact
 
   // region dataset_country
+
+  fun deleteCountries(datasetID: DatasetID): Int
+
+  fun insertCountries(datasetID: DatasetID, countries: Iterable<String>): Int
+
   // endregion dataset_country
 
   // region dataset_dependency
 
-  fun deleteDatasetDependencies(datasetID: DatasetID)
+  fun deleteDependencies(datasetID: DatasetID): Int
 
-  fun insertDatasetDependencies(datasetID: DatasetID, dependencies: Collection<DatasetDependency>)
+  fun insertDatasetDependencies(datasetID: DatasetID, dependencies: Iterable<DatasetDependency>): Int
 
   // endregion dataset_dependency
 
   // region dataset_disease
+
+  fun deleteDiseases(datasetID: DatasetID): Int
+
+  fun insertDiseases(datasetID: DatasetID, diseases: Iterable<String>): Int
+
   // endregion dataset_disease
 
   // region dataset_doi
+
+  fun deleteDOIs(datasetID: DatasetID): Int
+
+  fun insertDOIs(datasetID: DatasetID, dois: Iterable<DOIReference>): Int
+
   // endregion dataset_doi
 
   // region dataset_funding_award
+
+  fun deleteFundingAwards(datasetID: DatasetID): Int
+
+  fun insertFundingAwards(datasetID: DatasetID, awards: Iterable<DatasetFundingAward>): Int
+
   // endregion dataset_funding_award
 
   // region dataset_hyperlink
 
-  fun deleteDatasetHyperlinks(datasetID: DatasetID)
+  fun deleteHyperlinks(datasetID: DatasetID): Int
 
-  fun insertDatasetHyperlinks(datasetID: DatasetID, hyperlinks: Collection<DatasetHyperlink>)
+  fun insertHyperlinks(datasetID: DatasetID, hyperlinks: Iterable<DatasetHyperlink>): Int
 
   // endregion dataset_hyperlink
 
@@ -142,6 +177,11 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
   // endregion dataset_install_message
 
   // region dataset_link
+
+  fun deleteExternalDatasetLinks(datasetID: DatasetID): Int
+
+  fun insertExternalDatasetLinks(datasetID: DatasetID, otherDatasets: Iterable<LinkedDataset>): Int
+
   // endregion dataset_link
 
   // region dataset_meta
@@ -175,9 +215,11 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // region dataset_organism
 
-  fun deleteDatasetOrganisms(datasetID: DatasetID)
+  fun deleteDatasetOrganisms(datasetID: DatasetID): Int
 
-  fun insertDatasetOrganism(datasetID: DatasetID, organism: DatasetOrganism)
+  fun insertExperimentalOrganism(datasetID: DatasetID, organism: DatasetOrganism): Boolean
+
+  fun insertHostOrganism(datasetID: DatasetID, organism: DatasetOrganism): Boolean
 
   // endregion dataset_organism
 
@@ -230,16 +272,26 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // region dataset_publication
 
-  fun deleteDatasetPublications(datasetID: DatasetID)
+  fun deleteDatasetPublications(datasetID: DatasetID): Int
 
-  fun insertDatasetPublications(datasetID: DatasetID, publications: Collection<DatasetPublication>)
+  fun insertDatasetPublications(datasetID: DatasetID, publications: Iterable<DatasetPublication>): Int
 
   // endregion dataset_publication
 
   // region dataset_sample_type
+
+  fun deleteSampleTypes(datasetID: DatasetID): Int
+
+  fun insertSampleTypes(datasetID: DatasetID, sampleTypes: Iterable<String>): Int
+
   // endregion dataset_sample_type
 
   // region dataset_species
+
+  fun deleteSpecies(datasetID: DatasetID): Int
+
+  fun insertSpecies(datasetID: DatasetID, species: Iterable<String>): Int
+
   // endregion dataset_species
 
   // region dataset_visibility
@@ -253,7 +305,7 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
    * @param userID ID of the use for which the dataset visibility record should
    * be deleted.
    */
-  fun deleteDatasetVisibility(datasetID: DatasetID, userID: UserID)
+  fun deleteDatasetVisibility(datasetID: DatasetID, userID: UserID): Boolean
 
   /**
    * Deletes the dataset visibility records for a target dataset.
@@ -265,7 +317,7 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
    * @param datasetID ID of the target dataset whose visibility records should
    * be deleted.
    */
-  fun deleteDatasetVisibilities(datasetID: DatasetID)
+  fun deleteDatasetVisibilities(datasetID: DatasetID): Int
 
   /**
    * Inserts a new dataset visibility record for a target dataset and user.

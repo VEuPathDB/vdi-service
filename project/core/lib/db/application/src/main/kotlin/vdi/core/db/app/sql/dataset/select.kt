@@ -6,6 +6,7 @@ import java.sql.Connection
 import java.time.LocalDateTime
 import java.time.ZoneId
 import vdi.core.db.app.model.DatasetRecord
+import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.getDeleteFlag
 import vdi.core.db.jdbc.getDataType
 import vdi.core.db.jdbc.getUserID
@@ -31,7 +32,7 @@ SELECT
 , days_for_approval
 , creation_date
 FROM
-  ${schema}.dataset
+  ${schema}.${Table.Dataset}
 WHERE
   dataset_id = ?
 """

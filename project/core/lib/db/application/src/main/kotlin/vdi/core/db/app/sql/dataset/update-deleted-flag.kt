@@ -3,6 +3,7 @@ package vdi.core.db.app.sql.dataset
 import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.model.DeleteFlag
+import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.setDeleteFlag
 import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
@@ -11,7 +12,7 @@ private fun sql(schema: String) =
 // language=postgresql
 """
 UPDATE
-  ${schema}.dataset
+  ${schema}.${Table.Dataset}
 SET
   is_deleted = ?
 WHERE

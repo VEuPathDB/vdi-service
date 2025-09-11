@@ -12,10 +12,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "isPrimary",
     "email",
     "affiliation",
-    "country",
-    "city",
-    "state",
-    "address"
+    "country"
 })
 public class DatasetContactImpl implements DatasetContact {
   @JsonProperty(JsonField.FIRST_NAME)
@@ -41,15 +38,6 @@ public class DatasetContactImpl implements DatasetContact {
 
   @JsonProperty(JsonField.COUNTRY)
   private String country;
-
-  @JsonProperty(JsonField.CITY)
-  private String city;
-
-  @JsonProperty(JsonField.STATE)
-  private String state;
-
-  @JsonProperty(JsonField.ADDRESS)
-  private String address;
 
   @JsonProperty(JsonField.FIRST_NAME)
   public String getFirstName() {
@@ -125,35 +113,5 @@ public class DatasetContactImpl implements DatasetContact {
   @JsonProperty(JsonField.COUNTRY)
   public void setCountry(String country) {
     this.country = country;
-  }
-
-  @JsonProperty(JsonField.CITY)
-  public String getCity() {
-    return this.city;
-  }
-
-  @JsonProperty(JsonField.CITY)
-  public void setCity(String city) {
-    this.city = city;
-  }
-
-  @JsonProperty(JsonField.STATE)
-  public String getState() {
-    return this.state;
-  }
-
-  @JsonProperty(JsonField.STATE)
-  public void setState(String state) {
-    this.state = state;
-  }
-
-  @JsonProperty(JsonField.ADDRESS)
-  public String getAddress() {
-    return this.address;
-  }
-
-  @JsonProperty(JsonField.ADDRESS)
-  public void setAddress(String address) {
-    this.address = address;
   }
 }

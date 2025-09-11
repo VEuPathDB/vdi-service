@@ -33,3 +33,5 @@ fun APIBioReference.validatePatch(og: APIBioReference, jPath: String, errors: Va
   requireUnpatched(og, jPath, errors, APIBioReference::getId)
 }
 
+fun Iterable<APIBioReference>.toInternal() =
+  map { BioprojectIDReference(it.id, it.description) }

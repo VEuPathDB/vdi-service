@@ -7,6 +7,7 @@ import java.sql.Connection
 import vdi.core.db.app.model.DatasetInstallMessage
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
+import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.setInstallType
 import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
@@ -19,7 +20,7 @@ SELECT
 , message
 , updated
 FROM
-  ${schema}.dataset_install_message
+  ${schema}.${Table.InstallMessage}
 WHERE
   dataset_id = ?
   AND install_type = ?

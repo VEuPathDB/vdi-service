@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 
 @JsonDeserialize(
-    as = StudyCharacteristicsImpl.class
+    as = DatasetCharacteristicsImpl.class
 )
-public interface StudyCharacteristics {
+public interface DatasetCharacteristics {
   @JsonProperty(JsonField.STUDY_DESIGN)
   String getStudyDesign();
 

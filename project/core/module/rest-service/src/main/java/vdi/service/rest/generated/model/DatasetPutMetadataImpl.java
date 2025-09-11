@@ -3,7 +3,6 @@ package vdi.service.rest.generated.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -17,51 +16,63 @@ import java.util.List;
     "projectName",
     "programName",
     "linkedDatasets",
-    "studyCharacteristics",
+    "experimentalOrganism",
+    "hostOrganism",
+    "characteristics",
     "externalIdentifiers",
     "funding",
+    "shortAttribution",
     "origin",
     "revisionNote"
 })
 public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.TYPE)
-  private DatasetPutMetadata.TypeType type;
+  private DatasetTypePatch type;
 
   @JsonProperty(JsonField.VISIBILITY)
-  private DatasetPutMetadata.VisibilityType visibility;
+  private VisibilityPatch visibility;
 
   @JsonProperty(JsonField.NAME)
-  private DatasetPutMetadata.NameType name;
+  private StringPatch name;
 
   @JsonProperty(JsonField.SUMMARY)
-  private DatasetPutMetadata.SummaryType summary;
+  private StringPatch summary;
 
   @JsonProperty(JsonField.DESCRIPTION)
-  private DatasetPutMetadata.DescriptionType description;
+  private StringPatch description;
 
   @JsonProperty(JsonField.PUBLICATIONS)
-  private DatasetPutMetadata.PublicationsType publications;
+  private PublicationsPatch publications;
 
   @JsonProperty(JsonField.CONTACTS)
-  private DatasetPutMetadata.ContactsType contacts;
+  private ContactsPatch contacts;
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  private DatasetPutMetadata.ProjectNameType projectName;
+  private StringPatch projectName;
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  private DatasetPutMetadata.ProgramNameType programName;
+  private StringPatch programName;
 
   @JsonProperty(JsonField.LINKED_DATASETS)
-  private DatasetPutMetadata.LinkedDatasetsType linkedDatasets;
+  private LinkedDatasetPatch linkedDatasets;
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  private StudyCharacteristicsPatch studyCharacteristics;
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
+  private OrganismPatch experimentalOrganism;
+
+  @JsonProperty(JsonField.HOST_ORGANISM)
+  private OrganismPatch hostOrganism;
+
+  @JsonProperty(JsonField.CHARACTERISTICS)
+  private DatasetCharacteristicsPatch characteristics;
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
   private ExternalIdentifiersPatch externalIdentifiers;
 
   @JsonProperty(JsonField.FUNDING)
-  private DatasetPutMetadata.FundingType funding;
+  private FundingPatch funding;
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  private StringPatch shortAttribution;
 
   @JsonProperty(JsonField.ORIGIN)
   private String origin;
@@ -70,113 +81,133 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   private String revisionNote;
 
   @JsonProperty(JsonField.TYPE)
-  public DatasetPutMetadata.TypeType getType() {
+  public DatasetTypePatch getType() {
     return this.type;
   }
 
   @JsonProperty(JsonField.TYPE)
-  public void setType(DatasetPutMetadata.TypeType type) {
+  public void setType(DatasetTypePatch type) {
     this.type = type;
   }
 
   @JsonProperty(JsonField.VISIBILITY)
-  public DatasetPutMetadata.VisibilityType getVisibility() {
+  public VisibilityPatch getVisibility() {
     return this.visibility;
   }
 
   @JsonProperty(JsonField.VISIBILITY)
-  public void setVisibility(DatasetPutMetadata.VisibilityType visibility) {
+  public void setVisibility(VisibilityPatch visibility) {
     this.visibility = visibility;
   }
 
   @JsonProperty(JsonField.NAME)
-  public DatasetPutMetadata.NameType getName() {
+  public StringPatch getName() {
     return this.name;
   }
 
   @JsonProperty(JsonField.NAME)
-  public void setName(DatasetPutMetadata.NameType name) {
+  public void setName(StringPatch name) {
     this.name = name;
   }
 
   @JsonProperty(JsonField.SUMMARY)
-  public DatasetPutMetadata.SummaryType getSummary() {
+  public StringPatch getSummary() {
     return this.summary;
   }
 
   @JsonProperty(JsonField.SUMMARY)
-  public void setSummary(DatasetPutMetadata.SummaryType summary) {
+  public void setSummary(StringPatch summary) {
     this.summary = summary;
   }
 
   @JsonProperty(JsonField.DESCRIPTION)
-  public DatasetPutMetadata.DescriptionType getDescription() {
+  public StringPatch getDescription() {
     return this.description;
   }
 
   @JsonProperty(JsonField.DESCRIPTION)
-  public void setDescription(DatasetPutMetadata.DescriptionType description) {
+  public void setDescription(StringPatch description) {
     this.description = description;
   }
 
   @JsonProperty(JsonField.PUBLICATIONS)
-  public DatasetPutMetadata.PublicationsType getPublications() {
+  public PublicationsPatch getPublications() {
     return this.publications;
   }
 
   @JsonProperty(JsonField.PUBLICATIONS)
-  public void setPublications(DatasetPutMetadata.PublicationsType publications) {
+  public void setPublications(PublicationsPatch publications) {
     this.publications = publications;
   }
 
   @JsonProperty(JsonField.CONTACTS)
-  public DatasetPutMetadata.ContactsType getContacts() {
+  public ContactsPatch getContacts() {
     return this.contacts;
   }
 
   @JsonProperty(JsonField.CONTACTS)
-  public void setContacts(DatasetPutMetadata.ContactsType contacts) {
+  public void setContacts(ContactsPatch contacts) {
     this.contacts = contacts;
   }
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  public DatasetPutMetadata.ProjectNameType getProjectName() {
+  public StringPatch getProjectName() {
     return this.projectName;
   }
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  public void setProjectName(DatasetPutMetadata.ProjectNameType projectName) {
+  public void setProjectName(StringPatch projectName) {
     this.projectName = projectName;
   }
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  public DatasetPutMetadata.ProgramNameType getProgramName() {
+  public StringPatch getProgramName() {
     return this.programName;
   }
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  public void setProgramName(DatasetPutMetadata.ProgramNameType programName) {
+  public void setProgramName(StringPatch programName) {
     this.programName = programName;
   }
 
   @JsonProperty(JsonField.LINKED_DATASETS)
-  public DatasetPutMetadata.LinkedDatasetsType getLinkedDatasets() {
+  public LinkedDatasetPatch getLinkedDatasets() {
     return this.linkedDatasets;
   }
 
   @JsonProperty(JsonField.LINKED_DATASETS)
-  public void setLinkedDatasets(DatasetPutMetadata.LinkedDatasetsType linkedDatasets) {
+  public void setLinkedDatasets(LinkedDatasetPatch linkedDatasets) {
     this.linkedDatasets = linkedDatasets;
   }
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  public StudyCharacteristicsPatch getStudyCharacteristics() {
-    return this.studyCharacteristics;
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
+  public OrganismPatch getExperimentalOrganism() {
+    return this.experimentalOrganism;
   }
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  public void setStudyCharacteristics(StudyCharacteristicsPatch studyCharacteristics) {
-    this.studyCharacteristics = studyCharacteristics;
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
+  public void setExperimentalOrganism(OrganismPatch experimentalOrganism) {
+    this.experimentalOrganism = experimentalOrganism;
+  }
+
+  @JsonProperty(JsonField.HOST_ORGANISM)
+  public OrganismPatch getHostOrganism() {
+    return this.hostOrganism;
+  }
+
+  @JsonProperty(JsonField.HOST_ORGANISM)
+  public void setHostOrganism(OrganismPatch hostOrganism) {
+    this.hostOrganism = hostOrganism;
+  }
+
+  @JsonProperty(JsonField.CHARACTERISTICS)
+  public DatasetCharacteristicsPatch getCharacteristics() {
+    return this.characteristics;
+  }
+
+  @JsonProperty(JsonField.CHARACTERISTICS)
+  public void setCharacteristics(DatasetCharacteristicsPatch characteristics) {
+    this.characteristics = characteristics;
   }
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
@@ -190,13 +221,23 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonProperty(JsonField.FUNDING)
-  public DatasetPutMetadata.FundingType getFunding() {
+  public FundingPatch getFunding() {
     return this.funding;
   }
 
   @JsonProperty(JsonField.FUNDING)
-  public void setFunding(DatasetPutMetadata.FundingType funding) {
+  public void setFunding(FundingPatch funding) {
     this.funding = funding;
+  }
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  public StringPatch getShortAttribution() {
+    return this.shortAttribution;
+  }
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  public void setShortAttribution(StringPatch shortAttribution) {
+    this.shortAttribution = shortAttribution;
   }
 
   @JsonProperty(JsonField.ORIGIN)
@@ -217,192 +258,5 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.REVISION_NOTE)
   public void setRevisionNote(String revisionNote) {
     this.revisionNote = revisionNote;
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class SummaryTypeImpl implements DatasetPutMetadata.SummaryType {
-    @JsonProperty("value")
-    private String value;
-
-    @JsonProperty("value")
-    public String getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(String value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class FundingTypeImpl implements DatasetPutMetadata.FundingType {
-    @JsonProperty("value")
-    private List<DatasetFundingAward> value;
-
-    @JsonProperty("value")
-    public List<DatasetFundingAward> getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(List<DatasetFundingAward> value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class VisibilityTypeImpl implements DatasetPutMetadata.VisibilityType {
-    @JsonProperty("value")
-    private DatasetVisibility value;
-
-    @JsonProperty("value")
-    public DatasetVisibility getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(DatasetVisibility value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class ProgramNameTypeImpl implements DatasetPutMetadata.ProgramNameType {
-    @JsonProperty("value")
-    private String value;
-
-    @JsonProperty("value")
-    public String getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(String value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class NameTypeImpl implements DatasetPutMetadata.NameType {
-    @JsonProperty("value")
-    private String value;
-
-    @JsonProperty("value")
-    public String getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(String value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class DescriptionTypeImpl implements DatasetPutMetadata.DescriptionType {
-    @JsonProperty("value")
-    private String value;
-
-    @JsonProperty("value")
-    public String getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(String value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class TypeTypeImpl implements DatasetPutMetadata.TypeType {
-    @JsonProperty("value")
-    private DatasetTypeInput value;
-
-    @JsonProperty("value")
-    public DatasetTypeInput getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(DatasetTypeInput value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class ProjectNameTypeImpl implements DatasetPutMetadata.ProjectNameType {
-    @JsonProperty("value")
-    private String value;
-
-    @JsonProperty("value")
-    public String getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(String value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class ContactsTypeImpl implements DatasetPutMetadata.ContactsType {
-    @JsonProperty("value")
-    private List<DatasetContact> value;
-
-    @JsonProperty("value")
-    public List<DatasetContact> getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(List<DatasetContact> value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class LinkedDatasetsTypeImpl implements DatasetPutMetadata.LinkedDatasetsType {
-    @JsonProperty("value")
-    private List<LinkedDataset> value;
-
-    @JsonProperty("value")
-    public List<LinkedDataset> getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(List<LinkedDataset> value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class PublicationsTypeImpl implements DatasetPutMetadata.PublicationsType {
-    @JsonProperty("value")
-    private List<DatasetPublication> value;
-
-    @JsonProperty("value")
-    public List<DatasetPublication> getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(List<DatasetPublication> value) {
-      this.value = value;
-    }
   }
 }

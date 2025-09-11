@@ -2,77 +2,88 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.List;
 
 @JsonDeserialize(
     as = DatasetPatchRequestBodyImpl.class
 )
 public interface DatasetPatchRequestBody {
   @JsonProperty(JsonField.TYPE)
-  TypeType getType();
+  DatasetTypePatch getType();
 
   @JsonProperty(JsonField.TYPE)
-  void setType(TypeType type);
+  void setType(DatasetTypePatch type);
 
   @JsonProperty(JsonField.VISIBILITY)
-  VisibilityType getVisibility();
+  VisibilityPatch getVisibility();
 
   @JsonProperty(JsonField.VISIBILITY)
-  void setVisibility(VisibilityType visibility);
+  void setVisibility(VisibilityPatch visibility);
 
   @JsonProperty(JsonField.NAME)
-  NameType getName();
+  StringPatch getName();
 
   @JsonProperty(JsonField.NAME)
-  void setName(NameType name);
+  void setName(StringPatch name);
 
   @JsonProperty(JsonField.SUMMARY)
-  SummaryType getSummary();
+  StringPatch getSummary();
 
   @JsonProperty(JsonField.SUMMARY)
-  void setSummary(SummaryType summary);
+  void setSummary(StringPatch summary);
 
   @JsonProperty(JsonField.DESCRIPTION)
-  DescriptionType getDescription();
+  StringPatch getDescription();
 
   @JsonProperty(JsonField.DESCRIPTION)
-  void setDescription(DescriptionType description);
+  void setDescription(StringPatch description);
 
   @JsonProperty(JsonField.PUBLICATIONS)
-  PublicationsType getPublications();
+  PublicationsPatch getPublications();
 
   @JsonProperty(JsonField.PUBLICATIONS)
-  void setPublications(PublicationsType publications);
+  void setPublications(PublicationsPatch publications);
 
   @JsonProperty(JsonField.CONTACTS)
-  ContactsType getContacts();
+  ContactsPatch getContacts();
 
   @JsonProperty(JsonField.CONTACTS)
-  void setContacts(ContactsType contacts);
+  void setContacts(ContactsPatch contacts);
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  ProjectNameType getProjectName();
+  StringPatch getProjectName();
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  void setProjectName(ProjectNameType projectName);
+  void setProjectName(StringPatch projectName);
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  ProgramNameType getProgramName();
+  StringPatch getProgramName();
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  void setProgramName(ProgramNameType programName);
+  void setProgramName(StringPatch programName);
 
   @JsonProperty(JsonField.LINKED_DATASETS)
-  LinkedDatasetsType getLinkedDatasets();
+  LinkedDatasetPatch getLinkedDatasets();
 
   @JsonProperty(JsonField.LINKED_DATASETS)
-  void setLinkedDatasets(LinkedDatasetsType linkedDatasets);
+  void setLinkedDatasets(LinkedDatasetPatch linkedDatasets);
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  StudyCharacteristicsPatch getStudyCharacteristics();
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
+  OrganismPatch getExperimentalOrganism();
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  void setStudyCharacteristics(StudyCharacteristicsPatch studyCharacteristics);
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
+  void setExperimentalOrganism(OrganismPatch experimentalOrganism);
+
+  @JsonProperty(JsonField.HOST_ORGANISM)
+  OrganismPatch getHostOrganism();
+
+  @JsonProperty(JsonField.HOST_ORGANISM)
+  void setHostOrganism(OrganismPatch hostOrganism);
+
+  @JsonProperty(JsonField.CHARACTERISTICS)
+  DatasetCharacteristicsPatch getCharacteristics();
+
+  @JsonProperty(JsonField.CHARACTERISTICS)
+  void setCharacteristics(DatasetCharacteristicsPatch characteristics);
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
   ExternalIdentifiersPatch getExternalIdentifiers();
@@ -81,129 +92,14 @@ public interface DatasetPatchRequestBody {
   void setExternalIdentifiers(ExternalIdentifiersPatch externalIdentifiers);
 
   @JsonProperty(JsonField.FUNDING)
-  FundingType getFunding();
+  FundingPatch getFunding();
 
   @JsonProperty(JsonField.FUNDING)
-  void setFunding(FundingType funding);
+  void setFunding(FundingPatch funding);
 
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.SummaryTypeImpl.class
-  )
-  interface SummaryType {
-    @JsonProperty("value")
-    String getValue();
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  StringPatch getShortAttribution();
 
-    @JsonProperty("value")
-    void setValue(String value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.FundingTypeImpl.class
-  )
-  interface FundingType {
-    @JsonProperty("value")
-    List<DatasetFundingAward> getValue();
-
-    @JsonProperty("value")
-    void setValue(List<DatasetFundingAward> value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.VisibilityTypeImpl.class
-  )
-  interface VisibilityType {
-    @JsonProperty("value")
-    DatasetVisibility getValue();
-
-    @JsonProperty("value")
-    void setValue(DatasetVisibility value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.ProgramNameTypeImpl.class
-  )
-  interface ProgramNameType {
-    @JsonProperty("value")
-    String getValue();
-
-    @JsonProperty("value")
-    void setValue(String value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.NameTypeImpl.class
-  )
-  interface NameType {
-    @JsonProperty("value")
-    String getValue();
-
-    @JsonProperty("value")
-    void setValue(String value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.DescriptionTypeImpl.class
-  )
-  interface DescriptionType {
-    @JsonProperty("value")
-    String getValue();
-
-    @JsonProperty("value")
-    void setValue(String value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.TypeTypeImpl.class
-  )
-  interface TypeType {
-    @JsonProperty("value")
-    DatasetTypeInput getValue();
-
-    @JsonProperty("value")
-    void setValue(DatasetTypeInput value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.ProjectNameTypeImpl.class
-  )
-  interface ProjectNameType {
-    @JsonProperty("value")
-    String getValue();
-
-    @JsonProperty("value")
-    void setValue(String value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.ContactsTypeImpl.class
-  )
-  interface ContactsType {
-    @JsonProperty("value")
-    List<DatasetContact> getValue();
-
-    @JsonProperty("value")
-    void setValue(List<DatasetContact> value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.LinkedDatasetsTypeImpl.class
-  )
-  interface LinkedDatasetsType {
-    @JsonProperty("value")
-    List<LinkedDataset> getValue();
-
-    @JsonProperty("value")
-    void setValue(List<LinkedDataset> value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetPatchRequestBodyImpl.PublicationsTypeImpl.class
-  )
-  interface PublicationsType {
-    @JsonProperty("value")
-    List<DatasetPublication> getValue();
-
-    @JsonProperty("value")
-    void setValue(List<DatasetPublication> value);
-  }
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  void setShortAttribution(StringPatch shortAttribution);
 }

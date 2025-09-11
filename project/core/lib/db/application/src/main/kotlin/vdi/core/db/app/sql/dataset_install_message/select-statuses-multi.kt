@@ -8,6 +8,7 @@ import kotlin.math.max
 import kotlin.math.min
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.app.model.InstallType
+import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.getInstallStatus
 import vdi.core.db.app.sql.getInstallType
 import vdi.core.db.jdbc.reqDatasetID
@@ -23,7 +24,7 @@ SELECT
 , status
 , message
 FROM
-  ${schema}.dataset_install_message
+  ${schema}.${Table.InstallMessage}
 WHERE
   dataset_id IN (
 """

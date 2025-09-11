@@ -1,11 +1,11 @@
-@file:JvmName("StudyCharacteristicsInputAdaptor")
+@file:JvmName("DatasetCharacteristicsInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
 import vdi.model.data.DatasetCharacteristics
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.SampleYearRange as APIYearRange
-import vdi.service.rest.generated.model.StudyCharacteristics as APIStudyCharacteristics
+import vdi.service.rest.generated.model.DatasetCharacteristics as APIDatasetCharacteristics
 
 private val CommonLengthRange = 3..128
 
@@ -17,7 +17,7 @@ private val ParticipantAgeValidLength = CommonLengthRange
 private val SampleTypeValidLength = CommonLengthRange
 
 
-fun APIStudyCharacteristics?.cleanup() = this?.also {
+fun APIDatasetCharacteristics?.cleanup() = this?.also {
   cleanupString(::getStudyDesign)
   cleanupString(::getStudyType)
   cleanupDistinctList(::getCountries, String?::cleanup)
@@ -29,7 +29,7 @@ fun APIStudyCharacteristics?.cleanup() = this?.also {
   cleanupDistinctList(::getSampleTypes, String?::cleanup)
 }
 
-fun APIStudyCharacteristics.validate(jPath: String, errors: ValidationErrors) {
+fun APIDatasetCharacteristics.validate(jPath: String, errors: ValidationErrors) {
   if (studyDesign != null) {
     studyType.require(jPath..JsonField.STUDY_TYPE, errors) {}
   } else if (studyType != null) {
@@ -66,7 +66,7 @@ fun List<String>.validateDiseases(jPath: String, errors: ValidationErrors) =
 fun List<String>.validateAssociatedFactors(jPath: String, errors: ValidationErrors) =
   reqEntriesCheckLength(jPath..JsonField.ASSOCIATED_FACTORS, AssociatedFactorValidLength, errors)
 
-fun APIStudyCharacteristics.toInternal() =
+fun APIDatasetCharacteristics.toInternal() =
   DatasetCharacteristics(
     studyDesign  = studyDesign,
     studyType    = studyType,

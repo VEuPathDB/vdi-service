@@ -211,14 +211,10 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
    * Attempts to insert dataset revision history link records from dataset
    * revisions to the original dataset ID, skipping any conflicting records.
    *
-   * @param originalID ID of the first dataset upload in the revision history.
-   *
-   * @param revisions Dataset revision details.
-   *
    * @return The number of records that were actually inserted as a result of
    * this method call.
    */
-  fun tryInsertRevisionLinks(originalID: DatasetID, revisions: Iterable<DatasetRevision>): Int
+  fun tryInsertRevisionLinks(history: DatasetRevisionHistory): Int
 
   /**
    * Attempts to insert dataset publications records for a target dataset,
@@ -308,7 +304,7 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
 
   fun upsertImportControl(datasetID: DatasetID, status: DatasetImportStatus)
 
-  fun upsertImportMessages(datasetID: DatasetID, messages: String)
+  fun upsertImportMessages(datasetID: DatasetID, messages: Iterable<String>)
 
   // endregion Upsert
 

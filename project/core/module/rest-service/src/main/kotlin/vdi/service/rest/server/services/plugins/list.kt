@@ -19,8 +19,8 @@ internal fun listPlugins(project: String?): List<PluginListItem> {
 
 private fun PluginListItem(p: Pair<DatasetType, PluginDetails>): PluginListItem =
   PluginListItemImpl().also {
-    it.displayName = p.second.displayName
-    it.projects = p.second.projects
-    it.typeName = p.first.name.toString()
-    it.typeVersion = p.first.version
+    it.displayName    = p.second.displayName
+    it.installTargets = p.second.projects
+    it.typeName       = p.first.name.toString()
+    it.typeVersion    = p.first.version
   }

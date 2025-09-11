@@ -27,7 +27,6 @@ import vdi.core.db.cache.sql.import_control.tryInsertImportControl
 import vdi.core.db.cache.sql.import_control.updateDatasetImportStatus
 import vdi.core.db.cache.sql.import_control.upsertImportControl
 import vdi.core.db.cache.sql.import_messages.deleteImportMessages
-import vdi.core.db.cache.sql.import_messages.tryInsertImportMessages
 import vdi.core.db.cache.sql.import_messages.upsertImportMessages
 import vdi.core.db.cache.sql.install_files.tryInsertInstallFiles
 import vdi.core.db.cache.sql.sync_control.tryInsertSyncControl
@@ -121,16 +120,16 @@ internal class CacheDBTransactionImpl(
       log.debug("inserted sync control record for dataset {}", record.datasetID) }
 
   override fun tryInsertImportMessages(datasetID: DatasetID, messages: Iterable<String>) =
-    runQuery { tryInsertImportMessages(datasetID, messages) }.also { if (it > 0)
+    runQuery { upsertImportMessages(datasetID, messages) }.also { if (it > 0)
       log.debug("inserted {} import messages for dataset {}", it, datasetID) }
 
   override fun tryInsertRevisionLink(originalID: DatasetID, revision: DatasetRevision) =
     (runQuery { tryInsertDatasetRevision(originalID, revision) } > 0).also { if (it)
       log.debug("inserted revision link from dataset {} to revision {}", originalID, revision.revisionID) }
 
-  override fun tryInsertRevisionLinks(originalID: DatasetID, revisions: Iterable<DatasetRevision>) =
-    runQuery { tryInsertDatasetRevisions(originalID, revisions) }.also { if (it > 0)
-      log.debug("inserted {} revision links for dataset {}", it, originalID) }
+  override fun tryInsertRevisionLinks(history: DatasetRevisionHistory) =
+    runQuery { tryInsertDatasetRevisions(history.originalID, history.revisions) }.also { if (it > 0)
+      log.debug("inserted {} revision links for dataset {}", it, history.originalID) }
 
   override fun tryInsertPublications(datasetID: DatasetID, publications: Iterable<DatasetPublication>) =
     runQuery { tryInsertPublications(datasetID, publications) }.also { if (it > 0)
@@ -177,7 +176,7 @@ internal class CacheDBTransactionImpl(
     runQuery { upsertImportControl(datasetID, status) }
   }
 
-  override fun upsertImportMessages(datasetID: DatasetID, messages: String) {
+  override fun upsertImportMessages(datasetID: DatasetID, messages: Iterable<String>) {
     log.debug("upserting import messages for dataset {}", datasetID)
     runQuery { upsertImportMessages(datasetID, messages) }
   }

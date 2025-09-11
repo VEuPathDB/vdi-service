@@ -3,6 +3,7 @@ package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
+import vdi.model.data.DatasetMetadata
 import vdi.model.data.InstallTargetID
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 
@@ -17,7 +18,7 @@ fun DatasetPutRequestBody.cleanup() {
 }
 
 @Suppress("DuplicatedCode") // overlap in generated API pojo field names
-fun DatasetPutRequestBody.validate(projects: Iterable<InstallTargetID>): ValidationErrors {
+fun DatasetPutRequestBody.validate(original: DatasetMetadata): ValidationErrors {
   // DatasetPutRequestBody is not a JSON object, it is a multipart/form-data
   // request.  The "fields" are form parts and are not validated as if they are
   // part of a syntactically correct JSON body.
@@ -35,5 +36,5 @@ fun DatasetPutRequestBody.validate(projects: Iterable<InstallTargetID>): Validat
     throw BadRequestException("cannot provide both an upload file and a source file URL")
   }
 
-  return ValidationErrors().also { details.validate(projects, it) }
+  return ValidationErrors().also { details.validate(original, it) }
 }

@@ -74,18 +74,6 @@ types:
           * Dataset is public/community
         type: string
         maxLength: 200
-      city?:
-        type: string
-        minLength: 3
-        maxLength: 200
-      state?:
-        type: string
-        minLength: 3
-        maxLength: 200
-      address?:
-        type: string
-        minLength: 5
-        maxLength: 1000
 
   DatasetCreationDate:
     displayName: Dataset Creation Date
@@ -244,11 +232,12 @@ types:
           Optional for ClinEpi.
         type: DatasetOrganism
       hostOrganism?: DatasetOrganism
-      studyCharacteristics?: StudyCharacteristics
+      characteristics?: DatasetCharacteristics
       externalIdentifiers?: ExternalIdentifiers
       funding?:
         type: DatasetFundingAward[]
         uniqueItems: true
+      shortAttribution?: ShortAttribution
       # revisionHistory: (only present in response types)
     additionalProperties: false
 
@@ -347,6 +336,8 @@ types:
     displayName: Dataset Revision Action
     type: string
     enum:
+    - create
+    - extend
     - revise
 
   DatasetSourceUrl:
@@ -399,6 +390,16 @@ types:
     - private
     - protected
     - public
+
+  ShortName:
+    type: string
+    minLength: 3
+    maxLength: 20
+
+  ShortAttribution:
+    type: string
+    minLength: 3
+    maxLength: 40
 
   DOIReference:
     type: object
@@ -496,7 +497,7 @@ types:
     - accept
     - reject
 
-  StudyCharacteristics:
+  DatasetCharacteristics:
     type: object
     additionalProperties: false
     properties:

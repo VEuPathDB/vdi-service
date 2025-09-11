@@ -4,11 +4,11 @@ import vdi.model.data.SampleYearRange
 import vdi.model.data.DatasetCharacteristics
 import vdi.service.rest.generated.model.SampleYearRangeImpl
 import vdi.service.rest.generated.model.SampleYearRange as APIYears
-import vdi.service.rest.generated.model.StudyCharacteristicsImpl
-import vdi.service.rest.generated.model.StudyCharacteristics as APICharacteristics
+import vdi.service.rest.generated.model.DatasetCharacteristicsImpl
+import vdi.service.rest.generated.model.DatasetCharacteristics as APICharacteristics
 
-internal fun StudyCharacteristics(characteristics: DatasetCharacteristics): APICharacteristics =
-  StudyCharacteristicsImpl().also {
+internal fun DatasetCharacteristics(characteristics: DatasetCharacteristics): APICharacteristics =
+  DatasetCharacteristicsImpl().also {
     it.studyDesign       = characteristics.studyDesign
     it.studyType         = characteristics.studyType
     it.countries         = characteristics.countries

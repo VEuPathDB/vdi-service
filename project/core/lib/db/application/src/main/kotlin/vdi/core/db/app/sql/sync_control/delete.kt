@@ -2,6 +2,7 @@ package vdi.core.db.app.sql.sync_control
 
 import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
+import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
 
@@ -9,7 +10,7 @@ private fun sql(schema: String) =
 // language=postgresql
 """
 DELETE FROM
-  ${schema}.sync_control
+  ${schema}.${Table.SyncControl}
 WHERE
   dataset_id = ?
 """

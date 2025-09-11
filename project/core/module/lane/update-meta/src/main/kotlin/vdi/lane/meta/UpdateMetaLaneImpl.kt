@@ -33,6 +33,7 @@ import vdi.core.plugin.client.response.inm.InstallMetaResponseType
 import vdi.core.plugin.client.response.inm.InstallMetaUnexpectedErrorResponse
 import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.plugin.mapping.PluginHandlers
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
 import vdi.model.DatasetMetaFilename
@@ -213,38 +214,85 @@ internal class UpdateMetaLaneImpl(
       return
     }
 
+    // Record types to upsert:
+    // * dataset_bioproject_id
+    // * dataset_country
+    // * dataset_disease
+    // * dataset_doi
+    // * dataset_funding_award
+    // * dataset_hyperlink
+    // * dataset_link
+    // * dataset_project
+    // * dataset_sample_type
+    // * dataset_species
     appDB.withTransaction(installTarget, ph.type) {
       try {
+        // "constant" records created in this call:
+        // * dataset
+        // * dataset_meta
+        // * dataset_dependencies
+        // * dataset_visibility (owner id record only)
         val record = it.getOrInsertDatasetRecord(userID, datasetID, installTarget, meta)
 
         // If the record in the app db has an isPublic flag value different from
         // what we expect, update the app db record.
         if (record.isPublic != (meta.visibility == DatasetVisibility.Public)) {
-          it.updateDataset(record.copy(isPublic = meta.visibility == DatasetVisibility.Public))
+          it.updateDataset(record.copy(accessibility = meta.visibility))
         }
 
         log.debug("upserting dataset meta record for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
         it.upsertDatasetMeta(datasetID, meta)
 
-        it.deleteDatasetContacts(datasetID)
-        if (meta.contacts.isNotEmpty())
-          it.insertDatasetContacts(datasetID, meta.contacts)
-
-        it.deleteDatasetHyperlinks(datasetID)
-        if (meta.hyperlinks.isNotEmpty())
-          it.insertDatasetHyperlinks(datasetID, meta.hyperlinks)
-
         it.deleteDatasetPublications(datasetID)
         if (meta.publications.isNotEmpty())
           it.insertDatasetPublications(datasetID, meta.publications)
 
-        it.deleteDatasetOrganisms(datasetID)
-        if (meta.organisms.isNotEmpty())
-          it.insertDatasetOrganisms(datasetID, meta.organisms)
+        it.deleteContacts(datasetID)
+        if (meta.contacts.isNotEmpty())
+          it.insertDatasetContacts(datasetID, meta.contacts)
 
-        it.deleteDatasetProperties(datasetID)
-        if (meta.properties != null)
-          it.insertDatasetProperties(datasetID, meta.properties!!)
+        it.deleteExternalDatasetLinks(datasetID)
+        if (meta.linkedDatasets.isNotEmpty())
+          it.insertExternalDatasetLinks(datasetID, meta.linkedDatasets)
+
+        it.deleteDatasetOrganisms(datasetID)
+        if (meta.experimentalOrganism != null)
+          it.insertExperimentalOrganism(datasetID, meta.experimentalOrganism!!)
+        if (meta.hostOrganism != null)
+          it.insertHostOrganism(datasetID, meta.hostOrganism!!)
+
+        // Characteristics fields
+        it.deleteCountries(datasetID)
+        it.deleteSpecies(datasetID)
+        it.deleteDiseases(datasetID)
+        it.deleteAssociatedFactors(datasetID)
+        it.deleteSampleTypes(datasetID)
+        it.deleteCharacteristics(datasetID)
+        meta.characteristics?.also { characteristics ->
+          it.insertCharacteristics(datasetID, characteristics)
+          it.insertCountries(datasetID, characteristics.countries)
+          it.insertSpecies(datasetID, characteristics.studySpecies)
+          it.insertDiseases(datasetID, characteristics.diseases)
+          it.insertAssociatedFactors(datasetID, characteristics.associatedFactors)
+          it.insertSampleTypes(datasetID, characteristics.sampleTypes)
+        }
+
+        // External identifier fields
+        it.deleteDOIs(datasetID)
+        it.deleteHyperlinks(datasetID)
+        it.deleteBioprojectIDs(datasetID)
+        meta.externalIdentifiers?.also { identifiers ->
+          if (identifiers.dois.isNotEmpty())
+            it.insertDOIs(datasetID, identifiers.dois)
+          if (identifiers.hyperlinks.isNotEmpty())
+            it.insertHyperlinks(datasetID, identifiers.hyperlinks)
+          if (identifiers.bioprojectIDs.isNotEmpty())
+            it.insertBioprojectIDs(datasetID, identifiers.bioprojectIDs)
+        }
+
+        it.deleteFundingAwards(datasetID)
+        if (meta.funding.isNotEmpty())
+          it.insertFundingAwards(datasetID, meta.funding)
 
         it.selectDatasetSyncControlRecord(datasetID) orElse {
           it.insertDatasetSyncControl(SyncControlRecord(
@@ -350,13 +398,9 @@ internal class UpdateMetaLaneImpl(
 
     val record = DatasetRecord(
       datasetID       = datasetID,
-      owner           = meta.owner,
-      type            = meta.type,
-      deletionState   = DeleteFlag.NotDeleted,
-      isPublic        = meta.visibility == DatasetVisibility.Public,
-      accessibility   = meta.visibility,
+      meta            = meta,
+      category        = PluginRegistry.categoryFor(meta.type),
       daysForApproval = -1,
-      creationDate    = meta.created,
     )
 
     // this stuff is not project specific!
@@ -364,7 +408,7 @@ internal class UpdateMetaLaneImpl(
     // NOTE: We don't install meta stuff here because we will be synchronizing
     // it immediately after this function call anyway.
     try {
-      insertDataset(record)
+      upsertDataset(record)
       insertDatasetVisibility(datasetID, meta.owner)
       insertDatasetDependencies(datasetID, meta.dependencies)
 

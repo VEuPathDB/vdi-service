@@ -178,7 +178,7 @@ fun <T: ControllerBase> T.uploadFiles(
       logger.info("rejecting dataset upload for user error: {}", e.message)
       CacheDB().withTransaction {
         it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
-        e.message?.let { msg -> it.tryInsertImportMessages(datasetID, msg) }
+        e.message?.let { msg -> it.tryInsertImportMessages(datasetID, listOf(msg)) }
       }
     } else {
       logger.error("user dataset upload to minio failed: ", e)

@@ -3,7 +3,7 @@ package vdi.core.db.app.sql.dataset_meta
 import io.foxcapades.kdbc.set
 import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
-import vdi.core.db.app.MaxVarchar2Length
+import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.set
 import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
@@ -13,7 +13,7 @@ private fun sql(schema: String) =
 // language=postgresql
 """
 INSERT INTO
-  ${schema}.dataset_meta (
+  ${schema}.${Table.Meta} (
     dataset_id
   , name
   , summary
@@ -38,22 +38,22 @@ ON CONFLICT (dataset_id) DO UPDATE SET
 internal fun Connection.upsertDatasetMeta(schema: String, datasetID: DatasetID, meta: DatasetMetadata) {
   withPreparedUpdate(sql(schema)) {
     // insert
-    set(1, datasetID)
-    set(2, meta.name)
-    set(3, meta.summary)
-    set(4, meta.description)
-    set(5, meta.programName)
-    set(6, meta.projectName)
-    set(7, meta.shortAttribution)
-    set(8, TODO("compute short name"))
+    setDatasetID(1, datasetID)
+    setString(2, meta.name)
+    setString(3, meta.summary)
+    setString(4, meta.description)
+    setString(5, meta.programName)
+    setString(6, meta.projectName)
+    setString(7, meta.shortAttribution)
+    setString(8, TODO("compute short name"))
 
     // update
-    set(9, meta.name)
-    set(10, meta.summary)
-    set(11, meta.description)
-    set(12, meta.programName)
-    set(13, meta.projectName)
-    set(14, meta.shortAttribution)
-    set(15, TODO("compute short_name"))
+    setString(9, meta.name)
+    setString(10, meta.summary)
+    setString(11, meta.description)
+    setString(12, meta.programName)
+    setString(13, meta.projectName)
+    setString(14, meta.shortAttribution)
+    setString(15, TODO("compute short_name"))
   }
 }

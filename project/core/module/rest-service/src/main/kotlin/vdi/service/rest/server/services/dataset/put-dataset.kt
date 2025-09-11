@@ -2,7 +2,6 @@
 package vdi.service.rest.server.services.dataset
 
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
@@ -11,14 +10,15 @@ import vdi.model.DatasetMetaFilename
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetMetadata
 import vdi.model.data.DatasetRevision
+import vdi.model.data.DatasetRevisionHistory
 import vdi.service.rest.config.UploadConfig
-import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.model.DatasetPutResponseBody
 import vdi.service.rest.generated.model.DatasetPutResponseBodyImpl
 import vdi.service.rest.generated.resources.DatasetsVdiId.PutDatasetsByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.inputs.applyPatch
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.ForbiddenError
@@ -42,20 +42,15 @@ internal fun <T: ControllerBase> T.putDataset(
   if (originalDataset.isDeleted)
     return Either.ofRight(ForbiddenError("cannot add revisions to a deleted dataset").wrap())
 
+  val originalMeta = DatasetStore.getDatasetMeta(userID, datasetID)
+    ?: throw IllegalStateException("target dataset has no $DatasetMetaFilename file")
+
   request.cleanup()
-  request.validate(originalDataset.projects)
+  request.validate(originalMeta)
     .takeUnless { it.isEmpty }
     ?.let { return Either.ofRight(UnprocessableEntityError(it).wrap()) }
 
-  // validate type change
-  val targetType = (request.details as DatasetPatchRequestBody).optValidateType {
-    return Either.ofRight(ForbiddenError("cannot change the type of ${it.displayName} datasets").wrap())
-  }
-
   val newestRevisionID = CacheDB().selectLatestRevision(datasetID)?.revisionID ?: datasetID
-
-  val originalMeta = DatasetStore.getDatasetMeta(userID, datasetID)
-    ?: throw IllegalStateException("target dataset has no $DatasetMetaFilename file")
 
   // If a newer revision of the dataset already exists, only allow revising from
   // this point if the newer one failed irrecoverably.
@@ -70,21 +65,24 @@ internal fun <T: ControllerBase> T.putDataset(
     newDatasetID = newDatasetID.incrementRevision()
   }
 
-  val newMeta = originalMeta.let { it.applyPatch(
-    userID          = userID,
-    targetType      = targetType,
-    patch           = request.details,
-    originalID      = it.originalID ?: datasetID,
-    revisionHistory = it.revisionHistory + DatasetRevision(
-      action       = DatasetRevision.Action.Revise,
-      timestamp    = OffsetDateTime.now(ZoneOffset.UTC),
-      revisionID   = newDatasetID,
-      revisionNote = request.details.revisionNote,
-    ),
-  ) }
+  val newHistoryEntry = DatasetRevision(
+    DatasetRevision.Action.Revise,
+    OffsetDateTime.now(),
+    newDatasetID,
+    request.details.revisionNote,
+  )
+
+  val newHistory = originalMeta.revisionHistory
+    ?.let { DatasetRevisionHistory(it.originalID, it.revisions + newHistoryEntry) }
+    ?: DatasetRevisionHistory(datasetID, listOf(
+      DatasetRevision(DatasetRevision.Action.Create, OffsetDateTime.now(), datasetID, "dataset initial version"),
+      newHistoryEntry,
+    ))
+
+  val newMeta = request.details.applyPatch(originalMeta, newHistory)
 
   val uploadRefs = CacheDB().initializeDataset(userID, newDatasetID, newMeta) {
-    it.tryInsertRevisionLink(newMeta.originalID ?: datasetID, newMeta.revisionHistory.last())
+    it.tryInsertRevisionLink(newHistory.originalID, newHistory.revisions.last())
     resolveDatasetFiles(request.dataFiles, request.url, request.docFiles, uploadConfig)
   }
 

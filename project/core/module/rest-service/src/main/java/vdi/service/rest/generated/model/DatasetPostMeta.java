@@ -86,11 +86,11 @@ public interface DatasetPostMeta extends DatasetMetaBase {
   @JsonProperty(JsonField.HOST_ORGANISM)
   void setHostOrganism(DatasetOrganism hostOrganism);
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  StudyCharacteristics getStudyCharacteristics();
+  @JsonProperty(JsonField.CHARACTERISTICS)
+  DatasetCharacteristics getCharacteristics();
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  void setStudyCharacteristics(StudyCharacteristics studyCharacteristics);
+  @JsonProperty(JsonField.CHARACTERISTICS)
+  void setCharacteristics(DatasetCharacteristics characteristics);
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
   ExternalIdentifiers getExternalIdentifiers();
@@ -103,6 +103,12 @@ public interface DatasetPostMeta extends DatasetMetaBase {
 
   @JsonProperty(JsonField.FUNDING)
   void setFunding(List<DatasetFundingAward> funding);
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  String getShortAttribution();
+
+  @JsonProperty(JsonField.SHORT_ATTRIBUTION)
+  void setShortAttribution(String shortAttribution);
 
   @JsonProperty(JsonField.TYPE)
   DatasetTypeInput getType();
