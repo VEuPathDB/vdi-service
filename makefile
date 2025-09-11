@@ -30,8 +30,6 @@ raml-gen:
 	@which node || nvm --version 2>/dev/null || (echo 'NodeJS not found on $$PATH'; exit 1)
 	@$(GRADLE) -q :core:module:rest-service:generate-jaxrs :core:generate-raml-docs --rerun-tasks
 
-DOC_BUILD_DIR := ${PWD}/build/generated-docs
-
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃                                                                          ┃ #
 # ┃     Project Build Tasks                                                  ┃ #
@@ -48,10 +46,10 @@ build-plugin-server:
 build-core-server:
 	@$(GRADLE) :core:build
 
-# Builds the VDI core server Docker image.
-.PHONY: build-image
-build-image:
-	@$(GRADLE) -q build-image-cmd | tee >(bash)
+# (Re)Builds the VDI dev stack container images.
+.PHONY: build-stack
+build-stack:
+	@$(make) -C compose build SERVICES=$(SERVICES)
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃                                                                          ┃ #
@@ -59,26 +57,27 @@ build-image:
 # ┃                                                                          ┃ #
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
-ENV_FILE := ${PWD}/.env
-COMPOSE_DIR   := compose
-COMPOSE_FILES := docker-compose.old.yml docker-compose.dev.yml docker-compose.ssh.yml
-MERGED_COMPOSE_FLAGS := $(foreach FILE,$(COMPOSE_FILES),-f $(COMPOSE_DIR)/$(FILE))
-COMPOSE_CMD   := docker compose --env-file=$(ENV_FILE) $(MERGED_COMPOSE_FLAGS)
-
 # Starts up the stack (re)creating any containers necessary.
 .PHONY: compose-up
-compose-up: _env-file-test $(MERGE_TARGET)
+compose-up:
 	@if [ -z "${SSH_AUTH_SOCK}" ]; then echo "SSH agent does not appear to be correctly running"; exit 1; fi
-	@$(COMPOSE_CMD) up -d $(SERVICES)
+	@$(MAKE) -C compose up SERVICES=$(SERVICES)
 
 # Stops the stack and deletes any stack-specific state.
 .PHONY: compose-down
-compose-down: _env-file-test $(MERGE_TARGET)
-	@$(COMPOSE_CMD) down -v $(SERVICES)
+compose-down:
+	@$(MAKE) -C compose down SERVICES=$(SERVICES)
 
-.PHONY: _env-file-test
-_env-file-test:
-	@if [ ! -f .env ]; then echo "Missing .env file."; exit 1; fi
+# Starts a previously stopped stack.
+.PHONY: compose-start
+compose-start:
+	@$(MAKE) -C compose start SERVICES=$(SERVICES)
+
+# Stops a running stack, retaining container state.
+.PHONY: compose-stop
+compose-stop:
+	@$(MAKE) -C compose stop SERVICES=$(SERVICES)
+
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃                                                                          ┃ #
