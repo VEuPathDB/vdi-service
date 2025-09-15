@@ -1,6 +1,7 @@
 name: Plugin Server Release
 
 on:
+  workflow_dispatch: { }
   push:
     tags:
     - v*
@@ -9,27 +10,14 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+    - uses: ./.github/workflows/plugin-server-build.yml
 
-    - name: Checkout Revision
-      uses: actions/checkout@v4
-
-    - name: Install Java
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: corretto
-
-    - name: Install Gradle
-      uses: gradle/actions/setup-gradle@v4
-      with:
-        cache-read-only: false
-
-    - name: Run Gradle Build
+    - name: Run ShadowJar
       env:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |-
-        gradle --no-daemon :plugin-server:test :plugin-server:shadowJar
+        gradle --no-daemon :plugin-server:shadowJar
 
     - name: Create Server Archive
       run: |-

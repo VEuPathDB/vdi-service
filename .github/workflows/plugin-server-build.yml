@@ -1,0 +1,40 @@
+name: Build Plugin Server
+
+on:
+  workflow_dispatch: {}
+  workflow_call: {}
+  pull_request_target:
+    branches:
+    - main
+    paths:
+    - 'project/common/**'
+    - 'project/plugin-server/**'
+    - 'project/conventions/**'
+    - 'gradle/common.versions.toml'
+    - 'gradle/libs.versions.toml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout Revision
+      uses: actions/checkout@v4
+
+    - name: Install Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: corretto
+
+    - name: Install Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-read-only: false
+
+    - name: Run Gradle Build
+      env:
+        GH_USERNAME: ${{ secrets.GH_USERNAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |-
+        gradle --no-daemon :plugin-server:test :plugin-server:build
