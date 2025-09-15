@@ -14,7 +14,7 @@ volumes:
 services:
 
   cache-db:
-    image: veupathdb/vdi-internal-db:${VDI_CACHE_DB_TAG:-latest}
+    image: veupathdb/vdi-internal-db:${VDI_CACHE_DB_TAG:-prod}
     environment:
       POSTGRES_USER: vdi
       POSTGRES_PASSWORD: ${CACHE_DB_PASSWORD}
@@ -34,7 +34,7 @@ services:
       com.centurylinklabs.watchtower.enable: "${VDI_POSTGRES_WATCHTOWER:-true}"
 
   kafka:
-    image: veupathdb/apache-kafka:${VDI_KAFKA_TAG:-latest}
+    image: veupathdb/apache-kafka:${VDI_KAFKA_TAG:-prod}
     healthcheck:
       test: nc -z localhost 9092 || exit 1
       start_period: 30s
@@ -48,7 +48,7 @@ services:
     - internal
 
   service:
-    image: veupathdb/vdi-service:${VDI_SERVICE_TAG:-latest}
+    image: veupathdb/vdi-service:${VDI_SERVICE_TAG:-prod}
     depends_on:
       cache-db:
         condition: service_healthy
@@ -120,7 +120,7 @@ services:
       traefik.docker.network: "traefik"
 
   plugin-bigwig:
-    image: veupathdb/vdi-plugin-bigwig:${VDI_PLUGIN_BIGWIG_TAG:-latest}
+    image: veupathdb/vdi-plugin-bigwig:${VDI_PLUGIN_BIGWIG_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -170,7 +170,7 @@ services:
       UNIDB_LDAP: ${UNIDB_LDAP}
 
   plugin-biom:
-    image: veupathdb/vdi-plugin-biom:${VDI_PLUGIN_BIOM_TAG:-latest}
+    image: veupathdb/vdi-plugin-biom:${VDI_PLUGIN_BIOM_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -220,7 +220,7 @@ services:
       UNIDB_LDAP: ${UNIDB_LDAP}
 
   plugin-genelist:
-    image: veupathdb/vdi-plugin-genelist:${VDI_PLUGIN_GENELIST_TAG:-latest}
+    image: veupathdb/vdi-plugin-genelist:${VDI_PLUGIN_GENELIST_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -265,7 +265,7 @@ services:
       UNIDB_LDAP: ${UNIDB_LDAP}
 
   plugin-isasimple:
-    image: veupathdb/vdi-plugin-isasimple:${VDI_PLUGIN_ISASIMPLE_TAG:-latest}
+    image: veupathdb/vdi-plugin-isasimple:${VDI_PLUGIN_ISASIMPLE_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -314,51 +314,8 @@ services:
       MICROBIOME_LDAP: ${MICROBIOME_LDAP}
       UNIDB_LDAP: ${UNIDB_LDAP}
 
-#  plugin-noop:
-#    image: veupathdb/vdi-plugin-noop:${VDI_PLUGIN_NOOP_TAG:-latest}
-#    networks:
-#      internal:
-#        aliases:
-#        - noop
-#      monitoring-ext: { }
-#    labels:
-#      prometheus.scrape_enabled: "true"
-#      com.centurylinklabs.watchtower.enable: "${PLUGIN_NOOP_WATCHTOWER:-true}"
-#    volumes:
-#    - type: bind
-#      source: ${DATASET_INSTALL_DIR_LOCAL_PATH}
-#      target: /datasets
-#    environment:
-#      JVM_ARGS: ${JVM_ARGS}
-#      JVM_MEM_ARGS: ${JVM_MEM_ARGS}
-#
-#      LOCATION_INDICATOR: ${LOCATION_INDICATOR}
-#
-#      SITE_BUILD: ${SITE_BUILD}
-#
-#      # VPDB Application Database Connection Config
-#      LDAP_SERVER: ${LDAP_SERVER}
-#      DB_LOOKUP_BASE_DN: ${DB_LOOKUP_BASE_DN}
-#      VDI_APPDB_SCHEMA_PASS: ${VDI_APPDB_SCHEMA_PASS}
-#      AMOEBA_LDAP: ${AMOEBA_LDAP}
-#      CRYPTO_LDAP: ${CRYPTO_LDAP}
-#      FUNGI_LDAP: ${FUNGI_LDAP}
-#      GIARDIA_LDAP: ${GIARDIA_LDAP}
-#      HOST_LDAP: ${HOST_LDAP}
-#      MICROSPORIDIA_LDAP: ${MICROSPORIDIA_LDAP}
-#      PIROPLASMA_LDAP: ${PIROPLASMA_LDAP}
-#      PLASMO_LDAP: ${PLASMO_LDAP}
-#      TOXO_LDAP: ${TOXO_LDAP}
-#      TRICH_LDAP: ${TRICH_LDAP}
-#      TRITRYP_LDAP: ${TRITRYP_LDAP}
-#      VECTOR_LDAP: ${VECTOR_LDAP}
-#      ORTHO_LDAP: ${ORTHO_LDAP}
-#      CLINEPI_LDAP: ${CLINEPI_LDAP}
-#      MICROBIOME_LDAP: ${MICROBIOME_LDAP}
-#      UNIDB_LDAP: ${UNIDB_LDAP}
-
   plugin-wrangler:
-    image: veupathdb/vdi-plugin-wrangler:${VDI_PLUGIN_WRANGLER_TAG:-latest}
+    image: veupathdb/vdi-plugin-wrangler:${VDI_PLUGIN_WRANGLER_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -408,7 +365,7 @@ services:
       UNIDB_LDAP: ${UNIDB_LDAP}
 
   plugin-rnaseq:
-    image: veupathdb/vdi-plugin-rnaseq:${VDI_PLUGIN_RNASEQ_TAG:-latest}
+    image: veupathdb/vdi-plugin-rnaseq:${VDI_PLUGIN_RNASEQ_TAG:-prod}
     networks:
       internal:
         aliases:
