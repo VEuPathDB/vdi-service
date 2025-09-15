@@ -10,14 +10,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: ./.github/workflows/plugin-server-build.yml
+    - uses: ./.github/actions/build-plugin-server
 
     - name: Run ShadowJar
       env:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |-
-        gradle --no-daemon :plugin-server:shadowJar
+      run: gradle --no-daemon :plugin-server:shadowJar
 
     - name: Create Server Archive
       run: |-
