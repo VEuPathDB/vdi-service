@@ -1,4 +1,4 @@
-name: Build Service for PR
+name: Build Core Server
 
 on:
   workflow_dispatch: {}
