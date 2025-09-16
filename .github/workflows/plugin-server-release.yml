@@ -1,4 +1,4 @@
-name: Plugin Server Release
+name: Release Plugin Server
 
 on:
   workflow_dispatch: { }
@@ -12,6 +12,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ./.github/actions/build-plugin-server
+      with:
+        gh-token: ${{ secrets.GH_TOKEN }}
+        gh-user: ${{ secrets.GH_USERNAME }}
 
     - name: Run ShadowJar
       env:

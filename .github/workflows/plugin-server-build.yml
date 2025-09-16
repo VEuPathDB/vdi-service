@@ -19,3 +19,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ./.github/actions/build-plugin-server
+      with:
+        gh-token: ${{ secrets.GH_TOKEN }}
+        gh-user: ${{ secrets.GH_USERNAME }}
