@@ -20,7 +20,7 @@ jobs:
       env:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: gradle --no-daemon :plugin-server:shadowJar
+      run: gradle :plugin-server:shadowJar
 
     - name: Create Server Archive
       run: |-
@@ -45,33 +45,39 @@ jobs:
     uses: VEuPathDB/vdi-plugin-bigwig/.github/workflows/update-plugin-server.yml@main
     with:
       tag: ${{ github.ref_name }}
+      plugin: bigwig
   plugin-example:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-example/.github/workflows/update-plugin-server.yml@main
     with:
       tag: ${{ github.ref_name }}
+      plugin: example
   plugin-genelist:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-genelist/.github/workflows/update-plugin-server.yml@main
     with:
       tag: ${{ github.ref_name }}
+      plugin: genelist
   plugin-isasimple:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-isasimple/.github/workflows/update-plugin-server.yml@main
     with:
       tag: ${{ github.ref_name }}
+      plugin: isasimple
   plugin-rnaseq:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-rnaseq/.github/workflows/update-plugin-server.yml@main
     with:
       tag: ${{ github.ref_name }}
+      plugin: rnaseq
   plugin-wrangler:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-wrangler/.github/workflows/update-plugin-server.yml@main
     with:
       tag: ${{ github.ref_name }}
+      plugin: wrangler
