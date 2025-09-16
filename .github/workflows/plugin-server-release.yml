@@ -10,6 +10,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
     - uses: ./.github/actions/build-plugin-server
 
     - name: Run ShadowJar
