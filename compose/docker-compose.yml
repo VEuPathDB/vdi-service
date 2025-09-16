@@ -14,7 +14,7 @@ volumes:
 services:
 
   cache-db:
-    image: veupathdb/vdi-internal-db:${VDI_CACHE_DB_TAG:-prod}
+    image: veupathdb/vdi-internal-db:${CACHE_DB_TAG:-prod}
     environment:
       POSTGRES_USER: vdi
       POSTGRES_PASSWORD: ${CACHE_DB_PASSWORD}
@@ -31,10 +31,10 @@ services:
     volumes:
     - cache-db-data:/var/lib/postgresql/data
     labels:
-      com.centurylinklabs.watchtower.enable: "${VDI_POSTGRES_WATCHTOWER:-true}"
+      com.centurylinklabs.watchtower.enable: "${CACHE_DB_WATCHTOWER:-true}"
 
   kafka:
-    image: veupathdb/apache-kafka:${VDI_KAFKA_TAG:-prod}
+    image: veupathdb/apache-kafka:${KAFKA_TAG:-prod}
     healthcheck:
       test: nc -z localhost 9092 || exit 1
       start_period: 30s
@@ -46,9 +46,11 @@ services:
       KAFKA_ADVERTISED_LISTENERS: ${KAFKA_LISTENERS:-PLAINTEXT://kafka:9092}
     networks:
     - internal
+    labels:
+      com.centurylinklabs.watchtower.enable: "${KAFKA_WATCHTOWER:-true}"
 
   service:
-    image: veupathdb/vdi-service:${VDI_SERVICE_TAG:-prod}
+    image: veupathdb/vdi-service:${SERVICE_TAG:-prod}
     depends_on:
       cache-db:
         condition: service_healthy
@@ -65,8 +67,8 @@ services:
 
     stop_grace_period: 1m
     environment:
-      JVM_ARGS: ${JVM_ARGS}
-      JVM_MEM_ARGS: ${JVM_MEM_ARGS}
+      JVM_ARGS: ${SERVICE_JVM_ARGS}
+      JVM_MEM_ARGS: ${SERVICE_JVM_MEM_ARGS}
 
       LOCATION_INDICATOR: ${LOCATION_INDICATOR}
 
@@ -112,7 +114,7 @@ services:
 
     labels:
       prometheus.scrape_enabled: "true"
-      com.centurylinklabs.watchtower.enable: "${VDI_SERVICE_WATCHTOWER:-true}"
+      com.centurylinklabs.watchtower.enable: "${SERVICE_WATCHTOWER:-true}"
       traefik.http.services.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.loadbalancer.server.port: "80"
       traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.rule: "Host(`${TRAEFIK_VDI_HOST:-vdi-dev.local.apidb.org}`)"
       traefik.http.routers.${TRAEFIK_SERVICE_ROUTER:-vdi-dev}.tls: "${USE_TRAEFIK_SSL:-true}"
@@ -120,7 +122,7 @@ services:
       traefik.docker.network: "traefik"
 
   plugin-bigwig:
-    image: veupathdb/vdi-plugin-bigwig:${VDI_PLUGIN_BIGWIG_TAG:-prod}
+    image: veupathdb/vdi-plugin-bigwig:${PLUGIN_BIGWIG_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -141,8 +143,8 @@ services:
       source: ${DATASET_INSTALL_DIR_LOCAL_PATH}
       target: /datasets
     environment:
-      JVM_ARGS: ${JVM_ARGS}
-      JVM_MEM_ARGS: ${JVM_MEM_ARGS}
+      JVM_ARGS: ${PLUGIN_BIGWIG_JVM_ARGS}
+      JVM_MEM_ARGS: ${PLUGIN_BIGWIG_JVM_MEM_ARGS}
 
       LOCATION_INDICATOR: ${LOCATION_INDICATOR}
 
@@ -170,7 +172,7 @@ services:
       UNIDB_LDAP: ${UNIDB_LDAP}
 
   plugin-biom:
-    image: veupathdb/vdi-plugin-biom:${VDI_PLUGIN_BIOM_TAG:-prod}
+    image: veupathdb/vdi-plugin-biom:${PLUGIN_BIOM_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -191,8 +193,8 @@ services:
       source: ${DATASET_INSTALL_DIR_LOCAL_PATH}
       target: /datasets
     environment:
-      JVM_ARGS: ${JVM_ARGS}
-      JVM_MEM_ARGS: ${JVM_MEM_ARGS}
+      JVM_ARGS: ${PLUGIN_BIOM_JVM_ARGS}
+      JVM_MEM_ARGS: ${PLUGIN_BIOM_JVM_MEM_ARGS}
 
       LOCATION_INDICATOR: ${LOCATION_INDICATOR}
 
@@ -220,7 +222,7 @@ services:
       UNIDB_LDAP: ${UNIDB_LDAP}
 
   plugin-genelist:
-    image: veupathdb/vdi-plugin-genelist:${VDI_PLUGIN_GENELIST_TAG:-prod}
+    image: veupathdb/vdi-plugin-genelist:${PLUGIN_GENELIST_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -241,12 +243,14 @@ services:
       source: ${DATASET_INSTALL_DIR_LOCAL_PATH}
       target: /datasets
     environment:
-      DATASET_INSTALL_ROOT: /datasets
-      LDAP_SERVER: ${LDAP_SERVER}
-      ORACLE_BASE_DN: ${DB_LOOKUP_BASE_DN}
-      SITE_BUILD: ${SITE_BUILD}
+      JVM_ARGS: ${PLUGIN_GENELIST_JVM_ARGS}
+      JVM_MEM_ARGS: ${PLUGIN_GENELIST_JVM_MEM_ARGS}
+
       LOCATION_INDICATOR: ${LOCATION_INDICATOR}
 
+      SITE_BUILD: ${SITE_BUILD}
+
+      # VPDB Application Database Connection Config
       AMOEBA_LDAP: ${AMOEBA_LDAP}
       CRYPTO_LDAP: ${CRYPTO_LDAP}
       FUNGI_LDAP: ${FUNGI_LDAP}
@@ -265,7 +269,7 @@ services:
       UNIDB_LDAP: ${UNIDB_LDAP}
 
   plugin-isasimple:
-    image: veupathdb/vdi-plugin-isasimple:${VDI_PLUGIN_ISASIMPLE_TAG:-prod}
+    image: veupathdb/vdi-plugin-isasimple:${PLUGIN_ISASIMPLE_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -286,8 +290,8 @@ services:
       source: ${DATASET_INSTALL_DIR_LOCAL_PATH}
       target: /datasets
     environment:
-      JVM_ARGS: ${JVM_ARGS}
-      JVM_MEM_ARGS: ${JVM_MEM_ARGS}
+      JVM_ARGS: ${PLUGIN_ISASIMPLE_JVM_ARGS}
+      JVM_MEM_ARGS: ${PLUGIN_ISASIMPLE_JVM_MEM_ARGS}
 
       LOCATION_INDICATOR: ${LOCATION_INDICATOR}
 
@@ -315,7 +319,7 @@ services:
       UNIDB_LDAP: ${UNIDB_LDAP}
 
   plugin-wrangler:
-    image: veupathdb/vdi-plugin-wrangler:${VDI_PLUGIN_WRANGLER_TAG:-prod}
+    image: veupathdb/vdi-plugin-wrangler:${PLUGIN_WRANGLER_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -336,8 +340,8 @@ services:
       source: ${DATASET_INSTALL_DIR_LOCAL_PATH}
       target: /datasets
     environment:
-      JVM_ARGS: ${JVM_ARGS}
-      JVM_MEM_ARGS: ${JVM_MEM_ARGS}
+      JVM_ARGS: ${PLUGIN_WRANGLER_JVM_ARGS}
+      JVM_MEM_ARGS: ${PLUGIN_WRANGLER_JVM_MEM_ARGS}
 
       LOCATION_INDICATOR: ${LOCATION_INDICATOR}
 
@@ -365,7 +369,7 @@ services:
       UNIDB_LDAP: ${UNIDB_LDAP}
 
   plugin-rnaseq:
-    image: veupathdb/vdi-plugin-rnaseq:${VDI_PLUGIN_RNASEQ_TAG:-prod}
+    image: veupathdb/vdi-plugin-rnaseq:${PLUGIN_RNASEQ_TAG:-prod}
     networks:
       internal:
         aliases:
@@ -386,8 +390,8 @@ services:
       source: ${DATASET_INSTALL_DIR_LOCAL_PATH}
       target: /datasets
     environment:
-      JVM_ARGS: ${JVM_ARGS}
-      JVM_MEM_ARGS: ${JVM_MEM_ARGS}
+      JVM_ARGS: ${PLUGIN_RNASEQ_JVM_ARGS}
+      JVM_MEM_ARGS: ${PLUGIN_RNASEQ_JVM_MEM_ARGS}
 
       LOCATION_INDICATOR: ${LOCATION_INDICATOR}
 
