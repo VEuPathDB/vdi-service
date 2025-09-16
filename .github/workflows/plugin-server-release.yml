@@ -10,7 +10,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: ./.github/actions/build-plugin-server
+    - uses: .github/actions/build-plugin-server
 
     - name: Run ShadowJar
       env:
