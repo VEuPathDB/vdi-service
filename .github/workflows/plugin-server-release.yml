@@ -38,3 +38,40 @@ jobs:
         draft: false
         files: tmp/plugin-server.tar.gz
         generate_release_notes: true
+
+  plugin-bigwig:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-bigwig/.github/workflows/update-plugin-server.yml@main
+    with:
+      tag: ${{ github.ref_name }}
+  plugin-example:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-example/.github/workflows/update-plugin-server.yml@main
+    with:
+      tag: ${{ github.ref_name }}
+  plugin-genelist:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-genelist/.github/workflows/update-plugin-server.yml@main
+    with:
+      tag: ${{ github.ref_name }}
+  plugin-isasimple:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-isasimple/.github/workflows/update-plugin-server.yml@main
+    with:
+      tag: ${{ github.ref_name }}
+  plugin-rnaseq:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-rnaseq/.github/workflows/update-plugin-server.yml@main
+    with:
+      tag: ${{ github.ref_name }}
+  plugin-wrangler:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-wrangler/.github/workflows/update-plugin-server.yml@main
+    with:
+      tag: ${{ github.ref_name }}
