@@ -1,4 +1,4 @@
-name: Build Plugin Server
+name: Build Service for PR
 
 on:
   workflow_dispatch: {}
@@ -13,17 +13,19 @@ on:
     - ready_for_review
     paths:
     - 'project/common/**'
-    - 'project/plugin-server/**'
+    - 'project/core/**'
     - 'project/conventions/**'
     - 'gradle/common.versions.toml'
     - 'gradle/libs.versions.toml'
 
 jobs:
-  build:
+  gradle-build:
+    name: Pull Request Build Verification
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
     steps:
     - uses: actions/checkout@v4
-    - uses: ./.github/actions/build-plugin-server
+    - uses: ./.github/actions/build-core-server
       with:
         gh-token: ${{ secrets.GH_TOKEN }}
         gh-user: ${{ secrets.GH_USERNAME }}

@@ -1,0 +1,31 @@
+name: Core Server Gradle Build
+
+inputs:
+  gh-token:
+    description: GitHub token
+    required: true
+  gh-user:
+    description: GitHub username.
+    required: true
+
+runs:
+  using: composite
+  steps:
+
+  - name: Install Java
+    uses: actions/setup-java@v4
+    with:
+      java-version: '21'
+      distribution: corretto
+
+  - name: Install Gradle
+    uses: gradle/actions/setup-gradle@v4
+    with:
+      cache-read-only: false
+
+  - name: Run Gradle Build
+    env:
+      GH_USERNAME: ${{ inputs.gh-user }}
+      GH_TOKEN: ${{ inputs.gh-token }}
+    shell: bash
+    run: gradle :core:build :core:test
