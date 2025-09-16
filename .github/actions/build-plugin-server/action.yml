@@ -28,4 +28,4 @@ runs:
       GH_USERNAME: ${{ inputs.gh-user }}
       GH_TOKEN: ${{ inputs.gh-token }}
     shell: bash
-    run: gradle --no-daemon :plugin-server:test :plugin-server:build
+    run: gradle :plugin-server:test :plugin-server:build
