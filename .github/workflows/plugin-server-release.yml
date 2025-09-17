@@ -43,47 +43,47 @@ jobs:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-bigwig/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
     with:
       tag: ${{ github.ref_name }}
       plugin: bigwig
-      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
   plugin-example:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-example/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
     with:
       tag: ${{ github.ref_name }}
       plugin: example
-      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
   plugin-genelist:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-genelist/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
     with:
       tag: ${{ github.ref_name }}
       plugin: genelist
-      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
   plugin-isasimple:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-isasimple/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
     with:
       tag: ${{ github.ref_name }}
       plugin: isasimple
-      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
   plugin-rnaseq:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-rnaseq/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
     with:
       tag: ${{ github.ref_name }}
       plugin: rnaseq
-      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
   plugin-wrangler:
     needs:
     - publish
     uses: VEuPathDB/vdi-plugin-wrangler/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
     with:
       tag: ${{ github.ref_name }}
       plugin: wrangler
-      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
