@@ -46,6 +46,7 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
       plugin: bigwig
+      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
   plugin-example:
     needs:
     - publish
@@ -53,6 +54,7 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
       plugin: example
+      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
   plugin-genelist:
     needs:
     - publish
@@ -60,6 +62,7 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
       plugin: genelist
+      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
   plugin-isasimple:
     needs:
     - publish
@@ -67,6 +70,7 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
       plugin: isasimple
+      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
   plugin-rnaseq:
     needs:
     - publish
@@ -74,6 +78,7 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
       plugin: rnaseq
+      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
   plugin-wrangler:
     needs:
     - publish
@@ -81,3 +86,4 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
       plugin: wrangler
+      token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
