@@ -71,6 +71,14 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
       plugin: isasimple
+  plugin-noop:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-noop/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
+    with:
+      tag: ${{ github.ref_name }}
+      plugin: noop
   plugin-rnaseq:
     needs:
     - publish
