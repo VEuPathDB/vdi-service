@@ -49,7 +49,7 @@ build-core-server:
 # (Re)Builds the VDI dev stack container images.
 .PHONY: build-stack
 build-stack:
-	@$(make) -C compose build SERVICES=$(SERVICES)
+	@$(MAKE) -C compose build SERVICES=$(SERVICES)
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃                                                                          ┃ #

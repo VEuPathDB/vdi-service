@@ -9,7 +9,9 @@ default:
 
 .PHONY: build
 build: COMMAND := build
-build: OPTIONS += --build-arg GH_USERNAME=${GITHUB_USERNAME} --build-arg GH_TOKEN=${GITHUB_TOKEN}
+build: OPTIONS += --build-arg GH_USERNAME=${GITHUB_USERNAME}
+build: OPTIONS += --build-arg GH_TOKEN=${GITHUB_TOKEN}
+build: OPTIONS += --build-arg CONFIG_FILE=config/local-dev-config.yml
 build: compose
 
 .PHONY: compose-up

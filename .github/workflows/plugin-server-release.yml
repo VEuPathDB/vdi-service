@@ -27,7 +27,7 @@ jobs:
         mkdir -p tmp/etc/vdi
         cp project/plugin-server/build/libs/service.jar tmp
         cp project/plugin-server/startup.sh tmp
-        cp config/halfway-config.yml tmp/etc/vdi/config.yml
+        cp config/production-config.yml tmp/etc/vdi/config.yml
         cd tmp
         tar -czf plugin-server.tar.gz *
 
