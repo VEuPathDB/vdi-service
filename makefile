@@ -47,9 +47,9 @@ build-core-server:
 	@$(GRADLE) :core:build
 
 # (Re)Builds the VDI dev stack container images.
-.PHONY: build-stack
-build-stack:
-	@$(MAKE) -C compose build SERVICES=$(SERVICES)
+.PHONY: build-image
+build-image:
+	@$(MAKE) -C project/core build-image
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃                                                                          ┃ #

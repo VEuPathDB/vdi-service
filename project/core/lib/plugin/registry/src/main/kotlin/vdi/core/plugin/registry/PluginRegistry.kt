@@ -23,7 +23,8 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
         )
 
         plug.dataTypes.asSequence()
-          .map { DatasetType(DataType.of(it.name), it.version) }
+          .map { DatasetType(DataType.of(it.name), it.version)
+            .also { dt -> if (it.category != null) tmpCats[dt] = it.category!! } }
           .onEach {
             if (it in conflicts)
               conflicts[it] = conflicts[it]!! + plug.displayName

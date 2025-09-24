@@ -49,7 +49,5 @@ ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
 
 COPY --from=build ["/workspace/project/core/build/libs/vdi-service.jar", "/opt/vdi/"]
 
-ARG CONFIG_FILE="config/production-config.yml"
-COPY ${CONFIG_FILE} /etc/vdi/config.yml
 
 CMD ["sh", "-c", "java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /opt/vdi/vdi-service.jar"]
