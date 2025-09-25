@@ -27,14 +27,15 @@ jobs:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         GH_TAG: ${{ github.ref_type == 'tag' && github.ref_name}}
-      run: gradle \
-        -Pbuild.git.tag="${{ steps.short-tag.outputs.tag }}" \
-        -Pbuild.git.commit="${GITHUB_SHA}" \
-        -Pbuild.git.branch="${{ steps.short-tag.outputs.tag }}" \
-        -Pbuild.git.url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
-        -Pbuild.ci.id="${GITHUB_RUN_ID}" \
-        -Pbuild.ci.number="${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}" \
-        :plugin-server:shadowJar
+      run: | 
+        gradle \
+          -Pbuild.git.tag="${{ steps.short-tag.outputs.tag }}" \
+          -Pbuild.git.commit="${GITHUB_SHA}" \
+          -Pbuild.git.branch="${{ steps.short-tag.outputs.tag }}" \
+          -Pbuild.git.url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+          -Pbuild.ci.id="${GITHUB_RUN_ID}" \
+          -Pbuild.ci.number="${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}" \
+          :plugin-server:shadowJar
 
     - name: Create Server Archive
       run: |-
