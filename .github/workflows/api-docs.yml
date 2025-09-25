@@ -10,8 +10,6 @@ on:
     - 'project/common/config/src/main/json/schema/**'
     - 'project/core/module/rest-service/api-schema/**'
     - 'project/core/module/rest-service/*.raml'
-    - '.github/actions/api-doc-build/action.yml'
-    - '.github/actions/api-doc-env/action.yml'
     - '.github/workflows/api-docs.yml'
 
 jobs:
@@ -62,7 +60,7 @@ jobs:
     - name: Merge and Convert JSON Schema
       run: |-
         gradle -P SCHEMA_BUILD_DIR=$DOC_BUILD_DIR \
-          :commons:config:compile-config-schema
+          :common:config:compile-config-schema
 
     - name: Generate Configuration Docs
       run: >-
