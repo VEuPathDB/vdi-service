@@ -7,13 +7,15 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import com.networknt.schema.ExecutionContext
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
-import vdi.json.JSON
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
+import java.util.jar.Manifest
 import kotlin.io.path.Path
 import kotlin.io.path.readText
 import vdi.config.parse.ConfigurationException
 import vdi.config.parse.serde.interpolateFrom
+import vdi.config.raw.ManifestConfig
+import vdi.json.JSON
 import vdi.logging.MetaLogger
 import vdi.model.field.SecretString
 
@@ -56,3 +58,8 @@ fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
 
   return json
 }
+
+fun loadManifestConfig() =
+  ManifestConfig::class.java.classLoader.getResourceAsStream("META-INF/MANIFEST.MF")
+    .use(::Manifest)
+    .let(::ManifestConfig)

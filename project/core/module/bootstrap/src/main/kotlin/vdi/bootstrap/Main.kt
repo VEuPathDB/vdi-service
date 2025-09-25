@@ -8,8 +8,8 @@ import java.util.logging.LogManager
 import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
 import kotlin.system.exitProcess
+import vdi.config.loadManifestConfig
 import vdi.core.config.loadAndCacheStackConfig
-import vdi.core.config.loadManifestConfig
 import vdi.core.modules.VDIModule
 import vdi.daemon.events.routing.EventRouter
 import vdi.daemon.pruner.DatasetPruner
