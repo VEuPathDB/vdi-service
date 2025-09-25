@@ -126,6 +126,7 @@
         }
       },
       "required": [
+        "displayName",
         "name",
         "version"
       ],
