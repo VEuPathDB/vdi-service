@@ -16,11 +16,25 @@ jobs:
         gh-token: ${{ secrets.GH_TOKEN }}
         gh-user: ${{ secrets.GH_USERNAME }}
 
+    - name: Calc Short Tag
+      id: short-tag
+      run: |
+        echo tag=$(git describe --tags 2>/dev/null || cat <(echo -n untagged-) <(git rev-parse HEAD | cut -c1-8)) >> $GITHUB_OUTPUT
+        echo branch=$(git branch --show-current) >> $GITHUB_OUTPUT
+
     - name: Run ShadowJar
       env:
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: gradle :plugin-server:shadowJar
+        GH_TAG: ${{ github.ref_type == 'tag' && github.ref_name}}
+      run: gradle \
+        -Pbuild.git.tag="${{ steps.short-tag.outputs.tag }}" \
+        -Pbuild.git.commit="${GITHUB_SHA}" \
+        -Pbuild.git.branch="${{ steps.short-tag.outputs.tag }}" \
+        -Pbuild.git.url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+        -Pbuild.ci.id="${GITHUB_RUN_ID}" \
+        -Pbuild.ci.number="${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}" \
+        :plugin-server:shadowJar
 
     - name: Create Server Archive
       run: |-
