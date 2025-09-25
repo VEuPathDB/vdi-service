@@ -189,9 +189,9 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
           .loadContents()!!
           .use { handler.client.postImport(datasetID, meta, it) }
       } catch (e: S34KError) { // don't mix up minio errors with request errors
-        throw PluginException.import(handler.displayName, userID, datasetID, cause = e)
+        throw PluginException.import(handler.name, userID, datasetID, cause = e)
       } catch (e: Throwable) {
-        throw PluginRequestException.import(handler.displayName, userID, datasetID, cause = e)
+        throw PluginRequestException.import(handler.name, userID, datasetID, cause = e)
       }
 
       Metrics.Import.count.labels(meta.type.name.toString(), meta.type.version, result.responseCode.toString()).inc()
@@ -229,7 +229,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.import(handler.displayName, userID, datasetID, cause = e)
+      throw PluginException.import(handler.name, userID, datasetID, cause = e)
     }
   }
 
@@ -240,7 +240,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     result: ImportSuccessResponse,
     dd: DatasetDirectory
   ) {
-    kLogger.info("dataset handler server reports dataset {}/{} imported successfully in plugin {}", userID, datasetID, handler.displayName)
+    kLogger.info("dataset handler server reports dataset {}/{} imported successfully in plugin {}", userID, datasetID, handler.name)
 
     var warnings = emptyList<String>()
     var hasData = false
@@ -296,14 +296,14 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     datasetID: DatasetID,
     result: ImportBadRequestResponse
   ) {
-    kLogger.error("plugin reports 400 error for dataset {}/{} in plugin {}: {}", userID, datasetID, handler.displayName, result.message)
+    kLogger.error("plugin reports 400 error for dataset {}/{} in plugin {}: {}", userID, datasetID, handler.name, result.message)
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
       it.upsertImportMessages(datasetID, listOf(result.message))
     }
 
-    throw PluginException.import(handler.displayName, userID, datasetID, result.message)
+    throw PluginException.import(handler.name, userID, datasetID, result.message)
   }
 
   private fun handleImportInvalidResult(
@@ -312,7 +312,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     datasetID: DatasetID,
     result: ImportValidationErrorResponse
   ) {
-    kLogger.info("plugin reports dataset {}/{} failed validation in plugin {}", userID, datasetID, handler.displayName)
+    kLogger.info("plugin reports dataset {}/{} failed validation in plugin {}", userID, datasetID, handler.name)
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
@@ -321,14 +321,14 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
   }
 
   private fun handleImport500Result(handler: PluginHandler, userID: UserID, datasetID: DatasetID, result: ImportUnhandledErrorResponse) {
-    kLogger.error("plugin reports 500 for dataset {}/{} in plugin {}: {}", userID, datasetID, handler.displayName, result.message)
+    kLogger.error("plugin reports 500 for dataset {}/{} in plugin {}: {}", userID, datasetID, handler.name, result.message)
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
       it.upsertImportMessages(datasetID, listOf(result.message))
     }
 
-    throw PluginException.import(handler.displayName, userID, datasetID, result.message)
+    throw PluginException.import(handler.name, userID, datasetID, result.message)
   }
 
   private fun DatasetDirectory.isUsable(datasetID: DatasetID, userID: UserID): Boolean {

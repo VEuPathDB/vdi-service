@@ -58,15 +58,12 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
     .toMap()
 
   return shares.map {
-    val typeDisplayName = PluginRegistry[it.type]?.displayName
-      ?: throw IllegalStateException("unregistered dataset type: ${it.type}")
-
     ShareOfferEntry(
       datasetID              = it.datasetID,
       shareStatus            = ShareOfferStatus.OPEN,
       datasetTypeName        = it.type.name,
       datasetTypeVersion     = it.type.version,
-      datasetTypeDisplayName = typeDisplayName,
+      datasetTypeDisplayName = PluginRegistry.displayNameFor(it.type),
       owner                  = owners[it.ownerID] ?: throw IllegalStateException("unknown dataset owner ${it.ownerID}"),
       installTargets         = it.projects
     )

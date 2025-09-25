@@ -17,10 +17,10 @@ object PluginHandlers {
   init {
     val tmpMap = HashMap<DatasetType, PluginHandler>(loadAndCacheStackConfig().vdi.plugins.size)
 
-    loadAndCacheStackConfig().vdi.plugins.forEach { (_, plug) ->
+    loadAndCacheStackConfig().vdi.plugins.forEach { (name, plug) ->
       val addr = plug.server.toHostAddress(80u)
 
-      RemoteDependencies.register("Plugin ${plug.displayName}", addr.host, addr.port)
+      RemoteDependencies.register("Plugin $name", addr.host, addr.port)
 
       plug.dataTypes.forEach { dt ->
         val key = DatasetType(DataType.of(dt.name), dt.version)

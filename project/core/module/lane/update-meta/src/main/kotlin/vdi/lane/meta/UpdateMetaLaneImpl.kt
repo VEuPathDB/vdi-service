@@ -183,7 +183,7 @@ internal class UpdateMetaLaneImpl(
     } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.installMeta(ph.displayName, installTarget, userID, datasetID, cause = e)
+      throw PluginException.installMeta(ph.name, installTarget, userID, datasetID, cause = e)
     }
   }
 
@@ -324,7 +324,7 @@ internal class UpdateMetaLaneImpl(
     val result = try {
       ph.client.postInstallMeta(datasetID, installTarget, meta)
     } catch (e: Throwable){
-      throw PluginRequestException.installMeta(ph.displayName, installTarget, userID, datasetID, cause = e)
+      throw PluginRequestException.installMeta(ph.name, installTarget, userID, datasetID, cause = e)
     }
 
     Metrics.MetaUpdates.count.labels(meta.type.name.toString(), meta.type.version, result.responseCode.toString()).inc()
@@ -451,10 +451,10 @@ internal class UpdateMetaLaneImpl(
       userID,
       datasetID,
       installTarget,
-      handler.displayName,
+      handler.name,
     )
 
-    throw PluginException.installMeta(handler.displayName, installTarget, userID, datasetID, res.message)
+    throw PluginException.installMeta(handler.name, installTarget, userID, datasetID, res.message)
   }
 
   private fun handleUnexpectedErrorResponse(
@@ -469,10 +469,10 @@ internal class UpdateMetaLaneImpl(
       userID,
       datasetID,
       installTarget,
-      handler.displayName
+      handler.name
     )
 
-    throw PluginException.installMeta(handler.displayName, installTarget, userID, datasetID, res.message)
+    throw PluginException.installMeta(handler.name, installTarget, userID, datasetID, res.message)
   }
 
   private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {

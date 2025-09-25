@@ -55,13 +55,10 @@ internal fun DatasetRecord.toExternal(
   fileInfo: DatasetFileSummary?,
   shares: List<DatasetListShareUser>?,
 ): DatasetListEntry {
-  val typeDisplayName = PluginRegistry[type]?.displayName
-    ?: throw IllegalStateException("plugin missing: $type")
-
   return DatasetListEntry(
     datasetID        = datasetID,
     owner            = DatasetOwner(owner),
-    datasetType      = DatasetTypeOutput(this, typeDisplayName),
+    datasetType      = DatasetTypeOutput(this, PluginRegistry.displayNameFor(type)),
     visibility       = DatasetVisibility(visibility),
     name             = name,
     origin           = origin,

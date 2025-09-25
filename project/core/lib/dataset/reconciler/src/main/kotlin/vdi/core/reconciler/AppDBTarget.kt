@@ -32,19 +32,19 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
     val res = try {
       handler.client.postUninstall(dataset.datasetID, projectID, dataset.type)
     } catch (e: Throwable) {
-      throw PluginRequestException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID, cause = e)
+      throw PluginRequestException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID, cause = e)
     }
 
     if (!res.isSuccessResponse)
       when (res) {
         is UninstallBadRequestResponse ->
-          throw PluginException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID, res.message)
+          throw PluginException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID, res.message)
 
         is UninstallUnexpectedErrorResponse ->
-          throw PluginException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID, res.message)
+          throw PluginException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID, res.message)
 
         else ->
-          throw PluginException.uninstall(handler.displayName, projectID, dataset.ownerID, dataset.datasetID)
+          throw PluginException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID)
       }
 
       appDB.withTransaction(projectID, dataset.type) { it.purgeDatasetControlTables(dataset.datasetID) }

@@ -10,8 +10,8 @@ internal class PluginHandlerImpl(
   override val client: PluginHandlerClient,
   private val details: PluginDetails
 ) : PluginHandler {
-  override val displayName: String
-    get() = details.displayName
+  override val name: String
+    get() = details.name
 
   override fun appliesToProject(installTarget: InstallTargetID) =
     details.appliesTo(installTarget)

@@ -110,7 +110,7 @@ internal class SoftDeleteLaneImpl(
         } catch (e: PluginException) {
           throw e
         } catch (e: Throwable) {
-          throw PluginException.uninstall(handler.displayName, projectID, userID, datasetID, cause = e)
+          throw PluginException.uninstall(handler.name, projectID, userID, datasetID, cause = e)
         }
       }
     }
@@ -130,7 +130,7 @@ internal class SoftDeleteLaneImpl(
     val response = try {
       handler.client.postUninstall(datasetID, installTarget, record.type)
     } catch (e: Throwable) {
-      throw PluginRequestException.uninstall(handler.displayName, installTarget, userID, datasetID, cause = e)
+      throw PluginRequestException.uninstall(handler.name, installTarget, userID, datasetID, cause = e)
     }
 
     Metrics.Uninstall.count.labels(record.type.name.toString(), record.type.version, response.responseCode.toString()).inc()
@@ -174,7 +174,7 @@ internal class SoftDeleteLaneImpl(
       userID,
       datasetID,
       installTarget,
-      handler.displayName
+      handler.name
     )
 
     appDB.withTransaction(installTarget, handler.type) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedAndUninstalled) }
@@ -192,10 +192,10 @@ internal class SoftDeleteLaneImpl(
       userID,
       datasetID,
       installTarget,
-      handler.displayName,
+      handler.name,
     )
 
-    throw PluginException.uninstall(handler.displayName, installTarget, userID, datasetID, res.message)
+    throw PluginException.uninstall(handler.name, installTarget, userID, datasetID, res.message)
   }
 
   private fun handleUnexpectedErrorResponse(
@@ -213,6 +213,6 @@ internal class SoftDeleteLaneImpl(
       res.message,
     )
 
-    throw PluginException.uninstall(handler.displayName, installTarget, userID, datasetID, res.message)
+    throw PluginException.uninstall(handler.name, installTarget, userID, datasetID, res.message)
   }
 }

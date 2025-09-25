@@ -1,36 +1,31 @@
 package vdi.core.plugin.registry
 
-import vdi.model.data.DatasetType
-import vdi.core.config.loadAndCacheStackConfig
 import vdi.config.parse.ConfigurationException
+import vdi.core.config.loadAndCacheStackConfig
 import vdi.model.data.DataType
+import vdi.model.data.DatasetType
 
 object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
   private val mapping: Map<DatasetType, PluginDetails>
-  private val categories: Map<DatasetType, String>
+  private val metadata: Map<DatasetType, DataTypeMetadata>
 
   init {
-    val conflicts = HashMap<DatasetType, List<String>>(1)
-    val tmpCats   = HashMap<DatasetType, String>(12)
+    val conflicts = HashMap<String, MutableList<String>>(1)
+    val tmpCats   = HashMap<DatasetType, DataTypeMetadata>(12)
 
-    mapping = loadAndCacheStackConfig().vdi.plugins.values
+    mapping = loadAndCacheStackConfig().vdi.plugins
       .asSequence()
-      .flatMap { plug ->
+      .flatMap { (name, plug) ->
         val details = PluginDetails(
-          plug.displayName,
+          name,
           plug.projectIDs?.toList() ?: emptyList(),
           plug.typeChangesEnabled ?: false,
         )
 
         plug.dataTypes.asSequence()
+          .onEach { conflicts.computeIfAbsent(it.displayName, { ArrayList(1) }).add(name) }
           .map { DatasetType(DataType.of(it.name), it.version)
-            .also { dt -> if (it.category != null) tmpCats[dt] = it.category!! } }
-          .onEach {
-            if (it in conflicts)
-              conflicts[it] = conflicts[it]!! + plug.displayName
-            else
-              conflicts[it] = listOf(plug.displayName)
-          }
+            .also { dt -> if (it.category != null) tmpCats[dt] = DataTypeMetadata(it.displayName, it.category!!) } }
           .map { it to details }
       }
       .toMap()
@@ -42,15 +37,19 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
       .takeUnless { it.isBlank() }
       ?.also { throw ConfigurationException(it) }
 
-    categories = HashMap<DatasetType, String>(tmpCats.size)
+    metadata = HashMap<DatasetType, DataTypeMetadata>(tmpCats.size)
       .apply { putAll(tmpCats) }
   }
 
   fun contains(type: DatasetType) = type in mapping
 
-  fun categoryFor(type: DatasetType) = categories[type] ?: throw MissingDataTypeCategoryException(type)
+  fun categoryFor(type: DatasetType) = metadata[type]?.category ?: throw MissingDataTypeCategoryException(type)
 
-  fun categoryOrNullFor(type: DatasetType) = categories[type]
+  fun categoryOrNullFor(type: DatasetType) = metadata[type]?.category
+
+  fun displayNameFor(type: DatasetType) = metadata[type]?.displayName ?: throw MissingDataTypeCategoryException(type)
+
+  fun displayNameOrNullFor(type: DatasetType) = metadata[type]?.displayName
 
   operator fun get(type: DatasetType) = mapping[type]
 

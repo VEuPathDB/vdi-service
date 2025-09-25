@@ -89,6 +89,7 @@ public final class JsonField {
   public static final String ORIGINAL_ID = "originalId";
   public static final String OWNER = "owner";
   public static final String PARTICIPANT_AGES = "participantAges";
+  public static final String PLUGIN_NAME = "pluginName";
   public static final String PROGRAM_NAME = "programName";
   public static final String PROJECT_NAME = "projectName";
   public static final String PUBLICATIONS = "publications";
@@ -127,6 +128,7 @@ public final class JsonField {
   public static final String TIMESTAMP = "timestamp";
   public static final String TOTAL = "total";
   public static final String TYPE = "type";
+  public static final String TYPE_DISPLAY_NAME = "typeDisplayName";
   public static final String TYPE_NAME = "typeName";
   public static final String TYPE_VERSION = "typeVersion";
   public static final String UPLOAD = "upload";

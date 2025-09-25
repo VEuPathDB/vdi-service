@@ -3,7 +3,7 @@ package vdi.core.plugin.registry
 import vdi.model.data.InstallTargetID
 
 data class PluginDetails(
-  val displayName:    String,
+  val name:           String,
   val projects:       List<InstallTargetID>,
   val changesEnabled: Boolean,
 ) {

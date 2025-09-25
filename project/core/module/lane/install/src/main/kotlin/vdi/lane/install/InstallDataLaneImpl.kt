@@ -206,7 +206,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.installData(handler.displayName, "N/A", userID, datasetID, cause = e)
+      throw PluginException.installData(handler.name, "N/A", userID, datasetID, cause = e)
     }
   }
 
@@ -312,9 +312,9 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       val response = try {
         client.postInstallData(datasetID, installTarget, meta, manifest, data)
       } catch (e: S34KError) { // Don't mix up minio errors with request errors.
-        throw PluginException.installData(displayName, installTarget, userID, datasetID, cause = e)
+        throw PluginException.installData(name, installTarget, userID, datasetID, cause = e)
       } catch (e: Throwable) {
-        throw PluginRequestException.installData(displayName, installTarget, userID, datasetID, cause = e)
+        throw PluginRequestException.installData(name, installTarget, userID, datasetID, cause = e)
       }
 
       Metrics.Install.count.labels(dataset.type.name.toString(), dataset.type.version, response.responseCode.toString()).inc()
@@ -378,7 +378,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.installData(displayName, installTarget, userID, datasetID, cause = e)
+      throw PluginException.installData(name, installTarget, userID, datasetID, cause = e)
     } finally {
       timer?.observeDuration()
     }
@@ -396,7 +396,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       userID,
       datasetID,
       installTarget,
-      displayName,
+      name,
     )
 
     appDB.withTransaction(installTarget, type) {
@@ -423,7 +423,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       userID,
       datasetID,
       installTarget,
-      displayName,
+      name,
       res.message,
     )
 
@@ -438,7 +438,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       ))
     }
 
-    throw PluginException.installData(displayName, installTarget, userID, datasetID, res.message)
+    throw PluginException.installData(name, installTarget, userID, datasetID, res.message)
   }
 
   private fun PluginHandler.handleValidationFailureResponse(
@@ -480,7 +480,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       userID,
       datasetID,
       installTarget,
-      displayName,
+      name,
     )
 
     appDB.withTransaction(installTarget, type) {
@@ -510,7 +510,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       userID,
       datasetID,
       installTarget,
-      displayName,
+      name,
     )
 
     appDB.withTransaction(installTarget, type) {
@@ -524,7 +524,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       ))
     }
 
-    throw PluginException.installData(displayName, installTarget, userID, datasetID, res.message)
+    throw PluginException.installData(name, installTarget, userID, datasetID, res.message)
   }
 
   private suspend fun <T> DatasetDirectory.buildInstallBundle(

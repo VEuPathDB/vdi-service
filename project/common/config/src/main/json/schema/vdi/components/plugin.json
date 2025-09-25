@@ -10,9 +10,6 @@
         { "$ref": "../../common.json#/$defs/addressObject" }
       ]
     },
-    "displayName": {
-      "type": "string"
-    },
     "dataTypes": {
       "title": "Data Types",
       "description": "Types and versions of dataset data handled by the plugin being defined.",
@@ -77,7 +74,6 @@
   },
   "required": [
     "server",
-    "displayName",
     "dataTypes"
   ],
   "additionalProperties": false,
@@ -108,13 +104,20 @@
           "type": "string",
           "minLength": 3
         },
+        "displayName": {
+          "type": "string",
+          "minLength": 3
+        },
         "version": {
           "oneOf": [
             {
               "type":"string",
               "minLength": 1
             },
-            { "type": "number" }
+            {
+              "type": "number",
+              "minimum": 0
+            }
           ]
         },
         "category": {

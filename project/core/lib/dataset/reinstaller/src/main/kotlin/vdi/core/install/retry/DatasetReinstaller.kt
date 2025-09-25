@@ -132,14 +132,14 @@ object DatasetReinstaller {
     val uninstallResult = try {
       handler.client.postUninstall(dataset.datasetID, installTarget, dataset.type)
     } catch (e: Throwable) {
-      throw PluginRequestException.uninstall(handler.displayName, installTarget, dataset.owner, dataset.datasetID, cause = e)
+      throw PluginRequestException.uninstall(handler.name, installTarget, dataset.owner, dataset.datasetID, cause = e)
     }
 
     when (uninstallResult.type) {
       UninstallResponseType.Success -> { /* do nothing */ }
 
       UninstallResponseType.BadRequest -> throw PluginException.uninstall(
-        handler.displayName,
+        handler.name,
         installTarget,
         dataset.owner,
         dataset.datasetID,
@@ -147,7 +147,7 @@ object DatasetReinstaller {
       )
 
       UninstallResponseType.UnexpectedError -> throw PluginException.uninstall(
-        handler.displayName,
+        handler.name,
         installTarget,
         dataset.owner,
         dataset.datasetID,
@@ -176,9 +176,9 @@ object DatasetReinstaller {
         handler.client.postInstallData(dataset.datasetID, installTarget, meta, manifest, data)
       }
     } catch (e: S34KError) { // don't mix up minio errors with request errors
-      throw PluginException.installData(handler.displayName, installTarget, dataset.owner, dataset.datasetID, cause = e)
+      throw PluginException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, cause = e)
     } catch (e: Throwable) {
-      throw PluginRequestException.installData(handler.displayName, installTarget, dataset.owner, dataset.datasetID, cause = e)
+      throw PluginRequestException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, cause = e)
     }
 
     when (response.type) {
@@ -231,7 +231,7 @@ object DatasetReinstaller {
       dataset.owner,
       dataset.datasetID,
       installTarget,
-      handler.displayName,
+      handler.name,
     )
 
     appDB.withTransaction(installTarget, dataset.type) {
@@ -255,7 +255,7 @@ object DatasetReinstaller {
       dataset.owner,
       dataset.datasetID,
       installTarget,
-      handler.displayName,
+      handler.name,
       response.message,
     )
 
@@ -268,7 +268,7 @@ object DatasetReinstaller {
       ))
     }
 
-    throw PluginException.installData(handler.displayName, installTarget, dataset.owner, dataset.datasetID, response.message)
+    throw PluginException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, response.message)
   }
 
   private fun handleInstallValidationFailure(
@@ -282,7 +282,7 @@ object DatasetReinstaller {
       dataset.owner,
       dataset.datasetID,
       installTarget,
-      handler.displayName,
+      handler.name,
     )
 
     appDB.withTransaction(installTarget, dataset.type) {
@@ -306,7 +306,7 @@ object DatasetReinstaller {
       dataset.owner,
       dataset.datasetID,
       installTarget,
-      handler.displayName
+      handler.name
     )
 
     appDB.withTransaction(installTarget, dataset.type) {
@@ -330,7 +330,7 @@ object DatasetReinstaller {
       dataset.owner,
       dataset.datasetID,
       installTarget,
-      handler.displayName,
+      handler.name,
     )
 
     appDB.withTransaction(installTarget, dataset.type) {
@@ -342,7 +342,7 @@ object DatasetReinstaller {
       ))
     }
 
-    throw PluginException.installData(handler.displayName, installTarget, dataset.owner, dataset.datasetID, response.message)
+    throw PluginException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, response.message)
   }
 
   private suspend fun <T> withInstallBundle(

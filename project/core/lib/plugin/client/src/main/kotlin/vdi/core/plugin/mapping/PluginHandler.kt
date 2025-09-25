@@ -1,6 +1,5 @@
 package vdi.core.plugin.mapping
 
-import vdi.model.data.DataType
 import vdi.model.data.InstallTargetID
 import vdi.core.plugin.client.PluginHandlerClient
 import vdi.model.data.DatasetType
@@ -20,7 +19,7 @@ interface PluginHandler {
   /**
    * Display name of the type of dataset that this plugin handler handles.
    */
-  val displayName: String
+  val name: String
 
   /**
    * The plugin handler API client for connecting to and performing actions on

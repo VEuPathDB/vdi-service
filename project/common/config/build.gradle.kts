@@ -24,7 +24,7 @@ sourceSets.main {
 tasks.clean { delete(jsonSchemaBuildDir) }
 
 val json = ObjectMapper()
-val inputDir = file("src/main/json/schema/config/")
+val inputDir = file("src/main/json/schema/")
 val refRegex = Regex("\"\\\$ref\":\\s*\"([^\"]+)\"")
 
 fun File.load() =
