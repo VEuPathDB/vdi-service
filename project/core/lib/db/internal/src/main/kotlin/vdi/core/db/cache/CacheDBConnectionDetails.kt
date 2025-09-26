@@ -11,6 +11,6 @@ data class CacheDBConnectionDetails(
   constructor(conf: CacheDBConfig): this(
     host = conf.server.host,
     port = conf.server.port ?: PGProperty.PG_PORT.defaultValue!!.toUShort(),
-    name = conf.name ?: "vdi",
+    name = conf.name,
   )
 }

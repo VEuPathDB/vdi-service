@@ -9,12 +9,12 @@ import vdi.logging.MetaLogger
 fun migrateInternalDatabase(conf: CacheDBConfig) {
   MetaLogger.info("testing for required internal database migrations")
   val ds = HikariConfig().apply {
-      jdbcUrl = "jdbc:postgresql://${conf.server.host}:${conf.server.port}/${conf.name}"
-      username = conf.username
-      password = conf.password.asString
-      maximumPoolSize = 5
-      driverClassName = Driver::class.qualifiedName
-    }
+    jdbcUrl = "jdbc:postgresql://${conf.server.host}:${conf.server.port}/${conf.name}"
+    username = conf.username
+    password = conf.password.asString
+    maximumPoolSize = 5
+    driverClassName = Driver::class.qualifiedName
+  }
     .let(::HikariDataSource)
 
   ds.connection.use { conn ->

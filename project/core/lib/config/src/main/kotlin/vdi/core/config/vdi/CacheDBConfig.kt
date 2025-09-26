@@ -7,6 +7,6 @@ data class CacheDBConfig(
   val server: PartialHostAddress,
   val username: String,
   val password: SecretString,
-  val name: String?,
+  val name: String = "vdi",
   val poolSize: UByte?,
 )
