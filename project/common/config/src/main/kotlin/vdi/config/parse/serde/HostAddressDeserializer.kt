@@ -9,9 +9,9 @@ import vdi.config.parse.fields.PartialHostAddress
 class HostAddressDeserializer: StdDeserializer<PartialHostAddress>(PartialHostAddress::class.java) {
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext) =
     if (p.currentToken.isScalarValue)
-      vdi.config.parse.serde.HostAddressDeserializer.Companion.parseFromString(p.codec.readValue(p, String::class.java))
+      parseFromString(p.codec.readValue(p, String::class.java))
     else
-      vdi.config.parse.serde.HostAddressDeserializer.Companion.parseFromObject(p.codec.readValue(p, ObjectNode::class.java))
+      parseFromObject(p.codec.readValue(p, ObjectNode::class.java))
 
   companion object {
     fun parseFromObject(obj: ObjectNode) =

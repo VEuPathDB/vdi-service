@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.contains
 import vdi.config.parse.fields.PartialHostAddress
+import vdi.config.parse.serde.HostAddressDeserializer
 import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
 import vdi.config.raw.db.LDAPDatabaseConnectionConfig
@@ -32,16 +33,22 @@ class DatabaseConnectionConfigDeserializer: StdDeserializer<DatabaseConnectionCo
           schema   = get("schema")?.textValue(),
         )
       } else {
-        val server = get("server") as ObjectNode
+        val server = get("server").let {
+          if (it.isTextual) {
+            HostAddressDeserializer.parseFromString(it.textValue())
+          } else {
+            HostAddressDeserializer.parseFromObject(it as ObjectNode)
+          }
+        }
 
         DirectDatabaseConnectionConfig(
           username = user,
           password = pass,
           platform = get("platform").textValue(),
           poolSize = poolSize,
-          server = PartialHostAddress(server["host"].textValue(), server["port"]?.intValue()?.toUShort()),
-          dbName = get("dbName").textValue(),
-          schema = get("schema")?.textValue(),
+          server   = server,
+          dbName   = get("dbName").textValue(),
+          schema   = get("schema")?.textValue(),
         )
       }
     }
