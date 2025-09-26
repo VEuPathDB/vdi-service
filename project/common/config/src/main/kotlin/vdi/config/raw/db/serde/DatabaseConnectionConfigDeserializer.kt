@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.contains
-import vdi.config.parse.fields.PartialHostAddress
 import vdi.config.parse.serde.HostAddressDeserializer
 import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
@@ -47,7 +46,7 @@ class DatabaseConnectionConfigDeserializer: StdDeserializer<DatabaseConnectionCo
           platform = get("platform").textValue(),
           poolSize = poolSize,
           server   = server,
-          dbName   = get("dbName").textValue(),
+          dbName   = get("name").textValue(),
           schema   = get("schema")?.textValue(),
         )
       }
