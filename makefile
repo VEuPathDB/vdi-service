@@ -50,3 +50,8 @@ build-core-server:
 .PHONY: build-image
 build-image:
 	@$(MAKE) -C project/core build-image
+
+# (Re)Builds the VDI dev stack container images.
+.PHONY: build-db
+build-db:
+	@$(MAKE) -C stack-db/definition build
