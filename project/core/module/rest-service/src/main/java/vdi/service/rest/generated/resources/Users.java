@@ -33,7 +33,7 @@ public interface Users {
   @Path("/self/share-offers")
   @Produces("application/json")
   GetUsersSelfShareOffersResponse getUsersSelfShareOffers(
-      @QueryParam("status") @DefaultValue("open") UsersSelfShareOffersGetStatus status);
+      @QueryParam("status") @DefaultValue("OPEN") UsersSelfShareOffersGetStatus status);
 
   class GetUsersSelfMetaResponse extends ResponseDelegate {
     public GetUsersSelfMetaResponse(Response response, Object entity) {
