@@ -44,9 +44,9 @@ fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
   projectName?.checkLength(JsonField.META..JsonField.PROJECT_NAME, ProjectNameLengthRange, errors)
   programName?.checkLength(JsonField.META..JsonField.PROGRAM_NAME, ProgramNameLengthRange, errors)
   linkedDatasets.validate(JsonField.META..JsonField.LINKED_DATASETS, errors)
-  experimentalOrganism.validate(JsonField.META..JsonField.EXPERIMENTAL_ORGANISM, errors)
+  experimentalOrganism?.validate(JsonField.META..JsonField.EXPERIMENTAL_ORGANISM, errors)
   hostOrganism.validate(JsonField.META..JsonField.HOST_ORGANISM, errors)
   characteristics?.validate(JsonField.META..JsonField.CHARACTERISTICS, errors)
-  externalIdentifiers.validate(JsonField.META..JsonField.EXTERNAL_IDENTIFIERS, errors)
+  externalIdentifiers?.validate(JsonField.META..JsonField.EXTERNAL_IDENTIFIERS, errors)
   funding.validate(JsonField.META..JsonField.FUNDING, errors)
 }
