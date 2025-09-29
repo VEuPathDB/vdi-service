@@ -26,7 +26,7 @@ WITH results AS (
   , d.type_name
   , d.type_version
   , d.owner
-  , d.is_deleted
+  , d.deleted_status
   -- Sort ID is needed to align the result rows with the object key stream
   -- coming from the object store
   , d.owner || '/' || (
@@ -50,7 +50,7 @@ SELECT
 , type_name
 , type_version
 , owner
-, is_deleted
+, deleted_status
 FROM results
 ORDER BY sort_id
 """
@@ -84,7 +84,7 @@ class RecordIterator(
       dataUpdated   = rs.getDateTime("data_update_time"),
       metaUpdated   = rs.getDateTime("meta_update_time"),
       type          = DatasetType(rs.getDataType("type_name"), rs.getString("type_version")),
-      isUninstalled = rs.getInt("is_deleted") == DeleteFlag.DeletedAndUninstalled.value
+      isUninstalled = rs.getInt("deleted_status") == DeleteFlag.DeletedAndUninstalled.value
     )
   }
 

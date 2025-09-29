@@ -52,7 +52,7 @@ internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): Dat
         owner           = rs.getUserID("owner"),
         type            = type,
         category        = PluginRegistry.categoryOrNullFor(type) ?: rs.getString("category"),
-        deletionState   = rs.getDeleteFlag("is_deleted"),
+        deletionState   = rs.getDeleteFlag("deleted_status"),
         accessibility   = rs.getString("accessibility")?.let(DatasetVisibility::fromString)
           ?: if (rs.getBoolean("is_public")) DatasetVisibility.Public else DatasetVisibility.Private,
         daysForApproval = rs.getInt("days_for_approval").let { if (rs.wasNull()) -1 else it },

@@ -14,7 +14,7 @@ private fun sql(schema: String) =
 UPDATE
   ${schema}.${Table.Dataset}
 SET
-  is_deleted = ?
+  deleted_status = ?
 WHERE
   dataset_id = ?
 """

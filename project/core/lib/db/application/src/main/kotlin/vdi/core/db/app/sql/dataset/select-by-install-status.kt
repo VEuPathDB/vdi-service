@@ -65,7 +65,7 @@ internal fun Connection.selectDatasetsByInstallStatus(
         owner         = getUserID("owner"),
         type          = type,
         category      = PluginRegistry.categoryOrNullFor(type) ?: getString("category"),
-        deletionState = getDeleteFlag("is_deleted"),
+        deletionState = getDeleteFlag("deleted_status"),
         accessibility = getString("accessibility")?.let(DatasetVisibility::fromString)
           ?: if (getBoolean("is_public")) DatasetVisibility.Public else DatasetVisibility.Private,
         daysForApproval = getInt("days_for_approval").let { if (wasNull()) -1 else it },

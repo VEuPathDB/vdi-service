@@ -6,7 +6,7 @@ import vdi.core.db.app.AppDB
 import vdi.core.db.app.AppDatabaseRegistry
 import vdi.core.db.model.ReconcilerTargetRecord
 
-internal class CloseableMultiIterator(private val installTarget: InstallTargetID) : CloseableIterator<ReconcilerTargetRecord> {
+internal class CloseableMultiIterator(private val installTarget: InstallTargetID): CloseableIterator<ReconcilerTargetRecord> {
   private val dataTypeIterator = AppDatabaseRegistry[installTarget]!!.keys().iterator()
   private var current: CloseableIterator<ReconcilerTargetRecord>? = null
 
@@ -16,19 +16,15 @@ internal class CloseableMultiIterator(private val installTarget: InstallTargetID
 
   override fun next(): ReconcilerTargetRecord {
     // iterate until we have a record stream with at least one record in it.
-    while (current?.hasNext() != true) {
+    while (current?.hasNext() != true && dataTypeIterator.hasNext()) {
       // close the previous stream (if one exists)
       current?.close()
 
-      // ensure there is another type to move to for the current project
       if (!dataTypeIterator.hasNext())
-        throw NoSuchElementException()
-
-      // attempt to get a stream for the project/type pairing
-      current = AppDB().accessor(installTarget, dataTypeIterator.next())?.streamAllSyncControlRecords()
+        current = AppDB().accessor(installTarget, dataTypeIterator.next())?.streamAllSyncControlRecords()
     }
 
-    return current!!.next()
+    return if (current?.hasNext() == true) current!!.next() else throw NoSuchElementException()
   }
 
   override fun close() {
