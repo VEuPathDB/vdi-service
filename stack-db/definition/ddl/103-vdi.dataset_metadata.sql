@@ -30,4 +30,5 @@ CREATE TABLE IF NOT EXISTS vdi.dataset_metadata (
 , description VARCHAR
 );
 
-CREATE INDEX vdi.dataset_metadata_project_name ON vdi.dataset_metadata.
+CREATE INDEX vdi.dataset_metadata_project_name ON vdi.dataset_metadata (project_name);
+CREATE INDEX vdi.dataset_metadata_program_name ON vdi.dataset_metadata (program_name);

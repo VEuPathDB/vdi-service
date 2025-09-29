@@ -9,3 +9,7 @@ ALTER TABLE vdi.dataset_metadata
     REFERENCES vdi.dataset (dataset_id)
     ON DELETE CASCADE
 ;
+
+CREATE INDEX IF NOT EXISTS vdi.dataset_metadata_project_name ON vdi.dataset_metadata (project_name);
+CREATE INDEX IF NOT EXISTS vdi.dataset_metadata_program_name ON vdi.dataset_metadata (program_name);
+
