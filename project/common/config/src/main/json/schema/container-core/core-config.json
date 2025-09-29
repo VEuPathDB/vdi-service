@@ -12,20 +12,7 @@
       "properties": {
         "accountDb": { "$ref": "../common.json#/$defs/database" },
         "appDb": { "$ref": "../common.json#/$defs/database" },
-        "userDb": {
-          "allOf": [
-            { "$ref": "../common.json#/$defs/database" },
-            {
-              "properties": {
-                "schema": {
-                  "type": "string",
-                  "minLength": 5,
-                  "default": "userlogins5"
-                }
-              }
-            }
-          ]
-        }
+        "userDb": { "$ref": "../common.json#/$defs/database" }
       }
     }
   },

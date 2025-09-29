@@ -62,6 +62,11 @@
               "minimum": 5,
               "maximum": 32,
               "default": 5
+            },
+            "schema": {
+              "description": "Target database schema name.  If not provided, the username value is used.",
+              "type": "string",
+              "minimumLength": 3
             }
           },
           "required": [
