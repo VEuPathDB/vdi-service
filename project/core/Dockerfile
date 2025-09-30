@@ -4,17 +4,19 @@ WORKDIR /workspace
 
 COPY gradle gradle
 COPY project/conventions project/conventions
-
 RUN cd project/conventions && gradle build
-
-COPY settings.gradle.kts .
-COPY project project
-COPY stack-db stack-db
 
 ARG GH_USERNAME
 ARG GH_TOKEN
 
-RUN gradle --no-daemon :core:download-dependencies
+COPY project/common project/common
+RUN cd project/common && gradle :json:build :util:build :model:build :logging:build :config:build :target-db:build
+
+COPY settings.gradle.kts .
+COPY project/core project/core
+COPY stack-db/migrations stack-db/migrations
+
+RUN gradle :core:download-dependencies
 
 # Build Info
 ARG GIT_TAG="unknown"
@@ -25,7 +27,7 @@ ARG BUILD_ID="unknown"
 ARG BUILD_NUMBER="unknown"
 ARG BUILD_TIME="unknown"
 
-RUN gradle --no-daemon \
+RUN gradle \
     -Pbuild.git.tag="${GIT_TAG}" \
     -Pbuild.git.commit="${GIT_COMMIT}" \
     -Pbuild.git.branch="${GIT_BRANCH}" \
