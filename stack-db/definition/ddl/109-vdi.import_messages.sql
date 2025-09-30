@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS vdi.import_messages (
     NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS vdi.import_messages_dataset_id ON vdi.import_messages (dataset_id);
-CREATE UNIQUE INDEX IF NOT EXISTS vdi.import_messages_message_uq ON vdi.import_messages (dataset_id, message);
+CREATE INDEX IF NOT EXISTS vdi_import_messages_dataset_id ON vdi.import_messages (dataset_id);
+CREATE UNIQUE INDEX IF NOT EXISTS vdi_import_messages_message_uq ON vdi.import_messages (dataset_id, message);

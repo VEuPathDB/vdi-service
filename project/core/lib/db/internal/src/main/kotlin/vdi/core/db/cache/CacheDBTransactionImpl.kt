@@ -197,7 +197,9 @@ internal class CacheDBTransactionImpl(
 
   override fun close() {
     commit()
-    connection.close()
-    closed = true
+    if (!closed) {
+      connection.close()
+      closed = true
+    }
   }
 }

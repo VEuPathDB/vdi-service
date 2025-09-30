@@ -18,4 +18,4 @@ CREATE TABLE IF NOT EXISTS vdi.dataset_revisions (
 , timestamp   TIMESTAMPTZ NOT NULL    -- timestamp the revision was created
 );
 
-CREATE INDEX IF NOT EXISTS vdi.dataset_revisions_original_id ON vdi.dataset_revisions (original_id);
+CREATE INDEX IF NOT EXISTS vdi_dataset_revisions_original_id ON vdi.dataset_revisions (original_id);

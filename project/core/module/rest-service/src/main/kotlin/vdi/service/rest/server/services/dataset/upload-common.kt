@@ -79,6 +79,8 @@ fun <T: ControllerBase> T.resolveDatasetFiles(
   meta: Iterable<File>?,
   uploadConfig: UploadConfig,
 ): UploadFileReferences {
+  logger.debug("resolving dataset file")
+
   val tmpDir = TempFiles.makeTempDirectory()
 
   return try {

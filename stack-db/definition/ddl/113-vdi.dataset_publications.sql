@@ -10,6 +10,6 @@ CREATE TABLE IF NOT EXISTS vdi.dataset_publications (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS
-  vdi.dataset_publications_dataset_to_publication
+  vdi_dataset_publications_dataset_to_publication
 ON
   vdi.dataset_publications (dataset_id, publication_id);
