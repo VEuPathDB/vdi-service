@@ -1,5 +1,6 @@
 package vdi.core.kafka.router
 
+import org.slf4j.LoggerFactory
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
 import vdi.json.JSON
@@ -12,6 +13,8 @@ class KafkaRouter(
   private val config: KafkaRouterConfig,
   private val producer: KafkaProducer,
 ) {
+  private val logger = LoggerFactory.getLogger(javaClass)
+
   fun sendImportTrigger(userID: UserID, datasetID: DatasetID, source: EventSource) =
     send(config.importTrigger, userID, datasetID, source)
 
@@ -35,6 +38,11 @@ class KafkaRouter(
 
   fun close() = producer.close()
 
-  private fun send(tc: TriggerConfig, userID: UserID, datasetID: DatasetID, source: EventSource) =
-    producer.send(tc.topic, KafkaMessage(tc.messageKey, JSON.writeValueAsString(EventMessage(userID, datasetID, source))))
+  private fun send(tc: TriggerConfig, userID: UserID, datasetID: DatasetID, source: EventSource) {
+    logger.debug("sending message {} for {}/{} from {}", tc, userID, datasetID, source)
+    producer.send(
+      tc.topic,
+      KafkaMessage(tc.messageKey, JSON.writeValueAsString(EventMessage(userID, datasetID, source)))
+    )
+  }
 }

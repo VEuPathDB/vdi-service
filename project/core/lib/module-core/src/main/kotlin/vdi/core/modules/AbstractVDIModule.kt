@@ -162,9 +162,11 @@ abstract class AbstractVDIModule(
    *
    * @return A stream of event messages.
    */
-  protected fun KafkaConsumer.fetchMessages(key: MessageKey): Sequence<EventMessage> =
+  protected suspend fun KafkaConsumer.fetchMessages(key: MessageKey): Sequence<EventMessage> =
     receive()
+      .also { if (it.isNotEmpty()) log.debug("fetched {} for key {}", it, key) }
       .asSequence()
+      .onEach { log.debug("got {}", it) }
       .filter {
         if (it.key == key) {
           true

@@ -72,8 +72,6 @@ object Reconciler {
     val timer = Metrics.Reconciler.Full.reconcilerTimes.startTimer()
 
     log.info("running full reconciler for ${targets.size} targets")
-
-    log.info("beginning reconciliation")
     coroutineScope {
       targets.forEach {
         launch {
@@ -83,6 +81,7 @@ object Reconciler {
     }
 
     timer.observeDuration()
+    log.info("full reconciliation complete")
 
     return true
   }
@@ -92,7 +91,6 @@ object Reconciler {
       return false
 
     val timer = Metrics.Reconciler.Slim.executionTime.startTimer()
-
     val target = CacheDBTarget()
 
     ReconcilerInstance(target, datasetManager, kafkaRouter, slim = true, deletesEnabled = false).reconcile()
@@ -101,6 +99,4 @@ object Reconciler {
 
     return true
   }
-
-  private fun workerName(tgt: ReconcilerTarget) = "recon-${tgt.name}"
 }

@@ -27,10 +27,13 @@ import vdi.module.sleeper.AwaitDependencies
 import vdi.service.rest.RestService
 
 object Main {
-//  init {
-//    LogManager.getLogManager()
-//      .readConfiguration("handlers = org.slf4j.bridge.SLF4JBridgeHandler.level = SEVERE".byteInputStream())
-//  }
+  init {
+    LogManager.getLogManager()
+      .readConfiguration("""
+        handlers = org.slf4j.bridge.SLF4JBridgeHandler
+        .level = SEVERE
+      """.trimIndent().byteInputStream())
+  }
 
   @JvmStatic
   fun main(args: Array<String>) {

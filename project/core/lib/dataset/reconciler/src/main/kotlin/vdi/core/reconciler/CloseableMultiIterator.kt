@@ -10,24 +10,43 @@ internal class CloseableMultiIterator(private val installTarget: InstallTargetID
   private val dataTypeIterator = AppDatabaseRegistry[installTarget]!!.keys().iterator()
   private var current: CloseableIterator<ReconcilerTargetRecord>? = null
 
-  override fun hasNext() =
-    current?.let { it.hasNext() || dataTypeIterator.hasNext() }
-      ?: dataTypeIterator.hasNext()
+  override fun hasNext(): Boolean {
+    if (current?.hasNext() == true)
+      return true
 
-  override fun next(): ReconcilerTargetRecord {
-    // iterate until we have a record stream with at least one record in it.
-    while (current?.hasNext() != true && dataTypeIterator.hasNext()) {
-      // close the previous stream (if one exists)
-      current?.close()
-
-      if (!dataTypeIterator.hasNext())
-        current = AppDB().accessor(installTarget, dataTypeIterator.next())?.streamAllSyncControlRecords()
+    while (trySetNext()) {
+      if (current!!.hasNext())
+        return true
     }
 
-    return if (current?.hasNext() == true) current!!.next() else throw NoSuchElementException()
+    return false
   }
+
+  override fun next(): ReconcilerTargetRecord =
+    if (current == null || !current!!.hasNext()) {
+      trySetNext()
+      if (current?.hasNext() == true) current!!.next() else throw NoSuchElementException()
+    } else {
+      current!!.next()
+    }
 
   override fun close() {
     current?.close()
   }
+
+  private fun trySetNext(): Boolean {
+    current?.close()
+    current = null
+
+    while (dataTypeIterator.hasNext()) {
+      current = makeNext()
+      if (current != null)
+        return true
+    }
+
+    return false
+  }
+
+  private fun makeNext() =
+    AppDB().accessor(installTarget, dataTypeIterator.next())?.streamAllSyncControlRecords()
 }

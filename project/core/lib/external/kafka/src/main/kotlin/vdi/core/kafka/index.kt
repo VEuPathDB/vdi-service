@@ -1,7 +1,6 @@
 package vdi.core.kafka
 
 import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import java.util.Properties
@@ -17,7 +16,7 @@ private fun init(servers: Iterable<HostAddress>) {
     for (server in servers) {
       if (server !in knownServers) {
         knownServers.add(server)
-        RemoteDependencies.register("Kafka ${server}", server.host, server.port)
+        RemoteDependencies.register("Kafka $server", server.host, server.port)
       }
     }
   }
@@ -62,43 +61,5 @@ fun KafkaConsumer(topic: MessageTopic, config: KafkaConsumerConfig): KafkaConsum
 
 fun KafkaProducer(config: KafkaProducerConfig): KafkaProducer {
   init(config.servers)
-  val props = Properties()
-    .apply {
-      setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.servers.joinToString(",") { it.toString() })
-      setProperty(ProducerConfig.CLIENT_ID_CONFIG, config.clientID)
-
-      // Optional Props
-      config.bufferMemory
-        ?.also { setProperty(ProducerConfig.BUFFER_MEMORY_CONFIG, it.toString()) }
-      config.compressionType
-        ?.also { setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, it.toString()) }
-      config.sendRetries
-        ?.also { setProperty(ProducerConfig.RETRIES_CONFIG, it.toString()) }
-      config.batchSize
-        ?.also { setProperty(ProducerConfig.BATCH_SIZE_CONFIG, it.toString()) }
-      config.connectionsMaxIdle?.inWholeMilliseconds
-        ?.also { setProperty(ProducerConfig.CONNECTIONS_MAX_IDLE_MS_CONFIG, it.toString()) }
-      config.deliveryTimeout?.inWholeMilliseconds
-        ?.also { setProperty(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, it.toString()) }
-      config.lingerTime?.inWholeMilliseconds
-        ?.also { setProperty(ProducerConfig.LINGER_MS_CONFIG, it.toString()) }
-      config.maxBlockingTimeout?.inWholeMilliseconds
-        ?.also { setProperty(ProducerConfig.MAX_BLOCK_MS_CONFIG, it.toString()) }
-      config.maxRequestSize
-        ?.also { setProperty(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, it.toString()) }
-      config.receiveBufferSize
-        ?.also { setProperty(ProducerConfig.RECEIVE_BUFFER_CONFIG, it.toString()) }
-      config.requestTimeout?.inWholeMilliseconds
-        ?.also { setProperty(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, it.toString()) }
-      config.sendBufferSize
-        ?.also { setProperty(ProducerConfig.SEND_BUFFER_CONFIG, it.toString()) }
-      config.reconnectBackoffMaxTime?.inWholeMilliseconds
-        ?.also { setProperty(ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, it.toString()) }
-      config.reconnectBackoffTime?.inWholeMilliseconds
-        ?.also { setProperty(ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, it.toString()) }
-      config.retryBackoffTime?.inWholeMilliseconds
-        ?.also { setProperty(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, it.toString()) }
-    }
-
-  return KafkaProducerImpl(StringSerializer().let { KProducer(props, it, it) })
+  return KafkaProducerImpl(StringSerializer().let { KProducer(config.toProperties(), it, it) })
 }

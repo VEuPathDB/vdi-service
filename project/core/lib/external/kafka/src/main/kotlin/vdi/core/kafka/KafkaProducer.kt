@@ -22,18 +22,6 @@ interface KafkaProducer {
   fun send(topic: MessageTopic, message: KafkaMessage, wait: Boolean = false)
 
   /**
-   * Sends a message to Kafka.
-   *
-   * This method will wait for the message to be confirmed by the Kafka server
-   * before returning.
-   *
-   * @param topic Topic for the message being sent.
-   *
-   * @param message Message to send.
-   */
-  fun send(topic: MessageTopic, message: KafkaSerializable, wait: Boolean = false)
-
-  /**
    * Closes the producer connection.
    */
   fun close()

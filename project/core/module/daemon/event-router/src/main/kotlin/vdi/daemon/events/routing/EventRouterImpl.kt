@@ -142,6 +142,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
 
   private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: (UserID, DatasetID, EventSource) -> Unit) {
     try {
+      log.debug("TRACE - safeSend(userID={}, datasetID={}, fn=...)", userID, datasetID)
       fn(userID, datasetID, EventSource.ObjectStore)
     } catch (e: Throwable) {
       triggerShutdown()

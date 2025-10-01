@@ -183,14 +183,14 @@ internal class CacheDBTransactionImpl(
 
   override fun commit() {
     if (!committed) {
-      connection.commit()
+      con.commit()
       committed = true
     }
   }
 
   override fun rollback() {
     if (!committed) {
-      connection.rollback()
+      con.rollback()
       committed = true
     }
   }
@@ -198,7 +198,7 @@ internal class CacheDBTransactionImpl(
   override fun close() {
     commit()
     if (!closed) {
-      connection.close()
+      con.close()
       closed = true
     }
   }
