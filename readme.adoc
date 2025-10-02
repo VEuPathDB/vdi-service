@@ -1,6 +1,6 @@
 = VEuPathDB Dataset Installer Service (VDI)
 :source-highlighter: highlightjs
-// :toc:
+:toc:
 
 :confluence: https://veupathdb.atlassian.net/wiki/spaces
 
@@ -18,6 +18,11 @@ endif::[]
 
 == Links
 
+=== Compose Stack & Configuration
+
+[unstyled]
+* https://github.com/VEuPathDB/vdi-compose-stack
+
 === Documentation
 
 [unstyled]
@@ -27,349 +32,102 @@ endif::[]
 
 === Schema
 
-JSON schema files for use with editor validation & autocomplete.
+JSON schema files for use with editor validation & autocomplete when editing
+configuration files.
 
-[unstyled]
 * https://veupathdb.github.io/vdi-service/schema/config/full-config.json[Service Stack Configuration Schema]
-* https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.eda.json[EDA Dataset Characteristics Schema]
-* https://veupathdb.github.io/vdi-service/schema/data/dataset-characteristics.metaschema.json[Dataset Characteristics Metaschema]
-
-=== Dataset Characteristics Definitions
-
-Editable YAML schema files that define the valid properties that may appear in
-dataset characteristics.
-
-[unstyled]
-* link:schema/data/dataset-characteristics.eda.yml[EDA Dataset Characteristics]
+* https://veupathdb.github.io/vdi-service/schema/config/plugin-config.json[Plugin-Specific Configuration Schema] +
+  (a subset of the full config schema)
 
 
 == Development
 
 === Repository Structure
 
-.Stack Management
-[unstyled]
-* link:config/[Stack Configuration Files]
-* link:compose/[Docker Compose Files]
-* link:schema/config/[Stack Config JSON Schema]
-
 .Component Source
-[unstyled]
 * link:project/conventions/[Gradle Build Conventions]
 * link:project/common/[Shared Components]
+** link:project/common/config/src/main/json/schema[Config File JSON Schema]
 * link:project/core/[Core VDI Service Components]
+** link:project/core/module/rest-service[REST Service]
+** link:project/core/module/lane[Dataset Processing Lanes]
+** link:project/core/module/daemon[Background Processes]
+** link:project/core/lib/db/application[App DB Queries]
+** link:project/core/lib/dataset/reconciler[Reconciler Core]
 * link:project/plugin-server/[VDI Plugin Handler Server]
+* link:stack-db/definition[Internal Cache DB DDL]
 
 
-=== Core VDI Service
+=== Building VDI Components
 
-==== Container Image Build
+==== Docker Images
 
-[source, shell]
-----
-./gradlew build-image
-----
-
-////
-
-== Documentation Links
-
-=== API
-
-==== Production
-
-* link:https://veupathdb.github.io/vdi-service/prod/vdi-api.html[REST Service API Doc]
-//* Configuration Schema Doc
-//* Full Configuration Schema
-//* Configuration Schema Root
-
-
-==== QA
-
-* link:https://veupathdb.github.io/vdi-service/qa/vdi-api.html[REST Service API Doc]
-//* Configuration Schema Doc
-//* Full Configuration Schema
-//* Configuration Schema Root
-
-
-==== Dev
-
-* link:https://veupathdb.github.io/vdi-service/dev/vdi-api.html[REST Service API Doc]
-* EDA Dataset Characteristics Schema
-** link:schema/data/dataset-characteristics.eda.yml[Source YAML Schema]
-** link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.eda.json[Compiled JSON Schema]
-* Genomics Dataset Characteristics Schema
-** link:schema/data/dataset-characteristics.genomics.yml[Source YAML Schema]
-** link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.genomics.json[Compiled JSON Schema]
-* link:https://veupathdb.github.io/vdi-service/dev/schema/data/dataset-characteristics.metaschema.json[Dataset Characteristiscs Metaschema]
-
-
-=== Administration
-
-.Confluence
-* link:{confluence}/TECH/folder/1006829569[Administration Docs Folder]
-* link:{confluence}/TECH/pages/1006698498/Purge+Broken+Dataset+Folders+from+MinIO[Purge Broken Datasets from Object Store]
-* link:{confluence}/TECH/pages/1283817474/Handling+Failed+Dataset+Installs[Handling Failed Dataset Installs]
-* link:{confluence}/UI/pages/553680929/VDI+User+and+Administration+Guide[User and General Admin Guide]
-
-=== Deployment & Configuration
-
-* link:https://veupathdb.github.io/vdi-service/dev/config-schema.html[Configuration Schema Doc]
-* link:https://veupathdb.github.io/vdi-service/dev/schema/config/full-config.json[Full Configuration Schema]
-* link:https://veupathdb.github.io/vdi-service/dev/schema/config/stack-config.json[Configuration Schema Root]
-
-
-=== Design
-
-.Document Links
-[%collapsible]
-====
-Initial Design::
-+
---
-* link:docs/outdated/overview/overview.html[Original Overview]
---
-
-Feature Expansion::
-+
---
-* link:{confluence}/UI/pages/1292599331/VDI+Feature+Dataset+Data+Revisioning[Dataset Revisioning]
---
-====
-
-
-== Development
-
-=== Run the Stack Locally
-
-==== Configure Compose Environment
-
-Copy the `./compose/example.local.env` file into the project root with the name
-`.env`.
-
-[source, shell]
-----
-cp compose/example.local.env .env
-----
-
-Edit the `.env` file and fill in the required variable values.
-
-===== Optional: Select Image Versions
-
-If specific docker image versions are desired for running a test, additional
-environment variables may be added to the `.env` file to specify image versions.
-
-If no image version is specified for an image, `latest` will be assumed.
-
-.Image Env Vars
-[%collapsible]
-====
-[source, dotenv]
-----
-VDI_CACHE_DB_TAG=latest
-VDI_KAFKA_TAG=latest
-
-VDI_SERVICE_TAG=latest
-
-VDI_PLUGIN_BIGWIG_TAG=latest
-VDI_PLUGIN_BIOM_TAG=latest
-VDI_PLUGIN_EXAMPLE_TAG=latest
-VDI_PLUGIN_GENELIST_TAG=latest
-VDI_PLUGIN_ISASIMPLE_TAG=latest
-VDI_PLUGIN_NOOP_TAG=latest
-VDI_PLUGIN_WRANGLER_TAG=latest
-VDI_PLUGIN_RNASEQ_TAG=latest
-----
-====
-
-==== Start the Service Stack
-
-The full service stack can be started and managed locally by using available
-`make` commands for stack management.
-
-Initial Startup & Image Redeploy::
-Use if the stack has never been run, has been previously destroyed via
-`compose-down`, or to deploy rebuilt images (may be performed without stopping
-the stack).
-+
-[source, shell]
-----
-make compose-up
-----
-
-Shutdown & Destroy Stack::
-Erases volumes and container state.
-+
-[source, shell]
-----
-make compose-down
-----
-
-Halt Stack::
-Maintains volumes and container state.
-+
-[source, shell]
-----
-make compose-stop
-----
-
-Restart Halted Stack::
-+
-[source, shell]
-----
-make compose-start
-----
-
-
-===== Optional: Build Local Changes
-
-If local code changes have been made, and you wish to test those changes in the
-container stack, a new image may be built using the `make` target `build-image`.
+===== VDI Core Server
 
 [source, shell]
 ----
 make build-image
 ----
 
-This build target requires the environment variables `GITHUB_USERNAME` and
-`GITHUB_TOKEN` be available in the running shell.  See the
-{confluence}/TECH/pages/108560402/Deploy+Containerized+Services+for+Local+Development[Confluence Container Guide]
-for additional information.
-
-=== Update Dataset Characteristics Schema
-
-.Optional: Lightweight Checkout
-[%collapsible]
-====
-Clones only the dataset characteristics schema files without pulling down the
-full repository source.
+===== Internal Cache DB
 
 [source, shell]
 ----
-git clone git@github.com:VEuPathDB/vdi-service --depth 1 --filter tree:0 \
-  && cd vdi-service \
-  && git sparse-checkout set --no-cone /schema/data \
-  && git checkout
+make build-db
 ----
-====
 
-The dataset characteristics validation schema files are JSON schema, written in
-YAML that live in the link:schema/data/[data schema directory].
+==== Source Compilation
 
-The schema files themselves are validated using the included metaschema JSON
-file, which may be plugged into many smart editors to automatically validate
-the dataset schema as it is being edited.
+===== VDI Core Server
 
+[source, shell]
+----
+make build-core-server
+----
 
-== Repo Structure
+===== Regenerate RAML-Based Source
 
-The VDI service repository root directory contains subdirectories for source
-code, configuration, documentation, and deployment related files.  Most
-development tasks will be performed in the subprojects under the `./service`
-directory.
+[source, shell]
+----
+make raml-gen
+----
 
-=== Service Components
+===== Plugin Server
 
-==== Lanes
+[source, shell]
+----
+make raml-gen
+----
 
-Dataset event handlers.  Each lane is a separate process that subscribes to a
-Kafka channel and operates on datasets whose information is provided in the
-incoming events.
+=== Common Tasks
 
-* link:module/lane/hard-delete/[Hard Delete]
-* link:module/lane/import/[Import]
-* link:module/lane/install/[Install Data]
-* link:module/lane/reconciliation/[Reconciliation]
-* link:module/lane/sharing/[Share]
-* link:module/lane/soft-delete/[Soft Delete]
-* link:module/lane/update-meta/[Update Meta]
+==== Release a New Version
 
-==== Rest Service
+The core service and plugin server are versioned together, however they are
+presently built differently.
 
-The rest service is the public API through which users and administrators
-communicate with and operate on the VDI system.
+===== Plugin Server
 
-* link:module/rest-service/[Rest API Service]
+When pushing up a new git tag, a
+link:.github/workflows/plugin-server-release.yml[GitHub workflow] will
+automatically be triggered to build and release the plugin server.  That
+workflow will then open pull requests on each of the individual plugin
+repositories to update their copies of the server to the newest version.
 
-==== Daemons
+===== Core Server
 
-Independent background tasks.
+The core server docker image build and push to DockerHub is handled in
+https://ci.apidb.org/job/vdi-service/view/tags/[Jenkins].
 
-* link:module/daemon/event-router/[MinIO Event Router]
-* link:module/daemon/pruner/[Stale Object Pruner]
-* link:module/daemon/reconciler/[Dataset Reconciler]
+==== Update Dependencies
 
-==== Bootstrapper
-
-The bootstrapper is responsible for starting up the service modules listed above
-and ensuring a full JVM shutdown if any service module crashes.
-
-* link:module/bootstrap/[Bootstrapper]
-
-=== Internal Libs
-
-.link:lib/dataset/[Dataset Management]
-* link:lib/dataset/pruner[Dataset Pruner Implementation]
-* link:lib/dataset/reconciler/[Dataset Reconciler Implementation]
-* link:lib/dataset/reinstaller/[Dataset Reinstaller]
-
-.link:lib/db/[Database Interaction]
-* link:lib/db/application/[Application DB Client]
-* link:lib/db/internal/[Internal DB Client]
-* link:lib/db/common/[Shared DB Components]
-
-.link:lib/plugin/[Plugin Communication]
-* link:lib/plugin/client[Plugin HTTP Client]
-* link:lib/plugin/registry/[Enabled Plugin Mapping]
-
-.link:lib/external[External Service APIs]
-* link:lib/external/kafka[Kafka Client]
-* link:lib/external/ldap[LDAP Utilities]
-* link:lib/external/rabbit[Rabbit Client]
-* link:lib/external/s3[MinIO Dataset Management Wrapper]
-
-.Misc
-* link:lib/async/[Async Utilities]
-* link:lib/common/[Universal Components]
-* link:lib/config/[Dumb Service Config POJOs]
-* link:lib/install-target/[Dataset Install Target Registry]
-* link:lib/module-core/[Service/Module Core API]
-* link:lib/test-utils[Unit Test Utilities]
+Dependency version updates are automatically suggested once per week by
+https://github.com/dependabot[GitHub's Dependabot], however if manual updates
+are needed, the JVM dependencies for the full stack are declared in the
+link:gradle/libs.versions.toml[dependency catalog]. +
+(ref https://docs.gradle.org/current/userguide/version_catalogs.html[Gradle Version Catalogs])
 
 
-== VDI Project Repository Links
-
-.Services
-* https://github.com/VEuPathDB/vdi-service[VDI Core Service]
-* https://github.com/VEuPathDB/vdi-plugin-handler-server[VDI Plugin Handler Service]
-
-.Plugins
-* https://github.com/VEuPathDB/vdi-plugin-bigwig[bigWig]
-* https://github.com/VEuPathDB/vdi-plugin-biom[BIOM]
-* https://github.com/VEuPathDB/vdi-plugin-genelist[Gene List]
-* https://github.com/VEuPathDB/vdi-plugin-isasimple[ISA Study]
-* https://github.com/VEuPathDB/vdi-plugin-noop[NoOp]
-* https://github.com/VEuPathDB/vdi-plugin-wrangler[Phenotype]
-* https://github.com/VEuPathDB/vdi-plugin-rnaseq[RNA-Seq]
-
-.Docker Images
-* https://github.com/VEuPathDB/vdi-internal-db[Cache DB Docker Image]
-* https://github.com/VEuPathDB/docker-gus-apidb-base[Gus/ApiDB Schema Base] +
-[.small]#_Not explicitly part of VDI, but the base image for several plugins_#
-
-.Service Libraries
-* https://github.com/VEuPathDB/vdi-component-common[Commons Library]
-* https://github.com/VEuPathDB/vdi-component-json[JSON Utilities]
-
-.Plugin Libraries
-* https://github.com/VEuPathDB/lib-vdi-plugin-rnaseq[lib-rnaseq]
-* https://github.com/VEuPathDB/lib-vdi-plugin-study[lib-study]
-
-.Misc
-* https://github.com/VEuPathDB/vdi-plugin-example[Example Plugin]
-* https://github.com/VEuPathDB/VdiSchema[VDI App DB Schema]
-
-////
 
 == License
 
