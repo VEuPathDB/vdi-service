@@ -4,7 +4,7 @@ import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.setDatasetID
-import vdi.core.db.jdbc.setUserID
+import vdi.core.db.app.sql.setUserID
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
 

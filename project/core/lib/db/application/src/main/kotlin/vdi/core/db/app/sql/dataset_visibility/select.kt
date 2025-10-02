@@ -6,7 +6,7 @@ import io.foxcapades.kdbc.withResults
 import java.sql.Connection
 import vdi.core.db.app.model.DatasetVisibilityRecord
 import vdi.core.db.app.sql.Table
-import vdi.core.db.jdbc.getUserID
+import vdi.core.db.app.sql.getUserID
 import vdi.core.db.jdbc.setDatasetID
 import vdi.model.data.DatasetID
 
