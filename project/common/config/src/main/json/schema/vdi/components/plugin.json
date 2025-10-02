@@ -5,6 +5,8 @@
   "type": "object",
   "properties": {
     "server": {
+      "title": "Plugin Server Host Address",
+      "description": "Address of the plugin HTTP server.  Most likely the VDI-internal network alias of the container.",
       "oneOf": [
         { "$ref": "../../common.json#/$defs/addressString" },
         { "$ref": "../../common.json#/$defs/addressObject" }
@@ -101,6 +103,7 @@
       "type": "object",
       "properties": {
         "name": {
+          "title": "Internal Name",
           "type": "string",
           "minLength": 3
         },
@@ -117,6 +120,7 @@
           ]
         },
         "category": {
+          "title": "Data Type Category/Display Name",
           "type": "string",
           "minLength": 3
         }
