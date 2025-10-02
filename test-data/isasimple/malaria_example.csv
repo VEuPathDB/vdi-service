@@ -1,0 +1,1001 @@
+SID,age,town,date,education,occupation,sex_rad,temperature_fu,blood_smear_fu_rad,flu_rad
+1,7,Town E,2022-09-20,Primary,Student,0,36.8,Negative,Negative
+2,20,Town D,2022-05-29,College,Housekeeper,1,37.8,Indeterminate,Negative
+3,10,Town D,2022-03-20,Primary,Student,0,39,Positive,Not done
+4,31,Town C,2022-01-12,University,Clerk,0,39.1,Negative,Negative
+5,11,Town C,2022-10-26,Primary,Student,0,39.8,Positive,Not done
+6,8,Town D,2022-01-06,Primary,Student,1,40.1,Not done,Negative
+7,8,Town B,2022-04-24,Primary,Student,1,37.5,Negative,Negative
+8,20,Town A,2022-07-18,College,Farmer,0,37.6,Negative,Negative
+9,24,Town A,2022-03-16,College,Farmer,0,38.1,Negative,Positive
+10,38,Town C,2022-03-11,College,Farmer,0,38.4,Negative,Negative
+11,6,Town D,2022-10-06,Primary,Student,0,38.1,Negative,Positive
+12,17,Town B,2022-06-13,College,Student,1,37.1,Negative,Negative
+13,6,Town C,2022-09-14,Primary,Student,1,40.4,Positive,Not done
+14,6,Town E,2022-10-22,Primary,Student,0,38.6,Negative,Negative
+15,30,Town E,2022-09-08,College,Farmer,1,38.2,Not done,Positive
+16,16,Town A,2022-02-25,Secondary,Student,1,39.9,Negative,Negative
+17,7,Town E,2022-08-17,Primary,Student,0,39.8,Not done,Negative
+18,40,Town D,2022-04-23,College,Housekeeper,0,40.4,Not done,Negative
+19,33,Town A,2022-06-06,College,Logger,0,39.2,Negative,Negative
+20,14,Town A,2022-03-12,Secondary,Student,1,38.2,Negative,Negative
+21,27,Town E,2022-04-10,University,Clerk,1,38.9,Negative,Positive
+22,12,Town D,2022-03-17,Primary,Student,1,38.8,Negative,Negative
+23,7,Town A,2022-07-23,Primary,Student,1,40.1,Negative,Negative
+24,5,Town E,2022-09-21,Primary,Student,0,37.6,Negative,Negative
+25,8,Town D,2022-01-31,Primary,Student,0,37.9,Negative,Negative
+26,38,Town B,2022-08-22,University,Teacher,1,36.5,Positive,Not done
+27,35,Town A,2022-10-29,University,Teacher,0,38.5,Negative,Positive
+28,11,Town E,2022-04-21,Primary,Student,0,36.9,Positive,Not done
+29,10,Town A,2022-04-03,Primary,Student,0,39.1,Positive,Not done
+30,17,Town E,2022-03-23,College,Student,1,38.4,Negative,Negative
+31,7,Town C,2022-07-24,Primary,Student,1,38.3,Negative,Negative
+32,8,Town E,2022-08-01,Primary,Student,1,38.1,Positive,Not done
+33,35,Town A,2022-04-26,College,Housekeeper,1,36.3,Negative,Negative
+34,35,Town B,2022-03-22,University,Clerk,1,37.8,Negative,Negative
+35,13,Town C,2022-07-03,Secondary,Student,0,40.3,Negative,Negative
+36,25,Town E,2022-07-01,College,Logger,0,38.2,Negative,Positive
+37,37,Town B,2022-05-26,College,Farmer,0,37.9,Negative,Negative
+38,27,Town C,2022-03-22,College,Farmer,1,38,Negative,Positive
+39,26,Town E,2022-10-18,College,Housekeeper,1,40.3,Negative,Negative
+40,35,Town D,2022-07-21,College,Housekeeper,0,38.3,Positive,Not done
+41,37,Town E,2022-10-13,College,Farmer,0,39.5,Negative,Negative
+42,11,Town B,2022-02-26,Primary,Student,0,38.4,Positive,Not done
+43,22,Town B,2022-01-16,College,Farmer,1,38.3,Negative,Negative
+44,29,Town E,2022-10-12,University,Clerk,0,37.5,Negative,Negative
+45,15,Town B,2022-07-15,Secondary,Student,1,38.9,Positive,Not done
+46,9,Town A,2022-01-05,Primary,Student,0,39.9,Negative,Positive
+47,23,Town E,2022-04-06,College,Farmer,1,37.4,Positive,Not done
+48,39,Town B,2022-01-21,College,Logger,0,38.7,Negative,Negative
+49,9,Town B,2022-09-02,Primary,Student,0,37.5,Negative,Negative
+50,11,Town C,2022-02-21,Primary,Student,1,39.6,Positive,Not done
+51,12,Town B,2022-01-16,Primary,Student,1,37.5,Negative,Negative
+52,5,Town C,2022-04-23,Primary,Student,0,38.1,Negative,Negative
+53,17,Town B,2022-10-01,College,Student,0,38.7,Negative,Negative
+54,9,Town A,2022-07-16,Primary,Student,1,38.6,Positive,Not done
+55,21,Town D,2022-09-27,College,Farmer,1,38.8,Negative,Negative
+56,7,Town E,2022-04-14,Primary,Student,1,38.2,Negative,Negative
+57,11,Town D,2022-09-09,Primary,Student,1,39.6,Negative,Negative
+58,18,Town D,2022-02-17,College,Student,0,38.9,Negative,Positive
+59,15,Town C,2022-06-11,Secondary,Student,0,37,Negative,Negative
+60,29,Town D,2022-09-03,College,Logger,1,38.4,Negative,Negative
+61,11,Town A,2022-05-07,Primary,Student,1,37.8,Negative,Negative
+62,8,Town C,2022-02-10,Primary,Student,0,38,Positive,Not done
+63,22,Town B,2022-09-03,College,Farmer,1,38.3,Negative,Positive
+64,13,Town D,2022-06-15,Secondary,Student,0,38,Not done,Negative
+65,11,Town A,2022-06-07,Primary,Student,1,36.3,Negative,Negative
+66,11,Town C,2022-01-15,Primary,Student,1,36.9,Negative,Negative
+67,21,Town C,2022-10-27,College,Logger,1,40.3,Positive,Not done
+68,19,Town E,2022-10-18,College,Farmer,1,39,Negative,Positive
+69,40,Town A,2022-09-06,College,Logger,1,36.8,Negative,Negative
+70,23,Town E,2022-04-01,College,Logger,0,39,Negative,Negative
+71,23,Town B,2022-07-29,University,Clerk,0,38.3,Positive,Not done
+72,10,Town E,2022-09-23,Primary,Student,1,38.8,Indeterminate,Negative
+73,7,Town D,2022-08-27,Primary,Student,0,38,Negative,Negative
+74,8,Town A,2022-06-18,Primary,Student,1,37,Negative,Negative
+75,35,Town E,2022-10-12,University,Clerk,0,36.4,Negative,Negative
+76,19,Town B,2022-07-02,College,Farmer,1,37.9,Negative,Negative
+77,23,Town C,2022-01-23,College,Farmer,0,38.6,Not done,Negative
+78,12,Town B,2022-06-15,Primary,Student,0,39.4,Negative,Negative
+79,33,Town C,2022-07-22,College,Logger,1,37.2,Negative,Negative
+80,11,Town D,2022-02-25,Primary,Student,0,37.8,Positive,Not done
+81,18,Town A,2022-10-20,College,Student,1,38.7,Negative,Negative
+82,34,Town C,2022-03-28,University,Clerk,0,36.7,Negative,Negative
+83,23,Town A,2022-02-15,University,Clerk,0,38,Positive,Not done
+84,36,Town B,2022-09-15,University,Clerk,1,39.8,Positive,Not done
+85,8,Town D,2022-01-01,Primary,Student,1,38.7,Negative,Positive
+86,38,Town C,2022-05-13,College,Logger,1,39.1,Negative,Negative
+87,9,Town E,2022-05-12,Primary,Student,1,36.9,Negative,Negative
+88,30,Town B,2022-10-13,College,Housekeeper,0,38.3,Positive,Not done
+89,11,Town B,2022-03-06,Primary,Student,1,38.2,Negative,Not done
+90,16,Town E,2022-06-24,Secondary,Student,0,39.8,Negative,Negative
+91,10,Town B,2022-09-05,Primary,Student,0,36.5,Positive,Not done
+92,18,Town C,2022-05-26,College,Student,0,38.8,Positive,Not done
+93,11,Town E,2022-09-05,Primary,Student,1,37.1,Positive,Not done
+94,7,Town A,2022-05-16,Primary,Student,0,39.8,Negative,Negative
+95,12,Town E,2022-05-28,Primary,Student,0,36.5,Negative,Positive
+96,37,Town E,2022-10-10,College,Farmer,1,38.2,Positive,Not done
+97,13,Town D,2022-08-24,Secondary,Student,1,39.3,Negative,Negative
+98,35,Town D,2022-05-27,College,Farmer,1,38.4,Positive,Not done
+99,9,Town C,2022-10-23,Primary,Student,1,38.2,Positive,Not done
+100,24,Town B,2022-03-21,University,Clerk,0,38.5,Negative,Negative
+101,9,Town B,2022-07-28,Primary,Student,0,37,Positive,Not done
+102,10,Town A,2022-04-18,Primary,Student,0,39.9,Negative,Positive
+103,14,Town A,2022-03-13,Secondary,Student,0,40.4,Negative,Negative
+104,27,Town B,2022-07-05,University,Clerk,1,37.6,Not done,Negative
+105,15,Town E,2022-07-22,Secondary,Student,0,36.8,Negative,Negative
+106,31,Town D,2022-05-28,College,Farmer,0,37.2,Negative,Negative
+107,5,Town D,2022-03-12,Primary,Student,1,36.4,Negative,Negative
+108,10,Town C,2022-04-01,Primary,Student,1,38.3,Negative,Negative
+109,7,Town E,2022-08-15,Primary,Student,0,38.1,Negative,Negative
+110,6,Town C,2022-05-13,Primary,Student,0,40.4,Positive,Not done
+111,10,Town E,2022-02-27,Primary,Student,0,39.3,Negative,Negative
+112,33,Town E,2022-07-28,College,Logger,1,39.9,Positive,Not done
+113,7,Town E,2022-09-12,Primary,Student,1,37.2,Negative,Negative
+114,8,Town E,2022-06-09,Primary,Student,1,36.5,Positive,Not done
+115,13,Town A,2022-05-01,Secondary,Student,1,36.7,Positive,Not done
+116,20,Town B,2022-10-17,College,Farmer,1,38.8,Negative,Negative
+117,17,Town E,2022-06-10,College,Student,0,36.9,Positive,Not done
+118,8,Town C,2022-04-20,Primary,Student,0,38.9,Not done,Positive
+119,8,Town D,2022-06-29,Primary,Student,1,38.5,Negative,Negative
+120,37,Town D,2022-04-01,College,Farmer,1,39.1,Positive,Not done
+121,26,Town D,2022-09-12,College,Logger,0,36.9,Positive,Not done
+122,30,Town E,2022-06-28,College,Farmer,0,37.9,Negative,Negative
+123,38,Town E,2022-07-13,College,Farmer,1,37.4,Positive,Not done
+124,5,Town C,2022-04-02,Primary,Student,1,38.1,Negative,Negative
+125,32,Town E,2022-01-30,College,Farmer,1,37.6,Negative,Negative
+126,19,Town A,2022-06-04,College,Logger,0,36.3,Positive,Not done
+127,12,Town C,2022-10-19,Primary,Student,0,39.5,Negative,Indeterminate
+128,17,Town C,2022-01-05,College,Student,1,40.1,Negative,Negative
+129,39,Town B,2022-03-07,College,Farmer,1,38.1,Not done,Negative
+130,20,Town C,2022-05-29,University,Clerk,1,37.3,Negative,Negative
+131,13,Town A,2022-09-02,Secondary,Student,1,38.2,Positive,Not done
+132,26,Town B,2022-08-17,College,Farmer,1,37.7,Indeterminate,Negative
+133,7,Town A,2022-08-18,Primary,Student,1,39.1,Negative,Negative
+134,9,Town B,2022-04-26,Primary,Student,1,39.8,Negative,Indeterminate
+135,9,Town C,2022-08-28,Primary,Student,0,38.2,Negative,Negative
+136,30,Town D,2022-06-11,College,Farmer,1,38.4,Negative,Negative
+137,36,Town C,2022-02-24,College,Farmer,1,38.3,Negative,Negative
+138,9,Town B,2022-06-02,Primary,Student,0,37.6,Negative,Negative
+139,31,Town A,2022-05-30,College,Farmer,0,36.1,Negative,Negative
+140,5,Town D,2022-01-07,Primary,Student,0,39.3,Negative,Positive
+141,25,Town D,2022-09-28,College,Farmer,0,38.4,Not done,Negative
+142,31,Town B,2022-06-01,College,Farmer,0,39.5,Negative,Positive
+143,17,Town D,2022-08-08,College,Student,1,39.6,Negative,Negative
+144,26,Town D,2022-05-08,University,Teacher,0,38.9,Positive,Not done
+145,37,Town D,2022-04-29,College,Farmer,1,38.6,Negative,Positive
+146,31,Town D,2022-10-18,College,Farmer,0,39.3,Negative,Negative
+147,8,Town A,2022-03-31,Primary,Student,0,36.8,Negative,Negative
+148,38,Town B,2022-07-20,College,Logger,1,38.3,Negative,Positive
+149,16,Town A,2022-09-05,Secondary,Student,0,38.2,Negative,Negative
+150,12,Town E,2022-06-21,Primary,Student,0,36.9,Positive,Not done
+151,10,Town B,2022-02-26,Primary,Student,0,38.3,Negative,Negative
+152,8,Town D,2022-07-20,Primary,Student,1,38,Positive,Not done
+153,9,Town B,2022-02-05,Primary,Student,1,38.6,Negative,Positive
+154,40,Town A,2022-09-11,College,Farmer,1,38.1,Negative,Positive
+155,22,Town A,2022-09-20,College,Logger,1,38.7,Positive,Not done
+156,25,Town D,2022-03-09,University,Teacher,1,38.1,Negative,Positive
+157,26,Town A,2022-01-01,College,Farmer,1,38.3,Negative,Negative
+158,20,Town A,2022-08-14,College,Logger,1,37.8,Negative,Negative
+159,14,Town C,2022-01-22,Secondary,Student,0,40.3,Positive,Not done
+160,10,Town B,2022-01-30,Primary,Student,1,39.2,Negative,Negative
+161,18,Town E,2022-05-18,College,Student,0,37.8,Negative,Negative
+162,5,Town B,2022-05-28,Primary,Student,1,38.3,Negative,Negative
+163,23,Town E,2022-02-24,University,Clerk,0,38.6,Negative,Negative
+164,11,Town A,2022-02-28,Primary,Student,0,39.1,Positive,Not done
+165,25,Town E,2022-04-03,College,Farmer,1,38.2,Negative,Negative
+166,24,Town B,2022-10-27,University,Clerk,0,40.1,Negative,Negative
+167,39,Town D,2022-03-18,College,Farmer,1,36.4,Negative,Negative
+168,5,Town B,2022-03-28,Primary,Student,0,39.5,Negative,Negative
+169,5,Town C,2022-05-10,Primary,Student,1,39.4,Positive,Not done
+170,23,Town D,2022-09-02,College,Logger,0,37.3,Negative,Positive
+171,17,Town D,2022-07-17,College,Student,1,38.8,Positive,Not done
+172,33,Town C,2022-08-31,College,Housekeeper,0,37.6,Negative,Negative
+173,22,Town C,2022-07-23,College,Farmer,1,37.6,Positive,Not done
+174,7,Town D,2022-10-11,Primary,Student,1,36.9,Positive,Not done
+175,15,Town A,2022-01-02,Secondary,Student,1,38.7,Negative,Negative
+176,29,Town C,2022-02-01,University,Clerk,1,38.9,Negative,Positive
+177,10,Town D,2022-03-20,Primary,Student,1,40.3,Not done,Negative
+178,20,Town B,2022-06-27,College,Farmer,0,38.2,Negative,Negative
+179,6,Town A,2022-10-23,Primary,Student,1,37,Negative,Negative
+180,18,Town C,2022-01-27,College,Student,0,38.1,Positive,Not done
+181,5,Town A,2022-06-16,Primary,Student,1,36.8,Negative,Negative
+182,11,Town E,2022-10-21,Primary,Student,0,38.8,Negative,Negative
+183,35,Town A,2022-09-04,College,Farmer,0,37.6,Negative,Negative
+184,30,Town B,2022-10-11,College,Housekeeper,1,36.3,Indeterminate,Positive
+185,8,Town D,2022-09-26,Primary,Student,0,38.7,Positive,Not done
+186,19,Town A,2022-04-09,College,Logger,1,37.5,Negative,Indeterminate
+187,28,Town A,2022-10-26,College,Farmer,1,36.4,Negative,Negative
+188,31,Town B,2022-09-22,College,Farmer,0,36.3,Negative,Negative
+189,7,Town C,2022-02-02,Primary,Student,0,38.4,Negative,Negative
+190,29,Town D,2022-01-09,University,Clerk,0,40.3,Negative,Negative
+191,17,Town B,2022-03-11,College,Student,1,39.4,Positive,Not done
+192,9,Town C,2022-06-30,Primary,Student,1,37.3,Negative,Negative
+193,19,Town C,2022-07-22,University,Clerk,0,37.6,Negative,Negative
+194,26,Town C,2022-04-10,College,Logger,1,38.4,Not done,Negative
+195,17,Town E,2022-10-23,College,Student,1,37.5,Negative,Negative
+196,39,Town A,2022-08-14,College,Farmer,1,38.5,Negative,Negative
+197,10,Town D,2022-05-07,Primary,Student,0,37.3,Positive,Not done
+198,16,Town E,2022-07-24,Secondary,Student,0,37,Negative,Negative
+199,27,Town C,2022-06-07,College,Housekeeper,1,39.2,Negative,Negative
+200,13,Town D,2022-01-30,Secondary,Student,1,40.3,Negative,Negative
+201,31,Town A,2022-03-29,College,Farmer,1,38.5,Negative,Negative
+202,38,Town B,2022-07-27,College,Logger,0,39.3,Negative,Negative
+203,10,Town D,2022-10-11,Primary,Student,0,39.8,Negative,Negative
+204,16,Town E,2022-03-12,Secondary,Student,1,38.1,Negative,Negative
+205,39,Town C,2022-02-03,College,Logger,1,37.3,Negative,Negative
+206,16,Town E,2022-03-19,Secondary,Student,0,38.3,Positive,Not done
+207,9,Town D,2022-09-29,Primary,Student,1,39.5,Negative,Negative
+208,13,Town A,2022-07-20,Secondary,Student,1,37.7,Positive,Not done
+209,32,Town D,2022-01-02,College,Farmer,0,38,Negative,Negative
+210,20,Town B,2022-02-01,College,Farmer,0,39.1,Negative,Negative
+211,5,Town A,2022-07-03,Primary,Student,0,37.8,Negative,Negative
+212,39,Town E,2022-04-14,College,Logger,0,40.4,Negative,Negative
+213,40,Town E,2022-01-05,College,Farmer,0,36.1,Not done,Negative
+214,22,Town A,2022-06-17,College,Farmer,0,37.9,Negative,Negative
+215,6,Town C,2022-10-12,Primary,Student,0,36.3,Positive,Not done
+216,6,Town A,2022-09-27,Primary,Student,0,37,Positive,Not done
+217,17,Town D,2022-01-07,College,Student,1,36.9,Negative,Negative
+218,9,Town C,2022-06-14,Primary,Student,0,36.9,Negative,Negative
+219,10,Town D,2022-09-23,Primary,Student,1,38.4,Positive,Not done
+220,30,Town E,2022-10-23,University,Clerk,1,38.3,Positive,Not done
+221,11,Town B,2022-10-27,Primary,Student,0,36.9,Negative,Negative
+222,36,Town D,2022-09-30,University,Clerk,0,38.7,Negative,Negative
+223,16,Town D,2022-10-01,Secondary,Student,0,39.2,Negative,Negative
+224,15,Town B,2022-01-10,Secondary,Student,1,37,Negative,Negative
+225,11,Town D,2022-01-01,Primary,Student,0,36.9,Negative,Negative
+226,23,Town A,2022-02-06,College,Housekeeper,1,37.9,Positive,Not done
+227,30,Town B,2022-01-01,College,Farmer,0,39.1,Positive,Not done
+228,17,Town A,2022-04-06,College,Student,0,36.7,Positive,Not done
+229,12,Town D,2022-02-14,Primary,Student,0,38.8,Negative,Negative
+230,33,Town A,2022-01-16,College,Housekeeper,0,39.4,Positive,Not done
+231,6,Town A,2022-04-15,Primary,Student,0,38.3,Negative,Positive
+232,33,Town C,2022-05-24,University,Clerk,0,36.5,Negative,Negative
+233,35,Town C,2022-03-10,College,Logger,1,38,Negative,Negative
+234,30,Town E,2022-09-16,College,Housekeeper,1,40.3,Negative,Negative
+235,7,Town B,2022-05-19,Primary,Student,1,39.9,Negative,Negative
+236,21,Town A,2022-06-13,College,Logger,1,38.8,Negative,Negative
+237,7,Town B,2022-02-21,Primary,Student,0,38.6,Negative,Negative
+238,9,Town D,2022-10-01,Primary,Student,0,39.8,Negative,Negative
+239,29,Town A,2022-02-06,College,Farmer,1,38.3,Negative,Negative
+240,15,Town B,2022-05-31,Secondary,Student,0,36.7,Positive,Not done
+241,28,Town A,2022-05-14,College,Farmer,1,37.8,Negative,Negative
+242,12,Town E,2022-09-09,Primary,Student,0,36.9,Negative,Positive
+243,6,Town E,2022-09-23,Primary,Student,1,39.1,Negative,Negative
+244,6,Town D,2022-04-09,Primary,Student,1,39.8,Positive,Not done
+245,22,Town D,2022-01-28,University,Teacher,0,39.1,Negative,Negative
+246,10,Town E,2022-02-20,Primary,Student,0,36.1,Negative,Negative
+247,7,Town B,2022-07-02,Primary,Student,1,36.3,Indeterminate,Negative
+248,14,Town A,2022-08-23,Secondary,Student,0,38.2,Negative,Negative
+249,7,Town B,2022-08-19,Primary,Student,1,39.8,Positive,Not done
+250,34,Town E,2022-09-02,College,Farmer,1,38.5,Negative,Negative
+251,11,Town C,2022-08-23,Primary,Student,1,38.1,Positive,Not done
+252,24,Town E,2022-09-18,College,Farmer,1,37.6,Negative,Negative
+253,39,Town E,2022-09-02,College,Farmer,1,39.2,Negative,Negative
+254,39,Town C,2022-10-05,College,Logger,0,37.8,Negative,Negative
+255,11,Town C,2022-09-29,Primary,Student,0,39.4,Positive,Not done
+256,21,Town D,2022-01-22,College,Farmer,1,38.1,Negative,Negative
+257,9,Town C,2022-08-24,Primary,Student,0,36.8,Positive,Not done
+258,5,Town C,2022-04-18,Primary,Student,0,37.8,Negative,Negative
+259,9,Town B,2022-06-03,Primary,Student,0,38.3,Negative,Negative
+260,34,Town A,2022-06-16,College,Logger,0,38.6,Negative,Negative
+261,17,Town C,2022-02-12,College,Student,0,39.1,Positive,Not done
+262,11,Town C,2022-09-26,Primary,Student,1,39,Positive,Not done
+263,32,Town C,2022-04-05,College,Housekeeper,0,38.1,Negative,Negative
+264,19,Town C,2022-02-02,University,Teacher,0,36.9,Negative,Negative
+265,9,Town A,2022-03-02,Primary,Student,1,37.7,Negative,Positive
+266,17,Town C,2022-03-30,College,Student,0,38.1,Negative,Negative
+267,40,Town C,2022-07-13,University,Teacher,1,37.4,Positive,Not done
+268,39,Town E,2022-06-15,University,Clerk,1,40,Negative,Negative
+269,21,Town C,2022-10-03,College,Farmer,0,38.1,Negative,Positive
+270,5,Town D,2022-01-01,Primary,Student,1,38.1,Negative,Negative
+271,19,Town D,2022-02-18,College,Housekeeper,0,39.1,Negative,Negative
+272,36,Town B,2022-08-28,College,Farmer,0,36.8,Negative,Negative
+273,6,Town E,2022-03-06,Primary,Student,1,37.9,Positive,Not done
+274,7,Town D,2022-08-30,Primary,Student,0,37.9,Negative,Negative
+275,19,Town E,2022-07-19,University,Clerk,0,39.1,Negative,Positive
+276,15,Town E,2022-10-13,Secondary,Student,1,38.7,Negative,Negative
+277,29,Town D,2022-08-14,College,Housekeeper,1,39.9,Negative,Negative
+278,20,Town B,2022-03-16,College,Farmer,1,37.5,Positive,Not done
+279,14,Town E,2022-02-19,Secondary,Student,1,37.6,Negative,Negative
+280,23,Town E,2022-02-15,College,Farmer,0,39,Positive,Not done
+281,40,Town D,2022-07-14,College,Housekeeper,0,38,Negative,Negative
+282,9,Town D,2022-04-03,Primary,Student,0,38.5,Negative,Negative
+283,11,Town C,2022-07-01,Primary,Student,0,38.2,Negative,Negative
+284,26,Town B,2022-05-09,University,Clerk,0,38.9,Negative,Negative
+285,20,Town E,2022-04-05,College,Farmer,1,38.3,Negative,Negative
+286,39,Town D,2022-09-06,University,Clerk,1,39.3,Negative,Negative
+287,11,Town A,2022-07-11,Primary,Student,1,38.4,Negative,Negative
+288,7,Town A,2022-02-06,Primary,Student,1,38.3,Negative,Negative
+289,13,Town B,2022-10-02,Secondary,Student,0,37.6,Positive,Not done
+290,33,Town E,2022-03-26,College,Logger,1,38.9,Negative,Negative
+291,15,Town C,2022-02-16,Secondary,Student,1,38.2,Positive,Not done
+292,11,Town E,2022-06-16,Primary,Student,0,37.8,Negative,Positive
+293,16,Town B,2022-05-20,Secondary,Student,0,36.9,Positive,Not done
+294,10,Town C,2022-10-19,Primary,Student,0,36.4,Negative,Negative
+295,8,Town A,2022-05-02,Primary,Student,1,38.8,Not done,Negative
+296,5,Town C,2022-03-04,Primary,Student,1,39.4,Negative,Negative
+297,24,Town D,2022-08-05,College,Logger,1,36.3,Negative,Negative
+298,10,Town C,2022-03-11,Primary,Student,0,39.5,Positive,Not done
+299,9,Town E,2022-09-28,Primary,Student,0,39.9,Negative,Negative
+300,10,Town C,2022-05-25,Primary,Student,1,37.6,Negative,Negative
+301,25,Town B,2022-04-24,College,Farmer,0,38.1,Not done,Positive
+302,23,Town D,2022-01-06,College,Housekeeper,1,39.2,Negative,Negative
+303,36,Town E,2022-06-04,College,Farmer,0,38.3,Negative,Negative
+304,34,Town A,2022-03-30,College,Farmer,0,38.3,Negative,Negative
+305,8,Town C,2022-01-22,Primary,Student,1,38.1,Negative,Negative
+306,12,Town C,2022-10-12,Primary,Student,1,36.7,Negative,Negative
+307,9,Town A,2022-01-13,Primary,Student,0,39,Negative,Negative
+308,24,Town E,2022-10-16,University,Teacher,0,36.5,Positive,Not done
+309,19,Town E,2022-03-11,College,Logger,0,38.7,Negative,Indeterminate
+310,7,Town B,2022-08-22,Primary,Student,1,39.1,Positive,Not done
+311,12,Town A,2022-08-07,Primary,Student,1,38.6,Negative,Negative
+312,19,Town A,2022-04-08,College,Housekeeper,0,37.7,Positive,Not done
+313,26,Town E,2022-07-19,College,Farmer,1,38,Positive,Not done
+314,35,Town B,2022-06-25,University,Teacher,0,38.8,Positive,Not done
+315,17,Town C,2022-09-18,College,Student,0,37.2,Negative,Negative
+316,9,Town D,2022-01-07,Primary,Student,1,36.8,Negative,Negative
+317,35,Town C,2022-02-14,College,Farmer,1,38.5,Negative,Negative
+318,11,Town D,2022-04-05,Primary,Student,1,36.4,Negative,Not done
+319,33,Town C,2022-05-14,College,Housekeeper,0,36.7,Negative,Negative
+320,28,Town A,2022-05-05,University,Clerk,1,37,Negative,Negative
+321,9,Town A,2022-02-26,Primary,Student,1,37.4,Negative,Positive
+322,8,Town B,2022-07-08,Primary,Student,1,36.8,Not done,Negative
+323,17,Town B,2022-05-23,College,Student,1,37.4,Positive,Not done
+324,11,Town B,2022-03-22,Primary,Student,1,38.7,Not done,Negative
+325,12,Town B,2022-10-03,Primary,Student,0,39.2,Negative,Negative
+326,35,Town C,2022-04-19,University,Clerk,1,37.9,Positive,Not done
+327,30,Town D,2022-06-11,College,Farmer,0,38.2,Negative,Negative
+328,24,Town E,2022-09-20,College,Logger,0,39.8,Negative,Negative
+329,22,Town A,2022-07-01,University,Clerk,1,38.8,Negative,Negative
+330,22,Town A,2022-10-25,College,Farmer,0,37.7,Negative,Negative
+331,26,Town C,2022-06-02,College,Farmer,0,39.8,Positive,Not done
+332,32,Town E,2022-05-22,College,Farmer,0,38,Negative,Negative
+333,25,Town B,2022-01-29,University,Clerk,0,38.9,Negative,Negative
+334,27,Town B,2022-01-10,University,Clerk,1,38.7,Negative,Positive
+335,9,Town B,2022-01-10,Primary,Student,0,36.8,Negative,Negative
+336,11,Town C,2022-03-02,Primary,Student,0,38.3,Negative,Negative
+337,39,Town A,2022-06-12,College,Housekeeper,0,37.3,Negative,Negative
+338,10,Town D,2022-02-21,Primary,Student,0,37.5,Negative,Negative
+339,9,Town E,2022-03-28,Primary,Student,0,38.9,Negative,Negative
+340,15,Town D,2022-10-25,Secondary,Student,1,38.8,Negative,Negative
+341,7,Town A,2022-08-31,Primary,Student,1,37.5,Negative,Negative
+342,22,Town D,2022-03-11,College,Farmer,1,38.4,Negative,Negative
+343,38,Town D,2022-05-05,College,Logger,0,38.9,Negative,Negative
+344,9,Town E,2022-07-06,Primary,Student,0,39.3,Negative,Negative
+345,22,Town A,2022-08-31,University,Clerk,0,38.3,Positive,Not done
+346,40,Town B,2022-03-20,College,Logger,0,39.3,Negative,Negative
+347,25,Town A,2022-04-24,College,Logger,0,36.3,Negative,Negative
+348,15,Town E,2022-05-30,Secondary,Student,1,38.2,Positive,Not done
+349,29,Town B,2022-03-31,University,Clerk,0,38.2,Positive,Not done
+350,5,Town D,2022-01-18,Primary,Student,1,37.3,Positive,Not done
+351,15,Town A,2022-02-03,Secondary,Student,1,40,Negative,Positive
+352,39,Town A,2022-04-14,University,Clerk,0,38.1,Negative,Negative
+353,32,Town A,2022-02-08,College,Farmer,1,38,Negative,Negative
+354,6,Town E,2022-08-17,Primary,Student,0,38,Positive,Not done
+355,39,Town C,2022-07-29,College,Farmer,1,37.9,Negative,Positive
+356,40,Town E,2022-06-14,University,Teacher,0,38.9,Negative,Negative
+357,28,Town C,2022-02-14,College,Logger,1,39.3,Negative,Negative
+358,9,Town E,2022-06-25,Primary,Student,0,36.7,Negative,Negative
+359,22,Town C,2022-05-21,University,Clerk,1,36.8,Negative,Negative
+360,10,Town E,2022-01-01,Primary,Student,0,37.5,Positive,Not done
+361,34,Town C,2022-01-07,College,Farmer,1,38.3,Positive,Not done
+362,23,Town C,2022-01-15,University,Teacher,0,38.9,Negative,Positive
+363,21,Town A,2022-02-18,College,Farmer,1,38.1,Negative,Negative
+364,5,Town D,2022-02-06,Primary,Student,1,40,Negative,Negative
+365,33,Town A,2022-10-29,College,Logger,0,38.3,Positive,Not done
+366,27,Town B,2022-02-27,College,Logger,0,36.1,Negative,Negative
+367,8,Town C,2022-06-02,Primary,Student,0,39.8,Positive,Not done
+368,30,Town D,2022-09-02,College,Logger,1,37,Negative,Positive
+369,7,Town E,2022-03-04,Primary,Student,1,38.1,Negative,Negative
+370,14,Town A,2022-02-17,Secondary,Student,0,37.4,Negative,Negative
+371,8,Town B,2022-05-21,Primary,Student,1,38.8,Negative,Negative
+372,8,Town C,2022-05-19,Primary,Student,0,38.6,Positive,Not done
+373,24,Town B,2022-06-13,College,Farmer,1,40.1,Negative,Negative
+374,8,Town A,2022-02-05,Primary,Student,0,39.3,Negative,Negative
+375,16,Town D,2022-04-06,Secondary,Student,0,38.5,Negative,Negative
+376,5,Town E,2022-02-20,Primary,Student,0,38.3,Positive,Not done
+377,32,Town C,2022-02-16,College,Housekeeper,0,38.7,Negative,Negative
+378,35,Town E,2022-09-03,University,Teacher,1,38.9,Negative,Negative
+379,12,Town E,2022-06-28,Primary,Student,0,38.5,Negative,Negative
+380,34,Town A,2022-03-31,University,Teacher,0,38.4,Negative,Negative
+381,12,Town E,2022-07-27,Primary,Student,0,38.5,Negative,Negative
+382,9,Town D,2022-03-23,Primary,Student,1,38.7,Not done,Negative
+383,20,Town E,2022-03-25,College,Farmer,0,37.1,Negative,Negative
+384,9,Town E,2022-03-07,Primary,Student,0,38.6,Negative,Negative
+385,8,Town B,2022-01-31,Primary,Student,0,38,Negative,Negative
+386,14,Town D,2022-09-13,Secondary,Student,1,38.8,Positive,Not done
+387,11,Town B,2022-03-10,Primary,Student,1,38.5,Positive,Not done
+388,8,Town C,2022-04-14,Primary,Student,1,38.6,Negative,Negative
+389,36,Town C,2022-09-19,College,Logger,1,36.5,Positive,Not done
+390,34,Town A,2022-05-09,University,Clerk,0,40,Negative,Negative
+391,15,Town A,2022-01-25,Secondary,Student,1,38,Positive,Not done
+392,29,Town E,2022-05-25,University,Teacher,0,37,Positive,Not done
+393,12,Town C,2022-05-26,Primary,Student,1,38.1,Negative,Negative
+394,10,Town C,2022-07-11,Primary,Student,1,38.4,Positive,Not done
+395,28,Town A,2022-04-05,College,Housekeeper,0,40.3,Negative,Negative
+396,23,Town B,2022-09-19,College,Farmer,1,37.1,Negative,Positive
+397,40,Town A,2022-07-03,College,Farmer,0,38.9,Negative,Negative
+398,13,Town B,2022-06-07,Secondary,Student,1,38.3,Negative,Negative
+399,20,Town D,2022-01-07,University,Teacher,1,39.5,Negative,Negative
+400,12,Town D,2022-10-06,Primary,Student,1,37.3,Negative,Negative
+401,29,Town A,2022-05-02,College,Farmer,0,37.3,Negative,Negative
+402,20,Town D,2022-10-20,University,Clerk,1,38.8,Negative,Negative
+403,26,Town D,2022-05-09,College,Farmer,1,36.9,Negative,Negative
+404,25,Town D,2022-08-20,University,Clerk,1,37,Negative,Negative
+405,32,Town D,2022-06-24,College,Housekeeper,0,39.6,Positive,Not done
+406,10,Town E,2022-09-07,Primary,Student,0,39.5,Negative,Positive
+407,20,Town C,2022-02-10,College,Farmer,1,39,Negative,Negative
+408,39,Town D,2022-10-24,University,Clerk,1,36.3,Negative,Positive
+409,10,Town C,2022-04-02,Primary,Student,1,38.3,Positive,Not done
+410,8,Town E,2022-09-13,Primary,Student,0,38.9,Positive,Not done
+411,27,Town E,2022-04-22,University,Teacher,0,39.3,Negative,Negative
+412,29,Town B,2022-09-24,University,Clerk,0,36.4,Negative,Negative
+413,16,Town D,2022-08-04,Secondary,Student,1,38.6,Negative,Negative
+414,27,Town B,2022-06-05,University,Teacher,0,37.1,Negative,Negative
+415,19,Town E,2022-09-26,College,Farmer,0,39.4,Negative,Negative
+416,9,Town E,2022-08-28,Primary,Student,1,39.2,Indeterminate,Negative
+417,7,Town A,2022-07-18,Primary,Student,1,37.8,Negative,Negative
+418,30,Town A,2022-09-13,University,Clerk,1,39.2,Negative,Negative
+419,37,Town C,2022-02-14,College,Logger,0,38.4,Negative,Negative
+420,11,Town C,2022-04-10,Primary,Student,0,36.9,Negative,Negative
+421,8,Town B,2022-10-11,Primary,Student,0,36.7,Positive,Not done
+422,9,Town B,2022-04-10,Primary,Student,0,36.3,Positive,Not done
+423,17,Town E,2022-06-16,College,Student,0,36.5,Negative,Negative
+424,26,Town A,2022-06-18,College,Farmer,1,36.5,Not done,Negative
+425,16,Town B,2022-07-19,Secondary,Student,1,37.3,Negative,Negative
+426,7,Town E,2022-08-31,Primary,Student,1,36.9,Negative,Negative
+427,27,Town B,2022-07-14,College,Logger,1,39,Negative,Negative
+428,38,Town D,2022-07-19,College,Logger,0,39.1,Positive,Not done
+429,34,Town C,2022-05-14,University,Clerk,0,38.9,Negative,Negative
+430,15,Town B,2022-04-28,Secondary,Student,1,36.1,Negative,Negative
+431,27,Town A,2022-03-28,College,Logger,0,39.2,Positive,Not done
+432,9,Town E,2022-10-03,Primary,Student,1,36.8,Negative,Negative
+433,6,Town E,2022-05-31,Primary,Student,0,38.2,Negative,Negative
+434,38,Town B,2022-03-22,College,Housekeeper,0,38.1,Negative,Negative
+435,7,Town A,2022-05-25,Primary,Student,0,39.8,Negative,Negative
+436,6,Town C,2022-09-06,Primary,Student,0,36.3,Negative,Negative
+437,30,Town E,2022-06-07,College,Farmer,1,39.6,Negative,Negative
+438,40,Town A,2022-04-27,College,Farmer,1,37.9,Negative,Negative
+439,28,Town E,2022-09-09,College,Housekeeper,0,40,Positive,Not done
+440,9,Town E,2022-04-29,Primary,Student,0,39.6,Negative,Negative
+441,36,Town E,2022-07-03,University,Clerk,1,36.9,Negative,Negative
+442,28,Town A,2022-10-04,College,Housekeeper,0,39,Negative,Negative
+443,6,Town D,2022-08-13,Primary,Student,1,38.4,Negative,Negative
+444,6,Town A,2022-09-16,Primary,Student,1,39.5,Negative,Negative
+445,23,Town A,2022-01-20,College,Farmer,1,38.4,Negative,Negative
+446,36,Town E,2022-06-26,University,Teacher,0,38.1,Negative,Negative
+447,6,Town D,2022-04-23,Primary,Student,0,40.1,Negative,Negative
+448,17,Town D,2022-04-25,College,Student,1,38.1,Positive,Not done
+449,20,Town D,2022-10-02,College,Housekeeper,0,39.1,Negative,Negative
+450,12,Town E,2022-07-25,Primary,Student,1,40.4,Negative,Negative
+451,7,Town E,2022-07-28,Primary,Student,0,36.4,Negative,Positive
+452,30,Town B,2022-05-22,College,Farmer,0,39.6,Positive,Not done
+453,36,Town A,2022-01-17,University,Clerk,1,39.4,Positive,Not done
+454,29,Town D,2022-09-17,College,Farmer,1,38.6,Negative,Positive
+455,6,Town C,2022-10-11,Primary,Student,0,38,Positive,Not done
+456,26,Town A,2022-09-11,University,Clerk,0,37.3,Negative,Indeterminate
+457,34,Town C,2022-10-22,University,Clerk,0,39,Negative,Negative
+458,33,Town A,2022-07-31,College,Housekeeper,1,37.9,Negative,Negative
+459,33,Town A,2022-06-05,College,Logger,1,38,Negative,Negative
+460,24,Town C,2022-08-10,University,Clerk,0,37.9,Positive,Not done
+461,39,Town B,2022-02-21,University,Clerk,0,39.3,Positive,Not done
+462,17,Town C,2022-03-07,College,Student,1,39.1,Negative,Negative
+463,27,Town A,2022-09-17,College,Farmer,1,40.4,Negative,Negative
+464,39,Town D,2022-08-26,College,Farmer,1,38.7,Negative,Positive
+465,25,Town B,2022-03-24,College,Farmer,1,37.8,Positive,Not done
+466,5,Town B,2022-04-15,Primary,Student,1,36.4,Negative,Negative
+467,14,Town E,2022-07-31,Secondary,Student,1,37,Negative,Negative
+468,30,Town D,2022-08-09,College,Farmer,0,37.8,Positive,Not done
+469,7,Town B,2022-02-27,Primary,Student,0,37.9,Negative,Negative
+470,37,Town C,2022-08-17,University,Clerk,1,38.2,Positive,Not done
+471,5,Town C,2022-06-23,Primary,Student,1,38.5,Negative,Indeterminate
+472,5,Town A,2022-03-22,Primary,Student,1,37.3,Negative,Negative
+473,8,Town E,2022-05-23,Primary,Student,0,37.3,Positive,Not done
+474,9,Town D,2022-04-02,Primary,Student,0,38.5,Negative,Negative
+475,16,Town A,2022-02-21,Secondary,Student,0,37.5,Positive,Not done
+476,35,Town A,2022-07-04,College,Farmer,1,39.8,Positive,Not done
+477,17,Town B,2022-05-14,College,Student,0,38.4,Positive,Not done
+478,15,Town C,2022-03-12,Secondary,Student,0,39,Negative,Negative
+479,24,Town C,2022-04-23,College,Farmer,1,39,Negative,Negative
+480,6,Town E,2022-09-21,Primary,Student,0,37.5,Positive,Not done
+481,35,Town B,2022-06-04,College,Logger,1,39.1,Negative,Positive
+482,5,Town B,2022-01-19,Primary,Student,1,39.6,Positive,Not done
+483,34,Town A,2022-03-28,College,Logger,0,38.6,Negative,Positive
+484,18,Town C,2022-03-05,College,Student,0,36.3,Negative,Negative
+485,7,Town E,2022-07-16,Primary,Student,0,38.1,Negative,Positive
+486,26,Town E,2022-06-10,College,Farmer,0,36.3,Negative,Negative
+487,6,Town C,2022-01-26,Primary,Student,0,38.4,Positive,Not done
+488,33,Town C,2022-08-01,College,Logger,0,39.2,Negative,Negative
+489,31,Town C,2022-02-22,College,Logger,0,39.4,Positive,Not done
+490,27,Town A,2022-09-25,College,Farmer,0,38.1,Positive,Not done
+491,7,Town D,2022-08-04,Primary,Student,0,39.4,Positive,Not done
+492,30,Town E,2022-07-02,University,Clerk,1,40.3,Positive,Not done
+493,28,Town A,2022-01-29,College,Farmer,0,36.9,Negative,Positive
+494,17,Town D,2022-03-17,College,Student,0,37.2,Positive,Not done
+495,7,Town E,2022-09-24,Primary,Student,1,38.1,Negative,Negative
+496,20,Town E,2022-04-23,College,Farmer,0,38,Negative,Positive
+497,7,Town B,2022-04-01,Primary,Student,1,38.2,Positive,Not done
+498,38,Town A,2022-08-01,College,Farmer,0,38.2,Negative,Negative
+499,13,Town C,2022-06-29,Secondary,Student,1,38.4,Negative,Negative
+500,10,Town A,2022-08-19,Primary,Student,0,37.8,Negative,Negative
+501,5,Town E,2022-09-28,Primary,Student,0,37.8,Positive,Not done
+502,26,Town E,2022-05-04,University,Clerk,1,40.4,Negative,Negative
+503,22,Town B,2022-07-10,College,Housekeeper,1,37.2,Positive,Not done
+504,22,Town E,2022-05-23,College,Logger,0,39.8,Positive,Not done
+505,14,Town B,2022-03-16,Secondary,Student,1,38,Negative,Positive
+506,8,Town E,2022-09-26,Primary,Student,1,38.9,Positive,Not done
+507,9,Town A,2022-09-09,Primary,Student,1,38.3,Positive,Not done
+508,28,Town B,2022-06-06,University,Clerk,0,37.8,Negative,Negative
+509,11,Town D,2022-08-16,Primary,Student,0,38.1,Negative,Negative
+510,5,Town D,2022-02-22,Primary,Student,0,40.3,Negative,Negative
+511,13,Town A,2022-10-15,Secondary,Student,0,38.1,Negative,Negative
+512,12,Town D,2022-01-14,Primary,Student,1,38.8,Negative,Negative
+513,5,Town C,2022-07-07,Primary,Student,1,36.1,Negative,Negative
+514,16,Town B,2022-03-02,Secondary,Student,1,39.4,Negative,Negative
+515,11,Town C,2022-10-23,Primary,Student,0,36.3,Negative,Positive
+516,30,Town D,2022-04-19,College,Logger,0,39.3,Positive,Not done
+517,29,Town B,2022-04-05,College,Farmer,1,37.6,Positive,Not done
+518,40,Town A,2022-06-04,University,Clerk,1,38.7,Positive,Not done
+519,29,Town B,2022-05-30,College,Farmer,1,39.4,Negative,Negative
+520,5,Town A,2022-07-28,Primary,Student,0,39.9,Not done,Negative
+521,39,Town D,2022-08-01,College,Farmer,0,36.3,Negative,Negative
+522,13,Town D,2022-06-07,Secondary,Student,1,38.3,Negative,Negative
+523,38,Town A,2022-10-29,College,Farmer,0,40.1,Negative,Negative
+524,37,Town A,2022-02-26,College,Logger,0,37.7,Negative,Negative
+525,5,Town E,2022-09-05,Primary,Student,0,39.6,Positive,Not done
+526,36,Town C,2022-05-20,College,Farmer,1,39.5,Not done,Negative
+527,33,Town A,2022-05-02,College,Logger,0,36.9,Negative,Negative
+528,7,Town D,2022-03-03,Primary,Student,0,39.9,Negative,Negative
+529,22,Town A,2022-02-15,College,Logger,1,38.2,Positive,Not done
+530,6,Town C,2022-06-07,Primary,Student,1,37.7,Negative,Positive
+531,31,Town A,2022-08-30,College,Housekeeper,0,38.6,Negative,Negative
+532,15,Town D,2022-02-23,Secondary,Student,1,38.4,Negative,Negative
+533,19,Town D,2022-04-30,College,Housekeeper,1,38.9,Negative,Indeterminate
+534,12,Town A,2022-06-22,Primary,Student,1,36.4,Negative,Negative
+535,20,Town C,2022-02-22,University,Clerk,0,39,Negative,Negative
+536,29,Town E,2022-09-11,College,Logger,1,38.6,Negative,Negative
+537,5,Town E,2022-03-16,Primary,Student,0,37.2,Negative,Negative
+538,38,Town A,2022-08-21,College,Farmer,0,38.7,Negative,Negative
+539,27,Town B,2022-06-03,College,Farmer,0,36.9,Positive,Not done
+540,5,Town E,2022-01-03,Primary,Student,0,37.2,Negative,Negative
+541,36,Town A,2022-02-21,College,Farmer,1,36.1,Positive,Not done
+542,10,Town B,2022-07-03,Primary,Student,0,38.1,Negative,Negative
+543,8,Town B,2022-06-15,Primary,Student,0,37.6,Negative,Negative
+544,8,Town A,2022-09-29,Primary,Student,1,37.7,Positive,Not done
+545,6,Town E,2022-05-24,Primary,Student,0,38,Negative,Negative
+546,11,Town B,2022-08-28,Primary,Student,1,39.3,Negative,Negative
+547,37,Town E,2022-08-22,College,Logger,1,38.1,Not done,Negative
+548,10,Town C,2022-09-22,Primary,Student,1,38.7,Negative,Negative
+549,15,Town D,2022-04-13,Secondary,Student,1,38.1,Negative,Positive
+550,39,Town A,2022-10-29,College,Farmer,1,37.8,Positive,Not done
+551,11,Town C,2022-07-09,Primary,Student,0,38.7,Positive,Not done
+552,22,Town B,2022-05-21,College,Housekeeper,1,38.7,Positive,Not done
+553,31,Town D,2022-07-08,College,Farmer,1,36.1,Negative,Negative
+554,15,Town E,2022-01-18,Secondary,Student,1,37.8,Negative,Negative
+555,26,Town D,2022-06-14,University,Clerk,1,36.4,Positive,Not done
+556,12,Town A,2022-02-15,Primary,Student,1,39.6,Negative,Negative
+557,5,Town E,2022-08-27,Primary,Student,1,36.4,Negative,Negative
+558,19,Town E,2022-04-25,College,Logger,0,37.7,Not done,Negative
+559,14,Town D,2022-02-18,Secondary,Student,0,36.9,Negative,Negative
+560,35,Town D,2022-08-31,College,Farmer,1,38.3,Negative,Not done
+561,10,Town E,2022-07-17,Primary,Student,0,38.1,Negative,Negative
+562,25,Town B,2022-09-28,College,Housekeeper,1,37.4,Negative,Positive
+563,19,Town B,2022-08-28,University,Teacher,1,39.4,Negative,Negative
+564,32,Town C,2022-09-24,University,Clerk,1,38.7,Positive,Not done
+565,36,Town C,2022-02-02,College,Logger,1,37.3,Not done,Negative
+566,9,Town D,2022-08-05,Primary,Student,1,36.7,Negative,Negative
+567,32,Town C,2022-10-20,College,Logger,0,36.3,Negative,Positive
+568,19,Town E,2022-02-06,University,Clerk,1,40,Negative,Positive
+569,38,Town D,2022-07-04,University,Clerk,0,39.9,Negative,Negative
+570,36,Town C,2022-03-08,College,Farmer,1,37.8,Positive,Not done
+571,13,Town D,2022-02-14,Secondary,Student,1,37.3,Negative,Negative
+572,18,Town D,2022-05-19,College,Student,1,38.9,Negative,Negative
+573,14,Town E,2022-05-12,Secondary,Student,0,38.9,Negative,Negative
+574,9,Town A,2022-07-25,Primary,Student,1,37.6,Positive,Not done
+575,32,Town D,2022-04-17,University,Teacher,1,38.2,Positive,Not done
+576,30,Town B,2022-08-02,College,Housekeeper,0,39.3,Positive,Not done
+577,30,Town B,2022-07-08,College,Logger,1,37.7,Negative,Positive
+578,20,Town E,2022-04-01,College,Farmer,0,36.8,Negative,Negative
+579,28,Town C,2022-07-07,College,Farmer,0,37.1,Negative,Negative
+580,15,Town D,2022-05-17,Secondary,Student,0,37.3,Indeterminate,Negative
+581,13,Town C,2022-02-13,Secondary,Student,1,37.5,Positive,Not done
+582,38,Town E,2022-10-08,College,Farmer,0,36.4,Positive,Not done
+583,8,Town B,2022-04-30,Primary,Student,1,40,Negative,Negative
+584,8,Town C,2022-03-26,Primary,Student,0,37,Negative,Negative
+585,11,Town C,2022-02-23,Primary,Student,0,36.3,Negative,Negative
+586,9,Town C,2022-07-18,Primary,Student,1,38.3,Positive,Not done
+587,20,Town A,2022-06-06,College,Logger,1,39.8,Negative,Negative
+588,33,Town A,2022-10-17,College,Farmer,1,39.6,Negative,Negative
+589,9,Town B,2022-05-14,Primary,Student,1,37.6,Negative,Negative
+590,36,Town B,2022-04-06,College,Housekeeper,1,39,Negative,Negative
+591,26,Town B,2022-04-14,College,Farmer,0,40.3,Negative,Positive
+592,18,Town A,2022-07-26,College,Student,0,39,Negative,Negative
+593,21,Town B,2022-03-26,University,Clerk,1,38.9,Negative,Negative
+594,33,Town B,2022-03-06,College,Housekeeper,1,37.1,Negative,Negative
+595,33,Town A,2022-03-27,College,Farmer,0,39.4,Negative,Negative
+596,17,Town A,2022-04-02,College,Student,1,39,Negative,Negative
+597,6,Town D,2022-04-03,Primary,Student,1,38.3,Negative,Negative
+598,14,Town D,2022-01-02,Secondary,Student,1,37.8,Negative,Negative
+599,7,Town A,2022-04-25,Primary,Student,0,38.9,Negative,Negative
+600,34,Town A,2022-10-07,University,Clerk,1,37.9,Negative,Negative
+601,7,Town E,2022-09-25,Primary,Student,0,39.9,Positive,Not done
+602,18,Town C,2022-10-12,College,Student,1,39.9,Negative,Negative
+603,18,Town E,2022-03-02,College,Student,0,38.6,Negative,Negative
+604,9,Town D,2022-05-24,Primary,Student,1,37.4,Negative,Negative
+605,8,Town C,2022-01-12,Primary,Student,1,39.4,Positive,Not done
+606,18,Town B,2022-02-10,College,Student,1,38.2,Negative,Positive
+607,15,Town E,2022-05-23,Secondary,Student,0,39,Negative,Positive
+608,34,Town B,2022-09-21,College,Farmer,1,36.8,Negative,Negative
+609,33,Town D,2022-10-13,College,Housekeeper,0,36.9,Positive,Not done
+610,35,Town C,2022-08-30,University,Clerk,0,40.4,Negative,Negative
+611,13,Town D,2022-04-01,Secondary,Student,1,37.3,Negative,Negative
+612,34,Town C,2022-01-04,College,Housekeeper,0,38.5,Positive,Not done
+613,6,Town D,2022-01-25,Primary,Student,0,37.2,Negative,Negative
+614,11,Town B,2022-03-21,Primary,Student,1,39,Negative,Negative
+615,20,Town B,2022-07-09,University,Clerk,1,38.7,Negative,Negative
+616,22,Town B,2022-05-27,College,Farmer,1,38.1,Negative,Negative
+617,28,Town A,2022-06-17,College,Farmer,0,37,Negative,Negative
+618,10,Town E,2022-04-30,Primary,Student,0,36.4,Negative,Negative
+619,13,Town C,2022-07-23,Secondary,Student,1,37.9,Negative,Negative
+620,18,Town D,2022-05-30,College,Student,1,39.3,Negative,Negative
+621,35,Town B,2022-07-02,College,Farmer,1,36.9,Positive,Not done
+622,32,Town E,2022-03-08,College,Farmer,0,38.6,Positive,Not done
+623,36,Town C,2022-06-13,College,Housekeeper,1,37.6,Positive,Not done
+624,33,Town D,2022-04-09,College,Logger,0,39.8,Negative,Negative
+625,10,Town D,2022-01-30,Primary,Student,1,36.1,Negative,Negative
+626,13,Town A,2022-07-08,Secondary,Student,0,38.7,Negative,Positive
+627,9,Town E,2022-02-13,Primary,Student,0,38.9,Positive,Not done
+628,31,Town D,2022-02-01,College,Logger,0,38.5,Negative,Negative
+629,13,Town E,2022-01-04,Secondary,Student,0,39.6,Negative,Negative
+630,13,Town E,2022-10-08,Secondary,Student,1,38.1,Negative,Negative
+631,40,Town B,2022-04-20,College,Logger,0,38.3,Positive,Not done
+632,38,Town C,2022-09-11,College,Farmer,0,37.6,Negative,Positive
+633,6,Town E,2022-08-25,Primary,Student,0,40,Negative,Negative
+634,25,Town D,2022-01-15,University,Clerk,0,37.4,Negative,Negative
+635,5,Town E,2022-10-01,Primary,Student,1,38.2,Negative,Negative
+636,24,Town A,2022-01-18,University,Clerk,0,37.2,Negative,Negative
+637,31,Town B,2022-03-07,University,Clerk,0,36.5,Positive,Not done
+638,13,Town B,2022-01-17,Secondary,Student,0,39.4,Negative,Negative
+639,36,Town B,2022-05-19,College,Housekeeper,0,38.4,Negative,Negative
+640,9,Town B,2022-07-07,Primary,Student,0,37.8,Negative,Negative
+641,18,Town B,2022-02-22,College,Student,0,38.7,Indeterminate,Positive
+642,18,Town B,2022-06-03,College,Student,1,40.4,Negative,Negative
+643,37,Town C,2022-07-18,University,Clerk,0,38.3,Positive,Not done
+644,39,Town D,2022-03-08,College,Housekeeper,1,37.5,Not done,Negative
+645,23,Town A,2022-07-13,University,Clerk,0,37.4,Negative,Negative
+646,29,Town C,2022-10-16,College,Logger,1,37.2,Indeterminate,Negative
+647,23,Town A,2022-04-21,College,Logger,1,38.8,Negative,Negative
+648,13,Town C,2022-03-25,Secondary,Student,0,38.4,Negative,Negative
+649,8,Town C,2022-08-31,Primary,Student,1,38.2,Negative,Negative
+650,6,Town D,2022-01-26,Primary,Student,0,39.4,Positive,Not done
+651,7,Town D,2022-03-07,Primary,Student,0,38.7,Positive,Not done
+652,8,Town E,2022-05-16,Primary,Student,1,39.3,Negative,Negative
+653,9,Town D,2022-01-20,Primary,Student,1,39.4,Negative,Positive
+654,22,Town A,2022-03-27,College,Housekeeper,0,38.5,Negative,Negative
+655,40,Town A,2022-06-03,College,Logger,0,37.5,Negative,Negative
+656,12,Town A,2022-08-01,Primary,Student,0,37.2,Negative,Negative
+657,7,Town D,2022-02-17,Primary,Student,0,38.8,Negative,Negative
+658,9,Town C,2022-10-27,Primary,Student,0,39.6,Positive,Not done
+659,35,Town B,2022-02-17,College,Logger,0,38.6,Positive,Not done
+660,17,Town B,2022-09-06,College,Student,0,39.2,Positive,Not done
+661,16,Town E,2022-02-21,Secondary,Student,1,37.4,Positive,Not done
+662,29,Town E,2022-01-10,College,Logger,1,38.4,Negative,Negative
+663,35,Town B,2022-01-17,College,Farmer,0,38.2,Negative,Negative
+664,8,Town A,2022-01-14,Primary,Student,0,38.8,Not done,Indeterminate
+665,6,Town D,2022-02-18,Primary,Student,1,40.4,Negative,Negative
+666,5,Town E,2022-01-07,Primary,Student,0,39.4,Negative,Negative
+667,10,Town A,2022-08-24,Primary,Student,1,38.4,Positive,Not done
+668,16,Town E,2022-08-14,Secondary,Student,1,37.5,Positive,Not done
+669,5,Town A,2022-05-05,Primary,Student,0,37.1,Positive,Not done
+670,10,Town D,2022-01-24,Primary,Student,0,37.8,Positive,Not done
+671,28,Town A,2022-03-28,College,Logger,1,37.6,Negative,Positive
+672,29,Town E,2022-10-04,College,Farmer,1,38.5,Positive,Not done
+673,8,Town D,2022-08-16,Primary,Student,0,38.8,Positive,Not done
+674,11,Town B,2022-09-02,Primary,Student,1,38.9,Positive,Not done
+675,12,Town D,2022-01-15,Primary,Student,1,38.3,Positive,Not done
+676,39,Town B,2022-01-26,University,Clerk,1,39,Negative,Negative
+677,37,Town C,2022-10-30,College,Logger,1,38,Indeterminate,Negative
+678,35,Town B,2022-02-04,College,Logger,0,39.1,Negative,Negative
+679,28,Town C,2022-09-05,College,Housekeeper,1,38.5,Negative,Negative
+680,10,Town D,2022-07-05,Primary,Student,1,38.3,Negative,Indeterminate
+681,11,Town A,2022-05-14,Primary,Student,0,39.9,Negative,Negative
+682,6,Town B,2022-05-26,Primary,Student,1,37,Negative,Negative
+683,11,Town B,2022-09-17,Primary,Student,1,36.7,Positive,Not done
+684,6,Town C,2022-09-27,Primary,Student,0,38.7,Not done,Negative
+685,11,Town C,2022-01-27,Primary,Student,0,36.4,Negative,Negative
+686,38,Town B,2022-04-29,College,Farmer,0,39.3,Negative,Negative
+687,39,Town D,2022-03-21,College,Housekeeper,1,37,Negative,Negative
+688,31,Town D,2022-06-09,College,Logger,1,38.9,Negative,Negative
+689,39,Town C,2022-04-26,University,Teacher,1,38.8,Positive,Not done
+690,15,Town B,2022-03-31,Secondary,Student,0,38.8,Negative,Negative
+691,35,Town C,2022-03-12,University,Clerk,1,38.2,Positive,Not done
+692,32,Town C,2022-04-20,College,Logger,1,38,Negative,Positive
+693,10,Town B,2022-10-09,Primary,Student,1,36.9,Negative,Negative
+694,16,Town A,2022-01-23,Secondary,Student,1,38.1,Negative,Negative
+695,7,Town D,2022-03-12,Primary,Student,1,38.9,Negative,Negative
+696,6,Town A,2022-07-05,Primary,Student,1,37.4,Positive,Not done
+697,35,Town C,2022-09-13,College,Farmer,0,38.4,Negative,Negative
+698,23,Town C,2022-04-03,College,Farmer,1,37.3,Positive,Not done
+699,9,Town B,2022-01-05,Primary,Student,1,40.1,Negative,Negative
+700,19,Town D,2022-09-03,University,Clerk,1,36.1,Negative,Negative
+701,8,Town A,2022-05-31,Primary,Student,1,37.6,Negative,Negative
+702,30,Town A,2022-07-04,College,Farmer,1,37.4,Positive,Not done
+703,13,Town B,2022-03-23,Secondary,Student,0,39.3,Positive,Not done
+704,11,Town D,2022-08-13,Primary,Student,1,37.9,Negative,Positive
+705,37,Town E,2022-05-25,University,Clerk,1,38.1,Indeterminate,Negative
+706,14,Town E,2022-04-10,Secondary,Student,0,39.1,Negative,Negative
+707,36,Town D,2022-10-05,College,Logger,0,40.1,Positive,Not done
+708,11,Town A,2022-05-03,Primary,Student,0,38.4,Positive,Not done
+709,21,Town D,2022-02-25,University,Clerk,0,39.4,Negative,Negative
+710,17,Town E,2022-09-13,College,Student,1,39.2,Negative,Positive
+711,10,Town B,2022-02-01,Primary,Student,0,36.8,Positive,Not done
+712,7,Town B,2022-05-31,Primary,Student,1,38,Negative,Negative
+713,17,Town E,2022-04-02,College,Student,1,39.1,Negative,Negative
+714,30,Town A,2022-06-19,University,Teacher,0,39.3,Positive,Not done
+715,26,Town D,2022-06-04,University,Clerk,1,39.8,Negative,Negative
+716,15,Town B,2022-03-08,Secondary,Student,1,38.5,Negative,Positive
+717,10,Town B,2022-04-11,Primary,Student,1,37.1,Negative,Negative
+718,5,Town D,2022-05-08,Primary,Student,1,38.8,Positive,Not done
+719,36,Town B,2022-08-24,University,Clerk,1,36.4,Negative,Positive
+720,19,Town B,2022-08-01,University,Clerk,1,38.3,Negative,Negative
+721,9,Town A,2022-04-05,Primary,Student,0,36.7,Negative,Negative
+722,26,Town C,2022-06-01,University,Clerk,0,39.2,Indeterminate,Positive
+723,21,Town C,2022-05-02,College,Farmer,1,36.4,Positive,Not done
+724,8,Town A,2022-08-16,Primary,Student,1,38.6,Negative,Negative
+725,35,Town C,2022-08-11,College,Farmer,0,36.4,Positive,Not done
+726,9,Town D,2022-02-07,Primary,Student,0,39.3,Negative,Negative
+727,6,Town E,2022-04-18,Primary,Student,1,38.4,Negative,Negative
+728,6,Town C,2022-06-13,Primary,Student,0,38.2,Positive,Not done
+729,8,Town E,2022-02-22,Primary,Student,1,37.1,Positive,Not done
+730,9,Town C,2022-09-26,Primary,Student,1,36.7,Negative,Negative
+731,30,Town A,2022-01-26,College,Farmer,0,38.5,Positive,Not done
+732,11,Town D,2022-02-04,Primary,Student,1,37.5,Positive,Not done
+733,8,Town B,2022-02-17,Primary,Student,0,39.6,Negative,Negative
+734,16,Town B,2022-08-30,Secondary,Student,0,37.9,Positive,Not done
+735,10,Town C,2022-04-23,Primary,Student,1,38.4,Not done,Negative
+736,35,Town B,2022-02-28,College,Farmer,0,37,Positive,Not done
+737,7,Town D,2022-04-30,Primary,Student,0,39.1,Negative,Negative
+738,13,Town A,2022-08-10,Secondary,Student,0,38.2,Not done,Negative
+739,10,Town E,2022-10-02,Primary,Student,1,38.5,Negative,Negative
+740,9,Town E,2022-03-23,Primary,Student,1,38.3,Negative,Negative
+741,10,Town C,2022-02-04,Primary,Student,1,38.5,Negative,Negative
+742,10,Town B,2022-09-13,Primary,Student,0,36.1,Positive,Not done
+743,25,Town C,2022-06-19,College,Farmer,0,40,Negative,Negative
+744,10,Town A,2022-10-21,Primary,Student,0,37.2,Negative,Negative
+745,18,Town C,2022-08-14,College,Student,0,37.2,Negative,Negative
+746,9,Town D,2022-10-27,Primary,Student,0,39.1,Negative,Negative
+747,25,Town D,2022-07-11,University,Clerk,0,38.3,Negative,Negative
+748,9,Town A,2022-10-30,Primary,Student,0,39.8,Positive,Not done
+749,39,Town B,2022-09-09,College,Logger,0,38.4,Negative,Negative
+750,33,Town D,2022-05-30,University,Clerk,0,36.3,Negative,Negative
+751,6,Town D,2022-02-01,Primary,Student,1,37.4,Positive,Not done
+752,9,Town C,2022-02-02,Primary,Student,1,38.5,Negative,Negative
+753,27,Town B,2022-04-12,University,Clerk,0,39.9,Negative,Negative
+754,11,Town E,2022-07-30,Primary,Student,0,39.5,Positive,Not done
+755,32,Town A,2022-02-08,College,Logger,1,39.2,Negative,Negative
+756,6,Town B,2022-10-21,Primary,Student,0,38.8,Positive,Not done
+757,20,Town C,2022-10-17,University,Teacher,1,37.6,Positive,Not done
+758,8,Town B,2022-07-11,Primary,Student,1,38,Positive,Not done
+759,5,Town A,2022-04-18,Primary,Student,1,38.6,Positive,Not done
+760,15,Town A,2022-10-23,Secondary,Student,0,38.6,Negative,Negative
+761,15,Town D,2022-01-27,Secondary,Student,0,38.7,Negative,Negative
+762,8,Town E,2022-03-12,Primary,Student,1,39.5,Negative,Negative
+763,40,Town D,2022-08-10,College,Farmer,0,36.8,Negative,Negative
+764,21,Town C,2022-09-02,University,Clerk,0,38.8,Positive,Not done
+765,30,Town B,2022-06-30,College,Farmer,1,39.2,Positive,Not done
+766,7,Town E,2022-01-31,Primary,Student,0,36.9,Negative,Negative
+767,29,Town C,2022-02-11,College,Logger,0,37.7,Negative,Negative
+768,13,Town D,2022-01-24,Secondary,Student,0,37.5,Positive,Not done
+769,27,Town D,2022-02-22,University,Clerk,1,37.8,Positive,Not done
+770,17,Town D,2022-07-13,College,Student,1,39.3,Negative,Negative
+771,37,Town B,2022-07-31,College,Farmer,0,38.6,Negative,Negative
+772,10,Town C,2022-06-08,Primary,Student,0,37.5,Positive,Not done
+773,13,Town D,2022-08-04,Secondary,Student,1,37.2,Negative,Negative
+774,12,Town A,2022-07-27,Primary,Student,1,39.4,Negative,Positive
+775,9,Town C,2022-05-07,Primary,Student,0,37.8,Negative,Negative
+776,8,Town A,2022-01-22,Primary,Student,1,39.6,Negative,Negative
+777,24,Town A,2022-03-05,College,Logger,0,39,Positive,Not done
+778,28,Town D,2022-03-24,College,Farmer,1,38.1,Positive,Not done
+779,8,Town E,2022-01-21,Primary,Student,1,40.3,Positive,Not done
+780,12,Town C,2022-05-14,Primary,Student,1,40,Negative,Positive
+781,30,Town E,2022-05-11,University,Teacher,0,37.5,Positive,Not done
+782,8,Town C,2022-06-02,Primary,Student,1,36.1,Negative,Negative
+783,20,Town B,2022-07-19,University,Clerk,0,39,Negative,Negative
+784,30,Town A,2022-09-27,College,Farmer,0,37.9,Negative,Negative
+785,13,Town B,2022-02-27,Secondary,Student,0,36.8,Negative,Positive
+786,16,Town C,2022-06-12,Secondary,Student,1,39.6,Positive,Not done
+787,35,Town B,2022-04-13,College,Logger,1,38.5,Negative,Positive
+788,32,Town B,2022-06-27,University,Teacher,1,37.9,Negative,Negative
+789,27,Town E,2022-01-10,College,Farmer,0,36.9,Negative,Negative
+790,30,Town A,2022-01-18,University,Teacher,1,37.5,Negative,Negative
+791,5,Town E,2022-07-09,Primary,Student,0,37.6,Positive,Not done
+792,11,Town A,2022-09-24,Primary,Student,0,38,Negative,Negative
+793,20,Town E,2022-07-06,College,Logger,0,37.3,Negative,Negative
+794,5,Town A,2022-05-18,Primary,Student,0,39.8,Negative,Negative
+795,27,Town C,2022-05-24,University,Clerk,1,38.8,Positive,Not done
+796,20,Town B,2022-10-26,College,Logger,0,38.8,Negative,Negative
+797,29,Town D,2022-07-09,College,Farmer,1,38.1,Negative,Positive
+798,29,Town A,2022-09-25,University,Clerk,0,37.7,Positive,Not done
+799,6,Town A,2022-03-01,Primary,Student,0,38.6,Negative,Negative
+800,31,Town C,2022-08-09,College,Farmer,0,37,Negative,Negative
+801,29,Town B,2022-07-20,College,Farmer,1,38.9,Not done,Negative
+802,20,Town E,2022-07-28,College,Logger,0,37.7,Positive,Not done
+803,18,Town D,2022-06-06,College,Student,0,38.8,Negative,Positive
+804,31,Town D,2022-06-18,College,Farmer,0,40.4,Negative,Negative
+805,23,Town A,2022-01-04,University,Clerk,0,36.8,Positive,Not done
+806,10,Town A,2022-10-30,Primary,Student,0,37.7,Positive,Not done
+807,19,Town A,2022-01-08,University,Clerk,1,38.3,Negative,Negative
+808,19,Town A,2022-10-09,University,Clerk,0,37.6,Negative,Negative
+809,9,Town A,2022-07-27,Primary,Student,1,37.6,Negative,Negative
+810,14,Town B,2022-06-04,Secondary,Student,1,36.4,Negative,Positive
+811,15,Town A,2022-01-05,Secondary,Student,0,37.5,Positive,Not done
+812,18,Town B,2022-10-10,College,Student,0,38.8,Negative,Negative
+813,36,Town E,2022-06-02,College,Farmer,1,38.2,Negative,Negative
+814,39,Town E,2022-07-14,University,Clerk,1,37.4,Positive,Not done
+815,25,Town B,2022-04-19,College,Housekeeper,0,37.9,Negative,Negative
+816,37,Town D,2022-06-26,University,Clerk,1,39.6,Negative,Positive
+817,40,Town A,2022-08-17,University,Teacher,0,37.5,Positive,Not done
+818,28,Town A,2022-09-13,College,Farmer,1,36.8,Negative,Negative
+819,36,Town E,2022-10-10,College,Farmer,0,40,Negative,Positive
+820,16,Town C,2022-09-27,Secondary,Student,0,39.3,Negative,Negative
+821,16,Town E,2022-08-05,Secondary,Student,1,37,Negative,Negative
+822,14,Town D,2022-09-17,Secondary,Student,1,38.1,Negative,Negative
+823,23,Town E,2022-06-29,University,Clerk,1,39.2,Negative,Negative
+824,25,Town B,2022-07-27,College,Farmer,0,40.1,Positive,Not done
+825,36,Town E,2022-06-23,College,Farmer,1,36.5,Negative,Negative
+826,16,Town B,2022-08-10,Secondary,Student,1,39.6,Positive,Not done
+827,5,Town D,2022-08-28,Primary,Student,1,37.5,Negative,Negative
+828,8,Town A,2022-02-13,Primary,Student,1,39.9,Negative,Negative
+829,15,Town D,2022-09-16,Secondary,Student,1,36.9,Positive,Not done
+830,16,Town B,2022-04-26,Secondary,Student,0,39.2,Negative,Negative
+831,5,Town D,2022-09-04,Primary,Student,0,37.1,Positive,Not done
+832,11,Town D,2022-02-10,Primary,Student,0,37,Positive,Not done
+833,21,Town C,2022-08-10,College,Logger,1,38.2,Positive,Not done
+834,31,Town D,2022-04-12,University,Clerk,0,38.3,Negative,Negative
+835,8,Town E,2022-01-05,Primary,Student,1,37.2,Negative,Negative
+836,5,Town E,2022-06-11,Primary,Student,0,37.8,Negative,Negative
+837,12,Town B,2022-07-15,Primary,Student,0,39.2,Negative,Positive
+838,16,Town D,2022-10-17,Secondary,Student,0,36.9,Negative,Negative
+839,33,Town D,2022-10-24,College,Farmer,0,36.5,Negative,Negative
+840,25,Town B,2022-08-26,College,Logger,1,37.6,Negative,Negative
+841,14,Town B,2022-03-07,Secondary,Student,1,40.1,Negative,Negative
+842,10,Town B,2022-08-20,Primary,Student,0,37.9,Negative,Negative
+843,6,Town C,2022-07-04,Primary,Student,0,36.3,Negative,Negative
+844,9,Town A,2022-07-08,Primary,Student,0,38.1,Negative,Negative
+845,18,Town E,2022-02-08,College,Student,0,39.6,Negative,Negative
+846,20,Town A,2022-03-13,College,Farmer,1,38.3,Positive,Not done
+847,7,Town B,2022-05-04,Primary,Student,0,39.4,Negative,Negative
+848,29,Town B,2022-03-26,University,Teacher,0,39.8,Negative,Negative
+849,10,Town B,2022-02-20,Primary,Student,1,38.6,Positive,Not done
+850,15,Town D,2022-03-21,Secondary,Student,0,38.3,Positive,Not done
+851,5,Town A,2022-09-03,Primary,Student,0,40.3,Negative,Negative
+852,21,Town B,2022-08-01,University,Clerk,0,37.4,Negative,Negative
+853,16,Town C,2022-07-04,Secondary,Student,0,38.6,Negative,Negative
+854,14,Town D,2022-01-30,Secondary,Student,1,38.4,Negative,Negative
+855,15,Town D,2022-08-10,Secondary,Student,1,38.1,Negative,Negative
+856,21,Town C,2022-08-14,University,Clerk,1,39.4,Positive,Not done
+857,7,Town A,2022-04-04,Primary,Student,0,39.2,Negative,Negative
+858,7,Town B,2022-10-20,Primary,Student,0,36.7,Negative,Negative
+859,5,Town D,2022-05-12,Primary,Student,0,37.5,Negative,Negative
+860,17,Town D,2022-02-06,College,Student,1,39.8,Negative,Negative
+861,17,Town A,2022-05-12,College,Student,1,38.4,Negative,Negative
+862,35,Town E,2022-01-02,College,Farmer,1,39.8,Positive,Not done
+863,25,Town B,2022-01-29,College,Housekeeper,1,38.7,Negative,Negative
+864,22,Town B,2022-06-29,University,Clerk,1,36.7,Negative,Positive
+865,27,Town B,2022-05-22,College,Farmer,1,38,Negative,Negative
+866,28,Town E,2022-10-14,College,Farmer,0,39.2,Negative,Negative
+867,21,Town C,2022-10-19,University,Clerk,1,38.6,Negative,Negative
+868,15,Town B,2022-09-07,Secondary,Student,0,37.6,Negative,Negative
+869,17,Town D,2022-05-19,College,Student,0,36.4,Negative,Negative
+870,7,Town D,2022-06-04,Primary,Student,1,40.4,Indeterminate,Negative
+871,5,Town D,2022-10-15,Primary,Student,1,38.7,Positive,Not done
+872,29,Town E,2022-08-11,University,Clerk,1,39.5,Negative,Negative
+873,24,Town E,2022-05-17,College,Farmer,1,38.1,Negative,Negative
+874,6,Town D,2022-05-31,Primary,Student,1,38.3,Negative,Negative
+875,23,Town B,2022-05-05,College,Farmer,0,38.6,Negative,Negative
+876,24,Town E,2022-06-19,University,Teacher,0,40.1,Negative,Negative
+877,40,Town A,2022-09-13,College,Farmer,0,37.5,Negative,Positive
+878,9,Town C,2022-03-11,Primary,Student,1,37.7,Positive,Not done
+879,30,Town C,2022-09-26,University,Teacher,0,37.6,Positive,Not done
+880,32,Town A,2022-09-08,University,Teacher,1,37.2,Positive,Not done
+881,13,Town A,2022-05-28,Secondary,Student,0,38.7,Negative,Negative
+882,40,Town A,2022-05-25,University,Teacher,1,39.1,Negative,Negative
+883,20,Town A,2022-04-30,College,Farmer,0,39.4,Negative,Negative
+884,20,Town D,2022-08-25,University,Clerk,0,38.9,Positive,Not done
+885,26,Town D,2022-04-07,College,Farmer,1,36.1,Positive,Not done
+886,24,Town B,2022-08-04,University,Clerk,0,36.3,Negative,Negative
+887,38,Town D,2022-07-08,College,Logger,1,38.6,Negative,Positive
+888,8,Town B,2022-10-30,Primary,Student,0,40.4,Negative,Negative
+889,36,Town B,2022-01-10,University,Clerk,0,38,Positive,Not done
+890,35,Town A,2022-09-28,College,Farmer,1,39,Negative,Negative
+891,35,Town A,2022-01-10,University,Teacher,0,37.3,Negative,Negative
+892,26,Town E,2022-04-15,College,Farmer,1,38.4,Negative,Negative
+893,9,Town C,2022-09-16,Primary,Student,1,38.7,Negative,Negative
+894,6,Town A,2022-01-20,Primary,Student,0,39.3,Negative,Negative
+895,14,Town D,2022-05-10,Secondary,Student,0,37.6,Negative,Negative
+896,11,Town E,2022-07-26,Primary,Student,1,39.2,Negative,Negative
+897,9,Town B,2022-06-09,Primary,Student,0,38.1,Positive,Not done
+898,40,Town E,2022-01-24,University,Clerk,1,36.9,Negative,Negative
+899,37,Town A,2022-10-24,College,Farmer,1,39.3,Positive,Not done
+900,23,Town A,2022-02-03,University,Clerk,0,38,Positive,Not done
+901,29,Town C,2022-09-18,College,Farmer,0,38.3,Positive,Not done
+902,14,Town A,2022-05-01,Secondary,Student,0,36.9,Negative,Negative
+903,10,Town B,2022-07-18,Primary,Student,0,37,Negative,Negative
+904,32,Town E,2022-10-28,College,Logger,1,40.1,Negative,Negative
+905,18,Town D,2022-06-26,College,Student,0,38.8,Negative,Negative
+906,14,Town C,2022-04-25,Secondary,Student,1,38.4,Negative,Negative
+907,20,Town B,2022-07-10,College,Farmer,0,36.7,Positive,Not done
+908,15,Town B,2022-03-23,Secondary,Student,1,37.8,Positive,Not done
+909,39,Town C,2022-10-29,College,Logger,1,38.7,Positive,Not done
+910,10,Town C,2022-01-22,Primary,Student,1,37.7,Positive,Not done
+911,11,Town E,2022-03-29,Primary,Student,0,39,Positive,Not done
+912,6,Town D,2022-07-07,Primary,Student,1,38,Positive,Not done
+913,33,Town E,2022-04-05,College,Logger,1,40.4,Negative,Negative
+914,7,Town E,2022-10-10,Primary,Student,1,36.9,Positive,Not done
+915,12,Town E,2022-05-23,Primary,Student,0,37.7,Negative,Negative
+916,27,Town C,2022-08-25,University,Clerk,0,39.2,Negative,Negative
+917,7,Town B,2022-03-27,Primary,Student,0,39.3,Negative,Negative
+918,7,Town C,2022-10-03,Primary,Student,0,36.5,Positive,Not done
+919,23,Town A,2022-01-05,College,Farmer,1,39.3,Negative,Negative
+920,6,Town B,2022-05-26,Primary,Student,1,40.4,Positive,Not done
+921,5,Town A,2022-09-05,Primary,Student,1,40.1,Negative,Negative
+922,27,Town D,2022-05-31,College,Farmer,0,38.6,Not done,Negative
+923,12,Town E,2022-01-20,Primary,Student,0,37.8,Negative,Negative
+924,21,Town D,2022-05-12,College,Housekeeper,1,39.2,Positive,Not done
+925,15,Town A,2022-04-19,Secondary,Student,1,39.6,Negative,Negative
+926,17,Town D,2022-02-07,College,Student,1,40.4,Negative,Negative
+927,25,Town B,2022-08-19,University,Clerk,0,38.2,Positive,Not done
+928,10,Town A,2022-01-27,Primary,Student,0,36.8,Positive,Not done
+929,22,Town B,2022-06-15,College,Farmer,0,38.4,Negative,Negative
+930,34,Town D,2022-06-15,College,Farmer,0,39.2,Negative,Negative
+931,10,Town E,2022-03-20,Primary,Student,1,36.9,Negative,Negative
+932,38,Town D,2022-05-26,College,Farmer,0,37.7,Negative,Negative
+933,9,Town A,2022-05-28,Primary,Student,1,36.5,Positive,Not done
+934,35,Town E,2022-01-10,University,Teacher,1,38,Positive,Not done
+935,31,Town D,2022-07-13,College,Logger,0,37.6,Negative,Negative
+936,11,Town B,2022-06-12,Primary,Student,1,37.9,Not done,Negative
+937,6,Town B,2022-05-27,Primary,Student,0,38.3,Negative,Positive
+938,15,Town C,2022-03-14,Secondary,Student,1,38.1,Positive,Not done
+939,6,Town C,2022-01-17,Primary,Student,1,37.1,Positive,Not done
+940,29,Town A,2022-10-02,College,Logger,1,38.9,Negative,Positive
+941,8,Town C,2022-03-20,Primary,Student,1,37.5,Negative,Negative
+942,24,Town C,2022-07-18,College,Logger,1,37.6,Negative,Negative
+943,14,Town E,2022-06-16,Secondary,Student,1,39.2,Negative,Negative
+944,8,Town B,2022-03-29,Primary,Student,1,39.4,Positive,Not done
+945,9,Town D,2022-04-28,Primary,Student,0,38.4,Positive,Not done
+946,7,Town B,2022-01-15,Primary,Student,0,37,Positive,Not done
+947,33,Town B,2022-01-19,College,Logger,0,37.3,Positive,Not done
+948,32,Town E,2022-04-17,College,Farmer,0,40.3,Positive,Not done
+949,26,Town B,2022-04-06,University,Clerk,1,37.1,Negative,Negative
+950,9,Town E,2022-03-28,Primary,Student,1,38.2,Negative,Positive
+951,18,Town B,2022-01-11,College,Student,0,39,Negative,Negative
+952,5,Town A,2022-09-23,Primary,Student,0,39.6,Negative,Negative
+953,9,Town E,2022-05-09,Primary,Student,1,38.6,Positive,Not done
+954,11,Town E,2022-07-01,Primary,Student,0,36.8,Positive,Not done
+955,13,Town A,2022-01-14,Secondary,Student,1,38.3,Negative,Negative
+956,31,Town E,2022-06-10,College,Farmer,1,39.2,Negative,Positive
+957,38,Town D,2022-09-26,University,Clerk,0,37.2,Positive,Not done
+958,8,Town C,2022-02-04,Primary,Student,0,37.3,Negative,Negative
+959,20,Town E,2022-08-10,College,Farmer,0,39.1,Negative,Negative
+960,8,Town B,2022-02-17,Primary,Student,0,37.1,Positive,Not done
+961,36,Town E,2022-09-12,University,Clerk,0,37.4,Positive,Not done
+962,11,Town A,2022-05-06,Primary,Student,1,39,Negative,Negative
+963,12,Town E,2022-05-23,Primary,Student,1,37.3,Not done,Negative
+964,15,Town C,2022-01-10,Secondary,Student,0,38.2,Negative,Negative
+965,34,Town B,2022-04-11,University,Clerk,1,38.2,Negative,Negative
+966,28,Town D,2022-03-31,College,Farmer,1,38.8,Negative,Negative
+967,30,Town B,2022-02-02,College,Farmer,1,39.1,Negative,Negative
+968,15,Town D,2022-01-17,Secondary,Student,0,37.7,Positive,Not done
+969,14,Town D,2022-03-29,Secondary,Student,1,39.4,Negative,Negative
+970,7,Town A,2022-04-02,Primary,Student,0,38.3,Negative,Positive
+971,29,Town A,2022-02-27,College,Farmer,0,38,Negative,Negative
+972,5,Town A,2022-07-26,Primary,Student,0,39.9,Negative,Negative
+973,5,Town E,2022-01-14,Primary,Student,1,36.1,Positive,Not done
+974,29,Town C,2022-07-09,College,Logger,0,39.8,Positive,Not done
+975,20,Town A,2022-10-07,College,Housekeeper,0,39.2,Negative,Negative
+976,36,Town A,2022-03-27,University,Clerk,1,38.4,Negative,Negative
+977,25,Town B,2022-08-05,College,Farmer,0,38.2,Negative,Negative
+978,13,Town C,2022-01-25,Secondary,Student,0,37.3,Negative,Negative
+979,13,Town B,2022-07-10,Secondary,Student,0,37.3,Negative,Negative
+980,7,Town C,2022-06-26,Primary,Student,1,37.6,Negative,Negative
+981,5,Town E,2022-08-12,Primary,Student,0,37.5,Negative,Negative
+982,13,Town C,2022-04-18,Secondary,Student,0,38.1,Negative,Negative
+983,10,Town B,2022-06-04,Primary,Student,1,38,Positive,Not done
+984,30,Town B,2022-06-10,College,Logger,0,39.4,Positive,Not done
+985,32,Town C,2022-09-19,College,Farmer,0,37.7,Negative,Negative
+986,35,Town B,2022-03-29,College,Logger,0,37.7,Negative,Negative
+987,15,Town D,2022-04-14,Secondary,Student,1,36.9,Positive,Not done
+988,32,Town E,2022-05-14,College,Farmer,0,37.8,Positive,Not done
+989,34,Town D,2022-02-15,College,Farmer,0,38,Negative,Negative
+990,39,Town B,2022-06-10,College,Logger,0,38.7,Negative,Negative
+991,25,Town D,2022-09-14,College,Housekeeper,0,37.5,Positive,Not done
+992,31,Town E,2022-02-14,College,Farmer,1,38.3,Negative,Negative
+993,13,Town A,2022-05-14,Secondary,Student,1,39.2,Negative,Negative
+994,5,Town A,2022-05-01,Primary,Student,1,38.3,Negative,Positive
+995,9,Town C,2022-03-04,Primary,Student,0,36.1,Negative,Negative
+996,6,Town C,2022-01-26,Primary,Student,1,37,Negative,Negative
+997,7,Town B,2022-02-07,Primary,Student,0,40,Positive,Not done
+998,9,Town C,2022-02-28,Primary,Student,1,39.9,Negative,Negative
+999,11,Town E,2022-08-30,Primary,Student,0,39.2,Not done,Negative
+1000,13,Town D,2022-04-20,Secondary,Student,1,38.3,Negative,Negative

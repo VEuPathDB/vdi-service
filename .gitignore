@@ -25,6 +25,10 @@ vendor/
 bin/
 tmp/
 
+*.zip
+*.tgz
+*.tar.gz
+
 
 project/docs/
 
@@ -36,6 +40,8 @@ project/docs/
 
 *ssh*
 host-list.yml
+
+!test-data/rnaseq/plasmoRNASeq-PbANKA/69_ HTSeqCountToTPM on collection 54_ gene expression.tgz
 
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
