@@ -17,7 +17,6 @@ internal fun InternalDatasetDetails(record: AdminDatasetDetailsRecord): Internal
     it.summary = record.summary
     it.description = record.description
     it.visibility = DatasetVisibility(record.visibility)
-    it.sourceUrl = record.sourceURL
     it.installTargets = record.projects
     it.status = record.importStatus.toString()
 

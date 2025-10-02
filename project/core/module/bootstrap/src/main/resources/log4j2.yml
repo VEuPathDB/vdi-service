@@ -68,7 +68,7 @@ Configuration:
       AppenderRef:
       - ref: sub-0-mod
     - name: org.apache.kafka.clients
-      level: error
+      level: warn
       additivity: false
       AppenderRef:
       - ref: externals

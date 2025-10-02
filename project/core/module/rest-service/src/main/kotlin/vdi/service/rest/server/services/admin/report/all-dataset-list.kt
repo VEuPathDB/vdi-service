@@ -95,14 +95,13 @@ private fun AllDatasetsListEntry(
     it.datasetType = row.type.toExternal()
     it.visibility = DatasetVisibility(row.visibility)
     it.name = row.name
-    it.shortName = row.shortName
-    it.shortAttribution = row.shortAttribution
     it.summary = row.summary
     it.description = row.description
-    it.sourceUrl = row.sourceURL
     it.origin = row.origin
     it.installTargets = row.projects
     it.status = DatasetStatusInfo(row.importStatus, statuses)
     it.created = row.created.defaultZone()
     it.isDeleted = row.isDeleted
+    it.programName = row.programName
+    it.projectName = row.projectName
   }

@@ -7,10 +7,9 @@ interface CoreDatasetMeta {
   val datasetID: DatasetID
   val visibility: DatasetVisibility
   val name: String
-  val shortName: String?
-  val shortAttribution: String?
+  val projectName: String?
+  val programName: String?
   val summary: String
   val description: String?
-  val sourceURL: String?
   val originalID: DatasetID?
 }

@@ -23,7 +23,6 @@ import java.util.List;
     "visibility",
     "summary",
     "description",
-    "sourceUrl",
     "syncControl",
     "uploadFiles",
     "installFiles"
@@ -67,9 +66,6 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
 
   @JsonProperty(JsonField.DESCRIPTION)
   private String description;
-
-  @JsonProperty(JsonField.SOURCE_URL)
-  private String sourceUrl;
 
   @JsonProperty(JsonField.SYNC_CONTROL)
   private SyncControlRecord syncControl;
@@ -208,16 +204,6 @@ public class InternalDatasetDetailsImpl implements InternalDatasetDetails {
   @JsonProperty(JsonField.DESCRIPTION)
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  @JsonProperty(JsonField.SOURCE_URL)
-  public String getSourceUrl() {
-    return this.sourceUrl;
-  }
-
-  @JsonProperty(JsonField.SOURCE_URL)
-  public void setSourceUrl(String sourceUrl) {
-    this.sourceUrl = sourceUrl;
   }
 
   @JsonProperty(JsonField.SYNC_CONTROL)

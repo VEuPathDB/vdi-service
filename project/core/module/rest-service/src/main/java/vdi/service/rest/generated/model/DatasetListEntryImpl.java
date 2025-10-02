@@ -24,7 +24,6 @@ import java.util.List;
     "created",
     "summary",
     "description",
-    "sourceUrl",
     "originalId"
 })
 public class DatasetListEntryImpl implements DatasetListEntry {
@@ -69,9 +68,6 @@ public class DatasetListEntryImpl implements DatasetListEntry {
 
   @JsonProperty(JsonField.DESCRIPTION)
   private String description;
-
-  @JsonProperty(JsonField.SOURCE_URL)
-  private String sourceUrl;
 
   @JsonProperty(JsonField.ORIGINAL_ID)
   private String originalId;
@@ -214,16 +210,6 @@ public class DatasetListEntryImpl implements DatasetListEntry {
   @JsonProperty(JsonField.DESCRIPTION)
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  @JsonProperty(JsonField.SOURCE_URL)
-  public String getSourceUrl() {
-    return this.sourceUrl;
-  }
-
-  @JsonProperty(JsonField.SOURCE_URL)
-  public void setSourceUrl(String sourceUrl) {
-    this.sourceUrl = sourceUrl;
   }
 
   @JsonProperty(JsonField.ORIGINAL_ID)

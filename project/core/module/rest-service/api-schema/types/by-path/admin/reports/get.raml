@@ -89,9 +89,8 @@ types:
       isDeleted: boolean
       summary: common.DatasetSummary
       description?: common.DatasetDescription
-      sourceUrl?: common.DatasetSourceUrl
-      shortName?: common.ShortName
-      shortAttribution?: common.ShortAttribution
+      programName?: string
+      projectName?: string
 
   SyncControlRecord:
     additionalProperties: false
@@ -119,7 +118,6 @@ types:
       visibility: common.DatasetVisibility
       summary: common.DatasetSummary
       description?: common.DatasetDescription
-      sourceUrl?: common.DatasetSourceUrl
       syncControl?: SyncControlRecord
       uploadFiles?: string[]
       installFiles?: string[]

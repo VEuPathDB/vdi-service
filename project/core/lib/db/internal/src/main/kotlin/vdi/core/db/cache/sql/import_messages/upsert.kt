@@ -14,8 +14,7 @@ INSERT INTO
   )
 VALUES
   (?, ?)
-ON CONFLICT (dataset_id)
-  DO NOTHING
+ON CONFLICT DO NOTHING
 """
 
 internal fun Connection.upsertImportMessages(datasetID: DatasetID, messages: Iterable<String>) =

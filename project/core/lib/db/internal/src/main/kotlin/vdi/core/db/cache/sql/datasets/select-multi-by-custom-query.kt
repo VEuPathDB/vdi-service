@@ -30,12 +30,11 @@ SELECT
 , d.created
 , d.inserted
 , md.name
-, md.short_name
-, md.short_attribution
+, md.project_name
+, md.program_name
 , md.summary
 , md.description
 , md.visibility
-, md.source_url
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id) AS projects
 , ic.status
 , r.original_id
@@ -155,11 +154,10 @@ fun Connection.selectDatasetList(query: DatasetListQuery) : List<DatasetRecord> 
           visibility       = it.getDatasetVisibility("visibility"),
           origin           = it.getString("origin"),
           name             = it.getString("name"),
-          shortName        = it.getString("short_name"),
-          shortAttribution = it.getString("short_attribution"),
+          projectName      = it.getString("project_name"),
+          programName      = it.getString("program_name"),
           summary          = it.getString("summary"),
           description      = it.getString("description"),
-          sourceURL        = it.getString("source_url"),
           projects         = it.getProjectIDList("projects"),
           inserted         = it.getDateTime("inserted"),
           originalID       = it.optDatasetID("original_id")

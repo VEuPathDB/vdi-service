@@ -24,12 +24,11 @@ SELECT
 , vd.created
 , vd.inserted
 , dm.name
-, dm.short_name
-, dm.short_attribution
 , dm.summary
 , dm.description
 , dm.visibility
-, dm.source_url
+, dm.program_name
+, dm.project_name
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = vd.dataset_id) AS projects
 , ic.status
 , r.original_id
@@ -53,23 +52,22 @@ internal fun Connection.selectDataset(datasetID: DatasetID): DatasetRecord? =
         null
       else
         DatasetRecordImpl(
-          datasetID        = datasetID,
-          type             = DatasetType(getDataType("type_name"), getString("type_version")),
-          ownerID          = getUserID("owner_id"),
-          isDeleted        = getBoolean("is_deleted"),
-          origin           = getString("origin"),
-          created          = getDateTime("created"),
-          inserted         = getDateTime("inserted"),
-          name             = getString("name"),
-          shortName        = getString("short_name"),
-          shortAttribution = getString("short_attribution"),
-          summary          = getString("summary"),
-          description      = getString("description"),
-          visibility       = getDatasetVisibility("visibility"),
-          sourceURL        = getString("source_url"),
-          projects         = getProjectIDList("projects"),
-          importStatus     = getImportStatus("status") ?: DatasetImportStatus.Queued,
-          originalID       = optDatasetID("original_id"),
+          datasetID    = datasetID,
+          type         = DatasetType(getDataType("type_name"), getString("type_version")),
+          ownerID      = getUserID("owner_id"),
+          isDeleted    = getBoolean("is_deleted"),
+          origin       = getString("origin"),
+          created      = getDateTime("created"),
+          inserted     = getDateTime("inserted"),
+          name         = getString("name"),
+          projectName  = getString("project_name"),
+          programName  = getString("program_name"),
+          summary      = getString("summary"),
+          description  = getString("description"),
+          visibility   = getDatasetVisibility("visibility"),
+          projects     = getProjectIDList("projects"),
+          importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
+          originalID   = optDatasetID("original_id"),
         )
     }
   }

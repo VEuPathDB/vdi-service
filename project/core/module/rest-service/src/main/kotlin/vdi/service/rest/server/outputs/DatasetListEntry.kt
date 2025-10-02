@@ -27,7 +27,6 @@ internal fun DatasetListEntry(
   created: OffsetDateTime,
   summary: String?,
   description: String?,
-  sourceURL: String?,
   originalID: DatasetID?,
 ): DatasetListEntry =
   DatasetListEntryImpl().also {
@@ -45,7 +44,6 @@ internal fun DatasetListEntry(
     it.created = created
     it.summary = summary
     it.description = description
-    it.sourceUrl = sourceURL
     it.originalId = originalID?.toString()
   }
 
@@ -70,7 +68,6 @@ internal fun DatasetRecord.toExternal(
     created          = created.defaultZone(),
     summary          = summary,
     description      = description,
-    sourceURL        = sourceURL,
-    originalID       = originalID
+    originalID       = originalID,
   )
 }

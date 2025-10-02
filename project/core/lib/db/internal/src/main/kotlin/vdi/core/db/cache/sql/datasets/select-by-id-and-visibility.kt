@@ -23,12 +23,11 @@ SELECT
 , vd.created
 , vd.inserted
 , dm.name
-, dm.short_name
-, dm.short_attribution
-, dm.summary
-, dm.description
 , dm.visibility
-, dm.source_url
+, dm.summary
+, dm.project_name
+, dm.program_name
+, dm.description
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = vd.dataset_id) AS projects
 , ic.status
 , r.original_id
@@ -71,23 +70,22 @@ internal fun Connection.selectDatasetForUser(userID: UserID, datasetID: DatasetI
         null
       else
         DatasetRecordImpl(
-          datasetID        = datasetID,
-          type             = DatasetType(getDataType("type_name"), getString("type_version")),
-          ownerID          = getUserID("owner_id"),
-          isDeleted        = getBoolean("is_deleted"),
-          created          = getDateTime("created"),
-          importStatus     = getImportStatus("status") ?: DatasetImportStatus.Queued,
-          origin           = getString("origin"),
-          visibility       = getDatasetVisibility("visibility"),
-          name             = getString("name"),
-          shortName        = getString("short_name"),
-          shortAttribution = getString("short_attribution"),
-          summary          = getString("summary"),
-          description      = getString("description"),
-          sourceURL        = getString("source_url"),
-          projects         = getProjectIDList("projects"),
-          inserted         = getDateTime("inserted"),
-          originalID       = optDatasetID("original_id")
+          datasetID    = datasetID,
+          type         = DatasetType(getDataType("type_name"), getString("type_version")),
+          ownerID      = getUserID("owner_id"),
+          isDeleted    = getBoolean("is_deleted"),
+          created      = getDateTime("created"),
+          importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
+          origin       = getString("origin"),
+          visibility   = getDatasetVisibility("visibility"),
+          name         = getString("name"),
+          projectName  = getString("project_name"),
+          programName  = getString("program_name"),
+          summary      = getString("summary"),
+          description  = getString("description"),
+          projects     = getProjectIDList("projects"),
+          inserted     = getDateTime("inserted"),
+          originalID   = optDatasetID("original_id")
         )
     }
   }

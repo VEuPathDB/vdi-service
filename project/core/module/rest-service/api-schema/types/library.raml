@@ -26,9 +26,8 @@ types:
       isDeleted: boolean
       summary: DatasetSummary
       description?: DatasetDescription
-      sourceUrl?: DatasetSourceUrl
-      shortName?: ShortName
-      shortAttribution?: ShortAttribution
+      programName?: string
+      projectName?: string
   AllDatasetsListMeta:
     type: object
     additionalProperties: false
@@ -491,7 +490,6 @@ types:
       created: DatasetCreationDate
       summary: DatasetSummary
       description?: DatasetDescription
-      sourceUrl?: DatasetSourceUrl
       originalId?: VdiId
   DatasetListShareUser:
     displayName: Dataset Listing Share Info
@@ -1070,7 +1068,6 @@ types:
       visibility: DatasetVisibility
       summary: DatasetSummary
       description?: DatasetDescription
-      sourceUrl?: DatasetSourceUrl
       syncControl?: SyncControlRecord
       uploadFiles?: string[]
       installFiles?: string[]

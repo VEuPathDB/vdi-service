@@ -113,7 +113,6 @@ public final class JsonField {
   public static final String SHARES_RECORDS = "sharesRecords";
   public static final String SHARES_UPDATE_TIME = "sharesUpdateTime";
   public static final String SHORT_ATTRIBUTION = "shortAttribution";
-  public static final String SHORT_NAME = "shortName";
   public static final String SOURCE_URL = "sourceUrl";
   public static final String SPECIES = "species";
   public static final String START = "start";

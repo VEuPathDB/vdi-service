@@ -25,11 +25,10 @@ SELECT
 , d.type_version
 , d.inserted
 , m.name
-, m.short_name
-, m.short_attribution
 , m.summary
 , m.description
-, m.source_url
+, m.project_name
+, m.program_name
 , m.visibility
 , array(
     SELECT p.project_id
@@ -71,32 +70,31 @@ internal fun Connection.selectAdminDatasetDetails(datasetID: DatasetID): AdminDa
       }
 
       AdminDatasetDetailsRecord(
-        datasetID        = reqDatasetID("dataset_id"),
-        ownerID          = getUserID("owner_id"),
-        origin           = getString("origin"),
-        created          = getDateTime("created"),
-        inserted         = getDateTime("inserted"),
-        type             = DatasetType(getDataType("type_name"), getString("type_version")),
-        name             = getString("name"),
-        shortName        = getString("short_name"),
-        shortAttribution = getString("short_attribution"),
-        summary          = getString("summary"),
-        description      = getString("description"),
-        sourceURL        = getString("source_url"),
-        visibility       = getDatasetVisibility("visibility"),
-        projects         = getProjectIDList("projects"),
-        importStatus     = getImportStatus("status") ?: DatasetImportStatus.Queued,
-        originalID       = optDatasetID("original_id"),
-        syncControl      = SyncControlRecord(
-          datasetID     = reqDatasetID("dataset_id"),
+        datasetID    = reqDatasetID("dataset_id"),
+        ownerID      = getUserID("owner_id"),
+        origin       = getString("origin"),
+        created      = getDateTime("created"),
+        inserted     = getDateTime("inserted"),
+        type         = DatasetType(getDataType("type_name"), getString("type_version")),
+        name         = getString("name"),
+        projectName  = getString("project_name"),
+        programName  = getString("program_name"),
+        summary      = getString("summary"),
+        description  = getString("description"),
+        visibility   = getDatasetVisibility("visibility"),
+        projects     = getProjectIDList("projects"),
+        importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
+        originalID   = optDatasetID("original_id"),
+        syncControl  = SyncControlRecord(
+          datasetID  = reqDatasetID("dataset_id"),
           sharesUpdated = getDateTime("shares_update_time"),
           dataUpdated   = getDateTime("data_update_time"),
           metaUpdated   = getDateTime("meta_update_time")
         ),
-        messages         = getStringList("messages"),
-        installFiles     = getStringList("install_files"),
-        uploadFiles      = getStringList("upload_files"),
-        isDeleted        = false,
+        messages     = getStringList("messages"),
+        installFiles = getStringList("install_files"),
+        uploadFiles  = getStringList("upload_files"),
+        isDeleted    = false,
       )
     }
   }

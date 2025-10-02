@@ -93,12 +93,6 @@ public interface DatasetListEntry {
   @JsonProperty(JsonField.DESCRIPTION)
   void setDescription(String description);
 
-  @JsonProperty(JsonField.SOURCE_URL)
-  String getSourceUrl();
-
-  @JsonProperty(JsonField.SOURCE_URL)
-  void setSourceUrl(String sourceUrl);
-
   @JsonProperty(JsonField.ORIGINAL_ID)
   String getOriginalId();
 

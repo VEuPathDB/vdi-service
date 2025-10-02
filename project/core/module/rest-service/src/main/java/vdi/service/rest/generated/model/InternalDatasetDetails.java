@@ -87,12 +87,6 @@ public interface InternalDatasetDetails {
   @JsonProperty(JsonField.DESCRIPTION)
   void setDescription(String description);
 
-  @JsonProperty(JsonField.SOURCE_URL)
-  String getSourceUrl();
-
-  @JsonProperty(JsonField.SOURCE_URL)
-  void setSourceUrl(String sourceUrl);
-
   @JsonProperty(JsonField.SYNC_CONTROL)
   SyncControlRecord getSyncControl();
 
