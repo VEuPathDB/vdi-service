@@ -7,7 +7,7 @@ import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.setDeleteFlag
 import vdi.core.db.jdbc.setDataType
 import vdi.core.db.jdbc.setDatasetID
-import vdi.core.db.jdbc.setUserID
+import vdi.core.db.app.sql.setUserID
 
 private fun sql(schema: String) =
 // language=postgresql

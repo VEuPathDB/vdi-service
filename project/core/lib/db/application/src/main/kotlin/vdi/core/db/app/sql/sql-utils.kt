@@ -6,6 +6,7 @@ import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
 import vdi.model.data.DatasetID
+import vdi.model.data.UserID
 
 internal fun PreparedStatement.setDeleteFlag(index: Int, deleteFlag: DeleteFlag) = setInt(index, deleteFlag.value)
 
@@ -14,6 +15,9 @@ internal fun PreparedStatement.setInstallStatus(index: Int, installStatus: Insta
 internal fun PreparedStatement.setInstallType(index: Int, installType: InstallType) = setString(index, installType.value)
 
 internal operator fun PreparedStatement.set(index: Int, datasetID: DatasetID) = setString(index, datasetID.asString)
+
+internal fun PreparedStatement.setUserID(index: Int, userID: UserID) = setLong(index, userID.toLong())
+internal fun ResultSet.getUserID(field: String) = UserID(getLong(field))
 
 internal fun ResultSet.getDeleteFlag(column: String) = DeleteFlag.fromInt(getInt(column))
 

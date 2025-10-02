@@ -14,7 +14,7 @@ import vdi.core.db.app.sql.getDeleteFlag
 import vdi.core.db.app.sql.setInstallStatus
 import vdi.core.db.app.sql.setInstallType
 import vdi.core.db.jdbc.getDataType
-import vdi.core.db.jdbc.getUserID
+import vdi.core.db.app.sql.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.DatasetType

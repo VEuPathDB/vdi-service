@@ -9,7 +9,7 @@ import vdi.core.db.app.model.DatasetRecord
 import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.getDeleteFlag
 import vdi.core.db.jdbc.getDataType
-import vdi.core.db.jdbc.getUserID
+import vdi.core.db.app.sql.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.plugin.registry.PluginRegistry

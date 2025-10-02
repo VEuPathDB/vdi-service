@@ -7,7 +7,7 @@ import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.getDataType
 import vdi.core.db.jdbc.getDateTime
-import vdi.core.db.jdbc.getUserID
+import vdi.core.db.app.sql.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.model.ReconcilerTargetRecord
 import vdi.db.app.TargetDBPlatform
