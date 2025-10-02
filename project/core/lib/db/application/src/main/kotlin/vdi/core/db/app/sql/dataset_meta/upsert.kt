@@ -45,7 +45,7 @@ internal fun Connection.upsertDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(5, meta.programName)
     setString(6, meta.projectName)
     setString(7, meta.shortAttribution)
-    setString(8, TODO("compute short name"))
+    setString(8, meta.shortName)
 
     // update
     setString(9, meta.name)
@@ -54,6 +54,6 @@ internal fun Connection.upsertDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(12, meta.programName)
     setString(13, meta.projectName)
     setString(14, meta.shortAttribution)
-    setString(15, TODO("compute short_name"))
+    setString(15, meta.shortName)
   }
 }

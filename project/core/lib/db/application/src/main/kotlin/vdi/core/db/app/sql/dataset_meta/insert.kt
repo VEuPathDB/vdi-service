@@ -34,6 +34,6 @@ internal fun Connection.insertDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(5, meta.programName)
     setString(6, meta.projectName)
     setString(7, meta.shortAttribution)
-    setString(8, TODO("compute short name!"))
+    setString(8, meta.shortName)
   }
 }

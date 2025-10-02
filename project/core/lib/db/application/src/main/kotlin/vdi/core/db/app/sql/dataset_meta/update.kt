@@ -32,7 +32,7 @@ internal fun Connection.updateDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(4, meta.programName)
     setString(5, meta.projectName)
     setString(6, meta.shortAttribution)
-    setString(7, TODO("compute short name!"))
+    setString(7, meta.shortName)
     setDatasetID(8, datasetID)
   }
 }

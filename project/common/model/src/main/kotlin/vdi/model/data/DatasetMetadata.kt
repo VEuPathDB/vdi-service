@@ -1,6 +1,7 @@
 package vdi.model.data
 
 import com.fasterxml.jackson.annotation.JsonAlias
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.net.URI
 import java.time.OffsetDateTime
@@ -90,6 +91,9 @@ data class DatasetMetadata(
   @field:JsonProperty(RevisionHistory)
   val revisionHistory: DatasetRevisionHistory? = null,
 ) {
+  @get:JsonIgnore
+  val shortName get() = name.take(40)
+
   companion object JsonKey {
     const val Contacts             = "contacts"
     const val Created              = "created"
