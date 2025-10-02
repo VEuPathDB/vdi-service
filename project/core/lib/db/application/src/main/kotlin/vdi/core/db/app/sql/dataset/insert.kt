@@ -37,7 +37,7 @@ VALUES (
 , ? -- 9  days before automatic access approval to requesting users
 , ? -- 10 dataset creation date
 )
-ON CONFLICT DO UPDATE
+ON CONFLICT (dataset_id) DO UPDATE
 SET
   deleted_status = ?    -- 11 deletion status
 , is_public = ?         -- 12 public flag (redundant with accessibility == public)
