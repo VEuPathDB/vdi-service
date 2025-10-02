@@ -2,7 +2,6 @@ package vdi.core.kafka
 
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
-import org.slf4j.LoggerFactory
 import vdi.core.health.RemoteDependencies
 import vdi.model.field.HostAddress
 import org.apache.kafka.clients.consumer.KafkaConsumer as KConsumer
@@ -26,7 +25,7 @@ fun KafkaConsumer(topic: MessageTopic, config: KafkaConsumerConfig): KafkaConsum
     topic,
     config.pollDuration,
     StringDeserializer()
-      .let { KConsumer(config.toProperties().also { LoggerFactory.getLogger("eh").warn("{}", it) }, it, it).apply { subscribe(listOf(topic.value)) } }
+      .let { KConsumer(config.toProperties(), it, it).apply { subscribe(listOf(topic.value)) } }
   )
 }
 
