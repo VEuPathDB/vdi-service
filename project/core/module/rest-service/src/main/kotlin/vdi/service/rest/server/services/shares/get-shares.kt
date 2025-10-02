@@ -63,7 +63,7 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
       shareStatus            = ShareOfferStatus.OPEN,
       datasetTypeName        = it.type.name,
       datasetTypeVersion     = it.type.version,
-      datasetTypeDisplayName = PluginRegistry.displayNameFor(it.type),
+      datasetTypeDisplayName = PluginRegistry.categoryFor(it.type),
       owner                  = owners[it.ownerID] ?: throw IllegalStateException("unknown dataset owner ${it.ownerID}"),
       installTargets         = it.projects
     )

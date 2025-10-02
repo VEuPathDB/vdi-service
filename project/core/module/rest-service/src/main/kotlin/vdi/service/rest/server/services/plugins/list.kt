@@ -21,7 +21,7 @@ private fun PluginListItem(p: Pair<DatasetType, PluginDetails>): PluginListItem 
   PluginListItemImpl().also {
     it.pluginName      = p.second.name
     it.installTargets  = p.second.projects
-    it.typeDisplayName = PluginRegistry.displayNameFor(p.first)
+    it.typeDisplayName = PluginRegistry.categoryFor(p.first)
     it.typeName        = p.first.name.toString()
     it.typeVersion     = p.first.version
   }

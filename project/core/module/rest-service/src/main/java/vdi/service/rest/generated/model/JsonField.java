@@ -14,6 +14,7 @@ public final class JsonField {
   public static final String BUILD_ID = "buildId";
   public static final String BUILD_NUMBER = "buildNumber";
   public static final String BUILD_TIME = "buildTime";
+  public static final String CATEGORY = "category";
   public static final String CHARACTERISTICS = "characteristics";
   public static final String CITATION = "citation";
   public static final String CONTACTS = "contacts";
@@ -35,7 +36,6 @@ public final class JsonField {
   public static final String DESCRIPTION = "description";
   public static final String DETAILS = "details";
   public static final String DISEASES = "diseases";
-  public static final String DISPLAY_NAME = "displayName";
   public static final String DOC_FILES = "docFiles";
   public static final String DOCUMENTS = "documents";
   public static final String DOI = "doi";

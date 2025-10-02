@@ -104,10 +104,6 @@
           "type": "string",
           "minLength": 3
         },
-        "displayName": {
-          "type": "string",
-          "minLength": 3
-        },
         "version": {
           "oneOf": [
             {
@@ -126,7 +122,7 @@
         }
       },
       "required": [
-        "displayName",
+        "category",
         "name",
         "version"
       ],

@@ -19,9 +19,9 @@ public interface DatasetTypeOutput {
   @JsonProperty(JsonField.VERSION)
   void setVersion(String version);
 
-  @JsonProperty(JsonField.DISPLAY_NAME)
-  String getDisplayName();
+  @JsonProperty(JsonField.CATEGORY)
+  String getCategory();
 
-  @JsonProperty(JsonField.DISPLAY_NAME)
-  void setDisplayName(String displayName);
+  @JsonProperty(JsonField.CATEGORY)
+  void setCategory(String category);
 }

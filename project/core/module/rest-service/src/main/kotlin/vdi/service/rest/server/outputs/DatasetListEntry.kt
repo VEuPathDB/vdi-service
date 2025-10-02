@@ -56,7 +56,7 @@ internal fun DatasetRecord.toExternal(
   return DatasetListEntry(
     datasetID        = datasetID,
     owner            = DatasetOwner(owner),
-    datasetType      = DatasetTypeOutput(this, PluginRegistry.displayNameFor(type)),
+    datasetType      = DatasetTypeOutput(this, PluginRegistry.categoryFor(type)),
     visibility       = DatasetVisibility(visibility),
     name             = name,
     origin           = origin,

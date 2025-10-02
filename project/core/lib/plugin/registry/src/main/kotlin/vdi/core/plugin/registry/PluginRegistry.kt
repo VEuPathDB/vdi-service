@@ -7,11 +7,11 @@ import vdi.model.data.DatasetType
 
 object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
   private val mapping: Map<DatasetType, PluginDetails>
-  private val metadata: Map<DatasetType, DataTypeMetadata>
+  private val categories: Map<DatasetType, String>
 
   init {
-    val conflicts = HashMap<String, MutableList<String>>(1)
-    val tmpCats   = HashMap<DatasetType, DataTypeMetadata>(12)
+    val conflicts = HashMap<DatasetType, MutableList<String>>(1)
+    val tmpCats   = HashMap<DatasetType, String>(12)
 
     mapping = loadAndCacheStackConfig().vdi.plugins
       .asSequence()
@@ -23,9 +23,8 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
         )
 
         plug.dataTypes.asSequence()
-          .onEach { conflicts.computeIfAbsent(it.displayName, { ArrayList(1) }).add(name) }
-          .map { DatasetType(DataType.of(it.name), it.version)
-            .also { dt -> if (it.category != null) tmpCats[dt] = DataTypeMetadata(it.displayName, it.category!!) } }
+          .map { DatasetType(DataType.of(it.name), it.version).also { dt -> tmpCats[dt] = it.category } }
+          .onEach { conflicts.computeIfAbsent(it, { ArrayList(1) }).add(name) }
           .map { it to details }
       }
       .toMap()
@@ -37,19 +36,14 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
       .takeUnless { it.isBlank() }
       ?.also { throw ConfigurationException(it) }
 
-    metadata = HashMap<DatasetType, DataTypeMetadata>(tmpCats.size)
-      .apply { putAll(tmpCats) }
+    categories = HashMap<DatasetType, String>(tmpCats.size).apply { putAll(tmpCats) }
   }
 
   fun contains(type: DatasetType) = type in mapping
 
-  fun categoryFor(type: DatasetType) = metadata[type]?.category ?: throw MissingDataTypeCategoryException(type)
+  fun categoryFor(type: DatasetType) = categories[type] ?: throw MissingDataTypeCategoryException(type)
 
-  fun categoryOrNullFor(type: DatasetType) = metadata[type]?.category
-
-  fun displayNameFor(type: DatasetType) = metadata[type]?.displayName ?: throw MissingDataTypeCategoryException(type)
-
-  fun displayNameOrNullFor(type: DatasetType) = metadata[type]?.displayName
+  fun categoryOrNullFor(type: DatasetType) = categories[type]
 
   operator fun get(type: DatasetType) = mapping[type]
 

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "name",
     "version",
-    "displayName"
+    "category"
 })
 public class DatasetTypeOutputImpl implements DatasetTypeOutput {
   @JsonProperty(JsonField.NAME)
@@ -17,8 +17,8 @@ public class DatasetTypeOutputImpl implements DatasetTypeOutput {
   @JsonProperty(JsonField.VERSION)
   private String version;
 
-  @JsonProperty(JsonField.DISPLAY_NAME)
-  private String displayName;
+  @JsonProperty(JsonField.CATEGORY)
+  private String category;
 
   @JsonProperty(JsonField.NAME)
   public String getName() {
@@ -40,13 +40,13 @@ public class DatasetTypeOutputImpl implements DatasetTypeOutput {
     this.version = version;
   }
 
-  @JsonProperty(JsonField.DISPLAY_NAME)
-  public String getDisplayName() {
-    return this.displayName;
+  @JsonProperty(JsonField.CATEGORY)
+  public String getCategory() {
+    return this.category;
   }
 
-  @JsonProperty(JsonField.DISPLAY_NAME)
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
+  @JsonProperty(JsonField.CATEGORY)
+  public void setCategory(String category) {
+    this.category = category;
   }
 }
