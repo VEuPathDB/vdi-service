@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veupathdb.github.io/vdi-service/schema/stack-config.json",
   "title": "VDI Stack Configuration Schema",
+  "description": "Description/documentation for the schema of the VDI core stack configuration YAML file.\n\nThe root of the config file is a map with the keys listed below.",
   "type": "object",
   "properties": {
     "containerCore": { "$ref": "container-core/core-config.json" },
