@@ -33,6 +33,8 @@
     "ldap": { "$ref": "../common.json#/$defs/ldap" },
     "objectStore": { "$ref": "components/object-store.json" },
     "plugins": {
+      "title": "Plugin Registration",
+      "description": "Map of plugin definitions.\n\nMap keys are not significant to VDI, they are only used for logging and human reference.",
       "type": "object",
       "additionalProperties": { "$ref": "components/plugin.json" },
       "minProperties": 1,
