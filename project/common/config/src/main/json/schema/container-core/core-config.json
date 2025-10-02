@@ -16,44 +16,23 @@
       }
     }
   },
+  "required": [ "authentication" ],
   "additionalProperties": false,
   "$defs": {
     "altAuthentication": {
       "title": "Service Authentication Config",
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "authEnabled": {
-              "type": "boolean",
-              "const": false
-            },
-            "adminToken": {},
-            "oauth": {}
-          },
-          "required": [ "authEnabled" ],
-          "additionalProperties": false
+      "properties": {
+        "adminToken": {
+          "type": "string",
+          "minLength": 32
         },
-        {
-          "type": "object",
-          "properties": {
-            "authEnabled": {
-              "type": "boolean",
-              "const": true
-            },
-            "adminToken": {
-              "type": "string",
-              "minLength": 32
-            },
-            "oauth": { "$ref": "#/$defs/oauth" }
-          },
-          "required": [
-            "adminToken",
-            "oauth"
-          ],
-          "additionalProperties": false
-        }
-      ]
+        "oauth": { "$ref": "#/$defs/oauth" }
+      },
+      "required": [
+        "adminToken",
+        "oauth"
+      ],
+      "additionalProperties": false
     },
     "http": {
       "title": "HTTP Server Config",
