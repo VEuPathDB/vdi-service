@@ -5,14 +5,7 @@
   "type": "object",
   "properties": {
     "ldap": { "$ref": "../common.json#/$defs/ldap" },
-    "plugins": {
-      "title": "Plugin Registration",
-      "description": "Map of plugin definitions.\n\nThese map keys are not significant to VDI, they are only used for logging and human reference.",
-      "type": "object",
-      "additionalProperties": { "$ref": "components/plugin.json" },
-      "minProperties": 1,
-      "unevaluatedItems": false
-    },
+    "plugins": { "$ref": "components/plugin-map.json" },
     "siteBuild": {
       "title": "Site Build Directory Name",
       "description": "Name of the parent directory containing the per-project dataset files subdirectories.\n\nThis directory name will be used to form paths such as `{siteBuild}/{installTarget}/{datasetId}`.",

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/vdi-config.json",
+  "title": "Plugin Registration",
+  "description": "Map of plugin definitions.\n\nThese map keys are not significant to VDI, they are only used for logging and human reference.",
+  "type": "object",
+  "additionalProperties": { "$ref": "plugin.json" },
+  "minProperties": 1,
+  "unevaluatedItems": false
+}
