@@ -4,17 +4,16 @@ import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.time.ZoneId
 import vdi.core.db.app.model.DatasetRecord
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
+import vdi.core.db.app.sql.*
 import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.getDeleteFlag
+import vdi.core.db.app.sql.getUserID
 import vdi.core.db.app.sql.setInstallStatus
 import vdi.core.db.app.sql.setInstallType
 import vdi.core.db.jdbc.getDataType
-import vdi.core.db.app.sql.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.DatasetType
@@ -69,9 +68,7 @@ internal fun Connection.selectDatasetsByInstallStatus(
         accessibility = getString("accessibility")?.let(DatasetVisibility::fromString)
           ?: if (getBoolean("is_public")) DatasetVisibility.Public else DatasetVisibility.Private,
         daysForApproval = getInt("days_for_approval").let { if (wasNull()) -1 else it },
-        creationDate    = getObject("creation_date", LocalDateTime::class.java)
-          .atZone(ZoneId.systemDefault())
-          .toOffsetDateTime()
+        creationDate    = getOffsetDateTime("creation_date")
       )
     } }
   }

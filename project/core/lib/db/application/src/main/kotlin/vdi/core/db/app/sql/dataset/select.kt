@@ -3,11 +3,10 @@ package vdi.core.db.app.sql.dataset
 import io.foxcapades.kdbc.usingResults
 import io.foxcapades.kdbc.withPreparedStatement
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.time.ZoneId
 import vdi.core.db.app.model.DatasetRecord
 import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.getDeleteFlag
+import vdi.core.db.app.sql.getOffsetDateTime
 import vdi.core.db.jdbc.getDataType
 import vdi.core.db.app.sql.getUserID
 import vdi.core.db.jdbc.reqDatasetID
@@ -56,9 +55,7 @@ internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): Dat
         accessibility   = rs.getString("accessibility")?.let(DatasetVisibility::fromString)
           ?: if (rs.getBoolean("is_public")) DatasetVisibility.Public else DatasetVisibility.Private,
         daysForApproval = rs.getInt("days_for_approval").let { if (rs.wasNull()) -1 else it },
-        creationDate    = rs.getObject("creation_date", LocalDateTime::class.java)
-          .atZone(ZoneId.systemDefault())
-          .toOffsetDateTime()
+        creationDate    = rs.getOffsetDateTime("creation_date")
       )
     }
   }

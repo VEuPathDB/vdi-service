@@ -2,6 +2,7 @@ package vdi.core.db.app.sql
 
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.time.ZoneOffset
 import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
@@ -18,6 +19,8 @@ internal operator fun PreparedStatement.set(index: Int, datasetID: DatasetID) = 
 
 internal fun PreparedStatement.setUserID(index: Int, userID: UserID) = setLong(index, userID.toLong())
 internal fun ResultSet.getUserID(field: String) = UserID(getLong(field))
+
+internal fun ResultSet.getOffsetDateTime(field: String) = getTimestamp(field).toLocalDateTime().atOffset(ZoneOffset.UTC)
 
 internal fun ResultSet.getDeleteFlag(column: String) = DeleteFlag.fromInt(getInt(column))
 
