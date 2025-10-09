@@ -12,7 +12,7 @@ Configuration:
           %notEmpty{W=%X{workerID} }\
           %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
           %notEmpty{%marker }\
-          %c{1} - %m%n"
+          - %m%n"
     - name: sub-0-mod
       target: SYSTEM_OUT
       PatternLayout:
