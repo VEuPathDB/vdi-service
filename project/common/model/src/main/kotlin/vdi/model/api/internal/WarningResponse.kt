@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * single key "warnings" mapped to an array of strings representing warnings
  * generated during the triggering request.
  */
-data class WarningResponse(@field:JsonProperty(Warnings) val warnings: Collection<String>) {
+data class WarningResponse(@field:JsonProperty(Warnings) val warnings: Collection<String> = emptyList()) {
   companion object JsonKey {
     const val Warnings = "warnings"
   }
