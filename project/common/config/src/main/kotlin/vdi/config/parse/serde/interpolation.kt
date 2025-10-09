@@ -14,12 +14,12 @@ fun String.interpolateFrom(env: Map<String, String>): String {
     }
   }
 
-  val tail = when (val p = lastIndexOf('}')) {
+  val tail = when (val p = work.lastIndexOf('}')) {
     -1      -> return this
     in 0..7 -> return this
     else    -> {
-      work = work.substring(0, p+1)
-      substring(p+1)
+      work.substring(p+1) // return val for `tail`
+        .also { work = work.substring(0, p+1) }
     }
   }
 
