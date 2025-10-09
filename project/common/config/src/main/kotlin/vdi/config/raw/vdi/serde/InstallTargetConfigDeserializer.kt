@@ -13,6 +13,7 @@ import vdi.config.parse.fields.PartialHostAddress
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
 import vdi.config.raw.db.serde.DatabaseConnectionConfigDeserializer.Companion.deserialize
 import vdi.config.raw.vdi.InstallTargetConfig
+import vdi.config.raw.vdi.InstallTargetConfig.JsonKey
 import vdi.model.data.DatasetType
 import vdi.model.field.SecretString
 
@@ -20,10 +21,10 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): InstallTargetConfig {
     val obj = p.codec.readTree<ObjectNode>(p)
 
-    val targetName = obj["targetName"].textValue()
-    val dataTypes  = (obj["dataTypes"] as ArrayNode?)?.processDataTypes() ?: emptySet()
+    val targetName = obj[JsonKey.TargetName].textValue()
+    val dataTypes  = (obj[JsonKey.DataTypes] as ArrayNode?)?.processDataTypes() ?: emptySet()
 
-    if (obj["enabled"]?.booleanValue() == false) {
+    if (obj[JsonKey.Enabled]?.booleanValue() == false) {
       val dummyDB =
         DirectDatabaseConnectionConfig("disabled", SecretString("disabled"), null, null, "disabled", PartialHostAddress("disabled", null), "disabled")
 
@@ -39,9 +40,9 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
       enabled        = true,
       targetName     = targetName,
       dataTypes      = dataTypes,
-      controlDB      = (obj["controlDb"] as ObjectNode).deserialize(),
-      dataDB         = (obj["dataDb"] as ObjectNode).deserialize(),
-      metaValidation = obj["datasetPropertySchema"]
+      controlDB      = (obj[JsonKey.ControlDB] as ObjectNode).deserialize(),
+      dataDB         = (obj[JsonKey.DataDB] as ObjectNode).deserialize(),
+      metaValidation = obj[JsonKey.MetaValidation]
         ?.let { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it) }
     )
   }

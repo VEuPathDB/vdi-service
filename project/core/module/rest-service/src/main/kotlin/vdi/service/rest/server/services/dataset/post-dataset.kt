@@ -41,6 +41,7 @@ fun <T: ControllerBase> T.createDataset(
     .toList()
     .takeIf { it.isNotEmpty() }
     ?.also { targets ->
+      logger.debug("testing {} against {} additional json schema definitions", datasetID, uploadConfig)
       val json = JSON.convertValue<ObjectNode>(datasetMeta)
       val validationErrors = ValidationErrors()
 

@@ -2,6 +2,7 @@ package vdi.service.rest.server.controllers
 
 import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
+import org.slf4j.Logger
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import vdi.model.data.DatasetID

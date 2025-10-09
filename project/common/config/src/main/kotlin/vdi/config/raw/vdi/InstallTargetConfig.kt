@@ -9,20 +9,37 @@ import vdi.model.data.DatasetType
 
 @JsonDeserialize(using = InstallTargetConfigDeserializer::class)
 data class InstallTargetConfig(
+  @param:JsonProperty(JsonKey.Enabled)
+  @field:JsonProperty(JsonKey.Enabled)
   val enabled: Boolean = true,
 
+  @param:JsonProperty(JsonKey.TargetName)
+  @field:JsonProperty(JsonKey.TargetName)
   val targetName: String,
 
+  @param:JsonProperty(JsonKey.DataTypes)
+  @field:JsonProperty(JsonKey.DataTypes)
   val dataTypes: Set<DatasetType> = emptySet(),
 
-  @param:JsonProperty("controlDb")
-  @field:JsonProperty("controlDb")
+  @param:JsonProperty(JsonKey.ControlDB)
+  @field:JsonProperty(JsonKey.ControlDB)
   val controlDB: DatabaseConnectionConfig,
 
-  @param:JsonProperty("dataDb")
-  @field:JsonProperty("dataDb")
+  @param:JsonProperty(JsonKey.DataDB)
+  @field:JsonProperty(JsonKey.DataDB)
   val dataDB: DatabaseConnectionConfig,
 
+  @param:JsonProperty(JsonKey.MetaValidation)
+  @field:JsonProperty(JsonKey.MetaValidation)
   val metaValidation: JsonSchema? = null,
-)
+) {
+  internal object JsonKey {
+    const val Enabled = "enabled"
+    const val TargetName = "targetName"
+    const val DataTypes = "dataTypes"
+    const val ControlDB = "controlDb"
+    const val DataDB = "dataDb"
+    const val MetaValidation = "metaValidation"
+  }
+}
 
