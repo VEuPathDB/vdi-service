@@ -66,7 +66,7 @@ internal class ReconcilerInstance(
     sourceIterator: Iterator<DatasetDirectory>,
     targetIterator: Iterator<ReconcilerTargetRecord>,
   ) {
-    log.debug("tryReconcile(...)")
+    log.trace("tryReconcile(...)")
     nextTargetDataset = targetIterator.nextOrNull()
 
     // Iterate through datasets in S3.
