@@ -25,7 +25,7 @@ public final class JsonField {
   public static final String CREATED = "created";
   public static final String CREATED_ON = "createdOn";
   public static final String DATA_FILES = "dataFiles";
-  public static final String DATA_MESSAGE = "dataMessage";
+  public static final String DATA_MESSAGES = "dataMessages";
   public static final String DATA_STATUS = "dataStatus";
   public static final String DATA_UPDATE_TIME = "dataUpdateTime";
   public static final String DATASET_ID = "datasetId";
@@ -77,7 +77,7 @@ public final class JsonField {
   public static final String MESSAGE = "message";
   public static final String MESSAGES = "messages";
   public static final String META = "meta";
-  public static final String META_MESSAGE = "metaMessage";
+  public static final String META_MESSAGES = "metaMessages";
   public static final String META_STATUS = "metaStatus";
   public static final String META_UPDATE_TIME = "metaUpdateTime";
   public static final String MIDDLE_NAME = "middleName";

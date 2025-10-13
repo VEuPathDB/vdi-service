@@ -41,11 +41,13 @@ fun <T: ControllerBase> T.createDataset(
     .toList()
     .takeIf { it.isNotEmpty() }
     ?.also { targets ->
-      logger.debug("testing {} against {} additional json schema definitions", datasetID, uploadConfig)
       val json = JSON.convertValue<ObjectNode>(datasetMeta)
       val validationErrors = ValidationErrors()
 
-      targets.forEach { json.validate(it.metaValidation!!, validationErrors) }
+      targets.forEach {
+        logger.debug("applying additional schema validation from install target {}", it.name)
+        context(logger) { json.validate(it.metaValidation!!, validationErrors) }
+      }
 
       if (validationErrors.isNotEmpty)
         return UnprocessableEntityError(validationErrors).wrap()

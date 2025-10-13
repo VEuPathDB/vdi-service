@@ -2,6 +2,7 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 import org.openapitools.generator.gradle.plugin.tasks.MetaTask
 import org.veupathdb.lib.gradle.container.tasks.jaxrs.GenerateJaxRS
 import org.veupathdb.lib.gradle.container.tasks.raml.GenerateRamlDocs
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   alias(libs.plugins.vpdb)
@@ -198,3 +199,7 @@ tasks.register("special-patches") {
 
 tasks.withType<GenerateJaxRS> { finalizedBy("special-patches") }
 
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+  freeCompilerArgs.set(listOf("-Xcontext-parameters"))
+}

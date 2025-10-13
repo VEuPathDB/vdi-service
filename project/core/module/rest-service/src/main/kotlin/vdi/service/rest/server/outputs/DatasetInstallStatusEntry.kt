@@ -10,8 +10,8 @@ fun DatasetInstallStatusEntry(installTarget: InstallTargetID, status: InstallSta
     it.installTarget = installTarget
 
     it.metaStatus = status.meta.let(::DatasetInstallStatus)
-    it.metaMessage = status.metaMessage
+    it.metaMessages = status.metaMessages
 
     it.dataStatus = status.data?.let(::DatasetInstallStatus)
-    it.dataMessage = status.dataMessage
+    it.dataMessages = status.dataMessages
   }

@@ -73,18 +73,18 @@ internal fun Connection.selectInstallStatuses(
           when (type) {
             InstallType.Meta -> result[datasetID]!!.apply {
               meta = status
-              metaMessage = message
+              metaMessages = listOf(message)
             }
 
             InstallType.Data -> result[datasetID]!!.apply {
               data = status
-              dataMessage = message
+              dataMessages = listOf(message)
             }
           }
         } else {
           result[datasetID] = when (type) {
-            InstallType.Meta -> InstallStatuses(meta = status, metaMessage = message)
-            InstallType.Data -> InstallStatuses(data = status, dataMessage = message)
+            InstallType.Meta -> InstallStatuses(meta = status, metaMessages = listOf(message))
+            InstallType.Data -> InstallStatuses(data = status, dataMessages = listOf(message))
           }
         }
       } }

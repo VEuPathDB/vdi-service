@@ -20,7 +20,7 @@ types:
     properties:
       firstName?:
         # language=markdown
-        description: >-
+        description: |-
           Required if:
           * `isPrimary` is `true`
           * Install target is MBio or ClinEpi
@@ -33,7 +33,7 @@ types:
         maxLength: 300
       lastName?:
         # language=markdown
-        description: >-
+        description: |-
           Required if:
           * `isPrimary` is `true`
           * Install target is MBio or ClinEpi
@@ -47,7 +47,7 @@ types:
         default: false
       email?:
         # language=markdown
-        description: >-
+        description: |-
           Required if:
           * `isPrimary` is `true`
           * Install target is MBio or ClinEpi
@@ -58,7 +58,7 @@ types:
       affiliation?:
         displayName: Organization
         # language=markdown
-        description: >-
+        description: |-
           Required if:
           * `isPrimary` is `true`
           * Install target is MBio or ClinEpi
@@ -67,7 +67,7 @@ types:
         maxLength: 4000
       country?:
         # language=markdown
-        description: >-
+        description: |-
           Required if:
           * `isPrimary` is `true`
           * Install target is MBio or ClinEpi
@@ -167,9 +167,9 @@ types:
     properties:
       installTarget: InstallTargetID
       metaStatus: DatasetInstallStatus
-      metaMessage?: string
+      metaMessages?: string[]
       dataStatus?: DatasetInstallStatus
-      dataMessage?: string
+      dataMessages?: string[]
 
   DatasetMetaBase:
     displayName: Dataset Meta Base Fields
@@ -207,12 +207,12 @@ types:
         uniqueItems: true
       projectName?:
         # language=markdown
-        description: >-
+        description: |-
           Required if:
           * Install target is MBio or ClinEpi
         type: DatasetProjectName
       programName?:
-        description: >-
+        description: |-
           Required if:
           * Install target is MBio or ClinEpi
         type: DatasetProgramName
@@ -226,7 +226,7 @@ types:
         uniqueItems: true
       experimentalOrganism?:
         # language=markdown
-        description: >-
+        description: |-
           Required for Genomics, VectorBase, and Microbiome.
 
           Optional for ClinEpi.

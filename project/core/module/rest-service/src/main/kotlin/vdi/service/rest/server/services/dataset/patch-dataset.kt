@@ -3,6 +3,7 @@ package vdi.service.rest.server.services.dataset
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
+import org.slf4j.Logger
 import org.veupathdb.lib.request.validation.ValidationErrors
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.withTransaction
@@ -42,10 +43,10 @@ fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: Dataset
   if (!patch.hasSomethingToUpdate())
     return PatchDatasetsByVdiIdResponse.respond204()
 
-  val patchedMetadata = patch.validateAndApply(userID, datasetID).run {
+  val patchedMetadata = context(logger) { patch.validateAndApply(userID, datasetID).run {
     leftOrNull()?.also { return UnprocessableEntityError(it).wrap() }
     unwrapRight()
-  }
+  } }
 
   cacheDB.withTransaction { db ->
     DatasetStore.putDatasetMeta(userID, datasetID, patchedMetadata)
@@ -55,6 +56,7 @@ fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: Dataset
   return PatchDatasetsByVdiIdResponse.respond204()
 }
 
+context(logger: Logger)
 private fun DatasetPatchRequestBody.validateAndApply(
   userID: UserID,
   datasetID: DatasetID,

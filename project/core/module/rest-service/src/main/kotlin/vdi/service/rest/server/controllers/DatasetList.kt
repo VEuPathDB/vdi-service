@@ -55,14 +55,7 @@ class DatasetList(@Context request: ContainerRequest, @Context val uploadConfig:
 
     log.info("issuing dataset ID {}", datasetID)
 
-    createDataset(datasetID, entity, uploadConfig)
-
-    return Datasets.PostDatasetsResponse
-      .respond202WithApplicationJson(
-        DatasetPostResponseBody(datasetID),
-        Datasets.PostDatasetsResponse.headersFor202()
-          .withLocation(request.absolutePath.toString().replaceAfterLast('/', datasetID.toString()))
-      )
+    return createDataset(datasetID, entity, uploadConfig)
   }
 }
 

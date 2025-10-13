@@ -286,7 +286,11 @@ types:
     additionalProperties: false
     properties:
       firstName?:
-        description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
+        description: |-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
         type: string
         minLength: 1
         maxLength: 300
@@ -295,7 +299,11 @@ types:
         minLength: 1
         maxLength: 300
       lastName?:
-        description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
+        description: |-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
         type: string
         minLength: 1
         maxLength: 300
@@ -304,17 +312,29 @@ types:
         type: boolean
         default: false
       email?:
-        description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
+        description: |-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
         type: string
         minLength: 5
         maxLength: 4000
       affiliation?:
         displayName: Organization
-        description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
+        description: |-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
         type: string
         maxLength: 4000
       country?:
-        description: 'Required if: * `isPrimary` is `true` * Install target is MBio or ClinEpi * Dataset is public/community'
+        description: |-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
         type: string
         maxLength: 200
   DatasetCreationDate:
@@ -457,9 +477,9 @@ types:
     properties:
       installTarget: InstallTargetID
       metaStatus: DatasetInstallStatus
-      metaMessage?: string
+      metaMessages?: string[]
       dataStatus?: DatasetInstallStatus
-      dataMessage?: string
+      dataMessages?: string[]
   DatasetListEntry:
     displayName: Dataset Listing Item
     description: Short entry with basic details about a dataset.
@@ -531,10 +551,14 @@ types:
         type: DatasetContact[]
         uniqueItems: true
       projectName?:
-        description: 'Required if: * Install target is MBio or ClinEpi'
+        description: |-
+          Required if:
+          * Install target is MBio or ClinEpi
         type: DatasetProjectName
       programName?:
-        description: 'Required if: * Install target is MBio or ClinEpi'
+        description: |-
+          Required if:
+          * Install target is MBio or ClinEpi
         type: DatasetProgramName
       linkedDatasets?:
         displayName: Explicitly Related Datasets
@@ -546,6 +570,7 @@ types:
       experimentalOrganism?:
         description: |-
           Required for Genomics, VectorBase, and Microbiome.
+
           Optional for ClinEpi.
         type: DatasetOrganism
       hostOrganism?: DatasetOrganism

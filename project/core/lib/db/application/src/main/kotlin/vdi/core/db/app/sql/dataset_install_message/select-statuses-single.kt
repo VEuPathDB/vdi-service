@@ -39,12 +39,12 @@ internal fun Connection.selectInstallStatuses(schema: String, datasetID: Dataset
       when (type) {
         InstallType.Meta -> {
           result.meta = status
-          result.metaMessage = message
+          result.metaMessages = listOf(message)
         }
 
         InstallType.Data -> {
           result.data = status
-          result.dataMessage = message
+          result.dataMessages = listOf(message)
         }
       }
     } }

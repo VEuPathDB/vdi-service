@@ -2,7 +2,7 @@ package vdi.core.db.app.model
 
 data class InstallStatuses(
   var meta: InstallStatus = InstallStatus.Running,
-  var metaMessage: String? = null,
+  var metaMessages: List<String> = emptyList(),
   var data: InstallStatus? = null,
-  var dataMessage: String? = null,
+  var dataMessages: List<String> = emptyList(),
 )

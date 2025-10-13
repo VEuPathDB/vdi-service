@@ -8,11 +8,13 @@ import com.networknt.schema.ExecutionContext
 import com.networknt.schema.JsonSchema
 import com.networknt.schema.ValidationMessage
 import com.networknt.schema.ValidatorTypeCode
+import org.slf4j.Logger
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.messageIndex
 import org.veupathdb.lib.request.validation.rangeTo
 import vdi.json.JSON
 
+context(logger: Logger)
 fun ObjectNode.validate(schema: JsonSchema, errors: ValidationErrors) {
   val result = schema.validate(this) { ctx: ExecutionContext -> ctx.executionConfig.formatAssertionsEnabled = true }
 
@@ -27,7 +29,7 @@ fun ObjectNode.validate(schema: JsonSchema, errors: ValidationErrors) {
       else -> loc.substring(2)
     }.let {
       if (msg.property != null)
-        it..msg.property
+        if (it.isEmpty()) msg.property else it..msg.property
       else
         it
     }
@@ -62,9 +64,11 @@ fun ObjectNode.validate(schema: JsonSchema, errors: ValidationErrors) {
     }
   }
 
-  furtherProcessing.processFurther(errors)
+  if (furtherProcessing.isNotEmpty())
+    furtherProcessing.processFurther(errors)
 }
 
+context(logger: Logger)
 private fun Map<String, List<ValidationMessage>>.processFurther(errors: ValidationErrors) {
   val enum = HashSet<String>(16)
   val misc = HashSet<String>(16)

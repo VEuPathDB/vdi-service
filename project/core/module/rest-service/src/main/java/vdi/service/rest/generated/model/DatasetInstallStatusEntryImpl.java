@@ -3,14 +3,15 @@ package vdi.service.rest.generated.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "installTarget",
     "metaStatus",
-    "metaMessage",
+    "metaMessages",
     "dataStatus",
-    "dataMessage"
+    "dataMessages"
 })
 public class DatasetInstallStatusEntryImpl implements DatasetInstallStatusEntry {
   @JsonProperty(JsonField.INSTALL_TARGET)
@@ -19,14 +20,14 @@ public class DatasetInstallStatusEntryImpl implements DatasetInstallStatusEntry 
   @JsonProperty(JsonField.META_STATUS)
   private DatasetInstallStatus metaStatus;
 
-  @JsonProperty(JsonField.META_MESSAGE)
-  private String metaMessage;
+  @JsonProperty(JsonField.META_MESSAGES)
+  private List<String> metaMessages;
 
   @JsonProperty(JsonField.DATA_STATUS)
   private DatasetInstallStatus dataStatus;
 
-  @JsonProperty(JsonField.DATA_MESSAGE)
-  private String dataMessage;
+  @JsonProperty(JsonField.DATA_MESSAGES)
+  private List<String> dataMessages;
 
   @JsonProperty(JsonField.INSTALL_TARGET)
   public String getInstallTarget() {
@@ -48,14 +49,14 @@ public class DatasetInstallStatusEntryImpl implements DatasetInstallStatusEntry 
     this.metaStatus = metaStatus;
   }
 
-  @JsonProperty(JsonField.META_MESSAGE)
-  public String getMetaMessage() {
-    return this.metaMessage;
+  @JsonProperty(JsonField.META_MESSAGES)
+  public List<String> getMetaMessages() {
+    return this.metaMessages;
   }
 
-  @JsonProperty(JsonField.META_MESSAGE)
-  public void setMetaMessage(String metaMessage) {
-    this.metaMessage = metaMessage;
+  @JsonProperty(JsonField.META_MESSAGES)
+  public void setMetaMessages(List<String> metaMessages) {
+    this.metaMessages = metaMessages;
   }
 
   @JsonProperty(JsonField.DATA_STATUS)
@@ -68,13 +69,13 @@ public class DatasetInstallStatusEntryImpl implements DatasetInstallStatusEntry 
     this.dataStatus = dataStatus;
   }
 
-  @JsonProperty(JsonField.DATA_MESSAGE)
-  public String getDataMessage() {
-    return this.dataMessage;
+  @JsonProperty(JsonField.DATA_MESSAGES)
+  public List<String> getDataMessages() {
+    return this.dataMessages;
   }
 
-  @JsonProperty(JsonField.DATA_MESSAGE)
-  public void setDataMessage(String dataMessage) {
-    this.dataMessage = dataMessage;
+  @JsonProperty(JsonField.DATA_MESSAGES)
+  public void setDataMessages(List<String> dataMessages) {
+    this.dataMessages = dataMessages;
   }
 }
