@@ -153,6 +153,12 @@ public interface DatasetDetails extends DatasetMetaBase {
   @JsonProperty(JsonField.REVISION_HISTORY)
   void setRevisionHistory(RevisionHistory revisionHistory);
 
+  @JsonProperty(JsonField.SHORT_NAME)
+  String getShortName();
+
+  @JsonProperty(JsonField.SHORT_NAME)
+  void setShortName(String shortName);
+
   @JsonProperty(JsonField.RELATED_DATASETS)
   List<RelatedDatasetInfo> getRelatedDatasets();
 

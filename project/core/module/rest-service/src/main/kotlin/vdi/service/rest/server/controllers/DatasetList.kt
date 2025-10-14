@@ -14,14 +14,13 @@ import vdi.service.rest.generated.resources.Datasets
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.BadRequestError
-import vdi.service.rest.server.outputs.DatasetPostResponseBody
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.services.dataset.createDataset
 import vdi.service.rest.server.services.dataset.fetchUserDatasetList
 import vdi.service.rest.util.ShortID
 
 @Authenticated(allowGuests = false)
-class DatasetList(@Context request: ContainerRequest, @Context val uploadConfig: UploadConfig)
+class DatasetList(@Context request: ContainerRequest, @param:Context val uploadConfig: UploadConfig)
   : Datasets
   , ControllerBase(request)
 {

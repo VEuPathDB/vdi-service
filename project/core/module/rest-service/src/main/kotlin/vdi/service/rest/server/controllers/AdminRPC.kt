@@ -34,7 +34,7 @@ import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcInstallsClearFa
 @Authenticated(adminOverride = ALLOW_ALWAYS)
 class AdminRPC(
   @Context request: ContainerRequest,
-  @Context val uploadConfig: UploadConfig,
+  @param:Context val uploadConfig: UploadConfig,
 ): AdminRpc, ControllerBase(request) {
 
   override fun postAdminRpcDatasetsProxyUpload(

@@ -52,5 +52,7 @@ internal fun DatasetDetails(
     status               = importStatus?.let { DatasetStatusInfo(it, installs) }
     linkedDatasets       = meta.linkedDatasets.map(::LinkedDataset)
     this.relatedDatasets = relatedDatasets.map(::RelatedDatasetInfo).toList()
+    shortAttribution     = meta.shortAttribution
+    shortName            = meta.shortName
   }
 

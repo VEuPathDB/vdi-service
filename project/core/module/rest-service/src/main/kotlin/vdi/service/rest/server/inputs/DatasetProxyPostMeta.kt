@@ -44,5 +44,6 @@ fun DatasetProxyPostMeta.toInternal(userID: UserID, url: String?) =
     visibility           = visibility.toInternal(),
     owner                = userID,
     created              = createdOn ?: OffsetDateTime.now(),
-    sourceURL            = url?.let(URI::create)
+    sourceURL            = url?.let(URI::create),
+    shortAttribution     = shortAttribution,
   )

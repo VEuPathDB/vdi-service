@@ -25,11 +25,11 @@ public interface DatasetListShareUser {
   @JsonProperty(JsonField.LAST_NAME)
   void setLastName(String lastName);
 
-  @JsonProperty(JsonField.ORGANIZATION)
-  String getOrganization();
+  @JsonProperty(JsonField.AFFILIATION)
+  String getAffiliation();
 
-  @JsonProperty(JsonField.ORGANIZATION)
-  void setOrganization(String organization);
+  @JsonProperty(JsonField.AFFILIATION)
+  void setAffiliation(String affiliation);
 
   @JsonProperty(JsonField.ACCEPTED)
   Boolean getAccepted();

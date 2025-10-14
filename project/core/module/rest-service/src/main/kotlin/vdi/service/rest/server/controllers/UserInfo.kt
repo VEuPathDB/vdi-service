@@ -10,7 +10,10 @@ import vdi.service.rest.server.services.shares.lookupShares
 import vdi.service.rest.server.services.users.getUserMetadata
 
 @Authenticated(allowGuests = false)
-class UserInfo(@Context request: ContainerRequest, @Context val uploadConfig: UploadConfig)
+class UserInfo(
+  @Context request: ContainerRequest,
+  @param:Context val uploadConfig: UploadConfig,
+)
   : Users
   , ControllerBase(request)
 {

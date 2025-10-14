@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "firstName",
     "lastName",
     "email",
-    "organization"
+    "affiliation"
 })
 public class DatasetOwnerImpl implements DatasetOwner {
   @JsonProperty(JsonField.USER_ID)
@@ -25,8 +25,8 @@ public class DatasetOwnerImpl implements DatasetOwner {
   @JsonProperty(JsonField.EMAIL)
   private String email;
 
-  @JsonProperty(JsonField.ORGANIZATION)
-  private String organization;
+  @JsonProperty(JsonField.AFFILIATION)
+  private String affiliation;
 
   @JsonProperty(JsonField.USER_ID)
   public Long getUserId() {
@@ -68,13 +68,13 @@ public class DatasetOwnerImpl implements DatasetOwner {
     this.email = email;
   }
 
-  @JsonProperty(JsonField.ORGANIZATION)
-  public String getOrganization() {
-    return this.organization;
+  @JsonProperty(JsonField.AFFILIATION)
+  public String getAffiliation() {
+    return this.affiliation;
   }
 
-  @JsonProperty(JsonField.ORGANIZATION)
-  public void setOrganization(String organization) {
-    this.organization = organization;
+  @JsonProperty(JsonField.AFFILIATION)
+  public void setAffiliation(String affiliation) {
+    this.affiliation = affiliation;
   }
 }

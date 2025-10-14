@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "userId",
     "firstName",
     "lastName",
-    "organization",
+    "affiliation",
     "email"
 })
 public class ShareOfferRecipientImpl implements ShareOfferRecipient {
@@ -22,8 +22,8 @@ public class ShareOfferRecipientImpl implements ShareOfferRecipient {
   @JsonProperty(JsonField.LAST_NAME)
   private String lastName;
 
-  @JsonProperty(JsonField.ORGANIZATION)
-  private String organization;
+  @JsonProperty(JsonField.AFFILIATION)
+  private String affiliation;
 
   @JsonProperty(JsonField.EMAIL)
   private String email;
@@ -58,14 +58,14 @@ public class ShareOfferRecipientImpl implements ShareOfferRecipient {
     this.lastName = lastName;
   }
 
-  @JsonProperty(JsonField.ORGANIZATION)
-  public String getOrganization() {
-    return this.organization;
+  @JsonProperty(JsonField.AFFILIATION)
+  public String getAffiliation() {
+    return this.affiliation;
   }
 
-  @JsonProperty(JsonField.ORGANIZATION)
-  public void setOrganization(String organization) {
-    this.organization = organization;
+  @JsonProperty(JsonField.AFFILIATION)
+  public void setAffiliation(String affiliation) {
+    this.affiliation = affiliation;
   }
 
   @JsonProperty(JsonField.EMAIL)

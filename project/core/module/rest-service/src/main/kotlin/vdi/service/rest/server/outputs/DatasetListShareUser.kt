@@ -6,9 +6,9 @@ import vdi.service.rest.model.UserDetails
 
 fun DatasetListShareUser(user: UserDetails, accepted: Boolean): DatasetListShareUser =
   DatasetListShareUserImpl().also {
-    it.userId       = user.userID.toLong()
-    it.firstName    = user.firstName
-    it.lastName     = user.lastName
-    it.organization = user.organization
-    it.accepted     = accepted
+    it.userId      = user.userID.toLong()
+    it.firstName   = user.firstName
+    it.lastName    = user.lastName
+    it.affiliation = user.organization
+    it.accepted    = accepted
   }

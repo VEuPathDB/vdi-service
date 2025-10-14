@@ -84,7 +84,6 @@ public final class JsonField {
   public static final String NAME = "name";
   public static final String OFFSET = "offset";
   public static final String ONLINE = "online";
-  public static final String ORGANIZATION = "organization";
   public static final String ORIGIN = "origin";
   public static final String ORIGINAL_ID = "originalId";
   public static final String OWNER = "owner";
@@ -113,6 +112,7 @@ public final class JsonField {
   public static final String SHARES_RECORDS = "sharesRecords";
   public static final String SHARES_UPDATE_TIME = "sharesUpdateTime";
   public static final String SHORT_ATTRIBUTION = "shortAttribution";
+  public static final String SHORT_NAME = "shortName";
   public static final String SOURCE_URL = "sourceUrl";
   public static final String SPECIES = "species";
   public static final String START = "start";

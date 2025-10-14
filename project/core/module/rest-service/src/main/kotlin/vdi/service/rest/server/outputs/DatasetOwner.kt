@@ -10,5 +10,5 @@ fun DatasetOwner(user: UserDetails): DatasetOwner =
     firstName    = user.firstName
     lastName     = user.lastName
     email        = user.email
-    organization = user.organization
+    affiliation  = user.organization
   }

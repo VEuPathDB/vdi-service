@@ -31,9 +31,9 @@ public interface DatasetOwner {
   @JsonProperty(JsonField.EMAIL)
   void setEmail(String email);
 
-  @JsonProperty(JsonField.ORGANIZATION)
-  String getOrganization();
+  @JsonProperty(JsonField.AFFILIATION)
+  String getAffiliation();
 
-  @JsonProperty(JsonField.ORGANIZATION)
-  void setOrganization(String organization);
+  @JsonProperty(JsonField.AFFILIATION)
+  void setAffiliation(String affiliation);
 }

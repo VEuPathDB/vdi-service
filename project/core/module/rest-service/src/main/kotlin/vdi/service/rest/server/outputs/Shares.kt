@@ -40,9 +40,9 @@ internal fun ShareOfferEntry(
 
 fun ShareOfferRecipient(user: UserDetails): ShareOfferRecipient =
   ShareOfferRecipientImpl().also {
-    it.userId = user.userID.toLong()
-    it.firstName = user.firstName
-    it.lastName = user.lastName
-    it.email = user.email
-    it.organization = user.organization
+    it.userId      = user.userID.toLong()
+    it.firstName   = user.firstName
+    it.lastName    = user.lastName
+    it.email       = user.email
+    it.affiliation = user.organization
   }

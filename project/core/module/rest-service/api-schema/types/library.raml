@@ -375,6 +375,7 @@ types:
       created: DatasetCreationDate
       sourceUrl?: DatasetSourceUrl
       revisionHistory?: RevisionHistory
+      shortName: ShortName
       relatedDatasets?:
         displayName: Implicitly Related Datasets
         # language=markdown
@@ -519,7 +520,7 @@ types:
       userId: UserId
       firstName: string
       lastName: string
-      organization: string
+      affiliation: string
       accepted: boolean
   DatasetMetaBase:
     displayName: Dataset Meta Base Fields
@@ -617,7 +618,7 @@ types:
       firstName?: string
       lastName?: string
       email?: string
-      organization?: string
+      affiliation?: string
   DatasetPatchRequestBody:
     displayName: Dataset Patch Request
     description: "Request to update the metadata for a dataset.\n\nFields that are omitted will be ignored when updating the target dataset\nrecord.\n  \nFields that are present, with a `value` of `null` indicate the intent to\nremove the field from the dataset metadata.  All other values provided\nwill be used to replace the existing dataset metadata value."
@@ -1282,7 +1283,7 @@ types:
       userId: UserId
       firstName?: string
       lastName?: string
-      organization?: string
+      affiliation?: string
       email?: string
   ShareOfferStatus:
     displayName: Share Offer Status

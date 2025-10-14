@@ -50,6 +50,7 @@ internal fun DatasetPatchRequestBody.cleanup() {
     bioprojectIds?.apply { cleanupList(::getValue, BioprojectIDReference?::cleanup) }
   }
   funding?.apply { cleanupList(::getValue, DatasetFundingAward?::cleanup) }
+  shortAttribution?.apply { cleanupString(::getValue) }
 }
 
 internal fun DatasetPatchRequestBody.validate(
@@ -108,6 +109,7 @@ internal fun DatasetPatchRequestBody.validate(
   externalIdentifiers?.validate(JF.EXTERNAL_IDENTIFIERS, errors)
 
   funding?.value?.validate(JF.FUNDING, errors)
+  shortAttribution?.value?.checkLength(JF.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
 
   return errors
 }

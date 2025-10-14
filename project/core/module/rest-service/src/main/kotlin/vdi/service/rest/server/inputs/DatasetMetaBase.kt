@@ -9,8 +9,9 @@ import vdi.service.rest.generated.model.*
 
 val DatasetNameLengthRange = 3..1024
 val OriginLengthRange = 3..256
-val ProgramNameLengthRange = 1..256
+val ProgramNameLengthRange = OriginLengthRange
 val ProjectNameLengthRange = ProgramNameLengthRange
+val ShortAttributionLengthRange = 3..40
 val SummaryLengthRange = 3..4000 // max size for varchar in oracle
 
 fun DatasetMetaBase.cleanup() {
@@ -30,6 +31,7 @@ fun DatasetMetaBase.cleanup() {
   cleanup(::getCharacteristics, DatasetCharacteristics?::cleanup)
   cleanup(::getExternalIdentifiers, ExternalIdentifiers?::cleanup)
   cleanupDistinctList(::getFunding, DatasetFundingAward?::cleanup)
+  cleanupString(::getShortAttribution)
 }
 
 fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
@@ -49,4 +51,5 @@ fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
   characteristics?.validate(JsonField.META..JsonField.CHARACTERISTICS, errors)
   externalIdentifiers?.validate(JsonField.META..JsonField.EXTERNAL_IDENTIFIERS, errors)
   funding.validate(JsonField.META..JsonField.FUNDING, errors)
+  shortAttribution?.checkLength(JsonField.META..JsonField.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
 }

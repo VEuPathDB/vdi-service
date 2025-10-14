@@ -55,4 +55,5 @@ internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
     characteristics      = characteristics?.toInternal(),
     externalIdentifiers  = externalIdentifiers?.toInternal(),
     funding              = funding.toInternalDistinct(DatasetFundingAward::toInternal),
+    shortAttribution     = shortAttribution,
   )

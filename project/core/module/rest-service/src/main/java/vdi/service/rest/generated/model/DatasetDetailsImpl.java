@@ -34,6 +34,7 @@ import java.util.List;
     "created",
     "sourceUrl",
     "revisionHistory",
+    "shortName",
     "relatedDatasets",
     "importMessages",
     "shares",
@@ -111,6 +112,9 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty(JsonField.REVISION_HISTORY)
   private RevisionHistory revisionHistory;
+
+  @JsonProperty(JsonField.SHORT_NAME)
+  private String shortName;
 
   @JsonProperty(JsonField.RELATED_DATASETS)
   private List<RelatedDatasetInfo> relatedDatasets;
@@ -362,6 +366,16 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty(JsonField.REVISION_HISTORY)
   public void setRevisionHistory(RevisionHistory revisionHistory) {
     this.revisionHistory = revisionHistory;
+  }
+
+  @JsonProperty(JsonField.SHORT_NAME)
+  public String getShortName() {
+    return this.shortName;
+  }
+
+  @JsonProperty(JsonField.SHORT_NAME)
+  public void setShortName(String shortName) {
+    this.shortName = shortName;
   }
 
   @JsonProperty(JsonField.RELATED_DATASETS)
