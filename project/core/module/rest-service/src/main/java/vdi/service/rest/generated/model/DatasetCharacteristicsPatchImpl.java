@@ -19,10 +19,10 @@ import java.util.List;
 })
 public class DatasetCharacteristicsPatchImpl implements DatasetCharacteristicsPatch {
   @JsonProperty(JsonField.STUDY_DESIGN)
-  private DatasetCharacteristicsPatch.StudyDesignType studyDesign;
+  private OptionalStringPatch studyDesign;
 
   @JsonProperty(JsonField.STUDY_TYPE)
-  private DatasetCharacteristicsPatch.StudyTypeType studyType;
+  private OptionalStringPatch studyType;
 
   @JsonProperty(JsonField.COUNTRIES)
   private DatasetCharacteristicsPatch.CountriesType countries;
@@ -40,28 +40,28 @@ public class DatasetCharacteristicsPatchImpl implements DatasetCharacteristicsPa
   private DatasetCharacteristicsPatch.AssociatedFactorsType associatedFactors;
 
   @JsonProperty(JsonField.PARTICIPANT_AGES)
-  private DatasetCharacteristicsPatch.ParticipantAgesType participantAges;
+  private OptionalStringPatch participantAges;
 
   @JsonProperty(JsonField.SAMPLE_TYPES)
   private DatasetCharacteristicsPatch.SampleTypesType sampleTypes;
 
   @JsonProperty(JsonField.STUDY_DESIGN)
-  public DatasetCharacteristicsPatch.StudyDesignType getStudyDesign() {
+  public OptionalStringPatch getStudyDesign() {
     return this.studyDesign;
   }
 
   @JsonProperty(JsonField.STUDY_DESIGN)
-  public void setStudyDesign(DatasetCharacteristicsPatch.StudyDesignType studyDesign) {
+  public void setStudyDesign(OptionalStringPatch studyDesign) {
     this.studyDesign = studyDesign;
   }
 
   @JsonProperty(JsonField.STUDY_TYPE)
-  public DatasetCharacteristicsPatch.StudyTypeType getStudyType() {
+  public OptionalStringPatch getStudyType() {
     return this.studyType;
   }
 
   @JsonProperty(JsonField.STUDY_TYPE)
-  public void setStudyType(DatasetCharacteristicsPatch.StudyTypeType studyType) {
+  public void setStudyType(OptionalStringPatch studyType) {
     this.studyType = studyType;
   }
 
@@ -117,12 +117,12 @@ public class DatasetCharacteristicsPatchImpl implements DatasetCharacteristicsPa
   }
 
   @JsonProperty(JsonField.PARTICIPANT_AGES)
-  public DatasetCharacteristicsPatch.ParticipantAgesType getParticipantAges() {
+  public OptionalStringPatch getParticipantAges() {
     return this.participantAges;
   }
 
   @JsonProperty(JsonField.PARTICIPANT_AGES)
-  public void setParticipantAges(DatasetCharacteristicsPatch.ParticipantAgesType participantAges) {
+  public void setParticipantAges(OptionalStringPatch participantAges) {
     this.participantAges = participantAges;
   }
 
@@ -155,23 +155,6 @@ public class DatasetCharacteristicsPatchImpl implements DatasetCharacteristicsPa
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonPropertyOrder("value")
-  public static class StudyTypeTypeImpl implements DatasetCharacteristicsPatch.StudyTypeType {
-    @JsonProperty("value")
-    private String value;
-
-    @JsonProperty("value")
-    public String getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(String value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
   public static class SampleTypesTypeImpl implements DatasetCharacteristicsPatch.SampleTypesType {
     @JsonProperty("value")
     private List<String> value;
@@ -183,23 +166,6 @@ public class DatasetCharacteristicsPatchImpl implements DatasetCharacteristicsPa
 
     @JsonProperty("value")
     public void setValue(List<String> value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class StudyDesignTypeImpl implements DatasetCharacteristicsPatch.StudyDesignType {
-    @JsonProperty("value")
-    private String value;
-
-    @JsonProperty("value")
-    public String getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(String value) {
       this.value = value;
     }
   }
@@ -251,23 +217,6 @@ public class DatasetCharacteristicsPatchImpl implements DatasetCharacteristicsPa
 
     @JsonProperty("value")
     public void setValue(List<String> value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class ParticipantAgesTypeImpl implements DatasetCharacteristicsPatch.ParticipantAgesType {
-    @JsonProperty("value")
-    private String value;
-
-    @JsonProperty("value")
-    public String getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(String value) {
       this.value = value;
     }
   }

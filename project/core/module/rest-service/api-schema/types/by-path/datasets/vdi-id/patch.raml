@@ -23,18 +23,18 @@ types:
       visibility?: VisibilityPatch
       name?: StringPatch
       summary?: StringPatch
-      description?: StringPatch
+      description?: OptionalStringPatch
       publications?: PublicationsPatch
       contacts?: ContactsPatch
-      projectName?: StringPatch
-      programName?: StringPatch
+      projectName?: OptionalStringPatch
+      programName?: OptionalStringPatch
       linkedDatasets?: LinkedDatasetPatch
       experimentalOrganism?: OrganismPatch
       hostOrganism?: OrganismPatch
       characteristics?: DatasetCharacteristicsPatch
       externalIdentifiers?: ExternalIdentifiersPatch
       funding?: FundingPatch
-      shortAttribution?: StringPatch
+      shortAttribution?: OptionalStringPatch
 
   ContactsPatch:
     # language=markdown
@@ -48,29 +48,18 @@ types:
         uniqueItems: true
     additionalProperties: false
 
+  OptionalStringPatch:
+    type: object
+    properties:
+      value?: string
+    additionalProperties: false
+
   DatasetCharacteristicsPatch:
     type: object
     additionalProperties: false
     properties:
-      studyDesign?:
-        # language=markdown
-        description: |-
-          If the install targets array contains ClinEpiDB, the only valid
-          action is `replace`.
-        type: object
-        properties:
-          value?: string
-        additionalProperties: false
-
-      studyType?:
-        # language=markdown
-        description: |-
-          If the install targets array contains ClinEpiDB, the only valid
-          action is `replace`.
-        type: object
-        properties:
-          value?: string
-        additionalProperties: false
+      studyDesign?: OptionalStringPatch
+      studyType?: OptionalStringPatch
 
       countries?:
         type: object
@@ -126,14 +115,7 @@ types:
             uniqueItems: true
         additionalProperties: false
 
-      participantAges?:
-        type: object
-        properties:
-          value?:
-            type: string
-            minLength: 1
-            maxLength: 128
-        additionalProperties: false
+      participantAges?: OptionalStringPatch
 
       sampleTypes?:
         type: object

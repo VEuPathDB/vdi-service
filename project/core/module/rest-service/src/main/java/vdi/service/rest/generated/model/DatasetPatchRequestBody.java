@@ -32,10 +32,10 @@ public interface DatasetPatchRequestBody {
   void setSummary(StringPatch summary);
 
   @JsonProperty(JsonField.DESCRIPTION)
-  StringPatch getDescription();
+  OptionalStringPatch getDescription();
 
   @JsonProperty(JsonField.DESCRIPTION)
-  void setDescription(StringPatch description);
+  void setDescription(OptionalStringPatch description);
 
   @JsonProperty(JsonField.PUBLICATIONS)
   PublicationsPatch getPublications();
@@ -50,16 +50,16 @@ public interface DatasetPatchRequestBody {
   void setContacts(ContactsPatch contacts);
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  StringPatch getProjectName();
+  OptionalStringPatch getProjectName();
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  void setProjectName(StringPatch projectName);
+  void setProjectName(OptionalStringPatch projectName);
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  StringPatch getProgramName();
+  OptionalStringPatch getProgramName();
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  void setProgramName(StringPatch programName);
+  void setProgramName(OptionalStringPatch programName);
 
   @JsonProperty(JsonField.LINKED_DATASETS)
   LinkedDatasetPatch getLinkedDatasets();
@@ -98,8 +98,8 @@ public interface DatasetPatchRequestBody {
   void setFunding(FundingPatch funding);
 
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  StringPatch getShortAttribution();
+  OptionalStringPatch getShortAttribution();
 
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  void setShortAttribution(StringPatch shortAttribution);
+  void setShortAttribution(OptionalStringPatch shortAttribution);
 }

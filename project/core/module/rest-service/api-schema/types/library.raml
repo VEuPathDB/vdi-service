@@ -196,22 +196,8 @@ types:
     type: object
     additionalProperties: false
     properties:
-      studyDesign?:
-        description: |-
-          If the install targets array contains ClinEpiDB, the only valid
-          action is `replace`.
-        type: object
-        additionalProperties: false
-        properties:
-          value?: string
-      studyType?:
-        description: |-
-          If the install targets array contains ClinEpiDB, the only valid
-          action is `replace`.
-        type: object
-        additionalProperties: false
-        properties:
-          value?: string
+      studyDesign?: OptionalStringPatch
+      studyType?: OptionalStringPatch
       countries?:
         type: object
         additionalProperties: false
@@ -261,14 +247,7 @@ types:
               type: string
               minLength: 3
               maxLength: 128
-      participantAges?:
-        type: object
-        additionalProperties: false
-        properties:
-          value?:
-            type: string
-            minLength: 1
-            maxLength: 128
+      participantAges?: OptionalStringPatch
       sampleTypes?:
         type: object
         additionalProperties: false
@@ -629,18 +608,18 @@ types:
       visibility?: VisibilityPatch
       name?: StringPatch
       summary?: StringPatch
-      description?: StringPatch
+      description?: OptionalStringPatch
       publications?: PublicationsPatch
       contacts?: ContactsPatch
-      projectName?: StringPatch
-      programName?: StringPatch
+      projectName?: OptionalStringPatch
+      programName?: OptionalStringPatch
       linkedDatasets?: LinkedDatasetPatch
       experimentalOrganism?: OrganismPatch
       hostOrganism?: OrganismPatch
       characteristics?: DatasetCharacteristicsPatch
       externalIdentifiers?: ExternalIdentifiersPatch
       funding?: FundingPatch
-      shortAttribution?: StringPatch
+      shortAttribution?: OptionalStringPatch
   DatasetPostMeta:
     type: DatasetMetaBase
     additionalProperties: false
@@ -1128,6 +1107,11 @@ types:
     example:
       status: not-found
       message: the requested resource could not be found
+  OptionalStringPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value?: string
   OrganismPatch:
     type: object
     additionalProperties: false

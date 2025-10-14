@@ -9,16 +9,16 @@ import java.util.List;
 )
 public interface DatasetCharacteristicsPatch {
   @JsonProperty(JsonField.STUDY_DESIGN)
-  StudyDesignType getStudyDesign();
+  OptionalStringPatch getStudyDesign();
 
   @JsonProperty(JsonField.STUDY_DESIGN)
-  void setStudyDesign(StudyDesignType studyDesign);
+  void setStudyDesign(OptionalStringPatch studyDesign);
 
   @JsonProperty(JsonField.STUDY_TYPE)
-  StudyTypeType getStudyType();
+  OptionalStringPatch getStudyType();
 
   @JsonProperty(JsonField.STUDY_TYPE)
-  void setStudyType(StudyTypeType studyType);
+  void setStudyType(OptionalStringPatch studyType);
 
   @JsonProperty(JsonField.COUNTRIES)
   CountriesType getCountries();
@@ -51,10 +51,10 @@ public interface DatasetCharacteristicsPatch {
   void setAssociatedFactors(AssociatedFactorsType associatedFactors);
 
   @JsonProperty(JsonField.PARTICIPANT_AGES)
-  ParticipantAgesType getParticipantAges();
+  OptionalStringPatch getParticipantAges();
 
   @JsonProperty(JsonField.PARTICIPANT_AGES)
-  void setParticipantAges(ParticipantAgesType participantAges);
+  void setParticipantAges(OptionalStringPatch participantAges);
 
   @JsonProperty(JsonField.SAMPLE_TYPES)
   SampleTypesType getSampleTypes();
@@ -74,17 +74,6 @@ public interface DatasetCharacteristicsPatch {
   }
 
   @JsonDeserialize(
-      as = DatasetCharacteristicsPatchImpl.StudyTypeTypeImpl.class
-  )
-  interface StudyTypeType {
-    @JsonProperty("value")
-    String getValue();
-
-    @JsonProperty("value")
-    void setValue(String value);
-  }
-
-  @JsonDeserialize(
       as = DatasetCharacteristicsPatchImpl.SampleTypesTypeImpl.class
   )
   interface SampleTypesType {
@@ -93,17 +82,6 @@ public interface DatasetCharacteristicsPatch {
 
     @JsonProperty("value")
     void setValue(List<String> value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetCharacteristicsPatchImpl.StudyDesignTypeImpl.class
-  )
-  interface StudyDesignType {
-    @JsonProperty("value")
-    String getValue();
-
-    @JsonProperty("value")
-    void setValue(String value);
   }
 
   @JsonDeserialize(
@@ -137,17 +115,6 @@ public interface DatasetCharacteristicsPatch {
 
     @JsonProperty("value")
     void setValue(List<String> value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetCharacteristicsPatchImpl.ParticipantAgesTypeImpl.class
-  )
-  interface ParticipantAgesType {
-    @JsonProperty("value")
-    String getValue();
-
-    @JsonProperty("value")
-    void setValue(String value);
   }
 
   @JsonDeserialize(

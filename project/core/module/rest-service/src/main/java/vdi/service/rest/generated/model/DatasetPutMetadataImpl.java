@@ -39,7 +39,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   private StringPatch summary;
 
   @JsonProperty(JsonField.DESCRIPTION)
-  private StringPatch description;
+  private OptionalStringPatch description;
 
   @JsonProperty(JsonField.PUBLICATIONS)
   private PublicationsPatch publications;
@@ -48,10 +48,10 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   private ContactsPatch contacts;
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  private StringPatch projectName;
+  private OptionalStringPatch projectName;
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  private StringPatch programName;
+  private OptionalStringPatch programName;
 
   @JsonProperty(JsonField.LINKED_DATASETS)
   private LinkedDatasetPatch linkedDatasets;
@@ -72,7 +72,7 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   private FundingPatch funding;
 
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  private StringPatch shortAttribution;
+  private OptionalStringPatch shortAttribution;
 
   @JsonProperty(JsonField.ORIGIN)
   private String origin;
@@ -121,12 +121,12 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonProperty(JsonField.DESCRIPTION)
-  public StringPatch getDescription() {
+  public OptionalStringPatch getDescription() {
     return this.description;
   }
 
   @JsonProperty(JsonField.DESCRIPTION)
-  public void setDescription(StringPatch description) {
+  public void setDescription(OptionalStringPatch description) {
     this.description = description;
   }
 
@@ -151,22 +151,22 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  public StringPatch getProjectName() {
+  public OptionalStringPatch getProjectName() {
     return this.projectName;
   }
 
   @JsonProperty(JsonField.PROJECT_NAME)
-  public void setProjectName(StringPatch projectName) {
+  public void setProjectName(OptionalStringPatch projectName) {
     this.projectName = projectName;
   }
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  public StringPatch getProgramName() {
+  public OptionalStringPatch getProgramName() {
     return this.programName;
   }
 
   @JsonProperty(JsonField.PROGRAM_NAME)
-  public void setProgramName(StringPatch programName) {
+  public void setProgramName(OptionalStringPatch programName) {
     this.programName = programName;
   }
 
@@ -231,12 +231,12 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   }
 
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  public StringPatch getShortAttribution() {
+  public OptionalStringPatch getShortAttribution() {
     return this.shortAttribution;
   }
 
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
-  public void setShortAttribution(StringPatch shortAttribution) {
+  public void setShortAttribution(OptionalStringPatch shortAttribution) {
     this.shortAttribution = shortAttribution;
   }
 
