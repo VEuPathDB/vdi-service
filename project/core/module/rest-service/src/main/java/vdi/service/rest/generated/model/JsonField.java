@@ -7,6 +7,7 @@ public final class JsonField {
   public static final String AFTER = "after";
   public static final String AGENCY = "agency";
   public static final String ALL = "all";
+  public static final String API = "api";
   public static final String ASSOCIATED_FACTORS = "associatedFactors";
   public static final String AWARD_NUMBER = "awardNumber";
   public static final String BEFORE = "before";
@@ -26,6 +27,7 @@ public final class JsonField {
   public static final String COUNTRY = "country";
   public static final String CREATED = "created";
   public static final String CREATED_ON = "createdOn";
+  public static final String DAEMONS = "daemons";
   public static final String DATA_FILES = "dataFiles";
   public static final String DATA_MESSAGES = "dataMessages";
   public static final String DATA_STATUS = "dataStatus";
@@ -44,6 +46,7 @@ public final class JsonField {
   public static final String DOIS = "dois";
   public static final String EMAIL = "email";
   public static final String ENABLE_JERSEY_TRACE = "enableJerseyTrace";
+  public static final String ENABLED = "enabled";
   public static final String END = "end";
   public static final String ERRORS = "errors";
   public static final String EXPERIMENTAL_ORGANISM = "experimentalOrganism";
@@ -54,6 +57,7 @@ public final class JsonField {
   public static final String FILE_SIZE = "fileSize";
   public static final String FILE_SIZE_TOTAL = "fileSizeTotal";
   public static final String FIRST_NAME = "firstName";
+  public static final String FULL_RUN_INTERVAL = "fullRunInterval";
   public static final String FUNDING = "funding";
   public static final String GIT_BRANCH = "gitBranch";
   public static final String GIT_COMMIT = "gitCommit";
@@ -92,6 +96,7 @@ public final class JsonField {
   public static final String ORIGINAL_ID = "originalId";
   public static final String OWNER = "owner";
   public static final String PARTICIPANT_AGES = "participantAges";
+  public static final String PERFORM_DELETES = "performDeletes";
   public static final String PLUGIN_NAME = "pluginName";
   public static final String PROGRAM_NAME = "programName";
   public static final String PROJECT_NAME = "projectName";
@@ -117,6 +122,7 @@ public final class JsonField {
   public static final String SHARES_UPDATE_TIME = "sharesUpdateTime";
   public static final String SHORT_ATTRIBUTION = "shortAttribution";
   public static final String SHORT_NAME = "shortName";
+  public static final String SLIM_RUN_INTERVAL = "slimRunInterval";
   public static final String SOURCE_URL = "sourceUrl";
   public static final String SPECIES = "species";
   public static final String START = "start";

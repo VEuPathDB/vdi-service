@@ -7,21 +7,27 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = ReconcilerConfigImpl.class
 )
 public interface ReconcilerConfig {
-  @JsonProperty(JsonField.MAX_UPLOAD_SIZE)
-  Long getMaxUploadSize();
+  @JsonProperty(JsonField.ENABLED)
+  Boolean getEnabled();
 
-  @JsonProperty(JsonField.MAX_UPLOAD_SIZE)
-  void setMaxUploadSize(Long maxUploadSize);
+  @JsonProperty(JsonField.ENABLED)
+  void setEnabled(Boolean enabled);
 
-  @JsonProperty(JsonField.USER_MAX_STORAGE_SIZE)
-  Long getUserMaxStorageSize();
+  @JsonProperty(JsonField.FULL_RUN_INTERVAL)
+  String getFullRunInterval();
 
-  @JsonProperty(JsonField.USER_MAX_STORAGE_SIZE)
-  void setUserMaxStorageSize(Long userMaxStorageSize);
+  @JsonProperty(JsonField.FULL_RUN_INTERVAL)
+  void setFullRunInterval(String fullRunInterval);
 
-  @JsonProperty(JsonField.ENABLE_JERSEY_TRACE)
-  Boolean getEnableJerseyTrace();
+  @JsonProperty(JsonField.SLIM_RUN_INTERVAL)
+  String getSlimRunInterval();
 
-  @JsonProperty(JsonField.ENABLE_JERSEY_TRACE)
-  void setEnableJerseyTrace(Boolean enableJerseyTrace);
+  @JsonProperty(JsonField.SLIM_RUN_INTERVAL)
+  void setSlimRunInterval(String slimRunInterval);
+
+  @JsonProperty(JsonField.PERFORM_DELETES)
+  Boolean getPerformDeletes();
+
+  @JsonProperty(JsonField.PERFORM_DELETES)
+  void setPerformDeletes(Boolean performDeletes);
 }

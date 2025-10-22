@@ -27,7 +27,19 @@ types:
     type: object
     additionalProperties: false
     properties:
+      api: APIServiceConfiguration
       daemons: DaemonConfiguration
+
+  APIServiceConfiguration:
+    type: object
+    additionalProperties: false
+    properties:
+      maxUploadSize:
+        type: integer
+        format: int64
+      userMaxStorageSize:
+        type: integer
+        format: int64
 
   DaemonConfiguration:
     type: object
@@ -39,10 +51,7 @@ types:
     type: object
     additionalProperties: false
     properties:
-      maxUploadSize:
-        type: integer
-        format: int64
-      userMaxStorageSize:
-        type: integer
-        format: int64
-      enableJerseyTrace: boolean
+      enabled: boolean
+      fullRunInterval: string
+      slimRunInterval: string
+      performDeletes: boolean

@@ -4,6 +4,7 @@ import org.glassfish.jersey.internal.inject.AbstractBinder
 import org.glassfish.jersey.server.ServerProperties
 import org.veupathdb.lib.container.jaxrs.server.ContainerResources
 import vdi.config.raw.ManifestConfig
+import vdi.core.config.StackConfig
 import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.server.controllers.*
@@ -26,11 +27,12 @@ class Resources(opts: ServiceConfig) : ContainerResources(opts) {
       override fun configure() {
         bind(opts.uploads).to(UploadConfig::class.java)
         bind(opts.manifestConfig).to(ManifestConfig::class.java)
+        bind(opts.stackConfig).to(StackConfig::class.java)
       }
     })
   }
 
-  override fun resources() = arrayOf<Class<*>>(
+  override fun resources() = arrayOf(
     AdminReports::class.java,
     AdminRPC::class.java,
     CommunityDatasets::class.java,

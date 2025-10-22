@@ -11,16 +11,16 @@ import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
 import vdi.config.raw.db.LDAPDatabaseConnectionConfig
 
-class ServiceConfig(config: StackConfig, val manifestConfig: ManifestConfig): Options() {
-  private val coreConfig = config.core
+class ServiceConfig(val stackConfig: StackConfig, val manifestConfig: ManifestConfig): Options() {
+  private val coreConfig = stackConfig.core
 
-  val authEnabled = config.core.authentication?.authEnabled ?: true
+  val authEnabled = stackConfig.core.authentication?.authEnabled ?: true
 
-  val uploads = UploadConfig(config.vdi.restService)
+  val uploads = UploadConfig(stackConfig.vdi.restService)
 
-  val enableTrace = config.vdi.restService?.enableJerseyTrace ?: false
+  val enableTrace = stackConfig.vdi.restService.enableJerseyTrace
 
-  val projects = config.vdi.installTargets
+  val projects = stackConfig.vdi.installTargets
     .map { it.targetName }
 
   override fun getAdminAuthToken() =

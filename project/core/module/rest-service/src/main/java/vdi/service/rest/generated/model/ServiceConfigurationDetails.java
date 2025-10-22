@@ -7,9 +7,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = ServiceConfigurationDetailsImpl.class
 )
 public interface ServiceConfigurationDetails {
-  @JsonProperty("daemons")
+  @JsonProperty(JsonField.API)
+  APIServiceConfiguration getApi();
+
+  @JsonProperty(JsonField.API)
+  void setApi(APIServiceConfiguration api);
+
+  @JsonProperty(JsonField.DAEMONS)
   DaemonConfiguration getDaemons();
 
-  @JsonProperty("daemons")
+  @JsonProperty(JsonField.DAEMONS)
   void setDaemons(DaemonConfiguration daemons);
 }

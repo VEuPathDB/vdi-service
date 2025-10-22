@@ -1,11 +1,18 @@
 package vdi.service.rest.server.outputs
 
 import vdi.config.raw.ManifestConfig
+import vdi.core.config.StackConfig
+import vdi.core.config.vdi.daemons.ReconcilerConfig
+import vdi.service.rest.generated.model.APIServiceConfigurationImpl
+import vdi.service.rest.generated.model.DaemonConfigurationImpl
+import vdi.service.rest.generated.model.ReconcilerConfig as APIReconcilerConfig
+import vdi.service.rest.generated.model.ReconcilerConfigImpl
+import vdi.service.rest.generated.model.ServiceConfigurationDetailsImpl
 import vdi.service.rest.generated.model.ServiceMetadataBuildInfoOutputImpl
 import vdi.service.rest.generated.model.ServiceMetadataResponseBody
 import vdi.service.rest.generated.model.ServiceMetadataResponseBodyImpl
 
-fun ServiceMetadataResponseBody(metadata: ManifestConfig): ServiceMetadataResponseBody =
+fun ServiceMetadataResponseBody(metadata: ManifestConfig, stack: StackConfig): ServiceMetadataResponseBody =
   ServiceMetadataResponseBodyImpl().apply {
     buildInfo = ServiceMetadataBuildInfoOutputImpl().apply {
       gitTag = metadata.gitTag
@@ -16,4 +23,22 @@ fun ServiceMetadataResponseBody(metadata: ManifestConfig): ServiceMetadataRespon
       buildNumber = metadata.buildNumber
       buildTime = metadata.buildTime
     }
+    configuration = ServiceConfigurationDetailsImpl().apply {
+      daemons = DaemonConfigurationImpl().apply {
+        api = APIServiceConfigurationImpl().apply {
+          maxUploadSize = stack.vdi.restService.maxUploadSize.toLong()
+          userMaxStorageSize = stack.vdi.restService.userMaxStorageSize.toLong()
+        }
+
+        reconciler = ReconcilerConfig(stack.vdi.daemons.reconciler)
+      }
+    }
+  }
+
+private fun ReconcilerConfig(config: ReconcilerConfig): APIReconcilerConfig =
+  ReconcilerConfigImpl().apply {
+    enabled = config.enabled
+    fullRunInterval = config.fullRunInterval.toString()
+    slimRunInterval = config.slimRunInterval.toString()
+    performDeletes = config.performDeletes
   }

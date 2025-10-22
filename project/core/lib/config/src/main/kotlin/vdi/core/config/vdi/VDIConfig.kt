@@ -14,7 +14,7 @@ data class VDIConfig(
   @field:JsonProperty("cacheDb")
   val cacheDB: CacheDBConfig,
   val restService: RestServiceConfig = RestServiceConfig(),
-  val daemons: DaemonConfig?,
+  val daemons: DaemonConfig = DaemonConfig(),
   val kafka: KafkaConfig,
   val lanes: LaneConfig?,
   val ldap: LDAPConfig?,

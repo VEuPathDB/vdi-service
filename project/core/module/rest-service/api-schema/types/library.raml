@@ -7,6 +7,17 @@
 ################################################################################
 
 types:
+  APIServiceConfiguration:
+    type: object
+    additionalProperties: false
+    properties:
+      maxUploadSize:
+        type: integer
+        format: int64
+      userMaxStorageSize:
+        type: integer
+        format: int64
+      enableJerseyTrace: boolean
   AllDatasetsListEntry:
     type: object
     additionalProperties: false
@@ -1172,13 +1183,10 @@ types:
     type: object
     additionalProperties: false
     properties:
-      maxUploadSize:
-        type: integer
-        format: int64
-      userMaxStorageSize:
-        type: integer
-        format: int64
-      enableJerseyTrace: boolean
+      enabled: boolean
+      fullRunInterval: string
+      slimRunInterval: string
+      performDeletes: boolean
   RelatedDatasetInfo:
     type: object
     additionalProperties: false
@@ -1238,6 +1246,7 @@ types:
     type: object
     additionalProperties: false
     properties:
+      api: APIServiceConfiguration
       daemons: DaemonConfiguration
   ServiceMetadataBuildInfoOutput:
     type: object

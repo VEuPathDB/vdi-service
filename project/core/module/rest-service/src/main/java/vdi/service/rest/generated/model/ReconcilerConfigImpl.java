@@ -6,47 +6,61 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "maxUploadSize",
-    "userMaxStorageSize",
-    "enableJerseyTrace"
+    "enabled",
+    "fullRunInterval",
+    "slimRunInterval",
+    "performDeletes"
 })
 public class ReconcilerConfigImpl implements ReconcilerConfig {
-  @JsonProperty(JsonField.MAX_UPLOAD_SIZE)
-  private Long maxUploadSize;
+  @JsonProperty(JsonField.ENABLED)
+  private Boolean enabled;
 
-  @JsonProperty(JsonField.USER_MAX_STORAGE_SIZE)
-  private Long userMaxStorageSize;
+  @JsonProperty(JsonField.FULL_RUN_INTERVAL)
+  private String fullRunInterval;
 
-  @JsonProperty(JsonField.ENABLE_JERSEY_TRACE)
-  private Boolean enableJerseyTrace;
+  @JsonProperty(JsonField.SLIM_RUN_INTERVAL)
+  private String slimRunInterval;
 
-  @JsonProperty(JsonField.MAX_UPLOAD_SIZE)
-  public Long getMaxUploadSize() {
-    return this.maxUploadSize;
+  @JsonProperty(JsonField.PERFORM_DELETES)
+  private Boolean performDeletes;
+
+  @JsonProperty(JsonField.ENABLED)
+  public Boolean getEnabled() {
+    return this.enabled;
   }
 
-  @JsonProperty(JsonField.MAX_UPLOAD_SIZE)
-  public void setMaxUploadSize(Long maxUploadSize) {
-    this.maxUploadSize = maxUploadSize;
+  @JsonProperty(JsonField.ENABLED)
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
   }
 
-  @JsonProperty(JsonField.USER_MAX_STORAGE_SIZE)
-  public Long getUserMaxStorageSize() {
-    return this.userMaxStorageSize;
+  @JsonProperty(JsonField.FULL_RUN_INTERVAL)
+  public String getFullRunInterval() {
+    return this.fullRunInterval;
   }
 
-  @JsonProperty(JsonField.USER_MAX_STORAGE_SIZE)
-  public void setUserMaxStorageSize(Long userMaxStorageSize) {
-    this.userMaxStorageSize = userMaxStorageSize;
+  @JsonProperty(JsonField.FULL_RUN_INTERVAL)
+  public void setFullRunInterval(String fullRunInterval) {
+    this.fullRunInterval = fullRunInterval;
   }
 
-  @JsonProperty(JsonField.ENABLE_JERSEY_TRACE)
-  public Boolean getEnableJerseyTrace() {
-    return this.enableJerseyTrace;
+  @JsonProperty(JsonField.SLIM_RUN_INTERVAL)
+  public String getSlimRunInterval() {
+    return this.slimRunInterval;
   }
 
-  @JsonProperty(JsonField.ENABLE_JERSEY_TRACE)
-  public void setEnableJerseyTrace(Boolean enableJerseyTrace) {
-    this.enableJerseyTrace = enableJerseyTrace;
+  @JsonProperty(JsonField.SLIM_RUN_INTERVAL)
+  public void setSlimRunInterval(String slimRunInterval) {
+    this.slimRunInterval = slimRunInterval;
+  }
+
+  @JsonProperty(JsonField.PERFORM_DELETES)
+  public Boolean getPerformDeletes() {
+    return this.performDeletes;
+  }
+
+  @JsonProperty(JsonField.PERFORM_DELETES)
+  public void setPerformDeletes(Boolean performDeletes) {
+    this.performDeletes = performDeletes;
   }
 }
