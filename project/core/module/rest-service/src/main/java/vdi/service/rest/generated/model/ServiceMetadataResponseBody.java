@@ -7,9 +7,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     as = ServiceMetadataResponseBodyImpl.class
 )
 public interface ServiceMetadataResponseBody {
-  @JsonProperty("buildInfo")
+  @JsonProperty(JsonField.BUILD_INFO)
   ServiceMetadataBuildInfoOutput getBuildInfo();
 
-  @JsonProperty("buildInfo")
+  @JsonProperty(JsonField.BUILD_INFO)
   void setBuildInfo(ServiceMetadataBuildInfoOutput buildInfo);
+
+  @JsonProperty(JsonField.CONFIGURATION)
+  ServiceConfigurationDetails getConfiguration();
+
+  @JsonProperty(JsonField.CONFIGURATION)
+  void setConfiguration(ServiceConfigurationDetails configuration);
 }

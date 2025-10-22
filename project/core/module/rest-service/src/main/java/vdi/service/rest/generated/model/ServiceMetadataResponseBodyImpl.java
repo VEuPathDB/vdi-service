@@ -5,18 +5,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder("buildInfo")
+@JsonPropertyOrder({
+    "buildInfo",
+    "configuration"
+})
 public class ServiceMetadataResponseBodyImpl implements ServiceMetadataResponseBody {
-  @JsonProperty("buildInfo")
+  @JsonProperty(JsonField.BUILD_INFO)
   private ServiceMetadataBuildInfoOutput buildInfo;
 
-  @JsonProperty("buildInfo")
+  @JsonProperty(JsonField.CONFIGURATION)
+  private ServiceConfigurationDetails configuration;
+
+  @JsonProperty(JsonField.BUILD_INFO)
   public ServiceMetadataBuildInfoOutput getBuildInfo() {
     return this.buildInfo;
   }
 
-  @JsonProperty("buildInfo")
+  @JsonProperty(JsonField.BUILD_INFO)
   public void setBuildInfo(ServiceMetadataBuildInfoOutput buildInfo) {
     this.buildInfo = buildInfo;
+  }
+
+  @JsonProperty(JsonField.CONFIGURATION)
+  public ServiceConfigurationDetails getConfiguration() {
+    return this.configuration;
+  }
+
+  @JsonProperty(JsonField.CONFIGURATION)
+  public void setConfiguration(ServiceConfigurationDetails configuration) {
+    this.configuration = configuration;
   }
 }

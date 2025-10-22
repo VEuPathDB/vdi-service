@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import vdi.core.config.core.ContainerCoreConfig
 import vdi.core.config.vdi.VDIConfig
 
-@JsonIgnoreProperties("\$schema", "definitions")
+@JsonIgnoreProperties($$"$schema", "definitions")
 data class StackConfig(
   @param:JsonProperty("containerCore")
   @field:JsonProperty("containerCore")

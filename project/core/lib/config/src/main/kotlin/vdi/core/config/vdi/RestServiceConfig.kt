@@ -1,7 +1,7 @@
 package vdi.core.config.vdi
 
 data class RestServiceConfig(
-  val maxUploadSize: ULong?,
-  val userMaxStorageSize: ULong?,
-  val enableJerseyTrace: Boolean?,
+  val maxUploadSize: ULong = 1073741824uL,
+  val userMaxStorageSize: ULong = 10737418240uL,
+  val enableJerseyTrace: Boolean = false,
 )

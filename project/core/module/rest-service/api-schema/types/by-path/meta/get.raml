@@ -9,6 +9,7 @@ types:
     additionalProperties: false
     properties:
       buildInfo: ServiceMetadataBuildInfoOutput
+      configuration: ServiceConfigurationDetails
 
   ServiceMetadataBuildInfoOutput:
     type: object
@@ -21,3 +22,27 @@ types:
       buildId: string
       buildNumber: string
       buildTime: string
+
+  ServiceConfigurationDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      daemons: DaemonConfiguration
+
+  DaemonConfiguration:
+    type: object
+    additionalProperties: false
+    properties:
+      reconciler: ReconcilerConfig
+
+  ReconcilerConfig:
+    type: object
+    additionalProperties: false
+    properties:
+      maxUploadSize:
+        type: integer
+        format: int64
+      userMaxStorageSize:
+        type: integer
+        format: int64
+      enableJerseyTrace: boolean

@@ -12,11 +12,13 @@ public final class JsonField {
   public static final String BEFORE = "before";
   public static final String BIOPROJECT_IDS = "bioprojectIds";
   public static final String BUILD_ID = "buildId";
+  public static final String BUILD_INFO = "buildInfo";
   public static final String BUILD_NUMBER = "buildNumber";
   public static final String BUILD_TIME = "buildTime";
   public static final String CATEGORY = "category";
   public static final String CHARACTERISTICS = "characteristics";
   public static final String CITATION = "citation";
+  public static final String CONFIGURATION = "configuration";
   public static final String CONTACTS = "contacts";
   public static final String CONTENTS = "contents";
   public static final String COUNT = "count";
@@ -41,6 +43,7 @@ public final class JsonField {
   public static final String DOI = "doi";
   public static final String DOIS = "dois";
   public static final String EMAIL = "email";
+  public static final String ENABLE_JERSEY_TRACE = "enableJerseyTrace";
   public static final String END = "end";
   public static final String ERRORS = "errors";
   public static final String EXPERIMENTAL_ORGANISM = "experimentalOrganism";
@@ -74,6 +77,7 @@ public final class JsonField {
   public static final String LAST_NAME = "lastName";
   public static final String LIMIT = "limit";
   public static final String LINKED_DATASETS = "linkedDatasets";
+  public static final String MAX_UPLOAD_SIZE = "maxUploadSize";
   public static final String MESSAGE = "message";
   public static final String MESSAGES = "messages";
   public static final String META = "meta";
@@ -136,6 +140,7 @@ public final class JsonField {
   public static final String USAGE = "usage";
   public static final String USER = "user";
   public static final String USER_ID = "userId";
+  public static final String USER_MAX_STORAGE_SIZE = "userMaxStorageSize";
   public static final String VERSION = "version";
   public static final String VISIBILITY = "visibility";
   public static final String YEARS = "years";
