@@ -19,7 +19,8 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
         val details = PluginDetails(
           name,
           plug.projectIDs?.toList() ?: emptyList(),
-          plug.typeChangesEnabled ?: false,
+          plug.typeChangesEnabled,
+          plug.maxFileSize
         )
 
         plug.dataTypes.asSequence()

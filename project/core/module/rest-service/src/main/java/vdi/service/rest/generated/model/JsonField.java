@@ -45,7 +45,6 @@ public final class JsonField {
   public static final String DOI = "doi";
   public static final String DOIS = "dois";
   public static final String EMAIL = "email";
-  public static final String ENABLE_JERSEY_TRACE = "enableJerseyTrace";
   public static final String ENABLED = "enabled";
   public static final String END = "end";
   public static final String ERRORS = "errors";
@@ -81,6 +80,7 @@ public final class JsonField {
   public static final String LAST_NAME = "lastName";
   public static final String LIMIT = "limit";
   public static final String LINKED_DATASETS = "linkedDatasets";
+  public static final String MAX_FILE_SIZE = "maxFileSize";
   public static final String MAX_UPLOAD_SIZE = "maxUploadSize";
   public static final String MESSAGE = "message";
   public static final String MESSAGES = "messages";

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import org.veupathdb.lib.request.validation.ValidationErrors
 import vdi.core.db.cache.CacheDB
 import vdi.core.install.InstallTargetRegistry
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.json.JSON
 import vdi.model.data.DatasetID
 import vdi.service.rest.config.UploadConfig
@@ -57,7 +58,13 @@ fun <T: ControllerBase> T.createDataset(
     resolveDatasetFiles(entity.dataFiles, entity.url, entity.docFiles, uploadConfig)
   }
 
-  submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)
+  submitUpload(
+    datasetID,
+    uploadRefs,
+    datasetMeta,
+    uploadConfig,
+    PluginRegistry[datasetMeta.type]!!.maxFileSize,
+  )
 
   return Datasets.PostDatasetsResponse.respond202WithApplicationJson(
     DatasetPostResponseBody(datasetID),
@@ -71,5 +78,11 @@ fun <T: ControllerBase> T.createDataset(datasetID: DatasetID, entity: DatasetPro
     resolveDatasetFiles(entity.dataFiles, entity.url, entity.docFiles, uploadConfig)
   }
 
-  submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)
+  submitUpload(
+    datasetID,
+    uploadRefs,
+    datasetMeta,
+    uploadConfig,
+    PluginRegistry[datasetMeta.type]!!.maxFileSize,
+  )
 }

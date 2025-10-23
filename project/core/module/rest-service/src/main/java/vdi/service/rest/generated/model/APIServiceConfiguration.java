@@ -18,10 +18,4 @@ public interface APIServiceConfiguration {
 
   @JsonProperty(JsonField.USER_MAX_STORAGE_SIZE)
   void setUserMaxStorageSize(Long userMaxStorageSize);
-
-  @JsonProperty(JsonField.ENABLE_JERSEY_TRACE)
-  Boolean getEnableJerseyTrace();
-
-  @JsonProperty(JsonField.ENABLE_JERSEY_TRACE)
-  void setEnableJerseyTrace(Boolean enableJerseyTrace);
 }

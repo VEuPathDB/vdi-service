@@ -6,6 +6,7 @@ import vdi.core.db.app.AppDB
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
 import vdi.core.db.cache.CacheDB
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.DatasetMetaFilename
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetMetadata
@@ -86,7 +87,13 @@ internal fun <T: ControllerBase> T.putDataset(
     resolveDatasetFiles(request.dataFiles, request.url, request.docFiles, uploadConfig)
   }
 
-  submitUpload(newDatasetID, uploadRefs, newMeta, uploadConfig)
+  submitUpload(
+    newDatasetID,
+    uploadRefs,
+    newMeta,
+    uploadConfig,
+    PluginRegistry[originalMeta.type]!!.maxFileSize,
+  )
 
   return Either.ofLeft(DatasetPutResponseBodyImpl().apply { datasetId = newDatasetID.toString() })
 }

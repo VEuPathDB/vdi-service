@@ -17,7 +17,6 @@ types:
       userMaxStorageSize:
         type: integer
         format: int64
-      enableJerseyTrace: boolean
   AllDatasetsListEntry:
     type: object
     additionalProperties: false
@@ -1166,6 +1165,9 @@ types:
       typeName: string
       typeDisplayName: string
       typeVersion: string
+      maxFileSize:
+        type: integer
+        format: int64
       installTargets?:
         description: |-
           Projects that this plugin is restricted to.  An empty or absent list

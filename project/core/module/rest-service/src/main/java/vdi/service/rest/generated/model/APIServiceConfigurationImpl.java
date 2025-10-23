@@ -7,8 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "maxUploadSize",
-    "userMaxStorageSize",
-    "enableJerseyTrace"
+    "userMaxStorageSize"
 })
 public class APIServiceConfigurationImpl implements APIServiceConfiguration {
   @JsonProperty(JsonField.MAX_UPLOAD_SIZE)
@@ -16,9 +15,6 @@ public class APIServiceConfigurationImpl implements APIServiceConfiguration {
 
   @JsonProperty(JsonField.USER_MAX_STORAGE_SIZE)
   private Long userMaxStorageSize;
-
-  @JsonProperty(JsonField.ENABLE_JERSEY_TRACE)
-  private Boolean enableJerseyTrace;
 
   @JsonProperty(JsonField.MAX_UPLOAD_SIZE)
   public Long getMaxUploadSize() {
@@ -38,15 +34,5 @@ public class APIServiceConfigurationImpl implements APIServiceConfiguration {
   @JsonProperty(JsonField.USER_MAX_STORAGE_SIZE)
   public void setUserMaxStorageSize(Long userMaxStorageSize) {
     this.userMaxStorageSize = userMaxStorageSize;
-  }
-
-  @JsonProperty(JsonField.ENABLE_JERSEY_TRACE)
-  public Boolean getEnableJerseyTrace() {
-    return this.enableJerseyTrace;
-  }
-
-  @JsonProperty(JsonField.ENABLE_JERSEY_TRACE)
-  public void setEnableJerseyTrace(Boolean enableJerseyTrace) {
-    this.enableJerseyTrace = enableJerseyTrace;
   }
 }

@@ -11,6 +11,7 @@ import java.util.List;
     "typeName",
     "typeDisplayName",
     "typeVersion",
+    "maxFileSize",
     "installTargets"
 })
 public class PluginListItemImpl implements PluginListItem {
@@ -25,6 +26,9 @@ public class PluginListItemImpl implements PluginListItem {
 
   @JsonProperty(JsonField.TYPE_VERSION)
   private String typeVersion;
+
+  @JsonProperty(JsonField.MAX_FILE_SIZE)
+  private Long maxFileSize;
 
   @JsonProperty(JsonField.INSTALL_TARGETS)
   private List<String> installTargets;
@@ -67,6 +71,16 @@ public class PluginListItemImpl implements PluginListItem {
   @JsonProperty(JsonField.TYPE_VERSION)
   public void setTypeVersion(String typeVersion) {
     this.typeVersion = typeVersion;
+  }
+
+  @JsonProperty(JsonField.MAX_FILE_SIZE)
+  public Long getMaxFileSize() {
+    return this.maxFileSize;
+  }
+
+  @JsonProperty(JsonField.MAX_FILE_SIZE)
+  public void setMaxFileSize(Long maxFileSize) {
+    this.maxFileSize = maxFileSize;
   }
 
   @JsonProperty(JsonField.INSTALL_TARGETS)

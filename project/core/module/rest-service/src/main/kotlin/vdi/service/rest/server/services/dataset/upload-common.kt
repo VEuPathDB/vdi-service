@@ -25,6 +25,7 @@ import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.withTransaction
 import vdi.core.db.model.SyncControlRecord
 import vdi.core.metrics.Metrics
+import vdi.core.plugin.registry.PluginDetails
 import vdi.logging.markedLogger
 import vdi.model.OriginTimestamp
 import vdi.model.data.*
@@ -136,11 +137,12 @@ fun <T: ControllerBase> T.submitUpload(
   uploadRefs: UploadFileReferences,
   datasetMeta: DatasetMetadata,
   uploadConfig: UploadConfig,
+  maxFileSize: ULong,
 ) {
   Metrics.Upload.queueSize.inc()
   WorkPool.submit {
     try {
-      uploadFiles(datasetID, uploadRefs, datasetMeta, uploadConfig)
+      uploadFiles(datasetID, uploadRefs, datasetMeta, uploadConfig, maxFileSize)
     } finally {
       Metrics.Upload.queueSize.dec()
       uploadRefs.tempDir.deleteRecursively()
@@ -153,10 +155,11 @@ fun <T: ControllerBase> T.uploadFiles(
   uploadRefs: UploadFileReferences,
   datasetMeta: DatasetMetadata,
   uploadConfig: UploadConfig,
+  maxFileSize: ULong,
 ) {
   val logger = markedLogger(userID, datasetID)
 
-  verifyFileSize(uploadRefs, uploadConfig)
+  verifyFileSize(uploadRefs, uploadConfig, maxFileSize)
 
   try {
     TempFiles.withTempPath { archive ->
@@ -212,13 +215,19 @@ fun <T: ControllerBase> T.uploadFiles(
   }
 }
 
-fun <T: ControllerBase> T.verifyFileSize(uploadRefs: UploadFileReferences, uploadConfig: UploadConfig) {
+fun <T: ControllerBase> T.verifyFileSize(
+  uploadRefs: UploadFileReferences,
+  uploadConfig: UploadConfig,
+  pluginMaxSize: ULong,
+) {
+  val maxSize = min(uploadConfig.maxUploadSize, pluginMaxSize)
+
   val dataSize = uploadRefs.data.reduceTo(0L) { t, c -> t + c.fileSize() }
   val metaSize = uploadRefs.meta.reduceTo(0L) { t, c -> t + c.fileSize() }
 
-  if (dataSize > uploadConfig.maxUploadSize.toLong())
+  if (dataSize > maxSize.toLong())
     throw BadRequestException("upload upload size larger than the max permitted dataset size of "
-    + uploadConfig.maxUploadSize.toString() + " bytes")
+    + maxSize.toString() + " bytes")
 
   val remainingUploadAllowance = getUserRemainingQuota(uploadConfig)
 

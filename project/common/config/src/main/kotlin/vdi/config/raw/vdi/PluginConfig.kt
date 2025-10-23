@@ -5,13 +5,24 @@ import vdi.config.parse.fields.PartialHostAddress
 
 data class PluginConfig(
   val server: PartialHostAddress,
-  val customPath: String?,
-  val installRoot: String?,
-  val scripts: PluginScriptConfigSet?,
 
   val dataTypes: Set<DataTypeConfig>,
-  val typeChangesEnabled: Boolean?,
-  @param:JsonProperty("projectIds")
-  @field:JsonProperty("projectIds")
+
+  val typeChangesEnabled: Boolean = false,
+
+  val customPath: String?,
+
+  val installRoot: String?,
+
+  @param:JsonProperty(KeyProjectIDs)
+  @field:JsonProperty(KeyProjectIDs)
   val projectIDs: Set<String>?,
-)
+
+  val maxFileSize: ULong = ULong.MAX_VALUE,
+
+  val scripts: PluginScriptConfigSet?,
+) {
+  private companion object {
+    const val KeyProjectIDs = "projectIds"
+  }
+}

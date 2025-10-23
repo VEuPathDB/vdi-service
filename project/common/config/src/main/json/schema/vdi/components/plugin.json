@@ -4,6 +4,7 @@
   "title": "VDI Plugin Config",
   "type": "object",
   "properties": {
+
     "server": {
       "title": "Plugin Server Host Address",
       "description": "Address of the plugin HTTP server.  Most likely the VDI-internal network alias of the container.",
@@ -12,6 +13,7 @@
         { "$ref": "../../common.json#/$defs/addressObject" }
       ]
     },
+
     "dataTypes": {
       "title": "Data Types",
       "description": "Types and versions of dataset data handled by the plugin being defined.",
@@ -21,17 +23,20 @@
       "uniqueItems": true,
       "unevaluatedItems": false
     },
+
     "typeChangesEnabled": {
       "description": "Whether datasets can be revised from this data type to another.",
       "type": "boolean",
       "default": false
     },
+
     "customPath": {
       "title": "PATH Extension",
       "description": "Allows adding additional paths to the PATH environment variable passed to plugin scripts on execution in the typical colon (`:`) divided format.\nLeading or trailing colon characters are not required.",
       "type": "string",
       "examples": [ "/opt/something/bin:/opt/other/bin" ]
     },
+
     "installRoot": {
       "title": "Dataset File Install Root",
       "description": "The root mount path INSIDE THE CONTAINER which will contain the site build directory hierarchy into which dataset files will be installed.  The build directory itself MUST NOT be part of this path.",
@@ -42,11 +47,21 @@
         "/datasets"
       ]
     },
+
     "projectIds": {
       "type": "array",
       "items": { "$ref": "../../common.json#/$defs/installTarget" },
       "unevaluatedItems": false
     },
+
+    "maxFileSize": {
+      "title": "Maximum File Size",
+      "description": "Maximum permitted file size in bytes.\n\nIf this value exceeds the global max upload size configuration option, that value will be used instead.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9223372036854775807
+    },
+
     "scripts": {
       "type": "object",
       "properties": {
