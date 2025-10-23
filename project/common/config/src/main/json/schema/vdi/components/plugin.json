@@ -54,14 +54,6 @@
       "unevaluatedItems": false
     },
 
-    "maxFileSize": {
-      "title": "Maximum File Size",
-      "description": "Maximum permitted file size in bytes.\n\nIf this value exceeds the global max upload size configuration option, that value will be used instead.",
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 9223372036854775807
-    },
-
     "scripts": {
       "type": "object",
       "properties": {
@@ -138,6 +130,13 @@
           "title": "Data Type Category/Display Name",
           "type": "string",
           "minLength": 3
+        },
+        "maxFileSize": {
+          "title": "Maximum File Size",
+          "description": "Maximum permitted file size in bytes.\n\nIf this value exceeds the global max upload size configuration option, that value will be used instead.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9223372036854775807
         }
       },
       "required": [

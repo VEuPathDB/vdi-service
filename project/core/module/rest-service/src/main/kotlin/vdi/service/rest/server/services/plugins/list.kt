@@ -31,5 +31,5 @@ private fun PluginListItem(p: Pair<DatasetType, PluginDetails>, svcMaxFileSize: 
     it.typeDisplayName = PluginRegistry.categoryFor(p.first)
     it.typeName        = p.first.name.toString()
     it.typeVersion     = p.first.version
-    it.maxFileSize     = min(p.second.maxFileSize, svcMaxFileSize).toLong()
+    it.maxFileSize     = min(PluginRegistry.maxFileSizeFor(p.first), svcMaxFileSize).toLong()
   }

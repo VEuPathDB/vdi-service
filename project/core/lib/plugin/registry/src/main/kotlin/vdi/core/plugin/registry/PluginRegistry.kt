@@ -7,11 +7,11 @@ import vdi.model.data.DatasetType
 
 object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
   private val mapping: Map<DatasetType, PluginDetails>
-  private val categories: Map<DatasetType, String>
+  private val typeMeta: Map<DatasetType, PluginDatasetTypeMeta>
 
   init {
     val conflicts = HashMap<DatasetType, MutableList<String>>(1)
-    val tmpCats   = HashMap<DatasetType, String>(12)
+    val tmpCats   = HashMap<DatasetType, PluginDatasetTypeMeta>(12)
 
     mapping = loadAndCacheStackConfig().vdi.plugins
       .asSequence()
@@ -20,11 +20,11 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
           name,
           plug.projectIDs?.toList() ?: emptyList(),
           plug.typeChangesEnabled,
-          plug.maxFileSize
         )
 
         plug.dataTypes.asSequence()
-          .map { DatasetType(DataType.of(it.name), it.version).also { dt -> tmpCats[dt] = it.category } }
+          .map { DatasetType(DataType.of(it.name), it.version)
+            .also { dt -> tmpCats[dt] = PluginDatasetTypeMeta(it.category, it.maxFileSize) } }
           .onEach { conflicts.computeIfAbsent(it, { ArrayList(1) }).add(name) }
           .map { it to details }
       }
@@ -37,14 +37,24 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
       .takeUnless { it.isBlank() }
       ?.also { throw ConfigurationException(it) }
 
-    categories = HashMap<DatasetType, String>(tmpCats.size).apply { putAll(tmpCats) }
+    typeMeta = HashMap(tmpCats)
   }
 
   fun contains(type: DatasetType) = type in mapping
 
-  fun categoryFor(type: DatasetType) = categories[type] ?: throw MissingDataTypeCategoryException(type)
+  fun categoryFor(type: DatasetType): String =
+    typeMeta[type]?.category
+      ?: throw MissingDataTypeMetaException(type)
 
-  fun categoryOrNullFor(type: DatasetType) = categories[type]
+  fun categoryOrNullFor(type: DatasetType): String? =
+    typeMeta[type]?.category
+
+  fun maxFileSizeFor(type: DatasetType): ULong =
+    typeMeta[type]?.maxFileSize
+      ?: throw MissingDataTypeMetaException(type)
+
+  fun maxFileSizeOrNullFor(type: DatasetType): ULong? =
+    typeMeta[type]?.maxFileSize
 
   operator fun get(type: DatasetType) = mapping[type]
 

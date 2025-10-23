@@ -26,6 +26,7 @@ import vdi.core.db.cache.withTransaction
 import vdi.core.db.model.SyncControlRecord
 import vdi.core.metrics.Metrics
 import vdi.core.plugin.registry.PluginDetails
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.logging.markedLogger
 import vdi.model.OriginTimestamp
 import vdi.model.data.*
@@ -137,12 +138,11 @@ fun <T: ControllerBase> T.submitUpload(
   uploadRefs: UploadFileReferences,
   datasetMeta: DatasetMetadata,
   uploadConfig: UploadConfig,
-  maxFileSize: ULong,
 ) {
   Metrics.Upload.queueSize.inc()
   WorkPool.submit {
     try {
-      uploadFiles(datasetID, uploadRefs, datasetMeta, uploadConfig, maxFileSize)
+      uploadFiles(datasetID, uploadRefs, datasetMeta, uploadConfig)
     } finally {
       Metrics.Upload.queueSize.dec()
       uploadRefs.tempDir.deleteRecursively()
@@ -155,11 +155,10 @@ fun <T: ControllerBase> T.uploadFiles(
   uploadRefs: UploadFileReferences,
   datasetMeta: DatasetMetadata,
   uploadConfig: UploadConfig,
-  maxFileSize: ULong,
 ) {
   val logger = markedLogger(userID, datasetID)
 
-  verifyFileSize(uploadRefs, uploadConfig, maxFileSize)
+  verifyFileSize(uploadRefs, uploadConfig, PluginRegistry.maxFileSizeFor(datasetMeta.type))
 
   try {
     TempFiles.withTempPath { archive ->

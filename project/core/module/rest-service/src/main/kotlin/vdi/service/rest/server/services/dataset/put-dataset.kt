@@ -87,13 +87,7 @@ internal fun <T: ControllerBase> T.putDataset(
     resolveDatasetFiles(request.dataFiles, request.url, request.docFiles, uploadConfig)
   }
 
-  submitUpload(
-    newDatasetID,
-    uploadRefs,
-    newMeta,
-    uploadConfig,
-    PluginRegistry[originalMeta.type]!!.maxFileSize,
-  )
+  submitUpload(newDatasetID, uploadRefs, newMeta, uploadConfig)
 
   return Either.ofLeft(DatasetPutResponseBodyImpl().apply { datasetId = newDatasetID.toString() })
 }

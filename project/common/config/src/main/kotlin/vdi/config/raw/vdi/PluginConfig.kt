@@ -18,8 +18,6 @@ data class PluginConfig(
   @field:JsonProperty(KeyProjectIDs)
   val projectIDs: Set<String>?,
 
-  val maxFileSize: ULong = ULong.MAX_VALUE,
-
   val scripts: PluginScriptConfigSet?,
 ) {
   private companion object {
