@@ -139,9 +139,6 @@ public final class JsonField {
   public static final String TIMESTAMP = "timestamp";
   public static final String TOTAL = "total";
   public static final String TYPE = "type";
-  public static final String TYPE_DISPLAY_NAME = "typeDisplayName";
-  public static final String TYPE_NAME = "typeName";
-  public static final String TYPE_VERSION = "typeVersion";
   public static final String UPLOAD = "upload";
   public static final String UPLOAD_FILES = "uploadFiles";
   public static final String URL = "url";

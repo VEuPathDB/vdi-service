@@ -7,6 +7,7 @@ import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.data.DatasetType
 import vdi.service.rest.generated.model.PluginListItem
 import vdi.service.rest.generated.model.PluginListItemImpl
+import vdi.service.rest.server.outputs.DatasetTypeOutput
 
 internal fun listPlugins(project: String?): List<PluginListItem> {
   var seq = PluginRegistry.asSequence()
@@ -24,9 +25,7 @@ private fun PluginListItem(p: Pair<DatasetType, PluginDetails>): PluginListItem 
 
     it.pluginName = p.second.name
     it.installTargets = p.second.projects
-    it.typeDisplayName = config.category
-    it.typeName = p.first.name.toString()
-    it.typeVersion = p.first.version
+    it.type = DatasetTypeOutput(p.first)
     it.maxFileSize = config.maxFileSize.toLong()
     it.allowedFileExtensions = config.allowedFileExtensions.asList()
   }
