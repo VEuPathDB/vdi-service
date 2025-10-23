@@ -1,6 +1,7 @@
 package vdi.core.plugin.registry
 
-internal data class PluginDatasetTypeMeta(
+class PluginDatasetTypeMeta(
   val category: String,
   val maxFileSize: ULong,
+  val allowedFileExtensions: Array<String>,
 )

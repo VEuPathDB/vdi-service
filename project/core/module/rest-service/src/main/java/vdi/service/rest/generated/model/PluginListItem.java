@@ -38,6 +38,12 @@ public interface PluginListItem {
   @JsonProperty(JsonField.MAX_FILE_SIZE)
   void setMaxFileSize(Long maxFileSize);
 
+  @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
+  List<String> getAllowedFileExtensions();
+
+  @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
+  void setAllowedFileExtensions(List<String> allowedFileExtensions);
+
   @JsonProperty(JsonField.INSTALL_TARGETS)
   List<String> getInstallTargets();
 

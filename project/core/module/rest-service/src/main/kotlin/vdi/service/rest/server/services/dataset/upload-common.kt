@@ -25,7 +25,7 @@ import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.withTransaction
 import vdi.core.db.model.SyncControlRecord
 import vdi.core.metrics.Metrics
-import vdi.core.plugin.registry.PluginDetails
+import vdi.core.plugin.registry.PluginDatasetTypeMeta
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.logging.markedLogger
 import vdi.model.OriginTimestamp
@@ -47,25 +47,29 @@ fun <T> CacheDB.initializeDataset(
   fn: (CacheDBTransaction) -> T,
 ): T =
   withTransaction {
-    it.tryInsertDataset(DatasetImpl(
-      datasetID = datasetID,
-      type = datasetMeta.type,
-      ownerID = userID,
-      isDeleted = false,
-      created = datasetMeta.created,
-      importStatus = DatasetImportStatus.Queued,
-      origin = datasetMeta.origin,
-      inserted = OffsetDateTime.now(),
-    ))
+    it.tryInsertDataset(
+      DatasetImpl(
+        datasetID = datasetID,
+        type = datasetMeta.type,
+        ownerID = userID,
+        isDeleted = false,
+        created = datasetMeta.created,
+        importStatus = DatasetImportStatus.Queued,
+        origin = datasetMeta.origin,
+        inserted = OffsetDateTime.now(),
+      )
+    )
     it.tryInsertDatasetMeta(datasetID, datasetMeta)
     it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)
     it.tryInsertDatasetProjects(datasetID, datasetMeta.installTargets)
-    it.tryInsertSyncControl(SyncControlRecord(
-      datasetID = datasetID,
-      sharesUpdated = OriginTimestamp,
-      dataUpdated = OriginTimestamp,
-      metaUpdated = OriginTimestamp
-    ))
+    it.tryInsertSyncControl(
+      SyncControlRecord(
+        datasetID = datasetID,
+        sharesUpdated = OriginTimestamp,
+        dataUpdated = OriginTimestamp,
+        metaUpdated = OriginTimestamp
+      )
+    )
 
     fn(it)
   }
@@ -158,13 +162,21 @@ fun <T: ControllerBase> T.uploadFiles(
 ) {
   val logger = markedLogger(userID, datasetID)
 
-  verifyFileSize(uploadRefs, uploadConfig, PluginRegistry.maxFileSizeFor(datasetMeta.type))
+  verifyUploadFileSize(uploadRefs, uploadConfig)
 
   try {
     TempFiles.withTempPath { archive ->
       val sizes = if (uploadRefs.data.size == 1) {
         logger.debug("input was a single file, attempting to (re)pack")
-        TempFiles.withTempDirectory { dir -> uploadRefs.data[0].repack(into = archive, using = dir, logger = logger) }
+        TempFiles.withTempDirectory { dir ->
+          context(logger) {
+            uploadRefs.data[0].repack(
+              into = archive,
+              using = dir,
+              dataTypeMeta = PluginRegistry.configDataFor(datasetMeta.type),
+            )
+          }
+        }
       } else {
         uploadRefs.data.pack(into = archive)
       }
@@ -214,26 +226,26 @@ fun <T: ControllerBase> T.uploadFiles(
   }
 }
 
-fun <T: ControllerBase> T.verifyFileSize(
+fun <T: ControllerBase> T.verifyUploadFileSize(
   uploadRefs: UploadFileReferences,
   uploadConfig: UploadConfig,
-  pluginMaxSize: ULong,
 ) {
-  val maxSize = min(uploadConfig.maxUploadSize, pluginMaxSize)
-
   val dataSize = uploadRefs.data.reduceTo(0L) { t, c -> t + c.fileSize() }
   val metaSize = uploadRefs.meta.reduceTo(0L) { t, c -> t + c.fileSize() }
 
-  if (dataSize > maxSize.toLong())
-    throw BadRequestException("upload upload size larger than the max permitted dataset size of "
-    + maxSize.toString() + " bytes")
+  if (dataSize > uploadConfig.maxUploadSize.toLong())
+    throw BadRequestException(
+      "upload upload size larger than the max permitted dataset size of "
+      + uploadConfig.maxUploadSize.toString() + " bytes"
+    )
 
   val remainingUploadAllowance = getUserRemainingQuota(uploadConfig)
 
   if (dataSize + metaSize > remainingUploadAllowance)
     throw BadRequestException(
       "total upload size is larger than the remaining space allowed by the user quota " +
-      "($remainingUploadAllowance bytes)")
+      "($remainingUploadAllowance bytes)"
+    )
 }
 
 /**
@@ -247,19 +259,13 @@ fun <T: ControllerBase> T.verifyFileSize(
  *
  * @return A map of upload files and their sizes.
  */
-private fun Path.repack(into: Path, using: Path, logger: Logger): List<DatasetFileInfo> {
-  // If it resembles a zip file
-  return if (name.endsWith(".zip")) {
-    repackZip(into, using, logger)
+context(logger: Logger)
+private fun Path.repack(into: Path, using: Path, dataTypeMeta: PluginDatasetTypeMeta) =
+  when {
+    SupportedArchiveType.Zip.matches(name)   -> repackZip(into, using, dataTypeMeta)
+    SupportedArchiveType.TarGZ.matches(name) -> repackTar(into, using, dataTypeMeta)
+    else                                     -> repackRaw(into, dataTypeMeta)
   }
-
-  // If it resembles a tar file
-  else if (name.endsWith(".tar.gz") || name.endsWith(".tgz")) {
-    repackTar(into, using, logger)
-  } else {
-    repackRaw(into, logger)
-  }
-}
 
 /**
  * Packs the receiver files into a zip file for upload to S3.
@@ -286,14 +292,19 @@ private fun List<Path>.pack(into: Path): List<DatasetFileInfo> {
  *
  * @return A map of upload files and their sizes.
  */
-private fun Path.repackZip(into: Path, using: Path, logger: Logger): List<DatasetFileInfo> {
+context(logger: Logger)
+private fun Path.repackZip(
+  into: Path,
+  using: Path,
+  dataTypeMeta: PluginDatasetTypeMeta,
+): List<DatasetFileInfo> {
   logger.trace("repacking zip file {} into {}", this, into)
 
   // Map of file names to sizes that will be stored in the postgres database.
   val files = ArrayList<DatasetFileInfo>(12)
 
   // Validate that the zip appears usable.
-  validateZip()
+  validateZip(dataTypeMeta)
 
   // List of paths for the unpacked files
   val unpacked = ArrayList<Path>(12)
@@ -350,13 +361,16 @@ private fun Path.repackZip(into: Path, using: Path, logger: Logger): List<Datase
  *
  * @return A map of upload files and their sizes.
  */
-private fun Path.repackTar(into: Path, using: Path, logger: Logger): List<DatasetFileInfo> {
+context(logger: Logger)
+private fun Path.repackTar(into: Path, using: Path, dataTypeMeta: PluginDatasetTypeMeta): List<DatasetFileInfo> {
   logger.trace("repacking tar {} into {}", this, into)
 
   // Output map of files to sizes that will be written to the postgres DB.
   val sizes = ArrayList<DatasetFileInfo>(12)
 
   try {
+    validateTar(dataTypeMeta)
+
     Tar.decompressWithGZip(this, using)
   } catch (_: ZipException) {
     throw BadRequestException("input file had gzipped tar extension but could not be packed as a gzipped tar")
@@ -375,13 +389,33 @@ private fun Path.repackTar(into: Path, using: Path, logger: Logger): List<Datase
   return sizes
 }
 
-private fun Path.repackRaw(into: Path, logger: Logger): List<DatasetFileInfo> {
+private fun Path.validateTar(dataTypeMeta: PluginDatasetTypeMeta) {
+  val maxSize = dataTypeMeta.maxFileSize.toLong()
+  val badFiles = ArrayList<String>(2)
+
+  Tar.entries(this, true).forEach { (name, size) ->
+    if (dataTypeMeta.allowedFileExtensions.none { name.endsWith(it) })
+      badFiles.add("archive file \"$name\" has an unrecognized or disallowed file extension")
+    if (size > maxSize)
+      badFiles.add("archive file \"$name\" size is larger than the max permitted size of ${maxSize.toFileSizeString()}")
+  }
+}
+
+context(logger: Logger)
+private fun Path.repackRaw(into: Path, dataTypeMeta: PluginDatasetTypeMeta): List<DatasetFileInfo> {
   logger.trace("repacking raw file {} into {}", this, into)
+
+  if (fileSize() > dataTypeMeta.maxFileSize.toLong())
+    throw BadRequestException("uploaded file larger than the max permitted size of ${dataTypeMeta.maxFileSize.toFileSizeString()}")
+
+  if (dataTypeMeta.allowedFileExtensions.none { name.endsWith(it) })
+    throw BadRequestException("uploaded file has an unrecognized or disallowed file extension")
+
   into.compress(listOf(this))
   return listOf(DatasetFileInfo(name, fileSize().toULong()))
 }
 
-private fun Path.validateZip() {
+private fun Path.validateZip(dataTypeMeta: PluginDatasetTypeMeta) {
   when (getZipType()) {
     ZipType.Empty    -> throw BadRequestException("uploaded zip file is empty")
     ZipType.Standard -> { /* OK */
@@ -390,6 +424,19 @@ private fun Path.validateZip() {
     ZipType.Spanned  -> throw BadRequestException("uploaded zip file is part of a spanned archive")
     ZipType.Invalid  -> throw BadRequestException("uploaded zip file is invalid")
   }
+
+  val maxSize = dataTypeMeta.maxFileSize.toLong()
+  val badFiles = ArrayList<String>(2)
+
+  zipHeaders().forEach { file ->
+    if (dataTypeMeta.allowedFileExtensions.none { file.name.endsWith(it) })
+      badFiles.add("archive file \"$file\" has an unrecognized or disallowed file extension")
+    if (file.size > maxSize)
+      badFiles.add("archive file \"$file\" size is larger than the max permitted size of ${maxSize.toFileSizeString()}")
+  }
+
+  if (badFiles.isNotEmpty())
+    throw BadRequestException(badFiles.joinToString("\n"))
 }
 
 // endregion Dataset File Processing
@@ -415,11 +462,17 @@ fun <T: ControllerBase> T.downloadRemoteFile(url: URL, uploadConfig: UploadConfi
       ?.format(DateFormat)
       ?.let { timestamp ->
         logger.debug("could not download remote file from \"{}\", url expired at {}", url.host, timestamp)
-        throw FailedDependencyException(url, "remote server at \"${url.host}\" returned unexpected status code ${response.status}; given url appears to have expired at $timestamp")
+        throw FailedDependencyException(
+          url,
+          "remote server at \"${url.host}\" returned unexpected status code ${response.status}; given url appears to have expired at $timestamp"
+        )
       }
 
     logger.debug("could not download remote file from \"{}\", got status code {}", url, response.status)
-    throw FailedDependencyException(url, "remote server at \"${url.host}\" returned unexpected status code ${response.status}")
+    throw FailedDependencyException(
+      url,
+      "remote server at \"${url.host}\" returned unexpected status code ${response.status}"
+    )
   }
 
   // If for some reason the server returned nothing.

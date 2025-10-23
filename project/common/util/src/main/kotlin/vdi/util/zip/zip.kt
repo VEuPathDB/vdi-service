@@ -1,5 +1,6 @@
 package vdi.util.zip
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -201,3 +202,7 @@ fun InputStream.zipEntries(maxBytes: Long = 10737418240L): Sequence<Pair<ZipEntr
     }
   }
 }
+
+fun Path.zipHeaders(): Sequence<ZipEntry> =
+  ZipFile.builder().setFile(this.toFile()).get().use { it.entries.asSequence() }
+

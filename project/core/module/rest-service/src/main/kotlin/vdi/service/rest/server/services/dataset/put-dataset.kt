@@ -6,7 +6,6 @@ import vdi.core.db.app.AppDB
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
 import vdi.core.db.cache.CacheDB
-import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.DatasetMetaFilename
 import vdi.model.data.DatasetID
 import vdi.model.data.DatasetMetadata
@@ -101,7 +100,7 @@ private fun DatasetID.incrementRevision() =
     raw.indexOf('.')
       .takeUnless { it == -1 }
       ?.let { it+1 }
-      ?.let { DatasetID(raw.substring(0, it) + (raw.substring(it).toInt() + 1)) }
+      ?.let { DatasetID(raw.take(it) + (raw.substring(it).toInt() + 1)) }
       ?: DatasetID("$raw.1")
   }
 

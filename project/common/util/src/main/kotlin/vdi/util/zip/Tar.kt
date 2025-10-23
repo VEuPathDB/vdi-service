@@ -5,6 +5,9 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import java.nio.file.Path
 import java.util.zip.GZIPInputStream
 import kotlin.io.path.*
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
+import kotlin.io.path.outputStream
 
 object Tar {
   fun decompressWithGZip(inputFile: Path, outputDir: Path) {
@@ -35,8 +38,17 @@ object Tar {
     }
   }
 
-  private inline fun TarArchiveInputStream.forEach(fn: (entry: TarArchiveEntry) -> Unit) {
-    while (true)
-      fn(nextEntry ?: break)
+  fun entries(inputFile: Path, gzipped: Boolean): Sequence<Header> = sequence {
+    TarArchiveInputStream(
+      (if (gzipped)
+        GZIPInputStream(inputFile.inputStream())
+      else inputFile.inputStream())
+        .buffered()
+    ).use { tar ->
+      for (entry in tar)
+        yield(Header(entry.name, entry.realSize))
+    }
   }
+
+  data class Header(val name: String, val size: Long)
 }

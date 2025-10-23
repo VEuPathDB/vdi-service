@@ -1,8 +1,9 @@
 package vdi.config.raw.vdi
 
-data class DataTypeConfig(
+class DataTypeConfig(
   val name: String,
   val category: String,
   val version: String,
   val maxFileSize: ULong = ULong.MAX_VALUE,
+  val allowedFileExtensions: Array<String> = emptyArray(),
 )

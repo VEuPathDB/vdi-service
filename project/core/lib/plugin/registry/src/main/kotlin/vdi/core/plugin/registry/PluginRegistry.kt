@@ -24,7 +24,7 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
 
         plug.dataTypes.asSequence()
           .map { DatasetType(DataType.of(it.name), it.version)
-            .also { dt -> tmpCats[dt] = PluginDatasetTypeMeta(it.category, it.maxFileSize) } }
+            .also { dt -> tmpCats[dt] = PluginDatasetTypeMeta(it.category, it.maxFileSize, it.allowedFileExtensions) } }
           .onEach { conflicts.computeIfAbsent(it, { ArrayList(1) }).add(name) }
           .map { it to details }
       }
@@ -43,18 +43,23 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
   fun contains(type: DatasetType) = type in mapping
 
   fun categoryFor(type: DatasetType): String =
-    typeMeta[type]?.category
-      ?: throw MissingDataTypeMetaException(type)
+    configDataFor(type).category
 
   fun categoryOrNullFor(type: DatasetType): String? =
     typeMeta[type]?.category
 
   fun maxFileSizeFor(type: DatasetType): ULong =
-    typeMeta[type]?.maxFileSize
-      ?: throw MissingDataTypeMetaException(type)
+    configDataFor(type).maxFileSize
 
   fun maxFileSizeOrNullFor(type: DatasetType): ULong? =
     typeMeta[type]?.maxFileSize
+
+  fun configDataFor(type: DatasetType): PluginDatasetTypeMeta =
+    typeMeta[type]
+      ?: throw MissingDataTypeMetaException(type)
+
+  fun configDataOrNullFor(type: DatasetType): PluginDatasetTypeMeta? =
+    typeMeta[type]
 
   operator fun get(type: DatasetType) = mapping[type]
 

@@ -137,6 +137,17 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9223372036854775807
+        },
+        "allowedFileExtensions": {
+          "title": "Permitted File Extensions",
+          "description": "File extensions that are allowed on raw uploaded files, or on the content files of archive uploads.\n\nThis list should not include the supported vdi archive extensions.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "\\..+"
+          },
+          "uniqueItems": true,
+          "unevaluatedItems": false
         }
       },
       "required": [

@@ -18,4 +18,10 @@ public interface ServiceMetadataResponseBody {
 
   @JsonProperty(JsonField.CONFIGURATION)
   void setConfiguration(ServiceConfigurationDetails configuration);
+
+  @JsonProperty(JsonField.FEATURES)
+  ServiceFeatures getFeatures();
+
+  @JsonProperty(JsonField.FEATURES)
+  void setFeatures(ServiceFeatures features);
 }

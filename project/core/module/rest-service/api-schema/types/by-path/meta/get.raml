@@ -10,6 +10,7 @@ types:
     properties:
       buildInfo: ServiceMetadataBuildInfoOutput
       configuration: ServiceConfigurationDetails
+      features: ServiceFeatures
 
   ServiceMetadataBuildInfoOutput:
     type: object
@@ -55,3 +56,9 @@ types:
       fullRunInterval: string
       slimRunInterval: string
       performDeletes: boolean
+
+  ServiceFeatures:
+    type: object
+    additionalProperties: false
+    properties:
+      supportedArchiveTypes: string[]

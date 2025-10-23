@@ -7,6 +7,7 @@ public final class JsonField {
   public static final String AFTER = "after";
   public static final String AGENCY = "agency";
   public static final String ALL = "all";
+  public static final String ALLOWED_FILE_EXTENSIONS = "allowedFileExtensions";
   public static final String API = "api";
   public static final String ASSOCIATED_FACTORS = "associatedFactors";
   public static final String AWARD_NUMBER = "awardNumber";
@@ -50,6 +51,7 @@ public final class JsonField {
   public static final String ERRORS = "errors";
   public static final String EXPERIMENTAL_ORGANISM = "experimentalOrganism";
   public static final String EXTERNAL_IDENTIFIERS = "externalIdentifiers";
+  public static final String FEATURES = "features";
   public static final String FILE_COUNT = "fileCount";
   public static final String FILE_LIST_URL = "fileListUrl";
   public static final String FILE_NAME = "fileName";

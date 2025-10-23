@@ -4,33 +4,43 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.OffsetDateTime
 
 data class MinIOEventRecord(
-  @JsonProperty("eventVersion")
+  @param:JsonProperty("eventVersion")
+  @field:JsonProperty("eventVersion")
   val eventVersion: String,
 
-  @JsonProperty("eventSource")
+  @param:JsonProperty("eventSource")
+  @field:JsonProperty("eventSource")
   val eventSource: String,
 
-  @JsonProperty("awsRegion")
+  @param:JsonProperty("awsRegion")
+  @field:JsonProperty("awsRegion")
   val awsRegion: String,
 
-  @JsonProperty("eventTime")
+  @param:JsonProperty("eventTime")
+  @field:JsonProperty("eventTime")
   val eventTime: OffsetDateTime,
 
-  @JsonProperty("eventName")
+  @param:JsonProperty("eventName")
+  @field:JsonProperty("eventName")
   val eventName: String,
 
-  @JsonProperty("userIdentity")
+  @param:JsonProperty("userIdentity")
+  @field:JsonProperty("userIdentity")
   val userIdentity: MinIOEventUserIdentity,
 
-  @JsonProperty("requestParameters")
+  @param:JsonProperty("requestParameters")
+  @field:JsonProperty("requestParameters")
   val requestParameters: Map<String, String>?,
 
-  @JsonProperty("responseElements")
+  @param:JsonProperty("responseElements")
+  @field:JsonProperty("responseElements")
   val responseElements: Map<String, String>,
 
-  @JsonProperty("s3")
+  @param:JsonProperty("s3")
+  @field:JsonProperty("s3")
   val s3: MinIOEventRecordS3,
 
-  @JsonProperty("source")
+  @param:JsonProperty("source")
+  @field:JsonProperty("source")
   val source: MinIOEventRecordSource
 )

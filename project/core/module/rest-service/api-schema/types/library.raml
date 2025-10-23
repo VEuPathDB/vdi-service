@@ -1168,6 +1168,7 @@ types:
       maxFileSize:
         type: integer
         format: int64
+      allowedFileExtensions: string[]
       installTargets?:
         description: |-
           Projects that this plugin is restricted to.  An empty or absent list
@@ -1250,6 +1251,11 @@ types:
     properties:
       api: APIServiceConfiguration
       daemons: DaemonConfiguration
+  ServiceFeatures:
+    type: object
+    additionalProperties: false
+    properties:
+      supportedArchiveTypes: string[]
   ServiceMetadataBuildInfoOutput:
     type: object
     additionalProperties: false
@@ -1267,6 +1273,7 @@ types:
     properties:
       buildInfo: ServiceMetadataBuildInfoOutput
       configuration: ServiceConfigurationDetails
+      features: ServiceFeatures
   ShareOffer:
     displayName: Dataset Share Offer
     type: object
