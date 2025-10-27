@@ -102,6 +102,24 @@ types:
     type: string
     description: Longform description of the dataset.
 
+  DatasetFileDetails:
+    displayName: Decompressed File Info
+    additionalProperties: false
+    properties:
+      fileName: string
+      fileSize:
+        description: Size of the file in bytes.
+        type: integer
+        format: int64
+
+  DatasetFileListing:
+    displayName: Dataset File Report
+    additionalProperties: false
+    properties:
+      upload: DatasetZipDetails
+      install?: DatasetZipDetails
+      documents?: DatasetFileDetails[]
+
   DatasetFundingAward:
     type: object
     additionalProperties: false
@@ -390,6 +408,15 @@ types:
     - private
     - protected
     - public
+
+  DatasetZipDetails:
+    displayName: Archive File Info
+    additionalProperties: false
+    properties:
+      zipSize:
+        type: integer
+        format: int64
+      contents: DatasetFileDetails[]
 
   ShortName:
     type: string

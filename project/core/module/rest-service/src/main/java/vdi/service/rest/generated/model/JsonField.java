@@ -57,6 +57,7 @@ public final class JsonField {
   public static final String FILE_NAME = "fileName";
   public static final String FILE_SIZE = "fileSize";
   public static final String FILE_SIZE_TOTAL = "fileSizeTotal";
+  public static final String FILES = "files";
   public static final String FIRST_NAME = "firstName";
   public static final String FULL_RUN_INTERVAL = "fullRunInterval";
   public static final String FUNDING = "funding";

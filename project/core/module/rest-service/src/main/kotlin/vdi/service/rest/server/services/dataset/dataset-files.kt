@@ -65,7 +65,7 @@ fun <T: ControllerBase> T.listDatasetFilesForUser(vdiId: DatasetID) =
     ?.let(GetDatasetsFilesByVdiIdResponse::respond200WithApplicationJson)
     ?: Static404.wrap()
 
-private fun listDatasetFiles(owner: UserID, vdiId: DatasetID) =
+fun listDatasetFiles(owner: UserID, vdiId: DatasetID) =
   DatasetFileListingImpl().apply {
     upload = DatasetZipDetails(DatasetStore.getImportReadyZipSize(owner, vdiId), CacheDB().selectUploadFiles(vdiId))
     install = DatasetStore.getInstallReadyZipSize(owner, vdiId)

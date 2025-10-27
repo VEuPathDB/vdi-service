@@ -182,4 +182,10 @@ public interface DatasetDetails extends DatasetMetaBase {
 
   @JsonProperty(JsonField.STATUS)
   void setStatus(DatasetStatusInfo status);
+
+  @JsonProperty(JsonField.FILES)
+  DatasetFileListing getFiles();
+
+  @JsonProperty(JsonField.FILES)
+  void setFiles(DatasetFileListing files);
 }

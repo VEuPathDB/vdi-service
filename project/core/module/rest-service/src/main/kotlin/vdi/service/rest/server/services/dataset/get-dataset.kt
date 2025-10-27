@@ -76,7 +76,8 @@ private fun <T: ControllerBase> T.getDatasetByID(
     shares          = shares,
     installs        = installs,
     userInfo        = userDetails,
-    relatedDatasets = getRelatedDatasets(datasetID, metaJson)
+    relatedDatasets = getRelatedDatasets(datasetID, metaJson),
+    files           = listDatasetFiles(dataset.ownerID, datasetID)
   ))
 }
 

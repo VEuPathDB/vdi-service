@@ -8,6 +8,7 @@ import vdi.core.db.cache.model.RelatedDataset
 import vdi.model.data.*
 import vdi.service.rest.generated.model.DatasetDetails
 import vdi.service.rest.generated.model.DatasetDetailsImpl
+import vdi.service.rest.generated.model.DatasetFileListing
 import vdi.service.rest.model.UserDetails
 
 /**
@@ -23,6 +24,7 @@ internal fun DatasetDetails(
   installs: Map<InstallTargetID, InstallStatuses>,
   userInfo: Map<UserID, UserDetails>,
   relatedDatasets: Sequence<RelatedDataset>,
+  files: DatasetFileListing,
 ): DatasetDetails =
   DatasetDetailsImpl().apply {
     datasetId            = datasetID.toString()
@@ -54,5 +56,6 @@ internal fun DatasetDetails(
     this.relatedDatasets = relatedDatasets.map(::RelatedDatasetInfo).toList()
     shortAttribution     = meta.shortAttribution
     shortName            = meta.shortName
+    this.files           = files
   }
 

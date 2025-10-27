@@ -38,7 +38,8 @@ import java.util.List;
     "relatedDatasets",
     "importMessages",
     "shares",
-    "status"
+    "status",
+    "files"
 })
 public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty(JsonField.INSTALL_TARGETS)
@@ -127,6 +128,9 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty(JsonField.STATUS)
   private DatasetStatusInfo status;
+
+  @JsonProperty(JsonField.FILES)
+  private DatasetFileListing files;
 
   @JsonProperty(JsonField.INSTALL_TARGETS)
   public List<String> getInstallTargets() {
@@ -416,5 +420,15 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty(JsonField.STATUS)
   public void setStatus(DatasetStatusInfo status) {
     this.status = status;
+  }
+
+  @JsonProperty(JsonField.FILES)
+  public DatasetFileListing getFiles() {
+    return this.files;
+  }
+
+  @JsonProperty(JsonField.FILES)
+  public void setFiles(DatasetFileListing files) {
+    this.files = files;
   }
 }
