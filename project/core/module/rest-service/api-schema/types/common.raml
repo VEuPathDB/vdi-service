@@ -14,6 +14,58 @@ types:
         maxLength: 64
       description?: string
 
+  DatasetCharacteristics:
+    type: object
+    additionalProperties: false
+    properties:
+      studyDesign?:
+        description: Required for ClinEpi
+        type: string
+      studyType?:
+        description: Required for ClinEpi
+        type: string
+      countries?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      years?: SampleYearRange
+      studySpecies?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      diseases?:
+        description: Diseases or health conditions
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      associatedFactors?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      participantAges?:
+        type: string
+        minLength: 1
+        maxLength: 128
+      sampleTypes?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+
   DatasetContact:
     displayName: Dataset Contact
     additionalProperties: false
@@ -343,13 +395,6 @@ types:
         description: URL to the file listing for the revision entry.
         type: string
 
-  DatasetRevisionNote:
-    displayName: Dataset Revision Note
-    description: Note providing a reason and/or description for the revision.
-    type: string
-    minLength: 10
-    maxLength: 4096
-
   DatasetRevisionAction:
     displayName: Dataset Revision Action
     type: string
@@ -357,6 +402,13 @@ types:
     - create
     - extend
     - revise
+
+  DatasetRevisionNote:
+    displayName: Dataset Revision Note
+    description: Note providing a reason and/or description for the revision.
+    type: string
+    minLength: 10
+    maxLength: 4096
 
   DatasetSourceUrl:
     description: |
@@ -376,6 +428,18 @@ types:
     minLength: 3
     maxLength: 4000
 
+  DatasetTypeInput:
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        minLength: 3
+        maxLength: 128
+      version:
+        type: string
+        minLength: 1
+        maxLength: 32
+
   DatasetTypeOutput:
     description: Details about a specific dataset type.
     additionalProperties: false
@@ -390,24 +454,21 @@ types:
         type: string
         minLength: 3
 
-  DatasetTypeInput:
-    additionalProperties: false
-    properties:
-      name:
-        type: string
-        minLength: 3
-        maxLength: 128
-      version:
-        type: string
-        minLength: 1
-        maxLength: 32
-
   DatasetVisibility:
+    displayName: Dataset Visibility
+    # language=markdown
+    description: |
+      API visibility enum.
+        
+      This value differs from the internal dataset metadata visibility in that
+      the `controlled` value is a computed value defined as the combination of
+      visibility `protected` coupled with a "days to approve" value of `0`.
     type: string
     enum:
     - private
     - protected
     - public
+    - controlled
 
   DatasetZipDetails:
     displayName: Archive File Info
@@ -417,16 +478,6 @@ types:
         type: integer
         format: int64
       contents: DatasetFileDetails[]
-
-  ShortName:
-    type: string
-    minLength: 3
-    maxLength: 20
-
-  ShortAttribution:
-    type: string
-    minLength: 3
-    maxLength: 40
 
   DOIReference:
     type: object
@@ -451,6 +502,19 @@ types:
       bioprojectIds?:
         type: BioprojectIDReference[]
         uniqueItems: true
+
+  InstallTargetID:
+    description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".
+    type: string
+    minLength: 5
+    maxLength: 32
+
+  LinkedDataset:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetUri: string
+      sharesRecords: boolean
 
   PartialDate:
     displayName: Partial Datetime
@@ -477,25 +541,22 @@ types:
     type: string
     minLength: 4
 
-  InstallTargetID:
-    description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".
-    type: string
-    minLength: 5
-    maxLength: 32
-
-  LinkedDataset:
-    type: object
-    additionalProperties: false
-    properties:
-      datasetUri: string
-      sharesRecords: boolean
-
   RevisionHistory:
     type: object
     additionalProperties: false
     properties:
       originalId: VdiId
       revisions: DatasetRevision[]
+
+  ShortAttribution:
+    type: string
+    minLength: 3
+    maxLength: 40
+
+  ShortName:
+    type: string
+    minLength: 3
+    maxLength: 20
 
   SampleYearRange:
     type: object
@@ -523,58 +584,6 @@ types:
     enum:
     - accept
     - reject
-
-  DatasetCharacteristics:
-    type: object
-    additionalProperties: false
-    properties:
-      studyDesign?:
-        description: Required for ClinEpi
-        type: string
-      studyType?:
-        description: Required for ClinEpi
-        type: string
-      countries?:
-        type: array
-        items:
-          type: string
-          minLength: 3
-          maxLength: 128
-        uniqueItems: true
-      years?: SampleYearRange
-      studySpecies?:
-        type: array
-        items:
-          type: string
-          minLength: 3
-          maxLength: 128
-        uniqueItems: true
-      diseases?:
-        description: Diseases or health conditions
-        type: array
-        items:
-          type: string
-          minLength: 3
-          maxLength: 128
-        uniqueItems: true
-      associatedFactors?:
-        type: array
-        items:
-          type: string
-          minLength: 3
-          maxLength: 128
-        uniqueItems: true
-      participantAges?:
-        type: string
-        minLength: 1
-        maxLength: 128
-      sampleTypes?:
-        type: array
-        items:
-          type: string
-          minLength: 3
-          maxLength: 128
-        uniqueItems: true
 
   UserId:
     description: VEuPathDB User ID

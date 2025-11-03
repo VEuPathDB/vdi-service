@@ -912,11 +912,14 @@ types:
     properties:
       value?: DatasetTypeInput
   DatasetVisibility:
+    displayName: Dataset Visibility
+    description: "API visibility enum.\n  \nThis value differs from the internal dataset metadata visibility in that\nthe `controlled` value is a computed value defined as the combination of\nvisibility `protected` coupled with a \"days to approve\" value of `0`.\n"
     type: string
     enum:
       - private
       - protected
       - public
+      - controlled
   DatasetZipDetails:
     displayName: Archive File Info
     type: object

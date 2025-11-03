@@ -10,7 +10,10 @@ public enum DatasetVisibility {
   PROTECTED("protected"),
 
   @JsonProperty("public")
-  PUBLIC("public");
+  PUBLIC("public"),
+
+  @JsonProperty("controlled")
+  CONTROLLED("controlled");
 
   public final String value;
 
