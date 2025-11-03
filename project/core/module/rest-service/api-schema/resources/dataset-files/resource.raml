@@ -1,0 +1,114 @@
+#%RAML 1.0 Resource
+
+displayName: Dataset Files
+
+uriParameters:
+  vdi-id: lib.VdiId
+
+get:
+  displayName: List Files
+  # language=markdown
+  description: |
+    Lists the dataset zip files for the original user upload as well as the
+    install files (when available).
+
+    If this endpoint is hit before the dataset has been imported, the upload
+    zip size will be `-1` which may be used as an indicator to clients that
+    the zip size cannot yet be shown.
+  responses:
+    200:
+      body: lib.DatasetFileListing
+    401:
+      body: lib.UnauthorizedError
+    404:
+      body: lib.NotFoundError
+    500:
+      body: lib.ServerError
+
+/upload:
+  displayName: Original User Data
+  get:
+    displayName: Get Upload Zip File
+    # language=markdown
+    description: |
+      Returns a zip file containing the contents of the original upload to the
+      dataset importer.
+    responses:
+      200:
+        headers:
+          Content-Disposition:
+            description: Content disposition of `attachment` with a filename.
+            type: string
+            example: attachment; filename="1234567-upload.zip"
+        body:
+          application/zip:
+            type: any
+      401:
+        body: lib.UnauthorizedError
+      404:
+        body: lib.NotFoundError
+      500:
+        body: lib.ServerError
+
+/install:
+  displayName: Install-Ready Data
+  get:
+    displayName: Get Data File
+    # language=markdown
+    description: |
+      Returns a zip file containing the processed files that were/would be
+      installed into the VEuPathDB project site on successful installation
+      processing.
+    responses:
+      200:
+        headers:
+          Content-Disposition:
+            description: Content disposition of `attachment` with a filename.
+            type: string
+            example: attachment; filename="1234567-data.zip"
+        body:
+          application/zip:
+            type: any
+      401:
+        body: lib.UnauthorizedError
+      404:
+        body: lib.NotFoundError
+      500:
+        body: lib.ServerError
+
+/documents/{file-name}:
+  displayName: Additional Meta Files
+  uriParameters:
+    file-name:
+  get:
+    displayName: Get Document
+    responses:
+      200:
+        headers:
+          Content-Disposition:
+            description: Content disposition of `attachment` with a filename.
+            type: string
+            example: attachment; filename="1234567.pdf"
+        body:
+          application/octet-stream:
+            type: any
+      401:
+        body: lib.UnauthorizedError
+      404:
+        body: lib.NotFoundError
+      500:
+        body: lib.ServerError
+  put:
+    displayName: Put Document
+    body:
+      application/octet-stream: file
+    responses:
+      204:
+      400:
+        body: lib.BadRequestError
+      401:
+        body: lib.UnauthorizedError
+      404:
+        body: lib.NotFoundError
+      500:
+        body: lib.ServerError

@@ -1,0 +1,382 @@
+= Plugin Script Definition & Expectations
+:icons: font
+:toc: left
+:source-highlighter: pygments
+:pygments-style: lightbulb
+:stylesheet: ../css/adoc-dark.css
+
+== Plugin Scripts
+
+The following sections describe the purpose and inputs/outputs of the plugin
+scripts executed by the VDI plugin handler server.
+
+Each section's "Inputs" subsection includes the contents of the <<Base Environment>>
+section in addition to its own contents.
+
+=== Import (Preprocessing & Validation)
+
+The import script is responsible for performing initial validation and any
+necessary format transformation of a target dataset's data.  The output of the
+import script is expected to be file(s) in the format required for installation
+into the dataset's installation target(s).
+
+On execution, the import script will be given a directory containing the initial
+upload files, and an empty directory into which the import script will place the
+output "install ready" files.  All dataset-specific files that are required to
+install a dataset must be placed in this directory.
+
+==== Inputs
+
+===== CLI
+
+.Positional Arguments
+. Path to input directory
+. Path to output directory
+
+.Invocation Scheme
+[source, shell]
+----
+import {input-dir-path} {output-dir-path}
+----
+
+===== Environment
+
+[%header, cols="2m,8a"]
+|===
+^| Variable    ^| Description
+| VDI_ID        | Unique VDI dataset ID.
+| VDI_IMPORT_ID | Generated database-identifier-safe ID value for the import.
+|===
+
+===== Files
+
+The input directory will contain all uploaded files for the dataset, along with
+a JSON file containing the dataset's metadata which will be named
+`vdi-meta.json`.
+
+[IMPORTANT]
+The `vdi-meta.json` file should not be copied to the import script's output
+directory.
+
+==== Outputs
+
+===== Messages
+
+In addition to the script status logging that is expected on `STDERR`, `STDOUT`
+may also be used in import scripts to pass messages, such as warnings or error
+text, back to the dataset owner.
+
+Each line that is written to `STDOUT` will become an individual message visible
+to the dataset owner on import process completion, regardless of status.
+
+
+===== Exit Codes
+
+[cols=">8m,92"]
+|===
+| 0  | Success.  Data was valid, install-ready files were produced.
+| 1  | Invalid input.  Data failed validation.
+| >= 2 | Unexpected process error.
+|===
+
+===== Files
+
+Data files that have been validated and/or reformatted, and are now in an
+install-ready state MUST be placed in the output directory.  On successful
+import script completion, these files will be pushed into the VDI object store
+for eventual installation into the dataset's target project(s).
+
+The output directory should not contain any files that are not a part of the
+install-ready data.
+
+
+=== Metadata Installation
+
+The meta installation script is responsible for performing any 'extra' metadata
+installation steps that are not already handled by the core VDI service.
+
+==== Inputs
+
+===== CLI
+
+.Positional Arguments
+. VDI dataset ID
+. Path to the target dataset's `vdi-meta.json` file.
+
+.Invocation Scheme
+[source, shell]
+----
+install-meta {vdi-id} {path-to-meta-json}
+----
+
+.Invocation Example
+[source, shell]
+----
+install-meta ttN4s4Idk90kU /tmp/d1c10dc5-55df-4ee9-89c6-2669caf6c73a/vdi-meta.json
+----
+
+
+===== Environment
+
+[%header, cols="2m,8a"]
+|===
+^| Variable ^| Description
+| VDI_ID     | Unique VDI dataset ID.
+| DATA_FILES | Path to the dataset's filesystem installation directory. +
+*SEE WARNING*: <<install-dir-warn,Installation Path Existence>>
+| PROJECT_ID | Dataset installation target.  E.g.PlasmoDB
+| DB_HOST    | Installation target database hostname.
+| DB_PORT    | Installation target database port.
+| DB_NAME    | Installation target database name.
+| DB_USER    | Installation target database credentials username.
+| DB_PASS    | Installation target database credentials password.
+| DB_SCHEMA  | Installation target database schema name.
+| DB_PLATFORM | Installation target database platform (`Postgres` or `Oracle`)
+|===
+
+==== Outputs
+
+===== Exit Codes
+
+[cols=">8m,92"]
+|===
+| 0    | Success.  Metadata was installed.
+| >= 1 | Unexpected process error.
+|===
+
+
+=== Data Compatibility Checks
+
+The check compatibility script is called before attempting a dataset
+installation to ensure the dataset's declared dependencies are already available
+in the dataset's install target.
+
+==== Inputs
+
+===== Input Stream
+
+The check compatibility script accepts its primary input on `STDIN`.  The input
+will be a stream of all the dataset's declared dependencies as tab-delimited
+2-column lines containing each dependency's identifier and version.
+
+.Example Input
+[source, tabular]
+----
+identifier1	version1
+identifier2	version2
+identifier3	version3
+----
+
+===== Environment
+
+[%header, cols="2m,8a"]
+|===
+^| Variable ^| Description
+| VDI_ID     | Unique VDI dataset ID.
+| DATA_FILES | Path to the dataset's filesystem installation directory. +
+*SEE WARNING*: <<install-dir-warn,Installation Path Existence>>
+| PROJECT_ID | Dataset installation target.  E.g.PlasmoDB
+| DB_HOST    | Installation target database hostname.
+| DB_PORT    | Installation target database port.
+| DB_NAME    | Installation target database name.
+| DB_USER    | Installation target database credentials username.
+| DB_PASS    | Installation target database credentials password.
+| DB_SCHEMA  | Installation target database schema name.
+| DB_PLATFORM | Installation target database platform (`Postgres` or `Oracle`)
+|===
+
+==== Outputs
+
+===== Messages
+
+In addition to the script status logging that is expected on `STDERR`, `STDOUT`
+may also be used by the check-compatibility script to pass messages back to the
+dataset owner.
+
+Each line that is written to `STDOUT` will become an individual message visible
+to the dataset owner on installation process completion, regardless of status.
+
+===== Exit Codes
+
+[cols=">8m,92"]
+|===
+| 0  | Compatible - Required dependencies are met.
+| 1  | Incompatible - Required dependencies are not met.
+| >= 2 | Unexpected process error.
+|===
+
+=== Data Installation
+
+The install-data script is responsible for installing dataset data into any
+locations required for that data's use in the installation target, such as the
+target project's app database, or the project's filesystem.
+
+==== Inputs
+
+===== CLI
+
+.Positional Arguments
+1. VDI dataset ID
+2. Path to directory containing install-ready files.
+
+.Invocation Scheme
+[source, shell]
+install-data {vdi-id} {path-to-dataset-files}
+
+.Invocation Example
+[source, shell]
+install-data ttN4s4Idk90kU /tmp/d1c10dc5-55df-4ee9-89c6-2669caf6c73a
+
+===== Environment
+
+[%header, cols="2m,8a"]
+|===
+^| Variable ^| Description
+| VDI_ID     | Unique VDI dataset ID.
+| DATA_FILES | Path to the dataset's filesystem installation directory. +
+*SEE WARNING*: <<install-dir-warn,Installation Path Existence>>
+| PROJECT_ID | Dataset installation target.  E.g.PlasmoDB
+| DB_HOST    | Installation target database hostname.
+| DB_PORT    | Installation target database port.
+| DB_NAME    | Installation target database name.
+| DB_USER    | Installation target database credentials username.
+| DB_PASS    | Installation target database credentials password.
+| DB_SCHEMA  | Installation target database schema name.
+| DB_PLATFORM | Installation target database platform (`Postgres` or `Oracle`)
+|===
+
+===== Files
+
+The directory whose path is provided as a CLI positional argument will contain
+the install-ready files that were generated by the import script execution.
+
+==== Outputs
+
+===== Messages
+
+In addition to the script status logging that is expected on `STDERR`, `STDOUT`
+may also be used by the install-data script to pass messages back to the dataset
+owner.
+
+Each line that is written to `STDOUT` will become an individual message visible
+to the dataset owner on installation process completion, regardless of status.
+
+===== Exit Codes
+
+[cols=">8m,92"]
+|===
+| 0  | Success
+| 1  | Failure due to target-specific validation error.
+| >= 2 | Unexpected process error.
+|===
+
+
+=== Dataset Uninstallation
+
+The dataset uninstallation script is responsible for removing all dataset data
+and 'extra' metadata (installed by `install-meta`) to purge traces of the
+dataset from the target system.
+
+[CAUTION]
+This process should not assume a successful or complete installation, and will
+be called to purge traces of datasets for which initial installation, or
+a prior uninstall attempt failed.
+
+==== Inputs
+
+===== CLI
+
+.Positional Arguments
+. VDI Dataset ID
+
+.Invocation Scheme
+[source, shell]
+uninstall {vdi-id}
+
+.Invocation Example
+[source, shell]
+uninstall ttN4s4Idk90kU
+
+===== Environment
+
+[%header, cols="2m,8a"]
+|===
+^| Variable ^| Description
+| VDI_ID     | Unique VDI dataset ID.
+| DATA_FILES | Path to the dataset's filesystem installation directory. +
+*SEE WARNING*: <<install-dir-warn,Installation Path Existence>>
+| PROJECT_ID | Dataset installation target.  E.g.PlasmoDB
+| DB_HOST    | Installation target database hostname.
+| DB_PORT    | Installation target database port.
+| DB_NAME    | Installation target database name.
+| DB_USER    | Installation target database credentials username.
+| DB_PASS    | Installation target database credentials password.
+| DB_SCHEMA  | Installation target database schema name.
+| DB_PLATFORM | Installation target database platform (`Postgres` or `Oracle`)
+|===
+
+==== Outputs
+
+== Base Environment
+
+=== Script Working Directory
+
+Each script invocation is executed in its own working directory which may be
+used to create temporary files that will be removed on script completion.  This
+directory may be used by simply making relative references when creating file
+handles and paths.
+
+=== Dataset Installation Filesystem
+
+Plugin scripts may be given paths to dataset installation directories on the
+host filesystem in order to install or uninstall data.
+
+[#install-dir-warn]
+[IMPORTANT]
+Dataset file installation directories are _NOT_ created by the plugin server.
+If a plugin intends to install dataset artifacts into the filesystem, it MUST
+ensure the existence of that directory beforehand, creating it when necessary.
+
+=== Variables
+
+All plugin scripts will be executed in an environment containing any of the
+following variables that are present in the server execution environment.  Check
+the specific plugin's definition to see what variables are available.
+
+.OS Level
+* `HOSTNAME`
+* `JAVA_HOME`
+* `LANG`
+* `LD_LIBRARY_PATH`
+* `ORACLE_HOME`
+* `PATH`
+* `TZ`
+
+.Plugin Specific
+* `GUS_HOME`
+* `PROJECT_HOME`
+* `PYTHONPATH`
+* `SITE_BUILD`
+* `TEMPLATE_DB_NAME`
+* `TEMPLATE_DB_USER`
+* `TEMPLATE_DB_PASS`
+
+
+== Additional Details
+
+=== Logging from Plugin Scripts
+
+Plugin scripts are expected to log debug and process messages to `STDERR`, the
+use of `STDOUT` is used exclusively for writing messages that will be returned
+to the dataset owner.  All messages logged to `STDOUT` MUST be treated as
+publicly visible and MUST never contain credentials, PII, or any other protected
+information.
+
+=== Reserved File Names
+
+The following file names are reserved for use by VDI.  A plugin script creating
+a file a reserved name will be handled as a runtime error.
+
+* `vdi-meta.json`
+* `vdi-manifest.json`
+* `warnings.json`

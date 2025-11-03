@@ -1,19 +1,29 @@
 version: 2
+
 updates:
 - package-ecosystem: gradle
-  directory: "/"
   registries:
   - github-packages
   schedule:
     interval: weekly
-  commit-message:
-  open-pull-request-limit: 20
+  open-pull-requests-limit: 20
   ignore:
-    dependency-name: org.gusdb:fgputil*
-- package-ecosystem: docker
+  - dependency-name: org.gusdb:fgputil*
   directory: "/"
+  groups:
+    test-dependencies:
+      patterns:
+      - org.junit.*
+      - org.mockito.*
+    log4j:
+      patterns:
+      - org.apache.logging.*
+
+- package-ecosystem: docker
+  directory: "/project/core"
   schedule:
     interval: monthly
+
 registries:
   github-packages:
     type: maven-repository

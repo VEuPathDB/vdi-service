@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/lanes/reconciliation.json",
+  "title": "Dataset Reconciliation Lane Config",
+  "type": "object",
+  "properties": {
+    "kafkaConsumerId": {
+      "$ref": "lane-common.json#/$defs/kafkaConsumerId",
+      "default": "reconciliation-lane-receive"
+    },
+    "kafkaProducerId": {
+      "$ref": "lane-common.json#/$defs/kafkaProducerId",
+      "default": "reconciliation-lane-send"
+    },
+    "inMemoryQueueSize": {
+      "$ref": "lane-common.json#/$defs/inMemoryQueueSize",
+      "default": 10
+    },
+    "workerCount": {
+      "$ref": "lane-common.json#/$defs/workerCount",
+      "default": 10
+    },
+    "eventChannel": {
+      "$ref": "lane-common.json#/$defs/eventChannel",
+      "default": "reconciliation-triggers"
+    },
+    "eventKey": {
+      "$ref": "lane-common.json#/$defs/eventKey",
+      "default": "reconciliation-trigger"
+    }
+  },
+  "unevaluatedProperties": false
+}

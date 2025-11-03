@@ -1,0 +1,64 @@
+Configuration:
+  name: Default
+  status: error
+  Appenders:
+    Console:
+    - name: sub-0
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "\
+          %d{yyyy-MM-dd HH:mm:ss.SSS} \
+          %highlight{%-5level} \
+          %notEmpty{W=%X{workerID} }\
+          %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
+          %notEmpty{%marker }\
+          %c{1} - %m%n"
+    - name: sub-0-mod
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "\
+          %d{yyyy-MM-dd HH:mm:ss.SSS} \
+          %highlight{%-5level} \
+          %notEmpty{W=%X{workerID} }\
+          %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
+          %notEmpty{%marker }\
+          ext.%c{1} - %m%n"
+    - name: externals
+      target: SYSTEM_OUT
+      PatternLayout:
+        # Possible Layouts:
+        # 2022-09-07T14:33:06.027 INFO  ClassName - message
+        # 2022-09-07T14:33:06.027 ERROR [wid:something] ClassName - message
+        # 2022-09-07T14:33:06.027 WARN  [rid:12345] ClassName - message
+        #
+        # Technically possible, but shouldn't ever happen:
+        # 2022-09-07T14:33:06.027 DEBUG [wid:something][rid:12345] ClassName - message
+        pattern: "\
+          %d{yyyy-MM-dd HH:mm:ss.SSS} \
+          %highlight{%-5level} \
+          %notEmpty{W=%X{workerID} }\
+          %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
+          %notEmpty{%marker }\
+          %c{1.1.1.*} - %m%n"
+
+  Loggers:
+    Root:
+      level: warn
+      AppenderRef:
+      - ref: externals
+    Logger:
+    - name: vdi
+      level: debug
+      additivity: false
+      AppenderRef:
+      - ref: sub-0
+    - name: init
+      level: debug
+      additivity: false
+      AppenderRef:
+      - ref: sub-0
+    - name: org.veupathdb.lib
+      level: info
+      additivity: false
+      AppenderRef:
+      - ref: sub-0-mod

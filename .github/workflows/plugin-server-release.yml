@@ -1,0 +1,111 @@
+name: Release Plugin Server
+
+on:
+  workflow_dispatch: { }
+  push:
+    tags:
+    - v*
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ./.github/actions/build-plugin-server
+      with:
+        gh-token: ${{ secrets.GH_TOKEN }}
+        gh-user: ${{ secrets.GH_USERNAME }}
+
+    - name: Calc Short Tag
+      id: short-tag
+      run: |
+        echo tag=$(git describe --tags 2>/dev/null || cat <(echo -n untagged-) <(git rev-parse HEAD | cut -c1-8)) >> $GITHUB_OUTPUT
+        echo branch=$(git branch --show-current) >> $GITHUB_OUTPUT
+
+    - name: Run ShadowJar
+      env:
+        GH_USERNAME: ${{ secrets.GH_USERNAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GH_TAG: ${{ github.ref_type == 'tag' && github.ref_name}}
+      run: | 
+        gradle \
+          -Pbuild.git.tag="${{ steps.short-tag.outputs.tag }}" \
+          -Pbuild.git.commit="${GITHUB_SHA}" \
+          -Pbuild.git.branch="${{ steps.short-tag.outputs.tag }}" \
+          -Pbuild.git.url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+          -Pbuild.ci.id="${GITHUB_RUN_ID}" \
+          -Pbuild.ci.number="${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}" \
+          :plugin-server:shadowJar
+
+    - name: Create Server Archive
+      run: |-
+        mkdir -p tmp/etc/vdi
+        cp project/plugin-server/build/libs/service.jar tmp
+        cp project/plugin-server/startup.sh tmp
+        cd tmp
+        tar -czf plugin-server.tar.gz *
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        prerelease: ${{contains(github.ref_name, '-')}}
+        draft: false
+        files: tmp/plugin-server.tar.gz
+        generate_release_notes: true
+
+  plugin-bigwig:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-bigwig/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
+    with:
+      tag: ${{ github.ref_name }}
+      plugin: bigwig
+  plugin-example:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-example/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
+    with:
+      tag: ${{ github.ref_name }}
+      plugin: example
+  plugin-genelist:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-genelist/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
+    with:
+      tag: ${{ github.ref_name }}
+      plugin: genelist
+  plugin-isasimple:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-isasimple/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
+    with:
+      tag: ${{ github.ref_name }}
+      plugin: isasimple
+  plugin-noop:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-noop/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
+    with:
+      tag: ${{ github.ref_name }}
+      plugin: noop
+  plugin-rnaseq:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-rnaseq/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
+    with:
+      tag: ${{ github.ref_name }}
+      plugin: rnaseq
+  plugin-wrangler:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-wrangler/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
+    with:
+      tag: ${{ github.ref_name }}
+      plugin: wrangler

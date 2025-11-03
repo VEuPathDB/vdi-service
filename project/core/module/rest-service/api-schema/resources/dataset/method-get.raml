@@ -1,0 +1,32 @@
+#%RAML 1.0 Method
+
+displayName: Dataset Details
+
+# language=markdown
+description: |
+  Fetch details about a dataset and its status(es).
+
+  If the target dataset has just been posted, this endpoint may return a
+  404 for several seconds until the post has been asynchronously processed.
+
+responses:
+  200:
+    description: Target dataset was located and returned.
+    body: lib.DatasetDetails
+  301:
+    # language=markdown
+    description: |
+      Target dataset has been moved, by replacement, and has a new VDI ID.
+    headers:
+      Location:
+        type: string
+        description: URL to the newest dataset revision.
+        required: true
+  401:
+    body: lib.UnauthorizedError
+  404:
+    body: lib.NotFoundError
+  425:
+    body:
+  500:
+    body: lib.ServerError

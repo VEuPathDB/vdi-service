@@ -1,0 +1,11 @@
+#%RAML 1.0 Resource
+
+displayName: Dataset by ID
+
+uriParameters:
+  vdi-id: lib.VdiId
+
+get: !include method-get.raml
+patch: !include method-patch.raml
+put: !include method-put.raml
+delete: !include method-delete.raml

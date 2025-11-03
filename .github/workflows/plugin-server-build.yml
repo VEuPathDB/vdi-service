@@ -1,0 +1,29 @@
+name: Build Plugin Server
+
+on:
+  workflow_dispatch: {}
+  workflow_call: {}
+  pull_request_target:
+    branches:
+    - main
+    types:
+    - opened
+    - synchronize
+    - reopened
+    - ready_for_review
+    paths:
+    - 'project/common/**'
+    - 'project/plugin-server/**'
+    - 'project/conventions/**'
+    - 'gradle/common.versions.toml'
+    - 'gradle/libs.versions.toml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ./.github/actions/build-plugin-server
+      with:
+        gh-token: ${{ secrets.GH_TOKEN }}
+        gh-user: ${{ secrets.GH_USERNAME }}

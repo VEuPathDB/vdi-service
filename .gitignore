@@ -1,41 +1,93 @@
-.gradle/
-.idea/
-.tools/
-.bin/
-.settings/
-.kotlin/
-build/
-/vendor/
-/bin/
-/tmp/
-/*ssh*
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     General Exclusions                                                   ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
 
-.envrc
-merged-compose.yml
+# dot-files
+.*
+!.github/
+!.gitignore
+!.gitattributes
+!.dockerignore
 
+# Editor backups
 *.tmp
 *.bak
 *.swp
+*~
+*.log
+
+# Compiled outputs
 *.jar
 
-local.properties
-.loadpath
-.recommenders
+vendor/
+bin/
+tmp/
 
-!gradle-wrapper.jar
-/run.sh
-.env
 
-.classpath
-.project
-.settings
-*~
-.*~
+project/docs/
 
-# Secrets
-deploy/secrets/*.yml
-vault-init.sh
-keys/
-deploy/
-docker-compose.ssh.yml
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     VEuPathDB Specifics                                                  ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
+
+*ssh*
 host-list.yml
+
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     Editors and IDEs                                                     ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
+
+# Eclipse
+.settings/
+*.launch
+*.pydevproject
+.factorypath
+.buildpath
+.springBeans
+.recommenders
+.cache-main
+.scala_dependencies
+.worksheet
+.project
+.loadpath
+local.properties
+.classpath
+.settings
+
+# IntelliJ
+.idea/
+!.idea/inspectionProfiles/
+!.idea/codeStyles/
+*.iml
+
+# VS Code
+.vscode/
+
+# Gradle
+.gradle/
+build/
+!gradle-wrapper.jar
+
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
+# ┃                                                                          ┃ #
+# ┃     Language Specifics                                                   ┃ #
+# ┃                                                                          ┃ #
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ #
+
+# Kotlin
+kotlin.properties
+.kotlin
+
+# NodeJS
+node_modules/
+
+# Python
+venv/

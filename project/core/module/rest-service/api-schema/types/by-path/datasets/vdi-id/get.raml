@@ -1,0 +1,104 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../common.raml
+
+types:
+
+  DatasetDetails:
+    displayName: Dataset Details
+    description: Details about a specific singular dataset.
+    type: common.DatasetMetaBase
+    additionalProperties: false
+    properties:
+      datasetId: common.VdiId
+
+      type: common.DatasetTypeOutput
+      visibility: common.DatasetVisibility
+      owner: common.DatasetOwner
+      created: common.DatasetCreationDate
+      sourceUrl?: common.DatasetSourceUrl
+      revisionHistory?: common.RevisionHistory
+
+      relatedDatasets?:
+        displayName: Implicitly Related Datasets
+        # language=markdown
+        description: |-
+          Datasets that are implicitly related to the dataset represented by
+          this object by way of sharing a common project name or program name,
+          or by having one or more publications in common.
+        type: RelatedDatasetInfo[]
+        uniqueItems: true
+
+      importMessages?:
+        # language=markdown
+        description: |
+          Log lines from the import process.
+
+          These messages will be warnings and/or validation errors.
+        type: string[]
+      shares?:
+        # language=markdown
+        description: |
+          Array of share offers that have been created by the owner of this
+          dataset to share it with other users.
+        type: ShareOffer[]
+
+      status: common.DatasetStatusInfo
+
+  RelatedDatasetInfo:
+    type: object
+    properties:
+      datasetId: common.VdiId
+      type: common.DatasetTypeOutput
+      name: common.DatasetName
+      summary: common.DatasetSummary
+      created: common.DatasetCreationDate
+      relatedBy: ImplicitRelation
+    additionalProperties: false
+
+  ImplicitRelation:
+    type: object
+    discriminator: relationType
+    properties:
+      relationType: ImplicitRelationType
+    additionalProperties: false
+
+  ImplicitRelationType:
+    type: string
+    enum: [ "publication", "program-name", "project-name"]
+
+  RelationByPublication:
+    type: ImplicitRelation
+    discriminatorValue: publication
+    properties:
+      identifier: common.DatasetPublicationIdentifier
+      type: common.DatasetPublicationType
+    additionalProperties: false
+
+  RelationByProgramName:
+    type: ImplicitRelation
+    discriminatorValue: program-name
+    additionalProperties: false
+
+  RelationByProjectName:
+    type: ImplicitRelation
+    discriminatorValue: project-name
+    additionalProperties: false
+
+  ShareOffer:
+    displayName: Dataset Share Offer
+    additionalProperties: false
+    properties:
+      recipient: ShareOfferRecipient
+      status: common.ShareOfferAction
+
+  ShareOfferRecipient:
+    displayName: Dataset Share Recipient
+    additionalProperties: false
+    properties:
+      userId: common.UserId
+      firstName?: string
+      lastName?: string
+      organization?: string
+      email?: string

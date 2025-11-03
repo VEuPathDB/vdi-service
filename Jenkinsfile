@@ -8,6 +8,7 @@ node('centos8') {
 
   builder.gitClone()
   builder.buildContainers([
-    [ name: 'vdi-service' ],
+    [ name: 'vdi-service', dockerfile: 'project/core/Dockerfile' ],
+    [ name: 'vdi-internal-db', path: 'stack-db/definition' ]
   ])
 }

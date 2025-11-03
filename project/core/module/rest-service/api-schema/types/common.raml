@@ -1,0 +1,562 @@
+#%RAML 1.0 Library
+
+uses:
+  error: https://raw.githubusercontent.com/VEuPathDB/docs-api-schema/v2.4.0/libraries/errors.raml
+
+types:
+  BioprojectIDReference:
+    type: object
+    additionalProperties: false
+    properties:
+      id:
+        type: string
+        minLength: 4
+        maxLength: 64
+      description?: string
+
+  DatasetContact:
+    displayName: Dataset Contact
+    additionalProperties: false
+    properties:
+      firstName?:
+        # language=markdown
+        description: >-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
+        minLength: 1
+        maxLength: 300
+      middleName?:
+        type: string
+        minLength: 1
+        maxLength: 300
+      lastName?:
+        # language=markdown
+        description: >-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
+        type: string
+        minLength: 1
+        maxLength: 300
+      isPrimary?:
+        description: Only one contact may be marked as primary.
+        type: boolean
+        default: false
+      email?:
+        # language=markdown
+        description: >-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
+        type: string
+        minLength: 5
+        maxLength: 4000
+      affiliation?:
+        displayName: Organization
+        # language=markdown
+        description: >-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
+        type: string
+        maxLength: 4000
+      country?:
+        # language=markdown
+        description: >-
+          Required if:
+          * `isPrimary` is `true`
+          * Install target is MBio or ClinEpi
+          * Dataset is public/community
+        type: string
+        maxLength: 200
+
+  DatasetCreationDate:
+    displayName: Dataset Creation Date
+    description: Timestamp of the creation of the dataset
+    type: datetime
+
+  DatasetDependency:
+    displayName: Dataset Dependency
+    additionalProperties: false
+    properties:
+      resourceIdentifier:
+        type: string
+        minLength: 3
+        maxLength: 50
+      resourceDisplayName:
+        type: string
+        minLength: 3
+        maxLength: 100
+      resourceVersion:
+        type: string
+        minLength: 1
+        maxLength: 50
+
+  DatasetDescription:
+    displayName: Dataset Description
+    type: string
+    description: Longform description of the dataset.
+
+  DatasetFundingAward:
+    type: object
+    additionalProperties: false
+    properties:
+      agency:
+        type: string
+        minLength: 3
+        maxLength: 256
+      awardNumber:
+        type: string
+        minLength: 3
+        maxLength: 64
+
+  DatasetHyperlink:
+    displayName: Dataset Hyperlink
+    type: object
+    additionalProperties: false
+    properties:
+      url:
+        type: string
+        minLength: 7
+        maxLength: 200
+      description?:
+        type: string
+        maxLength: 4000
+
+  DatasetImportStatus:
+    displayName: Dataset Import Status
+    description: |
+      Import status of the dataset.
+
+      | Value         | Description                                                           |
+      |---------------|-----------------------------------------------------------------------|
+      | `queued`      | The dataset has not yet been processed and is waiting in the queue.   |
+      | `in-progress` | The dataset is currently being import processed.                      |
+      | `complete`    | The dataset has been processed and imported for installation.         |
+      | `invalid`     | The dataset failed import validation.                                 |
+      | `failed`      | The dataset import failed due to an internal server error.            |
+
+    type: string
+    enum:
+    - queued
+    - in-progress
+    - complete
+    - invalid
+    - failed
+
+  DatasetInstallStatus:
+    displayName: Dataset Install Status
+    type: string
+    enum:
+    - running
+    - complete
+    - failed-validation
+    - failed-installation
+    - ready-for-reinstall
+    - missing-dependency
+
+  DatasetInstallStatusEntry:
+    displayName: Dataset Install Target Status
+    description: Entry in a list of install statuses for a dataset.
+    additionalProperties: false
+    properties:
+      installTarget: InstallTargetID
+      metaStatus: DatasetInstallStatus
+      metaMessage?: string
+      dataStatus?: DatasetInstallStatus
+      dataMessage?: string
+
+  DatasetMetaBase:
+    displayName: Dataset Meta Base Fields
+    # language=markdown
+    description: |
+      Field definitions common to all dataset metadata representations
+      throughout the VDI REST API endpoints.
+      
+      Metadata fields that are omitted from this type are subtype dependent
+      on API context.
+    type: object
+    properties:
+      # type: (different based on subtype)
+      installTargets:
+        description: IDs of the projects this dataset is being submitted to.
+        type: InstallTargetID[]
+        minItems: 1
+        uniqueItems: true
+      # visibility: (optional in POST subtype, required in GET subtype)
+      # owner: (only present in responses, requests get this from the user session)
+      name: DatasetName
+      summary: DatasetSummary
+      description?: DatasetDescription
+      origin: DatasetOrigin
+      # created: (only present in responses and admin override requests)
+      # sourceUrl: (only present in responses)
+      dependencies:
+        type: DatasetDependency[]
+        uniqueItems: true
+      publications?:
+        type: DatasetPublication[]
+        uniqueItems: true
+      contacts?:
+        type: DatasetContact[]
+        uniqueItems: true
+      projectName?:
+        # language=markdown
+        description: >-
+          Required if:
+          * Install target is MBio or ClinEpi
+        type: DatasetProjectName
+      programName?:
+        description: >-
+          Required if:
+          * Install target is MBio or ClinEpi
+        type: DatasetProgramName
+      linkedDatasets?:
+        displayName: Explicitly Related Datasets
+        # language=markdown
+        description: |-
+          Other studies or datasets that the user is explicitly indicating are
+          related to the dataset represented by this metadata object.
+        type: LinkedDataset[]
+        uniqueItems: true
+      experimentalOrganism?:
+        # language=markdown
+        description: >-
+          Required for Genomics, VectorBase, and Microbiome.
+
+          Optional for ClinEpi.
+        type: DatasetOrganism
+      hostOrganism?: DatasetOrganism
+      characteristics?: DatasetCharacteristics
+      externalIdentifiers?: ExternalIdentifiers
+      funding?:
+        type: DatasetFundingAward[]
+        uniqueItems: true
+      shortAttribution?: ShortAttribution
+      # revisionHistory: (only present in response types)
+    additionalProperties: false
+
+  DatasetName:
+    displayName: Dataset Name
+    type: string
+    description: User-provided name for the dataset.
+    minLength: 3
+    maxLength: 1024
+
+  DatasetOrganism:
+    type: object
+    additionalProperties: false
+    properties:
+      species: string
+      strain: string
+
+  DatasetOrigin:
+    displayName: Dataset Origin
+    description: |
+      String representing the origin of the dataset.  Examples include
+      `direct-upload`, `nephele`, or `galaxy`.
+    type: string
+    minLength: 3
+    maxLength: 256
+
+  DatasetOwner:
+    displayName: Dataset Owner
+    description: Details about the owner of a VDI dataset.
+    additionalProperties: false
+    properties:
+      userId: UserId
+      firstName?: string
+      lastName?: string
+      email?: string
+      organization?: string
+
+  DatasetProjectName:
+    displayName: Project Name
+    type: string
+    minLength: 1
+    maxLength: 256
+
+  DatasetProgramName:
+    displayName: Program Name
+    type: string
+    minLength: 1
+    maxLength: 256
+
+  DatasetPublication:
+    displayName: Dataset Publication
+    additionalProperties: false
+    properties:
+      identifier: DatasetPublicationIdentifier
+      type?: DatasetPublicationType
+      citation?:
+        type: string
+        minLength: 3
+        maxLength: 2000
+      isPrimary?:
+        description: Only one publication may be marked as primary.
+        type: boolean
+        default: false
+
+  DatasetPublicationIdentifier:
+    type: string
+    minLength: 3
+    maxLength: 30
+
+  DatasetPublicationType:
+    type: string
+    enum: [ pmid, doi ]
+    default: pmid
+
+  DatasetRevision:
+    displayName: Dataset Revision
+    description: Dataset revision history entry.
+    additionalProperties: false
+    properties:
+      action: DatasetRevisionAction
+      timestamp: datetime
+      revisionId: VdiId
+      revisionNote: DatasetRevisionNote
+      fileListUrl:
+        description: URL to the file listing for the revision entry.
+        type: string
+
+  DatasetRevisionNote:
+    displayName: Dataset Revision Note
+    description: Note providing a reason and/or description for the revision.
+    type: string
+    minLength: 10
+    maxLength: 4096
+
+  DatasetRevisionAction:
+    displayName: Dataset Revision Action
+    type: string
+    enum:
+    - create
+    - extend
+    - revise
+
+  DatasetSourceUrl:
+    description: |
+      URL of the dataset data source, if the dataset was uploaded via URL.
+    type: string
+
+  DatasetStatusInfo:
+    description: Information about the import and install status of a dataset.
+    additionalProperties: false
+    properties:
+      import: DatasetImportStatus
+      install?: DatasetInstallStatusEntry[]
+
+  DatasetSummary:
+    description: Brief summary of the dataset.
+    type: string
+    minLength: 3
+    maxLength: 4000
+
+  DatasetTypeOutput:
+    description: Details about a specific dataset type.
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        minLength: 3
+      version:
+        type: string
+        minLength: 1
+      displayName:
+        type: string
+        minLength: 3
+
+  DatasetTypeInput:
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        minLength: 3
+        maxLength: 128
+      version:
+        type: string
+        minLength: 1
+        maxLength: 32
+
+  DatasetVisibility:
+    type: string
+    enum:
+    - private
+    - protected
+    - public
+
+  ShortName:
+    type: string
+    minLength: 3
+    maxLength: 20
+
+  ShortAttribution:
+    type: string
+    minLength: 3
+    maxLength: 40
+
+  DOIReference:
+    type: object
+    additionalProperties: false
+    properties:
+      doi:
+        type: string
+        minLength: 6
+        maxLength: 128
+      description?: string
+
+  ExternalIdentifiers:
+    type: object
+    additionalProperties: false
+    properties:
+      dois?:
+        type: DOIReference[]
+        uniqueItems: true
+      hyperlinks?:
+        type: DatasetHyperlink[]
+        uniqueItems: true
+      bioprojectIds?:
+        type: BioprojectIDReference[]
+        uniqueItems: true
+
+  PartialDate:
+    displayName: Partial Datetime
+    description: |
+      Subset of the RFC3339 format, requiring at least the 4 digit year, and may
+      include additional precision, part by part.  Each part must be 'complete'
+      and include standard preceding segment delimiters.
+
+      Date segments that are omitted will be defaulted to the minimum valid
+      value for that segment.  For example, If only the year value is provided,
+      the assumed remainder is `-01-01T00:00:00.000Z`.
+
+      Examples:
+      * `2022`
+      * `2022-03`
+      * `2022-03-15`
+      * `2022-03-15T16`
+      * `2022-03-15T16:30`
+      * `2022-03-15T16:30:12`
+      * `2022-03-15T16:30:12Z`
+      * `2022-03-15T16:30:12+04:00`
+      * `2022-03-15T16:30:12.123Z`
+      * `2022-03-15T16:30:12.123-06:00`
+    type: string
+    minLength: 4
+
+  InstallTargetID:
+    description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".
+    type: string
+    minLength: 5
+    maxLength: 32
+
+  LinkedDataset:
+    type: object
+    additionalProperties: false
+    properties:
+      datasetUri: string
+      sharesRecords: boolean
+
+  RevisionHistory:
+    type: object
+    additionalProperties: false
+    properties:
+      originalId: VdiId
+      revisions: DatasetRevision[]
+
+  SampleYearRange:
+    type: object
+    additionalProperties: false
+    properties:
+      start:
+        type: integer
+        format: int16
+        minimum: 1500
+        maximum: 2500
+      end:
+        type: integer
+        format: int16
+        minimum: 1500
+        maximum: 2500
+
+  ShareOfferAction:
+    type: string
+    enum:
+    - grant
+    - revoke
+
+  ShareReceiptAction:
+    type: string
+    enum:
+    - accept
+    - reject
+
+  DatasetCharacteristics:
+    type: object
+    additionalProperties: false
+    properties:
+      studyDesign?:
+        description: Required for ClinEpi
+        type: string
+      studyType?:
+        description: Required for ClinEpi
+        type: string
+      countries?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      years?: SampleYearRange
+      studySpecies?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      diseases?:
+        description: Diseases or health conditions
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      associatedFactors?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+      participantAges?:
+        type: string
+        minLength: 1
+        maxLength: 128
+      sampleTypes?:
+        type: array
+        items:
+          type: string
+          minLength: 3
+          maxLength: 128
+        uniqueItems: true
+
+  UserId:
+    description: VEuPathDB User ID
+    type: integer
+    format: int64
+    minimum: 1
+    maximum: 9223372036854775807
+
+  VdiId:
+    description: VDI dataset identifier
+    type: string
+    pattern: ^[a-zA-Z0-9_-]+$

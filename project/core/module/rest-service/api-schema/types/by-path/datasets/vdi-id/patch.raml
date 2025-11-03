@@ -1,0 +1,230 @@
+#%RAML 1.0 Library
+
+uses:
+  common: ../../../common.raml
+
+types:
+  DatasetPatchRequestBody:
+    displayName: Dataset Patch Request
+    # language=markdown
+    description: |-
+      Request to update the metadata for a dataset.
+
+      Fields that are omitted will be ignored when updating the target dataset
+      record.
+        
+      Fields that are present, with a `value` of `null` indicate the intent to
+      remove the field from the dataset metadata.  All other values provided
+      will be used to replace the existing dataset metadata value.
+    type: object
+    additionalProperties: false
+    properties:
+      type?: DatasetTypePatch
+      visibility?: VisibilityPatch
+      name?: StringPatch
+      summary?: StringPatch
+      description?: StringPatch
+      publications?: PublicationsPatch
+      contacts?: ContactsPatch
+      projectName?: StringPatch
+      programName?: StringPatch
+      linkedDatasets?: LinkedDatasetPatch
+      experimentalOrganism?: OrganismPatch
+      hostOrganism?: OrganismPatch
+      characteristics?: DatasetCharacteristicsPatch
+      externalIdentifiers?: ExternalIdentifiersPatch
+      funding?: FundingPatch
+      shortAttribution?: StringPatch
+
+  ContactsPatch:
+    # language=markdown
+    description: |-
+      If the dataset visibility is not `private`, the only valid action is
+      `replace`.
+    type: object
+    properties:
+      value?:
+        type: common.DatasetContact[]
+        uniqueItems: true
+    additionalProperties: false
+
+  DatasetCharacteristicsPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      studyDesign?:
+        # language=markdown
+        description: |-
+          If the install targets array contains ClinEpiDB, the only valid
+          action is `replace`.
+        type: object
+        properties:
+          value?: string
+        additionalProperties: false
+
+      studyType?:
+        # language=markdown
+        description: |-
+          If the install targets array contains ClinEpiDB, the only valid
+          action is `replace`.
+        type: object
+        properties:
+          value?: string
+        additionalProperties: false
+
+      countries?:
+        type: object
+        properties:
+          value?:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+
+      years?:
+        type: object
+        properties:
+          value?: SampleYearRange
+        additionalProperties: false
+
+      studySpecies?:
+        type: object
+        properties:
+          value?:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+
+      diseases?:
+        type: object
+        properties:
+          value?:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+
+      associatedFactors?:
+        type: object
+        properties:
+          value?:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+
+      participantAges?:
+        type: object
+        properties:
+          value?:
+            type: string
+            minLength: 1
+            maxLength: 128
+        additionalProperties: false
+
+      sampleTypes?:
+        type: object
+        properties:
+          value?:
+            type: array
+            items:
+              type: string
+              minLength: 3
+              maxLength: 128
+            uniqueItems: true
+        additionalProperties: false
+
+  DatasetTypePatch:
+    # language=markdown
+    description: |-
+      If present, the only valid action is `replace`.
+
+      Only permitted when transitioning from a none-type dataset into an
+      actual dataset type.
+    type: object
+    properties:
+      value?: common.DatasetTypeInput
+    additionalProperties: false
+
+  ExternalIdentifiersPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      dois?:
+        type: object
+        properties:
+          value?:
+            type: common.DOIReference[]
+            uniqueItems: true
+        additionalProperties: false
+      hyperlinks?:
+        type: object
+        properties:
+          value?:
+            type: common.DatasetHyperlink[]
+            uniqueItems: true
+        additionalProperties: false
+      bioprojectIds?:
+        type: object
+        properties:
+          value?:
+            type: common.BioprojectIDReference[]
+            uniqueItems: true
+        additionalProperties: false
+
+  FundingPatch:
+    type: object
+    properties:
+      value?:
+        type: common.DatasetFundingAward[]
+        uniqueItems: true
+    additionalProperties: false
+
+  LinkedDatasetPatch:
+    type: object
+    properties:
+      value?:
+        type: common.LinkedDataset[]
+        uniqueItems: true
+    additionalProperties: false
+
+  OrganismPatch:
+    type: object
+    properties:
+      value?: common.DatasetOrganism
+    additionalProperties: false
+
+  PublicationsPatch:
+    type: object
+    properties:
+      value?:
+        type: common.DatasetPublication[]
+        uniqueItems: true
+    additionalProperties: false
+
+  StringPatch:
+    type: object
+    properties:
+      value: string
+    additionalProperties: false
+
+  VisibilityPatch:
+    # language=markdown
+    description: If present, the only valid action is `replace`.
+    type: object
+    properties:
+      value?: common.DatasetVisibility
+    additionalProperties: false
