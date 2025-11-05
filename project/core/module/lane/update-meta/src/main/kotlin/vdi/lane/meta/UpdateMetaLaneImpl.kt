@@ -66,7 +66,7 @@ internal class UpdateMetaLaneImpl(
         while (!isShutDown()) {
           kc.fetchMessages(config.eventKey)
             .forEach {
-              log.info("Received install-meta job for dataset {}/{} from source {}", it.userID, it.datasetID, it.eventSource)
+              logger.info("Received install-meta job for dataset {}/{} from source {}", it.userID, it.datasetID, it.eventSource)
               wp.submit { updateMetaIfNotInProgress(dm, kr, it) }
             }
         }
@@ -87,27 +87,27 @@ internal class UpdateMetaLaneImpl(
         datasetsInProgress.remove(msg.datasetID)
       }
     } else {
-      log.info("meta update already in progress for dataset {}/{}, ignoring meta event", msg.userID, msg.datasetID)
+      logger.info("meta update already in progress for dataset {}/{}, ignoring meta event", msg.userID, msg.datasetID)
     }
   }
 
   private suspend fun tryUpdateMeta(dm: DatasetObjectStore, kr: KafkaRouter, msg: EventMessage) {
     try {
       if (msg.eventSource == EventSource.UpdateMetaLane) {
-        log.warn("attempted to recurse update meta on dataset ${msg.userID}/${msg.datasetID}")
+        logger.warn("attempted to recurse update meta on dataset ${msg.userID}/${msg.datasetID}")
       } else {
         updateMeta(dm, msg.userID, msg.datasetID)
         kr.sendReconciliationTrigger(msg.userID, msg.datasetID, EventSource.UpdateMetaLane)
       }
     } catch (e: PluginException) {
-      e.log(log::error)
+      e.log(logger::error)
     } catch (e: Throwable) {
-      PluginException.installMeta("N/A", "N/A", msg.userID, msg.datasetID, cause = e).log(log::error)
+      PluginException.installMeta("N/A", "N/A", msg.userID, msg.datasetID, cause = e).log(logger::error)
     }
   }
 
   private suspend fun updateMeta(dm: DatasetObjectStore, userID: UserID, datasetID: DatasetID) {
-    log.debug("Looking up dataset directory for dataset {}/{}", userID, datasetID)
+    logger.debug("Looking up dataset directory for dataset {}/{}", userID, datasetID)
 
     // lookup the dataset directory for the given userID and datasetID
     val dir = dm.getDatasetDirectory(userID, datasetID)
@@ -122,7 +122,7 @@ internal class UpdateMetaLaneImpl(
     // Load the dataset metadata from S3
     val datasetMeta   = dir.getMetaFile().load()!!
     val metaTimestamp = dir.getMetaFile().lastModified()!!
-    log.info("dataset {}/{} meta timestamp is {}", userID, datasetID, metaTimestamp)
+    logger.info("dataset {}/{} meta timestamp is {}", userID, datasetID, metaTimestamp)
 
     val timer = Metrics.MetaUpdates.duration
       .labels(datasetMeta.type.name.toString(), datasetMeta.type.version)
@@ -134,7 +134,7 @@ internal class UpdateMetaLaneImpl(
     // If no dataset record was found in the cache DB then this is (likely) the
     // first event for the dataset coming through the pipeline.
     if (cachedDataset == null) {
-      log.debug("dataset details were not found for dataset {}/{}, creating them", userID, datasetID)
+      logger.debug("dataset details were not found for dataset {}/{}, creating them", userID, datasetID)
       // If they were not found, construct them
       cacheDB.initializeDataset(datasetID, datasetMeta)
     }
@@ -142,7 +142,7 @@ internal class UpdateMetaLaneImpl(
     // Else if the dataset is marked as deleted already, then bail here.
     else {
       if (cachedDataset.isDeleted) {
-        log.info("refusing to update dataset {}/{} meta due to it being marked as deleted", userID, datasetID)
+        logger.info("refusing to update dataset {}/{} meta due to it being marked as deleted", userID, datasetID)
         return
       }
     }
@@ -160,7 +160,7 @@ internal class UpdateMetaLaneImpl(
     }
 
     val ph = PluginHandlers[datasetMeta.type] orElse {
-      log.error("dataset {}/{} declares a type of {}:{} which is unknown to the vdi service", userID, datasetID, datasetMeta.type.name, datasetMeta.type.version)
+      logger.error("dataset {}/{} declares a type of {}:{} which is unknown to the vdi service", userID, datasetID, datasetMeta.type.name, datasetMeta.type.version)
       return
     }
 
@@ -196,12 +196,12 @@ internal class UpdateMetaLaneImpl(
     userID: UserID,
   ) {
     if (!ph.appliesToProject(installTarget)) {
-      log.warn("dataset {}/{} declares a project id of {} which is not applicable to dataset type {}:{}", userID, datasetID, installTarget, meta.type.name, meta.type.version)
+      logger.warn("dataset {}/{} declares a project id of {} which is not applicable to dataset type {}:{}", userID, datasetID, installTarget, meta.type.name, meta.type.version)
       return
     }
 
     val appDb = appDB.accessor(installTarget, ph.type) orElse {
-      log.info("skipping dataset {}/{}, project {} update meta due to target being disabled", userID, datasetID, installTarget)
+      logger.info("skipping dataset {}/{}, project {} update meta due to target being disabled", userID, datasetID, installTarget)
       return
     }
 
@@ -210,7 +210,7 @@ internal class UpdateMetaLaneImpl(
       .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
 
     if (failed) {
-      log.info("skipping install-meta for dataset {}/{}, project {} due to previous failures", userID, datasetID, installTarget)
+      logger.info("skipping install-meta for dataset {}/{}, project {} due to previous failures", userID, datasetID, installTarget)
       return
     }
 
@@ -240,7 +240,7 @@ internal class UpdateMetaLaneImpl(
           it.updateDataset(record.copy(accessibility = meta.visibility))
         }
 
-        log.debug("upserting dataset meta record for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
+        logger.debug("upserting dataset meta record for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
         it.upsertDatasetMeta(datasetID, meta)
 
         it.deleteDatasetPublications(datasetID)
@@ -303,7 +303,7 @@ internal class UpdateMetaLaneImpl(
           ))
         }
       } catch (e: Throwable) {
-        log.error("exception while attempting to getOrCreate app db records for dataset $userID/$datasetID", e)
+        logger.error("exception while attempting to getOrCreate app db records for dataset $userID/$datasetID", e)
         it.rollback()
         throw e
       }
@@ -312,12 +312,12 @@ internal class UpdateMetaLaneImpl(
     val sync = appDB.accessor(installTarget, ph.type)!!.selectDatasetSyncControlRecord(datasetID)!!
 
     if (!sync.metaUpdated.isBefore(metaTimestamp)) {
-      log.info("skipping install-meta for dataset {}/{}, project {} as nothing has changed.", userID, datasetID, installTarget)
+      logger.info("skipping install-meta for dataset {}/{}, project {} as nothing has changed.", userID, datasetID, installTarget)
       return
     }
 
     appDB.withTransaction(installTarget, ph.type) {
-      log.debug("upserting install-meta message for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
+      logger.debug("upserting install-meta message for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
       it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
     }
 
@@ -350,13 +350,13 @@ internal class UpdateMetaLaneImpl(
         )
       }
     } catch (e: Throwable) {
-      log.info("install-meta request to handler server failed with exception:", e)
+      logger.info("install-meta request to handler server failed with exception:", e)
       appDB.withTransaction(installTarget, ph.type) {
         try {
           it.upsertInstallMetaMessage(datasetID, InstallStatus.FailedInstallation)
         } catch (e: SQLException) {
           if (e.errorCode == 1) {
-            log.info("unique key constraint violation on dataset {}/{} install meta, assuming race condition.", userID, datasetID)
+            logger.info("unique key constraint violation on dataset {}/{} install meta, assuming race condition.", userID, datasetID)
           } else {
             throw e
           }
@@ -369,7 +369,7 @@ internal class UpdateMetaLaneImpl(
   }
 
   private fun handleSuccessResponse(handler: PluginHandler, userID: UserID, datasetID: DatasetID, installTarget: InstallTargetID) {
-    log.info(
+    logger.info(
       "dataset handler server reports dataset {}/{} meta installed successfully into project {} via plugin {}",
       userID,
       datasetID,
@@ -394,7 +394,7 @@ internal class UpdateMetaLaneImpl(
     // Return the dataset if found
     selectDataset(datasetID)?.also { return it }
 
-    log.debug("inserting dataset record for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
+    logger.debug("inserting dataset record for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
 
     val record = DatasetRecord(
       datasetID       = datasetID,
@@ -414,7 +414,7 @@ internal class UpdateMetaLaneImpl(
 
       upsertInstallMetaMessage(datasetID, InstallStatus.Running)
 
-      log.debug("inserting sync control record for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
+      logger.debug("inserting sync control record for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
       insertDatasetSyncControl(SyncControlRecord(
         datasetID     = datasetID,
         sharesUpdated = OriginTimestamp,
@@ -429,7 +429,7 @@ internal class UpdateMetaLaneImpl(
     }
 
     try {
-      log.debug("inserting dataset project link for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
+      logger.debug("inserting dataset project link for dataset {}/{} into app db for project {}", userID, datasetID, installTarget)
       insertDatasetProjectLink(datasetID, installTarget)
     } catch (e: SQLException) {
       if (!isUniqueConstraintViolation(e))
@@ -446,7 +446,7 @@ internal class UpdateMetaLaneImpl(
     installTarget: InstallTargetID,
     res: vdi.core.plugin.client.response.inm.InstallMetaBadRequestResponse
   ) {
-    log.error(
+    logger.error(
       "dataset handler server reports 400 error for meta-install on dataset {}/{}, project {} via plugin {}",
       userID,
       datasetID,
@@ -464,7 +464,7 @@ internal class UpdateMetaLaneImpl(
     installTarget: InstallTargetID,
     res: InstallMetaUnexpectedErrorResponse,
   ) {
-    log.error(
+    logger.error(
       "dataset handler server reports 500 error for meta-install on dataset {}/{}, project {} via plugin {}",
       userID,
       datasetID,
@@ -477,17 +477,17 @@ internal class UpdateMetaLaneImpl(
 
   private fun DatasetDirectory.isUsable(userID: UserID, datasetID: DatasetID): Boolean {
     if (!exists()) {
-      log.warn("got an update-meta event for dataset {}/{} which has no directory?", userID, datasetID)
+      logger.warn("got an update-meta event for dataset {}/{} which has no directory?", userID, datasetID)
       return false
     }
 
     if (hasDeleteFlag()) {
-      log.info("got an update-meta event for dataset {}/{} which has a delete flag, ignoring it.", userID, datasetID)
+      logger.info("got an update-meta event for dataset {}/{} which has a delete flag, ignoring it.", userID, datasetID)
       return false
     }
 
     if (!hasMetaFile()) {
-      log.warn("got an update-meta event for dataset {}/{} which has no {} file?", userID, datasetID, DatasetMetaFilename)
+      logger.warn("got an update-meta event for dataset {}/{} which has no {} file?", userID, datasetID, DatasetMetaFilename)
       return false
     }
 

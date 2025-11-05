@@ -50,7 +50,7 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
         while (!isShutDown())
           kc.fetchMessages(config.eventMsgKey)
             .forEach { (userID, datasetID, source) ->
-              log.debug("submitting job to share worker pool for dataset {}/{} from source {}", datasetID, userID, source)
+              logger.debug("submitting job to share worker pool for dataset {}/{} from source {}", datasetID, userID, source)
               wp.submit { executeJob(userID, datasetID, dm) }
             }
       }

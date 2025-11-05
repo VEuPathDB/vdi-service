@@ -5,3 +5,4 @@ logging = { module = "common:logging" }
 model = { module = "common:model" }
 db-target = { module = "common:target-db" }
 util = { module = "common:util" }
+stack-io = { module = "common:stack-io" }

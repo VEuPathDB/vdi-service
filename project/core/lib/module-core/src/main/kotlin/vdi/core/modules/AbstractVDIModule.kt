@@ -24,7 +24,7 @@ import vdi.core.s3.DatasetObjectStore
  */
 abstract class AbstractVDIModule(
   protected val abortCB: AbortCB,
-  protected val log: Logger,
+  protected val logger: Logger,
 ) : VDIModule {
   private val shutdownTrigger = Trigger()
 
@@ -34,25 +34,25 @@ abstract class AbstractVDIModule(
 
   final override suspend fun start() {
     if (!started) {
-      log.info("module starting")
+      logger.info("module starting")
 
       started.set(true)
       try {
         run()
       } catch (e: Throwable) {
-        log.error("module execution failed", e)
+        logger.error("module execution failed", e)
         abortCB(e.message)
       }
     }
   }
 
   final override suspend fun stop() {
-    log.info("shutting down module")
+    logger.info("shutting down module")
 
     triggerShutdown()
     shutdownConfirm.await()
 
-    log.info("module shutdown confirmed")
+    logger.info("module shutdown confirmed")
   }
 
   /**
@@ -95,7 +95,7 @@ abstract class AbstractVDIModule(
     try {
       fn()
     } catch (e: Throwable) {
-      log.error("safeExec failed with error: $error", e)
+      logger.error("safeExec failed with error: $error", e)
       triggerShutdown()
       abortCB(e.message)
     }
@@ -169,7 +169,7 @@ abstract class AbstractVDIModule(
         if (it.key == key) {
           true
         } else {
-          log.warn("filtering out message with key {} as it does not match expected key {}", it.key, key)
+          logger.warn("filtering out message with key {} as it does not match expected key {}", it.key, key)
           false
         }
       }
@@ -177,7 +177,7 @@ abstract class AbstractVDIModule(
         try {
           JSON.readValue(it.value, EventMessage::class.java)
         } catch (e: Throwable) {
-          log.error("received invalid message body from Kafka: {}", it.value)
+          logger.error("received invalid message body from Kafka: {}", it.value)
           null
         }
       }

@@ -33,12 +33,12 @@ abstract class AbstractJobExecutor(
         try {
           runJob()
         } catch (e: Throwable) {
-          log.error("executor run failed with exception", e)
+          logger.error("executor run failed with exception", e)
           abortCB(e.message)
         }
       }
 
-      log.info("stopping module")
+      logger.info("stopping module")
 
       close()
       confirmShutdown()

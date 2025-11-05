@@ -13,14 +13,24 @@ import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import vdi.core.plugin.client.response.EmptyResponse
+import vdi.core.plugin.client.response.PluginResponse
+import vdi.core.plugin.client.response.ScriptErrorResponse
+import vdi.core.plugin.client.response.ServerErrorResponse
+import vdi.core.plugin.client.response.StreamResponse
+import vdi.core.plugin.client.response.ValidationResponse
 import vdi.logging.logger
-import vdi.core.plugin.client.response.imp.*
-import vdi.core.plugin.client.response.ind.*
-import vdi.core.plugin.client.response.inm.*
-import vdi.core.plugin.client.response.uni.*
-import vdi.model.api.internal.*
+import vdi.io.plugin.PluginEndpoint
+import vdi.io.plugin.requests.FormField
+import vdi.io.plugin.requests.ImportRequest
+import vdi.io.plugin.requests.InstallDataRequest
+import vdi.io.plugin.requests.InstallMetaRequest
+import vdi.io.plugin.requests.UninstallRequest
+import vdi.io.plugin.responses.PluginResponseStatus
+import vdi.logging.mark
+import vdi.model.EventID
 
-internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig) : PluginHandlerClient {
+internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig): PluginHandlerClient {
 
   private val log = logger<PluginHandlerClient>()
 
@@ -29,25 +39,32 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
 
   private fun resolve(ep: String) = baseUri.resolve(ep)
 
-  override suspend fun postImport(datasetID: DatasetID, meta: DatasetMetadata, upload: InputStream): ImportResponse {
+  override suspend fun postImport(
+    eventID: EventID,
+    datasetID: DatasetID,
+    meta: DatasetMetadata,
+    upload: InputStream,
+  ): PluginResponse {
+    val log = log.mark(eventID, datasetID)
+
     val multipart = MultiPart.createBody {
       withPart {
         fieldName = FormField.Details
         contentType(ContentType.JSON)
-        withBody(ImportRequest(datasetID, ImportCounter.nextIndex(), meta).toJSONString())
+        withBody(ImportRequest(eventID, datasetID, ImportCounter.nextIndex(), meta).toJSONString())
       }
 
       withPart {
         fieldName = FormField.Payload
-        fileName  = "import-ready.zip"
+        fileName = "import-ready.zip"
         contentType(ContentType.Zip)
         withBody(upload)
       }
     }
 
-    val uri = resolve(Endpoint.Import)
+    val uri = resolve(PluginEndpoint.Import)
 
-    log.debug("submitting import POST request to {} for dataset {}", uri, datasetID)
+    log.debug("submitting import POST request to {}", uri)
 
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
@@ -58,66 +75,76 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     ).await()
 
     return response.body().let { body ->
-      when (ImportResponseType.fromCode(response.statusCode())) {
-        ImportResponseType.Success
-        -> ImportSuccessResponseImpl(body)
+      when (val status = response.status) {
+        PluginResponseStatus.Success -> StreamResponse(status, body)
 
-        ImportResponseType.BadRequest
-        -> ImportBadRequestResponseImpl(JSON.readValue<SimpleErrorResponse>(body).message)
+        PluginResponseStatus.BasicValidationError -> ValidationResponse(status, JSON.readValue(body))
           .also { body.close() }
 
-        ImportResponseType.ValidationError
-        -> ImportValidationErrorResponseImpl(JSON.readValue<WarningResponse>(body).warnings)
+        PluginResponseStatus.CommunityValidationError -> StreamResponse(status, body)
+
+        PluginResponseStatus.ScriptError -> ScriptErrorResponse(JSON.readValue(body))
           .also { body.close() }
 
-        ImportResponseType.UnhandledError
-        -> ImportUnhandledErrorResponseImpl(JSON.readValue<SimpleErrorResponse>(body).message)
+        PluginResponseStatus.ServerError -> ServerErrorResponse(JSON.readValue(body))
           .also { body.close() }
+
+        else -> {
+          body.close()
+          throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
+        }
       }
     }
   }
 
-  override suspend fun postInstallMeta(datasetID: DatasetID, installTarget: InstallTargetID, meta: DatasetMetadata): InstallMetaResponse {
-    val uri = resolve(Endpoint.InstallMeta)
+  override suspend fun postInstallMeta(
+    eventID: EventID,
+    datasetID: DatasetID,
+    installTarget: InstallTargetID,
+    meta: DatasetMetadata,
+  ): PluginResponse {
+    val log = log.mark(eventID, datasetID)
+    val uri = resolve(PluginEndpoint.InstallMeta)
 
-    log.debug("submitting install-meta POST request to {} for project {} for dataset {}", uri, installTarget, datasetID)
+    log.debug("submitting install-meta POST request to {} for project {}", uri, installTarget)
 
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(InstallMetaRequest(datasetID, installTarget, meta).toJSONString()))
+        .POST(HttpRequest.BodyPublishers.ofString(InstallMetaRequest(eventID, datasetID, installTarget, meta).toJSONString()))
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()
 
-    return when (InstallMetaResponseType.fromCode(response.statusCode())) {
-      InstallMetaResponseType.Success
-      -> InstallMetaSuccessResponseImpl
+    return when (val status = response.status) {
+      PluginResponseStatus.Success -> EmptyResponse(status)
 
-      InstallMetaResponseType.BadRequest
-      -> InstallMetaBadRequestResponseImpl(JSON.readValue<SimpleErrorResponse>(response.body()).message)
+      PluginResponseStatus.BasicValidationError,
+      PluginResponseStatus.CommunityValidationError -> ValidationResponse(status, response.readJSON())
 
-      InstallMetaResponseType.UnexpectedError
-      -> InstallMetaUnexpectedErrorResponseImpl(
-        JSON.readValue<SimpleErrorResponse>(
-          response.body()
-        ).message
-      )
+      PluginResponseStatus.ScriptError -> ScriptErrorResponse(response.readJSON())
+
+      PluginResponseStatus.ServerError -> ServerErrorResponse(response.readJSON())
+
+      else -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
     }
   }
 
   override suspend fun postInstallData(
+    eventID: EventID,
     datasetID: DatasetID,
     installTarget: InstallTargetID,
     meta: InputStream,
     manifest: InputStream,
     payload: InputStream,
-  ): InstallDataResponse {
+  ): PluginResponse {
+    val log = log.mark(eventID, datasetID)
+
     val multipart = MultiPart.createBody {
       withPart {
         fieldName = FormField.Details
         contentType(ContentType.JSON)
-        withBody(InstallDataRequest(datasetID, installTarget).toJSONString())
+        withBody(InstallDataRequest(eventID, datasetID, installTarget).toJSONString())
       }
 
       withPart {
@@ -140,9 +167,9 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       }
     }
 
-    val uri = resolve(Endpoint.InstallData)
+    val uri = resolve(PluginEndpoint.InstallData)
 
-    log.debug("submitting install-data POST request to {} for project {} for dataset {}", uri, installTarget, datasetID)
+    log.debug("submitting install-data POST request to {} for project {}", uri, installTarget)
 
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
@@ -152,54 +179,55 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       HttpResponse.BodyHandlers.ofString()
     ).await()
 
-    return when(InstallDataResponseType.fromCode(response.statusCode())) {
-      InstallDataResponseType.Success
-      -> InstallDataSuccessResponseImpl(JSON.readValue<WarningResponse>(response.body()).warnings)
+    return when (val status = response.status) {
+      PluginResponseStatus.Success,
+      PluginResponseStatus.BasicValidationError,
+      PluginResponseStatus.CommunityValidationError -> ValidationResponse(status, response.readJSON())
 
-      InstallDataResponseType.BadRequest
-      -> InstallDataBadRequestResponseImpl(JSON.readValue<SimpleErrorResponse>(response.body()).message)
+      PluginResponseStatus.MissingDependencyError -> EmptyResponse(status)
 
-      InstallDataResponseType.ValidationFailure
-      -> InstallDataValidationFailureResponseImpl(
-        JSON.readValue<WarningResponse>(
-          response.body()
-        ).warnings
-      )
+      PluginResponseStatus.ServerError -> ServerErrorResponse(response.readJSON())
 
-      InstallDataResponseType.MissingDependencies
-      -> InstallDataMissingDependenciesResponseImpl(JSON.readValue<WarningResponse>(response.body()).warnings)
+      PluginResponseStatus.ScriptError -> ServerErrorResponse(response.readJSON())
 
-      InstallDataResponseType.UnexpectedError
-      -> InstallDataUnexpectedErrorResponseImpl(
-        JSON.readValue<SimpleErrorResponse>(
-          response.body()
-        ).message
-      )
+      else -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
     }
   }
 
-  override suspend fun postUninstall(datasetID: DatasetID, installTarget: InstallTargetID, type: DatasetType): UninstallResponse {
-    val uri = resolve(Endpoint.Uninstall)
+  override suspend fun postUninstall(
+    eventID: EventID,
+    datasetID: DatasetID,
+    installTarget: InstallTargetID,
+    type: DatasetType,
+  ): PluginResponse {
+    val log = log.mark(eventID, datasetID)
+    val uri = resolve(PluginEndpoint.Uninstall)
 
-    log.debug("submitting uninstall POST request to {} for project {} for dataset {} (type {})", uri, installTarget, datasetID, type.name)
+    log.debug(
+      "submitting uninstall POST request to {} for project {} (type {})",
+      uri,
+      installTarget,
+      type.name
+    )
 
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(UninstallRequest(datasetID, installTarget, type).toJSONString()))
+        .POST(HttpRequest.BodyPublishers.ofString(UninstallRequest(eventID, datasetID, installTarget, type).toJSONString()))
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()
 
-    return when(UninstallResponseType.fromCode(response.statusCode())) {
-      UninstallResponseType.Success
-      -> UninstallSuccessResponseImpl
-
-      UninstallResponseType.BadRequest
-      -> UninstallBadRequestResponseImpl(JSON.readValue<SimpleErrorResponse>(response.body()).message)
-
-      UninstallResponseType.UnexpectedError
-      -> UninstallUnexpectedErrorResponseImpl(JSON.readValue<SimpleErrorResponse>(response.body()).message)
+    return when (val status = response.status) {
+      PluginResponseStatus.Success -> EmptyResponse(status)
+      PluginResponseStatus.ScriptError -> ScriptErrorResponse(response.readJSON())
+      PluginResponseStatus.ServerError -> ScriptErrorResponse(response.readJSON())
+      else -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
     }
   }
+
+  private inline val HttpResponse<*>.status: PluginResponseStatus
+    get() = PluginResponseStatus.valueOf(statusCode())
+  private inline fun <reified T> HttpResponse<String>.readJSON() =
+    JSON.readValue<T>(body())
 }

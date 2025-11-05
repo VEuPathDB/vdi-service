@@ -10,6 +10,7 @@ dependencies {
   implementation(common.json)
   implementation(common.logging)
   implementation(common.model)
+  implementation(common.stack.io)
 
   implementation(libs.log.slf4j.api)
   implementation(libs.kt.coroutines)

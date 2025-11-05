@@ -18,14 +18,14 @@ internal class HardDeleteLaneImpl(private val config: HardDeleteLaneConfig, abor
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
           kc.fetchMessages(config.eventMsgKey)
-            .forEach { log.info("received hard-delete event for dataset {}/{} from {}", it.userID, it.datasetID, it.eventSource) }
+            .forEach { logger.info("received hard-delete event for dataset {}/{} from {}", it.userID, it.datasetID, it.eventSource) }
         }
       }
     }
 
-    log.info("closing kafka client")
+    logger.info("closing kafka client")
     kc.close()
-    log.info("kafka client closed")
+    logger.info("kafka client closed")
     confirmShutdown()
   }
 }

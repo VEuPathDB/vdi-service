@@ -18,7 +18,7 @@ internal class DatasetPrunerImpl(private val config: DatasetPrunerConfig, abortC
   override suspend fun runJob() {
     val start = now()
 
-    log.trace("testing whether we should be pruning S3")
+    logger.trace("testing whether we should be pruning S3")
 
     // If the last prune timestamp + the pruning duration is before (less
     // than) the current timestamp, then it is time to run a prune job.
@@ -28,7 +28,7 @@ internal class DatasetPrunerImpl(private val config: DatasetPrunerConfig, abortC
       // pruning job)
       pruneCount++
 
-      log.info("attempting to start S3 pruning job {}", pruneCount)
+      logger.info("attempting to start S3 pruning job {}", pruneCount)
 
       val end: Duration
 
@@ -42,13 +42,13 @@ internal class DatasetPrunerImpl(private val config: DatasetPrunerConfig, abortC
         // Since the pruning job executed, get a new timestamp for after the
         // job completed.
         end = now()
-        log.info("automatic S3 pruning job {} completed after {}", pruneCount, end - start)
+        logger.info("automatic S3 pruning job {} completed after {}", pruneCount, end - start)
         timer.observeDuration()
       } else {
         // Since the pruning job did not execute, there's no need to get a
         // new timestamp.
         end = start
-        log.info("automatic S3 pruning job {} skipped as a pruning job was already in progress", pruneCount)
+        logger.info("automatic S3 pruning job {} skipped as a pruning job was already in progress", pruneCount)
       }
 
       // Update the last pruned marker

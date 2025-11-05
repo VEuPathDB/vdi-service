@@ -1,5 +1,6 @@
 package vdi.core.kafka.router
 
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import vdi.model.data.DatasetID
 import vdi.model.data.UserID
@@ -8,6 +9,7 @@ import vdi.core.kafka.EventMessage
 import vdi.core.kafka.EventSource
 import vdi.core.kafka.KafkaMessage
 import vdi.core.kafka.KafkaProducer
+import vdi.util.events.EventIDs
 
 class KafkaRouter(
   private val config: KafkaRouterConfig,
@@ -42,7 +44,12 @@ class KafkaRouter(
     logger.debug("sending message {} for {}/{} from {}", tc, userID, datasetID, source)
     producer.send(
       tc.topic,
-      KafkaMessage(tc.messageKey, JSON.writeValueAsString(EventMessage(userID, datasetID, source)))
+      KafkaMessage(tc.messageKey, JSON.writeValueAsString(EventMessage(
+        runBlocking { EventIDs.issueID() },
+        userID,
+        datasetID,
+        source,
+      )))
     )
   }
 }

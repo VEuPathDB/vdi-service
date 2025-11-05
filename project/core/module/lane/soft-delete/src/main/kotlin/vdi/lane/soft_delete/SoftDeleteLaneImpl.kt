@@ -51,7 +51,7 @@ internal class SoftDeleteLaneImpl(
         while (!isShutDown()) {
           kc.fetchMessages(config.eventKey)
             .forEach { (userID, datasetID, source) ->
-              log.info("received uninstall job for dataset $userID/$datasetID from source $source")
+              logger.info("received uninstall job for dataset $userID/$datasetID from source $source")
               wp.submit { tryHandleUninstall(userID, datasetID) }
             }
         }
@@ -67,9 +67,9 @@ internal class SoftDeleteLaneImpl(
     try {
       handleUninstall(userID, datasetID)
     } catch (e: PluginException) {
-      e.log(log::error)
+      e.log(logger::error)
     } catch (e: Throwable) {
-      PluginException.uninstall("N/A", "N/A", userID, datasetID, cause = e).log(log::error)
+      PluginException.uninstall("N/A", "N/A", userID, datasetID, cause = e).log(logger::error)
     }
   }
 
@@ -87,7 +87,7 @@ internal class SoftDeleteLaneImpl(
 
     // Grab a plugin handler instance for this dataset type.
     val handler = PluginHandlers[internalDBRecord.type] orElse {
-      log.error("no plugin handler found for dataset {}/{} type {}:{}", userID, datasetID, internalDBRecord.type.name, internalDBRecord.type.version)
+      logger.error("no plugin handler found for dataset {}/{} type {}:{}", userID, datasetID, internalDBRecord.type.name, internalDBRecord.type.version)
       return
     }
 
@@ -95,12 +95,12 @@ internal class SoftDeleteLaneImpl(
     // uninstall on each.
     internalDBRecord.projects.forEach { projectID ->
       if (!handler.appliesToProject(projectID)) {
-        log.warn("type handler for dataset type {}:{} does not apply to project {} (dataset {}/{})", internalDBRecord.type.name, internalDBRecord.type.version, projectID, userID, datasetID)
+        logger.warn("type handler for dataset type {}:{} does not apply to project {} (dataset {}/{})", internalDBRecord.type.name, internalDBRecord.type.version, projectID, userID, datasetID)
         return@forEach
       }
 
       if (!AppDatabaseRegistry.contains(projectID, internalDBRecord.type)) {
-        log.warn("dataset {}/{} cannot be uninstalled from target project {} as the project is disabled", userID, datasetID, projectID)
+        logger.warn("dataset {}/{} cannot be uninstalled from target project {} as the project is disabled", userID, datasetID, projectID)
         return@forEach
       }
 
@@ -156,12 +156,12 @@ internal class SoftDeleteLaneImpl(
     val dataset = appDB.accessor(installTarget, dataType)!!.selectDataset(datasetID)
 
     if (dataset == null) {
-      log.warn("dataset {}/{} does not appear in target project {}, cannot run uninstall", userID, datasetID, installTarget)
+      logger.warn("dataset {}/{} does not appear in target project {}, cannot run uninstall", userID, datasetID, installTarget)
       return false
     }
 
     if (dataset.deletionState == DeleteFlag.DeletedAndUninstalled) {
-      log.info("dataset {}/{} has already been successfully uninstalled from target project {}", userID, datasetID, installTarget)
+      logger.info("dataset {}/{} has already been successfully uninstalled from target project {}", userID, datasetID, installTarget)
       return false
     }
 
@@ -169,7 +169,7 @@ internal class SoftDeleteLaneImpl(
   }
 
   private fun handleSuccessResponse(handler: PluginHandler, userID: UserID, datasetID: DatasetID, installTarget: InstallTargetID) {
-    log.info(
+    logger.info(
       "dataset handler server reports dataset {}/{} was successfully uninstalled from project {} via plugin {}",
       userID,
       datasetID,
@@ -187,7 +187,7 @@ internal class SoftDeleteLaneImpl(
     installTarget: InstallTargetID,
     res: UninstallBadRequestResponse
   ) {
-    log.error(
+    logger.error(
       "dataset handler server reports 400 error for uninstall on dataset {}/{} for project {} via plugin {}",
       userID,
       datasetID,
@@ -205,7 +205,7 @@ internal class SoftDeleteLaneImpl(
     installTarget: InstallTargetID,
     res: UninstallUnexpectedErrorResponse
   ) {
-    log.error(
+    logger.error(
       "dataset handler server reports 500 for uninstall on dataset {}/{} for project {} via plugin {}",
       userID,
       datasetID,

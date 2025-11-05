@@ -36,7 +36,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
     } catch (e: Throwable) {
       triggerShutdown()
       confirmShutdown()
-      log.error("failed to create a RabbitMQEventSource", e)
+      logger.error("failed to create a RabbitMQEventSource", e)
       abortCB(e.message)
     }
   }
@@ -47,7 +47,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
     } catch (e: Throwable) {
       triggerShutdown()
       confirmShutdown()
-      log.error("failed to create a KafkaRouterFactory", e)
+      logger.error("failed to create a KafkaRouterFactory", e)
       abortCB(e.message)
     }
   }
@@ -81,7 +81,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
     val path = event.objectKey.toDatasetPathOrNull().orElse {
       // If the event source object path was not for an object in the dataset
       // "directory" structure then warn and ignore it.
-      log.warn("received bucket event for unrecognized object: ${event.objectKey}")
+      logger.warn("received bucket event for unrecognized object: ${event.objectKey}")
       return
     }
 
@@ -142,11 +142,11 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
 
   private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: (UserID, DatasetID, EventSource) -> Unit) {
     try {
-      log.debug("TRACE - safeSend(userID={}, datasetID={}, fn=...)", userID, datasetID)
+      logger.debug("TRACE - safeSend(userID={}, datasetID={}, fn=...)", userID, datasetID)
       fn(userID, datasetID, EventSource.ObjectStore)
     } catch (e: Throwable) {
       triggerShutdown()
-      log.error("failed to send event message for {}/{}", userID, datasetID, e)
+      logger.error("failed to send event message for {}/{}", userID, datasetID, e)
       abortCB(e.message)
     }
   }
@@ -155,7 +155,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
     try {
       hasNext()
     } catch (e: Throwable) {
-      log.error("failed to poll RabbitMQ for next message", e)
+      logger.error("failed to poll RabbitMQ for next message", e)
       throw e
     }
 }

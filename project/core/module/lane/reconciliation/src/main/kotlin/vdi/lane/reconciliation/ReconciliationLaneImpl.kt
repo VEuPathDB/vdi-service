@@ -40,7 +40,7 @@ internal class ReconciliationLaneImpl(
         while (!isShutDown()) {
           kc.fetchMessages(config.eventMsgKey)
             .forEach { (userID, datasetID, source) ->
-              log.info("received reconciliation event for dataset {}/{} from source {}", userID, datasetID, source)
+              logger.info("received reconciliation event for dataset {}/{} from source {}", userID, datasetID, source)
               wp.submit { reconcile(userID, datasetID, source) }
             }
         }
@@ -60,7 +60,7 @@ internal class ReconciliationLaneImpl(
         datasetsInProgress.remove(datasetID)
       }
     } else {
-      log.info("dataset reconciliation already in progress for dataset {}/{}, skipping job", userID, datasetID)
+      logger.info("dataset reconciliation already in progress for dataset {}/{}, skipping job", userID, datasetID)
     }
   }
 }

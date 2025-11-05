@@ -29,7 +29,7 @@ internal class ReconcilerImpl(private val config: ReconcilerDaemonConfig, abortC
 
         // If the reconciler thread is disabled, just log a reminder.
         if (!config.reconcilerEnabled) {
-          log.warn("full reconciler disabled by config")
+          logger.warn("full reconciler disabled by config")
         } else {
           Recon.runFull()
         }

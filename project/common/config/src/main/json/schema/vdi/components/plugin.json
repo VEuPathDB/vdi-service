@@ -148,6 +148,12 @@
           },
           "uniqueItems": true,
           "unevaluatedItems": false
+        },
+        "usesDataDict": {
+          "title": "Enable Data Dictionaries",
+          "description": "Flag indicating whether the data type allows data-dictionary uploads.",
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [

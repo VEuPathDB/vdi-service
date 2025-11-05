@@ -1,6 +1,7 @@
 package vdi.core.plugin.client
 
+import vdi.io.plugin.responses.PluginResponseStatus
+
 interface PluginHandlerClientResponse {
-  val isSuccessResponse: Boolean
-  val responseCode: Int
+  val responseStatus: PluginResponseStatus
 }

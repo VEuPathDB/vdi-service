@@ -16,4 +16,6 @@ dependencies {
 
   implementation(common.logging)
   implementation(common.model)
+  implementation(common.stack.io)
+  implementation(common.util)
 }

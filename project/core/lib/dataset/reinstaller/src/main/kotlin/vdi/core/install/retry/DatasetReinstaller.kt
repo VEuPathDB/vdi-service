@@ -1,6 +1,7 @@
 package vdi.core.install.retry
 
 import kotlinx.coroutines.sync.Mutex
+import org.slf4j.Logger
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.errors.S34KError
 import vdi.model.data.InstallTargetID
@@ -16,14 +17,19 @@ import vdi.logging.logger
 import vdi.core.metrics.Metrics
 import vdi.core.plugin.client.PluginException
 import vdi.core.plugin.client.PluginRequestException
-import vdi.core.plugin.client.response.ind.*
-import vdi.core.plugin.client.response.uni.UninstallBadRequestResponse
-import vdi.core.plugin.client.response.uni.UninstallResponseType
-import vdi.core.plugin.client.response.uni.UninstallUnexpectedErrorResponse
+import vdi.core.plugin.client.response.MissingDependencyResponse
+import vdi.core.plugin.client.response.ScriptErrorResponse
+import vdi.core.plugin.client.response.ServerErrorResponse
+import vdi.core.plugin.client.response.StreamResponse
+import vdi.core.plugin.client.response.ValidationResponse
 import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.plugin.mapping.PluginHandlers
 import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
+import vdi.io.plugin.responses.PluginResponseStatus
+import vdi.logging.mark
+import vdi.model.EventID
+import vdi.util.events.EventIDs
 
 object DatasetReinstaller {
 
@@ -110,7 +116,8 @@ object DatasetReinstaller {
   }
 
   private suspend fun processDataset(dataset: DatasetRecord, installTarget: InstallTargetID, manager: DatasetObjectStore) {
-    log.info("reinstall processing dataset {}/{} for project {}", dataset.owner, dataset.datasetID, installTarget)
+    val logger = log.mark(dataset.owner, dataset.datasetID)
+    logger.info("reinstall processing dataset for project {}", installTarget)
 
     // Get a plugin handler for the target dataset type
     val handler = PluginHandlers[dataset.type]
@@ -122,58 +129,75 @@ object DatasetReinstaller {
     if (!handler.appliesToProject(installTarget))
       throw IllegalStateException("dataset type ${dataset.type} does not apply to project $installTarget")
 
-    uninstallDataset(dataset, installTarget, handler)
-    reinstallDataset(dataset, installTarget, handler, manager)
+    val eventID = EventIDs.issueID()
+
+    uninstallDataset(eventID, dataset, installTarget, handler, logger)
+    reinstallDataset(eventID, dataset, installTarget, handler, manager, logger)
   }
 
-  private suspend fun uninstallDataset(dataset: DatasetRecord, installTarget: InstallTargetID, handler: PluginHandler) {
-    log.debug("attempting to uninstall dataset {}/{} from project {}", dataset.owner, dataset.datasetID, installTarget)
+  private suspend fun uninstallDataset(
+    eventID: EventID,
+    dataset: DatasetRecord,
+    installTarget: InstallTargetID,
+    handler: PluginHandler,
+    logger: Logger,
+  ) {
+    logger.debug("attempting to uninstall dataset project {}", installTarget)
 
     val uninstallResult = try {
-      handler.client.postUninstall(dataset.datasetID, installTarget, dataset.type)
+      handler.client.postUninstall(eventID, dataset.datasetID, installTarget, dataset.type)
     } catch (e: Throwable) {
       throw PluginRequestException.uninstall(handler.name, installTarget, dataset.owner, dataset.datasetID, cause = e)
     }
 
-    when (uninstallResult.type) {
-      UninstallResponseType.Success -> { /* do nothing */ }
+    when (uninstallResult.status) {
+      PluginResponseStatus.Success -> { /* do nothing */ }
 
-      UninstallResponseType.BadRequest -> throw PluginException.uninstall(
+      PluginResponseStatus.ScriptError -> throw PluginException.uninstall(
         handler.name,
         installTarget,
         dataset.owner,
         dataset.datasetID,
-        (uninstallResult as UninstallBadRequestResponse).message,
+        (uninstallResult as ScriptErrorResponse).body.lastMessage,
       )
 
-      UninstallResponseType.UnexpectedError -> throw PluginException.uninstall(
+      PluginResponseStatus.ServerError -> throw PluginException.uninstall(
         handler.name,
         installTarget,
         dataset.owner,
         dataset.datasetID,
-        (uninstallResult as UninstallUnexpectedErrorResponse).message,
+        (uninstallResult as ServerErrorResponse).body.message,
       )
+
+      else -> {
+        if (uninstallResult is StreamResponse)
+          uninstallResult.body.close()
+
+        throw IllegalStateException("unrecognized uninstall result status: ${uninstallResult.status}")
+      }
     }
   }
 
   private suspend fun reinstallDataset(
-    dataset: DatasetRecord,
+    eventID:       EventID,
+    dataset:       DatasetRecord,
     installTarget: InstallTargetID,
-    handler: PluginHandler,
-    manager: DatasetObjectStore,
+    handler:       PluginHandler,
+    manager:       DatasetObjectStore,
+    logger:        Logger,
   ) {
-    log.debug("attempting to reinstall dataset {}/{} into project {}", dataset.owner, dataset.datasetID, installTarget)
+    logger.debug("attempting to reinstall dataset into project {}", installTarget)
 
     val directory = manager.getDatasetDirectory(dataset.owner, dataset.datasetID)
 
-    if (!directory.isReinstallable()) {
-      log.warn("skipping reinstall of dataset {}/{} into project {} due to the dataset directory being in an invalid state in the data store", dataset.owner, dataset.datasetID, installTarget)
+    if (!directory.isReinstallable(logger)) {
+      logger.warn("skipping reinstall of dataset into project {} due to the dataset directory being in an invalid state in the data store", installTarget)
       return
     }
 
     val response = try {
       withInstallBundle(directory) { meta, manifest, data ->
-        handler.client.postInstallData(dataset.datasetID, installTarget, meta, manifest, data)
+        handler.client.postInstallData(eventID, dataset.datasetID, installTarget, meta, manifest, data)
       }
     } catch (e: S34KError) { // don't mix up minio errors with request errors
       throw PluginException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, cause = e)
@@ -181,39 +205,49 @@ object DatasetReinstaller {
       throw PluginRequestException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, cause = e)
     }
 
-    when (response.type) {
-      InstallDataResponseType.Success
-      -> handleInstallSuccess(handler, response as InstallDataSuccessResponse, dataset, installTarget)
+    when (response.status) {
+      PluginResponseStatus.Success ->
+        handleInstallSuccess(handler, response as ValidationResponse, dataset, installTarget, logger)
 
-      InstallDataResponseType.BadRequest
-      -> handleInstallBadRequest(handler, response as InstallDataBadRequestResponse, dataset, installTarget)
+      PluginResponseStatus.BasicValidationError ->
+        handleInstallBasicValidationFailure(handler, response as ValidationResponse, dataset, installTarget, logger)
 
-      InstallDataResponseType.ValidationFailure
-      -> handleInstallValidationFailure(handler, response as InstallDataValidationFailureResponse, dataset, installTarget)
+      PluginResponseStatus.CommunityValidationError ->
+        handleInstallCommunityValidationFailure(handler, response as ValidationResponse, dataset, installTarget, logger)
 
-      InstallDataResponseType.MissingDependencies
-      -> handleInstallMissingDependency(handler, response as InstallDataMissingDependenciesResponse, dataset, installTarget)
+      PluginResponseStatus.MissingDependencyError ->
+        handleInstallMissingDependency(handler, response as MissingDependencyResponse, dataset, installTarget, logger)
 
-      InstallDataResponseType.UnexpectedError
-      -> handleInstallUnexpectedError(handler, response as InstallDataUnexpectedErrorResponse, dataset, installTarget)
+      PluginResponseStatus.ScriptError ->
+        handleInstallScriptError(handler, response as ScriptErrorResponse, dataset, installTarget, logger)
+
+      PluginResponseStatus.ServerError ->
+        handleInstallServerError(handler, response as ServerErrorResponse, dataset, installTarget, logger)
+
+      else -> {
+        if (response is StreamResponse)
+          response.body.close()
+
+        throw IllegalStateException("unrecognized uninstall result status: ${response.status}")
+      }
     }
   }
 
-  private fun DatasetDirectory.isReinstallable(): Boolean {
+  private fun DatasetDirectory.isReinstallable(logger: Logger): Boolean {
     var ok = true
 
     if (!hasMetaFile()) {
-      log.warn("dataset {}/{} has no meta file present in the data store", ownerID, datasetID)
+      logger.warn("no meta file present in the data store")
       ok = false
     }
 
     if (!hasManifestFile()) {
-      log.warn("dataset {}/{} has no manifest file present in the data store", ownerID, datasetID)
+      logger.warn("no manifest file present in the data store")
       ok = false
     }
 
     if (!hasInstallReadyFile()) {
-      log.warn("dataset {}/{} has no install-ready file present in the data store", ownerID, datasetID)
+      logger.warn("no install-ready file present in the data store")
       ok = false
     }
 
@@ -222,65 +256,32 @@ object DatasetReinstaller {
 
   private fun handleInstallSuccess(
     handler: PluginHandler,
-    res: InstallDataSuccessResponse,
+    res: ValidationResponse,
     dataset: DatasetRecord,
     installTarget: InstallTargetID,
+    logger: Logger,
   ) {
-    log.info(
-      "dataset {}/{} was reinstalled successfully into project {} via plugin {}",
-      dataset.owner,
-      dataset.datasetID,
-      installTarget,
-      handler.name,
-    )
+    logger.info("dataset was reinstalled successfully into project {} via plugin {}", installTarget, handler.name)
 
     appDB.withTransaction(installTarget, dataset.type) {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
         InstallStatus.Complete,
-        res.warnings.takeUnless { it.isEmpty() }?.joinToString("\n")
+        res.getWarningsSequence().joinToString("\n").takeUnless { it.isEmpty() }
       ))
     }
   }
 
-  private fun handleInstallBadRequest(
-    handler: PluginHandler,
-    response:  InstallDataBadRequestResponse,
-    dataset:   DatasetRecord,
-    installTarget: InstallTargetID
+  private fun handleInstallBasicValidationFailure(
+    handler:       PluginHandler,
+    response:      ValidationResponse,
+    dataset:       DatasetRecord,
+    installTarget: InstallTargetID,
+    logger:        Logger,
   ) {
-    log.error(
-      "dataset {}/{} reinstall into {} failed due to bad request exception from plugin {}: {}",
-      dataset.owner,
-      dataset.datasetID,
-      installTarget,
-      handler.name,
-      response.message,
-    )
-
-    appDB.withTransaction(installTarget, dataset.type) {
-      it.updateDatasetInstallMessage(DatasetInstallMessage(
-        dataset.datasetID,
-        InstallType.Data,
-        InstallStatus.FailedInstallation,
-        response.message
-      ))
-    }
-
-    throw PluginException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, response.message)
-  }
-
-  private fun handleInstallValidationFailure(
-    handler: PluginHandler,
-    response:  InstallDataValidationFailureResponse,
-    dataset:   DatasetRecord,
-    installTarget: InstallTargetID
-  ) {
-    log.info(
-      "dataset {}/{} reinstall into {} failed due to validation error in plugin {}",
-      dataset.owner,
-      dataset.datasetID,
+    logger.info(
+      "dataset reinstall into {} failed due to validation error in plugin {}",
       installTarget,
       handler.name,
     )
@@ -290,45 +291,25 @@ object DatasetReinstaller {
         dataset.datasetID,
         InstallType.Data,
         InstallStatus.FailedValidation,
-        response.warnings.joinToString("\n")
+        response.getWarningsSequence().joinToString("\n")
       ))
     }
   }
 
-  private fun handleInstallMissingDependency(
-    handler: PluginHandler,
-    response:  InstallDataMissingDependenciesResponse,
-    dataset:   DatasetRecord,
+  private fun handleInstallCommunityValidationFailure(
+    handler:       PluginHandler,
+    response:      ValidationResponse,
+    dataset:       DatasetRecord,
     installTarget: InstallTargetID,
+    logger:        Logger,
   ) {
-    log.info(
-      "dataset {}/{} reinstall into {} was rejected for missing dependencies in plugin {}",
-      dataset.owner,
-      dataset.datasetID,
-      installTarget,
-      handler.name
-    )
+    val status = if (dataset.isPublic)
+      InstallStatus.FailedValidation
+    else
+      InstallStatus.Complete
 
-    appDB.withTransaction(installTarget, dataset.type) {
-      it.updateDatasetInstallMessage(DatasetInstallMessage(
-        dataset.datasetID,
-        InstallType.Data,
-        InstallStatus.MissingDependency,
-        response.warnings.joinToString("\n")
-      ))
-    }
-  }
-
-  private fun handleInstallUnexpectedError(
-    handler: PluginHandler,
-    response:  InstallDataUnexpectedErrorResponse,
-    dataset:   DatasetRecord,
-    installTarget: InstallTargetID,
-  ) {
-    log.error(
-      "dataset {}/{} reinstall into {} failed with a 500 from plugin {}",
-      dataset.owner,
-      dataset.datasetID,
+    logger.info(
+      "dataset reinstall into {} failed due to validation error in plugin {}",
       installTarget,
       handler.name,
     )
@@ -337,12 +318,79 @@ object DatasetReinstaller {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
+        status,
+        response.body.communityValidation.warnings.joinToString("\n")
+      ))
+    }
+  }
+
+  private fun handleInstallMissingDependency(
+    handler:       PluginHandler,
+    response:      MissingDependencyResponse,
+    dataset:       DatasetRecord,
+    installTarget: InstallTargetID,
+    logger:        Logger,
+  ) {
+    logger.info("reinstall into {} was rejected for missing dependencies in plugin {}", installTarget, handler.name)
+
+    appDB.withTransaction(installTarget, dataset.type) {
+      it.updateDatasetInstallMessage(DatasetInstallMessage(
+        dataset.datasetID,
+        InstallType.Data,
+        InstallStatus.MissingDependency,
+        response.body.warnings.joinToString("\n")
+      ))
+    }
+  }
+
+  private fun handleInstallScriptError(
+    handler: PluginHandler,
+    response:  ScriptErrorResponse,
+    dataset:   DatasetRecord,
+    installTarget: InstallTargetID,
+    logger: Logger,
+  ): Nothing {
+    logger.error(
+      "reinstall into {} failed with due to script error in plugin {}",
+      installTarget,
+      handler.name,
+    )
+
+    handleInstall5xx(handler, response.body.lastMessage, dataset, installTarget)
+  }
+
+  private fun handleInstallServerError(
+    handler:       PluginHandler,
+    response:      ServerErrorResponse,
+    dataset:       DatasetRecord,
+    installTarget: InstallTargetID,
+    logger:        Logger,
+  ): Nothing {
+    logger.error(
+      "reinstall into {} failed with due to plugin {} server error",
+      installTarget,
+      handler.name,
+    )
+
+    handleInstall5xx(handler, response.body.message, dataset, installTarget)
+  }
+
+  private fun handleInstall5xx(
+    handler:       PluginHandler,
+    message:       String,
+    dataset:       DatasetRecord,
+    installTarget: InstallTargetID,
+  ): Nothing {
+    appDB.withTransaction(installTarget, dataset.type) {
+      it.updateDatasetInstallMessage(DatasetInstallMessage(
+        dataset.datasetID,
+        InstallType.Data,
         InstallStatus.FailedInstallation,
-        response.message
+        message,
       ))
     }
 
-    throw PluginException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, response.message)
+    throw PluginException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, message)
   }
 
   private suspend fun <T> withInstallBundle(

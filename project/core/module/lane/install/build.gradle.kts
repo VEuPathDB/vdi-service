@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   id("build-conventions")
 }
@@ -12,9 +14,15 @@ dependencies {
   implementation(project(":lib:module-core"))
   implementation(project(":lib:external-s3"))
 
-  implementation(common.model)
   implementation(common.logging)
+  implementation(common.model)
+  implementation(common.stack.io)
 
   implementation(libs.s34k)
   implementation(libs.kt.coroutines)
+}
+
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+  freeCompilerArgs.set(listOf("-Xcontext-parameters"))
 }

@@ -6,10 +6,6 @@ import vdi.core.plugin.client.PluginHandlerClientResponse
  * Install Meta Client Response
  *
  * A [PluginHandlerClientResponse] that must be one of the following types:
- *
- * * [InstallMetaSuccessResponse]
- * * [InstallMetaBadRequestResponse]
- * * [InstallMetaUnexpectedErrorResponse]
  */
 sealed interface InstallMetaResponse : PluginHandlerClientResponse {
 
