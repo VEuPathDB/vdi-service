@@ -54,9 +54,9 @@ deque = { group = "io.k-libs", name = "deque", version = "0.9.0" }
 #
 
 # JUnit5
-junit-api    = { group = "org.junit.jupiter", name = "junit-jupiter-api",    version = "5.12.0" }
-junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "5.12.0" }
+junit-api    = { group = "org.junit.jupiter", name = "junit-jupiter-api",    version = "6.0.1" }
+junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "6.0.1" }
 
 # Mockito
 mockito-core   = { group = "org.mockito",        name = "mockito-core",   version = "5.16.0" }
-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version = "5.4.0"  }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version = "6.1.0"  }
