@@ -30,7 +30,7 @@ kt-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-co
 
 # HTTP
 http-client-multipart = { group = "io.foxcapades.lib",         name = "k-multipart",   version = "1.2.1" }
-http-server-jersey    = { group = "org.glassfish.jersey.core", name = "jersey-server", version = "3.1.10" }
+http-server-jersey    = { group = "org.glassfish.jersey.core", name = "jersey-server", version = "4.0.0" }
 
 # Messaging
 msg-kafka  = { group = "org.apache.kafka", name = "kafka-clients", version = "4.1.0" }
