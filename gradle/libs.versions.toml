@@ -15,7 +15,7 @@ vdi-json   = { group = "org.veupathdb.vdi", name = "vdi-component-json",   versi
 
 # Database
 db-pool            = { group = "com.zaxxer",               name = "HikariCP",   version = "7.0.2"        }
-db-driver-oracle   = { group = "com.oracle.database.jdbc", name = "ojdbc8",     version = "23.7.0.25.01" }
+db-driver-oracle   = { group = "com.oracle.database.jdbc", name = "ojdbc8",     version = "23.26.0.0.0" }
 db-driver-postgres = { group = "org.postgresql",           name = "postgresql", version = "42.7.8"       }
 
 # Logging
