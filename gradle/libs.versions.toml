@@ -33,7 +33,7 @@ http-client-multipart = { group = "io.foxcapades.lib",         name = "k-multipa
 http-server-jersey    = { group = "org.glassfish.jersey.core", name = "jersey-server", version = "3.1.10" }
 
 # Messaging
-msg-kafka  = { group = "org.apache.kafka", name = "kafka-clients", version = "3.9.0" }
+msg-kafka  = { group = "org.apache.kafka", name = "kafka-clients", version = "4.1.0" }
 msg-rabbit = { group = "com.rabbitmq",     name = "amqp-client",   version = "5.27.1" }
 
 # LDAP
