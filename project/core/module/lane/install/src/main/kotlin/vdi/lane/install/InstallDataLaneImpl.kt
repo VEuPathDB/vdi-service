@@ -20,23 +20,18 @@ import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.withTransaction
-import vdi.logging.logger
-import vdi.core.metrics.Metrics
-import vdi.core.util.orElse
+import vdi.core.metrics.Metrics.Install as Metrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
 import vdi.core.plugin.client.PluginException
 import vdi.core.plugin.client.PluginRequestException
-import vdi.core.plugin.client.response.MissingDependencyResponse
-import vdi.core.plugin.client.response.ScriptErrorResponse
-import vdi.core.plugin.client.response.ServerErrorResponse
-import vdi.core.plugin.client.response.StreamResponse
-import vdi.core.plugin.client.response.ValidationResponse
-import vdi.core.plugin.mapping.PluginHandler
+import vdi.core.plugin.client.response.*
 import vdi.core.plugin.mapping.PluginHandlers
 import vdi.core.s3.DatasetDirectory
-import vdi.io.plugin.responses.PluginResponseStatus
-import vdi.model.data.*
+import vdi.core.util.orElse
+import vdi.logging.logger
+import vdi.model.data.DatasetID
+import vdi.model.data.DatasetMetadata
 
 internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, abortCB: AbortCB)
   : InstallDataLane
@@ -52,20 +47,17 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     val kc = requireKafkaConsumer(config.eventChannel, config.consumerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val wp = WorkerPool.create<InstallDataLane>(config.jobQueueSize, config.workerPoolSize) {
-      Metrics.Install.queueSize.inc(it.toDouble())
+      Metrics.queueSize.inc(it.toDouble())
     }
 
     coroutineScope {
       launch(Dispatchers.IO) {
         while (!isShutDown())
-          kc.fetchMessages(config.eventMsgKey)
-            .forEach { msg ->
-              wp.submit {
-                InstallationContext(msg, dm, logger)
-                  .also { it.logger.info("received install job from source {}", msg.eventSource) }
-                  .tryInstallData()
-              }
-            }
+          kc.fetchMessages(config.eventMsgKey).forEach { msg ->
+            InstallationContext(msg, dm, logger)
+              .also { it.logger.info("received install job from source {}", msg.eventSource) }
+              .also { wp.submit { it.tryInstallData() } }
+          }
       }
     }
 
@@ -81,7 +73,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       } catch (e: PluginException) {
         e.log(logger::error)
       } catch (e: Throwable) {
-        PluginException.installData("N/A", "N/A", userID, datasetID, cause = e).log(logger::error)
+        PluginException.installData("N/A", "N/A", ownerID, datasetID, cause = e).log(logger::error)
       } finally {
         datasetsInProgress.remove(datasetID)
       }
@@ -106,7 +98,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
   private suspend fun InstallationContext.installData() {
     logger.debug("looking up dataset directory")
 
-    val dir = store.getDatasetDirectory(userID, datasetID)
+    val dir = store.getDatasetDirectory(ownerID, datasetID)
 
     // if the directory doesn't yet exist in S3, then how did we even get here?
     if (!dir.exists()) {
@@ -159,7 +151,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     // If there is no handler for the target type, we shouldn't have gotten
     // here, but we can bail now to prevent issues.
     if (handler == null) {
-      logger.error("skipping install data event; no handler configured for dataset type {}:{}", meta.type.name, meta.type.version)
+      logger.error("skipping install data event; no handler configured for dataset type {}", meta.type)
       return
     }
 
@@ -179,16 +171,14 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
             // shouldn't be here, but we can bail out now with a warning.
             if (!handler.appliesToProject(projectID)) {
               logger.warn(
-                "skipping install data event; handler for type {}:{} does not apply to project {}",
-                meta.type.name,
-                meta.type.version,
+                "skipping install data event; handler for type {} does not apply to project {}",
+                meta.type,
                 projectID,
               )
               return@all true
             }
 
-            handler.installData(
-              projectID,
+            withPlugin(meta, handler, projectID).installData(
               installableFileTimestamp,
               metaStream,
               manifestStream,
@@ -202,7 +192,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.installData(handler.name, "N/A", userID, datasetID, cause = e)
+      throw PluginException.installData(handler.name, "N/A", ownerID, datasetID, cause = e)
     }
   }
 
@@ -217,9 +207,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
    * This method calls out to the handler server and deals with the response
    * status that it gets in reply.
    */
-  context(ctx: InstallationContext)
-  private suspend fun PluginHandler.installData(
-    installTarget: InstallTargetID,
+  private suspend fun InstallationContext.WithPlugin.installData(
     installableFileTimestamp: OffsetDateTime,
     meta: InputStream,
     manifest: InputStream,
@@ -228,32 +216,32 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     var timer: Histogram.Timer? = null
 
     try {
-      val appDB = appDB.accessor(installTarget, type) orElse {
-        ctx.logger.info("skipping install event into project {}; target project is disabled.", installTarget)
+      val appDB = appDB.accessor(target, type) orElse {
+        logger.info("skipping install event; target project is disabled.")
         return false
       }
 
-      val dataset = appDB.selectDataset(ctx.datasetID) orElse  {
-        ctx.logger.info("skipping install event into project {}; no dataset record is present", installTarget)
+      val dataset = appDB.selectDataset(datasetID) orElse  {
+        logger.info("skipping install event; no dataset record is present")
         return false
       }
 
       if (dataset.deletionState != DeleteFlag.NotDeleted) {
-        ctx.logger.info("skipping install event into project {}; dataset marked as deleted", installTarget)
+        logger.info("skipping install event; dataset marked as deleted")
         return false
       }
 
-      val status = appDB.selectDatasetInstallMessage(ctx.datasetID, InstallType.Data)
+      val status = appDB.selectDatasetInstallMessage(datasetID, InstallType.Data)
 
-      timer = Metrics.Install.duration.labels(dataset.type.name.toString(), dataset.type.version).startTimer()
+      timer = Metrics.duration.labels(dataset.type.name.toString(), dataset.type.version).startTimer()
 
       if (status == null) {
         var race = false
-        this@InstallDataLaneImpl.appDB.withTransaction(installTarget, type) {
+        this@InstallDataLaneImpl.appDB.withTransaction(target, type) {
           try {
             it.insertDatasetInstallMessage(
               DatasetInstallMessage(
-                ctx.datasetID,
+                datasetID,
                 InstallType.Data,
                 InstallStatus.Running,
                 null
@@ -261,7 +249,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
             )
           } catch (e: SQLException) {
             if (it.isUniqueConstraintViolation(e)) {
-              ctx.logger.info("unique constraint violation when writing install data message; assuming race condition and ignoring")
+              logger.info("unique constraint violation when writing install data message; assuming race condition and ignoring")
               race = true
             } else {
               throw e
@@ -273,96 +261,69 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
           return false
       } else {
         if (status.status != InstallStatus.ReadyForReinstall) {
-          ctx.logger.info("skipping install event into project {}; dataset status is {}", installTarget, status.status)
+          logger.info("skipping install event; dataset status is {}", status.status)
           return false
         }
       }
 
-      val response = try {
-        client.postInstallData(ctx.eventID, ctx.datasetID, installTarget, meta, manifest, data)
+      return try {
+        plugin.client.postInstallData(eventID, datasetID, target, meta, manifest, data).use { response ->
+          Metrics.count.labels(dataset.type.name.toString(), dataset.type.version, response.status.code.toString()).inc()
+
+          when (response) {
+            is SuccessWithWarningsResponse -> {
+              handleSuccessResponse(response, installableFileTimestamp)
+              true
+            }
+
+            is ValidationErrorResponse -> {
+              handleValidationFailureResponse(response, installableFileTimestamp)
+              false
+            }
+
+            is MissingDependencyResponse -> {
+              handleMissingDependenciesResponse(response, installableFileTimestamp)
+              false
+            }
+
+            is ScriptErrorResponse -> {
+              handleScriptErrorResponse(response, installableFileTimestamp)
+              false
+            }
+
+            is ServerErrorResponse -> {
+              handleServerErrorResponse(response, installableFileTimestamp)
+              false
+            }
+
+            else -> throw IllegalStateException("illegal response status ${response.status}")
+          }
+        }
       } catch (e: S34KError) { // Don't mix up minio errors with request errors.
-        throw PluginException.installData(name, installTarget, ctx.userID, ctx.datasetID, cause = e)
+        throw PluginException.installData(plugin.name, target, ownerID, datasetID, cause = e)
       } catch (e: Throwable) {
-        throw PluginRequestException.installData(name, installTarget, ctx.userID, ctx.datasetID, cause = e)
-      }
-
-      Metrics.Install.count.labels(dataset.type.name.toString(), dataset.type.version, response.status.code.toString()).inc()
-
-      return when (response.status) {
-        PluginResponseStatus.Success -> {
-          handleSuccessResponse(
-            response as ValidationResponse,
-            installTarget,
-            installableFileTimestamp,
-          )
-          true
-        }
-
-        PluginResponseStatus.ValidationError -> {
-          handleValidationFailureResponse(
-            response as ValidationResponse,
-            installTarget,
-            installableFileTimestamp
-          )
-          false
-        }
-
-        PluginResponseStatus.MissingDependencyError -> {
-          handleMissingDependenciesResponse(
-            response as MissingDependencyResponse,
-            installTarget,
-            installableFileTimestamp
-          )
-          false
-        }
-
-        PluginResponseStatus.ScriptError -> {
-          handleScriptErrorResponse(
-            response as ScriptErrorResponse,
-            installTarget,
-            installableFileTimestamp
-          )
-          false
-        }
-
-        PluginResponseStatus.ServerError -> {
-          handleServerErrorResponse(
-            response as ServerErrorResponse,
-            installTarget,
-            installableFileTimestamp
-          )
-          false
-        }
-
-        else -> {
-          if (response is StreamResponse)
-            response.body.close()
-
-          throw IllegalStateException("illegal response status ${response.status}")
-        }
+        throw PluginRequestException.installData(plugin.name, target, ownerID, datasetID, cause = e)
       }
     } catch (e: PluginException) {
       throw e
     } catch (e: Throwable) {
-      throw PluginException.installData(name, installTarget, ctx.userID, ctx.datasetID, cause = e)
+      throw PluginException.installData(plugin.name, target, ownerID, datasetID, cause = e)
     } finally {
       timer?.observeDuration()
     }
   }
 
-  context(ctx: InstallationContext)
-  private fun PluginHandler.handleSuccessResponse(
-    res:              ValidationResponse,
-    installTarget:    InstallTargetID,
+  private fun InstallationContext.WithPlugin.handleSuccessResponse(
+    res:              SuccessWithWarningsResponse,
     updatedTimestamp: OffsetDateTime,
   ) {
-    ctx.logger.info("data was installed successfully into project {} via plugin {}", installTarget, name)
+    logger.info("data was installed successfully")
 
-    appDB.withTransaction(installTarget, type) {
-      it.updateSyncControlDataTimestamp(ctx.datasetID, updatedTimestamp)
+    appDB.withTransaction(target, type) {
+      it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
-        ctx.datasetID,
+        datasetID,
         InstallType.Data,
         InstallStatus.Complete,
         res.getWarningsSequence().joinToString("\n").takeUnless(String::isEmpty)
@@ -370,23 +331,17 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     }
   }
 
-  context(ctx: InstallationContext)
-  private fun PluginHandler.handleValidationFailureResponse(
-    res:              ValidationResponse,
-    installTarget:    InstallTargetID,
+  private fun InstallationContext.WithPlugin.handleValidationFailureResponse(
+    res:              ValidationErrorResponse,
     updatedTimestamp: OffsetDateTime,
   ) {
-    ctx.logger.info(
-      "installation into {} via plugin {} failed due to validation errors",
-      installTarget,
-      this,
-    )
+    logger.info("installation failed due to validation errors")
 
-    appDB.withTransaction(installTarget, type) {
-      it.updateSyncControlDataTimestamp(ctx.datasetID, updatedTimestamp)
+    appDB.withTransaction(target, type) {
+      it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
-        ctx.datasetID,
+        datasetID,
         InstallType.Data,
         InstallStatus.FailedValidation,
         res.getWarningsSequence().joinToString("\n")
@@ -394,19 +349,17 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     }
   }
 
-  context(ctx: InstallationContext)
-  private fun PluginHandler.handleMissingDependenciesResponse(
+  private fun InstallationContext.WithPlugin.handleMissingDependenciesResponse(
     res:              MissingDependencyResponse,
-    installTarget:    InstallTargetID,
     updatedTimestamp: OffsetDateTime,
   ) {
-    ctx.logger.info("installation into {} was rejected by plugin {} for missing dependencies", installTarget, name)
+    logger.info("installation rejected for missing dependencies")
 
-    appDB.withTransaction(installTarget, type) {
-      it.updateSyncControlDataTimestamp(ctx.datasetID, updatedTimestamp)
+    appDB.withTransaction(target, type) {
+      it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
-        ctx.datasetID,
+        datasetID,
         InstallType.Data,
         InstallStatus.MissingDependency,
         res.body.warnings.joinToString("\n")
@@ -414,48 +367,44 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     }
   }
 
-  context(ctx: InstallationContext)
-  private fun PluginHandler.handleScriptErrorResponse(
+  private fun InstallationContext.WithPlugin.handleScriptErrorResponse(
     res: ScriptErrorResponse,
-    installTarget: InstallTargetID,
     updatedTimestamp: OffsetDateTime,
   ) {
-    ctx.logger.error("installation into {} failed due to plugin script error from plugin {}", installTarget, name)
+    logger.error("installation failed due to plugin script error: {}", res.message)
 
-    appDB.withTransaction(installTarget, type) {
-      it.updateSyncControlDataTimestamp(ctx.datasetID, updatedTimestamp)
+    appDB.withTransaction(target, type) {
+      it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
-        ctx.datasetID,
+        datasetID,
         InstallType.Data,
         InstallStatus.FailedInstallation,
         res.message
       ))
     }
 
-    throw PluginException.installData(name, installTarget, ctx.userID, ctx.datasetID, res.message)
+    throw PluginException.installData(plugin.name, target, ownerID, datasetID, res.message)
   }
 
-  context(ctx: InstallationContext)
-  private fun PluginHandler.handleServerErrorResponse(
+  private fun InstallationContext.WithPlugin.handleServerErrorResponse(
     res:              ServerErrorResponse,
-    installTarget:    InstallTargetID,
     updatedTimestamp: OffsetDateTime,
   ) {
-    ctx.logger.error("installation into {} failed due to plugin server error from plugin {}", installTarget, name)
+    logger.error("installation failed due to plugin server error: {}", res.message)
 
-    appDB.withTransaction(installTarget, type) {
-      it.updateSyncControlDataTimestamp(ctx.datasetID, updatedTimestamp)
+    appDB.withTransaction(target, type) {
+      it.updateSyncControlDataTimestamp(datasetID, updatedTimestamp)
 
       it.updateDatasetInstallMessage(DatasetInstallMessage(
-        ctx.datasetID,
+        datasetID,
         InstallType.Data,
         InstallStatus.FailedInstallation,
         res.message
       ))
     }
 
-    throw PluginException.installData(name, installTarget, ctx.userID, ctx.datasetID, res.message)
+    throw PluginException.installData(plugin.name, target, ownerID, datasetID, res.message)
   }
 
   private suspend fun <T> DatasetDirectory.buildInstallBundle(
@@ -473,10 +422,10 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     meta.revisionHistory!!.revisions
       .asSequence()
       .sortedByDescending { it.timestamp }
-      .map { store.getDatasetDirectory(userID, it.revisionID) }
+      .map { store.getDatasetDirectory(ownerID, it.revisionID) }
       .forEach { tryMarkRevised(it) }
 
-    tryMarkRevised(store.getDatasetDirectory(userID, meta.revisionHistory!!.originalID))
+    tryMarkRevised(store.getDatasetDirectory(ownerID, meta.revisionHistory!!.originalID))
   }
 
   private fun tryMarkRevised(dir: DatasetDirectory) {

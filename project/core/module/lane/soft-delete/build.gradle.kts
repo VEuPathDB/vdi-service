@@ -14,6 +14,7 @@ dependencies {
 
   implementation(common.model)
   implementation(common.logging)
+  implementation(common.stack.io)
 
   implementation(libs.s34k)
   implementation(libs.kt.coroutines)

@@ -7,8 +7,9 @@ import vdi.core.db.app.withTransaction
 import vdi.core.db.model.ReconcilerTargetRecord
 import vdi.core.plugin.client.PluginException
 import vdi.core.plugin.client.PluginRequestException
-import vdi.core.plugin.client.response.uni.UninstallBadRequestResponse
-import vdi.core.plugin.client.response.uni.UninstallUnexpectedErrorResponse
+import vdi.core.plugin.client.response.ScriptErrorResponse
+import vdi.core.plugin.client.response.ServerErrorResponse
+import vdi.core.plugin.client.response.isSuccessResponse
 import vdi.core.plugin.mapping.PluginHandlers
 
 internal class AppDBTarget(override val name: String, private val projectID: String) : ReconcilerTarget {
@@ -30,21 +31,16 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
     val handler = PluginHandlers[dataset.type]!!
 
     val res = try {
-      handler.client.postUninstall(dataset.datasetID, projectID, dataset.type)
+      handler.client.postUninstall(null, dataset.datasetID, projectID, dataset.type)
     } catch (e: Throwable) {
       throw PluginRequestException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID, cause = e)
     }
 
     if (!res.isSuccessResponse)
       when (res) {
-        is UninstallBadRequestResponse ->
-          throw PluginException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID, res.message)
-
-        is UninstallUnexpectedErrorResponse ->
-          throw PluginException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID, res.message)
-
-        else ->
-          throw PluginException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID)
+        is ScriptErrorResponse -> throw PluginException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID, res.message)
+        is ServerErrorResponse -> throw PluginException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID, res.message)
+        else -> throw PluginException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID)
       }
 
       appDB.withTransaction(projectID, dataset.type) { it.purgeDatasetControlTables(dataset.datasetID) }

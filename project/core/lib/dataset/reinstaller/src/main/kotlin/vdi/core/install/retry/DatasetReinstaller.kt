@@ -209,11 +209,8 @@ object DatasetReinstaller {
       PluginResponseStatus.Success ->
         handleInstallSuccess(handler, response as ValidationResponse, dataset, installTarget, logger)
 
-      PluginResponseStatus.BasicValidationError ->
-        handleInstallBasicValidationFailure(handler, response as ValidationResponse, dataset, installTarget, logger)
-
-      PluginResponseStatus.CommunityValidationError ->
-        handleInstallCommunityValidationFailure(handler, response as ValidationResponse, dataset, installTarget, logger)
+      PluginResponseStatus.ValidationError ->
+        handleInstallValidationFailure(handler, response as ValidationResponse, dataset, installTarget, logger)
 
       PluginResponseStatus.MissingDependencyError ->
         handleInstallMissingDependency(handler, response as MissingDependencyResponse, dataset, installTarget, logger)
@@ -268,12 +265,12 @@ object DatasetReinstaller {
         dataset.datasetID,
         InstallType.Data,
         InstallStatus.Complete,
-        res.getWarningsSequence().joinToString("\n").takeUnless { it.isEmpty() }
+        res.getWarningsSequence().joinToString("\n").takeUnless(String::isEmpty)
       ))
     }
   }
 
-  private fun handleInstallBasicValidationFailure(
+  private fun handleInstallValidationFailure(
     handler:       PluginHandler,
     response:      ValidationResponse,
     dataset:       DatasetRecord,
@@ -292,34 +289,6 @@ object DatasetReinstaller {
         InstallType.Data,
         InstallStatus.FailedValidation,
         response.getWarningsSequence().joinToString("\n")
-      ))
-    }
-  }
-
-  private fun handleInstallCommunityValidationFailure(
-    handler:       PluginHandler,
-    response:      ValidationResponse,
-    dataset:       DatasetRecord,
-    installTarget: InstallTargetID,
-    logger:        Logger,
-  ) {
-    val status = if (dataset.isPublic)
-      InstallStatus.FailedValidation
-    else
-      InstallStatus.Complete
-
-    logger.info(
-      "dataset reinstall into {} failed due to validation error in plugin {}",
-      installTarget,
-      handler.name,
-    )
-
-    appDB.withTransaction(installTarget, dataset.type) {
-      it.updateDatasetInstallMessage(DatasetInstallMessage(
-        dataset.datasetID,
-        InstallType.Data,
-        status,
-        response.body.communityValidation.warnings.joinToString("\n")
       ))
     }
   }

@@ -1,14 +1,14 @@
-package vdi.lane.install
+package vdi.lane.imports
 
 import org.slf4j.Logger
 import vdi.core.kafka.EventMessage
 import vdi.core.plugin.mapping.PluginHandler
+import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
 import vdi.logging.mark
 import vdi.model.data.DatasetMetadata
-import vdi.model.data.InstallTargetID
 
-internal class InstallationContext(
+internal class ImportContext(
   private val msg: EventMessage,
   val store: DatasetObjectStore,
   logger: Logger,
@@ -27,16 +27,16 @@ internal class InstallationContext(
   val source
     get() = msg.eventSource
 
-  fun withPlugin(meta: DatasetMetadata, plugin: PluginHandler, target: InstallTargetID) =
-    WithPlugin(this, meta, plugin, target)
+  fun withPlugin(meta: DatasetMetadata, plugin: PluginHandler, datasetDir: DatasetDirectory) =
+    WithPlugin(this, meta, plugin, datasetDir)
 
   class WithPlugin(
-    private val root: InstallationContext,
+    private val root: ImportContext,
     val meta: DatasetMetadata,
     val plugin: PluginHandler,
-    val target: InstallTargetID,
+    val datasetDir: DatasetDirectory,
   ) {
-    val logger = root.logger.mark(meta.type, plugin.name, target)
+    val logger = root.logger.mark(meta.type, plugin.name)
 
     val eventID
       get() = root.msg.eventID
@@ -51,6 +51,6 @@ internal class InstallationContext(
       get() = root.msg.eventSource
 
     val type
-      get() = plugin.type
+      get() = meta.type
   }
 }

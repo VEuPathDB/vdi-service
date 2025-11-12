@@ -17,10 +17,6 @@ sealed interface UninstallResponse: PluginHandlerClientResponse {
    *
    * The type indicates the HTTP response code and maps to one of the 3 possible
    * implementing subtypes of this interface:
-   *
-   * * [UninstallSuccessResponse]
-   * * [UninstallBadRequestResponse]
-   * * [UninstallUnexpectedErrorResponse]
    */
   val type: UninstallResponseType
 }

@@ -3,32 +3,23 @@ package vdi.core.plugin.client
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.foxcapades.lib.k.multipart.MultiPart
 import kotlinx.coroutines.future.await
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetType
-import vdi.json.JSON
-import vdi.json.toJSONString
 import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import vdi.core.plugin.client.response.EmptyResponse
-import vdi.core.plugin.client.response.PluginResponse
-import vdi.core.plugin.client.response.ScriptErrorResponse
-import vdi.core.plugin.client.response.ServerErrorResponse
-import vdi.core.plugin.client.response.StreamResponse
-import vdi.core.plugin.client.response.ValidationResponse
-import vdi.logging.logger
+import vdi.core.plugin.client.response.*
 import vdi.io.plugin.PluginEndpoint
-import vdi.io.plugin.requests.FormField
-import vdi.io.plugin.requests.ImportRequest
-import vdi.io.plugin.requests.InstallDataRequest
-import vdi.io.plugin.requests.InstallMetaRequest
-import vdi.io.plugin.requests.UninstallRequest
-import vdi.io.plugin.responses.PluginResponseStatus
+import vdi.io.plugin.requests.*
+import vdi.json.JSON
+import vdi.json.toJSONString
+import vdi.logging.logger
 import vdi.logging.mark
 import vdi.model.EventID
+import vdi.model.data.DatasetID
+import vdi.model.data.DatasetMetadata
+import vdi.model.data.DatasetType
+import vdi.model.data.InstallTargetID
+import vdi.io.plugin.responses.PluginResponseStatus as Status
 
 internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig): PluginHandlerClient {
 
@@ -75,21 +66,19 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     ).await()
 
     return response.body().let { body ->
-      when (val status = response.status) {
-        PluginResponseStatus.Success -> StreamResponse(status, body)
+      when (response.status) {
+        Status.Success         -> StreamSuccessResponse(body)
 
-        PluginResponseStatus.BasicValidationError -> ValidationResponse(status, JSON.readValue(body))
+        Status.ValidationError -> ValidationErrorResponse(JSON.readValue(body))
           .also { body.close() }
 
-        PluginResponseStatus.CommunityValidationError -> StreamResponse(status, body)
-
-        PluginResponseStatus.ScriptError -> ScriptErrorResponse(JSON.readValue(body))
+        Status.ScriptError     -> ScriptErrorResponse(JSON.readValue(body))
           .also { body.close() }
 
-        PluginResponseStatus.ServerError -> ServerErrorResponse(JSON.readValue(body))
+        Status.ServerError     -> ServerErrorResponse(JSON.readValue(body))
           .also { body.close() }
 
-        else -> {
+        else                   -> {
           body.close()
           throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
         }
@@ -111,22 +100,26 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(InstallMetaRequest(eventID, datasetID, installTarget, meta).toJSONString()))
+        .POST(
+          HttpRequest.BodyPublishers.ofString(
+            InstallMetaRequest(
+              eventID,
+              datasetID,
+              installTarget,
+              meta
+            ).toJSONString()
+          )
+        )
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()
 
-    return when (val status = response.status) {
-      PluginResponseStatus.Success -> EmptyResponse(status)
-
-      PluginResponseStatus.BasicValidationError,
-      PluginResponseStatus.CommunityValidationError -> ValidationResponse(status, response.readJSON())
-
-      PluginResponseStatus.ScriptError -> ScriptErrorResponse(response.readJSON())
-
-      PluginResponseStatus.ServerError -> ServerErrorResponse(response.readJSON())
-
-      else -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
+    return when (response.status) {
+      Status.Success         -> EmptySuccessResponse
+      Status.ValidationError -> ValidationErrorResponse(response.readJSON())
+      Status.ScriptError     -> ScriptErrorResponse(response.readJSON())
+      Status.ServerError     -> ServerErrorResponse(response.readJSON())
+      else                   -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
     }
   }
 
@@ -179,18 +172,13 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
       HttpResponse.BodyHandlers.ofString()
     ).await()
 
-    return when (val status = response.status) {
-      PluginResponseStatus.Success,
-      PluginResponseStatus.BasicValidationError,
-      PluginResponseStatus.CommunityValidationError -> ValidationResponse(status, response.readJSON())
-
-      PluginResponseStatus.MissingDependencyError -> EmptyResponse(status)
-
-      PluginResponseStatus.ServerError -> ServerErrorResponse(response.readJSON())
-
-      PluginResponseStatus.ScriptError -> ServerErrorResponse(response.readJSON())
-
-      else -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
+    return when (response.status) {
+      Status.Success                -> SuccessWithWarningsResponse(response.readJSON())
+      Status.ValidationError        -> ValidationErrorResponse(response.readJSON())
+      Status.MissingDependencyError -> MissingDependencyResponse(response.readJSON())
+      Status.ScriptError            -> ServerErrorResponse(response.readJSON())
+      Status.ServerError            -> ServerErrorResponse(response.readJSON())
+      else                          -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
     }
   }
 
@@ -213,21 +201,31 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
         .header(Header.ContentType, ContentType.JSON)
-        .POST(HttpRequest.BodyPublishers.ofString(UninstallRequest(eventID, datasetID, installTarget, type).toJSONString()))
+        .POST(
+          HttpRequest.BodyPublishers.ofString(
+            UninstallRequest(
+              eventID,
+              datasetID,
+              installTarget,
+              type
+            ).toJSONString()
+          )
+        )
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()
 
-    return when (val status = response.status) {
-      PluginResponseStatus.Success -> EmptyResponse(status)
-      PluginResponseStatus.ScriptError -> ScriptErrorResponse(response.readJSON())
-      PluginResponseStatus.ServerError -> ScriptErrorResponse(response.readJSON())
-      else -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
+    return when (response.status) {
+      Status.Success     -> EmptySuccessResponse
+      Status.ScriptError -> ScriptErrorResponse(response.readJSON())
+      Status.ServerError -> ScriptErrorResponse(response.readJSON())
+      else               -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
     }
   }
 
-  private inline val HttpResponse<*>.status: PluginResponseStatus
-    get() = PluginResponseStatus.valueOf(statusCode())
+  private inline val HttpResponse<*>.status: Status
+    get() = Status.valueOf(statusCode())
+
   private inline fun <reified T> HttpResponse<String>.readJSON() =
     JSON.readValue<T>(body())
 }

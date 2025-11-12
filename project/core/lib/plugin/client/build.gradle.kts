@@ -11,6 +11,7 @@ dependencies {
   implementation(common.logging)
   implementation(common.model)
   implementation(common.stack.io)
+  implementation(common.util)
 
   implementation(libs.log.slf4j.api)
   implementation(libs.kt.coroutines)

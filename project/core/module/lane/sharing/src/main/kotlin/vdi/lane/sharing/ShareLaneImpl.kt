@@ -7,20 +7,18 @@ import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import java.sql.SQLException
 import java.time.OffsetDateTime
-import vdi.core.db.app.*
-import vdi.logging.logger
-import vdi.logging.markedLogger
-import vdi.core.metrics.Metrics
 import vdi.core.async.WorkerPool
+import vdi.core.db.app.*
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.db.cache.model.ShareOfferRecord
 import vdi.core.db.cache.model.ShareReceiptRecord
 import vdi.core.db.cache.withTransaction
+import vdi.core.metrics.Metrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
-import vdi.core.s3.DatasetObjectStore
 import vdi.core.s3.files.DatasetShare
+import vdi.logging.logger
 import vdi.model.data.*
 import vdi.core.s3.files.DatasetShare as S3Share
 
@@ -49,9 +47,10 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
       launch(Dispatchers.IO) {
         while (!isShutDown())
           kc.fetchMessages(config.eventMsgKey)
-            .forEach { (userID, datasetID, source) ->
-              logger.debug("submitting job to share worker pool for dataset {}/{} from source {}", datasetID, userID, source)
-              wp.submit { executeJob(userID, datasetID, dm) }
+            .map { ShareContext(it, dm, logger) }
+            .forEach {
+              it.logger.debug("submitting share job for event from source {}", it.eventSource)
+              wp.submit { it.executeJob() }
             }
       }
     }
@@ -61,9 +60,8 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
     confirmShutdown()
   }
 
-  private fun executeJob(userID: UserID, datasetID: DatasetID, dm: DatasetObjectStore) {
-    val log = markedLogger<ShareLane>(userID, datasetID)
-    log.info("processing share trigger")
+  private fun ShareContext.executeJob() {
+    logger.info("processing share trigger")
 
     val dataset = cacheDB.selectDataset(datasetID)
 
@@ -71,28 +69,28 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
     // database, which is weird because the dataset record is written to the
     // cache database synchronously when the dataset is initially submitted.
     if (dataset == null) {
-      log.warn("skipping event, dataset does not exist in the internal cache database")
+      logger.warn("skipping event, dataset does not exist in the internal cache database")
       return
     }
 
     if (dataset.isDeleted) {
-      log.info("dataset is marked as deleted in the internal cache database")
-      purgeFromTargets(dataset, log)
+      logger.info("dataset is marked as deleted in the internal cache database")
+      purgeFromTargets(dataset)
       return
     }
 
-    log.debug("looking up dataset directory for dataset {}/{}", userID, datasetID)
-    val dir = dm.getDatasetDirectory(userID, datasetID)
+    logger.debug("looking up dataset directory")
+    val dir = store.getDatasetDirectory(ownerID, datasetID)
 
     val cacheDBSyncControl = cacheDB.selectSyncControl(datasetID)
 
     if (cacheDBSyncControl == null) {
-      log.info("skipping share event for dataset {}/{}: dataset does not yet have a sync control record", userID, datasetID)
+      logger.info("skipping share event; dataset does not yet have a sync control record")
       return
     }
 
     if (!dir.hasInstallReadyFile()) {
-      log.info("skipping share event for dataset {}/{}: dataset hasn't yet been imported", userID, datasetID)
+      logger.info("skipping share event; dataset hasn't yet been imported")
       return
     }
 
@@ -102,7 +100,7 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
     // the timestamp recorded in the postgres cache database, the share is brand
     // new and the share should be synchronized for all target projects.
     if (latestShareFileTimestamp.isAfter(cacheDBSyncControl.sharesUpdated)) {
-      synchronizeAll(dataset, dir.getShares(), latestShareFileTimestamp, log)
+      synchronizeAll(dataset, dir.getShares(), latestShareFileTimestamp)
     }
 
     // Else, if the newest file version in MinIO has a timestamp that is equal
@@ -113,61 +111,58 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
     // temporarily disabled, added later, was externally modified, or is being
     // rebuilt.
     else {
-      synchronizeWhereNeeded(dataset, dir.getShares(), latestShareFileTimestamp, log)
+      synchronizeWhereNeeded(dataset, dir.getShares(), latestShareFileTimestamp)
     }
   }
 
-  private fun synchronizeAll(
+  private fun ShareContext.synchronizeAll(
     dataset: DatasetRecord,
     shares: Map<UserID, S3Share>,
     latestShareTimestamp: OffsetDateTime,
-    log: Logger,
   ) {
-    synchronizeCacheDB(dataset, shares, latestShareTimestamp, log)
+    synchronizeCacheDB(dataset, shares, latestShareTimestamp)
     dataset.projects.forEach { projectID ->
       if (AppDatabaseRegistry.contains(projectID, dataset.type))
-        synchronizeProject(projectID, dataset, shares, latestShareTimestamp, log)
+        synchronizeProject(projectID, dataset, shares, latestShareTimestamp)
       else
-        log.info("skipping share sync, target {} is disabled", projectID)
+        logger.info("skipping share sync; target {} is disabled", projectID)
     }
   }
 
-  private fun synchronizeWhereNeeded(
+  private fun ShareContext.synchronizeWhereNeeded(
     dataset: DatasetRecord,
     shares: Map<UserID, S3Share>,
     latestShareTimestamp: OffsetDateTime,
-    log: Logger,
   ) {
     dataset.projects.forEach {
       val targetDB = appDB.accessor(it, dataset.type)
 
       if (targetDB == null) {
-        log.info("skipping share sync, install target {} is disabled", it)
+        logger.info("skipping share sync; install target {} is disabled", it)
         return@forEach
       }
 
       val targetSyncControl = targetDB.selectDatasetSyncControlRecord(dataset.datasetID)
 
       if (targetSyncControl == null) {
-        log.info("skipping share sync, dataset never been synchronized with target {}", it)
+        logger.info("skipping share sync; dataset never been synchronized with target {}", it)
         return@forEach
       }
 
       if (latestShareTimestamp.isAfter(targetSyncControl.sharesUpdated)) {
-        synchronizeProject(it, dataset, shares, latestShareTimestamp, log)
+        synchronizeProject(it, dataset, shares, latestShareTimestamp)
       } else {
-        log.info("skipping share sync, shares are up to date in target {}", it)
+        logger.info("skipping share sync, shares are up to date in target {}", it)
       }
     }
   }
 
-  private fun synchronizeCacheDB(
+  private fun ShareContext.synchronizeCacheDB(
     dataset: DatasetRecord,
     shares: Map<UserID, DatasetShare>,
     latestShareTimestamp: OffsetDateTime,
-    log: Logger,
   ) {
-    log.info("synchronizing shares in internal cache database")
+    logger.info("synchronizing shares in internal cache database")
 
     // Get a set of all the share recipients for all the shares attached to this
     // dataset in the internal cache db.
@@ -236,14 +231,13 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
     }
   }
 
-  private fun synchronizeProject(
+  private fun ShareContext.synchronizeProject(
     installTarget: InstallTargetID,
     dataset: DatasetRecord,
     shares: Map<UserID, S3Share>,
     latestShareTimestamp: OffsetDateTime,
-    log: Logger,
   ) {
-    log.info("synchronizing shares for install target {}", installTarget)
+    logger.info("synchronizing shares for install target {}", installTarget)
 
     appDB.withTransaction(installTarget, dataset.type) { db ->
       // Get a set of the recipient user IDs for all the users that this
@@ -260,7 +254,7 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
 
       // For all the shares (complete or partial) that appear in S3...
       shares.forEach { (shareRecipient, shareDetails) ->
-        log.debug("examining share for for recipient {} in install target {}", shareRecipient, installTarget)
+        logger.debug("examining share for for recipient {} in install target {}", shareRecipient, installTarget)
 
         // Figure out what's going on with the share, as in what share files
         // exist and what the files that do exist say.
@@ -276,15 +270,17 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
         // existed, or been created by a competing worker, unique constraint
         // violations will be ignored on insert.
         if (shareState.visibleInTarget) {
-          log.debug("ensuring dataset is visible to share recipient {} in install target {}", shareRecipient, installTarget)
-          db.tryInsertDatasetVisibility(dataset.datasetID, installTarget, shareRecipient, log)
+          logger.debug("ensuring dataset is visible to share recipient {} in install target {}", shareRecipient, installTarget)
+          context(logger) {
+            db.tryInsertDatasetVisibility(dataset.datasetID, installTarget, shareRecipient)
+          }
         }
 
         // If the dataset should not be visible to the recipient user as
         // determined by examining the S3 share state, attempt to remove any
         // existing visibility record.
         else {
-          log.info("removing dataset visibility from user {} in install target {}", shareRecipient, installTarget)
+          logger.info("removing dataset visibility from user {} in install target {}", shareRecipient, installTarget)
           db.deleteDatasetVisibility(dataset.datasetID, shareRecipient)
         }
       }
@@ -299,26 +295,28 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
       // target app database are invalid as they have no matching records in S3.
       // Purge them from the target app database.
       visibilityRecords.forEach { recipientUserID ->
-        log.info("removing dataset visibility from user {} in project {}; object store contains no such share", recipientUserID, installTarget)
+        logger.info("removing dataset visibility from user {} in project {}; object store contains no such share", recipientUserID, installTarget)
         db.deleteDatasetVisibility(dataset.datasetID, recipientUserID)
       }
 
       // In case the dataset owner's visibility record was accidentally deleted
       // by a user, bug, or other process, ensure that the record exists in the
       // target app db.
-      db.tryInsertDatasetVisibility(dataset.datasetID, installTarget, dataset.ownerID, log)
+      context(logger) {
+        db.tryInsertDatasetVisibility(dataset.datasetID, installTarget, dataset.ownerID)
+      }
 
       db.updateSyncControlSharesTimestamp(dataset.datasetID, latestShareTimestamp)
     }
   }
 
-  private fun purgeFromTargets(dataset: DatasetRecord, log: Logger) {
-    log.info("purging dataset visibility records from all target projects")
+  private fun ShareContext.purgeFromTargets(dataset: DatasetRecord) {
+    logger.info("purging dataset visibility records from all target projects")
 
     dataset.projects.forEach { projectID ->
 
       if (!AppDatabaseRegistry.contains(projectID, dataset.type)) {
-        log.warn("cannot purge dataset visibility records from disabled install target {}", projectID)
+        logger.warn("cannot purge dataset visibility records from disabled install target {}", projectID)
         return@forEach
       }
 
@@ -340,20 +338,20 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
       },
     )
 
+  context(logger: Logger)
   private fun AppDBTransaction.tryInsertDatasetVisibility(
     datasetID: DatasetID,
     installTarget: InstallTargetID,
     recipientID: UserID,
-    log: Logger,
   ) {
     try {
       insertDatasetVisibility(datasetID, recipientID)
       // This log is here because we only want an info level line for attempted
       // actions that actually resulted in something happening.
-      log.info("created dataset visibility record for recipient {} in install target {}", recipientID, installTarget)
+      logger.info("created dataset visibility record for recipient {} in install target {}", recipientID, installTarget)
     } catch (e: SQLException) {
       if (isUniqueConstraintViolation(e)) {
-        log.info("share insert race condition; already shared with recipient {}", recipientID)
+        logger.info("share insert race condition; already shared with recipient {}", recipientID)
       } else {
         throw e
       }

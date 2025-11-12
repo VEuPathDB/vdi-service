@@ -19,15 +19,12 @@ import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
 import vdi.core.plugin.client.PluginException
 import vdi.core.plugin.client.PluginRequestException
-import vdi.core.plugin.client.response.uni.UninstallBadRequestResponse
-import vdi.core.plugin.client.response.uni.UninstallResponseType
-import vdi.core.plugin.client.response.uni.UninstallUnexpectedErrorResponse
+import vdi.core.plugin.client.response.EmptySuccessResponse
+import vdi.core.plugin.client.response.ServiceErrorResponse
 import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.plugin.mapping.PluginHandlers
-import vdi.model.data.DatasetID
 import vdi.model.data.DatasetType
 import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
 
 internal class SoftDeleteLaneImpl(
   private val config: SoftDeleteLaneConfig,
@@ -50,10 +47,9 @@ internal class SoftDeleteLaneImpl(
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
           kc.fetchMessages(config.eventKey)
-            .forEach { (userID, datasetID, source) ->
-              logger.info("received uninstall job for dataset $userID/$datasetID from source $source")
-              wp.submit { tryHandleUninstall(userID, datasetID) }
-            }
+            .map { SoftDeleteContext(it, logger) }
+            .onEach { it.logger.info("received uninstall job from source {}", it.eventSource) }
+            .forEach { wp.submit { it.tryHandleUninstall() } }
         }
       }
     }
@@ -63,17 +59,17 @@ internal class SoftDeleteLaneImpl(
     confirmShutdown()
   }
 
-  private suspend fun tryHandleUninstall(userID: UserID, datasetID: DatasetID) {
+  private suspend fun SoftDeleteContext.tryHandleUninstall() {
     try {
-      handleUninstall(userID, datasetID)
+      handleUninstall()
     } catch (e: PluginException) {
       e.log(logger::error)
     } catch (e: Throwable) {
-      PluginException.uninstall("N/A", "N/A", userID, datasetID, cause = e).log(logger::error)
+      PluginException.uninstall("N/A", "N/A", ownerID, datasetID, cause = e).log(logger::error)
     }
   }
 
-  private suspend fun handleUninstall(userID: UserID, datasetID: DatasetID) {
+  private suspend fun SoftDeleteContext.handleUninstall() {
     val internalDBRecord = cacheDB.selectDataset(datasetID)
       ?: throw IllegalStateException("received uninstall event for a dataset that does not exist in the internal database")
 
@@ -87,7 +83,7 @@ internal class SoftDeleteLaneImpl(
 
     // Grab a plugin handler instance for this dataset type.
     val handler = PluginHandlers[internalDBRecord.type] orElse {
-      logger.error("no plugin handler found for dataset {}/{} type {}:{}", userID, datasetID, internalDBRecord.type.name, internalDBRecord.type.version)
+      logger.error("no plugin handler found type {}", internalDBRecord.type)
       return
     }
 
@@ -95,22 +91,22 @@ internal class SoftDeleteLaneImpl(
     // uninstall on each.
     internalDBRecord.projects.forEach { projectID ->
       if (!handler.appliesToProject(projectID)) {
-        logger.warn("type handler for dataset type {}:{} does not apply to project {} (dataset {}/{})", internalDBRecord.type.name, internalDBRecord.type.version, projectID, userID, datasetID)
+        logger.warn("type handler for {} does not apply to project {}", internalDBRecord.type, projectID)
         return@forEach
       }
 
       if (!AppDatabaseRegistry.contains(projectID, internalDBRecord.type)) {
-        logger.warn("dataset {}/{} cannot be uninstalled from target project {} as the project is disabled", userID, datasetID, projectID)
+        logger.warn("dataset cannot be uninstalled from target project {}; project is disabled", projectID)
         return@forEach
       }
 
-      if (datasetShouldBeUninstalled(userID, datasetID, projectID, internalDBRecord.type)) {
+      if (datasetShouldBeUninstalled(projectID, internalDBRecord.type)) {
         try {
-          uninstallDataset(userID, datasetID, projectID, handler, internalDBRecord)
+          uninstallDataset(projectID, handler, internalDBRecord)
         } catch (e: PluginException) {
           throw e
         } catch (e: Throwable) {
-          throw PluginException.uninstall(handler.name, projectID, userID, datasetID, cause = e)
+          throw PluginException.uninstall(handler.name, projectID, ownerID, datasetID, cause = e)
         }
       }
     }
@@ -118,9 +114,7 @@ internal class SoftDeleteLaneImpl(
     timer.observeDuration()
   }
 
-  private suspend fun uninstallDataset(
-    userID: UserID,
-    datasetID: DatasetID,
+  private suspend fun SoftDeleteContext.uninstallDataset(
     installTarget: InstallTargetID,
     handler: PluginHandler,
     record: DatasetRecord
@@ -128,91 +122,50 @@ internal class SoftDeleteLaneImpl(
     appDB.withTransaction(installTarget, record.type) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedNotUninstalled) }
 
     val response = try {
-      handler.client.postUninstall(datasetID, installTarget, record.type)
+      handler.client.postUninstall(eventID, datasetID, installTarget, record.type)
     } catch (e: Throwable) {
-      throw PluginRequestException.uninstall(handler.name, installTarget, userID, datasetID, cause = e)
+      throw PluginRequestException.uninstall(handler.name, installTarget, ownerID, datasetID, cause = e)
     }
 
-    Metrics.Uninstall.count.labels(record.type.name.toString(), record.type.version, response.responseCode.toString()).inc()
+    Metrics.Uninstall.count.labels(record.type.name.toString(), record.type.version, response.status.code.toString()).inc()
 
-    when (response.type) {
-      UninstallResponseType.Success
-      -> handleSuccessResponse(handler, userID, datasetID, installTarget)
-
-      UninstallResponseType.BadRequest
-      -> handleBadRequestResponse(handler, userID, datasetID, installTarget, response as UninstallBadRequestResponse)
-
-      UninstallResponseType.UnexpectedError
-      -> handleUnexpectedErrorResponse(handler, userID, datasetID, installTarget, response as UninstallUnexpectedErrorResponse)
+    when (response) {
+      is EmptySuccessResponse -> handleSuccessResponse(handler, installTarget)
+      is ServiceErrorResponse -> handleUnexpectedErrorResponse(handler, installTarget, response)
+      else -> throw IllegalStateException("invalid response status: ${response.status}")
     }
   }
 
-  private fun datasetShouldBeUninstalled(
-    userID: UserID,
-    datasetID: DatasetID,
+  private fun SoftDeleteContext.datasetShouldBeUninstalled(
     installTarget: InstallTargetID,
     dataType: DatasetType,
   ): Boolean {
     val dataset = appDB.accessor(installTarget, dataType)!!.selectDataset(datasetID)
 
     if (dataset == null) {
-      logger.warn("dataset {}/{} does not appear in target project {}, cannot run uninstall", userID, datasetID, installTarget)
+      logger.warn("dataset does not appear in target project {}, cannot run uninstall", installTarget)
       return false
     }
 
     if (dataset.deletionState == DeleteFlag.DeletedAndUninstalled) {
-      logger.info("dataset {}/{} has already been successfully uninstalled from target project {}", userID, datasetID, installTarget)
+      logger.info("dataset has already been successfully uninstalled from target project {}", installTarget)
       return false
     }
 
     return true
   }
 
-  private fun handleSuccessResponse(handler: PluginHandler, userID: UserID, datasetID: DatasetID, installTarget: InstallTargetID) {
-    logger.info(
-      "dataset handler server reports dataset {}/{} was successfully uninstalled from project {} via plugin {}",
-      userID,
-      datasetID,
-      installTarget,
-      handler.name
-    )
-
+  private fun SoftDeleteContext.handleSuccessResponse(handler: PluginHandler, installTarget: InstallTargetID) {
+    logger.info("dataset successfully uninstalled from project {} via plugin {}", installTarget, handler.name)
     appDB.withTransaction(installTarget, handler.type) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedAndUninstalled) }
   }
 
-  private fun handleBadRequestResponse(
+  private fun SoftDeleteContext.handleUnexpectedErrorResponse(
     handler: PluginHandler,
-    userID: UserID,
-    datasetID: DatasetID,
     installTarget: InstallTargetID,
-    res: UninstallBadRequestResponse
+    res: ServiceErrorResponse
   ) {
-    logger.error(
-      "dataset handler server reports 400 error for uninstall on dataset {}/{} for project {} via plugin {}",
-      userID,
-      datasetID,
-      installTarget,
-      handler.name,
-    )
-
-    throw PluginException.uninstall(handler.name, installTarget, userID, datasetID, res.message)
-  }
-
-  private fun handleUnexpectedErrorResponse(
-    handler: PluginHandler,
-    userID: UserID,
-    datasetID: DatasetID,
-    installTarget: InstallTargetID,
-    res: UninstallUnexpectedErrorResponse
-  ) {
-    logger.error(
-      "dataset handler server reports 500 for uninstall on dataset {}/{} for project {} via plugin {}",
-      userID,
-      datasetID,
-      installTarget,
-      res.message,
-    )
-
-    throw PluginException.uninstall(handler.name, installTarget, userID, datasetID, res.message)
+    logger.error("unhandled error when uninstalling dataset from project {} via plugin {}", installTarget, res.message)
+    throw PluginException.uninstall(handler.name, installTarget, ownerID, datasetID, res.message)
   }
 }

@@ -1,6 +1,5 @@
 package vdi.util.zip
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
 import java.io.FileNotFoundException
 import java.io.InputStream

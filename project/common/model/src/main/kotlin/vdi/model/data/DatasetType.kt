@@ -12,6 +12,8 @@ data class DatasetType @JsonCreator constructor(
   @field:JsonProperty(JsonKey.Version)
   val version: String,
 ) {
+  override fun toString() = "$name:$version"
+
   object JsonKey {
     const val Name    = "name"
     const val Version = "version"
