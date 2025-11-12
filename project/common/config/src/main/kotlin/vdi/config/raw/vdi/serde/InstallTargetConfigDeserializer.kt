@@ -23,27 +23,30 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
 
     val targetName = obj[JsonKey.TargetName].textValue()
     val dataTypes  = (obj[JsonKey.DataTypes] as ArrayNode?)?.processDataTypes() ?: emptySet()
+    val fileRoot   = obj[JsonKey.FileRoot].textValue()
 
     if (obj[JsonKey.Enabled]?.booleanValue() == false) {
       val dummyDB =
         DirectDatabaseConnectionConfig("disabled", SecretString("disabled"), null, null, "disabled", PartialHostAddress("disabled", null), "disabled")
 
       return InstallTargetConfig(
-        enabled    = false,
-        targetName = targetName,
-        controlDB  = dummyDB,
-        dataDB     = dummyDB,
+        enabled         = false,
+        targetName      = targetName,
+        controlDB       = dummyDB,
+        dataDB          = dummyDB,
+        datasetFileRoot = fileRoot,
       )
     }
 
     return InstallTargetConfig(
-      enabled        = true,
-      targetName     = targetName,
-      dataTypes      = dataTypes,
-      controlDB      = (obj[JsonKey.ControlDB] as ObjectNode).deserialize(),
-      dataDB         = (obj[JsonKey.DataDB] as ObjectNode).deserialize(),
-      metaValidation = obj[JsonKey.MetaValidation]
-        ?.let { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it) }
+      enabled         = true,
+      targetName      = targetName,
+      dataTypes       = dataTypes,
+      controlDB       = (obj[JsonKey.ControlDB] as ObjectNode).deserialize(),
+      dataDB          = (obj[JsonKey.DataDB] as ObjectNode).deserialize(),
+      metaValidation  = obj[JsonKey.MetaValidation]
+        ?.let { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it) },
+      datasetFileRoot = fileRoot,
     )
   }
 

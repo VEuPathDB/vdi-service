@@ -10,7 +10,15 @@
       "type": "boolean",
       "default": true
     },
-    "targetName": { "$ref": "../../common.json#/$defs/installTarget" },
+    "targetName": {
+      "$ref": "../../common.json#/$defs/installTarget",
+    },
+    "datasetFileRoot": {
+      "title": "Dataset File Root",
+      "description": "Alternative dataset file installation root directory to be used instead of `siteBuild` when constructing dataset directory paths.",
+      "type": "string",
+      "minLength": 3
+    },
     "dataTypes": {
       "title": "Supported Data Types",
       "description": "Optional list of data types that the install target supports.\n\nDefaults to supporting all data types from any plugins enabled for the install target.",

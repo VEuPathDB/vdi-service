@@ -32,14 +32,19 @@ data class InstallTargetConfig(
   @param:JsonProperty(JsonKey.MetaValidation)
   @field:JsonProperty(JsonKey.MetaValidation)
   val metaValidation: JsonSchema? = null,
+
+  @param:JsonProperty(JsonKey.FileRoot)
+  @field:JsonProperty(JsonKey.FileRoot)
+  val datasetFileRoot: String? = null,
 ) {
   internal object JsonKey {
-    const val Enabled = "enabled"
-    const val TargetName = "targetName"
-    const val DataTypes = "dataTypes"
-    const val ControlDB = "controlDb"
-    const val DataDB = "dataDb"
+    const val ControlDB      = "controlDb"
+    const val DataDB         = "dataDb"
+    const val DataTypes      = "dataTypes"
+    const val Enabled        = "enabled"
+    const val FileRoot       = "datasetFileRoot"
     const val MetaValidation = "metaValidation"
+    const val TargetName     = "targetName"
   }
 }
 

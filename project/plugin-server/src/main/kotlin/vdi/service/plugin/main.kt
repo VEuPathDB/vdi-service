@@ -31,7 +31,7 @@ fun main() {
     ServiceConfiguration(plugin, config.siteBuild),
     ScriptExecutorImpl(),
     PrometheusMeterRegistry(PrometheusConfig.DEFAULT).let { MetricsBundle(it, ScriptMetrics(it)) },
-    DatasetPathFactory(plugin.installRoot ?: "/datasets", config.siteBuild)
+    DatasetPathFactory(config, plugin)
   )
 
   MetaLogger.info("configuration loaded; starting netty")
