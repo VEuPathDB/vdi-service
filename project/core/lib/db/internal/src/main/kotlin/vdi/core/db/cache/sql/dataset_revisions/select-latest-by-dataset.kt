@@ -3,8 +3,8 @@ package vdi.core.db.cache.sql.dataset_revisions
 import io.foxcapades.kdbc.get
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetRevision
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetRevision
 import java.sql.Connection
 import vdi.core.db.cache.model.DatasetRevisionRecord
 import vdi.core.db.jdbc.reqDatasetID

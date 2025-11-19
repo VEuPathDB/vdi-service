@@ -3,8 +3,8 @@ package vdi.core.db.cache.sql.dataset_publications
 import io.foxcapades.kdbc.withPreparedBatchUpdate
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetPublication
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetPublication
 
 // language=postgresql
 private const val SQL = """

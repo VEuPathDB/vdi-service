@@ -8,7 +8,7 @@ import vdi.core.db.cache.util.getProjectIDList
 import vdi.core.db.jdbc.getDataType
 import vdi.core.db.jdbc.getUserID
 import vdi.core.db.jdbc.reqDatasetID
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetType
 
 // language=postgresql
 private const val SQL = """

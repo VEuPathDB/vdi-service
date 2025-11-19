@@ -5,7 +5,7 @@ import org.veupathdb.lib.s3.s34k.objects.S3Object
 import java.io.InputStream
 import java.time.OffsetDateTime
 
-internal sealed class EagerDatasetFileImpl(
+internal abstract class EagerDatasetFileImpl(
   override val path: String,
   private val lastModified: OffsetDateTime,
   protected val bucket: ObjectContainer,

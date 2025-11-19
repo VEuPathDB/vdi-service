@@ -1,8 +1,8 @@
 package vdi.core.db.cache.model
 
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetType
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetType
+import vdi.model.meta.UserID
 
 data class BrokenImportRecord(
   val datasetID: DatasetID,

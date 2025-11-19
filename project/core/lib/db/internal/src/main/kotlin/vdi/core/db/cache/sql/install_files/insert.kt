@@ -1,8 +1,8 @@
 package vdi.core.db.cache.sql.install_files
 
 import io.foxcapades.kdbc.withPreparedBatchUpdate
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetFileInfo
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetFileInfo
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
 

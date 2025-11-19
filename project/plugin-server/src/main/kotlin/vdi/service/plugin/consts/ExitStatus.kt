@@ -13,25 +13,6 @@ object ExitStatus {
     }
   }
 
-  enum class InstallData(val code: Int?, val metricFriendlyName: String) {
-    Success(0, "success"),
-    ValidationFailure(99, "validation_failure"),
-    Unknown(null ,"unknown");
-
-    companion object {
-      fun fromCode(code: Int) = entries.find { it.code == code } ?: Unknown
-    }
-  }
-
-  enum class UninstallData(val code: Int?, val metricFriendlyName: String) {
-    Success(0, "success"),
-    Unknown(null, "unknown");
-
-    companion object {
-      fun fromCode(code: Int) = entries.find { it.code == code } ?: Unknown
-    }
-  }
-
   enum class InstallMeta(val code: Int?, val metricFriendlyName: String) {
     Success(0, "success"),
     Unknown(null, "unknown");
@@ -41,10 +22,10 @@ object ExitStatus {
     }
   }
 
-  enum class CheckCompatibility(val code: Int?, val metricFriendlyName: String) {
-    Success(0, "success"),
-    Incompatible(1, "incompatible"),
-    Unknown(null, "unknown");
+  enum class CheckCompatibility(val code: Int?) {
+    Success(0),
+    Incompatible(1),
+    Unknown(null);
 
     companion object {
       fun fromCode(code: Int) = entries.find { it.code == code } ?: Unknown

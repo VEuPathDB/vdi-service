@@ -1,8 +1,8 @@
 package vdi.core.db.cache.sql.sync_control
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
+import vdi.model.meta.DatasetType
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet

@@ -1,16 +1,13 @@
 package vdi.service.plugin.server.errors
 
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.UnsupportedMediaTypeException
-import io.ktor.server.response.respondText
 import io.ktor.util.pipeline.PipelineContext
 import org.slf4j.LoggerFactory
-import vdi.json.toJSONString
-import vdi.model.api.internal.SimpleErrorResponse
+import vdi.io.plugin.responses.PluginResponseStatus
+import vdi.io.plugin.responses.ServerErrorResponse
+import vdi.service.plugin.model.ExpectedError
+import vdi.service.plugin.server.respondJSON
 
 private val log = LoggerFactory.getLogger("ExceptionMiddleware")
 
@@ -20,33 +17,11 @@ suspend fun PipelineContext<*, ApplicationCall>.withExceptionMapping(
   try {
     fn()
   } catch (e: Throwable) {
-    when (e) {
-      is BadRequestException -> {
-        log.debug("Thrown 400 exception.", e)
-        call.respondText(
-          SimpleErrorResponse(e.message ?: "null").toJSONString(),
-          ContentType.Application.Json,
-          HttpStatusCode.BadRequest,
-        )
-      }
-
-      is UnsupportedMediaTypeException -> {
-        log.debug("Thrown 415 exception.", e)
-        call.respondText(
-          SimpleErrorResponse(e.message ?: "null").toJSONString(),
-          ContentType.Application.Json,
-          HttpStatusCode.UnsupportedMediaType,
-        )
-      }
-
-      else                             -> {
-        log.error("Uncaught exception", e)
-        call.respondText(
-          SimpleErrorResponse(e.message ?: "null").toJSONString(),
-          ContentType.Application.Json,
-          HttpStatusCode.InternalServerError,
-        )
-      }
+    if (e is ExpectedError) {
+      call.respondJSON(e.toResponse(), e.status)
+    } else {
+      log.error("Uncaught exception", e)
+      call.respondJSON(ServerErrorResponse(e.message ?: "(null exception message)"), PluginResponseStatus.ServerError)
     }
   }
 }

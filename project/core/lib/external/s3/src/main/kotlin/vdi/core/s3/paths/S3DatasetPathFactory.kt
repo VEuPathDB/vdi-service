@@ -1,7 +1,7 @@
 package vdi.core.s3.paths
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 
 internal class S3DatasetPathFactory(
   private val ownerID: UserID,
@@ -35,4 +35,8 @@ internal class S3DatasetPathFactory(
   fun datasetDocumentsDir() = S3Paths.datasetDocumentsDir(ownerID, datasetID)
 
   fun datasetDocumentFile(fileName: String) = S3Paths.datasetDocumentFile(ownerID, datasetID, fileName)
+
+  fun datasetMappingsDir() = S3Paths.datasetMappingsDir(ownerID, datasetID)
+
+  fun datasetMappingFile(fileName: String) = S3Paths.datasetMappingFile(ownerID, datasetID, fileName)
 }

@@ -1,9 +1,9 @@
 package vdi.core.db.cache.model
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
 import java.time.OffsetDateTime
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetType
+import vdi.model.meta.UserID
 
 interface Dataset {
   val datasetID: DatasetID

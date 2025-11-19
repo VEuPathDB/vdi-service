@@ -7,7 +7,7 @@ import java.sql.Connection
 import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.jdbc.getUserID
 import vdi.core.db.jdbc.reqDatasetID
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import vdi.model.data.DatasetShareOffer
 import vdi.model.data.DatasetShareReceipt
 

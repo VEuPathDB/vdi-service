@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.networknt.schema.JsonSchema
 import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.vdi.serde.InstallTargetConfigDeserializer
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetType
 
 @JsonDeserialize(using = InstallTargetConfigDeserializer::class)
 data class InstallTargetConfig(

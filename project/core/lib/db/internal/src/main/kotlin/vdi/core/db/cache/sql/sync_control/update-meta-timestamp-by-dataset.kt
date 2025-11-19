@@ -1,7 +1,7 @@
 package vdi.core.db.cache.sql.sync_control
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import java.sql.Connection
 import java.time.OffsetDateTime
 import vdi.core.db.jdbc.setDatasetID

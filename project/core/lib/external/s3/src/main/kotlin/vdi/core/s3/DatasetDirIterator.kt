@@ -3,8 +3,8 @@ package vdi.core.s3
 import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import vdi.core.metrics.Metrics
 import vdi.core.s3.exception.MalformedDatasetException
 import vdi.core.s3.paths.S3DatasetPathFactory

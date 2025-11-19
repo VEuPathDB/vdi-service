@@ -1,7 +1,7 @@
 package vdi.core.s3
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import java.util.stream.Stream
 
 interface DatasetObjectStore {

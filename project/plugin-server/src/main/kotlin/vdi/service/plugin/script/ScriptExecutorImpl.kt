@@ -6,20 +6,20 @@ import kotlinx.coroutines.withContext
 
 class ScriptExecutorImpl : ScriptExecutor {
   override suspend fun <T> executeScript(
-    command:     String,
+    command:     Path,
     workDir:     Path,
     arguments:   Array<String>,
     environment: Map<String, String>,
     fn:          suspend ScriptProcess.() -> T,
   ): T = withContext(Dispatchers.IO) {
-    val rawProcess = ProcessBuilder(command, *arguments).apply {
+    val rawProcess = ProcessBuilder(command.toString(), *arguments).apply {
       directory(workDir.toFile())
       environment().clear()
       environment().putAll(environment)
     }.start()
 
     val out = try {
-      fn(ScriptProcessImpl(command, rawProcess))
+      fn(ScriptProcessImpl(command.toString(), rawProcess))
     } finally {
       rawProcess.waitFor()
     }

@@ -1,7 +1,7 @@
 package vdi.core.db.app.model
 
 import java.time.OffsetDateTime
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 
 /**
  * Represents a single record in the `vdi.dataset_install_messages` table.

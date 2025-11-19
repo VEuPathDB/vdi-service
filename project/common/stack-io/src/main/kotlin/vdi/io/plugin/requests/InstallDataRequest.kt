@@ -18,4 +18,4 @@ class InstallDataRequest(
 
   @JsonProperty(InstallTarget)
   installTarget: InstallTargetID,
-): TargettedPluginAPIRequest(eventID, vdiID, installTarget)
+): TargetedPluginAPIRequest(eventID, vdiID, installTarget)

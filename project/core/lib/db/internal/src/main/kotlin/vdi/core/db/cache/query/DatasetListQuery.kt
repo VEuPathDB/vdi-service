@@ -1,7 +1,7 @@
 package vdi.core.db.cache.query
 
 import vdi.core.db.cache.model.DatasetOwnershipFilter
-import vdi.model.data.UserID
+import vdi.model.meta.UserID
 
 data class DatasetListQuery(
   val userID:    UserID,

@@ -10,10 +10,8 @@ import vdi.model.data.InstallTargetID
 import vdi.service.plugin.conf.ShortVDIConfig
 
 
-class DatasetPathFactory(
-  config: ShortVDIConfig,
-  plugin: PluginConfig,
-) {
+class DatasetPathFactory(config: ShortVDIConfig, plugin: PluginConfig) {
+
   private val pathOverrides = config.installTargets.asSequence()
     .filter { it.enabled && it.datasetFileRoot != null }
     .map { it.targetName to it.datasetFileRoot!! }

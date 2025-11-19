@@ -2,7 +2,7 @@ package vdi.core.db.cache.model
 
 import java.time.OffsetDateTime
 import vdi.core.db.model.SyncControlRecord
-import vdi.model.data.*
+import vdi.model.meta.*
 
 data class AdminDatasetDetailsRecord(
   override val datasetID: DatasetID,

@@ -2,7 +2,7 @@ package vdi.core.db.cache.sql.import_control
 
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import java.sql.Connection
 import vdi.core.db.cache.util.getImportStatus
 import vdi.core.db.jdbc.setDatasetID

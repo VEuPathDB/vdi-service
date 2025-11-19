@@ -4,9 +4,9 @@ package vdi.core.db.cache.util
 
 import io.foxcapades.kdbc.forEach
 import io.foxcapades.kdbc.map
-import vdi.model.data.InstallTargetID
-import vdi.model.data.DatasetFileInfo
-import vdi.model.data.DatasetVisibility
+import vdi.model.meta.InstallTargetID
+import vdi.model.meta.DatasetFileInfo
+import vdi.model.meta.DatasetVisibility
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import vdi.core.db.cache.model.DatasetImportStatus

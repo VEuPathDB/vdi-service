@@ -4,13 +4,13 @@ import io.foxcapades.kdbc.get
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetRevision
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetRevision
 import java.sql.Connection
 import vdi.core.db.cache.model.DatasetRevisionRecordSet
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.jdbc.setDatasetID
-import vdi.model.data.DatasetRevisionHistory
+import vdi.model.meta.DatasetRevisionHistory
 
 /**
  * This slightly wonky looking query attempts to locate the revision records for

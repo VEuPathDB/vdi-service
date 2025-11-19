@@ -1,19 +1,19 @@
 package vdi.core.s3.paths
 
 import vdi.core.s3.files.FileName
-import vdi.core.s3.files.ShareFileType
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import vdi.core.s3.util.PathFactory
 
-sealed interface ShareFilePath: DatasetPath<ShareFileType> {
+sealed interface ShareFilePath: DatasetPath{
   val recipientID: UserID
 
   companion object: PathFactory<ShareFilePath> {
-    private val pattern = Regex("^([\\w-]+)/(\\d+)/([\\w.]+)/shares/(\\d+)/([^/]+)$")
+    private val pattern = Regex("^([\\w-]+)/(\\d+)/([\\w.]+)/${FileName.ShareDirectory}/(\\d+)/([^/]+)$")
 
     override fun matches(path: String) = pattern.matches(path)
-      && path.substringAfterLast('/').let { name -> ShareFileType.entries.any { it.fileName == name } }
+      && path.substringAfterLast('/')
+        .let { it == FileName.ShareOfferFile || it == FileName.ShareReceiptFile  }
 
     override fun create(path: String): ShareFilePath =
       pattern.matchEntire(path)!!.destructured.let { (bucket, user, dataset, recipient, file) ->
@@ -22,18 +22,14 @@ sealed interface ShareFilePath: DatasetPath<ShareFileType> {
   }
 
   private class ShareFilePathImpl(
-    fileName: String,
+    override val fileName: String,
     override val userID: UserID,
     override val datasetID: DatasetID,
     override val recipientID: UserID,
     override val bucketName: String,
   ) : ShareFilePath {
-    override val type = ShareFileType.entries.firstOrNull { it.fileName == fileName }
-      ?: throw IllegalArgumentException("unrecognized dataset path: $pathString")
-    override val fileName: String
-      get() = type.fileName
     override val pathString: String
-      get() = "$bucketName/$userID/$datasetID/${FileName.ShareDirectoryName}/$recipientID/$fileName"
+      get() = "$bucketName/$userID/$datasetID/${FileName.ShareDirectory}/$recipientID/$fileName"
 
     override fun toString() = pathString
   }

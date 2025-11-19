@@ -10,6 +10,8 @@ import kotlin.contracts.contract
 import kotlin.io.path.createFile
 import kotlin.io.path.outputStream
 
+internal const val DataDictionaryDirectoryName = "data-dict"
+
 internal fun PartData.handlePayload(workspace: Path, fileName: String): Path {
   val payload = workspace.resolve(fileName)
 
@@ -18,7 +20,7 @@ internal fun PartData.handlePayload(workspace: Path, fileName: String): Path {
     when (this) {
       is PartData.BinaryChannelItem -> provider().toInputStream().transferTo(it)
       is PartData.BinaryItem        -> provider().asStream().transferTo(it)
-      is PartData.FileItem          -> provider().asStream().transferTo(it)
+      is PartData.FileItem          -> provider().toInputStream().transferTo(it)
       is PartData.FormItem          -> value.byteInputStream().transferTo(it)
     }
   }

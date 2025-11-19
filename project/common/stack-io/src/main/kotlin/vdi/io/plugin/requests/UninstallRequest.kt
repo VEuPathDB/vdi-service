@@ -29,7 +29,7 @@ class UninstallRequest(
   @get:JsonProperty(Type)
   @param:JsonProperty(Type)
   val type: DatasetType,
-): TargettedPluginAPIRequest(eventID, vdiID, installTarget) {
+): TargetedPluginAPIRequest(eventID, vdiID, installTarget) {
   companion object JsonKey {
     const val Type = "type"
   }

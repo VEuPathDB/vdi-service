@@ -4,9 +4,9 @@ import vdi.core.db.app.model.*
 import vdi.core.db.model.ReconcilerTargetRecord
 import vdi.core.db.model.SyncControlRecord
 import vdi.db.app.TargetDBPlatform
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
+import vdi.model.meta.UserID
 import vdi.util.io.CloseableIterator
 
 interface AppDBAccessor {

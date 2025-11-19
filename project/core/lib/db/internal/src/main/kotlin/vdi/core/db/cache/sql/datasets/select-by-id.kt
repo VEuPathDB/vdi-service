@@ -2,7 +2,7 @@ package vdi.core.db.cache.sql.datasets
 
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import java.sql.Connection
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetRecord
@@ -11,7 +11,7 @@ import vdi.core.db.cache.util.getDatasetVisibility
 import vdi.core.db.cache.util.getImportStatus
 import vdi.core.db.cache.util.getProjectIDList
 import vdi.core.db.jdbc.*
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetType
 
 // language=postgresql
 private val SQL = """

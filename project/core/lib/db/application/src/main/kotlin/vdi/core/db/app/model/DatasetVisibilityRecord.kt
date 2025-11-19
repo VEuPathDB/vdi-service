@@ -1,7 +1,7 @@
 package vdi.core.db.app.model
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 
 /**
  * Represents a single row in the `vdi.dataset_visibility` table in an

@@ -7,10 +7,10 @@ import io.foxcapades.kdbc.withResults
 import java.sql.Connection
 import vdi.core.db.cache.model.RelatedDataset
 import vdi.core.db.jdbc.setDatasetID
-import vdi.model.data.DataType
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetPublication
-import vdi.model.data.DatasetType
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetPublication
+import vdi.model.meta.DatasetType
 
 // language=postgresql
 private const val SQL = """

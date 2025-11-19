@@ -55,7 +55,7 @@ interface ScriptExecutor {
    * @return Returns the value returned by the given function.
    */
   suspend fun <T> executeScript(
-    command: String,
+    command: Path,
     workDir: Path,
     arguments: Array<String> = emptyArray(),
     environment: Map<String, String> = emptyMap(),

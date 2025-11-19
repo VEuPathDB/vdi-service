@@ -2,8 +2,8 @@ package vdi.core.db.cache.sql.dataset_revisions
 
 import io.foxcapades.kdbc.setUByte
 import io.foxcapades.kdbc.withPreparedBatchUpdate
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetRevision
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetRevision
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.jdbc.setDateTime

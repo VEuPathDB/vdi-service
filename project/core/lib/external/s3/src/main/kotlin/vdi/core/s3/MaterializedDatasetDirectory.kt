@@ -2,15 +2,29 @@ package vdi.core.s3
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.model.data.DatasetManifest
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetShareOffer
-import vdi.model.data.DatasetShareReceipt
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
+import vdi.model.meta.DatasetManifest
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.DatasetShareOffer
+import vdi.model.meta.DatasetShareReceipt
 import java.io.InputStream
 import vdi.core.s3.exception.MalformedDatasetException
-import vdi.core.s3.files.*
+import vdi.core.s3.files.FileName
+import vdi.core.s3.files.data.DataFile
+import vdi.core.s3.files.data.ImportReadyFile
+import vdi.core.s3.files.data.InstallReadyFile
+import vdi.core.s3.files.data.RawUploadFile
+import vdi.core.s3.files.docs.DocumentFile
+import vdi.core.s3.files.flags.DeleteFlagFile
+import vdi.core.s3.files.flags.FlagFile
+import vdi.core.s3.files.flags.RevisedFlagFile
+import vdi.core.s3.files.maps.MappingFile
+import vdi.core.s3.files.meta.ManifestFile
+import vdi.core.s3.files.meta.MetaFile
+import vdi.core.s3.files.meta.MetadataFile
+import vdi.core.s3.files.shares.ShareOffer
+import vdi.core.s3.files.shares.ShareReceipt
 import vdi.core.s3.paths.*
 import vdi.core.s3.paths.S3DatasetPathFactory
 
@@ -27,14 +41,15 @@ internal class MaterializedDatasetDirectory(
   private val bucket: S3Bucket,
   private val pathFactory: S3DatasetPathFactory,
 
-  private val metaFile: DatasetMetaFile<DatasetMetadata>?,
-  private val manifest: DatasetMetaFile<DatasetManifest>?,
-  private val uploadFile: DatasetDataFile?,
-  private val importableFile: DatasetDataFile?,
-  private val installableFile: DatasetDataFile?,
-  private val deleteFlag: DatasetFlagFile?,
-  private val revisedFlag: DatasetFlagFile?,
-  private val shares: Map<UserID, DatasetShare>,
+  private val metaFile: MetadataFile?,
+  private val manifest: ManifestFile?,
+  private val uploadFile: DataFile?,
+  private val importableFile: DataFile?,
+  private val installableFile: DataFile?,
+  private val deleteFlag: FlagFile?,
+  private val revisedFlag: FlagFile?,
+  private val shares: Map<UserID, Pair<ShareOffer, ShareReceipt>>,
+  private val mappingFiles: List<MappingFile>,
 ): DatasetDirectory {
   companion object {
     // throws
@@ -46,15 +61,16 @@ internal class MaterializedDatasetDirectory(
       datasetID: DatasetID,
       pathFactory: S3DatasetPathFactory,
     ): MaterializedDatasetDirectory {
-      var metaFile: DatasetMetaFile<DatasetMetadata>? = null
-      var manifest: DatasetMetaFile<DatasetManifest>? = null
-      var uploadFile: DatasetDataFile? = null
-      var importableFile: DatasetDataFile? = null
-      var installableFile: DatasetDataFile? = null
-      var deleteFlag: DatasetFlagFile? = null
-      var revisedFlag: DatasetFlagFile? = null
+      var metaFile: MetadataFile? = null
+      var manifest: ManifestFile? = null
+      var uploadFile: DataFile? = null
+      var importableFile: DataFile? = null
+      var installableFile: DataFile? = null
+      var deleteFlag: FlagFile? = null
+      var revisedFlag: FlagFile? = null
 
-      val shareRefs = HashMap<UserID, ShareRef>(4)
+      val shareRefBuilders = HashMap<UserID, ShareRefBuilder>(4)
+      val mappingFiles = ArrayList<MappingFile>(1)
 
       objects.forEach {
         val path = "${it.bucket.name}/${it.path}"
@@ -62,24 +78,30 @@ internal class MaterializedDatasetDirectory(
           ?: throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
 
         when (path) {
-          is DataFilePath     -> when (path.type) {
-            DataFileType.ImportReady  -> importableFile = DatasetDataFile.create(it)
-            DataFileType.InstallReady -> installableFile = DatasetDataFile.create(it)
-            DataFileType.RawUpload    -> uploadFile = DatasetDataFile.create(it)
+          is DataFilePath -> when (path.fileName) {
+            FileName.ImportReadyFile  -> importableFile = ImportReadyFile(it)
+            FileName.InstallReadyFile -> installableFile = InstallReadyFile(it)
+            FileName.RawUploadFile    -> uploadFile = RawUploadFile(it)
           }
+
           is DocumentFilePath -> { /*ignore*/ }
-          is FlagFilePath     -> when (path.type) {
-            FlagFileType.Delete  -> deleteFlag  = DatasetFlagFile.create(it)
-            FlagFileType.Revised -> revisedFlag = DatasetFlagFile.create(it)
+
+          is FlagFilePath -> when (path.fileName) {
+            FileName.DeleteFlagFile  -> deleteFlag  = DeleteFlagFile(it)
+            FileName.RevisedFlagFile -> revisedFlag = RevisedFlagFile(it)
           }
-          is MetaFilePath     -> when (path.type) {
-            MetaFileType.Metadata -> metaFile = DatasetMetaFile.createMetadata(it)
-            MetaFileType.Manifest -> manifest = DatasetMetaFile.createManifest(it)
+
+          is MetaFilePath -> when (path.fileName) {
+            FileName.MetadataFile -> metaFile = MetaFile(it)
+            FileName.ManifestFile -> manifest = ManifestFile(it)
           }
-          is ShareFilePath    -> when (path.type) {
-            ShareFileType.Offer   -> shareRefs.computeIfAbsent(path.recipientID, ::ShareRef).offer = it
-            ShareFileType.Receipt -> shareRefs.computeIfAbsent(path.recipientID, ::ShareRef).receipt = it
+
+          is ShareFilePath -> when (path.fileName) {
+            FileName.ShareOfferFile   -> shareRefBuilders.computeIfAbsent(path.recipientID, ::ShareRefBuilder).offer = it
+            FileName.ShareReceiptFile -> shareRefBuilders.computeIfAbsent(path.recipientID, ::ShareRefBuilder).receipt = it
           }
+
+          is MappingFilePath -> mappingFiles.add(MappingFile(it))
         }
       }
 
@@ -94,26 +116,25 @@ internal class MaterializedDatasetDirectory(
         installableFile = installableFile,
         deleteFlag      = deleteFlag,
         revisedFlag     = revisedFlag,
-        shares          = shareRefs.mapValues { (_, ref) -> ref.toDatasetShare(pathFactory) },
+        shares          = shareRefBuilders.mapValues { (_, ref) -> ref.build(pathFactory) },
         pathFactory     = pathFactory,
+        mappingFiles    = mappingFiles,
       )
     }
 
-    private data class ShareRef(
+    private data class ShareRefBuilder(
       val recipientID: UserID,
       var offer: S3Object? = null,
       var receipt: S3Object? = null,
     ) {
-      fun toDatasetShare(pathFactory: S3DatasetPathFactory) =
-        DatasetShare.create(
-          recipientID,
-          offer?.let { DatasetShareFile.createOffer(it, recipientID) }
-            ?: DatasetShareFile.createOffer(pathFactory.datasetShareOfferFile(recipientID), recipientID, receipt!!.bucket),
-          receipt?.let { DatasetShareFile.createReceipt(it, recipientID) }
-            ?: DatasetShareFile.createReceipt(pathFactory.datasetShareReceiptFile(recipientID), recipientID, offer!!.bucket)
+      fun build(pathFactory: S3DatasetPathFactory) =
+        Pair(
+          offer?.let { ShareOffer(recipientID, it) }
+            ?: ShareOffer(recipientID, pathFactory.datasetShareOfferFile(recipientID), receipt!!.bucket.objects),
+          receipt?.let { ShareReceipt(recipientID, it) }
+            ?: ShareReceipt(recipientID, pathFactory.datasetShareReceiptFile(recipientID), offer!!.bucket.objects),
         )
     }
-
   }
 
   // Eagerly loaded dataset directory must exist by definition of being constructed.
@@ -123,7 +144,7 @@ internal class MaterializedDatasetDirectory(
     metaFile != null
 
   override fun getMetaFile() =
-    metaFile ?: DatasetMetaFile.createMetadata(pathFactory.datasetMetaFile(), bucket)
+    metaFile ?: MetaFile(pathFactory.datasetMetaFile(), bucket.objects)
 
   override fun putMetaFile(meta: DatasetMetadata) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -136,7 +157,7 @@ internal class MaterializedDatasetDirectory(
     manifest != null
 
   override fun getManifestFile() =
-    manifest ?: DatasetMetaFile.createManifest(pathFactory.datasetManifestFile(), bucket)
+    manifest ?: ManifestFile(pathFactory.datasetManifestFile(), bucket.objects)
 
   override fun putManifestFile(manifest: DatasetManifest) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -149,7 +170,7 @@ internal class MaterializedDatasetDirectory(
     deleteFlag != null
 
   override fun getDeleteFlag() =
-    deleteFlag ?: DatasetFlagFile.create(pathFactory.datasetDeleteFlagFile(), bucket)
+    deleteFlag ?: DeleteFlagFile(pathFactory.datasetDeleteFlagFile(), bucket.objects)
 
   override fun putDeleteFlag() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -162,7 +183,7 @@ internal class MaterializedDatasetDirectory(
     revisedFlag != null
 
   override fun getRevisedFlag() =
-    revisedFlag ?: DatasetFlagFile.create(pathFactory.datasetRevisedFlagFile(), bucket)
+    revisedFlag ?: RevisedFlagFile(pathFactory.datasetRevisedFlagFile(), bucket.objects)
 
   override fun putRevisedFlag() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -175,7 +196,7 @@ internal class MaterializedDatasetDirectory(
     uploadFile != null
 
   override fun getUploadFile() =
-    uploadFile ?: DatasetDataFile.create(pathFactory.datasetUploadZip(), bucket)
+    uploadFile ?: RawUploadFile(pathFactory.datasetUploadZip(), bucket.objects)
 
   override fun putUploadFile(fn: () -> InputStream) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -188,7 +209,7 @@ internal class MaterializedDatasetDirectory(
     importableFile != null
 
   override fun getImportReadyFile() =
-    importableFile ?: DatasetDataFile.create(pathFactory.datasetImportReadyZip(), bucket)
+    importableFile ?: ImportReadyFile(pathFactory.datasetImportReadyZip(), bucket.objects)
 
   override fun putImportReadyFile(fn: () -> InputStream) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -201,7 +222,7 @@ internal class MaterializedDatasetDirectory(
     installableFile != null
 
   override fun getInstallReadyFile() =
-    installableFile ?: DatasetDataFile.create(pathFactory.datasetInstallReadyZip(), bucket)
+    installableFile ?: InstallReadyFile(pathFactory.datasetInstallReadyZip(), bucket.objects)
 
   override fun putInstallReadyFile(fn: () -> InputStream) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -210,12 +231,32 @@ internal class MaterializedDatasetDirectory(
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
 
-  override fun getShares(): Map<UserID, DatasetShare> = shares
+  override fun getShares() = shares
 
   override fun putShare(recipientID: UserID) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun putShare(recipientID: UserID, offer: DatasetShareOffer, receipt: DatasetShareReceipt) =
+    throw UnsupportedOperationException("${javaClass.name} is read-only")
+
+  override fun getMappingFiles() = mappingFiles.asSequence()
+
+  override fun getMappingFile(name: String) = mappingFiles.firstOrNull { it.baseName == name }
+
+  override fun putMappingFile(name: String, fn: () -> InputStream) =
+    throw UnsupportedOperationException("${javaClass.name} is read-only")
+
+  override fun deleteMappingFile(name: String) =
+    throw UnsupportedOperationException("${javaClass.name} is read-only")
+
+  override fun getDocumentFiles() = emptySequence<DocumentFile>()
+
+  override fun getDocumentFile(name: String) = null
+
+  override fun putDocumentFile(name: String, fn: () -> InputStream) =
+    throw UnsupportedOperationException("${javaClass.name} is read-only")
+
+  override fun deleteDocumentFile(name: String) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun toString() = "EagerDatasetDir($ownerID/$datasetID)"

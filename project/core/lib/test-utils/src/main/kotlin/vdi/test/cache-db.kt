@@ -8,7 +8,7 @@ import vdi.core.db.cache.model.CoreDatasetMeta
 import vdi.core.db.cache.model.Dataset
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetRecord
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import vdi.model.data.DatasetVisibility
 import vdi.model.data.InstallTargetID
 import vdi.model.data.UserID

@@ -10,7 +10,7 @@ import vdi.core.db.cache.util.getDatasetVisibility
 import vdi.core.db.cache.util.getImportStatus
 import vdi.core.db.cache.util.getProjectIDList
 import vdi.core.db.jdbc.*
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetType
 
 // language=postgresql
 private fun sqlBody(

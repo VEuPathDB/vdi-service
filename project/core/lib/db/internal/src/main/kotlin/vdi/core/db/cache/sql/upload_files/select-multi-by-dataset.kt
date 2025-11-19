@@ -3,8 +3,8 @@ package vdi.core.db.cache.sql.upload_files
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetFileInfo
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetFileInfo
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
 

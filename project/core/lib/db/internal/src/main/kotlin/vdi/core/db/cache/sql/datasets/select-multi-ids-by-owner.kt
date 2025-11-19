@@ -3,8 +3,8 @@ package vdi.core.db.cache.sql.datasets
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import java.sql.Connection
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.jdbc.setUserID

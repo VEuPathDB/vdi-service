@@ -3,9 +3,6 @@ package vdi.core.pruner
 import kotlinx.coroutines.sync.Mutex
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 import vdi.core.db.app.AppDB
@@ -15,14 +12,18 @@ import vdi.core.db.app.purgeDatasetControlTables
 import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.withTransaction
-import vdi.logging.logger
 import vdi.core.metrics.Metrics
 import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
-import vdi.core.s3.files.DataFileType
-import vdi.core.s3.files.FlagFileType
-import vdi.core.s3.files.MetaFileType
-import vdi.core.s3.paths.*
+import vdi.core.s3.files.FileName
+import vdi.core.s3.paths.DataFilePath
+import vdi.core.s3.paths.FlagFilePath
+import vdi.core.s3.paths.MetaFilePath
+import vdi.core.s3.paths.S3Paths
+import vdi.logging.logger
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
+import vdi.model.meta.UserID
 
 /**
  * Dataset Pruner
@@ -56,11 +57,11 @@ object Pruner {
    * history details.
    */
   private val retainedRevisionHistoryFiles = arrayOf<(String) -> Boolean>(
-    { FlagFilePath.matches(it) && it.endsWith(FlagFileType.Revised.fileName) },
-    { MetaFilePath.matches(it) && it.endsWith(MetaFileType.Manifest.fileName) },
+    { FlagFilePath.matches(it) && it.endsWith(FileName.RevisedFlagFile) },
+    { MetaFilePath.matches(it) && it.endsWith(FileName.ManifestFile) },
     { DataFilePath.matches(it) && (
-      it.endsWith(DataFileType.RawUpload.fileName)
-      || it.endsWith(DataFileType.ImportReady.fileName) // TODO: remove this when the async upload process is implemented
+      it.endsWith(FileName.RawUploadFile)
+      || it.endsWith(FileName.ImportReadyFile) // TODO: remove this when the async upload process is implemented
     ) },
   )
 

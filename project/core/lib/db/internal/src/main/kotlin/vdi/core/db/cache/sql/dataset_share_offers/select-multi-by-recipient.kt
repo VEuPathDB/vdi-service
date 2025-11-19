@@ -3,7 +3,7 @@ package vdi.core.db.cache.sql.dataset_share_offers
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.model.data.UserID
+import vdi.model.meta.UserID
 import java.sql.Connection
 import vdi.core.db.cache.model.DatasetShareListEntry
 import vdi.core.db.cache.util.getProjectIDList
@@ -11,8 +11,8 @@ import vdi.core.db.jdbc.getDataType
 import vdi.core.db.jdbc.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.jdbc.setUserID
-import vdi.model.data.DatasetShareOffer
-import vdi.model.data.DatasetShareReceipt
+import vdi.model.meta.DatasetShareOffer
+import vdi.model.meta.DatasetShareReceipt
 import vdi.model.data.DatasetType
 
 // language=postgresql

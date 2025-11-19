@@ -1,11 +1,11 @@
 package vdi.core.db.cache.sql.dataset_share_receipts
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.jdbc.setUserID
-import vdi.model.data.UserID
+import vdi.model.meta.UserID
 
 // language=postgresql
 private const val SQL = """

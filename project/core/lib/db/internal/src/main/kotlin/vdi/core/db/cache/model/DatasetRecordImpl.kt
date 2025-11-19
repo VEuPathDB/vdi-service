@@ -1,7 +1,7 @@
 package vdi.core.db.cache.model
 
 import java.time.OffsetDateTime
-import vdi.model.data.*
+import vdi.model.meta.*
 
 data class DatasetRecordImpl(
   override val datasetID: DatasetID,

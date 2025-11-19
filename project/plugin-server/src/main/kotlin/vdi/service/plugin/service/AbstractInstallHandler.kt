@@ -8,7 +8,7 @@ import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.script.ScriptExecutor
 import vdi.service.plugin.server.context.InstallScriptContext
 
-sealed class AbstractInstallHandler<T, C: InstallScriptContext<*>>(
+abstract class AbstractInstallHandler<T, C: InstallScriptContext<*>>(
   scriptContext: C,
   executor: ScriptExecutor,
   metrics: ScriptMetrics,

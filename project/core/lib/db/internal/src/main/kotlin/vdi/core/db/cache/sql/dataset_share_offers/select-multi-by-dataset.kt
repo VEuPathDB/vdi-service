@@ -3,13 +3,13 @@ package vdi.core.db.cache.sql.dataset_share_offers
 import io.foxcapades.kdbc.map
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import java.sql.Connection
 import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.jdbc.getUserID
 import vdi.core.db.jdbc.setDatasetID
-import vdi.model.data.DatasetShareOffer
-import vdi.model.data.DatasetShareReceipt
+import vdi.model.meta.DatasetShareOffer
+import vdi.model.meta.DatasetShareReceipt
 
 // language=postgresql
 private const val SQL = """

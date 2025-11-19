@@ -1,7 +1,7 @@
 package vdi.core.db.cache.model
 
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetVisibility
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetVisibility
 
 interface CoreDatasetMeta {
   val datasetID: DatasetID

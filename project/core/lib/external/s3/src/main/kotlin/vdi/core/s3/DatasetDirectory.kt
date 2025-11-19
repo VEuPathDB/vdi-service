@@ -1,18 +1,17 @@
 package vdi.core.s3
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.model.data.DatasetManifest
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetShareOffer
-import vdi.model.data.DatasetShareReceipt
 import java.io.InputStream
-import java.time.OffsetDateTime
-import vdi.core.s3.files.DatasetDataFile
+import vdi.core.s3.files.meta.MetadataFile
 import vdi.core.s3.files.DatasetFile
-import vdi.core.s3.files.DatasetFlagFile
-import vdi.core.s3.files.DatasetMetaFile
-import vdi.core.s3.files.DatasetShare
+import vdi.core.s3.files.data.DataFile
+import vdi.core.s3.files.docs.DocumentFile
+import vdi.core.s3.files.flags.FlagFile
+import vdi.core.s3.files.maps.MappingFile
+import vdi.core.s3.files.meta.ManifestFile
+import vdi.core.s3.files.shares.ShareFile
+import vdi.core.s3.files.shares.ShareOffer
+import vdi.core.s3.files.shares.ShareReceipt
+import vdi.model.meta.*
 
 interface DatasetDirectory {
 
@@ -35,6 +34,8 @@ interface DatasetDirectory {
    */
   fun exists(): Boolean
 
+  // region vdi-meta.json
+
   /**
    * Tests whether this [DatasetDirectory] currently contains a metadata JSON
    * file.
@@ -51,7 +52,7 @@ interface DatasetDirectory {
    * file exists or existed.  The existence of the file can be tested using the
    * returned object's [DatasetFile.exists] method.
    */
-  fun getMetaFile(): DatasetMetaFile<DatasetMetadata>
+  fun getMetaFile(): MetadataFile
 
   /**
    * Puts a metadata JSON file into this [DatasetDirectory] overwriting any
@@ -65,6 +66,10 @@ interface DatasetDirectory {
    * Deletes the metadata JSON file from this [DatasetDirectory].
    */
   fun deleteMetaFile()
+
+  // endregion vdi-meta.json
+
+  // region vdi-manifest.json
 
   /**
    * Tests whether this [DatasetDirectory] currently contains a manifest JSON
@@ -82,7 +87,7 @@ interface DatasetDirectory {
    * file exists or existed.  The existence of the file can be tested using the
    * returned object's [DatasetFile.exists] method.
    */
-  fun getManifestFile(): DatasetMetaFile<DatasetManifest>
+  fun getManifestFile(): ManifestFile
 
   /**
    * Puts a manifest JSON file into this [DatasetDirectory] overwriting any
@@ -97,6 +102,10 @@ interface DatasetDirectory {
    */
   fun deleteManifestFile()
 
+  // endregion vdi-manifest.json
+
+  // region delete flag
+
   /**
    * Tests whether this [DatasetDirectory] currently contains a soft-delete
    * marker file.
@@ -110,11 +119,11 @@ interface DatasetDirectory {
    * Returns a representation of this [DatasetDirectory]'s soft-delete marker
    * file.
    *
-   * This method will return a value regardless of whether the delete flag
-   * file exists or existed.  The existence of the file can be tested using the
+   * This method will return a value regardless of whether the delete flag file
+   * exists or existed.  The existence of the file can be tested using the
    * returned object's [DatasetFile.exists] method.
    */
-  fun getDeleteFlag(): DatasetFlagFile
+  fun getDeleteFlag(): FlagFile
 
   /**
    * Puts a soft-delete marker file into this [DatasetDirectory].
@@ -125,10 +134,13 @@ interface DatasetDirectory {
   fun putDeleteFlag()
 
   /**
-   * Deletes the soft-delete marker file from this
-   * [DatasetDirectory].
+   * Deletes the soft-delete marker file from this [DatasetDirectory].
    */
   fun deleteDeleteFlag()
+
+  // endregion delete flag
+
+  // region revised flag
 
   /**
    * Tests whether this [DatasetDirectory] currently contains the obsolete or
@@ -139,11 +151,15 @@ interface DatasetDirectory {
    */
   fun hasRevisedFlag(): Boolean
 
-  fun getRevisedFlag(): DatasetFlagFile
+  fun getRevisedFlag(): FlagFile
 
   fun putRevisedFlag()
 
   fun deleteRevisedFlag()
+
+  // endregion delete flag
+
+  // region raw upload
 
   /**
    * Tests whether this [DatasetDirectory] currently contains a `raw-upload.zip`
@@ -162,7 +178,7 @@ interface DatasetDirectory {
    * file exists or existed.  The existence of the file can be tested using the
    * returned object's [DatasetFile.exists] method.
    */
-  fun getUploadFile(): DatasetDataFile
+  fun getUploadFile(): DataFile
 
   /**
    * Puts a `raw-upload.zip` file into this [DatasetDirectory].
@@ -173,6 +189,10 @@ interface DatasetDirectory {
    * Deletes the `raw-upload.zip` file from this [DatasetDirectory].
    */
   fun deleteUploadFile()
+
+  // endregion raw upload
+
+  // region import-ready
 
   /**
    * Tests whether this [DatasetDirectory] currently contains an
@@ -192,7 +212,7 @@ interface DatasetDirectory {
    * be tested using the returned object's [DatasetFile.exists]
    * method.
    */
-  fun getImportReadyFile(): DatasetDataFile
+  fun getImportReadyFile(): DataFile
 
   /**
    * Puts an `import-ready.zip` file into this [DatasetDirectory].
@@ -203,6 +223,10 @@ interface DatasetDirectory {
    * Deletes the `import-ready.zip` file from this [DatasetDirectory].
    */
   fun deleteImportReadyFile()
+
+  // endregion import-ready
+
+  // region install-ready
 
   /**
    * Tests whether this [DatasetDirectory] currently contains an
@@ -221,7 +245,7 @@ interface DatasetDirectory {
    * `install-ready.zip` file exists or existed.  The existence of the file can
    * be tested using the returned object's [DatasetFile.exists] method.
    */
-  fun getInstallReadyFile(): DatasetDataFile
+  fun getInstallReadyFile(): DataFile
 
   /**
    * Puts an `install-ready.zip` file into this [DatasetDirectory].
@@ -233,20 +257,24 @@ interface DatasetDirectory {
    */
   fun deleteInstallReadyFile()
 
+  // endregion install-ready
+
+  // region shares
+
   /**
-   * Fetches a map of [DatasetShare]s from this [DatasetDirectory].
+   * Fetches a map of [ShareFile]s from this [DatasetDirectory].
    *
    * The returned map will be keyed on the ID of the share recipient.
    *
    * The values in the returned map provide access to further information about
    * the share itself.
    */
-  fun getShares(): Map<UserID, DatasetShare>
+  fun getShares(): Map<UserID, Pair<ShareOffer, ShareReceipt>>
 
   /**
    * Puts a new "share" into this [DatasetDirectory] by creating a share offer
    * and share receipt file in the `DatasetDirectory` with default values that
-   * automatically accept the share on behalf of the recipient..
+   * automatically accept the share on behalf of the recipient.
    *
    * @param recipientID ID of the share recipient.
    */
@@ -264,90 +292,29 @@ interface DatasetDirectory {
    */
   fun putShare(recipientID: UserID, offer: DatasetShareOffer, receipt: DatasetShareReceipt)
 
-  /**
-   * Returns the last modified timestamp of the dataset metadata file in this
-   * dataset directory.
-   *
-   * If this dataset directory does not contain a metadata file at the time of
-   * this method call, this method will return `null`.
-   *
-   * @return The last modified timestamp of the dataset metadata file if it
-   * exists, otherwise `null`.
-   */
-  fun getMetaTimestamp() = getMetaFile().lastModified()
+  // endregion shares
 
-  /**
-   * Returns the last modified timestamp of the dataset manifest file in this
-   * dataset directory.
-   *
-   * If this dataset directory does not contain a manifest file at the time of
-   * this method call, this method will return `null`.
-   *
-   * @return The last modified timestamp of the dataset manifest file if it
-   * exists, otherwise `null`.
-   */
-  fun getManifestTimestamp() = getManifestFile().lastModified()
+  // region mapping files
 
-  /**
-   * Returns the last modified timestamp of the raw user upload file in this
-   * dataset directory.
-   *
-   * If this dataset directory does not contain a raw user upload file at the
-   * time of this method call, this method will return `null`.
-   *
-   * @return The last modified timestamp of the raw user upload file if it
-   * exists, otherwise `null`.
-   */
-  fun getUploadTimestamp() = getUploadFile().lastModified()
+  fun getMappingFiles(): Sequence<MappingFile>
 
-  /**
-   * Returns the last modified timestamp of the import-ready data file in this
-   * dataset directory.
-   *
-   * If this dataset directory does not contain an import-ready file at the time
-   * of this method call, this method will return `null`.
-   *
-   * @return The last modified timestamp of the import-ready data file if it
-   * exists, otherwise `null`.
-   */
-  fun getImportReadyTimestamp() = getImportReadyFile().lastModified()
+  fun getMappingFile(name: String): MappingFile?
 
-  /**
-   * Returns the last modified timestamp of the install-ready data file in this
-   * dataset directory.
-   *
-   * If this dataset directory does not contain an install-ready file at the
-   * time of this method call, this method will return `null`.
-   *
-   * @return The last modified timestamp of the install-ready data file if it
-   * exists, otherwise `null`.
-   */
-  fun getInstallReadyTimestamp() = getInstallReadyFile().lastModified()
+  fun putMappingFile(name: String, fn: () -> InputStream)
 
-  /**
-   * Returns the last modified timestamp of the delete-flag file in this dataset
-   * directory.
-   *
-   * If this dataset directory does not contain an delete-flag file at the time
-   * of this method call, this method will return `null`.
-   *
-   * @return The last modified timestamp of the delete-flag file if it
-   * exists, otherwise `null`.
-   */
-  fun getDeleteFlagTimestamp() = getDeleteFlag().lastModified()
+  fun deleteMappingFile(name: String)
 
-  /**
-   * Returns the most recent file last modified timestamp out of all the dataset
-   * share offer or receipt files that appear in MinIO.
-   */
-  fun getLatestShareTimestamp(fallback: OffsetDateTime): OffsetDateTime {
-    var latest = fallback
+  // endregion mapping files
 
-    getShares().forEach { (_, share) ->
-      share.offer.lastModified()?.also { if (it.isAfter(latest)) latest = it }
-      share.receipt.lastModified()?.also { if (it.isAfter(latest)) latest = it }
-    }
+  // region document files
 
-    return latest
-  }
+  fun getDocumentFiles(): Sequence<DocumentFile>
+
+  fun getDocumentFile(name: String): DocumentFile?
+
+  fun putDocumentFile(name: String, fn: () -> InputStream)
+
+  fun deleteDocumentFile(name: String)
+
+  // endregion document files
 }

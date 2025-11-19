@@ -3,7 +3,7 @@ package vdi.core.s3.files
 import java.io.InputStream
 import java.time.OffsetDateTime
 
-sealed interface DatasetFile {
+interface DatasetFile {
   /**
    * Full path to the dataset file.
    */

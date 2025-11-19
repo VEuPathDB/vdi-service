@@ -17,10 +17,11 @@ import vdi.core.db.cache.withTransaction
 import vdi.core.metrics.Metrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
-import vdi.core.s3.files.DatasetShare
+import vdi.core.s3.files.shares.ShareOffer
+import vdi.core.s3.files.shares.ShareReceipt
+import vdi.core.s3.getLatestShareTimestamp
 import vdi.logging.logger
-import vdi.model.data.*
-import vdi.core.s3.files.DatasetShare as S3Share
+import vdi.model.meta.*
 
 /**
  * Share Trigger Event Handler
@@ -117,7 +118,7 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
 
   private fun ShareContext.synchronizeAll(
     dataset: DatasetRecord,
-    shares: Map<UserID, S3Share>,
+    shares: Map<UserID, Pair<ShareOffer, ShareReceipt>>,
     latestShareTimestamp: OffsetDateTime,
   ) {
     synchronizeCacheDB(dataset, shares, latestShareTimestamp)
@@ -131,7 +132,7 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
 
   private fun ShareContext.synchronizeWhereNeeded(
     dataset: DatasetRecord,
-    shares: Map<UserID, S3Share>,
+    shares: Map<UserID, Pair<ShareOffer, ShareReceipt>>,
     latestShareTimestamp: OffsetDateTime,
   ) {
     dataset.projects.forEach {
@@ -159,7 +160,7 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
 
   private fun ShareContext.synchronizeCacheDB(
     dataset: DatasetRecord,
-    shares: Map<UserID, DatasetShare>,
+    shares: Map<UserID, Pair<ShareOffer, ShareReceipt>>,
     latestShareTimestamp: OffsetDateTime,
   ) {
     logger.info("synchronizing shares in internal cache database")
@@ -234,7 +235,7 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
   private fun ShareContext.synchronizeProject(
     installTarget: InstallTargetID,
     dataset: DatasetRecord,
-    shares: Map<UserID, S3Share>,
+    shares: Map<UserID, Pair<ShareOffer, ShareReceipt>>,
     latestShareTimestamp: OffsetDateTime,
   ) {
     logger.info("synchronizing shares for install target {}", installTarget)
@@ -324,14 +325,14 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
     }
   }
 
-  private fun computeShareState(shareDetails: S3Share) =
+  private fun computeShareState(shareDetails: Pair<ShareOffer, ShareReceipt>) =
     ShareInfo(
-      offer = when (shareDetails.offer.load()?.action) {
+      offer = when (shareDetails.first.load()?.action) {
         null                       -> ShareState.Absent
         DatasetShareOffer.Action.Grant  -> ShareState.Yes
         DatasetShareOffer.Action.Revoke -> ShareState.No
       },
-      receipt = when (shareDetails.receipt.load()?.action) {
+      receipt = when (shareDetails.second.load()?.action) {
         null                         -> ShareState.Absent
         DatasetShareReceipt.Action.Accept -> ShareState.Yes
         DatasetShareReceipt.Action.Reject -> ShareState.No

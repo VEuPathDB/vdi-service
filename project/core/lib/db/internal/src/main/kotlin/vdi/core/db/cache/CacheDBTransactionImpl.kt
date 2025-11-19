@@ -36,7 +36,7 @@ import vdi.core.db.cache.sql.sync_control.updateSyncControlShare
 import vdi.core.db.cache.sql.upload_files.tryInsertUploadFiles
 import vdi.core.db.model.SyncControlRecord
 import vdi.logging.logger
-import vdi.model.data.*
+import vdi.model.meta.*
 
 internal class CacheDBTransactionImpl(
   override val dataSource: DataSource,

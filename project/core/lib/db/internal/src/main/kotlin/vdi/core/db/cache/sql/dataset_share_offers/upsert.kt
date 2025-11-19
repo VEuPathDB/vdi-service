@@ -1,8 +1,8 @@
 package vdi.core.db.cache.sql.dataset_share_offers
 
 import io.foxcapades.kdbc.withPreparedUpdate
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.jdbc.setUserID

@@ -6,7 +6,7 @@ import vdi.core.db.cache.query.AdminAllDatasetsQuery
 import vdi.core.db.cache.query.DatasetListQuery
 import vdi.core.db.model.ReconcilerTargetRecord
 import vdi.core.db.model.SyncControlRecord
-import vdi.model.data.*
+import vdi.model.meta.*
 import vdi.util.io.CloseableIterator
 
 interface CacheDB {

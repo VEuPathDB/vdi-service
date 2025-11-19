@@ -1,8 +1,8 @@
 package vdi.core.db.cache.model
 
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetShareReceipt
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetShareReceipt
+import vdi.model.meta.UserID
 
 class ShareReceiptRecord(
   val datasetID: DatasetID,

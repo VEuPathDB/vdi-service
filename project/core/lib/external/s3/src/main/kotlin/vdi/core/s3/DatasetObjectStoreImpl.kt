@@ -1,17 +1,17 @@
 package vdi.core.s3
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
 import java.util.Spliterator
 import java.util.Spliterators
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
 import vdi.core.s3.paths.S3DatasetPathFactory
 import vdi.core.s3.paths.S3Paths
-import vdi.model.data.toUserIDOrNull
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
+import vdi.model.meta.toUserIDOrNull
 
-internal class DatasetObjectStoreImpl(private val s3Bucket: S3Bucket) : DatasetObjectStore {
+internal class DatasetObjectStoreImpl(private val s3Bucket: S3Bucket): DatasetObjectStore {
   override fun getDatasetDirectory(ownerID: UserID, datasetID: DatasetID): DatasetDirectory =
     DatasetDirectoryImpl(ownerID, datasetID, s3Bucket, S3DatasetPathFactory(ownerID, datasetID))
 

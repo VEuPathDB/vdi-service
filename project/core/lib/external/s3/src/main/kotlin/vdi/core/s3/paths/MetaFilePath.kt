@@ -1,17 +1,18 @@
 package vdi.core.s3.paths
 
-import vdi.core.s3.files.MetaFileType
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.core.s3.files.FileName
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import vdi.core.s3.util.PathFactory
 
-sealed interface MetaFilePath: DatasetPath<MetaFileType> {
+sealed interface MetaFilePath: DatasetPath {
 
   companion object: PathFactory<MetaFilePath> {
     private val pattern = Regex("^([\\w-]+)/(\\d+)/([\\w.]+)/([^/]+)$")
 
     override fun matches(path: String) = pattern.matches(path)
-      && path.substringAfterLast('/').let { name -> MetaFileType.entries.any { it.fileName == name } }
+      && path.substringAfterLast('/')
+        .let { name -> FileName.MetaFileNames.any(name::equals) }
 
     override fun create(path: String): MetaFilePath =
       pattern.matchEntire(path)!!.destructured.let { (bucket, user, dataset, file) ->
@@ -20,15 +21,11 @@ sealed interface MetaFilePath: DatasetPath<MetaFileType> {
   }
 
   private class MetaFilePathImpl(
-    fileName: String,
+    override val fileName: String,
     override val userID: UserID,
     override val datasetID: DatasetID,
     override val bucketName: String
   ): MetaFilePath {
-    override val type = MetaFileType.entries.firstOrNull { it.fileName == fileName }
-      ?: throw IllegalArgumentException("unrecognized dataset path: $pathString")
-    override val fileName: String
-      get() = type.fileName
     override val pathString: String
       get() = "$bucketName/$userID/$datasetID/$fileName"
 

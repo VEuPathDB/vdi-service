@@ -1,18 +1,18 @@
 package vdi.core.s3.paths
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import java.lang.IllegalArgumentException
-import vdi.core.s3.files.FlagFileType
+import vdi.core.s3.files.FileName
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import vdi.core.s3.util.PathFactory
 
-sealed interface FlagFilePath: DatasetPath<FlagFileType> {
+sealed interface FlagFilePath: DatasetPath {
 
   companion object: PathFactory<FlagFilePath> {
     private val pattern = Regex("^([\\w-]+)/(\\d+)/([\\w.]+)/([^/]+)$")
 
     override fun matches(path: String) = pattern.matches(path)
-      && path.substringAfterLast('/').let { name -> FlagFileType.entries.any { it.fileName == name } }
+      && path.substringAfterLast('/')
+        .let { it == FileName.DeleteFlagFile || it == FileName.RevisedFlagFile }
 
     override fun create(path: String): FlagFilePath =
       pattern.matchEntire(path)!!.destructured.let { (bucket, user, dataset, file) ->
@@ -21,17 +21,11 @@ sealed interface FlagFilePath: DatasetPath<FlagFileType> {
   }
 
   private class FlagFilePathImpl(
-    fileName: String,
+    override val fileName: String,
     override val userID: UserID,
     override val datasetID: DatasetID,
     override val bucketName: String,
   ): FlagFilePath {
-    override val type = FlagFileType.entries.firstOrNull { it.fileName == fileName }
-      ?: throw IllegalArgumentException("unrecognized dataset path: $pathString")
-
-    override val fileName: String
-      get() = type.fileName
-
     override val pathString: String
       get() = "$bucketName/$userID/$datasetID/$fileName"
 

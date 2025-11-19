@@ -1,6 +1,6 @@
 package vdi.core.db.cache.model
 
-import vdi.model.data.*
+import vdi.model.meta.*
 
 data class DatasetShareListEntry(
   val datasetID: DatasetID,

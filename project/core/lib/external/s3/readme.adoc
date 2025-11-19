@@ -1,0 +1,58 @@
+= VDI to Object-Store Interactions
+
+== Object Key Layout
+
+<<root-prefix,Dataset Root Prefix>>::
+`\{bucket}/\{user-id}/\{dataset-id}/`
+
+<<document-prefix,Documents Prefix>>::
+`\{bucket}/\{user-id}/\{dataset-id}/documents/`
+
+<<mapping-prefix,Mapping Files Prefix>>::
+`\{bucket}/\{user-id}/\{dataset-id}/mappings/`
+
+<<share-prefix,Shares Prefix>>::
+`\{bucket}/\{user-id}/\{dataset-id}/shares/\{share-target-id}/`
+
+
+[#root-prefix]
+=== Root Objects
+
+The following objects have the 'root prefix':
+
+[cols="2m,8m"]
+|===
+| vdi-manifest.json | \{bucket}/\{user-id}/\{dataset-id}/vdi-manifest.json
+| vdi-meta.json     | \{bucket}/\{user-id}/\{dataset-id}/vdi-meta.json
+| delete-flag       | \{bucket}/\{user-id}/\{dataset-id}/delete-flag
+| revised-flag      | \{bucket}/\{user-id}/\{dataset-id}/revised-flag
+| raw-upload.zip    | \{bucket}/\{user-id}/\{dataset-id}/raw-upload.zip
+| import-ready.zip  | \{bucket}/\{user-id}/\{dataset-id}/import-ready.zip
+| install-ready.zip | \{bucket}/\{user-id}/\{dataset-id}/install-ready.zip
+|===
+
+
+[#document-prefix]
+=== Document Objects
+
+Objects with the document prefix have no name requirements.
+
+----
+{bucket}/{user-id}/{dataset-id}/documents/{any-name}
+----
+
+
+[#mapping-prefix]
+=== Mapping Objects
+
+TODO::
+What is the naming pattern for these?
+
+[#share-prefix]
+=== Share Objects
+
+[cols="2m,8m"]
+|===
+| share-offer.json   | \{bucket}/\{user-id}/\{dataset-id}/shares/\{share-target-id}/share-offer.json
+| share-receipt.json | \{bucket}/\{user-id}/\{dataset-id}/shares/\{share-target-id}/share-receipt.json
+|===

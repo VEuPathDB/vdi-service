@@ -5,11 +5,10 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
-import vdi.model.data.DataType
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.model.data.DatasetType
-import org.veupathdb.vdi.core.common.util.CloseableIterator
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
+import vdi.model.meta.DatasetType
 import java.time.OffsetDateTime
 import kotlin.test.DefaultAsserter.assertEquals
 import kotlin.test.assertEquals
@@ -17,7 +16,10 @@ import vdi.core.db.model.ReconcilerTargetRecord
 import vdi.core.kafka.router.KafkaRouter
 import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
-import vdi.core.s3.files.DatasetMetaFile
+import vdi.core.s3.files.meta.MetadataFile
+import vdi.core.s3.getInstallReadyTimestamp
+import vdi.core.s3.getLatestShareTimestamp
+import vdi.util.io.CloseableIterator
 
 class ReconcilerTest {
   private val UpdateTime = OffsetDateTime.now()
@@ -270,7 +272,7 @@ class ReconcilerTest {
     `when`(dsMock.ownerID).thenReturn(UserID(userID))
     `when`(dsMock.getInstallReadyTimestamp() ?: UpdateTime).thenReturn(UpdateTime)
     `when`(dsMock.getLatestShareTimestamp(UpdateTime)).thenReturn(UpdateTime)
-    val meta = mock<DatasetMetaFile>()
+    val meta = mock<MetadataFile>()
     `when`(meta.lastModified()).thenReturn(UpdateTime)
     `when`(dsMock.getMetaFile()).thenReturn(meta)
     return dsMock
@@ -282,7 +284,7 @@ class ReconcilerTest {
     `when`(dsMock.ownerID).thenReturn(UserID(userID))
     `when`(dsMock.getInstallReadyTimestamp() ?: UpdateTime).thenReturn(syncTime)
     `when`(dsMock.getLatestShareTimestamp(UpdateTime)).thenReturn(syncTime)
-    val meta = mock<DatasetMetaFile>()
+    val meta = mock<MetadataFile>()
     `when`(meta.lastModified()).thenReturn(syncTime)
     `when`(dsMock.getMetaFile()).thenReturn(meta)
     return dsMock
@@ -306,5 +308,4 @@ class ReconcilerTest {
       type = type,
       isUninstalled = isUninstalled,
     )
-
 }

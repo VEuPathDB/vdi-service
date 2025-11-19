@@ -7,7 +7,7 @@ import java.sql.Connection
 import vdi.core.db.cache.model.DatasetShareListEntry
 import vdi.core.db.cache.util.getProjectIDList
 import vdi.core.db.jdbc.*
-import vdi.model.data.DatasetShareOffer
+import vdi.model.meta.DatasetShareOffer
 import vdi.model.data.DatasetShareReceipt
 import vdi.model.data.DatasetType
 import vdi.model.data.UserID

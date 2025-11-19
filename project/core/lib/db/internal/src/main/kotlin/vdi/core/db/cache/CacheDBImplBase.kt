@@ -22,7 +22,7 @@ import vdi.core.db.cache.sql.sync_control.selectSyncControl
 import vdi.core.db.cache.sql.upload_files.selectUploadFileCount
 import vdi.core.db.cache.sql.upload_files.selectUploadFileSummaries
 import vdi.core.db.cache.sql.upload_files.selectUploadFiles
-import vdi.model.data.*
+import vdi.model.meta.*
 
 internal sealed class CacheDBImplBase: CacheDB {
   protected abstract val connection: Connection

@@ -1,7 +1,7 @@
 package vdi.core.db.cache.sql.import_messages
 
 import io.foxcapades.kdbc.withPreparedBatchUpdate
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
 

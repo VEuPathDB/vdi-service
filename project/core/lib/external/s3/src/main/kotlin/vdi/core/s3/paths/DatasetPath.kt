@@ -1,13 +1,12 @@
 package vdi.core.s3.paths
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 
-sealed interface DatasetPath<T: Enum<T>> {
+sealed interface DatasetPath {
   val fileName: String
   val pathString: String
   val userID: UserID
   val datasetID: DatasetID
   val bucketName: String
-  val type: T
 }

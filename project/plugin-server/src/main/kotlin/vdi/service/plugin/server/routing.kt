@@ -9,12 +9,12 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import vdi.model.api.internal.Endpoint
+import vdi.io.plugin.PluginEndpoint
 import vdi.service.plugin.model.ApplicationContext
-import vdi.service.plugin.server.controller.handleImportRequest
-import vdi.service.plugin.server.controller.handleInstallDataRequest
-import vdi.service.plugin.server.controller.handleInstallMetaRequest
-import vdi.service.plugin.server.controller.handleUninstallRequest
+import vdi.service.plugin.process.preprocess.handleImportRequest
+import vdi.service.plugin.process.install.data.handleInstallDataRequest
+import vdi.service.plugin.process.install.meta.handleInstallMetaRequest
+import vdi.service.plugin.process.uninstall.handleUninstallRequest
 import vdi.service.plugin.server.errors.withExceptionMapping
 
 fun Application.configureServer(appCtx: ApplicationContext) {
@@ -22,14 +22,14 @@ fun Application.configureServer(appCtx: ApplicationContext) {
   install(MicrometerMetrics) { registry = appCtx.metrics.micrometer }
 
   routing {
-    post(Endpoint.Import) { withExceptionMapping { call.handleImportRequest(appCtx) } }
+    post(PluginEndpoint.Import) { withExceptionMapping { call.handleImportRequest(appCtx) } }
 
-    route(Endpoint.InstallPathRoot) {
-      post(Endpoint.DataSubPath) { withExceptionMapping { call.handleInstallDataRequest(appCtx) } }
-      post(Endpoint.MetaSubPath) { withExceptionMapping { call.handleInstallMetaRequest(appCtx) } }
+    route(PluginEndpoint.InstallPathRoot) {
+      post(PluginEndpoint.DataSubPath) { withExceptionMapping { call.handleInstallDataRequest(appCtx) } }
+      post(PluginEndpoint.MetaSubPath) { withExceptionMapping { call.handleInstallMetaRequest(appCtx) } }
     }
 
-    post(Endpoint.Uninstall) { withExceptionMapping { call.handleUninstallRequest(appCtx) } }
+    post(PluginEndpoint.Uninstall) { withExceptionMapping { call.handleUninstallRequest(appCtx) } }
 
     get("/metrics") { call.respond(appCtx.metrics.micrometer.scrape()) }
   }

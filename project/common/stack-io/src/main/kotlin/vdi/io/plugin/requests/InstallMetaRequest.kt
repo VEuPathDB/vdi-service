@@ -23,7 +23,7 @@ class InstallMetaRequest(
   @get:JsonProperty(Meta)
   @param:JsonProperty(Meta)
   val meta: DatasetMetadata,
-): TargettedPluginAPIRequest(eventID, vdiID, installTarget) {
+): TargetedPluginAPIRequest(eventID, vdiID, installTarget) {
   companion object JsonKey {
     const val Meta = "meta"
   }

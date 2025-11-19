@@ -1,11 +1,9 @@
 package vdi.core.s3.paths
 
 import vdi.core.s3.files.FileName
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import vdi.core.s3.util.PathBuilder
-import vdi.model.DatasetManifestFilename
-import vdi.model.DatasetMetaFilename
 
 
 /**
@@ -15,6 +13,10 @@ import vdi.model.DatasetMetaFilename
  * ```
  * {user-id}/
  *   |- {dataset-id}/
+ *        |- documents/
+ *        |    |- {any-files}
+ *        |- mappings/
+ *        |    |- {any-files}
  *        |- shares/
  *        |    |- {recipient-id}/
  *        |         |- offer.json
@@ -114,6 +116,12 @@ object S3Paths {
   fun datasetDocumentFile(userID: UserID, datasetID: DatasetID, fileName: String) =
     documentsPath(userID, datasetID).append(fileName).toString()
 
+  fun datasetMappingsDir(userID: UserID, datasetID: DatasetID) =
+    mappingsPath(userID, datasetID).dirPath()
+
+  fun datasetMappingFile(userID: UserID, datasetID: DatasetID, fileName: String) =
+    mappingsPath(userID, datasetID).append(fileName).toString()
+
   // endregion Public API
 
 
@@ -135,7 +143,7 @@ object S3Paths {
    * `{userID}/{datasetID}/shares/`
    */
   private inline fun sharePath(userID: UserID, datasetID: DatasetID) =
-    datasetPath(userID, datasetID).append(FileName.ShareDirectoryName)
+    datasetPath(userID, datasetID).append(FileName.ShareDirectory)
 
   /**
    * `{userID}/{datasetID}/shares/{recipientID}/`
@@ -147,7 +155,10 @@ object S3Paths {
    * `{userID}/{datasetID}/documents/`
    */
   private inline fun documentsPath(userID: UserID, datasetID: DatasetID) =
-    datasetPath(userID, datasetID).append(FileName.DocumentDirectoryName)
+    datasetPath(userID, datasetID).append(FileName.DocumentDirectory)
+
+  private inline fun mappingsPath(userID: UserID, datasetID: DatasetID) =
+    datasetPath(userID, datasetID).append(FileName.MappingDirectory)
 
   // endregion Path "Constants"
 }

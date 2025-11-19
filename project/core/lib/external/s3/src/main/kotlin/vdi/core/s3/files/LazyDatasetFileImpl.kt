@@ -3,7 +3,7 @@ package vdi.core.s3.files
 import org.veupathdb.lib.s3.s34k.objects.ObjectContainer
 import java.io.InputStream
 
-internal sealed class LazyDatasetFileImpl(
+internal abstract class LazyDatasetFileImpl(
   override val path: String,
   protected val bucket: ObjectContainer,
 ): DatasetFile {

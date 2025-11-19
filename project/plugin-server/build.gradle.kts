@@ -26,6 +26,7 @@ dependencies {
   implementation(common.json)
   implementation(common.logging)
   implementation(common.model)
+  implementation(common.stack.io)
   implementation(common.util)
 
   implementation(libs.metrics.micrometer)

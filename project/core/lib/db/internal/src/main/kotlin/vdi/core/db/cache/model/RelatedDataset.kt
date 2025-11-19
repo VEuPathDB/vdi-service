@@ -1,9 +1,9 @@
 package vdi.core.db.cache.model
 
 import java.time.OffsetDateTime
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetPublication
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetPublication
+import vdi.model.meta.DatasetType
 
 data class RelatedDataset(
   val datasetID: DatasetID,

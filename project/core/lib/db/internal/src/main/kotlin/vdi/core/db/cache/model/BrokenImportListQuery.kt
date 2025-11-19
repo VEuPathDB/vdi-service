@@ -1,6 +1,6 @@
 package vdi.core.db.cache.model
 
-import vdi.model.data.UserID
+import vdi.model.meta.UserID
 import java.time.OffsetDateTime
 
 data class BrokenImportListQuery(

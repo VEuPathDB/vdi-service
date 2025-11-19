@@ -1,3 +1,3 @@
 package vdi.core.db.cache.model
 
-interface DatasetRecord : Dataset, CoreDatasetMeta, DatasetProjectLinks
+interface DatasetRecord: Dataset, CoreDatasetMeta, DatasetProjectLinks

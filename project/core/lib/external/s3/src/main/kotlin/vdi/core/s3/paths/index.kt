@@ -1,11 +1,12 @@
 package vdi.core.s3.paths
 
 private val pathFactories = arrayOf(
-  MetaFilePath.Companion,
   DataFilePath.Companion,
   DocumentFilePath.Companion,
-  ShareFilePath.Companion,
   FlagFilePath.Companion,
+  MappingFilePath.Companion,
+  MetaFilePath.Companion,
+  ShareFilePath.Companion,
 )
 
 /**
@@ -17,7 +18,7 @@ private val pathFactories = arrayOf(
  * * `{bucket-name}/{user-id}/{dataset-id}/documents/{file-name}`
  * * `{bucket-name}/{user-id}/{dataset-id}/shares/{recipient-id}/{file-name}`
  */
-fun String.toDatasetPathOrNull(): DatasetPath<*>? {
+fun String.toDatasetPathOrNull(): DatasetPath? {
   return pathFactories.firstNotNullOfOrNull {
     if (it.matches(this))
       it.create(this)

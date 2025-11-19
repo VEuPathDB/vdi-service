@@ -5,26 +5,24 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.json.JSON
-import vdi.daemon.events.routing.model.MinIOEvent
-import vdi.daemon.events.routing.model.MinIOEventAction
-import vdi.core.util.discardException
 import vdi.core.kafka.EventSource
 import vdi.core.kafka.router.KafkaRouter
 import vdi.core.kafka.router.KafkaRouterFactory
-import vdi.logging.logger
-import vdi.logging.markedLogger
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
-import vdi.core.util.orElse
 import vdi.core.rabbit.RabbitMQEventIterator
 import vdi.core.rabbit.RabbitMQEventSource
-import vdi.core.s3.files.DataFileType
-import vdi.core.s3.files.FlagFileType
-import vdi.core.s3.files.MetaFileType
+import vdi.core.s3.files.FileName
 import vdi.core.s3.paths.*
+import vdi.core.util.discardException
+import vdi.core.util.orElse
+import vdi.daemon.events.routing.model.MinIOEvent
+import vdi.daemon.events.routing.model.MinIOEventAction
+import vdi.json.JSON
+import vdi.logging.logger
+import vdi.logging.markedLogger
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 
 internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: AbortCB)
   : EventRouter
@@ -93,7 +91,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
     }
   }
 
-  private suspend fun MinIOEvent.processDeleteEvent(path: DatasetPath<*>, log: Logger) {
+  private suspend fun MinIOEvent.processDeleteEvent(path: DatasetPath, log: Logger) {
     // If the event action was a deletion of an object, then it was a hard
     // delete regardless of the file.  We only remove anything when we remove
     // everything.  This event should be one of many for this specific dataset.
@@ -108,33 +106,35 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
     return
   }
 
-  private suspend fun processPutEvent(path: DatasetPath<*>, log: Logger) {
+  private suspend fun processPutEvent(path: DatasetPath, log: Logger) {
     log.debug("demuxing put event for {}", path)
 
     when (path) {
-      is MetaFilePath -> when (path.type) {
-        MetaFileType.Metadata -> {
+      is MetaFilePath -> when (path.fileName) {
+        FileName.MetadataFile -> {
           safeSend(path.userID, path.datasetID, kr::sendUpdateMetaTrigger)
 
           // Trigger an import here to handle replication race condition.
           safeSend(path.userID, path.datasetID, kr::sendImportTrigger)
         }
 
-        MetaFileType.Manifest -> { /* ignore manifest events */ }
+        FileName.ManifestFile -> { /* ignore manifest events */ }
       }
 
-      is DataFilePath -> when (path.type) {
-        DataFileType.ImportReady  -> safeSend(path.userID, path.datasetID, kr::sendImportTrigger)
-        DataFileType.InstallReady -> safeSend(path.userID, path.datasetID, kr::sendInstallTrigger)
-        DataFileType.RawUpload    -> TODO()
+      is DataFilePath -> when (path.fileName) {
+        FileName.ImportReadyFile  -> safeSend(path.userID, path.datasetID, kr::sendImportTrigger)
+        FileName.InstallReadyFile -> safeSend(path.userID, path.datasetID, kr::sendInstallTrigger)
+        FileName.RawUploadFile    -> TODO()
       }
 
       is ShareFilePath -> safeSend(path.userID, path.datasetID, kr::sendShareTrigger)
 
-      is FlagFilePath -> when (path.type) {
-        FlagFileType.Delete  -> safeSend(path.userID, path.datasetID, kr::sendSoftDeleteTrigger)
-        FlagFileType.Revised -> safeSend(path.userID, path.datasetID, kr::sendSoftDeleteTrigger)
+      is FlagFilePath -> when (path.fileName) {
+        FileName.DeleteFlagFile  -> safeSend(path.userID, path.datasetID, kr::sendSoftDeleteTrigger)
+        FileName.RevisedFlagFile -> safeSend(path.userID, path.datasetID, kr::sendSoftDeleteTrigger)
       }
+
+      is MappingFilePath -> TODO("")
 
       is DocumentFilePath -> { /* ignore dataset document events */ }
     }
@@ -142,7 +142,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
 
   private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: (UserID, DatasetID, EventSource) -> Unit) {
     try {
-      logger.debug("TRACE - safeSend(userID={}, datasetID={}, fn=...)", userID, datasetID)
+      logger.trace("safeSend(userID={}, datasetID={}, fn=...)", userID, datasetID)
       fn(userID, datasetID, EventSource.ObjectStore)
     } catch (e: Throwable) {
       triggerShutdown()

@@ -6,8 +6,8 @@ import io.foxcapades.kdbc.usingResults
 import io.foxcapades.kdbc.withPreparedStatement
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetPublication
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetPublication
 
 // language=postgresql
 private const val SQL = """
