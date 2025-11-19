@@ -5,9 +5,9 @@ package vdi.service.plugin.service
 import org.slf4j.Logger
 import vdi.logging.createLoggerMark
 import vdi.logging.markedLogger
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
+import vdi.model.meta.UserID
 import vdi.service.plugin.process.preprocess.ImportContext
 import vdi.service.plugin.process.preprocess.ImportHandler
 import vdi.service.plugin.process.install.data.InstallDataContext

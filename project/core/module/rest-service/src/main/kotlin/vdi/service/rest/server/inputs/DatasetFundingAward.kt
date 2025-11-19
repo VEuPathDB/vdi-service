@@ -4,7 +4,7 @@ package vdi.service.rest.server.inputs
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.reqCheckLength
 import org.veupathdb.lib.request.validation.require
-import vdi.model.data.DatasetFundingAward
+import vdi.model.meta.DatasetFundingAward
 import vdi.service.rest.generated.model.DatasetFundingAward as APIAwardReference
 
 private val AgencyNameLengthRange = 3..256

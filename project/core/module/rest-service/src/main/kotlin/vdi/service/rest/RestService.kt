@@ -10,8 +10,8 @@ import vdi.core.db.app.AppDB
 import vdi.core.db.app.AppDatabaseRegistry
 import vdi.core.db.cache.CacheDB
 import vdi.core.install.InstallTargetRegistry
-import vdi.logging.MetaLogger
 import vdi.core.plugin.registry.PluginRegistry
+import vdi.logging.MetaLogger
 import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.health.DependencySource
 import vdi.service.rest.s3.DatasetStore

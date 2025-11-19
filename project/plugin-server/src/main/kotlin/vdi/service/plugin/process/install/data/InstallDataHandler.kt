@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.seconds
 import vdi.io.plugin.responses.ValidationResponse
 import vdi.json.JSON
 import vdi.model.DatasetMetaFilename
-import vdi.model.data.DatasetMetadata
+import vdi.model.meta.DatasetMetadata
 import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.model.MissingDependencyError
 import vdi.service.plugin.model.PluginScriptError

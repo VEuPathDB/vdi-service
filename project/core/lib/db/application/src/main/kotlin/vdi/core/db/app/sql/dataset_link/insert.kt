@@ -5,8 +5,8 @@ import io.foxcapades.kdbc.withPreparedBatchUpdate
 import java.sql.Connection
 import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.set
-import vdi.model.data.DatasetID
-import vdi.model.data.LinkedDataset
+import vdi.model.meta.DatasetID
+import vdi.model.meta.LinkedDataset
 
 // language=postgresql
 private fun SQL(schema: String) = "INSERT INTO ${schema}.${Table.Links} VALUES (?, ?, ?)"

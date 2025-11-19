@@ -6,8 +6,8 @@ import java.sql.Connection
 import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.set
 import vdi.core.db.jdbc.setDatasetID
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetMetadata
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
 
 private fun sql(schema: String) =
 // language=postgresql

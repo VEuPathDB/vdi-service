@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.milliseconds
 
 class WorkerPool(
-  private val jobQueueSize: UByte,
+  jobQueueSize: UByte,
   private val workerCount: UByte = 5u,
   private val reportQueueSizeChange: (Int) -> Unit = { },
   private val owner: KClass<*>,
@@ -72,7 +72,7 @@ class WorkerPool(
   private suspend fun safeReceive() =
     try {
       queue.receive()
-    } catch (e: ClosedReceiveChannelException) {
+    } catch (_: ClosedReceiveChannelException) {
       null
     }
 

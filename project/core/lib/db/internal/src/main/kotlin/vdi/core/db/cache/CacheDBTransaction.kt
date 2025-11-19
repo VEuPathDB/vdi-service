@@ -6,7 +6,7 @@ import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.ShareOfferRecord
 import vdi.core.db.cache.model.ShareReceiptRecord
 import vdi.core.db.model.SyncControlRecord
-import vdi.model.data.*
+import vdi.model.meta.*
 
 interface CacheDBTransaction: CacheDB, AutoCloseable {
 

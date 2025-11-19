@@ -6,7 +6,7 @@ import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
 import vdi.logging.mark
-import vdi.model.data.DatasetMetadata
+import vdi.model.meta.DatasetMetadata
 
 internal class ImportContext(
   private val msg: EventMessage,

@@ -6,7 +6,7 @@ import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetShareListEntry
 import vdi.core.plugin.registry.PluginRegistry
-import vdi.model.data.UserID
+import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.ShareOfferEntry
 import vdi.service.rest.generated.model.ShareOfferStatus
 import vdi.service.rest.generated.model.UsersSelfShareOffersGetStatus

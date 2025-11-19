@@ -23,7 +23,7 @@ class HostAddressDeserializer: StdDeserializer<PartialHostAddress>(PartialHostAd
       return if (pos < 0) {
         PartialHostAddress(raw, null)
       } else {
-        PartialHostAddress(raw.substring(0, pos), raw.substring(pos + 1).toUShort())
+        PartialHostAddress(raw.take(pos), raw.substring(pos + 1).toUShort())
       }
     }
   }

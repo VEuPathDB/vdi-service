@@ -1,6 +1,6 @@
 package vdi.test
 
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import java.time.OffsetDateTime
 
 internal typealias DSGetter<T> = (DatasetID) -> T

@@ -1,11 +1,11 @@
 package vdi.config.parse.serde
 
-private val pattern = Regex("\\$\\{(?i:env):(\\w+)(?::-([^}\$]+))?}")
+private val pattern = Regex("\\$\\{(?i:env):(\\w+)(?::-([^}$]+))?}")
 
 fun String.interpolateFrom(env: Map<String, String>): String {
   val out = StringBuilder(length + length.ushr(2))
 
-  var work = when (val p = indexOf("\${env:")) {
+  var work = when (val p = indexOf($$"${env:")) {
     -1   -> return this
     0    -> this
     else -> {
@@ -19,7 +19,7 @@ fun String.interpolateFrom(env: Map<String, String>): String {
     in 0..7 -> return this
     else    -> {
       work.substring(p+1) // return val for `tail`
-        .also { work = work.substring(0, p+1) }
+        .also { work = work.take(p+1) }
     }
   }
 
@@ -27,7 +27,7 @@ fun String.interpolateFrom(env: Map<String, String>): String {
   work.lineSequence()
     .map {
       var line = it
-      while (line.contains("\${env:")) {
+      while (line.contains($$"${env:")) {
         line.interpolateLine(tempBuffer, env)
         line = tempBuffer.toString()
         tempBuffer.clear()

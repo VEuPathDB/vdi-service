@@ -1,6 +1,6 @@
 package vdi.core.reconciler
 
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.InstallTargetID
 import vdi.util.io.CloseableIterator
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.AppDatabaseRegistry

@@ -3,12 +3,15 @@ package vdi.daemon.events.routing.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class MinIOEventRecordS3Bucket(
-  @JsonProperty("name")
+  @param:JsonProperty("name")
+  @field:JsonProperty("name")
   val name: String,
 
-  @JsonProperty("ownerIdentity")
+  @param:JsonProperty("ownerIdentity")
+  @field:JsonProperty("ownerIdentity")
   val ownerIdentity: MinIOEventUserIdentity,
 
-  @JsonProperty("arn")
+  @param:JsonProperty("arn")
+  @field:JsonProperty("arn")
   val arn: String,
 )

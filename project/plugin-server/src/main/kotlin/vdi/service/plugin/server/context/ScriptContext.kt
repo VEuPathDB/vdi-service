@@ -2,7 +2,7 @@ package vdi.service.plugin.server.context
 
 import java.nio.file.Path
 import vdi.model.EventID
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 
 interface ScriptContext<T: Any> {
   val eventID: EventID

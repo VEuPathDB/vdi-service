@@ -2,11 +2,11 @@ package vdi.test
 
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import vdi.model.data.DataType
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
-import vdi.model.data.*
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
+import vdi.model.meta.UserID
+import vdi.model.meta.*
 import org.veupathdb.vdi.core.common.util.CloseableIterator
 import java.time.OffsetDateTime
 import vdi.core.db.model.ReconcilerTargetRecord

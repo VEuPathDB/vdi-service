@@ -1,7 +1,7 @@
 package vdi.core.install
 
 import com.networknt.schema.JsonSchema
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetType
 
 data class InstallTarget(
   val enabled:       Boolean,

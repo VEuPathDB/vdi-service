@@ -4,7 +4,7 @@ package vdi.service.rest.server.inputs
 import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
 import java.net.URI
-import vdi.model.data.UserID
+import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 
 fun DatasetPostRequestBody.cleanup() {

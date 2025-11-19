@@ -1,11 +1,11 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.SampleYearRange
-import vdi.model.data.DatasetCharacteristics
-import vdi.service.rest.generated.model.SampleYearRangeImpl
-import vdi.service.rest.generated.model.SampleYearRange as APIYears
+import vdi.model.meta.DatasetCharacteristics
+import vdi.model.meta.SampleYearRange
 import vdi.service.rest.generated.model.DatasetCharacteristicsImpl
+import vdi.service.rest.generated.model.SampleYearRangeImpl
 import vdi.service.rest.generated.model.DatasetCharacteristics as APICharacteristics
+import vdi.service.rest.generated.model.SampleYearRange as APIYears
 
 internal fun DatasetCharacteristics(characteristics: DatasetCharacteristics): APICharacteristics =
   DatasetCharacteristicsImpl().also {

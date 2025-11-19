@@ -1,6 +1,6 @@
 package vdi.service.rest.server.services.admin.report
 
-import vdi.model.data.toUserID
+import vdi.model.meta.toUserID
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.BrokenImportListQuery
 import vdi.core.db.cache.model.SortOrder

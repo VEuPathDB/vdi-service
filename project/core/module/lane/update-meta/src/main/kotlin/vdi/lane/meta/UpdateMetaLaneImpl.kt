@@ -38,7 +38,7 @@ import vdi.core.util.orElse
 import vdi.logging.logger
 import vdi.model.DatasetMetaFilename
 import vdi.model.OriginTimestamp
-import vdi.model.data.*
+import vdi.model.meta.*
 
 internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abortCB: AbortCB)
   : UpdateMetaLane
@@ -302,7 +302,6 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
             is EmptySuccessResponse    -> handleSuccessResponse()
             is ValidationErrorResponse -> handleValidationError(result)
             is ServiceErrorResponse    -> handleUnexpectedErrorResponse(result)
-            else                       -> throw IllegalStateException("unexpected update meta response: $result")
           }
         } catch (e: Throwable) {
           logger.info("install-meta request to handler server failed with exception:", e)

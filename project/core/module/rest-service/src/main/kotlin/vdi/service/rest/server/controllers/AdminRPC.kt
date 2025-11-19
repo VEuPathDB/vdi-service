@@ -7,13 +7,13 @@ import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import org.veupathdb.lib.container.jaxrs.server.annotations.AdminRequired
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
-import vdi.model.data.DatasetID
-import vdi.model.data.toUserID
 import vdi.core.install.cleanup.InstallCleaner
 import vdi.core.install.cleanup.ReinstallTarget
 import vdi.core.install.retry.DatasetReinstaller
 import vdi.core.pruner.Pruner
 import vdi.core.reconciler.Reconciler
+import vdi.model.meta.DatasetID
+import vdi.model.meta.toUserID
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetObjectPurgeRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody

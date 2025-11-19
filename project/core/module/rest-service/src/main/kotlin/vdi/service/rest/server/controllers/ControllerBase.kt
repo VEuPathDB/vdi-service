@@ -3,11 +3,11 @@ package vdi.service.rest.server.controllers
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.model.UserInfo
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.model.data.toUserID
 import java.net.URI
 import vdi.logging.logger
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
+import vdi.model.meta.toUserID
 
 sealed class ControllerBase(val request: ContainerRequest) {
   /**

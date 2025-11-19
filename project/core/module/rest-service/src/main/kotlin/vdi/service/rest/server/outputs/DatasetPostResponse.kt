@@ -1,6 +1,6 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import vdi.service.rest.generated.model.DatasetPostResponseBody
 import vdi.service.rest.generated.model.DatasetPostResponseBodyImpl
 

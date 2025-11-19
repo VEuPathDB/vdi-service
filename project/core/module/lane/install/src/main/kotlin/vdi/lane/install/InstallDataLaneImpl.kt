@@ -28,10 +28,11 @@ import vdi.core.plugin.client.PluginRequestException
 import vdi.core.plugin.client.response.*
 import vdi.core.plugin.mapping.PluginHandlers
 import vdi.core.s3.DatasetDirectory
+import vdi.core.s3.getInstallReadyTimestamp
 import vdi.core.util.orElse
 import vdi.logging.logger
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetMetadata
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
 
 internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, abortCB: AbortCB)
   : InstallDataLane
@@ -295,8 +296,6 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
               handleServerErrorResponse(response, installableFileTimestamp)
               false
             }
-
-            else -> throw IllegalStateException("illegal response status ${response.status}")
           }
         }
       } catch (e: S34KError) { // Don't mix up minio errors with request errors.
@@ -431,7 +430,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
   private fun tryMarkRevised(dir: DatasetDirectory) {
     dir.getRevisedFlag().also {
       if (!it.exists())
-        it.touch()
+        it.create()
     }
   }
 }

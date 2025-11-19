@@ -1,8 +1,8 @@
 package vdi.core.db.jdbc
 
-import vdi.model.data.DataType
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import java.sql.PreparedStatement
 import java.time.OffsetDateTime
 

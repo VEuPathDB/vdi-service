@@ -1,7 +1,7 @@
 package vdi.service.rest.server.services.admin.report
 
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.AppDatabaseRegistry
 import vdi.core.db.app.model.DatasetRecord
@@ -15,7 +15,6 @@ import vdi.service.rest.generated.model.BrokenDatasetInstallReportBodyImpl
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse.respond200WithApplicationJson
 import vdi.service.rest.server.outputs.DatasetStatusInfo
-import vdi.service.rest.server.outputs.DatasetTypeOutput
 import vdi.service.rest.server.outputs.toExternal
 
 /**

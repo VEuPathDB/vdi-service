@@ -4,10 +4,10 @@ import jakarta.ws.rs.core.Context
 import kotlinx.coroutines.runBlocking
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
-import vdi.model.data.DatasetID
-import vdi.core.db.cache.query.DatasetListQuery
 import vdi.core.db.cache.model.DatasetOwnershipFilter
+import vdi.core.db.cache.query.DatasetListQuery
 import vdi.logging.logger
+import vdi.model.meta.DatasetID
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.resources.Datasets

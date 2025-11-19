@@ -6,8 +6,8 @@ import java.sql.Connection
 import vdi.core.db.app.model.OrganismType
 import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.set
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetOrganism
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetOrganism
 
 
 private fun sql(schema: String) =

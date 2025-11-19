@@ -1,8 +1,10 @@
 @file:JvmName("BioprojectIDInputAdaptor")
 package vdi.service.rest.server.inputs
 
-import org.veupathdb.lib.request.validation.*
-import vdi.model.data.BioprojectIDReference
+import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.reqCheckLength
+import org.veupathdb.lib.request.validation.require
+import vdi.model.meta.BioprojectIDReference
 import vdi.service.rest.generated.model.BioprojectIDReferenceImpl
 import vdi.service.rest.generated.model.BioprojectIDReference as APIBioReference
 

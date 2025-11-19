@@ -2,8 +2,8 @@ package vdi.core.plugin.registry
 
 import vdi.config.parse.ConfigurationException
 import vdi.core.config.loadAndCacheStackConfig
-import vdi.model.data.DataType
-import vdi.model.data.DatasetType
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetType
 
 object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
   private val mapping: Map<DatasetType, PluginDetails>

@@ -1,13 +1,9 @@
 package vdi.util.zip
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import java.nio.file.Path
 import java.util.zip.GZIPInputStream
 import kotlin.io.path.*
-import kotlin.io.path.exists
-import kotlin.io.path.isDirectory
-import kotlin.io.path.outputStream
 
 object Tar {
   fun decompressWithGZip(inputFile: Path, outputDir: Path) {

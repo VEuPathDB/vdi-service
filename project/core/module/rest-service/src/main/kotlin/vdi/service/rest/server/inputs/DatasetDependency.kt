@@ -4,7 +4,7 @@ package vdi.service.rest.server.inputs
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.reqCheckLength
 import org.veupathdb.lib.request.validation.require
-import vdi.model.data.DatasetDependency
+import vdi.model.meta.DatasetDependency
 import vdi.service.rest.generated.model.DatasetDependency as APIDependency
 
 private val IDLengthRange = 3..50

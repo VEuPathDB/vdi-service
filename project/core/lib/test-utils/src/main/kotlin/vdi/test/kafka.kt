@@ -3,8 +3,8 @@ package vdi.test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import vdi.core.kafka.*
 import vdi.core.kafka.router.KafkaRouter
 

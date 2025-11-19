@@ -4,7 +4,7 @@ import io.foxcapades.kdbc.usingPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.set
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 
 // language=postgresql
 private fun SQL(schema: String) = "DELETE FROM ${schema}.${Table.Countries} WHERE dataset_id = ?"

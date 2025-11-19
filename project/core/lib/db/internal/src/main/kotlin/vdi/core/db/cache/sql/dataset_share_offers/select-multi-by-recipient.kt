@@ -13,7 +13,7 @@ import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.jdbc.setUserID
 import vdi.model.meta.DatasetShareOffer
 import vdi.model.meta.DatasetShareReceipt
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetType
 
 // language=postgresql
 private val SQL = """

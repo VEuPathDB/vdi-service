@@ -1,7 +1,7 @@
 @file:JvmName("LinkedDatasetOutputAdaptor")
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.LinkedDataset
+import vdi.model.meta.LinkedDataset
 import vdi.service.rest.generated.model.LinkedDatasetImpl
 import vdi.service.rest.generated.model.LinkedDataset as APILinkedDataset
 

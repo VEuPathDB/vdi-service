@@ -5,8 +5,8 @@ import io.foxcapades.kdbc.withPreparedBatchUpdate
 import java.sql.Connection
 import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.set
-import vdi.model.data.DatasetDependency
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetDependency
+import vdi.model.meta.DatasetID
 
 
 private fun sql(schema: String) =

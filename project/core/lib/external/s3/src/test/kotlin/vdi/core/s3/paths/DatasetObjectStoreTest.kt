@@ -18,8 +18,8 @@ import org.veupathdb.lib.s3.s34k.objects.ObjectTagContainer
 import org.veupathdb.lib.s3.s34k.params.DeleteParams
 import org.veupathdb.lib.s3.s34k.params.`object`.ObjectExistsParams
 import org.veupathdb.lib.s3.s34k.params.`object`.ObjectStatParams
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import java.time.OffsetDateTime
 import vdi.core.s3.DatasetObjectStore
 

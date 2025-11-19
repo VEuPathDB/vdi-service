@@ -3,16 +3,9 @@ package vdi.service.rest.server.outputs
 import vdi.config.raw.ManifestConfig
 import vdi.core.config.StackConfig
 import vdi.core.config.vdi.daemons.ReconcilerConfig
-import vdi.service.rest.generated.model.APIServiceConfigurationImpl
-import vdi.service.rest.generated.model.DaemonConfigurationImpl
-import vdi.service.rest.generated.model.ReconcilerConfig as APIReconcilerConfig
-import vdi.service.rest.generated.model.ReconcilerConfigImpl
-import vdi.service.rest.generated.model.ServiceConfigurationDetailsImpl
-import vdi.service.rest.generated.model.ServiceFeaturesImpl
-import vdi.service.rest.generated.model.ServiceMetadataBuildInfoOutputImpl
-import vdi.service.rest.generated.model.ServiceMetadataResponseBody
-import vdi.service.rest.generated.model.ServiceMetadataResponseBodyImpl
+import vdi.service.rest.generated.model.*
 import vdi.service.rest.util.SupportedArchiveType
+import vdi.service.rest.generated.model.ReconcilerConfig as APIReconcilerConfig
 
 fun ServiceMetadataResponseBody(metadata: ManifestConfig, stack: StackConfig): ServiceMetadataResponseBody =
   ServiceMetadataResponseBodyImpl().apply {

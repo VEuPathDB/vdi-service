@@ -6,8 +6,8 @@ import vdi.core.kafka.router.KafkaRouter
 import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.s3.DatasetObjectStore
 import vdi.logging.mark
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.InstallTargetID
 
 class UpdateMetaContext(
   private val message: EventMessage,

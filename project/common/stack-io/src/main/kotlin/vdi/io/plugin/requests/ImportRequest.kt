@@ -2,8 +2,8 @@ package vdi.io.plugin.requests
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import vdi.model.EventID
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetMetadata
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
 
 /**
  * Represents the JSON body of a dataset import request made by the core VDI

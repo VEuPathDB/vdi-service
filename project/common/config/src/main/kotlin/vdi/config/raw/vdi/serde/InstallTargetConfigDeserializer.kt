@@ -8,14 +8,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
-import vdi.json.JSON
 import vdi.config.parse.fields.PartialHostAddress
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
 import vdi.config.raw.db.serde.DatabaseConnectionConfigDeserializer.Companion.deserialize
 import vdi.config.raw.vdi.InstallTargetConfig
 import vdi.config.raw.vdi.InstallTargetConfig.JsonKey
-import vdi.model.data.DatasetType
+import vdi.json.JSON
 import vdi.model.field.SecretString
+import vdi.model.meta.DatasetType
 
 internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetConfig>(InstallTargetConfig::class.java) {
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): InstallTargetConfig {

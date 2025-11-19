@@ -15,10 +15,10 @@ import vdi.json.toJSONString
 import vdi.logging.logger
 import vdi.logging.mark
 import vdi.model.EventID
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetType
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.DatasetType
+import vdi.model.meta.InstallTargetID
 import vdi.io.plugin.responses.PluginResponseStatus as Status
 
 internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig): PluginHandlerClient {
@@ -35,7 +35,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     datasetID: DatasetID,
     meta: DatasetMetadata,
     upload: InputStream,
-  ): PluginResponse {
+  ): ImportResponse {
     val log = log.mark(eventID, datasetID)
 
     val multipart = MultiPart.createBody {
@@ -91,7 +91,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     datasetID: DatasetID,
     installTarget: InstallTargetID,
     meta: DatasetMetadata,
-  ): PluginResponse {
+  ): InstallMetaResponse {
     val log = log.mark(eventID, datasetID)
     val uri = resolve(PluginEndpoint.InstallMeta)
 
@@ -130,7 +130,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     meta: InputStream,
     manifest: InputStream,
     payload: InputStream,
-  ): PluginResponse {
+  ): InstallDataResponse {
     val log = log.mark(eventID, datasetID)
 
     val multipart = MultiPart.createBody {
@@ -187,7 +187,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     datasetID: DatasetID,
     installTarget: InstallTargetID,
     type: DatasetType,
-  ): PluginResponse {
+  ): UninstallResponse {
     val log = log.mark(eventID, datasetID)
     val uri = resolve(PluginEndpoint.Uninstall)
 

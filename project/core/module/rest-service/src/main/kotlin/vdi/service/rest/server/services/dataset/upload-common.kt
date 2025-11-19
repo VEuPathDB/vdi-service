@@ -29,7 +29,7 @@ import vdi.core.plugin.registry.PluginDatasetTypeMeta
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.logging.markedLogger
 import vdi.model.OriginTimestamp
-import vdi.model.data.*
+import vdi.model.meta.*
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase

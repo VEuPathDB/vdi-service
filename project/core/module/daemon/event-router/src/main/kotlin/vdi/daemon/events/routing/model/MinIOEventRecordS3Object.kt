@@ -9,24 +9,31 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-content-structure.html
  */
 data class MinIOEventRecordS3Object(
-  @JsonProperty("key")
+  @param:JsonProperty("key")
+  @field:JsonProperty("key")
   val key: String,
 
-  @JsonProperty("size")
+  @param:JsonProperty("size")
+  @field:JsonProperty("size")
   val size: Long?,
 
-  @JsonProperty("eTag")
+  @param:JsonProperty("eTag")
+  @field:JsonProperty("eTag")
   val eTag: String?,
 
-  @JsonProperty("contentType")
+  @param:JsonProperty("contentType")
+  @field:JsonProperty("contentType")
   val contentType: String?,
 
-  @JsonProperty("userMetadata")
+  @param:JsonProperty("userMetadata")
+  @field:JsonProperty("userMetadata")
   val userMetadata: Map<String, String>?,
 
-  @JsonProperty("sequencer")
+  @param:JsonProperty("sequencer")
+  @field:JsonProperty("sequencer")
   val sequencer: String,
 
-  @JsonProperty("versionId")
+  @param:JsonProperty("versionId")
+  @field:JsonProperty("versionId")
   val versionId: String?,
 )

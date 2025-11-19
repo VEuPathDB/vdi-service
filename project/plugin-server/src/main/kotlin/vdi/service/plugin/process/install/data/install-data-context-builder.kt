@@ -17,8 +17,8 @@ import kotlin.contracts.contract
 import kotlin.io.path.createDirectories
 import vdi.io.plugin.requests.FormField
 import vdi.io.plugin.requests.InstallDataRequest
-import vdi.model.data.DatasetManifest
-import vdi.model.data.DatasetMetadata
+import vdi.model.meta.DatasetManifest
+import vdi.model.meta.DatasetMetadata
 import vdi.service.plugin.model.ApplicationContext
 import vdi.service.plugin.server.context.*
 import vdi.service.plugin.util.parseAsJson

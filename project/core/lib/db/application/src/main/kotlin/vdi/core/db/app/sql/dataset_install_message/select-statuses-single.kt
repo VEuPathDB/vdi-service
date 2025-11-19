@@ -10,7 +10,7 @@ import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.getInstallStatus
 import vdi.core.db.app.sql.getInstallType
 import vdi.core.db.jdbc.setDatasetID
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 
 private fun sql(schema: String) =
 // language=postgresql

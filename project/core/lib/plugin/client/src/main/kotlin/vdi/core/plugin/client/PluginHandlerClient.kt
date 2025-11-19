@@ -1,12 +1,15 @@
 package vdi.core.plugin.client
 
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetType
 import java.io.InputStream
-import vdi.core.plugin.client.response.PluginResponse
+import vdi.core.plugin.client.response.ImportResponse
+import vdi.core.plugin.client.response.InstallDataResponse
+import vdi.core.plugin.client.response.InstallMetaResponse
+import vdi.core.plugin.client.response.UninstallResponse
 import vdi.model.EventID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.DatasetType
+import vdi.model.meta.InstallTargetID
 
 interface PluginHandlerClient {
 
@@ -23,11 +26,11 @@ interface PluginHandlerClient {
    * @param upload `tar.gz` archive containing the user upload file(s).
    */
   suspend fun postImport(
-    eventID: EventID,
+    eventID:   EventID,
     datasetID: DatasetID,
-    meta: DatasetMetadata,
-    upload: InputStream,
-  ): PluginResponse
+    meta:      DatasetMetadata,
+    upload:    InputStream,
+  ): ImportResponse
 
   /**
    * `POST`s an install-meta request to the configured plugin handler server
@@ -42,11 +45,11 @@ interface PluginHandlerClient {
    * @param meta Metadata to install.
    */
   suspend fun postInstallMeta(
-    eventID: EventID,
-    datasetID: DatasetID,
+    eventID:       EventID,
+    datasetID:     DatasetID,
     installTarget: InstallTargetID,
-    meta: DatasetMetadata,
-  ): PluginResponse
+    meta:          DatasetMetadata,
+  ): InstallMetaResponse
 
   /**
    * `POST`s an install-data request to the configured plugin handler server
@@ -65,13 +68,13 @@ interface PluginHandlerClient {
    * @param payload Imported data zip stream.
    */
   suspend fun postInstallData(
-    eventID: EventID,
-    datasetID: DatasetID,
+    eventID:       EventID,
+    datasetID:     DatasetID,
     installTarget: InstallTargetID,
-    meta: InputStream,
-    manifest: InputStream,
-    payload: InputStream,
-  ): PluginResponse
+    meta:          InputStream,
+    manifest:      InputStream,
+    payload:       InputStream,
+  ): InstallDataResponse
 
   /**
    * `POST`s an uninstall request to the configured plugin handler server.
@@ -83,9 +86,9 @@ interface PluginHandlerClient {
    * @param installTarget Target project for the uninstallation.
    */
   suspend fun postUninstall(
-    eventID: EventID,
-    datasetID: DatasetID,
+    eventID:       EventID,
+    datasetID:     DatasetID,
     installTarget: InstallTargetID,
-    type: DatasetType,
-  ): PluginResponse
+    type:          DatasetType,
+  ): UninstallResponse
 }

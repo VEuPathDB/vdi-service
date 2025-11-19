@@ -3,7 +3,7 @@ package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
-import vdi.model.data.ExternalDatasetIdentifiers
+import vdi.model.meta.ExternalDatasetIdentifiers
 import vdi.service.rest.generated.model.BioprojectIDReference
 import vdi.service.rest.generated.model.DOIReference
 import vdi.service.rest.generated.model.DatasetHyperlink

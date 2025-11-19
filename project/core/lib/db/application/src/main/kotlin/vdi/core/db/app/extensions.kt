@@ -3,9 +3,9 @@ package vdi.core.db.app
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetType
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetType
+import vdi.model.meta.InstallTargetID
 
 
 /**

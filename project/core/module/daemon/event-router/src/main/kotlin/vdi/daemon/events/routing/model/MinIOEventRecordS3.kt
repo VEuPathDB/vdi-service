@@ -3,15 +3,19 @@ package vdi.daemon.events.routing.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class MinIOEventRecordS3(
-  @JsonProperty("s3SchemaVersion")
+  @param:JsonProperty("s3SchemaVersion")
+  @field:JsonProperty("s3SchemaVersion")
   val s3SchemaVersion: String,
 
-  @JsonProperty("configurationId")
+  @param:JsonProperty("configurationId")
+  @field:JsonProperty("configurationId")
   val configurationID: String,
 
-  @JsonProperty("bucket")
+  @param:JsonProperty("bucket")
+  @field:JsonProperty("bucket")
   val bucket: MinIOEventRecordS3Bucket,
 
-  @JsonProperty("object")
+  @param:JsonProperty("object")
+  @field:JsonProperty("object")
   val `object`: MinIOEventRecordS3Object,
 )

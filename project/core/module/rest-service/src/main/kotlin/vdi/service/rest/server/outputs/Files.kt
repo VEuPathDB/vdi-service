@@ -1,6 +1,6 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DatasetFileInfo
+import vdi.model.meta.DatasetFileInfo
 import vdi.service.rest.generated.model.DatasetFileDetails
 import vdi.service.rest.generated.model.DatasetFileDetailsImpl
 import vdi.service.rest.generated.model.DatasetZipDetails

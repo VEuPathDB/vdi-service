@@ -1,7 +1,7 @@
 package vdi.core.reconciler
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import java.time.OffsetDateTime
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.sql.sync_control.TempHackCacheDBReconcilerTargetRecord
@@ -13,6 +13,8 @@ import vdi.logging.markedLogger
 import vdi.core.metrics.Metrics
 import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
+import vdi.core.s3.getInstallReadyTimestamp
+import vdi.core.s3.getLatestShareTimestamp
 
 /**
  * Component for synchronizing the dataset object store (the source of truth for

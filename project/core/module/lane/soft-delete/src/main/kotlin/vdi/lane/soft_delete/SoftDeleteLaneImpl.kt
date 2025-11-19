@@ -23,8 +23,8 @@ import vdi.core.plugin.client.response.EmptySuccessResponse
 import vdi.core.plugin.client.response.ServiceErrorResponse
 import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.plugin.mapping.PluginHandlers
-import vdi.model.data.DatasetType
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetType
+import vdi.model.meta.InstallTargetID
 
 internal class SoftDeleteLaneImpl(
   private val config: SoftDeleteLaneConfig,
@@ -132,7 +132,6 @@ internal class SoftDeleteLaneImpl(
     when (response) {
       is EmptySuccessResponse -> handleSuccessResponse(handler, installTarget)
       is ServiceErrorResponse -> handleUnexpectedErrorResponse(handler, installTarget, response)
-      else -> throw IllegalStateException("invalid response status: ${response.status}")
     }
   }
 

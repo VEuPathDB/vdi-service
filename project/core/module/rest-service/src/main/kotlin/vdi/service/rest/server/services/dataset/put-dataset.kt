@@ -7,10 +7,10 @@ import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
 import vdi.core.db.cache.CacheDB
 import vdi.model.DatasetMetaFilename
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetRevision
-import vdi.model.data.DatasetRevisionHistory
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.DatasetRevision
+import vdi.model.meta.DatasetRevisionHistory
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.model.DatasetPutResponseBody

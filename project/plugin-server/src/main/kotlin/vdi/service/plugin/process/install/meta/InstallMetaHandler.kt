@@ -55,7 +55,7 @@ open class InstallMetaHandler(context: InstallMetaContext, executor: ScriptExecu
 
           InstallMetaScript.ExitCode.ValidationError -> {
             logger.info("validation failed with")
-
+            TODO("WAAAAA")
           }
 
           else -> throw PluginScriptError(scriptContext.scriptConfig, status)

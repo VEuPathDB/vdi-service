@@ -1,7 +1,7 @@
 package vdi.service.rest.server.services.admin.report
 
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.cache.CacheDB

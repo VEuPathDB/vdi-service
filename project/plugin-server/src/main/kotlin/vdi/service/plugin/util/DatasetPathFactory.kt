@@ -5,8 +5,8 @@ import java.nio.file.Path
 import kotlin.io.path.createDirectory
 import kotlin.io.path.notExists
 import vdi.config.raw.vdi.PluginConfig
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
 import vdi.service.plugin.conf.ShortVDIConfig
 
 

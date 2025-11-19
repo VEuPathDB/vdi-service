@@ -8,9 +8,9 @@ import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
 import vdi.logging.logger
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetType
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetType
+import vdi.model.meta.InstallTargetID
 
 object InstallCleaner {
 

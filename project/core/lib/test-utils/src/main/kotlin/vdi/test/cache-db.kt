@@ -9,9 +9,9 @@ import vdi.core.db.cache.model.Dataset
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetRecord
 import vdi.model.meta.DatasetID
-import vdi.model.data.DatasetVisibility
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetVisibility
+import vdi.model.meta.InstallTargetID
+import vdi.model.meta.UserID
 
 fun mockDataset(
   datasetID: DatasetID? = null,

@@ -6,19 +6,14 @@ import org.veupathdb.lib.s3.s34k.S3Client
 import org.veupathdb.lib.s3.s34k.fields.BucketName
 import org.veupathdb.lib.s3.s34k.objects.S3Object
 import org.veupathdb.lib.s3.s34k.objects.StreamObject
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.model.data.DatasetManifest
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetShareOffer
-import vdi.model.data.DatasetShareReceipt
-import vdi.json.JSON
-import vdi.json.toJSONString
 import java.io.InputStream
 import vdi.core.config.vdi.ObjectStoreConfig
 import vdi.core.s3.files.FileName
 import vdi.core.s3.paths.S3Paths
 import vdi.core.s3.util.S3Config
+import vdi.json.JSON
+import vdi.json.toJSONString
+import vdi.model.meta.*
 
 object DatasetStore {
   private lateinit var client: S3Client

@@ -1,6 +1,6 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DatasetOrganism
+import vdi.model.meta.DatasetOrganism
 import vdi.service.rest.generated.model.DatasetOrganismImpl
 import vdi.service.rest.generated.model.DatasetOrganism as APIOrganism
 

@@ -1,8 +1,8 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DatasetContact
-import vdi.service.rest.generated.model.DatasetContact as APIContact
+import vdi.model.meta.DatasetContact
 import vdi.service.rest.generated.model.DatasetContactImpl
+import vdi.service.rest.generated.model.DatasetContact as APIContact
 
 
 internal fun DatasetContact(contact: DatasetContact): APIContact =

@@ -12,7 +12,9 @@ import kotlin.time.Duration.Companion.seconds
 import vdi.core.config.StackConfig
 import vdi.core.config.kafka.KafkaConfig
 import vdi.core.config.rabbit.RabbitConfig
-import vdi.core.config.vdi.*
+import vdi.core.config.vdi.CacheDBConfig
+import vdi.core.config.vdi.ObjectStoreConfig
+import vdi.core.config.vdi.VDIConfig
 import vdi.core.err.StartupException
 
 private const val OverallTimeoutSeconds = 60

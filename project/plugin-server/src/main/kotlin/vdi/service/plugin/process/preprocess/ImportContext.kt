@@ -3,7 +3,7 @@ package vdi.service.plugin.process.preprocess
 import java.nio.file.Path
 import vdi.io.plugin.requests.ImportRequest
 import vdi.model.EventID
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import vdi.service.plugin.server.context.ScriptContext
 
 data class ImportContext(

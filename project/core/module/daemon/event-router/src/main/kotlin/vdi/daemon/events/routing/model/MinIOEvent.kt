@@ -6,13 +6,16 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * MinIO (S3) Event Body
  */
 data class MinIOEvent(
-  @JsonProperty("EventName")
+  @param:JsonProperty("EventName")
+  @field:JsonProperty("EventName")
   val eventType: MinIOEventType,
 
-  @JsonProperty("Key")
+  @param:JsonProperty("Key")
+  @field:JsonProperty("Key")
   val objectKey: String,
 
-  @JsonProperty("Records")
+  @param:JsonProperty("Records")
+  @field:JsonProperty("Records")
   val records: Collection<MinIOEventRecord>
 )
 

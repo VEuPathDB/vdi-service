@@ -1,6 +1,6 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DatasetFundingAward
+import vdi.model.meta.DatasetFundingAward
 import vdi.service.rest.generated.model.DatasetFundingAwardImpl
 import vdi.service.rest.generated.model.DatasetFundingAward as APIFunding
 

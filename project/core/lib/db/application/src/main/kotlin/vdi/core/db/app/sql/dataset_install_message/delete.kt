@@ -6,7 +6,7 @@ import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.setInstallType
 import vdi.core.db.jdbc.setDatasetID
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 
 private fun bulkSQL(schema: String) =
 // language=postgresql

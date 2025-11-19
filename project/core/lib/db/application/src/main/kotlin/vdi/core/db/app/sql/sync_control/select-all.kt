@@ -11,7 +11,7 @@ import vdi.core.db.app.sql.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.model.ReconcilerTargetRecord
 import vdi.db.app.TargetDBPlatform
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetType
 import vdi.util.io.CloseableIterator
 
 private fun sql(schema: String, strpos: String) =

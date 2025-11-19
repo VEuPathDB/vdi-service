@@ -1,6 +1,6 @@
 package vdi.service.rest.server.inputs
 
-import vdi.model.data.DatasetCharacteristics
+import vdi.model.meta.DatasetCharacteristics
 import vdi.service.rest.generated.model.DatasetCharacteristicsPatch
 import vdi.service.rest.generated.model.SampleYearRange
 

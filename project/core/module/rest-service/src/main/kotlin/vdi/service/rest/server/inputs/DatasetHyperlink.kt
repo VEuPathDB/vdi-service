@@ -1,9 +1,12 @@
 @file:JvmName("DatasetHyperlinkInputAdaptor")
 package vdi.service.rest.server.inputs
 
-import org.veupathdb.lib.request.validation.*
+import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.rangeTo
+import org.veupathdb.lib.request.validation.reqCheckLength
+import org.veupathdb.lib.request.validation.require
 import java.net.URI
-import vdi.model.data.DatasetHyperlink
+import vdi.model.meta.DatasetHyperlink
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.DatasetHyperlink as APIHyperlink
 

@@ -12,7 +12,7 @@ data class EventRouterConfig(
   constructor(config: VDIConfig): this(
     RabbitMQConfig(config.rabbit),
     config.objectStore.bucketName,
-    KafkaRouterConfig(config.daemons?.eventRouter?.kafkaProducerID ?: "event-router", config.kafka, config.lanes)
+    KafkaRouterConfig(config.daemons.eventRouter.kafkaProducerID, config.kafka, config.lanes)
   )
 }
 

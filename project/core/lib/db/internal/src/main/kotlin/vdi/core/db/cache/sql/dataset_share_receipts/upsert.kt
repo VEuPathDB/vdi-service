@@ -6,7 +6,7 @@ import vdi.model.meta.UserID
 import java.sql.Connection
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.jdbc.setUserID
-import vdi.model.data.DatasetShareReceipt
+import vdi.model.meta.DatasetShareReceipt
 
 // language=postgresql
 private const val SQL = """

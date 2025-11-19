@@ -7,10 +7,10 @@ import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.cache.model.RelatedDataset
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.DatasetVisibility
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.DatasetVisibility
+import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.DatasetDetails
 import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse
 import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse.headersFor301

@@ -9,10 +9,10 @@ import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.ShareOfferRecord
 import vdi.core.db.cache.model.ShareReceiptRecord
 import vdi.core.db.cache.withTransaction
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetShareOffer
-import vdi.model.data.DatasetShareReceipt
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetShareOffer
+import vdi.model.meta.DatasetShareReceipt
+import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.ShareOfferAction
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase

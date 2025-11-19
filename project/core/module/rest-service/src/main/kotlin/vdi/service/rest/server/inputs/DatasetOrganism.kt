@@ -4,7 +4,7 @@ package vdi.service.rest.server.inputs
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.reqCheckLength
-import vdi.model.data.DatasetOrganism
+import vdi.model.meta.DatasetOrganism
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.DatasetOrganism as APIOrganism
 

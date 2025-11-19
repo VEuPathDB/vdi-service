@@ -4,7 +4,7 @@ import io.foxcapades.kdbc.withPreparedBatchUpdate
 import java.sql.Connection
 import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.setDatasetID
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 
 // language=postgresql
 private fun SQL(schema: String) = "INSERT INTO ${schema}.${Table.AssociatedFactors} VALUES (?, ?)"

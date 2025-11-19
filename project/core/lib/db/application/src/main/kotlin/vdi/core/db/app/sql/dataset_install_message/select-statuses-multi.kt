@@ -13,7 +13,7 @@ import vdi.core.db.app.sql.getInstallStatus
 import vdi.core.db.app.sql.getInstallType
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.jdbc.setDatasetID
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 
 private fun sqlStatusPrefix(schema: String) =
 // language=postgresql

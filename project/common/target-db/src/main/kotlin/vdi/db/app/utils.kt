@@ -4,8 +4,8 @@ import org.veupathdb.lib.ldap.LDAP
 import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
 import vdi.config.raw.db.LDAPDatabaseConnectionConfig
-import vdi.model.data.DataType
-import vdi.model.data.DatasetType
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetType
 import vdi.model.field.HostAddress
 
 val FallbackDatasetType = DatasetType(DataType.of("*"), "*")

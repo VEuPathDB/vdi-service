@@ -4,9 +4,9 @@ import jakarta.ws.rs.core.Context
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.model.data.toUserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
+import vdi.model.meta.toUserID
 import vdi.service.rest.generated.model.DatasetShareOffer
 import vdi.service.rest.generated.model.DatasetShareReceipt
 import vdi.service.rest.generated.resources.DatasetsVdiIdSharesRecipientUserId

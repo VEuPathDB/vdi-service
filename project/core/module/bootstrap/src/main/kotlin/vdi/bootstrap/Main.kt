@@ -65,11 +65,11 @@ object Main {
         HardDeleteLane(config.vdi, ::fatality),
         ImportLane(config.vdi, ::fatality),
         InstallDataLane(config.vdi, ::fatality),
-        DatasetPruner(config.vdi.daemons?.pruner, ::fatality),
+        DatasetPruner(config.vdi.daemons.pruner, ::fatality),
         ShareLane(config.vdi, ::fatality),
         SoftDeleteLane(config.vdi, ::fatality),
         UpdateMetaLane(config.vdi, ::fatality),
-        Reconciler(config.vdi.daemons?.reconciler, ::fatality),
+        Reconciler(config.vdi.daemons.reconciler, ::fatality),
         ReconciliationLane(config.vdi, ::fatality),
       )
     } catch (e: Throwable) {

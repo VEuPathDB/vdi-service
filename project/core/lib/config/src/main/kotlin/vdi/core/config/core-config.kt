@@ -2,12 +2,10 @@
 package vdi.core.config
 
 import java.nio.file.Path
-import java.util.jar.Manifest
 import kotlin.io.path.Path
 import vdi.config.DefaultFullStackSchemaPath
 import vdi.config.loadAndCastConfig
 import vdi.config.makeDefaultConfigPath
-import vdi.config.raw.ManifestConfig
 import vdi.logging.MetaLogger
 
 

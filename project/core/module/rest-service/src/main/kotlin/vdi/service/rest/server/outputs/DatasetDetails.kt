@@ -5,7 +5,10 @@ import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.cache.model.RelatedDataset
-import vdi.model.data.*
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.InstallTargetID
+import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.DatasetDetails
 import vdi.service.rest.generated.model.DatasetDetailsImpl
 import vdi.service.rest.generated.model.DatasetFileListing

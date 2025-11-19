@@ -3,8 +3,8 @@ package vdi.core.db.app.sql.dataset_project
 import io.foxcapades.kdbc.withPreparedBatchUpdate
 import java.sql.Connection
 import vdi.core.db.app.sql.Table
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
 
 private fun sql(schema: String) =
 // language=postgresql

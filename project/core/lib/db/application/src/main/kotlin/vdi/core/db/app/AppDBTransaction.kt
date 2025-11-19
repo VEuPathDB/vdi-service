@@ -7,7 +7,7 @@ import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.model.InstallType
 import vdi.core.db.model.SyncControlRecord
 import vdi.model.OriginTimestamp
-import vdi.model.data.*
+import vdi.model.meta.*
 
 interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 

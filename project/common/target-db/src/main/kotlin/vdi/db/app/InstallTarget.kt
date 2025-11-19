@@ -1,7 +1,7 @@
 package vdi.db.app
 
 import com.networknt.schema.JsonSchema
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.InstallTargetID
 
 data class InstallTarget(
   val name: InstallTargetID,

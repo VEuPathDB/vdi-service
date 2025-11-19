@@ -1,12 +1,12 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DatasetRevision
-import vdi.model.data.DatasetRevisionHistory
+import vdi.model.meta.DatasetRevision
+import vdi.model.meta.DatasetRevisionHistory
 import vdi.service.rest.generated.model.DatasetRevisionAction
 import vdi.service.rest.generated.model.DatasetRevisionImpl
-import vdi.service.rest.generated.model.DatasetRevision as APIRevision
 import vdi.service.rest.generated.model.RevisionHistory
 import vdi.service.rest.generated.model.RevisionHistoryImpl
+import vdi.service.rest.generated.model.DatasetRevision as APIRevision
 
 internal fun RevisionHistory(revs: DatasetRevisionHistory): RevisionHistory =
   RevisionHistoryImpl().also { response ->

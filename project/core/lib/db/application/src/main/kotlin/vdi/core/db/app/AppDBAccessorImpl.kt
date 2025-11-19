@@ -14,9 +14,9 @@ import vdi.core.db.app.sql.dataset_visibility.testDatasetVisibilityExists
 import vdi.core.db.app.sql.sync_control.selectAllSyncControl
 import vdi.core.db.app.sql.sync_control.selectSyncControl
 import vdi.db.app.TargetDBPlatform
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
+import vdi.model.meta.UserID
 
 internal class AppDBAccessorImpl(
   override val project: InstallTargetID,

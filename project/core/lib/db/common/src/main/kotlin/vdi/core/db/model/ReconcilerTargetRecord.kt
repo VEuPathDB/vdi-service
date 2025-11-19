@@ -1,8 +1,8 @@
 package vdi.core.db.model
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
+import vdi.model.meta.DatasetType
 import java.time.OffsetDateTime
 
 open class ReconcilerTargetRecord(

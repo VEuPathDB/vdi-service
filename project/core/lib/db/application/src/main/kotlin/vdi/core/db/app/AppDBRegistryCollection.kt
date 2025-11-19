@@ -1,7 +1,7 @@
 package vdi.core.db.app
 
 import vdi.db.app.FallbackDatasetType
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetType
 
 class AppDBRegistryCollection(private val byKey: Map<DatasetType, TargetDatabaseReference>)
 : Iterable<Pair<DatasetType, TargetDatabaseReference>> {

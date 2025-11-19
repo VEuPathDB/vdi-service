@@ -7,7 +7,7 @@ import java.sql.Connection
 import vdi.core.db.app.sql.Table
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.model.SyncControlRecord
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 
 private fun sql(schema: String) =
 // language=postgresql

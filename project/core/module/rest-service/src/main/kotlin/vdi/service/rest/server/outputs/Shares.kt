@@ -1,9 +1,9 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DataType
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.DatasetShareOffer
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
+import vdi.model.meta.DatasetShareOffer
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.model.UserDetails
 

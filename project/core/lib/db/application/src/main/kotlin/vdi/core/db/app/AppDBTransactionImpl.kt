@@ -47,7 +47,7 @@ import vdi.core.db.app.sql.dataset_visibility.*
 import vdi.core.db.app.sql.sync_control.*
 import vdi.core.db.model.SyncControlRecord
 import vdi.db.app.TargetDBPlatform
-import vdi.model.data.*
+import vdi.model.meta.*
 
 class AppDBTransactionImpl(
   override val project: InstallTargetID,

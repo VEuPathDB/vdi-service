@@ -1,16 +1,16 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.BioprojectIDReference
-import vdi.model.data.DOIReference
-import vdi.model.data.DatasetHyperlink
-import vdi.model.data.ExternalDatasetIdentifiers
+import vdi.model.meta.BioprojectIDReference
+import vdi.model.meta.DOIReference
+import vdi.model.meta.DatasetHyperlink
+import vdi.model.meta.ExternalDatasetIdentifiers
 import vdi.service.rest.generated.model.BioprojectIDReferenceImpl
-import vdi.service.rest.generated.model.BioprojectIDReference as APIBioRef
 import vdi.service.rest.generated.model.DOIReferenceImpl
 import vdi.service.rest.generated.model.DatasetHyperlinkImpl
-import vdi.service.rest.generated.model.DatasetHyperlink as APIHyperlink
-import vdi.service.rest.generated.model.DOIReference as APIDOI
 import vdi.service.rest.generated.model.ExternalIdentifiersImpl
+import vdi.service.rest.generated.model.BioprojectIDReference as APIBioRef
+import vdi.service.rest.generated.model.DOIReference as APIDOI
+import vdi.service.rest.generated.model.DatasetHyperlink as APIHyperlink
 import vdi.service.rest.generated.model.ExternalIdentifiers as APIIdentifiers
 
 internal fun ExternalIdentifiers(identifiers: ExternalDatasetIdentifiers): APIIdentifiers =

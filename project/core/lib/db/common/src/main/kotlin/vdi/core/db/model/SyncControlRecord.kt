@@ -1,6 +1,6 @@
 package vdi.core.db.model
 
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import java.time.OffsetDateTime
 
 

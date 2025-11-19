@@ -1,7 +1,7 @@
 package vdi.service.rest.server.controllers
 
 import jakarta.ws.rs.Consumes
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort
 import vdi.service.rest.generated.resources.AdminReports

@@ -13,8 +13,8 @@ import vdi.json.JSON
 import vdi.model.DatasetManifestFilename
 import vdi.model.DatasetMetaFilename
 import vdi.model.OriginTimestamp
-import vdi.model.data.DatasetFileInfo
-import vdi.model.data.DatasetManifest
+import vdi.model.meta.DatasetFileInfo
+import vdi.model.meta.DatasetManifest
 import vdi.service.plugin.consts.ScriptEnvKey
 import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.model.ValidationError

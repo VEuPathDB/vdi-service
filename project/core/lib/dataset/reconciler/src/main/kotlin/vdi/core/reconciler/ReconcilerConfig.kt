@@ -19,11 +19,7 @@ internal data class ReconcilerConfig(
     kafkaRouterConfig = KafkaRouterConfig("reconciler", config.kafka, config.lanes),
     s3Config          = S3Config(config.objectStore),
     s3Bucket          = BucketName(config.objectStore.bucketName),
-    deletesEnabled    = config.daemons?.reconciler?.performDeletes ?: DefaultDeletesEnabled,
+    deletesEnabled    = config.daemons.reconciler.performDeletes,
   )
-
-  companion object {
-    const val DefaultDeletesEnabled = true
-  }
 }
 

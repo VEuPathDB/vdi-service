@@ -1,11 +1,14 @@
 @file:JvmName("DatasetCharacteristicsInputAdaptor")
 package vdi.service.rest.server.inputs
 
-import org.veupathdb.lib.request.validation.*
-import vdi.model.data.DatasetCharacteristics
+import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.checkLength
+import org.veupathdb.lib.request.validation.rangeTo
+import org.veupathdb.lib.request.validation.require
+import vdi.model.meta.DatasetCharacteristics
 import vdi.service.rest.generated.model.JsonField
-import vdi.service.rest.generated.model.SampleYearRange as APIYearRange
 import vdi.service.rest.generated.model.DatasetCharacteristics as APIDatasetCharacteristics
+import vdi.service.rest.generated.model.SampleYearRange as APIYearRange
 
 private val CommonLengthRange = 3..128
 

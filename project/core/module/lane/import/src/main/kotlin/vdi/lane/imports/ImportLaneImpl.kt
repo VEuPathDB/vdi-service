@@ -27,15 +27,16 @@ import vdi.core.plugin.client.response.StreamSuccessResponse
 import vdi.core.plugin.client.response.ValidationErrorResponse
 import vdi.core.plugin.mapping.PluginHandlers
 import vdi.core.s3.DatasetDirectory
+import vdi.core.s3.getInstallReadyTimestamp
 import vdi.io.plugin.FileName
 import vdi.json.JSON
 import vdi.logging.logger
 import vdi.model.DatasetManifestFilename
 import vdi.model.DatasetMetaFilename
 import vdi.model.OriginTimestamp
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetManifest
-import vdi.model.data.DatasetMetadata
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetManifest
+import vdi.model.meta.DatasetMetadata
 import vdi.core.metrics.Metrics.Import as Metrics
 import vdi.io.plugin.responses.ValidationResponse as ValidationBody
 
@@ -187,12 +188,10 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
             Metrics.count.labels(meta.type.name.toString(), meta.type.version, result.status.code.toString()).inc()
 
             when (result) {
-              is StreamSuccessResponse -> handleImportSuccessResult(result)
+              is StreamSuccessResponse   -> handleImportSuccessResult(result)
               is ValidationErrorResponse -> handleImportInvalidResult(result)
-              is ScriptErrorResponse -> handleScriptError(result)
-              is ServerErrorResponse -> handleServerError(result)
-
-              else -> throw IllegalStateException("illegal response status ${result.status}")
+              is ScriptErrorResponse     -> handleScriptError(result)
+              is ServerErrorResponse     -> handleServerError(result)
             }
           }
       } catch (e: S34KError) { // don't mix up minio errors with request errors
@@ -248,12 +247,12 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     // Record the status update to the cache DB
     cacheDB.withTransaction { transaction ->
       if (
-        warnings?.basicValidation?.warnings?.isNotEmpty() == true
-        || warnings?.communityValidation?.warnings?.isNotEmpty() == true
+        warnings?.basicWarnings?.isNotEmpty() == true
+        || warnings?.communityWarnings?.isNotEmpty() == true
       ) {
         transaction.upsertImportMessages(
           datasetID,
-          (warnings.basicValidation.warnings + warnings.communityValidation.warnings).asList(),
+          warnings.basicWarnings + warnings.communityWarnings,
         )
       }
 

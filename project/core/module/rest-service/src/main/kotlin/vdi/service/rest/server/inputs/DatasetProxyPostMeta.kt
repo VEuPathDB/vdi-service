@@ -4,9 +4,9 @@ package vdi.service.rest.server.inputs
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
 import java.net.URI
-import vdi.model.data.UserID
 import java.time.OffsetDateTime
-import vdi.model.data.DatasetMetadata
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
 

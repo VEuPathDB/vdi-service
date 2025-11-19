@@ -7,8 +7,8 @@ import vdi.core.health.RemoteDependencies
 import vdi.db.app.InstallTargetRegistry
 import vdi.db.app.TargetDBPlatform
 import vdi.db.app.TargetDatabaseDetails
-import vdi.model.data.DatasetType
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetType
+import vdi.model.meta.InstallTargetID
 
 object AppDatabaseRegistry {
   private val dataSources: Map<InstallTargetID, AppDBRegistryCollection>

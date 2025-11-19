@@ -2,8 +2,8 @@ package vdi.core.kafka.router
 
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import vdi.json.JSON
 import vdi.core.kafka.EventMessage
 import vdi.core.kafka.EventSource

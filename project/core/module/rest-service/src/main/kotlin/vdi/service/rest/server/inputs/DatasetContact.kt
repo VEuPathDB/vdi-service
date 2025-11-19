@@ -2,9 +2,9 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.*
-import vdi.model.data.DatasetContact
-import vdi.service.rest.generated.model.DatasetContact as APIContact
+import vdi.model.meta.DatasetContact
 import vdi.service.rest.generated.model.JsonField
+import vdi.service.rest.generated.model.DatasetContact as APIContact
 
 private val ContactNameLengthRange = 3..300
 private val EmailLengthRange = 5..1024

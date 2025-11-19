@@ -3,7 +3,7 @@ package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.reqCheckInRange
-import vdi.model.data.SampleYearRange
+import vdi.model.meta.SampleYearRange
 import vdi.service.rest.generated.model.SampleYearRange as APIYearRange
 
 private const val MinYear: Short = 1500

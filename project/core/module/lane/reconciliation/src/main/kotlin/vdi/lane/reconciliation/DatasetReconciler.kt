@@ -1,8 +1,5 @@
 package vdi.lane.reconciliation
 
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
-import vdi.lane.reconciliation.util.*
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
@@ -11,9 +8,15 @@ import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.withTransaction
 import vdi.core.kafka.EventSource
 import vdi.core.kafka.router.KafkaRouter
-import vdi.logging.markedLogger
 import vdi.core.metrics.Metrics
 import vdi.core.s3.DatasetObjectStore
+import vdi.core.s3.getInstallReadyTimestamp
+import vdi.core.s3.getLatestShareTimestamp
+import vdi.core.s3.getMetaTimestamp
+import vdi.lane.reconciliation.util.*
+import vdi.logging.markedLogger
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 
 internal class DatasetReconciler(
   private val cacheDB: CacheDB = CacheDB(),
@@ -32,7 +35,7 @@ internal class DatasetReconciler(
     try {
       reconcile(ReconciliationContext(datasetManager.getDatasetDirectory(userID, datasetID), source, logger))
       logger.info("reconciliation completed")
-    } catch (e: CriticalReconciliationError) {
+    } catch (_: CriticalReconciliationError) {
       logger.error("reconciliation failed")
     } catch (e: Throwable) {
       Metrics.ReconciliationHandler.errors.inc()
@@ -225,7 +228,7 @@ internal class DatasetReconciler(
     targets.forEach {
       datasetManager.getDatasetDirectory(ctx.userID, it)
         .getRevisedFlag()
-        .also { flag -> if (!flag.exists()) flag.touch() }
+        .also { flag -> if (!flag.exists()) flag.create() }
     }
   }
 

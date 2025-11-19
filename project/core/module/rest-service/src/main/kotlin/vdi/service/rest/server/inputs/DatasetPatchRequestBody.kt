@@ -6,8 +6,9 @@ import org.veupathdb.lib.request.validation.checkLength
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.require
 import vdi.core.plugin.registry.PluginRegistry
-import vdi.model.data.*
-import vdi.model.data.DatasetCharacteristics
+import vdi.model.meta.*
+import vdi.model.meta.DatasetCharacteristics
+import vdi.model.meta.DatasetVisibility
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.BioprojectIDReference
 import vdi.service.rest.generated.model.DOIReference

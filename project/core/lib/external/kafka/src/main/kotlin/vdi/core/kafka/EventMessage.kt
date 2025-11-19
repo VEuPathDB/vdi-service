@@ -2,8 +2,8 @@ package vdi.core.kafka
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import vdi.model.EventID
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 
 data class EventMessage(
   @get:JsonProperty(EventID)

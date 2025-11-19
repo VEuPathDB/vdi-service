@@ -1,6 +1,6 @@
 package vdi.service.rest.model
 
-import vdi.model.data.UserID
+import vdi.model.meta.UserID
 
 data class UserDetails(
   val userID: UserID,

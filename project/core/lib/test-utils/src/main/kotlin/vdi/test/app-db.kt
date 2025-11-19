@@ -4,10 +4,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import vdi.model.data.DataType
-import vdi.model.data.DatasetID
-import vdi.model.data.InstallTargetID
-import vdi.model.data.UserID
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
+import vdi.model.meta.UserID
 import java.time.OffsetDateTime
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.AppDBAccessor

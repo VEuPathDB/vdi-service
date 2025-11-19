@@ -2,9 +2,9 @@ package vdi.io.plugin.requests
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import vdi.model.EventID
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetType
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetType
+import vdi.model.meta.InstallTargetID
 
 /**
  * Represents the JSON body of a dataset uninstall request made by the core VDI

@@ -1,8 +1,8 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DatasetDependency
-import vdi.service.rest.generated.model.DatasetDependency as APIDependency
+import vdi.model.meta.DatasetDependency
 import vdi.service.rest.generated.model.DatasetDependencyImpl
+import vdi.service.rest.generated.model.DatasetDependency as APIDependency
 
 internal fun DatasetDependency(dependency: DatasetDependency): APIDependency =
   DatasetDependencyImpl().also {

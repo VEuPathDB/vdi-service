@@ -9,9 +9,9 @@ import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.withTransaction
 import vdi.core.install.InstallTargetRegistry
 import vdi.json.JSON
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.resources.DatasetsVdiId.PatchDatasetsByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore

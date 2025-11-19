@@ -1,7 +1,7 @@
 @file:JvmName("DatasetPublicationTypeOutputAdaptor")
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DatasetPublication
+import vdi.model.meta.DatasetPublication
 import vdi.service.rest.generated.model.DatasetPublicationType
 
 fun DatasetPublicationType(pubType: DatasetPublication.PublicationType): DatasetPublicationType =

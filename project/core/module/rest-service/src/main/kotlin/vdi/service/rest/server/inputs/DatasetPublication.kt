@@ -1,8 +1,11 @@
 @file:JvmName("DatasetPublicationInputAdaptor")
 package vdi.service.rest.server.inputs
 
-import org.veupathdb.lib.request.validation.*
-import vdi.model.data.DatasetPublication
+import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.checkLength
+import org.veupathdb.lib.request.validation.rangeTo
+import org.veupathdb.lib.request.validation.require
+import vdi.model.meta.DatasetPublication
 import vdi.service.rest.generated.model.DatasetPublicationType
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.DatasetPublication as APIPublication

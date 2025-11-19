@@ -1,6 +1,6 @@
 package vdi.core.plugin.registry
 
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.InstallTargetID
 
 data class PluginDetails(
   val name:           String,

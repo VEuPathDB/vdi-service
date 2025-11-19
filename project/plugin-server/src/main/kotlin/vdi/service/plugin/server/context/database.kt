@@ -7,8 +7,8 @@ import kotlin.contracts.contract
 import vdi.db.app.InstallTarget
 import vdi.db.app.InstallTargetRegistry
 import vdi.db.app.TargetDatabaseDetails
-import vdi.model.data.DatasetType
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetType
+import vdi.model.meta.InstallTargetID
 
 @OptIn(ExperimentalContracts::class)
 suspend fun withDatabaseDetails(target: InstallTargetID, type: DatasetType, fn: suspend (TargetDatabaseDetails) -> Unit): InstallTarget {

@@ -4,7 +4,7 @@ package vdi.service.rest.server.services.plugins
 
 import vdi.core.plugin.registry.PluginDetails
 import vdi.core.plugin.registry.PluginRegistry
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetType
 import vdi.service.rest.generated.model.PluginListItem
 import vdi.service.rest.generated.model.PluginListItemImpl
 import vdi.service.rest.server.outputs.DatasetTypeOutput

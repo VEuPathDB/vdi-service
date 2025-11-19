@@ -56,7 +56,7 @@ internal fun URL.fetchContent(): URLFetchResult {
         throw URLFetchException("remote server responded with a 3xx status code and a blank redirect location")
 
       currentURL = try { location.toJavaURL() }
-      catch (e: MalformedURLException) {
+      catch (_: MalformedURLException) {
         throw URLFetchException("remove server responded with a 3xx status code and an invalid or unsupported url: "
           + location)
       }

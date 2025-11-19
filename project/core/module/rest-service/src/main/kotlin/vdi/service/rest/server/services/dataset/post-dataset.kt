@@ -7,7 +7,7 @@ import org.veupathdb.lib.request.validation.ValidationErrors
 import vdi.core.db.cache.CacheDB
 import vdi.core.install.InstallTargetRegistry
 import vdi.json.JSON
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody

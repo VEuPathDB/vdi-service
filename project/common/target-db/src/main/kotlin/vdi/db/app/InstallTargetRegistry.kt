@@ -6,9 +6,9 @@ import org.veupathdb.lib.ldap.LDAPHost
 import kotlin.io.path.Path
 import vdi.config.loadAndCastConfig
 import vdi.logging.MetaLogger
-import vdi.model.data.DataType
-import vdi.model.data.DatasetType
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetType
+import vdi.model.meta.InstallTargetID
 
 object InstallTargetRegistry {
   private const val SchemaPath = "/schema/config/app-db-config.json"

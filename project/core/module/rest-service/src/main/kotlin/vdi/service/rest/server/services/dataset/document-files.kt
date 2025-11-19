@@ -3,7 +3,7 @@ package vdi.service.rest.server.services.dataset
 import java.io.File
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetRecord
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.outputs.BadRequestError

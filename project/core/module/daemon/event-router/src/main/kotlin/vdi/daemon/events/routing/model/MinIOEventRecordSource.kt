@@ -3,12 +3,15 @@ package vdi.daemon.events.routing.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class MinIOEventRecordSource(
-  @JsonProperty("host")
+  @param:JsonProperty("host")
+  @field:JsonProperty("host")
   val host: String,
 
-  @JsonProperty("port")
+  @param:JsonProperty("port")
+  @field:JsonProperty("port")
   val port: String,
 
-  @JsonProperty("userAgent")
+  @param:JsonProperty("userAgent")
+  @field:JsonProperty("userAgent")
   val userAgent: String,
 )

@@ -38,10 +38,7 @@ class DatabaseDependency(
 }
 
 private fun Map<String, Any>.appendDbInfo(entry: TargetDatabaseDetails): Map<String, Any> {
-  val map = if (this is MutableMap)
-    this
-  else
-    this.toMutableMap()
+  val map = this as? MutableMap ?: this.toMutableMap()
 
   map["host"] = entry.server.host
   map["controlSchema"] = entry.schema

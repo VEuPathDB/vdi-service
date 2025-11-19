@@ -3,8 +3,8 @@ package vdi.lane.reconciliation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import java.util.concurrent.ConcurrentHashMap
 import vdi.core.async.WorkerPool
 import vdi.core.kafka.EventSource
@@ -39,7 +39,7 @@ internal class ReconciliationLaneImpl(
       launch(Dispatchers.IO) {
         while (!isShutDown()) {
           kc.fetchMessages(config.eventMsgKey)
-            .forEach { (userID, datasetID, source) ->
+//            .forEach { (eventID, userID, datasetID, source) ->
               logger.info("received reconciliation event for dataset {}/{} from source {}", userID, datasetID, source)
               wp.submit { reconcile(userID, datasetID, source) }
             }

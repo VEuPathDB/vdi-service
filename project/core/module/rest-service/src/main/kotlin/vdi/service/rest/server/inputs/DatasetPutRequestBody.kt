@@ -3,8 +3,7 @@ package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
-import vdi.model.data.DatasetMetadata
-import vdi.model.data.InstallTargetID
+import vdi.model.meta.DatasetMetadata
 import vdi.service.rest.generated.model.DatasetPutRequestBody
 
 

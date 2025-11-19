@@ -1,10 +1,10 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DatasetRevision
+import vdi.model.meta.DatasetRevision
 import vdi.service.rest.generated.model.DatasetRevisionAction
-import vdi.service.rest.generated.model.DatasetRevision as APIRevision
 import vdi.service.rest.generated.model.DatasetRevisionImpl
 import vdi.service.rest.util.defaultZone
+import vdi.service.rest.generated.model.DatasetRevision as APIRevision
 
 
 /**

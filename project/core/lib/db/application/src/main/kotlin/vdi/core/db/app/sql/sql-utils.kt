@@ -6,8 +6,8 @@ import java.time.ZoneOffset
 import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
-import vdi.model.data.DatasetID
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 
 internal fun PreparedStatement.setDeleteFlag(index: Int, deleteFlag: DeleteFlag) = setInt(index, deleteFlag.value)
 

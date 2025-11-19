@@ -6,9 +6,9 @@ import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.ShareReceiptRecord
 import vdi.core.db.cache.withTransaction
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetShareReceipt
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetShareReceipt
+import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.ShareReceiptAction
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.outputs.BadRequestError

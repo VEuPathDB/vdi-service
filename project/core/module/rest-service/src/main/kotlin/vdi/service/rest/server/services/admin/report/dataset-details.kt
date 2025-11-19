@@ -1,6 +1,6 @@
 package vdi.service.rest.server.services.admin.report
 
-import vdi.model.data.DatasetID
+import vdi.model.meta.DatasetID
 import vdi.core.db.cache.CacheDB
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsByVdiIdResponse
 import vdi.service.rest.server.outputs.InternalDatasetDetails

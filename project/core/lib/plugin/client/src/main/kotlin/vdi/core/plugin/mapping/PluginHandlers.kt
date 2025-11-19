@@ -1,12 +1,12 @@
 package vdi.core.plugin.mapping
 
-import vdi.model.data.DataType
+import vdi.model.meta.DataType
 import vdi.core.config.loadAndCacheStackConfig
 import vdi.core.health.RemoteDependencies
 import vdi.core.plugin.client.PluginHandlerClient
 import vdi.core.plugin.client.PluginHandlerClientConfig
 import vdi.core.plugin.registry.PluginRegistry
-import vdi.model.data.DatasetType
+import vdi.model.meta.DatasetType
 
 /**
  * Collection of [PluginHandler] instances mapped by dataset type name.

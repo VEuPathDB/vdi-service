@@ -5,8 +5,8 @@ import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.set
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetCharacteristics
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetCharacteristics
 
 // language=postgresql
 private fun SQL(schema: String) =

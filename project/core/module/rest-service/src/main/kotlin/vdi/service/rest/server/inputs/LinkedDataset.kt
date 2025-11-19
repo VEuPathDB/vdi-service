@@ -2,11 +2,11 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
-import org.veupathdb.lib.request.validation.reqCheckLength
 import org.veupathdb.lib.request.validation.rangeTo
+import org.veupathdb.lib.request.validation.reqCheckLength
 import org.veupathdb.lib.request.validation.require
 import java.net.URI
-import vdi.model.data.LinkedDataset
+import vdi.model.meta.LinkedDataset
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.LinkedDataset as APILinkedDataset
 

@@ -6,10 +6,10 @@ import vdi.core.db.app.AppDB
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.db.cache.query.DatasetListQuery
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetShareOffer
-import vdi.model.data.DatasetShareReceipt
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetShareOffer
+import vdi.model.meta.DatasetShareReceipt
+import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.DatasetListEntry
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.server.controllers.ControllerBase

@@ -12,9 +12,9 @@ import vdi.core.db.app.sql.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.plugin.registry.PluginRegistry
-import vdi.model.data.DatasetID
-import vdi.model.data.DatasetType
-import vdi.model.data.DatasetVisibility
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetType
+import vdi.model.meta.DatasetVisibility
 
 private fun sql(schema: String) =
 // language=postgresql

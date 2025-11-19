@@ -8,9 +8,9 @@ import vdi.core.db.cache.model.DatasetShareListEntry
 import vdi.core.db.cache.util.getProjectIDList
 import vdi.core.db.jdbc.*
 import vdi.model.meta.DatasetShareOffer
-import vdi.model.data.DatasetShareReceipt
-import vdi.model.data.DatasetType
-import vdi.model.data.UserID
+import vdi.model.meta.DatasetShareReceipt
+import vdi.model.meta.DatasetType
+import vdi.model.meta.UserID
 
 // language=postgresql
 private val SQL = """

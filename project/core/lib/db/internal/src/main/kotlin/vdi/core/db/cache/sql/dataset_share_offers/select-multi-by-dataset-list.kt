@@ -8,8 +8,8 @@ import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.jdbc.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.model.meta.DatasetID
-import vdi.model.data.DatasetShareOffer
-import vdi.model.data.DatasetShareReceipt
+import vdi.model.meta.DatasetShareOffer
+import vdi.model.meta.DatasetShareReceipt
 
 // language=postgresql
 private const val SQL = """

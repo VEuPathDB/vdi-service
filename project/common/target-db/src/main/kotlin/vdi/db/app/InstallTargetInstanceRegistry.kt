@@ -1,7 +1,7 @@
 package vdi.db.app
 
-import vdi.model.data.DataType
-import vdi.model.data.DatasetType
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetType
 
 internal class InstallTargetInstanceRegistry(private val registry: Map<DatasetType, InstallTarget>) {
   fun asSequence() =

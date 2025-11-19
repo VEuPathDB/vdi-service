@@ -1,6 +1,6 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.data.DatasetVisibility
+import vdi.model.meta.DatasetVisibility
 import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
 
 fun DatasetVisibility(vis: DatasetVisibility) = when (vis) {
