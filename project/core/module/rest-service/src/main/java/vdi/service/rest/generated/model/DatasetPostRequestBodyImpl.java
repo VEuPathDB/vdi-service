@@ -11,7 +11,8 @@ import java.util.List;
     "details",
     "dataFiles",
     "url",
-    "docFiles"
+    "docFiles",
+    "mappingFiles"
 })
 public class DatasetPostRequestBodyImpl implements DatasetPostRequestBody {
   @JsonProperty(JsonField.DETAILS)
@@ -25,6 +26,9 @@ public class DatasetPostRequestBodyImpl implements DatasetPostRequestBody {
 
   @JsonProperty(JsonField.DOC_FILES)
   private List<File> docFiles;
+
+  @JsonProperty(JsonField.MAPPING_FILES)
+  private List<File> mappingFiles;
 
   @JsonProperty(JsonField.DETAILS)
   public DatasetPostMeta getDetails() {
@@ -64,5 +68,15 @@ public class DatasetPostRequestBodyImpl implements DatasetPostRequestBody {
   @JsonProperty(JsonField.DOC_FILES)
   public void setDocFiles(List<File> docFiles) {
     this.docFiles = docFiles;
+  }
+
+  @JsonProperty(JsonField.MAPPING_FILES)
+  public List<File> getMappingFiles() {
+    return this.mappingFiles;
+  }
+
+  @JsonProperty(JsonField.MAPPING_FILES)
+  public void setMappingFiles(List<File> mappingFiles) {
+    this.mappingFiles = mappingFiles;
   }
 }

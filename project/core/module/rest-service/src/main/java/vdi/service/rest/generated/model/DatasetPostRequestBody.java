@@ -32,4 +32,10 @@ public interface DatasetPostRequestBody {
 
   @JsonProperty(JsonField.DOC_FILES)
   void setDocFiles(List<File> docFiles);
+
+  @JsonProperty(JsonField.MAPPING_FILES)
+  List<File> getMappingFiles();
+
+  @JsonProperty(JsonField.MAPPING_FILES)
+  void setMappingFiles(List<File> mappingFiles);
 }

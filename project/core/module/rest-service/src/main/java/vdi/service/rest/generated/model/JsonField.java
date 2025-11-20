@@ -84,6 +84,7 @@ public final class JsonField {
   public static final String LAST_NAME = "lastName";
   public static final String LIMIT = "limit";
   public static final String LINKED_DATASETS = "linkedDatasets";
+  public static final String MAPPING_FILES = "mappingFiles";
   public static final String MAX_FILE_SIZE = "maxFileSize";
   public static final String MAX_UPLOAD_SIZE = "maxUploadSize";
   public static final String MESSAGE = "message";
