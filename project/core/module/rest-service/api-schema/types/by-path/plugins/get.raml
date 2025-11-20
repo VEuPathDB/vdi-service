@@ -9,11 +9,7 @@ types:
     additionalProperties: false
     properties:
       pluginName: string
-      type: common.DatasetTypeOutput
-      maxFileSize:
-        type: integer
-        format: int64
-      allowedFileExtensions: string[]
+      dataTypes: PluginDataType[]
       installTargets?:
         # language=markdown
         description: |-
@@ -21,3 +17,14 @@ types:
           indicates that the plugin has no project restrictions and may be used
           on any site.
         type: common.InstallTargetID[]
+
+  PluginDataType:
+    type: common.DatasetTypeOutput
+    additionalProperties: false
+    properties:
+      usesMappingFiles:
+        type: boolean
+      maxFileSize:
+        type: integer
+        format: int64
+      allowedFileExtensions: string[]

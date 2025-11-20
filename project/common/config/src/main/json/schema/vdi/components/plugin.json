@@ -149,9 +149,9 @@
           "uniqueItems": true,
           "unevaluatedItems": false
         },
-        "usesDataDict": {
-          "title": "Enable Data Dictionaries",
-          "description": "Flag indicating whether the data type allows data-dictionary uploads.",
+        "usesVarMapping": {
+          "title": "Enable Mapping Files",
+          "description": "Flag indicating whether the data type allows variable mapping file uploads.",
           "type": "boolean",
           "default": false
         }

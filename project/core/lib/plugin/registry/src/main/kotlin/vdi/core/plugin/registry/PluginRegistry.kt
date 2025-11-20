@@ -24,7 +24,12 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
 
         plug.dataTypes.asSequence()
           .map { DatasetType(DataType.of(it.name), it.version)
-            .also { dt -> tmpCats[dt] = PluginDatasetTypeMeta(it.category, it.maxFileSize, it.allowedFileExtensions) } }
+            .also { dt -> tmpCats[dt] = PluginDatasetTypeMeta(
+              it.category,
+              it.maxFileSize,
+              it.allowedFileExtensions,
+              it.usesVarMapping,
+            ) } }
           .onEach { conflicts.computeIfAbsent(it, { ArrayList(1) }).add(name) }
           .map { it to details }
       }

@@ -14,23 +14,11 @@ public interface PluginListItem {
   @JsonProperty(JsonField.PLUGIN_NAME)
   void setPluginName(String pluginName);
 
-  @JsonProperty(JsonField.TYPE)
-  DatasetTypeOutput getType();
+  @JsonProperty(JsonField.DATA_TYPES)
+  List<PluginDataType> getDataTypes();
 
-  @JsonProperty(JsonField.TYPE)
-  void setType(DatasetTypeOutput type);
-
-  @JsonProperty(JsonField.MAX_FILE_SIZE)
-  Long getMaxFileSize();
-
-  @JsonProperty(JsonField.MAX_FILE_SIZE)
-  void setMaxFileSize(Long maxFileSize);
-
-  @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
-  List<String> getAllowedFileExtensions();
-
-  @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
-  void setAllowedFileExtensions(List<String> allowedFileExtensions);
+  @JsonProperty(JsonField.DATA_TYPES)
+  void setDataTypes(List<PluginDataType> dataTypes);
 
   @JsonProperty(JsonField.INSTALL_TARGETS)
   List<String> getInstallTargets();

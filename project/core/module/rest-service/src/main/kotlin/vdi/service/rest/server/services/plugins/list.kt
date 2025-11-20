@@ -5,9 +5,10 @@ package vdi.service.rest.server.services.plugins
 import vdi.core.plugin.registry.PluginDetails
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.DatasetType
+import vdi.service.rest.generated.model.PluginDataType
+import vdi.service.rest.generated.model.PluginDataTypeImpl
 import vdi.service.rest.generated.model.PluginListItem
 import vdi.service.rest.generated.model.PluginListItemImpl
-import vdi.service.rest.server.outputs.DatasetTypeOutput
 
 internal fun listPlugins(project: String?): List<PluginListItem> {
   var seq = PluginRegistry.asSequence()
@@ -16,16 +17,33 @@ internal fun listPlugins(project: String?): List<PluginListItem> {
     seq = seq.filter { (_, d) -> d.appliesTo(project) }
   }
 
-  return seq.map(::PluginListItem).toList()
+  val plugins = HashMap<String, PluginListItem>(12)
+
+  seq.forEach { (dt, plug) ->
+    plugins.compute(plug.name, { _, item ->
+      item?.apply { dataTypes.add(PluginDataType(dt)) }
+        ?: PluginListItem(dt, plug)
+    })
+  }
+
+  return plugins.values.toList()
 }
 
-private fun PluginListItem(p: Pair<DatasetType, PluginDetails>): PluginListItem =
+private fun PluginListItem(dt: DatasetType, plug: PluginDetails): PluginListItem =
   PluginListItemImpl().also {
-    val config = PluginRegistry.configDataFor(p.first)
+    it.pluginName = plug.name
+    it.installTargets = plug.projects
+    it.dataTypes = mutableListOf(PluginDataType(dt))
+  }
 
-    it.pluginName = p.second.name
-    it.installTargets = p.second.projects
-    it.type = DatasetTypeOutput(p.first)
-    it.maxFileSize = config.maxFileSize.toLong()
-    it.allowedFileExtensions = config.allowedFileExtensions.asList()
+private fun PluginDataType(dt: DatasetType): PluginDataType =
+  PluginDataTypeImpl().apply {
+    val config = PluginRegistry.configDataFor(dt)
+
+    name = dt.name.toString()
+    version = dt.version
+    category = config.category
+    usesMappingFiles = config.usesMappingFiles
+    maxFileSize = config.maxFileSize.toLong()
+    allowedFileExtensions = config.allowedFileExtensions.asList()
   }

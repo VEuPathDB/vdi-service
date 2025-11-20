@@ -6,4 +6,5 @@ class DataTypeConfig(
   val version: String,
   val maxFileSize: ULong = ULong.MAX_VALUE,
   val allowedFileExtensions: Array<String> = emptyArray(),
+  val usesVarMapping: Boolean = false,
 )

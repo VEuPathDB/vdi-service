@@ -1160,17 +1160,23 @@ types:
       * `2022-03-15T16:30:12.123-06:00`
     type: string
     minLength: 4
+  PluginDataType:
+    type: DatasetTypeOutput
+    additionalProperties: false
+    properties:
+      usesMappingFiles:
+        type: boolean
+      maxFileSize:
+        type: integer
+        format: int64
+      allowedFileExtensions: string[]
   PluginListItem:
     displayName: Plugin Info
     type: object
     additionalProperties: false
     properties:
       pluginName: string
-      type: DatasetTypeOutput
-      maxFileSize:
-        type: integer
-        format: int64
-      allowedFileExtensions: string[]
+      dataTypes: PluginDataType[]
       installTargets?:
         description: |-
           Projects that this plugin is restricted to.  An empty or absent list

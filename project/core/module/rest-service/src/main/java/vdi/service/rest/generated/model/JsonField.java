@@ -32,6 +32,7 @@ public final class JsonField {
   public static final String DATA_FILES = "dataFiles";
   public static final String DATA_MESSAGES = "dataMessages";
   public static final String DATA_STATUS = "dataStatus";
+  public static final String DATA_TYPES = "dataTypes";
   public static final String DATA_UPDATE_TIME = "dataUpdateTime";
   public static final String DATASET_ID = "datasetId";
   public static final String DATASET_TYPE = "datasetType";
@@ -147,6 +148,7 @@ public final class JsonField {
   public static final String USER = "user";
   public static final String USER_ID = "userId";
   public static final String USER_MAX_STORAGE_SIZE = "userMaxStorageSize";
+  public static final String USES_MAPPING_FILES = "usesMappingFiles";
   public static final String VERSION = "version";
   public static final String VISIBILITY = "visibility";
   public static final String YEARS = "years";
