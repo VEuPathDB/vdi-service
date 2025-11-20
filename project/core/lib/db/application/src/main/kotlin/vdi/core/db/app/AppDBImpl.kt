@@ -2,6 +2,7 @@ package vdi.core.db.app
 
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.app.sql.dataset_install_message.selectInstallStatuses
+import vdi.db.app.TargetDBPlatform
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetType
 import vdi.model.meta.InstallTargetID
@@ -46,6 +47,9 @@ internal object AppDBImpl : AppDB {
 
   override fun transaction(key: InstallTargetID, dataType: DatasetType): AppDBTransaction? =
     AppDatabaseRegistry[key, dataType]
-      ?.let { ds -> AppDBTransactionImpl(key, ds.details.schema, ds.dataSource.connection.also { it.autoCommit = false }, ds.details.platform) }
+      ?.let { ds -> when (ds.details.platform) {
+        TargetDBPlatform.Postgres -> PostgresTransaction(key, ds.details.schema, ds.dataSource.connection.also { it.autoCommit = false })
+        TargetDBPlatform.Oracle -> OracleTransaction(key, ds.details.schema, ds.dataSource.connection.also { it.autoCommit = false })
+      } }
 }
 

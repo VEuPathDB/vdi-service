@@ -2,6 +2,7 @@ package vdi.core.reconciler
 
 import vdi.util.io.CloseableIterator
 import vdi.core.db.model.ReconcilerTargetRecord
+import vdi.model.EventID
 
 /**
  * Facade over a target database that provides APIs necessary for synchronization reconciliation.
@@ -26,6 +27,6 @@ internal interface ReconcilerTarget {
    */
   fun streamSortedSyncControlRecords(): CloseableIterator<ReconcilerTargetRecord>
 
-  suspend fun deleteDataset(dataset: ReconcilerTargetRecord)
+  suspend fun deleteDataset(eventID: EventID, dataset: ReconcilerTargetRecord)
 }
 

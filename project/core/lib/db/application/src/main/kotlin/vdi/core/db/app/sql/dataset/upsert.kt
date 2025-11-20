@@ -10,7 +10,7 @@ import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.app.sql.setUserID
 
 private fun sql(schema: String) =
-// language=oracle
+// language=postgresql
 """
 INSERT INTO
   ${schema}.${Table.Dataset} (
@@ -37,11 +37,17 @@ VALUES (
 , ? -- 9  days before automatic access approval to requesting users
 , ? -- 10 dataset creation date
 )
+ON CONFLICT (dataset_id) DO UPDATE
+SET
+  deleted_status = ?    -- 11 deletion status
+, is_public = ?         -- 12 public flag (redundant with accessibility == public)
+, accessibility = ?     -- 13 accessibility
+, days_for_approval = ? -- 14 days for approval
 """
 
-@Suppress("DuplicatedCode")
-internal fun Connection.insertDataset(schema: String, dataset: DatasetRecord) =
+internal fun Connection.upsertDataset(schema: String, dataset: DatasetRecord) =
   withPreparedUpdate(sql(schema)) {
+    // insert
     setDatasetID(1, dataset.datasetID)
     setUserID(2, dataset.owner)
     setDataType(3, dataset.type.name)
@@ -52,4 +58,10 @@ internal fun Connection.insertDataset(schema: String, dataset: DatasetRecord) =
     setString(8, dataset.accessibility.value)
     setInt(9, dataset.daysForApproval)
     setObject(10, dataset.creationDate.toLocalDate())
+
+    // update
+    setDeleteFlag(11, dataset.deletionState)
+    setBoolean(12, dataset.isPublic)
+    setString(13, dataset.accessibility.value)
+    setInt(14, dataset.daysForApproval)
   }

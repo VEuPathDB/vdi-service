@@ -8,7 +8,7 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 DELETE FROM
   ${schema}.${Table.Projects}

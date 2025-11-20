@@ -11,7 +11,7 @@
       "default": true
     },
     "targetName": {
-      "$ref": "../../common.json#/$defs/installTarget",
+      "$ref": "../../common.json#/$defs/installTarget"
     },
     "datasetFileRoot": {
       "title": "Dataset File Root",

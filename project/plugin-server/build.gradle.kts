@@ -32,9 +32,7 @@ dependencies {
   implementation(libs.metrics.micrometer)
   implementation(libs.metrics.prometheus)
 
-  implementation(libs.ktor.core)
-  implementation(libs.ktor.netty)
-  implementation(libs.ktor.metrics)
+  implementation(libs.bundles.ktor.server)
 
   implementation(libs.log.log4j.slf4j)
 

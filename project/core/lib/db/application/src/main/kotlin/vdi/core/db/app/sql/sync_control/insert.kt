@@ -8,7 +8,7 @@ import vdi.core.db.jdbc.setDateTime
 import vdi.core.db.model.SyncControlRecord
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 INSERT INTO
   ${schema}.${Table.SyncControl} (

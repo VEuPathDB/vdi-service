@@ -6,17 +6,11 @@ import vdi.core.db.app.model.InstallType
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.withTransaction
-import vdi.core.kafka.EventSource
 import vdi.core.kafka.router.KafkaRouter
 import vdi.core.metrics.Metrics
-import vdi.core.s3.DatasetObjectStore
-import vdi.core.s3.getInstallReadyTimestamp
-import vdi.core.s3.getLatestShareTimestamp
-import vdi.core.s3.getMetaTimestamp
+import vdi.core.s3.*
 import vdi.lane.reconciliation.util.*
-import vdi.logging.markedLogger
 import vdi.model.meta.DatasetID
-import vdi.model.meta.UserID
 
 internal class DatasetReconciler(
   private val cacheDB: CacheDB = CacheDB(),
@@ -29,17 +23,20 @@ internal class DatasetReconciler(
   // TODO: If the raw upload file is newer than the import-ready file then we
   //       should fire an upload processing event.
 
-  fun reconcile(userID: UserID, datasetID: DatasetID, source: EventSource) {
-    val logger = markedLogger(userID, datasetID)
-    logger.info("beginning reconciliation")
+  fun reconcile(ctx: ReconcilerContext) {
+    ctx.logger.info("beginning reconciliation")
     try {
-      reconcile(ReconciliationContext(datasetManager.getDatasetDirectory(userID, datasetID), source, logger))
-      logger.info("reconciliation completed")
+      reconcile(ReconciliationContext(
+        datasetManager.getDatasetDirectory(ctx.ownerID, ctx.datasetID),
+        ctx.source,
+        ctx.logger,
+      ))
+      ctx.logger.info("reconciliation completed")
     } catch (_: CriticalReconciliationError) {
-      logger.error("reconciliation failed")
+      ctx.logger.error("reconciliation failed")
     } catch (e: Throwable) {
       Metrics.ReconciliationHandler.errors.inc()
-      logger.error("reconciliation failed", e)
+      ctx.logger.error("reconciliation failed", e)
     }
   }
 
@@ -138,7 +135,7 @@ internal class DatasetReconciler(
   }
 
   private fun runSync(ctx: ReconciliationContext) {
-    val syncStatus = checkSyncStatus(ctx)
+    val syncStatus = ctx.checkSyncStatus()
 
     if (syncStatus.metaOutOfSync)
       fireUpdateMetaEvent(ctx)
@@ -155,40 +152,46 @@ internal class DatasetReconciler(
       ensureRevisionFlags(ctx)
   }
 
-  private fun checkSyncStatus(ctx: ReconciliationContext): SyncIndicator {
-    val cacheDBSyncControl = cacheDB.requireSyncControl(ctx)
+  private fun ReconciliationContext.checkSyncStatus(): SyncIndicator {
+    val cacheDBSyncControl = cacheDB.requireSyncControl(this)
 
-    val metaTimestamp = ctx.datasetDirectory.getMetaTimestamp()
-      ?: cacheDBSyncControl.metaUpdated
+    val metaTimestamp = maxOf(
+      datasetDirectory.getMetaTimestamp() ?: cacheDBSyncControl.metaUpdated,
+      datasetDirectory.getLatestMappingTimestamp() ?: cacheDBSyncControl.metaUpdated,
+    )
 
-    val installDataTimestamp = ctx.datasetDirectory.getInstallReadyTimestamp()
+    val installDataTimestamp = datasetDirectory.getInstallReadyTimestamp()
       ?: cacheDBSyncControl.dataUpdated
 
-    val latestShareTimestamp = ctx.datasetDirectory.getLatestShareTimestamp(cacheDBSyncControl.sharesUpdated)
+    val latestShareTimestamp = datasetDirectory.getLatestShareTimestamp(cacheDBSyncControl.sharesUpdated)
 
     val indicator = SyncIndicator(
-      metaOutOfSync = cacheDBSyncControl.metaUpdated.isBefore(metaTimestamp),
-      sharesOutOfSync = cacheDBSyncControl.sharesUpdated.isBefore(latestShareTimestamp),
-      installOutOfSync = cacheDBSyncControl.dataUpdated.isBefore(installDataTimestamp),
+      metaOutOfSync     = cacheDBSyncControl.metaUpdated.isBefore(metaTimestamp),
+      sharesOutOfSync   = cacheDBSyncControl.sharesUpdated.isBefore(latestShareTimestamp),
+      installOutOfSync  = cacheDBSyncControl.dataUpdated.isBefore(installDataTimestamp),
     )
 
     if (indicator.fullyOutOfSync)
       return indicator
 
-    ctx.meta.installTargets.forEach { projectID ->
-      val appDB = appDB.accessor(projectID, ctx.meta.type)
+    meta.installTargets.forEach { projectID ->
+      val appDB = appDB.accessor(projectID, meta.type)
 
       if (appDB == null) {
-        ctx.logger.warn("skipping dataset state comparison for disabled target {}", projectID)
+        logger.warn("skipping dataset state comparison for disabled target {}", projectID)
         return@forEach
       }
 
-      val sync = appDB.selectSyncControl(ctx)
+      val sync = appDB.selectSyncControl(this)
         // If the dataset sync record does not exist at all, then fire a sync
         // action for shares and install.  The share sync is most likely going
         // to be processed before the install, so the shares probably won't make
         // it to the install target until the next big reconciler run.
-        ?: return SyncIndicator(metaOutOfSync = true, sharesOutOfSync = true, installOutOfSync = true)
+        ?: return SyncIndicator(
+          metaOutOfSync     = true,
+          sharesOutOfSync   = true,
+          installOutOfSync  = true,
+        )
 
       if (!indicator.metaOutOfSync && sync.metaUpdated.isBefore(metaTimestamp))
         indicator.metaOutOfSync = true

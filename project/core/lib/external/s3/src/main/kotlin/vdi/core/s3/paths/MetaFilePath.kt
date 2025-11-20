@@ -12,12 +12,11 @@ sealed interface MetaFilePath: DatasetPath {
 
     override fun matches(path: String) = pattern.matches(path)
       && path.substringAfterLast('/')
-        .let { name -> FileName.MetaFileNames.any(name::equals) }
+        .let { FileName.MetaFileNames.any(it::equals) }
 
     override fun create(path: String): MetaFilePath =
       pattern.matchEntire(path)!!.destructured.let { (bucket, user, dataset, file) ->
-        MetaFilePathImpl(file, UserID(user), DatasetID(dataset), bucket)
-      }
+        MetaFilePathImpl(file, UserID(user), DatasetID(dataset), bucket) }
   }
 
   private class MetaFilePathImpl(

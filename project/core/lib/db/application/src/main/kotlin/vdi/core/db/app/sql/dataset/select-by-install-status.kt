@@ -21,7 +21,7 @@ import vdi.model.meta.DatasetVisibility
 import vdi.model.meta.InstallTargetID
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 SELECT
   ds.dataset_id

@@ -1,4 +1,3 @@
-import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 import org.openapitools.generator.gradle.plugin.tasks.MetaTask
 import org.veupathdb.lib.gradle.container.tasks.jaxrs.GenerateJaxRS
 import org.veupathdb.lib.gradle.container.tasks.raml.GenerateRamlDocs

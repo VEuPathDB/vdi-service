@@ -39,10 +39,10 @@ class DatasetObjectStoreTest {
 
     val mockedS3 = mockS3List(
       listOf(
-        firstPathFactory.datasetMetaFile(),
-        firstPathFactory.datasetManifestFile(),
-        secondPathFactory.datasetMetaFile(),
-        secondPathFactory.datasetManifestFile()
+        firstPathFactory.metadataFile(),
+        firstPathFactory.manifestFile(),
+        secondPathFactory.metadataFile(),
+        secondPathFactory.manifestFile()
       )
     )
     val datasetManager = DatasetObjectStore(mockedS3)
@@ -66,9 +66,9 @@ class DatasetObjectStoreTest {
 
     val mockedS3 = mockS3List(
       listOf(
-        firstPathFactory.datasetMetaFile(),
-        firstPathFactory.datasetManifestFile(),
-        secondPathFactory.datasetMetaFile(),
+        firstPathFactory.metadataFile(),
+        firstPathFactory.manifestFile(),
+        secondPathFactory.metadataFile(),
       )
     )
     val datasetManager = DatasetObjectStore(mockedS3)
@@ -89,14 +89,14 @@ class DatasetObjectStoreTest {
 
     val mockedS3 = mockS3List(
       listOf(
-        firstPathFactory.datasetMetaFile(),
-        firstPathFactory.datasetManifestFile(),
+        firstPathFactory.metadataFile(),
+        firstPathFactory.manifestFile(),
 
-        secondPathFactory.datasetMetaFile(),
+        secondPathFactory.metadataFile(),
 
-        thirdPathFactory.datasetMetaFile(),
-        thirdPathFactory.datasetShareOfferFile(TestUserID1),
-        thirdPathFactory.datasetShareReceiptFile(TestUserID1)
+        thirdPathFactory.metadataFile(),
+        thirdPathFactory.shareOfferFile(TestUserID1),
+        thirdPathFactory.shareReceiptFile(TestUserID1)
       )
     )
 
@@ -114,9 +114,9 @@ class DatasetObjectStoreTest {
 
     val mockedS3 = mockS3List(
       listOf(
-        pathFactory.datasetMetaFile(),
-        pathFactory.datasetManifestFile(),
-        pathFactory.datasetDeleteFlagFile()
+        pathFactory.metadataFile(),
+        pathFactory.manifestFile(),
+        pathFactory.deleteFlagFile()
       )
     )
     val datasetManager = DatasetObjectStore(mockedS3)
@@ -134,18 +134,18 @@ class DatasetObjectStoreTest {
     val mockedS3 = mockS3List(
       listOf(
         // First dataset has just meta
-        firstPathFactory.datasetMetaFile(),
+        firstPathFactory.metadataFile(),
 
         // Random garbage path should be skipped.
         "$TestUserID1/Broken-path",
 
         // Second dataset with just meta
-        secondPathFactory.datasetMetaFile(),
+        secondPathFactory.metadataFile(),
 
         // Third dataset with meta and shares.
-        thirdPathFactory.datasetMetaFile(),
-        thirdPathFactory.datasetShareOfferFile(TestUserID1),
-        thirdPathFactory.datasetShareReceiptFile(TestUserID1)
+        thirdPathFactory.metadataFile(),
+        thirdPathFactory.shareOfferFile(TestUserID1),
+        thirdPathFactory.shareReceiptFile(TestUserID1)
       )
     )
     val datasetManager = DatasetObjectStore(mockedS3)
@@ -164,17 +164,17 @@ class DatasetObjectStoreTest {
     val mockedS3 = mockS3List(
       listOf(
         // All part of the first dataset. The whole first ds should be discarded.
-        firstPathFactory.datasetMetaFile(),
+        firstPathFactory.metadataFile(),
         "$TestUserID1/$DatasetID1/Broken-path1",
         "$TestUserID1/$DatasetID1/Broken-path2",
 
         // Second dataset with just meta.
-        secondPathFactory.datasetMetaFile(),
-        thirdPathFactory.datasetMetaFile(),
+        secondPathFactory.metadataFile(),
+        thirdPathFactory.metadataFile(),
 
         // Third dataset with just shares.
-        thirdPathFactory.datasetShareOfferFile(TestUserID1),
-        thirdPathFactory.datasetShareReceiptFile(TestUserID1)
+        thirdPathFactory.shareOfferFile(TestUserID1),
+        thirdPathFactory.shareReceiptFile(TestUserID1)
       )
     )
     val datasetManager = DatasetObjectStore(mockedS3)
@@ -195,15 +195,15 @@ class DatasetObjectStoreTest {
         // All part of the first dataset. The whole first ds should be discarded.
         "$TestUserID1/$DatasetID1/Broken-path1",
         "$TestUserID1/$DatasetID1/Broken-path2",
-        firstPathFactory.datasetMetaFile(),
+        firstPathFactory.metadataFile(),
 
         // Second dataset with just meta.
-        secondPathFactory.datasetMetaFile(),
+        secondPathFactory.metadataFile(),
 
         // Third dataset with meta and shares.
-        thirdPathFactory.datasetMetaFile(),
-        thirdPathFactory.datasetShareOfferFile(TestUserID1),
-        thirdPathFactory.datasetShareReceiptFile(TestUserID1)
+        thirdPathFactory.metadataFile(),
+        thirdPathFactory.shareOfferFile(TestUserID1),
+        thirdPathFactory.shareReceiptFile(TestUserID1)
       )
     )
     val datasetManager = DatasetObjectStore(mockedS3)
@@ -222,15 +222,15 @@ class DatasetObjectStoreTest {
     val mockedS3 = mockS3List(
       listOf(
         // First dataset with just meta
-        firstPathFactory.datasetMetaFile(),
+        firstPathFactory.metadataFile(),
 
         // Second dataset with just meta.
-        secondPathFactory.datasetMetaFile(),
+        secondPathFactory.metadataFile(),
 
         // Third dataset with meta and shares and broken paths.
-        thirdPathFactory.datasetMetaFile(),
-        thirdPathFactory.datasetShareOfferFile(TestUserID2),
-        thirdPathFactory.datasetShareReceiptFile(TestUserID2),
+        thirdPathFactory.metadataFile(),
+        thirdPathFactory.shareOfferFile(TestUserID2),
+        thirdPathFactory.shareReceiptFile(TestUserID2),
 
         "$TestUserID1/$DatasetID3/Broken-path1",
         "$TestUserID1/$DatasetID3/Broken-path2",

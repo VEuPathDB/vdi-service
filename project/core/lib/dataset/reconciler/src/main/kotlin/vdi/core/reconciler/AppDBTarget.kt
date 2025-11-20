@@ -11,8 +11,9 @@ import vdi.core.plugin.client.response.ScriptErrorResponse
 import vdi.core.plugin.client.response.ServerErrorResponse
 import vdi.core.plugin.client.response.isSuccessResponse
 import vdi.core.plugin.mapping.PluginHandlers
+import vdi.model.EventID
 
-internal class AppDBTarget(override val name: String, private val projectID: String) : ReconcilerTarget {
+internal class AppDBTarget(override val name: String, private val projectID: String): ReconcilerTarget {
   private val appDB = AppDB()
 
   override val type = ReconcilerTargetType.Install
@@ -20,7 +21,7 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
   override fun streamSortedSyncControlRecords(): CloseableIterator<ReconcilerTargetRecord> =
     CloseableMultiIterator(projectID)
 
-  override suspend fun deleteDataset(dataset: ReconcilerTargetRecord) {
+  override suspend fun deleteDataset(eventID: EventID, dataset: ReconcilerTargetRecord) {
     if (!PluginHandlers.contains(dataset.type)) {
       throw UnsupportedTypeException(
         "Unable to delete unknown dataset type ${dataset.type} from target database " +
@@ -31,7 +32,7 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
     val handler = PluginHandlers[dataset.type]!!
 
     val res = try {
-      handler.client.postUninstall(null, dataset.datasetID, projectID, dataset.type)
+      handler.client.postUninstall(eventID, dataset.datasetID, projectID, dataset.type)
     } catch (e: Throwable) {
       throw PluginRequestException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID, cause = e)
     }

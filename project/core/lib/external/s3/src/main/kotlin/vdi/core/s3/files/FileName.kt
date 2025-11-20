@@ -8,6 +8,8 @@ object FileName {
   const val DeleteFlagFile = "delete-flag"
   const val RevisedFlagFile = "revised-flag"
 
+  inline val FlagFileNames get() = arrayOf(DeleteFlagFile, RevisedFlagFile)
+
   // Data Files
   const val RawUploadFile = "raw-upload.zip"
   const val ImportReadyFile = "import-ready.zip"

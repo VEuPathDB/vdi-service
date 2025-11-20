@@ -9,7 +9,7 @@ import vdi.core.db.jdbc.setDateTime
 import vdi.model.meta.DatasetID
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 UPDATE
   ${schema}.${Table.SyncControl}

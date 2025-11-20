@@ -167,5 +167,5 @@ private fun KStubbing<DatasetFile>.mockDatasetFile(
   baseName?.also { on { this.baseName } doReturn it }
   on { this.exists() } doReturn exists
   lastModified?.also { on { this.lastModified() } doReturn it }
-  contents?.also { on { this.loadContents() } doReturn it }
+  contents?.also { on { this.open() } doReturn it }
 }

@@ -183,7 +183,7 @@ interface DatasetDirectory {
   /**
    * Puts a `raw-upload.zip` file into this [DatasetDirectory].
    */
-  fun putUploadFile(fn: () -> InputStream)
+  fun putUploadFile(provider: () -> InputStream)
 
   /**
    * Deletes the `raw-upload.zip` file from this [DatasetDirectory].
@@ -217,7 +217,7 @@ interface DatasetDirectory {
   /**
    * Puts an `import-ready.zip` file into this [DatasetDirectory].
    */
-  fun putImportReadyFile(fn: () -> InputStream)
+  fun putImportReadyFile(provider: () -> InputStream)
 
   /**
    * Deletes the `import-ready.zip` file from this [DatasetDirectory].
@@ -250,7 +250,7 @@ interface DatasetDirectory {
   /**
    * Puts an `install-ready.zip` file into this [DatasetDirectory].
    */
-  fun putInstallReadyFile(fn: () -> InputStream)
+  fun putInstallReadyFile(provider: () -> InputStream)
 
   /**
    * Deletes the `install-ready.zip` file from this [DatasetDirectory].
@@ -298,9 +298,9 @@ interface DatasetDirectory {
 
   fun getMappingFiles(): Sequence<MappingFile>
 
-  fun getMappingFile(name: String): MappingFile?
+  fun getMappingFile(name: String): MappingFile
 
-  fun putMappingFile(name: String, fn: () -> InputStream)
+  fun putMappingFile(name: String, contentType: String = MappingFile.ContentType, provider: () -> InputStream)
 
   fun deleteMappingFile(name: String)
 
@@ -310,9 +310,9 @@ interface DatasetDirectory {
 
   fun getDocumentFiles(): Sequence<DocumentFile>
 
-  fun getDocumentFile(name: String): DocumentFile?
+  fun getDocumentFile(name: String): DocumentFile
 
-  fun putDocumentFile(name: String, fn: () -> InputStream)
+  fun putDocumentFile(name: String, contentType: String = DocumentFile.ContentType, provider: () -> InputStream)
 
   fun deleteDocumentFile(name: String)
 

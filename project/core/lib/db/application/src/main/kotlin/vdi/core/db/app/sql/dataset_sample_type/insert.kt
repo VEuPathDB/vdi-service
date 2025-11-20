@@ -7,7 +7,7 @@ import vdi.core.db.app.sql.Table
 import vdi.core.db.app.sql.set
 import vdi.model.meta.DatasetID
 
-// language=postgresql
+// language=sql
 private fun SQL(schema: String) = "INSERT INTO ${schema}.${Table.SampleTypes} VALUES (?, ?)"
 
 internal fun Connection.insertSampleTypes(

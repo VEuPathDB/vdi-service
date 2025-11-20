@@ -8,7 +8,7 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 INSERT INTO
   ${schema}.${Table.Meta} (
@@ -25,6 +25,7 @@ VALUES
   (?, ?, ?, ?, ?, ?, ?, ?)
 """
 
+@Suppress("DuplicatedCode")
 internal fun Connection.insertDatasetMeta(schema: String, datasetID: DatasetID, meta: DatasetMetadata) {
   withPreparedUpdate(sql(schema)) {
     setDatasetID(1, datasetID)

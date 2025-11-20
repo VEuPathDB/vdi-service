@@ -6,7 +6,7 @@ import vdi.core.db.app.sql.Table
 import vdi.model.meta.DatasetID
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 DELETE FROM
   ${schema}.${Table.Meta}

@@ -11,7 +11,7 @@ import vdi.core.db.jdbc.setDatasetID
 import vdi.model.meta.DatasetID
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 SELECT
   user_id

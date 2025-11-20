@@ -2,13 +2,8 @@ package vdi.core.s3
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
 import org.veupathdb.lib.s3.s34k.objects.S3Object
-import vdi.model.meta.DatasetID
-import vdi.model.meta.UserID
-import vdi.model.meta.DatasetManifest
-import vdi.model.meta.DatasetMetadata
-import vdi.model.meta.DatasetShareOffer
-import vdi.model.meta.DatasetShareReceipt
 import java.io.InputStream
+import java.time.OffsetDateTime
 import vdi.core.s3.exception.MalformedDatasetException
 import vdi.core.s3.files.FileName
 import vdi.core.s3.files.data.DataFile
@@ -26,7 +21,7 @@ import vdi.core.s3.files.meta.MetadataFile
 import vdi.core.s3.files.shares.ShareOffer
 import vdi.core.s3.files.shares.ShareReceipt
 import vdi.core.s3.paths.*
-import vdi.core.s3.paths.S3DatasetPathFactory
+import vdi.model.meta.*
 
 /**
  * Implementation of a DatasetDirectory in which all objects are already known
@@ -130,9 +125,9 @@ internal class MaterializedDatasetDirectory(
       fun build(pathFactory: S3DatasetPathFactory) =
         Pair(
           offer?.let { ShareOffer(recipientID, it) }
-            ?: ShareOffer(recipientID, pathFactory.datasetShareOfferFile(recipientID), receipt!!.bucket.objects),
+            ?: ShareOffer(recipientID, pathFactory.shareOfferFile(recipientID), receipt!!.bucket.objects),
           receipt?.let { ShareReceipt(recipientID, it) }
-            ?: ShareReceipt(recipientID, pathFactory.datasetShareReceiptFile(recipientID), offer!!.bucket.objects),
+            ?: ShareReceipt(recipientID, pathFactory.shareReceiptFile(recipientID), offer!!.bucket.objects),
         )
     }
   }
@@ -144,7 +139,7 @@ internal class MaterializedDatasetDirectory(
     metaFile != null
 
   override fun getMetaFile() =
-    metaFile ?: MetaFile(pathFactory.datasetMetaFile(), bucket.objects)
+    metaFile ?: MetaFile(pathFactory.metadataFile(), bucket.objects)
 
   override fun putMetaFile(meta: DatasetMetadata) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -157,7 +152,7 @@ internal class MaterializedDatasetDirectory(
     manifest != null
 
   override fun getManifestFile() =
-    manifest ?: ManifestFile(pathFactory.datasetManifestFile(), bucket.objects)
+    manifest ?: ManifestFile(pathFactory.manifestFile(), bucket.objects)
 
   override fun putManifestFile(manifest: DatasetManifest) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -170,7 +165,7 @@ internal class MaterializedDatasetDirectory(
     deleteFlag != null
 
   override fun getDeleteFlag() =
-    deleteFlag ?: DeleteFlagFile(pathFactory.datasetDeleteFlagFile(), bucket.objects)
+    deleteFlag ?: DeleteFlagFile(pathFactory.deleteFlagFile(), bucket.objects)
 
   override fun putDeleteFlag() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -183,7 +178,7 @@ internal class MaterializedDatasetDirectory(
     revisedFlag != null
 
   override fun getRevisedFlag() =
-    revisedFlag ?: RevisedFlagFile(pathFactory.datasetRevisedFlagFile(), bucket.objects)
+    revisedFlag ?: RevisedFlagFile(pathFactory.revisedFlagFile(), bucket.objects)
 
   override fun putRevisedFlag() =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
@@ -196,9 +191,9 @@ internal class MaterializedDatasetDirectory(
     uploadFile != null
 
   override fun getUploadFile() =
-    uploadFile ?: RawUploadFile(pathFactory.datasetUploadZip(), bucket.objects)
+    uploadFile ?: RawUploadFile(pathFactory.uploadZip(), bucket.objects)
 
-  override fun putUploadFile(fn: () -> InputStream) =
+  override fun putUploadFile(provider: () -> InputStream) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun deleteUploadFile() =
@@ -209,9 +204,9 @@ internal class MaterializedDatasetDirectory(
     importableFile != null
 
   override fun getImportReadyFile() =
-    importableFile ?: ImportReadyFile(pathFactory.datasetImportReadyZip(), bucket.objects)
+    importableFile ?: ImportReadyFile(pathFactory.importReadyZip(), bucket.objects)
 
-  override fun putImportReadyFile(fn: () -> InputStream) =
+  override fun putImportReadyFile(provider: () -> InputStream) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun deleteImportReadyFile() =
@@ -222,9 +217,9 @@ internal class MaterializedDatasetDirectory(
     installableFile != null
 
   override fun getInstallReadyFile() =
-    installableFile ?: InstallReadyFile(pathFactory.datasetInstallReadyZip(), bucket.objects)
+    installableFile ?: InstallReadyFile(pathFactory.installReadyZip(), bucket.objects)
 
-  override fun putInstallReadyFile(fn: () -> InputStream) =
+  override fun putInstallReadyFile(provider: () -> InputStream) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun deleteInstallReadyFile() =
@@ -241,9 +236,11 @@ internal class MaterializedDatasetDirectory(
 
   override fun getMappingFiles() = mappingFiles.asSequence()
 
-  override fun getMappingFile(name: String) = mappingFiles.firstOrNull { it.baseName == name }
+  override fun getMappingFile(name: String) =
+    mappingFiles.firstOrNull { it.baseName == name }
+      ?: MissingFile(pathFactory.mappingFile(name))
 
-  override fun putMappingFile(name: String, fn: () -> InputStream) =
+  override fun putMappingFile(name: String, contentType: String, provider: () -> InputStream) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun deleteMappingFile(name: String) =
@@ -251,13 +248,32 @@ internal class MaterializedDatasetDirectory(
 
   override fun getDocumentFiles() = emptySequence<DocumentFile>()
 
-  override fun getDocumentFile(name: String) = null
+  override fun getDocumentFile(name: String): DocumentFile =
+    MissingFile(pathFactory.documentFile(name))
 
-  override fun putDocumentFile(name: String, fn: () -> InputStream) =
+  override fun putDocumentFile(name: String, contentType: String, provider: () -> InputStream): Nothing =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun deleteDocumentFile(name: String) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun toString() = "EagerDatasetDir($ownerID/$datasetID)"
+
+  private data class MissingFile(override val path: String): MappingFile, DocumentFile {
+    override val contentType: String
+      get() = "application/octet-stream"
+
+    override fun exists() = false
+    override fun lastModified(): OffsetDateTime? = null
+    override fun open(): InputStream? = null
+
+    override fun writeContents(content: InputStream): Nothing =
+      throw UnsupportedOperationException("${MaterializedDatasetDirectory::class.simpleName} is read-only")
+
+    override fun put(provider: () -> InputStream): Nothing =
+      throw UnsupportedOperationException("${MaterializedDatasetDirectory::class.simpleName} is read-only")
+
+    override fun delete(): Nothing =
+      throw UnsupportedOperationException("${MaterializedDatasetDirectory::class.simpleName} is read-only")
+  }
 }

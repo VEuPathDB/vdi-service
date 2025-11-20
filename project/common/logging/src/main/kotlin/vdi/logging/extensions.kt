@@ -67,6 +67,17 @@ inline fun logger(name: String): Logger =
 inline fun Any.markedLogger(mark: String): Logger =
   MarkedLogger(mark, javaClass)
 
+inline fun Any.markedLogger(
+  eventID: EventID? = null,
+  ownerID: UserID? = null,
+  datasetID: DatasetID? = null,
+  dataType: DatasetType? = null,
+  pluginName: String? = null,
+  scriptName: String? = null,
+  installTarget: InstallTargetID? = null,
+) = LoggerFactory.getLogger(javaClass)
+  .mark(eventID, ownerID, datasetID, dataType, pluginName, scriptName, installTarget)
+
 inline fun Any.markedLogger(ownerID: UserID, datasetID: DatasetID): Logger =
   markedLogger(createLoggerMark(ownerID, datasetID))
 

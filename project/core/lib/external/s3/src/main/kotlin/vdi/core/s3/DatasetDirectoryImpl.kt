@@ -31,7 +31,7 @@ internal class DatasetDirectoryImpl(
     bucket.objects.listSubPaths(pathFactory.datasetDir()).count > 0
 
 
-  private val lazyMetadata by lazy { MetaFile(pathFactory.datasetMetaFile(), bucket.objects) }
+  private val lazyMetadata by lazy { MetaFile(pathFactory.metadataFile(), bucket.objects) }
 
   override fun deleteMetaFile() = lazyMetadata.delete()
   override fun getMetaFile() = lazyMetadata
@@ -39,7 +39,7 @@ internal class DatasetDirectoryImpl(
   override fun putMetaFile(meta: DatasetMetadata) = lazyMetadata.put(meta)
 
 
-  private val lazyManifest by lazy { ManifestFile(pathFactory.datasetManifestFile(), bucket.objects) }
+  private val lazyManifest by lazy { ManifestFile(pathFactory.manifestFile(), bucket.objects) }
 
   override fun deleteManifestFile() = lazyManifest.delete()
   override fun getManifestFile() = lazyManifest
@@ -47,7 +47,7 @@ internal class DatasetDirectoryImpl(
   override fun putManifestFile(manifest: DatasetManifest) = this.lazyManifest.put(manifest)
 
 
-  private val lazyDeleteFlag by lazy { DeleteFlagFile(pathFactory.datasetDeleteFlagFile(), bucket.objects) }
+  private val lazyDeleteFlag by lazy { DeleteFlagFile(pathFactory.deleteFlagFile(), bucket.objects) }
 
   override fun deleteDeleteFlag() = lazyDeleteFlag.delete()
   override fun getDeleteFlag() = lazyDeleteFlag
@@ -55,31 +55,31 @@ internal class DatasetDirectoryImpl(
   override fun putDeleteFlag() = lazyDeleteFlag.create()
 
 
-  private val lazyUpload by lazy { RawUploadFile(pathFactory.datasetUploadZip(), bucket.objects) }
+  private val lazyUpload by lazy { RawUploadFile(pathFactory.uploadZip(), bucket.objects) }
 
   override fun deleteUploadFile() = lazyUpload.delete()
   override fun getUploadFile() = lazyUpload
   override fun hasUploadFile() = lazyUpload.exists()
-  override fun putUploadFile(fn: () -> InputStream) = fn().use { lazyUpload.writeContents(it) }
+  override fun putUploadFile(provider: () -> InputStream) = lazyUpload.put(provider)
 
 
-  private val lazyImportReady by lazy { ImportReadyFile(pathFactory.datasetImportReadyZip(), bucket.objects) }
+  private val lazyImportReady by lazy { ImportReadyFile(pathFactory.importReadyZip(), bucket.objects) }
 
   override fun deleteImportReadyFile() = lazyImportReady.delete()
   override fun getImportReadyFile() = lazyImportReady
   override fun hasImportReadyFile() = lazyImportReady.exists()
-  override fun putImportReadyFile(fn: () -> InputStream) = fn().use { lazyImportReady.writeContents(it) }
+  override fun putImportReadyFile(provider: () -> InputStream) = lazyImportReady.put(provider)
 
 
-  private val lazyInstallReady by lazy { InstallReadyFile(pathFactory.datasetInstallReadyZip(), bucket.objects) }
+  private val lazyInstallReady by lazy { InstallReadyFile(pathFactory.installReadyZip(), bucket.objects) }
 
   override fun deleteInstallReadyFile() = lazyInstallReady.delete()
   override fun getInstallReadyFile() = lazyInstallReady
   override fun hasInstallReadyFile() = lazyInstallReady.exists()
-  override fun putInstallReadyFile(fn: () -> InputStream) = fn().use { lazyInstallReady.writeContents(it) }
+  override fun putInstallReadyFile(provider: () -> InputStream) = lazyInstallReady.put(provider)
 
 
-  private val lazyRevisedFlag by lazy { RevisedFlagFile(pathFactory.datasetRevisedFlagFile(), bucket.objects) }
+  private val lazyRevisedFlag by lazy { RevisedFlagFile(pathFactory.revisedFlagFile(), bucket.objects) }
 
   override fun deleteRevisedFlag() = lazyRevisedFlag.delete()
   override fun getRevisedFlag() = lazyRevisedFlag
@@ -89,41 +89,51 @@ internal class DatasetDirectoryImpl(
   override fun getMappingFiles(): Sequence<MappingFile> {
     log.debug("looking up mapping files")
 
-    TODO("Not yet implemented")
+    return bucket.objects.listSubPaths(pathFactory.mappingsDir())
+      .contents()
+      .asSequence()
+      .map { MappingFile(it.path, bucket.objects) }
   }
 
-  override fun getMappingFile(name: String): MappingFile? {
-    TODO("Not yet implemented")
+  override fun getMappingFile(name: String): MappingFile =
+    MappingFile(pathFactory.mappingFile(name), bucket.objects)
+
+  override fun putMappingFile(name: String, contentType: String, provider: () -> InputStream) {
+    provider().use { bucket.objects.put(pathFactory.mappingFile(name)) {
+      this.contentType = contentType
+      this.stream = it
+    } }
   }
 
-  override fun putMappingFile(name: String, fn: () -> InputStream) {
-    TODO("Not yet implemented")
-  }
-
-  override fun deleteMappingFile(name: String) {
-    TODO("Not yet implemented")
-  }
+  override fun deleteMappingFile(name: String) =
+    bucket.objects.delete(pathFactory.mappingFile(name))
 
   override fun getDocumentFiles(): Sequence<DocumentFile> {
-    TODO("Not yet implemented")
+    log.debug("looking up document files")
+
+    return bucket.objects.listSubPaths(pathFactory.documentsDir())
+      .contents()
+      .asSequence()
+      .map { DocumentFile(it.path, bucket.objects) }
   }
 
-  override fun getDocumentFile(name: String): DocumentFile? {
-    TODO("Not yet implemented")
+  override fun getDocumentFile(name: String): DocumentFile =
+    DocumentFile(pathFactory.documentFile(name), bucket.objects)
+
+  override fun putDocumentFile(name: String, contentType: String, provider: () -> InputStream) {
+    provider().use { bucket.objects.put(pathFactory.documentFile(name)) {
+      this.contentType = contentType
+      this.stream = it
+    } }
   }
 
-  override fun putDocumentFile(name: String, fn: () -> InputStream) {
-    TODO("Not yet implemented")
-  }
-
-  override fun deleteDocumentFile(name: String) {
-    TODO("Not yet implemented")
-  }
+  override fun deleteDocumentFile(name: String) =
+    bucket.objects.delete(pathFactory.documentFile(name))
 
   override fun getShares(): Map<UserID, Pair<ShareOffer, ShareReceipt>> {
     log.debug("looking up shares")
 
-    val pathPrefix = pathFactory.datasetSharesDir()
+    val pathPrefix = pathFactory.sharesDir()
     val subPaths   = bucket.objects.listSubPaths(pathPrefix).commonPrefixes()
     val retValue   = HashMap<UserID, Pair<ShareOffer, ShareReceipt>>(subPaths.size)
 
@@ -134,8 +144,8 @@ internal class DatasetDirectoryImpl(
         ?: throw IllegalStateException("invalid user ID")
 
       retValue[recipientID] = Pair(
-        ShareOffer(recipientID, pathFactory.datasetShareOfferFile(recipientID), bucket.objects),
-        ShareReceipt(recipientID, pathFactory.datasetShareReceiptFile(recipientID), bucket.objects),
+        ShareOffer(recipientID, pathFactory.shareOfferFile(recipientID), bucket.objects),
+        ShareReceipt(recipientID, pathFactory.shareReceiptFile(recipientID), bucket.objects),
       )
     }
 
@@ -153,11 +163,11 @@ internal class DatasetDirectoryImpl(
   override fun putShare(recipientID: UserID, offer: DatasetShareOffer, receipt: DatasetShareReceipt) {
     log.debug("putting a new share for user {} with offer action {} and receipt action {} ", recipientID, offer.action, receipt.action)
 
-    bucket.objects.put(pathFactory.datasetShareOfferFile(recipientID)) {
+    bucket.objects.put(pathFactory.shareOfferFile(recipientID)) {
       contentType = "application/json"
       stream = JSON.writeValueAsBytes(offer).inputStream()
     }
-    bucket.objects.put(pathFactory.datasetShareReceiptFile(recipientID)) {
+    bucket.objects.put(pathFactory.shareReceiptFile(recipientID)) {
       contentType = "application/json"
       stream = JSON.writeValueAsBytes(receipt).inputStream()
     }

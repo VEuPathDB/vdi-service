@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   id("build-conventions")
 }
@@ -20,4 +22,15 @@ dependencies {
   implementation(libs.db.kotlin.extended)
 
   implementation(libs.log.slf4j.api)
+}
+
+
+tasks.register<JavaExec>("derp") {
+  mainClass = "vdi.core.db.app.MainKt"
+  classpath = sourceSets.main.get().runtimeClasspath
+}
+
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+  freeCompilerArgs.set(listOf("-Xcontext-parameters"))
 }

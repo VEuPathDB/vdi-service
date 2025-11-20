@@ -1,7 +1,6 @@
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins { kotlin("jvm") }
 
@@ -17,9 +16,11 @@ repositories {
   }
 }
 
-kotlin.compilerOptions.jvmTarget = JvmTarget.JVM_21
-java.targetCompatibility = JavaVersion.VERSION_21
-java.sourceCompatibility = JavaVersion.VERSION_21
+kotlin {
+  jvmToolchain {
+    languageVersion = JavaLanguageVersion.of(24)
+  }
+}
 
 val libs = the<LibrariesForLibs>()
 

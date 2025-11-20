@@ -8,7 +8,7 @@ import vdi.core.db.app.sql.set
 import vdi.model.meta.DatasetID
 import vdi.model.meta.LinkedDataset
 
-// language=postgresql
+// language=sql
 private fun SQL(schema: String) = "INSERT INTO ${schema}.${Table.Links} VALUES (?, ?, ?)"
 
 internal fun Connection.insertLinks(schema: String, datasetID: DatasetID, links: Iterable<LinkedDataset>) =

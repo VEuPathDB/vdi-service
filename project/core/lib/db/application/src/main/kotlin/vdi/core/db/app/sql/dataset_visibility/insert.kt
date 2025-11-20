@@ -9,7 +9,7 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.UserID
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 INSERT INTO
   ${schema}.${Table.Visibility} (
@@ -21,6 +21,7 @@ VALUES
 """
 
 internal fun Connection.insertDatasetVisibility(schema: String, datasetID: DatasetID, userID: UserID) {
+//  if (this.metaData.driverName)
   withPreparedUpdate(sql(schema)) {
     setDatasetID(1, datasetID)
     setUserID(2, userID)

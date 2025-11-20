@@ -1,8 +1,9 @@
 package vdi.core.s3.files.flags
 
 import org.veupathdb.lib.s3.s34k.objects.ObjectContainer
-import vdi.core.s3.files.LazyDatasetFileImpl
+import vdi.core.s3.files.LazyObjectRef
 
-internal class LazyLoadRevisedFlag(path: String, bucket: ObjectContainer)
-  : LazyDatasetFileImpl(path, bucket)
-  , RevisedFlagFile
+internal class LazyLoadRevisedFlag(path: String, bucket: ObjectContainer): LazyObjectRef(path, bucket), RevisedFlagFile {
+  override val contentType: String
+    get() = super<RevisedFlagFile>.contentType
+}

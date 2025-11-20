@@ -12,7 +12,6 @@ dependencies {
   implementation(project(":model"))
 }
 
-java.targetCompatibility = JavaVersion.VERSION_21
 
 val jsonSchemaBuildDir = findProperty("SCHEMA_BUILD_DIR")?.let { File(it as String) }
   ?: layout.buildDirectory.dir("json-schema").get().asFile
@@ -119,7 +118,7 @@ fun buildMergedSchema(rootSchema: File): ObjectNode {
   if (rootJson.has("\$defs"))
     (rootJson.get("\$defs") as ObjectNode).setAll<ObjectNode>(rootDefs)
   else
-    rootJson.set<ObjectNode>("\$defs", rootDefs)
+    rootJson.set("\$defs", rootDefs)
 
   cache.forEach { (path, res) -> processResult(path, res, buffer, rootDefs, rootSchema) }
 

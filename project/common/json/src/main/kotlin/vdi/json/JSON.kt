@@ -29,7 +29,7 @@ val JSON = JsonMapper.builder()
   .addModule(KotlinModule.Builder()
     .enable(KotlinFeature.SingletonSupport)
     .build())
-  .serializationInclusion(JsonInclude.Include.NON_DEFAULT)
+  .defaultPropertyInclusion(JsonInclude.Value(JsonInclude(JsonInclude.Include.NON_DEFAULT)))
   .addModule(ParameterNamesModule())
   .addModule(SimpleModule().apply {
     addSerializer(Path::class.java, object : JsonSerializer<Path>() {

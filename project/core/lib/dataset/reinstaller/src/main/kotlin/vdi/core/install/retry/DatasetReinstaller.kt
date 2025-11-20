@@ -328,9 +328,9 @@ object DatasetReinstaller {
     s3Dir: DatasetDirectory,
     fn:    suspend (meta: InputStream, manifest: InputStream, upload: InputStream) -> T
   ) =
-    s3Dir.getMetaFile().loadContents()!!.use { meta ->
-      s3Dir.getManifestFile().loadContents()!!.use { manifest ->
-        s3Dir.getInstallReadyFile().loadContents()!!.use { data ->
+    s3Dir.getMetaFile().open()!!.use { meta ->
+      s3Dir.getManifestFile().open()!!.use { manifest ->
+        s3Dir.getInstallReadyFile().open()!!.use { data ->
           fn(meta, manifest, data)
         }
       }

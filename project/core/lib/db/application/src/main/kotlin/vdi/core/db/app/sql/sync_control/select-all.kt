@@ -15,7 +15,7 @@ import vdi.model.meta.DatasetType
 import vdi.util.io.CloseableIterator
 
 private fun sql(schema: String, strpos: String) =
-// language=postgresql
+// language=sql
 """
 WITH results AS (
   SELECT

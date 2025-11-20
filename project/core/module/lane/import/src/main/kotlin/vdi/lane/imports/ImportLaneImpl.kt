@@ -182,7 +182,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
       try {
         datasetDir.getImportReadyFile()
-          .loadContents()!!
+          .open()!!
           .use { plugin.client.postImport(eventID, datasetID, meta, it) }
           .use { result ->
             Metrics.count.labels(meta.type.name.toString(), meta.type.version, result.status.code.toString()).inc()

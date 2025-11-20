@@ -11,7 +11,7 @@ sealed interface DataFilePath: DatasetPath{
 
     override fun matches(path: String) = pattern.matches(path)
       && path.substringAfterLast('/')
-        .let { name -> FileName.DataFileNames.any(name::equals) }
+        .let { FileName.DataFileNames.any(it::equals) }
 
     override fun create(path: String): DataFilePath =
       pattern.matchEntire(path)!!.destructured.let { (bucket, user, dataset, file) ->

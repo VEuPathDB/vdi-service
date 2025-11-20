@@ -7,36 +7,34 @@ internal class S3DatasetPathFactory(
   private val ownerID: UserID,
   private val datasetID: DatasetID,
 ) {
-  fun userDir() = S3Paths.userDir(ownerID)
-
   fun datasetDir() = S3Paths.datasetDir(ownerID, datasetID)
 
-  fun datasetManifestFile() = S3Paths.datasetManifestFile(ownerID, datasetID)
+  fun manifestFile() = S3Paths.datasetManifestFile(ownerID, datasetID)
 
-  fun datasetMetaFile() = S3Paths.datasetMetaFile(ownerID, datasetID)
+  fun metadataFile() = S3Paths.datasetMetaFile(ownerID, datasetID)
 
-  fun datasetDeleteFlagFile() = S3Paths.datasetDeleteFlagFile(ownerID, datasetID)
+  fun deleteFlagFile() = S3Paths.datasetDeleteFlagFile(ownerID, datasetID)
 
-  fun datasetRevisedFlagFile() = S3Paths.datasetRevisedFlagFile(ownerID, datasetID)
+  fun revisedFlagFile() = S3Paths.datasetRevisedFlagFile(ownerID, datasetID)
 
-  fun datasetSharesDir() = S3Paths.datasetSharesDir(ownerID, datasetID)
+  fun sharesDir() = S3Paths.datasetSharesDir(ownerID, datasetID)
 
-  fun datasetShareOfferFile(recipientID: UserID) = S3Paths.datasetShareOfferFile(ownerID, datasetID, recipientID)
+  fun shareOfferFile(recipientID: UserID) = S3Paths.datasetShareOfferFile(ownerID, datasetID, recipientID)
 
-  fun datasetShareReceiptFile(recipientID: UserID) =
+  fun shareReceiptFile(recipientID: UserID) =
     S3Paths.datasetShareReceiptFile(ownerID, datasetID, recipientID)
 
-  fun datasetImportReadyZip() = S3Paths.datasetImportReadyFile(ownerID, datasetID)
+  fun importReadyZip() = S3Paths.datasetImportReadyFile(ownerID, datasetID)
 
-  fun datasetInstallReadyZip() = S3Paths.datasetInstallReadyFile(ownerID, datasetID)
+  fun installReadyZip() = S3Paths.datasetInstallReadyFile(ownerID, datasetID)
 
-  fun datasetUploadZip() = S3Paths.datasetRawUploadFile(ownerID, datasetID)
+  fun uploadZip() = S3Paths.datasetRawUploadFile(ownerID, datasetID)
 
-  fun datasetDocumentsDir() = S3Paths.datasetDocumentsDir(ownerID, datasetID)
+  fun documentsDir() = S3Paths.datasetDocumentsDir(ownerID, datasetID)
 
-  fun datasetDocumentFile(fileName: String) = S3Paths.datasetDocumentFile(ownerID, datasetID, fileName)
+  fun documentFile(fileName: String) = S3Paths.datasetDocumentFile(ownerID, datasetID, fileName)
 
-  fun datasetMappingsDir() = S3Paths.datasetMappingsDir(ownerID, datasetID)
+  fun mappingsDir() = S3Paths.datasetMappingsDir(ownerID, datasetID)
 
-  fun datasetMappingFile(fileName: String) = S3Paths.datasetMappingFile(ownerID, datasetID, fileName)
+  fun mappingFile(fileName: String) = S3Paths.datasetMappingFile(ownerID, datasetID, fileName)
 }

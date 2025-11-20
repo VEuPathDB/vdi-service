@@ -6,7 +6,4 @@ import vdi.model.meta.DatasetManifest
 interface ManifestFile: MetaFile<DatasetManifest> {
   override val baseName: String
     get() = FileName.ManifestFile
-
-  override val contentType: String
-    get() = "application/json"
 }

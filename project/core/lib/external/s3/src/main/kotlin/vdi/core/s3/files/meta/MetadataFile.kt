@@ -6,7 +6,4 @@ import vdi.model.meta.DatasetMetadata
 interface MetadataFile: MetaFile<DatasetMetadata> {
   override val baseName: String
     get() = FileName.MetadataFile
-
-  override val contentType: String
-    get() = "application/json"
 }

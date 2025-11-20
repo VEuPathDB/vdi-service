@@ -28,10 +28,10 @@ internal fun Connection.selectSyncControl(datasetID: DatasetID) =
         null
       else
         SyncControlRecord(
-          datasetID     = datasetID,
-          sharesUpdated = getDateTime("shares_update_time"),
-          dataUpdated   = getDateTime("data_update_time"),
-          metaUpdated   = getDateTime("meta_update_time")
+          datasetID      = datasetID,
+          sharesUpdated  = getDateTime("shares_update_time"),
+          dataUpdated    = getDateTime("data_update_time"),
+          metaUpdated    = getDateTime("meta_update_time"),
         )
     }
   }

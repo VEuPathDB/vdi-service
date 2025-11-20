@@ -3,20 +3,15 @@ package vdi.lane.reconciliation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import vdi.model.meta.DatasetID
-import vdi.model.meta.UserID
 import java.util.concurrent.ConcurrentHashMap
 import vdi.core.async.WorkerPool
-import vdi.core.kafka.EventSource
-import vdi.logging.logger
 import vdi.core.metrics.Metrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
+import vdi.logging.logger
+import vdi.model.meta.DatasetID
 
-internal class ReconciliationLaneImpl(
-  private val config: ReconciliationLaneConfig,
-  abortCB: AbortCB
-)
+internal class ReconciliationLaneImpl(private val config: ReconciliationLaneConfig, abortCB: AbortCB)
   : ReconciliationLane
   , AbstractVDIModule(abortCB, logger<ReconciliationLane>())
 {
@@ -37,13 +32,11 @@ internal class ReconciliationLaneImpl(
 
     coroutineScope {
       launch(Dispatchers.IO) {
-        while (!isShutDown()) {
+        while (!isShutDown())
           kc.fetchMessages(config.eventMsgKey)
-//            .forEach { (eventID, userID, datasetID, source) ->
-              logger.info("received reconciliation event for dataset {}/{} from source {}", userID, datasetID, source)
-              wp.submit { reconcile(userID, datasetID, source) }
-            }
-        }
+            .map { ReconcilerContext(it, logger) }
+            .onEach { it.logger.info("received reconciliation event") }
+            .forEach { wp.submit { it.reconcile() } }
       }
     }
 
@@ -52,15 +45,15 @@ internal class ReconciliationLaneImpl(
     confirmShutdown()
   }
 
-  private fun reconcile(userID: UserID, datasetID: DatasetID, source: EventSource) {
+  private fun ReconcilerContext.reconcile() {
     if (datasetsInProgress.add(datasetID)) {
       try {
-        reconciler.reconcile(userID, datasetID, source)
+        reconciler.reconcile(this)
       } finally {
         datasetsInProgress.remove(datasetID)
       }
     } else {
-      logger.info("dataset reconciliation already in progress for dataset {}/{}, skipping job", userID, datasetID)
+      logger.info("dataset reconciliation already in progress")
     }
   }
 }

@@ -10,7 +10,7 @@ import vdi.core.db.model.SyncControlRecord
 import vdi.model.meta.DatasetID
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 SELECT
   shares_update_time

@@ -34,6 +34,7 @@ import vdi.core.plugin.client.response.ValidationErrorResponse
 import vdi.core.plugin.mapping.PluginHandlers
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.core.s3.DatasetDirectory
+import vdi.core.s3.getLatestMappingTimestamp
 import vdi.core.util.orElse
 import vdi.logging.logger
 import vdi.model.DatasetMetaFilename
@@ -60,12 +61,11 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
     coroutineScope {
       launch(Dispatchers.IO) {
-        while (!isShutDown()) {
+        while (!isShutDown())
           kc.fetchMessages(config.eventKey)
             .map { UpdateMetaContext(it, dm, kr, logger) }
             .onEach { it.logger.info("received install-meta job from source {}", it.source) }
             .forEach { wp.submit { it.updateMetaIfNotInProgress() } }
-        }
       }
     }
 
@@ -119,6 +119,9 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     val datasetMeta = dir.getMetaFile().load()!!
     val metaTimestamp = dir.getMetaFile().lastModified()!!
     logger.info("dataset meta timestamp is {}", metaTimestamp)
+
+    val mappingTimestamp = dir.getLatestMappingTimestamp() ?: OriginTimestamp
+    logger.info("dataset mapping timestamp is {}", mappingTimestamp)
 
     val timer = Metrics.MetaUpdates.duration
       .labels(datasetMeta.type.name.toString(), datasetMeta.type.version)

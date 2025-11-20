@@ -8,7 +8,7 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 UPDATE
   ${schema}.${Table.Meta}

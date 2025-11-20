@@ -2,7 +2,6 @@ package vdi.core.db.app
 
 import org.slf4j.LoggerFactory
 import java.sql.Connection
-import java.sql.SQLException
 import java.time.OffsetDateTime
 import vdi.core.db.app.model.*
 import vdi.core.db.app.sql.dataset.*
@@ -32,7 +31,6 @@ import vdi.core.db.app.sql.dataset_link.insertLinks
 import vdi.core.db.app.sql.dataset_meta.deleteDatasetMeta
 import vdi.core.db.app.sql.dataset_meta.insertDatasetMeta
 import vdi.core.db.app.sql.dataset_meta.updateDatasetMeta
-import vdi.core.db.app.sql.dataset_meta.upsertDatasetMeta
 import vdi.core.db.app.sql.dataset_organism.deleteDatasetOrganisms
 import vdi.core.db.app.sql.dataset_organism.insertExperimentalOrganism
 import vdi.core.db.app.sql.dataset_organism.insertHostOrganism
@@ -46,14 +44,12 @@ import vdi.core.db.app.sql.dataset_species.insertSpecies
 import vdi.core.db.app.sql.dataset_visibility.*
 import vdi.core.db.app.sql.sync_control.*
 import vdi.core.db.model.SyncControlRecord
-import vdi.db.app.TargetDBPlatform
 import vdi.model.meta.*
 
-class AppDBTransactionImpl(
+abstract class AppDBTransactionImpl(
   override val project: InstallTargetID,
-  private val schema: String,
-  private val connection: Connection,
-  override val platform: TargetDBPlatform,
+  protected val schema: String,
+  protected val connection: Connection,
 ): AppDBTransaction {
   private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -66,11 +62,6 @@ class AppDBTransactionImpl(
   override fun deleteDataset(datasetID: DatasetID) =
     (connection.deleteDataset(schema, datasetID) > 0)
       .also { if (it) logger.debug("deleted dataset record for {}", datasetID) }
-
-  override fun upsertDataset(dataset: DatasetRecord) {
-    if (connection.upsertDataset(schema, dataset) > 0)
-      logger.debug("upserted dataset record for {}", dataset.datasetID)
-  }
 
   override fun selectDataset(datasetID: DatasetID) =
     connection.selectDataset(schema, datasetID)
@@ -232,21 +223,6 @@ class AppDBTransactionImpl(
     connection.updateDatasetInstallMessage(schema, message)
   }
 
-  override fun upsertDatasetInstallMessage(message: DatasetInstallMessage) {
-    if (platform === TargetDBPlatform.Postgres) {
-      connection.upsertDatasetInstallMessage(schema, message)
-    } else {
-      try {
-        insertDatasetInstallMessage(message)
-      } catch (e: SQLException) {
-        if (isUniqueConstraintViolation(e))
-          updateDatasetInstallMessage(message)
-        else
-          throw e
-      }
-    }
-  }
-
   // endregion dataset_install_message
 
   // region dataset_link
@@ -273,22 +249,6 @@ class AppDBTransactionImpl(
 
   override fun updateDatasetMeta(datasetID: DatasetID, meta: DatasetMetadata) {
     connection.updateDatasetMeta(schema, datasetID, meta)
-  }
-
-  override fun upsertDatasetMeta(datasetID: DatasetID, meta: DatasetMetadata) {
-    if (platform === TargetDBPlatform.Postgres) {
-      connection.upsertDatasetMeta(schema, datasetID, meta)
-    } else {
-      try {
-        insertDatasetMeta(datasetID, meta)
-      } catch (e: SQLException) {
-        if (isUniqueConstraintViolation(e)) {
-          updateDatasetMeta(datasetID, meta)
-        } else {
-          throw e
-        }
-      }
-    }
   }
 
   // endregion dataset_meta

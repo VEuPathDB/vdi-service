@@ -6,6 +6,6 @@ sealed interface FlagFile: DatasetFile {
   override val contentType: String
     get() = "text/plain"
 
-  fun create()
+  fun create() = put { ByteArray(0).inputStream() }
 }
 

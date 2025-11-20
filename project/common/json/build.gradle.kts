@@ -1,3 +1,6 @@
 plugins { id("build-conventions") }
 
-dependencies.api(libs.bundles.jackson)
+dependencies {
+  api(platform(libs.json.jackson.bom))
+  api(libs.bundles.jackson)
+}

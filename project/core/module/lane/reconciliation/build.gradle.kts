@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   id("build-conventions")
 }
@@ -25,4 +27,8 @@ dependencies {
   testImplementation(libs.mockito.kotlin)
   testRuntimeOnly(libs.junit.engine)
   testRuntimeOnly(libs.log.log4j.slf4j)
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+  freeCompilerArgs.set(listOf("-Xcontext-parameters"))
 }

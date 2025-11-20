@@ -409,9 +409,9 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
   private suspend fun <T> DatasetDirectory.buildInstallBundle(
     fn: suspend (meta: InputStream, manifest: InputStream, upload: InputStream) -> T
   ) =
-    getMetaFile().loadContents()!!.use { meta ->
-      getManifestFile().loadContents()!!.use { manifest ->
-        getInstallReadyFile().loadContents()!!.use { data ->
+    getMetaFile().open()!!.use { meta ->
+      getManifestFile().open()!!.use { manifest ->
+        getInstallReadyFile().open()!!.use { data ->
           fn(meta, manifest, data)
         }
       }

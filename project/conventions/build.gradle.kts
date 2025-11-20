@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins { `kotlin-dsl` }
 
 repositories {
@@ -13,7 +11,9 @@ dependencies {
 }
 
 kotlin {
-  compilerOptions.jvmTarget = JvmTarget.JVM_21
+  jvmToolchain {
+    languageVersion = JavaLanguageVersion.of(24)
+  }
 }
 
 fun plugin(plugin: Provider<PluginDependency>) =

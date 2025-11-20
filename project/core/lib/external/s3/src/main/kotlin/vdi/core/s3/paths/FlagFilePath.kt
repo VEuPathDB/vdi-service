@@ -12,12 +12,11 @@ sealed interface FlagFilePath: DatasetPath {
 
     override fun matches(path: String) = pattern.matches(path)
       && path.substringAfterLast('/')
-        .let { it == FileName.DeleteFlagFile || it == FileName.RevisedFlagFile }
+        .let { FileName.FlagFileNames.any(it::equals) }
 
     override fun create(path: String): FlagFilePath =
       pattern.matchEntire(path)!!.destructured.let { (bucket, user, dataset, file) ->
-        FlagFilePathImpl(file, UserID(user), DatasetID(dataset), bucket)
-      }
+        FlagFilePathImpl(file, UserID(user), DatasetID(dataset), bucket) }
   }
 
   private class FlagFilePathImpl(

@@ -1,5 +1,5 @@
 [versions]
-jackson = "2.20.0"
+jackson = "2.20.1"
 kotlin = "2.2.21"
 ktor = "3.3.2"
 log4j = "2.25.2"
@@ -20,6 +20,9 @@ vpdb = { id = "org.veupathdb.lib.gradle.container.container-utils", version = "6
 # Common
 #
 
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-engine = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
+
 kt-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.2" }
 
 # Logging
@@ -38,13 +41,14 @@ compression = { module = "org.apache.commons:commons-compress", version = "1.28.
 
 
 # Serialization Formats
-json-jackson-core        = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
-json-jackson-databind    = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-json-jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations",  version = "2.20" }# version.ref = "jackson" }
-json-jackson-kotlin      = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
-json-jackson-parameters  = { module = "com.fasterxml.jackson.module:jackson-module-parameter-names", version.ref = "jackson" }
-json-jackson-datetime    = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
-json-jackson-options     = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8", version.ref = "jackson" }
+json-jackson-bom         = { group = "com.fasterxml.jackson", name = "jackson-bom", version.ref = "jackson" }
+json-jackson-core        = { group = "com.fasterxml.jackson.core", name = "jackson-core" }
+json-jackson-databind    = { group = "com.fasterxml.jackson.core", name = "jackson-databind" }
+json-jackson-annotations = { group = "com.fasterxml.jackson.core", name = "jackson-annotations" }
+json-jackson-kotlin      = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin" }
+json-jackson-parameters  = { group = "com.fasterxml.jackson.module", name = "jackson-module-parameter-names" }
+json-jackson-datetime    = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310" }
+json-jackson-options     = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jdk8" }
 
 json-schema-validation = { module = "com.networknt:json-schema-validator", version = "1.5.9" }
 json-patch-tools = { group = "com.github.java-json-tools", name = "json-patch", version = "1.13" }
@@ -56,9 +60,10 @@ yaml = { module = "org.yaml:snakeyaml", version = "2.5" }
 # Plugin Handler Only
 #
 
-ktor-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
-ktor-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
-ktor-metrics = { module = "io.ktor:ktor-server-metrics-micrometer", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-metrics = { module = "io.ktor:ktor-server-metrics-micrometer", version.ref = "ktor" }
+
 
 log4j-iostreams = { group = "org.apache.logging.log4j", name = "log4j-iostreams",   version.ref = "log4j" }
 
@@ -119,6 +124,34 @@ mockito-junit  = { module = "org.mockito:mockito-junit-jupiter", version.ref = "
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version = "6.1.0"  }
 
 [bundles]
-jackson = ["json-jackson-core", "json-jackson-annotations", "json-jackson-databind", "json-jackson-datetime", "json-jackson-kotlin", "json-jackson-options", "json-jackson-parameters"]
-logging = ["log-slf4j-api", "log-slf4j-jcl", "log-slf4j-jul", "log-log4j-slf4j", "log-log4j-api", "log-log4j-core"]
+jackson = [
+  "json-jackson-core",
+  "json-jackson-annotations",
+  "json-jackson-databind",
+  "json-jackson-datetime",
+  "json-jackson-kotlin",
+  "json-jackson-options",
+  "json-jackson-parameters",
+]
+
+ktor-client = [
+  "ktor-client-core",
+  "ktor-client-engine",
+]
+
+ktor-server = [
+  "ktor-server-core",
+  "ktor-server-metrics",
+  "ktor-server-netty",
+]
+
+logging = [
+  "log-slf4j-api",
+  "log-slf4j-jcl",
+  "log-slf4j-jul",
+  "log-log4j-slf4j",
+  "log-log4j-api",
+  "log-log4j-core",
+]
+
 testing = ["junit-api", "junit-params", "mockito-core", "mockito-junit", "mockito-kotlin"]

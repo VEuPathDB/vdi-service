@@ -9,7 +9,7 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.UserID
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 DELETE FROM
   ${schema}.${Table.Visibility}

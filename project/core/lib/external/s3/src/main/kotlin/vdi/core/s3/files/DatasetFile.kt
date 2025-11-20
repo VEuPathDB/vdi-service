@@ -15,7 +15,7 @@ interface DatasetFile {
   val baseName
     get() = path.substring(path.lastIndexOf('/') + 1)
 
-  val contentType: String
+  val contentType: String?
 
   /**
    * Tests whether this [DatasetFile] currently exists.
@@ -36,9 +36,12 @@ interface DatasetFile {
    */
   fun lastModified(): OffsetDateTime?
 
-  fun loadContents(): InputStream?
+  fun open(): InputStream?
 
+  @Deprecated("use put() instead")
   fun writeContents(content: InputStream)
+
+  fun put(provider: () -> InputStream)
 
   fun delete()
 }

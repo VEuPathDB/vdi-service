@@ -10,7 +10,7 @@ import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.jdbc.setDateTime
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
 """
 INSERT INTO
   ${schema}.${Table.InstallMessage} (

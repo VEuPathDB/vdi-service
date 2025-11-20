@@ -14,7 +14,11 @@ import vdi.core.metrics.Metrics
 import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
 import vdi.core.s3.getInstallReadyTimestamp
+import vdi.core.s3.getLatestMappingTimestamp
 import vdi.core.s3.getLatestShareTimestamp
+import vdi.logging.createLoggerMark
+import vdi.logging.mark
+import vdi.util.events.EventIDs
 
 /**
  * Component for synchronizing the dataset object store (the source of truth for
@@ -31,7 +35,7 @@ internal class ReconcilerInstance(
   private val slim: Boolean,
   private val deletesEnabled: Boolean
 ) {
-  private val log = markedLogger("Rec=${targetDB.name}")
+  private val log = markedLogger(installTarget = targetDB.name)
 
   private var nextTargetDataset: ReconcilerTargetRecord? = null
 
@@ -140,21 +144,19 @@ internal class ReconcilerInstance(
   }
 
   private suspend fun Iterator<ReconcilerTargetRecord>.uninstallUntilAligned(
-    comparableS3Id: String,
+    comparableSourceId: String,
     startingTargetId: String,
   ) {
     var comparableTargetId: String? = startingTargetId
 
     // Uninstall datasets and advance target database iterator until the streams
     // are aligned.
-    while (nextTargetDataset != null && comparableS3Id.compareTo(comparableTargetId!!, false) > 0) {
+    while (nextTargetDataset != null && comparableSourceId.compareTo(comparableTargetId!!, false) > 0) {
       if (!slim) {
         log.info(
-          "Attempting to uninstall dataset {} because the next dataset in the object store stream ({}) has a" +
-          " lexicographically greater ID. Presumably {} is not presently in the object store.",
-          comparableTargetId.substringBefore(".z"),
-          comparableS3Id.substringBefore(".z"),
-          comparableTargetId.substringBefore(".z")
+          "next install-target dataset {} has a lexicographically lesser ID than the next source dataset ({})",
+          comparableTargetId.trimSortSuffix(),
+          comparableSourceId.trimSortSuffix(),
         )
 
         tryUninstallDataset(targetDB, nextTargetDataset!!)
@@ -165,14 +167,14 @@ internal class ReconcilerInstance(
     }
   }
 
-  private fun ReconcilerTargetRecord.ensureUninstalled() {
+  private suspend fun ReconcilerTargetRecord.ensureUninstalled() {
     // If the dataset has not been marked as uninstalled in this target database
     if (!isUninstalled)
       // then fire a sync event
       sendSyncEvent(ownerID, datasetID, SyncReason.NeedsUninstall(targetDB))
   }
 
-  private fun DatasetDirectory.ensureSynchronized(comparableS3Id: String) {
+  private suspend fun DatasetDirectory.ensureSynchronized(comparableS3Id: String) {
     // The dataset does not have a delete flag present in MinIO
 
     // If for some reason it is marked as uninstalled in the target
@@ -180,7 +182,7 @@ internal class ReconcilerInstance(
     if (nextTargetDataset!!.isUninstalled) {
       log.error(
         "dataset {} is marked as uninstalled in target {} but has no deletion flag present in MinIO",
-        comparableS3Id.substringBefore(".z"),
+        comparableS3Id.trimSortSuffix(),
         targetDB.name
       )
       return
@@ -199,7 +201,11 @@ internal class ReconcilerInstance(
   private val tempYesterday = OffsetDateTime.now().minusDays(1)
 
   private suspend fun tryUninstallDataset(targetDB: ReconcilerTarget, record: ReconcilerTargetRecord) {
-    log.info("attempting to delete {}/{}", record.ownerID, record.datasetID)
+    val eventID = EventIDs.issueID()
+
+    val log = log.mark(eventID, record.ownerID, record.datasetID)
+
+    log.info("attempting to delete dataset")
 
     // FIXME: temporary hack to be removed when target db deletes are moved to
     //        the hard-delete lane.
@@ -207,7 +213,7 @@ internal class ReconcilerInstance(
       record as TempHackCacheDBReconcilerTargetRecord
 
       if (record.importStatus == DatasetImportStatus.Queued && record.inserted.isAfter(tempYesterday)) {
-        log.info("skipping delete of dataset {}/{} as it is import-queued and less than 1 day old", record.ownerID, record.datasetID)
+        log.info("skipping dataset delete; it is import-queued and less than 1 day old")
         return
       }
     }
@@ -215,23 +221,15 @@ internal class ReconcilerInstance(
     try {
       Metrics.Reconciler.Full.reconcilerDatasetDeleted.labels(targetDB.name).inc()
       if (deletesEnabled) {
-        log.info("trying to delete dataset {}/{}", record.ownerID, record.datasetID)
-        targetDB.deleteDataset(record)
+        log.info("deleting dataset")
+        targetDB.deleteDataset(eventID, record)
       } else {
-        log.info("would have deleted dataset {}/{}", record.ownerID, record.datasetID)
+        log.info("would have deleted dataset")
       }
     } catch (e: Exception) {
       // Swallow exception and alert if unable to delete. Reconciler can safely recover, but the dataset
       // may need a manual inspection.
-      log.error(
-        "failed to delete dataset {}/{} of type {}:{} from db {}",
-        record.ownerID,
-        record.datasetID,
-        record.type.name,
-        record.type.version,
-        targetDB.name,
-        e,
-      )
+      log.error("failed to delete dataset", e)
     }
   }
 
@@ -247,7 +245,7 @@ internal class ReconcilerInstance(
    * @return A boolean value indicating whether the dataset was relevant to the
    * current target project and a reconciliation event was fired.
    */
-  private fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory, reason: SyncReason): Boolean {
+  private suspend fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory, reason: SyncReason): Boolean {
     if (targetDB.type == ReconcilerTargetType.Install) {
 
       // Ensure the meta json file exists in S3 to protect against NPEs being
@@ -268,9 +266,17 @@ internal class ReconcilerInstance(
     return true
   }
 
-  private fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
-    log.info("sending reconciliation event for {}/{} for reason: {}", ownerID, datasetID, reason)
-    kafkaRouter.sendReconciliationTrigger(ownerID, datasetID, if (slim) EventSource.SlimReconciler else EventSource.FullReconciler)
+  private suspend fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
+    val eventID = EventIDs.issueID()
+
+    log.info("{} sending reconciliation event: {}", createLoggerMark(eventID, ownerID, datasetID), reason)
+
+    kafkaRouter.sendReconciliationTrigger(
+      eventID,
+      ownerID,
+      datasetID,
+      if (slim) EventSource.SlimReconciler else EventSource.FullReconciler,
+    )
 
     if (slim)
       Metrics.Reconciler.Slim.datasetsSynced.inc()
@@ -278,7 +284,7 @@ internal class ReconcilerInstance(
       Metrics.Reconciler.Full.reconcilerDatasetSynced.labels(targetDB.name).inc()
   }
 
-  private fun Iterator<DatasetDirectory>.consumeAndTrySync(first: DatasetDirectory) {
+  private suspend fun Iterator<DatasetDirectory>.consumeAndTrySync(first: DatasetDirectory) {
     sendSyncIfRelevant(first, SyncReason.MissingInTarget(targetDB))
 
     while (hasNext())
@@ -290,8 +296,9 @@ internal class ReconcilerInstance(
    */
   private fun DatasetDirectory.isOutOfSync(targetLastUpdated: SyncControlRecord): SyncStatus {
     return SyncStatus(
-      metaOutOfSync    = targetLastUpdated.metaUpdated.isBefore(getMetaFile().lastModified()),
-      sharesOutOfSync = targetLastUpdated.sharesUpdated.isBefore(getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
+      metaOutOfSync    = targetLastUpdated.metaUpdated.isBefore(getMetaFile().lastModified())
+        || targetLastUpdated.metaUpdated.isBefore(getLatestMappingTimestamp()),
+      sharesOutOfSync  = targetLastUpdated.sharesUpdated.isBefore(getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
       installOutOfSync = targetLastUpdated.dataUpdated.isBefore(getInstallReadyTimestamp() ?: targetLastUpdated.dataUpdated),
     )
   }
@@ -300,8 +307,18 @@ internal class ReconcilerInstance(
   private inline fun <T> Iterator<T>.nextOrNull() =
     if (hasNext()) next() else null
 
-  private fun ReconcilerTargetRecord.getComparableID() = "$ownerID/$datasetID".appendZ()
-  private fun DatasetDirectory.getComparableID() = "$ownerID/$datasetID".appendZ()
+  private fun ReconcilerTargetRecord.getComparableID() = "$ownerID/$datasetID".appendSortSuffix()
 
-  private fun String.appendZ() = if (contains('.')) this else "$this.z"
+  private fun DatasetDirectory.getComparableID() = "$ownerID/$datasetID".appendSortSuffix()
+
+  /**
+   * Appends `.z` to the dataset ID value to make the sorting predictable when
+   * comparing against datasets with revision suffixes.
+   */
+  private fun String.appendSortSuffix() = if (contains('.')) this else "$this.z"
+
+  /**
+   * Removes the sort suffix value `.z` from the dataset ID value.
+   */
+  private fun String.trimSortSuffix() = substringBefore(".z")
 }

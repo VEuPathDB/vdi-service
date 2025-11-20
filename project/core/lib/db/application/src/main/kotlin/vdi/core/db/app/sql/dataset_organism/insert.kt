@@ -11,7 +11,7 @@ import vdi.model.meta.DatasetOrganism
 
 
 private fun sql(schema: String) =
-// language=postgresql
+// language=sql
   """
 INSERT INTO
   ${schema}.${Table.Organisms} (

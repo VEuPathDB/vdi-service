@@ -1,9 +1,17 @@
 package vdi.core.db.app
 
+import org.slf4j.Logger
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import vdi.core.db.app.model.DatasetInstallMessage
+import vdi.core.db.app.model.DatasetRecord
+import vdi.core.db.app.model.InstallStatus
+import vdi.core.db.app.model.InstallType
+import vdi.core.db.model.SyncControlRecord
+import vdi.model.OriginTimestamp
 import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.DatasetType
 import vdi.model.meta.InstallTargetID
 
@@ -105,6 +113,25 @@ fun AppDBTransaction.purgeDatasetControlTables(datasetID: DatasetID) {
   deleteSpecies(datasetID)
   deleteDatasetVisibilities(datasetID)
   deleteDataset(datasetID)
+}
+
+context(logger: Logger)
+fun AppDBTransaction.upsertDatasetRecord(record: DatasetRecord, meta: DatasetMetadata) {
+  upsertDataset(record)
+  insertDatasetVisibility(record.datasetID, meta.owner)
+  insertDatasetDependencies(record.datasetID, meta.dependencies)
+
+  upsertDatasetInstallMessage(DatasetInstallMessage(record.datasetID, InstallType.Meta, InstallStatus.Running, null))
+
+  logger.debug("inserting sync control record for dataset into app db")
+  insertDatasetSyncControl(
+    SyncControlRecord(
+      datasetID = record.datasetID,
+      sharesUpdated = OriginTimestamp,
+      dataUpdated = OriginTimestamp,
+      metaUpdated = OriginTimestamp,
+    )
+  )
 }
 
 @Suppress("NOTHING_TO_INLINE")
