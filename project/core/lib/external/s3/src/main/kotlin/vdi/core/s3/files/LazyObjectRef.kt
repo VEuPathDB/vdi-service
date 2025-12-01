@@ -30,13 +30,6 @@ internal abstract class LazyObjectRef(
   override fun open() =
     bucket.open(path)?.stream
 
-  override fun writeContents(content: InputStream) {
-    bucket.put(path) {
-      contentType = this@LazyObjectRef.contentType
-      stream = content
-    }
-  }
-
   override fun put(provider: () -> InputStream) {
     provider().use {
       bucket.put(path) {

@@ -38,9 +38,6 @@ interface DatasetFile {
 
   fun open(): InputStream?
 
-  @Deprecated("use put() instead")
-  fun writeContents(content: InputStream)
-
   fun put(provider: () -> InputStream)
 
   fun delete()

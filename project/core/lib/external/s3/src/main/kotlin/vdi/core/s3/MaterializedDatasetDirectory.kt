@@ -267,9 +267,6 @@ internal class MaterializedDatasetDirectory(
     override fun lastModified(): OffsetDateTime? = null
     override fun open(): InputStream? = null
 
-    override fun writeContents(content: InputStream): Nothing =
-      throw UnsupportedOperationException("${MaterializedDatasetDirectory::class.simpleName} is read-only")
-
     override fun put(provider: () -> InputStream): Nothing =
       throw UnsupportedOperationException("${MaterializedDatasetDirectory::class.simpleName} is read-only")
 

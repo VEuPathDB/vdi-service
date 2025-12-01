@@ -33,8 +33,6 @@ internal abstract class MaterializedObjectRef(s3Object: S3Object): DatasetFile {
    */
   override fun lastModified() = lastModified
 
-  override fun writeContents(content: InputStream) = throw UnsupportedOperationException()
-
   /**
    * Write operations are not supported for materialized object references.
    */

@@ -32,7 +32,6 @@ fun APIPublication?.cleanup() = this?.apply {
       this
     }
   } }
-  cleanupString(::getCitation)
   ensureNotNull(::getType, DatasetPublicationType.PMID)
   ensureNotNull(::getIsPrimary, false)
 }
@@ -55,8 +54,6 @@ fun APIPublication.validate(jPath: String, index: Int, errors: ValidationErrors)
       }
     }
   }
-
-  citation?.checkLength(jPath..JsonField.CITATION, index, CitationLengthRange, errors)
 }
 
 fun Collection<APIPublication>.validate(jPath: String, errors: ValidationErrors) {
@@ -81,10 +78,10 @@ fun Collection<APIPublication>.validate(jPath: String, errors: ValidationErrors)
 }
 
 fun APIPublication.toInternal() =
-  DatasetPublication(identifier, type.toInternal(), citation, isPrimary)
+  DatasetPublication(identifier, type.toInternal(), isPrimary)
 
 fun List<APIPublication>.toInternal() =
-  map { DatasetPublication(it.identifier, it.type.toInternal(), it.citation, it.isPrimary) }
+  map { DatasetPublication(it.identifier, it.type.toInternal(), it.isPrimary) }
 
 fun DatasetPublicationType .toInternal() =
   when (this) {

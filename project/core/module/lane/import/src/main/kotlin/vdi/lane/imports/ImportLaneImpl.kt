@@ -230,7 +230,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
         FileName.DataFile -> {
           logger.debug("writing install-ready zip contents to object store")
-          datasetDir.getInstallReadyFile().writeContents(stream)
+          datasetDir.getInstallReadyFile().put { stream }
           hasData = true
         }
 

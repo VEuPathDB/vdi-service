@@ -10,7 +10,6 @@ internal fun DatasetPublication(publication: DatasetPublication): APIPublication
   DatasetPublicationImpl().also {
     it.identifier = publication.identifier
     it.type       = DatasetPublicationType(publication.type)
-    it.citation   = publication.citation
     it.isPrimary  = publication.isPrimary
   }
 

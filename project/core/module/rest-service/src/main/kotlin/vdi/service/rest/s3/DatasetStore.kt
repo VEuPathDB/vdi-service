@@ -127,7 +127,8 @@ object DatasetStore {
 
   fun streamAll() = bucket.objects.streamAll().stream()
 
-  fun hasDeletionFlag(userID: UserID, datasetID: DatasetID): Boolean {}
+  fun hasDeleteFlag(userID: UserID, datasetID: DatasetID): Boolean =
+    S3Paths.datasetDeleteFlagFile(userID, datasetID) in bucket.objects
 
   private fun String.getDatasetIDFromPath(): DatasetID {
     val it = splitToSequence('/').iterator()

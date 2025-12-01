@@ -3,17 +3,15 @@ package vdi.core.db.cache.sql.complex
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.core.db.cache.model.TempHackCacheDBReconcilerTargetRecord
 import vdi.core.db.cache.util.getImportStatus
 import vdi.core.db.jdbc.getDataType
 import vdi.core.db.jdbc.getDateTime
 import vdi.core.db.jdbc.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.model.ReconcilerTargetRecord
-import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetType
-import vdi.model.meta.UserID
 import vdi.util.io.CloseableIterator
 
 internal object ReconcilerQueries {
@@ -71,21 +69,6 @@ ORDER BY sort_id
     return RecordIterator(rs, con, ps)
   }
 
-  // FIXME: Remove this class when the target db delete logic is moved from the
-//        reconciler to the hard-delete lane.
-  class TempHackCacheDBReconcilerTargetRecord(
-    ownerID: UserID,
-    datasetID: DatasetID,
-    sharesUpdated: OffsetDateTime,
-    dataUpdated: OffsetDateTime,
-    metaUpdated: OffsetDateTime,
-    type: DatasetType,
-    isUninstalled: Boolean,
-
-    val inserted: OffsetDateTime,
-    val importStatus: DatasetImportStatus,
-  ): ReconcilerTargetRecord(ownerID, datasetID, sharesUpdated, dataUpdated, metaUpdated, type, isUninstalled)
-
   class RecordIterator(
     val rs: ResultSet,
     val connection: Connection,
@@ -98,15 +81,15 @@ ORDER BY sort_id
       // FIXME: Remove this when the target db delete logic is moved from the
       //        reconciler to the hard-delete lane.
       return TempHackCacheDBReconcilerTargetRecord(
-        ownerID       = rs.getUserID("owner_id"),
-        datasetID     = rs.reqDatasetID("dataset_id"),
+        ownerID = rs.getUserID("owner_id"),
+        datasetID = rs.reqDatasetID("dataset_id"),
         sharesUpdated = rs.getDateTime("shares_update_time"),
-        dataUpdated   = rs.getDateTime("data_update_time"),
-        metaUpdated   = rs.getDateTime("meta_update_time"),
-        type          = DatasetType(rs.getDataType("type_name"), rs.getString("type_version")),
+        dataUpdated = rs.getDateTime("data_update_time"),
+        metaUpdated = rs.getDateTime("meta_update_time"),
+        type = DatasetType(rs.getDataType("type_name"), rs.getString("type_version")),
         isUninstalled = rs.getBoolean("is_deleted"),
-        inserted      = rs.getDateTime("inserted"),
-        importStatus  = rs.getImportStatus("status") ?: DatasetImportStatus.Queued
+        inserted = rs.getDateTime("inserted"),
+        importStatus = rs.getImportStatus("status") ?: DatasetImportStatus.Queued
       )
 
 // FIXME: Uncomment the following when the target db delete logic is moved from
@@ -133,3 +116,4 @@ ORDER BY sort_id
     }
   }
 }
+
