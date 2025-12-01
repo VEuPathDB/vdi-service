@@ -25,7 +25,7 @@ const val DefaultFullStackSchemaPath = "/schema/config/full-config.json"
 
 fun makeDefaultConfigPath() = Path(System.getenv("VDI_CONFIG_PATH") ?: DefaultConfigPath)
 
-inline fun <reified T: Any> loadAndCastConfig(path: Path = makeDefaultConfigPath(), schema: Path): T =
+inline fun <reified T: Any> loadTypedConfig(path: Path = makeDefaultConfigPath(), schema: Path): T =
   try {
     JSON.convertValue(loadAndValidateConfig(path, schema))
   } catch (e: IllegalArgumentException) {
@@ -46,7 +46,7 @@ fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
     .use { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it)!! }
 
   val json = JSON.convertValue<ObjectNode>(Yaml().load<Any>(path.readText().interpolateFrom(System.getenv())))
-    .apply { remove(listOf("definitions", "\$schema")) }
+    .apply { remove(listOf("definitions", $$"$schema")) }
 
   validator.validate(json) { ctx: ExecutionContext -> ctx.executionConfig.formatAssertionsEnabled = true }
     ?.takeUnless { it.isEmpty() }

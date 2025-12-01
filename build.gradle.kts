@@ -60,7 +60,6 @@ tasks {
       "--file=project/core/Dockerfile",
       "--build-arg=GH_USERNAME=${ghUsername}",
       "--build-arg=GH_TOKEN=${ghToken}",
-      "--build-arg=CONFIG_FILE=config/local-dev-config.yml",
       "--build-arg=GIT_TAG=$tag",
       "--build-arg=GIT_URL=localhost",
       "--build-arg=GIT_BRANCH=$branch",

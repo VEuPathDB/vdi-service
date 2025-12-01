@@ -7,7 +7,7 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlin.io.path.Path
 import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.script.ScriptExecutorImpl
-import vdi.config.loadAndCastConfig
+import vdi.config.loadTypedConfig
 import vdi.config.loadManifestConfig
 import vdi.logging.MetaLogger
 import vdi.service.plugin.conf.PluginServerConfig
@@ -23,7 +23,7 @@ fun main() {
   MetaLogger.info("=".repeat(80))
   MetaLogger.info("starting VDI plugin server version: {}", manifest.gitTag)
 
-  val config = loadAndCastConfig<PluginServerConfig>(schema = Path("/schema/config/plugin-config.json")).vdi
+  val config = loadTypedConfig<PluginServerConfig>(schema = Path("/schema/config/plugin-config.json")).vdi
   val plugin = System.getenv("PLUGIN_ID")?.let(config.plugins::get)
     ?: throw IllegalStateException("could not match PLUGIN_ID to plugin configuration")
 
