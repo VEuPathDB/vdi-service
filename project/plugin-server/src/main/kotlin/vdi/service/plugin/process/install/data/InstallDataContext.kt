@@ -4,8 +4,6 @@ import java.nio.file.Path
 import vdi.db.app.TargetDatabaseDetails
 import vdi.io.plugin.requests.InstallDataRequest
 import vdi.model.meta.DatasetMetadata
-import vdi.service.plugin.process.install.data.CheckCompatibilityScript
-import vdi.service.plugin.process.install.data.InstallDataScript
 import vdi.service.plugin.process.install.meta.InstallMetaScript
 import vdi.service.plugin.server.context.InstallScriptContext
 

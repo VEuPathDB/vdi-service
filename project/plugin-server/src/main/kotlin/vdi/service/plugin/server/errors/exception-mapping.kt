@@ -1,8 +1,6 @@
 package vdi.service.plugin.server.errors
 
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.call
-import io.ktor.util.pipeline.PipelineContext
+import io.ktor.server.routing.RoutingContext
 import org.slf4j.LoggerFactory
 import vdi.io.plugin.responses.PluginResponseStatus
 import vdi.io.plugin.responses.ServerErrorResponse
@@ -11,8 +9,8 @@ import vdi.service.plugin.server.respondJSON
 
 private val log = LoggerFactory.getLogger("ExceptionMiddleware")
 
-suspend fun PipelineContext<*, ApplicationCall>.withExceptionMapping(
-  fn: suspend PipelineContext<*, ApplicationCall>.() -> Unit
+suspend fun RoutingContext.withExceptionMapping(
+  fn: suspend RoutingContext.() -> Unit
 ) {
   try {
     fn()

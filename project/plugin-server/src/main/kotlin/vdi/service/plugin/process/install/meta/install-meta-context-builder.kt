@@ -1,6 +1,7 @@
 package vdi.service.plugin.process.install.meta
 
 import com.fasterxml.jackson.core.JacksonException
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.ContentType
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.plugins.BadRequestException
@@ -10,7 +11,7 @@ import io.ktor.server.request.receiveStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import vdi.json.JSON
-import vdi.model.api.internal.InstallMetaRequest
+import vdi.io.plugin.requests.InstallMetaRequest
 import vdi.service.plugin.model.ApplicationContext
 import vdi.service.plugin.server.context.withDatabaseDetails
 import vdi.util.fs.TempFiles

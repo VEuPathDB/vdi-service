@@ -17,7 +17,6 @@ import kotlin.contracts.contract
 import kotlin.io.path.createDirectories
 import vdi.io.plugin.requests.FormField
 import vdi.io.plugin.requests.ImportRequest
-import vdi.io.plugin.responses.ServerErrorResponse
 import vdi.service.plugin.model.ApplicationContext
 import vdi.service.plugin.server.context.DataDictionaryDirectoryName
 import vdi.service.plugin.server.context.handlePayload
@@ -78,13 +77,13 @@ private suspend fun ApplicationCall.withParsedRequest(
 
           else -> {
             errored = true
-            respondJSON500(ServerErrorResponse("received unrecognized multipart/form-data part \"${part.name}\" of type ${part::class}"))
+            throw Exception("received unrecognized multipart/form-data part \"${part.name}\" of type ${part::class}")
           }
         }
 
         else -> {
           errored = true
-          respondJSON500(ServerErrorResponse("received unrecognized multipart/form-data part \"${part.name}\" of type ${part::class}"))
+          throw Exception("received unrecognized multipart/form-data part \"${part.name}\" of type ${part::class}")
         }
       }
     } finally {
