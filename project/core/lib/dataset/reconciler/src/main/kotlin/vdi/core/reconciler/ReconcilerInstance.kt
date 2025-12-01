@@ -14,7 +14,7 @@ import vdi.core.metrics.Metrics
 import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
 import vdi.core.s3.getInstallReadyTimestamp
-import vdi.core.s3.getLatestMappingTimestamp
+import vdi.core.s3.getLatestVariablePropertiesTimestamp
 import vdi.core.s3.getLatestShareTimestamp
 import vdi.logging.createLoggerMark
 import vdi.logging.mark
@@ -297,7 +297,7 @@ internal class ReconcilerInstance(
   private fun DatasetDirectory.isOutOfSync(targetLastUpdated: SyncControlRecord): SyncStatus {
     return SyncStatus(
       metaOutOfSync    = targetLastUpdated.metaUpdated.isBefore(getMetaFile().lastModified())
-        || targetLastUpdated.metaUpdated.isBefore(getLatestMappingTimestamp()),
+        || targetLastUpdated.metaUpdated.isBefore(getLatestVariablePropertiesTimestamp()),
       sharesOutOfSync  = targetLastUpdated.sharesUpdated.isBefore(getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
       installOutOfSync = targetLastUpdated.dataUpdated.isBefore(getInstallReadyTimestamp() ?: targetLastUpdated.dataUpdated),
     )

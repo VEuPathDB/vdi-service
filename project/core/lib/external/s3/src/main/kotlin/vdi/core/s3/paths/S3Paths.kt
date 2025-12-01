@@ -116,10 +116,10 @@ object S3Paths {
   fun datasetDocumentFile(userID: UserID, datasetID: DatasetID, fileName: String) =
     documentsPath(userID, datasetID).append(fileName).toString()
 
-  fun datasetMappingsDir(userID: UserID, datasetID: DatasetID) =
+  fun variablePropertiesDir(userID: UserID, datasetID: DatasetID) =
     mappingsPath(userID, datasetID).dirPath()
 
-  fun datasetMappingFile(userID: UserID, datasetID: DatasetID, fileName: String) =
+  fun variablePropertiesFile(userID: UserID, datasetID: DatasetID, fileName: String) =
     mappingsPath(userID, datasetID).append(fileName).toString()
 
   // endregion Public API

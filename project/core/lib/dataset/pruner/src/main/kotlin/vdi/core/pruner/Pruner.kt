@@ -11,6 +11,7 @@ import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.purgeDatasetControlTables
 import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.purgeDataset
 import vdi.core.db.cache.withTransaction
 import vdi.core.metrics.Metrics
 import vdi.core.s3.DatasetDirectory
@@ -56,7 +57,7 @@ object Pruner {
    * Files to be kept in the object store for maintaining dataset revision
    * history details.
    */
-  private val retainedRevisionHistoryFiles = arrayOf<(String) -> Boolean>(
+  private inline val retainedRevisionHistoryFiles get() = arrayOf<(String) -> Boolean>(
     { FlagFilePath.matches(it) && it.endsWith(FileName.RevisedFlagFile) },
     { MetaFilePath.matches(it) && it.endsWith(FileName.ManifestFile) },
     { DataFilePath.matches(it) && (
@@ -303,7 +304,7 @@ object Pruner {
         it.deleteRevisions(it.selectOriginalDatasetID(datasetID))
       }
 
-      it.deleteDataset(datasetID)
+      it.purgeDataset(datasetID)
     }
   }
 
@@ -372,7 +373,10 @@ object Pruner {
    */
   private fun S3Bucket.pruneAllObjects(ownerID: UserID, datasetID: DatasetID) {
     objects.list(prefix = S3Paths.datasetDir(ownerID, datasetID))
+      .asSequence()
+      .filter { it.baseName != FileName.DeleteFlagFile }
       .map { it.path }
+      .asIterable()
       .let { objects.deleteAll(it) }
   }
 

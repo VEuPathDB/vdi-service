@@ -250,7 +250,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
         warnings?.basicWarnings?.isNotEmpty() == true
         || warnings?.communityWarnings?.isNotEmpty() == true
       ) {
-        transaction.upsertImportMessages(
+        transaction.tryInsertImportMessages(
           datasetID,
           warnings.basicWarnings + warnings.communityWarnings,
         )
@@ -267,7 +267,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
-      it.upsertImportMessages(
+      it.tryInsertImportMessages(
         datasetID,
         Iterable { result.getWarningsSequence().iterator() },
       )
@@ -279,7 +279,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
-      it.upsertImportMessages(datasetID, listOf(result.message))
+      it.tryInsertImportMessages(datasetID, listOf(result.message))
     }
 
     throw PluginException.import(plugin.name, ownerID, datasetID, result.message)
@@ -290,7 +290,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
     cacheDB.withTransaction {
       it.updateImportControl(datasetID, DatasetImportStatus.Failed)
-      it.upsertImportMessages(datasetID, listOf(result.message))
+      it.tryInsertImportMessages(datasetID, listOf(result.message))
     }
 
     throw PluginException.import(plugin.name, ownerID, datasetID, result.message)

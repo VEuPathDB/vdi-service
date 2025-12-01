@@ -10,15 +10,14 @@ import java.io.File
 import vdi.model.meta.DatasetID
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.*
-import vdi.service.rest.server.services.dataset.*
+import vdi.service.rest.server.outputs.BadRequestError
+import vdi.service.rest.server.outputs.wrap
+import vdi.service.rest.server.services.dataset.files.*
 import vdi.service.rest.util.fold
 import vdi.service.rest.util.mapLeft
 
 @Authenticated(adminOverride = ALLOW_ALWAYS)
-class DatasetFiles(@Context request: ContainerRequest)
-  : DatasetsVdiIdFiles
-  , ControllerBase(request)
-{
+class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, ControllerBase(request) {
   override fun getDatasetsFilesByVdiId(rawID: String): GetDatasetsFilesByVdiIdResponse =
     when (maybeUser) {
       null -> listDatasetFilesForAdmin(DatasetID(rawID))
@@ -36,8 +35,7 @@ class DatasetFiles(@Context request: ContainerRequest)
             StreamingOutput { obj.stream.use { inp -> inp.transferTo(it) } },
             GetDatasetsFilesUploadByVdiIdResponse
               .headersFor200()
-              .withContentDisposition("attachment; filename=\"$rawID-upload.zip\"")
-          )
+              .withContentDisposition(makeContentDisposition("$rawID-upload.zip")))
       }
       .fold()
   }
@@ -53,8 +51,7 @@ class DatasetFiles(@Context request: ContainerRequest)
             StreamingOutput { so.stream.use { inp -> inp.transferTo(it) } },
             GetDatasetsFilesInstallByVdiIdResponse
               .headersFor200()
-              .withContentDisposition("attachment; filename=\"$rawID-data.zip\"")
-          )
+              .withContentDisposition(makeContentDisposition("$rawID-data.zip")))
       }
       .fold()
 
@@ -69,4 +66,18 @@ class DatasetFiles(@Context request: ContainerRequest)
       null -> throw ForbiddenException("only users may put document files")
       else -> putUserDocument(DatasetID(vdiId), fileName, entity)
     }
+
+  override fun getDatasetsFilesVariablePropertiesByVdiIdAndFileName(
+    vdiId: String,
+    fileName: String,
+    download: Boolean?,
+  ) = getVariablePropertiesFile(DatasetID(vdiId), fileName, download ?: true, maybeUser == null)
+
+  override fun putDatasetsFilesVariablePropertiesByVdiIdAndFileName(
+    vdiId: String,
+    fileName: String,
+    entity: File?,
+  ) = entity
+    ?.let { putVariablePropertiesFile(DatasetID(vdiId), fileName, it, maybeUser == null) }
+    ?: BadRequestError("upload content not provided").wrap()
 }

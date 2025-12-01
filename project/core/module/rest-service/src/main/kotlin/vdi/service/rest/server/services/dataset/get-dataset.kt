@@ -19,6 +19,7 @@ import vdi.service.rest.model.UserDetails
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.outputs.*
+import vdi.service.rest.server.services.dataset.files.listDatasetFiles
 import vdi.service.rest.util.Either
 import vdi.service.rest.util.Either.Companion.left
 import vdi.service.rest.util.Either.Companion.right

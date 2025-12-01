@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.net.URI
 import java.time.OffsetDateTime
-import vdi.model.meta.VersionedMetaObject
 
 data class DatasetMetadata(
   @param:JsonProperty(Type)

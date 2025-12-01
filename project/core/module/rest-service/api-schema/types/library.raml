@@ -412,6 +412,7 @@ types:
       upload: DatasetZipDetails
       install?: DatasetZipDetails
       documents?: DatasetFileDetails[]
+      variableProperties?: DatasetFileDetails[]
   DatasetFundingAward:
     type: object
     additionalProperties: false
@@ -740,10 +741,6 @@ types:
     properties:
       identifier: DatasetPublicationIdentifier
       type?: DatasetPublicationType
-      citation?:
-        type: string
-        minLength: 3
-        maxLength: 2000
       isPrimary?:
         description: Only one publication may be marked as primary.
         type: boolean
@@ -1167,12 +1164,14 @@ types:
     type: DatasetTypeOutput
     additionalProperties: false
     properties:
-      usesMappingFiles:
-        type: boolean
       maxFileSize:
         type: integer
         format: int64
+      usesDataProperties:
+        type: boolean
       allowedFileExtensions: string[]
+      dataPropsFileNameSingular: string
+      dataPropsFileNamePlural: string
   PluginListItem:
     displayName: Plugin Info
     type: object

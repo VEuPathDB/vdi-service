@@ -2,6 +2,8 @@ package vdi.service.rest.server.outputs
 
 import org.veupathdb.lib.container.jaxrs.errors.UnprocessableEntityException
 import org.veupathdb.lib.request.validation.ValidationErrors
+import vdi.model.meta.DatasetID
+import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.support.ResponseDelegate
 
@@ -50,6 +52,17 @@ inline fun <reified T: ResponseDelegate> ConflictError.wrap(): T =
     .invoke(null, this) as T
 
 // endregion 409
+
+// region 410
+
+fun GoneError(message: String = "target dataset is no longer available"): GoneError =
+  GoneErrorImpl().also { it.message = message }
+
+inline fun <reified T: ResponseDelegate> GoneError.wrap(): T =
+  T::class.java.getMethod("respond410WithApplicationJson", GoneError::class.java)
+    .invoke(null, this) as T
+
+// endregion 410
 
 // region 422
 

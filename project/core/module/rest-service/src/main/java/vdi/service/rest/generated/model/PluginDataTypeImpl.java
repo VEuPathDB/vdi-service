@@ -10,9 +10,11 @@ import java.util.List;
     "name",
     "version",
     "category",
-    "usesMappingFiles",
     "maxFileSize",
-    "allowedFileExtensions"
+    "usesDataProperties",
+    "allowedFileExtensions",
+    "dataPropsFileNameSingular",
+    "dataPropsFileNamePlural"
 })
 public class PluginDataTypeImpl implements PluginDataType {
   @JsonProperty(JsonField.NAME)
@@ -24,14 +26,20 @@ public class PluginDataTypeImpl implements PluginDataType {
   @JsonProperty(JsonField.CATEGORY)
   private String category;
 
-  @JsonProperty(JsonField.USES_MAPPING_FILES)
-  private Boolean usesMappingFiles;
-
   @JsonProperty(JsonField.MAX_FILE_SIZE)
   private Long maxFileSize;
 
+  @JsonProperty(JsonField.USES_DATA_PROPERTIES)
+  private Boolean usesDataProperties;
+
   @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
   private List<String> allowedFileExtensions;
+
+  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_SINGULAR)
+  private String dataPropsFileNameSingular;
+
+  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_PLURAL)
+  private String dataPropsFileNamePlural;
 
   @JsonProperty(JsonField.NAME)
   public String getName() {
@@ -63,16 +71,6 @@ public class PluginDataTypeImpl implements PluginDataType {
     this.category = category;
   }
 
-  @JsonProperty(JsonField.USES_MAPPING_FILES)
-  public Boolean getUsesMappingFiles() {
-    return this.usesMappingFiles;
-  }
-
-  @JsonProperty(JsonField.USES_MAPPING_FILES)
-  public void setUsesMappingFiles(Boolean usesMappingFiles) {
-    this.usesMappingFiles = usesMappingFiles;
-  }
-
   @JsonProperty(JsonField.MAX_FILE_SIZE)
   public Long getMaxFileSize() {
     return this.maxFileSize;
@@ -83,6 +81,16 @@ public class PluginDataTypeImpl implements PluginDataType {
     this.maxFileSize = maxFileSize;
   }
 
+  @JsonProperty(JsonField.USES_DATA_PROPERTIES)
+  public Boolean getUsesDataProperties() {
+    return this.usesDataProperties;
+  }
+
+  @JsonProperty(JsonField.USES_DATA_PROPERTIES)
+  public void setUsesDataProperties(Boolean usesDataProperties) {
+    this.usesDataProperties = usesDataProperties;
+  }
+
   @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
   public List<String> getAllowedFileExtensions() {
     return this.allowedFileExtensions;
@@ -91,5 +99,25 @@ public class PluginDataTypeImpl implements PluginDataType {
   @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
   public void setAllowedFileExtensions(List<String> allowedFileExtensions) {
     this.allowedFileExtensions = allowedFileExtensions;
+  }
+
+  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_SINGULAR)
+  public String getDataPropsFileNameSingular() {
+    return this.dataPropsFileNameSingular;
+  }
+
+  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_SINGULAR)
+  public void setDataPropsFileNameSingular(String dataPropsFileNameSingular) {
+    this.dataPropsFileNameSingular = dataPropsFileNameSingular;
+  }
+
+  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_PLURAL)
+  public String getDataPropsFileNamePlural() {
+    return this.dataPropsFileNamePlural;
+  }
+
+  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_PLURAL)
+  public void setDataPropsFileNamePlural(String dataPropsFileNamePlural) {
+    this.dataPropsFileNamePlural = dataPropsFileNamePlural;
   }
 }

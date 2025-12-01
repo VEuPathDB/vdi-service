@@ -113,10 +113,21 @@ object DatasetStore {
   fun listDocumentFiles(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
     bucket.objects.list(prefix = S3Paths.datasetDocumentsDir(userID, datasetID))
 
+  fun getVariablePropertiesFile(userID: UserID, datasetID: DatasetID, filename: String) =
+    bucket.objects.open(S3Paths.variablePropertiesFile(userID, datasetID, filename))
+
+  fun putVariablePropertiesFile(userID: UserID, datasetID: DatasetID, filename: String, fn: () -> InputStream) =
+    fn().use { bucket.objects[S3Paths.variablePropertiesFile(userID, datasetID, filename)] = it }
+
+  fun listVariablePropertiesFiles(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
+    bucket.objects.list(prefix = S3Paths.variablePropertiesDir(userID, datasetID))
+
   fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
     bucket.objects.list(prefix = S3Paths.datasetDir(userID, datasetID))
 
   fun streamAll() = bucket.objects.streamAll().stream()
+
+  fun hasDeletionFlag(userID: UserID, datasetID: DatasetID): Boolean {}
 
   private fun String.getDatasetIDFromPath(): DatasetID {
     val it = splitToSequence('/').iterator()

@@ -26,21 +26,33 @@ public interface PluginDataType extends DatasetTypeOutput {
   @JsonProperty(JsonField.CATEGORY)
   void setCategory(String category);
 
-  @JsonProperty(JsonField.USES_MAPPING_FILES)
-  Boolean getUsesMappingFiles();
-
-  @JsonProperty(JsonField.USES_MAPPING_FILES)
-  void setUsesMappingFiles(Boolean usesMappingFiles);
-
   @JsonProperty(JsonField.MAX_FILE_SIZE)
   Long getMaxFileSize();
 
   @JsonProperty(JsonField.MAX_FILE_SIZE)
   void setMaxFileSize(Long maxFileSize);
 
+  @JsonProperty(JsonField.USES_DATA_PROPERTIES)
+  Boolean getUsesDataProperties();
+
+  @JsonProperty(JsonField.USES_DATA_PROPERTIES)
+  void setUsesDataProperties(Boolean usesDataProperties);
+
   @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
   List<String> getAllowedFileExtensions();
 
   @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
   void setAllowedFileExtensions(List<String> allowedFileExtensions);
+
+  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_SINGULAR)
+  String getDataPropsFileNameSingular();
+
+  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_SINGULAR)
+  void setDataPropsFileNameSingular(String dataPropsFileNameSingular);
+
+  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_PLURAL)
+  String getDataPropsFileNamePlural();
+
+  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_PLURAL)
+  void setDataPropsFileNamePlural(String dataPropsFileNamePlural);
 }

@@ -37,13 +37,16 @@ private fun PluginListItem(dt: DatasetType, plug: PluginDetails): PluginListItem
   }
 
 private fun PluginDataType(dt: DatasetType): PluginDataType =
-  PluginDataTypeImpl().apply {
-    val config = PluginRegistry.configDataFor(dt)
-
-    name = dt.name.toString()
-    version = dt.version
-    category = config.category
-    usesMappingFiles = config.usesMappingFiles
-    maxFileSize = config.maxFileSize.toLong()
-    allowedFileExtensions = config.allowedFileExtensions.asList()
-  }
+  PluginRegistry.configDataFor(dt)
+    .let { config ->
+      PluginDataTypeImpl().apply {
+        name = dt.name.toString()
+        version = dt.version
+        category = config.category
+        usesDataProperties = config.usesDataPropertiesFiles
+        maxFileSize = config.maxFileSize.toLong()
+        allowedFileExtensions = config.allowedFileExtensions.asList()
+        dataPropsFileNameSingular = config.varPropertiesFileNameSingular
+        dataPropsFileNamePlural = config.varPropertiesFileNamePlural
+      }
+    }

@@ -19,7 +19,6 @@ public final class JsonField {
   public static final String BUILD_TIME = "buildTime";
   public static final String CATEGORY = "category";
   public static final String CHARACTERISTICS = "characteristics";
-  public static final String CITATION = "citation";
   public static final String CONFIGURATION = "configuration";
   public static final String CONTACTS = "contacts";
   public static final String CONTENTS = "contents";
@@ -31,6 +30,8 @@ public final class JsonField {
   public static final String DAEMONS = "daemons";
   public static final String DATA_FILES = "dataFiles";
   public static final String DATA_MESSAGES = "dataMessages";
+  public static final String DATA_PROPS_FILE_NAME_PLURAL = "dataPropsFileNamePlural";
+  public static final String DATA_PROPS_FILE_NAME_SINGULAR = "dataPropsFileNameSingular";
   public static final String DATA_STATUS = "dataStatus";
   public static final String DATA_TYPES = "dataTypes";
   public static final String DATA_UPDATE_TIME = "dataUpdateTime";
@@ -149,7 +150,8 @@ public final class JsonField {
   public static final String USER = "user";
   public static final String USER_ID = "userId";
   public static final String USER_MAX_STORAGE_SIZE = "userMaxStorageSize";
-  public static final String USES_MAPPING_FILES = "usesMappingFiles";
+  public static final String USES_DATA_PROPERTIES = "usesDataProperties";
+  public static final String VARIABLE_PROPERTIES = "variableProperties";
   public static final String VERSION = "version";
   public static final String VISIBILITY = "visibility";
   public static final String YEARS = "years";

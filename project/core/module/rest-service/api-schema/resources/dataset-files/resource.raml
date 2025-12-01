@@ -22,6 +22,9 @@ get:
       body: lib.UnauthorizedError
     404:
       body: lib.NotFoundError
+    410:
+      description: Parent dataset has been deleted, or is no longer public.
+      body: lib.GoneError
     500:
       body: lib.ServerError
 
@@ -96,6 +99,9 @@ get:
         body: lib.UnauthorizedError
       404:
         body: lib.NotFoundError
+      410:
+        description: Parent dataset has been deleted, or is no longer public.
+        body: lib.GoneError
       500:
         body: lib.ServerError
   put:
@@ -110,5 +116,60 @@ get:
         body: lib.UnauthorizedError
       404:
         body: lib.NotFoundError
+      500:
+        body: lib.ServerError
+
+/variable-properties/{file-name}:
+  displayName: Variable Properties Files
+  uriParameters:
+    file-name:
+  get:
+    displayName: Get Variable Properties File
+    queryParameters:
+      download:
+        type: boolean
+        required: false
+        default: true
+    responses:
+      200:
+        headers:
+          Content-Disposition:
+            type: string
+            required: false
+        body:
+          text/tab-separated-values:
+            type: any
+      401:
+        body: lib.UnauthorizedError
+      404:
+        body: lib.NotFoundError
+      410:
+        description: Parent dataset has been deleted, or is no longer public.
+        body: lib.GoneError
+      500:
+        body: lib.ServerError
+
+  put:
+    displayName: Put Variable Properties File
+    body:
+      text/tab-separated-values: file
+    responses:
+      202:
+      400:
+        body: lib.BadRequestError
+      401:
+        body: lib.UnauthorizedError
+      403:
+        # language=markdown
+        description: |
+          Returned when:
+          * The data type does not permit mapping files
+          * The requesting user does not own the dataset
+        body: lib.ForbiddenError
+      404:
+        body: lib.NotFoundError
+      410:
+        description: Parent dataset has been deleted, or is no longer public.
+        body: lib.GoneError
       500:
         body: lib.ServerError

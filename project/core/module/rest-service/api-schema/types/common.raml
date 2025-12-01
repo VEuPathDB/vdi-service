@@ -171,6 +171,7 @@ types:
       upload: DatasetZipDetails
       install?: DatasetZipDetails
       documents?: DatasetFileDetails[]
+      variableProperties?: DatasetFileDetails[]
 
   DatasetFundingAward:
     type: object
@@ -363,10 +364,6 @@ types:
     properties:
       identifier: DatasetPublicationIdentifier
       type?: DatasetPublicationType
-      citation?:
-        type: string
-        minLength: 3
-        maxLength: 2000
       isPrimary?:
         description: Only one publication may be marked as primary.
         type: boolean

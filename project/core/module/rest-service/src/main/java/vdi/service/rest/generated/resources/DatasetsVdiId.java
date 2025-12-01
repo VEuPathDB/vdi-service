@@ -14,6 +14,7 @@ import vdi.service.rest.generated.model.DatasetPatchRequestBody;
 import vdi.service.rest.generated.model.DatasetPutRequestBody;
 import vdi.service.rest.generated.model.DatasetPutResponseBody;
 import vdi.service.rest.generated.model.ForbiddenError;
+import vdi.service.rest.generated.model.GoneError;
 import vdi.service.rest.generated.model.NotFoundError;
 import vdi.service.rest.generated.model.ServerError;
 import vdi.service.rest.generated.model.UnauthorizedError;
@@ -89,8 +90,8 @@ public interface DatasetsVdiId {
       return new GetDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsByVdiIdResponse respond425WithApplicationJson(Object entity) {
-      Response.ResponseBuilder responseBuilder = Response.status(425).header("Content-Type", "application/json");
+    public static GetDatasetsByVdiIdResponse respond410WithApplicationJson(GoneError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(410).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }

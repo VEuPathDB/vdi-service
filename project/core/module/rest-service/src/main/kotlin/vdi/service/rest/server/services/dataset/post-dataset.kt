@@ -11,35 +11,27 @@ import vdi.model.meta.DatasetID
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
-import vdi.service.rest.generated.resources.Datasets
 import vdi.service.rest.server.controllers.ControllerBase
-import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.toDatasetMeta
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.DatasetPostResponseBody
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.outputs.wrap
+import vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse as PostResponse
 
 fun <T: ControllerBase> T.createDataset(
-  datasetID: DatasetID,
-  entity: DatasetPostRequestBody,
+  datasetID:    DatasetID,
+  entity:       DatasetPostRequestBody,
   uploadConfig: UploadConfig,
-): Datasets.PostDatasetsResponse {
-  entity.cleanup()
-
-  with (entity.validate()) {
-    if (isNotEmpty)
-      return UnprocessableEntityError(this).wrap()
-  }
-
+): PostResponse {
   val datasetMeta = entity.toDatasetMeta(userID)
 
   // Secondary validation for any additional json schema rules in service config
   datasetMeta.installTargets.asSequence()
-    .map { InstallTargetRegistry[it]!! }
+    .mapNotNull(InstallTargetRegistry::get)
     .filter { it.metaValidation != null }
     .toList()
-    .takeIf { it.isNotEmpty() }
+    .takeIf(Collection<*>::isNotEmpty)
     ?.also { targets ->
       val json = JSON.convertValue<ObjectNode>(datasetMeta)
       val validationErrors = ValidationErrors()
@@ -53,21 +45,26 @@ fun <T: ControllerBase> T.createDataset(
         return UnprocessableEntityError(validationErrors).wrap()
     }
 
-  val uploadRefs = CacheDB().initializeDataset(userID, datasetID, datasetMeta) {
-    resolveDatasetFiles(entity.dataFiles, entity.url, entity.docFiles, uploadConfig)
-  }
+  val uploadRefs = CacheDB()
+    .initializeDataset(userID, datasetID, datasetMeta) {
+      resolveDatasetFiles(entity.dataFiles, entity.url, entity.docFiles, uploadConfig)
+    }
 
   submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)
 
-  return Datasets.PostDatasetsResponse.respond202WithApplicationJson(
+  return PostResponse.respond202WithApplicationJson(
     DatasetPostResponseBody(datasetID),
-    Datasets.PostDatasetsResponse.headersFor202().withLocation(redirectURL(datasetID)),
+    PostResponse.headersFor202().withLocation(redirectURL(datasetID)),
   )
 }
 
-fun <T: ControllerBase> T.createDataset(datasetID: DatasetID, entity: DatasetProxyPostRequestBody, uploadConfig: UploadConfig) {
+fun <T: ControllerBase> T.createDataset(
+  datasetID:    DatasetID,
+  entity:       DatasetProxyPostRequestBody,
+  uploadConfig: UploadConfig,
+) {
   val datasetMeta = entity.toDatasetMeta(userID)
-  val uploadRefs = CacheDB().initializeDataset(userID, datasetID, datasetMeta) {
+  val uploadRefs  = CacheDB().initializeDataset(userID, datasetID, datasetMeta) {
     resolveDatasetFiles(entity.dataFiles, entity.url, entity.docFiles, uploadConfig)
   }
 

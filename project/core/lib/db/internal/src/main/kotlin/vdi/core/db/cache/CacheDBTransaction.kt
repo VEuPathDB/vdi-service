@@ -13,17 +13,6 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
   // region Delete
 
   /**
-   * Performs a cascade deletion of records relating to a target dataset,
-   * excluding revision history references.
-   *
-   * @param datasetID ID of the target dataset whose database records should be
-   * deleted.
-   *
-   * @return The total number of records deleted by the method call.
-   */
-  fun deleteDataset(datasetID: DatasetID): Int
-
-  /**
    * Deletes a singular share offer record for a target dataset/recipient user
    * combination.
    *
@@ -36,6 +25,8 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
    * of this method call.
    */
   fun deleteShareOffer(datasetID: DatasetID, recipientID: UserID): Boolean
+
+  fun deleteShareOffers(datasetID: DatasetID): Int
 
   /**
    * Deletes a singular share receipt record for a target dataset/recipient user
@@ -50,6 +41,8 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
    * of this method call.
    */
   fun deleteShareReceipt(datasetID: DatasetID, recipientID: UserID): Boolean
+
+  fun deleteShareReceipts(datasetID: DatasetID): Int
 
   /**
    * Deletes the `vdi.import_messages` table entry for a target dataset
@@ -86,6 +79,18 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
    * call.
    */
   fun deletePublications(datasetID: DatasetID): Int
+
+  fun deleteInstallFiles(datasetID: DatasetID): Int
+
+  fun deleteUploadFiles(datasetID: DatasetID): Int
+
+  fun deleteImportControlRecords(datasetID: DatasetID): Int
+
+  fun deleteSyncControlRecords(datasetID: DatasetID): Int
+
+  fun deleteDatasetMetadata(datasetID: DatasetID): Boolean
+
+  fun deleteDatasetInstallTargets(datasetID: DatasetID): Int
 
   // endregion Delete
 
@@ -303,8 +308,6 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
   fun upsertDatasetShareReceipt(row: ShareReceiptRecord)
 
   fun upsertImportControl(datasetID: DatasetID, status: DatasetImportStatus)
-
-  fun upsertImportMessages(datasetID: DatasetID, messages: Iterable<String>)
 
   // endregion Upsert
 

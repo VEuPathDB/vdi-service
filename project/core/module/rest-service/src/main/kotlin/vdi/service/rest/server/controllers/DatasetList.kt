@@ -18,35 +18,43 @@ import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.services.dataset.createDataset
 import vdi.service.rest.server.services.dataset.fetchUserDatasetList
 import vdi.service.rest.util.ShortID
+import vdi.service.rest.util.fold
+import vdi.service.rest.generated.resources.Datasets.GetDatasetsResponse as GetResponse
+import vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse as PostResponse
 
 @Authenticated(allowGuests = false)
-class DatasetList(@Context request: ContainerRequest, @param:Context val uploadConfig: UploadConfig)
+class DatasetList(
+  @Context request: ContainerRequest,
+  @param:Context val uploadConfig: UploadConfig,
+)
   : Datasets
   , ControllerBase(request)
 {
   private val log = logger()
 
-  override fun getDatasets(projectId: String?, ownership: String?): Datasets.GetDatasetsResponse {
+  override fun getDatasets(projectId: String?, ownership: String?): GetResponse {
     // Parse the ownership filter field
     val parsedOwnership = ownership
       ?.let {
         DatasetOwnershipFilter.fromStringOrNull(it)
-          ?: return Datasets.GetDatasetsResponse.respond400WithApplicationJson(BadRequestError("Invalid ownership query param value."))
+          ?: return GetResponse.respond400WithApplicationJson(BadRequestError("Invalid ownership query param value."))
       }
       ?: DatasetOwnershipFilter.ANY
 
-    return Datasets.GetDatasetsResponse.respond200WithApplicationJson(
+    return GetResponse.respond200WithApplicationJson(
       fetchUserDatasetList(DatasetListQuery(userID, projectId, parsedOwnership))
     )
   }
 
-  override fun postDatasets(entity: DatasetPostRequestBody?): Datasets.PostDatasetsResponse {
-    with(entity ?: return Datasets.PostDatasetsResponse.respond400WithApplicationJson(BadRequestError("request body must not be empty"))) {
+  override fun postDatasets(entity: DatasetPostRequestBody?): PostResponse {
+    with(entity ?: return PostResponse.respond400WithApplicationJson(BadRequestError("request body must not be empty"))) {
       cleanup()
-      validate().let {
-        if (it.isNotEmpty)
-          return Datasets.PostDatasetsResponse.respond422WithApplicationJson(UnprocessableEntityError(it))
-      }
+      validate().fold(
+        PostResponse::respond400WithApplicationJson,
+        { v -> v.takeIf { it.isNotEmpty }
+          ?.let(::UnprocessableEntityError)
+          ?.let(PostResponse::respond422WithApplicationJson) }
+      )?.also { return it }
     }
 
     // Generate a new dataset ID.

@@ -4,6 +4,7 @@ import org.slf4j.Logger
 import vdi.core.kafka.EventMessage
 import vdi.core.kafka.router.KafkaRouter
 import vdi.core.plugin.mapping.PluginHandler
+import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
 import vdi.logging.mark
 import vdi.model.meta.DatasetMetadata
@@ -29,13 +30,14 @@ class UpdateMetaContext(
   val source
     get() = message.eventSource
 
-  fun withPlugin(meta: DatasetMetadata, plugin: PluginHandler, target: InstallTargetID) =
-    WithPlugin(meta, plugin, target)
+  fun withPlugin(meta: DatasetMetadata, plugin: PluginHandler, target: InstallTargetID, dir: DatasetDirectory) =
+    WithPlugin(meta, plugin, target, dir)
 
   inner class WithPlugin(
     val meta: DatasetMetadata,
     val plugin: PluginHandler,
     val target: InstallTargetID,
+    val directory: DatasetDirectory,
   ) {
     val logger = this@UpdateMetaContext.logger.mark(meta.type, plugin.name, target)
 

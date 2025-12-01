@@ -33,23 +33,23 @@ inline fun InstallDataContext.compatLogger() = makeLogger("check-compatibility")
 
 
 inline fun InstallMetaContext.makeLogger() =
-  makeLogger<InstallMetaHandler>(createLoggerMark(ownerID, datasetID, installTarget) + " S=install-meta")
+  markedLogger<InstallMetaHandler>(createLoggerMark(ownerID, datasetID, installTarget) + " S=install-meta")
 
 inline fun UninstallDataContext.makeLogger() =
-  makeLogger<UninstallDataHandler>(createLoggerMark(datasetID, installTarget) + "S=uninstall-data")
+  markedLogger<UninstallDataHandler>(createLoggerMark(datasetID, installTarget) + "S=uninstall-data")
 
 inline fun ImportContext.makeLogger() =
-  makeLogger<ImportHandler>(createLoggerMark(ownerID, datasetID) + " S=import")
+  markedLogger<ImportHandler>(createLoggerMark(ownerID, datasetID) + " S=import")
 
 inline fun <reified T: Any> makeLogger(
   ownerID: UserID,
   datasetID: DatasetID,
   script: String,
-) = makeLogger<T>(createLoggerMark(ownerID, datasetID) + " S=$script")
+) = markedLogger<T>(createLoggerMark(ownerID, datasetID) + " S=$script")
 
 inline fun <reified T: Any> makeLogger(
   ownerID: UserID,
   datasetID: DatasetID,
   installTarget: InstallTargetID,
   script: String,
-) = makeLogger<T>(createLoggerMark(ownerID, datasetID, installTarget) + " S=$script")
+) = markedLogger<T>(createLoggerMark(ownerID, datasetID, installTarget) + " S=$script")

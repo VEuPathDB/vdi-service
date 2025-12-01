@@ -1,5 +1,6 @@
 package vdi.service.rest.server.outputs
 
+import org.veupathdb.lib.s3.s34k.objects.S3Object
 import vdi.model.meta.DatasetFileInfo
 import vdi.service.rest.generated.model.DatasetFileDetails
 import vdi.service.rest.generated.model.DatasetFileDetailsImpl
@@ -16,6 +17,12 @@ fun DatasetFileDetails(file: DatasetFileInfo): DatasetFileDetails =
   DatasetFileDetailsImpl().also {
     it.fileName = file.name
     it.fileSize = file.size.toLong()
+  }
+
+fun DatasetFileDetails(obj: S3Object): DatasetFileDetails =
+  DatasetFileDetailsImpl().also {
+    it.fileName = obj.baseName
+    it.fileSize = obj.size
   }
 
 fun DatasetFileDetails(name: String, size: Long): DatasetFileDetails =

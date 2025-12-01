@@ -4,24 +4,11 @@ import java.sql.Connection
 import vdi.core.db.cache.model.BrokenImportListQuery
 import vdi.core.db.cache.query.AdminAllDatasetsQuery
 import vdi.core.db.cache.query.DatasetListQuery
-import vdi.core.db.cache.sql.dataset_publications.selectPublicationsForDataset
-import vdi.core.db.cache.sql.dataset_revisions.selectDatasetRevisions
-import vdi.core.db.cache.sql.dataset_revisions.selectLatestDatasetRevision
-import vdi.core.db.cache.sql.dataset_revisions.selectOriginalDatasetID
-import vdi.core.db.cache.sql.dataset_share_offers.selectAllSharesFor
-import vdi.core.db.cache.sql.dataset_share_offers.selectOpenSharesFor
-import vdi.core.db.cache.sql.dataset_share_offers.selectSharesFor
-import vdi.core.db.cache.sql.datasets.*
-import vdi.core.db.cache.sql.import_control.selectBrokenImports
-import vdi.core.db.cache.sql.import_control.selectImportControl
-import vdi.core.db.cache.sql.import_messages.selectImportMessages
-import vdi.core.db.cache.sql.install_files.selectInstallFileCount
-import vdi.core.db.cache.sql.install_files.selectInstallFiles
-import vdi.core.db.cache.sql.sync_control.selectAllSyncControl
-import vdi.core.db.cache.sql.sync_control.selectSyncControl
-import vdi.core.db.cache.sql.upload_files.selectUploadFileCount
-import vdi.core.db.cache.sql.upload_files.selectUploadFileSummaries
-import vdi.core.db.cache.sql.upload_files.selectUploadFiles
+import vdi.core.db.cache.sql.complex.DatasetAdminQueries
+import vdi.core.db.cache.sql.complex.DatasetQueries
+import vdi.core.db.cache.sql.complex.DatasetShareQueries
+import vdi.core.db.cache.sql.complex.ReconcilerQueries
+import vdi.core.db.cache.sql.simple.*
 import vdi.model.meta.*
 
 internal sealed class CacheDBImplBase: CacheDB {
@@ -30,101 +17,101 @@ internal sealed class CacheDBImplBase: CacheDB {
   protected abstract fun <T> runQuery(fn: Connection.() -> T): T
 
   override fun selectAcceptedSharesForUser(recipientID: UserID) =
-    runQuery { selectSharesFor(recipientID, DatasetShareOffer.Action.Grant, DatasetShareReceipt.Action.Accept) }
+    runQuery { DatasetShareQueries.select(recipientID, DatasetShareOffer.Action.Grant, DatasetShareReceipt.Action.Accept) }
 
   override fun selectAdminAllDatasets(query: AdminAllDatasetsQuery) =
-    runQuery { selectAdminAllDatasets(query) }
+    runQuery { DatasetAdminQueries.select(query) }
 
   override fun selectAdminAllDatasetCount(query: AdminAllDatasetsQuery) =
-    runQuery { selectAdminAllDatasetCount(query) }
+    runQuery { DatasetAdminQueries.count(query) }
 
   override fun selectAdminDatasetDetails(datasetID: DatasetID) =
-    runQuery { selectAdminDatasetDetails(datasetID) }
+    runQuery { DatasetAdminQueries.select(datasetID) }
 
   override fun selectDataset(datasetID: DatasetID) =
-    runQuery { selectDataset(datasetID) }
+    runQuery { DatasetQueries.select(datasetID) }
 
   override fun selectDatasetsByProjectName(ownerID: UserID, projectName: String) =
-    runQuery { selectDatasetsByProjectName(ownerID, projectName) }
+    runQuery { DatasetQueries.selectByProjectName(ownerID, projectName) }
 
   override fun selectDatasetsByProgramName(ownerID: UserID, programName: String) =
-    runQuery { selectDatasetsByProgramName(ownerID, programName) }
+    runQuery { DatasetQueries.selectByProgramName(ownerID, programName) }
 
   override fun selectDatasetsByCommonPublication(rootDatasetID: DatasetID) =
-    runQuery { selectDatasetsByCommonPublication(rootDatasetID) }
+    runQuery { DatasetQueries.selectByCommonPublication(rootDatasetID) }
 
   override fun selectDatasetForUser(userID: UserID, datasetID: DatasetID) =
-    runQuery { selectDatasetForUser(userID, datasetID) }
+    runQuery { DatasetQueries.select(userID, datasetID) }
 
   override fun selectDatasetList(query: DatasetListQuery) =
-    runQuery { selectDatasetList(query) }
+    runQuery { DatasetQueries.select(query) }
 
   override fun selectInstallFiles(datasetID: DatasetID) =
-    runQuery { selectInstallFiles(datasetID) }
+    runQuery { DatasetInstallFiles.select(datasetID) }
 
   override fun selectInstallFileCount(datasetID: DatasetID) =
-    runQuery { selectInstallFileCount(datasetID) }
+    runQuery { DatasetInstallFiles.count(datasetID) }
 
   override fun selectNonPrivateDatasets() =
-    runQuery { selectNonPrivateDatasets() }
+    runQuery { DatasetQueries.selectNonPrivateDatasets() }
 
   override fun selectPublications(datasetID: DatasetID): List<DatasetPublication> =
-    runQuery { selectPublicationsForDataset(datasetID) }
+    runQuery { DatasetPublicationsTable.select(datasetID) }
 
   override fun selectUploadFiles(datasetID: DatasetID) =
-    runQuery { selectUploadFiles(datasetID) }
+    runQuery { DatasetUploadFiles.select(datasetID) }
 
   override fun selectUndeletedDatasetIDsForUser(userID: UserID) =
-    runQuery { selectUndeletedDatasetIDsForUser(userID) }
+    runQuery { DatasetsTable.selectIDs(userID) }
 
   override fun selectUploadFileCount(datasetID: DatasetID) =
-    runQuery { selectUploadFileCount(datasetID) }
+    runQuery { DatasetUploadFiles.count(datasetID) }
 
   override fun selectUploadFileSummaries(datasetIDs: List<DatasetID>) =
-    runQuery { selectUploadFileSummaries(datasetIDs) }
+    runQuery { DatasetUploadFiles.selectSummaries(datasetIDs) }
 
   override fun selectSharesForDataset(datasetID: DatasetID) =
-    runQuery { selectSharesFor(datasetID) }
+    runQuery { DatasetShareQueries.select(datasetID) }
 
   override fun selectSharesForDatasets(datasetIDs: List<DatasetID>) =
-    runQuery { selectSharesFor(datasetIDs) }
+    runQuery { DatasetShareQueries.select(datasetIDs) }
 
   override fun selectImportControl(datasetID: DatasetID) =
-    runQuery { selectImportControl(datasetID) }
+    runQuery { ImportControlTable.select(datasetID) }
 
   override fun selectImportMessages(datasetID: DatasetID) =
-    runQuery { selectImportMessages(datasetID) }
+    runQuery { ImportMessagesTable.select(datasetID) }
 
   override fun selectSyncControl(datasetID: DatasetID) =
-    runQuery { selectSyncControl(datasetID) }
+    runQuery { SyncControlTable.select(datasetID) }
 
   override fun selectDeletedDatasets() =
-    runQuery { selectDeletedDatasets() }
+    runQuery { DatasetQueries.selectDeleted() }
 
   override fun selectOpenSharesForUser(recipientID: UserID) =
-    runQuery { selectOpenSharesFor(recipientID) }
+    runQuery { DatasetShareQueries.selectOpenShares(recipientID) }
 
   override fun selectRejectedSharesForUser(recipientID: UserID) =
-    runQuery { selectSharesFor(recipientID, DatasetShareOffer.Action.Grant, DatasetShareReceipt.Action.Reject) }
+    runQuery { DatasetShareQueries.select(recipientID, DatasetShareOffer.Action.Grant, DatasetShareReceipt.Action.Reject) }
 
   override fun selectAllSharesForUser(recipientID: UserID) =
-    runQuery { selectAllSharesFor(recipientID) }
+    runQuery { DatasetShareQueries.select(recipientID) }
 
   // NOTE: THE CALLER IS RESPONSIBLE FOR CLOSING THE CONNECTION!
   override fun selectAllSyncControlRecords() =
-    connection.selectAllSyncControl()
+    context(connection) { ReconcilerQueries.select() }
 
   override fun selectBrokenDatasetImports(query: BrokenImportListQuery) =
-    runQuery { selectBrokenImports(query) }
+    runQuery { DatasetAdminQueries.selectBrokenImports(query) }
 
   override fun selectLatestRevision(datasetID: DatasetID, includeDeleted: Boolean) =
-    runQuery { selectLatestDatasetRevision(datasetID, includeDeleted) }
+    runQuery { DatasetRevisionsTable.selectLatestRevision(datasetID, includeDeleted) }
 
   override fun selectOriginalDatasetID(datasetID: DatasetID) =
-    runQuery { selectOriginalDatasetID(datasetID) }
+    runQuery { DatasetRevisionsTable.selectOriginalDatasetID(datasetID) }
 
   override fun selectRevisions(datasetID: DatasetID) =
-    runQuery { selectDatasetRevisions(datasetID) }
+    runQuery { DatasetRevisionsTable.selectRevisionHistory(datasetID) }
 
   override fun openTransaction(): CacheDBTransaction =
     CacheDBTransactionImpl(dataSource, connection.apply { autoCommit = false }, details)

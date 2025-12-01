@@ -1,46 +1,67 @@
 @file:JvmName("DatasetPostRequestInputAdaptor")
 package vdi.service.rest.server.inputs
 
-import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
 import java.net.URI
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.UserID
+import vdi.service.rest.generated.model.BadRequestError
 import vdi.service.rest.generated.model.DatasetPostRequestBody
+import vdi.service.rest.generated.model.DatasetVisibility
+import vdi.service.rest.server.outputs.BadRequestError
+import vdi.service.rest.util.Either
+import vdi.service.rest.util.Either.Companion.left
+import vdi.service.rest.util.Either.Companion.right
 
 fun DatasetPostRequestBody.cleanup() {
   details?.cleanup()
-  url = url.takeUnless { it.isNullOrBlank() }
-    ?.trim()
-  dataFiles = dataFiles.takeUnless { it.isNullOrEmpty() }
-  docFiles = docFiles.takeUnless { it.isNullOrEmpty() }
+  url = url.takeUnless(String::isNullOrBlank)?.trim()
+  dataFiles = dataFiles.takeUnless(Collection<*>::isNullOrEmpty)
+  docFiles = docFiles.takeUnless(Collection<*>::isNullOrEmpty)
+  mappingFiles = mappingFiles.takeUnless(Collection<*>::isNullOrEmpty)
 }
 
 @Suppress("DuplicatedCode") // overlap in generated API pojo field names
-fun DatasetPostRequestBody.validate(): ValidationErrors {
+fun DatasetPostRequestBody.validate(): Either<BadRequestError, ValidationErrors> {
   // DatasetPostRequestBody is not a JSON object, it is a multipart/form-data
   // request.  The "fields" are form parts and are not validated as if they are
   // part of a syntactically correct JSON body.
 
   // If the meta field is null, then the request body was incomplete.
   if (details == null)
-    throw BadRequestException("missing dataset metadata")
+    return left(BadRequestError("missing dataset metadata"))
 
   // If there is no file or URL, then the request body was incomplete.
   // If there is a file AND URL, then the request body is invalid.
   if (dataFiles == null) {
     if (url == null)
-      throw BadRequestException("must provide an upload file or url to a source file")
+      return left(BadRequestError("must provide an upload file or url to a source file"))
 
     try {
       URI(url).toURL()
     } catch (e: IllegalArgumentException){
-      throw BadRequestException("invalid source URL")
+      return left(BadRequestError("invalid source URL"))
     }
   } else if (url != null) {
-    throw BadRequestException("cannot provide both an upload file and a source file URL")
+    return left(BadRequestError("cannot provide both an upload file and a source file URL"))
   }
 
-  return ValidationErrors().also { details.validate(it) }
+  val dataTypeConfig = details.type?.toInternal()?.let(PluginRegistry::configDataFor)
+
+  // If no mapping files were provided
+  if (mappingFiles == null) {
+    // AND the dataset is NOT private
+    // AND the data type uses variable mapping files
+    if (details.visibility != DatasetVisibility.PRIVATE && dataTypeConfig?.usesDataPropertiesFiles == true) {
+      return left(BadRequestError("must provide at least one mapping file"))
+    }
+  // If at least one mapping file was provided
+  // AND the data type doesn't use mapping files
+  } else if (dataTypeConfig?.usesDataPropertiesFiles == false) {
+    return left(BadRequestError("chosen data type does not permit mapping files"))
+  }
+
+  return right(ValidationErrors().also { details.validate(it) })
 }
 
 fun DatasetPostRequestBody.toDatasetMeta(userID: UserID) =

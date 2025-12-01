@@ -22,9 +22,11 @@ types:
     type: common.DatasetTypeOutput
     additionalProperties: false
     properties:
-      usesMappingFiles:
-        type: boolean
       maxFileSize:
         type: integer
         format: int64
+      usesDataProperties:
+        type: boolean
       allowedFileExtensions: string[]
+      dataPropsFileNameSingular: string
+      dataPropsFileNamePlural: string

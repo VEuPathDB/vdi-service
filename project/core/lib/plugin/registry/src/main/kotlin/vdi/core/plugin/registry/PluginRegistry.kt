@@ -28,7 +28,9 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
               it.category,
               it.maxFileSize,
               it.allowedFileExtensions,
-              it.usesVarMapping,
+              it.usesDataProperties,
+              it.dataPropsFileNameSingular,
+              it.dataPropsFileNamePlural,
             ) } }
           .onEach { conflicts.computeIfAbsent(it, { ArrayList(1) }).add(name) }
           .map { it to details }
