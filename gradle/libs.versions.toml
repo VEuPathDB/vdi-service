@@ -93,7 +93,7 @@ db-driver-postgres = { module = "org.postgresql:postgresql",       version = "42
 db-kotlin-extended = { module = "io.foxcapades.kt:kdbc",           version = "1.1.1"        }
 
 # Messaging
-msg-kafka  = { group = "org.apache.kafka", name = "kafka-clients", version = "4.1.0" }
+msg-kafka  = { group = "org.apache.kafka", name = "kafka-clients", version = "4.1.1" }
 msg-rabbit = { group = "com.rabbitmq",     name = "amqp-client",   version = "5.27.0" }
 
 # Metrics
