@@ -95,7 +95,7 @@ db-kotlin-extended = { module = "io.foxcapades.kt:kdbc",            version = "1
 
 # Messaging
 msg-kafka  = { group = "org.apache.kafka", name = "kafka-clients", version = "4.1.1" }
-msg-rabbit = { group = "com.rabbitmq",     name = "amqp-client",   version = "5.27.0" }
+msg-rabbit = { group = "com.rabbitmq",     name = "amqp-client",   version = "5.27.1" }
 
 # Metrics
 prometheus-client = { group = "io.prometheus", name = "simpleclient",        version = "0.16.0" }
