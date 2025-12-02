@@ -61,6 +61,14 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
       plugin: bigwig
+  plugin-biom:
+    needs:
+    - publish
+    uses: VEuPathDB/vdi-plugin-biom/.github/workflows/update-plugin-server.yml@main
+    secrets: inherit
+    with:
+      tag: ${{ github.ref_name }}
+      plugin: biom
   plugin-example:
     needs:
     - publish
