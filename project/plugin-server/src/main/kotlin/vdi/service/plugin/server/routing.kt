@@ -1,7 +1,6 @@
 package vdi.service.plugin.server
 
 import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.metrics.micrometer.MicrometerMetrics
 import io.ktor.server.response.respond
@@ -17,7 +16,7 @@ import vdi.service.plugin.process.install.meta.handleInstallMetaRequest
 import vdi.service.plugin.process.uninstall.handleUninstallRequest
 import vdi.service.plugin.server.errors.withExceptionMapping
 
-suspend fun Application.configureServer(appCtx: ApplicationContext) {
+fun Application.configureServer(appCtx: ApplicationContext) {
 
   install(MicrometerMetrics) { registry = appCtx.metrics.micrometer }
 
