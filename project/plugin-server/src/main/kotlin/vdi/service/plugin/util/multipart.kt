@@ -2,7 +2,6 @@ package vdi.service.plugin.util
 
 import com.fasterxml.jackson.core.JacksonException
 import io.ktor.http.content.PartData
-import io.ktor.http.content.streamProvider
 import io.ktor.util.asStream
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import org.slf4j.LoggerFactory
@@ -23,7 +22,7 @@ fun <T : Any> PartData.parseAsJson(maxInputSize: ULong, type: KClass<T>): T =
     when (this) {
       is PartData.BinaryChannelItem -> BoundedInputStream(provider().toInputStream(), maxInputSize)
       is PartData.BinaryItem        -> BoundedInputStream(provider().asStream(), maxInputSize)
-      is PartData.FileItem          -> BoundedInputStream(streamProvider(), maxInputSize)
+      is PartData.FileItem          -> BoundedInputStream(provider().toInputStream(), maxInputSize)
       is PartData.FormItem          -> BoundedInputStream(value.byteInputStream(), maxInputSize)
     }
   ) {

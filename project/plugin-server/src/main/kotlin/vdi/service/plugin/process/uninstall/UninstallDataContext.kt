@@ -12,8 +12,8 @@ class UninstallDataContext(
   override val request: UninstallRequest,
   override val installPath: Path,
   override val databaseConfig: TargetDatabaseDetails,
-  val scriptConfig: UninstallScript,
-): InstallScriptContext<UninstallRequest> {
+  override val scriptConfig: UninstallScript,
+): InstallScriptContext<UninstallRequest, UninstallScript> {
   override val eventID: EventID
     get() = request.eventID
 
@@ -22,6 +22,9 @@ class UninstallDataContext(
 
   override val installTarget
     get() = request.installTarget
+
+  override val dataPropertiesPath: Path?
+    get() = null
 
   override fun toString() = "UninstallContext(datasetID: $datasetID, projectID: $installTarget)"
 }

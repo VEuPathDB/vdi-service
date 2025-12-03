@@ -16,7 +16,8 @@ import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.model.MissingDependencyError
 import vdi.service.plugin.model.PluginScriptError
 import vdi.service.plugin.model.ValidationError
-import vdi.service.plugin.process.install.meta.InstallMetaScript
+import vdi.service.plugin.process.install.meta.InstallMetaHandler
+import vdi.service.plugin.process.install.meta.InstallMetaHandler.Companion.InstallMetaJob
 import vdi.service.plugin.script.ScriptExecutor
 import vdi.service.plugin.service.*
 import vdi.util.io.LineListOutputStream
@@ -45,7 +46,15 @@ class InstallDataHandler(context: InstallDataContext, executor: ScriptExecutor, 
 
     runInstallData(installWorkspace, warnings)
 
-    runInstallMeta(metaFile, scriptContext.metaConfig)
+    InstallMetaHandler.runJob(InstallMetaJob(
+      executor,
+      workspace,
+      metaFile,
+      scriptContext,
+      metrics,
+      buildScriptEnv(),
+      scriptContext.metaLogger(),
+    ))
 
     return newValidationResponse(true, warnings)
   }
@@ -137,50 +146,6 @@ class InstallDataHandler(context: InstallDataContext, executor: ScriptExecutor, 
           }
 
           else -> throw PluginScriptError(scriptContext.compatConfig, compatStatus)
-            .also { log.error(it.message) }
-        }
-      }
-    }
-  }
-
-  private suspend fun runInstallMeta(metaFile: Path, script: InstallMetaScript) {
-    val log = scriptContext.metaLogger()
-    val timer = metrics.installMetaScriptDuration.startTimer()
-    val warnings = ArrayList<String>(8)
-
-    logger.info("executing install-meta (for install-data)")
-
-    executor.executeScript(
-      script.path,
-      workspace,
-      arrayOf(datasetID.toString(), metaFile.absolutePathString()),
-      buildScriptEnv()
-    ) {
-      coroutineScope {
-        val logJob = launch { LoggingOutputStream(log).use { scriptStdErr.transferTo(it) } }
-        val warnJob = launch { LineListOutputStream(warnings).use { scriptStdOut.transferTo(it) } }
-
-        waitFor(script.maxDuration)
-
-        logJob.join()
-        warnJob.join()
-
-        val status = InstallMetaScript.ExitCode.fromCode(exitCode())
-
-        metrics.installMetaCalls.labelValues(status.displayName).inc()
-
-        when (status) {
-          InstallMetaScript.ExitCode.Success -> {
-            val dur = timer.observeDuration()
-            log.info("script completed successfully in {}", dur.seconds)
-          }
-
-          InstallMetaScript.ExitCode.ValidationError -> {
-            log.info("script failed validation with {} warnings", warnings.size)
-            throw ValidationError(newValidationResponse(false, warnings))
-          }
-
-          else -> throw PluginScriptError(script, status)
             .also { log.error(it.message) }
         }
       }

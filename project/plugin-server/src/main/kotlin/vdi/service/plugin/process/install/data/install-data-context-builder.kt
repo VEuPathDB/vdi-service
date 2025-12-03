@@ -14,7 +14,6 @@ import java.nio.file.Path
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.io.path.createDirectories
 import vdi.io.plugin.requests.FormField
 import vdi.io.plugin.requests.InstallDataRequest
 import vdi.model.meta.DatasetManifest
@@ -22,38 +21,35 @@ import vdi.model.meta.DatasetMetadata
 import vdi.service.plugin.model.ApplicationContext
 import vdi.service.plugin.server.context.*
 import vdi.service.plugin.util.parseAsJson
-import vdi.util.fs.TempFiles
 
 private const val INSTALL_PAYLOAD_FILE_NAME = "install-ready.zip"
 private const val INSTALL_DETAILS_MAX_SIZE = 1024uL
 
 @Suppress("DuplicatedCode")
-@OptIn(ExperimentalContracts::class)
 suspend fun ApplicationCall.withInstallDataContext(
   appCtx: ApplicationContext,
   fn: suspend (InstallDataContext) -> Unit,
 ) {
-  contract { callsInPlace(fn, InvocationKind.EXACTLY_ONCE) }
-
   if (!request.contentType().match(ContentType.MultiPart.FormData))
     throw UnsupportedMediaTypeException(request.contentType())
 
-  TempFiles.withTempDirectory { workspace -> withContext(Dispatchers.IO) { withParsedRequest(appCtx, workspace, fn) } }
+  withDoubleTempDirs { workspace, propsPath -> withContext(Dispatchers.IO) {
+    withParsedRequest(appCtx, workspace, propsPath, fn)
+  } }
 }
 
 @OptIn(ExperimentalContracts::class)
 private suspend fun ApplicationCall.withParsedRequest(
   appCtx: ApplicationContext,
   workspace: Path,
+  propsDir: Path,
   fn: suspend (context: InstallDataContext) -> Unit,
 ) {
   contract { callsInPlace(fn, InvocationKind.EXACTLY_ONCE) }
 
-  val dataDictDir = workspace.resolve(DataDictionaryDirectoryName)
-
-  var details: InstallDataRequest? = null
-  var payload: Path? = null
-  var meta: DatasetMetadata? = null
+  var details:  InstallDataRequest? = null
+  var payload:  Path? = null
+  var meta:     DatasetMetadata? = null
   var manifest: DatasetManifest? = null
 
   receiveMultipart().forEachPart { part ->
@@ -80,7 +76,7 @@ private suspend fun ApplicationCall.withParsedRequest(
         }
 
         FormField.DataDict -> {
-          part.handlePayload(dataDictDir.createDirectories(), (part as PartData.FileItem).originalFileName!!)
+          part.handlePayload(propsDir, (part as PartData.FileItem).originalFileName!!)
         }
       }
     } finally {
@@ -96,20 +92,19 @@ private suspend fun ApplicationCall.withParsedRequest(
   details.also { deets ->
     deets.validate()
     withDatabaseDetails(deets.installTarget, meta.type) {
-      fn(
-        InstallDataContext(
-          workspace = workspace,
-          customPath = appCtx.config.customPath,
-          request = deets,
-          installPath = appCtx.pathFactory.makePath(deets.installTarget, deets.vdiID),
-          databaseConfig = it,
-          metadata = meta,
-          payload = payload,
-          metaConfig = appCtx.config.installMetaScript,
-          dataConfig = appCtx.config.installDataScript,
-          compatConfig = appCtx.config.checkCompatScript,
-        )
-      )
+      fn(InstallDataContext(
+        workspace          = workspace,
+        customPath         = appCtx.config.customPath,
+        request            = deets,
+        installPath        = appCtx.pathFactory.makePath(deets.installTarget, deets.vdiID),
+        databaseConfig     = it,
+        metadata           = meta,
+        payload            = payload,
+        metaConfig         = appCtx.config.installMetaScript,
+        dataConfig         = appCtx.config.installDataScript,
+        compatConfig       = appCtx.config.checkCompatScript,
+        dataPropertiesPath = propsDir,
+      ))
     }
   }
 }

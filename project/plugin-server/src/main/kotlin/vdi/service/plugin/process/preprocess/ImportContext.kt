@@ -12,8 +12,8 @@ data class ImportContext(
   override val request: ImportRequest,
   val importReadyZip: Path,
   val dataDictPath: Path,
-  val scriptConfig: ImportScript,
-): ScriptContext<ImportRequest> {
+  override val scriptConfig: ImportScript,
+): ScriptContext<ImportRequest, ImportScript> {
   inline val metadata
     get() = request.meta
 

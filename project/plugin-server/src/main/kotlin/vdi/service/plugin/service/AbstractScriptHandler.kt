@@ -9,7 +9,7 @@ import vdi.model.Environment
 import vdi.service.plugin.consts.ScriptEnvKey
 import vdi.service.plugin.server.context.ScriptContext
 
-abstract class AbstractScriptHandler<T, C: ScriptContext<*>>(
+abstract class AbstractScriptHandler<T, C: ScriptContext<*, *>>(
   protected val scriptContext: C,
   protected val executor: ScriptExecutor,
   protected val metrics: ScriptMetrics,

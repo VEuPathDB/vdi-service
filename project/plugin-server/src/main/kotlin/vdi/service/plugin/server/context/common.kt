@@ -9,6 +9,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.io.path.createFile
 import kotlin.io.path.outputStream
+import vdi.util.fs.TempFiles
 
 internal const val DataDictionaryDirectoryName = "data-dict"
 
@@ -27,6 +28,9 @@ internal fun PartData.handlePayload(workspace: Path, fileName: String): Path {
 
   return payload
 }
+
+internal suspend fun <T> withDoubleTempDirs(fn: suspend (Path, Path) -> T): T =
+  TempFiles.withTempDirectory { dir1 -> TempFiles.withTempDirectory { dir2 -> fn(dir1, dir2) } }
 
 @Suppress("NOTHING_TO_INLINE")
 @OptIn(ExperimentalContracts::class)

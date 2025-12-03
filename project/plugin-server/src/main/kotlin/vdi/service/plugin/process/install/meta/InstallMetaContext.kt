@@ -7,13 +7,14 @@ import vdi.model.EventID
 import vdi.service.plugin.server.context.InstallScriptContext
 
 data class InstallMetaContext(
-  override val workspace: Path,
-  override val customPath: String,
-  override val request: InstallMetaRequest,
-  override val installPath: Path,
-  override val databaseConfig: TargetDatabaseDetails,
-  val scriptConfig: InstallMetaScript,
-): InstallScriptContext<InstallMetaRequest> {
+  override val workspace:          Path,
+  override val customPath:         String,
+  override val request:            InstallMetaRequest,
+  override val installPath:        Path,
+  override val dataPropertiesPath: Path?,
+  override val databaseConfig:     TargetDatabaseDetails,
+  override val scriptConfig:       InstallMetaScript,
+): InstallScriptContext<InstallMetaRequest, InstallMetaScript> {
   inline val ownerID
     get() = metadata.owner
 

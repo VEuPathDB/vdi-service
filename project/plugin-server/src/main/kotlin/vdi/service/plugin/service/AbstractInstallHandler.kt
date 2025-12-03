@@ -8,11 +8,11 @@ import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.script.ScriptExecutor
 import vdi.service.plugin.server.context.InstallScriptContext
 
-abstract class AbstractInstallHandler<T, C: InstallScriptContext<*>>(
+abstract class AbstractInstallHandler<T, C: InstallScriptContext<*, *>>(
   scriptContext: C,
-  executor: ScriptExecutor,
-  metrics: ScriptMetrics,
-  logger: Logger,
+  executor:      ScriptExecutor,
+  metrics:       ScriptMetrics,
+  logger:        Logger,
 ): AbstractScriptHandler<T, C>(scriptContext, executor, metrics, logger) {
   protected inline val projectID
     get() = scriptContext.installTarget

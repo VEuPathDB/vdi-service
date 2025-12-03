@@ -8,5 +8,5 @@ object FormField {
   const val Manifest = "manifest"
   const val Metadata = "meta"
   const val Payload  = "payload"
-  const val DataDict = "dataDictionary"
+  const val DataDict = "dataProperties"
 }
