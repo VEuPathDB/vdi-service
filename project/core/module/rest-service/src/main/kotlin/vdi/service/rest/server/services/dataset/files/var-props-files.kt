@@ -13,18 +13,22 @@ import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.PutDatasetsFilesV
 
 fun DatasetFiles.getVariablePropertiesFile(
   datasetID: DatasetID,
-  fileName: String,
-  download: Boolean,
-  forAdmin: Boolean,
+  fileName:  String,
+  download:  Boolean,
+  forAdmin:  Boolean,
 ): GetResponse {
   val dataset = ((
     if (forAdmin) CacheDB().selectDataset(datasetID)
     else CacheDB().selectDatasetForUser(userID, datasetID)
-  ) ?: return Static404.wrap())
-    .also { if (it.isDeleted) return GoneError().wrap() }
+  ) ?: return Respond404())
+    .also { if (it.isDeleted) return Respond410() }
+
+  (PluginRegistry.configDataOrNullFor(dataset.type)
+    ?: return Respond400("data type ${dataset.type} is not currently enabled"))
+    .also { meta -> if (!meta.usesDataPropertiesFiles) return Respond404() }
 
   val stream = DatasetStore.getVariablePropertiesFile(dataset.ownerID, datasetID, fileName)?.stream
-    ?: return Static404.wrap()
+    ?: return Respond404()
 
   return GetResponse.respond200WithTextTabSeparatedValues(
     StreamingOutput { stream.use { file -> file.transferTo(it) } },
@@ -37,20 +41,20 @@ fun DatasetFiles.getVariablePropertiesFile(
 
 fun DatasetFiles.putVariablePropertiesFile(
   datasetID: DatasetID,
-  fileName: String,
-  file: File,
-  forAdmin: Boolean,
+  fileName:  String,
+  file:      File,
+  forAdmin:  Boolean,
 ): PutResponse {
-  val dataset = (CacheDB().selectDataset(datasetID) ?: return Static404.wrap())
-    .also { if (it.isDeleted) return GoneError().wrap() }
+  val dataset = (CacheDB().selectDataset(datasetID) ?: return Respond404())
+    .also { if (it.isDeleted) return Respond410() }
     .takeIf { forAdmin || it.ownerID == userID }
-    ?: return ForbiddenError("cannot modify unowned dataset").wrap()
+    ?: return Respond403("cannot modify unowned dataset")
 
   val dtConfig = PluginRegistry.configDataOrNullFor(dataset.type)
-    ?: return BadRequestError("dataset data type is disabled").wrap()
+    ?: return Respond400("data type ${dataset.type} is not currently enabled")
 
   if (!dtConfig.usesDataPropertiesFiles)
-    return ForbiddenError("dataset type does not permit ${dtConfig.varPropertiesFileNamePlural.lowercase()}").wrap()
+    return Respond403("dataset type does not permit ${dtConfig.varPropertiesFileNamePlural.lowercase()}")
 
   DatasetStore.putVariablePropertiesFile(dataset.ownerID, datasetID, fileName, file::inputStream)
 

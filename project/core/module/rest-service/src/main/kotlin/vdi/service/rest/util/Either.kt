@@ -41,6 +41,12 @@ inline fun <L, R> Either<L, R>.leftOrNull(): L? =
 inline fun <L, R> Either<L, R>.rightOrNull(): R? =
   if (isRight) unwrapRight() else null
 
+inline fun <L, R, NL> Either<L, R>.flatMapLeft(fn: (L) -> Either<NL, R>): Either<NL, R> =
+  if (isLeft) fn(unwrapLeft()) else Either.ofRight(unwrapRight())
+
+inline fun <L, R, NR> Either<L, R>.flatMapRight(fn: (R) -> Either<L, NR>): Either<L, NR> =
+  if (isRight) fn(unwrapRight()) else Either.ofLeft(unwrapLeft())
+
 @JvmInline
 private value class LeftEither<L, R>(private val actual: L): Either<L, R> {
   override val isLeft: Boolean

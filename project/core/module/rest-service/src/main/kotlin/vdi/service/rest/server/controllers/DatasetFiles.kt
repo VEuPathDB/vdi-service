@@ -68,15 +68,15 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
     }
 
   override fun getDatasetsFilesVariablePropertiesByVdiIdAndFileName(
-    vdiId: String,
+    vdiId:    String,
     fileName: String,
-    download: Boolean?,
+    download: Boolean?, // THIS MUST BE NULLABLE FOR JERSEY COMPATIBILITY!!!
   ) = getVariablePropertiesFile(DatasetID(vdiId), fileName, download ?: true, maybeUser == null)
 
   override fun putDatasetsFilesVariablePropertiesByVdiIdAndFileName(
-    vdiId: String,
+    vdiId:    String,
     fileName: String,
-    entity: File?,
+    entity:   File?,
   ) = entity
     ?.let { putVariablePropertiesFile(DatasetID(vdiId), fileName, it, maybeUser == null) }
     ?: BadRequestError("upload content not provided").wrap()
