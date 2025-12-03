@@ -22,11 +22,8 @@ class RestService(config: StackConfig, manifest: ManifestConfig): Server() {
   init {
     // Eager load classes for fail-fast
     MetaLogger.info("eagerly loading rest service dependencies")
-    AppDatabaseRegistry
-    InstallTargetRegistry
-    PluginRegistry
-    AppDB()
-    CacheDB()
+
+    initFacades()
 
     DatasetStore.init(config.vdi.objectStore)
     JaxRSMultipartUpload.maxFileUploadSize = options.uploads.maxUploadSize.toLong()
@@ -40,5 +37,14 @@ class RestService(config: StackConfig, manifest: ManifestConfig): Server() {
   override fun newResourceConfig(opts: Options) = Resources(opts as ServiceConfig)
 
   override fun newOptions() = options
+
+  @Suppress("UnusedExpression")
+  private fun initFacades() {
+    AppDatabaseRegistry
+    InstallTargetRegistry
+    PluginRegistry
+    AppDB()
+    CacheDB()
+  }
 }
 

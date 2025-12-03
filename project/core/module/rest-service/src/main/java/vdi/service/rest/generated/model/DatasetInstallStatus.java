@@ -3,6 +3,9 @@ package vdi.service.rest.generated.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum DatasetInstallStatus {
+  @JsonProperty("queued")
+  QUEUED("queued"),
+
   @JsonProperty("running")
   RUNNING("running"),
 

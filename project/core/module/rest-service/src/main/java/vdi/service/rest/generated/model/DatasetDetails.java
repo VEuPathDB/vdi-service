@@ -165,12 +165,6 @@ public interface DatasetDetails extends DatasetMetaBase {
   @JsonProperty(JsonField.RELATED_DATASETS)
   void setRelatedDatasets(List<RelatedDatasetInfo> relatedDatasets);
 
-  @JsonProperty(JsonField.IMPORT_MESSAGES)
-  List<String> getImportMessages();
-
-  @JsonProperty(JsonField.IMPORT_MESSAGES)
-  void setImportMessages(List<String> importMessages);
-
   @JsonProperty(JsonField.SHARES)
   List<ShareOffer> getShares();
 

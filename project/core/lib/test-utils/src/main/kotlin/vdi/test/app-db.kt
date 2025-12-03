@@ -19,8 +19,8 @@ import vdi.core.db.model.SyncControlRecord
 fun mockAppDB(
   accessor: (InstallTargetID, DataType) -> AppDBAccessor? = ::twoParamNull,
   transaction: (InstallTargetID, DataType) -> AppDBTransaction? = ::twoParamNull,
-  bulkStatuses: (Map<InstallTargetID, Collection<DatasetID>>) -> Map<DatasetID, Map<InstallTargetID, InstallStatuses>> = ::oneParamMap,
-  datasetStatuses: (DatasetID, Collection<InstallTargetID>) -> Map<InstallTargetID, InstallStatuses> = ::twoParamMap,
+  bulkStatuses: (Map<InstallTargetID, Collection<DatasetID>>) -> Map<DatasetID, Map<InstallTargetID, InstallStatusDetails>> = ::oneParamMap,
+  datasetStatuses: (DatasetID, Collection<InstallTargetID>) -> Map<InstallTargetID, InstallStatusDetails> = ::twoParamMap,
 ): AppDB =
   mock {
     on { getDatasetStatuses(any()) } doAnswer { bulkStatuses(it.getArgument(0)) }

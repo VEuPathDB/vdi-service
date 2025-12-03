@@ -15,7 +15,7 @@ import vdi.service.rest.util.Either.Companion.right
 
 fun DatasetPostRequestBody.cleanup() {
   details?.cleanup()
-  url = url.takeUnless(String::isNullOrBlank)?.trim()
+  url = url?.takeUnless(String::isBlank)?.trim()
   dataFiles = dataFiles.takeUnless(Collection<*>::isNullOrEmpty)
   docFiles = docFiles.takeUnless(Collection<*>::isNullOrEmpty)
   mappingFiles = mappingFiles.takeUnless(Collection<*>::isNullOrEmpty)
@@ -39,7 +39,7 @@ fun DatasetPostRequestBody.validate(): Either<BadRequestError, ValidationErrors>
 
     try {
       URI(url).toURL()
-    } catch (e: IllegalArgumentException){
+    } catch (_: IllegalArgumentException){
       return left(BadRequestError("invalid source URL"))
     }
   } else if (url != null) {

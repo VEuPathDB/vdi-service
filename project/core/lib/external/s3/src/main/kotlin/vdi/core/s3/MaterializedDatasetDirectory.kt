@@ -47,8 +47,6 @@ internal class MaterializedDatasetDirectory(
   private val mappingFiles: List<MappingFile>,
 ): DatasetDirectory {
   companion object {
-    // throws
-    @JvmStatic
     fun build(
       bucket: S3Bucket,
       objects: List<S3Object>,
@@ -68,8 +66,7 @@ internal class MaterializedDatasetDirectory(
       val mappingFiles = ArrayList<MappingFile>(1)
 
       objects.forEach {
-        val path = "${it.bucket.name}/${it.path}"
-          .toDatasetPathOrNull()
+        val path = "${it.bucket.name}/${it.path}".toDatasetPathOrNull()
           ?: throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
 
         when (path) {

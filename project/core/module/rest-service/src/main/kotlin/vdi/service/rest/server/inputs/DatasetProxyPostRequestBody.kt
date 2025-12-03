@@ -45,7 +45,7 @@ fun DatasetProxyPostRequestBody.validate(): ValidationErrors {
     try {
       // validate url format
       URI(url).toURL()
-    } catch (e: IllegalArgumentException) {
+    } catch (_: IllegalArgumentException) {
       throw BadRequestException("invalid source URL")
     }
   } else if (url != null) {

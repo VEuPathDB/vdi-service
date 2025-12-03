@@ -9,14 +9,14 @@ import java.util.List;
 )
 public interface DatasetStatusInfo {
   @JsonProperty(JsonField.IMPORT)
-  DatasetImportStatus getImport();
+  DatasetImportStatusDetails getImport();
 
   @JsonProperty(JsonField.IMPORT)
-  void setImport(DatasetImportStatus importVariable);
+  void setImport(DatasetImportStatusDetails importVariable);
 
   @JsonProperty(JsonField.INSTALL)
-  List<DatasetInstallStatusEntry> getInstall();
+  List<DatasetInstallStatusListEntry> getInstall();
 
   @JsonProperty(JsonField.INSTALL)
-  void setInstall(List<DatasetInstallStatusEntry> install);
+  void setInstall(List<DatasetInstallStatusListEntry> install);
 }

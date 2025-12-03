@@ -1,10 +1,6 @@
 package vdi.core.s3
 
 import org.veupathdb.lib.s3.s34k.buckets.S3Bucket
-import java.util.Spliterator
-import java.util.Spliterators
-import java.util.stream.Stream
-import java.util.stream.StreamSupport
 import vdi.core.s3.paths.S3DatasetPathFactory
 import vdi.core.s3.paths.S3Paths
 import vdi.model.meta.DatasetID
@@ -20,12 +16,8 @@ internal class DatasetObjectStoreImpl(private val s3Bucket: S3Bucket): DatasetOb
       .commonPrefixes()
       .map(::DatasetID)
 
-  override fun streamAllDatasets(): Stream<DatasetDirectory> =
-    StreamSupport.stream(
-      Spliterators.spliteratorUnknownSize(
-      DatasetDirIterator(s3Bucket, s3Bucket.objects.stream().stream().iterator()),
-      Spliterator.ORDERED
-    ), false)
+  override fun streamAllDatasets(): Iterator<DatasetDirectory> =
+    DatasetDirIterator(s3Bucket, s3Bucket.objects.stream().stream().iterator())
 
   override fun listUsers(): List<UserID> =
     s3Bucket.objects.listSubPaths()

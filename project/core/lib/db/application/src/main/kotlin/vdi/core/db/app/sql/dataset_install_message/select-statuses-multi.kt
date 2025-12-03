@@ -6,6 +6,7 @@ import io.foxcapades.kdbc.withResults
 import java.sql.Connection
 import kotlin.math.max
 import kotlin.math.min
+import vdi.core.db.app.model.InstallStatusDetails
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.sql.Table
@@ -35,14 +36,15 @@ private const val SQL_GET_STATUSES_SUFFIX = """
 """
 
 internal fun Connection.selectInstallStatuses(
-  schema: String,
+  schema:     String,
   datasetIDs: Collection<DatasetID>
-): Map<DatasetID, InstallStatuses> {
+): Map<DatasetID, InstallStatuses?> {
   if (datasetIDs.isEmpty())
     return emptyMap()
 
-  val result = HashMap<DatasetID, InstallStatuses>(datasetIDs.size)
-  val list   = datasetIDs.toList()
+  val result = HashMap<DatasetID, InstallStatuses?>(datasetIDs.size)
+    .apply { datasetIDs.forEach { put(it, null) } }
+  val list = datasetIDs.toList()
 
   for (offset in list.indices step 1000) {
     val limit = min(1000, max(list.size - offset, 0))
@@ -65,26 +67,15 @@ internal fun Connection.selectInstallStatuses(
 
       withResults { forEach {
         val datasetID = reqDatasetID("dataset_id")
-        val type      = getInstallType("install_type")
-        val status    = getInstallStatus("status")
-        val message   = getString("message")
+        val details   = InstallStatusDetails(getInstallStatus("status"), listOf(getString("message")))
 
-        if (datasetID in result) {
-          when (type) {
-            InstallType.Meta -> result[datasetID]!!.apply {
-              meta = status
-              metaMessages = listOf(message)
-            }
-
-            InstallType.Data -> result[datasetID]!!.apply {
-              data = status
-              dataMessages = listOf(message)
-            }
+        when (getInstallType("install_type")) {
+          InstallType.Meta -> result.compute(datasetID) { _, value ->
+            value?.copy(meta = details) ?: InstallStatuses(meta = details)
           }
-        } else {
-          result[datasetID] = when (type) {
-            InstallType.Meta -> InstallStatuses(meta = status, metaMessages = listOf(message))
-            InstallType.Data -> InstallStatuses(data = status, dataMessages = listOf(message))
+
+          InstallType.Data -> result.compute(datasetID) { _, value ->
+            value?.copy(data = details) ?: InstallStatuses(data = details)
           }
         }
       } }

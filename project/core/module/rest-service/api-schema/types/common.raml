@@ -220,10 +220,18 @@ types:
     - invalid
     - failed
 
+  DatasetImportStatusDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      status: DatasetImportStatus
+      messages?: string[]
+
   DatasetInstallStatus:
     displayName: Dataset Install Status
     type: string
     enum:
+    - queued
     - running
     - complete
     - failed-validation
@@ -231,16 +239,21 @@ types:
     - ready-for-reinstall
     - missing-dependency
 
-  DatasetInstallStatusEntry:
+  DatasetInstallStatusDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      status: DatasetInstallStatus
+      messages?: string[]
+
+  DatasetInstallStatusListEntry:
     displayName: Dataset Install Target Status
     description: Entry in a list of install statuses for a dataset.
     additionalProperties: false
     properties:
       installTarget: InstallTargetID
-      metaStatus: DatasetInstallStatus
-      metaMessages?: string[]
-      dataStatus?: DatasetInstallStatus
-      dataMessages?: string[]
+      meta: DatasetInstallStatusDetails
+      data?: DatasetInstallStatusDetails
 
   DatasetMetaBase:
     displayName: Dataset Meta Base Fields
@@ -416,8 +429,8 @@ types:
     description: Information about the import and install status of a dataset.
     additionalProperties: false
     properties:
-      import: DatasetImportStatus
-      install?: DatasetInstallStatusEntry[]
+      import: DatasetImportStatusDetails
+      install: DatasetInstallStatusListEntry[]
 
   DatasetSummary:
     description: Brief summary of the dataset.

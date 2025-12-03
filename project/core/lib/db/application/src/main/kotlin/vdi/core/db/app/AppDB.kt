@@ -6,9 +6,9 @@ import vdi.model.meta.DatasetType
 import vdi.model.meta.InstallTargetID
 
 interface AppDB {
-  fun getDatasetStatuses(targets: Map<InstallTargetID, Collection<DatasetID>>): Map<DatasetID, Map<InstallTargetID, InstallStatuses>>
+  fun getDatasetStatuses(targets: Map<InstallTargetID, Collection<DatasetID>>): Map<DatasetID, Map<InstallTargetID, InstallStatuses?>>
 
-  fun getDatasetStatuses(target: DatasetID, projects: Collection<InstallTargetID>): Map<InstallTargetID, InstallStatuses>
+  fun getDatasetStatuses(target: DatasetID, projects: Collection<InstallTargetID>): Map<InstallTargetID, InstallStatuses?>
 
   fun accessor(key: InstallTargetID, dataType: DatasetType): AppDBAccessor?
 

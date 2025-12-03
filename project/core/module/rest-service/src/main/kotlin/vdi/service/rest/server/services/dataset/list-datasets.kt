@@ -86,7 +86,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
   return datasetList.map {
     it.toExternal(
       owner    = userDetails.requireDetails(it.ownerID),
-      statuses = datasetInstallStatusMap[it.datasetID],
+      statuses = datasetInstallStatusMap[it.datasetID] ?: emptyMap(), // TODO investigate: why would this be null?
       fileInfo = fileSummaries[it.datasetID],
       shares   = if (it.ownerID != requesterID)
         null

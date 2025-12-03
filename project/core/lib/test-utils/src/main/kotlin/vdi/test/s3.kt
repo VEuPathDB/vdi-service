@@ -102,7 +102,7 @@ fun mockDatasetDirectory(
 fun mockDatasetManager(
   onGetDatasetDirectory: BiFn<UserID, DatasetID, vdi.core.s3.DatasetDirectory> = { u, d -> mockDatasetDirectory(ownerID = u, datasetID = d) },
   onListDatasets: Fn<UserID, List<DatasetID>> = ::oneParamList,
-  onStreamAllDatasets: Pro<Stream<vdi.core.s3.DatasetDirectory>> = { Stream.empty() },
+  onStreamAllDatasets: Pro<Sequence<vdi.core.s3.DatasetDirectory>> = { emptySequence() },
   onListUsers: Pro<List<UserID>> = ::noParamList,
 ): DatasetObjectStore =
   mock {

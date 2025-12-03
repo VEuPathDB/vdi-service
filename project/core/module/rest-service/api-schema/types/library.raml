@@ -379,13 +379,6 @@ types:
           or by having one or more publications in common.
         type: RelatedDatasetInfo[]
         uniqueItems: true
-      importMessages?:
-        # language=markdown
-        description: |
-          Log lines from the import process.
-
-          These messages will be warnings and/or validation errors.
-        type: string[]
       shares?:
         # language=markdown
         description: |
@@ -456,27 +449,38 @@ types:
       - complete
       - invalid
       - failed
+  DatasetImportStatusDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      status: DatasetImportStatus
+      messages?: string[]
   DatasetInstallStatus:
     displayName: Dataset Install Status
     type: string
     enum:
+      - queued
       - running
       - complete
       - failed-validation
       - failed-installation
       - ready-for-reinstall
       - missing-dependency
-  DatasetInstallStatusEntry:
+  DatasetInstallStatusDetails:
+    type: object
+    additionalProperties: false
+    properties:
+      status: DatasetInstallStatus
+      messages?: string[]
+  DatasetInstallStatusListEntry:
     displayName: Dataset Install Target Status
     description: Entry in a list of install statuses for a dataset.
     type: object
     additionalProperties: false
     properties:
       installTarget: InstallTargetID
-      metaStatus: DatasetInstallStatus
-      metaMessages?: string[]
-      dataStatus?: DatasetInstallStatus
-      dataMessages?: string[]
+      meta: DatasetInstallStatusDetails
+      data?: DatasetInstallStatusDetails
   DatasetListEntry:
     displayName: Dataset Listing Item
     description: Short entry with basic details about a dataset.
@@ -868,8 +872,8 @@ types:
     type: object
     additionalProperties: false
     properties:
-      import: DatasetImportStatus
-      install?: DatasetInstallStatusEntry[]
+      import: DatasetImportStatusDetails
+      install: DatasetInstallStatusListEntry[]
   DatasetSummary:
     description: Brief summary of the dataset.
     type: string

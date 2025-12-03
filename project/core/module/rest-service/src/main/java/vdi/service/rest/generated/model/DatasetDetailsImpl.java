@@ -36,7 +36,6 @@ import java.util.List;
     "revisionHistory",
     "shortName",
     "relatedDatasets",
-    "importMessages",
     "shares",
     "status",
     "files"
@@ -119,9 +118,6 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty(JsonField.RELATED_DATASETS)
   private List<RelatedDatasetInfo> relatedDatasets;
-
-  @JsonProperty(JsonField.IMPORT_MESSAGES)
-  private List<String> importMessages;
 
   @JsonProperty(JsonField.SHARES)
   private List<ShareOffer> shares;
@@ -390,16 +386,6 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty(JsonField.RELATED_DATASETS)
   public void setRelatedDatasets(List<RelatedDatasetInfo> relatedDatasets) {
     this.relatedDatasets = relatedDatasets;
-  }
-
-  @JsonProperty(JsonField.IMPORT_MESSAGES)
-  public List<String> getImportMessages() {
-    return this.importMessages;
-  }
-
-  @JsonProperty(JsonField.IMPORT_MESSAGES)
-  public void setImportMessages(List<String> importMessages) {
-    this.importMessages = importMessages;
   }
 
   @JsonProperty(JsonField.SHARES)

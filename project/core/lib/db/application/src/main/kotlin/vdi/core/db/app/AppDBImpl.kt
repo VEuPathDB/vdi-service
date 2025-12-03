@@ -8,18 +8,19 @@ import vdi.model.meta.DatasetType
 import vdi.model.meta.InstallTargetID
 
 internal object AppDBImpl : AppDB {
-  override fun getDatasetStatuses(targets: Map<InstallTargetID, Collection<DatasetID>>): Map<DatasetID, Map<InstallTargetID, InstallStatuses>> {
-    val result = HashMap<DatasetID, MutableMap<InstallTargetID, InstallStatuses>>(100)
+  override fun getDatasetStatuses(targets: Map<InstallTargetID, Collection<DatasetID>>): Map<DatasetID, Map<InstallTargetID, InstallStatuses?>> {
+    val result = HashMap<DatasetID, MutableMap<InstallTargetID, InstallStatuses?>>(64)
 
     for ((projectID, datasetIDs) in targets) {
       for ((dataType, _) in AppDatabaseRegistry[projectID] ?: emptyList()) {
         val ds = AppDatabaseRegistry.require(projectID, dataType)
 
         ds.dataSource.connection.use { con ->
-          con.selectInstallStatuses(ds.details.schema, datasetIDs)
-            .forEach { (datasetID, statuses) ->
-              result.computeIfAbsent(datasetID) { HashMap() }[projectID] = statuses
-            }
+          val statuses = con.selectInstallStatuses(ds.details.schema, datasetIDs)
+
+          datasetIDs.forEach { datasetID ->
+            result.computeIfAbsent(datasetID) { HashMap(1) }[projectID] = statuses[datasetID]
+          }
         }
       }
     }

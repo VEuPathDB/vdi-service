@@ -1,7 +1,5 @@
 package vdi.service.rest.server.services.admin.report
 
-import vdi.model.meta.DatasetID
-import vdi.model.meta.InstallTargetID
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.AppDatabaseRegistry
 import vdi.core.db.app.model.DatasetRecord
@@ -9,6 +7,8 @@ import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.app.model.InstallType
 import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
 import vdi.service.rest.generated.model.BrokenDatasetInstallDetails
 import vdi.service.rest.generated.model.BrokenDatasetInstallDetailsImpl
 import vdi.service.rest.generated.model.BrokenDatasetInstallReportBodyImpl
@@ -108,12 +108,12 @@ private fun getBrokenDatasets(installTarget: InstallTargetID) =
 
 private fun DatasetRecord.toDetails(
   projects: Collection<InstallTargetID>,
-  statuses: Map<InstallTargetID, InstallStatuses>,
+  statuses: Map<InstallTargetID, InstallStatuses?>,
 ) =
   BrokenDatasetInstallDetailsImpl().also { out ->
     out.datasetId      = datasetID.toString()
     out.owner          = owner.toLong()
     out.datasetType    = type.toExternal()
     out.installTargets = projects.toList()
-    out.status         = DatasetStatusInfo(DatasetImportStatus.Complete, statuses)
+    out.status         = DatasetStatusInfo(DatasetImportStatus.Complete, null, statuses)
   }

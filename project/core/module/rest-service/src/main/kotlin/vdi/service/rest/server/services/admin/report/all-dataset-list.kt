@@ -1,12 +1,12 @@
 package vdi.service.rest.server.services.admin.report
 
-import vdi.model.meta.DatasetID
-import vdi.model.meta.InstallTargetID
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.AdminAllDatasetsRow
 import vdi.core.db.cache.query.AdminAllDatasetsQuery
+import vdi.model.meta.DatasetID
+import vdi.model.meta.InstallTargetID
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse.respond200WithApplicationJson
@@ -50,7 +50,7 @@ internal fun listAllDatasets(
   ))
 }
 
-private fun getAppDBStatuses(datasets: Collection<AdminAllDatasetsRow>): Map<DatasetID, Map<InstallTargetID, InstallStatuses>> {
+private fun getAppDBStatuses(datasets: Collection<AdminAllDatasetsRow>): Map<DatasetID, Map<InstallTargetID, InstallStatuses?>> {
   val projectToDatasetID = HashMap<String, MutableSet<DatasetID>>(datasets.size)
 
   datasets.forEach { ds ->
@@ -86,8 +86,8 @@ private fun AllDatasetsListMeta(
   }
 
 private fun AllDatasetsListEntry(
-  row: AdminAllDatasetsRow,
-  statuses: Map<InstallTargetID, InstallStatuses>
+  row:      AdminAllDatasetsRow,
+  statuses: Map<InstallTargetID, InstallStatuses?>
 ): AllDatasetsListEntry =
   AllDatasetsListEntryImpl().also {
     it.datasetId = row.datasetID.toString()
@@ -99,7 +99,7 @@ private fun AllDatasetsListEntry(
     it.description = row.description
     it.origin = row.origin
     it.installTargets = row.projects
-    it.status = DatasetStatusInfo(row.importStatus, statuses)
+    it.status = DatasetStatusInfo(row.importStatus, null, statuses)
     it.created = row.created.defaultZone()
     it.isDeleted = row.isDeleted
     it.programName = row.programName

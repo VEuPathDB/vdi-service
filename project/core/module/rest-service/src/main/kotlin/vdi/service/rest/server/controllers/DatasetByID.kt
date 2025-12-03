@@ -39,7 +39,7 @@ class DatasetByID(@Context request: ContainerRequest, @param:Context val uploadC
           // check if it has been revised.  If there is a newer revision,
           // redirect to the new dataset ID endpoint.
           it.unwrapRight().let { oRes ->
-            if (oRes.status == 404)
+            if (oRes.status == 404 || oRes.status == 410)
               getLatestRevision(vdiID, ::redirectURL) ?: oRes
             else
               oRes

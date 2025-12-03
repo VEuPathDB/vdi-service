@@ -4,9 +4,9 @@ package vdi.service.rest.server.services.dataset
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import vdi.core.db.app.AppDB
 import vdi.core.db.cache.CacheDB
-import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.cache.model.RelatedDataset
+import vdi.core.util.orElse
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.DatasetVisibility
@@ -28,13 +28,13 @@ import vdi.service.rest.util.Either.Companion.right
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
  * return user information.
  */
-fun <T: ControllerBase> T.adminGetDatasetByID(datasetID: DatasetID) =
+fun adminGetDatasetByID(datasetID: DatasetID) =
   getDatasetByID(null, datasetID, true)
 
-fun <T: ControllerBase> T.userGetDatasetByID(datasetID: DatasetID) =
+fun ControllerBase.userGetDatasetByID(datasetID: DatasetID) =
   getDatasetByID(userID, datasetID, false)
 
-private fun <T: ControllerBase> T.getDatasetByID(
+private fun getDatasetByID(
   userID: UserID?,
   datasetID: DatasetID,
   includeDeleted: Boolean,
@@ -45,8 +45,13 @@ private fun <T: ControllerBase> T.getDatasetByID(
   //       call a different method for that if we return 404.
   val dataset = when {
     userID == null -> CacheDB().selectDataset(datasetID)
-    else           -> lookupDatasetForUser(userID, datasetID)
-  } ?: return right(Static404.wrap())
+      ?: return right(Static404.wrap())
+
+    else -> lookupDatasetForUser(userID, datasetID) orElse {
+      CacheDB().selectDataset(datasetID) ?: return right(Static404.wrap())
+      return right(GoneError().wrap())
+    }
+  }
 
   if (!includeDeleted && userID != null && dataset.isDeleted)
     return right(Static404.wrap())
@@ -60,23 +65,14 @@ private fun <T: ControllerBase> T.getDatasetByID(
     emptyList()
   }
 
-  val userDetails = getUserDetails(dataset.ownerID, shares, userID)
-
-  val importStatus = CacheDB().selectImportControl(datasetID)
-
-  val installs = if (importStatus == DatasetImportStatus.Complete)
-    AppDB().getDatasetStatuses(datasetID, metaJson.installTargets)
-  else
-    emptyMap()
-
   return left(DatasetDetails(
     datasetID       = datasetID,
     meta            = metaJson,
-    importStatus    = importStatus,
+    importStatus    = CacheDB().selectImportControl(datasetID),
     importMessages  = CacheDB().selectImportMessages(datasetID),
     shares          = shares,
-    installs        = installs,
-    userInfo        = userDetails,
+    installs        = AppDB().getDatasetStatuses(datasetID, metaJson.installTargets),
+    userInfo        = getUserDetails(dataset.ownerID, shares, userID),
     relatedDatasets = getRelatedDatasets(datasetID, metaJson),
     files           = listDatasetFiles(dataset.ownerID, datasetID)
   ))

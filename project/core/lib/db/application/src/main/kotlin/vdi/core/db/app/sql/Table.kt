@@ -20,7 +20,7 @@ internal object Table {
   const val Projects          = "dataset_project"
   const val Publications      = "dataset_publication"
   const val SampleTypes       = "dataset_sample_type"
-  const val Species          = "dataset_species"
+  const val Species           = "dataset_species"
   const val Visibility        = "dataset_visibility"
   const val SyncControl       = "sync_control"
 }

@@ -4,6 +4,7 @@ import io.foxcapades.kdbc.forEach
 import io.foxcapades.kdbc.withPreparedStatement
 import io.foxcapades.kdbc.withResults
 import java.sql.Connection
+import vdi.core.db.app.model.InstallStatusDetails
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.sql.Table
@@ -27,7 +28,8 @@ WHERE
 """
 
 internal fun Connection.selectInstallStatuses(schema: String, datasetID: DatasetID): InstallStatuses {
-  val result = InstallStatuses()
+  var meta: InstallStatusDetails? = null
+  var data: InstallStatusDetails? = null
 
   withPreparedStatement(sql(schema)) {
     setDatasetID(1, datasetID)
@@ -37,18 +39,11 @@ internal fun Connection.selectInstallStatuses(schema: String, datasetID: Dataset
       val message = getString("message")
 
       when (type) {
-        InstallType.Meta -> {
-          result.meta = status
-          result.metaMessages = listOf(message)
-        }
-
-        InstallType.Data -> {
-          result.data = status
-          result.dataMessages = listOf(message)
-        }
+        InstallType.Meta -> meta = InstallStatusDetails(status, listOf(message))
+        InstallType.Data -> data = InstallStatusDetails(status, listOf(message))
       }
     } }
   }
 
-  return result
+  return InstallStatuses(meta, data)
 }

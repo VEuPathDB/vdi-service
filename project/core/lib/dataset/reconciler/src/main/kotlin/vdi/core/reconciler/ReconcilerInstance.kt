@@ -61,7 +61,7 @@ internal class ReconcilerInstance(
   }
 
   private suspend fun tryReconcile() {
-    targetDB.streamSortedSyncControlRecords().use { tryReconcile(datasetManager.streamAllDatasets().iterator(), it) }
+    targetDB.streamSortedSyncControlRecords().use { tryReconcile(datasetManager.streamAllDatasets(), it) }
   }
 
   private suspend fun tryReconcile(

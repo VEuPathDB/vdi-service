@@ -20,6 +20,10 @@ kotlin {
   jvmToolchain {
     languageVersion = JavaLanguageVersion.of(24)
   }
+  compilerOptions {
+    progressiveMode = true
+    extraWarnings = true
+  }
 }
 
 val libs = the<LibrariesForLibs>()

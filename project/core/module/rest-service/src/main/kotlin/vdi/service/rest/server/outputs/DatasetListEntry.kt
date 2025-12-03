@@ -48,10 +48,10 @@ internal fun DatasetListEntry(
   }
 
 internal fun DatasetRecord.toExternal(
-  owner: UserDetails,
-  statuses: Map<InstallTargetID, InstallStatuses>?,
+  owner:    UserDetails,
+  statuses: Map<InstallTargetID, InstallStatuses?>,
   fileInfo: DatasetFileSummary?,
-  shares: List<DatasetListShareUser>?,
+  shares:   List<DatasetListShareUser>?,
 ): DatasetListEntry {
   return DatasetListEntry(
     datasetID        = datasetID,
@@ -61,7 +61,7 @@ internal fun DatasetRecord.toExternal(
     name             = name,
     origin           = origin,
     installTargets   = projects,
-    status           = DatasetStatusInfo(importStatus, statuses ?: emptyMap()),
+    status           = DatasetStatusInfo(importStatus, null, statuses),
     shares           = shares ?: emptyList(),
     fileCount        = fileInfo?.count?.toInt() ?: 0,
     fileSizeTotal    = fileInfo?.size?.toLong() ?: 0,

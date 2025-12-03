@@ -2,8 +2,6 @@ package vdi.service.rest.server.outputs
 
 import org.veupathdb.lib.container.jaxrs.errors.UnprocessableEntityException
 import org.veupathdb.lib.request.validation.ValidationErrors
-import vdi.model.meta.DatasetID
-import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.support.ResponseDelegate
 

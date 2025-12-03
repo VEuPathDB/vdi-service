@@ -2,7 +2,6 @@ package vdi.core.s3
 
 import vdi.model.meta.DatasetID
 import vdi.model.meta.UserID
-import java.util.stream.Stream
 
 interface DatasetObjectStore {
 
@@ -32,7 +31,7 @@ interface DatasetObjectStore {
    */
   fun listDatasets(ownerID: UserID): List<DatasetID>
 
-  fun streamAllDatasets(): Stream<DatasetDirectory>
+  fun streamAllDatasets(): Iterator<DatasetDirectory>
 
   fun listUsers(): List<UserID>
 }
