@@ -15,6 +15,7 @@ import vdi.core.db.app.withTransaction
 import vdi.core.metrics.Metrics
 import vdi.core.plugin.client.PluginException
 import vdi.core.plugin.client.PluginRequestException
+import vdi.core.plugin.client.model.DataPropertiesFile
 import vdi.core.plugin.client.response.*
 import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.plugin.mapping.PluginHandlers
@@ -165,8 +166,8 @@ object DatasetReinstaller {
     }
 
     try {
-      withInstallBundle(directory) { meta, manifest, data ->
-        handler.client.postInstallData(eventID, dataset.datasetID, installTarget, meta, manifest, data)
+      withInstallFiles(directory) { meta, manifest, data, dataPropsFiles ->
+        handler.client.postInstallData(eventID, dataset.datasetID, installTarget, meta, manifest, data, dataPropsFiles)
       }
     } catch (e: S34KError) { // don't mix up minio errors with request errors
       throw PluginException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, cause = e)
@@ -324,15 +325,45 @@ object DatasetReinstaller {
     throw PluginException.installData(handler.name, installTarget, dataset.owner, dataset.datasetID, message)
   }
 
-  private suspend fun <T> withInstallBundle(
+  private suspend fun <T> withInstallFiles(
     s3Dir: DatasetDirectory,
-    fn:    suspend (meta: InputStream, manifest: InputStream, upload: InputStream) -> T
+    fn: suspend (
+      meta:      InputStream,
+      manifest:  InputStream,
+      upload:    InputStream,
+      propFiles: Iterable<DataPropertiesFile>,
+    ) -> T
   ) =
     s3Dir.getMetaFile().open()!!.use { meta ->
       s3Dir.getManifestFile().open()!!.use { manifest ->
         s3Dir.getInstallReadyFile().open()!!.use { data ->
-          fn(meta, manifest, data)
+          val ogFiles = s3Dir.getDataPropertiesFiles().toMutableList()
+          val dataPropFiles = ArrayList<DataPropertiesFile>(ogFiles.size)
+
+          ogFiles.forEach {
+            try { dataPropFiles.add(DataPropertiesFile(it.baseName, it.open()!!)) }
+            catch (e: Throwable) {
+              dataPropFiles.closeAll()
+              throw e
+            }
+          }
+          ogFiles.clear()
+
+          try {
+            fn(meta, manifest, data, dataPropFiles)
+          } finally {
+            dataPropFiles.closeAll()
+          }
         }
       }
     }
+
+  private fun List<DataPropertiesFile>.closeAll() {
+    forEach {
+      try { it.close() }
+      catch (e: Throwable) {
+        log.error("failed to close object stream for {}", it.name, e)
+      }
+    }
+  }
 }
