@@ -22,10 +22,10 @@ internal fun AppDB.isFullyUninstalled(ctx: ReconciliationContext): Boolean {
 }
 
 internal fun AppDBAccessor.selectAppDatasetRecord(state: ReconciliationContext) =
-  state.safeExec("failed to fetch dataset record from $project") { selectDataset(state.datasetID) }
+  state.safeExec("failed to fetch dataset record from $installTarget") { selectDataset(state.datasetID) }
 
 internal fun AppDBAccessor.selectSyncControl(state: ReconciliationContext) =
-  state.safeExec("failed to fetch dataset sync control record from $project") { selectDatasetSyncControlRecord(state.datasetID) }
+  state.safeExec("failed to fetch dataset sync control record from $installTarget") { selectDatasetSyncControlRecord(state.datasetID) }
 
 internal fun AppDBAccessor.isUninstalled(ctx: ReconciliationContext): Boolean {
   val targetRecord = selectAppDatasetRecord(ctx)
@@ -40,7 +40,7 @@ internal fun AppDBAccessor.isUninstalled(ctx: ReconciliationContext): Boolean {
       " assuming clean database and treating dataset as if it has been successfully uninstalled",
       ctx.userID,
       ctx.datasetID,
-      project
+      installTarget
     )
     return true
   }

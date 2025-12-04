@@ -1,15 +1,10 @@
 package vdi.core.db.app
 
-import org.slf4j.Logger
+import java.time.OffsetDateTime
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import vdi.core.db.app.model.DatasetInstallMessage
 import vdi.core.db.app.model.DatasetRecord
-import vdi.core.db.app.model.InstallStatus
-import vdi.core.db.app.model.InstallType
-import vdi.core.db.model.SyncControlRecord
-import vdi.model.OriginTimestamp
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.DatasetType
@@ -62,36 +57,6 @@ inline fun <T> AppDB.withTransaction(installTarget: InstallTargetID, dataType: D
   return out
 }
 
-/**
- * Executes the given callback function for every dataset type registered for a
- * target project.
- *
- * @param installTarget ID of the project for which registered dataset types should
- * be iterated over.
- *
- * @param fn Function that will be executed for every data type registered for a
- * target dataset.
- */
-inline fun AppDB.accessorForEachDataType(installTarget: InstallTargetID, fn: AppDBAccessor.(DatasetType) -> Unit) {
-  for (entry in AppDatabaseRegistry[installTarget]!!)
-    accessor(installTarget, entry.first)!!.fn(entry.first)
-}
-
-/**
- * Executes the given callback function for every dataset type registered for a
- * target project.
- *
- * @param installTarget ID of the project for which registered dataset types should
- * be iterated over.
- *
- * @param fn Function that will be executed for every data type registered for a
- * target dataset.
- */
-inline fun AppDB.transactionForEachDataType(installTarget: InstallTargetID, fn: AppDBTransaction.(DatasetType) -> Unit) {
-  for (entry in AppDatabaseRegistry[installTarget]!!)
-    transaction(installTarget, entry.first)!!.fn(entry.first)
-}
-
 fun AppDBTransaction.purgeDatasetControlTables(datasetID: DatasetID) {
   deleteAssociatedFactors(datasetID)
   deleteBioprojectIDs(datasetID)
@@ -108,32 +73,72 @@ fun AppDBTransaction.purgeDatasetControlTables(datasetID: DatasetID) {
   deleteDatasetMeta(datasetID)
   deleteDatasetOrganisms(datasetID)
   deleteDatasetProjectLinks(datasetID)
-  deleteDatasetPublications(datasetID)
+  deletePublications(datasetID)
   deleteSampleTypes(datasetID)
   deleteSpecies(datasetID)
   deleteDatasetVisibilities(datasetID)
   deleteDataset(datasetID)
 }
 
-context(logger: Logger)
-fun AppDBTransaction.upsertDatasetRecord(record: DatasetRecord, meta: DatasetMetadata) {
+fun AppDBTransaction.upsertDatasetRecord(
+  record:        DatasetRecord,
+  meta:          DatasetMetadata,
+  metaTimestamp: OffsetDateTime,
+) {
+  val (datasetID) = record
+
+  // Actions written in the same order that the table defs appear in the DDL for
+  // the AppDB schema.
   upsertDataset(record)
-  insertDatasetVisibility(record.datasetID, meta.owner)
-  insertDatasetDependencies(record.datasetID, meta.dependencies)
+  upsertDatasetMeta(datasetID, meta)
+  upsertSyncControlMetaTimestamp(datasetID, metaTimestamp)
+  // upsertDatasetInstallMessage() -- we don't have install messages yet
+  upsertDatasetVisibility(datasetID, meta.owner)
+  tryInsertDatasetProjectLink(datasetID)
+  // upsertDatasetInstallActivity() -- we aren't installing here
+  replace(datasetID, meta.dependencies, ::deleteDependencies, ::insertDependencies)
+  replace(datasetID, meta.publications, ::deletePublications, ::insertPublications)
+  replace(datasetID, meta.externalIdentifiers?.hyperlinks, ::deleteHyperlinks, ::insertHyperlinks)
+  replace(datasetID, meta.contacts, ::deleteContacts, ::insertContacts)
 
-  upsertDatasetInstallMessage(DatasetInstallMessage(record.datasetID, InstallType.Meta, InstallStatus.Running, null))
+  deleteDatasetOrganisms(datasetID)
+  if (meta.experimentalOrganism != null)
+    insertExperimentalOrganism(datasetID, meta.experimentalOrganism!!)
+  if (meta.hostOrganism != null)
+    insertHostOrganism(datasetID, meta.hostOrganism!!)
 
-  logger.debug("inserting sync control record for dataset into app db")
-  insertDatasetSyncControl(
-    SyncControlRecord(
-      datasetID = record.datasetID,
-      sharesUpdated = OriginTimestamp,
-      dataUpdated = OriginTimestamp,
-      metaUpdated = OriginTimestamp,
-    )
-  )
+  replace(datasetID, meta.funding, ::deleteFundingAwards, ::insertFundingAwards)
+
+  deleteCharacteristics(datasetID)
+  meta.characteristics?.also { characteristics -> insertCharacteristics(datasetID, characteristics) }
+
+  replace(datasetID, meta.characteristics?.countries, ::deleteCountries, ::insertCountries)
+  replace(datasetID, meta.characteristics?.studySpecies, ::deleteSpecies, ::insertSpecies)
+  replace(datasetID, meta.characteristics?.diseases, ::deleteDiseases, ::insertDiseases)
+  replace(datasetID, meta.characteristics?.associatedFactors, ::deleteAssociatedFactors, ::insertAssociatedFactors)
+  replace(datasetID, meta.characteristics?.sampleTypes, ::deleteSampleTypes, ::insertSampleTypes)
+  replace(datasetID, meta.externalIdentifiers?.dois, ::deleteDOIs, ::insertDOIs)
+  replace(datasetID, meta.externalIdentifiers?.bioprojectIDs, ::deleteBioprojectIDs, ::insertBioprojectIDs)
+  replace(datasetID, meta.linkedDatasets, ::deleteExternalDatasetLinks, ::insertExternalDatasetLinks)
 }
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun AppDBTransaction.isUniqueConstraintViolation(e: Throwable) =
   platform.isUniqueConstraintViolation(e)
+
+@OptIn(ExperimentalContracts::class)
+private inline fun <T: Any> replace(
+  datasetID: DatasetID,
+  rows: Collection<T>?,
+  delete: (DatasetID) -> Any?,
+  insert: (DatasetID, Iterable<T>) -> Any?,
+) {
+  contract {
+    callsInPlace(delete, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(insert, InvocationKind.AT_MOST_ONCE)
+  }
+
+  delete(datasetID)
+  if (rows?.isNotEmpty() == true)
+    insert(datasetID, rows)
+}

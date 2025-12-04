@@ -6,7 +6,7 @@ import vdi.core.s3.files.DatasetFile
 import vdi.core.s3.files.data.DataFile
 import vdi.core.s3.files.docs.DocumentFile
 import vdi.core.s3.files.flags.FlagFile
-import vdi.core.s3.files.maps.MappingFile
+import vdi.core.s3.files.maps.DataPropertiesFile
 import vdi.core.s3.files.meta.ManifestFile
 import vdi.core.s3.files.shares.ShareFile
 import vdi.core.s3.files.shares.ShareOffer
@@ -296,13 +296,13 @@ interface DatasetDirectory {
 
   // region mapping files
 
-  fun getMappingFiles(): Sequence<MappingFile>
+  fun getDataPropertiesFiles(): Sequence<DataPropertiesFile>
 
-  fun getMappingFile(name: String): MappingFile
+  fun getDataPropertiesFile(name: String): DataPropertiesFile
 
-  fun putMappingFile(name: String, contentType: String = MappingFile.ContentType, provider: () -> InputStream)
+  fun putDataPropertiesFile(name: String, contentType: String = DataPropertiesFile.ContentType, provider: () -> InputStream)
 
-  fun deleteMappingFile(name: String)
+  fun deleteDataPropertiesFile(name: String)
 
   // endregion mapping files
 

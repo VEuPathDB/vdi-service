@@ -1,6 +1,7 @@
 package vdi.core.plugin.client
 
 import java.io.InputStream
+import vdi.core.plugin.client.model.DataPropertiesFile
 import vdi.core.plugin.client.response.ImportResponse
 import vdi.core.plugin.client.response.InstallDataResponse
 import vdi.core.plugin.client.response.InstallMetaResponse
@@ -49,6 +50,7 @@ interface PluginHandlerClient {
     datasetID:     DatasetID,
     installTarget: InstallTargetID,
     meta:          DatasetMetadata,
+    dataPropFiles: Iterable<DataPropertiesFile>,
   ): InstallMetaResponse
 
   /**
@@ -74,6 +76,7 @@ interface PluginHandlerClient {
     meta:          InputStream,
     manifest:      InputStream,
     payload:       InputStream,
+    dataPropFiles: Iterable<DataPropertiesFile>,
   ): InstallDataResponse
 
   /**

@@ -1,6 +1,5 @@
 package vdi.core.db.app
 
-import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.time.OffsetDateTime
 import vdi.core.db.app.model.*
@@ -44,14 +43,15 @@ import vdi.core.db.app.sql.dataset_species.insertSpecies
 import vdi.core.db.app.sql.dataset_visibility.*
 import vdi.core.db.app.sql.sync_control.*
 import vdi.core.db.model.SyncControlRecord
+import vdi.logging.logger
 import vdi.model.meta.*
 
-abstract class AppDBTransactionImpl(
-  override val project: InstallTargetID,
+internal abstract class AppDBTransactionImpl(
+  override val installTarget: InstallTargetID,
   protected val schema: String,
   protected val connection: Connection,
 ): AppDBTransaction {
-  private val logger = LoggerFactory.getLogger(javaClass)
+  private val logger = logger()
 
   init {
     connection.autoCommit = false
@@ -67,7 +67,7 @@ abstract class AppDBTransactionImpl(
     connection.selectDataset(schema, datasetID)
 
   override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
-    connection.selectDatasetsByInstallStatus(schema, installType, installStatus, project)
+    connection.selectDatasetsByInstallStatus(schema, installType, installStatus, installTarget)
 
   override fun updateDataset(dataset: DatasetRecord) =
     (connection.updateDataset(schema, dataset) > 0)
@@ -121,7 +121,7 @@ abstract class AppDBTransactionImpl(
     connection.deleteDatasetContacts(schema, datasetID)
       .also { if (it > 0) logger.debug("deleted {} dataset_contact records from dataset {}", it, datasetID) }
 
-  override fun insertDatasetContacts(datasetID: DatasetID, contacts: Iterable<DatasetContact>) =
+  override fun insertContacts(datasetID: DatasetID, contacts: Iterable<DatasetContact>) =
     connection.insertDatasetContacts(schema, datasetID, contacts)
       .also { if (it > 0) logger.debug("inserted {} dataset_contact records for dataset {}", it, datasetID) }
 
@@ -145,7 +145,7 @@ abstract class AppDBTransactionImpl(
     connection.deleteDatasetDependencies(schema, datasetID)
       .also { if (it > 0) logger.debug("deleted {} dataset_dependency records from dataset {}", it, datasetID) }
 
-  override fun insertDatasetDependencies(datasetID: DatasetID, dependencies: Iterable<DatasetDependency>) =
+  override fun insertDependencies(datasetID: DatasetID, dependencies: Iterable<DatasetDependency>) =
     connection.insertDatasetDependencies(schema, datasetID, dependencies)
       .also { if (it > 0) logger.debug("inserted {} dataset_dependency records for dataset {}", it, datasetID) }
 
@@ -279,7 +279,7 @@ abstract class AppDBTransactionImpl(
     connection.deleteDatasetProjectLinks(schema, datasetID)
   }
 
-  override fun insertDatasetProjectLink(datasetID: DatasetID, installTarget: InstallTargetID) {
+  override fun insertDatasetProjectLink(datasetID: DatasetID) {
     connection.insertDatasetProjectLink(schema, datasetID, installTarget)
   }
 
@@ -297,11 +297,11 @@ abstract class AppDBTransactionImpl(
 
   // region dataset_publication
 
-  override fun deleteDatasetPublications(datasetID: DatasetID) =
+  override fun deletePublications(datasetID: DatasetID) =
     connection.deleteDatasetPublications(schema, datasetID)
       .also { if (it > 0) logger.debug("deleted {} dataset_publication records from dataset {}", it, datasetID) }
 
-  override fun insertDatasetPublications(datasetID: DatasetID, publications: Iterable<DatasetPublication>) =
+  override fun insertPublications(datasetID: DatasetID, publications: Iterable<DatasetPublication>) =
     connection.insertDatasetPublications(schema, datasetID, publications)
       .also { if (it > 0) logger.debug("inserted {} dataset_publication records for dataset {}", it, datasetID) }
 
@@ -373,8 +373,8 @@ abstract class AppDBTransactionImpl(
     connection.updateSyncControlDataTimestamp(schema, datasetID, timestamp)
   }
 
-  override fun updateSyncControlMetaTimestamp(datasetID: DatasetID, timestamp: OffsetDateTime) {
-    connection.updateSyncControlMetaTimestamp(schema, datasetID, timestamp)
+  override fun upsertSyncControlMetaTimestamp(datasetID: DatasetID, timestamp: OffsetDateTime) {
+    connection.upsertSyncControlMetaTimestamp(platform, schema, datasetID, timestamp)
   }
 
   override fun updateSyncControlSharesTimestamp(datasetID: DatasetID, timestamp: OffsetDateTime) {

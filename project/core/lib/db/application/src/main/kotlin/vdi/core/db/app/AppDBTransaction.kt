@@ -1,5 +1,6 @@
 package vdi.core.db.app
 
+import java.sql.SQLException
 import java.time.OffsetDateTime
 import vdi.core.db.app.model.DatasetInstallMessage
 import vdi.core.db.app.model.DatasetRecord
@@ -79,7 +80,7 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   fun deleteContacts(datasetID: DatasetID): Int
 
-  fun insertDatasetContacts(datasetID: DatasetID, contacts: Iterable<DatasetContact>): Int
+  fun insertContacts(datasetID: DatasetID, contacts: Iterable<DatasetContact>): Int
 
   // endregion dataset_contact
 
@@ -95,7 +96,7 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   fun deleteDependencies(datasetID: DatasetID): Int
 
-  fun insertDatasetDependencies(datasetID: DatasetID, dependencies: Iterable<DatasetDependency>): Int
+  fun insertDependencies(datasetID: DatasetID, dependencies: Iterable<DatasetDependency>): Int
 
   // endregion dataset_dependency
 
@@ -251,11 +252,16 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
    *
    * @param datasetID ID of the dataset for which a project link should be
    * inserted.
-   *
-   * @param installTarget ID of the project for which a project link should be
-   * inserted.
    */
-  fun insertDatasetProjectLink(datasetID: DatasetID, installTarget: InstallTargetID)
+  fun insertDatasetProjectLink(datasetID: DatasetID)
+
+  fun tryInsertDatasetProjectLink(datasetID: DatasetID) {
+    try { insertDatasetProjectLink(datasetID) }
+    catch (e: SQLException) {
+      if (!platform.isUniqueConstraintViolation(e))
+        throw e
+    }
+  }
 
   /**
    * Inserts new project links for a dataset.
@@ -272,9 +278,9 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // region dataset_publication
 
-  fun deleteDatasetPublications(datasetID: DatasetID): Int
+  fun deletePublications(datasetID: DatasetID): Int
 
-  fun insertDatasetPublications(datasetID: DatasetID, publications: Iterable<DatasetPublication>): Int
+  fun insertPublications(datasetID: DatasetID, publications: Iterable<DatasetPublication>): Int
 
   // endregion dataset_publication
 
@@ -333,6 +339,15 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
    */
   fun insertDatasetVisibility(datasetID: DatasetID, userID: UserID)
 
+  // manual upsert for oracle compatibility
+  fun upsertDatasetVisibility(datasetID: DatasetID, userID: UserID) {
+    try { insertDatasetVisibility(datasetID, userID) }
+    catch (e: SQLException) {
+      if (!isUniqueConstraintViolation(e))
+        throw e
+    }
+  }
+
   // endregion dataset_visibility
 
   // region sync_control
@@ -378,7 +393,7 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
    *
    * @param timestamp New timestamp to set for the meta last updated field.
    */
-  fun updateSyncControlMetaTimestamp(datasetID: DatasetID, timestamp: OffsetDateTime)
+  fun upsertSyncControlMetaTimestamp(datasetID: DatasetID, timestamp: OffsetDateTime)
 
   /**
    * Updates the "shares" last updated field on a target dataset sync control

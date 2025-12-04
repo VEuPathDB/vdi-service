@@ -13,7 +13,7 @@ interface AppDBAccessor {
 
   val platform: TargetDBPlatform
 
-  val project: InstallTargetID
+  val installTarget: InstallTargetID
 
   /**
    * Looks up a dataset record for the target dataset.

@@ -20,11 +20,11 @@ import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.withTransaction
-import vdi.core.metrics.Metrics.Install as Metrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
 import vdi.core.plugin.client.PluginException
 import vdi.core.plugin.client.PluginRequestException
+import vdi.core.plugin.client.model.DataPropertiesFile
 import vdi.core.plugin.client.response.*
 import vdi.core.plugin.mapping.PluginHandlers
 import vdi.core.s3.DatasetDirectory
@@ -33,6 +33,7 @@ import vdi.core.util.orElse
 import vdi.logging.logger
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
+import vdi.core.metrics.Metrics.Install as Metrics
 
 internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, abortCB: AbortCB)
   : InstallDataLane
@@ -165,7 +166,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
 
       cacheDB.withTransaction { it.updateDataSyncControl(datasetID, installableFileTimestamp) }
 
-      val success = dir.buildInstallBundle { metaStream, manifestStream, uploadStream ->
+      val success = dir.withInstallFiles { metaStream, manifestStream, uploadStream, dataPropFiles ->
         meta.installTargets
           .all { projectID ->
             // If the handler doesn't apply to the target project, again we
@@ -184,6 +185,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
               metaStream,
               manifestStream,
               uploadStream,
+              dataPropFiles,
             )
           }
       }
@@ -209,10 +211,11 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
    * status that it gets in reply.
    */
   private suspend fun InstallationContext.WithPlugin.installData(
-    installableFileTimestamp: OffsetDateTime,
-    meta: InputStream,
-    manifest: InputStream,
-    data: InputStream,
+    installFileTimestamp: OffsetDateTime,
+    meta:                 InputStream,
+    manifest:             InputStream,
+    data:                 InputStream,
+    dataPropFiles:        Iterable<DataPropertiesFile>,
   ): Boolean {
     var timer: Histogram.Timer? = null
 
@@ -268,32 +271,32 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       }
 
       return try {
-        plugin.client.postInstallData(eventID, datasetID, target, meta, manifest, data).use { response ->
+        plugin.client.postInstallData(eventID, datasetID, target, meta, manifest, data, dataPropFiles).use { response ->
           Metrics.count.labels(dataset.type.name.toString(), dataset.type.version, response.status.code.toString()).inc()
 
           when (response) {
             is SuccessWithWarningsResponse -> {
-              handleSuccessResponse(response, installableFileTimestamp)
+              handleSuccessResponse(response, installFileTimestamp)
               true
             }
 
             is ValidationErrorResponse -> {
-              handleValidationFailureResponse(response, installableFileTimestamp)
+              handleValidationFailureResponse(response, installFileTimestamp)
               false
             }
 
             is MissingDependencyResponse -> {
-              handleMissingDependenciesResponse(response, installableFileTimestamp)
+              handleMissingDependenciesResponse(response, installFileTimestamp)
               false
             }
 
             is ScriptErrorResponse -> {
-              handleScriptErrorResponse(response, installableFileTimestamp)
+              handleScriptErrorResponse(response, installFileTimestamp)
               false
             }
 
             is ServerErrorResponse -> {
-              handleServerErrorResponse(response, installableFileTimestamp)
+              handleServerErrorResponse(response, installFileTimestamp)
               false
             }
           }
@@ -406,16 +409,48 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
     throw PluginException.installData(plugin.name, target, ownerID, datasetID, res.message)
   }
 
-  private suspend fun <T> DatasetDirectory.buildInstallBundle(
-    fn: suspend (meta: InputStream, manifest: InputStream, upload: InputStream) -> T
+  context(ctx: InstallationContext)
+  private suspend fun <T> DatasetDirectory.withInstallFiles(
+    fn: suspend (
+      meta:      InputStream,
+      manifest:  InputStream,
+      upload:    InputStream,
+      propFiles: Iterable<DataPropertiesFile>,
+    ) -> T
   ) =
     getMetaFile().open()!!.use { meta ->
       getManifestFile().open()!!.use { manifest ->
         getInstallReadyFile().open()!!.use { data ->
-          fn(meta, manifest, data)
+          val ogFiles = getDataPropertiesFiles().toMutableList()
+          val dataPropFiles = ArrayList<DataPropertiesFile>(ogFiles.size)
+
+          ogFiles.forEach {
+            try { dataPropFiles.add(DataPropertiesFile(it.baseName, it.open()!!)) }
+            catch (e: Throwable) {
+              dataPropFiles.closeAll()
+              throw e
+            }
+          }
+          ogFiles.clear()
+
+          try {
+            fn(meta, manifest, data, dataPropFiles)
+          } finally {
+            dataPropFiles.closeAll()
+          }
         }
       }
     }
+
+  context(ctx: InstallationContext)
+  private fun List<DataPropertiesFile>.closeAll() {
+    forEach {
+      try { it.close() }
+      catch (e: Throwable) {
+        ctx.logger.error("failed to close object stream for {}", it.name, e)
+      }
+    }
+  }
 
   private fun InstallationContext.tryMarkRevised(meta: DatasetMetadata) {
     meta.revisionHistory!!.revisions

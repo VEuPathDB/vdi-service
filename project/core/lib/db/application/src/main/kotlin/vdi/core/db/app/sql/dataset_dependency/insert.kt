@@ -10,8 +10,8 @@ import vdi.model.meta.DatasetID
 
 
 private fun sql(schema: String) =
-// language=postgresql
-  """
+// language=sql
+"""
 INSERT INTO
   ${schema}.${Table.Dependencies} (
     dataset_id

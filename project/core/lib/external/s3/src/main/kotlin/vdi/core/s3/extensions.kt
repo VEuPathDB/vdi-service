@@ -92,6 +92,6 @@ fun DatasetDirectory.getInstallReadyTimestamp() = getInstallReadyFile().lastModi
 fun DatasetDirectory.getDeleteFlagTimestamp() = getDeleteFlag().lastModified()
 
 fun DatasetDirectory.getLatestVariablePropertiesTimestamp() =
-  getMappingFiles()
+  getDataPropertiesFiles()
     .mapNotNull { it.lastModified() }
     .maxOrNull()

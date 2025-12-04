@@ -14,14 +14,13 @@ dependencies {
   implementation(common.db.target)
   implementation(common.model)
   implementation(common.json)
+  implementation(common.logging)
   implementation(common.util)
 
   implementation(libs.db.pool)
   implementation(libs.db.driver.oracle)
   implementation(libs.db.driver.postgres)
   implementation(libs.db.kotlin.extended)
-
-  implementation(libs.log.slf4j.api)
 }
 
 

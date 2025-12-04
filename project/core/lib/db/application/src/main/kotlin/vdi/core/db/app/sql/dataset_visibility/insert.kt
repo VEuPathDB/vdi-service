@@ -21,7 +21,6 @@ VALUES
 """
 
 internal fun Connection.insertDatasetVisibility(schema: String, datasetID: DatasetID, userID: UserID) {
-//  if (this.metaData.driverName)
   withPreparedUpdate(sql(schema)) {
     setDatasetID(1, datasetID)
     setUserID(2, userID)

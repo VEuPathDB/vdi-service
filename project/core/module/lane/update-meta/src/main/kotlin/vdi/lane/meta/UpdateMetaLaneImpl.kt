@@ -10,11 +10,11 @@ import java.util.concurrent.ConcurrentHashMap
 import vdi.core.async.WorkerPool
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.AppDBTransaction
-import vdi.core.db.app.isUniqueConstraintViolation
 import vdi.core.db.app.model.DatasetInstallMessage
 import vdi.core.db.app.model.DatasetRecord
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallType
+import vdi.core.db.app.upsertDatasetRecord
 import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.CacheDBTransaction
@@ -39,7 +39,10 @@ import vdi.core.util.orElse
 import vdi.logging.logger
 import vdi.model.DatasetMetaFilename
 import vdi.model.OriginTimestamp
-import vdi.model.meta.*
+import vdi.model.meta.DatasetID
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.DatasetVisibility
+import vdi.core.plugin.client.model.DataPropertiesFile as PluginDataPropsFile
 
 internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abortCB: AbortCB)
   : UpdateMetaLane
@@ -187,6 +190,8 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
   }
 
   private suspend fun UpdateMetaContext.WithPlugin.updateTargetMeta(metaTimestamp: OffsetDateTime) {
+    var meta = this.meta
+
     if (!shouldUpdateTargetMeta(metaTimestamp))
       return
 
@@ -205,121 +210,68 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
     if (!variablePropertiesInstallSucceeded && shouldRevertToPrivateOnVariablePropertiesError(meta)) {
       logger.info("reverting dataset visibility to private in the object store")
-      directory.getMetaFile().apply {
+
+      // override the visibility on the version currently in the object store to
+      // limit the race-condition window for this change to the object store's
+      // response time.
+      with(directory.getMetaFile()) {
         load()
           ?.copy(visibility = DatasetVisibility.Private)
           ?.also(::put)
       }
+
+      // set visibility to private in memory as well before upserting the app db
+      // records.
+      meta = meta.copy(visibility = DatasetVisibility.Private)
     }
 
     appDB.withTransaction(target, plugin.type) {
-      val record = it.getOrInsertDatasetRecord()
-
-      if (variablePropertiesInstallSucceeded) {
-        // If the record in the app db has an isPublic flag value different from
-        // what we expect, update the app db record.
-        if (record.isPublic != (meta.visibility == DatasetVisibility.Public)) {
-          it.updateDataset(record.copy(accessibility = meta.visibility))
-        }
-      }
-
-      logger.debug("upserting dataset meta record")
-      it.upsertDatasetMeta(datasetID, meta)
-
-      it.deleteDatasetPublications(datasetID)
-      if (meta.publications.isNotEmpty())
-        it.insertDatasetPublications(datasetID, meta.publications)
-
-      it.deleteContacts(datasetID)
-      if (meta.contacts.isNotEmpty())
-        it.insertDatasetContacts(datasetID, meta.contacts)
-
-      it.deleteExternalDatasetLinks(datasetID)
-      if (meta.linkedDatasets.isNotEmpty())
-        it.insertExternalDatasetLinks(datasetID, meta.linkedDatasets)
-
-      it.deleteDatasetOrganisms(datasetID)
-      if (meta.experimentalOrganism != null)
-        it.insertExperimentalOrganism(datasetID, meta.experimentalOrganism!!)
-      if (meta.hostOrganism != null)
-        it.insertHostOrganism(datasetID, meta.hostOrganism!!)
-
-      // Characteristics fields
-      it.deleteCountries(datasetID)
-      it.deleteSpecies(datasetID)
-      it.deleteDiseases(datasetID)
-      it.deleteAssociatedFactors(datasetID)
-      it.deleteSampleTypes(datasetID)
-      it.deleteCharacteristics(datasetID)
-      meta.characteristics?.also { characteristics ->
-        it.insertCharacteristics(datasetID, characteristics)
-        it.insertCountries(datasetID, characteristics.countries)
-        it.insertSpecies(datasetID, characteristics.studySpecies)
-        it.insertDiseases(datasetID, characteristics.diseases)
-        it.insertAssociatedFactors(datasetID, characteristics.associatedFactors)
-        it.insertSampleTypes(datasetID, characteristics.sampleTypes)
-      }
-
-      // External identifier fields
-      it.deleteDOIs(datasetID)
-      it.deleteHyperlinks(datasetID)
-      it.deleteBioprojectIDs(datasetID)
-      meta.externalIdentifiers?.also { identifiers ->
-        if (identifiers.dois.isNotEmpty())
-          it.insertDOIs(datasetID, identifiers.dois)
-        if (identifiers.hyperlinks.isNotEmpty())
-          it.insertHyperlinks(datasetID, identifiers.hyperlinks)
-        if (identifiers.bioprojectIDs.isNotEmpty())
-          it.insertBioprojectIDs(datasetID, identifiers.bioprojectIDs)
-      }
-
-      it.deleteFundingAwards(datasetID)
-      if (meta.funding.isNotEmpty())
-        it.insertFundingAwards(datasetID, meta.funding)
-
-      it.selectDatasetSyncControlRecord(datasetID) orElse {
-        it.insertDatasetSyncControl(
-          SyncControlRecord(
-            datasetID = datasetID,
-            sharesUpdated = OriginTimestamp,
-            dataUpdated = OriginTimestamp,
-            metaUpdated = OriginTimestamp,
-          )
-        )
-      }
+      val record = DatasetRecord(datasetID, meta, PluginRegistry.categoryFor(meta.type))
+      it.upsertDatasetRecord(record, meta, metaTimestamp)
     }
   }
 
   private suspend fun UpdateMetaContext.WithPlugin.runPluginScript(metaTimestamp: OffsetDateTime) {
-    plugin.client.postInstallMeta(eventID, datasetID, target, meta).use { result ->
-      Metrics.MetaUpdates.count.labels(
-        meta.type.name.toString(),
-        meta.type.version,
-        result.status.toString(),
-      ).inc()
+    val dataPropFiles = directory.getDataPropertiesFiles()
+      .map { PluginDataPropsFile(it.baseName, it.open()!!) }
+      .asIterable()
 
-      try {
-        when (result) {
-          is EmptySuccessResponse    -> handleSuccessResponse()
-          is ValidationErrorResponse -> handleValidationError(result)
-          is ServiceErrorResponse    -> handleUnexpectedErrorResponse(result)
-        }
-      } catch (e: Throwable) {
-        logger.info("install-meta request to handler server failed with exception:", e)
-        appDB.withTransaction(target, plugin.type) {
-          try {
-            it.upsertInstallMetaMessage(datasetID, InstallStatus.FailedInstallation)
-          } catch (e: SQLException) {
-            if (e.errorCode == 1) {
-              logger.info("unique key constraint violation on install meta; assuming race condition")
-            } else {
-              throw e
+    try {
+      plugin.client.postInstallMeta(eventID, datasetID, target, meta, dataPropFiles).use { result ->
+        Metrics.MetaUpdates.count.labels(
+          meta.type.name.toString(),
+          meta.type.version,
+          result.status.toString(),
+        ).inc()
+
+        try {
+          when (result) {
+            is EmptySuccessResponse    -> handleSuccessResponse()
+            is ValidationErrorResponse -> handleValidationError(result)
+            is ServiceErrorResponse    -> handleUnexpectedErrorResponse(result)
+          }
+        } catch (e: Throwable) {
+          logger.info("install-meta request to handler server failed with exception:", e)
+          appDB.withTransaction(target, plugin.type) {
+            try {
+              it.upsertInstallMetaMessage(datasetID, InstallStatus.FailedInstallation)
+            } catch (e: SQLException) {
+              if (e.errorCode == 1) {
+                logger.info("unique key constraint violation on install meta; assuming race condition")
+              } else {
+                throw e
+              }
             }
           }
+          throw e
+        } finally {
+          appDB.withTransaction(target, plugin.type) { it.upsertSyncControlMetaTimestamp(datasetID, metaTimestamp) }
         }
-        throw e
-      } finally {
-        appDB.withTransaction(target, plugin.type) { it.updateSyncControlMetaTimestamp(datasetID, metaTimestamp) }
+      }
+    } finally {
+      dataPropFiles.forEach {
+        try { it.close() }
+        catch (e: Throwable) { logger.error("failed to close s3 object {}", it.name, e)}
       }
     }
   }
@@ -390,53 +342,6 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
   ) {
     val message = DatasetInstallMessage(datasetID, InstallType.Meta, status, message)
     upsertDatasetInstallMessage(message)
-  }
-
-  context(ctx: UpdateMetaContext.WithPlugin)
-  private fun AppDBTransaction.getOrInsertDatasetRecord(): DatasetRecord {
-    // Return the dataset if found
-    selectDataset(ctx.datasetID)?.also { return it }
-
-    ctx.logger.debug("inserting dataset record into app db")
-
-    val record = DatasetRecord(ctx.datasetID, ctx.meta, PluginRegistry.categoryFor(ctx.meta.type), daysForApproval = -1)
-
-    // this stuff is not project specific!
-    //
-    // NOTE: We don't install meta stuff here because we will be synchronizing
-    // it immediately after this function call anyway.
-    try {
-      upsertDataset(record)
-      insertDatasetVisibility(ctx.datasetID, ctx.meta.owner)
-      insertDatasetDependencies(ctx.datasetID, ctx.meta.dependencies)
-
-      upsertInstallMetaMessage(ctx.datasetID, InstallStatus.Running)
-
-      logger.debug("inserting sync control record for dataset into app db")
-      insertDatasetSyncControl(
-        SyncControlRecord(
-          datasetID = ctx.datasetID,
-          sharesUpdated = OriginTimestamp,
-          dataUpdated = OriginTimestamp,
-          metaUpdated = OriginTimestamp,
-        )
-      )
-    } catch (e: SQLException) {
-      // Race condition: someone else inserted the record before us, which
-      // should be fine.
-      if (!isUniqueConstraintViolation(e))
-        throw e
-    }
-
-    try {
-      logger.debug("inserting dataset project link for dataset into app db")
-      insertDatasetProjectLink(ctx.datasetID, ctx.target)
-    } catch (e: SQLException) {
-      if (!isUniqueConstraintViolation(e))
-        throw e
-    }
-
-    return record
   }
 
   context(ctx: UpdateMetaContext)

@@ -2,11 +2,13 @@ package vdi.core.plugin.client
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.foxcapades.lib.k.multipart.MultiPart
+import io.foxcapades.lib.k.multipart.MultiPartBuilder
 import kotlinx.coroutines.future.await
 import java.io.InputStream
 import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import vdi.core.plugin.client.model.DataPropertiesFile
 import vdi.core.plugin.client.response.*
 import vdi.io.plugin.PluginEndpoint
 import vdi.io.plugin.requests.*
@@ -87,29 +89,31 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
   }
 
   override suspend fun postInstallMeta(
-    eventID: EventID,
-    datasetID: DatasetID,
+    eventID:       EventID,
+    datasetID:     DatasetID,
     installTarget: InstallTargetID,
-    meta: DatasetMetadata,
+    meta:          DatasetMetadata,
+    dataPropFiles: Iterable<DataPropertiesFile>,
   ): InstallMetaResponse {
     val log = log.mark(eventID, datasetID)
     val uri = resolve(PluginEndpoint.InstallMeta)
+
+    val multipart = MultiPart.createBody {
+      withPart {
+        fieldName = FormField.Details
+        contentType(ContentType.JSON)
+        withBody(InstallMetaRequest(eventID, datasetID, installTarget, meta).toJSONString())
+      }
+
+      appendDataPropFiles(dataPropFiles)
+    }
 
     log.debug("submitting install-meta POST request to {} for project {}", uri, installTarget)
 
     val response = config.client.sendAsync(
       HttpRequest.newBuilder(uri)
-        .header(Header.ContentType, ContentType.JSON)
-        .POST(
-          HttpRequest.BodyPublishers.ofString(
-            InstallMetaRequest(
-              eventID,
-              datasetID,
-              installTarget,
-              meta
-            ).toJSONString()
-          )
-        )
+        .header(Header.ContentType, multipart.getContentTypeHeader())
+        .POST(multipart.makePublisher())
         .build(),
       HttpResponse.BodyHandlers.ofString()
     ).await()
@@ -130,6 +134,7 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
     meta: InputStream,
     manifest: InputStream,
     payload: InputStream,
+    dataPropFiles: Iterable<DataPropertiesFile>,
   ): InstallDataResponse {
     val log = log.mark(eventID, datasetID)
 
@@ -158,6 +163,8 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
         contentType(ContentType.Zip)
         withBody(payload)
       }
+
+      appendDataPropFiles(dataPropFiles)
     }
 
     val uri = resolve(PluginEndpoint.InstallData)
@@ -183,10 +190,10 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
   }
 
   override suspend fun postUninstall(
-    eventID: EventID,
-    datasetID: DatasetID,
+    eventID:       EventID,
+    datasetID:     DatasetID,
     installTarget: InstallTargetID,
-    type: DatasetType,
+    type:          DatasetType,
   ): UninstallResponse {
     val log = log.mark(eventID, datasetID)
     val uri = resolve(PluginEndpoint.Uninstall)
@@ -228,4 +235,13 @@ internal class PluginHandlerClientImpl(private val config: PluginHandlerClientCo
 
   private inline fun <reified T> HttpResponse<String>.readJSON() =
     JSON.readValue<T>(body())
+
+  private fun MultiPartBuilder.appendDataPropFiles(dataPropFiles: Iterable<DataPropertiesFile>) {
+    dataPropFiles.forEach { withPart {
+      fieldName = FormField.DataDict
+      fileName  = it.name
+      contentType(ContentType.Any)
+      withBody(it.stream)
+    } }
+  }
 }

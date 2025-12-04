@@ -21,11 +21,11 @@ VALUES
   (?, ?, ?, ?)
 """
 
-internal fun Connection.insertDatasetSyncControl(schema: String, sync: SyncControlRecord) {
+internal fun Connection.insertDatasetSyncControl(schema: String, sync: SyncControlRecord) =
   withPreparedUpdate(sql(schema)) {
     setDatasetID(1, sync.datasetID)
     setDateTime(2, sync.sharesUpdated)
     setDateTime(3, sync.dataUpdated)
     setDateTime(4, sync.metaUpdated)
   }
-}
+

@@ -15,6 +15,7 @@ import vdi.core.s3.files.flags.DeleteFlagFile
 import vdi.core.s3.files.flags.FlagFile
 import vdi.core.s3.files.flags.RevisedFlagFile
 import vdi.core.s3.files.maps.MappingFile
+import vdi.core.s3.files.maps.DataPropertiesFile
 import vdi.core.s3.files.meta.ManifestFile
 import vdi.core.s3.files.meta.MetaFile
 import vdi.core.s3.files.meta.MetadataFile
@@ -44,7 +45,7 @@ internal class MaterializedDatasetDirectory(
   private val deleteFlag: FlagFile?,
   private val revisedFlag: FlagFile?,
   private val shares: Map<UserID, Pair<ShareOffer, ShareReceipt>>,
-  private val mappingFiles: List<MappingFile>,
+  private val dataPropertiesFiles: List<DataPropertiesFile>,
 ): DatasetDirectory {
   companion object {
     fun build(
@@ -63,7 +64,7 @@ internal class MaterializedDatasetDirectory(
       var revisedFlag: FlagFile? = null
 
       val shareRefBuilders = HashMap<UserID, ShareRefBuilder>(4)
-      val mappingFiles = ArrayList<MappingFile>(1)
+      val dataPropertiesFiles = ArrayList<DataPropertiesFile>(1)
 
       objects.forEach {
         val path = "${it.bucket.name}/${it.path}".toDatasetPathOrNull()
@@ -93,7 +94,7 @@ internal class MaterializedDatasetDirectory(
             FileName.ShareReceiptFile -> shareRefBuilders.computeIfAbsent(path.recipientID, ::ShareRefBuilder).receipt = it
           }
 
-          is MappingFilePath -> mappingFiles.add(MappingFile(it))
+          is MappingFilePath -> dataPropertiesFiles.add(MappingFile(it))
         }
       }
 
@@ -110,7 +111,7 @@ internal class MaterializedDatasetDirectory(
         revisedFlag     = revisedFlag,
         shares          = shareRefBuilders.mapValues { (_, ref) -> ref.build(pathFactory) },
         pathFactory     = pathFactory,
-        mappingFiles    = mappingFiles,
+        dataPropertiesFiles    = dataPropertiesFiles,
       )
     }
 
@@ -231,16 +232,16 @@ internal class MaterializedDatasetDirectory(
   override fun putShare(recipientID: UserID, offer: DatasetShareOffer, receipt: DatasetShareReceipt) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
-  override fun getMappingFiles() = mappingFiles.asSequence()
+  override fun getDataPropertiesFiles() = dataPropertiesFiles.asSequence()
 
-  override fun getMappingFile(name: String) =
-    mappingFiles.firstOrNull { it.baseName == name }
+  override fun getDataPropertiesFile(name: String) =
+    dataPropertiesFiles.firstOrNull { it.baseName == name }
       ?: MissingFile(pathFactory.mappingFile(name))
 
-  override fun putMappingFile(name: String, contentType: String, provider: () -> InputStream) =
+  override fun putDataPropertiesFile(name: String, contentType: String, provider: () -> InputStream) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
-  override fun deleteMappingFile(name: String) =
+  override fun deleteDataPropertiesFile(name: String) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun getDocumentFiles() = emptySequence<DocumentFile>()
@@ -256,7 +257,7 @@ internal class MaterializedDatasetDirectory(
 
   override fun toString() = "EagerDatasetDir($ownerID/$datasetID)"
 
-  private data class MissingFile(override val path: String): MappingFile, DocumentFile {
+  private data class MissingFile(override val path: String): DataPropertiesFile, DocumentFile {
     override val contentType: String
       get() = "application/octet-stream"
 

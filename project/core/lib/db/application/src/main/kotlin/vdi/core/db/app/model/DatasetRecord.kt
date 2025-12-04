@@ -21,7 +21,6 @@ data class DatasetRecord(
     meta:            DatasetMetadata,
     category:        String,
     deletionState:   DeleteFlag = DeleteFlag.NotDeleted,
-    daysForApproval: Int = -1,
   ): this (
     datasetID,
     meta.owner,
@@ -29,7 +28,7 @@ data class DatasetRecord(
     category,
     deletionState,
     meta.visibility,
-    daysForApproval,
+    meta.daysForApproval,
     meta.created,
   )
 

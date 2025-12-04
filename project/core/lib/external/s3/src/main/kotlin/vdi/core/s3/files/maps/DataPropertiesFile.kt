@@ -2,7 +2,7 @@ package vdi.core.s3.files.maps
 
 import vdi.core.s3.files.DatasetFile
 
-interface MappingFile: DatasetFile {
+interface DataPropertiesFile: DatasetFile {
   override val contentType: String
     get() = ContentType
 

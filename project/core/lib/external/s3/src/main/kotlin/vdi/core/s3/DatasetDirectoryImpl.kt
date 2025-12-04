@@ -12,6 +12,7 @@ import vdi.core.s3.files.docs.DocumentFile
 import vdi.core.s3.files.flags.DeleteFlagFile
 import vdi.core.s3.files.flags.RevisedFlagFile
 import vdi.core.s3.files.maps.MappingFile
+import vdi.core.s3.files.maps.DataPropertiesFile
 import vdi.core.s3.files.meta.ManifestFile
 import vdi.core.s3.files.meta.MetaFile
 import vdi.core.s3.files.shares.ShareOffer
@@ -86,7 +87,7 @@ internal class DatasetDirectoryImpl(
   override fun hasRevisedFlag() = lazyRevisedFlag.exists()
   override fun putRevisedFlag() = lazyRevisedFlag.create()
 
-  override fun getMappingFiles(): Sequence<MappingFile> {
+  override fun getDataPropertiesFiles(): Sequence<DataPropertiesFile> {
     log.debug("looking up mapping files")
 
     return bucket.objects.listSubPaths(pathFactory.mappingsDir())
@@ -95,17 +96,17 @@ internal class DatasetDirectoryImpl(
       .map { MappingFile(it.path, bucket.objects) }
   }
 
-  override fun getMappingFile(name: String): MappingFile =
+  override fun getDataPropertiesFile(name: String): DataPropertiesFile =
     MappingFile(pathFactory.mappingFile(name), bucket.objects)
 
-  override fun putMappingFile(name: String, contentType: String, provider: () -> InputStream) {
+  override fun putDataPropertiesFile(name: String, contentType: String, provider: () -> InputStream) {
     provider().use { bucket.objects.put(pathFactory.mappingFile(name)) {
       this.contentType = contentType
       this.stream = it
     } }
   }
 
-  override fun deleteMappingFile(name: String) =
+  override fun deleteDataPropertiesFile(name: String) =
     bucket.objects.delete(pathFactory.mappingFile(name))
 
   override fun getDocumentFiles(): Sequence<DocumentFile> {

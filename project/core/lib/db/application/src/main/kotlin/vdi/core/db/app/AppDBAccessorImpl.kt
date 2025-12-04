@@ -19,7 +19,7 @@ import vdi.model.meta.InstallTargetID
 import vdi.model.meta.UserID
 
 internal class AppDBAccessorImpl(
-  override val project: InstallTargetID,
+  override val installTarget: InstallTargetID,
   private val schema: String,
   private val dataSource: DataSource,
   override val platform: TargetDBPlatform,
@@ -53,5 +53,5 @@ internal class AppDBAccessorImpl(
     con.use { it.testDatasetProjectLinkExists(schema, datasetID, installTarget) }
 
   override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
-    con.use { it.selectDatasetsByInstallStatus(schema, installType, installStatus, project) }
+    con.use { it.selectDatasetsByInstallStatus(schema, installType, installStatus, installTarget) }
 }

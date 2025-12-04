@@ -148,6 +148,10 @@ data class DatasetMetadata(
   @param:JsonProperty(RevisionHistory)
   @field:JsonProperty(RevisionHistory)
   val revisionHistory: DatasetRevisionHistory? = null,
+
+  @param:JsonProperty(DaysForApproval)
+  @field:JsonProperty(DaysForApproval)
+  val daysForApproval: Int = -1,
 ): VersionedMetaObject {
   @get:JsonIgnore
   val shortName get() = name.take(40)
@@ -155,6 +159,7 @@ data class DatasetMetadata(
   companion object JsonKey {
     const val Contacts             = "contacts"
     const val Created              = "created"
+    const val DaysForApproval      = "daysForApproval"
     const val Dependencies         = "dependencies"
     const val Description          = "description"
     const val ExperimentalOrganism = "experimentalOrganism"
