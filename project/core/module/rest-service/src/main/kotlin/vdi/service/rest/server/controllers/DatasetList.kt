@@ -18,7 +18,7 @@ import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.services.dataset.createDataset
 import vdi.service.rest.server.services.dataset.fetchUserDatasetList
 import vdi.service.rest.util.ShortID
-import vdi.service.rest.util.fold
+import vdi.util.fn.fold
 import vdi.service.rest.generated.resources.Datasets.GetDatasetsResponse as GetResponse
 import vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse as PostResponse
 

@@ -1,5 +1,5 @@
 package vdi.core.plugin.client
 
-fun PluginHandlerClient(config: PluginHandlerClientConfig): PluginHandlerClient {
-  return PluginHandlerClientImpl(config)
+fun PluginHandlerClient(name: String, config: PluginHandlerClientConfig): PluginHandlerClient {
+  return PluginHandlerClientImpl(name, config)
 }

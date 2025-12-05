@@ -12,6 +12,7 @@ import vdi.core.plugin.client.model.DataPropertiesFile
 import vdi.core.plugin.client.response.*
 import vdi.io.plugin.PluginEndpoint
 import vdi.io.plugin.requests.*
+import vdi.io.plugin.responses.ServerInfoResponse
 import vdi.json.JSON
 import vdi.json.toJSONString
 import vdi.logging.logger
@@ -21,22 +22,40 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.DatasetType
 import vdi.model.meta.InstallTargetID
+import vdi.util.fn.Either
 import vdi.io.plugin.responses.PluginResponseStatus as Status
 
-internal class PluginHandlerClientImpl(private val config: PluginHandlerClientConfig): PluginHandlerClient {
+internal class PluginHandlerClientImpl(
+  name: String,
+  private val config: PluginHandlerClientConfig,
+): PluginHandlerClient {
 
-  private val log = logger<PluginHandlerClient>()
+  private val log = logger<PluginHandlerClient>().mark(pluginName = name)
 
   private inline val baseUri
     get() = URI.create("http://${config.address.host}:${config.address.port}")
 
   private fun resolve(ep: String) = baseUri.resolve(ep)
 
+  override suspend fun getServerInfo(): Either<ServerInfoResponse, ServerErrorResponse> {
+    log.info("retrieving plugin server build info")
+
+    val response = config.client.sendAsync(
+      HttpRequest.newBuilder(resolve(PluginEndpoint.ServiceInfo)).GET().build(),
+      HttpResponse.BodyHandlers.ofString(),
+    ).await()
+
+    return when (response.statusCode()) {
+      200  -> Either.left(response.readJSON())
+      else -> Either.right(response.readJSON())
+    }
+  }
+
   override suspend fun postImport(
-    eventID: EventID,
+    eventID:   EventID,
     datasetID: DatasetID,
-    meta: DatasetMetadata,
-    upload: InputStream,
+    meta:      DatasetMetadata,
+    upload:    InputStream,
   ): ImportResponse {
     val log = log.mark(eventID, datasetID)
 

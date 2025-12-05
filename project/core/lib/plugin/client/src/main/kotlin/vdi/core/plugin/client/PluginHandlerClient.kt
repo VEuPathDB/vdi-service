@@ -5,14 +5,19 @@ import vdi.core.plugin.client.model.DataPropertiesFile
 import vdi.core.plugin.client.response.ImportResponse
 import vdi.core.plugin.client.response.InstallDataResponse
 import vdi.core.plugin.client.response.InstallMetaResponse
+import vdi.core.plugin.client.response.ServerErrorResponse
 import vdi.core.plugin.client.response.UninstallResponse
+import vdi.io.plugin.responses.ServerInfoResponse
 import vdi.model.EventID
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.DatasetType
 import vdi.model.meta.InstallTargetID
+import vdi.util.fn.Either
 
 interface PluginHandlerClient {
+
+  suspend fun getServerInfo(): Either<ServerInfoResponse, ServerErrorResponse>
 
   /**
    * `POST`s an import request to the configured plugin handler server with the

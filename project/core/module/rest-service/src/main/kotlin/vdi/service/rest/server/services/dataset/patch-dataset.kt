@@ -23,10 +23,10 @@ import vdi.service.rest.server.outputs.ForbiddenError
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.outputs.wrap
-import vdi.service.rest.util.Either
-import vdi.service.rest.util.Either.Companion.left
-import vdi.service.rest.util.Either.Companion.right
-import vdi.service.rest.util.leftOrNull
+import vdi.util.fn.Either
+import vdi.util.fn.Either.Companion.left
+import vdi.util.fn.Either.Companion.right
+import vdi.util.fn.leftOrNull
 
 fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: DatasetPatchRequestBody): PatchDatasetsByVdiIdResponse {
   val cacheDB = CacheDB()

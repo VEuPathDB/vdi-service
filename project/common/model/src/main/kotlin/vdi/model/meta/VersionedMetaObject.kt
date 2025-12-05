@@ -6,10 +6,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import vdi.model.versioning.MetaStructureVersion
 import vdi.model.versioning.VersionedObjectDeserializer
 
-@JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonDeserialize(using = VersionedObjectDeserializer::class)
 sealed interface VersionedMetaObject {
+  @Suppress("unused")
   @get:JsonGetter(VersionKey)
+  @get:JsonInclude(JsonInclude.Include.ALWAYS)
   val vdiMetaVersion: MetaStructureVersion
     get() = MetaStructureVersion.CurrentVersion
 

@@ -4,9 +4,9 @@ import kotlin.io.path.Path
 import vdi.config.raw.vdi.PluginConfig
 import vdi.service.plugin.consts.ConfigDefault
 import vdi.service.plugin.process.install.data.CheckCompatibilityScript
-import vdi.service.plugin.process.preprocess.ImportScript
 import vdi.service.plugin.process.install.data.InstallDataScript
 import vdi.service.plugin.process.install.meta.InstallMetaScript
+import vdi.service.plugin.process.preprocess.ImportScript
 import vdi.service.plugin.process.uninstall.UninstallScript
 
 /**
@@ -15,7 +15,9 @@ import vdi.service.plugin.process.uninstall.UninstallScript
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data class ServiceConfiguration(
+internal class ServiceConfiguration(
+  val name: String,
+
   val importScript: ImportScript,
   val installDataScript: InstallDataScript,
   val installMetaScript: InstallMetaScript,
@@ -23,10 +25,10 @@ data class ServiceConfiguration(
   val checkCompatScript: CheckCompatibilityScript,
 
   val customPath: String,
-  val datasetRoot: String,
-  val siteBuild: String,
 ) {
-  constructor(raw: PluginConfig, siteBuild: String): this(
+  constructor(name: String, raw: PluginConfig): this(
+    name = name,
+
     importScript = raw.scripts?.dataCleaning.let {
       ImportScript(
         Path(it?.pathOverride ?: ConfigDefault.ImportScriptPath),
@@ -57,8 +59,7 @@ data class ServiceConfiguration(
         it?.maxDuration ?: ConfigDefault.CheckCompatScriptMaxDuration
       )
     },
+
     customPath = raw.customPath ?: ConfigDefault.CustomPath,
-    datasetRoot = raw.installRoot ?: ConfigDefault.InstallRoot,
-    siteBuild = siteBuild,
   )
 }

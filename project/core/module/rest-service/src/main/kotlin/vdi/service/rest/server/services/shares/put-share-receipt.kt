@@ -15,9 +15,9 @@ import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.outputs.ForbiddenError
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.wrap
-import vdi.service.rest.util.Either
-import vdi.service.rest.util.leftOr
-import vdi.service.rest.util.mapLeft
+import vdi.util.fn.Either
+import vdi.util.fn.leftOr
+import vdi.util.fn.mapLeft
 import vdi.service.rest.generated.model.DatasetShareReceipt as APIShare
 import vdi.service.rest.generated.resources.DatasetsVdiIdSharesRecipientUserId.PutDatasetsSharesReceiptByVdiIdAndRecipientUserIdResponse as PutReceipt
 

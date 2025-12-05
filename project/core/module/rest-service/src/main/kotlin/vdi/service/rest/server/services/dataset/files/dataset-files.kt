@@ -16,7 +16,7 @@ import vdi.service.rest.server.outputs.DatasetFileDetails
 import vdi.service.rest.server.outputs.DatasetZipDetails
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.wrap
-import vdi.service.rest.util.Either
+import vdi.util.fn.Either
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesInstallByVdiIdResponse as DataResponse
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesUploadByVdiIdResponse as UploadResponse
 

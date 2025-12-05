@@ -19,13 +19,14 @@ object PluginHandlers {
 
     loadAndCacheStackConfig().vdi.plugins.forEach { (name, plug) ->
       val addr = plug.server.toHostAddress(80u)
+      val client = PluginHandlerClient(name, PluginHandlerClientConfig(addr))
 
-      RemoteDependencies.register("Plugin $name", addr.host, addr.port)
+      RemoteDependencies.register(PluginDependency(name, addr.host, addr.port, client))
 
       plug.dataTypes.forEach { dt ->
         val key = DatasetType(DataType.of(dt.name), dt.version)
 
-        tmpMap[key] = PluginHandlerImpl(key, PluginHandlerClient(PluginHandlerClientConfig(addr)), PluginRegistry[key]!!)
+        tmpMap[key] = PluginHandlerImpl(key, client, PluginRegistry[key]!!)
       }
     }
 

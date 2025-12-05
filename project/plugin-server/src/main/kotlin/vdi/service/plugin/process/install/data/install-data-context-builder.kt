@@ -26,9 +26,9 @@ private const val INSTALL_PAYLOAD_FILE_NAME = "install-ready.zip"
 private const val INSTALL_DETAILS_MAX_SIZE = 1024uL
 
 @Suppress("DuplicatedCode")
-suspend fun ApplicationCall.withInstallDataContext(
+internal suspend fun ApplicationCall.withInstallDataContext(
   appCtx: ApplicationContext,
-  fn: suspend (InstallDataContext) -> Unit,
+  fn: suspend InstallDataContext.() -> Unit,
 ) {
   if (!request.contentType().match(ContentType.MultiPart.FormData))
     throw UnsupportedMediaTypeException(request.contentType())
@@ -40,10 +40,10 @@ suspend fun ApplicationCall.withInstallDataContext(
 
 @OptIn(ExperimentalContracts::class)
 private suspend fun ApplicationCall.withParsedRequest(
-  appCtx: ApplicationContext,
+  appCtx:    ApplicationContext,
   workspace: Path,
-  propsDir: Path,
-  fn: suspend (context: InstallDataContext) -> Unit,
+  propsDir:  Path,
+  fn:        suspend (context: InstallDataContext) -> Unit,
 ) {
   contract { callsInPlace(fn, InvocationKind.EXACTLY_ONCE) }
 
@@ -93,6 +93,7 @@ private suspend fun ApplicationCall.withParsedRequest(
     deets.validate()
     withDatabaseDetails(deets.installTarget, meta.type) {
       fn(InstallDataContext(
+        pluginName         = appCtx.config.name,
         workspace          = workspace,
         customPath         = appCtx.config.customPath,
         request            = deets,

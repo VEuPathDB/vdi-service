@@ -26,6 +26,10 @@ class ScriptProcessImpl(private val command: String, private val raw: Process) :
     }
   }
 
+  override fun kill() {
+    raw.destroyForcibly()
+  }
+
   override fun exitCode() = raw.exitValue()
 
   override fun isAlive() = raw.isAlive

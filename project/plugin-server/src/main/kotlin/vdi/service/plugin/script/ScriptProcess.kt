@@ -38,6 +38,11 @@ interface ScriptProcess {
   fun waitFor(timeout: Duration)
 
   /**
+   * Force terminates the script process.
+   */
+  fun kill()
+
+  /**
    * Returns the exit code of the process.
    */
   fun exitCode(): Int

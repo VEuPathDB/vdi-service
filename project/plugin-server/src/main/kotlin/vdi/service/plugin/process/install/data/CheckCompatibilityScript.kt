@@ -5,7 +5,7 @@ import kotlin.time.Duration
 import vdi.service.plugin.script.ExitStatus
 import vdi.service.plugin.script.PluginScript
 
-class CheckCompatibilityScript(
+internal class CheckCompatibilityScript(
   override val path: Path,
   override val maxDuration: Duration,
 ): PluginScript {
@@ -20,7 +20,7 @@ class CheckCompatibilityScript(
       when (val c = code.toUByte()) {
         ExitStatus.Success.code            -> ExitStatus.Success
         ExitStatus.CompatibilityError.code -> ExitStatus.CompatibilityError
-        else                                         -> ExitStatus.Unknown(c)
+        else                               -> ExitStatus.Unknown(c)
       }
   }
 }

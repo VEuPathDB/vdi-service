@@ -1,5 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
-package vdi.service.rest.util
+
+package vdi.util.fn
 
 sealed interface Either<L, R> {
   val isLeft: Boolean

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class ServerErrorResponse(
   @field:JsonProperty(Message)
   val message: String
-) {
+): ErrorResponse {
   companion object JsonKey {
     const val Message = "message"
   }

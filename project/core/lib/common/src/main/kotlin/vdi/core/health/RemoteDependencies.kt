@@ -2,7 +2,7 @@ package vdi.core.health
 
 import io.klibs.collections.Deque
 
-object RemoteDependencies : Iterable<Dependency> {
+object RemoteDependencies: Iterable<Dependency> {
   private val registry = Deque<Dependency>()
 
   fun register(dependency: Dependency) {

@@ -8,24 +8,31 @@ import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.moveTo
 import kotlin.time.Duration.Companion.seconds
+import vdi.io.plugin.responses.UninstallResponse
 import vdi.service.plugin.metrics.ScriptMetrics
-import vdi.service.plugin.model.PluginScriptError
 import vdi.service.plugin.script.ScriptExecutor
+import vdi.service.plugin.script.newErrorResponse
 import vdi.service.plugin.service.AbstractInstallHandler
-import vdi.service.plugin.service.makeLogger
 import vdi.util.fmt.RFC3339
 import vdi.util.io.LoggingOutputStream
 
-class UninstallDataHandler(context: UninstallDataContext, executor: ScriptExecutor, metrics: ScriptMetrics)
-  : AbstractInstallHandler<Unit, UninstallDataContext>(context, executor, metrics, context.makeLogger())
+internal class UninstallDataHandler
+private constructor(context: UninstallDataContext, executor: ScriptExecutor, metrics: ScriptMetrics)
+: AbstractInstallHandler<UninstallResponse?, UninstallDataContext>(context, executor, metrics)
 {
+  companion object {
+    context(ctx: UninstallDataContext)
+    suspend fun run(executor: ScriptExecutor, metrics: ScriptMetrics) =
+      UninstallDataHandler(ctx, executor, metrics).run()
+  }
+
   private inline val script
     get() = scriptContext.scriptConfig
 
-  override suspend fun runJob() {
+  override suspend fun runJob(): UninstallResponse? {
     val timer = metrics.uninstallScriptDuration.startTimer()
 
-    executor.executeScript(script.path, workspace, arrayOf(datasetID.toString()), buildScriptEnv()) {
+    return executor.executeScript(script.path, workspace, arrayOf(datasetID.toString()), buildScriptEnv()) {
       coroutineScope {
         val logJob = launch { LoggingOutputStream(logger).use { scriptStdErr.transferTo(it) } }
 
@@ -42,9 +49,11 @@ class UninstallDataHandler(context: UninstallDataContext, executor: ScriptExecut
             val dur = timer.observeDuration()
             logger.info("uninstall script completed successfully in {}", dur.seconds)
             wipeDatasetDir()
+            null
           }
 
-          else -> throw PluginScriptError(script, exitStatus).also { logger.error(it.message) }
+          else -> script.newErrorResponse(exitStatus.code)
+            .also { logger.error(it.message) }
         }
       }
     }

@@ -3,48 +3,63 @@ package vdi.service.plugin.process.install.data
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import org.slf4j.Logger
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.nio.file.Path
 import kotlin.io.path.*
 import kotlin.time.Duration.Companion.seconds
-import vdi.io.plugin.responses.ValidationResponse
+import vdi.io.plugin.responses.InstallDataResponse
+import vdi.io.plugin.responses.MissingDependencyResponse
+import vdi.io.plugin.responses.ServerErrorResponse
 import vdi.json.JSON
+import vdi.logging.mark
 import vdi.model.DatasetMetaFilename
 import vdi.model.meta.DatasetMetadata
 import vdi.service.plugin.metrics.ScriptMetrics
-import vdi.service.plugin.model.MissingDependencyError
-import vdi.service.plugin.model.PluginScriptError
-import vdi.service.plugin.model.ValidationError
 import vdi.service.plugin.process.install.meta.InstallMetaHandler
 import vdi.service.plugin.process.install.meta.InstallMetaHandler.Companion.InstallMetaJob
 import vdi.service.plugin.script.ScriptExecutor
-import vdi.service.plugin.service.*
+import vdi.service.plugin.script.ScriptProcess
+import vdi.service.plugin.script.newErrorResponse
+import vdi.service.plugin.service.AbstractInstallHandler
+import vdi.service.plugin.service.InstallDirName
 import vdi.util.io.LineListOutputStream
 import vdi.util.io.LoggingOutputStream
 import vdi.util.zip.unzip
 
-class InstallDataHandler(context: InstallDataContext, executor: ScriptExecutor, metrics: ScriptMetrics)
-  : AbstractInstallHandler<ValidationResponse, InstallDataContext>(context, executor, metrics, context.dataLogger())
+internal class InstallDataHandler
+private constructor(
+  context:  InstallDataContext,
+  executor: ScriptExecutor,
+  metrics:  ScriptMetrics,
+)
+: AbstractInstallHandler<InstallDataResponse, InstallDataContext>(context, executor, metrics)
 {
-  init {
+  companion object {
+    context(ctx: InstallDataContext)
+    suspend fun run(executor: ScriptExecutor, metrics: ScriptMetrics) =
+      InstallDataHandler(ctx, executor, metrics).run()
+  }
+
+  override suspend fun runJob(): InstallDataResponse {
     scriptContext.installPath.also {
       if (it.exists()) {
         val msg = "dataset install directory already exists: ${it.relativeTo(it.parent.parent.parent)}"
         logger.error(msg)
-        throw InstallDirConflictError(msg)
+        return ServerErrorResponse(msg)
       }
     }
-  }
 
-  override suspend fun runJob(): ValidationResponse {
     val installWorkspace = prepareInstallWorkspace()
     val metaFile = writeMetaFile(installWorkspace, scriptContext.metadata)
     val warnings = ArrayList<String>(4)
 
     runCheckDependencies(metaFile)
+      ?.also { return it }
 
     runInstallData(installWorkspace, warnings)
+      ?.also { return it }
 
     InstallMetaHandler.runJob(InstallMetaJob(
       executor,
@@ -53,7 +68,7 @@ class InstallDataHandler(context: InstallDataContext, executor: ScriptExecutor, 
       scriptContext,
       metrics,
       buildScriptEnv(),
-      scriptContext.metaLogger(),
+      metaLogger(),
     ))
 
     return newValidationResponse(true, warnings)
@@ -72,11 +87,11 @@ class InstallDataHandler(context: InstallDataContext, executor: ScriptExecutor, 
     return installWorkspace
   }
 
-  private suspend fun runCheckDependencies(metaFile: Path) {
-    if (scriptContext.metadata.dependencies.isNotEmpty())
-      return
+  private suspend fun runCheckDependencies(metaFile: Path): InstallDataResponse? {
+    if (scriptContext.metadata.dependencies.isEmpty())
+      return null
 
-    val log = scriptContext.compatLogger()
+    val log = compatLogger()
 
     logger.info("executing check-compatibility")
 
@@ -84,7 +99,7 @@ class InstallDataHandler(context: InstallDataContext, executor: ScriptExecutor, 
     val warnings = ArrayList<String>()
     val meta = JSON.readValue<DatasetMetadata>(metaFile.inputStream())
 
-    executor.executeScript(
+    return executor.executeScript(
       scriptContext.compatConfig.path,
       workspace,
       emptyArray(),
@@ -102,28 +117,7 @@ class InstallDataHandler(context: InstallDataContext, executor: ScriptExecutor, 
             .use { scriptStdOut.transferTo(it) }
         }
 
-        val osw = OutputStreamWriter(scriptStdIn)
-
-        try {
-          for (dep in meta.dependencies)
-            osw.appendLine("${dep.identifier}\t${dep.version}")
-
-          osw.flush()
-        } catch (e: IOException) {
-          log.error("Encountered error while attempting to write to process stdin:", e)
-
-          if (isAlive())
-            throw e
-        } finally {
-          try {
-            osw.close()
-          } catch (e: IOException) {
-            log.error("Encountered error while attempting to close process stdin:", e)
-
-            if (isAlive())
-              throw e
-          }
-        }
+        writeDependencies(meta, log)?.also { return@coroutineScope it }
 
         waitFor(scriptContext.compatConfig.maxDuration)
 
@@ -134,28 +128,64 @@ class InstallDataHandler(context: InstallDataContext, executor: ScriptExecutor, 
 
         metrics.checkCompatCalls.labelValues(compatStatus.displayName).inc()
 
-        when (compatStatus) {
+        return@coroutineScope when (compatStatus) {
           CheckCompatibilityScript.ExitCode.Success -> {
             val dur = timer.observeDuration()
             log.info("script completed successfully in {}", dur.seconds)
+            null
           }
 
           CheckCompatibilityScript.ExitCode.CompatibilityError -> {
             log.info("script completed with status 'incompatible'")
-            throw MissingDependencyError(warnings)
+            MissingDependencyResponse(warnings)
           }
 
-          else -> throw PluginScriptError(scriptContext.compatConfig, compatStatus)
+          else -> scriptContext.compatConfig.newErrorResponse(compatStatus.code)
             .also { log.error(it.message) }
         }
       }
     }
   }
 
-  private suspend fun runInstallData(installDir: Path, warnings: MutableList<String>) {
+  private fun ScriptProcess.writeDependencies(meta: DatasetMetadata, log: Logger): InstallDataResponse? {
+    val osw = OutputStreamWriter(scriptStdIn)
+
+    try {
+      for (dep in meta.dependencies)
+        osw.appendLine("${dep.identifier}\t${dep.version}")
+
+      osw.flush()
+    } catch (e: IOException) {
+      log.error("Encountered error while attempting to write to process stdin:", e)
+
+      // If the process is still running, then this is an error.  If the
+      // process ended, then this may be ignored.
+      if (isAlive()) {
+        kill()
+        return ServerErrorResponse(e.message!!)
+      }
+    } finally {
+      try {
+        osw.close()
+      } catch (e: IOException) {
+        log.error("Encountered error while attempting to close process stdin:", e)
+
+        // If the process is still running, then this is an error.  If the
+        // process ended, then this may be ignored.
+        if (isAlive()) {
+          kill()
+          throw e
+        }
+      }
+    }
+
+    return null
+  }
+
+  private suspend fun runInstallData(installDir: Path, warnings: MutableList<String>): InstallDataResponse? {
     logger.info("executing install-data")
     val timer = metrics.installDataScriptDuration.startTimer()
-    executor.executeScript(
+    return executor.executeScript(
       scriptContext.dataConfig.path,
       workspace,
       arrayOf(datasetID.toString(), installDir.absolutePathString()),
@@ -178,14 +208,15 @@ class InstallDataHandler(context: InstallDataContext, executor: ScriptExecutor, 
           InstallDataScript.ExitCode.Success -> {
             val dur = timer.observeDuration()
             logger.info("script completed successfully in {}", dur.seconds)
+            null
           }
 
           InstallDataScript.ExitCode.ValidationError -> {
             logger.info("script refused to install dataset for validation errors")
-            throw ValidationError(newValidationResponse(false, warnings))
+            newValidationResponse(false, warnings)
           }
 
-          else -> throw PluginScriptError(scriptContext.dataConfig, installStatus)
+          else -> scriptContext.dataConfig.newErrorResponse(installStatus.code)
             .also { logger.error(it.message) }
         }
       }
@@ -199,6 +230,7 @@ class InstallDataHandler(context: InstallDataContext, executor: ScriptExecutor, 
     return metaFile
   }
 
-  class InstallDirConflictError(msg: String): RuntimeException(msg)
+  private fun metaLogger() = logger.mark(scriptName = scriptContext.metaConfig.kind.name)
+  private fun compatLogger() = logger.mark(scriptName = scriptContext.compatConfig.kind.name)
 }
 

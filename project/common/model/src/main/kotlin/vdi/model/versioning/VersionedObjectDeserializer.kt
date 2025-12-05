@@ -12,7 +12,6 @@ import vdi.model.meta.VersionedMetaObject
 
 
 internal class VersionedObjectDeserializer: JsonDeserializer<VersionedMetaObject>() {
-
   @Suppress("UNCHECKED_CAST")
   override fun deserialize(parser: JsonParser, ctx: DeserializationContext): VersionedMetaObject {
     val kind = (ctx.contextualType.rawClass as Class<out VersionedMetaObject>).kotlin
@@ -23,7 +22,7 @@ internal class VersionedObjectDeserializer: JsonDeserializer<VersionedMetaObject
       DatasetMetadata::class,
       DatasetManifest::class,
       DatasetFileInfo::class -> { /* OK */ }
-      else -> throw IllegalStateException("unrecognized versioned meta type: $kind")
+      else -> throw IllegalStateException("unknown versioned meta type: $kind")
     }
 
     val raw = JSON.readValue(parser, ObjectNode::class.java)
@@ -32,8 +31,9 @@ internal class VersionedObjectDeserializer: JsonDeserializer<VersionedMetaObject
       return JSON.convertValue(raw, kind.java)
 
     MetaStructureVersion.entries.forEach { v ->
-      if (v > raw.version)
+      if (v > raw.version) {
         v.migrator.migrate(raw, kind)
+      }
     }
 
     return JSON.convertValue(raw, kind.java)

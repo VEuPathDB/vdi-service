@@ -8,6 +8,8 @@ import java.time.temporal.ChronoUnit
 import kotlin.io.path.*
 import kotlin.time.Duration.Companion.seconds
 import vdi.io.plugin.FileName
+import vdi.io.plugin.responses.ErrorResponse
+import vdi.io.plugin.responses.ImportResponse
 import vdi.io.plugin.responses.ValidationResponse
 import vdi.json.JSON
 import vdi.model.DatasetManifestFilename
@@ -17,11 +19,15 @@ import vdi.model.meta.DatasetFileInfo
 import vdi.model.meta.DatasetManifest
 import vdi.service.plugin.consts.ScriptEnvKey
 import vdi.service.plugin.metrics.ScriptMetrics
-import vdi.service.plugin.model.ValidationError
-import vdi.service.plugin.model.PluginScriptError
 import vdi.service.plugin.script.ScriptExecutor
-import vdi.service.plugin.service.*
+import vdi.service.plugin.script.newErrorResponse
+import vdi.service.plugin.service.AbstractScriptHandler
+import vdi.service.plugin.service.InputDirName
+import vdi.service.plugin.service.OutputDirName
+import vdi.service.plugin.service.OutputFileName
 import vdi.service.plugin.util.Base36
+import vdi.util.fn.Either
+import vdi.util.fn.leftOr
 import vdi.util.io.LineListOutputStream
 import vdi.util.io.LoggingOutputStream
 import vdi.util.zip.CompressionLevel
@@ -33,9 +39,20 @@ import vdi.util.zip.zipEntries
  *
  * @see [vdi.service.plugin.service.AbstractScriptHandler.run] for more details.
  */
-class ImportHandler(context: ImportContext, executor: ScriptExecutor, metrics: ScriptMetrics)
-  : AbstractScriptHandler<Path, ImportContext>(context, executor, metrics, context.makeLogger())
+internal class ImportHandler
+private constructor(
+  context:  ImportContext,
+  executor: ScriptExecutor,
+  metrics:  ScriptMetrics,
+)
+: AbstractScriptHandler<Either<Path, ImportResponse>, ImportContext>(context, executor, metrics)
 {
+  companion object {
+    context(ctx: ImportContext)
+    suspend fun run(executor: ScriptExecutor, metrics: ScriptMetrics) =
+      ImportHandler(ctx, executor, metrics).run()
+  }
+
   private val inputDirectory  = workspace.resolve(InputDirName).createDirectory()
   private val outputDirectory = workspace.resolve(OutputDirName).createDirectory()
 
@@ -55,10 +72,17 @@ class ImportHandler(context: ImportContext, executor: ScriptExecutor, metrics: S
    *    compressed results.
    */
   @OptIn(ExperimentalPathApi::class)
-  override suspend fun runJob(): Path {
+  override suspend fun runJob(): Either<Path, ImportResponse> {
     val inputFiles   = unpackInput()
-    val warnings     = executeScript()
-    val outputFiles  = collectOutputFiles()
+    val warnings = executeScript()
+
+    // If validation failed, or some other error occurred, stop here.
+    if (warnings !is ValidationResponse || !warnings.isValid)
+      return Either.right(warnings)
+
+    val outputFiles = collectOutputFiles()
+      .leftOr { return Either.right(it) }
+
     val dataFilesZip = workspace.resolve(FileName.DataFile)
       .also { it.compress(outputFiles) }
 
@@ -68,12 +92,13 @@ class ImportHandler(context: ImportContext, executor: ScriptExecutor, metrics: S
       .also { it.compress(
         listOf(
           writeManifestFile(inputFiles, outputFiles),
-          writeWarningFile(newValidationResponse(true, warnings)),
+          writeWarningFile(warnings),
           dataFilesZip,
         ),
         CompressionLevel(0u)
       ) }
       .also { outputDirectory.deleteRecursively() }
+      .let { Either.left(it) }
   }
 
   override fun appendScriptEnv(env: MutableMap<String, String>) {
@@ -109,9 +134,6 @@ class ImportHandler(context: ImportContext, executor: ScriptExecutor, metrics: S
     // want to track in the manifest.
     writeInputMetaFile()
 
-    if (inputFiles.isEmpty())
-      throw EmptyInputError()
-
     return inputFiles.map { it to it.fileSize() }
   }
 
@@ -124,21 +146,14 @@ class ImportHandler(context: ImportContext, executor: ScriptExecutor, metrics: S
    * If the import script returns a status code of
    * [vdi.service.plugin.consts.ExitStatus.Import.Success], this method returns normally.
    *
-   * If the import script returns a status code of
-   * [vdi.service.plugin.consts.ExitStatus.Import.ValidationFailure], this method will throw a
-   * [vdi.service.plugin.model.ValidationError] exception.
-   *
-   * If the import script returns any other status code, this method will throw
-   * an [PluginScriptError].
-   *
    * @return A collection of warnings raised by the import script during its
    * execution.
    */
-  private suspend fun executeScript(): Collection<String> {
+  private suspend fun executeScript(): ImportResponse {
     val timer = metrics.importScriptDuration.startTimer()
 
     logger.info("starting import script execution")
-    val warnings = executor.executeScript(
+    return executor.executeScript(
       script.path,
       workspace,
       arrayOf(inputDirectory.absolutePathString(), outputDirectory.absolutePathString()),
@@ -163,37 +178,34 @@ class ImportHandler(context: ImportContext, executor: ScriptExecutor, metrics: S
           ImportScript.ExitCode.Success -> {
             val dur = timer.observeDuration()
             logger.info("script completed successfully in {}", dur.seconds)
+            newValidationResponse(true, warnings)
           }
 
           ImportScript.ExitCode.ValidationError -> {
             logger.info("script rejected dataset with {} validation error(s)", warnings.size)
-            throw ValidationError(newValidationResponse(false, warnings))
+            newValidationResponse(false, warnings)
           }
 
-          else -> throw PluginScriptError(scriptContext.scriptConfig, importStatus)
+          else -> scriptContext.scriptConfig.newErrorResponse(importStatus.code)
             .also { logger.error(it.message) }
         }
-
-        warnings
       }
     }
-
-    return warnings
   }
 
-  private fun collectOutputFiles(): MutableCollection<Path> {
+  private fun collectOutputFiles(): Either<MutableCollection<Path>, ErrorResponse> {
     // Collect a list of the files that the import script spit out.
     val outputFiles = outputDirectory.listDirectoryEntries()
       .toMutableList()
 
     // Ensure that _something_ was produced.
     if (outputFiles.isEmpty())
-      throw PluginScriptError(scriptContext.scriptConfig, "script produced no output files")
+      return Either.right(script.newErrorResponse(0u, "script produced no output files"))
 
     if (outputFiles.any { it.name.startsWith("vdi-") })
-      throw PluginScriptError(scriptContext.scriptConfig, "script produced 'vdi-' prefixed file(s)")
+      return Either.right(script.newErrorResponse(0u, "script produced 'vdi-' prefixed file(s)"))
 
-    return outputFiles
+    return Either.left(outputFiles)
   }
 
   private fun writeManifestFile(inputFiles: Collection<Pair<Path, Long>>, outputFiles: Collection<Path>) =
@@ -216,9 +228,5 @@ class ImportHandler(context: ImportContext, executor: ScriptExecutor, metrics: S
       userUploadFiles = inputFiles.map { DatasetFileInfo(it.first.name, it.second.toULong()) },
       installReadyFiles = outputFiles.map { DatasetFileInfo(it.name, it.fileSize().toULong()) },
     )
-
-  class EmptyInputError : RuntimeException("input archive contained no files")
-
-  data class WarningsFile(val warnings: Collection<String>)
 }
 

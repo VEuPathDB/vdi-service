@@ -3,11 +3,14 @@ package vdi.service.plugin.process.install.data
 import java.nio.file.Path
 import vdi.db.app.TargetDatabaseDetails
 import vdi.io.plugin.requests.InstallDataRequest
+import vdi.logging.logger
+import vdi.logging.mark
 import vdi.model.meta.DatasetMetadata
 import vdi.service.plugin.process.install.meta.InstallMetaScript
 import vdi.service.plugin.server.context.InstallScriptContext
 
-class InstallDataContext(
+internal class InstallDataContext(
+  pluginName: String,
   override val workspace: Path,
   override val customPath: String,
   override val request: InstallDataRequest,
@@ -20,6 +23,17 @@ class InstallDataContext(
   val dataConfig: InstallDataScript,
   val compatConfig: CheckCompatibilityScript,
 ): InstallScriptContext<InstallDataRequest, InstallDataScript> {
+  override val logger = logger<InstallDataHandler>()
+    .mark(
+      eventID       = eventID,
+      datasetID     = datasetID,
+      ownerID       = ownerID,
+      scriptName    = scriptConfig.kind.name,
+      dataType      = metadata.type,
+      pluginName    = pluginName,
+      installTarget = installTarget,
+    )
+
   override val scriptConfig: InstallDataScript
     get() = dataConfig
 

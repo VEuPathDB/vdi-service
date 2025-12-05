@@ -4,7 +4,7 @@ import vdi.io.plugin.responses.ScriptErrorResponse
 
 data class ScriptErrorResponse(override val body: ScriptErrorResponse): ServiceErrorResponse {
   override val message
-    get() = body.lastMessage
+    get() = body.message
 
   inline val exitCode
     get() = body.exitCode

@@ -12,8 +12,7 @@ abstract class AbstractInstallHandler<T, C: InstallScriptContext<*, *>>(
   scriptContext: C,
   executor:      ScriptExecutor,
   metrics:       ScriptMetrics,
-  logger:        Logger,
-): AbstractScriptHandler<T, C>(scriptContext, executor, metrics, logger) {
+): AbstractScriptHandler<T, C>(scriptContext, executor, metrics) {
   protected inline val projectID
     get() = scriptContext.installTarget
 

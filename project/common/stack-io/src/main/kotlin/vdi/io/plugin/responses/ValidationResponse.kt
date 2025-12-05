@@ -14,7 +14,7 @@ data class ValidationResponse(
   @param:JsonProperty(Community)
   @field:JsonProperty(Community)
   val communityWarnings: List<String>,
-) {
+): ImportResponse, InstallMetaResponse, InstallDataResponse {
   companion object JsonKey {
     const val IsValid = "isValid"
     const val Basic = "basicValidation"

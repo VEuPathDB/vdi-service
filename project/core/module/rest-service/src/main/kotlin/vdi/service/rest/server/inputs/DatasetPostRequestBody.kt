@@ -9,9 +9,9 @@ import vdi.service.rest.generated.model.BadRequestError
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.DatasetVisibility
 import vdi.service.rest.server.outputs.BadRequestError
-import vdi.service.rest.util.Either
-import vdi.service.rest.util.Either.Companion.left
-import vdi.service.rest.util.Either.Companion.right
+import vdi.util.fn.Either
+import vdi.util.fn.Either.Companion.left
+import vdi.util.fn.Either.Companion.right
 
 fun DatasetPostRequestBody.cleanup() {
   details?.cleanup()

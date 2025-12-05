@@ -22,9 +22,9 @@ import vdi.service.plugin.util.parseAsJson
 // Max allowed size of the post body: 32KiB
 private const val MAX_INPUT_BYTES = 32768uL
 
-suspend fun ApplicationCall.withInstallMetaContext(
+internal suspend fun ApplicationCall.withInstallMetaContext(
   appCtx: ApplicationContext,
-  fn: suspend (InstallMetaContext) -> Unit,
+  fn: suspend InstallMetaContext.() -> Unit,
 ) {
   if (!request.contentType().match(ContentType.Application.Json))
     throw UnsupportedMediaTypeException(request.contentType())
@@ -66,6 +66,7 @@ private suspend fun ApplicationCall.withParsedRequest(
 
   withDatabaseDetails(details.installTarget, details.meta.type) {
     fn(InstallMetaContext(
+      pluginName         = appCtx.config.name,
       workspace          = workspace,
       customPath         = appCtx.config.customPath,
       request            = details,

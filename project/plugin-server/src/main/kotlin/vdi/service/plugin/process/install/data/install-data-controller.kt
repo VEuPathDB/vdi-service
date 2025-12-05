@@ -1,24 +1,22 @@
 package vdi.service.plugin.process.install.data
 
 import io.ktor.server.application.ApplicationCall
-import vdi.io.plugin.responses.PluginResponseStatus
-import vdi.io.plugin.responses.ServerErrorResponse
+import vdi.io.plugin.responses.*
 import vdi.service.plugin.model.ApplicationContext
-import vdi.service.plugin.model.MissingDependencyError
 import vdi.service.plugin.server.respondJSON
 
-suspend fun ApplicationCall.handleInstallDataRequest(appCtx: ApplicationContext) {
-  withInstallDataContext(appCtx) { installCtx ->
-    try {
-      respondJSON(
-        InstallDataHandler(installCtx, appCtx.executor, appCtx.metrics.scriptMetrics)
-          .run(),
-        PluginResponseStatus.Success,
-      )
-    } catch (e: MissingDependencyError) {
-      respondJSON(e.toResponse(), PluginResponseStatus.MissingDependencyError)
-    } catch (e: InstallDataHandler.InstallDirConflictError) {
-      respondJSON(ServerErrorResponse(e.message!!), PluginResponseStatus.ServerError)
-    }
+internal suspend fun ApplicationCall.handleInstallDataRequest(appCtx: ApplicationContext) {
+  withInstallDataContext(appCtx) {
+    val res = InstallDataHandler.run(appCtx.executor, appCtx.metrics.scriptMetrics)
+
+    respondJSON(res, when (res) {
+      is ValidationResponse ->
+        if (res.isValid) PluginResponseStatus.Success
+        else PluginResponseStatus.ValidationError
+
+      is MissingDependencyResponse -> PluginResponseStatus.MissingDependencyError
+      is ScriptErrorResponse       -> PluginResponseStatus.ScriptError
+      is ServerErrorResponse       -> PluginResponseStatus.ServerError
+    })
   }
 }

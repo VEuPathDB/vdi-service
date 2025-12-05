@@ -16,7 +16,7 @@ import vdi.service.plugin.process.install.meta.handleInstallMetaRequest
 import vdi.service.plugin.process.uninstall.handleUninstallRequest
 import vdi.service.plugin.server.errors.withExceptionMapping
 
-fun Application.configureServer(appCtx: ApplicationContext) {
+internal fun Application.configureServer(appCtx: ApplicationContext) {
 
   install(MicrometerMetrics) { registry = appCtx.metrics.micrometer }
 

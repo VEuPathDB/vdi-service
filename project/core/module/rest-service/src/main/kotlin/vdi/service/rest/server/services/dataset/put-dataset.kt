@@ -25,7 +25,7 @@ import vdi.service.rest.server.outputs.ForbiddenError
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.outputs.wrap
-import vdi.service.rest.util.Either
+import vdi.util.fn.Either
 
 // TODO: don't allow users to revise a dataset that has another revision already in progress!
 

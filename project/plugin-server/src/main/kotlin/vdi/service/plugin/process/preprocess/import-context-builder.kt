@@ -14,11 +14,9 @@ import java.nio.file.Path
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.io.path.createDirectories
 import vdi.io.plugin.requests.FormField
 import vdi.io.plugin.requests.ImportRequest
 import vdi.service.plugin.model.ApplicationContext
-import vdi.service.plugin.server.context.DataDictionaryDirectoryName
 import vdi.service.plugin.server.context.handlePayload
 import vdi.service.plugin.server.context.reqNotNull
 import vdi.service.plugin.server.context.reqNull
@@ -29,9 +27,9 @@ private const val IMPORT_PAYLOAD_FILE_NAME = "import.zip"
 private const val IMPORT_DETAILS_MAX_SIZE  = 16384uL
 
 @OptIn(ExperimentalContracts::class)
-suspend fun ApplicationCall.withImportContext(
+internal suspend fun ApplicationCall.withImportContext(
   appCtx: ApplicationContext,
-  fn: suspend (importCtx: ImportContext) -> Unit,
+  fn: suspend ImportContext.() -> Unit,
 ) {
   contract { callsInPlace(fn, InvocationKind.AT_MOST_ONCE) }
 
@@ -51,7 +49,6 @@ private suspend fun ApplicationCall.withParsedRequest(
 
   var details: ImportRequest? = null
   var payload: Path? = null
-  val dataDictPath: Path = workspace.resolve(DataDictionaryDirectoryName)
   var errored = false
 
   receiveMultipart().forEachPart { part ->
@@ -68,11 +65,6 @@ private suspend fun ApplicationCall.withParsedRequest(
           FormField.Payload -> {
             reqNull(payload, FormField.Payload)
             payload = part.handlePayload(workspace, IMPORT_PAYLOAD_FILE_NAME)
-          }
-
-          FormField.DataDict -> {
-            dataDictPath.createDirectories()
-            part.handlePayload(dataDictPath, part.originalFileName!!)
           }
 
           else -> {
@@ -100,12 +92,12 @@ private suspend fun ApplicationCall.withParsedRequest(
   details.also { deets ->
     deets.validate()
     fn(ImportContext(
+      appCtx.config.name,
       workspace,
       appCtx.config.customPath,
       deets,
-      payload,
-      dataDictPath,
       appCtx.config.importScript,
+      payload,
     ))
   }
 }

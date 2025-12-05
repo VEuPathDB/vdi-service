@@ -3,10 +3,13 @@ package vdi.service.plugin.process.install.meta
 import java.nio.file.Path
 import vdi.db.app.TargetDatabaseDetails
 import vdi.io.plugin.requests.InstallMetaRequest
+import vdi.logging.logger
+import vdi.logging.mark
 import vdi.model.EventID
 import vdi.service.plugin.server.context.InstallScriptContext
 
-data class InstallMetaContext(
+internal class InstallMetaContext(
+  pluginName: String,
   override val workspace:          Path,
   override val customPath:         String,
   override val request:            InstallMetaRequest,
@@ -15,6 +18,17 @@ data class InstallMetaContext(
   override val databaseConfig:     TargetDatabaseDetails,
   override val scriptConfig:       InstallMetaScript,
 ): InstallScriptContext<InstallMetaRequest, InstallMetaScript> {
+  override val logger = logger<InstallMetaHandler>()
+    .mark(
+      eventID       = eventID,
+      datasetID     = datasetID,
+      ownerID       = ownerID,
+      scriptName    = scriptConfig.kind.name,
+      dataType      = metadata.type,
+      pluginName    = pluginName,
+      installTarget = installTarget,
+    )
+
   inline val ownerID
     get() = metadata.owner
 

@@ -16,5 +16,6 @@ interface PluginScript {
     InstallData,
     InstallMeta,
     Uninstall,
+    ;
   }
 }

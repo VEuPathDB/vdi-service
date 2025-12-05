@@ -13,8 +13,8 @@ import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.*
 import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.server.services.dataset.files.*
-import vdi.service.rest.util.fold
-import vdi.service.rest.util.mapLeft
+import vdi.util.fn.fold
+import vdi.util.fn.mapLeft
 
 @Authenticated(adminOverride = ALLOW_ALWAYS)
 class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, ControllerBase(request) {

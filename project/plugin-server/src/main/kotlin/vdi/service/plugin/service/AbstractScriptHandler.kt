@@ -1,6 +1,5 @@
 package vdi.service.plugin.service
 
-import org.slf4j.Logger
 import vdi.io.plugin.responses.ValidationResponse
 import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.script.ScriptExecutor
@@ -9,12 +8,18 @@ import vdi.model.Environment
 import vdi.service.plugin.consts.ScriptEnvKey
 import vdi.service.plugin.server.context.ScriptContext
 
+/**
+ * @param T Response Type
+ * @param C Script Context
+ */
 abstract class AbstractScriptHandler<T, C: ScriptContext<*, *>>(
   protected val scriptContext: C,
   protected val executor: ScriptExecutor,
   protected val metrics: ScriptMetrics,
-  protected val logger: Logger,
 ) {
+  protected inline val logger
+    get() = scriptContext.logger
+
   protected inline val datasetID
     get() = scriptContext.datasetID
 

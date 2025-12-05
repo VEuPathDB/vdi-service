@@ -8,31 +8,33 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.createFile
 import kotlin.io.path.outputStream
 import kotlin.time.Duration.Companion.seconds
+import vdi.io.plugin.responses.ErrorResponse
+import vdi.io.plugin.responses.InstallMetaResponse
 import vdi.json.JSON
 import vdi.model.DatasetMetaFilename
 import vdi.model.Environment
 import vdi.service.plugin.metrics.ScriptMetrics
-import vdi.service.plugin.model.PluginScriptError
 import vdi.service.plugin.script.ScriptExecutor
+import vdi.service.plugin.script.newErrorResponse
 import vdi.service.plugin.server.context.InstallScriptContext
 import vdi.service.plugin.service.AbstractInstallHandler
-import vdi.service.plugin.service.makeLogger
 import vdi.util.io.LineListOutputStream
 import vdi.util.io.LoggingOutputStream
 
-class InstallMetaHandler(
+internal class InstallMetaHandler
+private constructor(
   context:  InstallMetaContext,
   executor: ScriptExecutor,
   metrics:  ScriptMetrics,
 )
-  : AbstractInstallHandler<Unit, InstallMetaContext>(context, executor, metrics, context.makeLogger())
+: AbstractInstallHandler<InstallMetaResponse?, InstallMetaContext>(context, executor, metrics)
 {
-  override suspend fun runJob() {
+  override suspend fun runJob(): InstallMetaResponse? {
     val metaFile = workspace.resolve(DatasetMetaFilename)
       .createFile()
       .apply { outputStream().use { JSON.writeValue(it, scriptContext.metadata) } }
 
-    runJob(InstallMetaJob(
+    return runJob(InstallMetaJob(
       executor,
       workspace,
       metaFile,
@@ -44,6 +46,10 @@ class InstallMetaHandler(
   }
 
   companion object {
+    context(ctx: InstallMetaContext)
+    suspend fun run(executor: ScriptExecutor, metrics: ScriptMetrics) =
+      InstallMetaHandler(ctx, executor, metrics).run()
+
     data class InstallMetaJob(
       val executor:    ScriptExecutor,
       val workspace:   Path,
@@ -54,10 +60,10 @@ class InstallMetaHandler(
       val logger:      Logger,
     )
 
-    suspend fun runJob(job: InstallMetaJob) {
+    suspend fun runJob(job: InstallMetaJob): ErrorResponse? {
       val timer = job.metrics.installMetaScriptDuration.startTimer()
 
-      job.executor.executeScript(
+      return job.executor.executeScript(
         job.script.scriptConfig.path,
         job.workspace,
         arrayOf(
@@ -86,6 +92,7 @@ class InstallMetaHandler(
             InstallMetaScript.ExitCode.Success -> {
               val dur = timer.observeDuration()
               job.logger.info("script completed successfully in {}", dur.seconds)
+              null
             }
 
             InstallMetaScript.ExitCode.ValidationError -> {
@@ -93,7 +100,9 @@ class InstallMetaHandler(
               TODO("WAAAAA")
             }
 
-            else -> throw PluginScriptError(job.script.scriptConfig, status)
+            else -> job.script.scriptConfig.newErrorResponse(
+              status.code,
+            )
           }
         }
       }

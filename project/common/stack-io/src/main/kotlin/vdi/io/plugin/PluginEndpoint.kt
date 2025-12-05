@@ -9,4 +9,6 @@ object PluginEndpoint {
   const val InstallData = "$InstallPathRoot$DataSubPath"
   const val InstallMeta = "$InstallPathRoot$MetaSubPath"
   const val Uninstall = "/uninstall"
+
+  const val ServiceInfo = "/service-info"
 }

@@ -19,23 +19,29 @@ const val PrefixScript = "S"
 
 // region Logger Wrapping
 
+inline fun Logger.mark(marks: Array<String>) =
+  when (this) {
+    is MarkedLogger -> copy(marks)
+    else            -> MarkedLogger(marks, this)
+  }
+
 inline fun Logger.mark(eventID: EventID) =
-  MarkedLogger("$PrefixEventID=$eventID", this)
+  mark(arrayOf("$PrefixEventID=$eventID"))
 
 inline fun Logger.mark(eventID: EventID, datasetID: DatasetID) =
-  MarkedLogger("$PrefixEventID=$eventID $PrefixDatasetID=$datasetID", this)
+  mark(arrayOf("$PrefixEventID=$eventID", "$PrefixDatasetID=$datasetID"))
 
 inline fun Logger.mark(eventID: EventID, ownerID: UserID, datasetID: DatasetID) =
-  MarkedLogger(createLoggerMark(eventID, ownerID, datasetID), this)
+  mark(createLoggerMark(eventID, ownerID, datasetID))
 
 inline fun Logger.mark(dataType: DatasetType, plugin: String) =
-  MarkedLogger(createLoggerMark(dataType, plugin), this)
+  mark(createLoggerMark(dataType, plugin))
 
 inline fun Logger.mark(dataType: DatasetType, plugin: String, target: InstallTargetID) =
-  MarkedLogger(createLoggerMark(dataType, plugin) + " $PrefixInstallTarget=$target", this)
+  mark(createLoggerMark(dataType, plugin) + " $PrefixInstallTarget=$target")
 
 inline fun Logger.mark(ownerID: UserID, datasetID: DatasetID) =
-  MarkedLogger(createLoggerMark(ownerID, datasetID), this)
+  mark(createLoggerMark(ownerID, datasetID))
 
 inline fun Logger.mark(
   eventID: EventID? = null,
@@ -46,16 +52,7 @@ inline fun Logger.mark(
   scriptName: String? = null,
   installTarget: InstallTargetID? = null,
 ) =
-  MarkedLogger(
-    createLoggerMark(eventID, ownerID, datasetID, dataType, pluginName, scriptName, installTarget),
-    this,
-  )
-
-private inline fun String.add(prefix: String, value: Any?) =
-  if (value != null)
-    "$this $prefix=$value"
-  else
-    this
+  mark(createLoggerMark(eventID, ownerID, datasetID, dataType, pluginName, scriptName, installTarget))
 
 // endregion Logger Wrapping
 
@@ -79,13 +76,13 @@ inline fun Any.markedLogger(
   .mark(eventID, ownerID, datasetID, dataType, pluginName, scriptName, installTarget)
 
 inline fun Any.markedLogger(ownerID: UserID, datasetID: DatasetID): Logger =
-  markedLogger(createLoggerMark(ownerID, datasetID))
+  logger().mark(createLoggerMark(ownerID, datasetID))
 
 inline fun Any.markedLogger(ownerID: UserID, datasetID: DatasetID, project: InstallTargetID): Logger =
-  markedLogger(createLoggerMark(ownerID, datasetID, project))
+  logger().mark(createLoggerMark(ownerID, datasetID, project))
 
 inline fun Any.markedLogger(datasetID: DatasetID, project: InstallTargetID): Logger =
-  markedLogger(createLoggerMark(datasetID, project))
+  logger().mark(createLoggerMark(datasetID, project))
 
 inline fun Any.logger(): Logger =
   LoggerFactory.getLogger(this::class.java)
@@ -94,7 +91,7 @@ inline fun <reified T: Any> logger(): Logger =
   LoggerFactory.getLogger(T::class.java)
 
 inline fun <reified T: Any> markedLogger(ownerID: UserID, datasetID: DatasetID): Logger =
-  markedLogger<T>(createLoggerMark(ownerID, datasetID))
+  MarkedLogger(createLoggerMark(ownerID, datasetID), logger<T>())
 
 inline fun <reified T: Any> markedLogger(mark: String): Logger =
   MarkedLogger(mark, T::class)
@@ -104,25 +101,27 @@ inline fun <reified T: Any> markedLogger(mark: String): Logger =
 // region String Building
 
 inline fun createLoggerMark(dataType: DatasetType, pluginName: String) =
-  "$PrefixDataType=$dataType $PrefixPluginName=$pluginName"
+  arrayOf("$PrefixDataType=$dataType", "$PrefixPluginName=$pluginName")
 
-inline fun createLoggerMark(
-  ownerID: UserID,
-  datasetID: DatasetID,
-  project: InstallTargetID,
-) = "$PrefixUserID=$ownerID $PrefixDatasetID=$datasetID $PrefixInstallTarget=$project"
+inline fun createLoggerMark(ownerID: UserID, datasetID: DatasetID, installTarget: InstallTargetID) =
+  arrayOf(
+    "$PrefixUserID=$ownerID",
+    "$PrefixDatasetID=$datasetID",
+    "$PrefixInstallTarget=$installTarget",
+  )
 
-inline fun createLoggerMark(
-  eventID: EventID,
-  ownerID: UserID,
-  datasetID: DatasetID,
-) = "$PrefixEventID=$eventID $PrefixUserID=$ownerID $PrefixInstallTarget=$datasetID"
+inline fun createLoggerMark(eventID: EventID, ownerID: UserID, datasetID: DatasetID) =
+  arrayOf(
+    "$PrefixEventID=$eventID",
+    "$PrefixUserID=$ownerID",
+    "$PrefixInstallTarget=$datasetID",
+  )
 
 inline fun createLoggerMark(ownerID: UserID, datasetID: DatasetID) =
-  "$PrefixUserID=$ownerID $PrefixDatasetID=$datasetID"
+  arrayOf("$PrefixUserID=$ownerID", "$PrefixDatasetID=$datasetID")
 
 inline fun createLoggerMark(datasetID: DatasetID, project: InstallTargetID) =
-  "$PrefixDatasetID=$datasetID $PrefixInstallTarget=$project"
+  arrayOf("$PrefixDatasetID=$datasetID", "$PrefixInstallTarget=$project")
 
 fun createLoggerMark(
   eventID: EventID? = null,
@@ -132,13 +131,26 @@ fun createLoggerMark(
   pluginName: String? = null,
   scriptName: String? = null,
   installTarget: InstallTargetID? = null,
-) = ""
-  .add(PrefixEventID, eventID)
-  .add(PrefixUserID, ownerID)
-  .add(PrefixDatasetID, datasetID)
-  .add(PrefixDataType, dataType)
-  .add(PrefixPluginName, pluginName)
-  .add(PrefixScript, scriptName)
-  .add(PrefixInstallTarget, installTarget)
+) = arrayOf(
+  eventID?.let { "$PrefixEventID=$it" },
+  ownerID?.let { "$PrefixUserID=$it" },
+  datasetID?.let { "$PrefixDatasetID=$it" },
+  dataType?.let { "$PrefixDataType=$it" },
+  pluginName?.let { "$PrefixPluginName=$it" },
+  scriptName?.let { "$PrefixScript=$it" },
+  installTarget?.let { "$PrefixInstallTarget=$it" },
+).let { marks ->
+  var last = 0
+  Array(marks.count { it != null }) {
+    for (i in last ..< marks.size) {
+      if (marks[i] != null) {
+        last = i+1
+        return@Array marks[i]!!
+      }
+    }
+
+    ""
+  }
+}
 
 // endregion String Building

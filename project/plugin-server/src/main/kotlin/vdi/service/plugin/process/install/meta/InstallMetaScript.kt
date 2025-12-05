@@ -5,7 +5,7 @@ import kotlin.time.Duration
 import vdi.service.plugin.script.ExitStatus
 import vdi.service.plugin.script.PluginScript
 
-class InstallMetaScript(
+internal class InstallMetaScript(
   override val path: Path,
   override val maxDuration: Duration,
 ): PluginScript {
