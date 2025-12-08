@@ -94,7 +94,7 @@ internal class MaterializedDatasetDirectory(
             FileName.ShareReceiptFile -> shareRefBuilders.computeIfAbsent(path.recipientID, ::ShareRefBuilder).receipt = it
           }
 
-          is MappingFilePath -> dataPropertiesFiles.add(MappingFile(it))
+          is VariablePropsFilePath -> dataPropertiesFiles.add(MappingFile(it))
         }
       }
 

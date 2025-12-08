@@ -21,6 +21,7 @@ import vdi.core.s3.paths.DataFilePath
 import vdi.core.s3.paths.FlagFilePath
 import vdi.core.s3.paths.MetaFilePath
 import vdi.core.s3.paths.S3Paths
+import vdi.core.s3.paths.VariablePropsFilePath
 import vdi.logging.logger
 import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
@@ -58,8 +59,17 @@ object Pruner {
    * history details.
    */
   private inline val retainedRevisionHistoryFiles get() = arrayOf<(String) -> Boolean>(
+    // Keep the revised flag
     { FlagFilePath.matches(it) && it.endsWith(FileName.RevisedFlagFile) },
+
+    // Keep the metadata flags
     { MetaFilePath.matches(it) && it.endsWith(FileName.ManifestFile) },
+    { MetaFilePath.matches(it) && it.endsWith(FileName.MetadataFile) },
+
+    // Keep the variable properties
+    { VariablePropsFilePath.matches(it) },
+
+    // Keep the original user upload
     { DataFilePath.matches(it) && (
       it.endsWith(FileName.RawUploadFile)
       || it.endsWith(FileName.ImportReadyFile) // TODO: remove this when the async upload process is implemented

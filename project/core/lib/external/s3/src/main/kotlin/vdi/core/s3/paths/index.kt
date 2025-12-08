@@ -4,7 +4,7 @@ private val pathFactories = arrayOf(
   DataFilePath.Companion,
   DocumentFilePath.Companion,
   FlagFilePath.Companion,
-  MappingFilePath.Companion,
+  VariablePropsFilePath.Companion,
   MetaFilePath.Companion,
   ShareFilePath.Companion,
 )

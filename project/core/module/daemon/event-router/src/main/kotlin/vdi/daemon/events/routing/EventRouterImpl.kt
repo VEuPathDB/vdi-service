@@ -134,7 +134,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
         FileName.RevisedFlagFile -> safeSend(path.userID, path.datasetID, kr::sendSoftDeleteTrigger)
       }
 
-      is MappingFilePath -> TODO("")
+      is VariablePropsFilePath -> safeSend(path.userID, path.datasetID, kr::sendUpdateMetaTrigger)
 
       is DocumentFilePath -> { /* ignore dataset document events */ }
     }

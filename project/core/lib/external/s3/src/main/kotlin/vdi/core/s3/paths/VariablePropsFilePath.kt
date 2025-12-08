@@ -5,23 +5,23 @@ import vdi.core.s3.util.PathFactory
 import vdi.model.meta.DatasetID
 import vdi.model.meta.UserID
 
-sealed interface MappingFilePath: DatasetPath {
+sealed interface VariablePropsFilePath: DatasetPath {
 
-  companion object: PathFactory<MappingFilePath> {
+  companion object: PathFactory<VariablePropsFilePath> {
     private val pattern = Regex("^([\\w-]+)/(\\d+)/([\\w.]+)/${FileName.MappingDirectory}/([^/]+)$")
 
     override fun matches(path: String) = pattern.matches(path)
 
-    override fun create(path: String): MappingFilePath =
+    override fun create(path: String): VariablePropsFilePath =
       pattern.matchEntire(path)!!.destructured.let { (bucket, user, dataset, file) ->
-        MappingFilePathImpl(file, path, UserID(user), DatasetID(dataset), bucket) }
+        VariablePropsFilePathImpl(file, path, UserID(user), DatasetID(dataset), bucket) }
   }
 
-  private class MappingFilePathImpl(
+  private class VariablePropsFilePathImpl(
     override val fileName: String,
     override val pathString: String,
     override val userID: UserID,
     override val datasetID: DatasetID,
     override val bucketName: String
-  ): MappingFilePath
+  ): VariablePropsFilePath
 }
