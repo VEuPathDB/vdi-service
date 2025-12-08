@@ -30,6 +30,7 @@ public final class JsonField {
   public static final String DAEMONS = "daemons";
   public static final String DATA = "data";
   public static final String DATA_FILES = "dataFiles";
+  public static final String DATA_PROPERTIES_FILES = "dataPropertiesFiles";
   public static final String DATA_PROPS_FILE_NAME_PLURAL = "dataPropsFileNamePlural";
   public static final String DATA_PROPS_FILE_NAME_SINGULAR = "dataPropsFileNameSingular";
   public static final String DATA_TYPES = "dataTypes";
@@ -84,7 +85,6 @@ public final class JsonField {
   public static final String LAST_NAME = "lastName";
   public static final String LIMIT = "limit";
   public static final String LINKED_DATASETS = "linkedDatasets";
-  public static final String MAPPING_FILES = "mappingFiles";
   public static final String MAX_FILE_SIZE = "maxFileSize";
   public static final String MAX_UPLOAD_SIZE = "maxUploadSize";
   public static final String MESSAGE = "message";
