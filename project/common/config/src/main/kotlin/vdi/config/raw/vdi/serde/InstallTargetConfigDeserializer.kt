@@ -23,7 +23,7 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
 
     val targetName = obj[JsonKey.TargetName].textValue()
     val dataTypes  = (obj[JsonKey.DataTypes] as ArrayNode?)?.processDataTypes() ?: emptySet()
-    val fileRoot   = obj[JsonKey.FileRoot].textValue()
+    val fileRoot   = obj[JsonKey.FileRoot]?.textValue()
 
     if (obj[JsonKey.Enabled]?.booleanValue() == false) {
       val dummyDB =
