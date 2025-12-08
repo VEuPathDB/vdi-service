@@ -93,13 +93,13 @@ internal class PluginHandlerClientImpl(
         Status.ValidationError -> ValidationErrorResponse(JSON.readValue(body))
           .also { body.close() }
 
-        Status.ScriptError     -> ScriptErrorResponse(JSON.readValue(body))
+        Status.ScriptError -> ScriptErrorResponse(JSON.readValue(body))
           .also { body.close() }
 
-        Status.ServerError     -> ServerErrorResponse(JSON.readValue(body))
+        Status.ServerError -> ServerErrorResponse(JSON.readValue(body))
           .also { body.close() }
 
-        else                   -> {
+        else -> {
           body.close()
           throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
         }
@@ -147,12 +147,12 @@ internal class PluginHandlerClientImpl(
   }
 
   override suspend fun postInstallData(
-    eventID: EventID,
-    datasetID: DatasetID,
+    eventID:       EventID,
+    datasetID:     DatasetID,
     installTarget: InstallTargetID,
-    meta: InputStream,
-    manifest: InputStream,
-    payload: InputStream,
+    meta:          InputStream,
+    manifest:      InputStream,
+    payload:       InputStream,
     dataPropFiles: Iterable<DataPropertiesFile>,
   ): InstallDataResponse {
     val log = log.mark(eventID, datasetID)

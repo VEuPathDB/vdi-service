@@ -17,7 +17,7 @@ internal class RabbitInstanceFactory(config: RabbitMQConfig) {
       password = config.connection.password.asString
       isAutomaticRecoveryEnabled = false
       connectionTimeout = config.connection.connectionTimeout.inWholeMilliseconds.toInt()
-      useNio()
+      netty()
 
       if (config.connection.useTLS) {
         useSslProtocol()

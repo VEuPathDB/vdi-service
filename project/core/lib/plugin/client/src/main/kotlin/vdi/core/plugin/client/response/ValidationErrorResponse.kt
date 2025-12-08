@@ -2,7 +2,7 @@ package vdi.core.plugin.client.response
 
 import vdi.io.plugin.responses.ValidationResponse
 
-data class ValidationErrorResponse(override val body: ValidationResponse)
+class ValidationErrorResponse(override val body: ValidationResponse)
   : DataErrorResponse
   , ImportResponse
   , InstallDataResponse

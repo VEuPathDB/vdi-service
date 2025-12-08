@@ -116,9 +116,8 @@ object ShortID {
    */
   suspend fun generate(): String {
     var curTime = timestamp()
-    var tbCopy: Byte
 
-    lock.withLock {
+    val tbCopy = lock.withLock {
       if (curTime <= lastTime) {
         if (tieBreaker == TieMax) {
           lastTime++
@@ -132,7 +131,7 @@ object ShortID {
         tieBreaker = 0
       }
 
-      tbCopy = tieBreaker
+      tieBreaker
     }
 
     return String(buildIdentifier(curTime, tbCopy))

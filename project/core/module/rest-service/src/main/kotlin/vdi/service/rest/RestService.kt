@@ -38,11 +38,14 @@ class RestService(config: StackConfig, manifest: ManifestConfig): Server() {
 
   override fun newOptions() = options
 
-  @Suppress("UnusedExpression")
   private fun initFacades() {
+    @Suppress("UnusedExpression")
     AppDatabaseRegistry
+    @Suppress("UnusedExpression")
     InstallTargetRegistry
+    @Suppress("UnusedExpression")
     PluginRegistry
+
     AppDB()
     CacheDB()
   }
