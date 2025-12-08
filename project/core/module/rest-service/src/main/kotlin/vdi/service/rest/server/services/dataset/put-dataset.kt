@@ -83,7 +83,7 @@ internal fun <T: ControllerBase> T.putDataset(
 
   val uploadRefs = CacheDB().initializeDataset(userID, newDatasetID, newMeta) {
     it.tryInsertRevisionLink(newHistory.originalID, newHistory.revisions.last())
-    resolveDatasetFiles(request.dataFiles, request.url, request.docFiles, uploadConfig)
+    resolveDatasetFiles(request.dataFiles, request.url, request.docFiles, emptyList(), uploadConfig)
   }
 
   submitUpload(newDatasetID, uploadRefs, newMeta, uploadConfig)

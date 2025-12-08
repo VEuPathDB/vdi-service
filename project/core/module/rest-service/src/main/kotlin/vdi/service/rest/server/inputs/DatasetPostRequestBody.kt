@@ -15,10 +15,11 @@ import vdi.util.fn.Either.Companion.right
 
 fun DatasetPostRequestBody.cleanup() {
   details?.cleanup()
-  url          = url?.takeUnless(String::isBlank)?.trim()
-  dataFiles    = dataFiles.takeUnless(Collection<*>::isNullOrEmpty)
-  docFiles     = docFiles.takeUnless(Collection<*>::isNullOrEmpty)
-  mappingFiles = mappingFiles.takeUnless(Collection<*>::isNullOrEmpty)
+  url       = url?.takeUnless(String::isBlank)?.trim()
+  dataFiles = dataFiles.takeUnless(Collection<*>::isNullOrEmpty)
+  docFiles  = docFiles.takeUnless(Collection<*>::isNullOrEmpty)
+
+  dataPropertiesFiles = dataPropertiesFiles.takeUnless(Collection<*>::isNullOrEmpty)
 }
 
 @Suppress("DuplicatedCode") // overlap in generated API pojo field names
@@ -49,7 +50,7 @@ fun DatasetPostRequestBody.validate(): Either<BadRequestError, ValidationErrors>
   val dataTypeConfig = details.type?.toInternal()?.let(PluginRegistry::configDataFor)
 
   // If no mapping files were provided
-  if (mappingFiles == null) {
+  if (dataPropertiesFiles == null) {
     // AND the dataset is NOT private
     // AND the data type uses variable mapping files
     if (details.visibility != DatasetVisibility.PRIVATE && dataTypeConfig?.usesDataPropertiesFiles == true) {
