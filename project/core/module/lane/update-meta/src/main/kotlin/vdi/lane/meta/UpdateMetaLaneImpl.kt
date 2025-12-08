@@ -126,6 +126,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
     // Load the dataset metadata from S3
     val datasetMeta = dir.getMetaFile().load()!!
+
     val metaTimestamp = dir.getMetaFile().lastModified()!!
     logger.debug("meta json timestamp is {}", metaTimestamp)
 
@@ -148,11 +149,9 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     }
 
     // Else if the dataset is marked as deleted already, then bail here.
-    else {
-      if (cachedDataset.isDeleted) {
-        logger.info("refusing to update dataset meta; dataset marked as deleted")
-        return
-      }
+    else if (cachedDataset.isDeleted) {
+      logger.info("refusing to update dataset meta; dataset marked as deleted")
+      return
     }
 
     cacheDB.withTransaction { db ->
@@ -172,9 +171,10 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       return
     }
 
-    datasetMeta.installTargets
-      .forEach { withPlugin(datasetMeta, ph, it, dir)
-        .tryUpdateTargetMeta(maxOf(metaTimestamp, mappingTimestamp)) }
+    datasetMeta.installTargets.forEach {
+      withPlugin(datasetMeta, ph, it, dir)
+        .tryUpdateTargetMeta(maxOf(metaTimestamp, mappingTimestamp))
+    }
 
     timer.observeDuration()
   }
@@ -200,28 +200,18 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
     }
 
+    // Attempt to run the target plugin's install-meta script.
     val variablePropertiesInstallSucceeded = try {
-      runPluginScript(metaTimestamp)
-      true
+      runPluginInstallMeta(metaTimestamp)
     } catch (e: Throwable) {
       logger.error("plugin error", PluginRequestException.installMeta(plugin.name, target, ownerID, datasetID, cause = e))
       false
     }
 
+    // If the install-meta script failed, AND the user is attempting to promote
+    // the dataset to community, then refuse to change the visibility.
     if (!variablePropertiesInstallSucceeded && shouldRevertToPrivateOnVariablePropertiesError(meta)) {
-      logger.info("reverting dataset visibility to private in the object store")
-
-      // override the visibility on the version currently in the object store to
-      // limit the race-condition window for this change to the object store's
-      // response time.
-      with(directory.getMetaFile()) {
-        load()
-          ?.copy(visibility = DatasetVisibility.Private)
-          ?.also(::put)
-      }
-
-      // set visibility to private in memory as well before upserting the app db
-      // records.
+      logger.warn("refusing to make dataset public due to unsuccessful install-meta")
       meta = meta.copy(visibility = DatasetVisibility.Private)
     }
 
@@ -231,7 +221,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     }
   }
 
-  private suspend fun UpdateMetaContext.WithPlugin.runPluginScript(metaTimestamp: OffsetDateTime) {
+  private suspend fun UpdateMetaContext.WithPlugin.runPluginInstallMeta(metaTimestamp: OffsetDateTime): Boolean {
     val dataPropFiles = directory.getDataPropertiesFiles()
       .map { PluginDataPropsFile(it.baseName, it.open()!!) }
       .asIterable()
@@ -245,10 +235,19 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
         ).inc()
 
         try {
-          when (result) {
-            is EmptySuccessResponse    -> handleSuccessResponse()
-            is ValidationErrorResponse -> handleValidationError(result)
-            is ServiceErrorResponse    -> handleUnexpectedErrorResponse(result)
+          return when (result) {
+            is EmptySuccessResponse -> {
+              handleSuccessResponse()
+              true
+            }
+            is ValidationErrorResponse -> {
+              handleValidationError(result)
+              false
+            }
+            is ServiceErrorResponse -> {
+              handleUnexpectedErrorResponse(result)
+              false
+            }
           }
         } catch (e: Throwable) {
           logger.info("install-meta request to handler server failed with exception:", e)
