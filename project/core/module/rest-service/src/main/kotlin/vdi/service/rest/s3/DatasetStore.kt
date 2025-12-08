@@ -20,7 +20,7 @@ object DatasetStore {
   private var bucketName: BucketName? = null
 
   fun init(config: ObjectStoreConfig) {
-    client = S3Api.newClient(S3Config(config))
+    client     = S3Api.newClient(S3Config(config))
     bucketName = BucketName(config.bucketName)
   }
 
@@ -129,6 +129,9 @@ object DatasetStore {
 
   fun hasDeleteFlag(userID: UserID, datasetID: DatasetID): Boolean =
     S3Paths.datasetDeleteFlagFile(userID, datasetID) in bucket.objects
+
+  fun hasRevisedFlag(userID: UserID, datasetID: DatasetID): Boolean =
+    S3Paths.datasetRevisedFlagFile(userID, datasetID) in bucket.objects
 
   private fun String.getDatasetIDFromPath(): DatasetID {
     val it = splitToSequence('/').iterator()

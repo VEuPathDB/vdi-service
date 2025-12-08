@@ -10,6 +10,7 @@ import vdi.model.meta.UserID
 import vdi.service.rest.generated.resources.DatasetsVdiId
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.outputs.ForbiddenError
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.wrap
 
@@ -32,17 +33,21 @@ fun adminDeleteDataset(datasetID: DatasetID): DatasetsVdiId.DeleteDatasetsByVdiI
  */
 fun <T: ControllerBase> T.userDeleteDataset(datasetID: DatasetID): DatasetsVdiId.DeleteDatasetsByVdiIdResponse {
   // Verify that the target dataset exists.
-  val ds = CacheDB().selectDataset(datasetID) ?: return Static404.wrap()
+  val ds = CacheDB().selectDataset(datasetID)
+    ?: return Static404.wrap()
 
   // Verify the dataset is owned by the requesting user.
   if (ds.ownerID != userID)
-    throw ForbiddenException()
+    return ForbiddenError("cannot delete unowned datasets").wrap()
 
-  deleteUserDataset(userID, datasetID)
-  return DatasetsVdiId.DeleteDatasetsByVdiIdResponse.respond204()
+  return deleteUserDataset(userID, datasetID)
 }
 
-private fun deleteUserDataset(userID: UserID, datasetID: DatasetID) {
+private fun deleteUserDataset(userID: UserID, datasetID: DatasetID): DatasetsVdiId.DeleteDatasetsByVdiIdResponse {
+  // If the dataset has been revised, don't create a delete flag.
+  if (DatasetStore.hasRevisedFlag(userID, datasetID))
+    return ForbiddenError("cannot delete old revisions of a live dataset").wrap()
+
   CacheDB().withTransaction {
     // Put a delete flag in S3 for the target dataset.
     DatasetStore.putDeleteFlag(userID, datasetID)
@@ -50,4 +55,6 @@ private fun deleteUserDataset(userID: UserID, datasetID: DatasetID) {
     // Update the deleted flag in the local pg.
     it.updateDatasetDeleted(datasetID, true)
   }
+
+  return DatasetsVdiId.DeleteDatasetsByVdiIdResponse.respond204()
 }
