@@ -26,7 +26,7 @@ fun <T: ControllerBase> T.createDataset(
 ): PostResponse {
   val datasetMeta = entity.toDatasetMeta(userID)
 
-  // Secondary validation for any additional json schema rules in service config
+  // Secondary validation for any additional JSON schema rules in service config
   datasetMeta.installTargets.asSequence()
     .mapNotNull(InstallTargetRegistry::get)
     .filter { it.metaValidation != null }
@@ -47,7 +47,13 @@ fun <T: ControllerBase> T.createDataset(
 
   val uploadRefs = CacheDB()
     .initializeDataset(userID, datasetID, datasetMeta) {
-      resolveDatasetFiles(entity.dataFiles, entity.url, entity.docFiles, uploadConfig)
+      resolveDatasetFiles(
+        entity.dataFiles,
+        entity.url,
+        entity.docFiles,
+        entity.dataPropertiesFiles,
+        uploadConfig,
+      )
     }
 
   submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)
@@ -65,7 +71,7 @@ fun <T: ControllerBase> T.createDataset(
 ) {
   val datasetMeta = entity.toDatasetMeta(userID)
   val uploadRefs  = CacheDB().initializeDataset(userID, datasetID, datasetMeta) {
-    resolveDatasetFiles(entity.dataFiles, entity.url, entity.docFiles, uploadConfig)
+    resolveDatasetFiles(entity.dataFiles, entity.url, entity.docFiles, emptyList(), uploadConfig)
   }
 
   submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)

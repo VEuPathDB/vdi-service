@@ -1,4 +1,5 @@
 GRADLE := $(shell command -v gradle || echo "./gradlew")
+.ONESHELL:
 
 .PHONY: default
 default:
@@ -27,8 +28,8 @@ default:
 # Generate JaxRS-based java classes from the service's RAML API specification
 .PHONY: raml-gen
 raml-gen:
-	@which node || nvm --version 2>/dev/null || (echo 'NodeJS not found on $$PATH'; exit 1)
-	@$(GRADLE) -q :core:module:rest-service:generate-jaxrs :core:generate-raml-docs --rerun-tasks
+#	@command node 2>/dev/null || $$HOME/.cache/nvm/nvm.sh --version || (echo 'NodeJS not found on $$PATH'; exit 1)
+	@$(GRADLE) -q :core:module:rest-service:generate-jaxrs :core:generate-raml-docs --rerun-tasks --stacktrace
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ #
 # ┃                                                                          ┃ #

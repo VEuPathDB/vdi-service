@@ -49,14 +49,14 @@ fun <T> CacheDB.initializeDataset(
   withTransaction {
     it.tryInsertDataset(
       DatasetImpl(
-        datasetID = datasetID,
-        type = datasetMeta.type,
-        ownerID = userID,
-        isDeleted = false,
-        created = datasetMeta.created,
+        datasetID    = datasetID,
+        type         = datasetMeta.type,
+        ownerID      = userID,
+        isDeleted    = false,
+        created      = datasetMeta.created,
         importStatus = DatasetImportStatus.Queued,
-        origin = datasetMeta.origin,
-        inserted = OffsetDateTime.now(),
+        origin       = datasetMeta.origin,
+        inserted     = OffsetDateTime.now(),
       )
     )
     it.tryInsertDatasetMeta(datasetID, datasetMeta)
@@ -64,10 +64,10 @@ fun <T> CacheDB.initializeDataset(
     it.tryInsertDatasetProjects(datasetID, datasetMeta.installTargets)
     it.tryInsertSyncControl(
       SyncControlRecord(
-        datasetID = datasetID,
+        datasetID     = datasetID,
         sharesUpdated = OriginTimestamp,
-        dataUpdated = OriginTimestamp,
-        metaUpdated = OriginTimestamp
+        dataUpdated   = OriginTimestamp,
+        metaUpdated   = OriginTimestamp
       )
     )
 
@@ -80,9 +80,10 @@ fun <T> CacheDB.initializeDataset(
 
 @OptIn(ExperimentalPathApi::class)
 fun <T: ControllerBase> T.resolveDatasetFiles(
-  data: Iterable<File>?,
-  url: String?,
-  meta: Iterable<File>?,
+  data:         Iterable<File>?,
+  url:          String?,
+  meta:         Iterable<File>?,
+  properties:   Iterable<File>?,
   uploadConfig: UploadConfig,
 ): UploadFileReferences {
   logger.debug("resolving dataset file")
@@ -91,9 +92,20 @@ fun <T: ControllerBase> T.resolveDatasetFiles(
 
   return try {
     if (data != null)
-      resolveUploadFiles(data, meta ?: emptyList(), tmpDir)
+      resolveUploadFiles(
+        data.asSequence(),
+        meta?.asSequence() ?: emptySequence(),
+        properties?.asSequence() ?: emptySequence(),
+        tmpDir,
+      )
     else
-      resolveURLFile(url!!, meta ?: emptyList(), uploadConfig, tmpDir)
+      resolveURLFile(
+        url!!,
+        meta?.asSequence() ?: emptySequence(),
+        properties?.asSequence() ?: emptySequence(),
+        uploadConfig,
+        tmpDir,
+      )
   } catch (e: Throwable) {
     tmpDir.deleteRecursively()
     throw e
@@ -101,46 +113,51 @@ fun <T: ControllerBase> T.resolveDatasetFiles(
 }
 
 fun resolveUploadFiles(
-  data: Iterable<File>,
-  meta: Iterable<File>,
+  data:   Sequence<File>,
+  docs:   Sequence<File>,
+  props:  Sequence<File>,
   tmpDir: Path,
 ): UploadFileReferences =
   UploadFileReferences(
     tempDir = tmpDir,
-    data = data.asSequence()
-      .map { it.copyTo(tmpDir.resolve(it.name).toFile()) }
-      .map { it.toPath() }
-      .toList(),
-    meta = meta.asSequence()
-      .map { it.copyTo(tmpDir.resolve(it.name).toFile()) }
-      .map { it.toPath() }
-      .toList()
+    data    = data.toTempPaths(tmpDir),
+    docs    = docs.toTempPaths(tmpDir),
+    props   = props.toTempPaths(tmpDir),
   )
 
 fun <T: ControllerBase> T.resolveURLFile(
-  url: String,
-  meta: Iterable<File>,
+  url:          String,
+  docs:         Sequence<File>,
+  props:        Sequence<File>,
   uploadConfig: UploadConfig,
-  tmpDir: Path,
+  tmpDir:       Path,
 ): UploadFileReferences =
   UploadFileReferences(
     tempDir = tmpDir,
-    data = listOf(downloadRemoteFile(url.toURL(), uploadConfig, tmpDir)),
-    meta = meta.asSequence()
-      .map { it.copyTo(tmpDir.resolve(it.name).toFile()) }
-      .map { it.toPath() }
-      .toList()
+    data    = listOf(downloadRemoteFile(url.toURL(), uploadConfig, tmpDir)),
+    docs    = docs.toTempPaths(tmpDir),
+    props   = props.toTempPaths(tmpDir)
   )
 
-data class UploadFileReferences(val tempDir: Path, val data: List<Path>, val meta: List<Path>)
+data class UploadFileReferences(
+  val tempDir: Path,
+  val data:    List<Path>,
+  val docs:    List<Path>,
+  val props:   List<Path>,
+)
+
+private fun Sequence<File>.toTempPaths(tmpDir: Path): List<Path> =
+  map { it.copyTo(tmpDir.resolve(it.name).toFile()) }
+    .map { it.toPath() }
+    .toList()
 
 private val WorkPool = Executors.newFixedThreadPool(10)
 
 @OptIn(ExperimentalPathApi::class)
 fun <T: ControllerBase> T.submitUpload(
-  datasetID: DatasetID,
-  uploadRefs: UploadFileReferences,
-  datasetMeta: DatasetMetadata,
+  datasetID:    DatasetID,
+  uploadRefs:   UploadFileReferences,
+  datasetMeta:  DatasetMetadata,
   uploadConfig: UploadConfig,
 ) {
   Metrics.Upload.queueSize.inc()
@@ -155,9 +172,9 @@ fun <T: ControllerBase> T.submitUpload(
 }
 
 fun <T: ControllerBase> T.uploadFiles(
-  datasetID: DatasetID,
-  uploadRefs: UploadFileReferences,
-  datasetMeta: DatasetMetadata,
+  datasetID:    DatasetID,
+  uploadRefs:   UploadFileReferences,
+  datasetMeta:  DatasetMetadata,
   uploadConfig: UploadConfig,
 ) {
   val logger = markedLogger(userID, datasetID)
@@ -171,8 +188,8 @@ fun <T: ControllerBase> T.uploadFiles(
         TempFiles.withTempDirectory { dir ->
           context(logger) {
             uploadRefs.data[0].repack(
-              into = archive,
-              using = dir,
+              into         = archive,
+              using        = dir,
               dataTypeMeta = PluginRegistry.configDataFor(datasetMeta.type),
             )
           }
@@ -214,11 +231,22 @@ fun <T: ControllerBase> T.uploadFiles(
     throw e
   }
 
-  if (uploadRefs.meta.isNotEmpty()) {
+  if (uploadRefs.docs.isNotEmpty()) {
     logger.debug("uploading dataset meta files")
     try {
-      for (path in uploadRefs.meta)
+      for (path in uploadRefs.docs)
         DatasetStore.putDocumentFile(userID, datasetID, path.name, path::inputStream)
+    } catch (e: Throwable) {
+      logger.error("dataset additional document file(s) upload to minio failed:", e)
+      throw e
+    }
+  }
+
+  if (uploadRefs.props.isNotEmpty()) {
+    logger.debug("uploading data properties files")
+    try {
+      for (path in uploadRefs.props)
+        DatasetStore.putVariablePropertiesFile(userID, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
       logger.error("dataset additional document file(s) upload to minio failed:", e)
       throw e
@@ -227,11 +255,12 @@ fun <T: ControllerBase> T.uploadFiles(
 }
 
 fun <T: ControllerBase> T.verifyUploadFileSize(
-  uploadRefs: UploadFileReferences,
+  uploadRefs:   UploadFileReferences,
   uploadConfig: UploadConfig,
 ) {
   val dataSize = uploadRefs.data.reduceTo(0L) { t, c -> t + c.fileSize() }
-  val metaSize = uploadRefs.meta.reduceTo(0L) { t, c -> t + c.fileSize() }
+  val metaSize = uploadRefs.docs.reduceTo(0L) { t, c -> t + c.fileSize() }
+  val propSize = uploadRefs.props.reduceTo(0L) { t, c -> t + c.fileSize() }
 
   if (dataSize > uploadConfig.maxUploadSize.toLong())
     throw BadRequestException(
@@ -240,8 +269,9 @@ fun <T: ControllerBase> T.verifyUploadFileSize(
     )
 
   val remainingUploadAllowance = getUserRemainingQuota(uploadConfig)
+  val totalUploadSize = dataSize + metaSize + propSize
 
-  if (dataSize + metaSize > remainingUploadAllowance)
+  if (totalUploadSize > remainingUploadAllowance)
     throw BadRequestException(
       "total upload size is larger than the remaining space allowed by the user quota " +
       "($remainingUploadAllowance bytes)"
@@ -294,8 +324,8 @@ private fun List<Path>.pack(into: Path): List<DatasetFileInfo> {
  */
 context(logger: Logger)
 private fun Path.repackZip(
-  into: Path,
-  using: Path,
+  into:         Path,
+  using:        Path,
   dataTypeMeta: PluginDatasetTypeMeta,
 ): List<DatasetFileInfo> {
   logger.trace("repacking zip file {} into {}", this, into)
