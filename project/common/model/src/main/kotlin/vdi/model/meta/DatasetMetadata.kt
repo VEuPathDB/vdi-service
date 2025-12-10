@@ -1,5 +1,6 @@
 package vdi.model.meta
 
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.net.URI
@@ -13,6 +14,7 @@ data class DatasetMetadata(
   /**
    * @since v1.7.0 - replaces "projects"
    */
+  @param:JsonAlias(LegacyInstallTargets)
   @param:JsonProperty(InstallTargets)
   @field:JsonProperty(InstallTargets)
   val installTargets: Set<InstallTargetID>,
@@ -152,7 +154,7 @@ data class DatasetMetadata(
   @param:JsonProperty(DaysForApproval)
   @field:JsonProperty(DaysForApproval)
   val daysForApproval: Int = -1,
-): VersionedMetaObject {
+) {
   @get:JsonIgnore
   val shortName get() = name.take(40)
 
@@ -181,5 +183,7 @@ data class DatasetMetadata(
     const val Summary              = "summary"
     const val Type                 = "type"
     const val Visibility           = "visibility"
+
+    private const val LegacyInstallTargets = "projects"
   }
 }

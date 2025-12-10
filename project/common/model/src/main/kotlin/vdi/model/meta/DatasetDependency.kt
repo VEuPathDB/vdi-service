@@ -1,7 +1,6 @@
 package vdi.model.meta
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import vdi.model.meta.VersionedMetaObject
 
 data class DatasetDependency(
   @param:JsonProperty(Identifier)

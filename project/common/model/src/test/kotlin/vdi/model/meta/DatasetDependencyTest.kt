@@ -1,4 +1,4 @@
-package vdi.model.data
+package vdi.model.meta
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.junit.jupiter.api.DisplayName
@@ -33,11 +33,14 @@ class DatasetDependencyTest {
   inner class Serialization {
     @Test
     fun test1() {
-      assertEquals(DatasetDependency(
-        identifier  = "something",
-        version     = "numbers",
-        displayName = "fancy words",
-      ).toJSONString(), """{"resourceIdentifier":"something","resourceVersion":"numbers","resourceDisplayName":"fancy words"}""")
+      assertEquals(
+        DatasetDependency(
+          identifier = "something",
+          version = "numbers",
+          displayName = "fancy words",
+        ).toJSONString(),
+        """{"resourceIdentifier":"something","resourceVersion":"numbers","resourceDisplayName":"fancy words"}"""
+      )
     }
   }
 }

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins { `kotlin-dsl` }
 
 repositories {
@@ -11,8 +13,8 @@ dependencies {
 }
 
 kotlin {
-  jvmToolchain {
-    languageVersion = JavaLanguageVersion.of(24)
+  compilerOptions {
+    jvmTarget = JvmTarget.JVM_24
   }
 }
 

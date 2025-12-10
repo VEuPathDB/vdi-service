@@ -1,4 +1,4 @@
-package vdi.model.data
+package vdi.model.meta
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.junit.jupiter.api.DisplayName
@@ -16,12 +16,15 @@ class DatasetFileInfoTest {
     @Test
     @DisplayName("current field names")
     fun test1() {
-      JSON.readValue<DatasetFileInfo>("""
+      JSON.readValue<DatasetFileInfo>(
+        // language=json
+        """
         {
           "name": "file",
           "size": 234
         }
-      """.trimIndent()).also {
+        """
+      ).also {
         assertEquals("file", it.name)
         assertEquals(234uL, it.size)
       }
@@ -30,12 +33,15 @@ class DatasetFileInfoTest {
     @Test
     @DisplayName("legacy field names")
     fun test2() {
-      JSON.readValue<DatasetFileInfo>("""
+      JSON.readValue<DatasetFileInfo>(
+        // language=json
+        """
         {
           "filename": "file",
           "fileSize": 234
         }
-      """.trimIndent()).also {
+        """
+      ).also {
         assertEquals("file", it.name)
         assertEquals(234uL, it.size)
       }

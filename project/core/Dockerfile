@@ -1,4 +1,4 @@
-FROM veupathdb/alpine-dev-base:jdk24-gradle8.14 AS build
+FROM veupathdb/alpine-dev-base:jdk25-gradle9.2 AS build
 
 WORKDIR /workspace
 
@@ -42,7 +42,7 @@ RUN gradle --no-daemon \
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-FROM amazoncorretto:24-alpine3.20 AS runtime
+FROM amazoncorretto:25-alpine3.22 AS runtime
 
 RUN apk add --no-cache tzdata \
     && cp /usr/share/zoneinfo/America/New_York /etc/localtime \
