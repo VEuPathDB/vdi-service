@@ -33,7 +33,7 @@ internal class ReconcilerInstance(
 ) {
   private val log = markedLogger(installTarget = targetDB.name)
 
-  private var nextTargetDataset: ReconcilerTargetRecord? = null
+  private var nextInstallTargetDataset: ReconcilerTargetRecord? = null
 
   val name = targetDB.name
 
@@ -65,42 +65,42 @@ internal class ReconcilerInstance(
   }
 
   private suspend fun tryReconcile(
-    sourceIterator: Iterator<DatasetDirectory>,
-    targetIterator: Iterator<ReconcilerTargetRecord>,
+    objectStoreIterator:   Iterator<DatasetDirectory>,
+    installTargetIterator: Iterator<ReconcilerTargetRecord>,
   ) {
     log.trace("tryReconcile(...)")
-    nextTargetDataset = targetIterator.nextOrNull()
+    nextInstallTargetDataset = installTargetIterator.nextOrNull()
 
     // Iterate through datasets in S3.
-    while (sourceIterator.hasNext()) {
+    while (objectStoreIterator.hasNext()) {
       // Pop the next DatasetDirectory instance from the S3 stream.
-      val sourceDatasetDir = sourceIterator.next()
+      val sourceDatasetDir = objectStoreIterator.next()
 
       // If target stream is exhausted, everything left in the source stream is
       // absent from the target database.
-      if (nextTargetDataset == null) {
-        sourceIterator.consumeAndTrySync(sourceDatasetDir)
+      if (nextInstallTargetDataset == null) {
+        objectStoreIterator.consumeAndTrySync(sourceDatasetDir)
         return
       }
 
       // Owner ID is included as part of sort, so it must be included when comparing streams.
       val comparableS3Id = sourceDatasetDir.getComparableID()
-      var comparableTargetId: String? = nextTargetDataset!!.getComparableID()
+      var comparableTargetId: String? = nextInstallTargetDataset!!.getComparableID()
 
       // If install-target dataset stream is "ahead" of source stream, uninstall
       // the datasets from the target database until either the streams are
       // aligned again, or the install-target dataset stream is consumed.
       if (comparableS3Id > comparableTargetId!!)
-        targetIterator.uninstallUntilAligned(comparableS3Id, comparableTargetId)
+        installTargetIterator.uninstallUntilAligned(comparableS3Id, comparableTargetId)
 
       // Check again if target stream is exhausted, consume source stream if so.
-      if (nextTargetDataset == null) {
-        sourceIterator.consumeAndTrySync(sourceDatasetDir)
+      if (nextInstallTargetDataset == null) {
+        objectStoreIterator.consumeAndTrySync(sourceDatasetDir)
         return
       }
 
       // Owner ID is included as part of sort, so it must be included when comparing streams.
-      comparableTargetId = nextTargetDataset!!.getComparableID()
+      comparableTargetId = nextInstallTargetDataset!!.getComparableID()
 
       // If the object-store dataset ID is less than the ID we got from the
       // target DB
@@ -113,12 +113,12 @@ internal class ReconcilerInstance(
         // If the dataset should be uninstalled due to either having a
         // soft-delete or revision flag
         if (sourceDatasetDir.hasDeleteFlag() || sourceDatasetDir.hasRevisedFlag()) {
-          nextTargetDataset!!.ensureUninstalled()
+          nextInstallTargetDataset!!.ensureUninstalled()
         } else {
           sourceDatasetDir.ensureSynchronized(comparableS3Id)
 
           // Advance next target dataset pointer, we're done with this one
-          nextTargetDataset = targetIterator.nextOrNull()
+          nextInstallTargetDataset = installTargetIterator.nextOrNull()
         }
       }
     }
@@ -131,11 +131,11 @@ internal class ReconcilerInstance(
       return
 
     // If nextTargetDataset is not null at this point, then S3 was empty.
-    nextTargetDataset?.also { tryUninstallDataset(targetDB, it) }
+    nextInstallTargetDataset?.also { tryUninstallDataset(targetDB, it) }
 
     // Consume target stream, deleting all remaining datasets.
-    while (targetIterator.hasNext()) {
-      tryUninstallDataset(targetDB, targetIterator.next())
+    while (installTargetIterator.hasNext()) {
+      tryUninstallDataset(targetDB, installTargetIterator.next())
     }
   }
 
@@ -147,7 +147,7 @@ internal class ReconcilerInstance(
 
     // Uninstall datasets and advance target database iterator until the streams
     // are aligned.
-    while (nextTargetDataset != null && comparableSourceId.compareTo(comparableTargetId!!, false) > 0) {
+    while (nextInstallTargetDataset != null && comparableSourceId.compareTo(comparableTargetId!!, false) > 0) {
       if (!slim) {
         log.info(
           "next install-target dataset {} has a lexicographically lesser ID than the next source dataset ({})",
@@ -155,11 +155,11 @@ internal class ReconcilerInstance(
           comparableSourceId.trimSortSuffix(),
         )
 
-        tryUninstallDataset(targetDB, nextTargetDataset!!)
+        tryUninstallDataset(targetDB, nextInstallTargetDataset!!)
       }
 
-      nextTargetDataset = nextOrNull()
-      comparableTargetId = nextTargetDataset?.getComparableID()
+      nextInstallTargetDataset = nextOrNull()
+      comparableTargetId = nextInstallTargetDataset?.getComparableID()
     }
   }
 
@@ -175,7 +175,7 @@ internal class ReconcilerInstance(
 
     // If for some reason it is marked as uninstalled in the target
     // database, log an error and skip
-    if (nextTargetDataset!!.isUninstalled) {
+    if (nextInstallTargetDataset!!.isUninstalled) {
       log.error(
         "dataset {} is marked as uninstalled in target {} but has no deletion flag present in MinIO",
         comparableS3Id.trimSortSuffix(),
@@ -184,7 +184,7 @@ internal class ReconcilerInstance(
       return
     }
 
-    val syncStatus = isOutOfSync(nextTargetDataset!!)
+    val syncStatus = isOutOfSync(nextInstallTargetDataset!!)
 
     // Dataset is in source and target. Check dates to see if sync is needed.
     if (syncStatus.isOutOfSync) {
@@ -244,7 +244,7 @@ internal class ReconcilerInstance(
   private suspend fun sendSyncIfRelevant(sourceDatasetDir: DatasetDirectory, reason: SyncReason): Boolean {
     if (targetDB.type == ReconcilerTargetType.Install) {
 
-      // Ensure the meta json file exists in S3 to protect against NPEs being
+      // Ensure the meta JSON file exists in S3 to protect against NPEs being
       // thrown on broken dataset directories.
       if (!sourceDatasetDir.hasMetaFile()) {
         log.warn("skipping dataset {}/{} as it has no meta json file", sourceDatasetDir.ownerID, sourceDatasetDir.datasetID)

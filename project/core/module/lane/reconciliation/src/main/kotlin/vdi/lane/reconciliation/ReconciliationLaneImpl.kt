@@ -26,7 +26,7 @@ internal class ReconciliationLaneImpl(private val config: ReconciliationLaneConf
     }
 
     reconciler = DatasetReconciler(
-      eventRouter = requireKafkaRouter(config.kafkaOutConfig),
+      eventRouter    = requireKafkaRouter(config.kafkaOutConfig),
       datasetManager = requireDatasetManager(config.s3Config, config.s3Bucket)
     )
 

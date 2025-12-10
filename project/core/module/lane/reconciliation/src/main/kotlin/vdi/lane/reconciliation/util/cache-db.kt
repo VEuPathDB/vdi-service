@@ -5,6 +5,7 @@ import vdi.lane.reconciliation.ReconciliationContext
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetImpl
 import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.db.cache.withTransaction
 import vdi.core.db.model.SyncControlRecord
 import vdi.model.OriginTimestamp
@@ -42,6 +43,15 @@ internal fun CacheDB.getCacheDatasetRecord(ctx: ReconciliationContext) =
 internal fun CacheDB.requireCacheDatasetRecord(ctx: ReconciliationContext) =
   getCacheDatasetRecord(ctx)
     .require(ctx, "could not find dataset record in cache db")
+
+internal fun CacheDB.ensureCacheDatasetRecord(ctx: ReconciliationContext): DatasetRecord {
+  getCacheDatasetRecord(ctx)?.also { return it }
+
+  // We need a record for the deleted dataset
+  tryInitDataset(ctx, if (ctx.hasInstallReadyData) DatasetImportStatus.Complete else DatasetImportStatus.Failed)
+
+  return requireCacheDatasetRecord(ctx)
+}
 
 internal fun CacheDB.dropImportMessages(ctx: ReconciliationContext) =
   ctx.safeExec("failed to delete import messages") { withTransaction { it.deleteImportMessages(ctx.datasetID) } }

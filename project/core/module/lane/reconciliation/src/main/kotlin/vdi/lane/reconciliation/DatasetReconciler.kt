@@ -101,7 +101,7 @@ internal class DatasetReconciler(
     }
 
   private fun ensureUninstalled(ctx: ReconciliationContext) {
-    val dataset = cacheDB.requireCacheDatasetRecord(ctx)
+    val dataset = cacheDB.ensureCacheDatasetRecord(ctx)
 
     if (!dataset.isDeleted) {
       ctx.safeExec("failed to mark dataset as deleted in cache db") {
