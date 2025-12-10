@@ -23,3 +23,6 @@ internal fun ExternalIdentifiersPatch.validate(jPath: String, errors: Validation
   hyperlinks?.value?.validate(jPath..JsonField.HYPERLINKS, errors)
   bioprojectIds?.value?.validate(jPath..JsonField.BIOPROJECT_IDS, errors)
 }
+
+internal fun ExternalIdentifiersPatch.hasSomethingToUpdate() =
+  dois != null || hyperlinks != null || bioprojectIds != null

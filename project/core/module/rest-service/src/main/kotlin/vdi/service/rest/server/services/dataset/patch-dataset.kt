@@ -1,23 +1,28 @@
-@file:JvmName("DatasetPatchService")
 package vdi.service.rest.server.services.dataset
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
 import org.slf4j.Logger
 import org.veupathdb.lib.request.validation.ValidationErrors
+import vdi.core.db.app.AppDB
+import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.withTransaction
 import vdi.core.install.InstallTargetRegistry
+import vdi.core.plugin.registry.PluginRegistry
 import vdi.json.JSON
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.DatasetVisibility
 import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
+import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.resources.DatasetsVdiId.PatchDatasetsByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.inputs.applyPatch
 import vdi.service.rest.server.inputs.cleanup
+import vdi.service.rest.server.inputs.hasSomethingToUpdate
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.ForbiddenError
 import vdi.service.rest.server.outputs.Static404
@@ -58,7 +63,7 @@ fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: Dataset
 
 context(logger: Logger)
 private fun DatasetPatchRequestBody.validateAndApply(
-  userID: UserID,
+  userID:    UserID,
   datasetID: DatasetID,
 ): Either<ValidationErrors, DatasetMetadata> {
   val originalMetadata = DatasetStore.getDatasetMeta(userID, datasetID)!!
@@ -88,6 +93,15 @@ private fun DatasetPatchRequestBody.validateAndApply(
   if (errors.isNotEmpty)
     return left(errors)
 
+  // If the PATCH body seems valid at a surface level, move on to performing
+  // heavier validations.
+
+  if (newMetadata.isPromotingToCommunity(originalMetadata))
+    newMetadata.validateForPromotion(datasetID, errors)
+
+  if (errors.isNotEmpty)
+    return left(errors)
+
   return right(newMetadata)
 }
 
@@ -102,6 +116,32 @@ private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
   || projectName != null
   || programName != null
   || linkedDatasets != null
-  || characteristics != null
-  || externalIdentifiers != null
+  || (characteristics != null && characteristics.hasSomethingToUpdate())
+  || (externalIdentifiers != null && externalIdentifiers.hasSomethingToUpdate())
   || funding != null
+
+/**
+ * Tests if the PATCH request is attempting to promote the target dataset to a
+ * community dataset.
+ */
+private fun DatasetMetadata.isPromotingToCommunity(original: DatasetMetadata) =
+  visibility != DatasetVisibility.Private && original.visibility == DatasetVisibility.Private
+
+private fun DatasetMetadata.validateForPromotion(datasetID: DatasetID, errors: ValidationErrors) {
+  val typeConfig = PluginRegistry.configDataFor(type)
+
+  // If the target data type doesn't use variable properties files, then there
+  // is no extra validation the VDI core service can perform.  All additional
+  // validation is done by the type-specific plugin.
+  if (!typeConfig.usesDataPropertiesFiles)
+    return
+
+  val metaInstallsSucceeded = installTargets
+    .asSequence()
+    .map { AppDB(it, type)?.selectDatasetInstallMessages(datasetID) }
+    .flatMap { it?.asSequence() ?: sequenceOf(null) }
+    .all { it?.status == InstallStatus.Complete }
+
+  if (!metaInstallsSucceeded)
+    errors.add(JsonField.VISIBILITY, "cannot promote dataset to community with dataset install failures")
+}

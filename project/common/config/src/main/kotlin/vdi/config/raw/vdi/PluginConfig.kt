@@ -8,8 +8,6 @@ data class PluginConfig(
 
   val dataTypes: Set<DataTypeConfig>,
 
-  val typeChangesEnabled: Boolean = false,
-
   val customPath: String?,
 
   val installRoot: String?,

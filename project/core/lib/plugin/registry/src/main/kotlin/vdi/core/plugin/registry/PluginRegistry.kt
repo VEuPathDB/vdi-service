@@ -16,11 +16,7 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
     mapping = loadAndCacheStackConfig().vdi.plugins
       .asSequence()
       .flatMap { (name, plug) ->
-        val details = PluginDetails(
-          name,
-          plug.projectIDs?.toList() ?: emptyList(),
-          plug.typeChangesEnabled,
-        )
+        val details = PluginDetails(name, plug.projectIDs?.toList() ?: emptyList())
 
         plug.dataTypes.asSequence()
           .map { DatasetType(DataType.of(it.name), it.version)
@@ -28,6 +24,7 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDetails>> {
               it.category,
               it.maxFileSize,
               it.allowedFileExtensions,
+              it.typeChangesEnabled,
               it.usesDataProperties,
               it.dataPropsFileNameSingular,
               it.dataPropsFileNamePlural,

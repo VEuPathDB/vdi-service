@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veupathdb.github.io/vdi-service/schema/vdi/data-type.json",
+  "title": "VDI Data-Type Config",
+  "type": "object",
+  "properties": {
+
+    "name": {
+      "title": "Internal Name",
+      "type": "string",
+      "minLength": 3
+    },
+
+    "version": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ]
+    },
+
+    "category": {
+      "title": "Data Type Category/Display Name",
+      "type": "string",
+      "minLength": 3
+    },
+
+    "typeChangesEnabled": {
+      "description": "Whether datasets can be revised from this data type to another.",
+      "type": "boolean",
+      "default": false
+    },
+
+    "maxFileSize": {
+      "title": "Maximum File Size",
+      "description": "Maximum permitted file size in bytes.\n\nIf this value exceeds the global max upload size configuration option, that value will be used instead.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9223372036854775807
+    },
+
+    "allowedFileExtensions": {
+      "title": "Permitted File Extensions",
+      "description": "File extensions that are allowed on raw uploaded files, or on the content files of archive uploads.\n\nThis list should not include the supported vdi archive extensions.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "\\..+"
+      },
+      "uniqueItems": true,
+      "unevaluatedItems": false
+    },
+
+    "usesDataProperties": {
+      "title": "Enable Data Properties Files",
+      "description": "Flag indicating whether the data type allows the use of additional data properties/metadata files.",
+      "type": "boolean",
+      "default": false
+    },
+
+    "dataPropsFileNameSingular": {
+      "title": "Singular Properties File Form Name",
+      "description": "Name to show for singular data properties file references in user facing text.",
+      "type": "string",
+      "default": "Data Properties File"
+    },
+
+    "dataPropsFileNamePlural": {
+      "title": "Plural Properties File Form Name",
+      "description": "Name to show for plural data properties files references in user facing text.",
+      "type": "string",
+      "default": "Data Properties Files"
+    }
+
+  },
+  "required": [
+    "category",
+    "name",
+    "version"
+  ],
+  "additionalProperties": false
+}

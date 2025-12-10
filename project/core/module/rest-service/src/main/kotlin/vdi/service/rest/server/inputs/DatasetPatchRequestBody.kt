@@ -1,4 +1,3 @@
-@file:JvmName("DatasetPatchRequestInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
@@ -8,7 +7,6 @@ import org.veupathdb.lib.request.validation.require
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.*
 import vdi.model.meta.DatasetCharacteristics
-import vdi.model.meta.DatasetVisibility
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.BioprojectIDReference
 import vdi.service.rest.generated.model.DOIReference
@@ -55,15 +53,12 @@ internal fun DatasetPatchRequestBody.cleanup() {
 }
 
 internal fun DatasetPatchRequestBody.validate(
-  original: DatasetMetadata,
-  errors: ValidationErrors = ValidationErrors()
+  original:  DatasetMetadata,
+  errors:    ValidationErrors = ValidationErrors(),
 ): ValidationErrors {
-  var isPublic = original.visibility != DatasetVisibility.Private
-
-  visibility?.apply { value.requireAnd(JF.VISIBILITY, errors) {
-    if (this != APIVisibility.PRIVATE)
-      isPublic = true
-  } }
+  visibility?.apply {
+    value.require(JF.VISIBILITY, errors) {}
+  }
 
   type?.apply {
     value.requireAnd(JF.DATASET_TYPE, errors) {
@@ -73,7 +68,7 @@ internal fun DatasetPatchRequestBody.validate(
 
       if (originalHandler == null)
         errors.add(JF.DATASET_TYPE, "original dataset type is disabled")
-      else if (!originalHandler.changesEnabled)
+      else if (!PluginRegistry.configDataFor(original.type).typeChangesEnabled)
         errors.add(JF.DATASET_TYPE, "cannot change dataset type from ${original.type}")
       else if (PluginRegistry[DatasetType(DataType.of(name), version)] == null)
         errors.add(JF.DATASET_TYPE, "no installers available for given dataset type")
@@ -82,24 +77,17 @@ internal fun DatasetPatchRequestBody.validate(
 
   name?.apply { value.requireAnd(JF.NAME, errors) { checkLength(JF.NAME, DatasetNameLengthRange, errors) } }
 
-  summary?.apply { value.requireAnd(JF.SUMMARY, errors) {
-    checkLength(JF.SUMMARY, SummaryLengthRange, errors)
-  } }
+  summary?.apply {
+    value.requireAnd(JF.SUMMARY, errors) {
+      checkLength(JF.SUMMARY, SummaryLengthRange, errors)
+    }
+  }
 
   // description (nothing to validate)
   publications?.value?.validate(JF.PUBLICATIONS, errors)
 
   contacts?.apply {
-    if (isPublic) {
-      // Contacts are required for public datasets.
-      value.requireAnd(JF.CONTACTS, errors) {
-        validate(JF.CONTACTS, true, errors)
-        if (size < 0)
-          errors.add(JF.CONTACTS, "must provide at least one contact for non-private datasets")
-      }
-    } else {
-      value?.validate(JF.CONTACTS, false, errors)
-    }
+    value?.validate(JF.CONTACTS, false, errors)
   }
 
   projectName?.value?.checkLength(JF.PROJECT_NAME, ProjectNameLengthRange, errors)
@@ -124,13 +112,13 @@ private inline fun <T: Any> T?.requireAnd(jPath: String, errors: ValidationError
 
 
 internal fun DatasetPatchRequestBody.applyPatch(
-  original: DatasetMetadata,
+  original:        DatasetMetadata,
   revisionHistory: DatasetRevisionHistory? = original.revisionHistory,
 ) =
   DatasetMetadata(
     type                 = type?.toInternal() ?: original.type,
     installTargets       = original.installTargets,
-    visibility           = visibility.unsafePatch(original.visibility, vdi.service.rest.generated.model.DatasetVisibility::toInternal),
+    visibility           = visibility.unsafePatch(original.visibility, APIVisibility::toInternal),
     owner                = original.owner,
     name                 = name.unsafePatch(original.name),
     summary              = summary.unsafePatch(original.summary),
@@ -180,7 +168,7 @@ private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristic
       }
     }
 
-  // If the client is attempting to change the study type value
+    // If the client is attempting to change the study type value
   } else if (studyType != null) {
     when {
       // we already know the client didn't attempt to change the study design
