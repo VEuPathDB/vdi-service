@@ -14,9 +14,7 @@ RUN cd project/common && gradle --no-daemon :json:build :util:build :model:build
 
 COPY settings.gradle.kts .
 COPY stack-db/migrations stack-db/migrations
-COPY [ "project/core/build.gradle.kts", "project/core/settings.gradle.kts", "project/core/" ]
-
-RUN gradle --no-daemon :core:download-dependencies
+COPY project/core project/core
 
 # Build Info
 ARG GIT_TAG="unknown"
@@ -26,8 +24,6 @@ ARG GIT_URL="unknown"
 ARG BUILD_ID="unknown"
 ARG BUILD_NUMBER="unknown"
 ARG BUILD_TIME="unknown"
-
-COPY project/core project/core
 
 RUN gradle --no-daemon \
     -Pbuild.git.tag="${GIT_TAG}" \

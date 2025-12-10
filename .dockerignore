@@ -1,6 +1,7 @@
 # Global Exclusions
 **/build/
 **/docs/
+!project/core/lib/external/s3/src/main/kotlin/vdi/core/s3/files/docs
 gradle/*
 !gradle/libs.versions.toml
 !gradle/common.versions.toml
