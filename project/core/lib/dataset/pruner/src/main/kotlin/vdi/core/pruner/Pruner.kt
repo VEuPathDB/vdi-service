@@ -14,7 +14,6 @@ import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.purgeDataset
 import vdi.core.db.cache.withTransaction
 import vdi.core.metrics.Metrics
-import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
 import vdi.core.s3.files.FileName
 import vdi.core.s3.paths.DataFilePath
@@ -152,8 +151,8 @@ object Pruner {
 
       try {
         when (it.state) {
-          PrunableState.Deleted -> runPruneAll(bucket, it)
-          PrunableState.Obsoleted -> runPruneObsolete(bucket, it)
+          PrunableState.Deleted     -> runPruneAll(bucket, it)
+          PrunableState.Obsoleted   -> runPruneObsolete(bucket, it)
           PrunableState.NotPrunable -> throw IllegalStateException("somehow got state ${it.state} in deletion loop")
         }
         Metrics.Pruner.count.inc()
@@ -222,69 +221,46 @@ object Pruner {
     val dir = dos.getDatasetDirectory(ownerID, datasetID)
 
     // If the directory doesn't exist, then it has already been deleted.
-    state = dir.takeIf(DatasetDirectory::exists)
-      // If the dataset directory doesn't exist, log an error and mark the
-      // dataset as not prunable for future investigation.
-      .let { when (it) {
-        null -> {
-          Metrics.Pruner.conflict.inc()
-          logger.error("dataset has records in the cache db but has been deleted from the object store")
-          PrunableState.NotPrunable
-        }
-        else -> null
-      } }
-      .let { when (it) {
-        // If the dataset directory does exist, we won't have a prune state yet.
-        // Check if there is a delete flag.
-        null -> dir.getDeleteFlag().lastModified()
-          // If the delete flag exists...
-          ?.let { time -> when {
-            // and is from before (outside) the retention window, it is now old
-            // enough to be subject to pruning.
-            time.isBefore(threshold) -> PrunableState.Deleted
+    // Log an error and mark the dataset as not prunable for future
+    // investigation.
+    if (!dir.exists()) {
+      Metrics.Pruner.conflict.inc()
+      logger.error("dataset has records in the cache db but has been deleted from the object store")
+      state = PrunableState.NotPrunable
+      return
+    }
 
-            // and is from after the retention window start, it is within the
-            // retention window and is not yet prunable.
-            else -> PrunableState.NotPrunable
-          } }
+    // If the directory has a revised flag,
+    if (dir.hasRevisedFlag()) {
+      // And that revised flag is outside the retention window
+      if (dir.getRevisedFlag().lastModified()!!.isBefore(threshold)) {
+        state = PrunableState.Obsoleted
+        return
+      }
 
-        // If we already had a pruning state, just pass it through
-        else -> it
-      } }
-      .let { when (it) {
-        // If the dataset directory does exist, but doesn't have a prune state
-        // yet, then there was no delete flag.  Check if there is a historical
-        // revision flag.
-        null -> dir.getRevisedFlag().lastModified()
-          // If the revised flag exists...
-          ?.let { time -> when {
-            // and is from before (outside) the retention window, it is now old
-            // enough to be subject to pruning.
-            time.isBefore(threshold) -> PrunableState.Obsoleted
+      // And that revised flag is within the retention window
+      state = PrunableState.NotPrunable
+      return
+    }
 
-            // and is from after the retention window start, it is within the
-            // retention window and is not yet prunable.
-            else -> PrunableState.NotPrunable
-          } }
+    // If the dataset does not have a deleted flag
+    if (!dir.hasDeleteFlag()) {
+      Metrics.Pruner.conflict.inc()
+      logger.error("dataset is marked as deleted in the cache db but does" +
+      " not have a deleted or revised flag in the object store")
 
-        // If we already had a pruning state, just pass it through
-        else -> it
-      } }
-      .let { when (it) {
-        // If we haven't determined a pruner state by now, then the dataset
-        // directory existed, but it didn't have deleted flag or revised flag,
-        // which means the cache db deletion flag doesn't align with the object
-        // store state.  Something must have gone wrong to get here; log an
-        // error and mark the dataset as not prunable for future investigation.
-        null -> {
-          Metrics.Pruner.conflict.inc()
-          logger.error("dataset is marked as deleted in the cache db but does" +
-            " not have a deleted or revised flag in the object store")
-          PrunableState.NotPrunable
-        }
+      state = PrunableState.NotPrunable
+      return
+    }
 
-        else -> it
-      } }
+    // If the deletion flag is outside the retention window
+    if (dir.getDeleteFlag().lastModified()!!.isBefore(threshold)) {
+      state = PrunableState.Deleted
+      return
+    }
+
+    // Not yet old enough to prune
+    state = PrunableState.NotPrunable
   }
 
   // region Shared Pruning Functionality

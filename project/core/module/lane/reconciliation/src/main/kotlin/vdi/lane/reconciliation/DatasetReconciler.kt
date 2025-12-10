@@ -46,6 +46,11 @@ internal class DatasetReconciler(
     // Make sure the cache db has at least the base records for this dataset.
     cacheDB.tryInitDataset(ctx, calcNewStatus(ctx, reimport))
 
+    // If, by race condition, both a revised flag and delete flag were created,
+    // remove the delete flag.
+    if (ctx.hasDeleteFlag && ctx.hasRevisedFlag)
+      ctx.datasetDirectory.deleteDeleteFlag()
+
     // If the dataset has been marked as deleted, or if there is a revision flag
     // ensure that it has been uninstalled.
     if (ctx.hasDeleteFlag || ctx.hasRevisedFlag)
