@@ -17,7 +17,7 @@ fun DatasetProxyPostMeta.cleanup() {
 }
 
 fun DatasetProxyPostMeta.validate(errors: ValidationErrors) {
-  type.validate(JsonField.META..JsonField.DATASET_TYPE, installTargets, errors)
+  type.validate(JsonField.META..JsonField.TYPE, installTargets, errors)
 
   (this as DatasetPostMeta).validate(errors)
 }

@@ -47,7 +47,7 @@ fun DatasetPostRequestBody.validate(): Either<BadRequestError, ValidationErrors>
     return left(BadRequestError("cannot provide both an upload file and a source file URL"))
   }
 
-  val dataTypeConfig = details.type?.toInternal()?.let(PluginRegistry::configDataFor)
+  val dataTypeConfig = details.type?.toInternal()?.let(PluginRegistry::configDataOrNullFor)
 
   // If no mapping files were provided
   if (dataPropertiesFiles == null) {

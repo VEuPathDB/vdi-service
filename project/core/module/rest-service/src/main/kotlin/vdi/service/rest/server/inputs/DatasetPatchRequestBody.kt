@@ -61,17 +61,17 @@ internal fun DatasetPatchRequestBody.validate(
   }
 
   type?.apply {
-    value.requireAnd(JF.DATASET_TYPE, errors) {
-      validate(JF.DATASET_TYPE, original.installTargets, errors)
+    value.requireAnd(JF.TYPE, errors) {
+      validate(JF.TYPE, original.installTargets, errors)
 
       val originalHandler = PluginRegistry[original.type]
 
       if (originalHandler == null)
-        errors.add(JF.DATASET_TYPE, "original dataset type is disabled")
+        errors.add(JF.TYPE, "original dataset type is disabled")
       else if (!PluginRegistry.configDataFor(original.type).typeChangesEnabled)
-        errors.add(JF.DATASET_TYPE, "cannot change dataset type from ${original.type}")
+        errors.add(JF.TYPE, "cannot change dataset type from ${original.type}")
       else if (PluginRegistry[DatasetType(DataType.of(name), version)] == null)
-        errors.add(JF.DATASET_TYPE, "no installers available for given dataset type")
+        errors.add(JF.TYPE, "no installers available for given dataset type")
     }
   }
 

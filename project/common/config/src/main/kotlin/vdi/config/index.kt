@@ -38,8 +38,8 @@ inline fun <reified T: Any> loadTypedConfig(path: Path = makeDefaultConfigPath()
   }
 
 fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
-  MetaLogger.info("loading config from $path")
-  MetaLogger.info("loading config schema from $schema")
+  MetaLogger.info("loading config from file $path")
+  MetaLogger.info("loading schema from jar $schema")
 
   val validator = object {}.javaClass.getResourceAsStream(schema.toString())
     .let { it ?: throw ConfigurationException("failed to load config schema $schema") }
