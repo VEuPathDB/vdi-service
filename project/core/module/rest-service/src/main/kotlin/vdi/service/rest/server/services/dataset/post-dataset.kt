@@ -38,7 +38,7 @@ fun <T: ControllerBase> T.createDataset(
 
       targets.forEach {
         logger.debug("applying additional schema validation from install target {}", it.name)
-        context(logger) { json.validate(it.metaValidation!!, validationErrors) }
+        json.validate(it.metaValidation!!, validationErrors)
       }
 
       if (validationErrors.isNotEmpty)

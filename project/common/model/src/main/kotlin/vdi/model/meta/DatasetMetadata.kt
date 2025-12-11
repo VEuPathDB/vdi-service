@@ -128,7 +128,7 @@ data class DatasetMetadata(
    */
   @param:JsonProperty(Characteristics)
   @field:JsonProperty(Characteristics)
-  val characteristics: DatasetCharacteristics? = null,
+  val studyCharacteristics: DatasetCharacteristics? = null,
 
   /**
    * @since v1.7.0
@@ -179,7 +179,7 @@ data class DatasetMetadata(
     const val RevisionHistory      = "revisionHistory"
     const val ShortAttribution     = "shortAttribution"
     const val SourceURL            = "sourceUrl"
-    const val Characteristics      = "datasetCharacteristics"
+    const val Characteristics      = "studyCharacteristics"
     const val Summary              = "summary"
     const val Type                 = "type"
     const val Visibility           = "visibility"

@@ -79,11 +79,11 @@ public interface DatasetPatchRequestBody {
   @JsonProperty(JsonField.HOST_ORGANISM)
   void setHostOrganism(OrganismPatch hostOrganism);
 
-  @JsonProperty(JsonField.CHARACTERISTICS)
-  DatasetCharacteristicsPatch getCharacteristics();
+  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
+  DatasetCharacteristicsPatch getStudyCharacteristics();
 
-  @JsonProperty(JsonField.CHARACTERISTICS)
-  void setCharacteristics(DatasetCharacteristicsPatch characteristics);
+  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
+  void setStudyCharacteristics(DatasetCharacteristicsPatch studyCharacteristics);
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
   ExternalIdentifiersPatch getExternalIdentifiers();

@@ -31,7 +31,7 @@ internal fun DatasetPatchRequestBody.cleanup() {
   programName?.apply { cleanupString(::getValue) }
   linkedDatasets?.apply { cleanupList(::getValue, LinkedDataset?::cleanup) }
 
-  characteristics?.apply {
+  studyCharacteristics?.apply {
     studyDesign?.apply { cleanupString(::getValue) }
     studyType?.apply { cleanupString(::getValue) }
     countries?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
@@ -94,7 +94,7 @@ internal fun DatasetPatchRequestBody.validate(
   programName?.value?.checkLength(JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
   linkedDatasets?.value?.validate(JF.LINKED_DATASETS, errors)
 
-  characteristics?.validate(original.characteristics, errors)
+  studyCharacteristics?.validate(original.studyCharacteristics, errors)
   externalIdentifiers?.validate(JF.EXTERNAL_IDENTIFIERS, errors)
 
   funding?.value?.validate(JF.FUNDING, errors)
@@ -137,7 +137,7 @@ internal fun DatasetPatchRequestBody.applyPatch(
     linkedDatasets       = linkedDatasets.unsafePatch(original.linkedDatasets, Iterable<LinkedDataset>::toInternal),
     experimentalOrganism = experimentalOrganism.unsafePatch(original.experimentalOrganism),
     hostOrganism         = hostOrganism.unsafePatch(original.hostOrganism),
-    characteristics      = characteristics.applyPatch(original.characteristics),
+    studyCharacteristics      = studyCharacteristics.applyPatch(original.studyCharacteristics),
     funding              = funding.unsafePatch(original.funding, Iterable<DatasetFundingAward>::toInternal),
   )
 
@@ -152,19 +152,19 @@ private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristic
       studyDesign.value == null -> {
         // then the study type must also be set to null (study type requires study design)
         if (studyType == null || studyType.value != null)
-          errors.add(JF.CHARACTERISTICS..JF.STUDY_TYPE, "cannot remove study design without also removing study type")
+          errors.add(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE, "cannot remove study design without also removing study type")
       }
 
       // If the study design has been set, AND no study type value was provided
       studyType == null -> {
         // then the original must already have a study type value
-        original?.studyType.require(JF.CHARACTERISTICS..JF.STUDY_TYPE, errors) {}
+        original?.studyType.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE, errors) {}
       }
 
       // If the study design has been set, AND the client is trying to remove out the study type value.
       studyType.value == null -> {
         // No.
-        errors.add(JF.CHARACTERISTICS..JF.STUDY_TYPE)
+        errors.add(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE)
       }
     }
 
@@ -174,25 +174,25 @@ private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristic
       // we already know the client didn't attempt to change the study design
       // value by virtue of being in this else block.
       studyType.value == null -> {
-        null.require(JF.CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
+        null.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
       }
 
       // If the client is attempting to change the study type value without also
       // providing a study design value
       else -> {
         // then the action is only valid if we already had a study design value.
-        original?.studyDesign.require(JF.CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
+        original?.studyDesign.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
       }
     }
   }
 
-  countries?.value?.validateCountries(JF.CHARACTERISTICS, errors)
+  countries?.value?.validateCountries(JF.STUDY_CHARACTERISTICS, errors)
 
-  years?.value?.validate(JF.CHARACTERISTICS..JF.YEARS, errors)
+  years?.value?.validate(JF.STUDY_CHARACTERISTICS..JF.YEARS, errors)
 
-  studySpecies?.value?.validateStudySpecies(JF.CHARACTERISTICS, errors)
-  diseases?.value?.validateDiseases(JF.CHARACTERISTICS, errors)
-  associatedFactors?.value?.validateAssociatedFactors(JF.CHARACTERISTICS, errors)
-  participantAges?.value?.validateParticipantAges(JF.CHARACTERISTICS, errors)
-  sampleTypes?.value?.validateSampleTypes(JF.CHARACTERISTICS, errors)
+  studySpecies?.value?.validateStudySpecies(JF.STUDY_CHARACTERISTICS, errors)
+  diseases?.value?.validateDiseases(JF.STUDY_CHARACTERISTICS, errors)
+  associatedFactors?.value?.validateAssociatedFactors(JF.STUDY_CHARACTERISTICS, errors)
+  participantAges?.value?.validateParticipantAges(JF.STUDY_CHARACTERISTICS, errors)
+  sampleTypes?.value?.validateSampleTypes(JF.STUDY_CHARACTERISTICS, errors)
 }

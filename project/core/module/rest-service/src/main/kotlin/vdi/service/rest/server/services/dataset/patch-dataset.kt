@@ -48,10 +48,10 @@ fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: Dataset
   if (!patch.hasSomethingToUpdate())
     return PatchDatasetsByVdiIdResponse.respond204()
 
-  val patchedMetadata = context(logger) { patch.validateAndApply(userID, datasetID).run {
+  val patchedMetadata = patch.validateAndApply(userID, datasetID).run {
     leftOrNull()?.also { return UnprocessableEntityError(it).wrap() }
     unwrapRight()
-  } }
+  }
 
   cacheDB.withTransaction { db ->
     DatasetStore.putDatasetMeta(userID, datasetID, patchedMetadata)
@@ -61,7 +61,6 @@ fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: Dataset
   return PatchDatasetsByVdiIdResponse.respond204()
 }
 
-context(logger: Logger)
 private fun DatasetPatchRequestBody.validateAndApply(
   userID:    UserID,
   datasetID: DatasetID,
@@ -116,7 +115,7 @@ private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
   || projectName != null
   || programName != null
   || linkedDatasets != null
-  || (characteristics != null && characteristics.hasSomethingToUpdate())
+  || (studyCharacteristics != null && studyCharacteristics.hasSomethingToUpdate())
   || (externalIdentifiers != null && externalIdentifiers.hasSomethingToUpdate())
   || funding != null
 
