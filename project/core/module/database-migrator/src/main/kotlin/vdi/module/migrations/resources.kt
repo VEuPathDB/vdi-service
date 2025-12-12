@@ -14,6 +14,7 @@ internal data class Migration(val version: Int, val scripts: List<String>): Comp
 
   fun getQueries() =
     scripts.asSequence()
+      .map { "/$it" }
       .map { javaClass.getResourceAsStream(it)!!.use { stream -> stream.readAllBytes() } }
       .map { it.decodeToString() }
 }
@@ -36,6 +37,8 @@ private fun getAllMigrations(): Sequence<Migration> {
           buffer.clear()
         }
       }
+
+    yield(Migration(lastVersion, buffer.sorted()))
   }
 }
 

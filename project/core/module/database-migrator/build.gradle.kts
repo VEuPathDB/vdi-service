@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
   implementation(project(":lib:config"))
+  implementation("db:migrations")
 
   implementation(common.config)
   implementation(common.logging)
