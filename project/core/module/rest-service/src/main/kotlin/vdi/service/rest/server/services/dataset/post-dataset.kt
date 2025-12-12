@@ -3,6 +3,7 @@ package vdi.service.rest.server.services.dataset
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
+import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
 import vdi.core.db.cache.CacheDB
 import vdi.core.install.InstallTargetRegistry
@@ -19,7 +20,7 @@ import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse as PostResponse
 
-fun <T: ControllerBase> T.createDataset(
+fun ControllerBase.createDataset(
   datasetID:    DatasetID,
   entity:       DatasetPostRequestBody,
   uploadConfig: UploadConfig,
@@ -45,6 +46,10 @@ fun <T: ControllerBase> T.createDataset(
         return UnprocessableEntityError(validationErrors).wrap()
     }
 
+  entity.dataFiles
+    ?.let { verifyFileExtensions(it, datasetMeta.type) }
+    ?.also { return it.wrap() }
+
   val uploadRefs = CacheDB()
     .initializeDataset(userID, datasetID, datasetMeta) {
       resolveDatasetFiles(
@@ -64,12 +69,17 @@ fun <T: ControllerBase> T.createDataset(
   )
 }
 
-fun <T: ControllerBase> T.createDataset(
+fun ControllerBase.createDataset(
   datasetID:    DatasetID,
   entity:       DatasetProxyPostRequestBody,
   uploadConfig: UploadConfig,
 ) {
   val datasetMeta = entity.toDatasetMeta(userID)
+
+  entity.dataFiles
+    ?.let { verifyFileExtensions(it, datasetMeta.type) }
+    ?.also { throw BadRequestException(it.message) }
+
   val uploadRefs  = CacheDB().initializeDataset(userID, datasetID, datasetMeta) {
     resolveDatasetFiles(entity.dataFiles, entity.url, entity.docFiles, emptyList(), uploadConfig)
   }
