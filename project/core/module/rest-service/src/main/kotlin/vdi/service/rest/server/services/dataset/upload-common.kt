@@ -491,9 +491,24 @@ private fun Path.validateZip(dataTypeMeta: PluginDatasetTypeMeta) {
   val maxSize = dataTypeMeta.maxFileSize.toLong()
   val badFiles = ArrayList<String>(2)
 
+  dataTypeMeta.allowedFileExtensions
+    .takeUnless { it.isEmpty() }
+    ?.also { exts ->
+      val fileName = name.lowercase()
+
+      if (exts.none { fileName.endsWith(it) })
+        throw BadRequestException("uploaded file has an unrecognized or disallowed file extension")
+    }
   zipHeaders().forEach { file ->
-    if (dataTypeMeta.allowedFileExtensions.none { file.name.endsWith(it) })
-      badFiles.add("archive file \"$file\" has an unrecognized or disallowed file extension")
+    dataTypeMeta.allowedFileExtensions
+      .takeUnless { it.isEmpty() }
+      ?.also { exts ->
+        val fileName = name.lowercase()
+
+        if (exts.none { fileName.endsWith(it) })
+          badFiles.add("archive file \"$file\" has an unrecognized or disallowed file extension")
+      }
+
     if (file.size > maxSize)
       badFiles.add("archive file \"$file\" size is larger than the max permitted size of ${maxSize.toFileSizeString()}")
   }

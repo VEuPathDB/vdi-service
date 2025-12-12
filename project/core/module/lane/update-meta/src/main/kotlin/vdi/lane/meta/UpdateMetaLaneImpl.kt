@@ -295,7 +295,8 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       return false
     }
 
-    val sync = appDb.selectDatasetSyncControlRecord(datasetID)!!
+    val sync = appDb.selectDatasetSyncControlRecord(datasetID)
+      ?: return true
 
     if (!sync.metaUpdated.isBefore(metaTimestamp)) {
       logger.info("skipping update; nothing has changed")
