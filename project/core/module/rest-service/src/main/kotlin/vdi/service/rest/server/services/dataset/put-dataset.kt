@@ -29,7 +29,7 @@ import vdi.util.fn.Either
 
 // TODO: don't allow users to revise a dataset that has another revision already in progress!
 
-internal fun <T: ControllerBase> T.putDataset(
+internal fun ControllerBase.putDataset(
   datasetID:    DatasetID,
   request:      DatasetPutRequestBody,
   uploadConfig: UploadConfig,
@@ -80,6 +80,10 @@ internal fun <T: ControllerBase> T.putDataset(
     ))
 
   val newMeta = request.details.applyPatch(originalMeta, newHistory)
+
+  request.dataFiles
+    ?.let { verifyFileExtensions(it, newMeta.type) }
+    ?.also { return Either.ofRight(it.wrap()) }
 
   val uploadRefs = CacheDB().initializeDataset(userID, newDatasetID, newMeta) {
     it.tryInsertRevisionLink(newHistory.originalID, newHistory.revisions.last())

@@ -31,8 +31,10 @@ import vdi.logging.markedLogger
 import vdi.model.OriginTimestamp
 import vdi.model.meta.*
 import vdi.service.rest.config.UploadConfig
+import vdi.service.rest.generated.model.BadRequestError
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.services.users.getCurrentQuotaUsage
 import vdi.service.rest.util.*
 import vdi.util.fs.TempFiles
@@ -78,15 +80,31 @@ fun <T> CacheDB.initializeDataset(
 
 // region Dataset File Processing
 
+fun verifyFileExtensions(data: Iterable<File>, dataType: DatasetType): BadRequestError? {
+  val exts = PluginRegistry.configDataFor(dataType).allowedFileExtensions
+
+  for (file in data) {
+    for (e in SupportedArchiveType.entries)
+      if (e.matches(file.name))
+        return null
+
+    for (e in exts)
+      if (file.name.endsWith(e))
+        return null
+  }
+
+  return BadRequestError("unsupported file type")
+}
+
 @OptIn(ExperimentalPathApi::class)
-fun <T: ControllerBase> T.resolveDatasetFiles(
+fun ControllerBase.resolveDatasetFiles(
   data:         Iterable<File>?,
   url:          String?,
   meta:         Iterable<File>?,
   properties:   Iterable<File>?,
   uploadConfig: UploadConfig,
 ): UploadFileReferences {
-  logger.debug("resolving dataset file")
+  logger.debug("resolving dataset files")
 
   val tmpDir = TempFiles.makeTempDirectory()
 
@@ -125,7 +143,7 @@ fun resolveUploadFiles(
     props   = props.toTempPaths(tmpDir),
   )
 
-fun <T: ControllerBase> T.resolveURLFile(
+fun ControllerBase.resolveURLFile(
   url:          String,
   docs:         Sequence<File>,
   props:        Sequence<File>,
@@ -154,7 +172,7 @@ private fun Sequence<File>.toTempPaths(tmpDir: Path): List<Path> =
 private val WorkPool = Executors.newFixedThreadPool(10)
 
 @OptIn(ExperimentalPathApi::class)
-fun <T: ControllerBase> T.submitUpload(
+fun ControllerBase.submitUpload(
   datasetID:    DatasetID,
   uploadRefs:   UploadFileReferences,
   datasetMeta:  DatasetMetadata,
@@ -171,7 +189,7 @@ fun <T: ControllerBase> T.submitUpload(
   }
 }
 
-fun <T: ControllerBase> T.uploadFiles(
+fun ControllerBase.uploadFiles(
   datasetID:    DatasetID,
   uploadRefs:   UploadFileReferences,
   datasetMeta:  DatasetMetadata,
@@ -254,7 +272,7 @@ fun <T: ControllerBase> T.uploadFiles(
   }
 }
 
-fun <T: ControllerBase> T.verifyUploadFileSize(
+fun ControllerBase.verifyUploadFileSize(
   uploadRefs:   UploadFileReferences,
   uploadConfig: UploadConfig,
 ) {
@@ -474,7 +492,7 @@ private fun Path.validateZip(dataTypeMeta: PluginDatasetTypeMeta) {
 // region Dataset File Retrieval
 
 @OptIn(ExperimentalPathApi::class)
-fun <T: ControllerBase> T.downloadRemoteFile(url: URL, uploadConfig: UploadConfig, tmpDir: Path): Path {
+fun ControllerBase.downloadRemoteFile(url: URL, uploadConfig: UploadConfig, tmpDir: Path): Path {
   logger.info("attempting to download a remote file from {}", url)
 
   val response = try {
@@ -549,7 +567,7 @@ fun String.toURL() =
 
 private fun FailedDependencyException(url: URL, msg: String) = FailedDependencyException(url.toString(), msg)
 
-private fun <T: ControllerBase> T.getUserRemainingQuota(uploadConfig: UploadConfig): Long =
+private fun ControllerBase.getUserRemainingQuota(uploadConfig: UploadConfig): Long =
   max(0L, uploadConfig.userMaxStorageSize.toLong() - getCurrentQuotaUsage(userID))
 
 /**
