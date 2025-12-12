@@ -68,7 +68,7 @@ private fun AllDatasetsListResponse(
   results: List<AllDatasetsListEntry>,
 ): AllDatasetsListResponse =
   AllDatasetsListResponseImpl().also {
-    it.meta = meta
+    it.meta    = meta
     it.results = results
   }
 
@@ -79,10 +79,10 @@ private fun AllDatasetsListMeta(
   total: UInt,
 ): AllDatasetsListMeta =
   AllDatasetsListMetaImpl().also {
-    it.count = count.toInt()
+    it.count  = count.toInt()
     it.offset = offset.toInt()
-    it.limit = limit.toInt()
-    it.total = total.toInt()
+    it.limit  = limit.toInt()
+    it.total  = total.toInt()
   }
 
 private fun AllDatasetsListEntry(
@@ -90,18 +90,18 @@ private fun AllDatasetsListEntry(
   statuses: Map<InstallTargetID, InstallStatuses?>
 ): AllDatasetsListEntry =
   AllDatasetsListEntryImpl().also {
-    it.datasetId = row.datasetID.toString()
-    it.owner = row.ownerID.toLong()
-    it.datasetType = row.type.toExternal()
-    it.visibility = DatasetVisibility(row.visibility)
-    it.name = row.name
-    it.summary = row.summary
-    it.description = row.description
-    it.origin = row.origin
+    it.datasetId      = row.datasetID.toString()
+    it.owner          = row.ownerID.toLong()
+    it.datasetType    = row.type.toExternal()
+    it.visibility     = DatasetVisibility(row.visibility)
+    it.name           = row.name
+    it.summary        = row.summary
+    it.description    = row.description
+    it.origin         = row.origin
     it.installTargets = row.projects
-    it.status = DatasetStatusInfo(row.importStatus, null, statuses)
-    it.created = row.created.defaultZone()
-    it.isDeleted = row.isDeleted
-    it.programName = row.programName
-    it.projectName = row.projectName
+    it.status         = DatasetStatusInfo(row.importStatus, null, statuses)
+    it.created        = row.created.defaultZone()
+    it.isDeleted      = row.isDeleted
+    it.programName    = row.programName
+    it.projectName    = row.projectName
   }

@@ -4,6 +4,7 @@ package vdi.service.rest.server.services.dataset
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import vdi.core.db.app.AppDB
 import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.db.cache.query.DatasetListQuery
 import vdi.model.meta.DatasetID
@@ -50,19 +51,22 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
   val fileSummaries = cacheDB.selectUploadFileSummaries(datasetIDs)
 
   // for each dataset the original search returned
-  datasetList.forEach { ds ->
-
-    // add the owner id to the set of user ids
-    userIDs.add(ds.ownerID)
-
-    // for each project the dataset is associated with
-    ds.projects.forEach { project ->
-      // add an entry into the projectToDatasetID map for the combination of
-      // project id and dataset id
-      projectToDatasetID.computeIfAbsent(project) { HashSet(1) }
-        .add(ds.datasetID)
+  datasetList
+    .asSequence()
+    // Get the user ID for the dataset record
+    .onEach { userIDs.add(it.ownerID) }
+    // Filter down to just datasets that imported successfully
+    .filter { it.importStatus == DatasetImportStatus.Complete }
+    // Collect datasets to check install statuses for
+    .forEach { ds ->
+      // for each project the dataset is associated with
+      ds.projects.forEach { project ->
+        // add an entry into the projectToDatasetID map for the combination of
+        // project id and dataset id
+        projectToDatasetID.computeIfAbsent(project) { HashSet(1) }
+          .add(ds.datasetID)
+      }
     }
-  }
 
   // Get the statuses for each installation by project ID and dataset ID
   //
@@ -76,17 +80,16 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
   // listing returned by the original query.
   val userDetails = UserProvider.getUsersById(userIDs.map { it.toLong() })
     .asSequence()
-    .map { (userIdLong, user) ->
+    .associate { (userIdLong, user) ->
       val userId = UserID(userIdLong)
       userId to UserDetails(userId, user.firstName, user.lastName, user.email, user.organization)
     }
-    .toMap()
   userIDs.clear()
 
   return datasetList.map {
     it.toExternal(
       owner    = userDetails.requireDetails(it.ownerID),
-      statuses = datasetInstallStatusMap[it.datasetID] ?: emptyMap(), // TODO investigate: why would this be null?
+      installs = datasetInstallStatusMap[it.datasetID] ?: emptyMap(),
       fileInfo = fileSummaries[it.datasetID],
       shares   = if (it.ownerID != requesterID)
         null
