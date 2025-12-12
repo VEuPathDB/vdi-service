@@ -80,20 +80,29 @@ fun <T> CacheDB.initializeDataset(
 
 // region Dataset File Processing
 
-fun verifyFileExtensions(data: Iterable<File>, dataType: DatasetType): BadRequestError? {
+fun verifyFileExtensions(data: Collection<File>, dataType: DatasetType): BadRequestError? {
   val exts = PluginRegistry.configDataFor(dataType).allowedFileExtensions
 
+  // If no special extensions have been defined, we can't validate.
+  if (exts.isEmpty())
+    return null
+
   for (file in data) {
+    val name = file.name.lowercase()
+
     for (e in SupportedArchiveType.entries)
-      if (e.matches(file.name))
+      if (e.matches(name))
         return null
 
     for (e in exts)
-      if (file.name.endsWith(e))
+      if (name.endsWith(e))
         return null
   }
 
-  return BadRequestError("unsupported file type")
+  return BadRequestError(
+    "unsupported data file type.  permitted upload data file types are: " +
+    (SupportedArchiveType.SupportedExtensions + exts).joinToString("', '", "['", "']")
+  )
 }
 
 @OptIn(ExperimentalPathApi::class)
@@ -456,8 +465,14 @@ private fun Path.repackRaw(into: Path, dataTypeMeta: PluginDatasetTypeMeta): Lis
   if (fileSize() > dataTypeMeta.maxFileSize.toLong())
     throw BadRequestException("uploaded file larger than the max permitted size of ${dataTypeMeta.maxFileSize.toFileSizeString()}")
 
-  if (dataTypeMeta.allowedFileExtensions.none { name.endsWith(it) })
-    throw BadRequestException("uploaded file has an unrecognized or disallowed file extension")
+  dataTypeMeta.allowedFileExtensions
+    .takeUnless { it.isEmpty() }
+    ?.also { exts ->
+      val fileName = name.lowercase()
+
+      if (exts.none { fileName.endsWith(it) })
+        throw BadRequestException("uploaded file has an unrecognized or disallowed file extension")
+    }
 
   into.compress(listOf(this))
   return listOf(DatasetFileInfo(name, fileSize().toULong()))

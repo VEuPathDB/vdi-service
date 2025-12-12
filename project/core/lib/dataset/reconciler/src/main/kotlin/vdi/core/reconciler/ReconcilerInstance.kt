@@ -293,7 +293,7 @@ internal class ReconcilerInstance(
   private fun DatasetDirectory.isOutOfSync(targetLastUpdated: SyncControlRecord): SyncStatus {
     return SyncStatus(
       metaOutOfSync    = targetLastUpdated.metaUpdated.isBefore(getMetaFile().lastModified())
-        || targetLastUpdated.metaUpdated.isBefore(getLatestVariablePropertiesTimestamp()),
+        || getLatestVariablePropertiesTimestamp()?.let { targetLastUpdated.metaUpdated.isBefore(it) } == true,
       sharesOutOfSync  = targetLastUpdated.sharesUpdated.isBefore(getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
       installOutOfSync = targetLastUpdated.dataUpdated.isBefore(getInstallReadyTimestamp() ?: targetLastUpdated.dataUpdated),
     )
