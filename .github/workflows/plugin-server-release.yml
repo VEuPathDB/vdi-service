@@ -85,14 +85,6 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
       plugin: genelist
-  plugin-isasimple:
-    needs:
-    - publish
-    uses: VEuPathDB/vdi-plugin-isasimple/.github/workflows/update-plugin-server.yml@main
-    secrets: inherit
-    with:
-      tag: ${{ github.ref_name }}
-      plugin: isasimple
   plugin-noop:
     needs:
     - publish
