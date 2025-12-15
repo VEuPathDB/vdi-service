@@ -9,11 +9,11 @@ data class ValidationResponse(
 
   @param:JsonProperty(Basic)
   @field:JsonProperty(Basic)
-  val basicWarnings: List<String>,
+  val basicWarnings: List<String> = emptyList(),
 
   @param:JsonProperty(Community)
   @field:JsonProperty(Community)
-  val communityWarnings: List<String>,
+  val communityWarnings: List<String> = emptyList(),
 ): ImportResponse, InstallMetaResponse, InstallDataResponse {
   companion object JsonKey {
     const val IsValid = "isValid"
