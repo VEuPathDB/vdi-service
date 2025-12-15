@@ -27,7 +27,7 @@ WHERE
   // language=postgresql
   private const val InsertSQL = """
 INSERT INTO
-  vdi.install_files (dataset_id, file_name, file_size)
+  vdi.upload_files (dataset_id, file_name, file_size)
 VALUES
   (?, ?, ?)
 ON CONFLICT
