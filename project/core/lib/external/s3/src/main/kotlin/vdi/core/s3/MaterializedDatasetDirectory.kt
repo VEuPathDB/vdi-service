@@ -102,7 +102,7 @@ internal class MaterializedDatasetDirectory(
         ownerID         = ownerID,
         datasetID       = datasetID,
         bucket          = bucket,
-        metaFile        = metaFile!!,
+        metaFile        = metaFile ?: throw MalformedDatasetException("dataset missing ${FileName.MetadataFile}"),
         manifest        = manifest,
         uploadFile      = uploadFile,
         importableFile  = importableFile,
