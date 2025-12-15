@@ -37,9 +37,11 @@ object Main {
 
   @JvmStatic
   fun main(args: Array<String>) {
+    MetaLogger.info("=".repeat(80))
+
     val manifest = loadManifestConfig()
     val config = loadAndCacheStackConfig()
-    MetaLogger.info("=".repeat(80))
+
     MetaLogger.info("starting VDI service version: {}", manifest.gitTag)
 
     MetaLogger.info("awaiting external dependencies")
