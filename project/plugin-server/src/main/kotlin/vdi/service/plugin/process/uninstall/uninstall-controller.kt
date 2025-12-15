@@ -5,7 +5,7 @@ import vdi.io.plugin.responses.PluginResponseStatus
 import vdi.io.plugin.responses.ScriptErrorResponse
 import vdi.io.plugin.responses.ServerErrorResponse
 import vdi.service.plugin.model.ApplicationContext
-import vdi.service.plugin.server.respond204
+import vdi.service.plugin.server.respond200
 import vdi.service.plugin.server.respondJSON
 
 internal suspend fun ApplicationCall.handleUninstallRequest(appCtx: ApplicationContext) {
@@ -14,7 +14,7 @@ internal suspend fun ApplicationCall.handleUninstallRequest(appCtx: ApplicationC
       .also { when (it) {
         is ScriptErrorResponse -> respondJSON(it, PluginResponseStatus.ScriptError)
         is ServerErrorResponse -> respondJSON(it, PluginResponseStatus.ServerError)
-        null -> respond204()
+        null -> respond200()
       } }
   }
 }

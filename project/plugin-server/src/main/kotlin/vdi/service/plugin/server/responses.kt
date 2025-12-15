@@ -15,9 +15,9 @@ import vdi.service.plugin.server.context.ScriptContext
 import vdi.service.plugin.util.ReadableByteArrayChannel
 
 context(ctx: ScriptContext<*, *>)
-internal suspend inline fun ApplicationCall.respond204() {
-  ctx.logger.info("responding with HTTP 204")
-  respondText("", ContentType.Text.Plain, HttpStatusCode.NoContent)
+internal suspend inline fun ApplicationCall.respond200() {
+  ctx.logger.info("responding with empty HTTP 200")
+  respondText("", ContentType.Text.Plain, HttpStatusCode.fromValue(PluginResponseStatus.Success.code.toInt()))
 }
 
 context(ctx: ScriptContext<*, *>)

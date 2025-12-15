@@ -14,8 +14,8 @@ import vdi.core.s3.files.docs.DocumentFile
 import vdi.core.s3.files.flags.DeleteFlagFile
 import vdi.core.s3.files.flags.FlagFile
 import vdi.core.s3.files.flags.RevisedFlagFile
-import vdi.core.s3.files.maps.MappingFile
 import vdi.core.s3.files.maps.DataPropertiesFile
+import vdi.core.s3.files.maps.MappingFile
 import vdi.core.s3.files.meta.ManifestFile
 import vdi.core.s3.files.meta.MetaFile
 import vdi.core.s3.files.meta.MetadataFile
