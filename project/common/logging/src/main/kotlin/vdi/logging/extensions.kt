@@ -114,7 +114,7 @@ inline fun createLoggerMark(eventID: EventID, ownerID: UserID, datasetID: Datase
   arrayOf(
     "$PrefixEventID=$eventID",
     "$PrefixUserID=$ownerID",
-    "$PrefixInstallTarget=$datasetID",
+    "$PrefixDatasetID=$datasetID",
   )
 
 inline fun createLoggerMark(ownerID: UserID, datasetID: DatasetID) =

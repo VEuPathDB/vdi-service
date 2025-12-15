@@ -9,7 +9,7 @@ import kotlin.reflect.KClass
 @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
 class MarkedLogger(marks: Array<String>, private val delegate: Logger): Logger by delegate {
   private val marks = ArrayList<String>(marks.size)
-    .apply { marks.forEach { if (it.isNotBlank()) setMark(it) } }
+    .apply { marks.forEach { if (it.isNotBlank()) setMark(it.trim()) } }
     .apply { sort() }
     .toTypedArray()
 
