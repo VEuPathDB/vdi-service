@@ -1,5 +1,3 @@
-@file:JvmName("DatasetUploadCommon")
-
 package vdi.service.rest.server.services.dataset
 
 import jakarta.ws.rs.BadRequestException
@@ -37,6 +35,8 @@ import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.services.users.getCurrentQuotaUsage
 import vdi.service.rest.util.*
+import vdi.util.fn.Either
+import vdi.util.fn.leftOr
 import vdi.util.fs.TempFiles
 import vdi.util.zip.*
 
@@ -218,9 +218,11 @@ fun ControllerBase.uploadFiles(
               into         = archive,
               using        = dir,
               dataTypeMeta = PluginRegistry.configDataFor(datasetMeta.type),
+              uploadConfig = uploadConfig,
             )
           }
         }
+          .leftOr { throw BadRequestException(it.message) }
       } else {
         uploadRefs.data.pack(into = archive)
       }
@@ -292,17 +294,15 @@ fun ControllerBase.verifyUploadFileSize(
   if (dataSize > uploadConfig.maxUploadSize.toLong())
     throw BadRequestException(
       "upload upload size larger than the max permitted dataset size of "
-      + uploadConfig.maxUploadSize.toString() + " bytes"
+      + uploadConfig.maxUploadSize.toFileSizeString()
     )
 
   val remainingUploadAllowance = getUserRemainingQuota(uploadConfig)
   val totalUploadSize = dataSize + metaSize + propSize
 
   if (totalUploadSize > remainingUploadAllowance)
-    throw BadRequestException(
-      "total upload size is larger than the remaining space allowed by the user quota " +
-      "($remainingUploadAllowance bytes)"
-    )
+    throw BadRequestException("total upload size is larger than the remaining" +
+      " space allowed by the user quota (${remainingUploadAllowance.toFileSizeString()})")
 }
 
 /**
@@ -316,12 +316,27 @@ fun ControllerBase.verifyUploadFileSize(
  *
  * @return A map of upload files and their sizes.
  */
-context(logger: Logger)
-private fun Path.repack(into: Path, using: Path, dataTypeMeta: PluginDatasetTypeMeta) =
+context(logger: Logger, controller: ControllerBase)
+private fun Path.repack(
+  into:         Path,
+  using:        Path,
+  dataTypeMeta: PluginDatasetTypeMeta,
+  uploadConfig: UploadConfig,
+): Either<List<DatasetFileInfo>, BadRequestError> =
   when {
-    SupportedArchiveType.Zip.matches(name)   -> repackZip(into, using, dataTypeMeta)
-    SupportedArchiveType.TarGZ.matches(name) -> repackTar(into, using, dataTypeMeta)
-    else                                     -> repackRaw(into, dataTypeMeta)
+    SupportedArchiveType.Zip.matches(name) -> {
+      validateZip(dataTypeMeta, controller.getUserRemainingQuota(uploadConfig))
+        ?.let { Either.right(it) }
+        ?: Either.left(repackZip(into, using))
+    }
+
+    SupportedArchiveType.TarGZ.matches(name) -> {
+      validateTar(dataTypeMeta, controller.getUserRemainingQuota(uploadConfig))
+        ?.let { Either.right(it) }
+        ?: Either.left(repackTar(into, using))
+    }
+
+    else -> repackRaw(into, dataTypeMeta)
   }
 
 /**
@@ -335,7 +350,6 @@ private fun List<Path>.pack(into: Path): List<DatasetFileInfo> {
   into.compress(this)
   return map { DatasetFileInfo(it.name, it.fileSize().toULong()) }
 }
-
 
 /**
  * Repacks the receiver zip file into a new highly compressed zip file for
@@ -353,15 +367,11 @@ context(logger: Logger)
 private fun Path.repackZip(
   into:         Path,
   using:        Path,
-  dataTypeMeta: PluginDatasetTypeMeta,
 ): List<DatasetFileInfo> {
   logger.trace("repacking zip file {} into {}", this, into)
 
   // Map of file names to sizes that will be stored in the postgres database.
   val files = ArrayList<DatasetFileInfo>(12)
-
-  // Validate that the zip appears usable.
-  validateZip(dataTypeMeta)
 
   // List of paths for the unpacked files
   val unpacked = ArrayList<Path>(12)
@@ -419,15 +429,13 @@ private fun Path.repackZip(
  * @return A map of upload files and their sizes.
  */
 context(logger: Logger)
-private fun Path.repackTar(into: Path, using: Path, dataTypeMeta: PluginDatasetTypeMeta): List<DatasetFileInfo> {
+private fun Path.repackTar(into: Path, using: Path): List<DatasetFileInfo> {
   logger.trace("repacking tar {} into {}", this, into)
 
   // Output map of files to sizes that will be written to the postgres DB.
   val sizes = ArrayList<DatasetFileInfo>(12)
 
   try {
-    validateTar(dataTypeMeta)
-
     Tar.decompressWithGZip(this, using)
   } catch (_: ZipException) {
     throw BadRequestException("input file had gzipped tar extension but could not be packed as a gzipped tar")
@@ -446,76 +454,83 @@ private fun Path.repackTar(into: Path, using: Path, dataTypeMeta: PluginDatasetT
   return sizes
 }
 
-private fun Path.validateTar(dataTypeMeta: PluginDatasetTypeMeta) {
+private fun Path.validateTar(dataTypeMeta: PluginDatasetTypeMeta, remainingQuota: Long): BadRequestError? {
   val maxSize = dataTypeMeta.maxFileSize.toLong()
-  val badFiles = ArrayList<String>(2)
+  val messages = ArrayList<String>(2)
+  var totalSize = 0L
 
   Tar.entries(this, true).forEach { (name, size) ->
-    if (dataTypeMeta.allowedFileExtensions.none { name.endsWith(it) })
-      badFiles.add("archive file \"$name\" has an unrecognized or disallowed file extension")
+    if (!dataTypeMeta.allowedFileExtensions.matchesFilename(name))
+      messages.add("archive file \"$name\" has an unrecognized or disallowed file extension")
+
     if (size > maxSize)
-      badFiles.add("archive file \"$name\" size is larger than the max permitted size of ${maxSize.toFileSizeString()}")
+      messages.add("archive file \"$name\" size is larger than the max permitted size of ${maxSize.toFileSizeString()}")
+
+    totalSize += size
   }
+
+  if (totalSize > remainingQuota)
+    messages.add("total size of archive content is larger than the remaining" +
+    " user allowance of ${remainingQuota.toFileSizeString()}")
+
+  return messages.takeUnless { it.isEmpty() }
+    ?.let { BadRequestError(it.joinToString("\n")) }
 }
 
 context(logger: Logger)
-private fun Path.repackRaw(into: Path, dataTypeMeta: PluginDatasetTypeMeta): List<DatasetFileInfo> {
-  logger.trace("repacking raw file {} into {}", this, into)
+private fun Path.repackRaw(into: Path, dataTypeMeta: PluginDatasetTypeMeta): Either<List<DatasetFileInfo>, BadRequestError> {
+  logger.trace("packing raw file {} into {}", this, into)
 
   if (fileSize() > dataTypeMeta.maxFileSize.toLong())
-    throw BadRequestException("uploaded file larger than the max permitted size of ${dataTypeMeta.maxFileSize.toFileSizeString()}")
+    return Either.right(BadRequestError("uploaded file larger than the max permitted size of ${dataTypeMeta.maxFileSize.toFileSizeString()}"))
 
-  dataTypeMeta.allowedFileExtensions
-    .takeUnless { it.isEmpty() }
-    ?.also { exts ->
-      val fileName = name.lowercase()
-
-      if (exts.none { fileName.endsWith(it) })
-        throw BadRequestException("uploaded file has an unrecognized or disallowed file extension")
-    }
+  if (!dataTypeMeta.allowedFileExtensions.matchesFilename(name.lowercase()))
+    return Either.right(BadRequestError("uploaded file has an unrecognized or disallowed file extension"))
 
   into.compress(listOf(this))
-  return listOf(DatasetFileInfo(name, fileSize().toULong()))
+
+  return Either.left(listOf(DatasetFileInfo(name, fileSize().toULong())))
 }
 
-private fun Path.validateZip(dataTypeMeta: PluginDatasetTypeMeta) {
+private fun Path.validateZip(dataTypeMeta: PluginDatasetTypeMeta, remainingQuota: Long): BadRequestError? {
   when (getZipType()) {
-    ZipType.Empty    -> throw BadRequestException("uploaded zip file is empty")
+    ZipType.Empty    -> return BadRequestError("uploaded zip file is empty")
     ZipType.Standard -> { /* OK */
     }
 
-    ZipType.Spanned  -> throw BadRequestException("uploaded zip file is part of a spanned archive")
-    ZipType.Invalid  -> throw BadRequestException("uploaded zip file is invalid")
+    ZipType.Spanned  -> return BadRequestError("uploaded zip file is part of a spanned archive")
+    ZipType.Invalid  -> return BadRequestError("uploaded zip file is invalid")
   }
 
   val maxSize = dataTypeMeta.maxFileSize.toLong()
-  val badFiles = ArrayList<String>(2)
+  val messages = ArrayList<String>(2)
+  var totalSize = 0L
 
-  dataTypeMeta.allowedFileExtensions
-    .takeUnless { it.isEmpty() }
-    ?.also { exts ->
-      val fileName = name.lowercase()
-
-      if (exts.none { fileName.endsWith(it) })
-        throw BadRequestException("uploaded file has an unrecognized or disallowed file extension")
-    }
   zipHeaders().forEach { file ->
-    dataTypeMeta.allowedFileExtensions
-      .takeUnless { it.isEmpty() }
-      ?.also { exts ->
-        val fileName = name.lowercase()
-
-        if (exts.none { fileName.endsWith(it) })
-          badFiles.add("archive file \"$file\" has an unrecognized or disallowed file extension")
-      }
+    if (!dataTypeMeta.allowedFileExtensions.matchesFilename(file.name))
+      messages.add("archive contains data file \"${file.name}\" with an" +
+        " unrecognized or disallowed file extension")
 
     if (file.size > maxSize)
-      badFiles.add("archive file \"$file\" size is larger than the max permitted size of ${maxSize.toFileSizeString()}")
+      messages.add("archive contains data file \"${file.name}\" with a size" +
+        " larger than the max permitted size of ${maxSize.toFileSizeString()}")
+
+    totalSize += file.size
   }
 
-  if (badFiles.isNotEmpty())
-    throw BadRequestException(badFiles.joinToString("\n"))
+  if (totalSize > remainingQuota)
+    messages.add("total size of archive content is larger than the remaining" +
+      " user allowance of ${remainingQuota.toFileSizeString()}")
+
+
+  if (messages.isNotEmpty())
+    return BadRequestError(messages.joinToString("\n"))
+
+  return null
 }
+
+private fun Array<String>.matchesFilename(name: String) =
+  isEmpty() || any(name.lowercase()::endsWith)
 
 // endregion Dataset File Processing
 
