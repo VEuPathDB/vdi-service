@@ -13,6 +13,7 @@ import vdi.core.metrics.Metrics
 import vdi.core.util.orElse
 import vdi.core.async.WorkerPool
 import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.db.cache.withTransaction
 import vdi.core.modules.AbortCB
@@ -137,12 +138,16 @@ internal class SoftDeleteLaneImpl(
 
   private fun SoftDeleteContext.datasetShouldBeUninstalled(
     installTarget: InstallTargetID,
-    dataType: DatasetType,
+    record:        DatasetRecord,
   ): Boolean {
-    val dataset = appDB.accessor(installTarget, dataType)!!.selectDataset(datasetID)
+    val dataset = appDB.accessor(installTarget, record.type)!!.selectDataset(datasetID)
 
     if (dataset == null) {
-      logger.warn("dataset does not appear in target project {}, cannot run uninstall", installTarget)
+      // If the import status was not complete, then we didn't actually expect
+      // the dataset to be installed in the first place, this is more of a worst
+      // case safety check.
+      if (record.importStatus == DatasetImportStatus.Complete)
+        logger.warn("dataset does not appear in target project {}, cannot run uninstall", installTarget)
       return false
     }
 
