@@ -24,7 +24,6 @@ import vdi.core.plugin.client.response.EmptySuccessResponse
 import vdi.core.plugin.client.response.ServiceErrorResponse
 import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.plugin.mapping.PluginHandlers
-import vdi.model.meta.DatasetType
 import vdi.model.meta.InstallTargetID
 
 internal class SoftDeleteLaneImpl(
@@ -101,7 +100,7 @@ internal class SoftDeleteLaneImpl(
         return@forEach
       }
 
-      if (datasetShouldBeUninstalled(projectID, internalDBRecord.type)) {
+      if (datasetShouldBeUninstalled(projectID, internalDBRecord)) {
         try {
           uninstallDataset(projectID, handler, internalDBRecord)
         } catch (e: PluginException) {
