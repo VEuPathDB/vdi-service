@@ -25,7 +25,6 @@ internal class PluginDependency(
     get() = "http"
 
   override var extra: Map<String, String> = emptyMap()
-    get() = TODO("Not yet implemented")
     private set
 
   override fun checkStatus(): Dependency.Status {
@@ -59,7 +58,5 @@ internal class PluginDependency(
         Dependency.Status.NotOk
       }
     }
-
-
   }
 }

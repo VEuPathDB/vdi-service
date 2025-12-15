@@ -12,6 +12,8 @@ import vdi.logging.logger
 import vdi.core.metrics.Metrics
 import vdi.core.util.orElse
 import vdi.core.async.WorkerPool
+import vdi.core.db.app.model.InstallStatus
+import vdi.core.db.app.model.InstallType
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetRecord
@@ -139,7 +141,9 @@ internal class SoftDeleteLaneImpl(
     installTarget: InstallTargetID,
     record:        DatasetRecord,
   ): Boolean {
-    val dataset = appDB.accessor(installTarget, record.type)!!.selectDataset(datasetID)
+    val targetDB = appDB.accessor(installTarget, record.type)!!
+
+    val dataset = targetDB.selectDataset(datasetID)
 
     if (dataset == null) {
       // If the import status was not complete, then we didn't actually expect
@@ -155,7 +159,7 @@ internal class SoftDeleteLaneImpl(
       return false
     }
 
-    return true
+    return targetDB.selectDatasetInstallMessages(datasetID).isNotEmpty()
   }
 
   private fun SoftDeleteContext.handleSuccessResponse(handler: PluginHandler, installTarget: InstallTargetID) {
