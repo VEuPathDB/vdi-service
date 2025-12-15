@@ -67,7 +67,7 @@ ktor-server-metrics = { module = "io.ktor:ktor-server-metrics-micrometer", versi
 
 log4j-iostreams = { group = "org.apache.logging.log4j", name = "log4j-iostreams",   version.ref = "log4j" }
 
-metrics-micrometer = { group = "io.micrometer", name = "micrometer-registry-prometheus", version = "1.16.0" }
+metrics-micrometer = { group = "io.micrometer", name = "micrometer-registry-prometheus", version = "1.16.1" }
 metrics-prometheus = { group = "io.prometheus", name = "prometheus-metrics-tracer-initializer", version = "1.4.3" }
 
 
