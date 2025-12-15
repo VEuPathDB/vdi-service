@@ -24,6 +24,8 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
    */
   fun deleteDataset(datasetID: DatasetID): Boolean
 
+  fun tryInsertDataset(dataset: DatasetRecord): Boolean
+
   /**
    * Inserts a new dataset record.
    *

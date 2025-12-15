@@ -130,7 +130,8 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     val metaTimestamp = dir.getMetaFile().lastModified()!!
     logger.debug("meta json timestamp is {}", metaTimestamp)
 
-    val mappingTimestamp = dir.getLatestVariablePropertiesTimestamp() ?: OriginTimestamp
+    val mappingTimestamp = dir.getLatestVariablePropertiesTimestamp()
+      ?: OriginTimestamp
     logger.debug("variable properties timestamp is {}", mappingTimestamp)
 
     val timer = Metrics.MetaUpdates.duration
@@ -190,10 +191,19 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
   }
 
   private suspend fun UpdateMetaContext.WithPlugin.updateTargetMeta(metaTimestamp: OffsetDateTime) {
-    var meta = this.meta
-
     if (!shouldUpdateTargetMeta(metaTimestamp))
       return
+
+    // Ensure at least some record exists for the dataset before attempting
+    // to write anything else to the target database.
+    appDB.withTransaction(target, plugin.type) {
+      it.tryInsertDataset(DatasetRecord(
+        datasetID,
+        // If the dataset didn't already exist, set it to private first
+        meta.copy(visibility = DatasetVisibility.Private),
+        PluginRegistry.categoryFor(meta.type),
+      ))
+    }
 
     appDB.withTransaction(target, plugin.type) {
       logger.debug("upserting install-meta message into app db")
@@ -208,16 +218,19 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       false
     }
 
+    var newMeta = meta
+
     // If the install-meta script failed, AND the user is attempting to promote
     // the dataset to community, then refuse to change the visibility.
     if (!variablePropertiesInstallSucceeded && shouldRevertToPrivateOnVariablePropertiesError(meta)) {
       logger.warn("refusing to make dataset public due to unsuccessful install-meta")
-      meta = meta.copy(visibility = DatasetVisibility.Private)
+      newMeta = meta.copy(visibility = DatasetVisibility.Private)
     }
 
+    // Update/insert full set of dataset records.
     appDB.withTransaction(target, plugin.type) {
-      val record = DatasetRecord(datasetID, meta, PluginRegistry.categoryFor(meta.type))
-      it.upsertDatasetRecord(record, meta, metaTimestamp)
+      val record = DatasetRecord(datasetID, newMeta, PluginRegistry.categoryFor(meta.type))
+      it.upsertDatasetRecord(record, newMeta, metaTimestamp)
     }
   }
 

@@ -1,6 +1,7 @@
 package vdi.core.db.app
 
 import java.sql.Connection
+import java.sql.SQLException
 import java.time.OffsetDateTime
 import vdi.core.db.app.model.*
 import vdi.core.db.app.sql.dataset.*
@@ -68,6 +69,16 @@ internal abstract class AppDBTransactionImpl(
 
   override fun selectDatasetsByInstallStatus(installType: InstallType, installStatus: InstallStatus) =
     connection.selectDatasetsByInstallStatus(schema, installType, installStatus, installTarget)
+
+  override fun tryInsertDataset(dataset: DatasetRecord): Boolean =
+    try {
+      connection.insertDataset(schema, dataset) > 0
+    } catch (e: SQLException) {
+      if (platform.isUniqueConstraintViolation(e))
+        false
+      else
+        throw e
+    }
 
   override fun updateDataset(dataset: DatasetRecord) =
     (connection.updateDataset(schema, dataset) > 0)
