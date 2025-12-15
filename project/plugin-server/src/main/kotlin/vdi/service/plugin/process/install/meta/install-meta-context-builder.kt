@@ -26,7 +26,7 @@ internal suspend fun ApplicationCall.withInstallMetaContext(
   appCtx: ApplicationContext,
   fn: suspend InstallMetaContext.() -> Unit,
 ) {
-  if (!request.contentType().match(ContentType.Application.Json))
+  if (!request.contentType().match(ContentType.MultiPart.FormData))
     throw UnsupportedMediaTypeException(request.contentType())
 
   withDoubleTempDirs { workspace, propsDir -> withContext(Dispatchers.IO) {
