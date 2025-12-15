@@ -2,7 +2,6 @@ package vdi.core.db.app
 
 import org.slf4j.LoggerFactory
 import java.sql.Connection
-import java.sql.SQLException
 import vdi.core.db.app.model.DatasetInstallMessage
 import vdi.core.db.app.model.DatasetRecord
 import vdi.core.db.app.sql.dataset.upsertDataset
@@ -21,7 +20,7 @@ internal class PostgresTransaction(
   private val logger = LoggerFactory.getLogger(javaClass)
 
   override val platform: TargetDBPlatform
-    get() = TargetDBPlatform.Oracle
+    get() = TargetDBPlatform.Postgres
 
   init {
     connection.autoCommit = false
