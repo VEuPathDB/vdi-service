@@ -50,7 +50,7 @@ json-jackson-parameters  = { group = "com.fasterxml.jackson.module", name = "jac
 json-jackson-datetime    = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310" }
 json-jackson-options     = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jdk8" }
 
-json-schema-validation = { module = "com.networknt:json-schema-validator", version = "1.5.9" }
+json-schema-validation = { module = "com.networknt:json-schema-validator", version = "3.0.0" }
 json-patch-tools = { group = "com.github.java-json-tools", name = "json-patch", version = "1.13" }
 
 yaml = { module = "org.yaml:snakeyaml", version = "2.5" }
