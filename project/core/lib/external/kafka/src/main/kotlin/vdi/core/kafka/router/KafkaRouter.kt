@@ -8,7 +8,7 @@ import vdi.core.kafka.EventMessage
 import vdi.core.kafka.EventSource
 import vdi.core.kafka.KafkaMessage
 import vdi.core.kafka.KafkaProducer
-import vdi.logging.createLoggerMark
+import vdi.logging.createLoggerMarkString
 import vdi.logging.logger
 import vdi.model.EventID
 import vdi.util.events.EventIDs
@@ -67,7 +67,7 @@ class KafkaRouter(
     send(tc, runBlocking { EventIDs.issueID() }, userID, datasetID, source)
 
   private fun send(tc: TriggerConfig, eventID: EventID, userID: UserID, datasetID: DatasetID, source: EventSource) {
-    logger.debug("{} sending message {} from {}", createLoggerMark(
+    logger.debug("{} sending message {} from {}", createLoggerMarkString(
       eventID = eventID,
       ownerID = userID,
       datasetID = datasetID,

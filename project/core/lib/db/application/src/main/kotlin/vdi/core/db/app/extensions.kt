@@ -5,6 +5,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import vdi.core.db.app.model.DatasetRecord
+import vdi.core.db.app.model.DeleteFlag
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.DatasetType
@@ -57,7 +58,15 @@ inline fun <T> AppDB.withTransaction(installTarget: InstallTargetID, dataType: D
   return out
 }
 
-fun AppDBTransaction.purgeDatasetControlTables(datasetID: DatasetID) {
+/**
+ * Remove all app-db records for a dataset for uninstallation or pruning.
+ *
+ * @param datasetID ID of the dataset to remove.
+ *
+ * @param flag If set, the root dataset record will not be deleted, but will
+ * instead have its soft-delete flag updated to the given value.
+ */
+fun AppDBTransaction.purgeDatasetControlTables(datasetID: DatasetID, flag: DeleteFlag? = null) {
   deleteAssociatedFactors(datasetID)
   deleteBioprojectIDs(datasetID)
   deleteCharacteristics(datasetID)
@@ -77,7 +86,11 @@ fun AppDBTransaction.purgeDatasetControlTables(datasetID: DatasetID) {
   deleteSampleTypes(datasetID)
   deleteSpecies(datasetID)
   deleteDatasetVisibilities(datasetID)
-  deleteDataset(datasetID)
+  deleteSyncControl(datasetID)
+  if (flag != null)
+    updateDatasetDeletedFlag(datasetID, flag)
+  else
+    deleteDataset(datasetID)
 }
 
 fun AppDBTransaction.upsertDatasetRecord(

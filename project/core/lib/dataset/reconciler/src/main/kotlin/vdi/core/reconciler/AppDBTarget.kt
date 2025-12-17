@@ -2,6 +2,7 @@ package vdi.core.reconciler
 
 import vdi.util.io.CloseableIterator
 import vdi.core.db.app.AppDB
+import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.purgeDatasetControlTables
 import vdi.core.db.app.withTransaction
 import vdi.core.db.model.ReconcilerTargetRecord
@@ -31,6 +32,10 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
 
     val handler = PluginHandlers[dataset.type]!!
 
+    appDB.withTransaction(projectID, dataset.type) {
+      it.purgeDatasetControlTables(dataset.datasetID, DeleteFlag.DeletedNotUninstalled)
+    }
+
     val res = try {
       handler.client.postUninstall(eventID, dataset.datasetID, projectID, dataset.type)
     } catch (e: Throwable) {
@@ -44,7 +49,9 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
         else -> throw PluginException.uninstall(handler.name, projectID, dataset.ownerID, dataset.datasetID)
       }
 
-      appDB.withTransaction(projectID, dataset.type) { it.purgeDatasetControlTables(dataset.datasetID) }
+      appDB.withTransaction(projectID, dataset.type) {
+        it.updateDatasetDeletedFlag(dataset.datasetID, DeleteFlag.DeletedAndUninstalled)
+      }
   }
 }
 

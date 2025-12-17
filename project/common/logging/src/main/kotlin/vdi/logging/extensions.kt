@@ -32,7 +32,7 @@ inline fun Logger.mark(eventID: EventID, datasetID: DatasetID) =
   mark(arrayOf("$PrefixEventID=$eventID", "$PrefixDatasetID=$datasetID"))
 
 inline fun Logger.mark(eventID: EventID, ownerID: UserID, datasetID: DatasetID) =
-  mark(createLoggerMark(eventID, ownerID, datasetID))
+  mark(createLoggerMark(eventID = eventID, ownerID = ownerID, datasetID = datasetID))
 
 inline fun Logger.mark(dataType: DatasetType, plugin: String) =
   mark(createLoggerMark(dataType, plugin))
@@ -110,12 +110,12 @@ inline fun createLoggerMark(ownerID: UserID, datasetID: DatasetID, installTarget
     "$PrefixInstallTarget=$installTarget",
   )
 
-inline fun createLoggerMark(eventID: EventID, ownerID: UserID, datasetID: DatasetID) =
+inline fun createLoggerMarkString(eventID: EventID, ownerID: UserID, datasetID: DatasetID) =
   arrayOf(
     "$PrefixEventID=$eventID",
     "$PrefixUserID=$ownerID",
     "$PrefixDatasetID=$datasetID",
-  )
+  ).joinToString(" ")
 
 inline fun createLoggerMark(ownerID: UserID, datasetID: DatasetID) =
   arrayOf("$PrefixUserID=$ownerID", "$PrefixDatasetID=$datasetID")
