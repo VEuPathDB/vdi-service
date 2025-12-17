@@ -161,7 +161,8 @@
         "TrichDB",
         "TriTrypDB",
         "VectorBase",
-        "VEuPathDB"
+        "UniDB",
+        "DataExplorer"
       ]
     },
     "ldap": {
