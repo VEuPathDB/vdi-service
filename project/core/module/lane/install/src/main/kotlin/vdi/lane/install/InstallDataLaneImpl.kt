@@ -104,7 +104,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
 
     // if the directory doesn't yet exist in S3, then how did we even get here?
     if (!dir.exists()) {
-      logger.error("received an install trigger for a dataset whose minio directory does not exist")
+      logger.error("received an install trigger for a dataset whose object-store directory does not exist")
       return
     }
 

@@ -227,10 +227,10 @@ fun ControllerBase.uploadFiles(
         uploadRefs.data.pack(into = archive)
       }
 
-      logger.debug("uploading manifest")
+      logger.debug("uploading manifest to object store")
       DatasetStore.putManifest(userID, datasetID, DatasetManifest(sizes, emptyList()))
 
-      logger.debug("uploading raw dataset data")
+      logger.debug("uploading raw dataset data to object store")
       DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
 
       CacheDB().withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
@@ -243,7 +243,7 @@ fun ControllerBase.uploadFiles(
         e.message?.let { msg -> it.tryInsertImportMessages(datasetID, listOf(msg)) }
       }
     } else {
-      logger.error("user dataset upload to minio failed: ", e)
+      logger.error("user dataset upload to object store failed: ", e)
       Metrics.Upload.failed.inc()
       CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     }
@@ -252,10 +252,10 @@ fun ControllerBase.uploadFiles(
   }
 
   try {
-    logger.debug("uploading dataset metadata")
+    logger.debug("uploading dataset metadata to object store")
     DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
   } catch (e: Throwable) {
-    logger.error("user dataset meta file upload to minio failed:", e)
+    logger.error("user dataset meta file upload to object store failed:", e)
     CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     throw e
   }
@@ -266,7 +266,7 @@ fun ControllerBase.uploadFiles(
       for (path in uploadRefs.docs)
         DatasetStore.putDocumentFile(userID, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
-      logger.error("dataset additional document file(s) upload to minio failed:", e)
+      logger.error("dataset additional document file(s) upload to object-store failed:", e)
       throw e
     }
   }
@@ -277,7 +277,7 @@ fun ControllerBase.uploadFiles(
       for (path in uploadRefs.props)
         DatasetStore.putVariablePropertiesFile(userID, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
-      logger.error("dataset additional document file(s) upload to minio failed:", e)
+      logger.error("dataset additional document file(s) upload to object-store failed:", e)
       throw e
     }
   }
