@@ -1,9 +1,7 @@
 package vdi.logging
 
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import kotlin.math.min
-import kotlin.reflect.KClass
 
 
 @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
@@ -19,14 +17,6 @@ class MarkedLogger(marks: Array<String>, private val delegate: Logger): Logger b
     if (marks.isEmpty())
       throw IllegalArgumentException("MarkedLogger must be given at least one non-blank log mark")
   }
-
-  constructor(mark: String, name: String): this(arrayOf(mark), LoggerFactory.getLogger(name))
-
-  constructor(mark: String, cls: Class<*>): this(arrayOf(mark), LoggerFactory.getLogger(cls))
-
-  constructor(mark: String, cls: KClass<*>): this(arrayOf(mark), LoggerFactory.getLogger(cls.java))
-
-  constructor(mark: String, logger: Logger): this(arrayOf(mark), logger)
 
   private fun String.eqPos(): Int {
     for (c in 1 ..< min(length, 5)) {
