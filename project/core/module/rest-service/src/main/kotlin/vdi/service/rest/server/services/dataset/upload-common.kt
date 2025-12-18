@@ -25,7 +25,7 @@ import vdi.core.db.model.SyncControlRecord
 import vdi.core.metrics.Metrics
 import vdi.core.plugin.registry.PluginDatasetTypeMeta
 import vdi.core.plugin.registry.PluginRegistry
-import vdi.logging.markedLogger
+import vdi.logging.mark
 import vdi.model.OriginTimestamp
 import vdi.model.meta.*
 import vdi.service.rest.config.UploadConfig
@@ -204,7 +204,7 @@ fun ControllerBase.uploadFiles(
   datasetMeta:  DatasetMetadata,
   uploadConfig: UploadConfig,
 ) {
-  val logger = markedLogger(userID, datasetID)
+  val logger = logger.mark(userID, datasetID)
 
   verifyUploadFileSize(uploadRefs, uploadConfig)
 

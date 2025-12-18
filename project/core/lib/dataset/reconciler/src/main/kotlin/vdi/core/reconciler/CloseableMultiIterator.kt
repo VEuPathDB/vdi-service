@@ -11,42 +11,39 @@ internal class CloseableMultiIterator(private val installTarget: InstallTargetID
   private var current: CloseableIterator<ReconcilerTargetRecord>? = null
 
   override fun hasNext(): Boolean {
+    // If our current data type iterator still has records left, return true
     if (current?.hasNext() == true)
       return true
 
-    while (trySetNext()) {
-      if (current!!.hasNext())
+    // Close the current iterator if it exists
+    current?.close()
+    current = null
+
+    // Attempt to get the next install target to try and make an iterator for
+    while (dataTypeIterator.hasNext()) {
+      // attempt to make a dataset iterator for the data type
+      current = AppDB().accessor(installTarget, dataTypeIterator.next())
+        ?.streamAllSyncControlRecords()
+
+      // If we have a new iterator that has records, return true
+      if (current?.hasNext() == true)
         return true
     }
 
+    // if we got here then there were no more install targets with datasets left
+    // to process.
     return false
   }
 
   override fun next(): ReconcilerTargetRecord =
-    if (current == null || !current!!.hasNext()) {
-      trySetNext()
-      if (current?.hasNext() == true) current!!.next() else throw NoSuchElementException()
-    } else {
-      current!!.next()
-    }
+    // If we have more records
+    current?.takeIf { it.hasNext() }
+      // get the next record
+      ?.next()
+      // or throw an error
+      ?: throw NoSuchElementException()
 
   override fun close() {
     current?.close()
   }
-
-  private fun trySetNext(): Boolean {
-    current?.close()
-    current = null
-
-    while (dataTypeIterator.hasNext()) {
-      current = makeNext()
-      if (current != null)
-        return true
-    }
-
-    return false
-  }
-
-  private fun makeNext() =
-    AppDB().accessor(installTarget, dataTypeIterator.next())?.streamAllSyncControlRecords()
 }

@@ -10,6 +10,7 @@ import vdi.core.kafka.router.KafkaRouter
 import vdi.core.metrics.Metrics
 import vdi.core.s3.*
 import vdi.logging.createLoggerMark
+import vdi.logging.createLoggerMarkString
 import vdi.logging.mark
 import vdi.logging.markedLogger
 import vdi.model.meta.DatasetID
@@ -31,7 +32,7 @@ internal class ReconcilerInstance(
   private val slim: Boolean,
   private val deletesEnabled: Boolean
 ) {
-  private val log = markedLogger(installTarget = targetDB.name)
+  private val log = markedLogger<Reconciler>(installTarget = targetDB.name)
 
   private var nextInstallTargetDataset: ReconcilerTargetRecord? = null
 
@@ -265,7 +266,7 @@ internal class ReconcilerInstance(
   private suspend fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
     val eventID = EventIDs.issueID()
 
-    log.info("{} sending reconciliation event: {}", createLoggerMark(eventID, ownerID, datasetID), reason)
+    log.info("{} sending reconciliation event: {}", createLoggerMarkString(eventID, ownerID, datasetID), reason)
 
     kafkaRouter.sendReconciliationTrigger(
       eventID,
@@ -299,8 +300,7 @@ internal class ReconcilerInstance(
     )
   }
 
-  @Suppress("NOTHING_TO_INLINE")
-  private inline fun <T> Iterator<T>.nextOrNull() =
+  private fun <T> Iterator<T>.nextOrNull() =
     if (hasNext()) next() else null
 
   private fun ReconcilerTargetRecord.getComparableID() = "$ownerID/$datasetID".appendSortSuffix()

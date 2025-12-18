@@ -13,7 +13,7 @@ class MarkedLogger(marks: Array<String>, private val delegate: Logger): Logger b
     .apply { sort() }
     .toTypedArray()
 
-  private val marker = marks.joinToString(" ", postfix = " ")
+  private val marker = marks.joinToString(" ", postfix = " - ")
 
   init {
     if (marks.isEmpty())

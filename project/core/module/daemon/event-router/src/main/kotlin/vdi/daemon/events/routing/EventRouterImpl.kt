@@ -83,7 +83,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
       return
     }
 
-    val log = markedLogger<EventRouter>(path.userID, path.datasetID)
+    val log = markedLogger<EventRouter>(ownerID = path.userID, datasetID = path.datasetID)
 
     when (event.eventType.action) {
       MinIOEventAction.DELETE -> event.processDeleteEvent(path, log)

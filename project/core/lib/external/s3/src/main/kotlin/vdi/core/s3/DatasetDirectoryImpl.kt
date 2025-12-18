@@ -26,7 +26,7 @@ internal class DatasetDirectoryImpl(
   private val bucket: S3Bucket,
   private val pathFactory: S3DatasetPathFactory,
 ): DatasetDirectory {
-  private val log = markedLogger<DatasetDirectory>(ownerID, datasetID)
+  private val log = markedLogger<DatasetDirectory>(ownerID = ownerID, datasetID = datasetID)
 
   override fun exists(): Boolean =
     bucket.objects.listSubPaths(pathFactory.datasetDir()).count > 0

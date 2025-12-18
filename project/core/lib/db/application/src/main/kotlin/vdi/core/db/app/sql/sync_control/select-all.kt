@@ -71,12 +71,29 @@ class RecordIterator(
   private val con: Connection,
   private val ps: PreparedStatement
 ): CloseableIterator<ReconcilerTargetRecord> {
+  /**
+   * 0 = unknown/unchecked
+   * 1 = next record loaded
+   * 2 = no more records in rs
+   */
+  private var state = 0
 
-  override fun hasNext(): Boolean {
-    return rs.next()
-  }
+  override fun hasNext(): Boolean =
+    when (state) {
+      1    -> true
+      2    -> false
+      else -> {
+        state = if (rs.next()) 1 else 2
+        hasNext()
+      }
+    }
 
   override fun next(): ReconcilerTargetRecord {
+    if (state == 2)
+      throw NoSuchElementException()
+
+    state = 0
+
     return ReconcilerTargetRecord(
       datasetID     = rs.reqDatasetID("dataset_id"),
       ownerID       = rs.getUserID("owner"),
