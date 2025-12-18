@@ -266,7 +266,7 @@ internal class ReconcilerInstance(
   private suspend fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
     val eventID = EventIDs.issueID()
 
-    log.info("{} sending reconciliation event: {}", createLoggerMarkString(eventID, ownerID, datasetID), reason)
+    log.info("{} sending reconciliation event: {}", createLoggerMarkString(eventID = eventID, ownerID = ownerID, datasetID = datasetID), reason)
 
     kafkaRouter.sendReconciliationTrigger(
       eventID,
