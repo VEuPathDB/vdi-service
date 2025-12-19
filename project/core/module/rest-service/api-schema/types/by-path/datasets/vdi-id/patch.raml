@@ -38,9 +38,6 @@ types:
 
   ContactsPatch:
     # language=markdown
-    description: |-
-      If the dataset visibility is not `private`, the only valid action is
-      `replace`.
     type: object
     properties:
       value?:
@@ -132,8 +129,6 @@ types:
   DatasetTypePatch:
     # language=markdown
     description: |-
-      If present, the only valid action is `replace`.
-
       Only permitted when transitioning from a none-type dataset into an
       actual dataset type.
     type: object
@@ -205,7 +200,6 @@ types:
 
   VisibilityPatch:
     # language=markdown
-    description: If present, the only valid action is `replace`.
     type: object
     properties:
       value?: common.DatasetVisibility

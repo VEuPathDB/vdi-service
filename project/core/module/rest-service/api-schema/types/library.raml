@@ -133,9 +133,6 @@ types:
       status: conflict
       message: Target resource already exists and cannot be overwritten.
   ContactsPatch:
-    description: |-
-      If the dataset visibility is not `private`, the only valid action is
-      `replace`.
     type: object
     additionalProperties: false
     properties:
@@ -907,8 +904,6 @@ types:
         minLength: 3
   DatasetTypePatch:
     description: |-
-      If present, the only valid action is `replace`.
-
       Only permitted when transitioning from a none-type dataset into an
       actual dataset type.
     type: object
@@ -1425,7 +1420,6 @@ types:
     type: string
     pattern: ^[a-zA-Z0-9_-]+$
   VisibilityPatch:
-    description: If present, the only valid action is `replace`.
     type: object
     additionalProperties: false
     properties:
