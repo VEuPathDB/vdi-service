@@ -661,7 +661,7 @@ types:
       details:
         description: Metadata about the dataset being submitted.
         type: DatasetPostMeta
-      dataFiles?:
+      dataFile?:
         description: |-
           Dataset files to upload.
 
@@ -673,12 +673,12 @@ types:
 
           This field is incompatible with the `file` field.
         type: string
-      docFiles?:
+      docFile?:
         description: |-
           Files containing additional dataset documentation or meta info that is
           not part of the data itself.
         type: file[]
-      dataPropertiesFiles?:
+      dataPropertiesFile?:
         description: Data properties files.
         type: file[]
   DatasetPostResponseBody:
@@ -718,7 +718,7 @@ types:
       details:
         description: Metadata about the dataset being submitted.
         type: DatasetProxyPostMeta
-      dataFiles?:
+      dataFile?:
         description: |-
           Dataset files to upload.
 
@@ -730,7 +730,7 @@ types:
 
           This field is incompatible with the `file` field.
         type: string
-      docFiles?:
+      docFile?:
         description: |-
           Files containing additional dataset documentation or meta info that is
           not part of the data itself.
@@ -771,7 +771,7 @@ types:
       details:
         description: Metadata about the dataset being submitted.
         type: DatasetPutMetadata
-      dataFiles?:
+      dataFile?:
         description: |-
           Dataset files to upload.
 
@@ -783,7 +783,7 @@ types:
 
           This field is incompatible with the `file` field.
         type: string
-      docFiles?:
+      docFile?:
         description: |-
           Files containing additional dataset documentation or meta info that is
           not part of the data itself.

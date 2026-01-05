@@ -46,17 +46,17 @@ fun ControllerBase.createDataset(
         return UnprocessableEntityError(validationErrors).wrap()
     }
 
-  entity.dataFiles
+  entity.dataFile
     ?.let { verifyFileExtensions(it, datasetMeta.type) }
     ?.also { return it.wrap() }
 
   val uploadRefs = CacheDB()
     .initializeDataset(userID, datasetID, datasetMeta) {
       resolveDatasetFiles(
-        entity.dataFiles,
+        entity.dataFile,
         entity.url,
-        entity.docFiles,
-        entity.dataPropertiesFiles,
+        entity.docFile,
+        entity.dataPropertiesFile,
         uploadConfig,
       )
     }
@@ -76,12 +76,12 @@ fun ControllerBase.createDataset(
 ) {
   val datasetMeta = entity.toDatasetMeta(userID)
 
-  entity.dataFiles
+  entity.dataFile
     ?.let { verifyFileExtensions(it, datasetMeta.type) }
     ?.also { throw BadRequestException(it.message) }
 
   val uploadRefs  = CacheDB().initializeDataset(userID, datasetID, datasetMeta) {
-    resolveDatasetFiles(entity.dataFiles, entity.url, entity.docFiles, emptyList(), uploadConfig)
+    resolveDatasetFiles(entity.dataFile, entity.url, entity.docFile, emptyList(), uploadConfig)
   }
 
   submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)

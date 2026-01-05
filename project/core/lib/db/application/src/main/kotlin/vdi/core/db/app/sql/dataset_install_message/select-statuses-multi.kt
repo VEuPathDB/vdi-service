@@ -67,7 +67,7 @@ internal fun Connection.selectInstallStatuses(
 
       withResults { forEach {
         val datasetID = reqDatasetID("dataset_id")
-        val details   = InstallStatusDetails(getInstallStatus("status"), listOf(getString("message")))
+        val details   = InstallStatusDetails(getInstallStatus("status"), getString("message")?.let(::listOf))
 
         when (getInstallType("install_type")) {
           InstallType.Meta -> result.compute(datasetID) { _, value ->

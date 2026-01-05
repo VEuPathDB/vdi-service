@@ -28,8 +28,8 @@ public final class JsonField {
   public static final String CREATED_ON = "createdOn";
   public static final String DAEMONS = "daemons";
   public static final String DATA = "data";
-  public static final String DATA_FILES = "dataFiles";
-  public static final String DATA_PROPERTIES_FILES = "dataPropertiesFiles";
+  public static final String DATA_FILE = "dataFile";
+  public static final String DATA_PROPERTIES_FILE = "dataPropertiesFile";
   public static final String DATA_PROPS_FILE_NAME_PLURAL = "dataPropsFileNamePlural";
   public static final String DATA_PROPS_FILE_NAME_SINGULAR = "dataPropsFileNameSingular";
   public static final String DATA_TYPES = "dataTypes";
@@ -42,7 +42,7 @@ public final class JsonField {
   public static final String DESCRIPTION = "description";
   public static final String DETAILS = "details";
   public static final String DISEASES = "diseases";
-  public static final String DOC_FILES = "docFiles";
+  public static final String DOC_FILE = "docFile";
   public static final String DOCUMENTS = "documents";
   public static final String DOI = "doi";
   public static final String DOIS = "dois";

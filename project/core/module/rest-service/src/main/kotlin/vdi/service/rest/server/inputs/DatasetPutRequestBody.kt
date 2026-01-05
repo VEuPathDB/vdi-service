@@ -1,4 +1,3 @@
-@file:JvmName("DatasetPutRequestBodyInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException
@@ -12,8 +11,8 @@ fun DatasetPutRequestBody.cleanup() {
 
   cleanupString(::getUrl)
 
-  cleanup(::getDataFiles) { it?.takeUnless { it.isEmpty() } ?: emptyList() }
-  cleanup(::getDocFiles) { it?.takeUnless { it.isEmpty() } ?: emptyList() }
+  cleanup(::getDataFile) { it?.takeUnless { it.isEmpty() } ?: emptyList() }
+  cleanup(::getDocFile) { it?.takeUnless { it.isEmpty() } ?: emptyList() }
 }
 
 @Suppress("DuplicatedCode") // overlap in generated API pojo field names
@@ -28,7 +27,7 @@ fun DatasetPutRequestBody.validate(original: DatasetMetadata): ValidationErrors 
 
   // If there is no file or URL, then the request body was incomplete.
   // If there is a file AND URL, then the request body is invalid.
-  if (dataFiles.isEmpty()) {
+  if (dataFile.isEmpty()) {
     if (url == null)
       throw BadRequestException("must provide an upload file or url to a source file")
   } else if (url != null) {
