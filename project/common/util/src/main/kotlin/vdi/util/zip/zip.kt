@@ -18,7 +18,7 @@ private val SpannedZipHeader = byteArrayOf(0x50, 0x4B, 0x07, 0x08)
 
 /**
  * Compresses the files at the given paths ([files]) into a new zip file at
- * the target [zipPath].
+ * the receiver path.
  *
  * @receiver Path for the zip file that will be created.
  *
@@ -116,13 +116,13 @@ fun Path.unzip(into: Path, maxBytes: Long = 10737418240L): Collection<Path> {
  */
 fun Path.zipEntries(maxBytes: Long = 10737418240L): Sequence<Pair<ZipEntry, InputStream>> {
   if (!exists())
-    throw FileNotFoundException("cannot open non-existent zip file ${this}")
+    throw FileNotFoundException("cannot open non-existent zip file $this")
 
   if (isDirectory())
-    throw IllegalStateException("cannot open target zip file ${this} as it is a directory")
+    throw IllegalStateException("cannot open target zip file $this as it is a directory")
 
   if (!isReadable())
-    throw IllegalStateException("cannot open unreadable zip file ${this}")
+    throw IllegalStateException("cannot open unreadable zip file $this")
 
   return sequence {
     inputStream().use { stream ->
@@ -204,4 +204,3 @@ fun InputStream.zipEntries(maxBytes: Long = 10737418240L): Sequence<Pair<ZipEntr
 
 fun Path.zipHeaders(): Sequence<ZipEntry> =
   ZipFile.builder().setFile(this.toFile()).get().use { it.entries.asSequence() }
-

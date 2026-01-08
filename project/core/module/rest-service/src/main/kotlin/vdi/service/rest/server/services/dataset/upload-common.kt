@@ -364,10 +364,7 @@ private fun List<Path>.pack(into: Path): List<DatasetFileInfo> {
  * @return A map of upload files and their sizes.
  */
 context(logger: Logger)
-private fun Path.repackZip(
-  into:         Path,
-  using:        Path,
-): List<DatasetFileInfo> {
+private fun Path.repackZip(into: Path, using: Path): List<DatasetFileInfo> {
   logger.trace("repacking zip file {} into {}", this, into)
 
   // Map of file names to sizes that will be stored in the postgres database.
@@ -410,7 +407,6 @@ private fun Path.repackZip(
     throw BadRequestException("uploaded file was empty or was not a valid zip")
 
   logger.info("Compressing file from {} into {}", unpacked, into)
-  // recompress the files as a tgz file
   into.compress(unpacked)
 
   return files

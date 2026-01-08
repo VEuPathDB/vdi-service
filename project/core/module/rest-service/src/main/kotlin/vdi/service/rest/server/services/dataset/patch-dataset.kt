@@ -2,7 +2,6 @@ package vdi.service.rest.server.services.dataset
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
-import org.slf4j.Logger
 import org.veupathdb.lib.request.validation.ValidationErrors
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.model.InstallStatus
@@ -14,7 +13,6 @@ import vdi.json.JSON
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.DatasetVisibility
-import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.resources.DatasetsVdiId.PatchDatasetsByVdiIdResponse
@@ -24,10 +22,7 @@ import vdi.service.rest.server.inputs.applyPatch
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.hasSomethingToUpdate
 import vdi.service.rest.server.inputs.validate
-import vdi.service.rest.server.outputs.ForbiddenError
-import vdi.service.rest.server.outputs.Static404
-import vdi.service.rest.server.outputs.UnprocessableEntityError
-import vdi.service.rest.server.outputs.wrap
+import vdi.service.rest.server.outputs.*
 import vdi.util.fn.Either
 import vdi.util.fn.Either.Companion.left
 import vdi.util.fn.Either.Companion.right
@@ -48,10 +43,14 @@ fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: Dataset
   if (!patch.hasSomethingToUpdate())
     return PatchDatasetsByVdiIdResponse.respond204()
 
-  val patchedMetadata = patch.validateAndApply(userID, datasetID).run {
-    leftOrNull()?.also { return UnprocessableEntityError(it).wrap() }
-    unwrapRight()
-  }
+  val originalMetadata = DatasetStore.getDatasetMeta(userID, datasetID)
+    ?: return TooEarlyError("dataset is not yet ready to be updated").wrap()
+
+  val patchedMetadata = patch.validateAndApply(datasetID, originalMetadata)
+    .run {
+      leftOrNull()?.also { return UnprocessableEntityError(it).wrap() }
+      unwrapRight()
+    }
 
   cacheDB.withTransaction { db ->
     DatasetStore.putDatasetMeta(userID, datasetID, patchedMetadata)
@@ -62,24 +61,22 @@ fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: Dataset
 }
 
 private fun DatasetPatchRequestBody.validateAndApply(
-  userID:    UserID,
   datasetID: DatasetID,
+  original:  DatasetMetadata,
 ): Either<ValidationErrors, DatasetMetadata> {
-  val originalMetadata = DatasetStore.getDatasetMeta(userID, datasetID)!!
-
   cleanup()
 
   // Run standard validation.
-  val errors = validate(originalMetadata)
+  val errors = validate(original)
 
   if (errors.isNotEmpty)
     return left(errors)
 
   // Apply patch to get new metadata
-  val newMetadata = applyPatch(originalMetadata)
+  val newMetadata = applyPatch(original)
 
   // Optionally apply project-specific JSON schema validation
-  val validators = originalMetadata.installTargets
+  val validators = original.installTargets
     .mapNotNull { InstallTargetRegistry[it]!!.metaValidation }
 
   if (validators.isNotEmpty()) {
@@ -95,7 +92,7 @@ private fun DatasetPatchRequestBody.validateAndApply(
   // If the PATCH body seems valid at a surface level, move on to performing
   // heavier validations.
 
-  if (newMetadata.isPromotingToCommunity(originalMetadata))
+  if (newMetadata.isPromotingToCommunity(original))
     newMetadata.validateForPromotion(datasetID, errors)
 
   if (errors.isNotEmpty)

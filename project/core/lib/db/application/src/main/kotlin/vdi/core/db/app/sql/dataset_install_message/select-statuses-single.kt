@@ -39,8 +39,8 @@ internal fun Connection.selectInstallStatuses(schema: String, datasetID: Dataset
       val message = getString("message")
 
       when (type) {
-        InstallType.Meta -> meta = InstallStatusDetails(status, listOf(message))
-        InstallType.Data -> data = InstallStatusDetails(status, listOf(message))
+        InstallType.Meta -> meta = InstallStatusDetails(status, message?.let(::listOf))
+        InstallType.Data -> data = InstallStatusDetails(status, message?.let(::listOf))
       }
     } }
   }
