@@ -17,8 +17,7 @@ private fun sql(schema: String) =
 // language=postgresql
 """
 SELECT
-  dataset_id
-, install_type
+  install_type
 , status
 , message
 FROM
