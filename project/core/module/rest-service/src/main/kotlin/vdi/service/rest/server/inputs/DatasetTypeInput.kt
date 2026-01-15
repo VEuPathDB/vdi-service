@@ -24,7 +24,7 @@ fun DatasetTypeInput?.validate(jPath: String, projects: Iterable<InstallTargetID
       && version.reqCheckMinLength(jPath..JsonField.VERSION, 1, errors)
     ) {
       val details = PluginRegistry[toInternal()]
-        ?: return errors.add(jPath, "unrecognized or unavailable dataset type")
+        ?: return@require errors.add(jPath, "unrecognized or unavailable dataset type")
 
       projects.forEach {
         if (!details.appliesTo(it))
