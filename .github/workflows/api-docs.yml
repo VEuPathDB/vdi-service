@@ -4,7 +4,7 @@ on:
   workflow_dispatch: {}
   push:
     branches:
-    - dev
+    - main
     paths:
     - 'docs/vdi-api.html'
     - 'project/common/config/src/main/json/schema/**'
