@@ -5,6 +5,7 @@ on:
   workflow_call: {}
   pull_request_target:
     branches:
+    - dev
     - main
     types:
     - opened
