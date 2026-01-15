@@ -31,6 +31,7 @@ internal class ReconcilerImpl(private val config: ReconcilerDaemonConfig, abortC
         if (!config.reconcilerEnabled) {
           logger.warn("full reconciler disabled by config")
         } else {
+          lastSlimRun = now
           Recon.runFull()
         }
       }

@@ -9,22 +9,22 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "details",
-    "dataFiles",
+    "dataFile",
     "url",
-    "docFiles"
+    "docFile"
 })
 public class DatasetPutRequestBodyImpl implements DatasetPutRequestBody {
   @JsonProperty(JsonField.DETAILS)
   private DatasetPutMetadata details;
 
-  @JsonProperty(JsonField.DATA_FILES)
-  private List<File> dataFiles;
+  @JsonProperty(JsonField.DATA_FILE)
+  private List<File> dataFile;
 
   @JsonProperty(JsonField.URL)
   private String url;
 
-  @JsonProperty(JsonField.DOC_FILES)
-  private List<File> docFiles;
+  @JsonProperty(JsonField.DOC_FILE)
+  private List<File> docFile;
 
   @JsonProperty(JsonField.DETAILS)
   public DatasetPutMetadata getDetails() {
@@ -36,14 +36,14 @@ public class DatasetPutRequestBodyImpl implements DatasetPutRequestBody {
     this.details = details;
   }
 
-  @JsonProperty(JsonField.DATA_FILES)
-  public List<File> getDataFiles() {
-    return this.dataFiles;
+  @JsonProperty(JsonField.DATA_FILE)
+  public List<File> getDataFile() {
+    return this.dataFile;
   }
 
-  @JsonProperty(JsonField.DATA_FILES)
-  public void setDataFiles(List<File> dataFiles) {
-    this.dataFiles = dataFiles;
+  @JsonProperty(JsonField.DATA_FILE)
+  public void setDataFile(List<File> dataFile) {
+    this.dataFile = dataFile;
   }
 
   @JsonProperty(JsonField.URL)
@@ -56,13 +56,13 @@ public class DatasetPutRequestBodyImpl implements DatasetPutRequestBody {
     this.url = url;
   }
 
-  @JsonProperty(JsonField.DOC_FILES)
-  public List<File> getDocFiles() {
-    return this.docFiles;
+  @JsonProperty(JsonField.DOC_FILE)
+  public List<File> getDocFile() {
+    return this.docFile;
   }
 
-  @JsonProperty(JsonField.DOC_FILES)
-  public void setDocFiles(List<File> docFiles) {
-    this.docFiles = docFiles;
+  @JsonProperty(JsonField.DOC_FILE)
+  public void setDocFile(List<File> docFile) {
+    this.docFile = docFile;
   }
 }

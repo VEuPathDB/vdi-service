@@ -133,9 +133,6 @@ types:
       status: conflict
       message: Target resource already exists and cannot be overwritten.
   ContactsPatch:
-    description: |-
-      If the dataset visibility is not `private`, the only valid action is
-      `replace`.
     type: object
     additionalProperties: false
     properties:
@@ -664,7 +661,7 @@ types:
       details:
         description: Metadata about the dataset being submitted.
         type: DatasetPostMeta
-      dataFiles?:
+      dataFile?:
         description: |-
           Dataset files to upload.
 
@@ -676,12 +673,12 @@ types:
 
           This field is incompatible with the `file` field.
         type: string
-      docFiles?:
+      docFile?:
         description: |-
           Files containing additional dataset documentation or meta info that is
           not part of the data itself.
         type: file[]
-      dataPropertiesFiles?:
+      dataPropertiesFile?:
         description: Data properties files.
         type: file[]
   DatasetPostResponseBody:
@@ -721,7 +718,7 @@ types:
       details:
         description: Metadata about the dataset being submitted.
         type: DatasetProxyPostMeta
-      dataFiles?:
+      dataFile?:
         description: |-
           Dataset files to upload.
 
@@ -733,7 +730,7 @@ types:
 
           This field is incompatible with the `file` field.
         type: string
-      docFiles?:
+      docFile?:
         description: |-
           Files containing additional dataset documentation or meta info that is
           not part of the data itself.
@@ -774,7 +771,7 @@ types:
       details:
         description: Metadata about the dataset being submitted.
         type: DatasetPutMetadata
-      dataFiles?:
+      dataFile?:
         description: |-
           Dataset files to upload.
 
@@ -786,7 +783,7 @@ types:
 
           This field is incompatible with the `file` field.
         type: string
-      docFiles?:
+      docFile?:
         description: |-
           Files containing additional dataset documentation or meta info that is
           not part of the data itself.
@@ -907,8 +904,6 @@ types:
         minLength: 3
   DatasetTypePatch:
     description: |-
-      If present, the only valid action is `replace`.
-
       Only permitted when transitioning from a none-type dataset into an
       actual dataset type.
     type: object
@@ -1425,7 +1420,6 @@ types:
     type: string
     pattern: ^[a-zA-Z0-9_-]+$
   VisibilityPatch:
-    description: If present, the only valid action is `replace`.
     type: object
     additionalProperties: false
     properties:

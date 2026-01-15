@@ -16,6 +16,7 @@ const val PrefixInstallTarget = "P" // P for project
 const val PrefixPluginName = "I" // I for installer
 const val PrefixUserID = "O" // O for owner
 const val PrefixScript = "S"
+const val PrefixRequestID = "R"
 
 // region Logger Wrapping
 
@@ -51,8 +52,9 @@ inline fun Logger.mark(
   pluginName: String? = null,
   scriptName: String? = null,
   installTarget: InstallTargetID? = null,
+  requestID: String? = null,
 ) =
-  mark(createLoggerMark(eventID, ownerID, datasetID, dataType, pluginName, scriptName, installTarget))
+  mark(createLoggerMark(eventID, ownerID, datasetID, dataType, pluginName, scriptName, installTarget, requestID))
 
 // endregion Logger Wrapping
 
@@ -61,8 +63,17 @@ inline fun Logger.mark(
 inline fun logger(name: String): Logger =
   LoggerFactory.getLogger(name)
 
-inline fun Any.markedLogger(mark: String): Logger =
-  MarkedLogger(mark, javaClass)
+inline fun <reified T: Any> markedLogger(
+  eventID: EventID? = null,
+  ownerID: UserID? = null,
+  datasetID: DatasetID? = null,
+  dataType: DatasetType? = null,
+  pluginName: String? = null,
+  scriptName: String? = null,
+  installTarget: InstallTargetID? = null,
+) = LoggerFactory.getLogger(T::class.java)
+  .mark(eventID, ownerID, datasetID, dataType, pluginName, scriptName, installTarget)
+
 
 inline fun Any.markedLogger(
   eventID: EventID? = null,
@@ -75,26 +86,11 @@ inline fun Any.markedLogger(
 ) = LoggerFactory.getLogger(javaClass)
   .mark(eventID, ownerID, datasetID, dataType, pluginName, scriptName, installTarget)
 
-inline fun Any.markedLogger(ownerID: UserID, datasetID: DatasetID): Logger =
-  logger().mark(createLoggerMark(ownerID, datasetID))
-
-inline fun Any.markedLogger(ownerID: UserID, datasetID: DatasetID, project: InstallTargetID): Logger =
-  logger().mark(createLoggerMark(ownerID, datasetID, project))
-
-inline fun Any.markedLogger(datasetID: DatasetID, project: InstallTargetID): Logger =
-  logger().mark(createLoggerMark(datasetID, project))
-
 inline fun Any.logger(): Logger =
   LoggerFactory.getLogger(this::class.java)
 
 inline fun <reified T: Any> logger(): Logger =
   LoggerFactory.getLogger(T::class.java)
-
-inline fun <reified T: Any> markedLogger(ownerID: UserID, datasetID: DatasetID): Logger =
-  MarkedLogger(createLoggerMark(ownerID, datasetID), logger<T>())
-
-inline fun <reified T: Any> markedLogger(mark: String): Logger =
-  MarkedLogger(mark, T::class)
 
 // endregion Generic Logger Builder
 
@@ -131,6 +127,7 @@ fun createLoggerMark(
   pluginName: String? = null,
   scriptName: String? = null,
   installTarget: InstallTargetID? = null,
+  requestID: String? = null,
 ) = arrayOf(
   eventID?.let { "$PrefixEventID=$it" },
   ownerID?.let { "$PrefixUserID=$it" },
@@ -139,6 +136,7 @@ fun createLoggerMark(
   pluginName?.let { "$PrefixPluginName=$it" },
   scriptName?.let { "$PrefixScript=$it" },
   installTarget?.let { "$PrefixInstallTarget=$it" },
+  requestID?.let { "$PrefixRequestID=$it" },
 ).let { marks ->
   var last = 0
   Array(marks.count { it != null }) {

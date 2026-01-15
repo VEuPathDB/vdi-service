@@ -18,12 +18,19 @@ fun Collection<String?>.reqEntriesCheckLength(jPath: String, length: IntRange, e
 }
 
 fun Collection<String?>?.validateProjects(jPath: String, errors: ValidationErrors) {
-  requireNonEmpty(jPath, errors) { forEachIndexed { i, p ->
-    p.require(jPath, i, errors) {
-      if (this !in InstallTargetRegistry)
-        errors.add(jPath..i, "unknown or disabled target project")
+  requireNonEmpty(jPath, errors) {
+    val enabledTargets = InstallTargetRegistry.asSequence()
+      .filter { it.enabled }
+      .map { it.name }
+      .toSet()
+
+    forEachIndexed { i, p ->
+      p.require(jPath, i, errors) {
+        if (this !in enabledTargets)
+          errors.add(jPath..i, "unknown or disabled target project")
+      }
     }
-  } }
+  }
 }
 
 fun ValidationErrors.readOnlyError(jPath: String) =

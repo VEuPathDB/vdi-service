@@ -9,7 +9,7 @@ import vdi.core.kafka.EventSource
 import vdi.core.kafka.router.KafkaRouter
 import vdi.core.metrics.Metrics
 import vdi.core.s3.*
-import vdi.logging.createLoggerMark
+import vdi.logging.createLoggerMarkString
 import vdi.logging.mark
 import vdi.logging.markedLogger
 import vdi.model.meta.DatasetID
@@ -31,7 +31,7 @@ internal class ReconcilerInstance(
   private val slim: Boolean,
   private val deletesEnabled: Boolean
 ) {
-  private val log = markedLogger(installTarget = targetDB.name)
+  private val log = markedLogger<Reconciler>(installTarget = targetDB.name)
 
   private var nextInstallTargetDataset: ReconcilerTargetRecord? = null
 
@@ -68,7 +68,6 @@ internal class ReconcilerInstance(
     objectStoreIterator:   Iterator<DatasetDirectory>,
     installTargetIterator: Iterator<ReconcilerTargetRecord>,
   ) {
-    log.trace("tryReconcile(...)")
     nextInstallTargetDataset = installTargetIterator.nextOrNull()
 
     // Iterate through datasets in S3.
@@ -83,43 +82,51 @@ internal class ReconcilerInstance(
         return
       }
 
-      // Owner ID is included as part of sort, so it must be included when comparing streams.
-      val comparableS3Id = sourceDatasetDir.getComparableID()
+      val comparableSourceId = sourceDatasetDir.getComparableID()
       var comparableTargetId: String? = nextInstallTargetDataset!!.getComparableID()
 
       // If install-target dataset stream is "ahead" of source stream, uninstall
       // the datasets from the target database until either the streams are
       // aligned again, or the install-target dataset stream is consumed.
-      if (comparableS3Id > comparableTargetId!!)
-        installTargetIterator.uninstallUntilAligned(comparableS3Id, comparableTargetId)
+      //
+      // !!! THIS CALL MUTATES installTargetIterator AND nextInstallTargetDataset !!!
+      ///
+      if (comparableSourceId > comparableTargetId!!)
+        installTargetIterator.uninstallUntilAligned(comparableSourceId, comparableTargetId)
 
       // Check again if target stream is exhausted, consume source stream if so.
+      // !!! Required due to the above state mutations !!!
       if (nextInstallTargetDataset == null) {
         objectStoreIterator.consumeAndTrySync(sourceDatasetDir)
         return
       }
 
-      // Owner ID is included as part of sort, so it must be included when comparing streams.
+      // Ensure we have the correct ID
+      // !!! Required due to the above state mutations !!!
       comparableTargetId = nextInstallTargetDataset!!.getComparableID()
+
+      val sourceMarkedAsDeleted = sourceDatasetDir.hasDeleteFlag()
+        || sourceDatasetDir.hasRevisedFlag()
 
       // If the object-store dataset ID is less than the ID we got from the
       // target DB
-      if (comparableS3Id < comparableTargetId) {
-        // If the dataset is in the object store, but not in the install-target,
-        // send an event.
-        if (sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB)) && !slim)
-          Metrics.Reconciler.Full.missingInTarget.labels(targetDB.name).inc()
+      if (comparableSourceId < comparableTargetId) {
+        // If the dataset is not marked as deleted in the object store, but is
+        // present in the install-target, send an event.
+        if (!sourceMarkedAsDeleted)
+          sendSyncIfRelevant(sourceDatasetDir, SyncReason.MissingInTarget(targetDB))
+            .also { eventFired -> if (eventFired && !slim)
+              Metrics.Reconciler.Full.missingInTarget.labels(targetDB.name).inc() }
       } else {
-        // If the dataset should be uninstalled due to either having a
-        // soft-delete or revision flag
-        if (sourceDatasetDir.hasDeleteFlag() || sourceDatasetDir.hasRevisedFlag()) {
+        // If the dataset should be uninstalled due to being marked as deleted
+        if (sourceMarkedAsDeleted) {
           nextInstallTargetDataset!!.ensureUninstalled()
         } else {
-          sourceDatasetDir.ensureSynchronized(comparableS3Id)
-
-          // Advance next target dataset pointer, we're done with this one
-          nextInstallTargetDataset = installTargetIterator.nextOrNull()
+          sourceDatasetDir.ensureSynchronized(comparableSourceId)
         }
+
+        // Advance next target dataset pointer, we're done with this one
+        nextInstallTargetDataset = installTargetIterator.nextOrNull()
       }
     }
 
@@ -265,7 +272,7 @@ internal class ReconcilerInstance(
   private suspend fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
     val eventID = EventIDs.issueID()
 
-    log.info("{} sending reconciliation event: {}", createLoggerMark(eventID, ownerID, datasetID), reason)
+    log.info("{} sending reconciliation event: {}", createLoggerMarkString(eventID = eventID, ownerID = ownerID, datasetID = datasetID), reason)
 
     kafkaRouter.sendReconciliationTrigger(
       eventID,
@@ -299,9 +306,8 @@ internal class ReconcilerInstance(
     )
   }
 
-  @Suppress("NOTHING_TO_INLINE")
-  private inline fun <T> Iterator<T>.nextOrNull() =
-    if (hasNext()) next() else null
+  private fun <T> Iterator<T>.nextOrNull() =
+    (if (hasNext()) next() else null)
 
   private fun ReconcilerTargetRecord.getComparableID() = "$ownerID/$datasetID".appendSortSuffix()
 

@@ -6,7 +6,7 @@ import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import vdi.core.db.cache.model.DatasetOwnershipFilter
 import vdi.core.db.cache.query.DatasetListQuery
-import vdi.logging.logger
+import vdi.logging.mark
 import vdi.model.meta.DatasetID
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
@@ -30,8 +30,6 @@ class DatasetList(
   : Datasets
   , ControllerBase(request)
 {
-  private val log = logger()
-
   override fun getDatasets(projectId: String?, ownership: String?): GetResponse {
     // Parse the ownership filter field
     val parsedOwnership = ownership
@@ -60,7 +58,8 @@ class DatasetList(
     // Generate a new dataset ID.
     val datasetID = runBlocking { DatasetID(ShortID.generate()) }
 
-    log.info("issuing dataset ID {}", datasetID)
+    logger.info("issuing dataset ID {}", datasetID)
+    logger = logger.mark(datasetID = datasetID)
 
     return createDataset(datasetID, entity, uploadConfig)
   }

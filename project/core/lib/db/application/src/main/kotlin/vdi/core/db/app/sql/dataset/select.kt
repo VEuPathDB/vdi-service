@@ -9,7 +9,6 @@ import vdi.core.db.app.sql.getDeleteFlag
 import vdi.core.db.app.sql.getOffsetDateTime
 import vdi.core.db.jdbc.getDataType
 import vdi.core.db.app.sql.getUserID
-import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.jdbc.setDatasetID
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.DatasetID
@@ -20,8 +19,7 @@ private fun sql(schema: String) =
 // language=postgresql
 """
 SELECT
-  dataset_id
-, owner
+  owner
 , type_name
 , type_version
 , category
@@ -47,7 +45,7 @@ internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): Dat
       val type = DatasetType(rs.getDataType("type_name"), rs.getString("type_version"))
 
       DatasetRecord(
-        datasetID       = rs.reqDatasetID("dataset_id"),
+        datasetID       = datasetID,
         owner           = rs.getUserID("owner"),
         type            = type,
         category        = PluginRegistry.categoryOrNullFor(type) ?: rs.getString("category"),

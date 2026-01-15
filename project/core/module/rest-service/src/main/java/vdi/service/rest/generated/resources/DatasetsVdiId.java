@@ -17,6 +17,7 @@ import vdi.service.rest.generated.model.ForbiddenError;
 import vdi.service.rest.generated.model.GoneError;
 import vdi.service.rest.generated.model.NotFoundError;
 import vdi.service.rest.generated.model.ServerError;
+import vdi.service.rest.generated.model.TooEarlyError;
 import vdi.service.rest.generated.model.UnauthorizedError;
 import vdi.service.rest.generated.model.UnprocessableEntityError;
 import vdi.service.rest.generated.support.PATCH;
@@ -92,6 +93,12 @@ public interface DatasetsVdiId {
 
     public static GetDatasetsByVdiIdResponse respond410WithApplicationJson(GoneError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(410).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetDatasetsByVdiIdResponse(responseBuilder.build(), entity);
+    }
+
+    public static GetDatasetsByVdiIdResponse respond424WithApplicationJson(TooEarlyError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(424).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }

@@ -1,4 +1,3 @@
-@file:JvmName("DatasetProxyPostRequestInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import jakarta.ws.rs.BadRequestException
@@ -11,8 +10,8 @@ import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
 internal fun DatasetProxyPostRequestBody.cleanup() {
   details?.cleanup()
   url = url.cleanup()
-  dataFiles = dataFiles.takeUnless { it.isNullOrEmpty() }
-  docFiles = docFiles.takeUnless { it.isNullOrEmpty() }
+  dataFile = dataFile.takeUnless { it.isNullOrEmpty() }
+  docFile = docFile.takeUnless { it.isNullOrEmpty() }
 }
 
 /**
@@ -38,7 +37,7 @@ fun DatasetProxyPostRequestBody.validate(): ValidationErrors {
 
   // If there is no file OR URL, then the request body was incomplete.
   // If there is a file AND URL, then the request body is invalid.
-  if (dataFiles == null) {
+  if (dataFile == null) {
     if (url == null)
       throw BadRequestException("must provide an upload file or url to a source file")
 

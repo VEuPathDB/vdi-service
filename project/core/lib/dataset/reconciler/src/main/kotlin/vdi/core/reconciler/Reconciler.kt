@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.veupathdb.lib.s3.s34k.S3Api
+import kotlin.time.Duration.Companion.seconds
 import vdi.core.db.app.AppDatabaseRegistry
 import vdi.core.kafka.router.KafkaRouter
 import vdi.core.kafka.router.KafkaRouterFactory
@@ -71,7 +72,7 @@ object Reconciler {
 
     val timer = Metrics.Reconciler.Full.reconcilerTimes.startTimer()
 
-    log.info("running full reconciler for ${targets.size} targets")
+    log.info("starting full reconciliation for ${targets.size} targets")
     coroutineScope {
       targets.forEach {
         launch {
@@ -80,8 +81,8 @@ object Reconciler {
       }
     }
 
-    timer.observeDuration()
-    log.info("full reconciliation complete")
+    val time = timer.observeDuration()
+    log.info("full reconciliation completed in {}", time.seconds)
 
     return true
   }
@@ -90,12 +91,15 @@ object Reconciler {
     if (active.isLocked)
       return false
 
+    log.info("starting slim reconciliation")
+
     val timer = Metrics.Reconciler.Slim.executionTime.startTimer()
     val target = CacheDBTarget()
 
     ReconcilerInstance(target, datasetManager, kafkaRouter, slim = true, deletesEnabled = false).reconcile()
 
-    timer.observeDuration()
+    val time = timer.observeDuration()
+    log.info("slim reconciliation completed in {}", time.seconds)
 
     return true
   }

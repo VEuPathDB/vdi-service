@@ -81,13 +81,13 @@ internal fun ControllerBase.putDataset(
 
   val newMeta = request.details.applyPatch(originalMeta, newHistory)
 
-  request.dataFiles
+  request.dataFile
     ?.let { verifyFileExtensions(it, newMeta.type) }
     ?.also { return Either.ofRight(it.wrap()) }
 
   val uploadRefs = CacheDB().initializeDataset(userID, newDatasetID, newMeta) {
     it.tryInsertRevisionLink(newHistory.originalID, newHistory.revisions.last())
-    resolveDatasetFiles(request.dataFiles, request.url, request.docFiles, emptyList(), uploadConfig)
+    resolveDatasetFiles(request.dataFile, request.url, request.docFile, emptyList(), uploadConfig)
   }
 
   submitUpload(newDatasetID, uploadRefs, newMeta, uploadConfig)

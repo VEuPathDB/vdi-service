@@ -9,7 +9,7 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.UserID
 
 private fun sql(schema: String) =
-// language=sql
+// language=postgresql
 """
 INSERT INTO
   ${schema}.${Table.Visibility} (
@@ -18,6 +18,7 @@ INSERT INTO
   )
 VALUES
   (?, ?)
+ON CONFLICT DO NOTHING
 """
 
 internal fun Connection.insertDatasetVisibility(schema: String, datasetID: DatasetID, userID: UserID) {

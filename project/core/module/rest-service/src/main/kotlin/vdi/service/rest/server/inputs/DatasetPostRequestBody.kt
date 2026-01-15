@@ -1,4 +1,3 @@
-@file:JvmName("DatasetPostRequestInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
@@ -15,11 +14,11 @@ import vdi.util.fn.Either.Companion.right
 
 fun DatasetPostRequestBody.cleanup() {
   details?.cleanup()
-  url       = url?.takeUnless(String::isBlank)?.trim()
-  dataFiles = dataFiles.takeUnless(Collection<*>::isNullOrEmpty)
-  docFiles  = docFiles.takeUnless(Collection<*>::isNullOrEmpty)
+  url      = url?.takeUnless(String::isBlank)?.trim()
+  dataFile = dataFile.takeUnless(Collection<*>::isNullOrEmpty)
+  docFile  = docFile.takeUnless(Collection<*>::isNullOrEmpty)
 
-  dataPropertiesFiles = dataPropertiesFiles.takeUnless(Collection<*>::isNullOrEmpty)
+  dataPropertiesFile = dataPropertiesFile.takeUnless(Collection<*>::isNullOrEmpty)
 }
 
 @Suppress("DuplicatedCode") // overlap in generated API pojo field names
@@ -34,7 +33,7 @@ fun DatasetPostRequestBody.validate(): Either<BadRequestError, ValidationErrors>
 
   // If there is no file or URL, then the request body was incomplete.
   // If there is a file AND URL, then the request body is invalid.
-  if (dataFiles == null) {
+  if (dataFile == null) {
     if (url == null)
       return left(BadRequestError("must provide an upload file or url to a source file"))
 
@@ -50,7 +49,7 @@ fun DatasetPostRequestBody.validate(): Either<BadRequestError, ValidationErrors>
   val dataTypeConfig = details.type?.toInternal()?.let(PluginRegistry::configDataOrNullFor)
 
   // If no mapping files were provided
-  if (dataPropertiesFiles == null) {
+  if (dataPropertiesFile == null) {
     // AND the dataset is NOT private
     // AND the data type uses variable mapping files
     if (details.visibility != DatasetVisibility.PRIVATE && dataTypeConfig?.usesDataPropertiesFiles == true) {

@@ -27,5 +27,10 @@ responses:
     description: |
       Target dataset has been deleted, or is no longer public.
     body: lib.GoneError
+  424:
+    description: |
+      Target dataset has not yet been pushed to the object store.  The service
+      is likely still processing the upload.
+    body: lib.TooEarlyError
   500:
     body: lib.ServerError

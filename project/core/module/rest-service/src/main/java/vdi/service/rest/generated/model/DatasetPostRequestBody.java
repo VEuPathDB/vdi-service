@@ -15,11 +15,11 @@ public interface DatasetPostRequestBody {
   @JsonProperty(JsonField.DETAILS)
   void setDetails(DatasetPostMeta details);
 
-  @JsonProperty(JsonField.DATA_FILES)
-  List<File> getDataFiles();
+  @JsonProperty(JsonField.DATA_FILE)
+  List<File> getDataFile();
 
-  @JsonProperty(JsonField.DATA_FILES)
-  void setDataFiles(List<File> dataFiles);
+  @JsonProperty(JsonField.DATA_FILE)
+  void setDataFile(List<File> dataFile);
 
   @JsonProperty(JsonField.URL)
   String getUrl();
@@ -27,15 +27,15 @@ public interface DatasetPostRequestBody {
   @JsonProperty(JsonField.URL)
   void setUrl(String url);
 
-  @JsonProperty(JsonField.DOC_FILES)
-  List<File> getDocFiles();
+  @JsonProperty(JsonField.DOC_FILE)
+  List<File> getDocFile();
 
-  @JsonProperty(JsonField.DOC_FILES)
-  void setDocFiles(List<File> docFiles);
+  @JsonProperty(JsonField.DOC_FILE)
+  void setDocFile(List<File> docFile);
 
-  @JsonProperty(JsonField.DATA_PROPERTIES_FILES)
-  List<File> getDataPropertiesFiles();
+  @JsonProperty(JsonField.DATA_PROPERTIES_FILE)
+  List<File> getDataPropertiesFile();
 
-  @JsonProperty(JsonField.DATA_PROPERTIES_FILES)
-  void setDataPropertiesFiles(List<File> dataPropertiesFiles);
+  @JsonProperty(JsonField.DATA_PROPERTIES_FILE)
+  void setDataPropertiesFile(List<File> dataPropertiesFile);
 }

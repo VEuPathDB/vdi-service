@@ -9,26 +9,26 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "details",
-    "dataFiles",
+    "dataFile",
     "url",
-    "docFiles",
-    "dataPropertiesFiles"
+    "docFile",
+    "dataPropertiesFile"
 })
 public class DatasetPostRequestBodyImpl implements DatasetPostRequestBody {
   @JsonProperty(JsonField.DETAILS)
   private DatasetPostMeta details;
 
-  @JsonProperty(JsonField.DATA_FILES)
-  private List<File> dataFiles;
+  @JsonProperty(JsonField.DATA_FILE)
+  private List<File> dataFile;
 
   @JsonProperty(JsonField.URL)
   private String url;
 
-  @JsonProperty(JsonField.DOC_FILES)
-  private List<File> docFiles;
+  @JsonProperty(JsonField.DOC_FILE)
+  private List<File> docFile;
 
-  @JsonProperty(JsonField.DATA_PROPERTIES_FILES)
-  private List<File> dataPropertiesFiles;
+  @JsonProperty(JsonField.DATA_PROPERTIES_FILE)
+  private List<File> dataPropertiesFile;
 
   @JsonProperty(JsonField.DETAILS)
   public DatasetPostMeta getDetails() {
@@ -40,14 +40,14 @@ public class DatasetPostRequestBodyImpl implements DatasetPostRequestBody {
     this.details = details;
   }
 
-  @JsonProperty(JsonField.DATA_FILES)
-  public List<File> getDataFiles() {
-    return this.dataFiles;
+  @JsonProperty(JsonField.DATA_FILE)
+  public List<File> getDataFile() {
+    return this.dataFile;
   }
 
-  @JsonProperty(JsonField.DATA_FILES)
-  public void setDataFiles(List<File> dataFiles) {
-    this.dataFiles = dataFiles;
+  @JsonProperty(JsonField.DATA_FILE)
+  public void setDataFile(List<File> dataFile) {
+    this.dataFile = dataFile;
   }
 
   @JsonProperty(JsonField.URL)
@@ -60,23 +60,23 @@ public class DatasetPostRequestBodyImpl implements DatasetPostRequestBody {
     this.url = url;
   }
 
-  @JsonProperty(JsonField.DOC_FILES)
-  public List<File> getDocFiles() {
-    return this.docFiles;
+  @JsonProperty(JsonField.DOC_FILE)
+  public List<File> getDocFile() {
+    return this.docFile;
   }
 
-  @JsonProperty(JsonField.DOC_FILES)
-  public void setDocFiles(List<File> docFiles) {
-    this.docFiles = docFiles;
+  @JsonProperty(JsonField.DOC_FILE)
+  public void setDocFile(List<File> docFile) {
+    this.docFile = docFile;
   }
 
-  @JsonProperty(JsonField.DATA_PROPERTIES_FILES)
-  public List<File> getDataPropertiesFiles() {
-    return this.dataPropertiesFiles;
+  @JsonProperty(JsonField.DATA_PROPERTIES_FILE)
+  public List<File> getDataPropertiesFile() {
+    return this.dataPropertiesFile;
   }
 
-  @JsonProperty(JsonField.DATA_PROPERTIES_FILES)
-  public void setDataPropertiesFiles(List<File> dataPropertiesFiles) {
-    this.dataPropertiesFiles = dataPropertiesFiles;
+  @JsonProperty(JsonField.DATA_PROPERTIES_FILE)
+  public void setDataPropertiesFile(List<File> dataPropertiesFile) {
+    this.dataPropertiesFile = dataPropertiesFile;
   }
 }

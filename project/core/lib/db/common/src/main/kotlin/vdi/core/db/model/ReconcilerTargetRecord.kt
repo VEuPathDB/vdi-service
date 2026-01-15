@@ -13,4 +13,6 @@ open class ReconcilerTargetRecord(
   metaUpdated: OffsetDateTime,
   val type: DatasetType,
   val isUninstalled: Boolean,
-): SyncControlRecord(datasetID, sharesUpdated, dataUpdated, metaUpdated)
+): SyncControlRecord(datasetID, sharesUpdated, dataUpdated, metaUpdated) {
+  override fun toString() = "$ownerID/$datasetID"
+}

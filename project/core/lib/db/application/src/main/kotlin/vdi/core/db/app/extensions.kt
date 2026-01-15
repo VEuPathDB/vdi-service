@@ -106,7 +106,7 @@ fun AppDBTransaction.upsertDatasetRecord(
   upsertDatasetMeta(datasetID, meta)
   upsertSyncControlMetaTimestamp(datasetID, metaTimestamp)
   // upsertDatasetInstallMessage() -- we don't have install messages yet
-  upsertDatasetVisibility(datasetID, meta.owner)
+  insertDatasetVisibility(datasetID, meta.owner)
   tryInsertDatasetProjectLink(datasetID)
   // upsertDatasetInstallActivity() -- we aren't installing here
   replace(datasetID, meta.dependencies, ::deleteDependencies, ::insertDependencies)

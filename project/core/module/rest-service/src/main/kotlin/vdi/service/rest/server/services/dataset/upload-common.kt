@@ -25,7 +25,7 @@ import vdi.core.db.model.SyncControlRecord
 import vdi.core.metrics.Metrics
 import vdi.core.plugin.registry.PluginDatasetTypeMeta
 import vdi.core.plugin.registry.PluginRegistry
-import vdi.logging.markedLogger
+import vdi.logging.mark
 import vdi.model.OriginTimestamp
 import vdi.model.meta.*
 import vdi.service.rest.config.UploadConfig
@@ -204,7 +204,7 @@ fun ControllerBase.uploadFiles(
   datasetMeta:  DatasetMetadata,
   uploadConfig: UploadConfig,
 ) {
-  val logger = markedLogger(userID, datasetID)
+  val logger = logger.mark(userID, datasetID)
 
   verifyUploadFileSize(uploadRefs, uploadConfig)
 
@@ -227,10 +227,10 @@ fun ControllerBase.uploadFiles(
         uploadRefs.data.pack(into = archive)
       }
 
-      logger.debug("uploading manifest")
+      logger.debug("uploading manifest to object store")
       DatasetStore.putManifest(userID, datasetID, DatasetManifest(sizes, emptyList()))
 
-      logger.debug("uploading raw dataset data")
+      logger.debug("uploading raw dataset data to object store")
       DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
 
       CacheDB().withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
@@ -243,7 +243,7 @@ fun ControllerBase.uploadFiles(
         e.message?.let { msg -> it.tryInsertImportMessages(datasetID, listOf(msg)) }
       }
     } else {
-      logger.error("user dataset upload to minio failed: ", e)
+      logger.error("user dataset upload to object store failed: ", e)
       Metrics.Upload.failed.inc()
       CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     }
@@ -252,10 +252,10 @@ fun ControllerBase.uploadFiles(
   }
 
   try {
-    logger.debug("uploading dataset metadata")
+    logger.debug("uploading dataset metadata to object store")
     DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
   } catch (e: Throwable) {
-    logger.error("user dataset meta file upload to minio failed:", e)
+    logger.error("user dataset meta file upload to object store failed:", e)
     CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     throw e
   }
@@ -266,7 +266,7 @@ fun ControllerBase.uploadFiles(
       for (path in uploadRefs.docs)
         DatasetStore.putDocumentFile(userID, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
-      logger.error("dataset additional document file(s) upload to minio failed:", e)
+      logger.error("dataset additional document file(s) upload to object-store failed:", e)
       throw e
     }
   }
@@ -277,7 +277,7 @@ fun ControllerBase.uploadFiles(
       for (path in uploadRefs.props)
         DatasetStore.putVariablePropertiesFile(userID, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
-      logger.error("dataset additional document file(s) upload to minio failed:", e)
+      logger.error("dataset additional document file(s) upload to object-store failed:", e)
       throw e
     }
   }
@@ -364,10 +364,7 @@ private fun List<Path>.pack(into: Path): List<DatasetFileInfo> {
  * @return A map of upload files and their sizes.
  */
 context(logger: Logger)
-private fun Path.repackZip(
-  into:         Path,
-  using:        Path,
-): List<DatasetFileInfo> {
+private fun Path.repackZip(into: Path, using: Path): List<DatasetFileInfo> {
   logger.trace("repacking zip file {} into {}", this, into)
 
   // Map of file names to sizes that will be stored in the postgres database.
@@ -410,7 +407,6 @@ private fun Path.repackZip(
     throw BadRequestException("uploaded file was empty or was not a valid zip")
 
   logger.info("Compressing file from {} into {}", unpacked, into)
-  // recompress the files as a tgz file
   into.compress(unpacked)
 
   return files

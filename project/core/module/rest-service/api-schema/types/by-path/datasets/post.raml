@@ -19,7 +19,7 @@ types:
       details:
         description: Metadata about the dataset being submitted.
         type: DatasetPostMeta
-      dataFiles?:
+      dataFile?:
         # language=markdown
         description: |-
           Dataset files to upload.
@@ -33,13 +33,13 @@ types:
 
           This field is incompatible with the `file` field.
         type: string
-      docFiles?:
+      docFile?:
         # language=markdown
         description: |-
           Files containing additional dataset documentation or meta info that is
           not part of the data itself.
         type: file[]
-      dataPropertiesFiles?:
+      dataPropertiesFile?:
         # language=markdown
         description: Data properties files.
         type: file[]
