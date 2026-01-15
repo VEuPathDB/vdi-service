@@ -341,15 +341,6 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
    */
   fun insertDatasetVisibility(datasetID: DatasetID, userID: UserID)
 
-  // manual upsert for oracle compatibility
-  fun upsertDatasetVisibility(datasetID: DatasetID, userID: UserID) {
-    try { insertDatasetVisibility(datasetID, userID) }
-    catch (e: SQLException) {
-      if (!isUniqueConstraintViolation(e))
-        throw e
-    }
-  }
-
   // endregion dataset_visibility
 
   // region sync_control

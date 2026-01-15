@@ -3,7 +3,7 @@ package vdi.core.install
 import vdi.core.config.loadAndCacheStackConfig
 import vdi.config.parse.ConfigurationException
 
-object InstallTargetRegistry {
+object InstallTargetRegistry: Iterable<InstallTarget> {
   private val registry = HashMap<String, InstallTarget>(20)
 
   init {
@@ -17,7 +17,7 @@ object InstallTargetRegistry {
 
   operator fun get(name: String) = registry[name]
 
-  operator fun iterator() = registry.values.iterator()
+  override fun iterator(): Iterator<InstallTarget> = registry.values.iterator()
 
   operator fun contains(name: String) = name in registry
 }

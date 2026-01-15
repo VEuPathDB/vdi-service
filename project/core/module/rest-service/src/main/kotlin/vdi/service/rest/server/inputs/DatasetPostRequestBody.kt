@@ -14,7 +14,7 @@ import vdi.util.fn.Either.Companion.right
 
 fun DatasetPostRequestBody.cleanup() {
   details?.cleanup()
-  url       = url?.takeUnless(String::isBlank)?.trim()
+  url      = url?.takeUnless(String::isBlank)?.trim()
   dataFile = dataFile.takeUnless(Collection<*>::isNullOrEmpty)
   docFile  = docFile.takeUnless(Collection<*>::isNullOrEmpty)
 
