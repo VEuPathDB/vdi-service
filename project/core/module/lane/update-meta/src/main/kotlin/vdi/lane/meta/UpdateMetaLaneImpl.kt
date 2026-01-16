@@ -201,7 +201,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
         datasetID,
         // If the dataset didn't already exist, set it to private first
         meta.copy(visibility = DatasetVisibility.Private),
-        PluginRegistry.categoryFor(meta.type),
+        PluginRegistry.require(meta.type).category,
       ))
     }
 
@@ -229,7 +229,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
     // Update/insert full set of dataset records.
     appDB.withTransaction(target, plugin.type) {
-      val record = DatasetRecord(datasetID, newMeta, PluginRegistry.categoryFor(meta.type))
+      val record = DatasetRecord(datasetID, newMeta, PluginRegistry.require(meta.type).category)
       it.upsertDatasetRecord(record, newMeta, metaTimestamp)
     }
   }

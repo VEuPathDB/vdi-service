@@ -48,7 +48,7 @@ internal fun Connection.selectDataset(schema: String, datasetID: DatasetID): Dat
         datasetID       = datasetID,
         owner           = rs.getUserID("owner"),
         type            = type,
-        category        = PluginRegistry.categoryOrNullFor(type) ?: rs.getString("category"),
+        category        = PluginRegistry[type]?.category ?: rs.getString("category"),
         deletionState   = rs.getDeleteFlag("deleted_status"),
         accessibility   = rs.getString("accessibility")?.let(DatasetVisibility::fromString)
           ?: if (rs.getBoolean("is_public")) DatasetVisibility.Public else DatasetVisibility.Private,

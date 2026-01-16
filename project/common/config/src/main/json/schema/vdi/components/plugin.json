@@ -40,12 +40,6 @@
       "examples": [ "/datasets" ]
     },
 
-    "projectIds": {
-      "type": "array",
-      "items": { "$ref": "../../common.json#/$defs/installTarget" },
-      "unevaluatedItems": false
-    },
-
     "scripts": {
       "type": "object",
       "properties": {

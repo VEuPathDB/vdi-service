@@ -14,8 +14,7 @@ class DatasetPathFactory(config: ShortVDIConfig, plugin: PluginConfig) {
 
   private val pathOverrides = config.installTargets.asSequence()
     .filter { it.enabled && it.datasetFileRoot != null }
-    .map { it.targetName to it.datasetFileRoot!! }
-    .toMap()
+    .associate { it.targetName to it.datasetFileRoot!! }
 
   private val rootDirectory = plugin.installRoot ?: "/datasets"
 

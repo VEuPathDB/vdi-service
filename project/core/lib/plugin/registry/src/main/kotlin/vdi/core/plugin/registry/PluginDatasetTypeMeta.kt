@@ -1,6 +1,9 @@
 package vdi.core.plugin.registry
 
+import vdi.model.meta.InstallTargetID
+
 class PluginDatasetTypeMeta(
+  val plugin: String,
   val category: String,
   val maxFileSize: ULong,
   val allowedFileExtensions: Array<String>,
@@ -8,4 +11,8 @@ class PluginDatasetTypeMeta(
   val usesDataPropertiesFiles: Boolean,
   val varPropertiesFileNameSingular: String = "Variable Properties File",
   val varPropertiesFileNamePlural: String = "Variable Properties Files",
-)
+  val installTargets: Array<InstallTargetID>?,
+) {
+  fun appliesTo(target: InstallTargetID) =
+    installTargets?.contains(target) ?: true
+}

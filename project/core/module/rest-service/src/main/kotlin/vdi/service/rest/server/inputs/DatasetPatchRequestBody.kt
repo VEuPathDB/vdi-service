@@ -68,7 +68,7 @@ internal fun DatasetPatchRequestBody.validate(
 
       if (originalHandler == null)
         errors.add(JF.TYPE, "original dataset type is disabled")
-      else if (!PluginRegistry.configDataFor(original.type).typeChangesEnabled)
+      else if (!PluginRegistry.require(original.type).typeChangesEnabled)
         errors.add(JF.TYPE, "cannot change dataset type from ${original.type}")
       else if (PluginRegistry[DatasetType(DataType.of(name), version)] == null)
         errors.add(JF.TYPE, "no installers available for given dataset type")

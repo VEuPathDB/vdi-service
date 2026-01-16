@@ -63,7 +63,7 @@ internal fun Connection.selectDatasetsByInstallStatus(
         datasetID     = reqDatasetID("dataset_id"),
         owner         = getUserID("owner"),
         type          = type,
-        category      = PluginRegistry.categoryOrNullFor(type) ?: getString("category"),
+        category      = PluginRegistry[type]?.category ?: getString("category"),
         deletionState = getDeleteFlag("deleted_status"),
         accessibility = getString("accessibility")?.let(DatasetVisibility::fromString)
           ?: if (getBoolean("is_public")) DatasetVisibility.Public else DatasetVisibility.Private,

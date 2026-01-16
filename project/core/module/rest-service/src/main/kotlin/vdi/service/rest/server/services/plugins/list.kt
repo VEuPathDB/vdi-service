@@ -2,6 +2,7 @@
 
 package vdi.service.rest.server.services.plugins
 
+import vdi.core.plugin.registry.PluginDatasetTypeMeta
 import vdi.core.plugin.registry.PluginDetails
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.DatasetType
@@ -20,7 +21,7 @@ internal fun listPlugins(project: String?): List<PluginListItem> {
   val plugins = HashMap<String, PluginListItem>(12)
 
   seq.forEach { (dt, plug) ->
-    plugins.compute(plug.name, { _, item ->
+    plugins.compute(plug.plugin, { _, item ->
       item?.apply { dataTypes.add(PluginDataType(dt)) }
         ?: PluginListItem(dt, plug)
     })
@@ -29,15 +30,15 @@ internal fun listPlugins(project: String?): List<PluginListItem> {
   return plugins.values.toList()
 }
 
-private fun PluginListItem(dt: DatasetType, plug: PluginDetails): PluginListItem =
+private fun PluginListItem(dt: DatasetType, plug: PluginDatasetTypeMeta): PluginListItem =
   PluginListItemImpl().also {
-    it.pluginName = plug.name
-    it.installTargets = plug.projects
+    it.pluginName = plug.plugin
+    it.installTargets = plug.installTargets?.asList() ?: emptyList()
     it.dataTypes = mutableListOf(PluginDataType(dt))
   }
 
 private fun PluginDataType(dt: DatasetType): PluginDataType =
-  PluginRegistry.configDataFor(dt)
+  PluginRegistry.require(dt)
     .let { config ->
       PluginDataTypeImpl().apply {
         name = dt.name.toString()

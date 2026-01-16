@@ -9,7 +9,7 @@ fun BrokenImportDetails(record: BrokenImportRecord): BrokenImportDetails =
   BrokenImportDetailsImpl().apply {
     datasetId = record.datasetID.toString()
     owner = record.ownerID.toLong()
-    datasetType = DatasetTypeOutput(record.type, PluginRegistry.categoryFor(record.type))
+    datasetType = DatasetTypeOutput(record.type, PluginRegistry.require(record.type).category)
     installTargets = record.projects
     messages = record.messages
   }

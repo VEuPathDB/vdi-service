@@ -75,8 +75,13 @@
       "description": "Name to show for plural data properties files references in user facing text.",
       "type": "string",
       "default": "Data Properties Files"
-    }
+    },
 
+    "projectIds": {
+      "type": "array",
+      "items": { "$ref": "../../common.json#/$defs/installTarget" },
+      "unevaluatedItems": false
+    }
   },
   "required": [
     "category",

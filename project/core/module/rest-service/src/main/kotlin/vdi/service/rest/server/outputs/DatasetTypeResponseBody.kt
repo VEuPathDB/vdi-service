@@ -12,7 +12,7 @@ internal fun DatasetTypeOutput(type: DatasetType) =
   DatasetTypeOutputImpl().also {
     it.name     = type.name.toString()
     it.version  = type.version
-    it.category = PluginRegistry.categoryFor(type)
+    it.category = PluginRegistry.require(type).category
   }
 
 internal fun DatasetTypeOutput(rec: DatasetRecord, typeName: String) =
@@ -32,7 +32,7 @@ internal fun DatasetType.toExternal(): APIType =
   DatasetTypeOutputImpl().also {
     it.name     = name.toString()
     it.version  = version
-    it.category = PluginRegistry.categoryFor(this)
+    it.category = PluginRegistry.require(this).category
   }
 
 

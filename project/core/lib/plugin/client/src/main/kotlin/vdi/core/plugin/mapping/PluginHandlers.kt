@@ -5,7 +5,6 @@ import vdi.core.config.loadAndCacheStackConfig
 import vdi.core.health.RemoteDependencies
 import vdi.core.plugin.client.PluginHandlerClient
 import vdi.core.plugin.client.PluginHandlerClientConfig
-import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.DatasetType
 
 /**
@@ -26,7 +25,7 @@ object PluginHandlers {
       plug.dataTypes.forEach { dt ->
         val key = DatasetType(DataType.of(dt.name), dt.version)
 
-        tmpMap[key] = PluginHandlerImpl(key, client, PluginRegistry[key]!!)
+        tmpMap[key] = PluginHandlerImpl(key, client)
       }
     }
 

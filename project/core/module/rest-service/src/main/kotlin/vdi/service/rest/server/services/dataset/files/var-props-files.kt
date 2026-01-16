@@ -23,7 +23,7 @@ fun DatasetFiles.getVariablePropertiesFile(
   ) ?: return Respond404())
     .also { if (it.isDeleted) return Respond410() }
 
-  (PluginRegistry.configDataOrNullFor(dataset.type)
+  (PluginRegistry[dataset.type]
     ?: return Respond400("data type ${dataset.type} is not currently enabled"))
     .also { meta -> if (!meta.usesDataPropertiesFiles) return Respond404() }
 
@@ -50,7 +50,7 @@ fun DatasetFiles.putVariablePropertiesFile(
     .takeIf { forAdmin || it.ownerID == userID }
     ?: return Respond403("cannot modify unowned dataset")
 
-  val dtConfig = PluginRegistry.configDataOrNullFor(dataset.type)
+  val dtConfig = PluginRegistry[dataset.type]
     ?: return Respond400("data type ${dataset.type} is not currently enabled")
 
   if (!dtConfig.usesDataPropertiesFiles)

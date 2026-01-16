@@ -24,7 +24,7 @@ fun main() {
   MetaLogger.info("starting VDI plugin server version: {}", manifest.gitTag)
 
   val config = loadTypedConfig<PluginServerConfig>(schema = Path("/schema/config/plugin-config.json")).vdi
-  val name = System.getenv("PLUGIN_ID")
+  val name   = System.getenv("PLUGIN_ID")
   val plugin = name?.let(config.plugins::get)
     ?: throw IllegalStateException("could not match PLUGIN_ID to plugin configuration")
 

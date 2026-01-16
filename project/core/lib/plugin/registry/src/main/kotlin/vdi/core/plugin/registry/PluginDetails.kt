@@ -1,12 +1,11 @@
 package vdi.core.plugin.registry
 
-import vdi.model.meta.InstallTargetID
+import vdi.model.meta.DatasetType
 
-data class PluginDetails(
-  val name:     String,
-  val projects: List<InstallTargetID>,
-) {
-  @Suppress("NOTHING_TO_INLINE")
-  inline fun appliesTo(project: InstallTargetID) =
-    projects.isEmpty() || projects.contains(project)
+data class PluginDetails(val name: String, val dataTypes: Array<DatasetType>) {
+  override fun equals(other: Any?) =
+    this === other || (other is PluginDetails && other.name == name)
+
+  override fun hashCode() =
+    31 * name.hashCode() + dataTypes.contentHashCode()
 }

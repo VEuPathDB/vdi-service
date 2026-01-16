@@ -81,7 +81,7 @@ fun <T> CacheDB.initializeDataset(
 // region Dataset File Processing
 
 fun verifyFileExtensions(data: Collection<File>, dataType: DatasetType): BadRequestError? {
-  val exts = PluginRegistry.configDataFor(dataType).allowedFileExtensions
+  val exts = PluginRegistry.require(dataType).allowedFileExtensions
 
   // If no special extensions have been defined, we can't validate.
   if (exts.isEmpty())
@@ -217,7 +217,7 @@ fun ControllerBase.uploadFiles(
             uploadRefs.data[0].repack(
               into         = archive,
               using        = dir,
-              dataTypeMeta = PluginRegistry.configDataFor(datasetMeta.type),
+              dataTypeMeta = PluginRegistry.require(datasetMeta.type),
               uploadConfig = uploadConfig,
             )
           }

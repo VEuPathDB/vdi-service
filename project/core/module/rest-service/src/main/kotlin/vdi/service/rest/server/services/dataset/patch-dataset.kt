@@ -124,7 +124,7 @@ private fun DatasetMetadata.isPromotingToCommunity(original: DatasetMetadata) =
   visibility != DatasetVisibility.Private && original.visibility == DatasetVisibility.Private
 
 private fun DatasetMetadata.validateForPromotion(datasetID: DatasetID, errors: ValidationErrors) {
-  val typeConfig = PluginRegistry.configDataFor(type)
+  val typeConfig = PluginRegistry.require(type)
 
   // If the target data type doesn't use variable properties files, then there
   // is no extra validation the VDI core service can perform.  All additional
