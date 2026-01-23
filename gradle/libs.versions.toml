@@ -122,7 +122,7 @@ junit-launcher = { module = "org.junit.platform:junit-platform-launcher", versio
 # Mockito
 mockito-core   = { module = "org.mockito:mockito-core",          version.ref = "mockito" }
 mockito-junit  = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version = "6.2.0"  }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version = "6.2.2"  }
 
 [bundles]
 jackson = [
