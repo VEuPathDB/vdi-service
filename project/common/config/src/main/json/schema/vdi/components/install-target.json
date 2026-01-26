@@ -26,7 +26,10 @@
         {
           "title": "Specific Data Types",
           "type": "array",
-          "items": { "$ref": "data-type.json#/$defs/baseDataType" },
+          "items": {
+            "$ref": "data-type.json#/$defs/baseDataType",
+            "unevaluatedProperties": false
+          },
           "unevaluatedItems": false,
           "uniqueItems": true,
           "minItems": 1

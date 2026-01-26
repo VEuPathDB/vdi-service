@@ -83,6 +83,7 @@
   "required": [
     "category"
   ],
+  "unevaluatedProperties": false,
   "$defs": {
     "baseDataType": {
       "type": "object",
@@ -108,8 +109,7 @@
       "required": [
         "name",
         "version"
-      ],
-      "unevaluatedProperties": false
+      ]
     }
   }
 }
