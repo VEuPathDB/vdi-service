@@ -14,7 +14,7 @@ INSERT INTO
   ${schema}.${Table.Projects} (
     dataset_id
   , project_id
-  , project_name
+  , project_display_name
   )
 VALUES
   (?, ?, ?)
