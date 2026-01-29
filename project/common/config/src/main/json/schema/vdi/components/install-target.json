@@ -10,8 +10,15 @@
       "type": "boolean",
       "default": true
     },
-    "targetName": {
+    "targetId": {
       "$ref": "../../common.json#/$defs/installTarget"
+    },
+    "targetName": {
+      "title": "Install Target Display Name",
+      "description": "Optional display name for an install target, used when the install target ID differs from the name users should see.\n\nDefaults to the same value as `targetId`",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
     },
     "datasetFileRoot": {
       "title": "Dataset File Root",
@@ -86,7 +93,7 @@
           "dataDb": { "$ref": "../../common.json#/$defs/database" }
         },
         "required": [
-          "targetName",
+          "targetId",
           "controlDb",
           "dataDb"
         ]

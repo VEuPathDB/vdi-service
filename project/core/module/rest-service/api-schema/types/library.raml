@@ -1066,8 +1066,18 @@ types:
     properties:
       datasetId: VdiId
       installTarget: InstallTargetID
+  InstallTarget:
+    type: object
+    properties:
+      id: InstallTargetID
+      name: InstallTargetDisplayName
+  InstallTargetDisplayName:
+    description: Display name of a target VEuPathDB project.
+    type: string
+    minLength: 3
+    maxLength: 128
   InstallTargetID:
-    description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".
+    description: Unique identifier of a target VEuPathDB project.
     type: string
     minLength: 5
     maxLength: 32
@@ -1260,6 +1270,7 @@ types:
     properties:
       api: APIServiceConfiguration
       daemons: DaemonConfiguration
+      installTargets: InstallTarget[]
   ServiceFeatures:
     type: object
     additionalProperties: false

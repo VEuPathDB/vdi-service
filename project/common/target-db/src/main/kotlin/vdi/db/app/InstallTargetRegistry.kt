@@ -29,12 +29,13 @@ object InstallTargetRegistry {
       } } }
       .map { c ->
         InstallTarget(
+          id              = c.targetID,
           name            = c.targetName,
           installDatabase = c.dataDB.resolve(ldap),
           controlDatabase = c.controlDB.resolve(ldap),
           metaValidation  = c.metaValidation,
         ).let { tgt ->
-          c.targetName to InstallTargetInstanceRegistry(registry = when {
+          c.targetID to InstallTargetInstanceRegistry(registry = when {
             c.dataTypes.isEmpty() -> mapOf(FallbackDatasetType to tgt)
             else                  -> c.dataTypes.associateWith { tgt }
           })

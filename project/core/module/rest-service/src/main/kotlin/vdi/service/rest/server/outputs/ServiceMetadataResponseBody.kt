@@ -19,14 +19,22 @@ fun ServiceMetadataResponseBody(metadata: ManifestConfig, stack: StackConfig): S
       buildTime = metadata.buildTime
     }
     configuration = ServiceConfigurationDetailsImpl().apply {
-      daemons = DaemonConfigurationImpl().apply {
-        api = APIServiceConfigurationImpl().apply {
-          maxUploadSize = stack.vdi.restService.maxUploadSize.toLong()
-          userMaxStorageSize = stack.vdi.restService.userMaxStorageSize.toLong()
-        }
+      api = APIServiceConfigurationImpl().apply {
+        maxUploadSize = stack.vdi.restService.maxUploadSize.toLong()
+        userMaxStorageSize = stack.vdi.restService.userMaxStorageSize.toLong()
+      }
 
+      daemons = DaemonConfigurationImpl().apply {
         reconciler = ReconcilerConfig(stack.vdi.daemons.reconciler)
       }
+
+      installTargets = stack.installTargets.map { (id, name) ->
+        InstallTargetImpl().also {
+          it.id = id
+          it.name = name
+        }
+      }
+
     }
     features = ServiceFeaturesImpl().apply {
       supportedArchiveTypes = SupportedArchiveType.SupportedExtensions.asList()

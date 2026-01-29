@@ -513,11 +513,23 @@ types:
         type: BioprojectIDReference[]
         uniqueItems: true
 
+  InstallTarget:
+    type: object
+    properties:
+      id: InstallTargetID
+      name: InstallTargetDisplayName
+
   InstallTargetID:
-    description: Name or ID of a target VEuPathDB project, such as "PlasmoDB".
+    description: Unique identifier of a target VEuPathDB project.
     type: string
     minLength: 5
     maxLength: 32
+
+  InstallTargetDisplayName:
+    description: Display name of a target VEuPathDB project.
+    type: string
+    minLength: 3
+    maxLength: 128
 
   LinkedDataset:
     type: object

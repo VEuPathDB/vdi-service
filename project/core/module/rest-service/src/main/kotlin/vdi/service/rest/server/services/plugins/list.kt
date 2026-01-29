@@ -3,7 +3,6 @@
 package vdi.service.rest.server.services.plugins
 
 import vdi.core.plugin.registry.PluginDatasetTypeMeta
-import vdi.core.plugin.registry.PluginDetails
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.DatasetType
 import vdi.service.rest.generated.model.PluginDataType

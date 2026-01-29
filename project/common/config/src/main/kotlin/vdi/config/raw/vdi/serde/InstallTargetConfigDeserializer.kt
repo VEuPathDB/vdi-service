@@ -21,7 +21,8 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): InstallTargetConfig {
     val obj = p.codec.readTree<ObjectNode>(p)
 
-    val targetName = obj[JsonKey.TargetName].textValue()
+    val targetID   = obj[JsonKey.TargetID].textValue()
+    val targetName = obj[JsonKey.TargetName]?.textValue()
     val dataTypes  = (obj[JsonKey.DataTypes] as ArrayNode?)?.processDataTypes() ?: emptySet()
     val fileRoot   = obj[JsonKey.FileRoot]?.textValue()
 
@@ -31,7 +32,8 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
 
       return InstallTargetConfig(
         enabled         = false,
-        targetName      = targetName,
+        targetID        = targetID,
+        targetName      = targetName ?: targetID,
         controlDB       = dummyDB,
         dataDB          = dummyDB,
         datasetFileRoot = fileRoot,
@@ -40,7 +42,8 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
 
     return InstallTargetConfig(
       enabled         = true,
-      targetName      = targetName,
+      targetID        = targetID,
+      targetName      = targetName ?: targetID,
       dataTypes       = dataTypes,
       controlDB       = (obj[JsonKey.ControlDB] as ObjectNode).deserialize(),
       dataDB          = (obj[JsonKey.DataDB] as ObjectNode).deserialize(),

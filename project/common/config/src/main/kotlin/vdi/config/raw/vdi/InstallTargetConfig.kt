@@ -13,9 +13,13 @@ data class InstallTargetConfig(
   @field:JsonProperty(JsonKey.Enabled)
   val enabled: Boolean = true,
 
+  @param:JsonProperty(JsonKey.TargetID)
+  @field:JsonProperty(JsonKey.TargetID)
+  val targetID: String,
+
   @param:JsonProperty(JsonKey.TargetName)
   @field:JsonProperty(JsonKey.TargetName)
-  val targetName: String,
+  val targetName: String = targetID,
 
   @param:JsonProperty(JsonKey.DataTypes)
   @field:JsonProperty(JsonKey.DataTypes)
@@ -44,6 +48,7 @@ data class InstallTargetConfig(
     const val Enabled        = "enabled"
     const val FileRoot       = "datasetFileRoot"
     const val MetaValidation = "metaValidation"
+    const val TargetID       = "targetId"
     const val TargetName     = "targetName"
   }
 }

@@ -12,4 +12,6 @@ data class StackConfig(
   val core: ContainerCoreConfig,
 
   val vdi: VDIConfig,
+
+  val installTargets: Set<Pair<String, String>>,
 )
