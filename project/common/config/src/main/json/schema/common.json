@@ -149,6 +149,7 @@
         "AmoebaDB",
         "ClinEpiDB",
         "CryptoDB",
+        "DataExplorer",
         "FungiDB",
         "GiardiaDB",
         "HostDB",
@@ -161,8 +162,7 @@
         "TrichDB",
         "TriTrypDB",
         "VectorBase",
-        "VEuPathDB",
-        "DataExplorer"
+        "UniDB"
       ]
     },
     "ldap": {
