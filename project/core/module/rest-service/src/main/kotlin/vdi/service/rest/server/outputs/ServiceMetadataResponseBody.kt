@@ -28,10 +28,10 @@ fun ServiceMetadataResponseBody(metadata: ManifestConfig, stack: StackConfig): S
         reconciler = ReconcilerConfig(stack.vdi.daemons.reconciler)
       }
 
-      installTargets = stack.installTargets.map { (id, name) ->
+      installTargets = stack.vdi.installTargets.map { tgt ->
         InstallTargetImpl().also {
-          it.id = id
-          it.name = name
+          it.id = tgt.targetID
+          it.name = tgt.targetName
         }
       }
 
