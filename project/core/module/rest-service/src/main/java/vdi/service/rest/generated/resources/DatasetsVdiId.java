@@ -97,8 +97,8 @@ public interface DatasetsVdiId {
       return new GetDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }
 
-    public static GetDatasetsByVdiIdResponse respond424WithApplicationJson(TooEarlyError entity) {
-      Response.ResponseBuilder responseBuilder = Response.status(424).header("Content-Type", "application/json");
+    public static GetDatasetsByVdiIdResponse respond425WithApplicationJson(TooEarlyError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(425).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetDatasetsByVdiIdResponse(responseBuilder.build(), entity);
     }

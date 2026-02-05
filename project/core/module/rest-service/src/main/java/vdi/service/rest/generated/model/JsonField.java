@@ -18,6 +18,7 @@ public final class JsonField {
   public static final String BUILD_NUMBER = "buildNumber";
   public static final String BUILD_TIME = "buildTime";
   public static final String CATEGORY = "category";
+  public static final String CITATION = "citation";
   public static final String CONFIGURATION = "configuration";
   public static final String CONTACTS = "contacts";
   public static final String CONTENTS = "contents";

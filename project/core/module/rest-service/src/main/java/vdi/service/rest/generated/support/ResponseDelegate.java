@@ -75,6 +75,11 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
+  public Response.StatusType getStatusInfo() {
+    return this.delegate.getStatusInfo();
+  }
+
+  @Override
   public <T> T readEntity(GenericType<T> p0, Annotation[] p1) {
     return this.delegate.readEntity(p0,p1);
   }
@@ -97,6 +102,11 @@ public class ResponseDelegate extends Response {
   @Override
   public boolean hasEntity() {
     return this.delegate.hasEntity();
+  }
+
+  @Override
+  public boolean bufferEntity() {
+    return this.delegate.bufferEntity();
   }
 
   @Override
@@ -152,16 +162,6 @@ public class ResponseDelegate extends Response {
   @Override
   public Object getEntity() {
     return this.entity;}
-
-  @Override
-  public Response.StatusType getStatusInfo() {
-    return this.delegate.getStatusInfo();
-  }
-
-  @Override
-  public boolean bufferEntity() {
-    return this.delegate.bufferEntity();
-  }
 
   public static class HeaderBuilderBase {
     protected final Map<String, String> headerMap;

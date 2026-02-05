@@ -5,14 +5,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 
 @JsonDeserialize(
-    as = DatasetImportStatusDetailsImpl.class
+    as = DatasetImportStatusInfoImpl.class
 )
-public interface DatasetImportStatusDetails {
+public interface DatasetImportStatusInfo {
   @JsonProperty(JsonField.STATUS)
-  DatasetImportStatus getStatus();
+  DatasetImportStatusCode getStatus();
 
   @JsonProperty(JsonField.STATUS)
-  void setStatus(DatasetImportStatus status);
+  void setStatus(DatasetImportStatusCode status);
 
   @JsonProperty(JsonField.MESSAGES)
   List<String> getMessages();

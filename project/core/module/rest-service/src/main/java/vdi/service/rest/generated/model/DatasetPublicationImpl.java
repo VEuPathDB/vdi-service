@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "identifier",
     "type",
+    "citation",
     "isPrimary"
 })
 public class DatasetPublicationImpl implements DatasetPublication {
@@ -16,6 +17,9 @@ public class DatasetPublicationImpl implements DatasetPublication {
 
   @JsonProperty(JsonField.TYPE)
   private DatasetPublicationType type;
+
+  @JsonProperty(JsonField.CITATION)
+  private String citation;
 
   @JsonProperty(
       value = JsonField.IS_PRIMARY,
@@ -41,6 +45,16 @@ public class DatasetPublicationImpl implements DatasetPublication {
   @JsonProperty(JsonField.TYPE)
   public void setType(DatasetPublicationType type) {
     this.type = type;
+  }
+
+  @JsonProperty(JsonField.CITATION)
+  public String getCitation() {
+    return this.citation;
+  }
+
+  @JsonProperty(JsonField.CITATION)
+  public void setCitation(String citation) {
+    this.citation = citation;
   }
 
   @JsonProperty(

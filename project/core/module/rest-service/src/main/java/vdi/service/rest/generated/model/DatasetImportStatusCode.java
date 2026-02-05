@@ -2,7 +2,7 @@ package vdi.service.rest.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum DatasetImportStatus {
+public enum DatasetImportStatusCode {
   @JsonProperty("queued")
   QUEUED("queued"),
 
@@ -24,7 +24,7 @@ public enum DatasetImportStatus {
     return this.value;
   }
 
-  DatasetImportStatus(String name) {
+  DatasetImportStatusCode(String name) {
     this.value = name;
   }
 }
