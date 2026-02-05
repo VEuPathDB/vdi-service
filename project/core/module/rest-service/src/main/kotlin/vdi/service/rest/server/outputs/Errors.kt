@@ -1,10 +1,7 @@
 package vdi.service.rest.server.outputs
 
-import jakarta.ws.rs.core.Request
 import org.veupathdb.lib.container.jaxrs.errors.UnprocessableEntityException
-import org.veupathdb.lib.container.jaxrs.providers.RequestIdProvider
 import org.veupathdb.lib.request.validation.ValidationErrors
-import kotlin.reflect.KClass
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.support.ResponseDelegate
 
@@ -113,7 +110,7 @@ fun TooEarlyError(message: String = "the requested resource is not yet available
   TooEarlyErrorImpl().also { it.message = message }
 
 inline fun <reified T: ResponseDelegate> TooEarlyError.wrap(): T =
-  T::class.java.getDeclaredMethod("respond424WithApplicationJson", TooEarlyError::class.java)
+  T::class.java.getDeclaredMethod("respond425WithApplicationJson", TooEarlyError::class.java)
     .invoke(null, this) as T
 
 // endregion 425
@@ -129,14 +126,8 @@ fun ServerError(
     it.message   = message
   }
 
-inline fun <reified T: ResponseDelegate> Respond500(request: Request, message: String): T =
-  ServerErrorImpl().also {
-    it.requestId = RequestIdProvider.getRequestId(request)
-    it.message   = message
-  }.wrap()
-
 inline fun <reified T: ResponseDelegate> ServerError.wrap(): T =
-  T::class.java.getDeclaredMethod("respond424WithApplicationJson", ServerError::class.java)
+  T::class.java.getDeclaredMethod("respond500WithApplicationJson", ServerError::class.java)
     .invoke(null, this) as T
 
 // endregion 500
