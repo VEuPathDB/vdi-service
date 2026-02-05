@@ -10,20 +10,20 @@ import java.util.List;
     "status",
     "messages"
 })
-public class DatasetImportStatusDetailsImpl implements DatasetImportStatusDetails {
+public class DatasetImportStatusInfoImpl implements DatasetImportStatusInfo {
   @JsonProperty(JsonField.STATUS)
-  private DatasetImportStatus status;
+  private DatasetImportStatusCode status;
 
   @JsonProperty(JsonField.MESSAGES)
   private List<String> messages;
 
   @JsonProperty(JsonField.STATUS)
-  public DatasetImportStatus getStatus() {
+  public DatasetImportStatusCode getStatus() {
     return this.status;
   }
 
   @JsonProperty(JsonField.STATUS)
-  public void setStatus(DatasetImportStatus status) {
+  public void setStatus(DatasetImportStatusCode status) {
     this.status = status;
   }
 

@@ -427,7 +427,7 @@ types:
       description?:
         type: string
         maxLength: 4000
-  DatasetImportStatus:
+  DatasetImportStatusCode:
     displayName: Dataset Import Status
     description: |
       Import status of the dataset.
@@ -446,11 +446,11 @@ types:
       - complete
       - invalid
       - failed
-  DatasetImportStatusDetails:
+  DatasetImportStatusInfo:
     type: object
     additionalProperties: false
     properties:
-      status: DatasetImportStatus
+      status: DatasetImportStatusCode
       messages?: string[]
   DatasetInstallStatus:
     displayName: Dataset Install Status
@@ -742,6 +742,7 @@ types:
     properties:
       identifier: DatasetPublicationIdentifier
       type?: DatasetPublicationType
+      citation?: string
       isPrimary?:
         description: Only one publication may be marked as primary.
         type: boolean
@@ -869,7 +870,8 @@ types:
     type: object
     additionalProperties: false
     properties:
-      import: DatasetImportStatusDetails
+      upload: DatasetUploadStatusInfo
+      import: DatasetImportStatusInfo
       install: DatasetInstallStatusListEntry[]
   DatasetSummary:
     description: Brief summary of the dataset.
@@ -910,6 +912,18 @@ types:
     additionalProperties: false
     properties:
       value?: DatasetTypeInput
+  DatasetUploadStatusCode:
+    type: string
+    enum:
+      - running
+      - complete
+      - failed
+  DatasetUploadStatusInfo:
+    type: object
+    additionalProperties: false
+    properties:
+      status: DatasetUploadStatusCode
+      message?: string
   DatasetVisibility:
     displayName: Dataset Visibility
     description: "API visibility enum.\n  \nThis value differs from the internal dataset metadata visibility in that\nthe `controlled` value is a computed value defined as the combination of\nvisibility `protected` coupled with a \"days to approve\" value of `0`.\n"

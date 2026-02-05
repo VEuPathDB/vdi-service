@@ -19,6 +19,12 @@ public interface DatasetPublication {
   @JsonProperty(JsonField.TYPE)
   void setType(DatasetPublicationType type);
 
+  @JsonProperty(JsonField.CITATION)
+  String getCitation();
+
+  @JsonProperty(JsonField.CITATION)
+  void setCitation(String citation);
+
   @JsonProperty(
       value = JsonField.IS_PRIMARY,
       defaultValue = "false"
