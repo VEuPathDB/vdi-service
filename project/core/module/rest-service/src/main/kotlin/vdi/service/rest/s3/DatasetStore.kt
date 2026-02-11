@@ -8,12 +8,15 @@ import org.veupathdb.lib.s3.s34k.objects.S3Object
 import org.veupathdb.lib.s3.s34k.objects.StreamObject
 import java.io.InputStream
 import vdi.core.config.vdi.ObjectStoreConfig
+import vdi.core.s3.DatasetDirectory
+import vdi.core.s3.DatasetObjectStore
 import vdi.core.s3.files.FileName
 import vdi.core.s3.paths.S3Paths
 import vdi.core.s3.util.S3Config
 import vdi.json.JSON
 import vdi.json.toJSONString
 import vdi.model.meta.*
+import vdi.model.misc.UploadErrorReport
 
 object DatasetStore {
   private lateinit var client: S3Client
@@ -28,6 +31,9 @@ object DatasetStore {
     get() = try { client.buckets[bucketName!!] }
     catch (_: Throwable) { throw IllegalStateException("invalid S3 bucket name") }
       ?: throw IllegalStateException("bucket $bucketName does not exist!")
+
+  private val store
+    get() = DatasetObjectStore(bucket)
 
   fun getDatasetMeta(userID: UserID, datasetID: DatasetID): DatasetMetadata? {
     return bucket.objects.open(S3Paths.datasetMetaFile(userID, datasetID))
@@ -124,6 +130,23 @@ object DatasetStore {
 
   fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
     bucket.objects.list(prefix = S3Paths.datasetDir(userID, datasetID))
+
+  fun putUploadError(userID: UserID, datasetID: DatasetID, message: String, ex: Throwable? = null) {
+    store.getDatasetDirectory(userID, datasetID)
+      .putUploadErrorFile(
+        ex?.let { UploadErrorReport(message, it) }
+          ?: UploadErrorReport(message))
+  }
+
+  @JvmStatic
+  fun getDatasetDirectory(userID: UserID, datasetID: DatasetID): DatasetDirectory =
+    store.getDatasetDirectory(userID, datasetID)
+
+  @JvmStatic
+  fun getUploadErrorReport(userID: UserID, datasetID: DatasetID): UploadErrorReport? =
+    store.getDatasetDirectory(userID, datasetID)
+      .getUploadErrorFile()
+      .load()
 
   fun streamAll() = bucket.objects.streamAll().stream()
 

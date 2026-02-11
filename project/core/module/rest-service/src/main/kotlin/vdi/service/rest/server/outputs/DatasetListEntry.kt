@@ -61,7 +61,7 @@ internal fun DatasetRecord.toExternal(
     name             = name,
     origin           = origin,
     installTargets   = projects,
-    status           = DatasetStatusInfo(importStatus, null, installs),
+    status           = DatasetStatusInfo(uploadStatus, importStatus, null, installs),
     shares           = shares ?: emptyList(),
     fileCount        = fileInfo?.count?.toInt() ?: 0,
     fileSizeTotal    = fileInfo?.size?.toLong() ?: 0,

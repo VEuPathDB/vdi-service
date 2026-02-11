@@ -7,6 +7,7 @@ import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.cache.model.RelatedDataset
 import vdi.model.meta.*
 import vdi.model.meta.DatasetDependency
+import vdi.service.rest.conversion.DatasetImportStatusInfo
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.generated.model.BioprojectIDReference as APIBioRef
@@ -20,6 +21,10 @@ import vdi.service.rest.generated.model.DOIReference as APIDOI
 import vdi.service.rest.generated.model.ExternalIdentifiers as APIIdentifiers
 import vdi.service.rest.generated.model.LinkedDataset as APILinkedDataset
 import vdi.service.rest.generated.model.SampleYearRange as APIYears
+import vdi.service.rest.conversion.DatasetStatusInfo
+import vdi.service.rest.conversion.DatasetUploadStatusInfo
+import vdi.service.rest.conversion.EnumTranslator
+import vdi.service.rest.s3.DatasetStore
 
 /**
  * API type conversion for use when the dataset metadata is available from the
@@ -43,7 +48,11 @@ internal fun DatasetDetails(
       it.owner                = DatasetOwner(userInfo[meta.owner]!!)
       it.relatedDatasets      = relatedDatasets.map(::RelatedDatasetInfo).toList()
       it.shares               = shares.map { (user, offer) -> ShareOffer(userInfo[user]!!, offer!!) }
-      it.status               = DatasetStatusInfo(importStatus, importMessages, installs)
+      it.status               = DatasetStatusInfo(
+        DatasetUploadStatusInfo(EnumTranslator.toExternal(DatasetStore.get))
+        DatasetImportStatusInfo(EnumTranslator.toExternal(importStatus), importMessages),
+        installs
+      )
       it.files                = files
     }
 
@@ -139,6 +148,7 @@ private fun DatasetPublication(publication: DatasetPublication): APIPublication 
   DatasetPublicationImpl().also {
     it.identifier = publication.identifier
     it.type       = DatasetPublicationType(publication.type)
+    it.citation   = publication.citation
     it.isPrimary  = publication.isPrimary
   }
 

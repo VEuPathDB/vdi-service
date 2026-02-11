@@ -1,4 +1,3 @@
-@file:JvmName("DatasetPublicationTypeOutputAdaptor")
 package vdi.service.rest.server.outputs
 
 import vdi.model.meta.DatasetPublication

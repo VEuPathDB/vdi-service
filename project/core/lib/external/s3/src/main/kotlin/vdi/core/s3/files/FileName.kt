@@ -20,6 +20,7 @@ object FileName {
   // Meta Files
   const val MetadataFile = DatasetMetaFilename
   const val ManifestFile = DatasetManifestFilename
+  const val UploadErrorFile = "upload-error.json"
 
   inline val MetaFileNames get() = arrayOf(MetadataFile, ManifestFile)
 

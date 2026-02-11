@@ -19,10 +19,12 @@ import vdi.core.s3.files.maps.MappingFile
 import vdi.core.s3.files.meta.ManifestFile
 import vdi.core.s3.files.meta.MetaFile
 import vdi.core.s3.files.meta.MetadataFile
+import vdi.core.s3.files.meta.UploadErrorFile
 import vdi.core.s3.files.shares.ShareOffer
 import vdi.core.s3.files.shares.ShareReceipt
 import vdi.core.s3.paths.*
 import vdi.model.meta.*
+import vdi.model.misc.UploadErrorReport
 
 /**
  * Implementation of a DatasetDirectory in which all objects are already known
@@ -254,6 +256,18 @@ internal class MaterializedDatasetDirectory(
 
   override fun deleteDocumentFile(name: String) =
     throw UnsupportedOperationException("${javaClass.name} is read-only")
+
+  override fun hasUploadErrorFile(): Boolean =
+    throw UnsupportedOperationException("failed uploads cannot be materialized")
+
+  override fun getUploadErrorFile(): UploadErrorFile =
+    throw UnsupportedOperationException("failed uploads cannot be materialized")
+
+  override fun putUploadErrorFile(report: UploadErrorReport) =
+    throw UnsupportedOperationException("failed uploads cannot be materialized")
+
+  override fun deleteUploadErrorFile() =
+    throw UnsupportedOperationException("failed uploads cannot be materialized")
 
   override fun toString() = "EagerDatasetDir($ownerID/$datasetID)"
 

@@ -10,7 +10,7 @@ fun UserID(value: Long): UserID {
 fun UserID(value: String): UserID {
   val long = try {
     value.toLong()
-  } catch (e: Throwable) {
+  } catch (_: Throwable) {
     throw IllegalArgumentException("User ID values must be integral numbers.")
   }
 

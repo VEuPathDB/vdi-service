@@ -8,10 +8,12 @@ import vdi.core.s3.files.docs.DocumentFile
 import vdi.core.s3.files.flags.FlagFile
 import vdi.core.s3.files.maps.DataPropertiesFile
 import vdi.core.s3.files.meta.ManifestFile
+import vdi.core.s3.files.meta.UploadErrorFile
 import vdi.core.s3.files.shares.ShareFile
 import vdi.core.s3.files.shares.ShareOffer
 import vdi.core.s3.files.shares.ShareReceipt
 import vdi.model.meta.*
+import vdi.model.misc.UploadErrorReport
 
 interface DatasetDirectory {
 
@@ -317,4 +319,37 @@ interface DatasetDirectory {
   fun deleteDocumentFile(name: String)
 
   // endregion document files
+
+  // region upload-error.json
+
+  /**
+   * Tests whether this [DatasetDirectory] currently contains an upload error
+   * report JSON file.
+   */
+  fun hasUploadErrorFile(): Boolean
+
+  /**
+   * Returns a representation of this [DatasetDirectory]'s upload error report
+   * JSON file.
+   *
+   * This method will return a value regardless of whether the metadata JSON
+   * file exists or existed.  The existence of the file can be tested using the
+   * returned object's [DatasetFile.exists] method.
+   */
+  fun getUploadErrorFile(): UploadErrorFile
+
+  /**
+   * Puts an upload error report JSON file into this [DatasetDirectory],
+   * overwriting any previously existing upload report JSON file.
+   *
+   * @param report Upload error report content to put.
+   */
+  fun putUploadErrorFile(report: UploadErrorReport)
+
+  /**
+   * Deletes the upload error report JSON file from this [DatasetDirectory].
+   */
+  fun deleteUploadErrorFile()
+
+  // endregion upload-error.json
 }

@@ -17,6 +17,7 @@ const val PrefixPluginName = "I" // I for installer
 const val PrefixUserID = "O" // O for owner
 const val PrefixScript = "S"
 const val PrefixRequestID = "R"
+const val PrefixRequestURI = "U"
 
 // region Logger Wrapping
 

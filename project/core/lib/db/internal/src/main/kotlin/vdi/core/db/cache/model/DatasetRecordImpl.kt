@@ -1,6 +1,7 @@
 package vdi.core.db.cache.model
 
 import java.time.OffsetDateTime
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 
 data class DatasetRecordImpl(
@@ -20,4 +21,5 @@ data class DatasetRecordImpl(
   override val projects: List<String>,
   override val inserted: OffsetDateTime,
   override val originalID: DatasetID?,
+  override val uploadStatus: DatasetUploadStatus,
 ): DatasetRecord

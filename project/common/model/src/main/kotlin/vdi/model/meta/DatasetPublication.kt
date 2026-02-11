@@ -17,6 +17,10 @@ data class DatasetPublication(
   @field:JsonProperty(Type)
   val type: PublicationType,
 
+  @param:JsonProperty(Citation)
+  @field:JsonProperty(Citation)
+  val citation: String? = null,
+
   @param:JsonProperty(IsPrimary)
   @field:JsonProperty(IsPrimary)
   val isPrimary: Boolean = false,
@@ -51,8 +55,9 @@ data class DatasetPublication(
   }
 
   companion object JsonKey {
+    const val Citation   = "citation"
     const val Identifier = "identifier"
-    const val IsPrimary = "isPrimary"
-    const val Type = "type"
+    const val IsPrimary  = "isPrimary"
+    const val Type       = "type"
   }
 }

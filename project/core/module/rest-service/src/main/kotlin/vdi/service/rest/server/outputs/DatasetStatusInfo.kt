@@ -4,18 +4,35 @@ import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallStatusDetails
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.InstallTargetID
+import vdi.model.misc.UploadErrorReport
 import vdi.service.rest.generated.model.*
-import vdi.service.rest.generated.model.DatasetImportStatus as ExternalImportStatus
+import vdi.service.rest.generated.model.DatasetImportStatusCode as ExternalImportStatus
 
-fun DatasetStatusInfo(
+fun DatasetStatusInfo_(
+  uploadStatus:    DatasetUploadStatus,
+  uploadMessages:  UploadErrorReport?,
   importStatus:    DatasetImportStatus?,
   importMessages:  List<String>?,
-  installStatuses: Map<InstallTargetID, InstallStatuses?>
+  installStatuses: Map<InstallTargetID, InstallStatuses?>?,
 ): DatasetStatusInfo =
-  DatasetStatusInfoImpl().also {
-    it.import  = DatasetImportStatusDetails(importStatus, importMessages)
-    it.install = installStatuses.map(::DatasetInstallStatusListEntry)
+  DatasetStatusInfoImpl().apply {
+    upload  = uploadMessages?.let(::DatasetUploadStatusInfo)
+      ?: DatasetUploadStatusInfo(running = importStatus == null)
+    import  = importStatus?.let { DatasetImportStatusDetails(it, importMessages) }
+    install = installStatuses?.map(::DatasetInstallStatusListEntry)
+  }
+
+fun DatasetStatusInfo_(
+  uploadStatus:    DatasetUploadStatus,
+  importStatus:    DatasetImportStatus?,
+  installStatuses: Map<InstallTargetID, InstallStatuses?>?,
+): DatasetStatusInfo =
+  DatasetStatusInfoImpl().apply {
+    upload  = DatasetUploadStatusInfo(uploadStatus)
+    import  = importStatus?.let(::DatasetImportStatusInfo)
+    install = installStatuses?.map(::DatasetInstallStatusListEntry)
   }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -39,11 +56,11 @@ private fun DatasetInstallStatusDetails(info: InstallStatusDetails): DatasetInst
     it.messages = info.messages
   }
 
-private fun DatasetImportStatusDetails(
+private fun DatasetImportStatusInfo(
   status:   DatasetImportStatus?,
-  messages: List<String>?,
-): DatasetImportStatusDetails =
-  DatasetImportStatusDetailsImpl().also {
+  messages: List<String>? = null,
+): DatasetImportStatusInfo =
+  DatasetImportStatusInfoImpl().also {
     it.status   = status?.let(::DatasetImportStatus) ?: ExternalImportStatus.QUEUED
     it.messages = messages
   }
@@ -66,3 +83,21 @@ private inline fun DatasetImportStatus(dis: DatasetImportStatus): ExternalImport
   DatasetImportStatus.Invalid    -> ExternalImportStatus.INVALID
   DatasetImportStatus.Failed     -> ExternalImportStatus.FAILED
 }
+
+private fun DatasetUploadStatusInfo(status: DatasetUploadStatus): DatasetUploadStatusInfo =
+  DatasetUploadStatusInfoImpl().also {
+    it.status = status.toExternal()
+  }
+
+private fun DatasetUploadStatus.toExternal() =
+  when (this) {
+    DatasetUploadStatus.Success -> DatasetUploadStatusCode.COMPLETE
+    DatasetUploadStatus.Running -> DatasetUploadStatusCode.RUNNING
+    DatasetUploadStatus.Failed  -> DatasetUploadStatusCode.FAILED
+  }
+
+private fun DatasetUploadStatusInfo(report: UploadErrorReport): DatasetUploadStatusInfo =
+  DatasetUploadStatusInfoImpl().apply {
+    status  = DatasetUploadStatusCode.FAILED
+    message = report.message
+  }

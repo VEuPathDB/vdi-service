@@ -206,6 +206,16 @@ fun ControllerBase.uploadFiles(
 ) {
   val logger = logger.mark(userID, datasetID)
 
+  try {
+    logger.debug("uploading dataset metadata to object store")
+    DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
+  } catch (e: Throwable) {
+    logger.error("user dataset meta file upload to object store failed:", e)
+    CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+    throw e
+  }
+
+  logger.debug("checking upload file sizes")
   verifyUploadFileSize(uploadRefs, uploadConfig)
 
   try {
@@ -238,25 +248,14 @@ fun ControllerBase.uploadFiles(
   } catch (e: Throwable) {
     if (e is WebApplicationException && (e.response?.status ?: 500) in 400..499) {
       logger.info("rejecting dataset upload for user error: {}", e.message)
-      CacheDB().withTransaction {
-        it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
-        e.message?.let { msg -> it.tryInsertImportMessages(datasetID, listOf(msg)) }
-      }
+      DatasetStore.putUploadError(userID, datasetID, e.message!!)
     } else {
       logger.error("user dataset upload to object store failed: ", e)
+      DatasetStore.putUploadError(userID, datasetID, "internal server error", e)
       Metrics.Upload.failed.inc()
       CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     }
 
-    throw e
-  }
-
-  try {
-    logger.debug("uploading dataset metadata to object store")
-    DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
-  } catch (e: Throwable) {
-    logger.error("user dataset meta file upload to object store failed:", e)
-    CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     throw e
   }
 
