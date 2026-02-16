@@ -3,4 +3,4 @@ CREATE TABLE IF NOT EXISTS vdi.service_metadata (
 , value VARCHAR
 );
 
-INSERT INTO vdi.service_metadata (key, value) VALUES ('db.version', 2)
+INSERT INTO vdi.service_metadata (key, value) VALUES ('db.version', 3)
