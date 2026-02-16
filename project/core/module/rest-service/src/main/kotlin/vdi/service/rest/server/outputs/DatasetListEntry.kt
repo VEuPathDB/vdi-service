@@ -68,7 +68,7 @@ internal fun DatasetRecord.toExternal(
     installTargets   = projects,
     status           = DatasetStatusInfo(
       DatasetUploadStatusInfo(uploadStatus, null),
-      DatasetImportStatusInfo(importStatus, null),
+      importStatus?.let { DatasetImportStatusInfo(it, null) },
       installs.map { (k, v) -> DatasetInstallStatusListEntry(k, v) },
     ),
     shares           = shares ?: emptyList(),
