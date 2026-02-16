@@ -59,7 +59,7 @@ ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "kto
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 ktor-server-metrics = { module = "io.ktor:ktor-server-metrics-micrometer", version.ref = "ktor" }
 
-metrics-micrometer = { group = "io.micrometer", name = "micrometer-registry-prometheus", version = "1.16.2" }
+metrics-micrometer = { group = "io.micrometer", name = "micrometer-registry-prometheus", version = "1.16.3" }
 metrics-prometheus = { group = "io.prometheus", name = "prometheus-metrics-tracer-initializer", version = "1.4.3" }
 
 
@@ -81,7 +81,7 @@ fgputil-db = { group = "org.gusdb", name = "fgputil-db", version = "2.16.0-jakar
 db-pool = { group = "com.zaxxer", name = "HikariCP",   version = "7.0.2"        }
 
 db-driver-oracle   = { module = "com.oracle.database.jdbc:ojdbc17", version = "23.26.1.0.0" }
-db-driver-postgres = { module = "org.postgresql:postgresql",        version = "42.7.9"       }
+db-driver-postgres = { module = "org.postgresql:postgresql",        version = "42.7.10"       }
 db-kotlin-extended = { module = "io.foxcapades.kt:kdbc",            version = "1.1.1"        }
 
 # Messaging
