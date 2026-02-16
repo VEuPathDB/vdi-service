@@ -233,10 +233,18 @@ fun ControllerBase.uploadFiles(
   } catch (e: Throwable) {
     if (e is WebApplicationException && (e.response?.status ?: 500) in 400..499) {
       logger.info("rejecting dataset upload for user error: {}", e.message)
-      DatasetStore.putUploadError(userID, datasetID, e.message!!)
+      try {
+        DatasetStore.putUploadError(userID, datasetID, e.message!!)
+      } catch (e2: Throwable) {
+        e.addSuppressed(e2)
+      }
     } else {
       logger.error("user dataset upload to object store failed: ", e)
-      DatasetStore.putUploadError(userID, datasetID, "internal server error", e)
+      try {
+        DatasetStore.putUploadError(userID, datasetID, "internal server error", e)
+      } catch (e2: Throwable) {
+        e.addSuppressed(e2)
+      }
       Metrics.Upload.failed.inc()
       CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     }
