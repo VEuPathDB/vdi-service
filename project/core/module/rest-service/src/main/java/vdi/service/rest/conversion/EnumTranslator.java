@@ -1,5 +1,6 @@
 package vdi.service.rest.conversion;
 
+import org.jetbrains.annotations.Nullable;
 import vdi.core.db.app.model.InstallStatus;
 import vdi.core.db.cache.model.DatasetImportStatus;
 import vdi.model.DatasetUploadStatus;
@@ -8,8 +9,10 @@ import vdi.service.rest.generated.model.DatasetInstallStatus;
 import vdi.service.rest.generated.model.DatasetUploadStatusCode;
 
 public final class EnumTranslator {
-  public static DatasetImportStatusCode toExternal(DatasetImportStatus status) {
+  @Nullable
+  public static DatasetImportStatusCode toExternal(@Nullable DatasetImportStatus status) {
     return switch (status) {
+      case null -> null;
       case DatasetImportStatus.Complete -> DatasetImportStatusCode.COMPLETE;
       case DatasetImportStatus.Invalid -> DatasetImportStatusCode.INVALID;
       case DatasetImportStatus.InProgress -> DatasetImportStatusCode.INPROGRESS;

@@ -27,7 +27,9 @@ public class DatasetStatusInfo extends DatasetStatusInfoImpl {
   ) {
     this(
       new DatasetUploadStatusInfo(uploadStatus, null),
-      new DatasetImportStatusInfo(importStatus, null),
+      importStatus == null
+        ? null
+        : new DatasetImportStatusInfo(importStatus, null),
       installStatuses.entrySet()
         .stream()
         .map(DatasetInstallStatusListEntry::new)
