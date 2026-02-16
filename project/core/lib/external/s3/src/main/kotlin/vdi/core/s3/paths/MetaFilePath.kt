@@ -5,6 +5,12 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.UserID
 import vdi.core.s3.util.PathFactory
 
+/**
+ * VDI-internal metadata file path.
+ *
+ * These files are stored at the root of the dataset directory in the object
+ * store.
+ */
 sealed interface MetaFilePath: DatasetPath {
 
   companion object: PathFactory<MetaFilePath> {
