@@ -6,6 +6,7 @@ import vdi.core.db.cache.query.AdminAllDatasetsQuery
 import vdi.core.db.cache.query.DatasetListQuery
 import vdi.core.db.model.ReconcilerTargetRecord
 import vdi.core.db.model.SyncControlRecord
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 import vdi.util.io.CloseableIterator
 
@@ -86,6 +87,8 @@ interface CacheDB {
   fun selectRejectedSharesForUser(recipientID: UserID): List<DatasetShareListEntry>
 
   fun selectAllSharesForUser(recipientID: UserID): List<DatasetShareListEntry>
+
+  fun selectUploadStatus(datasetID: DatasetID): DatasetUploadStatus?
 
   /**
    * Streams sorted stream of all dataset control records.

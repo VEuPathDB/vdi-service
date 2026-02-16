@@ -139,6 +139,7 @@ object DatasetStore {
   }
 
   @JvmStatic
+  @JvmName("getDatasetDirectory")
   fun getDatasetDirectory(userID: UserID, datasetID: DatasetID): DatasetDirectory =
     store.getDatasetDirectory(userID, datasetID)
 

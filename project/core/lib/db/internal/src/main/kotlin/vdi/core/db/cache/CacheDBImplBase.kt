@@ -9,6 +9,7 @@ import vdi.core.db.cache.sql.complex.DatasetQueries
 import vdi.core.db.cache.sql.complex.DatasetShareQueries
 import vdi.core.db.cache.sql.complex.ReconcilerQueries
 import vdi.core.db.cache.sql.simple.*
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 
 internal sealed class CacheDBImplBase: CacheDB {
@@ -96,6 +97,9 @@ internal sealed class CacheDBImplBase: CacheDB {
 
   override fun selectAllSharesForUser(recipientID: UserID) =
     runQuery { DatasetShareQueries.select(recipientID) }
+
+  override fun selectUploadStatus(datasetID: DatasetID): DatasetUploadStatus? =
+    runQuery { UploadStatus.select(datasetID) }
 
   // NOTE: THE CALLER IS RESPONSIBLE FOR CLOSING THE CONNECTION!
   override fun selectAllSyncControlRecords() =

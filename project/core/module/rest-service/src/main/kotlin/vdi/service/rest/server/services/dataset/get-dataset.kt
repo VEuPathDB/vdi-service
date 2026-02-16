@@ -7,6 +7,7 @@ import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.cache.model.RelatedDataset
 import vdi.core.util.orElse
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.DatasetVisibility
@@ -68,6 +69,10 @@ private fun getDatasetByID(
   return left(DatasetDetails(
     datasetID       = datasetID,
     meta            = metaJson,
+    uploadStatus    = CacheDB().selectUploadStatus(datasetID)
+      // For backwards compatibility, report success for datasets whose status
+      // isn't recorded.  The reconciler should remedy this.
+      ?: DatasetUploadStatus.Success,
     importStatus    = CacheDB().selectImportControl(datasetID),
     importMessages  = CacheDB().selectImportMessages(datasetID),
     shares          = shares,
