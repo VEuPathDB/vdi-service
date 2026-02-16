@@ -25,6 +25,8 @@ sealed class ControllerBase(val request: ContainerRequest) {
 
   val urlBase by lazy { request.baseUri.let { URI(it.scheme, it.host, "", "") } }
 
+  val requestID by lazy { RequestIdProvider.getRequestId(request)!! }
+
   /**
    * Base URI used to reach this service.  This value may or may not have a path
    * following the hostname.

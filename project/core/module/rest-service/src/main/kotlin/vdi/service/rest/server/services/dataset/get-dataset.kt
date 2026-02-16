@@ -2,8 +2,10 @@
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
+import java.time.OffsetDateTime
 import vdi.core.db.app.AppDB
 import vdi.core.db.cache.CacheDB
+import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.cache.model.RelatedDataset
 import vdi.core.util.orElse
@@ -29,13 +31,13 @@ import vdi.util.fn.Either.Companion.right
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
  * return user information.
  */
-fun adminGetDatasetByID(datasetID: DatasetID) =
+fun ControllerBase.adminGetDatasetByID(datasetID: DatasetID) =
   getDatasetByID(null, datasetID, true)
 
 fun ControllerBase.userGetDatasetByID(datasetID: DatasetID) =
   getDatasetByID(userID, datasetID, false)
 
-private fun getDatasetByID(
+private fun ControllerBase.getDatasetByID(
   userID: UserID?,
   datasetID: DatasetID,
   includeDeleted: Boolean,
@@ -58,7 +60,7 @@ private fun getDatasetByID(
     return right(Static404.wrap())
 
   val metaJson = DatasetStore.getDatasetMeta(dataset.ownerID, dataset.datasetID)
-    ?: return right(TooEarlyError().wrap())
+    ?: return right(handleMissingMeta(dataset))
 
   val shares = if (dataset.ownerID == userID) {
     CacheDB().selectSharesForDataset(datasetID)
@@ -81,6 +83,15 @@ private fun getDatasetByID(
     relatedDatasets = getRelatedDatasets(datasetID, metaJson),
     files           = listDatasetFiles(dataset.ownerID, datasetID)
   ))
+}
+
+private fun ControllerBase.handleMissingMeta(dataset: DatasetRecord): GetDatasetsByVdiIdResponse {
+  return if (dataset.created.isBefore(OffsetDateTime.now().minusMinutes(5)))
+    TooEarlyError("The server is taking longer than usual to process the upload for the requested dataset.").wrap()
+  else {
+    logger.error("dataset was created more than 5 minutes ago but metadata json did not reach minio")
+    ServerError(requestID, "The server encountered an error and could not process the dataset upload files.").wrap()
+  }
 }
 
 internal fun getLatestRevision(datasetID: DatasetID, fn: (DatasetID) -> String) =

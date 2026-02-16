@@ -1,4 +1,5 @@
 @file:JvmName("DatasetDetailsOutputAdaptor")
+
 package vdi.service.rest.server.outputs
 
 import vdi.core.db.app.model.InstallStatuses
@@ -47,11 +48,12 @@ internal fun DatasetDetails(
   DatasetDetailsImpl()
     .applyMeta(meta)
     .also {
-      it.datasetId            = datasetID.toString()
-      it.owner                = DatasetOwner(userInfo[meta.owner]!!)
-      it.relatedDatasets      = relatedDatasets.map(::RelatedDatasetInfo).toList()
-      it.shares               = shares.map { (user, offer) -> ShareOffer(userInfo[user]!!, offer!!) }
-      it.status               = DatasetStatusInfo(
+      it.datasetId = datasetID.toString()
+      it.owner = DatasetOwner(userInfo[meta.owner]!!)
+      it.relatedDatasets = relatedDatasets.map(::RelatedDatasetInfo).toList()
+      it.shares = shares.map { (user, offer) -> ShareOffer(userInfo[user]!!, offer!!) }
+        .takeUnless(List<*>::isEmpty)
+      it.status = DatasetStatusInfo(
         DatasetUploadStatusInfo(
           uploadStatus,
           if (uploadStatus == DatasetUploadStatus.Failed)
@@ -64,9 +66,9 @@ internal fun DatasetDetails(
         },
         installs.map { (installTarget, statuses) ->
           DatasetInstallStatusListEntry(installTarget, statuses)
-        }
+        }.takeUnless(List<*>::isEmpty)
       )
-      it.files                = files
+      it.files = files
     }
 
 /**
@@ -74,29 +76,29 @@ internal fun DatasetDetails(
  */
 @Suppress("NOTHING_TO_INLINE")
 private inline fun DatasetDetails.applyMeta(meta: DatasetMetadata) = apply {
-  installTargets       = meta.installTargets.toList()
-  name                 = meta.name
-  summary              = meta.summary
-  description          = meta.description
-  origin               = meta.origin
-  dependencies         = DatasetDependencies(meta.dependencies)
-  publications         = meta.publications.map(::DatasetPublication)
-  contacts             = meta.contacts.map(::DatasetContact)
-  projectName          = meta.projectName
-  programName          = meta.programName
-  linkedDatasets       = meta.linkedDatasets.map(::LinkedDataset)
+  installTargets = meta.installTargets.toList()
+  name = meta.name
+  summary = meta.summary
+  description = meta.description
+  origin = meta.origin
+  dependencies = DatasetDependencies(meta.dependencies)
+  publications = meta.publications.map(::DatasetPublication)
+  contacts = meta.contacts.map(::DatasetContact)
+  projectName = meta.projectName
+  programName = meta.programName
+  linkedDatasets = meta.linkedDatasets.map(::LinkedDataset)
   experimentalOrganism = meta.experimentalOrganism?.let(::DatasetOrganism)
-  hostOrganism         = meta.hostOrganism?.let(::DatasetOrganism)
+  hostOrganism = meta.hostOrganism?.let(::DatasetOrganism)
   studyCharacteristics = meta.studyCharacteristics?.let(::DatasetCharacteristics)
-  externalIdentifiers  = meta.externalIdentifiers?.let(::ExternalIdentifiers)
-  funding              = meta.funding.map(::DatasetFundingAward)
-  shortAttribution     = meta.shortAttribution
-  type                 = DatasetTypeOutput(meta.type)
-  visibility           = DatasetVisibility(meta.visibility)
-  created              = meta.created
-  sourceUrl            = meta.sourceURL?.toString()
-  revisionHistory      = meta.revisionHistory?.let(::RevisionHistory)
-  shortName            = meta.shortName
+  externalIdentifiers = meta.externalIdentifiers?.let(::ExternalIdentifiers)
+  funding = meta.funding.map(::DatasetFundingAward)
+  shortAttribution = meta.shortAttribution
+  type = DatasetTypeOutput(meta.type)
+  visibility = DatasetVisibility(meta.visibility)
+  created = meta.created
+  sourceUrl = meta.sourceURL?.toString()
+  revisionHistory = meta.revisionHistory?.let(::RevisionHistory)
+  shortName = meta.shortName
 }
 
 private fun BioprojectIDReference(ref: BioprojectIDReference): APIBioRef =
@@ -107,26 +109,26 @@ private fun BioprojectIDReference(ref: BioprojectIDReference): APIBioRef =
 
 private fun DatasetCharacteristics(characteristics: DatasetCharacteristics): APICharacteristics =
   DatasetCharacteristicsImpl().also {
-    it.studyDesign       = characteristics.studyDesign
-    it.studyType         = characteristics.studyType
-    it.countries         = characteristics.countries
-    it.years             = characteristics.years?.let(::SampleYearRange)
-    it.studySpecies      = characteristics.studySpecies
-    it.diseases          = characteristics.diseases
+    it.studyDesign = characteristics.studyDesign
+    it.studyType = characteristics.studyType
+    it.countries = characteristics.countries
+    it.years = characteristics.years?.let(::SampleYearRange)
+    it.studySpecies = characteristics.studySpecies
+    it.diseases = characteristics.diseases
     it.associatedFactors = characteristics.associatedFactors
-    it.participantAges   = characteristics.participantAges
-    it.sampleTypes       = characteristics.sampleTypes
+    it.participantAges = characteristics.participantAges
+    it.sampleTypes = characteristics.sampleTypes
   }
 
 private fun DatasetContact(contact: DatasetContact): APIContact =
   DatasetContactImpl().apply {
-    firstName   = contact.firstName
-    middleName  = contact.middleName
-    lastName    = contact.lastName
-    email       = contact.email
+    firstName = contact.firstName
+    middleName = contact.middleName
+    lastName = contact.lastName
+    email = contact.email
     affiliation = contact.affiliation
-    country     = contact.country
-    isPrimary   = contact.isPrimary
+    country = contact.country
+    isPrimary = contact.isPrimary
   }
 
 private fun DatasetDependencies(dependencies: Collection<DatasetDependency>) =
@@ -140,7 +142,7 @@ private fun DatasetDependencies(dependencies: Collection<DatasetDependency>) =
 
 private fun DatasetFundingAward(award: DatasetFundingAward): APIFunding =
   DatasetFundingAwardImpl().also {
-    it.agency      = award.agency
+    it.agency = award.agency
     it.awardNumber = award.awardNumber
   }
 
@@ -154,15 +156,15 @@ private fun DatasetHyperlink(link: DatasetHyperlink): APIHyperlink =
 private fun DatasetOrganism(organism: DatasetOrganism): APIOrganism =
   DatasetOrganismImpl().also {
     it.species = organism.species
-    it.strain  = organism.strain
+    it.strain = organism.strain
   }
 
 private fun DatasetPublication(publication: DatasetPublication): APIPublication =
   DatasetPublicationImpl().also {
     it.identifier = publication.identifier
-    it.type       = DatasetPublicationType(publication.type)
-    it.citation   = publication.citation
-    it.isPrimary  = publication.isPrimary
+    it.type = DatasetPublicationType(publication.type)
+    it.citation = publication.citation
+    it.isPrimary = publication.isPrimary
   }
 
 private fun DOIReference(ref: DOIReference): APIDOI =
@@ -173,8 +175,8 @@ private fun DOIReference(ref: DOIReference): APIDOI =
 
 private fun ExternalIdentifiers(identifiers: ExternalDatasetIdentifiers): APIIdentifiers =
   ExternalIdentifiersImpl().also {
-    it.dois          = identifiers.dois.map(::DOIReference)
-    it.hyperlinks    = identifiers.hyperlinks.map(::DatasetHyperlink)
+    it.dois = identifiers.dois.map(::DOIReference)
+    it.hyperlinks = identifiers.hyperlinks.map(::DatasetHyperlink)
     it.bioprojectIds = identifiers.bioprojectIDs.map(::BioprojectIDReference)
   }
 
@@ -184,27 +186,28 @@ private fun ImplicitRelation(other: RelatedDataset): ImplicitRelation =
     RelatedDataset.RelationType.ProjectName -> RelationByProjectNameImpl()
     RelatedDataset.RelationType.Publication -> RelationByPublicationImpl().apply {
       identifier = other.publication!!.identifier
-      type       = DatasetPublicationType(other.publication!!.type)
+      type = DatasetPublicationType(other.publication!!.type)
     }
   }
+
 private fun LinkedDataset(link: LinkedDataset): APILinkedDataset =
   LinkedDatasetImpl().apply {
-    datasetUri    = link.datasetURI.toString()
+    datasetUri = link.datasetURI.toString()
     sharesRecords = link.sharesRecords
   }
 
 private fun RelatedDatasetInfo(other: RelatedDataset): RelatedDatasetInfo =
   RelatedDatasetInfoImpl().apply {
     datasetId = other.datasetID.toString()
-    type      = DatasetTypeOutput(other.datasetType)
-    name      = other.name
-    summary   = other.summary
-    created   = other.created
+    type = DatasetTypeOutput(other.datasetType)
+    name = other.name
+    summary = other.summary
+    created = other.created
     relatedBy = ImplicitRelation(other)
   }
 
 private fun SampleYearRange(years: SampleYearRange): APIYears =
   SampleYearRangeImpl().also {
     it.start = years.start
-    it.end   = years.end
+    it.end = years.end
   }
