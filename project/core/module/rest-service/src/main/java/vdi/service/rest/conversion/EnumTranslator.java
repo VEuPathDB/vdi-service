@@ -20,7 +20,7 @@ public final class EnumTranslator {
 
   public static DatasetUploadStatusCode toExternal(DatasetUploadStatus status) {
     return switch (status) {
-      case DatasetUploadStatus.Success -> DatasetUploadStatusCode.COMPLETE;
+      case DatasetUploadStatus.Success -> DatasetUploadStatusCode.SUCCESS;
       case DatasetUploadStatus.Failed -> DatasetUploadStatusCode.FAILED;
       case DatasetUploadStatus.Running -> DatasetUploadStatusCode.RUNNING;
     };

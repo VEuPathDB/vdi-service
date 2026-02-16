@@ -1,6 +1,6 @@
 package vdi.service.rest
 
-import org.glassfish.jersey.internal.inject.AbstractBinder
+import org.glassfish.hk2.utilities.binding.AbstractBinder
 import org.glassfish.jersey.server.ServerProperties
 import org.veupathdb.lib.container.jaxrs.server.ContainerResources
 import vdi.config.raw.ManifestConfig

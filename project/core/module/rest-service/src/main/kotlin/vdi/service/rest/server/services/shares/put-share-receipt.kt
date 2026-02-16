@@ -33,7 +33,7 @@ fun putShareReceipt(datasetID: DatasetID, recipientID: UserID, entity: APIShare)
     return Static404.wrap()
 
   when (dataset.importStatus) {
-    DatasetImportStatus.Queued, DatasetImportStatus.InProgress
+    null, DatasetImportStatus.Queued, DatasetImportStatus.InProgress
     -> return ForbiddenError("cannot share a dataset until after it has been processed").wrap()
 
     DatasetImportStatus.Invalid, DatasetImportStatus.Failed

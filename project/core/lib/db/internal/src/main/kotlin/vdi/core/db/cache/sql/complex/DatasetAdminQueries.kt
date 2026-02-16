@@ -11,6 +11,7 @@ import vdi.core.db.cache.query.AdminAllDatasetsQuery
 import vdi.core.db.cache.util.*
 import vdi.core.db.jdbc.*
 import vdi.core.db.model.SyncControlRecord
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetType
 
@@ -42,11 +43,12 @@ SELECT
 , array(SELECT m.message FROM vdi.import_messages AS m WHERE m.dataset_id = d.dataset_id) AS messages
 , array(SELECT file_name FROM vdi.install_files AS if WHERE if.dataset_id = d.dataset_id) AS install_files
 , array(SELECT file_name FROM vdi.upload_files AS if WHERE if.dataset_id = d.dataset_id) AS upload_files
-, i.status
+, i.status AS import_status
 , sc.shares_update_time
 , sc.data_update_time
 , sc.meta_update_time
 , r.original_id
+, us.status AS upload_status
 FROM
   vdi.datasets AS d
   INNER JOIN vdi.dataset_metadata AS m
@@ -57,6 +59,8 @@ FROM
     USING (dataset_id)
   LEFT JOIN vdi.dataset_revisions AS r
     ON r.revision_id = d.dataset_id
+  LEFT JOIN vdi.upload_status AS us
+    USING (dataset_id)
 WHERE
   d.is_deleted = FALSE
 AND
@@ -72,6 +76,8 @@ AND
           return null
         }
 
+        val importStatus = getImportStatus("import_status")
+
         AdminDatasetDetailsRecord(
           datasetID    = reqDatasetID("dataset_id"),
           ownerID      = getUserID("owner_id"),
@@ -86,7 +92,7 @@ AND
           description  = getString("description"),
           visibility   = getDatasetVisibility("visibility"),
           projects     = getProjectIDList("projects"),
-          importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
+          importStatus = importStatus,
           originalID   = optDatasetID("original_id"),
           syncControl  = SyncControlRecord(
             datasetID  = reqDatasetID("dataset_id"),
@@ -98,6 +104,11 @@ AND
           installFiles = getStringList("install_files"),
           uploadFiles  = getStringList("upload_files"),
           isDeleted    = false,
+          uploadStatus = getString("upload_status")?.let(DatasetUploadStatus.Companion::fromString)
+            ?: when (importStatus) {
+              null -> DatasetUploadStatus.Running
+              else -> DatasetUploadStatus.Success
+            }
         )
       }
     }
@@ -128,7 +139,7 @@ SELECT
     FROM vdi.dataset_projects AS p
     WHERE p.dataset_id = d.dataset_id
   ) AS projects
-, i.status
+, i.status as import_status
 , s.message
 , array(
     SELECT (f.file_name, f.file_size)
@@ -141,6 +152,7 @@ SELECT
     WHERE f.dataset_id = d.dataset_id
   ) AS install_files
 , r.original_id
+, us.status AS upload_status
 FROM
   vdi.datasets AS d
   INNER JOIN vdi.dataset_metadata AS m
@@ -151,6 +163,8 @@ FROM
     USING (dataset_id)
   LEFT JOIN vdi.dataset_revisions AS r
     ON r.revision_id = d.dataset_id
+  LEFT JOIN vdi.upload_status AS us
+    USING (dataset_id)
 WHERE
   1 = 1
 """
@@ -212,6 +226,9 @@ WHERE
 
       withResults {
         map {
+
+          val importStatus = getImportStatus("import_status")
+
           AdminAllDatasetsRow(
             datasetID     = it.reqDatasetID("dataset_id"),
             ownerID       = it.getUserID("owner_id"),
@@ -226,12 +243,17 @@ WHERE
             description   = it.getString("description"),
             visibility    = it.getDatasetVisibility("visibility"),
             projects      = it.getProjectIDList("projects"),
-            importStatus  = it.getString("status")?.let(DatasetImportStatus::fromString) ?: DatasetImportStatus.Queued,
+            importStatus  = importStatus,
             inserted      = it.getDateTime("inserted"),
             originalID    = it.optDatasetID("original_id"),
             importMessage = it.getString("message"),
             uploadFiles   = it.getFileDetailList("upload_files"),
             installFiles  = it.getFileDetailList("install_files"),
+            uploadStatus = getString("upload_status")?.let(DatasetUploadStatus.Companion::fromString)
+              ?: when (importStatus) {
+                null -> DatasetUploadStatus.Running
+                else -> DatasetUploadStatus.Success
+              }
           )
         }
       }

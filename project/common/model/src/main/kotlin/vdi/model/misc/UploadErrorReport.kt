@@ -16,5 +16,10 @@ constructor(
   constructor(ex: Throwable): this(ex.message ?: ex::class.simpleName!!, ex)
 
   constructor(msg: String): this(msg, emptyList())
+
+  companion object JsonKey {
+    const val Message    = "message"
+    const val Stacktrace = "stacktrace"
+  }
 }
 

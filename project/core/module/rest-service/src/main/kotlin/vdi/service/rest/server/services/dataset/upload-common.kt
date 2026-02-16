@@ -18,15 +18,13 @@ import kotlin.math.max
 import kotlin.math.min
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.CacheDBTransaction
-import vdi.core.db.cache.model.DatasetImpl
+import vdi.core.db.cache.initializeDataset
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.withTransaction
-import vdi.core.db.model.SyncControlRecord
 import vdi.core.metrics.Metrics
 import vdi.core.plugin.registry.PluginDatasetTypeMeta
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.logging.mark
-import vdi.model.OriginTimestamp
 import vdi.model.meta.*
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.BadRequestError
@@ -43,36 +41,12 @@ import vdi.util.zip.*
 // region Cache DB Interactions
 
 fun <T> CacheDB.initializeDataset(
-  userID: UserID,
   datasetID: DatasetID,
   datasetMeta: DatasetMetadata,
   fn: (CacheDBTransaction) -> T,
 ): T =
   withTransaction {
-    it.tryInsertDataset(
-      DatasetImpl(
-        datasetID    = datasetID,
-        type         = datasetMeta.type,
-        ownerID      = userID,
-        isDeleted    = false,
-        created      = datasetMeta.created,
-        importStatus = DatasetImportStatus.Queued,
-        origin       = datasetMeta.origin,
-        inserted     = OffsetDateTime.now(),
-      )
-    )
-    it.tryInsertDatasetMeta(datasetID, datasetMeta)
-    it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)
-    it.tryInsertDatasetProjects(datasetID, datasetMeta.installTargets)
-    it.tryInsertSyncControl(
-      SyncControlRecord(
-        datasetID     = datasetID,
-        sharesUpdated = OriginTimestamp,
-        dataUpdated   = OriginTimestamp,
-        metaUpdated   = OriginTimestamp
-      )
-    )
-
+    it.initializeDataset(datasetID, datasetMeta)
     fn(it)
   }
 

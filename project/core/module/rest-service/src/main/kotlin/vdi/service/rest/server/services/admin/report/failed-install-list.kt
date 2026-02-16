@@ -7,6 +7,7 @@ import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.app.model.InstallType
 import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
 import vdi.service.rest.generated.model.BrokenDatasetInstallDetails
@@ -14,7 +15,7 @@ import vdi.service.rest.generated.model.BrokenDatasetInstallDetailsImpl
 import vdi.service.rest.generated.model.BrokenDatasetInstallReportBodyImpl
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse.respond200WithApplicationJson
-import vdi.service.rest.server.outputs.DatasetStatusInfo
+import vdi.service.rest.conversion.DatasetStatusInfo
 import vdi.service.rest.server.outputs.toExternal
 
 /**
@@ -115,5 +116,5 @@ private fun DatasetRecord.toDetails(
     out.owner          = owner.toLong()
     out.datasetType    = type.toExternal()
     out.installTargets = projects.toList()
-    out.status         = DatasetStatusInfo(DatasetImportStatus.Complete, null, statuses)
+    out.status         = DatasetStatusInfo(DatasetUploadStatus.Success, DatasetImportStatus.Complete, statuses)
   }

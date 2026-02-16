@@ -13,7 +13,7 @@ interface Dataset {
   val isDeleted: Boolean
   val created: OffsetDateTime
   val uploadStatus: DatasetUploadStatus
-  val importStatus: DatasetImportStatus
+  val importStatus: DatasetImportStatus?
   val origin: String
   val inserted: OffsetDateTime
 }

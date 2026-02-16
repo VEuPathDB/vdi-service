@@ -17,11 +17,8 @@ import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.upsertDatasetRecord
 import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
-import vdi.core.db.cache.CacheDBTransaction
-import vdi.core.db.cache.model.DatasetImpl
-import vdi.core.db.cache.model.DatasetImportStatus
+import vdi.core.db.cache.initializeDataset
 import vdi.core.db.cache.withTransaction
-import vdi.core.db.model.SyncControlRecord
 import vdi.core.kafka.EventSource
 import vdi.core.metrics.Metrics
 import vdi.core.modules.AbortCB
@@ -146,7 +143,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     if (cachedDataset == null) {
       logger.debug("dataset details were not found for dataset, creating them")
       // If they were not found, construct them
-      cacheDB.initializeDataset(datasetMeta)
+      cacheDB.withTransaction { it.initializeDataset(datasetID, datasetMeta) }
     }
 
     // Else if the dataset is marked as deleted already, then bail here.
@@ -377,37 +374,6 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     return true
   }
 
-  context(ctx: UpdateMetaContext)
-  private fun CacheDB.initializeDataset(meta: DatasetMetadata) {
-    openTransaction().use {
-
-      // Insert a new dataset record
-      it.tryInsertDataset(DatasetImpl(
-        datasetID    = ctx.datasetID,
-        type         = meta.type,
-        ownerID      = meta.owner,
-        isDeleted    = false,
-        origin       = meta.origin,
-        created      = meta.created,
-        importStatus = DatasetImportStatus.Queued,
-        inserted     = OffsetDateTime.now(),
-      ))
-
-      // insert metadata for the dataset
-      it.tryInsertDatasetMeta(ctx.datasetID, meta)
-
-      // Insert an import control record for the dataset
-      it.tryInsertImportControl(ctx.datasetID, DatasetImportStatus.Queued)
-
-      // insert project links for the dataset
-      it.tryInsertDatasetProjects(ctx.datasetID, meta.installTargets)
-
-      // insert a sync control record for the dataset using an old timestamp
-      // that will predate any possible upload timestamp.
-      it.initSyncControl(ctx.datasetID)
-    }
-  }
-
   /**
    * Determines if the metadata json visibility field should be reset to private
    * on failure of a variable properties install attempt.
@@ -423,14 +389,5 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     // if the dataset is private in the target AND the meta says it should be
     // made public
     return !publicInTarget && meta.visibility != DatasetVisibility.Private
-  }
-
-  private fun CacheDBTransaction.initSyncControl(datasetID: DatasetID) {
-    tryInsertSyncControl(SyncControlRecord(
-      datasetID     = datasetID,
-      sharesUpdated = OriginTimestamp,
-      dataUpdated   = OriginTimestamp,
-      metaUpdated   = OriginTimestamp
-    ))
   }
 }

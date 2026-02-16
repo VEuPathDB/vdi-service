@@ -6,8 +6,8 @@ public enum DatasetUploadStatusCode {
   @JsonProperty("running")
   RUNNING("running"),
 
-  @JsonProperty("complete")
-  COMPLETE("complete"),
+  @JsonProperty("success")
+  SUCCESS("success"),
 
   @JsonProperty("failed")
   FAILED("failed");

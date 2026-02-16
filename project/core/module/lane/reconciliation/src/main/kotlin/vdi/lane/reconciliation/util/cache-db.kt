@@ -1,15 +1,11 @@
 package vdi.lane.reconciliation.util
 
-import java.time.OffsetDateTime
 import vdi.core.db.cache.CacheDB
-import vdi.core.db.cache.model.DatasetImpl
+import vdi.core.db.cache.initializeDataset
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.db.cache.withTransaction
-import vdi.core.db.model.SyncControlRecord
 import vdi.lane.reconciliation.ReconcilerTarget
-import vdi.model.OriginTimestamp
-import vdi.model.meta.DatasetID
 import vdi.model.meta.toDatasetID
 
 
@@ -60,35 +56,13 @@ internal fun CacheDB.dropImportMessages(ctx: ReconcilerTarget) =
 
 internal fun CacheDB.tryInitDataset(ctx: ReconcilerTarget, importStatus: DatasetImportStatus) {
   withTransaction { db ->
-    db.tryInsertDataset(DatasetImpl(
-      datasetID    = DatasetID(ctx.datasetId),
-      type         = ctx.meta!!.type,
-      ownerID      = ctx.userId,
-      isDeleted    = ctx.hasDeleteFlag(),
-      created      = ctx.meta!!.created,
-      importStatus = DatasetImportStatus.Queued, // this value is not used for inserts
-      origin       = ctx.meta!!.origin,
-      inserted     = OffsetDateTime.now(),
-    ))
-
-    db.tryInsertDatasetMeta(ctx.datasetId.toDatasetID(), ctx.meta!!)
-
-    db.tryInsertDatasetProjects(ctx.datasetId.toDatasetID(), ctx.meta!!.installTargets)
-
-    db.tryInsertImportControl(ctx.datasetId.toDatasetID(), importStatus)
+    db.initializeDataset(ctx.datasetId.toDatasetID(), ctx.meta!!)
 
     if (importStatus == DatasetImportStatus.Failed)
       db.tryInsertImportMessages(
         ctx.datasetId.toDatasetID(),
         listOf("dataset has no import-ready file and is in an incomplete state due to the absence of the install-ready data and/or manifest")
       )
-
-    db.tryInsertSyncControl(SyncControlRecord(
-      datasetID     = ctx.datasetId.toDatasetID(),
-      sharesUpdated = OriginTimestamp,
-      dataUpdated   = OriginTimestamp,
-      metaUpdated   = OriginTimestamp,
-    ))
 
     if (ctx.meta!!.revisionHistory != null)
       db.tryInsertRevisionLinks(ctx.meta!!.revisionHistory!!)

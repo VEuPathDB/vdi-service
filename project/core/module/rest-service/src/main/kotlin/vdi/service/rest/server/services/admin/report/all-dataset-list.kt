@@ -8,11 +8,11 @@ import vdi.core.db.cache.query.AdminAllDatasetsQuery
 import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
 import vdi.service.rest.generated.model.*
+import vdi.service.rest.conversion.DatasetStatusInfo
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse.respond200WithApplicationJson
 import vdi.service.rest.server.inputs.toSafeLimit
 import vdi.service.rest.server.inputs.toSafeOffset
-import vdi.service.rest.server.outputs.DatasetStatusInfo
 import vdi.service.rest.server.outputs.DatasetVisibility
 import vdi.service.rest.server.outputs.toExternal
 import vdi.service.rest.util.defaultZone
@@ -99,7 +99,7 @@ private fun AllDatasetsListEntry(
     it.description    = row.description
     it.origin         = row.origin
     it.installTargets = row.projects
-    it.status         = DatasetStatusInfo(row.importStatus, null, statuses)
+    it.status         = DatasetStatusInfo(row.uploadStatus, row.importStatus, statuses)
     it.created        = row.created.defaultZone()
     it.isDeleted      = row.isDeleted
     it.programName    = row.programName
