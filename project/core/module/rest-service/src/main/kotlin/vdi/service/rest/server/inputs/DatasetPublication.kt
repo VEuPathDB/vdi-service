@@ -1,4 +1,3 @@
-@file:JvmName("DatasetPublicationInputAdaptor")
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
@@ -10,11 +9,9 @@ import vdi.service.rest.generated.model.DatasetPublicationType
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.DatasetPublication as APIPublication
 
-private val CitationLengthRange = 3..2000
 private val PubMedLengthRange = 3..30
 
 private val PubMedIDPattern = Regex("^\\d+$")
-
 
 fun APIPublication?.cleanup() = this?.apply {
   cleanup(::getIdentifier) { it.cleanup()?.run {
@@ -78,12 +75,12 @@ fun Collection<APIPublication>.validate(jPath: String, errors: ValidationErrors)
 }
 
 fun APIPublication.toInternal() =
-  DatasetPublication(identifier, type.toInternal(), isPrimary)
+  DatasetPublication(identifier, type.toInternal(), citation, isPrimary)
 
 fun List<APIPublication>.toInternal() =
-  map { DatasetPublication(it.identifier, it.type.toInternal(), it.isPrimary) }
+  map { DatasetPublication(it.identifier, it.type.toInternal(), it.citation, it.isPrimary) }
 
-fun DatasetPublicationType .toInternal() =
+fun DatasetPublicationType.toInternal() =
   when (this) {
     DatasetPublicationType.PMID -> DatasetPublication.PublicationType.PubMed
     DatasetPublicationType.DOI  -> DatasetPublication.PublicationType.DOI

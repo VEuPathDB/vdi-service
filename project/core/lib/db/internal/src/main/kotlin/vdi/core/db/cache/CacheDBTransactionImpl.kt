@@ -10,6 +10,7 @@ import vdi.core.db.cache.model.ShareReceiptRecord
 import vdi.core.db.cache.sql.simple.*
 import vdi.core.db.model.SyncControlRecord
 import vdi.logging.logger
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 
 internal class CacheDBTransactionImpl(
@@ -176,6 +177,11 @@ internal class CacheDBTransactionImpl(
   override fun upsertImportControl(datasetID: DatasetID, status: DatasetImportStatus) {
     log.debug("upserting import control record for dataset {} for status {}", datasetID, status)
     runQuery { ImportControlTable.upsert(datasetID, status) }
+  }
+
+  override fun upsertUploadStatus(datasetID: DatasetID, status: DatasetUploadStatus) {
+    log.debug("upserting upload status record for dataset {} for status {}", datasetID, status)
+    runQuery { UploadStatus.upsert(datasetID, status) }
   }
 
   override fun commit() {

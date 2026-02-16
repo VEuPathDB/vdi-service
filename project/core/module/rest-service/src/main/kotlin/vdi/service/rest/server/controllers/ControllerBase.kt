@@ -5,6 +5,7 @@ import org.veupathdb.lib.container.jaxrs.model.UserInfo
 import org.veupathdb.lib.container.jaxrs.providers.RequestIdProvider
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import java.net.URI
+import vdi.logging.PrefixRequestURI
 import vdi.logging.logger
 import vdi.logging.mark
 import vdi.model.meta.DatasetID
@@ -17,8 +18,9 @@ sealed class ControllerBase(val request: ContainerRequest) {
    *
    * This field is public to allow access by extension methods.
    */
-  var logger = logger("HTTP " + request.uriInfo.path)
+  var logger = logger()
     .mark(requestID = RequestIdProvider.getRequestId(request))
+    .copy(arrayOf("$PrefixRequestURI=${request.uriInfo.path}"))
     protected set
 
   val urlBase by lazy { request.baseUri.let { URI(it.scheme, it.host, "", "") } }

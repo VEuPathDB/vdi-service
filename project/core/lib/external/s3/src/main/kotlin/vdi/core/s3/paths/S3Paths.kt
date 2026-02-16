@@ -122,6 +122,9 @@ object S3Paths {
   fun variablePropertiesFile(userID: UserID, datasetID: DatasetID, fileName: String) =
     mappingsPath(userID, datasetID).append(fileName).toString()
 
+  fun uploadErrorFile(userID: UserID, datasetID: DatasetID) =
+    datasetPath(userID, datasetID).append(FileName.UploadErrorFile).toString()
+
   // endregion Public API
 
 

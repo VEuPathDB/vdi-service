@@ -51,7 +51,7 @@ fun ControllerBase.createDataset(
     ?.also { return it.wrap() }
 
   val uploadRefs = CacheDB()
-    .initializeDataset(userID, datasetID, datasetMeta) {
+    .initializeDataset(datasetID, datasetMeta) {
       resolveDatasetFiles(
         entity.dataFile,
         entity.url,
@@ -60,6 +60,8 @@ fun ControllerBase.createDataset(
         uploadConfig,
       )
     }
+
+  writeMetadata(userID, datasetID, datasetMeta)
 
   submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)
 
@@ -80,7 +82,7 @@ fun ControllerBase.createDataset(
     ?.let { verifyFileExtensions(it, datasetMeta.type) }
     ?.also { throw BadRequestException(it.message) }
 
-  val uploadRefs  = CacheDB().initializeDataset(userID, datasetID, datasetMeta) {
+  val uploadRefs  = CacheDB().initializeDataset(datasetID, datasetMeta) {
     resolveDatasetFiles(entity.dataFile, entity.url, entity.docFile, emptyList(), uploadConfig)
   }
 

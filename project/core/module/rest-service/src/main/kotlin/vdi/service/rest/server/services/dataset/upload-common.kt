@@ -18,15 +18,14 @@ import kotlin.math.max
 import kotlin.math.min
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.CacheDBTransaction
-import vdi.core.db.cache.model.DatasetImpl
+import vdi.core.db.cache.initializeDataset
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.withTransaction
-import vdi.core.db.model.SyncControlRecord
 import vdi.core.metrics.Metrics
 import vdi.core.plugin.registry.PluginDatasetTypeMeta
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.logging.mark
-import vdi.model.OriginTimestamp
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.BadRequestError
@@ -43,36 +42,12 @@ import vdi.util.zip.*
 // region Cache DB Interactions
 
 fun <T> CacheDB.initializeDataset(
-  userID: UserID,
   datasetID: DatasetID,
   datasetMeta: DatasetMetadata,
   fn: (CacheDBTransaction) -> T,
 ): T =
   withTransaction {
-    it.tryInsertDataset(
-      DatasetImpl(
-        datasetID    = datasetID,
-        type         = datasetMeta.type,
-        ownerID      = userID,
-        isDeleted    = false,
-        created      = datasetMeta.created,
-        importStatus = DatasetImportStatus.Queued,
-        origin       = datasetMeta.origin,
-        inserted     = OffsetDateTime.now(),
-      )
-    )
-    it.tryInsertDatasetMeta(datasetID, datasetMeta)
-    it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)
-    it.tryInsertDatasetProjects(datasetID, datasetMeta.installTargets)
-    it.tryInsertSyncControl(
-      SyncControlRecord(
-        datasetID     = datasetID,
-        sharesUpdated = OriginTimestamp,
-        dataUpdated   = OriginTimestamp,
-        metaUpdated   = OriginTimestamp
-      )
-    )
-
+    it.initializeDataset(datasetID, datasetMeta)
     fn(it)
   }
 
@@ -180,6 +155,25 @@ private fun Sequence<File>.toTempPaths(tmpDir: Path): List<Path> =
 
 private val WorkPool = Executors.newFixedThreadPool(10)
 
+fun ControllerBase.writeMetadata(userID: UserID, datasetID: DatasetID, datasetMeta: DatasetMetadata) {
+  try {
+    logger.debug("uploading dataset metadata to object store")
+    DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
+  } catch (e: Throwable) {
+    logger.error("user dataset meta file upload to object store failed:", e)
+
+    CacheDB().withTransaction { it.upsertUploadStatus(datasetID, DatasetUploadStatus.Failed) }
+
+    try {
+      DatasetStore.putUploadError(userID, datasetID, "internal server error while communicating with object store", e)
+    } catch (e2: Throwable) {
+      e.addSuppressed(e2)
+    }
+
+    throw e
+  }
+}
+
 @OptIn(ExperimentalPathApi::class)
 fun ControllerBase.submitUpload(
   datasetID:    DatasetID,
@@ -206,6 +200,7 @@ fun ControllerBase.uploadFiles(
 ) {
   val logger = logger.mark(userID, datasetID)
 
+  logger.debug("checking upload file sizes")
   verifyUploadFileSize(uploadRefs, uploadConfig)
 
   try {
@@ -238,25 +233,22 @@ fun ControllerBase.uploadFiles(
   } catch (e: Throwable) {
     if (e is WebApplicationException && (e.response?.status ?: 500) in 400..499) {
       logger.info("rejecting dataset upload for user error: {}", e.message)
-      CacheDB().withTransaction {
-        it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
-        e.message?.let { msg -> it.tryInsertImportMessages(datasetID, listOf(msg)) }
+      try {
+        DatasetStore.putUploadError(userID, datasetID, e.message!!)
+      } catch (e2: Throwable) {
+        e.addSuppressed(e2)
       }
     } else {
       logger.error("user dataset upload to object store failed: ", e)
+      try {
+        DatasetStore.putUploadError(userID, datasetID, "internal server error", e)
+      } catch (e2: Throwable) {
+        e.addSuppressed(e2)
+      }
       Metrics.Upload.failed.inc()
       CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     }
 
-    throw e
-  }
-
-  try {
-    logger.debug("uploading dataset metadata to object store")
-    DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
-  } catch (e: Throwable) {
-    logger.error("user dataset meta file upload to object store failed:", e)
-    CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
     throw e
   }
 

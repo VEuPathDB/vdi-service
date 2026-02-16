@@ -1,13 +1,25 @@
 package vdi.core.plugin.client
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.foxcapades.lib.k.multipart.MultiPart
-import io.foxcapades.lib.k.multipart.MultiPartBuilder
-import kotlinx.coroutines.future.await
+import io.ktor.client.call.body
+import io.ktor.client.request.forms.InputProvider
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.append
+import io.ktor.utils.io.jvm.javaio.toInputStream
+import io.ktor.utils.io.streams.asInput
+import kotlinx.io.buffered
 import java.io.InputStream
 import java.net.URI
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import vdi.core.plugin.client.model.DataPropertiesFile
 import vdi.core.plugin.client.response.*
 import vdi.io.plugin.PluginEndpoint
@@ -35,18 +47,24 @@ internal class PluginHandlerClientImpl(
   private inline val baseUri
     get() = URI.create("http://${config.address.host}:${config.address.port}")
 
-  private fun resolve(ep: String) = baseUri.resolve(ep)
+  private fun resolve(ep: String) = baseUri.resolve(ep).toURL()
+
+  private val JsonHeaders = Headers.build {
+    append(HttpHeaders.ContentType, ContentType.Application.Json.withParameter("charset", "utf-8"))
+  }
 
   override suspend fun getServerInfo(): Either<ServerInfoResponse, ServerErrorResponse> {
     log.info("retrieving plugin server build info")
 
-    val response = config.client.sendAsync(
-      HttpRequest.newBuilder(resolve(PluginEndpoint.ServiceInfo)).GET().build(),
-      HttpResponse.BodyHandlers.ofString(),
-    ).await()
+    val response = config.client.get(url = resolve(PluginEndpoint.ServiceInfo))
 
-    return when (response.statusCode()) {
-      200  -> Either.left(response.readJSON())
+//    val response = config.client.sendAsync(
+//      HttpRequest.newBuilder().GET().build(),
+//      HttpResponse.BodyHandlers.ofString(),
+//    ).await()
+
+    return when (response.status) {
+      HttpStatusCode.OK -> Either.left(response.body() )
       else -> Either.right(response.readJSON())
     }
   }
@@ -58,37 +76,34 @@ internal class PluginHandlerClientImpl(
     upload:    InputStream,
   ): ImportResponse {
     val log = log.mark(eventID, datasetID)
-
-    val multipart = MultiPart.createBody {
-      withPart {
-        fieldName = FormField.Details
-        contentType(ContentType.JSON)
-        withBody(ImportRequest(eventID, datasetID, ImportCounter.nextIndex(), meta).toJSONString())
-      }
-
-      withPart {
-        fieldName = FormField.Payload
-        fileName = "import-ready.zip"
-        contentType(ContentType.Zip)
-        withBody(upload)
-      }
-    }
-
     val uri = resolve(PluginEndpoint.Import)
 
     log.debug("submitting import POST request to {}", uri)
 
-    val response = config.client.sendAsync(
-      HttpRequest.newBuilder(uri)
-        .header(Header.ContentType, multipart.getContentTypeHeader())
-        .POST(multipart.makePublisher())
-        .build(),
-      HttpResponse.BodyHandlers.ofInputStream()
-    ).await()
+    val response = config.client.post(uri) {
+      setBody(MultiPartFormDataContent(formData {
+        append(
+          FormField.Details,
+          ImportRequest(eventID, datasetID, ImportCounter.nextIndex(), meta).toJSONString(),
+          JsonHeaders,
+        )
 
-    return response.body().let { body ->
-      when (response.status) {
-        Status.Success         -> StreamSuccessResponse(body)
+        append(
+          FormField.Payload,
+          InputProvider { upload.asInput().buffered() },
+          Headers.build {
+            append(HttpHeaders.ContentType, ContentType.Application.Zip)
+            append(HttpHeaders.ContentDisposition, "filename=\"import-ready.zip\"")
+          }
+        )
+      }))
+    }
+
+    return response.bodyAsChannel()
+      .toInputStream()
+      .let { body ->
+      when (Status.valueOf(response.status.value)) {
+        Status.Success -> StreamSuccessResponse(body)
 
         Status.ValidationError -> ValidationErrorResponse(JSON.readValue(body))
           .also { body.close() }
@@ -101,7 +116,7 @@ internal class PluginHandlerClientImpl(
 
         else -> {
           body.close()
-          throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
+          throw IllegalStateException("plugin server responded with invalid code ${response.status}")
         }
       }
     }
@@ -117,32 +132,32 @@ internal class PluginHandlerClientImpl(
     val log = log.mark(eventID, datasetID)
     val uri = resolve(PluginEndpoint.InstallMeta)
 
-    val multipart = MultiPart.createBody {
-      withPart {
-        fieldName = FormField.Details
-        contentType(ContentType.JSON)
-        withBody(InstallMetaRequest(eventID, datasetID, installTarget, meta).toJSONString())
-      }
-
-      appendDataPropFiles(dataPropFiles)
-    }
-
     log.debug("submitting install-meta POST request to {} for project {}", uri, installTarget)
 
-    val response = config.client.sendAsync(
-      HttpRequest.newBuilder(uri)
-        .header(Header.ContentType, multipart.getContentTypeHeader())
-        .POST(multipart.makePublisher())
-        .build(),
-      HttpResponse.BodyHandlers.ofString()
-    ).await()
+    val response = config.client.post(uri) {
+      setBody(MultiPartFormDataContent(formData {
+        append(
+          key     = FormField.Details,
+          value   = InstallMetaRequest(eventID, datasetID, installTarget, meta).toJSONString(),
+          headers = JsonHeaders,
+        )
 
-    return when (response.status) {
+        dataPropFiles.forEach { append(
+          key     = FormField.DataDict,
+          value   = InputProvider { it.stream.asInput().buffered() },
+          headers = Headers.build {
+            append(HttpHeaders.ContentDisposition, "filename=\"${it.name}\"")
+          },
+        ) }
+      }))
+    }
+
+    return when (Status.valueOf(response.status.value)) {
       Status.Success         -> EmptySuccessResponse
       Status.ValidationError -> ValidationErrorResponse(response.readJSON())
       Status.ScriptError     -> ScriptErrorResponse(response.readJSON())
       Status.ServerError     -> ServerErrorResponse(response.readJSON())
-      else                   -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
+      else                   -> throw IllegalStateException("plugin server responded with invalid code ${response.status}")
     }
   }
 
@@ -156,55 +171,56 @@ internal class PluginHandlerClientImpl(
     dataPropFiles: Iterable<DataPropertiesFile>,
   ): InstallDataResponse {
     val log = log.mark(eventID, datasetID)
-
-    val multipart = MultiPart.createBody {
-      withPart {
-        fieldName = FormField.Details
-        contentType(ContentType.JSON)
-        withBody(InstallDataRequest(eventID, datasetID, installTarget).toJSONString())
-      }
-
-      withPart {
-        fieldName = FormField.Metadata
-        contentType(ContentType.JSON)
-        withBody(meta)
-      }
-
-      withPart {
-        fieldName = FormField.Manifest
-        contentType(ContentType.JSON)
-        withBody(manifest)
-      }
-
-      withPart {
-        fieldName = FormField.Payload
-        fileName = "install-ready.zip"
-        contentType(ContentType.Zip)
-        withBody(payload)
-      }
-
-      appendDataPropFiles(dataPropFiles)
-    }
-
     val uri = resolve(PluginEndpoint.InstallData)
 
     log.debug("submitting install-data POST request to {} for project {}", uri, installTarget)
 
-    val response = config.client.sendAsync(
-      HttpRequest.newBuilder(uri)
-        .header(Header.ContentType, multipart.getContentTypeHeader())
-        .POST(multipart.makePublisher())
-        .build(),
-      HttpResponse.BodyHandlers.ofString()
-    ).await()
+    val response = config.client.post(uri) {
+      setBody(MultiPartFormDataContent(formData {
+        append(
+          key     = FormField.Details,
+          value   = InstallDataRequest(eventID, datasetID, installTarget).toJSONString(),
+          headers = JsonHeaders,
+        )
 
-    return when (response.status) {
+        append(
+          key     = FormField.Metadata,
+          value   = InputProvider { meta.asInput().buffered() },
+          headers = JsonHeaders,
+        )
+
+        append(
+          key     = FormField.Manifest,
+          value   = InputProvider { manifest.asInput().buffered() },
+          headers = JsonHeaders,
+        )
+
+        append(
+          key     = FormField.Payload,
+          value   = InputProvider { payload.asInput().buffered() },
+          headers = Headers.build {
+            append(HttpHeaders.ContentType, ContentType.Application.Zip)
+            append(HttpHeaders.ContentDisposition, "filename=\"install-ready.zip\"")
+          }
+        )
+
+        dataPropFiles.forEach { append(
+          key     = FormField.DataDict,
+          value   = InputProvider { it.stream.asInput().buffered() },
+          headers = Headers.build {
+            append(HttpHeaders.ContentDisposition, "filename=\"${it.name}\"")
+          },
+        ) }
+      }))
+    }
+
+    return when (Status.valueOf(response.status.value)) {
       Status.Success                -> SuccessWithWarningsResponse(response.readJSON())
       Status.ValidationError        -> ValidationErrorResponse(response.readJSON())
       Status.MissingDependencyError -> MissingDependencyResponse(response.readJSON())
       Status.ScriptError            -> ScriptErrorResponse(response.readJSON())
       Status.ServerError            -> ServerErrorResponse(response.readJSON())
-      else                          -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
+      else                          -> throw IllegalStateException("plugin server responded with invalid code ${response.status}")
     }
   }
 
@@ -224,43 +240,24 @@ internal class PluginHandlerClientImpl(
       type.name
     )
 
-    val response = config.client.sendAsync(
-      HttpRequest.newBuilder(uri)
-        .header(Header.ContentType, ContentType.JSON)
-        .POST(
-          HttpRequest.BodyPublishers.ofString(
-            UninstallRequest(
-              eventID,
-              datasetID,
-              installTarget,
-              type
-            ).toJSONString()
-          )
-        )
-        .build(),
-      HttpResponse.BodyHandlers.ofString()
-    ).await()
+    val response = config.client.post(uri) {
+      headers.append(HttpHeaders.ContentType, ContentType.Application.Json)
+      setBody(UninstallRequest(
+        eventID,
+        datasetID,
+        installTarget,
+        type
+      ).toJSONString())
+    }
 
-    return when (response.status) {
+    return when (Status.valueOf(response.status.value)) {
       Status.Success     -> EmptySuccessResponse
       Status.ScriptError -> ScriptErrorResponse(response.readJSON())
       Status.ServerError -> ScriptErrorResponse(response.readJSON())
-      else               -> throw IllegalStateException("plugin server responded with invalid code ${response.statusCode()}")
+      else               -> throw IllegalStateException("plugin server responded with invalid code ${response.status}")
     }
   }
 
-  private inline val HttpResponse<*>.status: Status
-    get() = Status.valueOf(statusCode())
-
-  private inline fun <reified T> HttpResponse<String>.readJSON() =
-    JSON.readValue<T>(body())
-
-  private fun MultiPartBuilder.appendDataPropFiles(dataPropFiles: Iterable<DataPropertiesFile>) {
-    dataPropFiles.forEach { withPart {
-      fieldName = FormField.DataDict
-      fileName  = it.name
-      contentType(ContentType.Any)
-      withBody(it.stream)
-    } }
-  }
+  private suspend inline fun <reified T> HttpResponse.readJSON() =
+    JSON.readValue<T>(bodyAsChannel().toInputStream())
 }

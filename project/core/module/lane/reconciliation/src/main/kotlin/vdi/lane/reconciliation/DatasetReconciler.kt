@@ -10,7 +10,9 @@ import vdi.core.kafka.router.KafkaRouter
 import vdi.core.metrics.Metrics
 import vdi.core.s3.*
 import vdi.lane.reconciliation.util.*
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.DatasetID
+import vdi.model.meta.toDatasetID
 
 internal class DatasetReconciler(
   private val cacheDB: CacheDB = CacheDB(),
@@ -26,7 +28,8 @@ internal class DatasetReconciler(
   fun reconcile(ctx: ReconcilerContext) {
     ctx.logger.info("beginning reconciliation")
     try {
-      reconcile(ReconciliationContext(
+      reconcile(ReconcilerTarget(
+        ctx.datasetID.toString(),
         datasetManager.getDatasetDirectory(ctx.ownerID, ctx.datasetID),
         ctx.source,
         ctx.logger,
@@ -40,7 +43,7 @@ internal class DatasetReconciler(
     }
   }
 
-  private fun reconcile(ctx: ReconciliationContext) {
+  private fun reconcile(ctx: ReconcilerTarget) {
     val reimport = shouldReimport(ctx)
 
     // Make sure the cache db has at least the base records for this dataset.
@@ -48,29 +51,42 @@ internal class DatasetReconciler(
 
     // If, by race condition, both a revised flag and delete flag were created,
     // remove the delete flag.
-    if (ctx.hasDeleteFlag && ctx.hasRevisedFlag)
+    if (ctx.hasDeleteFlag() && ctx.hasRevisedFlag())
       ctx.datasetDirectory.deleteDeleteFlag()
 
     // If the dataset has been marked as deleted, or if there is a revision flag
     // ensure that it has been uninstalled.
-    if (ctx.hasDeleteFlag || ctx.hasRevisedFlag)
+    if (ctx.hasDeleteFlag() || ctx.hasRevisedFlag())
       return ensureUninstalled(ctx)
 
     // The upload file should only exist before an attempt has been made to
     // process the raw upload into an import-ready form.
-    if (ctx.hasRawUpload)
+    //
+    // THIS IS NOT YET FULLY IMPLEMENTED!!  THE IMPORT READY FILE _IS_ THE RAW
+    // UPLOAD UNTIL WE FIX THE ASYNC UPLOAD PROCESS
+    if (ctx.hasRawUpload())
       handleHasUpload(ctx)
 
     // If we determined that a reimport is possible and required (the
     // import-ready.zip file exists but no install-ready.zip file exists) then
     // perform the reimport and halt here.
-    if (reimport == ReimportIndicator.NeedReimport)
+    if (reimport == ReimportIndicator.NeedReimport) {
       return tryReimport(ctx)
+    }
 
-    // If we have no import-ready file, then something is wrong, but we may have
-    // install-ready files we can process?
-    if (!ctx.hasImportReadyData)
-      ctx.logger.error("missing import-ready file")
+    // If we have no import-ready file then the upload probably failed.
+    if (!ctx.hasImportReadyData()) {
+      // Check for an upload error log
+      if (ctx.hasUploadError()) {
+        return synchronizeUploadStatus(ctx, DatasetUploadStatus.Failed)
+      }
+
+      ctx.logger.error("missing import-ready file and no upload error was recorded")
+    } else {
+      // if we do have an import ready file, ensure the cache db knows that the
+      // upload succeeded
+      synchronizeUploadStatus(ctx, DatasetUploadStatus.Success)
+    }
 
     // If we determined that a reimport is not needed by the existence and age
     // of the install-ready files, ensure that the import status for the dataset
@@ -80,37 +96,37 @@ internal class DatasetReconciler(
         cacheDB.updateImportStatus(ctx, DatasetImportStatus.Complete)
 
     if (reimport != ReimportIndicator.ReimportNotPossible) {
-      if (!ctx.hasInstallReadyData)
+      if (!ctx.hasInstallReadyData())
         ctx.logger.warn("missing install-ready file")
 
-      if (!ctx.hasManifest)
+      if (!ctx.hasManifest())
         ctx.logger.warn("missing manifest file")
     }
 
-    runSync(ctx)
+    runDatasetSync(ctx)
 
-    if (!ctx.haveFiredAnyEvents)
+    if (!ctx.haveFiredAnyEvents())
       ctx.logger.info("no events fired")
   }
 
-  private fun calcNewStatus(ctx: ReconciliationContext, oldStatus: ReimportIndicator) =
+  private fun calcNewStatus(ctx: ReconcilerTarget, oldStatus: ReimportIndicator) =
     when (oldStatus) {
       ReimportIndicator.ReimportNotNeeded -> DatasetImportStatus.Complete
       ReimportIndicator.NeedReimport -> DatasetImportStatus.Queued
       ReimportIndicator.ReimportNotPossible -> {
-        if (ctx.hasInstallReadyData && ctx.hasManifest)
+        if (ctx.hasInstallReadyData() && ctx.hasManifest())
           DatasetImportStatus.Complete
         else
           DatasetImportStatus.Failed
       }
     }
 
-  private fun ensureUninstalled(ctx: ReconciliationContext) {
+  private fun ensureUninstalled(ctx: ReconcilerTarget) {
     val dataset = cacheDB.ensureCacheDatasetRecord(ctx)
 
     if (!dataset.isDeleted) {
       ctx.safeExec("failed to mark dataset as deleted in cache db") {
-        cacheDB.withTransaction { it.updateDatasetDeleted(ctx.datasetID, true) }
+        cacheDB.withTransaction { it.updateDatasetDeleted(ctx.datasetId.toDatasetID(), true) }
       }
     }
 
@@ -118,11 +134,11 @@ internal class DatasetReconciler(
       fireUninstallEvent(ctx)
   }
 
-  private fun handleHasUpload(ctx: ReconciliationContext) {
+  private fun handleHasUpload(ctx: ReconcilerTarget) {
     // If an import-ready.zip file exists for the dataset then we can delete the
     // raw upload file and ensure that the upload control table in the cache db
     // indicates that the upload was successfully processed.
-    if (ctx.hasImportReadyData) {
+    if (ctx.hasImportReadyData()) {
       ctx.safeExec("failed to delete raw upload file") { ctx.datasetDirectory.deleteUploadFile() }
       // TODO: Write completed status to upload control table in cache db
     }
@@ -139,7 +155,13 @@ internal class DatasetReconciler(
     }
   }
 
-  private fun runSync(ctx: ReconciliationContext) {
+  private fun synchronizeUploadStatus(ctx: ReconcilerTarget, status: DatasetUploadStatus) {
+    cacheDB.withTransaction {
+      it.upsertUploadStatus(DatasetID(ctx.datasetId), status)
+    }
+  }
+
+  private fun runDatasetSync(ctx: ReconcilerTarget) {
     val syncStatus = ctx.checkSyncStatus()
 
     if (syncStatus.metaOutOfSync)
@@ -153,11 +175,11 @@ internal class DatasetReconciler(
     // event here.
     if (!ctx.haveFiredImportEvent && syncStatus.installOutOfSync)
       fireInstallEvent(ctx)
-    else if (!syncStatus.installOutOfSync && ctx.meta.revisionHistory != null && isInstalled(ctx))
+    else if (!syncStatus.installOutOfSync && ctx.meta!!.revisionHistory != null && isInstalled(ctx))
       ensureRevisionFlags(ctx)
   }
 
-  private fun ReconciliationContext.checkSyncStatus(): SyncIndicator {
+  private fun ReconcilerTarget.checkSyncStatus(): SyncIndicator {
     val cacheDBSyncControl = cacheDB.requireSyncControl(this)
 
     val metaTimestamp = maxOf(
@@ -179,8 +201,8 @@ internal class DatasetReconciler(
     if (indicator.fullyOutOfSync)
       return indicator
 
-    meta.installTargets.forEach { projectID ->
-      val appDB = appDB.accessor(projectID, meta.type)
+    meta!!.installTargets.forEach { projectID ->
+      val appDB = appDB.accessor(projectID, meta!!.type)
 
       if (appDB == null) {
         logger.warn("skipping dataset state comparison for disabled target {}", projectID)
@@ -214,27 +236,27 @@ internal class DatasetReconciler(
     return indicator
   }
 
-  private fun tryReimport(ctx: ReconciliationContext) {
+  private fun tryReimport(ctx: ReconcilerTarget) {
     cacheDB.updateImportStatus(ctx, DatasetImportStatus.Queued)
     cacheDB.dropImportMessages(ctx)
     fireImportEvent(ctx)
   }
 
-  private fun isInstalled(ctx: ReconciliationContext) =
-    ctx.meta.installTargets.all {
-      (AppDB().accessor(it, ctx.meta.type) ?: return@all true)
-        .selectDatasetInstallMessage(ctx.datasetID, InstallType.Data)?.status == InstallStatus.Complete
+  private fun isInstalled(ctx: ReconcilerTarget) =
+    ctx.meta!!.installTargets.all {
+      (AppDB().accessor(it, ctx.meta!!.type) ?: return@all true)
+        .selectDatasetInstallMessage(ctx.datasetId.toDatasetID(), InstallType.Data)?.status == InstallStatus.Complete
     }
 
-  private fun ensureRevisionFlags(ctx: ReconciliationContext) {
-    val targets = ArrayList<DatasetID>(ctx.meta.revisionHistory!!.revisions.size)
-    ctx.meta.revisionHistory!!.revisions
+  private fun ensureRevisionFlags(ctx: ReconcilerTarget) {
+    val targets = ArrayList<DatasetID>(ctx.meta!!.revisionHistory!!.revisions.size)
+    ctx.meta!!.revisionHistory!!.revisions
       .asSequence()
       .sortedByDescending { it.timestamp }
       .forEach { targets.add(it.revisionID) }
 
     targets.forEach {
-      datasetManager.getDatasetDirectory(ctx.userID, it)
+      datasetManager.getDatasetDirectory(ctx.userId, it)
         .getRevisedFlag()
         .also { flag -> if (!flag.exists()) flag.create() }
     }
@@ -248,11 +270,11 @@ internal class DatasetReconciler(
    * 2. Import has failed but there are no import messages.
    * 3. TODO: import-ready file is newer than installable and/or manifest files
    */
-  private fun shouldReimport(ctx: ReconciliationContext) =
+  private fun shouldReimport(ctx: ReconcilerTarget) =
     when {
       // If we don't have an import-ready file, we can't rerun the import
       // process
-      !ctx.hasImportReadyData -> ReimportIndicator.ReimportNotPossible
+      !ctx.hasImportReadyData() -> ReimportIndicator.ReimportNotPossible
 
       // If the import was found to be invalid, then it's a data problem and no
       // amount of reimport attempts will help.
@@ -271,7 +293,7 @@ internal class DatasetReconciler(
 
       // If we are missing the install-ready file and/or the manifest file then
       // we need to rerun the import to get those files back.
-      !(ctx.hasInstallReadyData && ctx.hasManifest) -> ReimportIndicator.NeedReimport
+      !(ctx.hasInstallReadyData() && ctx.hasManifest()) -> ReimportIndicator.NeedReimport
 
       // We have an import-ready file, we have no failed import record, we have
       // both the install-ready and manifest files.  There is no need to rerun
@@ -281,42 +303,42 @@ internal class DatasetReconciler(
 
   // region Kafka
 
-  private fun fireImportEvent(ctx: ReconciliationContext) {
+  private fun fireImportEvent(ctx: ReconcilerTarget) {
     ctx.logger.info("firing import event")
     ctx.safeExec("failed to fire import trigger") {
-      eventRouter.sendImportTrigger(ctx.userID, ctx.datasetID, ctx.source)
+      eventRouter.sendImportTrigger(ctx.userId, ctx.datasetId.toDatasetID(), ctx.source)
       ctx.haveFiredImportEvent = true
     }
   }
 
-  private fun fireUpdateMetaEvent(ctx: ReconciliationContext) {
+  private fun fireUpdateMetaEvent(ctx: ReconcilerTarget) {
     ctx.logger.info("firing update meta event")
     ctx.safeExec("failed to fire update-meta trigger") {
-      eventRouter.sendUpdateMetaTrigger(ctx.userID, ctx.datasetID, ctx.source)
+      eventRouter.sendUpdateMetaTrigger(ctx.userId, ctx.datasetId.toDatasetID(), ctx.source)
       ctx.haveFiredMetaUpdateEvent = true
     }
   }
 
-  private fun fireShareEvent(ctx: ReconciliationContext) {
+  private fun fireShareEvent(ctx: ReconcilerTarget) {
     ctx.logger.info("firing share event")
     ctx.safeExec("failed to send share trigger") {
-      eventRouter.sendShareTrigger(ctx.userID, ctx.datasetID, ctx.source)
+      eventRouter.sendShareTrigger(ctx.userId, ctx.datasetId.toDatasetID(), ctx.source)
       ctx.haveFiredShareEvent = true
     }
   }
 
-  private fun fireInstallEvent(ctx: ReconciliationContext) {
+  private fun fireInstallEvent(ctx: ReconcilerTarget) {
     ctx.logger.info("firing data install event")
     ctx.safeExec("failed to send install-data trigger") {
-      eventRouter.sendInstallTrigger(ctx.userID, ctx.datasetID, ctx.source)
+      eventRouter.sendInstallTrigger(ctx.userId, ctx.datasetId.toDatasetID(), ctx.source)
       ctx.haveFiredInstallEvent = true
     }
   }
 
-  private fun fireUninstallEvent(ctx: ReconciliationContext) {
+  private fun fireUninstallEvent(ctx: ReconcilerTarget) {
     ctx.logger.info("firing soft-delete event")
     ctx.safeExec("failed to send soft-delete trigger") {
-      eventRouter.sendSoftDeleteTrigger(ctx.userID, ctx.datasetID, ctx.source)
+      eventRouter.sendSoftDeleteTrigger(ctx.userId, ctx.datasetId.toDatasetID(), ctx.source)
       ctx.haveFiredUninstallEvent = true
     }
   }

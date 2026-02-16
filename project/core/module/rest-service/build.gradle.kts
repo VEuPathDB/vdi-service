@@ -17,60 +17,6 @@ buildscript {
   }
 }
 
-//apply { plugin("org.openapi.generator") }
-//
-//tasks.withType<GenerateTask> {
-//  val newSrcPath = "src/generated/kotlin"
-//
-//  apiPackage = "vdi.service.rest.generated.api"
-//  modelPackage = "vdi.service.rest.generated.model"
-//  generatorName = "vpdb"
-//
-//  inputSpec = "$projectDir/openapi.yml"
-//  outputDir = projectDir.path
-//
-//  additionalProperties = mapOf(
-//    "dateLibrary" to "java8",
-//    "enumPropertyNaming" to "PascalCase",
-//    "sourceFolder" to newSrcPath,
-//    "debugModels" to "$projectDir/models.json",
-//    "debugOperations" to "$projectDir/operations.json",
-//  )
-//
-//  nameMappings = mapOf(
-//    "data" to "datasetData",
-//    "meta" to "datasetMeta",
-//  )
-//
-//  inlineSchemaNameMappings = mapOf(
-//    "WDK_User_Info_1" to "WDK_User_Info",
-//    "Dataset_Type_Details_1" to "Dataset_Type_Details",
-//    "Dataset_List_Item_1" to "Dataset_List_Item",
-//    "Dataset_Visibility_1" to "Dataset_Visibility",
-////    "Dataset_File_Archive_allOf" to "Dataset_File_Archive",
-//  )
-//
-//  ignoreFileOverride = "$projectDir/.openapi-generator-ignore"
-//
-//  globalProperties = mapOf(
-//    "apis"        to "",
-//    "models"      to "",
-//    "verbose"     to "true",
-//  )
-//  inlineSchemaOptions = mapOf(
-//    "RESOLVE_INLINE_ENUMS" to "true",
-//    "REFACTOR_ALLOF_INLINE_SCHEMAS" to "true",
-//    "ADD_UNSIGNED_TO_INTEGER_WITH_INVALID_MAX_VALUE" to "true",
-//  )
-//  openapiNormalizer = mapOf(
-//    "REF_AS_PARENT_IN_ALLOF" to "true"
-//  )
-//
-//  doFirst {
-//    file(newSrcPath).deleteRecursively()
-//  }
-//}
-
 tasks.withType<MetaTask> {
   outputFolder = "${rootDir}/derp"
   generatorName = "vpdb-jaxrs-kt"

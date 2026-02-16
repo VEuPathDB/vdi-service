@@ -8,4 +8,3 @@ sealed interface FlagFile: DatasetFile {
 
   fun create() = put { ByteArray(0).inputStream() }
 }
-

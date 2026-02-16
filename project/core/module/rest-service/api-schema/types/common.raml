@@ -431,8 +431,8 @@ types:
     additionalProperties: false
     properties:
       upload: DatasetUploadStatusInfo
-      import: DatasetImportStatusInfo
-      install: DatasetInstallStatusListEntry[]
+      import?: DatasetImportStatusInfo
+      install?: DatasetInstallStatusListEntry[]
 
   DatasetSummary:
     description: Brief summary of the dataset.
@@ -470,7 +470,7 @@ types:
     type: string
     enum:
     - running
-    - complete
+    - success
     - failed
 
   DatasetUploadStatusInfo:

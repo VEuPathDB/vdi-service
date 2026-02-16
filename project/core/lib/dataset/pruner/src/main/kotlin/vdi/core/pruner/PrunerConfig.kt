@@ -16,7 +16,7 @@ data class PrunerConfig(
 ) {
   constructor(): this(
     loadAndCacheStackConfig().vdi.objectStore,
-    loadAndCacheStackConfig().vdi.daemons?.pruner,
+    loadAndCacheStackConfig().vdi.daemons.pruner,
   )
 
   constructor(oConfig: ObjectStoreConfig, pConfig: PrunerConfig?): this (

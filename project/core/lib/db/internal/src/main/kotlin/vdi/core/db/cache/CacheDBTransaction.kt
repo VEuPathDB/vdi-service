@@ -6,6 +6,7 @@ import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.ShareOfferRecord
 import vdi.core.db.cache.model.ShareReceiptRecord
 import vdi.core.db.model.SyncControlRecord
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 
 interface CacheDBTransaction: CacheDB, AutoCloseable {
@@ -308,6 +309,8 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
   fun upsertDatasetShareReceipt(row: ShareReceiptRecord)
 
   fun upsertImportControl(datasetID: DatasetID, status: DatasetImportStatus)
+
+  fun upsertUploadStatus(datasetID: DatasetID, status: DatasetUploadStatus)
 
   // endregion Upsert
 

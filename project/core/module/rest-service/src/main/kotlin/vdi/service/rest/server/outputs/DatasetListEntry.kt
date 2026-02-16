@@ -7,7 +7,12 @@ import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
+import vdi.service.rest.conversion.DatasetImportStatusInfo
+import vdi.service.rest.conversion.DatasetInstallStatusListEntry
 import vdi.service.rest.generated.model.*
+import vdi.service.rest.conversion.DatasetOwner
+import vdi.service.rest.conversion.DatasetStatusInfo
+import vdi.service.rest.conversion.DatasetUploadStatusInfo
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.util.defaultZone
 
@@ -61,7 +66,11 @@ internal fun DatasetRecord.toExternal(
     name             = name,
     origin           = origin,
     installTargets   = projects,
-    status           = DatasetStatusInfo(importStatus, null, installs),
+    status           = DatasetStatusInfo(
+      DatasetUploadStatusInfo(uploadStatus, null),
+      DatasetImportStatusInfo(importStatus, null),
+      installs.map { (k, v) -> DatasetInstallStatusListEntry(k, v) },
+    ),
     shares           = shares ?: emptyList(),
     fileCount        = fileInfo?.count?.toInt() ?: 0,
     fileSizeTotal    = fileInfo?.size?.toLong() ?: 0,

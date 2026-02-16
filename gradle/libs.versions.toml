@@ -1,6 +1,6 @@
 [versions]
 jackson = "2.21.0"
-kotlin = "2.3.10"
+kotlin = "2.3.0"
 ktor = "3.4.0"
 log4j = "2.25.3"
 slf4j = "2.0.17"
@@ -15,11 +15,6 @@ shadow = { id = "com.gradleup.shadow", version = "9.3.1" }
 vpdb = { id = "org.veupathdb.lib.gradle.container.container-utils", version = "6.4.2" }
 
 [libraries]
-
-#
-# Common
-#
-
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-engine = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
@@ -64,9 +59,6 @@ ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "kto
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 ktor-server-metrics = { module = "io.ktor:ktor-server-metrics-micrometer", version.ref = "ktor" }
 
-
-log4j-iostreams = { group = "org.apache.logging.log4j", name = "log4j-iostreams",   version.ref = "log4j" }
-
 metrics-micrometer = { group = "io.micrometer", name = "micrometer-registry-prometheus", version = "1.16.3" }
 metrics-prometheus = { group = "io.prometheus", name = "prometheus-metrics-tracer-initializer", version = "1.4.3" }
 
@@ -79,9 +71,8 @@ metrics-prometheus = { group = "io.prometheus", name = "prometheus-metrics-trace
 log-log4j-kotlin = { group = "org.apache.logging.log4j", name = "log4j-api-kotlin",  version = "1.5.0"  }
 
 # HTTP
-http-client-multipart = { group = "io.foxcapades.lib", name = "k-multipart",   version = "1.2.1" }
 http-server-jersey = { group = "org.glassfish.jersey.core", name = "jersey-server", version = "4.0.2" }
-container-core = { group = "org.veupathdb.lib", name = "jaxrs-container-core", version = "10.0.0" }
+container-core = { group = "org.veupathdb.lib", name = "jaxrs-container-core", version = "10.0.2" }
 container-multipart = { group = "org.veupathdb.lib", name = "multipart-jackson-pojo", version = "2.0.0" }
 json-request-validation     = { group = "org.veupathdb.lib", name = "jpath-request-validation", version = "0.6.0" }
 

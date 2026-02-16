@@ -2,6 +2,7 @@ package vdi.core.db.cache.model
 
 import java.time.OffsetDateTime
 import vdi.core.db.model.SyncControlRecord
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 
 data class AdminDatasetDetailsRecord(
@@ -19,8 +20,9 @@ data class AdminDatasetDetailsRecord(
   override val description: String?,
   override val visibility: DatasetVisibility,
   override val projects: List<InstallTargetID>,
-  override val importStatus: DatasetImportStatus,
+  override val importStatus: DatasetImportStatus?,
   override val originalID: DatasetID?,
+  override val uploadStatus: DatasetUploadStatus,
   val syncControl: SyncControlRecord?,
   val messages: List<String>,
   val installFiles: List<String>,

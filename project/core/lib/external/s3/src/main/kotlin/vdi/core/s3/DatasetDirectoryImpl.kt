@@ -15,10 +15,12 @@ import vdi.core.s3.files.maps.MappingFile
 import vdi.core.s3.files.maps.DataPropertiesFile
 import vdi.core.s3.files.meta.ManifestFile
 import vdi.core.s3.files.meta.MetaFile
+import vdi.core.s3.files.meta.UploadErrorFile
 import vdi.core.s3.files.shares.ShareOffer
 import vdi.core.s3.files.shares.ShareReceipt
 import vdi.logging.markedLogger
 import vdi.core.s3.paths.S3DatasetPathFactory
+import vdi.model.misc.UploadErrorReport
 
 internal class DatasetDirectoryImpl(
   override val ownerID: UserID,
@@ -86,6 +88,13 @@ internal class DatasetDirectoryImpl(
   override fun getRevisedFlag() = lazyRevisedFlag
   override fun hasRevisedFlag() = lazyRevisedFlag.exists()
   override fun putRevisedFlag() = lazyRevisedFlag.create()
+
+  private val lazyErrorReport by lazy { UploadErrorFile(pathFactory.uploadErrorFile(), bucket.objects) }
+
+  override fun deleteUploadErrorFile() = lazyErrorReport.delete()
+  override fun getUploadErrorFile() = lazyErrorReport
+  override fun hasUploadErrorFile() = lazyErrorReport.exists()
+  override fun putUploadErrorFile(report: UploadErrorReport) = lazyErrorReport.put(report)
 
   override fun getDataPropertiesFiles(): Sequence<DataPropertiesFile> {
     log.debug("looking up mapping files")

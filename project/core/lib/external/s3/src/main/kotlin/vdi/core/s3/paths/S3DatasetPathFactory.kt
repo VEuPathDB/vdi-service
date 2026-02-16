@@ -17,6 +17,8 @@ internal class S3DatasetPathFactory(
 
   fun revisedFlagFile() = S3Paths.datasetRevisedFlagFile(ownerID, datasetID)
 
+  fun uploadErrorFile() = S3Paths.uploadErrorFile(ownerID, datasetID)
+
   fun sharesDir() = S3Paths.datasetSharesDir(ownerID, datasetID)
 
   fun shareOfferFile(recipientID: UserID) = S3Paths.datasetShareOfferFile(ownerID, datasetID, recipientID)

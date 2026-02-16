@@ -15,6 +15,11 @@ sealed interface UserID {
 
   @JsonValue
   override fun toString(): String
+
+  companion object {
+    @JvmStatic
+    fun newUserID(userID: Long): UserID = UserID(userID)
+  }
 }
 
 class UserIDDeserializer: JsonDeserializer<UserID>() {

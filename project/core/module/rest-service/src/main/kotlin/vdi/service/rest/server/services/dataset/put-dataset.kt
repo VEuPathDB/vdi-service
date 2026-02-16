@@ -85,10 +85,12 @@ internal fun ControllerBase.putDataset(
     ?.let { verifyFileExtensions(it, newMeta.type) }
     ?.also { return Either.ofRight(it.wrap()) }
 
-  val uploadRefs = CacheDB().initializeDataset(userID, newDatasetID, newMeta) {
+  val uploadRefs = CacheDB().initializeDataset(newDatasetID, newMeta) {
     it.tryInsertRevisionLink(newHistory.originalID, newHistory.revisions.last())
     resolveDatasetFiles(request.dataFile, request.url, request.docFile, emptyList(), uploadConfig)
   }
+
+  writeMetadata(userID, datasetID, newMeta)
 
   submitUpload(newDatasetID, uploadRefs, newMeta, uploadConfig)
 

@@ -12,11 +12,9 @@ import org.veupathdb.lib.s3.s34k.errors.S34KError
 import java.time.OffsetDateTime
 import vdi.core.async.WorkerPool
 import vdi.core.db.cache.CacheDB
-import vdi.core.db.cache.CacheDBTransaction
-import vdi.core.db.cache.model.DatasetImpl
+import vdi.core.db.cache.initializeDataset
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.withTransaction
-import vdi.core.db.model.SyncControlRecord
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
 import vdi.core.plugin.client.PluginException
@@ -33,10 +31,8 @@ import vdi.json.JSON
 import vdi.logging.logger
 import vdi.model.DatasetManifestFilename
 import vdi.model.DatasetMetaFilename
-import vdi.model.OriginTimestamp
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetManifest
-import vdi.model.meta.DatasetMetadata
 import vdi.core.metrics.Metrics.Import as Metrics
 import vdi.io.plugin.responses.ValidationResponse as ValidationBody
 
@@ -131,7 +127,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     with(cacheDB.selectDataset(datasetID)) {
       if (this == null) {
         logger.info("initializing dataset in cache db")
-        cacheDB.initializeDataset(datasetID, datasetMeta)
+        cacheDB.withTransaction { it.initializeDataset(datasetID, datasetMeta) }
       } else {
         if (isDeleted) {
           logger.info("skipping import event; dataset is marked as deleted in the cache db")
@@ -320,41 +316,4 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
     return true
   }
-
-  private fun CacheDBTransaction.initSyncControl(datasetID: DatasetID) {
-    tryInsertSyncControl(SyncControlRecord(
-      datasetID     = datasetID,
-      sharesUpdated = OriginTimestamp,
-      dataUpdated   = OriginTimestamp,
-      metaUpdated   = OriginTimestamp
-    ))
-  }
-
-  private fun CacheDB.initializeDataset(datasetID: DatasetID, meta: DatasetMetadata): Unit =
-    withTransaction {
-      // Insert a new dataset record
-      it.tryInsertDataset(DatasetImpl(
-        datasetID    = datasetID,
-        type         = meta.type,
-        ownerID      = meta.owner,
-        isDeleted    = false,
-        created      = meta.created,
-        origin       = meta.origin,
-        importStatus = DatasetImportStatus.Queued,
-        inserted     = OffsetDateTime.now(),
-      ))
-
-      // insert metadata for the dataset
-      it.tryInsertDatasetMeta(datasetID, meta)
-
-      // Insert an import control record for the dataset
-      it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued)
-
-      // insert project links for the dataset
-      it.tryInsertDatasetProjects(datasetID, meta.installTargets)
-
-      // insert a sync control record for the dataset using an old timestamp
-      // that will predate any possible upload timestamp.
-      it.initSyncControl(datasetID)
-    }
 }

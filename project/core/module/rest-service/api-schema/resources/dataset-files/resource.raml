@@ -173,3 +173,40 @@ get:
         body: lib.GoneError
       500:
         body: lib.ServerError
+
+/{file-name}:
+  displayName: VDI Metadata Files
+  uriParameters:
+    file-name:
+      type: string
+      enum:
+      - metadata.json
+      - upload-errors.json
+  get:
+    displayName: Get Metadata File
+    # language=markdown
+    description: |-
+      Retrieves the specified metadata file for the target dataset.
+      
+      **NOTE**: The `upload-errors.json` file response contains additional
+      debugging information when the requester provides admin credentials.
+    queryParameters:
+      download:
+        type: boolean
+        required: false
+        default: true
+    responses:
+      200:
+        headers:
+          Content-Disposition:
+            type: string
+            required: false
+        body:
+          application/json:
+            type: any
+      401:
+        body: lib.UnauthorizedError
+      404:
+        body: lib.NotFoundError
+      500:
+        body: lib.ServerError

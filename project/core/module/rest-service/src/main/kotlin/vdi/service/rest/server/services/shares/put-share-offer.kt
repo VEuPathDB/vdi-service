@@ -63,7 +63,7 @@ fun <T: ControllerBase> T.putShareOffer(datasetID: DatasetID, recipientID: UserI
     return ForbiddenError("cannot share a deleted dataset").wrap()
 
   when (dataset.importStatus) {
-    DatasetImportStatus.Queued, DatasetImportStatus.InProgress,
+    null, DatasetImportStatus.Queued, DatasetImportStatus.InProgress,
       -> return ForbiddenError("cannot share a dataset until after it has been processed").wrap()
 
     DatasetImportStatus.Invalid, DatasetImportStatus.Failed,

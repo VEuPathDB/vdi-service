@@ -5,6 +5,7 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
 import vdi.model.meta.DatasetShareOffer
 import vdi.service.rest.generated.model.*
+import vdi.service.rest.conversion.DatasetOwner
 import vdi.service.rest.model.UserDetails
 
 

@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream
 import vdi.core.s3.files.DatasetFile
 import vdi.json.JSON
 
-sealed interface MetaFile<T: Any>: DatasetFile {
+sealed interface VDIMetaFile<T: Any>: DatasetFile {
   override val contentType: String
     get() = "application/json"
 

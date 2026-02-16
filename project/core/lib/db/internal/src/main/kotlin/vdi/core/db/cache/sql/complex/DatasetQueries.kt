@@ -9,6 +9,7 @@ import vdi.core.db.cache.util.getDatasetVisibility
 import vdi.core.db.cache.util.getImportStatus
 import vdi.core.db.cache.util.getProjectIDList
 import vdi.core.db.jdbc.*
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 
 internal object DatasetQueries {
@@ -30,16 +31,19 @@ SELECT
 , dm.program_name
 , dm.project_name
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = vd.dataset_id) AS projects
-, ic.status
+, ic.status AS import_status
 , r.original_id
+, us.status AS upload_status
 FROM
   vdi.datasets vd
-  INNER JOIN vdi.dataset_metadata dm
+  INNER JOIN vdi.dataset_metadata AS dm
     USING (dataset_id)
-  LEFT JOIN vdi.import_control ic
+  LEFT JOIN vdi.import_control AS ic
     USING (dataset_id)
   LEFT JOIN vdi.dataset_revisions AS r
     ON r.revision_id = vd.dataset_id
+  LEFT JOIN vdi.upload_status AS us
+    USING (dataset_id)
 WHERE
   vd.dataset_id = ?
 """
@@ -67,8 +71,10 @@ WHERE
             description  = getString("description"),
             visibility   = getDatasetVisibility("visibility"),
             projects     = getProjectIDList("projects"),
-            importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
+            importStatus = getImportStatus("import_status") ?: DatasetImportStatus.Queued,
             originalID   = optDatasetID("original_id"),
+            uploadStatus = getString("upload_status")?.let(DatasetUploadStatus::fromString)
+              ?: DatasetUploadStatus.Running
           )
       }
     }
@@ -90,8 +96,9 @@ SELECT
 , dm.program_name
 , dm.description
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = vd.dataset_id) AS projects
-, ic.status
+, ic.status AS import_status
 , r.original_id
+, us.status AS upload_status
 FROM
   vdi.datasets vd
   INNER JOIN vdi.dataset_metadata AS dm
@@ -100,6 +107,8 @@ FROM
     USING (dataset_id)
   LEFT JOIN vdi.dataset_revisions AS r
     ON r.revision_id = vd.dataset_id
+  LEFT JOIN vdi.upload_status AS us
+    USING (dataset_id)
 WHERE
   vd.dataset_id = ?
   AND (
@@ -137,7 +146,7 @@ WHERE
             ownerID      = getUserID("owner_id"),
             isDeleted    = getBoolean("is_deleted"),
             created      = getDateTime("created"),
-            importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
+            importStatus = getImportStatus("import_status") ?: DatasetImportStatus.Queued,
             origin       = getString("origin"),
             visibility   = getDatasetVisibility("visibility"),
             name         = getString("name"),
@@ -147,7 +156,9 @@ WHERE
             description  = getString("description"),
             projects     = getProjectIDList("projects"),
             inserted     = getDateTime("inserted"),
-            originalID   = optDatasetID("original_id")
+            originalID   = optDatasetID("original_id"),
+            uploadStatus = getString("upload_status")?.let(DatasetUploadStatus::fromString)
+              ?: DatasetUploadStatus.Running,
           )
       }
     }
@@ -298,8 +309,9 @@ SELECT
 , md.description
 , md.visibility
 , array(SELECT p.project_id FROM vdi.dataset_projects AS p WHERE p.dataset_id = d.dataset_id) AS projects
-, ic.status
+, ic.status AS import_status
 , r.original_id
+, us.status AS upload_status
 FROM
   dataset_ids AS did
   INNER JOIN vdi.datasets AS d
@@ -310,6 +322,8 @@ FROM
     USING (dataset_id)
   LEFT JOIN vdi.dataset_revisions AS r
     ON r.revision_id = did.dataset_id
+  LEFT JOIN vdi.upload_status AS us
+    USING (dataset_id)
 WHERE
   d.is_deleted = FALSE
   $projectFilter
@@ -413,7 +427,7 @@ $PREFIX_OWNERSHIP_SHARED
             ownerID          = it.getUserID("owner_id"),
             isDeleted        = it.getBoolean("is_deleted"),
             created          = it.getDateTime("created"),
-            importStatus     = it.getImportStatus("status") ?: DatasetImportStatus.Queued,
+            importStatus     = it.getImportStatus("import_status") ?: DatasetImportStatus.Queued,
             visibility       = it.getDatasetVisibility("visibility"),
             origin           = it.getString("origin"),
             name             = it.getString("name"),
@@ -423,7 +437,9 @@ $PREFIX_OWNERSHIP_SHARED
             description      = it.getString("description"),
             projects         = it.getProjectIDList("projects"),
             inserted         = it.getDateTime("inserted"),
-            originalID       = it.optDatasetID("original_id")
+            originalID       = it.optDatasetID("original_id"),
+            uploadStatus = getString("upload_status")?.let(DatasetUploadStatus::fromString)
+              ?: DatasetUploadStatus.Running,
           )
         }
       }
@@ -478,8 +494,9 @@ SELECT
   FROM vdi.dataset_projects AS p
   WHERE p.dataset_id = d.dataset_id
 ) AS projects
-, ic.status
+, ic.status AS import_status
 , r.original_id
+, us.status AS upload_status
 FROM
   vdi.datasets AS d
   INNER JOIN vdi.dataset_metadata AS md
@@ -488,6 +505,8 @@ FROM
     USING (dataset_id)
   LEFT JOIN vdi.dataset_revisions AS r
     ON r.revision_id = d.dataset_id
+  LEFT JOIN vdi.upload_status AS us
+    USING (dataset_id)
 WHERE
   md.visibility != 'private'
 """
@@ -503,7 +522,7 @@ WHERE
             ownerID      = getUserID("owner_id"),
             isDeleted    = getBoolean("is_deleted"),
             created      = getDateTime("created"),
-            importStatus = getImportStatus("status") ?: DatasetImportStatus.Queued,
+            importStatus = getImportStatus("import_status") ?: DatasetImportStatus.Queued,
             visibility   = getDatasetVisibility("visibility"),
             origin       = getString("origin"),
             name         = getString("name"),
@@ -514,9 +533,10 @@ WHERE
             projects     = getProjectIDList("projects"),
             inserted     = getDateTime("inserted"),
             originalID   = optDatasetID("original_id"),
+            uploadStatus = getString("upload_status")?.let(DatasetUploadStatus::fromString)
+              ?: DatasetUploadStatus.Running,
           )
         }
       }
     }
-
 }

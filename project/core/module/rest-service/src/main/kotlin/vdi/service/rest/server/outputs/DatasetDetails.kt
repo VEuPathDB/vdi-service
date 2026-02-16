@@ -5,8 +5,12 @@ import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.cache.model.RelatedDataset
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 import vdi.model.meta.DatasetDependency
+import vdi.service.rest.conversion.DatasetImportStatusInfo
+import vdi.service.rest.conversion.DatasetOwner
+import vdi.service.rest.conversion.DatasetInstallStatusListEntry
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.generated.model.BioprojectIDReference as APIBioRef
@@ -20,6 +24,9 @@ import vdi.service.rest.generated.model.DOIReference as APIDOI
 import vdi.service.rest.generated.model.ExternalIdentifiers as APIIdentifiers
 import vdi.service.rest.generated.model.LinkedDataset as APILinkedDataset
 import vdi.service.rest.generated.model.SampleYearRange as APIYears
+import vdi.service.rest.conversion.DatasetStatusInfo
+import vdi.service.rest.conversion.DatasetUploadStatusInfo
+import vdi.service.rest.lookups.DatasetStatusLookups
 
 /**
  * API type conversion for use when the dataset metadata is available from the
@@ -28,6 +35,7 @@ import vdi.service.rest.generated.model.SampleYearRange as APIYears
 internal fun DatasetDetails(
   datasetID: DatasetID,
   meta: DatasetMetadata,
+  uploadStatus: DatasetUploadStatus,
   importStatus: DatasetImportStatus?,
   importMessages: List<String>,
   shares: List<DatasetShare>,
@@ -43,7 +51,21 @@ internal fun DatasetDetails(
       it.owner                = DatasetOwner(userInfo[meta.owner]!!)
       it.relatedDatasets      = relatedDatasets.map(::RelatedDatasetInfo).toList()
       it.shares               = shares.map { (user, offer) -> ShareOffer(userInfo[user]!!, offer!!) }
-      it.status               = DatasetStatusInfo(importStatus, importMessages, installs)
+      it.status               = DatasetStatusInfo(
+        DatasetUploadStatusInfo(
+          uploadStatus,
+          if (uploadStatus == DatasetUploadStatus.Failed)
+            DatasetStatusLookups.getUploadError(meta.owner, datasetID.asString)
+          else
+            null
+        ),
+        importStatus?.let { status ->
+          DatasetImportStatusInfo(status, importMessages.takeUnless(Collection<*>::isEmpty))
+        },
+        installs.map { (installTarget, statuses) ->
+          DatasetInstallStatusListEntry(installTarget, statuses)
+        }
+      )
       it.files                = files
     }
 
@@ -65,7 +87,7 @@ private inline fun DatasetDetails.applyMeta(meta: DatasetMetadata) = apply {
   linkedDatasets       = meta.linkedDatasets.map(::LinkedDataset)
   experimentalOrganism = meta.experimentalOrganism?.let(::DatasetOrganism)
   hostOrganism         = meta.hostOrganism?.let(::DatasetOrganism)
-  studyCharacteristics      = meta.studyCharacteristics?.let(::DatasetCharacteristics)
+  studyCharacteristics = meta.studyCharacteristics?.let(::DatasetCharacteristics)
   externalIdentifiers  = meta.externalIdentifiers?.let(::ExternalIdentifiers)
   funding              = meta.funding.map(::DatasetFundingAward)
   shortAttribution     = meta.shortAttribution
@@ -139,6 +161,7 @@ private fun DatasetPublication(publication: DatasetPublication): APIPublication 
   DatasetPublicationImpl().also {
     it.identifier = publication.identifier
     it.type       = DatasetPublicationType(publication.type)
+    it.citation   = publication.citation
     it.isPrimary  = publication.isPrimary
   }
 

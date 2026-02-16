@@ -119,6 +119,8 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
         }
 
         FileName.ManifestFile -> { /* ignore manifest events */ }
+
+        FileName.UploadErrorFile -> { /* ignore manifest events */ }
       }
 
       is DataFilePath -> when (path.fileName) {

@@ -17,10 +17,11 @@ INSERT INTO
     dataset_id
   , external_id
   , type
+  , citation
   , is_primary
   )
 VALUES
-  (?, ?, ?, ?)
+  (?, ?, ?, ?, ?)
 """
 
 internal fun Connection.insertDatasetPublications(
@@ -32,5 +33,6 @@ internal fun Connection.insertDatasetPublications(
     set(1, datasetID)
     set(2, it.identifier)
     set(3, it.type.toString())
+    set(4, it.citation)
     set(5, it.isPrimary)
   }.reduceOrNull(Int::plus) ?: 0
