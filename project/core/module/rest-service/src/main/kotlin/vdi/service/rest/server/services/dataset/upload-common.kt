@@ -252,6 +252,8 @@ fun ControllerBase.uploadFiles(
     throw e
   }
 
+  CacheDB().withTransaction { it.upsertImportControl(datasetID, DatasetImportStatus.Queued) }
+
   if (uploadRefs.docs.isNotEmpty()) {
     logger.debug("uploading dataset meta files")
     try {
