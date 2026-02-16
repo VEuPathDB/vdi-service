@@ -25,6 +25,7 @@ import vdi.core.metrics.Metrics
 import vdi.core.plugin.registry.PluginDatasetTypeMeta
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.logging.mark
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.BadRequestError
@@ -154,6 +155,25 @@ private fun Sequence<File>.toTempPaths(tmpDir: Path): List<Path> =
 
 private val WorkPool = Executors.newFixedThreadPool(10)
 
+fun ControllerBase.writeMetadata(userID: UserID, datasetID: DatasetID, datasetMeta: DatasetMetadata) {
+  try {
+    logger.debug("uploading dataset metadata to object store")
+    DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
+  } catch (e: Throwable) {
+    logger.error("user dataset meta file upload to object store failed:", e)
+
+    CacheDB().withTransaction { it.upsertUploadStatus(datasetID, DatasetUploadStatus.Failed) }
+
+    try {
+      DatasetStore.putUploadError(userID, datasetID, "internal server error while communicating with object store", e)
+    } catch (e2: Throwable) {
+      e.addSuppressed(e2)
+    }
+
+    throw e
+  }
+}
+
 @OptIn(ExperimentalPathApi::class)
 fun ControllerBase.submitUpload(
   datasetID:    DatasetID,
@@ -179,15 +199,6 @@ fun ControllerBase.uploadFiles(
   uploadConfig: UploadConfig,
 ) {
   val logger = logger.mark(userID, datasetID)
-
-  try {
-    logger.debug("uploading dataset metadata to object store")
-    DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
-  } catch (e: Throwable) {
-    logger.error("user dataset meta file upload to object store failed:", e)
-    CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
-    throw e
-  }
 
   logger.debug("checking upload file sizes")
   verifyUploadFileSize(uploadRefs, uploadConfig)

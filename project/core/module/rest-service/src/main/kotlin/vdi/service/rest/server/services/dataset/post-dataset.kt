@@ -61,6 +61,8 @@ fun ControllerBase.createDataset(
       )
     }
 
+  writeMetadata(userID, datasetID, datasetMeta)
+
   submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)
 
   return PostResponse.respond202WithApplicationJson(

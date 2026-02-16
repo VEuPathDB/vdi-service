@@ -90,6 +90,8 @@ internal fun ControllerBase.putDataset(
     resolveDatasetFiles(request.dataFile, request.url, request.docFile, emptyList(), uploadConfig)
   }
 
+  writeMetadata(userID, datasetID, newMeta)
+
   submitUpload(newDatasetID, uploadRefs, newMeta, uploadConfig)
 
   return Either.ofLeft(DatasetPutResponseBodyImpl().apply { datasetId = newDatasetID.toString() })
