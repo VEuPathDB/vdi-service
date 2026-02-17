@@ -58,19 +58,61 @@ configuration files.
 * link:stack-db/definition[Internal Cache DB DDL]
 
 
+=== Common Task Starting Points
+
+==== Updating Cache DB Schema
+
+===== Relevant Locations
+
+* link:stack-db/definition[Cache DB Schema Definitions]
+* link:stack-db/migrations/src/main/sql/db-migrations[Version Migration SQL]
+* link:project/core/lib/db/internal[Database JVM Code (Queries & Wrappers)]
+
+===== Making a Schema Change
+
+1. Make the changes to the stack-db schema definition.
+2. Add a new migration directory containing migration scripts to update existing
+   database instances in the stack-db migrations.
+3. Update the impacted queries, database managers, and POJO types in the
+   `core.lib.db.internal` subproject.
+
+===== Migrations: Additional Explanation
+
+Physically, a migration is a directory full of queries used to apply the changes
+necessary for a target database schema version.  The directories are named after
+the version that they will migrate the database schema to, e.g. a directory
+named `012` would be expected to migrate the database schema to version 12.  The
+directories will be checked in ascending numeric order, only being used if the
+database schema version is less than the version indicated by the directory
+name.
+
+[IMPORTANT]
+VDI does not update the recorded db schema version itself.  The migration is
+expected to perform that update, preferably as its final step/statement.
+
+The migration scripts are baked into the service jar as resources.
+
+On startup, VDI will test the stack-internal cache-db to fetch the current db
+schema version.  VDI will then iterate through the migration directories,
+executing the SQL scripts contained in any directory whose numeric name is
+greater than the current schema version.
+
+[CAUTION]
+VDI will not notice or apply migration scripts that have been altered in schema
+versions less than or equal to the current db schema version.
+
+
 === Building VDI Components
 
 ==== Docker Images
 
-===== VDI Core Server
-
+.VDI Core Server Image
 [source, shell]
 ----
 make build-image
 ----
 
-===== Internal Cache DB
-
+.Internal Cache DB Image
 [source, shell]
 ----
 make build-db
@@ -78,25 +120,22 @@ make build-db
 
 ==== Source Compilation
 
-===== VDI Core Server
+.Regenerate RAML-Based Java Code
+[source, shell]
+----
+make raml-gen
+----
 
+.Compile VDI Core Server
 [source, shell]
 ----
 make build-core-server
 ----
 
-===== Regenerate RAML-Based Source
-
+.Compile Plugin Server
 [source, shell]
 ----
-make raml-gen
-----
-
-===== Plugin Server
-
-[source, shell]
-----
-make raml-gen
+make build-plugin-server
 ----
 
 === Common Tasks
@@ -135,9 +174,7 @@ Copyright 2020 VEuPathDB
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License.  You may obtain a copy of the
-License at
-
-http://www.apache.org/licenses/LICENSE-2.0
+License at link:http://www.apache.org/licenses/LICENSE-2.0[].
 
 Unless required by applicable law or agreed to in writing, software distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
