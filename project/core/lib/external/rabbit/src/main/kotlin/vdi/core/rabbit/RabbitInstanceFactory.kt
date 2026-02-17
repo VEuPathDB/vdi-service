@@ -1,6 +1,8 @@
 package vdi.core.rabbit
 
 import com.rabbitmq.client.ConnectionFactory
+import com.rabbitmq.client.TrustEverythingTrustManager
+import io.netty.handler.ssl.SslContextBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
@@ -17,10 +19,15 @@ internal class RabbitInstanceFactory(config: RabbitMQConfig) {
       password = config.connection.password.asString
       isAutomaticRecoveryEnabled = false
       connectionTimeout = config.connection.connectionTimeout.inWholeMilliseconds.toInt()
-      netty()
 
-      if (config.connection.useTLS) {
-        useSslProtocol()
+      netty().apply {
+        if (config.connection.useTLS) {
+          sslContext(
+            SslContextBuilder.forClient()
+              .trustManager(TrustEverythingTrustManager())
+              .build()
+          )
+        }
       }
     }
 
