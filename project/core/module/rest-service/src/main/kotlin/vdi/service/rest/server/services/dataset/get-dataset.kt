@@ -87,7 +87,7 @@ private fun ControllerBase.getDatasetByID(
 
 private fun ControllerBase.handleMissingMeta(dataset: DatasetRecord): GetDatasetsByVdiIdResponse {
   return if (dataset.created.isBefore(OffsetDateTime.now().minusMinutes(5)))
-    TooEarlyError("The server is taking longer than usual to process the upload for the requested dataset.").wrap()
+    TooEarlyError("The server is taking longer than usual to process the uploaded files for the requested dataset.").wrap()
   else {
     logger.error("dataset was created more than 5 minutes ago but metadata json did not reach minio")
     ServerError(requestID, "The server encountered an error and could not process the dataset upload files.").wrap()
