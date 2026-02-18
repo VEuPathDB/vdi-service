@@ -67,7 +67,7 @@ class KafkaRouter(
     send(tc, runBlocking { EventIDs.issueID() }, userID, datasetID, source)
 
   private fun send(tc: TriggerConfig, eventID: EventID, userID: UserID, datasetID: DatasetID, source: EventSource) {
-    logger.debug("{} sending message {} from {}", createLoggerMarkString(
+    logger.debug("{} sending message to {} from {}", createLoggerMarkString(
       eventID = eventID,
       ownerID = userID,
       datasetID = datasetID,
