@@ -9,8 +9,6 @@ class PluginDatasetTypeMeta(
   val allowedFileExtensions: Array<String>,
   val typeChangesEnabled: Boolean,
   val usesDataPropertiesFiles: Boolean,
-  val varPropertiesFileNameSingular: String = "Variable Properties File",
-  val varPropertiesFileNamePlural: String = "Variable Properties Files",
   val installTargets: Array<InstallTargetID>?,
 ) {
   fun appliesTo(target: InstallTargetID) =

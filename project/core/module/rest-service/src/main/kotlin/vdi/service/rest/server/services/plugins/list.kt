@@ -46,7 +46,5 @@ private fun PluginDataType(dt: DatasetType): PluginDataType =
         usesDataProperties = config.usesDataPropertiesFiles
         maxFileSize = config.maxFileSize.toLong()
         allowedFileExtensions = config.allowedFileExtensions.asList()
-        dataPropsFileNameSingular = config.varPropertiesFileNameSingular
-        dataPropsFileNamePlural = config.varPropertiesFileNamePlural
       }
     }

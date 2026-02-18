@@ -54,7 +54,7 @@ fun DatasetFiles.putVariablePropertiesFile(
     ?: return Respond400("data type ${dataset.type} is not currently enabled")
 
   if (!dtConfig.usesDataPropertiesFiles)
-    return Respond403("dataset type does not permit ${dtConfig.varPropertiesFileNamePlural.lowercase()}")
+    return Respond403("dataset type does not permit additional data properties")
 
   DatasetStore.putVariablePropertiesFile(dataset.ownerID, datasetID, fileName, file::inputStream)
 

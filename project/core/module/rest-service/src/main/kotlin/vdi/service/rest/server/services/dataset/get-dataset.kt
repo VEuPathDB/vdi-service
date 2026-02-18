@@ -1,4 +1,3 @@
-@file:JvmName("DatasetLookupService")
 package vdi.service.rest.server.services.dataset
 
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
@@ -90,7 +89,7 @@ private fun ControllerBase.handleMissingMeta(dataset: DatasetRecord): GetDataset
     TooEarlyError("The server is taking longer than usual to process the uploaded files for the requested dataset.").wrap()
   else {
     logger.error("dataset was created more than 5 minutes ago but its metadata json did not reach minio")
-    ServerError(requestID, "The server encountered an error and could not process the dataset upload files.").wrap()
+    ServerError(requestID, "The server encountered an error while processing the upload for the requested dataset.").wrap()
   }
 }
 

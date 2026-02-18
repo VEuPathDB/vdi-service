@@ -15,8 +15,6 @@ class DataTypeConfig(
   val allowedFileExtensions: Array<String> = emptyArray(),
   val typeChangesEnabled: Boolean = false,
   val usesDataProperties: Boolean = false,
-  val dataPropsFileNameSingular: String = "Data Properties File",
-  val dataPropsFileNamePlural: String = "Data Properties Files",
 ) {
   private companion object {
     const val KeyProjectIDs = "projectIds"

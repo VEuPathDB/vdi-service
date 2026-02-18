@@ -25,8 +25,6 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDatasetTypeMeta>> {
               allowedFileExtensions         = it.allowedFileExtensions,
               typeChangesEnabled            = it.typeChangesEnabled,
               usesDataPropertiesFiles       = it.usesDataProperties,
-              varPropertiesFileNameSingular = it.dataPropsFileNameSingular,
-              varPropertiesFileNamePlural   = it.dataPropsFileNamePlural,
               installTargets                = it.installTargets ?: emptyArray(),
             ) } }
           .onEach { conflicts.computeIfAbsent(it, { ArrayList(1) }).add(pluginName) }

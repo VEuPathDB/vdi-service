@@ -10,6 +10,7 @@
       "type": "string",
       "minLength": 3
     },
+
     "version": {
       "oneOf": [
         {
@@ -22,11 +23,13 @@
         }
       ]
     },
+
     "category": {
       "title": "Data Type Category/Display Name",
       "type": "string",
       "minLength": 3
     },
+
     "typeChangesEnabled": {
       "description": "Whether datasets can be revised from this data type to another.",
       "type": "boolean",
@@ -58,20 +61,6 @@
       "description": "Flag indicating whether the data type allows the use of additional data properties/metadata files.",
       "type": "boolean",
       "default": false
-    },
-
-    "dataPropsFileNameSingular": {
-      "title": "Singular Properties File Form Name",
-      "description": "Name to show for singular data properties file references in user facing text.",
-      "type": "string",
-      "default": "Data Properties File"
-    },
-
-    "dataPropsFileNamePlural": {
-      "title": "Plural Properties File Form Name",
-      "description": "Name to show for plural data properties files references in user facing text.",
-      "type": "string",
-      "default": "Data Properties Files"
     },
 
     "projectIds": {
