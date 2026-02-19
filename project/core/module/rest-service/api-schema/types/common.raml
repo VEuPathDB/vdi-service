@@ -467,10 +467,18 @@ types:
         minLength: 3
 
   DatasetUploadStatusCode:
+    displayName: Dataset Upload Status Code
+    # language=markdown
+    description: |
+      Status of the VDI service's asynchronous upload ingestion process.
+  
+      Uploads may be rejected due to validation or security concerns, or they
+      may fail due to system errors.
     type: string
     enum:
     - running
     - success
+    - rejected
     - failed
 
   DatasetUploadStatusInfo:

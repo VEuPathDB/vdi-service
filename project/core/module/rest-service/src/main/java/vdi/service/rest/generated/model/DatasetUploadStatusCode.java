@@ -9,6 +9,9 @@ public enum DatasetUploadStatusCode {
   @JsonProperty("success")
   SUCCESS("success"),
 
+  @JsonProperty("rejected")
+  REJECTED("rejected"),
+
   @JsonProperty("failed")
   FAILED("failed");
 

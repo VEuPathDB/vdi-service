@@ -31,8 +31,6 @@ public final class JsonField {
   public static final String DATA = "data";
   public static final String DATA_FILE = "dataFile";
   public static final String DATA_PROPERTIES_FILE = "dataPropertiesFile";
-  public static final String DATA_PROPS_FILE_NAME_PLURAL = "dataPropsFileNamePlural";
-  public static final String DATA_PROPS_FILE_NAME_SINGULAR = "dataPropsFileNameSingular";
   public static final String DATA_TYPES = "dataTypes";
   public static final String DATA_UPDATE_TIME = "dataUpdateTime";
   public static final String DATASET_ID = "datasetId";

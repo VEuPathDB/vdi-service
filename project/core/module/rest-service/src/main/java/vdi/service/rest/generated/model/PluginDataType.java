@@ -43,16 +43,4 @@ public interface PluginDataType extends DatasetTypeOutput {
 
   @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
   void setAllowedFileExtensions(List<String> allowedFileExtensions);
-
-  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_SINGULAR)
-  String getDataPropsFileNameSingular();
-
-  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_SINGULAR)
-  void setDataPropsFileNameSingular(String dataPropsFileNameSingular);
-
-  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_PLURAL)
-  String getDataPropsFileNamePlural();
-
-  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_PLURAL)
-  void setDataPropsFileNamePlural(String dataPropsFileNamePlural);
 }

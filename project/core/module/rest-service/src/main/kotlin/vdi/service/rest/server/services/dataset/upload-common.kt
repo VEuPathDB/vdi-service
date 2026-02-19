@@ -210,8 +210,8 @@ fun ControllerBase.uploadFiles(
         TempFiles.withTempDirectory { dir ->
           context(logger) {
             uploadRefs.data[0].repack(
-              into         = archive,
-              using        = dir,
+              into = archive,
+              using = dir,
               dataTypeMeta = PluginRegistry.require(datasetMeta.type),
               uploadConfig = uploadConfig,
             )
@@ -231,8 +231,12 @@ fun ControllerBase.uploadFiles(
       CacheDB().withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
     }
   } catch (e: Throwable) {
+    val uploadStatus: DatasetUploadStatus
+
     if (e is WebApplicationException && (e.response?.status ?: 500) in 400..499) {
       logger.info("rejecting dataset upload for user error: {}", e.message)
+      uploadStatus = DatasetUploadStatus.Rejected
+
       try {
         DatasetStore.putUploadError(userID, datasetID, e.message!!)
       } catch (e2: Throwable) {
@@ -240,14 +244,18 @@ fun ControllerBase.uploadFiles(
       }
     } else {
       logger.error("user dataset upload to object store failed: ", e)
+      uploadStatus = DatasetUploadStatus.Failed
+      Metrics.Upload.failed.inc()
+
       try {
         DatasetStore.putUploadError(userID, datasetID, "internal server error", e)
       } catch (e2: Throwable) {
         e.addSuppressed(e2)
       }
-      Metrics.Upload.failed.inc()
-      CacheDB().withTransaction { it.updateImportControl(datasetID, DatasetImportStatus.Failed) }
+
     }
+
+    CacheDB().withTransaction { it.upsertUploadStatus(datasetID, uploadStatus) }
 
     throw e
   }

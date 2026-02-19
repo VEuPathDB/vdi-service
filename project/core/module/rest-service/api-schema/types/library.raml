@@ -913,10 +913,17 @@ types:
     properties:
       value?: DatasetTypeInput
   DatasetUploadStatusCode:
+    displayName: Dataset Upload Status Code
+    description: |
+      Status of the VDI service's asynchronous upload ingestion process.
+
+      Uploads may be rejected due to validation or security concerns, or they
+      may fail due to system errors.
     type: string
     enum:
       - running
       - success
+      - rejected
       - failed
   DatasetUploadStatusInfo:
     type: object
@@ -1193,8 +1200,6 @@ types:
       usesDataProperties:
         type: boolean
       allowedFileExtensions: string[]
-      dataPropsFileNameSingular: string
-      dataPropsFileNamePlural: string
   PluginListItem:
     displayName: Plugin Info
     type: object

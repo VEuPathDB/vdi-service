@@ -12,9 +12,7 @@ import java.util.List;
     "category",
     "maxFileSize",
     "usesDataProperties",
-    "allowedFileExtensions",
-    "dataPropsFileNameSingular",
-    "dataPropsFileNamePlural"
+    "allowedFileExtensions"
 })
 public class PluginDataTypeImpl implements PluginDataType {
   @JsonProperty(JsonField.NAME)
@@ -34,12 +32,6 @@ public class PluginDataTypeImpl implements PluginDataType {
 
   @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
   private List<String> allowedFileExtensions;
-
-  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_SINGULAR)
-  private String dataPropsFileNameSingular;
-
-  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_PLURAL)
-  private String dataPropsFileNamePlural;
 
   @JsonProperty(JsonField.NAME)
   public String getName() {
@@ -99,25 +91,5 @@ public class PluginDataTypeImpl implements PluginDataType {
   @JsonProperty(JsonField.ALLOWED_FILE_EXTENSIONS)
   public void setAllowedFileExtensions(List<String> allowedFileExtensions) {
     this.allowedFileExtensions = allowedFileExtensions;
-  }
-
-  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_SINGULAR)
-  public String getDataPropsFileNameSingular() {
-    return this.dataPropsFileNameSingular;
-  }
-
-  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_SINGULAR)
-  public void setDataPropsFileNameSingular(String dataPropsFileNameSingular) {
-    this.dataPropsFileNameSingular = dataPropsFileNameSingular;
-  }
-
-  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_PLURAL)
-  public String getDataPropsFileNamePlural() {
-    return this.dataPropsFileNamePlural;
-  }
-
-  @JsonProperty(JsonField.DATA_PROPS_FILE_NAME_PLURAL)
-  public void setDataPropsFileNamePlural(String dataPropsFileNamePlural) {
-    this.dataPropsFileNamePlural = dataPropsFileNamePlural;
   }
 }
