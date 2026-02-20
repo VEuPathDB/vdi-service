@@ -1,12 +1,10 @@
 package vdi.core.db.app
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
+import javax.sql.DataSource
+import kotlin.math.min
 import vdi.core.db.app.health.DatabaseDependency
 import vdi.core.health.RemoteDependencies
 import vdi.db.app.InstallTargetRegistry
-import vdi.db.app.TargetDBPlatform
-import vdi.db.app.TargetDatabaseDetails
 import vdi.model.meta.DatasetType
 import vdi.model.meta.InstallTargetID
 
@@ -15,19 +13,38 @@ object AppDatabaseRegistry {
 
   init {
     val builders = HashMap<InstallTargetID, MutableMap<DatasetType, TargetDatabaseReference>>(16)
+    val distinctDatabaseReferences = HashMap<TargetDatabaseConfig, UByte>(16)
 
-    InstallTargetRegistry.asSequence()
-      .forEach { (target, type, config) ->
-        val targetDB = TargetDatabaseReference(
-          identifier = target,
-          details    = config.controlDatabase,
-          dataSource = config.controlDatabase.makeDataSource()
-        )
+    // toList to evaluate stream and resolve all db refs
+    val targetDatabases = InstallTargetRegistry.asSequence()
+      .map { (target, type, config) ->
+        val dbRef = TargetDatabaseConfig(config.controlDatabase)
 
-        builders.computeIfAbsent(target) { HashMap(2) }[type] = targetDB
+        distinctDatabaseReferences.compute(dbRef) { k, v ->
+          min(v?.let { (it + (dbRef.poolSize.toInt() * 0.5).toUInt()) } ?: k.poolSize.toUInt(), 20u).toUByte()
+        }
 
-        RemoteDependencies.register(DatabaseDependency(targetDB))
+        Quad(target, type, config, dbRef)
       }
+      .toList()
+
+    val sharedDatabaseRefs = HashMap<TargetDatabaseConfig, DataSource>(targetDatabases.size)
+
+    targetDatabases.forEach { (target, type, config, dbRef) ->
+      val targetDB = TargetDatabaseReference(
+        identifier = target,
+        details    = config.controlDatabase,
+        dataSource = sharedDatabaseRefs.computeIfAbsent(dbRef) {
+          // get computed pool size
+          dbRef.poolSize = distinctDatabaseReferences[dbRef]!!
+          dbRef.makeDataSource()
+        }
+      )
+
+      builders.computeIfAbsent(target) { HashMap(2) }[type] = targetDB
+
+      RemoteDependencies.register(DatabaseDependency(targetDB))
+    }
 
     dataSources = HashMap<InstallTargetID, AppDBRegistryCollection>(builders.size)
       .also { src -> builders.forEach { (k, v) ->
@@ -68,27 +85,4 @@ object AppDatabaseRegistry {
   fun require(key: InstallTargetID, dataType: DatasetType): TargetDatabaseReference =
     get(key, dataType)
       ?: throw IllegalStateException("required AppDB connection $key was not registered with AppDatabases")
-
-  private fun TargetDatabaseDetails.makeDataSource() =
-    HikariConfig()
-      .also {
-        it.jdbcUrl = toJDBCString()
-        it.username = user
-        it.password = pass.asString
-        it.maximumPoolSize = poolSize.toInt()
-        it.driverClassName = driverClass
-      }
-      .let(::HikariDataSource)
-
-  private fun TargetDatabaseDetails.toJDBCString() =
-    when (platform) {
-      TargetDBPlatform.Postgres -> "jdbc:postgresql://$server/$name"
-      TargetDBPlatform.Oracle   -> "jdbc:oracle:thin:@//$server/$name"
-    }
-
-  private inline val TargetDatabaseDetails.driverClass get() =
-    when (platform) {
-      TargetDBPlatform.Postgres -> "org.postgresql.Driver"
-      TargetDBPlatform.Oracle   -> "oracle.jdbc.OracleDriver"
-    }
 }
