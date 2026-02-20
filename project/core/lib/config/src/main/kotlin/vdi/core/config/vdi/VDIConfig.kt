@@ -32,6 +32,8 @@ data class VDIConfig(
 
   val siteBuild: String,
 
+  val sharedTargetDbPooling: SharedPoolConfig = SharedPoolConfig(),
+
   val installTargets: Set<InstallTargetConfig>,
 ) {
   object JSONKey {

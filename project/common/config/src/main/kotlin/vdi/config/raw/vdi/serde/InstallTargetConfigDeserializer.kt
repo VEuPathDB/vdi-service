@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
+import kotlin.time.Duration.Companion.milliseconds
 import vdi.config.parse.fields.PartialHostAddress
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
 import vdi.config.raw.db.serde.DatabaseConnectionConfigDeserializer.Companion.deserialize
@@ -28,7 +29,16 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
 
     if (obj[JsonKey.Enabled]?.booleanValue() == false) {
       val dummyDB =
-        DirectDatabaseConnectionConfig("disabled", SecretString("disabled"), null, null, "disabled", PartialHostAddress("disabled", null), "disabled")
+        DirectDatabaseConnectionConfig(
+          "disabled",
+          SecretString("disabled"),
+          null,
+          null,
+          0.milliseconds,
+          "disabled",
+          PartialHostAddress("disabled", null),
+          "disabled",
+        )
 
       return InstallTargetConfig(
         enabled         = false,

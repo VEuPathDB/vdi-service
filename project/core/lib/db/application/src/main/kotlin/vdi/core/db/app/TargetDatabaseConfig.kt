@@ -3,6 +3,7 @@ package vdi.core.db.app
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import javax.sql.DataSource
+import kotlin.time.Duration
 import vdi.db.app.TargetDBPlatform
 import vdi.db.app.TargetDatabaseDetails
 import vdi.model.field.HostAddress
@@ -15,6 +16,7 @@ internal class TargetDatabaseConfig(
   val pass: SecretString,
   val platform: TargetDBPlatform,
   var poolSize: UByte,
+  var idleTimeout: Duration,
 ) {
   constructor(details: TargetDatabaseDetails): this(
     details.name,
@@ -23,6 +25,7 @@ internal class TargetDatabaseConfig(
     details.pass,
     details.platform,
     details.poolSize,
+    details.idleTimeout,
   )
 
   override fun equals(other: Any?): Boolean {
@@ -55,6 +58,7 @@ internal class TargetDatabaseConfig(
         it.password = pass.asString
         it.maximumPoolSize = poolSize.toInt()
         it.driverClassName = driverClass
+        it.idleTimeout = idleTimeout.inWholeMilliseconds
       }
       .let(::HikariDataSource)
 

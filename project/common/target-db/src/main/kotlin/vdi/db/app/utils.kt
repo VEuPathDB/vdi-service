@@ -1,6 +1,7 @@
 package vdi.db.app
 
 import org.veupathdb.lib.ldap.LDAP
+import kotlin.time.Duration.Companion.minutes
 import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
 import vdi.config.raw.db.LDAPDatabaseConnectionConfig
@@ -25,6 +26,7 @@ internal fun DatabaseConnectionConfig.resolve(ldap: LDAP?): TargetDatabaseDetail
         schema = schema ?: username,
         poolSize = poolSize ?: 5u,
         platform = platform,
+        idleTimeout = idleTimeout ?: 10.minutes,
       ) }
 
     is LDAPDatabaseConnectionConfig   -> {
@@ -38,7 +40,8 @@ internal fun DatabaseConnectionConfig.resolve(ldap: LDAP?): TargetDatabaseDetail
         pass = password,
         schema = schema ?: username,
         poolSize = poolSize ?: 5u,
-        platform = platform
+        platform = platform,
+        idleTimeout = idleTimeout ?: 10.minutes,
       )
     }
   }

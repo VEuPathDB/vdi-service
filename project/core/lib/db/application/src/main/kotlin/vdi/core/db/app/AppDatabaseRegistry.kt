@@ -1,7 +1,7 @@
 package vdi.core.db.app
 
 import javax.sql.DataSource
-import kotlin.math.min
+import vdi.core.config.loadAndCacheStackConfig
 import vdi.core.db.app.health.DatabaseDependency
 import vdi.core.health.RemoteDependencies
 import vdi.db.app.InstallTargetRegistry
@@ -13,7 +13,9 @@ object AppDatabaseRegistry {
 
   init {
     val builders = HashMap<InstallTargetID, MutableMap<DatasetType, TargetDatabaseReference>>(16)
-    val distinctDatabaseReferences = HashMap<TargetDatabaseConfig, UByte>(16)
+    val distinctDatabaseReferences = HashMap<TargetDatabaseConfig, Unit>(16)
+
+    val sharedPoolConfig = loadAndCacheStackConfig().vdi.sharedTargetDbPooling
 
     // toList to evaluate stream and resolve all db refs
     val targetDatabases = InstallTargetRegistry.asSequence()
@@ -21,7 +23,11 @@ object AppDatabaseRegistry {
         val dbRef = TargetDatabaseConfig(config.controlDatabase)
 
         distinctDatabaseReferences.compute(dbRef) { k, v ->
-          min(v?.let { (it + (dbRef.poolSize.toInt() * 0.5).toUInt()) } ?: k.poolSize.toUInt(), 20u).toUByte()
+          // If we have multiple targets sharing a db reference
+          if (v != null) {
+            k.idleTimeout = sharedPoolConfig.idleTimeout
+            k.poolSize    = sharedPoolConfig.poolSize
+          }
         }
 
         Quad(target, type, config, dbRef)
@@ -35,8 +41,6 @@ object AppDatabaseRegistry {
         identifier = target,
         details    = config.controlDatabase,
         dataSource = sharedDatabaseRefs.computeIfAbsent(dbRef) {
-          // get computed pool size
-          dbRef.poolSize = distinctDatabaseReferences[dbRef]!!
           dbRef.makeDataSource()
         }
       )

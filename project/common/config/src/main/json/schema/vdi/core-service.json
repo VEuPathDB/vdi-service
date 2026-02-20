@@ -47,6 +47,27 @@
       "type": "string",
       "examples": [ "build-65" ]
     },
+    "sharedTargetDbPooling": {
+      "title": "Shared Install-Target Connection Pool Options",
+      "description": "Configuration options for database connection pools that are shared between multiple install-targets.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "poolSize": {
+          "title": "Maximum Connection Pool Size",
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 255,
+          "default": 20
+        },
+        "idleTimeout": {
+          "title": "Idle Connection Timeout",
+          "description": "Maximum time an idle connection is allowed to live before being removed from the pool.",
+          "$ref": "../common.json#/$defs/duration",
+          "default": "10m"
+        }
+      }
+    },
     "installTargets": {
       "title": "Dataset Installation Targets",
       "type": "array",

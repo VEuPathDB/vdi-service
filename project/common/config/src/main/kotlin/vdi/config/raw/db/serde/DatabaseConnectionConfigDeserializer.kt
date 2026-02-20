@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.contains
+import kotlin.time.Duration
 import vdi.config.parse.serde.HostAddressDeserializer
 import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
@@ -22,14 +23,16 @@ class DatabaseConnectionConfigDeserializer: StdDeserializer<DatabaseConnectionCo
       val pass = SecretString(get("password").textValue())
 
       val poolSize = get("poolSize")?.intValue()?.toUByte()
+      val idleTimeout = get("idleTimeout")?.textValue()?.let(Duration::parse)
 
       return if ("lookupCn" in this) {
         LDAPDatabaseConnectionConfig(
-          username = user,
-          password = pass,
-          poolSize = poolSize,
-          lookupCN = get("lookupCn").textValue(),
-          schema   = get("schema")?.textValue(),
+          username    = user,
+          password    = pass,
+          poolSize    = poolSize,
+          lookupCN    = get("lookupCn").textValue(),
+          schema      = get("schema")?.textValue(),
+          idleTimeout = idleTimeout,
         )
       } else {
         val server = get("server").let {
@@ -41,13 +44,14 @@ class DatabaseConnectionConfigDeserializer: StdDeserializer<DatabaseConnectionCo
         }
 
         DirectDatabaseConnectionConfig(
-          username = user,
-          password = pass,
-          platform = get("platform").textValue(),
-          poolSize = poolSize,
-          server   = server,
-          dbName   = get("name").textValue(),
-          schema   = get("schema")?.textValue(),
+          username    = user,
+          password    = pass,
+          platform    = get("platform").textValue(),
+          poolSize    = poolSize,
+          server      = server,
+          dbName      = get("name").textValue(),
+          schema      = get("schema")?.textValue(),
+          idleTimeout = idleTimeout,
         )
       }
     }

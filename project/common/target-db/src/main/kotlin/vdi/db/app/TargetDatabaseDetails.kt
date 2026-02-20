@@ -1,5 +1,6 @@
 package vdi.db.app
 
+import kotlin.time.Duration
 import vdi.model.field.HostAddress
 import vdi.model.field.SecretString
 
@@ -11,5 +12,6 @@ data class TargetDatabaseDetails(
   val schema: String,
   val poolSize: UByte,
   val platform: TargetDBPlatform,
+  val idleTimeout: Duration,
 )
 
