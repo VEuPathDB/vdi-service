@@ -81,6 +81,7 @@ class ServiceConfig(val stackConfig: StackConfig, val manifestConfig: ManifestCo
         null, // platform
         poolSize?.toInt(),
         "app-db",
+        200,
       )
       is DirectDatabaseConnectionConfig -> DbOptionsImpl(
         null, // lookup cn
@@ -91,7 +92,8 @@ class ServiceConfig(val stackConfig: StackConfig, val manifestConfig: ManifestCo
         password.asString,
         SupportedPlatform.toPlatform(platform),
         poolSize?.toInt(),
-        "app-db"
+        "app-db",
+        200,
       )
     }
 }
