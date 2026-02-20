@@ -46,6 +46,7 @@ private fun Map<String, Any>.appendDbInfo(entry: TargetDatabaseDetails, ref: Hik
   map["controlSchema"] = entry.schema
   map["activeConnections"] = ref.hikariPoolMXBean.activeConnections
   map["idleConnections"] = ref.hikariPoolMXBean.idleConnections
+  map["poolInstance"] = System.identityHashCode(ref)
 
   return map
 }
