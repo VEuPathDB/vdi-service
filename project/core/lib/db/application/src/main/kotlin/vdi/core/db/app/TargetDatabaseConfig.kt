@@ -15,8 +15,6 @@ internal class TargetDatabaseConfig(
   val user: String,
   val pass: SecretString,
   val platform: TargetDBPlatform,
-  var poolSize: UByte,
-  var idleTimeout: Duration,
 ) {
   constructor(details: TargetDatabaseDetails): this(
     details.name,
@@ -24,8 +22,6 @@ internal class TargetDatabaseConfig(
     details.user,
     details.pass,
     details.platform,
-    details.poolSize,
-    details.idleTimeout,
   )
 
   override fun equals(other: Any?): Boolean {
@@ -50,7 +46,7 @@ internal class TargetDatabaseConfig(
     return result
   }
 
-  fun makeDataSource(): DataSource =
+  fun makeDataSource(poolSize: UByte, idleTimeout: Duration): DataSource =
     HikariConfig()
       .also {
         it.jdbcUrl = toJDBCString()
