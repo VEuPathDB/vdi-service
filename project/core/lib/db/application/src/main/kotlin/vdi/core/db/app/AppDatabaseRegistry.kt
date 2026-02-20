@@ -27,6 +27,8 @@ object AppDatabaseRegistry {
           if (v != null) {
             k.idleTimeout = sharedPoolConfig.idleTimeout
             k.poolSize    = sharedPoolConfig.poolSize
+            dbRef.idleTimeout = sharedPoolConfig.idleTimeout
+            dbRef.poolSize    = sharedPoolConfig.poolSize
           }
         }
 
