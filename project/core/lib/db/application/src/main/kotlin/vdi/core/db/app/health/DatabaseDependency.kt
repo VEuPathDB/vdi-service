@@ -1,5 +1,6 @@
 package vdi.core.db.app.health
 
+import com.zaxxer.hikari.HikariDataSource
 import org.slf4j.LoggerFactory
 import vdi.core.db.app.TargetDatabaseReference
 import vdi.core.health.Dependency
@@ -15,7 +16,7 @@ class DatabaseDependency(
   protocol = "",
   host     = connection.details.server.host,
   port     = connection.details.server.port,
-  extra    = extra.appendDbInfo(connection.details),
+  extra    = extra.appendDbInfo(connection.details, connection.dataSource as HikariDataSource),
 ) {
   override fun checkStatus() =
     when (connection.details.platform) {
@@ -37,12 +38,14 @@ class DatabaseDependency(
     }
 }
 
-private fun Map<String, Any>.appendDbInfo(entry: TargetDatabaseDetails): Map<String, Any> {
+private fun Map<String, Any>.appendDbInfo(entry: TargetDatabaseDetails, ref: HikariDataSource): Map<String, Any> {
   val map = this as? MutableMap ?: this.toMutableMap()
 
   map["platform"] = entry.platform.name
   map["host"] = entry.server.host
   map["controlSchema"] = entry.schema
+  map["activeConnections"] = ref.hikariPoolMXBean.activeConnections
+  map["idleConnections"] = ref.hikariPoolMXBean.idleConnections
 
   return map
 }
