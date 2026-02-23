@@ -3,6 +3,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 
 plugins { id("build-conventions") }
 
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath(platform(libs.json.jackson.bom))
+    classpath(libs.bundles.jackson)
+    classpath("com.networknt:json-schema-validator:3.0.0")
+  }
+}
+
 dependencies {
   implementation(libs.yaml)
   implementation(libs.json.schema.validation)

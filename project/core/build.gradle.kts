@@ -13,6 +13,18 @@ dependencies {
   implementation(project(":module:bootstrap"))
 }
 
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath(platform(libs.json.jackson.bom))
+    classpath(libs.bundles.jackson)
+    classpath("com.networknt:json-schema-validator:3.0.0")
+  }
+}
+
 // Fat Jar Config
 tasks.shadowJar {
 //  dependencyFilter.exclude { it.moduleGroup == "commons-logging" }

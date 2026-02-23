@@ -25,13 +25,3 @@ pluginManagement {
     gradlePluginPortal()
   }
 }
-
-buildscript {
-  repositories {
-    mavenCentral()
-  }
-
-  dependencies {
-    classpath("com.networknt:json-schema-validator:3.0.0")
-  }
-}
