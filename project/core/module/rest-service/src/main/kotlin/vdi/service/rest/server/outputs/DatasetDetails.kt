@@ -66,9 +66,13 @@ internal fun DatasetDetails(
         importStatus?.let { status ->
           DatasetImportStatusInfo(status, importMessages.takeUnless(Collection<*>::isEmpty))
         },
-        installs.map { (installTarget, statuses) ->
-          DatasetInstallStatusListEntry(installTarget, statuses)
-        }.takeUnless(List<*>::isEmpty)
+        installs.asSequence()
+          .filter { (_, statuses) -> statuses?.meta != null }
+          .map { (installTarget, statuses) ->
+            DatasetInstallStatusListEntry(installTarget, statuses)
+          }
+          .toList()
+          .takeUnless(List<*>::isEmpty)
       )
       it.files = files
     }
