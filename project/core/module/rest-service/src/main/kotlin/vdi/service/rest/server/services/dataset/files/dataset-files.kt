@@ -68,7 +68,9 @@ fun <T: ControllerBase> T.listDatasetFilesForUser(vdiId: DatasetID) =
 
 fun listDatasetFiles(owner: UserID, vdiId: DatasetID) =
   DatasetFileListingImpl().apply {
-    upload = DatasetZipDetails(DatasetStore.getImportReadyZipSize(owner, vdiId), CacheDB().selectUploadFiles(vdiId))
+    upload = DatasetStore.getImportReadyZipSize(owner, vdiId)
+      .takeUnless { it < 0 }
+      ?.let { DatasetZipDetails(it, CacheDB().selectUploadFiles(vdiId)) }
     install = DatasetStore.getInstallReadyZipSize(owner, vdiId)
       .takeUnless { it < 0 }
       ?.let { DatasetZipDetails(it, CacheDB().selectInstallFiles(vdiId)) }

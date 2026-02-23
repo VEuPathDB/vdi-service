@@ -17,3 +17,6 @@ fun MetaFile(s3Object: S3Object): MetadataFile =
 
 fun UploadErrorFile(path: String, bucket: ObjectContainer): UploadErrorFile =
   LazyUploadErrorFile(path, bucket)
+
+fun UploadErrorFile(s3Object: S3Object): UploadErrorFile =
+  MaterializedUploadErrorFile(s3Object)

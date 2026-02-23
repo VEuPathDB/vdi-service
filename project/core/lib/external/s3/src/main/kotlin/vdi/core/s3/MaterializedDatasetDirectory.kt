@@ -46,6 +46,7 @@ internal class MaterializedDatasetDirectory(
   private val installableFile: DataFile?,
   private val deleteFlag: FlagFile?,
   private val revisedFlag: FlagFile?,
+  private val uploadErrorFile: UploadErrorFile?,
   private val shares: Map<UserID, Pair<ShareOffer, ShareReceipt>>,
   private val dataPropertiesFiles: List<DataPropertiesFile>,
 ): DatasetDirectory {
@@ -64,6 +65,7 @@ internal class MaterializedDatasetDirectory(
       var installableFile: DataFile? = null
       var deleteFlag: FlagFile? = null
       var revisedFlag: FlagFile? = null
+      var uploadError: UploadErrorFile? = null
 
       val shareRefBuilders = HashMap<UserID, ShareRefBuilder>(4)
       val dataPropertiesFiles = ArrayList<DataPropertiesFile>(1)
@@ -89,6 +91,7 @@ internal class MaterializedDatasetDirectory(
           is MetaFilePath -> when (path.fileName) {
             FileName.MetadataFile -> metaFile = MetaFile(it)
             FileName.ManifestFile -> manifest = ManifestFile(it)
+            FileName.UploadErrorFile -> uploadError = UploadErrorFile(it)
           }
 
           is ShareFilePath -> when (path.fileName) {
@@ -111,6 +114,7 @@ internal class MaterializedDatasetDirectory(
         installableFile = installableFile,
         deleteFlag      = deleteFlag,
         revisedFlag     = revisedFlag,
+        uploadErrorFile = uploadError,
         shares          = shareRefBuilders.mapValues { (_, ref) -> ref.build(pathFactory) },
         pathFactory     = pathFactory,
         dataPropertiesFiles    = dataPropertiesFiles,
@@ -258,16 +262,16 @@ internal class MaterializedDatasetDirectory(
     throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun hasUploadErrorFile(): Boolean =
-    throw UnsupportedOperationException("failed uploads cannot be materialized")
+    uploadErrorFile != null
 
   override fun getUploadErrorFile(): UploadErrorFile =
-    throw UnsupportedOperationException("failed uploads cannot be materialized")
+    uploadErrorFile ?: UploadErrorFile(pathFactory.uploadErrorFile(), bucket.objects)
 
   override fun putUploadErrorFile(report: UploadErrorReport) =
-    throw UnsupportedOperationException("failed uploads cannot be materialized")
+    throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun deleteUploadErrorFile() =
-    throw UnsupportedOperationException("failed uploads cannot be materialized")
+    throw UnsupportedOperationException("${javaClass.name} is read-only")
 
   override fun toString() = "EagerDatasetDir($ownerID/$datasetID)"
 

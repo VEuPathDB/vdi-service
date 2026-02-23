@@ -22,7 +22,11 @@ object FileName {
   const val ManifestFile = DatasetManifestFilename
   const val UploadErrorFile = "upload-error.json"
 
-  inline val MetaFileNames get() = arrayOf(MetadataFile, ManifestFile)
+  inline val MetaFileNames get() = arrayOf(
+    MetadataFile,
+    ManifestFile,
+    UploadErrorFile,
+  )
 
   // Share Files
   const val ShareDirectory = "shares"

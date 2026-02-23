@@ -56,10 +56,12 @@ internal fun DatasetDetails(
       it.status = DatasetStatusInfo(
         DatasetUploadStatusInfo(
           uploadStatus,
-          if (uploadStatus == DatasetUploadStatus.Failed)
-            DatasetStatusLookups.getUploadError(meta.owner, datasetID.asString)
-          else
-            null
+          when (uploadStatus) {
+            DatasetUploadStatus.Failed,
+            DatasetUploadStatus.Rejected ->
+              DatasetStatusLookups.getUploadError(meta.owner, datasetID.asString)
+            else -> null
+          }
         ),
         importStatus?.let { status ->
           DatasetImportStatusInfo(status, importMessages.takeUnless(Collection<*>::isEmpty))
