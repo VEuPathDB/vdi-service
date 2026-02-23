@@ -12,7 +12,7 @@ import java.util.List;
     "countries",
     "years",
     "studySpecies",
-    "diseases",
+    "outcomes",
     "associatedFactors",
     "participantAges",
     "sampleTypes"
@@ -33,8 +33,8 @@ public class DatasetCharacteristicsPatchImpl implements DatasetCharacteristicsPa
   @JsonProperty(JsonField.STUDY_SPECIES)
   private DatasetCharacteristicsPatch.StudySpeciesType studySpecies;
 
-  @JsonProperty(JsonField.DISEASES)
-  private DatasetCharacteristicsPatch.DiseasesType diseases;
+  @JsonProperty(JsonField.OUTCOMES)
+  private DatasetCharacteristicsPatch.OutcomesType outcomes;
 
   @JsonProperty(JsonField.ASSOCIATED_FACTORS)
   private DatasetCharacteristicsPatch.AssociatedFactorsType associatedFactors;
@@ -95,14 +95,14 @@ public class DatasetCharacteristicsPatchImpl implements DatasetCharacteristicsPa
     this.studySpecies = studySpecies;
   }
 
-  @JsonProperty(JsonField.DISEASES)
-  public DatasetCharacteristicsPatch.DiseasesType getDiseases() {
-    return this.diseases;
+  @JsonProperty(JsonField.OUTCOMES)
+  public DatasetCharacteristicsPatch.OutcomesType getOutcomes() {
+    return this.outcomes;
   }
 
-  @JsonProperty(JsonField.DISEASES)
-  public void setDiseases(DatasetCharacteristicsPatch.DiseasesType diseases) {
-    this.diseases = diseases;
+  @JsonProperty(JsonField.OUTCOMES)
+  public void setOutcomes(DatasetCharacteristicsPatch.OutcomesType outcomes) {
+    this.outcomes = outcomes;
   }
 
   @JsonProperty(JsonField.ASSOCIATED_FACTORS)
@@ -155,6 +155,23 @@ public class DatasetCharacteristicsPatchImpl implements DatasetCharacteristicsPa
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonPropertyOrder("value")
+  public static class OutcomesTypeImpl implements DatasetCharacteristicsPatch.OutcomesType {
+    @JsonProperty("value")
+    private List<String> value;
+
+    @JsonProperty("value")
+    public List<String> getValue() {
+      return this.value;
+    }
+
+    @JsonProperty("value")
+    public void setValue(List<String> value) {
+      this.value = value;
+    }
+  }
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @JsonPropertyOrder("value")
   public static class SampleTypesTypeImpl implements DatasetCharacteristicsPatch.SampleTypesType {
     @JsonProperty("value")
     private List<String> value;
@@ -173,23 +190,6 @@ public class DatasetCharacteristicsPatchImpl implements DatasetCharacteristicsPa
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonPropertyOrder("value")
   public static class StudySpeciesTypeImpl implements DatasetCharacteristicsPatch.StudySpeciesType {
-    @JsonProperty("value")
-    private List<String> value;
-
-    @JsonProperty("value")
-    public List<String> getValue() {
-      return this.value;
-    }
-
-    @JsonProperty("value")
-    public void setValue(List<String> value) {
-      this.value = value;
-    }
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @JsonPropertyOrder("value")
-  public static class DiseasesTypeImpl implements DatasetCharacteristicsPatch.DiseasesType {
     @JsonProperty("value")
     private List<String> value;
 

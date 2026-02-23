@@ -37,7 +37,7 @@ internal fun DatasetPatchRequestBody.cleanup() {
     countries?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
     years?.apply { cleanup(::getValue, SampleYearRange?::cleanup) }
     studySpecies?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
-    diseases?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
+    outcomes?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
     associatedFactors?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
     participantAges?.apply { cleanupString(::getValue) }
     sampleTypes?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
@@ -191,7 +191,7 @@ private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristic
   years?.value?.validate(JF.STUDY_CHARACTERISTICS..JF.YEARS, errors)
 
   studySpecies?.value?.validateStudySpecies(JF.STUDY_CHARACTERISTICS, errors)
-  diseases?.value?.validateDiseases(JF.STUDY_CHARACTERISTICS, errors)
+  outcomes?.value?.validateOutcomes(JF.STUDY_CHARACTERISTICS, errors)
   associatedFactors?.value?.validateAssociatedFactors(JF.STUDY_CHARACTERISTICS, errors)
   participantAges?.value?.validateParticipantAges(JF.STUDY_CHARACTERISTICS, errors)
   sampleTypes?.value?.validateSampleTypes(JF.STUDY_CHARACTERISTICS, errors)

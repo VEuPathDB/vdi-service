@@ -29,9 +29,9 @@ data class DatasetCharacteristics(
   /**
    * Diseases or health conditions.
    */
-  @param:JsonProperty(Diseases)
-  @field:JsonProperty(Diseases)
-  val diseases: List<String> = emptyList(),
+  @param:JsonProperty(Outcomes)
+  @field:JsonProperty(Outcomes)
+  val outcomes: List<String> = emptyList(),
 
   @param:JsonProperty(AssociatedFactors)
   @field:JsonProperty(AssociatedFactors)
@@ -48,7 +48,7 @@ data class DatasetCharacteristics(
   companion object JsonKey {
     const val AssociatedFactors = "associatedFactors"
     const val Countries         = "countries"
-    const val Diseases          = "diseases"
+    const val Outcomes          = "outcomes"
     const val ParticipantAges   = "participantAges"
     const val SampleTypes       = "sampleTypes"
     const val StudyDesign       = "studyDesign"

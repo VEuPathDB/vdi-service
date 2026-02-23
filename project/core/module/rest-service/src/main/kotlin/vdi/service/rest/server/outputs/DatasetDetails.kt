@@ -9,19 +9,19 @@ import vdi.core.db.cache.model.RelatedDataset
 import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 import vdi.model.meta.DatasetDependency
+import vdi.service.rest.conversion.BioprojectIDReference
 import vdi.service.rest.conversion.DatasetImportStatusInfo
 import vdi.service.rest.conversion.DatasetOwner
 import vdi.service.rest.conversion.DatasetInstallStatusListEntry
+import vdi.service.rest.conversion.DOIReference
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.model.UserDetails
-import vdi.service.rest.generated.model.BioprojectIDReference as APIBioRef
 import vdi.service.rest.generated.model.DatasetCharacteristics as APICharacteristics
 import vdi.service.rest.generated.model.DatasetContact as APIContact
 import vdi.service.rest.generated.model.DatasetFundingAward as APIFunding
 import vdi.service.rest.generated.model.DatasetHyperlink as APIHyperlink
 import vdi.service.rest.generated.model.DatasetOrganism as APIOrganism
 import vdi.service.rest.generated.model.DatasetPublication as APIPublication
-import vdi.service.rest.generated.model.DOIReference as APIDOI
 import vdi.service.rest.generated.model.ExternalIdentifiers as APIIdentifiers
 import vdi.service.rest.generated.model.LinkedDataset as APILinkedDataset
 import vdi.service.rest.generated.model.SampleYearRange as APIYears
@@ -107,12 +107,6 @@ private inline fun DatasetDetails.applyMeta(meta: DatasetMetadata) = apply {
   shortName = meta.shortName
 }
 
-private fun BioprojectIDReference(ref: BioprojectIDReference): APIBioRef =
-  BioprojectIDReferenceImpl().also {
-    it.id = ref.id
-    it.description = ref.description
-  }
-
 private fun DatasetCharacteristics(characteristics: DatasetCharacteristics): APICharacteristics =
   DatasetCharacteristicsImpl().also {
     it.studyDesign = characteristics.studyDesign
@@ -120,7 +114,7 @@ private fun DatasetCharacteristics(characteristics: DatasetCharacteristics): API
     it.countries = characteristics.countries
     it.years = characteristics.years?.let(::SampleYearRange)
     it.studySpecies = characteristics.studySpecies
-    it.diseases = characteristics.diseases
+    it.outcomes = characteristics.outcomes
     it.associatedFactors = characteristics.associatedFactors
     it.participantAges = characteristics.participantAges
     it.sampleTypes = characteristics.sampleTypes
@@ -171,12 +165,6 @@ private fun DatasetPublication(publication: DatasetPublication): APIPublication 
     it.type = DatasetPublicationType(publication.type)
     it.citation = publication.citation
     it.isPrimary = publication.isPrimary
-  }
-
-private fun DOIReference(ref: DOIReference): APIDOI =
-  DOIReferenceImpl().also {
-    it.doi = ref.doi
-    it.description = ref.description
   }
 
 private fun ExternalIdentifiers(identifiers: ExternalDatasetIdentifiers): APIIdentifiers =

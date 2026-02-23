@@ -1,4 +1,4 @@
-package vdi.core.db.app.sql.dataset_disease
+package vdi.core.db.app.sql.dataset_outcome
 
 import io.foxcapades.kdbc.usingPreparedUpdate
 import java.sql.Connection
@@ -7,7 +7,7 @@ import vdi.core.db.app.sql.set
 import vdi.model.meta.DatasetID
 
 // language=postgresql
-private fun SQL(schema: String) = "DELETE FROM ${schema}.${Table.Diseases} WHERE dataset_id = ?"
+private fun SQL(schema: String) = "DELETE FROM ${schema}.${Table.Outcomes} WHERE dataset_id = ?"
 
-internal fun Connection.deleteDiseases(schema: String, datasetID: DatasetID) =
+internal fun Connection.deleteOutcomes(schema: String, datasetID: DatasetID) =
   usingPreparedUpdate(SQL(schema)) { it[1] = datasetID }

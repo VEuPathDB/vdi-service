@@ -38,11 +38,11 @@ public interface DatasetCharacteristicsPatch {
   @JsonProperty(JsonField.STUDY_SPECIES)
   void setStudySpecies(StudySpeciesType studySpecies);
 
-  @JsonProperty(JsonField.DISEASES)
-  DiseasesType getDiseases();
+  @JsonProperty(JsonField.OUTCOMES)
+  OutcomesType getOutcomes();
 
-  @JsonProperty(JsonField.DISEASES)
-  void setDiseases(DiseasesType diseases);
+  @JsonProperty(JsonField.OUTCOMES)
+  void setOutcomes(OutcomesType outcomes);
 
   @JsonProperty(JsonField.ASSOCIATED_FACTORS)
   AssociatedFactorsType getAssociatedFactors();
@@ -74,6 +74,17 @@ public interface DatasetCharacteristicsPatch {
   }
 
   @JsonDeserialize(
+      as = DatasetCharacteristicsPatchImpl.OutcomesTypeImpl.class
+  )
+  interface OutcomesType {
+    @JsonProperty("value")
+    List<String> getValue();
+
+    @JsonProperty("value")
+    void setValue(List<String> value);
+  }
+
+  @JsonDeserialize(
       as = DatasetCharacteristicsPatchImpl.SampleTypesTypeImpl.class
   )
   interface SampleTypesType {
@@ -88,17 +99,6 @@ public interface DatasetCharacteristicsPatch {
       as = DatasetCharacteristicsPatchImpl.StudySpeciesTypeImpl.class
   )
   interface StudySpeciesType {
-    @JsonProperty("value")
-    List<String> getValue();
-
-    @JsonProperty("value")
-    void setValue(List<String> value);
-  }
-
-  @JsonDeserialize(
-      as = DatasetCharacteristicsPatchImpl.DiseasesTypeImpl.class
-  )
-  interface DiseasesType {
     @JsonProperty("value")
     List<String> getValue();
 

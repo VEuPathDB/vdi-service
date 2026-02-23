@@ -17,8 +17,8 @@ import vdi.core.db.app.sql.dataset_country.deleteCountries
 import vdi.core.db.app.sql.dataset_country.insertCountries
 import vdi.core.db.app.sql.dataset_dependency.deleteDatasetDependencies
 import vdi.core.db.app.sql.dataset_dependency.insertDatasetDependencies
-import vdi.core.db.app.sql.dataset_disease.deleteDiseases
-import vdi.core.db.app.sql.dataset_disease.insertDiseases
+import vdi.core.db.app.sql.dataset_outcome.deleteOutcomes
+import vdi.core.db.app.sql.dataset_outcome.insertOutcomes
 import vdi.core.db.app.sql.dataset_doi.deleteDOIs
 import vdi.core.db.app.sql.dataset_doi.insertDOIs
 import vdi.core.db.app.sql.dataset_funding_award.deleteFundingAwards
@@ -162,17 +162,17 @@ internal abstract class AppDBTransactionImpl(
 
   // endregion dataset_dependency
 
-  // region dataset_disease
+  // region dataset_outcome
 
-  override fun deleteDiseases(datasetID: DatasetID) =
-    connection.deleteDiseases(schema, datasetID)
-      .also { if (it > 0) logger.debug("deleted {} dataset_disease records from dataset {}", it, datasetID) }
+  override fun deleteOutcomes(datasetID: DatasetID) =
+    connection.deleteOutcomes(schema, datasetID)
+      .also { if (it > 0) logger.debug("deleted {} dataset_outcome records from dataset {}", it, datasetID) }
 
-  override fun insertDiseases(datasetID: DatasetID, diseases: Iterable<String>) =
-    connection.insertDiseases(schema, datasetID, diseases)
-      .also { if (it > 0) logger.debug("inserted {} dataset_disease records for dataset {}", it, datasetID) }
+  override fun insertOutcomes(datasetID: DatasetID, outcomes: Iterable<String>) =
+    connection.insertOutcomes(schema, datasetID, outcomes)
+      .also { if (it > 0) logger.debug("inserted {} dataset_outcome records for dataset {}", it, datasetID) }
 
-  // endregion dataset_disease
+  // endregion dataset_outcome
 
   // region dataset_dois
 

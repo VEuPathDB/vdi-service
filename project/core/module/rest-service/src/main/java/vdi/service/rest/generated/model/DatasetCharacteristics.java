@@ -38,11 +38,11 @@ public interface DatasetCharacteristics {
   @JsonProperty(JsonField.STUDY_SPECIES)
   void setStudySpecies(List<String> studySpecies);
 
-  @JsonProperty(JsonField.DISEASES)
-  List<String> getDiseases();
+  @JsonProperty(JsonField.OUTCOMES)
+  List<String> getOutcomes();
 
-  @JsonProperty(JsonField.DISEASES)
-  void setDiseases(List<String> diseases);
+  @JsonProperty(JsonField.OUTCOMES)
+  void setOutcomes(List<String> outcomes);
 
   @JsonProperty(JsonField.ASSOCIATED_FACTORS)
   List<String> getAssociatedFactors();

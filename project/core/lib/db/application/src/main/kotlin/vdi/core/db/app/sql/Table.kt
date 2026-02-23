@@ -8,7 +8,7 @@ internal object Table {
   const val Contacts          = "dataset_contact"
   const val Countries         = "dataset_country"
   const val Dependencies      = "dataset_dependency"
-  const val Diseases          = "dataset_disease"
+  const val Outcomes          = "dataset_outcome"
   const val DOIs              = "dataset_doi"
   const val FundingAwards     = "dataset_funding_award"
   const val Hyperlinks        = "dataset_hyperlink"

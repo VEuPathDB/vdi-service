@@ -12,7 +12,7 @@ import java.util.List;
     "countries",
     "years",
     "studySpecies",
-    "diseases",
+    "outcomes",
     "associatedFactors",
     "participantAges",
     "sampleTypes"
@@ -33,8 +33,8 @@ public class DatasetCharacteristicsImpl implements DatasetCharacteristics {
   @JsonProperty(JsonField.STUDY_SPECIES)
   private List<String> studySpecies;
 
-  @JsonProperty(JsonField.DISEASES)
-  private List<String> diseases;
+  @JsonProperty(JsonField.OUTCOMES)
+  private List<String> outcomes;
 
   @JsonProperty(JsonField.ASSOCIATED_FACTORS)
   private List<String> associatedFactors;
@@ -95,14 +95,14 @@ public class DatasetCharacteristicsImpl implements DatasetCharacteristics {
     this.studySpecies = studySpecies;
   }
 
-  @JsonProperty(JsonField.DISEASES)
-  public List<String> getDiseases() {
-    return this.diseases;
+  @JsonProperty(JsonField.OUTCOMES)
+  public List<String> getOutcomes() {
+    return this.outcomes;
   }
 
-  @JsonProperty(JsonField.DISEASES)
-  public void setDiseases(List<String> diseases) {
-    this.diseases = diseases;
+  @JsonProperty(JsonField.OUTCOMES)
+  public void setOutcomes(List<String> outcomes) {
+    this.outcomes = outcomes;
   }
 
   @JsonProperty(JsonField.ASSOCIATED_FACTORS)

@@ -40,7 +40,6 @@ public final class JsonField {
   public static final String DEPENDENCY = "dependency";
   public static final String DESCRIPTION = "description";
   public static final String DETAILS = "details";
-  public static final String DISEASES = "diseases";
   public static final String DOC_FILE = "docFile";
   public static final String DOCUMENTS = "documents";
   public static final String DOI = "doi";
@@ -95,6 +94,7 @@ public final class JsonField {
   public static final String ONLINE = "online";
   public static final String ORIGIN = "origin";
   public static final String ORIGINAL_ID = "originalId";
+  public static final String OUTCOMES = "outcomes";
   public static final String OWNER = "owner";
   public static final String PARTICIPANT_AGES = "participantAges";
   public static final String PERFORM_DELETES = "performDeletes";

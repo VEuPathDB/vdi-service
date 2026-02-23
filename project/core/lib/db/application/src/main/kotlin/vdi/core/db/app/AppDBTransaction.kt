@@ -102,13 +102,13 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // endregion dataset_dependency
 
-  // region dataset_disease
+  // region dataset_outcome
 
-  fun deleteDiseases(datasetID: DatasetID): Int
+  fun deleteOutcomes(datasetID: DatasetID): Int
 
-  fun insertDiseases(datasetID: DatasetID, diseases: Iterable<String>): Int
+  fun insertOutcomes(datasetID: DatasetID, outcomes: Iterable<String>): Int
 
-  // endregion dataset_disease
+  // endregion dataset_outcome
 
   // region dataset_doi
 

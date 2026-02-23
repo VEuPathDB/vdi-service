@@ -1,4 +1,4 @@
-package vdi.core.db.app.sql.dataset_disease
+package vdi.core.db.app.sql.dataset_outcome
 
 import io.foxcapades.kdbc.set
 import io.foxcapades.kdbc.withPreparedBatchUpdate
@@ -8,14 +8,14 @@ import vdi.core.db.app.sql.set
 import vdi.model.meta.DatasetID
 
 // language=postgresql
-private fun SQL(schema: String) = "INSERT INTO ${schema}.${Table.Diseases} VALUES (?, ?)"
+private fun SQL(schema: String) = "INSERT INTO ${schema}.${Table.Outcomes} VALUES (?, ?)"
 
-internal fun Connection.insertDiseases(
+internal fun Connection.insertOutcomes(
   schema: String,
   datasetID: DatasetID,
-  diseases: Iterable<String>,
+  outcomes: Iterable<String>,
 ) =
-  withPreparedBatchUpdate(SQL(schema), diseases) {
+  withPreparedBatchUpdate(SQL(schema), outcomes) {
     set(1, datasetID)
     set(2, it)
   }.reduceOrNull(Int::plus) ?: 0
