@@ -4,9 +4,8 @@ package vdi.config
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
-import com.networknt.schema.ExecutionContext
-import com.networknt.schema.JsonSchemaFactory
-import com.networknt.schema.SpecVersion
+import com.networknt.schema.SchemaRegistry
+import com.networknt.schema.SpecificationVersion
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
 import java.util.jar.Manifest
@@ -43,18 +42,12 @@ fun loadAndValidateConfig(path: Path, schema: Path): ObjectNode {
 
   val validator = object {}.javaClass.getResourceAsStream(schema.toString())
     .let { it ?: throw ConfigurationException("failed to load config schema $schema") }
-    .use { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it)!! }
+    .use { SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_2020_12).getSchema(it) }
 
   val json = JSON.convertValue<ObjectNode>(Yaml().load<Any>(path.readText().interpolateFrom(System.getenv())))
     .apply { remove(listOf("definitions", $$"$schema")) }
 
-  validator.validate(json) { ctx: ExecutionContext -> ctx.executionConfig.formatAssertionsEnabled = true }
-    ?.takeUnless { it.isEmpty() }
-    ?.also {
-      MetaLogger
-        .error("service config validation failed:\n{}", JSON.writerWithDefaultPrettyPrinter().writeValueAsString(it))
-      throw ConfigurationException("service config validation failed")
-    }
+  validator.validate(json) { ctx -> ctx.executionConfig { it.formatAssertionsEnabled(true) } }
 
   return json
 }

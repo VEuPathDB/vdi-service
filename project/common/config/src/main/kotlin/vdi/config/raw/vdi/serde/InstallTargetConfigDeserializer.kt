@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
-import com.networknt.schema.JsonSchemaFactory
-import com.networknt.schema.SpecVersion
+import com.networknt.schema.SchemaRegistry
+import com.networknt.schema.SpecificationVersion
 import kotlin.time.Duration.Companion.milliseconds
 import vdi.config.parse.fields.PartialHostAddress
 import vdi.config.raw.db.DirectDatabaseConnectionConfig
@@ -58,7 +58,7 @@ internal class InstallTargetConfigDeserializer: StdDeserializer<InstallTargetCon
       controlDB       = (obj[JsonKey.ControlDB] as ObjectNode).deserialize(),
       dataDB          = (obj[JsonKey.DataDB] as ObjectNode).deserialize(),
       metaValidation  = obj[JsonKey.MetaValidation]
-        ?.let { JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012).getSchema(it) },
+        ?.let { SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_2020_12).getSchema(it) },
       datasetFileRoot = fileRoot,
     )
   }

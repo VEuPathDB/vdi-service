@@ -2,7 +2,7 @@ package vdi.config.raw.vdi
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.networknt.schema.JsonSchema
+import com.networknt.schema.Schema
 import vdi.config.raw.db.DatabaseConnectionConfig
 import vdi.config.raw.vdi.serde.InstallTargetConfigDeserializer
 import vdi.model.meta.DatasetType
@@ -35,7 +35,7 @@ data class InstallTargetConfig(
 
   @param:JsonProperty(JsonKey.MetaValidation)
   @field:JsonProperty(JsonKey.MetaValidation)
-  val metaValidation: JsonSchema? = null,
+  val metaValidation: Schema? = null,
 
   @param:JsonProperty(JsonKey.FileRoot)
   @field:JsonProperty(JsonKey.FileRoot)

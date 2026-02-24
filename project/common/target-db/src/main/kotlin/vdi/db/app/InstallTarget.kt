@@ -1,6 +1,6 @@
 package vdi.db.app
 
-import com.networknt.schema.JsonSchema
+import com.networknt.schema.Schema
 import vdi.model.meta.InstallTargetID
 
 data class InstallTarget(
@@ -8,5 +8,5 @@ data class InstallTarget(
   val name: String,
   val installDatabase: TargetDatabaseDetails,
   val controlDatabase: TargetDatabaseDetails,
-  val metaValidation: JsonSchema?,
+  val metaValidation: Schema?,
 )
