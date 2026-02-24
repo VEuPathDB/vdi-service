@@ -26,7 +26,7 @@ internal fun DatasetListEntry(
   origin: String,
   installTargets: List<InstallTargetID>,
   status: DatasetStatusInfo,
-  shares: List<DatasetListShareUser>,
+  shares: List<DatasetListShareUser>?,
   fileCount: Int,
   fileSizeTotal: Long,
   created: OffsetDateTime,
@@ -54,7 +54,7 @@ internal fun DatasetListEntry(
 
 internal fun DatasetRecord.toExternal(
   owner:    UserDetails,
-  installs: Map<InstallTargetID, InstallStatuses?>,
+  installs: Map<InstallTargetID, InstallStatuses?>?,
   fileInfo: DatasetFileSummary?,
   shares:   List<DatasetListShareUser>?,
 ): DatasetListEntry {
@@ -69,9 +69,10 @@ internal fun DatasetRecord.toExternal(
     status           = DatasetStatusInfo(
       DatasetUploadStatusInfo(uploadStatus, null),
       importStatus?.let { DatasetImportStatusInfo(it, null) },
-      installs.map { (k, v) -> DatasetInstallStatusListEntry(k, v) },
+      installs?.map { (k, v) -> DatasetInstallStatusListEntry(k, v) }
+        ?.takeUnless(List<*>::isEmpty),
     ),
-    shares           = shares ?: emptyList(),
+    shares           = shares,
     fileCount        = fileInfo?.count?.toInt() ?: 0,
     fileSizeTotal    = fileInfo?.size?.toLong() ?: 0,
     created          = created.defaultZone(),

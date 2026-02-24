@@ -89,7 +89,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
   return datasetList.map {
     it.toExternal(
       owner    = userDetails.requireDetails(it.ownerID),
-      installs = datasetInstallStatusMap[it.datasetID] ?: emptyMap(),
+      installs = datasetInstallStatusMap[it.datasetID],
       fileInfo = fileSummaries[it.datasetID],
       shares   = if (it.ownerID != requesterID)
         null
@@ -103,6 +103,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
             )
           }
           ?.toList()
+          ?.takeUnless(List<*>::isEmpty)
     )
   }
 }

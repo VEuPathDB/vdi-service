@@ -38,7 +38,7 @@ class Resources(opts: ServiceConfig) : ContainerResources(opts) {
     CommunityDatasets::class.java,
     DatasetByID::class.java,
     DatasetFiles::class.java,
-    DatasetList::class.java,
+    DatasetListController::class.java,
     DatasetSharePut::class.java,
     MetaInfo::class.java,
     PluginInfo::class.java,

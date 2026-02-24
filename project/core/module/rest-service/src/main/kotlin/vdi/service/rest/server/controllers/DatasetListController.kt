@@ -23,7 +23,7 @@ import vdi.service.rest.generated.resources.Datasets.GetDatasetsResponse as GetR
 import vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse as PostResponse
 
 @Authenticated(allowGuests = false)
-class DatasetList(
+class DatasetListController(
   @Context request: ContainerRequest,
   @param:Context val uploadConfig: UploadConfig,
 )
