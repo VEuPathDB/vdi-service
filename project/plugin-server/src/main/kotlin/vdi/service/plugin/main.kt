@@ -7,6 +7,7 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlin.io.path.Path
 import vdi.config.loadManifestConfig
 import vdi.config.loadTypedConfig
+import vdi.db.app.InstallTargetRegistry
 import vdi.logging.MetaLogger
 import vdi.service.plugin.conf.PluginServerConfig
 import vdi.service.plugin.conf.ServiceConfiguration
@@ -22,6 +23,8 @@ fun main() {
   val manifest = loadManifestConfig()
   MetaLogger.info("=".repeat(80))
   MetaLogger.info("starting VDI plugin server version: {}", manifest.gitTag)
+
+  InstallTargetRegistry.run { /*do nothing, imported for side effect*/ }
 
   val config = loadTypedConfig<PluginServerConfig>(schema = Path("/schema/config/plugin-config.json")).vdi
   val name   = System.getenv("PLUGIN_ID")

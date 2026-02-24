@@ -23,11 +23,14 @@ object InstallTargetRegistry {
     )) }
 
     registry = config.installTargets.asSequence()
-      .filter { it.enabled.also { enabled -> when {
-        enabled -> MetaLogger.info("install target {} is marked as enabled", it.targetName)
-        else    -> MetaLogger.warn("install target {} is marked as disabled", it.targetName)
-      } } }
-      .map { c ->
+      .filter {
+        it.enabled.also { enabled ->
+          when {
+            enabled -> MetaLogger.info("install target {} is marked as enabled", it.targetName)
+            else    -> MetaLogger.warn("install target {} is marked as disabled", it.targetName)
+          }
+        }
+      }.associate { c ->
         InstallTarget(
           id              = c.targetID,
           name            = c.targetName,
@@ -35,13 +38,13 @@ object InstallTargetRegistry {
           controlDatabase = c.controlDB.resolve(ldap),
           metaValidation  = c.metaValidation,
         ).let { tgt ->
-          c.targetID to InstallTargetInstanceRegistry(registry = when {
-            c.dataTypes.isEmpty() -> mapOf(FallbackDatasetType to tgt)
-            else                  -> c.dataTypes.associateWith { tgt }
-          })
+          c.targetID to InstallTargetInstanceRegistry(
+            registry = when {
+              c.dataTypes.isEmpty() -> mapOf(FallbackDatasetType to tgt)
+              else -> c.dataTypes.associateWith { tgt }
+            })
         }
       }
-      .toMap()
   }
 
   operator fun get(installTarget: InstallTargetID) =
