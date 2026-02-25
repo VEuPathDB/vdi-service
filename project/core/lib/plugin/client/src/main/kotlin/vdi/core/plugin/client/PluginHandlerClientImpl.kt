@@ -253,7 +253,7 @@ internal class PluginHandlerClientImpl(
     return when (Status.valueOf(response.status.value)) {
       Status.Success     -> EmptySuccessResponse
       Status.ScriptError -> ScriptErrorResponse(response.readJSON())
-      Status.ServerError -> ScriptErrorResponse(response.readJSON())
+      Status.ServerError -> ServerErrorResponse(response.readJSON())
       else               -> throw IllegalStateException("plugin server responded with invalid code ${response.status}")
     }
   }

@@ -53,7 +53,7 @@ object AppDatabaseRegistry {
 
       builders.computeIfAbsent(target) { HashMap(2) }[type] = targetDB
 
-      RemoteDependencies.register(DatabaseDependency(targetDB))
+      RemoteDependencies.register(DatabaseDependency(targetDB, mapOf("dataSchema" to config.installDatabase)))
     }
 
     dataSources = HashMap<InstallTargetID, AppDBRegistryCollection>(builders.size)
