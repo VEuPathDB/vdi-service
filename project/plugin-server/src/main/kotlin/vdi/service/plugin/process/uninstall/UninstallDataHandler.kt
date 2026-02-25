@@ -4,15 +4,16 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.exists
-import kotlin.io.path.moveTo
 import kotlin.time.Duration.Companion.seconds
 import vdi.io.plugin.responses.UninstallResponse
 import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.script.ScriptExecutor
 import vdi.service.plugin.script.newErrorResponse
 import vdi.service.plugin.service.AbstractInstallHandler
+import vdi.service.plugin.util.deleteRecursively
+import vdi.service.plugin.util.exists
+import vdi.service.plugin.util.moveTo
+import vdi.service.plugin.util.resolve
 import vdi.util.fmt.RFC3339
 import vdi.util.io.LoggingOutputStream
 
@@ -69,7 +70,7 @@ private constructor(context: UninstallDataContext, executor: ScriptExecutor, met
     logger.debug("attempting to delete dataset directory {}", installPath)
 
     installPath
-      .moveTo(installPath.parent.resolve("deleting-$datasetID-${LocalDateTime.now().format(RFC3339)}"))
+      .moveTo(installPath.parent!!.resolve("deleting-$datasetID-${LocalDateTime.now().format(RFC3339)}"))
       .deleteRecursively()
 
     logger.info("deleted dataset directory {}", installPath)

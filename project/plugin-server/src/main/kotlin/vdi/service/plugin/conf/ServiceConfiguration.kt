@@ -1,6 +1,6 @@
 package vdi.service.plugin.conf
 
-import kotlin.io.path.Path
+import kotlinx.io.files.Path
 import vdi.config.raw.vdi.PluginConfig
 import vdi.service.plugin.consts.ConfigDefault
 import vdi.service.plugin.process.install.data.CheckCompatibilityScript

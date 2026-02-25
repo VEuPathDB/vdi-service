@@ -2,35 +2,35 @@ package vdi.service.plugin.server.context
 
 import io.ktor.http.content.PartData
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.util.asStream
-import io.ktor.utils.io.jvm.javaio.toInputStream
-import java.nio.file.Path
+import io.ktor.utils.io.asSource
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.writeString
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import kotlin.io.path.createFile
-import kotlin.io.path.outputStream
+import vdi.service.plugin.util.toKtxPath
 import vdi.util.fs.TempFiles
 
-internal const val DataDictionaryDirectoryName = "data-dict"
-
 internal fun PartData.handlePayload(workspace: Path, fileName: String): Path {
-  val payload = workspace.resolve(fileName)
+  val payload = Path(workspace, fileName)
 
-  payload.createFile()
-  payload.outputStream().use {
+  SystemFileSystem.sink(payload).use {
+    val buf = it.buffered()
     when (this) {
-      is PartData.BinaryChannelItem -> provider().toInputStream().transferTo(it)
-      is PartData.BinaryItem        -> provider().asStream().transferTo(it)
-      is PartData.FileItem          -> provider().toInputStream().transferTo(it)
-      is PartData.FormItem          -> value.byteInputStream().transferTo(it)
+      is PartData.BinaryChannelItem -> provider().asSource().buffered().transferTo(buf)
+      is PartData.BinaryItem        -> provider().transferTo(buf)
+      is PartData.FileItem          -> provider().asSource().buffered().transferTo(buf)
+      is PartData.FormItem          -> buf.writeString(value)
     }
+    buf.flush()
   }
 
   return payload
 }
 
 internal suspend fun <T> withDoubleTempDirs(fn: suspend (Path, Path) -> T): T =
-  TempFiles.withTempDirectory { dir1 -> TempFiles.withTempDirectory { dir2 -> fn(dir1, dir2) } }
+  TempFiles.withTempDirectory { dir1 -> TempFiles.withTempDirectory { dir2 -> fn(dir1.toKtxPath(), dir2.toKtxPath()) } }
 
 @Suppress("NOTHING_TO_INLINE")
 @OptIn(ExperimentalContracts::class)

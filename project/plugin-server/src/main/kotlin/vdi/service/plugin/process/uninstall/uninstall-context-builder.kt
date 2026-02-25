@@ -13,6 +13,7 @@ import vdi.io.plugin.requests.UninstallRequest
 import vdi.json.JSON
 import vdi.service.plugin.model.ApplicationContext
 import vdi.service.plugin.server.context.withDatabaseDetails
+import vdi.service.plugin.util.toKtxPath
 import vdi.util.fs.TempFiles
 
 internal suspend fun ApplicationCall.withUninstallContext(
@@ -28,7 +29,7 @@ internal suspend fun ApplicationCall.withUninstallContext(
     withDatabaseDetails(body.installTarget, body.type) {
       fn(UninstallDataContext(
         pluginName     = appCtx.config.name,
-        workspace      = workspace,
+        workspace      = workspace.toKtxPath(),
         customPath     = appCtx.config.customPath,
         request        = body,
         installPath    = appCtx.pathFactory.makePath(body.installTarget, body.vdiID),

@@ -1,7 +1,7 @@
 package vdi.service.plugin.server.context
 
+import kotlinx.io.files.Path
 import org.slf4j.Logger
-import java.nio.file.Path
 import vdi.model.EventID
 import vdi.model.meta.DatasetID
 import vdi.service.plugin.script.PluginScript

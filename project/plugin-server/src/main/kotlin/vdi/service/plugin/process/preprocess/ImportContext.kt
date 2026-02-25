@@ -1,6 +1,6 @@
 package vdi.service.plugin.process.preprocess
 
-import java.nio.file.Path
+import kotlinx.io.files.Path
 import vdi.io.plugin.requests.ImportRequest
 import vdi.logging.logger
 import vdi.logging.mark

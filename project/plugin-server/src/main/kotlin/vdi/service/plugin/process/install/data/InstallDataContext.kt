@@ -1,6 +1,6 @@
 package vdi.service.plugin.process.install.data
 
-import java.nio.file.Path
+import kotlinx.io.files.Path
 import vdi.db.app.TargetDatabaseDetails
 import vdi.io.plugin.requests.InstallDataRequest
 import vdi.logging.logger

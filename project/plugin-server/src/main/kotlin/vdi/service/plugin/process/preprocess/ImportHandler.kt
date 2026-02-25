@@ -2,7 +2,10 @@ package vdi.service.plugin.process.preprocess
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import java.nio.file.Path
+import kotlinx.io.asOutputStream
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 import kotlin.io.path.*
@@ -26,6 +29,8 @@ import vdi.service.plugin.service.InputDirName
 import vdi.service.plugin.service.OutputDirName
 import vdi.service.plugin.service.OutputFileName
 import vdi.service.plugin.util.Base36
+import vdi.service.plugin.util.fileSize
+import vdi.service.plugin.util.toJavaPath
 import vdi.util.fn.Either
 import vdi.util.fn.leftOr
 import vdi.util.io.LineListOutputStream
@@ -33,6 +38,7 @@ import vdi.util.io.LoggingOutputStream
 import vdi.util.zip.CompressionLevel
 import vdi.util.zip.compress
 import vdi.util.zip.zipEntries
+import java.nio.file.Path as JavaPath
 
 /**
  * Executes 'import' dataset preprocessing and validation.
@@ -45,7 +51,7 @@ private constructor(
   executor: ScriptExecutor,
   metrics:  ScriptMetrics,
 )
-: AbstractScriptHandler<Either<Path, ImportResponse>, ImportContext>(context, executor, metrics)
+: AbstractScriptHandler<Either<JavaPath, ImportResponse>, ImportContext>(context, executor, metrics)
 {
   companion object {
     context(ctx: ImportContext)
@@ -53,8 +59,8 @@ private constructor(
       ImportHandler(ctx, executor, metrics).run()
   }
 
-  private val inputDirectory  = workspace.resolve(InputDirName).createDirectory()
-  private val outputDirectory = workspace.resolve(OutputDirName).createDirectory()
+  private val inputDirectory  = Path(workspace, InputDirName).also(SystemFileSystem::createDirectories)
+  private val outputDirectory = Path(workspace, OutputDirName).also(SystemFileSystem::createDirectories)
 
   private inline val script
     get() = scriptContext.scriptConfig
@@ -72,8 +78,8 @@ private constructor(
    *    compressed results.
    */
   @OptIn(ExperimentalPathApi::class)
-  override suspend fun runJob(): Either<Path, ImportResponse> {
-    val inputFiles   = unpackInput()
+  override suspend fun runJob(): Either<JavaPath, ImportResponse> {
+    val inputFiles = unpackInput()
     val warnings = executeScript()
 
     // If validation failed, or some other error occurred, stop here.
@@ -83,12 +89,14 @@ private constructor(
     val outputFiles = collectOutputFiles()
       .leftOr { return Either.right(it) }
 
-    val dataFilesZip = workspace.resolve(FileName.DataFile)
-      .also { it.compress(outputFiles) }
+    val dataFilesZip = Path(workspace, FileName.DataFile)
+      .toJavaPath()
+      .also { it.compress(outputFiles.map(Path::toJavaPath)) }
 
-    inputDirectory.deleteRecursively()
+    inputDirectory.toJavaPath().deleteRecursively()
 
-    return workspace.resolve(OutputFileName)
+    return Path(workspace, OutputFileName)
+      .toJavaPath()
       .also { it.compress(
         listOf(
           writeManifestFile(inputFiles, outputFiles),
@@ -97,7 +105,7 @@ private constructor(
         ),
         CompressionLevel(0u)
       ) }
-      .also { outputDirectory.deleteRecursively() }
+      .also { outputDirectory.toJavaPath().deleteRecursively() }
       .let { Either.left(it) }
   }
 
@@ -121,20 +129,24 @@ private constructor(
    * to build the `vdi-manifest.json` file.
    */
   private fun unpackInput(): Collection<Pair<Path, Long>> {
-    scriptContext.importReadyZip.zipEntries().forEach { (entry, inp) ->
-      val file = inputDirectory.resolve(entry.name)
-      file.outputStream().use { out -> inp.transferTo(out) }
-    }
+    val jvmImportZip = scriptContext.importReadyZip.toJavaPath()
 
-    scriptContext.importReadyZip.deleteExisting()
+    jvmImportZip
+      .zipEntries()
+      .forEach { (entry, inp) ->
+        val file = Path(inputDirectory, entry.name).toJavaPath()
+        file.outputStream().use { out -> inp.transferTo(out) }
+      }
 
-    val inputFiles = inputDirectory.listDirectoryEntries()
+    jvmImportZip.deleteExisting()
+
+    val inputFiles = SystemFileSystem.list(inputDirectory)
 
     // Write this out AFTER we gather the input files as this is not a file we
     // want to track in the manifest.
     writeInputMetaFile()
 
-    return inputFiles.map { it to it.fileSize() }
+    return inputFiles.map { it to it.fileSize()!! }
   }
 
   /**
@@ -156,7 +168,7 @@ private constructor(
     return executor.executeScript(
       script.path,
       workspace,
-      arrayOf(inputDirectory.absolutePathString(), outputDirectory.absolutePathString()),
+      arrayOf(inputDirectory.toJavaPath().absolutePathString(), outputDirectory.toJavaPath().absolutePathString()),
       buildScriptEnv(),
     ) {
       coroutineScope {
@@ -195,7 +207,7 @@ private constructor(
 
   private fun collectOutputFiles(): Either<MutableCollection<Path>, ErrorResponse> {
     // Collect a list of the files that the import script spit out.
-    val outputFiles = outputDirectory.listDirectoryEntries()
+    val outputFiles = SystemFileSystem.list(outputDirectory)
       .toMutableList()
 
     // Ensure that _something_ was produced.
@@ -209,24 +221,32 @@ private constructor(
   }
 
   private fun writeManifestFile(inputFiles: Collection<Pair<Path, Long>>, outputFiles: Collection<Path>) =
-    outputDirectory.resolve(DatasetManifestFilename)
-      .createFile()
-      .apply { outputStream().use { JSON.writeValue(it, buildManifest(inputFiles, outputFiles)) } }
+    Path(outputDirectory, DatasetManifestFilename)
+      .also { file -> SystemFileSystem.sink(file).buffered().use { sink ->
+        JSON.writeValue(sink.asOutputStream(), buildManifest(inputFiles, outputFiles))
+        sink.flush()
+      } }
+      .toJavaPath()
 
   private fun writeInputMetaFile() =
-    inputDirectory.resolve(DatasetMetaFilename)
-      .createFile()
-      .apply { outputStream().use { JSON.writeValue(it, scriptContext.request.meta) } }
+    Path(inputDirectory, DatasetMetaFilename)
+      .also { file -> SystemFileSystem.sink(file).buffered().use { sink ->
+        JSON.writeValue(sink.asOutputStream(), scriptContext.request.meta)
+        sink.flush()
+      } }
+      .toJavaPath()
 
   private fun writeWarningFile(warnings: ValidationResponse) =
-    outputDirectory.resolve(FileName.WarningsFile)
-      .createFile()
-      .apply { outputStream().use { JSON.writeValue(it, warnings) } }
+    Path(outputDirectory, FileName.WarningsFile)
+      .also { file -> SystemFileSystem.sink(file).buffered().use { sink ->
+        JSON.writeValue(sink.asOutputStream(), warnings)
+      } }
+      .toJavaPath()
 
   private fun buildManifest(inputFiles: Collection<Pair<Path, Long>>, outputFiles: Collection<Path>) =
     DatasetManifest(
       userUploadFiles = inputFiles.map { DatasetFileInfo(it.first.name, it.second.toULong()) },
-      installReadyFiles = outputFiles.map { DatasetFileInfo(it.name, it.fileSize().toULong()) },
+      installReadyFiles = outputFiles.map { DatasetFileInfo(it.name, SystemFileSystem.metadataOrNull(it)!!.size.toULong()) },
     )
 }
 

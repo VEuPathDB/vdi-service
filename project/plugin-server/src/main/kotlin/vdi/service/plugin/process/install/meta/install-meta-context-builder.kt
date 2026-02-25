@@ -9,7 +9,7 @@ import io.ktor.server.request.contentType
 import io.ktor.server.request.receiveMultipart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.nio.file.Path
+import kotlinx.io.files.Path
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

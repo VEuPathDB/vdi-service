@@ -1,6 +1,6 @@
 package vdi.service.plugin.process.preprocess
 
-import java.nio.file.Path
+import kotlinx.io.files.Path
 import kotlin.time.Duration
 import vdi.service.plugin.script.ExitStatus
 import vdi.service.plugin.script.PluginScript

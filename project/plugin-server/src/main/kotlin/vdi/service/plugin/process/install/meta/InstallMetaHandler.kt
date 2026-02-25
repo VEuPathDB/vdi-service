@@ -2,11 +2,11 @@ package vdi.service.plugin.process.install.meta
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.io.asOutputStream
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import org.slf4j.Logger
-import java.nio.file.Path
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.createFile
-import kotlin.io.path.outputStream
 import kotlin.time.Duration.Companion.seconds
 import vdi.io.plugin.responses.ErrorResponse
 import vdi.io.plugin.responses.InstallMetaResponse
@@ -30,9 +30,11 @@ private constructor(
 : AbstractInstallHandler<InstallMetaResponse?, InstallMetaContext>(context, executor, metrics)
 {
   override suspend fun runJob(): InstallMetaResponse? {
-    val metaFile = workspace.resolve(DatasetMetaFilename)
-      .createFile()
-      .apply { outputStream().use { JSON.writeValue(it, scriptContext.metadata) } }
+    val metaFile = Path(workspace, DatasetMetaFilename)
+      .also { file -> SystemFileSystem.sink(file).buffered().use { sink ->
+        JSON.writeValue(sink.asOutputStream(), scriptContext.metadata)
+        sink.flush()
+      } }
 
     return runJob(InstallMetaJob(
       executor,
@@ -68,8 +70,8 @@ private constructor(
         job.workspace,
         arrayOf(
           job.script.datasetID.toString(),
-          job.metaFile.absolutePathString(),
-          job.script.dataPropertiesPath?.absolutePathString() ?: "",
+          SystemFileSystem.resolve(job.metaFile).toString(),
+          job.script.dataPropertiesPath?.let(SystemFileSystem::resolve)?.toString() ?: "",
         ),
         job.environment
       ) {

@@ -1,13 +1,13 @@
 package vdi.service.plugin.process.install.data
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import org.slf4j.Logger
 import java.io.IOException
 import java.io.OutputStreamWriter
-import java.nio.file.Path
-import kotlin.io.path.*
+import kotlin.io.path.relativeTo
 import kotlin.time.Duration.Companion.seconds
 import vdi.io.plugin.responses.InstallDataResponse
 import vdi.io.plugin.responses.MissingDependencyResponse
@@ -24,9 +24,9 @@ import vdi.service.plugin.script.ScriptProcess
 import vdi.service.plugin.script.newErrorResponse
 import vdi.service.plugin.service.AbstractInstallHandler
 import vdi.service.plugin.service.InstallDirName
+import vdi.service.plugin.util.*
 import vdi.util.io.LineListOutputStream
 import vdi.util.io.LoggingOutputStream
-import vdi.util.zip.unzip
 
 internal class InstallDataHandler
 private constructor(
@@ -44,8 +44,8 @@ private constructor(
 
   override suspend fun runJob(): InstallDataResponse {
     scriptContext.installPath.also {
-      if (it.exists()) {
-        val msg = "dataset install directory already exists: ${it.relativeTo(it.parent.parent.parent)}"
+      if (SystemFileSystem.exists(it)) {
+        val msg = "dataset install directory already exists: ${it.toJavaPath().relativeTo(it.toJavaPath().parent.parent.parent)}"
         logger.error(msg)
         return ServerErrorResponse(msg)
       }
@@ -97,7 +97,7 @@ private constructor(
 
     val timer = metrics.checkCompatScriptDuration.startTimer()
     val warnings = ArrayList<String>()
-    val meta = JSON.readValue<DatasetMetadata>(metaFile.inputStream())
+    val meta = JSON.readValue<DatasetMetadata>(metaFile)
 
     return executor.executeScript(
       scriptContext.compatConfig.path,
@@ -223,12 +223,9 @@ private constructor(
     }
   }
 
-  private fun writeMetaFile(installDir: Path, meta: DatasetMetadata): Path {
-    val metaFile = installDir.resolve(DatasetMetaFilename)
-    metaFile.createFile()
-    metaFile.outputStream().buffered().use { JSON.writeValue(it, meta) }
-    return metaFile
-  }
+  private fun writeMetaFile(installDir: Path, meta: DatasetMetadata) =
+    installDir.resolve(DatasetMetaFilename)
+      .also { JSON.writeValue(it, meta) }
 
   private fun metaLogger() = logger.mark(scriptName = scriptContext.metaConfig.kind.name)
   private fun compatLogger() = logger.mark(scriptName = scriptContext.compatConfig.kind.name)

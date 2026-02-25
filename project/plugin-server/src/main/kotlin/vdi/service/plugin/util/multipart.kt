@@ -1,55 +1,36 @@
 package vdi.service.plugin.util
 
-import com.fasterxml.jackson.core.JacksonException
 import io.ktor.http.content.PartData
-import io.ktor.util.asStream
-import io.ktor.utils.io.jvm.javaio.toInputStream
-import org.slf4j.LoggerFactory
-import java.io.InputStream
-import java.io.InputStreamReader
+import io.ktor.utils.io.asSource
+import kotlinx.io.Source
+import kotlinx.io.asInputStream
+import kotlinx.io.asSource
+import kotlinx.io.buffered
 import kotlin.reflect.KClass
 import vdi.json.JSON
-import vdi.util.io.BoundedInputStream
 
 private const val MaxSizeToLoadInMemory = 16384uL
 
-private val logger = LoggerFactory.getLogger("multipart-util")
+inline fun <reified T: Any> PartData.parseAsJson(maxInputSize: ULong): T =
+  parseAsJson(maxInputSize, T::class)
 
-inline fun <reified T : Any> PartData.parseAsJson(maxInputSize: ULong): T = parseAsJson(maxInputSize, T::class)
-
-fun <T : Any> PartData.parseAsJson(maxInputSize: ULong, type: KClass<T>): T =
+fun <T: Any> PartData.parseAsJson(maxInputSize: ULong, type: KClass<T>): T =
   with(
     when (this) {
-      is PartData.BinaryChannelItem -> BoundedInputStream(provider().toInputStream(), maxInputSize)
-      is PartData.BinaryItem        -> BoundedInputStream(provider().asStream(), maxInputSize)
-      is PartData.FileItem          -> BoundedInputStream(provider().toInputStream(), maxInputSize)
-      is PartData.FormItem          -> BoundedInputStream(value.byteInputStream(), maxInputSize)
+      is PartData.BinaryChannelItem -> provider().asSource().buffered()
+      is PartData.BinaryItem        -> provider()
+      is PartData.FileItem          -> provider().asSource().buffered()
+      is PartData.FormItem          -> value.byteInputStream().asSource().buffered()
     }
   ) {
     if (maxInputSize > MaxSizeToLoadInMemory)
-      parseStreamAsJson(this, type)
+      this.parseAsJson(ByteArray(MaxSizeToLoadInMemory.toInt()), type)
     else
-      parseStringAsJson(this, type)
+      this.parseAsJson(type)
   }
 
-private fun <T : Any> parseStringAsJson(stream: InputStream, type: KClass<T>): T =
-  stream.use {
-    val body = InputStreamReader(it).readText()
+private fun <T: Any> Source.parseAsJson(buffer: ByteArray, type: KClass<T>): T =
+  JSON.readValue(buffer, 0, readAtMostTo(buffer), type.java)
 
-    try {
-      JSON.readValue(body, type.java)
-    } catch (e: JacksonException) {
-      logger.error("jackson encountered an error while attempting to parse the following value: {}", body)
-      throw e
-    }
-  }
-
-private fun <T : Any> parseStreamAsJson(stream: InputStream, type: KClass<T>): T =
-  stream.use {
-    try {
-      JSON.readValue(stream, type.java)
-    } catch (e: JacksonException) {
-      logger.error("jackson encountered an error while attempting to parse a JSON stream of an unknown size")
-      throw e
-    }
-  }
+private fun <T: Any> Source.parseAsJson(type: KClass<T>): T =
+  JSON.readValue(asInputStream(), type.java)

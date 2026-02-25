@@ -10,7 +10,7 @@ import io.ktor.server.request.contentType
 import io.ktor.server.request.receiveMultipart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.nio.file.Path
+import kotlinx.io.files.Path
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -21,6 +21,7 @@ import vdi.service.plugin.server.context.handlePayload
 import vdi.service.plugin.server.context.reqNotNull
 import vdi.service.plugin.server.context.reqNull
 import vdi.service.plugin.util.parseAsJson
+import vdi.service.plugin.util.toKtxPath
 import vdi.util.fs.TempFiles
 
 private const val IMPORT_PAYLOAD_FILE_NAME = "import.zip"
@@ -36,7 +37,7 @@ internal suspend fun ApplicationCall.withImportContext(
   if (!request.contentType().match(ContentType.MultiPart.FormData))
     throw UnsupportedMediaTypeException(request.contentType())
 
-  TempFiles.withTempDirectory { workspace -> withContext(Dispatchers.IO) { withParsedRequest(appCtx, workspace, fn) } }
+  TempFiles.withTempDirectory { workspace -> withContext(Dispatchers.IO) { withParsedRequest(appCtx, workspace.toKtxPath(), fn) } }
 }
 
 @OptIn(ExperimentalContracts::class)

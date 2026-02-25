@@ -1,6 +1,6 @@
 package vdi.service.plugin.script
 
-import java.nio.file.Path
+import kotlinx.io.files.Path
 import kotlin.time.Duration
 
 interface PluginScript {
