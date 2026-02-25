@@ -30,6 +30,7 @@ import vdi.service.plugin.service.OutputDirName
 import vdi.service.plugin.service.OutputFileName
 import vdi.service.plugin.util.Base36
 import vdi.service.plugin.util.fileSize
+import vdi.service.plugin.util.safeFlush
 import vdi.service.plugin.util.toJavaPath
 import vdi.util.fn.Either
 import vdi.util.fn.leftOr
@@ -224,7 +225,7 @@ private constructor(
     Path(outputDirectory, DatasetManifestFilename)
       .also { file -> SystemFileSystem.sink(file).buffered().use { sink ->
         JSON.writeValue(sink.asOutputStream(), buildManifest(inputFiles, outputFiles))
-        sink.flush()
+        sink.safeFlush()
       } }
       .toJavaPath()
 
@@ -232,7 +233,7 @@ private constructor(
     Path(inputDirectory, DatasetMetaFilename)
       .also { file -> SystemFileSystem.sink(file).buffered().use { sink ->
         JSON.writeValue(sink.asOutputStream(), scriptContext.request.meta)
-        sink.flush()
+        sink.safeFlush()
       } }
       .toJavaPath()
 

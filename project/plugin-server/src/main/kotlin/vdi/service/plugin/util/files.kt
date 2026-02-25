@@ -82,5 +82,5 @@ internal inline fun <reified T: Any> ObjectMapper.readValue(path: Path): T =
 internal fun ObjectMapper.writeValue(path: Path, content: Any) =
   SystemFileSystem.sink(path).buffered().use {
     writeValue(it.asOutputStream(), content)
-    it.flush()
+    it.safeFlush()
   }

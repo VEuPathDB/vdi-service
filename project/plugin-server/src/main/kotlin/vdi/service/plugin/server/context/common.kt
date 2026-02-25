@@ -9,6 +9,7 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import vdi.service.plugin.util.safeFlush
 import vdi.service.plugin.util.toKtxPath
 import vdi.util.fs.TempFiles
 
@@ -23,7 +24,7 @@ internal fun PartData.handlePayload(workspace: Path, fileName: String): Path {
       is PartData.FileItem          -> provider().asSource().buffered().transferTo(buf)
       is PartData.FormItem          -> buf.writeString(value)
     }
-    buf.flush()
+    buf.safeFlush()
   }
 
   return payload

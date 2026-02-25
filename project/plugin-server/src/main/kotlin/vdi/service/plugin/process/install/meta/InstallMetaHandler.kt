@@ -18,6 +18,7 @@ import vdi.service.plugin.script.ScriptExecutor
 import vdi.service.plugin.script.newErrorResponse
 import vdi.service.plugin.server.context.InstallScriptContext
 import vdi.service.plugin.service.AbstractInstallHandler
+import vdi.service.plugin.util.safeFlush
 import vdi.util.io.LineListOutputStream
 import vdi.util.io.LoggingOutputStream
 
@@ -33,7 +34,7 @@ private constructor(
     val metaFile = Path(workspace, DatasetMetaFilename)
       .also { file -> SystemFileSystem.sink(file).buffered().use { sink ->
         JSON.writeValue(sink.asOutputStream(), scriptContext.metadata)
-        sink.flush()
+        sink.safeFlush()
       } }
 
     return runJob(InstallMetaJob(
