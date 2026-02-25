@@ -52,7 +52,7 @@ private suspend fun ApplicationCall.withParsedRequest(
   var meta:     DatasetMetadata? = null
   var manifest: DatasetManifest? = null
 
-  receiveMultipart().forEachPart { part ->
+  receiveMultipart(Long.MAX_VALUE).forEachPart { part ->
     try {
       when (part.name) {
         FormField.Details -> {

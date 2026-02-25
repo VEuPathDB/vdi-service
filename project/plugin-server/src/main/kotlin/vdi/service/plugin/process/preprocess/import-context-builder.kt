@@ -52,7 +52,7 @@ private suspend fun ApplicationCall.withParsedRequest(
   var payload: Path? = null
   var errored = false
 
-  receiveMultipart().forEachPart { part ->
+  receiveMultipart(Long.MAX_VALUE).forEachPart { part ->
     try {
       when (part) {
         is PartData.FormItem -> {

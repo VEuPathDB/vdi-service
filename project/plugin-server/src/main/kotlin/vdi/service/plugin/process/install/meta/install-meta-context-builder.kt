@@ -45,7 +45,7 @@ private suspend fun ApplicationCall.withParsedRequest(
 
   var details: InstallMetaRequest? = null
 
-  receiveMultipart().forEachPart { part ->
+  receiveMultipart(Long.MAX_VALUE).forEachPart { part ->
     try {
       when (part.name) {
         FormField.Details -> {
