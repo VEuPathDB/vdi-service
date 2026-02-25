@@ -3,6 +3,7 @@ package vdi.service.plugin.process.uninstall
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.time.Duration.Companion.seconds
 import vdi.io.plugin.responses.UninstallResponse
@@ -70,7 +71,7 @@ private constructor(context: UninstallDataContext, executor: ScriptExecutor, met
     logger.debug("attempting to delete dataset directory {}", installPath)
 
     installPath
-      .moveTo(installPath.parent!!.resolve("deleting-$datasetID-${LocalDateTime.now().format(RFC3339)}"))
+      .moveTo(installPath.parent!!.resolve("deleting-$datasetID-${OffsetDateTime.now().format(RFC3339)}"))
       .deleteRecursively()
 
     logger.info("deleted dataset directory {}", installPath)
