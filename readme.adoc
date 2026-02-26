@@ -67,10 +67,11 @@ The key/value pairs will always appear in ascending order by key.
 | S   | Plugin **S**cript name
 | T   | Data **T**ype name
 | U   | Request **U**RI
+| W   | **W**orker identifier
 |===
 
 .Example Usage
-[source, shell]
+[%nowrap, source, shell]
 ----
 # Trace an event through the system
 grep -R "E=<EVENT_ID>"
