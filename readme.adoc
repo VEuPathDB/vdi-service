@@ -80,6 +80,9 @@ grep -R "D=<DATASET_ID>"
 
 # Trace a specific request
 grep -R "R=<REQUEST_ID>"
+
+# Filter by user & project
+grep -R "O=<USER_ID> P=<PROJECT_ID>"
 ----
 
 ==== Event IDs
