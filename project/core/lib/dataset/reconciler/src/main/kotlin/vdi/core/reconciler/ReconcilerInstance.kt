@@ -9,7 +9,6 @@ import vdi.core.kafka.EventSource
 import vdi.core.kafka.router.KafkaRouter
 import vdi.core.metrics.Metrics
 import vdi.core.s3.*
-import vdi.logging.createLoggerMarkString
 import vdi.logging.mark
 import vdi.logging.markedLogger
 import vdi.model.meta.DatasetID
@@ -272,7 +271,7 @@ internal class ReconcilerInstance(
   private suspend fun sendSyncEvent(ownerID: UserID, datasetID: DatasetID, reason: SyncReason) {
     val eventID = EventIDs.issueID()
 
-    log.info("{} sending reconciliation event: {}", createLoggerMarkString(eventID = eventID, ownerID = ownerID, datasetID = datasetID), reason)
+    log.mark(eventID = eventID, ownerID = ownerID, datasetID = datasetID).info("sending reconciliation event: {}", reason)
 
     kafkaRouter.sendReconciliationTrigger(
       eventID,
