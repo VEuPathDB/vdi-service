@@ -42,7 +42,7 @@ class DatasetPathFactory(config: ShortVDIConfig, plugin: PluginConfig) {
     // If this is the first time we're seeing a path for a given target project,
     // create the project directory.
 
-    if (SystemFileSystem.exists(siteDir))
+    if (!SystemFileSystem.exists(siteDir))
       try { SystemFileSystem.createDirectories(siteDir) } catch (_: FileAlreadyExistsException) { /* Ignore race condition mkdir */ }
 
     return Path(siteDir, datasetID.toString())
