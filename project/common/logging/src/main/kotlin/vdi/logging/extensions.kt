@@ -40,7 +40,7 @@ inline fun Logger.mark(dataType: DatasetType, plugin: String) =
   mark(createLoggerMark(dataType, plugin))
 
 inline fun Logger.mark(dataType: DatasetType, plugin: String, target: InstallTargetID) =
-  mark(createLoggerMark(dataType, plugin) + " $PrefixInstallTarget=$target")
+  mark(createLoggerMark(dataType, plugin) + "$PrefixInstallTarget=$target")
 
 inline fun Logger.mark(ownerID: UserID, datasetID: DatasetID) =
   mark(createLoggerMark(ownerID, datasetID))
@@ -100,25 +100,15 @@ inline fun <reified T: Any> logger(): Logger =
 inline fun createLoggerMark(dataType: DatasetType, pluginName: String) =
   arrayOf("$PrefixDataType=$dataType", "$PrefixPluginName=$pluginName")
 
-inline fun createLoggerMark(ownerID: UserID, datasetID: DatasetID, installTarget: InstallTargetID) =
-  arrayOf(
-    "$PrefixUserID=$ownerID",
-    "$PrefixDatasetID=$datasetID",
-    "$PrefixInstallTarget=$installTarget",
-  )
-
 inline fun createLoggerMarkString(eventID: EventID, ownerID: UserID, datasetID: DatasetID) =
   arrayOf(
+    "$PrefixDatasetID=$datasetID",
     "$PrefixEventID=$eventID",
     "$PrefixUserID=$ownerID",
-    "$PrefixDatasetID=$datasetID",
   ).joinToString(" ")
 
 inline fun createLoggerMark(ownerID: UserID, datasetID: DatasetID) =
   arrayOf("$PrefixUserID=$ownerID", "$PrefixDatasetID=$datasetID")
-
-inline fun createLoggerMark(datasetID: DatasetID, project: InstallTargetID) =
-  arrayOf("$PrefixDatasetID=$datasetID", "$PrefixInstallTarget=$project")
 
 fun createLoggerMark(
   eventID: EventID? = null,

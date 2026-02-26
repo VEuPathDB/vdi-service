@@ -5,16 +5,16 @@ import kotlin.math.min
 
 
 @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
-class MarkedLogger(marks: Array<String>, private val delegate: Logger): Logger by delegate {
-  private val marks = ArrayList<String>(marks.size)
-    .apply { marks.forEach { if (it.isNotBlank()) setMark(it.trim()) } }
+class MarkedLogger(unsortedMarks: Array<String>, private val delegate: Logger): Logger by delegate {
+  private val marks = ArrayList<String>(unsortedMarks.size)
+    .apply { unsortedMarks.forEach { if (it.isNotBlank()) setMark(it.trim()) } }
     .apply { sort() }
     .toTypedArray()
 
   private val marker = marks.joinToString(" ", postfix = " - ")
 
   init {
-    if (marks.isEmpty())
+    if (unsortedMarks.isEmpty())
       throw IllegalArgumentException("MarkedLogger must be given at least one non-blank log mark")
   }
 
