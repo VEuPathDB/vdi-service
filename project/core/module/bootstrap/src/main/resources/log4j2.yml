@@ -10,7 +10,6 @@ Configuration:
           %d{yyyy-MM-dd HH:mm:ss.SSS} \
           %highlight{%-5level} \
           %notEmpty{W=%X{workerID} }\
-          %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
           %notEmpty{%marker }\
           %c{1} - %m%n"
     - name: sub-0-mod
@@ -20,7 +19,6 @@ Configuration:
           %d{yyyy-MM-dd HH:mm:ss.SSS} \
           %highlight{%-5level} \
           %notEmpty{W=%X{workerID} }\
-          %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
           %notEmpty{%marker }\
           ext.%c{1} - %m%n"
     - name: externals
@@ -37,7 +35,6 @@ Configuration:
           %d{yyyy-MM-dd HH:mm:ss.SSS} \
           %highlight{%-5level} \
           %notEmpty{W=%X{workerID} }\
-          %notEmpty{R=%replace{%.10X{traceId}}{init0|term0}{} }\
           %notEmpty{%marker }\
           %c{1.1.1.*} - %m%n"
 
