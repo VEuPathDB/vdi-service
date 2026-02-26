@@ -69,7 +69,11 @@ internal fun DatasetRecord.toExternal(
     status           = DatasetStatusInfo(
       DatasetUploadStatusInfo(uploadStatus, null),
       importStatus?.let { DatasetImportStatusInfo(it, null) },
-      installs?.map { (k, v) -> DatasetInstallStatusListEntry(k, v) }
+      installs
+        ?.asSequence()
+        ?.filter { (_, v) -> v?.meta != null }
+        ?.map(::DatasetInstallStatusListEntry)
+        ?.toList()
         ?.takeUnless(List<*>::isEmpty),
     ),
     shares           = shares,

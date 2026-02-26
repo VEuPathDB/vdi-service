@@ -14,7 +14,7 @@ public class DatasetInstallStatusListEntry extends DatasetInstallStatusListEntry
     DatasetInstallStatusDetails data
   ) {
     setInstallTarget(Objects.requireNonNull(installTarget));
-    setMeta(meta);
+    setMeta(Objects.requireNonNull(meta));
     setData(data);
   }
 
