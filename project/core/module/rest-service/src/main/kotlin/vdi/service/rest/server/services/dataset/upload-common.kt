@@ -228,7 +228,10 @@ fun ControllerBase.uploadFiles(
       logger.debug("uploading raw dataset data to object store")
       DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
 
-      CacheDB().withTransaction { it.tryInsertUploadFiles(datasetID, sizes) }
+      CacheDB().withTransaction {
+        it.tryInsertUploadFiles(datasetID, sizes)
+        it.upsertUploadStatus(datasetID, DatasetUploadStatus.Success)
+      }
     }
   } catch (e: Throwable) {
     val uploadStatus: DatasetUploadStatus
