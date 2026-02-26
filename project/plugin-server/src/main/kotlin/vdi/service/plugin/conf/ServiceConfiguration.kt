@@ -1,6 +1,7 @@
 package vdi.service.plugin.conf
 
 import kotlinx.io.files.Path
+import vdi.config.raw.ManifestConfig
 import vdi.config.raw.vdi.PluginConfig
 import vdi.service.plugin.consts.ConfigDefault
 import vdi.service.plugin.process.install.data.CheckCompatibilityScript
@@ -25,8 +26,10 @@ internal class ServiceConfiguration(
   val checkCompatScript: CheckCompatibilityScript,
 
   val customPath: String,
+
+  val manifest: ManifestConfig,
 ) {
-  constructor(name: String, raw: PluginConfig): this(
+  constructor(name: String, raw: PluginConfig, manifest: ManifestConfig): this(
     name = name,
 
     importScript = raw.scripts?.dataCleaning.let {
@@ -61,5 +64,7 @@ internal class ServiceConfiguration(
     },
 
     customPath = raw.customPath ?: ConfigDefault.CustomPath,
+
+    manifest = manifest,
   )
 }

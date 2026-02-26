@@ -32,7 +32,7 @@ fun main() {
     ?: throw IllegalStateException("could not match PLUGIN_ID to plugin configuration")
 
   val appCtx = ApplicationContext(
-    ServiceConfiguration(name, plugin),
+    ServiceConfiguration(name, plugin, manifest),
     ScriptExecutorImpl(),
     PrometheusMeterRegistry(PrometheusConfig.DEFAULT).let { MetricsBundle(it, ScriptMetrics(it)) },
     DatasetPathFactory(config, plugin)

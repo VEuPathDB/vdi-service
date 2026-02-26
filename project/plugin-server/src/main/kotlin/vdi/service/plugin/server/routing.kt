@@ -32,5 +32,7 @@ internal fun Application.configureServer(appCtx: ApplicationContext) {
     post(PluginEndpoint.Uninstall) { withExceptionMapping { call.handleUninstallRequest(appCtx) } }
 
     get("/metrics") { call.respond(appCtx.metrics.micrometer.scrape()) }
+
+    get(PluginEndpoint.ServiceInfo) { withExceptionMapping { call.handleServiceInfoRequest(appCtx) } }
   }
 }
