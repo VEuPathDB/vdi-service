@@ -41,6 +41,59 @@ configuration files.
   (a subset of the full config schema)
 
 
+== Operation
+
+=== Logging
+
+==== Log Format
+
+VDI's logging includes structured key/value pairs with log-line-specific data to
+be used in filtering the logs to only lines relevant to a specific task.
+
+The keys are constants link:/project/common/logging/src/main/kotlin/vdi/logging/extensions.kt[defined here].
+
+[NOTE]
+The key/value pairs will always appear in ascending order by key.
+
+[%header,cols="1m,9a"]
+|===
+| Key | Meaning
+| D   | VDI **D**ataset ID
+| E   | Unique **E**vent ID
+| I   | Plugin name, or **I**nstaller
+| O   | Dataset **O**wner user ID
+| P   | **P**roject ID
+| R   | **R**equest ID
+| S   | Plugin **S**cript name
+| T   | Data **T**ype name
+| U   | Request **U**RI
+|===
+
+.Example Usage
+[source, shell]
+----
+# Trace an event through the system
+grep -R "E=<EVENT_ID>"
+
+# Trace a specific dataset ID
+grep -R "D=<DATASET_ID>"
+
+# Trace a specific request
+grep -R "R=<REQUEST_ID>"
+----
+
+==== Event IDs
+
+VDI is an event driven asynchronous system where a single event can result in
+actions across multiple services.  To help trace the path and results of an
+event, a numeric ID is assigned to each event that will follow the processing of
+that event through each part of the core VDI service and plugin services.
+
+[CAUTION]
+Event IDs may not be issued for requests.  In those cases, the request ID is the
+intended filter field.
+
+
 == Development
 
 === Repository Structure
