@@ -45,7 +45,7 @@ public class Resources extends ContainerResources {
       DatasetFiles.class,
       DatasetListController.class,
       DatasetSharePut.class,
-      MetaInfo.class,
+      MetaInfoController.class,
       PluginInfo.class,
       UserInfo.class
     };
