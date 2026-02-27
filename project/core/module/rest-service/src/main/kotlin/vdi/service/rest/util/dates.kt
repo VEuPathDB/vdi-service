@@ -116,7 +116,6 @@ private fun handleUTC(sb: StringBuilder, date: String): Boolean {
   if (!(sb.writeYear(date) && sb.writeMonth(date) && sb.writeDay(date) && sb.writeHour(date) && sb.writeMinute(date) && sb.writeSecond(date) && sb.writeMillis(date)))
     return false
 
-
   if (date[23] == 'z')
     sb.append('Z')
   else if (date[23] == 'Z')
@@ -130,7 +129,6 @@ private fun handleUTC(sb: StringBuilder, date: String): Boolean {
 private fun handleZoned(sb: StringBuilder, date: String): Boolean {
   if (!(sb.writeYear(date) && sb.writeMonth(date) && sb.writeDay(date) && sb.writeHour(date) && sb.writeMinute(date) && sb.writeSecond(date) && sb.writeMillis(date)))
     return false
-
 
   if (date[23] == '-' || date[23] == '+')
     sb.append(date[23])
@@ -240,7 +238,6 @@ private fun StringBuilder.writeMillis(date: String): Boolean {
 
   return true
 }
-
 
 fun StringBuilder.writeZoneOffset() {
   val hours = (TimeZone.getDefault().rawOffset/1000/60).toFloat()/60.0

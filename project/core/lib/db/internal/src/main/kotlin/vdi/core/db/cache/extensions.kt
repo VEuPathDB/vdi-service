@@ -59,7 +59,7 @@ fun CacheDBTransaction.initializeDataset(datasetID: DatasetID, meta: DatasetMeta
   // insert metadata for the dataset
   tryInsertDatasetMeta(datasetID, meta)
 
-  upsertUploadStatus(datasetID, DatasetUploadStatus.Running)
+  tryInsertUploadStatus(datasetID, DatasetUploadStatus.Running)
 
   // insert project links for the dataset
   tryInsertDatasetProjects(datasetID, meta.installTargets)

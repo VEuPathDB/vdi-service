@@ -312,6 +312,8 @@ interface CacheDBTransaction: CacheDB, AutoCloseable {
 
   fun upsertUploadStatus(datasetID: DatasetID, status: DatasetUploadStatus)
 
+  fun tryInsertUploadStatus(datasetID: DatasetID, status: DatasetUploadStatus)
+
   // endregion Upsert
 
   fun commit()

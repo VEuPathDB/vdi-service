@@ -32,6 +32,23 @@ DO UPDATE SET
   }
 
   // language=postgresql
+  private const val InsertSQL = """
+INSERT INTO
+  vdi.upload_status (dataset_id, status)
+VALUES
+  (?, ?)
+ON CONFLICT DO NOTHING
+"""
+
+  context(con: Connection)
+  fun insert(datasetID: DatasetID, status: DatasetUploadStatus) {
+    con.withPreparedUpdate(InsertSQL) {
+      setDatasetID(1, datasetID)
+      setString(2, status.toString())
+    }
+  }
+
+  // language=postgresql
   private const val SelectSingleSQL = """
 SELECT
   status
