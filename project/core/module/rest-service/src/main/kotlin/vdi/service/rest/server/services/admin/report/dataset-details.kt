@@ -1,3 +1,4 @@
+@file:JvmName("DatasetDetailsAdmin")
 package vdi.service.rest.server.services.admin.report
 
 import vdi.model.meta.DatasetID
@@ -7,8 +8,9 @@ import vdi.service.rest.server.outputs.InternalDatasetDetails
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.wrap
 
-internal fun getDatasetDetails(datasetID: DatasetID) =
-  CacheDB().selectAdminDatasetDetails(datasetID)
+fun getAdminDatasetDetails(datasetID: String) =
+  CacheDB().selectAdminDatasetDetails(DatasetID(datasetID))
     ?.let(::InternalDatasetDetails)
     ?.let(GetAdminReportsDatasetsByVdiIdResponse::respond200WithApplicationJson)
     ?: Static404.wrap()
+

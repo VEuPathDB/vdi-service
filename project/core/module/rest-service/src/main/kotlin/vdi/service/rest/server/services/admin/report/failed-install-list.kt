@@ -1,3 +1,4 @@
+@file:JvmName("FailedInstallList")
 package vdi.service.rest.server.services.admin.report
 
 import vdi.core.db.app.AppDB

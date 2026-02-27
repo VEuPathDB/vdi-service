@@ -38,7 +38,7 @@ public class Resources extends ContainerResources {
   @Override
   protected Object[] resources() {
     return new Object[] {
-      AdminReports.class,
+      AdminReportController.class,
       AdminRPC.class,
       CommunityDatasets.class,
       DatasetByID.class,

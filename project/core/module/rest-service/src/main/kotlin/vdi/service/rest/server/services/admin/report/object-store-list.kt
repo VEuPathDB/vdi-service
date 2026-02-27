@@ -1,3 +1,4 @@
+@file:JvmName("ObjectStoreList")
 package vdi.service.rest.server.services.admin.report
 
 import jakarta.ws.rs.core.StreamingOutput

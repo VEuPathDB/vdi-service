@@ -1,3 +1,4 @@
+@file:JvmName("FailedImportList")
 package vdi.service.rest.server.services.admin.report
 
 import vdi.model.meta.toUserID
