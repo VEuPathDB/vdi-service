@@ -27,6 +27,7 @@ import vdi.core.plugin.registry.PluginRegistry
 import vdi.logging.mark
 import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
+import vdi.service.rest.config.SupportedArchiveType
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.BadRequestError
 import vdi.service.rest.s3.DatasetStore
@@ -76,7 +77,7 @@ fun verifyFileExtensions(data: Collection<File>, dataType: DatasetType): BadRequ
 
   return BadRequestError(
     "unsupported data file type.  permitted upload data file types are: " +
-    (SupportedArchiveType.SupportedExtensions + exts).joinToString("', '", "['", "']")
+    (SupportedArchiveType.getAllSupportedExtensions() + exts).joinToString("', '", "['", "']")
   )
 }
 
@@ -329,13 +330,13 @@ private fun Path.repack(
   uploadConfig: UploadConfig,
 ): Either<List<DatasetFileInfo>, BadRequestError> =
   when {
-    SupportedArchiveType.Zip.matches(name) -> {
+    SupportedArchiveType.ZIP.matches(name) -> {
       validateZip(dataTypeMeta, controller.getUserRemainingQuota(uploadConfig))
         ?.let { Either.right(it) }
         ?: Either.left(repackZip(into, using))
     }
 
-    SupportedArchiveType.TarGZ.matches(name) -> {
+    SupportedArchiveType.TAR_GZ.matches(name) -> {
       validateTar(dataTypeMeta, controller.getUserRemainingQuota(uploadConfig))
         ?.let { Either.right(it) }
         ?: Either.left(repackTar(into, using))

@@ -4,7 +4,7 @@ import vdi.config.raw.ManifestConfig
 import vdi.core.config.StackConfig
 import vdi.core.config.vdi.daemons.ReconcilerConfig
 import vdi.service.rest.generated.model.*
-import vdi.service.rest.util.SupportedArchiveType
+import vdi.service.rest.config.SupportedArchiveType
 import vdi.service.rest.generated.model.ReconcilerConfig as APIReconcilerConfig
 
 fun ServiceMetadataResponseBody(metadata: ManifestConfig, stack: StackConfig): ServiceMetadataResponseBody =
@@ -37,7 +37,7 @@ fun ServiceMetadataResponseBody(metadata: ManifestConfig, stack: StackConfig): S
 
     }
     features = ServiceFeaturesImpl().apply {
-      supportedArchiveTypes = SupportedArchiveType.SupportedExtensions.asList()
+      supportedArchiveTypes = SupportedArchiveType.getAllSupportedExtensions()
     }
   }
 
