@@ -10,7 +10,7 @@ import vdi.service.plugin.process.install.meta.InstallMetaScript
 import vdi.service.plugin.server.context.InstallScriptContext
 
 internal class InstallDataContext(
-  pluginName: String,
+  val pluginName: String,
   override val workspace: Path,
   override val customPath: String,
   override val request: InstallDataRequest,
