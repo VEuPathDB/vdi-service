@@ -70,8 +70,7 @@ internal fun Path.fileSize() =
 /**
  * @see kotlin.io.path.moveTo
  */
-internal fun Path.moveTo(target: Path) =
-  also { SystemFileSystem.atomicMove(it, target) }
+internal fun Path.moveTo(target: Path) = target.also { SystemFileSystem.atomicMove(this, it) }
 
 /**
  * @see com.fasterxml.jackson.module.kotlin.readValue
