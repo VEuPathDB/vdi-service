@@ -48,7 +48,7 @@ json-jackson-options     = { group = "com.fasterxml.jackson.datatype", name = "j
 json-schema-validation = { module = "com.networknt:json-schema-validator", version = "2.0.1" }
 json-patch-tools = { group = "com.github.java-json-tools", name = "json-patch", version = "1.13" }
 
-yaml = { module = "org.yaml:snakeyaml", version = "2.5" }
+yaml = { module = "org.yaml:snakeyaml", version = "2.6" }
 
 
 #
