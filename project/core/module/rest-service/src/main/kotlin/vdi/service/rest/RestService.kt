@@ -39,12 +39,11 @@ class RestService(config: StackConfig, manifest: ManifestConfig): Server() {
   override fun newOptions() = options
 
   private fun initFacades() {
-    @Suppress("UnusedExpression")
-    AppDatabaseRegistry
-    @Suppress("UnusedExpression")
-    InstallTargetRegistry
-    @Suppress("UnusedExpression")
-    PluginRegistry
+    arrayOf(
+      AppDatabaseRegistry,
+      InstallTargetRegistry,
+      PluginRegistry,
+    ).apply { /* do nothing, imported for proactive static init */ }
 
     AppDB()
     CacheDB()
