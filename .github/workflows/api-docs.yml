@@ -84,12 +84,12 @@ jobs:
 
     - name: Copy & Commit Docs
       run: >-
-        rm -rf ${{ env.PUBLISH_DIR }}
-        cp -r ${{ env.DOC_BUILD_DIR }} ${{ env.PUBLISH_DIR }}
-        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add ${{ env.PUBLISH_DIR }}
-        git commit -m "create/update ${{ env.PUBLISH_DIR }}"
+        rm -rf ${{ env.PUBLISH_DIR }};
+        cp -r ${{ env.DOC_BUILD_DIR }} ${{ env.PUBLISH_DIR }};
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com";
+        git config --local user.name "github-actions[bot]";
+        git add ${{ env.PUBLISH_DIR }};
+        git commit -m "create/update ${{ env.PUBLISH_DIR }}";
 
     - name: Push Docs
       uses: ad-m/github-push-action@v1.0.0
