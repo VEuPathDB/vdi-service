@@ -80,6 +80,7 @@ jobs:
     - name: Checkout Docs Branch
       uses: actions/checkout@v4
       with:
+        clean: 'false'
         ref: gh-pages
 
     - name: Copy & Commit Docs
