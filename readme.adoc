@@ -3,6 +3,8 @@
 :toc:
 :toclevels: 3
 
+:docs-root: https://veupathdb.github.io/vdi-service
+:latest-docs: {docs-root}/latest
 :confluence: https://veupathdb.atlassian.net/wiki/spaces
 
 ifdef::env-github[]
@@ -27,17 +29,17 @@ endif::[]
 === Documentation
 
 [unstyled]
-* https://veupathdb.github.io/vdi-service/core/[HTTP API]
-* https://veupathdb.github.io/vdi-service/schema/config/full-config.html[Full Stack Config]
-* https://veupathdb.github.io/vdi-service/schema/config/plugin-config.html[Plugin Config]
+* {latest-docs}/core/[HTTP API]
+* {latest-docs}/schema/config/full-config.html[Full Stack Config]
+* {latest-docs}/schema/config/plugin-config.html[Plugin Config]
 
 === Schema
 
 JSON schema files for use with editor validation & autocomplete when editing
 configuration files.
 
-* https://veupathdb.github.io/vdi-service/schema/config/full-config.json[Service Stack Configuration Schema]
-* https://veupathdb.github.io/vdi-service/schema/config/plugin-config.json[Plugin-Specific Configuration Schema] +
+* {latest-docs}/schema/config/full-config.json[Service Stack Configuration Schema]
+* {latest-docs}/schema/config/plugin-config.json[Plugin-Specific Configuration Schema] +
   (a subset of the full config schema)
 
 
