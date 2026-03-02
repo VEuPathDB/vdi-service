@@ -83,6 +83,13 @@ jobs:
         clean: 'false'
         ref: gh-pages
 
+#    - name: Generate Doc Index
+#      run: >-
+#        sed '1,/<\/dd>/!d' docs/content/docs-index.html > index.html
+#        PATTERN="$(sed '1,/<!/d;1,/\/dd/!d' docs/content/docs-index.html)"
+#        for i in `find . -maxdepth 1 -type d -name 'v*' -printf '%P '`; do echo $PATTERN | VERSION=$i envsubst >> index.html; done;
+#        sed '1,/-->/d' docs/content/docs-index.html;
+
     - name: Copy & Commit Docs
       run: >-
         rm -rf ${{ env.PUBLISH_DIR }};

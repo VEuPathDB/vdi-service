@@ -26,21 +26,36 @@ endif::[]
 [unstyled]
 * https://github.com/VEuPathDB/vdi-compose-stack
 
-=== Documentation
+=== Documentation & Schema
 
-[unstyled]
+Service configuration and REST API documentation in addition to JSON schema
+files to be used with smart editor validation & autocomplete.
+
+[NOTE]
+--
+Documentation is maintained by version starting with the v1.7.0 release. The
+docs for specific tags may be referenced by replacing the version reference or
+'latest' in the doc url with the desired tag:
+
+[source, subs=attributes]
+{docs-root}/{SERVICE_TAG}/...
+--
+
+==== Latest Commit
+
+.Docs
 * {latest-docs}/core/[HTTP API]
 * {latest-docs}/schema/config/full-config.html[Full Stack Config]
 * {latest-docs}/schema/config/plugin-config.html[Plugin Config]
 
-=== Schema
-
-JSON schema files for use with editor validation & autocomplete when editing
-configuration files.
-
+.Schema
 * {latest-docs}/schema/config/full-config.json[Service Stack Configuration Schema]
 * {latest-docs}/schema/config/plugin-config.json[Plugin-Specific Configuration Schema] +
   (a subset of the full config schema)
+
+==== Latest Release
+
+...
 
 
 == Operation
