@@ -83,7 +83,6 @@ jobs:
         ref: gh-pages
 
     - name: Copy & Commit Docs
-      shell: bash
       run: >-
         rm -rf ${{ env.PUBLISH_DIR }}
         cp -r ${{ env.DOC_BUILD_DIR }} ${{ env.PUBLISH_DIR }}
