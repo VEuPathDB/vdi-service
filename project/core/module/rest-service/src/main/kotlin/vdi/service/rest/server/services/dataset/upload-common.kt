@@ -297,7 +297,7 @@ fun ControllerBase.verifyUploadFileSize(
   val metaSize = uploadRefs.docs.reduceTo(0L) { t, c -> t + c.fileSize() }
   val propSize = uploadRefs.props.reduceTo(0L) { t, c -> t + c.fileSize() }
 
-  if (dataSize > uploadConfig.maxUploadSize.toLong())
+  if (dataSize > uploadConfig.maxUploadSize)
     throw BadRequestException(
       "upload upload size larger than the max permitted dataset size of "
       + uploadConfig.maxUploadSize.toFileSizeString()
@@ -581,10 +581,10 @@ fun ControllerBase.downloadRemoteFile(url: URL, uploadConfig: UploadConfig, tmpD
 
   // Try to download the file from the source URL.
   try {
-    val maxUploadSize = min(getUserRemainingQuota(uploadConfig), uploadConfig.maxUploadSize.toLong())
+    val maxUploadSize = min(getUserRemainingQuota(uploadConfig), uploadConfig.maxUploadSize)
 
     BoundedInputStream(maxUploadSize, response.body!!) {
-      val message = if (maxUploadSize < uploadConfig.maxUploadSize.toLong())
+      val message = if (maxUploadSize < uploadConfig.maxUploadSize)
         "given source URL was to a file that exceeds the remaining upload space allowed by the user quota " +
         "($maxUploadSize bytes)"
       else
@@ -615,7 +615,7 @@ fun String.toURL() =
 private fun FailedDependencyException(url: URL, msg: String) = FailedDependencyException(url.toString(), msg)
 
 private fun ControllerBase.getUserRemainingQuota(uploadConfig: UploadConfig): Long =
-  max(0L, uploadConfig.userMaxStorageSize.toLong() - getCurrentQuotaUsage(userID))
+  max(0L, uploadConfig.userMaxStorageSize - getCurrentQuotaUsage(userID))
 
 /**
  * Special handling for AWS urls that contain an Expires query parameter.  If

@@ -19,14 +19,12 @@ fun <T: ControllerBase> T.getUserMetadata(uploadConfig: UploadConfig): UserMetad
 private fun getUserQuotaInfo(userID: UserID, uploadConfig: UploadConfig): UserQuotaDetails =
   UserQuotaDetailsImpl().apply {
     usage = getCurrentQuotaUsage(userID)
-    limit = uploadConfig.userMaxStorageSize.toLong()
+    limit = uploadConfig.userMaxStorageSize
   }
 
 internal fun getCurrentQuotaUsage(userID: UserID): Long {
   val sizes = DatasetStore.listDatasetImportReadyZipSizes(userID)
 
   return CacheDB().selectUndeletedDatasetIDsForUser(userID)
-    .asSequence()
-    .map { sizes[it] ?: 0L }
-    .sum()
+    .sumOf { sizes[it] ?: 0L }
 }
