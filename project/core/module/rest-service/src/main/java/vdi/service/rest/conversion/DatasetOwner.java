@@ -5,10 +5,10 @@ import vdi.service.rest.model.UserDetails;
 
 public class DatasetOwner extends DatasetOwnerImpl {
   public DatasetOwner(UserDetails user) {
-    setUserId(user.getUserID().toLong());
-    setFirstName(user.getFirstName());
-    setLastName(user.getLastName());
-    setEmail(user.getEmail());
-    setAffiliation(user.getOrganization());
+    setUserId(user.userID().toLong());
+    setFirstName(user.firstName());
+    setLastName(user.lastName());
+    setEmail(user.email());
+    setAffiliation(user.organization());
   }
 }
