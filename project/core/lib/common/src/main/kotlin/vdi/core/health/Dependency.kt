@@ -20,4 +20,6 @@ interface Dependency {
       "$protocol://$host"
     else
       host
+
+  fun getPortAsInt() = port.toInt()
 }

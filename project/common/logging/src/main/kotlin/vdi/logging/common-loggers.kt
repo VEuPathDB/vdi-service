@@ -1,3 +1,4 @@
+@file:JvmName("LoggingUtils")
 package vdi.logging
 
 import org.slf4j.Logger
