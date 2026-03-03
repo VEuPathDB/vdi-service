@@ -7,4 +7,6 @@ data class ServerConfig(
   @field:JsonProperty("enableCors")
   val enableCORS: Boolean?,
   val bindPort: UShort?,
-)
+) {
+  fun getPortAsInt() = bindPort?.toInt()
+}

@@ -8,4 +8,6 @@ import vdi.model.field.HostAddress
 data class PartialHostAddress(val host: String, val port: UShort?) {
   fun toHostAddress(fallbackPort: UShort) =
     HostAddress(host, port ?: fallbackPort)
+
+  fun getPortAsInt() = port?.toInt()
 }

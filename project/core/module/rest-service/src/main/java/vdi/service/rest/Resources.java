@@ -13,7 +13,7 @@ public class Resources extends ContainerResources {
   public Resources(ServiceConfig opts) {
     super(opts);
 
-    if (opts.getAuthEnabled())
+    if (opts.isAuthEnabled())
       enableAuth();
 
     property(ServerProperties.WADL_FEATURE_DISABLE, true);
@@ -22,7 +22,7 @@ public class Resources extends ContainerResources {
     property(ServerProperties.JSON_PROCESSING_FEATURE_DISABLE, true);
     property(ServerProperties.MOXY_JSON_FEATURE_DISABLE, true);
 
-    if (opts.getEnableTrace())
+    if (opts.isTraceEnabled())
       enableJerseyTrace();
 
     register(new AbstractBinder() {

@@ -12,4 +12,6 @@ sealed interface DatabaseConnectionConfig {
   val poolSize: UByte?
   val schema: String?
   val idleTimeout: Duration?
+
+  fun getPoolSizeAsInt() = poolSize?.toInt()
 }
