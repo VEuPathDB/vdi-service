@@ -64,8 +64,8 @@ internal class PluginHandlerClientImpl(
 //    ).await()
 
     return when (response.status) {
-      HttpStatusCode.OK -> Either.left(response.body() )
-      else -> Either.right(response.readJSON())
+      HttpStatusCode.OK -> Either.left(response.readJSON())
+      else              -> Either.right(response.readJSON())
     }
   }
 
