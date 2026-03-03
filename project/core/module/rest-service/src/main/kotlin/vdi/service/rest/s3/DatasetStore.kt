@@ -43,6 +43,7 @@ object DatasetStore {
   fun getImportReadyZipSize(userID: UserID, datasetID: DatasetID) =
     bucket.objects[S3Paths.datasetImportReadyFile(userID, datasetID)]?.size ?: -1L
 
+  @JvmStatic
   fun listDatasetImportReadyZipSizes(userID: UserID): Map<DatasetID, Long> {
     val out = HashMap<DatasetID, Long>()
 

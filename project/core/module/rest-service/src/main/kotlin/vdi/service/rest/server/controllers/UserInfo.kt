@@ -6,8 +6,8 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.UsersSelfShareOffersGetStatus
 import vdi.service.rest.generated.resources.Users
+import vdi.service.rest.server.services.UserService
 import vdi.service.rest.server.services.shares.lookupShares
-import vdi.service.rest.server.services.users.getUserMetadata
 
 @Authenticated(allowGuests = false)
 class UserInfo(
@@ -18,7 +18,7 @@ class UserInfo(
   , ControllerBase(request)
 {
   override fun getUsersSelfMeta() =
-    Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(getUserMetadata(uploadConfig))!!
+    Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(UserService.getUserMetadata(userID, uploadConfig))!!
 
   override fun getUsersSelfShareOffers(status: UsersSelfShareOffersGetStatus?): Users.GetUsersSelfShareOffersResponse =
     Users.GetUsersSelfShareOffersResponse
