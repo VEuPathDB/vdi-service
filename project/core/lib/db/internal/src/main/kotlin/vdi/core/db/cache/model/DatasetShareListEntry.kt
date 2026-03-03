@@ -8,4 +8,6 @@ data class DatasetShareListEntry(
   val type: DatasetType,
   val receiptStatus: DatasetShareReceipt.Action?,
   val projects: List<InstallTargetID>
-)
+) {
+  fun getDatasetIdString() = datasetID.asString
+}

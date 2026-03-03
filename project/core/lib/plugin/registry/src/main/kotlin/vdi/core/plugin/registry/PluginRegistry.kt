@@ -45,6 +45,7 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDatasetTypeMeta>> {
 
   fun pluginFor(type: DatasetType) = mapping[type]!!
 
+  @JvmStatic
   fun require(type: DatasetType): PluginDatasetTypeMeta =
     typeMeta[type]
       ?: throw MissingDataTypeMetaException(type)

@@ -7,7 +7,6 @@ import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.UsersSelfShareOffersGetStatus
 import vdi.service.rest.generated.resources.Users
 import vdi.service.rest.server.services.UserService
-import vdi.service.rest.server.services.shares.lookupShares
 
 @Authenticated(allowGuests = false)
 class UserInfo(
@@ -22,5 +21,5 @@ class UserInfo(
 
   override fun getUsersSelfShareOffers(status: UsersSelfShareOffersGetStatus?): Users.GetUsersSelfShareOffersResponse =
     Users.GetUsersSelfShareOffersResponse
-      .respond200WithApplicationJson(lookupShares(userID, status ?: UsersSelfShareOffersGetStatus.OPEN))!!
+      .respond200WithApplicationJson(UserService.lookupShares(userID, status ?: UsersSelfShareOffersGetStatus.OPEN))!!
 }

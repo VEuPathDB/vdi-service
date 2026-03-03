@@ -5,9 +5,11 @@ import org.jetbrains.annotations.NotNull;
 import vdi.core.db.app.model.InstallStatus;
 import vdi.core.db.cache.model.DatasetImportStatus;
 import vdi.model.DatasetUploadStatus;
+import vdi.model.meta.DatasetShareReceipt;
 import vdi.service.rest.generated.model.DatasetImportStatusCode;
 import vdi.service.rest.generated.model.DatasetInstallStatus;
 import vdi.service.rest.generated.model.DatasetUploadStatusCode;
+import vdi.service.rest.generated.model.ShareOfferStatus;
 
 public final class EnumTranslator {
   @NotNull
@@ -43,6 +45,14 @@ public final class EnumTranslator {
       case MissingDependency -> DatasetInstallStatus.MISSINGDEPENDENCY;
       case Running -> DatasetInstallStatus.RUNNING;
       case ReadyForReinstall -> DatasetInstallStatus.READYFORREINSTALL;
+    };
+  }
+
+  public static ShareOfferStatus toExternal(DatasetShareReceipt.Action action) {
+    return switch (action) {
+      case null   -> ShareOfferStatus.OPEN;
+      case Accept -> ShareOfferStatus.ACCEPTED;
+      case Reject -> ShareOfferStatus.REJECTED;
     };
   }
 }
