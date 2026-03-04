@@ -29,8 +29,7 @@ WITH results AS (
   , d.deleted_status
   -- Sort ID is needed to align the result rows with the object key stream
   -- coming from the object store
-  , d.owner || '/' || (
-    CASE
+  , CASE
       WHEN ${strpos}(d.dataset_id, '.') > 0
         THEN d.dataset_id
       ELSE
@@ -52,7 +51,10 @@ SELECT
 , owner
 , deleted_status
 FROM results
-ORDER BY sort_id
+ORDER BY
+  owner::text
+, sort_id
+COLLATE "C"
 """
 
 private const val PostgresStrPos = "strpos"
