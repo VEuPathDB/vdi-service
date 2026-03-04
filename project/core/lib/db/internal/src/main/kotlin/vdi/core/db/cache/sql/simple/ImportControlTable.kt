@@ -41,8 +41,8 @@ ON CONFLICT (dataset_id)
   context(con: Connection)
   internal fun tryInsert(datasetID: DatasetID, status: DatasetImportStatus) =
     con.withPreparedUpdate(InsertSQL) {
-      setDatasetID(1, datasetID)
-      setImportStatus(2, status)
+      setString(1, datasetID.asString)
+      setString(2, status.value)
     }
 
 

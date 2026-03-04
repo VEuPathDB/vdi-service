@@ -128,11 +128,11 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
       if (this == null) {
         logger.info("initializing dataset in cache db")
         cacheDB.withTransaction { it.initializeDataset(datasetID, datasetMeta) }
+      } else if (isDeleted) {
+        logger.info("skipping import event; dataset is marked as deleted in the cache db")
+        return
       } else {
-        if (isDeleted) {
-          logger.info("skipping import event; dataset is marked as deleted in the cache db")
-          return
-        }
+        cacheDB.withTransaction { it.tryInsertImportControl(datasetID, DatasetImportStatus.Queued) }
       }
     }
 
@@ -159,7 +159,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
       withPlugin(datasetMeta, handler, datasetDir).processImportJob()
     } catch (e: Throwable) {
       cacheDB.withTransaction { tran ->
-        tran.updateImportControl(datasetID, DatasetImportStatus.Failed)
+        tran.upsertImportControl(datasetID, DatasetImportStatus.Failed)
         tran.tryInsertImportMessages(datasetID, listOf("process error: ${e.message}"))
       }
 
@@ -254,7 +254,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
       transaction.tryInsertInstallFiles(datasetID, manifest.installReadyFiles)
       transaction.updateDataSyncControl(datasetID, datasetDir.getInstallReadyTimestamp() ?: OffsetDateTime.now())
-      transaction.updateImportControl(datasetID, DatasetImportStatus.Complete)
+      transaction.upsertImportControl(datasetID, DatasetImportStatus.Complete)
     }
   }
 
@@ -262,7 +262,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     logger.info("validation failed with {} warnings", result.getWarningsSequence().count())
 
     cacheDB.withTransaction {
-      it.updateImportControl(datasetID, DatasetImportStatus.Invalid)
+      it.upsertImportControl(datasetID, DatasetImportStatus.Invalid)
       it.tryInsertImportMessages(
         datasetID,
         Iterable { result.getWarningsSequence().iterator() },
@@ -274,7 +274,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     logger.error("import failed due to script error: {}", result.message)
 
     cacheDB.withTransaction {
-      it.updateImportControl(datasetID, DatasetImportStatus.Failed)
+      it.upsertImportControl(datasetID, DatasetImportStatus.Failed)
       it.tryInsertImportMessages(datasetID, listOf(result.message))
     }
 
@@ -285,7 +285,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     logger.error("import failed due to plugin server error: {}", result.message)
 
     cacheDB.withTransaction {
-      it.updateImportControl(datasetID, DatasetImportStatus.Failed)
+      it.upsertImportControl(datasetID, DatasetImportStatus.Failed)
       it.tryInsertImportMessages(datasetID, listOf(result.message))
     }
 
