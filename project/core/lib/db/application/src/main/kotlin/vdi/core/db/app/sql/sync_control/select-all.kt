@@ -30,12 +30,11 @@ WITH results AS (
   -- Sort ID is needed to align the result rows with the object key stream
   -- coming from the object store
   , CASE
-      WHEN ${strpos}(d.dataset_id, '.') > 0
-        THEN d.dataset_id
-      ELSE
-        d.dataset_id || '.z'
-    END
-  ) AS sort_id
+    WHEN ${strpos}(d.dataset_id, '.') > 0
+      THEN d.dataset_id
+    ELSE
+      d.dataset_id || '.z'
+  END AS sort_id
   FROM
     ${schema}.${Table.SyncControl} s
     INNER JOIN ${schema}.${Table.Dataset} d
