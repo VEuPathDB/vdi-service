@@ -509,6 +509,7 @@ FROM
     USING (dataset_id)
 WHERE
   md.visibility != 'private'
+  AND is_deleted = FALSE
 """
 
   context(con: Connection)
