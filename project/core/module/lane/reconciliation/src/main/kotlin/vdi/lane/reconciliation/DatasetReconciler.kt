@@ -122,6 +122,11 @@ internal class DatasetReconciler(
     }
 
   private fun ensureUninstalled(ctx: ReconcilerTarget) {
+    if (!ctx.hasMeta()) {
+      ctx.logger.error("dataset does not have a meta file, cannot uninstall")
+      return
+    }
+
     val dataset = cacheDB.ensureCacheDatasetRecord(ctx)
 
     if (!dataset.isDeleted) {
