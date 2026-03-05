@@ -1,7 +1,6 @@
 package vdi.core.plugin.client
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.ktor.client.call.body
 import io.ktor.client.request.forms.InputProvider
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
@@ -10,13 +9,11 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsChannel
-import io.ktor.http.ContentType
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.append
+import io.ktor.http.*
+import io.ktor.utils.io.asSource
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import io.ktor.utils.io.streams.asInput
+import io.ktor.utils.io.streams.inputStream
 import kotlinx.io.buffered
 import java.io.InputStream
 import java.net.URI
@@ -100,26 +97,28 @@ internal class PluginHandlerClientImpl(
     }
 
     return response.bodyAsChannel()
-      .toInputStream()
+      .asSource()
+      .buffered()
+      .inputStream()
       .let { body ->
-      when (Status.valueOf(response.status.value)) {
-        Status.Success -> StreamSuccessResponse(body)
+        when (Status.valueOf(response.status.value)) {
+          Status.Success -> StreamSuccessResponse(body)
 
-        Status.ValidationError -> ValidationErrorResponse(JSON.readValue(body))
-          .also { body.close() }
+          Status.ValidationError -> ValidationErrorResponse(JSON.readValue(body))
+            .also { body.close() }
 
-        Status.ScriptError -> ScriptErrorResponse(JSON.readValue(body))
-          .also { body.close() }
+          Status.ScriptError -> ScriptErrorResponse(JSON.readValue(body))
+            .also { body.close() }
 
-        Status.ServerError -> ServerErrorResponse(JSON.readValue(body))
-          .also { body.close() }
+          Status.ServerError -> ServerErrorResponse(JSON.readValue(body))
+            .also { body.close() }
 
-        else -> {
-          body.close()
-          throw IllegalStateException("plugin server responded with invalid code ${response.status}")
+          else -> {
+            body.close()
+            throw IllegalStateException("plugin server responded with invalid code ${response.status}")
+          }
         }
       }
-    }
   }
 
   override suspend fun postInstallMeta(
