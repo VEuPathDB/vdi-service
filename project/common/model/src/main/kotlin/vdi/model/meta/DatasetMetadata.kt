@@ -42,7 +42,7 @@ data class DatasetMetadata(
    */
   @param:JsonProperty(Summary)
   @field:JsonProperty(Summary)
-  val summary: String = name,
+  val summary: String = "",
 
   @param:JsonProperty(Description)
   @field:JsonProperty(Description)
