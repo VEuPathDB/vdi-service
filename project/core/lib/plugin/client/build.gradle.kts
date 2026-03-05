@@ -15,6 +15,7 @@ dependencies {
 
   implementation(libs.log.slf4j.api)
   implementation(libs.kt.coroutines)
+  implementation(libs.http.client.multipart)
 
   implementation(libs.bundles.ktor.client)
 }
