@@ -139,6 +139,10 @@ fun AppDBTransaction.upsertDatasetRecord(
 inline fun AppDBTransaction.isUniqueConstraintViolation(e: Throwable) =
   platform.isUniqueConstraintViolation(e)
 
+@Suppress("NOTHING_TO_INLINE")
+inline fun AppDBTransaction.isForeignKeyConstraintViolation(e: Throwable) =
+  platform.isForeignKeyConstraintViolation(e)
+
 @OptIn(ExperimentalContracts::class)
 private inline fun <T: Any> replace(
   datasetID: DatasetID,

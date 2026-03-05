@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import java.sql.SQLException
 import java.time.OffsetDateTime
+import java.util.concurrent.ConcurrentHashMap
 import vdi.core.async.WorkerPool
 import vdi.core.db.app.*
 import vdi.core.db.cache.CacheDB
@@ -34,6 +35,8 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
   : ShareLane
   , AbstractVDIModule(abortCB, logger<ShareLane>())
 {
+  private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(config.workerCount.toInt())
+
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
   private val appDB = AppDB()
@@ -52,7 +55,7 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
             .map { ShareContext(it, dm, logger) }
             .forEach {
               it.logger.debug("submitting share job for event from source {}", it.eventSource)
-              wp.submit { it.executeJob() }
+              wp.submit { it.executeIfNotAlreadyRunning() }
             }
       }
     }
@@ -60,6 +63,16 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
     wp.stop()
     kc.close()
     confirmShutdown()
+  }
+
+  private fun ShareContext.executeIfNotAlreadyRunning() {
+    if (datasetsInProgress.add(datasetID)) {
+      try {
+        executeJob()
+      } finally {
+        datasetsInProgress.remove(datasetID)
+      }
+    }
   }
 
   private fun ShareContext.executeJob() {
@@ -342,12 +355,12 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
   private fun computeShareState(shareDetails: Pair<ShareOffer, ShareReceipt>) =
     ShareInfo(
       offer = when (shareDetails.first.load()?.action) {
-        null                       -> ShareState.Absent
+        null                            -> ShareState.Absent
         DatasetShareOffer.Action.Grant  -> ShareState.Yes
         DatasetShareOffer.Action.Revoke -> ShareState.No
       },
       receipt = when (shareDetails.second.load()?.action) {
-        null                         -> ShareState.Absent
+        null                              -> ShareState.Absent
         DatasetShareReceipt.Action.Accept -> ShareState.Yes
         DatasetShareReceipt.Action.Reject -> ShareState.No
       },
@@ -365,7 +378,16 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
       logger.info("created dataset visibility record for recipient {}", recipientID)
     } catch (e: SQLException) {
       if (isUniqueConstraintViolation(e)) {
-        logger.info("share insert race condition; already shared with recipient {}", recipientID)
+        logger.info(
+          "share insert race condition; already shared with recipient {}",
+          recipientID,
+        )
+      } else if (isForeignKeyConstraintViolation(e)) {
+        logger.warn(
+          "dataset meta not yet installed in target; share sync may be" +
+          " delayed until next reconciliation for recipient {}",
+          recipientID,
+        )
       } else {
         throw e
       }

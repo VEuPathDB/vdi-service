@@ -5,10 +5,15 @@ import java.sql.SQLException
 enum class TargetDBPlatform {
   Postgres {
     private val PostgresUniqueConstraintSQLState = "23505"
+    private val PostgresForeignKeyViolationSQLState = "23503"
 
     override fun isUniqueConstraintViolation(e: Throwable): Boolean =
       (e is SQLException && e.sqlState == PostgresUniqueConstraintSQLState)
       || (e.cause?.let(::isUniqueConstraintViolation) ?: false)
+
+    override fun isForeignKeyConstraintViolation(e: Throwable): Boolean =
+      (e is SQLException && e.sqlState == PostgresForeignKeyViolationSQLState)
+      || (e.cause?.let(::isForeignKeyConstraintViolation) ?: false)
   },
 
   Oracle {
@@ -17,6 +22,10 @@ enum class TargetDBPlatform {
     override fun isUniqueConstraintViolation(e: Throwable): Boolean =
       (e is SQLException && e.errorCode == OracleUniqueConstraintErrorCode)
       || (e.cause?.let(::isUniqueConstraintViolation) ?: false)
+
+    override fun isForeignKeyConstraintViolation(e: Throwable): Boolean {
+      throw UnsupportedOperationException()
+    }
   };
 
   inline val defaultPort: UShort get() = when (this) {
@@ -34,4 +43,6 @@ enum class TargetDBPlatform {
   }
 
   abstract fun isUniqueConstraintViolation(e: Throwable): Boolean
+
+  abstract fun isForeignKeyConstraintViolation(e: Throwable): Boolean
 }
