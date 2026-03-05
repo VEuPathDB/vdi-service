@@ -103,6 +103,8 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       }
     } catch (e: PluginException) {
       e.log(logger::error)
+    } catch (e: SQLException) {
+      logger.error("sql error", e)
     } catch (e: Throwable) {
       PluginException.installMeta("N/A", "N/A", ownerID, datasetID, cause = e).log(logger::error)
     }
@@ -181,6 +183,8 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     try {
       updateTargetMeta(metaTimestamp)
     } catch (e: PluginException) {
+      throw e
+    } catch (e: SQLException) {
       throw e
     } catch (e: Throwable) {
       throw PluginException.installMeta(plugin.name, target, ownerID, datasetID, cause = e)
@@ -375,7 +379,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
   }
 
   /**
-   * Determines if the metadata json visibility field should be reset to private
+   * Determines if the metadata JSON visibility field should be reset to private
    * on failure of a variable properties install attempt.
    *
    * This is done to avoid making promoting a dataset to community if required
