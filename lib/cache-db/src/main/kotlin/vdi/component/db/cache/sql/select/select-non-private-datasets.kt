@@ -33,6 +33,7 @@ FROM
     USING (dataset_id)
 WHERE
   md.visibility != 'private'
+  AND d.is_deleted = FALSE
 """
 
 internal fun Connection.selectNonPrivateDatasets(): List<DatasetRecord> {
