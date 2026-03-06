@@ -4,6 +4,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
+import vdi.service.rest.generated.model.ServerError;
 import vdi.service.rest.generated.model.ServiceMetadataResponseBody;
 import vdi.service.rest.generated.support.ResponseDelegate;
 
@@ -31,6 +32,12 @@ public interface MetaInfo {
     public static GetMetaInfoResponse respond200WithApplicationJson(
         ServiceMetadataResponseBody entity) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new GetMetaInfoResponse(responseBuilder.build(), entity);
+    }
+
+    public static GetMetaInfoResponse respond500WithApplicationJson(ServerError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new GetMetaInfoResponse(responseBuilder.build(), entity);
     }

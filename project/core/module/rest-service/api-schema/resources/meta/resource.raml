@@ -4,6 +4,10 @@ displayName: Service Metadata
 description: Information about the running service.
 
 get:
+  displayName: Get Service Metadata
+  description: Returns information about the service and its configuration.
   responses:
     200:
       body: lib.ServiceMetadataResponseBody
+    500:
+      body: lib.ServerError
