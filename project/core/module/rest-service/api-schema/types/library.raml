@@ -1169,27 +1169,12 @@ types:
   PartialDate:
     displayName: Partial Datetime
     description: |
-      Subset of the RFC3339 format, requiring at least the 4 digit year, and may
-      include additional precision, part by part.  Each part must be 'complete'
-      and include standard preceding segment delimiters.
-
-      Date segments that are omitted will be defaulted to the minimum valid
-      value for that segment.  For example, If only the year value is provided,
-      the assumed remainder is `-01-01T00:00:00.000Z`.
-
-      Examples:
-      * `2022`
-      * `2022-03`
+      Local datetime represented in one of 2 formats:
       * `2022-03-15`
-      * `2022-03-15T16`
-      * `2022-03-15T16:30`
       * `2022-03-15T16:30:12`
-      * `2022-03-15T16:30:12Z`
-      * `2022-03-15T16:30:12+04:00`
-      * `2022-03-15T16:30:12.123Z`
-      * `2022-03-15T16:30:12.123-06:00`
     type: string
-    minLength: 4
+    minLength: 10
+    maxLength: 19
   PluginDataType:
     type: DatasetTypeOutput
     additionalProperties: false

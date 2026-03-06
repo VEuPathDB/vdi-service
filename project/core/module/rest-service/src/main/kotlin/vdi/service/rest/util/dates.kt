@@ -5,15 +5,8 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.TimeZone
 
-private const val lenYear   = 4
-private const val lenMonth  = 7
 private const val lenDay    = 10
-private const val lenHour   = 13
-private const val lenMinute = 16
 private const val lenSecond = 19
-private const val lenMillis = 23
-private const val lenUTC    = 24
-private const val lenZoned  = 29
 
 val DateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
 
@@ -25,15 +18,8 @@ fun fixVariableDateString(date: String): OffsetDateTime? {
   val sb = StringBuilder(32)
 
   val ok = when (date.length) {
-    lenYear   -> handleYear(sb, date)
-    lenMonth  -> handleMonth(sb, date)
     lenDay    -> handleDay(sb, date)
-    lenHour   -> handleHour(sb, date)
-    lenMinute -> handleMinute(sb, date)
     lenSecond -> handleSecond(sb, date)
-    lenMillis -> handleMillis(sb, date)
-    lenUTC    -> handleUTC(sb, date)
-    lenZoned  -> handleZoned(sb, date)
     else      -> return null
   }
 
@@ -47,47 +33,10 @@ fun fixVariableDateString(date: String): OffsetDateTime? {
   }
 }
 
-private fun handleYear(sb: StringBuilder, date: String): Boolean {
-  if (!sb.writeYear(date))
-    return false
-  sb.append("-01-01T00:00:00.000")
-  sb.writeZoneOffset()
-  return true
-}
-
-private fun handleMonth(sb: StringBuilder, date: String): Boolean {
-  if (!(sb.writeYear(date) && sb.writeMonth(date)))
-    return false
-  sb.append("-01T00:00:00.000")
-  sb.writeZoneOffset()
-
-  return true
-}
-
 private fun handleDay(sb: StringBuilder, date: String): Boolean {
   if (!(sb.writeYear(date) && sb.writeMonth(date) && sb.writeDay(date)))
     return false
   sb.append("T00:00:00.000")
-  sb.writeZoneOffset()
-
-  return true
-}
-
-private fun handleHour(sb: StringBuilder, date: String): Boolean {
-  if (!(sb.writeYear(date) && sb.writeMonth(date) && sb.writeDay(date) && sb.writeHour(date)))
-    return false
-
-  sb.append(":00:00.000")
-  sb.writeZoneOffset()
-
-  return true
-}
-
-private fun handleMinute(sb: StringBuilder, date: String): Boolean {
-  if (!(sb.writeYear(date) && sb.writeMonth(date) && sb.writeDay(date) && sb.writeHour(date) && sb.writeMinute(date)))
-    return false
-
-  sb.append(":00.000")
   sb.writeZoneOffset()
 
   return true
@@ -99,58 +48,6 @@ private fun handleSecond(sb: StringBuilder, date: String): Boolean {
 
   sb.append(".000")
   sb.writeZoneOffset()
-
-  return true
-}
-
-private fun handleMillis(sb: StringBuilder, date: String): Boolean {
-  if (!(sb.writeYear(date) && sb.writeMonth(date) && sb.writeDay(date) && sb.writeHour(date) && sb.writeMinute(date) && sb.writeSecond(date) && sb.writeMillis(date)))
-    return false
-
-  sb.writeZoneOffset()
-
-  return true
-}
-
-private fun handleUTC(sb: StringBuilder, date: String): Boolean {
-  if (!(sb.writeYear(date) && sb.writeMonth(date) && sb.writeDay(date) && sb.writeHour(date) && sb.writeMinute(date) && sb.writeSecond(date) && sb.writeMillis(date)))
-    return false
-
-  if (date[23] == 'z')
-    sb.append('Z')
-  else if (date[23] == 'Z')
-    sb.append('Z')
-  else
-    return false
-
-  return true
-}
-
-private fun handleZoned(sb: StringBuilder, date: String): Boolean {
-  if (!(sb.writeYear(date) && sb.writeMonth(date) && sb.writeDay(date) && sb.writeHour(date) && sb.writeMinute(date) && sb.writeSecond(date) && sb.writeMillis(date)))
-    return false
-
-  if (date[23] == '-' || date[23] == '+')
-    sb.append(date[23])
-  else
-    return false
-
-  for (i in 24 until 26)
-    if (isDecimalDigit(date[i]))
-      sb.append(date[i])
-    else
-      return false
-
-  if (date[26] == ':')
-    sb.append(':')
-  else
-    return false
-
-  for (i in 27 until 29)
-    if (isDecimalDigit(date[i]))
-      sb.append(date[i])
-    else
-      return false
 
   return true
 }
@@ -219,18 +116,6 @@ private fun StringBuilder.writeSecond(date: String): Boolean {
   append(':')
 
   for (i in 17 until 19)
-    if (isDecimalDigit(date[i]))
-      append(date[i])
-    else
-      return false
-
-  return true
-}
-
-private fun StringBuilder.writeMillis(date: String): Boolean {
-  append('.')
-
-  for (i in 20 until 23)
     if (isDecimalDigit(date[i]))
       append(date[i])
     else

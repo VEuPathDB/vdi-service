@@ -300,7 +300,7 @@ fun ControllerBase.verifyUploadFileSize(
   if (dataSize > uploadConfig.maxUploadSize)
     throw BadRequestException(
       "upload upload size larger than the max permitted dataset size of "
-      + uploadConfig.maxUploadSize.toFileSizeString()
+      + Formatting.formatFileSize(uploadConfig.maxUploadSize)
     )
 
   val remainingUploadAllowance = getUserRemainingQuota(uploadConfig)
@@ -308,7 +308,7 @@ fun ControllerBase.verifyUploadFileSize(
 
   if (totalUploadSize > remainingUploadAllowance)
     throw BadRequestException("total upload size is larger than the remaining" +
-      " space allowed by the user quota (${remainingUploadAllowance.toFileSizeString()})")
+      " space allowed by the user quota (${Formatting.formatFileSize(remainingUploadAllowance)})")
 }
 
 /**
@@ -466,14 +466,14 @@ private fun Path.validateTar(dataTypeMeta: PluginDatasetTypeMeta, remainingQuota
       messages.add("archive file \"$name\" has an unrecognized or disallowed file extension")
 
     if (size > maxSize)
-      messages.add("archive file \"$name\" size is larger than the max permitted size of ${maxSize.toFileSizeString()}")
+      messages.add("archive file \"$name\" size is larger than the max permitted size of ${Formatting.formatFileSize(maxSize)}")
 
     totalSize += size
   }
 
   if (totalSize > remainingQuota)
     messages.add("total size of archive content is larger than the remaining" +
-    " user allowance of ${remainingQuota.toFileSizeString()}")
+    " user allowance of ${Formatting.formatFileSize(remainingQuota)}")
 
   return messages.takeUnless { it.isEmpty() }
     ?.let { BadRequestError(it.joinToString("\n")) }
@@ -515,14 +515,14 @@ private fun Path.validateZip(dataTypeMeta: PluginDatasetTypeMeta, remainingQuota
 
     if (file.size > maxSize)
       messages.add("archive contains data file \"${file.name}\" with a size" +
-        " larger than the max permitted size of ${maxSize.toFileSizeString()}")
+        " larger than the max permitted size of ${Formatting.formatFileSize(maxSize)}")
 
     totalSize += file.size
   }
 
   if (totalSize > remainingQuota)
     messages.add("total size of archive content is larger than the remaining" +
-      " user allowance of ${remainingQuota.toFileSizeString()}")
+      " user allowance of ${Formatting.formatFileSize(remainingQuota)}")
 
 
   if (messages.isNotEmpty())
