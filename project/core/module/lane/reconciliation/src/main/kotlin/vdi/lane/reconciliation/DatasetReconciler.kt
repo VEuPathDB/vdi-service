@@ -162,6 +162,9 @@ internal class DatasetReconciler(
 
   private fun synchronizeUploadStatus(ctx: ReconcilerTarget, status: DatasetUploadStatus) {
     cacheDB.withTransaction {
+      ctx.meta
+        ?.created
+        ?.let { created -> it.updateMetaSyncControl(DatasetID(ctx.datasetId), created) }
       it.upsertUploadStatus(DatasetID(ctx.datasetId), status)
     }
   }

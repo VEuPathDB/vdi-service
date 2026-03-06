@@ -54,7 +54,7 @@ internal class ShareLaneImpl(private val config: ShareLaneConfig, abortCB: Abort
           kc.fetchMessages(config.eventMsgKey)
             .map { ShareContext(it, dm, logger) }
             .forEach {
-              it.logger.debug("submitting share job for event from source {}", it.eventSource)
+              it.logger.debug("received share job for event from source {}", it.eventSource)
               wp.submit { it.executeIfNotAlreadyRunning() }
             }
       }
