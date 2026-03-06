@@ -39,7 +39,7 @@ public class Resources extends ContainerResources {
   protected Object[] resources() {
     return new Object[] {
       AdminReportController.class,
-      AdminRPC.class,
+      AdminRpcController.class,
       CommunityDatasetController.class,
       DatasetByID.class,
       DatasetFiles.class,

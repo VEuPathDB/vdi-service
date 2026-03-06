@@ -61,6 +61,7 @@ object Reconciler {
     }
   }
 
+  @JvmSynthetic
   suspend fun runFull(): Boolean {
     if (active.isLocked)
       return false
@@ -86,6 +87,9 @@ object Reconciler {
 
     return true
   }
+
+  @JvmStatic
+  fun runFullReconciliation() = runBlocking { runFull() }
 
   suspend fun runSlim(): Boolean {
     if (active.isLocked)

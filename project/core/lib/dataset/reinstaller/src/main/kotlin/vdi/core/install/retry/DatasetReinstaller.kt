@@ -1,5 +1,6 @@
 package vdi.core.install.retry
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import org.slf4j.Logger
 import org.veupathdb.lib.s3.s34k.S3Api
@@ -47,6 +48,7 @@ object DatasetReinstaller {
    * If a run of the `DatasetReinstaller` is _not_ already in progress, this
    * method will return `true` after the process has completed.
    */
+  @JvmSynthetic
   suspend fun tryRun(): Boolean {
     return if (lock.tryLock()) {
       try {
@@ -59,6 +61,10 @@ object DatasetReinstaller {
       false
     }
   }
+
+  @JvmStatic
+  @JvmName("tryRun")
+  fun tryRunBlocking() = runBlocking { tryRun() }
 
   private suspend fun run() {
     log.info("starting dataset reinstaller run {}", ++runCounter)

@@ -16,6 +16,8 @@ data class DatasetFileInfo(
   @field:JsonProperty(Size)
   val size: ULong,
 ) {
+  fun getSizeAsLong() = size.toLong()
+
   companion object JsonKey {
     const val Name = "name"
     const val Size = "size"

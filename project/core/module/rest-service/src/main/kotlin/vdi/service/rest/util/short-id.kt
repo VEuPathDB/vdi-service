@@ -1,6 +1,7 @@
 @file:Suppress("SameParameterValue")
 package vdi.service.rest.util
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.random.Random
@@ -114,6 +115,7 @@ object ShortID {
    *
    * @return A new identifier string.
    */
+  @JvmSynthetic
   suspend fun generate(): String {
     var curTime = timestamp()
 
@@ -136,6 +138,10 @@ object ShortID {
 
     return String(buildIdentifier(curTime, tbCopy))
   }
+
+  @JvmStatic
+  @JvmName("generate")
+  fun generateBlocking() = runBlocking { generate() }
 
   private fun buildIdentifier(timestamp: UInt, tieBreaker: Byte): ByteArray {
     val tsi = timestamp.toInt() // this may flip the int to negative, use ushr

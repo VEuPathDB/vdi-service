@@ -129,8 +129,14 @@ object DatasetStore {
   fun listVariablePropertiesFiles(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
     bucket.objects.list(prefix = S3Paths.variablePropertiesDir(userID, datasetID))
 
+  @JvmSynthetic
   fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
     bucket.objects.list(prefix = S3Paths.datasetDir(userID, datasetID))
+
+  @JvmStatic
+  @JvmName("listObjectsForDataset")
+  fun jvmListObjectsForDataset(userID: Long, datasetID: String): Iterable<S3Object> =
+    listObjectsForDataset(userID.toUserID(), DatasetID(datasetID))
 
   fun putUploadError(userID: UserID, datasetID: DatasetID, message: String, ex: Throwable? = null) {
     store.getDatasetDirectory(userID, datasetID)

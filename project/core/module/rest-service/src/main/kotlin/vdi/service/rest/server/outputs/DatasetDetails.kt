@@ -11,8 +11,9 @@ import vdi.model.meta.*
 import vdi.model.meta.DatasetDependency
 import vdi.service.rest.conversion.BioprojectIDReference
 import vdi.service.rest.conversion.DatasetImportStatusInfo
-import vdi.service.rest.conversion.DatasetOwner
 import vdi.service.rest.conversion.DatasetInstallStatusListEntry
+import vdi.service.rest.conversion.DatasetOwner
+import vdi.service.rest.conversion.DatasetTypeOutput
 import vdi.service.rest.conversion.DOIReference
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.model.UserDetails

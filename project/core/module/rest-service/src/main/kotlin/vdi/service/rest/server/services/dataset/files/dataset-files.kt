@@ -6,12 +6,12 @@ import vdi.core.db.cache.model.DatasetRecord
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetVisibility
 import vdi.model.meta.UserID
+import vdi.service.rest.conversion.DatasetFileDetails
+import vdi.service.rest.conversion.DatasetZipDetails
 import vdi.service.rest.generated.model.DatasetFileListingImpl
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
-import vdi.service.rest.server.outputs.DatasetFileDetails
-import vdi.service.rest.server.outputs.DatasetZipDetails
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.wrap
 import vdi.util.fn.Either

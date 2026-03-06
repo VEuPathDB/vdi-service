@@ -400,7 +400,7 @@ OFFSET
             datasetID   = reqDatasetID("dataset_id"),
             ownerID     = getUserID("owner_id"),
             type        = DatasetType(getDataType("type_name"), getString("type_version")),
-            projects    = getProjectIDList("projects"),
+            installTargets    = getProjectIDList("projects"),
             messages    = getStringList("messages"),
           ))
         }

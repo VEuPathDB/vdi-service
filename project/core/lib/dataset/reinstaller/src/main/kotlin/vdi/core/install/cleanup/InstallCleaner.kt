@@ -24,6 +24,7 @@ object InstallCleaner {
    * Locate all datasets in all application databases that are in an
    * install-failed state and mark them as ready-for-reinstall.
    */
+  @JvmStatic
   fun cleanAll() {
     log.info("starting broken install cleanup for all broken datasets")
 
@@ -58,6 +59,7 @@ object InstallCleaner {
    * each dataset's target application databases then update the dataset's
    * status to ready-for-reinstall.
    */
+  @JvmStatic
   fun cleanTargets(targets: Iterable<ReinstallTarget>) {
     log.info("starting broken install cleanup for target datasets")
 

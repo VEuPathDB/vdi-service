@@ -72,11 +72,12 @@ fun ControllerBase.createDataset(
 }
 
 fun ControllerBase.createDataset(
-  datasetID:    DatasetID,
+  datasetId:    String,
   entity:       DatasetProxyPostRequestBody,
   uploadConfig: UploadConfig,
 ) {
   val datasetMeta = entity.toDatasetMeta(userID)
+  val datasetID = DatasetID(datasetId)
 
   entity.dataFile
     ?.let { verifyFileExtensions(it, datasetMeta.type) }

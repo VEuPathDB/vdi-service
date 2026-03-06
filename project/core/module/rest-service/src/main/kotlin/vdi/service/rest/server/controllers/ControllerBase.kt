@@ -12,7 +12,7 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.UserID
 import vdi.model.meta.toUserID
 
-sealed class ControllerBase(val request: ContainerRequest) {
+abstract class ControllerBase(val request: ContainerRequest) {
   /**
    * Controller-scoped logger instance.
    *
