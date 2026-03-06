@@ -18,13 +18,18 @@ class LineListOutputStream(private val lines: MutableCollection<in String>) : Ou
   private val buffer = StringBuilder(1024)
 
   override fun write(b: Int) {
-    if (b == ASCII_LF) {
-      if (buffer.isNotBlank()) {
-        lines.add(buffer.toString())
+    when (b) {
+      ASCII_LF -> {
+        if (buffer.isNotBlank()) {
+          lines.add(buffer.toString())
+        }
+        buffer.clear()
       }
-      buffer.clear()
-    } else {
-      buffer.append(b.toChar())
+
+      in 0x20..0x7E -> buffer.append(b.toChar())
+
+      else -> buffer.append("\\u")
+        .append(b.toShort().toHexString())
     }
   }
 

@@ -50,4 +50,4 @@ ENV JVM_MEM_ARGS="-Xms32M -Xmx256M" \
 COPY --from=build ["/workspace/project/core/build/libs/vdi-service.jar", "/opt/vdi/"]
 
 
-CMD ["sh", "-c", "java -jar -XX:+CrashOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /opt/vdi/vdi-service.jar"]
+CMD ["sh", "-c", "java -jar -XX:+CrashOnOutOfMemoryError -XX:+HeapDumpOnOutOfMemoryError $JVM_MEM_ARGS $JVM_ARGS /opt/vdi/vdi-service.jar"]

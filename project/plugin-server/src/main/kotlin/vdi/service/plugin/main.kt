@@ -15,7 +15,7 @@ import vdi.service.plugin.consts.ConfigDefault
 import vdi.service.plugin.metrics.ScriptMetrics
 import vdi.service.plugin.model.ApplicationContext
 import vdi.service.plugin.model.MetricsBundle
-import vdi.service.plugin.script.ScriptExecutorImpl
+import vdi.service.plugin.script.ScriptExecutor
 import vdi.service.plugin.server.configureServer
 import vdi.service.plugin.util.DatasetPathFactory
 
@@ -33,7 +33,7 @@ fun main() {
 
   val appCtx = ApplicationContext(
     ServiceConfiguration(name, plugin, manifest),
-    ScriptExecutorImpl(),
+    ScriptExecutor(),
     PrometheusMeterRegistry(PrometheusConfig.DEFAULT).let { MetricsBundle(it, ScriptMetrics(it)) },
     DatasetPathFactory(config, plugin)
   )

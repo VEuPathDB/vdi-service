@@ -122,6 +122,11 @@ internal class DatasetReconciler(
     }
 
   private fun ensureUninstalled(ctx: ReconcilerTarget) {
+    if (!ctx.hasMeta()) {
+      ctx.logger.error("dataset does not have a meta file, cannot uninstall")
+      return
+    }
+
     val dataset = cacheDB.ensureCacheDatasetRecord(ctx)
 
     if (!dataset.isDeleted) {
@@ -157,6 +162,9 @@ internal class DatasetReconciler(
 
   private fun synchronizeUploadStatus(ctx: ReconcilerTarget, status: DatasetUploadStatus) {
     cacheDB.withTransaction {
+      ctx.meta
+        ?.created
+        ?.let { created -> it.updateMetaSyncControl(DatasetID(ctx.datasetId), created) }
       it.upsertUploadStatus(DatasetID(ctx.datasetId), status)
     }
   }

@@ -361,12 +361,14 @@ determine how the VDI Plugin Handler Server process should proceed after the
 script exits.
 
 .Exit Codes
-[source]
-----
-0   - Successful exit
-1   - Failure due to validation errors
-2+  - Failure due to unexpected/undefined error
-----
+--
+[cols='1,9']
+|===
+| `0`  | Successful exit
+| `99` | Failure due to validation errors
+| else | Failure due to unexpected/undefined error
+|===
+--
 
 === Install-Meta Script
 
@@ -439,11 +441,12 @@ Handler Server itself.
 
 ==== Exit Codes
 
-[source]
-----
-0    - Success
-1+   - Failure due to unxpected/undefined error.
-----
+[cols='1,9']
+|===
+| `0`  | Successful exit
+| else | Failure due to unexpected/undefined error
+|===
+
 === Check Compatibility Script
 
 ==== Inputs
@@ -512,12 +515,13 @@ Handler Server itself.
 
 ==== Exit Codes
 
-[source]
-----
-0    - Required dependencies are met (compatible).
-1    - Requried dependencies are not met (incompatible).
-1+   - Failure due to unexpected/undefined error.
-----
+[cols='1,9']
+|===
+| `0`  | Required dependencies are met (compatible).
+| `99` | Required dependencies are not met (incompatible).
+| else | Failure due to unexpected/undefined error
+|===
+
 
 === Install-Data Script
 
@@ -589,12 +593,12 @@ VDI Plugin Handler Server.
 
 ==== Exit Codes
 
-[source]
-----
-0    - Success
-1    - Failure due to validation error.
-2+   - Failure due to unxpected/undefined error.
-----
+[cols='1,9']
+|===
+| `0`  | Successful exit
+| `99` | Failure due to validation errors
+| else | Failure due to unexpected/undefined error
+|===
 
 === Uninstall Script
 
@@ -653,17 +657,12 @@ will be disregarded.
 
 Messages logged to `STDERR` will be recorded in the logs of the VDI Plugin
 Handler Server itself.
+
+
 ==== Exit Codes
 
-[source]
-----
-0    - Success
-1+   - Failure due to unxpected/undefined error.
-----
-
-== HTTP API
-
-link:https://veupathdb.github.io/vdi-plugin-handler-server/http-api.html[API Documentation]
-
-TODO
-
+[cols='1,9']
+|===
+| `0`  | Successful exit
+| else | Failure due to unexpected/undefined error
+|===

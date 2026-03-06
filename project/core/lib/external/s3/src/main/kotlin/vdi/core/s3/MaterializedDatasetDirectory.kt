@@ -72,7 +72,7 @@ internal class MaterializedDatasetDirectory(
 
       objects.forEach {
         val path = "${it.bucket.name}/${it.path}".toDatasetPathOrNull()
-          ?: throw MalformedDatasetException("Unrecognized file path in S3: " + it.path)
+          ?: throw MalformedDatasetException("unrecognized file path in S3: " + it.path)
 
         when (path) {
           is DataFilePath -> when (path.fileName) {
@@ -107,7 +107,7 @@ internal class MaterializedDatasetDirectory(
         ownerID         = ownerID,
         datasetID       = datasetID,
         bucket          = bucket,
-        metaFile        = metaFile ?: throw MalformedDatasetException("dataset missing ${FileName.MetadataFile}"),
+        metaFile        = metaFile,
         manifest        = manifest,
         uploadFile      = uploadFile,
         importableFile  = importableFile,

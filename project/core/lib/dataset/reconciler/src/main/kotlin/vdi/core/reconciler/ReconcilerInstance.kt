@@ -301,7 +301,7 @@ internal class ReconcilerInstance(
       metaOutOfSync    = targetLastUpdated.metaUpdated.isBefore(getMetaFile().lastModified())
         || getLatestVariablePropertiesTimestamp()?.let { targetLastUpdated.metaUpdated.isBefore(it) } == true,
       sharesOutOfSync  = targetLastUpdated.sharesUpdated.isBefore(getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
-      installOutOfSync = targetLastUpdated.dataUpdated.isBefore(getInstallReadyTimestamp() ?: targetLastUpdated.dataUpdated),
+      installOutOfSync = false, // DISABLED -- datasets are versioned, data files should not be updated
     )
   }
 

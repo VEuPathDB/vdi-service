@@ -34,9 +34,15 @@ data class DatasetMetadata(
   @field:JsonProperty(Name)
   val name: String,
 
+  /**
+   * Short summary of the dataset.
+   *
+   * Defaults to the dataset name value for compatibility with older datasets
+   * that were created before the summary field was required by the REST API.
+   */
   @param:JsonProperty(Summary)
   @field:JsonProperty(Summary)
-  val summary: String,
+  val summary: String = "",
 
   @param:JsonProperty(Description)
   @field:JsonProperty(Description)

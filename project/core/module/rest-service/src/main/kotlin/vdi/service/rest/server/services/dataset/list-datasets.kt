@@ -44,15 +44,16 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
     .forEach { userIDs.add(it.recipientID) }}
 
   // build a map for collecting project ID -> dataset ID collection mappings
-  // to use when querying for dataset status info.
+  // to use when querying for dataset install status info.
   val projectToDatasetID = HashMap<String, MutableSet<DatasetID>>(12)
 
   // Get file counts and sizes for the datasets.
   val fileSummaries = cacheDB.selectUploadFileSummaries(datasetIDs)
 
-  // for each dataset the original search returned
-  datasetList
-    .asSequence()
+  // Populate the map of datasets that we want to fetch install statuses for by:
+  //
+  // iterate through each dataset the original search returned
+  datasetList.asSequence()
     // Get the user ID for the dataset record
     .onEach { userIDs.add(it.ownerID) }
     // Filter down to just datasets that imported successfully

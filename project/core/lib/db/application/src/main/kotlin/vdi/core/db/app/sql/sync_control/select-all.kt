@@ -10,12 +10,11 @@ import vdi.core.db.jdbc.getDateTime
 import vdi.core.db.app.sql.getUserID
 import vdi.core.db.jdbc.reqDatasetID
 import vdi.core.db.model.ReconcilerTargetRecord
-import vdi.db.app.TargetDBPlatform
 import vdi.model.meta.DatasetType
 import vdi.util.io.CloseableIterator
 
-private fun sql(schema: String, strpos: String) =
-// language=sql
+private fun sql(schema: String) =
+// language=postgresql
 """
 WITH results AS (
   SELECT
@@ -29,14 +28,12 @@ WITH results AS (
   , d.deleted_status
   -- Sort ID is needed to align the result rows with the object key stream
   -- coming from the object store
-  , d.owner || '/' || (
-    CASE
-      WHEN ${strpos}(d.dataset_id, '.') > 0
-        THEN d.dataset_id
-      ELSE
-        d.dataset_id || '.z'
-    END
-  ) AS sort_id
+  , CASE
+    WHEN strpos(d.dataset_id, '.') > 0
+      THEN d.dataset_id
+    ELSE
+      d.dataset_id || '.z'
+  END AS sort_id
   FROM
     ${schema}.${Table.SyncControl} s
     INNER JOIN ${schema}.${Table.Dataset} d
@@ -52,17 +49,14 @@ SELECT
 , owner
 , deleted_status
 FROM results
-ORDER BY sort_id
+ORDER BY
+  owner::text
+, sort_id
+COLLATE "C"
 """
 
-private const val PostgresStrPos = "strpos"
-private const val OracleStrPos = "instr"
-
-internal fun Connection.selectAllSyncControl(schema: String, platform: TargetDBPlatform): CloseableIterator<ReconcilerTargetRecord> {
-  val ps = prepareStatement(sql(schema, when (platform) {
-    TargetDBPlatform.Postgres -> PostgresStrPos
-    TargetDBPlatform.Oracle   -> OracleStrPos
-  }))
+internal fun Connection.selectAllSyncControl(schema: String): CloseableIterator<ReconcilerTargetRecord> {
+  val ps = prepareStatement(sql(schema))
   return RecordIterator(ps.executeQuery(), this, ps)
 }
 

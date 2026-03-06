@@ -1,6 +1,9 @@
 package vdi.service.plugin.script
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.io.files.Path
+import vdi.service.plugin.util.toJavaPath
 
 /**
  * Script Executor
@@ -10,7 +13,7 @@ import kotlinx.io.files.Path
  * This type is used over direct use of Java's [ProcessBuilder] to allow for
  * unit testing of functions that execute command line scripts.
  */
-interface ScriptExecutor {
+class ScriptExecutor {
 
   /**
    * Executes the target command in the target working directory and calls the
@@ -56,10 +59,23 @@ interface ScriptExecutor {
    */
   suspend fun <T> executeScript(
     command: Path,
-    workDir: Path,
-    arguments: Array<String> = emptyArray(),
-    environment: Map<String, String> = emptyMap(),
-    fn: suspend ScriptProcess.() -> T
-  ): T
-}
+    workDir:     Path,
+    arguments:   Array<String>,
+    environment: Map<String, String>,
+    fn:          suspend ScriptProcess.() -> T,
+  ): T = withContext(Dispatchers.IO) {
+    val rawProcess = ProcessBuilder(command.toString(), *arguments).apply {
+      directory(workDir.toJavaPath().toFile())
+      environment().clear()
+      environment().putAll(environment)
+    }.start()
 
+    val out = try {
+      fn(ScriptProcessImpl(command.toString(), rawProcess))
+    } finally {
+      rawProcess.waitFor()
+    }
+
+    out
+  }
+}
