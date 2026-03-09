@@ -5,6 +5,7 @@ import vdi.model.meta.toUserID
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.BrokenImportListQuery
 import vdi.core.db.cache.model.SortOrder
+import vdi.service.rest.conversion.OutputTypes
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetSort
 import vdi.service.rest.generated.model.BrokenImportListingImpl
@@ -13,7 +14,6 @@ import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsImportsF
 import vdi.service.rest.server.inputs.toSafeLimit
 import vdi.service.rest.server.inputs.toSafeOffset
 import vdi.service.rest.server.outputs.BadRequestError
-import vdi.service.rest.server.outputs.BrokenImportDetails
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.util.fixVariableDateString
 
@@ -39,7 +39,7 @@ fun generateFailedImportReport(
   )
 
   val broken = CacheDB().selectBrokenDatasetImports(query)
-    .map(::BrokenImportDetails)
+    .map(OutputTypes::BrokenImportDetails)
 
   return GetAdminReportsImportsFailedResponse.respond200WithApplicationJson(BrokenImportListingImpl()
     .also {

@@ -17,7 +17,7 @@ import vdi.service.rest.generated.model.BrokenDatasetInstallReportBodyImpl
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsInstallsFailedResponse.respond200WithApplicationJson
 import vdi.service.rest.conversion.DatasetStatusInfo
-import vdi.service.rest.server.outputs.toExternal
+import vdi.service.rest.conversion.OutputTypes
 
 /**
  * Lists datasets across all registered projects that are in the broken install
@@ -115,7 +115,7 @@ private fun DatasetRecord.toDetails(
   BrokenDatasetInstallDetailsImpl().also { out ->
     out.datasetId      = datasetID.toString()
     out.owner          = owner.toLong()
-    out.datasetType    = type.toExternal()
+    out.datasetType    = OutputTypes.DatasetTypeOutput(type)
     out.installTargets = projects.toList()
     out.status         = DatasetStatusInfo(DatasetUploadStatus.Success, DatasetImportStatus.Complete, statuses)
   }

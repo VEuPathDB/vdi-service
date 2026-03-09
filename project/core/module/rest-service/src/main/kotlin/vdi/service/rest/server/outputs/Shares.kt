@@ -1,11 +1,12 @@
 package vdi.service.rest.server.outputs
 
-import vdi.model.meta.DataType
 import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
 import vdi.model.meta.DatasetShareOffer
+import vdi.model.meta.DatasetType
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.conversion.DatasetOwner
+import vdi.service.rest.conversion.OutputTypes
 import vdi.service.rest.model.UserDetails
 
 
@@ -24,9 +25,7 @@ fun ShareOfferAction(action: DatasetShareOffer.Action): ShareOfferAction =
 internal fun ShareOfferEntry(
   datasetID: DatasetID,
   shareStatus: ShareOfferStatus,
-  datasetTypeName: DataType,
-  datasetTypeVersion: String,
-  datasetTypeDisplayName: String,
+  datasetType: DatasetType,
   owner:       UserDetails,
   installTargets:  List<InstallTargetID>
 ): ShareOfferEntry =
@@ -34,7 +33,7 @@ internal fun ShareOfferEntry(
     .also {
       it.datasetId = datasetID.toString()
       it.shareStatus = shareStatus
-      it.type = DatasetTypeOutput(datasetTypeName, datasetTypeVersion, datasetTypeDisplayName)
+      it.type = OutputTypes.DatasetTypeOutput(datasetType)
       it.owner = DatasetOwner(owner)
       it.installTargets = installTargets
     }

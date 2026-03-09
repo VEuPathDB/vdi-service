@@ -5,7 +5,6 @@ package vdi.service.rest.server.services.shares
 import org.veupathdb.lib.container.jaxrs.providers.UserProvider
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetShareListEntry
-import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.ShareOfferEntry
 import vdi.service.rest.generated.model.ShareOfferStatus
@@ -59,13 +58,11 @@ private fun convertToOutType(shares: Collection<DatasetShareListEntry>): List<Sh
 
   return shares.map {
     ShareOfferEntry(
-      datasetID              = it.datasetID,
-      shareStatus            = ShareOfferStatus.OPEN,
-      datasetTypeName        = it.type.name,
-      datasetTypeVersion     = it.type.version,
-      datasetTypeDisplayName = PluginRegistry.require(it.type).category,
-      owner                  = owners[it.ownerID] ?: throw IllegalStateException("unknown dataset owner ${it.ownerID}"),
-      installTargets         = it.projects
+      datasetID      = it.datasetID,
+      shareStatus    = ShareOfferStatus.OPEN,
+      datasetType    = it.type,
+      owner          = owners[it.ownerID] ?: throw IllegalStateException("unknown dataset owner ${it.ownerID}"),
+      installTargets = it.projects
     )
   }
 }

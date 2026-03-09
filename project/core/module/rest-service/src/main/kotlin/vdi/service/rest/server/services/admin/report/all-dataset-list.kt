@@ -10,12 +10,12 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.conversion.DatasetStatusInfo
+import vdi.service.rest.conversion.OutputTypes
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse
 import vdi.service.rest.generated.resources.AdminReports.GetAdminReportsDatasetsListAllResponse.respond200WithApplicationJson
 import vdi.service.rest.server.inputs.toSafeLimit
 import vdi.service.rest.server.inputs.toSafeOffset
 import vdi.service.rest.server.outputs.DatasetVisibility
-import vdi.service.rest.server.outputs.toExternal
 import vdi.service.rest.util.defaultZone
 
 internal fun listAllDatasets(
@@ -93,7 +93,7 @@ private fun AllDatasetsListEntry(
   AllDatasetsListEntryImpl().also {
     it.datasetId      = row.datasetID.toString()
     it.owner          = row.ownerID.toLong()
-    it.datasetType    = row.type.toExternal()
+    it.datasetType    = OutputTypes.DatasetTypeOutput(row.type)
     it.visibility     = DatasetVisibility(row.visibility)
     it.name           = row.name
     it.summary        = row.summary

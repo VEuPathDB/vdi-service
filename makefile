@@ -40,12 +40,12 @@ raml-gen:
 # Builds the VDI plugin server shadow jar.
 .PHONY: build-plugin-server
 build-plugin-server:
-	@$(GRADLE) :plugin-server:build
+	@$(GRADLE) :plugin-server:build :plugin-server:test
 
 # Builds the VDI core server shadow jar.
 .PHONY: build-core-server
 build-core-server:
-	@$(GRADLE) :core:build
+	@$(GRADLE) :core:build :core:test
 
 # (Re)Builds the VDI dev stack container images.
 .PHONY: build-image

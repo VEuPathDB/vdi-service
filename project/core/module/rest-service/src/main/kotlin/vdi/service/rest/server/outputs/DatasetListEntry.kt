@@ -4,7 +4,6 @@ import java.time.OffsetDateTime
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.cache.model.DatasetFileSummary
 import vdi.core.db.cache.model.DatasetRecord
-import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
 import vdi.service.rest.conversion.DatasetImportStatusInfo
@@ -13,6 +12,7 @@ import vdi.service.rest.generated.model.*
 import vdi.service.rest.conversion.DatasetOwner
 import vdi.service.rest.conversion.DatasetStatusInfo
 import vdi.service.rest.conversion.DatasetUploadStatusInfo
+import vdi.service.rest.conversion.OutputTypes
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.util.defaultZone
 
@@ -61,7 +61,7 @@ internal fun DatasetRecord.toExternal(
   return DatasetListEntry(
     datasetID        = datasetID,
     owner            = DatasetOwner(owner),
-    datasetType      = DatasetTypeOutput(this, PluginRegistry.require(type).category),
+    datasetType      = OutputTypes.DatasetTypeOutput(this.type),
     visibility       = DatasetVisibility(visibility),
     name             = name,
     origin           = origin,

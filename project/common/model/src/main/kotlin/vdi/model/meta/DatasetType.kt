@@ -11,6 +11,8 @@ data class DatasetType(
   @field:JsonProperty(JsonKey.Version)
   val version: String,
 ) {
+  fun getNameString() = name.toString()
+
   override fun toString() = "$name:$version"
 
   object JsonKey {

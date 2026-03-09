@@ -39,7 +39,7 @@ default:
 
 .PHONY: build
 build:
-	@gradle :build
+	@gradle :build :test
 
 # Regenerates REST API documentation and JaxRS classes from the REST service
 # api.raml file

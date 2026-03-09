@@ -39,12 +39,9 @@ containerService {
   }
 }
 
-sourceSets {
-  main {
-    kotlin {
-//      srcDir("src/generated/kotlin")
-    }
-  }
+java {
+  targetCompatibility = JavaVersion.VERSION_24
+  sourceCompatibility = JavaVersion.VERSION_24
 }
 
 configurations.all {

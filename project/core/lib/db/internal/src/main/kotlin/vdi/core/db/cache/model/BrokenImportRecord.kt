@@ -8,6 +8,8 @@ data class BrokenImportRecord(
   val datasetID: DatasetID,
   val ownerID:   UserID,
   val type:      DatasetType,
-  val projects:  List<String>,
+  val installTargets:  List<String>,
   val messages:  List<String>,
-)
+) {
+  fun datasetIdAsString() = datasetID.asString
+}
