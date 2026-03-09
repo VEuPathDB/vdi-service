@@ -5,6 +5,7 @@ import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.reqCheckLength
 import org.veupathdb.lib.request.validation.require
 import vdi.model.meta.BioprojectIDReference
+import vdi.service.rest.conversion.InputTypes
 import vdi.service.rest.generated.model.BioprojectIDReferenceImpl
 import vdi.service.rest.generated.model.BioprojectIDReference as APIBioReference
 
@@ -36,4 +37,4 @@ fun APIBioReference.validatePatch(og: APIBioReference, jPath: String, errors: Va
 }
 
 fun Iterable<APIBioReference>.toInternal() =
-  map { BioprojectIDReference(it.id, it.description) }
+  map(InputTypes::BioprojectIDReference)

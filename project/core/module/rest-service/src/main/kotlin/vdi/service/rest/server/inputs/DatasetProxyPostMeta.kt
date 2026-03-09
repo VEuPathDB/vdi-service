@@ -6,6 +6,7 @@ import java.net.URI
 import java.time.OffsetDateTime
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.UserID
+import vdi.service.rest.conversion.InputTypes
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
 
@@ -34,9 +35,9 @@ fun DatasetProxyPostMeta.toInternal(userID: UserID, url: String?) =
     projectName          = projectName,
     programName          = programName,
     linkedDatasets       = linkedDatasets.toInternalDistinct(LinkedDataset::toInternal),
-    experimentalOrganism = experimentalOrganism?.toInternal(),
-    hostOrganism         = hostOrganism?.toInternal(),
-    studyCharacteristics      = studyCharacteristics?.toInternal(),
+    experimentalOrganism = experimentalOrganism?.let(InputTypes::DatasetOrganism),
+    hostOrganism         = hostOrganism?.let(InputTypes::DatasetOrganism),
+    studyCharacteristics = studyCharacteristics?.toInternal(),
     externalIdentifiers  = externalIdentifiers?.toInternal(),
     funding              = funding.toInternalDistinct(DatasetFundingAward::toInternal),
     type                 = type.toInternal(),

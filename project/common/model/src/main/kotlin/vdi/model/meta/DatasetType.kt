@@ -19,4 +19,10 @@ data class DatasetType(
     const val Name    = "name"
     const val Version = "version"
   }
+
+  companion object {
+    @JvmStatic
+    fun create(name: String, version: String): DatasetType =
+      DatasetType(DataType.of(name), version)
+  }
 }

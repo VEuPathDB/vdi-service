@@ -9,6 +9,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.UserID
+import vdi.service.rest.conversion.InputTypes
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.JsonField as JF
 
@@ -50,9 +51,9 @@ internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
     projectName          = projectName,
     programName          = programName,
     linkedDatasets       = linkedDatasets.toInternalDistinct(LinkedDataset::toInternal),
-    experimentalOrganism = experimentalOrganism?.toInternal(),
-    hostOrganism         = hostOrganism?.toInternal(),
-    studyCharacteristics      = studyCharacteristics?.toInternal(),
+    experimentalOrganism = experimentalOrganism?.let(InputTypes::DatasetOrganism),
+    hostOrganism         = hostOrganism?.let(InputTypes::DatasetOrganism),
+    studyCharacteristics = studyCharacteristics?.toInternal(),
     externalIdentifiers  = externalIdentifiers?.toInternal(),
     funding              = funding.toInternalDistinct(DatasetFundingAward::toInternal),
     shortAttribution     = shortAttribution,
