@@ -11,6 +11,8 @@ class PluginDatasetTypeMeta(
   val usesDataPropertiesFiles: Boolean,
   val installTargets: Array<InstallTargetID>?,
 ) {
+  fun getMaxFileSizeAsLong() = maxFileSize.toLong()
+
   fun appliesTo(target: InstallTargetID) =
     installTargets?.contains(target) ?: true
 }

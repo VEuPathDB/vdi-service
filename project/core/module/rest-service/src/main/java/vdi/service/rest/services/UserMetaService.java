@@ -9,7 +9,7 @@ import vdi.service.rest.generated.model.UserQuotaDetails;
 import vdi.service.rest.generated.model.UserQuotaDetailsImpl;
 import vdi.service.rest.s3.DatasetStore;
 
-public class UserMetaService {
+public final class UserMetaService {
   public static UserMetadata getUserMetadata(UserID userId, UploadConfig uploadConfig) {
     return new UserMetadataImpl() {{
       setQuota(getUserQuotaDetails(userId, uploadConfig));

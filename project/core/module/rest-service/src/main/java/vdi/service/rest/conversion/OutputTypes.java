@@ -1,11 +1,16 @@
 package vdi.service.rest.conversion;
 
 import vdi.core.db.cache.model.BrokenImportRecord;
+import vdi.core.plugin.registry.PluginDatasetTypeMeta;
 import vdi.core.plugin.registry.PluginRegistry;
 import vdi.model.meta.DatasetRevisionHistory;
 import vdi.model.meta.DatasetType;
 import vdi.service.rest.generated.model.*;
 import vdi.service.rest.model.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 public final class OutputTypes {
   public static BrokenImportDetails BrokenImportDetails(BrokenImportRecord record) {
@@ -51,6 +56,29 @@ public final class OutputTypes {
       setName(type.getNameString());
       setVersion(type.getVersion());
       setCategory(PluginRegistry.require(type).getCategory());
+    }};
+  }
+
+  public static PluginListItem PluginListItem(DatasetType type, PluginDatasetTypeMeta pluginMeta) {
+    return new PluginListItemImpl() {{
+      setPluginName(pluginMeta.getPlugin());
+      setInstallTargets(Arrays.asList(Objects.requireNonNull(pluginMeta.getInstallTargets())));
+      setDataTypes(new ArrayList<>(8) {{
+        add(PluginDataType(type));
+      }});
+    }};
+  }
+
+  public static PluginDataType PluginDataType(DatasetType type) {
+    var config = PluginRegistry.require(type);
+
+    return new PluginDataTypeImpl() {{
+      setName(type.getNameString());
+      setVersion(type.getVersion());
+      setCategory(config.getCategory());
+      setUsesDataProperties(config.getUsesDataPropertiesFiles());
+      setMaxFileSize(config.getMaxFileSizeAsLong());
+      setAllowedFileExtensions(Arrays.asList(config.getAllowedFileExtensions()));
     }};
   }
 

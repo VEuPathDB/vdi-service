@@ -1,9 +1,9 @@
 package vdi.service.rest.server.controllers
 
 import vdi.service.rest.generated.resources.Plugins
-import vdi.service.rest.server.services.plugins.listPlugins
+import vdi.service.rest.services.PluginMetaService
 
 class PluginInfo: Plugins {
   override fun getPlugins(project: String?) =
-    Plugins.GetPluginsResponse.respond200WithApplicationJson(listPlugins(project))!!
+    Plugins.GetPluginsResponse.respond200WithApplicationJson(PluginMetaService.listPlugins(project))!!
 }
