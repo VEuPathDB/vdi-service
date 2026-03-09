@@ -32,6 +32,8 @@ open class DatasetRevision(
     const val Timestamp    = "timestamp"
   }
 
+  fun getRevisionIdString() = revisionID.asString
+
   override fun toString() =
     "DatasetRevision(action=$action, timestamp=$timestamp, revisionID=$revisionID, revisionNote=$revisionNote)"
 

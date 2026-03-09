@@ -104,7 +104,7 @@ private inline fun DatasetDetails.applyMeta(meta: DatasetMetadata) = apply {
   visibility = DatasetVisibility(meta.visibility)
   created = meta.created
   sourceUrl = meta.sourceURL?.toString()
-  revisionHistory = meta.revisionHistory?.let(::RevisionHistory)
+  revisionHistory = meta.revisionHistory?.let(OutputTypes::RevisionHistory)
   shortName = meta.shortName
 }
 

@@ -11,10 +11,10 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetShareOffer
 import vdi.model.meta.DatasetShareReceipt
 import vdi.model.meta.UserID
+import vdi.service.rest.conversion.OutputTypes
 import vdi.service.rest.generated.model.DatasetListEntry
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.server.controllers.ControllerBase
-import vdi.service.rest.server.outputs.DatasetListShareUser
 import vdi.service.rest.server.outputs.toExternal
 import vdi.service.rest.util.reduceTo
 
@@ -98,7 +98,7 @@ private fun fetchDatasetList(datasetList: List<DatasetRecord>, requesterID: User
         shares[it.datasetID]?.asSequence()
           ?.filter { share -> share.offerStatus == DatasetShareOffer.Action.Grant }
           ?.map { sh ->
-            DatasetListShareUser(
+            OutputTypes.DatasetListShareUser(
               userDetails.requireDetails(sh.recipientID),
               sh.receiptStatus == DatasetShareReceipt.Action.Accept
             )

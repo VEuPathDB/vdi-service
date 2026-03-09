@@ -27,4 +27,6 @@ data class DatasetRevisionHistory(
     const val OriginalID      = "originalId"
     const val RevisionHistory = "revisionHistory"
   }
+
+  fun getOriginalIdString() = originalID.asString
 }
