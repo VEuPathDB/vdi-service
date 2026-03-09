@@ -33,7 +33,7 @@ import vdi.service.rest.generated.model.BadRequestError
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.outputs.BadRequestError
-import vdi.service.rest.server.services.users.getCurrentQuotaUsage
+import vdi.service.rest.services.UserMetaService
 import vdi.service.rest.util.*
 import vdi.util.fn.Either
 import vdi.util.fn.leftOr
@@ -615,7 +615,7 @@ fun String.toURL() =
 private fun FailedDependencyException(url: URL, msg: String) = FailedDependencyException(url.toString(), msg)
 
 private fun ControllerBase.getUserRemainingQuota(uploadConfig: UploadConfig): Long =
-  max(0L, uploadConfig.userMaxStorageSize - getCurrentQuotaUsage(userID))
+  max(0L, uploadConfig.userMaxStorageSize - UserMetaService.getCurrentQuotaUsage(userID))
 
 /**
  * Special handling for AWS urls that contain an Expires query parameter.  If

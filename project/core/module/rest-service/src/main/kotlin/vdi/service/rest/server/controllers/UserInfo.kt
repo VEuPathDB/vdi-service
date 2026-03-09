@@ -7,7 +7,7 @@ import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.UsersSelfShareOffersGetStatus
 import vdi.service.rest.generated.resources.Users
 import vdi.service.rest.server.services.shares.lookupShares
-import vdi.service.rest.server.services.users.getUserMetadata
+import vdi.service.rest.services.UserMetaService
 
 @Authenticated(allowGuests = false)
 class UserInfo(
@@ -18,7 +18,7 @@ class UserInfo(
   , ControllerBase(request)
 {
   override fun getUsersSelfMeta() =
-    Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(getUserMetadata(uploadConfig))!!
+    Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(UserMetaService.getUserMetadata(userID, uploadConfig))!!
 
   override fun getUsersSelfShareOffers(status: UsersSelfShareOffersGetStatus?): Users.GetUsersSelfShareOffersResponse =
     Users.GetUsersSelfShareOffersResponse
