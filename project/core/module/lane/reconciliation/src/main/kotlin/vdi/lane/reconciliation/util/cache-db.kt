@@ -6,6 +6,11 @@ import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.db.cache.withTransaction
 import vdi.lane.reconciliation.ReconcilerTarget
+import vdi.model.OriginTimestamp
+import vdi.model.meta.DataType
+import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.DatasetType
+import vdi.model.meta.DatasetVisibility
 import vdi.model.meta.toDatasetID
 
 
@@ -56,7 +61,15 @@ internal fun CacheDB.dropImportMessages(ctx: ReconcilerTarget) =
 
 internal fun CacheDB.tryInitDataset(ctx: ReconcilerTarget, importStatus: DatasetImportStatus) {
   withTransaction { db ->
-    db.initializeDataset(ctx.datasetId.toDatasetID(), ctx.meta!!)
+    db.initializeDataset(ctx.datasetId.toDatasetID(), ctx.meta ?: DatasetMetadata(
+      type = DatasetType(DataType.of("unknown"), "unknown"),
+      installTargets = emptySet(),
+      visibility = DatasetVisibility.Private,
+      owner = ctx.userId,
+      name = "unknown",
+      origin = "unknown",
+      created = OriginTimestamp
+    ))
 
     if (importStatus == DatasetImportStatus.Failed)
       db.tryInsertImportMessages(
