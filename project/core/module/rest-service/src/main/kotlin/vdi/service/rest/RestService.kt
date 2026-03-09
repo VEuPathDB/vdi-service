@@ -26,7 +26,7 @@ class RestService(config: StackConfig, manifest: ManifestConfig): Server() {
     initFacades()
 
     DatasetStore.init(config.vdi.objectStore)
-    JaxRSMultipartUpload.maxFileUploadSize = options.uploads.maxUploadSize.toLong()
+    JaxRSMultipartUpload.maxFileUploadSize = options.uploads.maxUploadSize
   }
 
   fun main(args: Array<String>) {
