@@ -195,6 +195,15 @@ internal class ReconcilerInstance(
     // Dataset is in source and target. Check dates to see if sync is needed.
     if (syncStatus.isOutOfSync) {
       sendSyncIfRelevant(this, syncStatus.toSyncReason(targetDB))
+    } else {
+      // Ensure all datasets have an import status, even those that are being
+      // reconciled after already having install-ready data.
+      nextInstallTargetDataset.let { it as? TempHackCacheDBReconcilerTargetRecord }
+        // If the dataset doesn't already have an import status, then we are
+        // either doing a clean sync, or it was already imported by another
+        // instance.
+        ?.takeIf { it.importStatus == null }
+        ?.also { sendSyncEvent(it.ownerID, it.datasetID, SyncReason.OutOfSync(true, false, false, targetDB)) }
     }
   }
 

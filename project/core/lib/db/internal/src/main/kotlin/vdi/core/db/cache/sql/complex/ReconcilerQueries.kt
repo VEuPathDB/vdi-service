@@ -90,7 +90,7 @@ COLLATE "C"
         type = DatasetType(rs.getDataType("type_name"), rs.getString("type_version")),
         isUninstalled = rs.getBoolean("is_deleted"),
         inserted = rs.getDateTime("inserted"),
-        importStatus = rs.getImportStatus("status") ?: DatasetImportStatus.Queued
+        importStatus = rs.getImportStatus("status"),
       )
 
 // FIXME: Uncomment the following when the target db delete logic is moved from

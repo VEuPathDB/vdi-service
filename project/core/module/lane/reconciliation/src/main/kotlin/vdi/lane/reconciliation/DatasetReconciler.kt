@@ -111,11 +111,13 @@ internal class DatasetReconciler(
 
   private fun calcNewStatus(ctx: ReconcilerTarget, oldStatus: ReimportIndicator) =
     when (oldStatus) {
-      ReimportIndicator.ReimportNotNeeded -> DatasetImportStatus.Complete
-      ReimportIndicator.NeedReimport -> DatasetImportStatus.Queued
+      ReimportIndicator.ReimportNotNeeded   -> DatasetImportStatus.Complete
+      ReimportIndicator.NeedReimport        -> DatasetImportStatus.Queued
       ReimportIndicator.ReimportNotPossible -> {
         if (ctx.hasInstallReadyData() && ctx.hasManifest())
           DatasetImportStatus.Complete
+        else if (ctx.hasUploadError())
+          null
         else
           DatasetImportStatus.Failed
       }
@@ -127,7 +129,7 @@ internal class DatasetReconciler(
       return
     }
 
-    val dataset = cacheDB.ensureCacheDatasetRecord(ctx)
+    val dataset = cacheDB.requireCacheDatasetRecord(ctx)
 
     if (!dataset.isDeleted) {
       ctx.safeExec("failed to mark dataset as deleted in cache db") {
