@@ -3,9 +3,9 @@ package vdi.lane.reconciliation.util
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.initializeDataset
 import vdi.core.db.cache.model.DatasetImportStatus
-import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.db.cache.withTransaction
 import vdi.lane.reconciliation.ReconcilerTarget
+import vdi.model.DatasetUploadStatus
 import vdi.model.OriginTimestamp
 import vdi.model.meta.DataType
 import vdi.model.meta.DatasetMetadata
@@ -47,29 +47,27 @@ internal fun CacheDB.requireCacheDatasetRecord(ctx: ReconcilerTarget) =
   getCacheDatasetRecord(ctx)
     .require(ctx, "could not find dataset record in cache db")
 
-internal fun CacheDB.ensureCacheDatasetRecord(ctx: ReconcilerTarget): DatasetRecord {
-  getCacheDatasetRecord(ctx)?.also { return it }
-
-  // We need a record for the deleted dataset
-  tryInitDataset(ctx, if (ctx.hasInstallReadyData()) DatasetImportStatus.Complete else DatasetImportStatus.Failed)
-
-  return requireCacheDatasetRecord(ctx)
-}
-
 internal fun CacheDB.dropImportMessages(ctx: ReconcilerTarget) =
   ctx.safeExec("failed to delete import messages") { withTransaction { it.deleteImportMessages(ctx.datasetId.toDatasetID()) } }
 
-internal fun CacheDB.tryInitDataset(ctx: ReconcilerTarget, importStatus: DatasetImportStatus) {
+internal fun CacheDB.tryInitDataset(ctx: ReconcilerTarget, importStatus: DatasetImportStatus?) {
   withTransaction { db ->
-    db.initializeDataset(ctx.datasetId.toDatasetID(), ctx.meta ?: DatasetMetadata(
-      type = DatasetType(DataType.of("unknown"), "unknown"),
-      installTargets = emptySet(),
-      visibility = DatasetVisibility.Private,
-      owner = ctx.userId,
-      name = "unknown",
-      origin = "unknown",
-      created = OriginTimestamp
-    ))
+    db.initializeDataset(
+      ctx.datasetId.toDatasetID(),
+      ctx.meta ?: DatasetMetadata(
+        type = DatasetType(DataType.of("unknown"), "unknown"),
+        installTargets = emptySet(),
+        visibility = DatasetVisibility.Private,
+        owner = ctx.userId,
+        name = "unknown",
+        origin = "unknown",
+        created = OriginTimestamp
+      ),
+      if (importStatus == null)
+        DatasetUploadStatus.Failed
+      else DatasetUploadStatus.Success,
+      importStatus,
+    )
 
     if (importStatus == DatasetImportStatus.Failed)
       db.tryInsertImportMessages(

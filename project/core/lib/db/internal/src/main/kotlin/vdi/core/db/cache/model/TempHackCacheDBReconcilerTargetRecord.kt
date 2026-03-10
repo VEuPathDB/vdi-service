@@ -18,5 +18,5 @@ class TempHackCacheDBReconcilerTargetRecord(
   isUninstalled: Boolean,
 
   val inserted: OffsetDateTime,
-  val importStatus: DatasetImportStatus,
+  val importStatus: DatasetImportStatus?,
 ): ReconcilerTargetRecord(ownerID, datasetID, sharesUpdated, dataUpdated, metaUpdated, type, isUninstalled)

@@ -3,6 +3,7 @@ package vdi.core.db.cache
 
 import java.time.OffsetDateTime
 import vdi.core.db.cache.model.DatasetImpl
+import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.model.SyncControlRecord
 import vdi.model.DatasetUploadStatus
 import vdi.model.OriginTimestamp
@@ -40,7 +41,12 @@ fun CacheDBTransaction.purgeDataset(datasetID: DatasetID) {
   deletePublications(datasetID)
 }
 
-fun CacheDBTransaction.initializeDataset(datasetID: DatasetID, meta: DatasetMetadata) {
+fun CacheDBTransaction.initializeDataset(
+  datasetID:    DatasetID,
+  meta:         DatasetMetadata,
+  uploadStatus: DatasetUploadStatus = DatasetUploadStatus.Running,
+  importStatus: DatasetImportStatus? = null,
+) {
   // Insert a new dataset record
   tryInsertDataset(DatasetImpl(
     datasetID    = datasetID,
@@ -53,13 +59,16 @@ fun CacheDBTransaction.initializeDataset(datasetID: DatasetID, meta: DatasetMeta
 
     // Status fields are ignored by tryInsertDataset
     importStatus = null,
-    uploadStatus = DatasetUploadStatus.Running,
+    uploadStatus = uploadStatus,
   ))
 
   // insert metadata for the dataset
   tryInsertDatasetMeta(datasetID, meta)
 
-  tryInsertUploadStatus(datasetID, DatasetUploadStatus.Running)
+  tryInsertUploadStatus(datasetID, uploadStatus)
+
+  if (importStatus != null)
+    tryInsertImportControl(datasetID, importStatus)
 
   // insert project links for the dataset
   tryInsertDatasetProjects(datasetID, meta.installTargets)

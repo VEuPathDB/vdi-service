@@ -31,6 +31,7 @@ import vdi.json.JSON
 import vdi.logging.logger
 import vdi.model.DatasetManifestFilename
 import vdi.model.DatasetMetaFilename
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetManifest
 import vdi.core.metrics.Metrics.Import as Metrics
@@ -127,7 +128,9 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     with(cacheDB.selectDataset(datasetID)) {
       if (this == null) {
         logger.info("initializing dataset in cache db")
-        cacheDB.withTransaction { it.initializeDataset(datasetID, datasetMeta) }
+        cacheDB.withTransaction {
+          it.initializeDataset(datasetID, datasetMeta, DatasetUploadStatus.Success, DatasetImportStatus.Queued)
+        }
       } else if (isDeleted) {
         logger.info("skipping import event; dataset is marked as deleted in the cache db")
         return
