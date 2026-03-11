@@ -75,7 +75,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       } catch (e: PluginException) {
         e.log(logger::error)
       } catch (e: Throwable) {
-        PluginException.installData("N/A", "N/A", ownerID, datasetID, cause = e).log(logger::error)
+        InstallDataException(ownerID, datasetID.asString, e).log(logger::error)
       } finally {
         datasetsInProgress.remove(datasetID)
       }

@@ -103,10 +103,10 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       }
     } catch (e: PluginException) {
       e.log(logger::error)
-    } catch (e: SQLException) {
-      logger.error("sql error", e)
+    } catch (e: UpdateMetaException) {
+      e.log(logger::error)
     } catch (e: Throwable) {
-      PluginException.installMeta("N/A", "N/A", ownerID, datasetID, cause = e).log(logger::error)
+      UpdateMetaException(ownerID, datasetID.asString, cause = e).log(logger::error)
     }
   }
 
@@ -184,10 +184,8 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       updateTargetMeta(metaTimestamp)
     } catch (e: PluginException) {
       throw e
-    } catch (e: SQLException) {
-      throw e
     } catch (e: Throwable) {
-      throw PluginException.installMeta(plugin.name, target, ownerID, datasetID, cause = e)
+      throw UpdateMetaException(ownerID, datasetID.asString, cause = e)
     }
   }
 
