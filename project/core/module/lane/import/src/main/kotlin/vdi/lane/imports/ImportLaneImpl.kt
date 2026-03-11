@@ -78,7 +78,7 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
     } catch (e: PluginException) {
       e.log(logger::error)
     } catch (e: Throwable) {
-      PluginException.import("N/A", ownerID, datasetID, cause = e).log(logger::error)
+      ImportException(ownerID, datasetID.asString, e).log(logger::error)
     }
   }
 
