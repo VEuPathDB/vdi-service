@@ -17,7 +17,7 @@ import vdi.service.rest.generated.model.DatasetPutResponseBody
 import vdi.service.rest.generated.model.DatasetPutResponseBodyImpl
 import vdi.service.rest.generated.resources.DatasetsVdiId.PutDatasetsByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.inputs.applyPatch
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.validate
@@ -29,20 +29,20 @@ import vdi.util.fn.Either
 
 // TODO: don't allow users to revise a dataset that has another revision already in progress!
 
-internal fun ControllerBase.putDataset(
+internal fun AbstractController.putDataset(
   datasetID:    DatasetID,
   request:      DatasetPutRequestBody,
   uploadConfig: UploadConfig,
 ): Either<DatasetPutResponseBody, PutDatasetsByVdiIdResponse> {
   // Ensure the dataset exists and is owned by the requesting user.
   val originalDataset = CacheDB().selectDataset(datasetID)
-    ?.takeIf { it.ownerID == userID }
+    ?.takeIf { it.ownerID == userId }
     ?: return Either.ofRight(Static404.wrap())
 
   if (originalDataset.isDeleted)
     return Either.ofRight(ForbiddenError("cannot add revisions to a deleted dataset").wrap())
 
-  val originalMeta = DatasetStore.getDatasetMeta(userID, datasetID)
+  val originalMeta = DatasetStore.getDatasetMeta(userId, datasetID)
     ?: throw IllegalStateException("target dataset has no $DatasetMetaFilename file")
 
   request.cleanup()
@@ -61,7 +61,7 @@ internal fun ControllerBase.putDataset(
   var newDatasetID = (CacheDB().selectLatestRevision(datasetID)?.revisionID ?: datasetID)
     .incrementRevision()
 
-  while (DatasetStore.getImportReadyZipSize(userID, newDatasetID) > -1L) {
+  while (DatasetStore.getImportReadyZipSize(userId, newDatasetID) > -1L) {
     newDatasetID = newDatasetID.incrementRevision()
   }
 
@@ -90,7 +90,7 @@ internal fun ControllerBase.putDataset(
     resolveDatasetFiles(request.dataFile, request.url, request.docFile, emptyList(), uploadConfig)
   }
 
-  writeMetadata(userID, datasetID, newMeta)
+  writeMetadata(userId, datasetID, newMeta)
 
   submitUpload(newDatasetID, uploadRefs, newMeta, uploadConfig)
 

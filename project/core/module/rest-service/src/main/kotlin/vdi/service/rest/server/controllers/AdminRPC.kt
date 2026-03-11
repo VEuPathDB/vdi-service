@@ -20,6 +20,7 @@ import vdi.service.rest.generated.model.DatasetObjectPurgeRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
 import vdi.service.rest.generated.model.InstallCleanupRequestBody
 import vdi.service.rest.generated.resources.AdminRpc
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.*
@@ -36,7 +37,7 @@ import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcInstallsClearFa
 class AdminRPC(
   @Context request: ContainerRequest,
   @param:Context val uploadConfig: UploadConfig,
-): AdminRpc, ControllerBase(request) {
+): AdminRpc, AbstractController(request) {
 
   override fun postAdminRpcDatasetsProxyUpload(
     userId: Long?,
@@ -53,10 +54,10 @@ class AdminRPC(
       }
     }
 
-    userID = userId.toUserID()
+    this.userId = userId.toUserID()
 
-    with (UserProvider.getUsersById(listOf(userID.toLong()))) {
-      if (isEmpty() || get(userID.toLong())?.isGuest != false)
+    with (UserProvider.getUsersById(listOf(this.userId.toLong()))) {
+      if (isEmpty() || get(this@AdminRPC.userId.toLong())?.isGuest != false)
         return ForbiddenError("target user does not exist or is a guest user").wrap()
     }
 

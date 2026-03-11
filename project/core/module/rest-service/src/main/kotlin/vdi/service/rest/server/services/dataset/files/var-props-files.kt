@@ -19,7 +19,7 @@ fun DatasetFiles.getVariablePropertiesFile(
 ): GetResponse {
   val dataset = ((
     if (forAdmin) CacheDB().selectDataset(datasetID)
-    else CacheDB().selectDatasetForUser(userID, datasetID)
+    else CacheDB().selectDatasetForUser(userId, datasetID)
   ) ?: return Respond404())
     .also { if (it.isDeleted) return Respond410() }
 
@@ -47,7 +47,7 @@ fun DatasetFiles.putVariablePropertiesFile(
 ): PutResponse {
   val dataset = (CacheDB().selectDataset(datasetID) ?: return Respond404())
     .also { if (it.isDeleted) return Respond410() }
-    .takeIf { forAdmin || it.ownerID == userID }
+    .takeIf { forAdmin || it.ownerID == userId }
     ?: return Respond403("cannot modify unowned dataset")
 
   val dtConfig = PluginRegistry[dataset.type]

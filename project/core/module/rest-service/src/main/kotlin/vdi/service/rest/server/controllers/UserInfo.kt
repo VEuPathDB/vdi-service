@@ -6,6 +6,7 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.UsersSelfShareOffersGetStatus
 import vdi.service.rest.generated.resources.Users
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.services.shares.lookupShares
 import vdi.service.rest.services.UserMetaService
 
@@ -15,12 +16,12 @@ class UserInfo(
   @param:Context val uploadConfig: UploadConfig,
 )
   : Users
-  , ControllerBase(request)
+    , AbstractController(request)
 {
   override fun getUsersSelfMeta() =
-    Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(UserMetaService.getUserMetadata(userID, uploadConfig))!!
+    Users.GetUsersSelfMetaResponse.respond200WithApplicationJson(UserMetaService.getUserMetadata(userId, uploadConfig))!!
 
   override fun getUsersSelfShareOffers(status: UsersSelfShareOffersGetStatus?): Users.GetUsersSelfShareOffersResponse =
     Users.GetUsersSelfShareOffersResponse
-      .respond200WithApplicationJson(lookupShares(userID, status ?: UsersSelfShareOffersGetStatus.OPEN))!!
+      .respond200WithApplicationJson(lookupShares(userId, status ?: UsersSelfShareOffersGetStatus.OPEN))!!
 }

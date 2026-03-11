@@ -7,6 +7,9 @@ import vdi.config.raw.ManifestConfig;
 import vdi.core.config.StackConfig;
 import vdi.service.rest.config.ServiceConfig;
 import vdi.service.rest.config.UploadConfig;
+import vdi.service.rest.server.AdminReportController;
+import vdi.service.rest.server.DatasetListController;
+import vdi.service.rest.server.MetaInfoController;
 import vdi.service.rest.server.controllers.*;
 
 public class Resources extends ContainerResources {

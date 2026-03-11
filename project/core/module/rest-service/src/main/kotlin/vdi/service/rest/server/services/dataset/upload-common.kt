@@ -31,7 +31,7 @@ import vdi.service.rest.config.SupportedArchiveType
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.BadRequestError
 import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.services.UserMetaService
 import vdi.service.rest.util.*
@@ -82,7 +82,7 @@ fun verifyFileExtensions(data: Collection<File>, dataType: DatasetType): BadRequ
 }
 
 @OptIn(ExperimentalPathApi::class)
-fun ControllerBase.resolveDatasetFiles(
+fun AbstractController.resolveDatasetFiles(
   data:         Iterable<File>?,
   url:          String?,
   meta:         Iterable<File>?,
@@ -128,7 +128,7 @@ fun resolveUploadFiles(
     props   = props.toTempPaths(tmpDir),
   )
 
-fun ControllerBase.resolveURLFile(
+fun AbstractController.resolveURLFile(
   url:          String,
   docs:         Sequence<File>,
   props:        Sequence<File>,
@@ -156,7 +156,7 @@ private fun Sequence<File>.toTempPaths(tmpDir: Path): List<Path> =
 
 private val WorkPool = Executors.newFixedThreadPool(10)
 
-fun ControllerBase.writeMetadata(userID: UserID, datasetID: DatasetID, datasetMeta: DatasetMetadata) {
+fun AbstractController.writeMetadata(userID: UserID, datasetID: DatasetID, datasetMeta: DatasetMetadata) {
   try {
     logger.debug("uploading dataset metadata to object store")
     DatasetStore.putDatasetMeta(userID, datasetID, datasetMeta)
@@ -176,7 +176,7 @@ fun ControllerBase.writeMetadata(userID: UserID, datasetID: DatasetID, datasetMe
 }
 
 @OptIn(ExperimentalPathApi::class)
-fun ControllerBase.submitUpload(
+fun AbstractController.submitUpload(
   datasetID:    DatasetID,
   uploadRefs:   UploadFileReferences,
   datasetMeta:  DatasetMetadata,
@@ -193,13 +193,13 @@ fun ControllerBase.submitUpload(
   }
 }
 
-fun ControllerBase.uploadFiles(
+fun AbstractController.uploadFiles(
   datasetID:    DatasetID,
   uploadRefs:   UploadFileReferences,
   datasetMeta:  DatasetMetadata,
   uploadConfig: UploadConfig,
 ) {
-  val logger = logger.mark(userID, datasetID)
+  val logger = logger.mark(userId, datasetID)
 
   logger.debug("checking upload file sizes")
   verifyUploadFileSize(uploadRefs, uploadConfig)
@@ -224,10 +224,10 @@ fun ControllerBase.uploadFiles(
       }
 
       logger.debug("uploading manifest to object store")
-      DatasetStore.putManifest(userID, datasetID, DatasetManifest(sizes, emptyList()))
+      DatasetStore.putManifest(userId, datasetID, DatasetManifest(sizes, emptyList()))
 
       logger.debug("uploading raw dataset data to object store")
-      DatasetStore.putImportReadyZip(userID, datasetID, archive::inputStream)
+      DatasetStore.putImportReadyZip(userId, datasetID, archive::inputStream)
 
       CacheDB().withTransaction {
         it.tryInsertUploadFiles(datasetID, sizes)
@@ -242,7 +242,7 @@ fun ControllerBase.uploadFiles(
       uploadStatus = DatasetUploadStatus.Rejected
 
       try {
-        DatasetStore.putUploadError(userID, datasetID, e.message!!)
+        DatasetStore.putUploadError(userId, datasetID, e.message!!)
       } catch (e2: Throwable) {
         e.addSuppressed(e2)
       }
@@ -252,7 +252,7 @@ fun ControllerBase.uploadFiles(
       Metrics.Upload.failed.inc()
 
       try {
-        DatasetStore.putUploadError(userID, datasetID, "internal server error", e)
+        DatasetStore.putUploadError(userId, datasetID, "internal server error", e)
       } catch (e2: Throwable) {
         e.addSuppressed(e2)
       }
@@ -270,7 +270,7 @@ fun ControllerBase.uploadFiles(
     logger.debug("uploading dataset meta files")
     try {
       for (path in uploadRefs.docs)
-        DatasetStore.putDocumentFile(userID, datasetID, path.name, path::inputStream)
+        DatasetStore.putDocumentFile(userId, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
       logger.error("dataset additional document file(s) upload to object-store failed:", e)
       throw e
@@ -281,7 +281,7 @@ fun ControllerBase.uploadFiles(
     logger.debug("uploading data properties files")
     try {
       for (path in uploadRefs.props)
-        DatasetStore.putVariablePropertiesFile(userID, datasetID, path.name, path::inputStream)
+        DatasetStore.putVariablePropertiesFile(userId, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
       logger.error("dataset additional document file(s) upload to object-store failed:", e)
       throw e
@@ -289,7 +289,7 @@ fun ControllerBase.uploadFiles(
   }
 }
 
-fun ControllerBase.verifyUploadFileSize(
+fun AbstractController.verifyUploadFileSize(
   uploadRefs:   UploadFileReferences,
   uploadConfig: UploadConfig,
 ) {
@@ -322,7 +322,7 @@ fun ControllerBase.verifyUploadFileSize(
  *
  * @return A map of upload files and their sizes.
  */
-context(logger: Logger, controller: ControllerBase)
+context(logger: Logger, controller: AbstractController)
 private fun Path.repack(
   into:         Path,
   using:        Path,
@@ -539,7 +539,7 @@ private fun Array<String>.matchesFilename(name: String) =
 // region Dataset File Retrieval
 
 @OptIn(ExperimentalPathApi::class)
-fun ControllerBase.downloadRemoteFile(url: URL, uploadConfig: UploadConfig, tmpDir: Path): Path {
+fun AbstractController.downloadRemoteFile(url: URL, uploadConfig: UploadConfig, tmpDir: Path): Path {
   logger.info("attempting to download a remote file from {}", url)
 
   val response = try {
@@ -614,8 +614,8 @@ fun String.toURL() =
 
 private fun FailedDependencyException(url: URL, msg: String) = FailedDependencyException(url.toString(), msg)
 
-private fun ControllerBase.getUserRemainingQuota(uploadConfig: UploadConfig): Long =
-  max(0L, uploadConfig.userMaxStorageSize - UserMetaService.getCurrentQuotaUsage(userID))
+private fun AbstractController.getUserRemainingQuota(uploadConfig: UploadConfig): Long =
+  max(0L, uploadConfig.userMaxStorageSize - UserMetaService.getCurrentQuotaUsage(userId))
 
 /**
  * Special handling for AWS urls that contain an Expires query parameter.  If

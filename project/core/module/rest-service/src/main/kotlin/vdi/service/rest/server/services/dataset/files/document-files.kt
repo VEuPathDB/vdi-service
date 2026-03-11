@@ -5,7 +5,7 @@ import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetRecord
 import vdi.model.meta.DatasetID
 import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.wrap
@@ -15,13 +15,13 @@ import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.PutDatasetsFilesD
 fun getUserDocumentForAdmin(datasetID: DatasetID, filename: String) =
   CacheDB().selectDataset(datasetID).getDocument(filename)
 
-fun ControllerBase.getUserDocumentForUser(datasetID: DatasetID, filename: String) =
-  lookupVisibleDataset(userID, datasetID).getDocument(filename)
+fun AbstractController.getUserDocumentForUser(datasetID: DatasetID, filename: String) =
+  lookupVisibleDataset(userId, datasetID).getDocument(filename)
 
-fun ControllerBase.putUserDocument(datasetID: DatasetID, filename: String, tmpFile: File?) =
+fun AbstractController.putUserDocument(datasetID: DatasetID, filename: String, tmpFile: File?) =
   tmpFile?.run {
-    takeUnless { CacheDB().selectDatasetForUser(userID, datasetID) == null }
-      ?.let { DatasetStore.putDocumentFile(userID, datasetID, filename, it::inputStream) }
+    takeUnless { CacheDB().selectDatasetForUser(userId, datasetID) == null }
+      ?.let { DatasetStore.putDocumentFile(userId, datasetID, filename, it::inputStream) }
       ?.let { PutResponse.respond204() }
       ?: Static404.wrap()
   }

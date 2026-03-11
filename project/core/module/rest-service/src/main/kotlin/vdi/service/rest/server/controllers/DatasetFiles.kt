@@ -19,6 +19,7 @@ import vdi.service.rest.generated.model.DatasetsVdiIdFilesFileNameFileName
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.*
 import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.outputs.NotFoundError
 import vdi.service.rest.server.outputs.wrap
@@ -27,15 +28,15 @@ import vdi.util.fn.fold
 import vdi.util.fn.mapLeft
 
 @Authenticated(adminOverride = ALLOW_ALWAYS)
-class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, ControllerBase(request) {
+class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, AbstractController(request) {
   override fun getDatasetsFilesByVdiId(rawID: String): GetDatasetsFilesByVdiIdResponse =
-    when (maybeUser) {
+    when (user) {
       null -> listDatasetFilesForAdmin(DatasetID(rawID))
       else -> listDatasetFilesForUser(DatasetID(rawID))
     }
 
   override fun getDatasetsFilesUploadByVdiId(rawID: String): GetDatasetsFilesUploadByVdiIdResponse {
-    return when (maybeUser) {
+    return when (user) {
       null -> getUploadFileForAdmin(DatasetID(rawID))
       else -> getUploadFileForUser(DatasetID(rawID))
     }
@@ -51,7 +52,7 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
   }
 
   override fun getDatasetsFilesInstallByVdiId(rawID: String): GetDatasetsFilesInstallByVdiIdResponse =
-    when (maybeUser) {
+    when (user) {
       null -> getInstallReadyZipForAdmin(DatasetID(rawID))
       else -> getInstallReadyZipForUser(DatasetID(rawID))
     }
@@ -66,13 +67,13 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
       .fold()
 
   override fun getDatasetsFilesDocumentsByVdiIdAndFileName(vdiId: String, fileName: String) =
-    when (maybeUser) {
+    when (user) {
       null -> getUserDocumentForAdmin(DatasetID(vdiId), fileName)
       else -> getUserDocumentForUser(DatasetID(vdiId), fileName)
     }
 
   override fun putDatasetsFilesDocumentsByVdiIdAndFileName(vdiId: String, fileName: String, entity: File?) =
-    when (maybeUser) {
+    when (user) {
       null -> throw ForbiddenException("only users may put document files")
       else -> putUserDocument(DatasetID(vdiId), fileName, entity)
     }
@@ -83,14 +84,14 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
     // IMPORTANT: java primitives are boxed by code-gen and must be marked as
     // nullable in kotlin, otherwise valid requests will return unexpected 404s.
     download: Boolean?,
-  ) = getVariablePropertiesFile(DatasetID(vdiId), fileName, download ?: true, maybeUser == null)
+  ) = getVariablePropertiesFile(DatasetID(vdiId), fileName, download ?: true, user == null)
 
   override fun putDatasetsFilesVariablePropertiesByVdiIdAndFileName(
     vdiId:    String,
     fileName: String,
     entity:   File?,
   ) = entity
-    ?.let { putVariablePropertiesFile(DatasetID(vdiId), fileName, it, maybeUser == null) }
+    ?.let { putVariablePropertiesFile(DatasetID(vdiId), fileName, it, user == null) }
     ?: BadRequestError("upload content not provided").wrap()
 
   override fun getDatasetsFilesByVdiIdAndFileName(
@@ -99,7 +100,7 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
     // IMPORTANT: java primitives are boxed by code-gen and must be marked as
     // nullable in kotlin, otherwise valid requests will return unexpected 404s.
     download: Boolean?,
-  ) = getDatasetMetaFileJson(vdiId, fileName, maybeUser != null, download!!)
+  ) = getDatasetMetaFileJson(vdiId, fileName, user != null, download!!)
 
   private fun getDatasetMetaFileJson(
     vdiId: String,

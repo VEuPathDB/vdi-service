@@ -9,7 +9,7 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.UserID
 import vdi.service.rest.generated.resources.DatasetsVdiId
 import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.outputs.ForbiddenError
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.wrap
@@ -31,16 +31,16 @@ fun adminDeleteDataset(datasetID: DatasetID): DatasetsVdiId.DeleteDatasetsByVdiI
  * @throws ForbiddenException If the target dataset is not owned by the
  * requesting user.
  */
-fun <T: ControllerBase> T.userDeleteDataset(datasetID: DatasetID): DatasetsVdiId.DeleteDatasetsByVdiIdResponse {
+fun AbstractController.userDeleteDataset(datasetID: DatasetID): DatasetsVdiId.DeleteDatasetsByVdiIdResponse {
   // Verify that the target dataset exists.
   val ds = CacheDB().selectDataset(datasetID)
     ?: return Static404.wrap()
 
   // Verify the dataset is owned by the requesting user.
-  if (ds.ownerID != userID)
+  if (ds.ownerID != userId)
     return ForbiddenError("cannot delete unowned datasets").wrap()
 
-  return deleteUserDataset(userID, datasetID)
+  return deleteUserDataset(userId, datasetID)
 }
 
 private fun deleteUserDataset(userID: UserID, datasetID: DatasetID): DatasetsVdiId.DeleteDatasetsByVdiIdResponse {

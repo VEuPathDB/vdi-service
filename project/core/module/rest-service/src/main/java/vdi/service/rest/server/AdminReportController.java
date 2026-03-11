@@ -1,4 +1,4 @@
-package vdi.service.rest.server.controllers;
+package vdi.service.rest.server;
 
 import jakarta.ws.rs.Consumes;
 import vdi.service.rest.generated.model.AdminReportsImportsFailedGetOrder;

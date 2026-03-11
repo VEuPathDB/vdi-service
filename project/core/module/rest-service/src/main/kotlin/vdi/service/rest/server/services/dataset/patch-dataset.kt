@@ -17,7 +17,7 @@ import vdi.service.rest.generated.model.DatasetPatchRequestBody
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.resources.DatasetsVdiId.PatchDatasetsByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.inputs.applyPatch
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.hasSomethingToUpdate
@@ -28,13 +28,13 @@ import vdi.util.fn.Either.Companion.left
 import vdi.util.fn.Either.Companion.right
 import vdi.util.fn.leftOrNull
 
-fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: DatasetPatchRequestBody): PatchDatasetsByVdiIdResponse {
+fun AbstractController.updateDatasetMeta(datasetID: DatasetID, patch: DatasetPatchRequestBody): PatchDatasetsByVdiIdResponse {
   val cacheDB = CacheDB()
 
   val dataset = cacheDB.selectDataset(datasetID)
     ?: return Static404.wrap()
 
-  if (dataset.ownerID != userID)
+  if (dataset.ownerID != userId)
     return Static404.wrap()
 
   if (dataset.isDeleted)
@@ -43,7 +43,7 @@ fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: Dataset
   if (!patch.hasSomethingToUpdate())
     return PatchDatasetsByVdiIdResponse.respond204()
 
-  val originalMetadata = DatasetStore.getDatasetMeta(userID, datasetID)
+  val originalMetadata = DatasetStore.getDatasetMeta(userId, datasetID)
     ?: return TooEarlyError("dataset is not yet ready to be updated").wrap()
 
   val patchedMetadata = patch.validateAndApply(datasetID, originalMetadata)
@@ -53,7 +53,7 @@ fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: Dataset
     }
 
   cacheDB.withTransaction { db ->
-    DatasetStore.putDatasetMeta(userID, datasetID, patchedMetadata)
+    DatasetStore.putDatasetMeta(userId, datasetID, patchedMetadata)
     db.updateDatasetMeta(datasetID, patchedMetadata)
   }
 

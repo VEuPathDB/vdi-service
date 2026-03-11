@@ -14,12 +14,12 @@ import vdi.model.meta.UserID
 import vdi.service.rest.conversion.OutputTypes
 import vdi.service.rest.generated.model.DatasetListEntry
 import vdi.service.rest.model.UserDetails
-import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.outputs.toExternal
 import vdi.service.rest.util.reduceTo
 
-fun <T: ControllerBase> T.fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
-  return fetchDatasetList(CacheDB().selectDatasetList(query), userID)
+fun AbstractController.fetchUserDatasetList(query: DatasetListQuery): List<DatasetListEntry> {
+  return fetchDatasetList(CacheDB().selectDatasetList(query), userId)
 }
 
 fun fetchCommunityUserDatasetList(): List<DatasetListEntry> {

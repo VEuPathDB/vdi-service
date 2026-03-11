@@ -9,7 +9,7 @@ import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.DatasetFileListingImpl
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.outputs.DatasetFileDetails
 import vdi.service.rest.server.outputs.DatasetZipDetails
 import vdi.service.rest.server.outputs.Static404
@@ -26,8 +26,8 @@ fun getInstallReadyZipForAdmin(vdiId: DatasetID): Either<StreamObject, DataRespo
     ?.let { Either.ofLeft(it) }
     ?: Either.ofRight(Static404.wrap())
 
-fun <T: ControllerBase> T.getInstallReadyZipForUser(vdiId: DatasetID): Either<StreamObject, DataResponse> =
-  lookupVisibleDataset(userID, vdiId)
+fun AbstractController.getInstallReadyZipForUser(vdiId: DatasetID): Either<StreamObject, DataResponse> =
+  lookupVisibleDataset(userId, vdiId)
     ?.let { DatasetStore.getInstallReadyZip(it.ownerID, vdiId) }
     ?.let { Either.ofLeft(it) }
     ?: Either.ofRight(Static404.wrap())
@@ -42,8 +42,8 @@ fun getUploadFileForAdmin(vdiId: DatasetID): Either<StreamObject, UploadResponse
     ?.let { Either.ofLeft(it) }
     ?: Either.ofRight(Static404.wrap())
 
-fun <T: ControllerBase> T.getUploadFileForUser(vdiId: DatasetID): Either<StreamObject, UploadResponse> =
-  lookupVisibleDataset(userID, vdiId)
+fun AbstractController.getUploadFileForUser(vdiId: DatasetID): Either<StreamObject, UploadResponse> =
+  lookupVisibleDataset(userId, vdiId)
     ?.let { DatasetStore.getImportReadyZip(it.ownerID, vdiId) }
     ?.let { Either.ofLeft(it) }
     ?: Either.ofRight(Static404.wrap())
@@ -58,8 +58,8 @@ fun listDatasetFilesForAdmin(vdiId: DatasetID) =
     ?.let(GetDatasetsFilesByVdiIdResponse::respond200WithApplicationJson)
     ?: Static404.wrap()
 
-fun <T: ControllerBase> T.listDatasetFilesForUser(vdiId: DatasetID) =
-  lookupVisibleDataset(userID, vdiId)
+fun AbstractController.listDatasetFilesForUser(vdiId: DatasetID) =
+  lookupVisibleDataset(userId, vdiId)
     ?.let { listDatasetFiles(it.ownerID, vdiId) }
     ?.let(GetDatasetsFilesByVdiIdResponse::respond200WithApplicationJson)
     ?: Static404.wrap()

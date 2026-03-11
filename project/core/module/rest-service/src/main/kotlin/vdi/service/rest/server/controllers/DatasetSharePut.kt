@@ -10,6 +10,7 @@ import vdi.model.meta.toUserID
 import vdi.service.rest.generated.model.DatasetShareOffer
 import vdi.service.rest.generated.model.DatasetShareReceipt
 import vdi.service.rest.generated.resources.DatasetsVdiIdSharesRecipientUserId
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.outputs.ForbiddenError
 import vdi.service.rest.server.outputs.wrap
@@ -21,14 +22,14 @@ import vdi.service.rest.generated.resources.DatasetsVdiIdSharesRecipientUserId.P
 @Authenticated(adminOverride = ALLOW_ALWAYS)
 class DatasetSharePut(@Context request: ContainerRequest)
   : DatasetsVdiIdSharesRecipientUserId
-  , ControllerBase(request)
+    , AbstractController(request)
 {
   override fun putDatasetsSharesOfferByVdiIdAndRecipientUserId(
     vdiId:           String,
     recipientUserId: Long?,
     entity:          DatasetShareOffer?,
   ) =
-    entity?.let { when (maybeUser) {
+    entity?.let { when (user) {
       null -> adminPutShareOffer(DatasetID(vdiId), recipientUserId!!.toUserID(), it)
       else -> putShareOffer(DatasetID(vdiId), UserID(recipientUserId!!), it)
     } }
@@ -42,13 +43,13 @@ class DatasetSharePut(@Context request: ContainerRequest)
     if (entity == null)
       return PutReceipt.respond400WithApplicationJson(BadRequestError("body must not be blank or null"))
 
-    when (val userID = maybeUserID) {
+    when (val userID = user?.userId) {
       null -> putShareReceipt(DatasetID(vdiId), recipientUserId!!.toUserID(), entity)
       else -> {
-        if (user.userId != recipientUserId)
+        if (requireUser().userId != recipientUserId)
           return PutReceipt.respond403WithApplicationJson(ForbiddenError("cannot accept share offers for other users"))
 
-        putShareReceipt(DatasetID(vdiId), userID, entity)
+        putShareReceipt(DatasetID(vdiId), userID.toUserID(), entity)
       }
     }
 

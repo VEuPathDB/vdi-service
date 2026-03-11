@@ -1,3 +1,4 @@
+@file:JvmName("OutputErrors")
 package vdi.service.rest.server.outputs
 
 import org.veupathdb.lib.container.jaxrs.errors.UnprocessableEntityException

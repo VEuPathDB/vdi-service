@@ -15,7 +15,7 @@ import vdi.model.meta.DatasetShareReceipt
 import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.ShareOfferAction
 import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.outputs.ForbiddenError
 import vdi.service.rest.server.outputs.NotFoundError
 import vdi.service.rest.server.outputs.wrap
@@ -47,8 +47,8 @@ fun adminPutShareOffer(datasetID: DatasetID, recipientID: UserID, entity: APISha
   return PutOffer.respond204()
 }
 
-fun <T: ControllerBase> T.putShareOffer(datasetID: DatasetID, recipientID: UserID, entity: APIShare): PutOffer {
-  val ownerID = userID // For clarity
+fun AbstractController.putShareOffer(datasetID: DatasetID, recipientID: UserID, entity: APIShare): PutOffer {
+  val ownerID = userId // For clarity
 
   // Lookup the target dataset or throw a 404 if it doesn't exist.
   val dataset = CacheDB().selectDataset(datasetID)

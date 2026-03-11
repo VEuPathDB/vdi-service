@@ -11,6 +11,7 @@ import vdi.service.rest.generated.model.DatasetPutRequestBody
 import vdi.service.rest.generated.resources.DatasetsVdiId
 import vdi.service.rest.generated.resources.DatasetsVdiId.*
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.server.services.dataset.*
@@ -18,12 +19,12 @@ import vdi.service.rest.server.services.dataset.*
 @Authenticated
 class DatasetByID(@Context request: ContainerRequest, @param:Context val uploadConfig: UploadConfig)
   : DatasetsVdiId
-  , ControllerBase(request)
+    , AbstractController(request)
 {
   @Authenticated(adminOverride = ALLOW_ALWAYS)
   override fun getDatasetsByVdiId(rawID: String): GetDatasetsByVdiIdResponse =
     DatasetID(rawID).let { vdiID ->
-      when (maybeUserID) {
+      when (user?.userId) {
         null -> adminGetDatasetByID(vdiID)
         else -> userGetDatasetByID(vdiID)
       }.let {
@@ -32,7 +33,7 @@ class DatasetByID(@Context request: ContainerRequest, @param:Context val uploadC
             .apply {
               revisionHistory
                 ?.revisions
-                ?.forEach { e -> e.fileListUrl = createURL(DatasetsVdiIdFiles.ROOT_PATH.replace(VDI_ID_VAR, e.revisionId)) } }
+                ?.forEach { e -> e.fileListUrl = createUrl(DatasetsVdiIdFiles.ROOT_PATH.replace(VDI_ID_VAR, e.revisionId)) } }
             .let(GetDatasetsByVdiIdResponse::respond200WithApplicationJson)
         } else {
           // If the dataset could not be found under the given dataset ID, then
@@ -40,7 +41,7 @@ class DatasetByID(@Context request: ContainerRequest, @param:Context val uploadC
           // redirect to the new dataset ID endpoint.
           it.unwrapRight().let { oRes ->
             if (oRes.status == 404 || oRes.status == 410)
-              getLatestRevision(vdiID, ::redirectURL) ?: oRes
+              getLatestRevision(vdiID, ::redirectUrl) ?: oRes
             else
               oRes
           }
@@ -70,7 +71,7 @@ class DatasetByID(@Context request: ContainerRequest, @param:Context val uploadC
 
   @Authenticated(adminOverride = ALLOW_ALWAYS)
   override fun deleteDatasetsByVdiId(vdiID: String) =
-    when (maybeUser) {
+    when (user) {
       null -> adminDeleteDataset(DatasetID(vdiID))
       else -> userDeleteDataset(DatasetID(vdiID))
     }

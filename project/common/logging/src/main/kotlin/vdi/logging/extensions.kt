@@ -1,3 +1,4 @@
+@file:JvmName("LoggingExt")
 @file:Suppress("NOTHING_TO_INLINE")
 package vdi.logging
 

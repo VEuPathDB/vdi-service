@@ -19,7 +19,7 @@ import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResp
 import vdi.service.rest.generated.resources.DatasetsVdiId.GetDatasetsByVdiIdResponse.respond301
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.s3.DatasetStore
-import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.outputs.*
 import vdi.service.rest.server.services.dataset.files.listDatasetFiles
 import vdi.util.fn.Either
@@ -30,13 +30,13 @@ import vdi.util.fn.Either.Companion.right
  * Admin-auth endpoint for looking up a dataset by ID.  In this case we don't
  * return user information.
  */
-fun ControllerBase.adminGetDatasetByID(datasetID: DatasetID) =
+fun AbstractController.adminGetDatasetByID(datasetID: DatasetID) =
   getDatasetByID(null, datasetID, true)
 
-fun ControllerBase.userGetDatasetByID(datasetID: DatasetID) =
-  getDatasetByID(userID, datasetID, false)
+fun AbstractController.userGetDatasetByID(datasetID: DatasetID) =
+  getDatasetByID(userId, datasetID, false)
 
-private fun ControllerBase.getDatasetByID(
+private fun AbstractController.getDatasetByID(
   userID: UserID?,
   datasetID: DatasetID,
   includeDeleted: Boolean,
@@ -84,18 +84,18 @@ private fun ControllerBase.getDatasetByID(
   ))
 }
 
-private fun ControllerBase.handleMissingMeta(dataset: DatasetRecord): GetDatasetsByVdiIdResponse {
+private fun AbstractController.handleMissingMeta(dataset: DatasetRecord): GetDatasetsByVdiIdResponse {
   return if (dataset.created.isAfter(OffsetDateTime.now().minusMinutes(5)))
     TooEarlyError("The server is taking longer than usual to process the uploaded files for the requested dataset.").wrap()
   else {
     logger.error("dataset was created more than 5 minutes ago but its metadata json did not reach minio")
-    ServerError(requestID, "The server encountered an error while processing the upload for the requested dataset.").wrap()
+    ServerError(requestId, "The server encountered an error while processing the upload for the requested dataset.").wrap()
   }
 }
 
-internal fun getLatestRevision(datasetID: DatasetID, fn: (DatasetID) -> String) =
+internal fun getLatestRevision(datasetID: DatasetID, fn: (String) -> String) =
   CacheDB().selectLatestRevision(datasetID)
-    ?.let { respond301(headersFor301().withLocation(fn(it.revisionID))) }
+    ?.let { respond301(headersFor301().withLocation(fn(it.revisionID.asString))) }
 
 private fun lookupDatasetForUser(userID: UserID, datasetID: DatasetID) =
   with(CacheDB()) {

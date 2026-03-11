@@ -15,6 +15,7 @@ enum class DatasetOwnershipFilter {
       fromStringOrNull(value)
         ?: throw IllegalArgumentException("unrecognized DatasetOwnershipFilter value $value")
 
+    @JvmStatic
     fun fromStringOrNull(value: String): DatasetOwnershipFilter? {
       val lowercase = value.lowercase()
 

@@ -1,4 +1,4 @@
-package vdi.service.rest.server.controllers;
+package vdi.service.rest.server;
 
 import jakarta.ws.rs.core.Context;
 import vdi.config.raw.ManifestConfig;

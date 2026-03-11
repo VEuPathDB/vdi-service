@@ -12,7 +12,7 @@ import vdi.model.meta.DatasetID
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
-import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.AbstractController
 import vdi.service.rest.server.inputs.toDatasetMeta
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.DatasetPostResponseBody
@@ -20,12 +20,13 @@ import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.outputs.wrap
 import vdi.service.rest.generated.resources.Datasets.PostDatasetsResponse as PostResponse
 
-fun ControllerBase.createDataset(
-  datasetID:    DatasetID,
+fun AbstractController.createDataset(
+  datasetId:    String,
   entity:       DatasetPostRequestBody,
   uploadConfig: UploadConfig,
 ): PostResponse {
-  val datasetMeta = entity.toDatasetMeta(userID)
+  val datasetMeta = entity.toDatasetMeta(userId)
+  val datasetID = DatasetID(datasetId)
 
   // Secondary validation for any additional JSON schema rules in service config
   datasetMeta.installTargets.asSequence()
@@ -61,22 +62,22 @@ fun ControllerBase.createDataset(
       )
     }
 
-  writeMetadata(userID, datasetID, datasetMeta)
+  writeMetadata(userId, datasetID, datasetMeta)
 
   submitUpload(datasetID, uploadRefs, datasetMeta, uploadConfig)
 
   return PostResponse.respond202WithApplicationJson(
     DatasetPostResponseBody(datasetID),
-    PostResponse.headersFor202().withLocation(redirectURL(datasetID)),
+    PostResponse.headersFor202().withLocation(redirectUrl(datasetID.asString)),
   )
 }
 
-fun ControllerBase.createDataset(
+fun AbstractController.createDataset(
   datasetID:    DatasetID,
   entity:       DatasetProxyPostRequestBody,
   uploadConfig: UploadConfig,
 ) {
-  val datasetMeta = entity.toDatasetMeta(userID)
+  val datasetMeta = entity.toDatasetMeta(userId)
 
   entity.dataFile
     ?.let { verifyFileExtensions(it, datasetMeta.type) }
