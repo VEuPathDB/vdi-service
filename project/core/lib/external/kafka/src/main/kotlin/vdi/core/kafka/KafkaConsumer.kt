@@ -25,7 +25,7 @@ interface KafkaConsumer {
    * This is the topic that this [KafkaConsumer] listens to when polling Kafka
    * for messages.
    */
-  val topic: MessageTopic
+  val topic: String
 
   /**
    * Polls Kafka for messages.

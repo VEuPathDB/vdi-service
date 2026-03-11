@@ -8,7 +8,7 @@ import kotlin.time.toJavaDuration
 import org.apache.kafka.clients.consumer.Consumer as KConsumer
 
 internal class KafkaConsumerImpl(
-  override val topic:        MessageTopic,
+  override val topic:        String,
   override val pollDuration: Duration,
   private  val kafka:        KConsumer<String, String>
 ) : KafkaConsumer {
@@ -17,7 +17,7 @@ internal class KafkaConsumerImpl(
 
   override suspend fun receive() = withContext(coContext) {
     kafka.poll(pollDuration.toJavaDuration())
-      .map { KafkaMessage(it.key()?.toMessageKey(), it.value()) }
+      .map { KafkaMessage(it.key(), it.value()) }
   }
 
   override fun close() = kafka.close()

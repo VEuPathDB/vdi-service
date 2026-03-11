@@ -112,7 +112,7 @@ abstract class AbstractVDIModule(
    *
    * @return A new `KafkaConsumer` instance.
    */
-  protected suspend fun requireKafkaConsumer(topic: MessageTopic, config: KafkaConsumerConfig) =
+  protected suspend fun requireKafkaConsumer(topic: String, config: KafkaConsumerConfig) =
     safeExec("failed to create Kafka consumer client") { KafkaConsumer(topic, config) }
 
   /**
@@ -162,7 +162,7 @@ abstract class AbstractVDIModule(
    *
    * @return A stream of event messages.
    */
-  protected suspend fun KafkaConsumer.fetchMessages(key: MessageKey): Sequence<EventMessage> =
+  protected suspend fun KafkaConsumer.fetchMessages(key: String): Sequence<EventMessage> =
     receive()
       .asSequence()
       .filter {
@@ -173,15 +173,14 @@ abstract class AbstractVDIModule(
           false
         }
       }
-      .map {
+      .mapNotNull {
         try {
           JSON.readValue(it.value, EventMessage::class.java)
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
           logger.error("received invalid message body from Kafka: {}", it.value)
           null
         }
       }
-      .filterNotNull()
 
   protected suspend fun requireKafkaRouter(config: KafkaRouterConfig) =
     safeExec("failed to create KafkaRouter instance") { KafkaRouterFactory(config).newKafkaRouter() }

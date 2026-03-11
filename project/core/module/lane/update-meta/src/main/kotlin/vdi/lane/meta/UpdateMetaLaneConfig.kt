@@ -20,8 +20,8 @@ data class UpdateMetaLaneConfig(
   val kafkaRouterConfig:   KafkaRouterConfig,
   val s3Config:            S3Config,
   val s3Bucket:            BucketName,
-  val eventKey:            MessageKey,
-  val eventTopic:          MessageTopic,
+  val eventKey:            String,
+  val eventTopic:          String,
 ) {
   constructor(config: VDIConfig): this(
     config.lanes?.updateMeta,
@@ -42,8 +42,8 @@ data class UpdateMetaLaneConfig(
     kafkaRouterConfig   = KafkaRouterConfig(lane?.kafkaProducerID ?: ProducerID, kafka, lanes),
     s3Config            = S3Config(store),
     s3Bucket            = store.bucket,
-    eventKey            = lane?.eventKey?.toMessageKey() ?: MessageKey,
-    eventTopic          = lane?.eventChannel?.toMessageTopic() ?: MessageChannel,
+    eventKey            = lane?.eventKey ?: MessageKey,
+    eventTopic          = lane?.eventChannel ?: MessageChannel,
   )
 
   private companion object {

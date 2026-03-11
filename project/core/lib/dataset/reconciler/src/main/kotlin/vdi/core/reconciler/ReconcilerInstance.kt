@@ -286,7 +286,7 @@ internal class ReconcilerInstance(
       eventID,
       ownerID,
       datasetID,
-      if (slim) EventSource.SlimReconciler else EventSource.FullReconciler,
+      if (slim) EventSource.SLIM_RECONCILER else EventSource.FULL_RECONCILER,
     )
 
     if (slim)

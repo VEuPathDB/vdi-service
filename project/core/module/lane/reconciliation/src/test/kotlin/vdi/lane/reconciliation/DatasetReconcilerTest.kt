@@ -64,7 +64,7 @@ class DatasetReconcilerTest {
       val appDB = mockAppDB()
       val router = mockKafkaRouter()
 
-      DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+      DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
       verifyNoInteractions(cacheDB)
       verifyNoInteractions(appDB)
@@ -126,7 +126,7 @@ class DatasetReconcilerTest {
 
       val router = mockKafkaRouter()
 
-      DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+      DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
       verify(cacheDB, times(1)).openTransaction()
       verifyNoMoreInteractions(cacheDB)
@@ -180,7 +180,7 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
         verify(transaction, times(1)).tryInsertDataset(any())
 
@@ -219,7 +219,7 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
         verify(transaction, times(1)).updateDatasetDeleted(datasetID, true)
 
@@ -254,7 +254,7 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
         verify(appDB, times(1)).accessor(projects.first(), dsType.name)
         verify(accessor, times(1)).selectDataset(datasetID)
@@ -289,12 +289,12 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
         verify(appDB, times(1)).accessor(projects.first(), dsType.name)
         verify(accessor, times(1)).selectDataset(datasetID)
 
-        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID, EventSource.SlimReconciler)
+        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
         verifyNoMoreInteractions(router)
       }
     }
@@ -319,11 +319,11 @@ class DatasetReconcilerTest {
         val appDB = mockAppDB()
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
         verify(appDB, times(1)).accessor(projects.first(), dsType.name)
 
-        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID, EventSource.SlimReconciler)
+        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
         verifyNoMoreInteractions(router)
       }
     }
@@ -351,12 +351,12 @@ class DatasetReconcilerTest {
         val appDB = mockAppDB(accessor = { _, _ -> accessor })
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
         verify(appDB, times(1)).accessor(projects.first(), dsType.name)
         verify(accessor, times(1)).selectDataset(datasetID)
 
-        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID, EventSource.SlimReconciler)
+        verify(router, times(1)).sendSoftDeleteTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
         verifyNoMoreInteractions(router)
       }
     }
@@ -398,12 +398,12 @@ class DatasetReconcilerTest {
             onSendImport = { _, _, _ -> throw Exception("exception to halt dataset reconciler") }
           )
 
-          DatasetReconciler(cacheDB, mockAppDB(), router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+          DatasetReconciler(cacheDB, mockAppDB(), router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
           verify(cacheDB, times(1)).selectImportControl(datasetID)
           verify(cacheDB, times(1)).selectImportMessages(datasetID)
           verify(transaction, times(1)).upsertImportControl(datasetID, DatasetImportStatus.Queued)
-          verify(router, times(1)).sendImportTrigger(userID, datasetID, EventSource.SlimReconciler)
+          verify(router, times(1)).sendImportTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
           verifyNoMoreInteractions(router)
         }
       }
@@ -433,7 +433,7 @@ class DatasetReconcilerTest {
 
           val router = mockKafkaRouter()
 
-          DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+          DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
           // Called in tryInitCacheDB and main reconciliation path
           verify(cacheDB, times(1)).selectImportControl(datasetID)
@@ -471,13 +471,13 @@ class DatasetReconcilerTest {
           val appDB = mockAppDB()
           val router = mockKafkaRouter()
 
-          DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+          DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
           verify(transaction, times(1)).upsertImportControl(datasetID, DatasetImportStatus.Queued)
 
           verifyNoInteractions(appDB)
 
-          verify(router, times(1)).sendImportTrigger(userID, datasetID, EventSource.SlimReconciler)
+          verify(router, times(1)).sendImportTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
           verifyNoMoreInteractions(router)
         }
       }
@@ -504,7 +504,7 @@ class DatasetReconcilerTest {
           val appDB = mockAppDB()
           val router = mockKafkaRouter()
 
-          DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+          DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
           verifyNoInteractions(appDB)
           verifyNoInteractions(router)
@@ -541,7 +541,7 @@ class DatasetReconcilerTest {
         val appDB = mockAppDB()
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
         verify(transaction, times(1)).tryInsertImportControl(datasetID, DatasetImportStatus.Complete)
 
@@ -590,9 +590,9 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
-        verify(router, times(1)).sendUpdateMetaTrigger(userID, datasetID, EventSource.SlimReconciler)
+        verify(router, times(1)).sendUpdateMetaTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
         verifyNoMoreInteractions(router)
       }
     }
@@ -633,9 +633,9 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
-        verify(router, times(1)).sendShareTrigger(userID, datasetID, EventSource.SlimReconciler)
+        verify(router, times(1)).sendShareTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
         verifyNoMoreInteractions(router)
       }
     }
@@ -676,9 +676,9 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
-        verify(router, times(1)).sendInstallTrigger(userID, datasetID, EventSource.SlimReconciler)
+        verify(router, times(1)).sendInstallTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
         verifyNoMoreInteractions(router)
       }
     }
@@ -727,9 +727,9 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
-        verify(router, times(1)).sendUpdateMetaTrigger(userID, datasetID, EventSource.SlimReconciler)
+        verify(router, times(1)).sendUpdateMetaTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
         verifyNoMoreInteractions(router)
       }
     }
@@ -774,9 +774,9 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
-        verify(router, times(1)).sendShareTrigger(userID, datasetID, EventSource.SlimReconciler)
+        verify(router, times(1)).sendShareTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
         verifyNoMoreInteractions(router)
       }
     }
@@ -821,9 +821,9 @@ class DatasetReconcilerTest {
 
         val router = mockKafkaRouter()
 
-        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SlimReconciler)
+        DatasetReconciler(cacheDB, appDB, router, dsMan).reconcile(userID, datasetID, EventSource.SLIM_RECONCILER)
 
-        verify(router, times(1)).sendInstallTrigger(userID, datasetID, EventSource.SlimReconciler)
+        verify(router, times(1)).sendInstallTrigger(userID, datasetID, EventSource.SLIM_RECONCILER)
         verifyNoMoreInteractions(router)
       }
     }

@@ -1,41 +1,38 @@
 package vdi.core.kafka.router
 
-import vdi.core.kafka.MessageKey
-import vdi.core.kafka.MessageTopic
-
 object RouterDefaults {
   inline val ImportTriggerMessageKey
-    get() = MessageKey("import-trigger")
+    get() = "import-trigger"
   inline val ImportTriggerTopic
-    get() = MessageTopic("import-triggers")
+    get() = "import-triggers"
 
   inline val InstallTriggerMessageKey
-    get() = MessageKey("install-trigger")
+    get() = "install-trigger"
   inline val InstallTriggerTopic
-    get() = MessageTopic("install-triggers")
+    get() = "install-triggers"
 
   inline val UpdateMetaTriggerMessageKey
-    get() = MessageKey("update-meta-trigger")
+    get() = "update-meta-trigger"
   inline val UpdateMetaTriggerTopic
-    get() = MessageTopic("update-meta-triggers")
+    get() = "update-meta-triggers"
 
   inline val SoftDeleteTriggerMessageKey
-    get() = MessageKey("soft-delete-trigger")
+    get() = "soft-delete-trigger"
   inline val SoftDeleteTriggerTopic
-    get() = MessageTopic("soft-delete-triggers")
+    get() = "soft-delete-triggers"
 
   inline val HardDeleteTriggerMessageKey
-    get() = MessageKey("hard-delete-trigger")
+    get() = "hard-delete-trigger"
   inline val HardDeleteTriggerTopic
-    get() = MessageTopic("hard-delete-triggers")
+    get() = "hard-delete-triggers"
 
   inline val ShareTriggerMessageKey
-    get() = MessageKey("share-trigger")
+    get() = "share-trigger"
   inline val ShareTriggerTopic
-    get() = MessageTopic("share-triggers")
+    get() = "share-triggers"
 
   inline val ReconciliationTriggerMessageKey
-    get() = MessageKey("reconciliation-trigger")
+    get() = "reconciliation-trigger"
   inline val ReconciliationTriggerTopic
-    get() = MessageTopic("reconciliation-triggers")
+    get() = "reconciliation-triggers"
 }

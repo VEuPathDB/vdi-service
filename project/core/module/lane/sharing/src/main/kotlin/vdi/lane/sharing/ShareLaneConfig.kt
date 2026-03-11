@@ -17,8 +17,8 @@ data class ShareLaneConfig(
   val kafkaConfig:  KafkaConsumerConfig,
   val s3Config:     S3Config,
   val s3Bucket:     BucketName,
-  val eventTopic:   MessageTopic,
-  val eventMsgKey:  MessageKey,
+  val eventTopic:   String,
+  val eventMsgKey:  String,
 ) {
   constructor(config: VDIConfig): this(config.lanes?.sharing, config.objectStore, config.kafka)
 
@@ -28,8 +28,8 @@ data class ShareLaneConfig(
     kafkaConfig  = KafkaConsumerConfig(lane?.kafkaConsumerID ?: ConsumerID, kafka),
     s3Config     = S3Config(store),
     s3Bucket     = store.bucket,
-    eventTopic   = lane?.eventChannel?.toMessageTopic() ?: EventChannel,
-    eventMsgKey  = lane?.eventKey?.toMessageKey() ?: EventKey,
+    eventTopic   = lane?.eventChannel ?: EventChannel,
+    eventMsgKey  = lane?.eventKey ?: EventKey,
   )
 
   private companion object {

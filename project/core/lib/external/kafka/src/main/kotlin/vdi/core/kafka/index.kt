@@ -19,13 +19,13 @@ private fun init(servers: Iterable<HostAddress>) {
   }
 }
 
-fun KafkaConsumer(topic: MessageTopic, config: KafkaConsumerConfig): KafkaConsumer {
+fun KafkaConsumer(topic: String, config: KafkaConsumerConfig): KafkaConsumer {
   init(config.servers)
   return KafkaConsumerImpl(
     topic,
     config.pollDuration,
     StringDeserializer()
-      .let { KConsumer(config.toProperties(), it, it).apply { subscribe(listOf(topic.value)) } }
+      .let { KConsumer(config.toProperties(), it, it).apply { subscribe(listOf(topic)) } }
   )
 }
 

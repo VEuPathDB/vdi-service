@@ -12,8 +12,6 @@ import vdi.logging.logger
 import vdi.core.metrics.Metrics
 import vdi.core.util.orElse
 import vdi.core.async.WorkerPool
-import vdi.core.db.app.model.InstallStatus
-import vdi.core.db.app.model.InstallType
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetRecord
