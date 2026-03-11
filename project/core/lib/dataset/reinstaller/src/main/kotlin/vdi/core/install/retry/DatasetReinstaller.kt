@@ -84,7 +84,7 @@ object DatasetReinstaller {
     for ((dataType, _) in AppDatabaseRegistry[installTarget]!!) {
       // locate datasets in the ready-for-reinstall status
       val datasets = appDB.accessor(installTarget, dataType)!!
-        .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.ReadyForReinstall)
+        .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.READY_FOR_REINSTALL)
 
       log.info("found {} datasets in project {} that are ready for reinstall", datasets.size, installTarget)
 
@@ -227,7 +227,7 @@ object DatasetReinstaller {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
-        InstallStatus.Complete,
+        InstallStatus.COMPLETE,
         warnings.joinToString("\n").takeUnless(String::isEmpty)
       ))
     }
@@ -250,7 +250,7 @@ object DatasetReinstaller {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
-        InstallStatus.FailedValidation,
+        InstallStatus.FAILED_VALIDATION,
         warnings.joinToString("\n")
       ))
     }
@@ -269,7 +269,7 @@ object DatasetReinstaller {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
-        InstallStatus.MissingDependency,
+        InstallStatus.MISSING_DEPENDENCY,
         warnings.joinToString("\n")
       ))
     }
@@ -317,7 +317,7 @@ object DatasetReinstaller {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         dataset.datasetID,
         InstallType.Data,
-        InstallStatus.FailedInstallation,
+        InstallStatus.FAILED_INSTALLATION,
         message,
       ))
     }

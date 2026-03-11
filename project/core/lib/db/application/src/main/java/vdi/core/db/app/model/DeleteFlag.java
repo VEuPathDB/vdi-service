@@ -54,6 +54,6 @@ public enum DeleteFlag {
       if (e.value == value)
         return e;
 
-    throw new IllegalArgumentException("unrecognized DeleteFlag value: $value");
+    throw new IllegalArgumentException("unrecognized DeleteFlag value: " + value);
   }
 }

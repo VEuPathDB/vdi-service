@@ -121,17 +121,17 @@ private fun isRevisionBlocker(datasetID: DatasetID, meta: DatasetMetadata) =
           // dataset has no data install status, don't block
           null                             -> false
           // newer revision is currently installing
-          InstallStatus.Running            -> true
+          InstallStatus.RUNNING            -> true
           // newer revision completed while this request was processing
-          InstallStatus.Complete           -> true
+          InstallStatus.COMPLETE           -> true
           // unrecoverable user error, this dataset cannot be used and should not block revisions
-          InstallStatus.FailedValidation   -> false
+          InstallStatus.FAILED_VALIDATION   -> false
           // newer revision failed for bug and needs admin input
-          InstallStatus.FailedInstallation -> true
+          InstallStatus.FAILED_INSTALLATION -> true
           // unrecoverable user error, this dataset cannot be used and should not block revisions
-          InstallStatus.MissingDependency  -> false
+          InstallStatus.MISSING_DEPENDENCY  -> false
           // newer revision failed but will be retried
-          InstallStatus.ReadyForReinstall  -> true
+          InstallStatus.READY_FOR_REINSTALL  -> true
         } } -> true
 
         // no install-data record exists, check install-meta next
@@ -139,17 +139,17 @@ private fun isRevisionBlocker(datasetID: DatasetID, meta: DatasetMetadata) =
           // dataset has no meta install status, don't block
           null                             -> false
           // newer revision is currently installing
-          InstallStatus.Running            -> true
+          InstallStatus.RUNNING            -> true
           // newer revision meta complete, install will be attempted shortly
-          InstallStatus.Complete           -> true
+          InstallStatus.COMPLETE           -> true
           // unrecoverable user error, this dataset cannot be used and should not block revisions
-          InstallStatus.FailedValidation   -> false
+          InstallStatus.FAILED_VALIDATION   -> false
           // newer revision failed for bug and needs admin input
-          InstallStatus.FailedInstallation -> true
+          InstallStatus.FAILED_INSTALLATION -> true
           // unrecoverable user error, this dataset cannot be used and should not block revisions
-          InstallStatus.MissingDependency  -> false
+          InstallStatus.MISSING_DEPENDENCY  -> false
           // newer revision failed but will be retried
-          InstallStatus.ReadyForReinstall  -> true
+          InstallStatus.READY_FOR_REINSTALL  -> true
         } } -> true
 
         // no blocking data or meta install

@@ -1,5 +1,6 @@
 package vdi.service.rest.server.controllers
 
+import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.core.Context
 import kotlinx.coroutines.runBlocking
 import org.glassfish.jersey.server.ContainerRequest
@@ -22,8 +23,8 @@ import vdi.service.rest.generated.resources.AdminRpc
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.*
-import vdi.service.rest.server.services.admin.rpc.purgeDataset
 import vdi.service.rest.server.services.dataset.createDataset
+import vdi.service.rest.services.AdminRpcService
 import vdi.service.rest.util.ShortID
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcDatasetsProxyUploadResponse as ProxyUploadResponse
 import vdi.service.rest.generated.resources.AdminRpc.PostAdminRpcDatasetsPruneResponse as DatasetPruneResponse
@@ -99,6 +100,16 @@ class AdminRPC(
     return InstallCleanupResponse.respond204()
   }
 
-  override fun postAdminRpcObjectStorePurgeDataset(request: DatasetObjectPurgeRequestBody) =
-    purgeDataset(request)
+  override fun postAdminRpcObjectStorePurgeDataset(request: DatasetObjectPurgeRequestBody): AdminRpc.PostAdminRpcObjectStorePurgeDatasetResponse {
+    val userId = request.userId;
+    val datasetId = request.datasetId;
+
+    if (userId == null || datasetId == null)
+      throw BadRequestException()
+
+    AdminRpcService.purgeDataset(userId, datasetId)
+
+    return AdminRpc.PostAdminRpcObjectStorePurgeDatasetResponse
+      .respond204()
+  }
 }

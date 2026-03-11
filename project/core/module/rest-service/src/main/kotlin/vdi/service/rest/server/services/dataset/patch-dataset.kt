@@ -136,7 +136,7 @@ private fun DatasetMetadata.validateForPromotion(datasetID: DatasetID, errors: V
     .asSequence()
     .map { AppDB(it, type)?.selectDatasetInstallMessages(datasetID) }
     .flatMap { it?.asSequence() ?: sequenceOf(null) }
-    .all { it?.status == InstallStatus.Complete }
+    .all { it?.status == InstallStatus.COMPLETE }
 
   if (!metaInstallsSucceeded)
     errors.add(JsonField.VISIBILITY, "cannot promote dataset to community with dataset install failures")

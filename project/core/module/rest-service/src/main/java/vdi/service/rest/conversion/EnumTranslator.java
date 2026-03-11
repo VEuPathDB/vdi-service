@@ -37,12 +37,12 @@ public final class EnumTranslator {
   @Contract(pure = true)
   public static DatasetInstallStatus toExternal(@NotNull InstallStatus status) {
     return switch (status) {
-      case Complete -> DatasetInstallStatus.COMPLETE;
-      case FailedInstallation -> DatasetInstallStatus.FAILEDINSTALLATION;
-      case FailedValidation -> DatasetInstallStatus.FAILEDVALIDATION;
-      case MissingDependency -> DatasetInstallStatus.MISSINGDEPENDENCY;
-      case Running -> DatasetInstallStatus.RUNNING;
-      case ReadyForReinstall -> DatasetInstallStatus.READYFORREINSTALL;
+      case COMPLETE -> DatasetInstallStatus.COMPLETE;
+      case FAILED_INSTALLATION -> DatasetInstallStatus.FAILEDINSTALLATION;
+      case FAILED_VALIDATION -> DatasetInstallStatus.FAILEDVALIDATION;
+      case MISSING_DEPENDENCY -> DatasetInstallStatus.MISSINGDEPENDENCY;
+      case RUNNING -> DatasetInstallStatus.RUNNING;
+      case READY_FOR_REINSTALL -> DatasetInstallStatus.READYFORREINSTALL;
     };
   }
 }

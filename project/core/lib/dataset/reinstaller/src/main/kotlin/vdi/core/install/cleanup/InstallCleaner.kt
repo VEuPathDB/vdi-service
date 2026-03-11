@@ -33,7 +33,7 @@ object InstallCleaner {
       try {
         // Fetch a list of datasets with broken installs
         val targets = AppDB().accessor(projectID, dataType)!!
-          .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FailedInstallation)
+          .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FAILED_INSTALLATION)
 
         log.info("found {} broken datasets for cleanup in project {}", targets.size, projectID)
 
@@ -80,8 +80,8 @@ object InstallCleaner {
   }
 
   /**
-   * Marks the target dataset as [InstallStatus.ReadyForReinstall] in the target
-   * database only if it is already in the [InstallStatus.FailedInstallation]
+   * Marks the target dataset as [InstallStatus.READY_FOR_REINSTALL] in the target
+   * database only if it is already in the [InstallStatus.FAILED_INSTALLATION]
    * status.
    */
   private fun maybeCleanDatasetFromTargetDB(datasetID: DatasetID, installTarget: InstallTargetID, dataType: DatasetType) {
@@ -104,7 +104,7 @@ object InstallCleaner {
       }
 
       // If the status is not failed installation, then we shouldn't touch it.
-      if (message.status != InstallStatus.FailedInstallation) {
+      if (message.status != InstallStatus.FAILED_INSTALLATION) {
         log.debug("skipping uninstall of dataset {} from project {} as it is not in a failed state", datasetID, installTarget)
         return
       }
@@ -124,7 +124,7 @@ object InstallCleaner {
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,
-        InstallStatus.ReadyForReinstall,
+        InstallStatus.READY_FOR_REINSTALL,
         null
       ))
     }

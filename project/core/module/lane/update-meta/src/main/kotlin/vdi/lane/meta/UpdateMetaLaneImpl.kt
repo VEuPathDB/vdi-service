@@ -206,7 +206,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
     appDB.withTransaction(target, plugin.type) {
       logger.debug("upserting install-meta message into app db")
-      it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
+      it.upsertInstallMetaMessage(datasetID, InstallStatus.RUNNING)
     }
 
     // Attempt to run the target plugin's install-meta script.
@@ -265,7 +265,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
           logger.info("install-meta request to handler server failed with exception:", e)
           appDB.withTransaction(target, plugin.type) {
             try {
-              it.upsertInstallMetaMessage(datasetID, InstallStatus.FailedInstallation)
+              it.upsertInstallMetaMessage(datasetID, InstallStatus.FAILED_INSTALLATION)
             } catch (e: SQLException) {
               if (e.errorCode == 1) {
                 logger.info("unique key constraint violation on install meta; assuming race condition")
@@ -300,7 +300,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
     val failed = appDb
       .selectDatasetInstallMessages(datasetID)
-      .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
+      .any { it.status == InstallStatus.FAILED_INSTALLATION || it.status == InstallStatus.FAILED_VALIDATION }
 
     if (failed) {
       logger.info("skipping update due to previous failures")
@@ -324,7 +324,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     appDB.withTransaction(target, plugin.type) {
       it.upsertInstallMetaMessage(
         datasetID,
-        InstallStatus.Complete
+        InstallStatus.COMPLETE
       )
     }
   }
@@ -335,7 +335,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     appDB.withTransaction(target, plugin.type) {
       it.upsertInstallMetaMessage(
         datasetID,
-        InstallStatus.FailedValidation,
+        InstallStatus.FAILED_VALIDATION,
         response.getWarningsSequence().joinToString("\n")
       )
     }

@@ -21,7 +21,7 @@ import vdi.service.rest.conversion.OutputTypes
 
 /**
  * Lists datasets across all registered projects that are in the broken install
- * status [InstallStatus.FailedInstallation].
+ * status [InstallStatus.FAILED_INSTALLATION].
  *
  * Returns either a list of objects containing details about the datasets, or a
  * simple list of dataset IDs based on whether the [expanded] flag is set to
@@ -36,7 +36,7 @@ internal fun generateFailedInstallReport(expanded: Boolean) =
 
 /**
  * Lists IDs of datasets across all registered projects that are in the broken
- * install status [InstallStatus.FailedInstallation].
+ * install status [InstallStatus.FAILED_INSTALLATION].
  */
 private fun listSimpleBrokenDatasets(): GetAdminReportsInstallsFailedResponse {
   val out = HashSet<DatasetID>()
@@ -51,7 +51,7 @@ private fun listSimpleBrokenDatasets(): GetAdminReportsInstallsFailedResponse {
 
 /**
  * Lists details about datasets across all registered projects that are in the
- * broken install status [InstallStatus.FailedInstallation].
+ * broken install status [InstallStatus.FAILED_INSTALLATION].
  */
 private fun listExpandedBrokenDatasets(): GetAdminReportsInstallsFailedResponse {
   // Collect the datasets that are in a broken status into a map to unique the
@@ -104,7 +104,7 @@ private fun getBrokenDatasets(installTarget: InstallTargetID) =
   ArrayList<DatasetRecord>(1024).apply {
     for ((_, dataType) in AppDatabaseRegistry) {
       addAll(AppDB().accessor(installTarget, dataType)!!
-        .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FailedInstallation))
+        .selectDatasetsByInstallStatus(InstallType.Data, InstallStatus.FAILED_INSTALLATION))
     }
   }
 

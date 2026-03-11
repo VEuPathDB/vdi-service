@@ -255,7 +255,7 @@ internal class DatasetReconciler(
   private fun isInstalled(ctx: ReconcilerTarget) =
     ctx.meta!!.installTargets.all {
       (AppDB().accessor(it, ctx.meta!!.type) ?: return@all true)
-        .selectDatasetInstallMessage(ctx.datasetId.toDatasetID(), InstallType.Data)?.status == InstallStatus.Complete
+        .selectDatasetInstallMessage(ctx.datasetId.toDatasetID(), InstallType.Data)?.status == InstallStatus.COMPLETE
     }
 
   private fun ensureRevisionFlags(ctx: ReconcilerTarget) {

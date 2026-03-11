@@ -133,6 +133,10 @@ object DatasetStore {
   fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
     bucket.objects.list(prefix = S3Paths.datasetDir(userID, datasetID))
 
+  @JvmStatic
+  fun listDatasetObjects(userId: Long, datasetId: String): Iterable<S3Object> =
+    listObjectsForDataset(UserID(userId), DatasetID(datasetId))
+
   fun putUploadError(userID: UserID, datasetID: DatasetID, message: String, ex: Throwable? = null) {
     store.getDatasetDirectory(userID, datasetID)
       .putUploadErrorFile(

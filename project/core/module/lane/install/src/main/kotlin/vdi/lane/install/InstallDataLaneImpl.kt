@@ -247,7 +247,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
               DatasetInstallMessage(
                 datasetID,
                 InstallType.Data,
-                InstallStatus.Running,
+                InstallStatus.RUNNING,
                 null
               )
             )
@@ -264,7 +264,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
         if (race)
           return false
       } else {
-        if (status.status != InstallStatus.ReadyForReinstall) {
+        if (status.status != InstallStatus.READY_FOR_REINSTALL) {
           logger.info("skipping install event; dataset status is {}", status.status)
           return false
         }
@@ -327,7 +327,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,
-        InstallStatus.Complete,
+        InstallStatus.COMPLETE,
         res.getWarningsSequence().joinToString("\n").takeUnless(String::isEmpty)
       ))
     }
@@ -345,7 +345,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,
-        InstallStatus.FailedValidation,
+        InstallStatus.FAILED_VALIDATION,
         res.getWarningsSequence().joinToString("\n")
       ))
     }
@@ -363,7 +363,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,
-        InstallStatus.MissingDependency,
+        InstallStatus.MISSING_DEPENDENCY,
         res.body.warnings.joinToString("\n")
       ))
     }
@@ -381,7 +381,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,
-        InstallStatus.FailedInstallation,
+        InstallStatus.FAILED_INSTALLATION,
         res.message
       ))
     }
@@ -401,7 +401,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       it.updateDatasetInstallMessage(DatasetInstallMessage(
         datasetID,
         InstallType.Data,
-        InstallStatus.FailedInstallation,
+        InstallStatus.FAILED_INSTALLATION,
         res.message
       ))
     }
