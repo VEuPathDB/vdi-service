@@ -20,7 +20,7 @@ data class DatasetRecord(
     datasetID:       DatasetID,
     meta:            DatasetMetadata,
     category:        String,
-    deletionState:   DeleteFlag = DeleteFlag.NotDeleted,
+    deletionState:   DeleteFlag = DeleteFlag.NOT_DELETED,
   ): this (
     datasetID,
     meta.owner,

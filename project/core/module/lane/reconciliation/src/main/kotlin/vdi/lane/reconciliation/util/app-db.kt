@@ -46,7 +46,7 @@ internal fun AppDBAccessor.isUninstalled(ctx: ReconcilerTarget): Boolean {
     return true
   }
 
-  if (targetRecord.deletionState != DeleteFlag.DeletedAndUninstalled) {
+  if (targetRecord.deletionState != DeleteFlag.DELETED_AND_UNINSTALLED) {
     return false
   }
 
