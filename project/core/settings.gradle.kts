@@ -37,7 +37,6 @@ arrayOf(
   "db/common",
   "db/internal",
   "external/kafka",
-  "external/ldap",
   "external/rabbit",
   "external/s3",
   "install-target",
