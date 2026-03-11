@@ -17,8 +17,8 @@ data class SoftDeleteLaneConfig(
   val kafkaConfig:  KafkaConsumerConfig,
   val s3Config:     S3Config,
   val s3Bucket:     BucketName,
-  val eventChannel: MessageTopic,
-  val eventKey:     MessageKey,
+  val eventChannel: String,
+  val eventKey:     String,
 ) {
   constructor(config: VDIConfig): this(config.lanes?.softDelete, config.objectStore, config.kafka)
 
@@ -28,8 +28,8 @@ data class SoftDeleteLaneConfig(
     kafkaConfig  = KafkaConsumerConfig(lane?.kafkaConsumerID ?: ConsumerID, kafka),
     s3Config     = S3Config(store),
     s3Bucket     = store.bucket,
-    eventChannel = lane?.eventChannel?.toMessageTopic() ?: EventChannel,
-    eventKey     = lane?.eventKey?.toMessageKey() ?: EventKey,
+    eventChannel = lane?.eventChannel ?: EventChannel,
+    eventKey     = lane?.eventKey ?: EventKey,
   )
 
   private companion object {

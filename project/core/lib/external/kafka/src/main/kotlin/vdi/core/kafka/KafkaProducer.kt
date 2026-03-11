@@ -19,7 +19,7 @@ interface KafkaProducer {
    *
    * @param message Message to send.
    */
-  fun send(topic: MessageTopic, message: KafkaMessage, wait: Boolean = false)
+  fun send(topic: String, message: KafkaMessage, wait: Boolean = false)
 
   /**
    * Closes the producer connection.

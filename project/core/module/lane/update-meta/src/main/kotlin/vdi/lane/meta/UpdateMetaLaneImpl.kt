@@ -95,11 +95,11 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
    */
   private suspend fun UpdateMetaContext.updateMetaIfNotRecursive() {
     try {
-      if (source == EventSource.UpdateMetaLane) {
+      if (source == EventSource.UPDATE_META_LANE) {
         logger.warn("attempted to recurse update meta")
       } else {
         updateMeta()
-        events.sendReconciliationTrigger(ownerID, datasetID, EventSource.UpdateMetaLane)
+        events.sendReconciliationTrigger(ownerID, datasetID, EventSource.UPDATE_META_LANE)
       }
     } catch (e: PluginException) {
       e.log(logger::error)

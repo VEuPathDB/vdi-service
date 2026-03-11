@@ -16,8 +16,8 @@ data class ReconciliationLaneConfig(
   val jobQueueSize:   UByte,
   val kafkaInConfig:  KafkaConsumerConfig,
   val kafkaOutConfig: KafkaRouterConfig,
-  val eventChannel:   MessageTopic,
-  val eventMsgKey:    MessageKey,
+  val eventChannel:   String,
+  val eventMsgKey:    String,
   val s3Config:       S3Config,
   val s3Bucket:       BucketName,
 ) {
@@ -28,8 +28,8 @@ data class ReconciliationLaneConfig(
     jobQueueSize   = lanes?.reconciliation?.workerCount ?: WorkerPoolSize,
     kafkaInConfig  = KafkaConsumerConfig(lanes?.reconciliation?.kafkaConsumerID ?: ConsumerID, kafka),
     kafkaOutConfig = KafkaRouterConfig(lanes?.reconciliation?.kafkaProducerID ?: ProducerID, kafka, lanes),
-    eventChannel   = lanes?.reconciliation?.eventChannel?.toMessageTopic() ?: KafkaTopic,
-    eventMsgKey    = lanes?.reconciliation?.eventKey?.toMessageKey() ?: KafkaMessageKey,
+    eventChannel   = lanes?.reconciliation?.eventChannel ?: KafkaTopic,
+    eventMsgKey    = lanes?.reconciliation?.eventKey ?: KafkaMessageKey,
     s3Config       = S3Config(obj),
     s3Bucket       = BucketName(obj.bucketName),
   )

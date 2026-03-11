@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory
 class KafkaProducerImpl(val kafka: Producer<String, String>) : KafkaProducer {
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  override fun send(topic: MessageTopic, message: KafkaMessage, wait: Boolean) {
+  override fun send(topic: String, message: KafkaMessage, wait: Boolean) {
     logger.trace("send(topic={}, message={}, wait={})", topic, message, wait)
-    val future = kafka.send(ProducerRecord(topic.value, message.key?.value, message.value))
+    val future = kafka.send(ProducerRecord(topic, message.key, message.value))
 
     if (wait)
       future.get()

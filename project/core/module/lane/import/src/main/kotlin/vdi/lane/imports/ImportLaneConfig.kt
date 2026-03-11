@@ -29,7 +29,7 @@ data class ImportLaneConfig(
    * Messages received on the import trigger topic that do not have this message
    * key will be ignored with a warning.
    */
-  val eventMsgKey: MessageKey,
+  val eventMsgKey: String,
 
   /**
    * Import Triggers Topic
@@ -37,7 +37,7 @@ data class ImportLaneConfig(
    * Name of the Kafka topic that import trigger messages will be listened for
    * on.
    */
-  val eventChannel: MessageTopic,
+  val eventChannel: String,
 
   val s3Config: S3Config,
 
@@ -49,8 +49,8 @@ data class ImportLaneConfig(
     workerCount  = lane?.workerCount ?: WorkerPoolSize,
     jobQueueSize = lane?.inMemoryQueueSize ?: WorkQueueSize,
     kafkaConfig  = KafkaConsumerConfig(lane?.kafkaConsumerID ?: ConsumerID, kafka),
-    eventMsgKey  = lane?.eventKey?.toMessageKey() ?: EventKey,
-    eventChannel = lane?.eventChannel?.toMessageTopic() ?: EventChannel,
+    eventMsgKey  = lane?.eventKey ?: EventKey,
+    eventChannel = lane?.eventChannel ?: EventChannel,
     s3Config     = S3Config(store),
     s3Bucket     = store.bucket,
   )

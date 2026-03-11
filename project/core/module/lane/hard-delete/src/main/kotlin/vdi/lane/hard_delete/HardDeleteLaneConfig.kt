@@ -10,8 +10,8 @@ data class HardDeleteLaneConfig(
   val jobQueueSize:   UByte,
   val workerPoolSize: UByte,
   val kafkaConfig:    KafkaConsumerConfig,
-  val eventChannel:   MessageTopic,
-  val eventMsgKey:    MessageKey,
+  val eventChannel:   String,
+  val eventMsgKey:    String,
 ) {
   constructor(config: VDIConfig): this(config.lanes?.hardDelete, config.kafka)
 
@@ -19,8 +19,8 @@ data class HardDeleteLaneConfig(
     jobQueueSize   = lConf?.inMemoryQueueSize ?: Defaults.JobQueueSize,
     workerPoolSize = lConf?.workerCount ?: Defaults.WorkerPoolSize,
     kafkaConfig    = KafkaConsumerConfig(lConf?.kafkaConsumerID ?: Defaults.KafkaConsumerClientID, kConf),
-    eventChannel   = lConf?.eventChannel?.toMessageTopic() ?: Defaults.HardDeleteTopic,
-    eventMsgKey    = lConf?.eventKey?.toMessageKey() ?: Defaults.HardDeleteMessageKey,
+    eventChannel   = lConf?.eventChannel ?: Defaults.HardDeleteTopic,
+    eventMsgKey    = lConf?.eventKey ?: Defaults.HardDeleteMessageKey,
   )
 
   object Defaults {

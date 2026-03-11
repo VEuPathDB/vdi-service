@@ -17,8 +17,8 @@ data class InstallDataLaneConfig(
   val consumerConfig: KafkaConsumerConfig,
   val s3Config:       S3Config,
   val s3Bucket:       BucketName,
-  val eventChannel:   MessageTopic,
-  val eventMsgKey:    MessageKey,
+  val eventChannel:   String,
+  val eventMsgKey:    String,
 ) {
   constructor(conf: VDIConfig): this(conf.lanes?.install, conf.objectStore, conf.kafka)
 
@@ -28,8 +28,8 @@ data class InstallDataLaneConfig(
     consumerConfig = KafkaConsumerConfig(lane?.kafkaConsumerID ?: ConsumerID, kafka),
     s3Config       = S3Config(store),
     s3Bucket       = store.bucket,
-    eventChannel   = lane?.eventChannel?.toMessageTopic() ?: EventChannel,
-    eventMsgKey    = lane?.eventKey?.toMessageKey() ?: EventMsgKey,
+    eventChannel   = lane?.eventChannel ?: EventChannel,
+    eventMsgKey    = lane?.eventKey ?: EventMsgKey,
   )
 
   private companion object {

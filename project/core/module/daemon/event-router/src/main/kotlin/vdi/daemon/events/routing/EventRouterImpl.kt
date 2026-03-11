@@ -145,7 +145,7 @@ internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: A
   private suspend fun safeSend(userID: UserID, datasetID: DatasetID, fn: (UserID, DatasetID, EventSource) -> Unit) {
     try {
       logger.trace("safeSend(userID={}, datasetID={}, fn=...)", userID, datasetID)
-      fn(userID, datasetID, EventSource.ObjectStore)
+      fn(userID, datasetID, EventSource.OBJECT_STORE)
     } catch (e: Throwable) {
       triggerShutdown()
       logger.error("failed to send event message for {}/{}", userID, datasetID, e)
