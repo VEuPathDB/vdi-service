@@ -51,18 +51,20 @@ internal fun CacheDB.dropImportMessages(ctx: ReconcilerTarget) =
   ctx.safeExec("failed to delete import messages") { withTransaction { it.deleteImportMessages(ctx.datasetId.toDatasetID()) } }
 
 internal fun CacheDB.tryInitDataset(ctx: ReconcilerTarget, importStatus: DatasetImportStatus?) {
+  val meta = ctx.meta ?: DatasetMetadata(
+    type           = DatasetType(DataType.of("unknown"), "unknown"),
+    installTargets = emptySet(),
+    visibility     = DatasetVisibility.Private,
+    owner          = ctx.userId,
+    name           = "unknown",
+    origin         = "unknown",
+    created        = OriginTimestamp
+  )
+
   withTransaction { db ->
     db.initializeDataset(
       ctx.datasetId.toDatasetID(),
-      ctx.meta ?: DatasetMetadata(
-        type = DatasetType(DataType.of("unknown"), "unknown"),
-        installTargets = emptySet(),
-        visibility = DatasetVisibility.Private,
-        owner = ctx.userId,
-        name = "unknown",
-        origin = "unknown",
-        created = OriginTimestamp
-      ),
+      meta,
       if (importStatus == null)
         DatasetUploadStatus.Failed
       else DatasetUploadStatus.Success,
@@ -75,8 +77,8 @@ internal fun CacheDB.tryInitDataset(ctx: ReconcilerTarget, importStatus: Dataset
         listOf("dataset has no import-ready file and is in an incomplete state due to the absence of the install-ready data and/or manifest")
       )
 
-    if (ctx.meta!!.revisionHistory != null)
-      db.tryInsertRevisionLinks(ctx.meta!!.revisionHistory!!)
+    if (meta.revisionHistory != null)
+      db.tryInsertRevisionLinks(meta.revisionHistory!!)
 
     ctx.manifest?.also {
       db.tryInsertUploadFiles(ctx.datasetId.toDatasetID(), it.userUploadFiles)
