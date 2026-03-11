@@ -230,7 +230,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
         return false
       }
 
-      if (dataset.deletionState != DeleteFlag.NotDeleted) {
+      if (dataset.deletionState != DeleteFlag.NOT_DELETED) {
         logger.info("skipping install event; dataset marked as deleted")
         return false
       }

@@ -33,7 +33,7 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
     val handler = PluginHandlers[dataset.type]!!
 
     appDB.withTransaction(projectID, dataset.type) {
-      it.purgeDatasetControlTables(dataset.datasetID, DeleteFlag.DeletedNotUninstalled)
+      it.purgeDatasetControlTables(dataset.datasetID, DeleteFlag.DELETED_NOT_UNINSTALLED)
     }
 
     val res = try {
@@ -50,7 +50,7 @@ internal class AppDBTarget(override val name: String, private val projectID: Str
       }
 
       appDB.withTransaction(projectID, dataset.type) {
-        it.updateDatasetDeletedFlag(dataset.datasetID, DeleteFlag.DeletedAndUninstalled)
+        it.updateDatasetDeletedFlag(dataset.datasetID, DeleteFlag.DELETED_AND_UNINSTALLED)
       }
   }
 }

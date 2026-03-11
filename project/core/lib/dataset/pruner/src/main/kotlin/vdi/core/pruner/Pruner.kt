@@ -190,7 +190,7 @@ object Pruner {
             if (it == null) {
               logger.warn("no control record in install target {}; this will not prevent pruning", projectID)
               true
-            } else if (it.deletionState != DeleteFlag.DeletedAndUninstalled) {
+            } else if (it.deletionState != DeleteFlag.DELETED_AND_UNINSTALLED) {
               logger.warn("not successfully uninstalled from target {}; cannot be pruned", projectID)
               false
             } else {

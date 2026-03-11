@@ -95,7 +95,7 @@ class RecordIterator(
       dataUpdated   = rs.getDateTime("data_update_time"),
       metaUpdated   = rs.getDateTime("meta_update_time"),
       type          = DatasetType(rs.getDataType("type_name"), rs.getString("type_version")),
-      isUninstalled = rs.getInt("deleted_status") == DeleteFlag.DeletedAndUninstalled.value
+      isUninstalled = rs.getInt("deleted_status") == DeleteFlag.DELETED_AND_UNINSTALLED.value
     )
   }
 

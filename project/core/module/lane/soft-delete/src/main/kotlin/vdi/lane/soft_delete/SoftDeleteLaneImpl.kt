@@ -119,7 +119,7 @@ internal class SoftDeleteLaneImpl(
     handler: PluginHandler,
     record: DatasetRecord
   ) {
-    appDB.withTransaction(installTarget, record.type) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedNotUninstalled) }
+    appDB.withTransaction(installTarget, record.type) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DELETED_NOT_UNINSTALLED) }
 
     val response = try {
       handler.client.postUninstall(eventID, datasetID, installTarget, record.type)
@@ -152,7 +152,7 @@ internal class SoftDeleteLaneImpl(
       return false
     }
 
-    if (dataset.deletionState == DeleteFlag.DeletedAndUninstalled) {
+    if (dataset.deletionState == DeleteFlag.DELETED_AND_UNINSTALLED) {
       logger.info("dataset has already been successfully uninstalled from target project {}", installTarget)
       return false
     }
@@ -162,7 +162,7 @@ internal class SoftDeleteLaneImpl(
 
   private fun SoftDeleteContext.handleSuccessResponse(handler: PluginHandler, installTarget: InstallTargetID) {
     logger.info("dataset successfully uninstalled from project {} via plugin {}", installTarget, handler.name)
-    appDB.withTransaction(installTarget, handler.type) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DeletedAndUninstalled) }
+    appDB.withTransaction(installTarget, handler.type) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DELETED_AND_UNINSTALLED) }
   }
 
   private fun SoftDeleteContext.handleUnexpectedErrorResponse(

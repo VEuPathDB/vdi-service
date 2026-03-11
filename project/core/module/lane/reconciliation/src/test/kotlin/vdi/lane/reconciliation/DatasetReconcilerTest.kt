@@ -247,7 +247,7 @@ class DatasetReconcilerTest {
         val cacheDB = mockCacheDB(onSelectDataset = { mockCacheDatasetRecord(isDeleted = true) })
 
         val accessor = mockAppDBAccessor(
-          dataset = { mockAppDatasetRecord(isDeleted = DeleteFlag.DeletedAndUninstalled) }
+          dataset = { mockAppDatasetRecord(isDeleted = DeleteFlag.DELETED_AND_UNINSTALLED) }
         )
 
         val appDB = mockAppDB(accessor = { _, _ -> accessor })
@@ -282,7 +282,7 @@ class DatasetReconcilerTest {
         val cacheDB = mockCacheDB(onSelectDataset = { mockCacheDatasetRecord(isDeleted = true) })
 
         val accessor = mockAppDBAccessor(
-          dataset = { mockAppDatasetRecord(isDeleted = DeleteFlag.DeletedNotUninstalled) }
+          dataset = { mockAppDatasetRecord(isDeleted = DeleteFlag.DELETED_NOT_UNINSTALLED) }
         )
 
         val appDB = mockAppDB(accessor = { _, _ -> accessor })
