@@ -203,6 +203,9 @@ internal class ReconcilerInstance(
         // either doing a clean sync, or it was already imported by another
         // instance.
         ?.takeIf { it.importStatus == null }
+        // Filter out datasets that failed upload, they shouldn't have an import
+        // status as they have not and will not ever be imported.
+        ?.takeIf { !hasUploadErrorFile() }
         ?.also { sendSyncEvent(it.ownerID, it.datasetID, SyncReason.OutOfSync(true, false, false, targetDB)) }
     }
   }
