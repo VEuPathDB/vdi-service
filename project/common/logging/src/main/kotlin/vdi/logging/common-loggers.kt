@@ -1,3 +1,4 @@
+@file:JvmName("StackLogging")
 package vdi.logging
 
 import org.slf4j.Logger

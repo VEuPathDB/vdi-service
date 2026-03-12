@@ -10,6 +10,7 @@ import vdi.service.rest.config.UploadConfig;
 import vdi.service.rest.server.AdminReportController;
 import vdi.service.rest.server.DatasetListController;
 import vdi.service.rest.server.MetaInfoController;
+import vdi.service.rest.server.UserInfoController;
 import vdi.service.rest.server.controllers.*;
 
 public class Resources extends ContainerResources {
@@ -50,7 +51,7 @@ public class Resources extends ContainerResources {
       DatasetSharePut.class,
       MetaInfoController.class,
       PluginInfo.class,
-      UserInfo.class
+      UserInfoController.class
     };
   }
 }

@@ -1,6 +1,6 @@
 package vdi.service.rest.services;
 
-import vdi.core.db.cache.CacheDBManager;
+import vdi.core.db.cache.CacheDbManager;
 import vdi.model.meta.UserID;
 import vdi.service.rest.config.UploadConfig;
 import vdi.service.rest.generated.model.UserMetadata;
@@ -26,7 +26,7 @@ public final class UserMetaService {
   public static long getCurrentQuotaUsage(UserID userId) {
     var sizes = DatasetStore.listDatasetImportReadyZipSizes(userId);
 
-    return CacheDBManager.getInstance()
+    return CacheDbManager.getInstance()
       .selectUndeletedDatasetIDsForUser(userId)
       .stream()
       .mapToLong(it -> sizes.getOrDefault(it, 0L))

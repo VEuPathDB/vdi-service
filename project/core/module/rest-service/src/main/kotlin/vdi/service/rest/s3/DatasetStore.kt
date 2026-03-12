@@ -22,6 +22,7 @@ object DatasetStore {
   private lateinit var client: S3Client
   private var bucketName: BucketName? = null
 
+  @JvmStatic
   fun init(config: ObjectStoreConfig) {
     client     = S3Api.newClient(S3Config(config))
     bucketName = BucketName(config.bucketName)

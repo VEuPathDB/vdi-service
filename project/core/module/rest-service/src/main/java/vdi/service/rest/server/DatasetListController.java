@@ -16,7 +16,7 @@ import vdi.service.rest.server.services.dataset.DatasetListService;
 import vdi.service.rest.server.services.dataset.DatasetPostService;
 import vdi.service.rest.util.ShortID;
 
-@Authenticated()
+@Authenticated
 public class DatasetListController extends AbstractController implements Datasets {
   private final UploadConfig uploadConfig;
 

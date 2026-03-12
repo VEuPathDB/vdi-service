@@ -1,4 +1,4 @@
-@file:JvmName("CacheDBManager")
+@file:JvmName("CacheDbManager")
 package vdi.core.db.cache
 
 /**
