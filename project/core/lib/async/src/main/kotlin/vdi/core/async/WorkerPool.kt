@@ -77,6 +77,8 @@ class WorkerPool(
     }
 
   companion object {
+    inline fun <reified T: Any> create(jobQueueSize: Int, workerCount: Int = 5, noinline reportQueueSizeChange: (Int) -> Unit = { }) =
+      WorkerPool(jobQueueSize.toUByte(), workerCount.toUByte(), reportQueueSizeChange, T::class)
     inline fun <reified T: Any> create(jobQueueSize: UByte, workerCount: UByte = 5u, noinline reportQueueSizeChange: (Int) -> Unit = { }) =
       WorkerPool(jobQueueSize, workerCount, reportQueueSizeChange, T::class)
   }

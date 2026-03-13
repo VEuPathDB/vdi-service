@@ -10,4 +10,7 @@ sealed class LaneConfigBase(
   val workerCount: UByte?,
   val eventChannel: String?,
   val eventKey: String?,
-)
+) {
+  fun getWorkerCountInt() = workerCount?.toInt()
+  fun getInMemoryQueueSizeInt() = inMemoryQueueSize?.toInt()
+}

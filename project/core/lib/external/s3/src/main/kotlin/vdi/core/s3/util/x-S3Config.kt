@@ -1,3 +1,4 @@
+@file:JvmName("S3Util")
 package vdi.core.s3.util
 
 import org.veupathdb.lib.s3.s34k.S3Config

@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.veupathdb.lib.s3.s34k.errors.S34KError
+import org.veupathdb.lib.s3.s34k.fields.BucketName
 import java.time.OffsetDateTime
 import vdi.core.async.WorkerPool
 import vdi.core.config.vdi.VDIConfig
@@ -46,7 +47,7 @@ class ImportLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abor
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
   override suspend fun run() {
-    val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
+    val dm = requireDatasetManager(config.s3Config, BucketName(config.s3Bucket))
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
     val wp = WorkerPool.create<ImportLane>(config.jobQueueSize, config.workerCount) {
       Metrics.queueSize.inc(it.toDouble())
@@ -74,7 +75,7 @@ class ImportLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abor
     } catch (e: PluginException) {
       e.log(logger::error)
     } catch (e: Throwable) {
-      ImportException(ownerID, datasetID.asString, e).log(logger::error)
+      ImportException(ownerID.toLong(), datasetID.asString, e).log(logger::error)
     }
   }
 
