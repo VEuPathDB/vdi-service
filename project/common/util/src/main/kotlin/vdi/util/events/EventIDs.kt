@@ -7,7 +7,7 @@ import vdi.model.OriginTimestamp
 
 object EventIDs {
   private val mutex = Mutex(false)
-  private var eventID = (System.currentTimeMillis() - OriginTimestamp.toInstant().toEpochMilli()).toULong()
+  private var eventID = System.currentTimeMillis() - OriginTimestamp.toInstant().toEpochMilli()
 
   suspend fun issueID(): EventID =
     mutex.withLock { return eventID++ }

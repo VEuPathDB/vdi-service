@@ -22,6 +22,8 @@ data class EventMessage(
   @param:JsonProperty(Source)
   val eventSource: EventSource,
 ) {
+  fun getDatasetIdString() = datasetID.asString
+
   private companion object JsonKey {
     const val DatasetID = "datasetID"
     const val EventID = "eventID"

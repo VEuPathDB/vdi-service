@@ -24,6 +24,7 @@ import vdi.core.plugin.client.response.EmptySuccessResponse
 import vdi.core.plugin.client.response.ServiceErrorResponse
 import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.plugin.mapping.PluginHandlers
+import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
 
 class SoftDeleteLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abortCB) {
@@ -110,6 +111,11 @@ class SoftDeleteLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(
     timer.observeDuration()
   }
 
+  private inline val SoftDeleteContext.datasetID
+    get() = DatasetID(datasetId)
+  private inline val SoftDeleteContext.ownerID
+    get() = ownerId
+
   private suspend fun SoftDeleteContext.uninstallDataset(
     installTarget: InstallTargetID,
     handler: PluginHandler,
@@ -118,7 +124,7 @@ class SoftDeleteLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(
     appDB.withTransaction(installTarget, record.type) { it.updateDatasetDeletedFlag(datasetID, DeleteFlag.DELETED_NOT_UNINSTALLED) }
 
     val response = try {
-      handler.client.postUninstall(eventID, datasetID, installTarget, record.type)
+      handler.client.postUninstall(eventId, datasetID, installTarget, record.type)
     } catch (e: Throwable) {
       throw PluginRequestException.uninstall(handler.name, installTarget, ownerID, datasetID, cause = e)
     }
