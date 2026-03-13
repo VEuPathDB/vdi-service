@@ -5,6 +5,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
+import org.veupathdb.lib.s3.s34k.fields.BucketName
 import java.sql.SQLException
 import java.time.OffsetDateTime
 import java.util.concurrent.ConcurrentHashMap
@@ -34,7 +35,7 @@ import vdi.model.meta.*
 class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abortCB) {
   private val config = ShareLaneConfig(vdiConfig)
 
-  private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(config.workerCount.toInt())
+  private val datasetsInProgress = ConcurrentHashMap.newKeySet<DatasetID>(config.workerCount)
 
   private val cacheDB = runBlocking { safeExec("failed to init Cache DB", ::CacheDB) }
 
@@ -42,7 +43,7 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConfig)
-    val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
+    val dm = requireDatasetManager(config.s3Config, BucketName(config.s3Bucket))
     val wp = WorkerPool.create<ShareLane>(config.jobQueueSize, config.workerCount) {
       Metrics.shareQueueSize.inc(it.toDouble())
     }
@@ -63,6 +64,9 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
     kc.close()
     confirmShutdown()
   }
+
+  private inline val ShareContext.datasetID
+    get() = DatasetID(datasetId)
 
   private fun ShareContext.executeIfNotAlreadyRunning() {
     if (datasetsInProgress.add(datasetID)) {
@@ -94,7 +98,7 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
     }
 
     logger.debug("looking up dataset directory")
-    val dir = store.getDatasetDirectory(ownerID, datasetID)
+    val dir = store.getDatasetDirectory(ownerId, datasetID)
 
     val cacheDBSyncControl = cacheDB.selectSyncControl(datasetID)
 
@@ -138,10 +142,10 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
     dataset.projects.forEach { projectID ->
       if (AppDatabaseRegistry.contains(projectID, dataset.type)) {
         try {
-          loggingForInstallTarget(projectID)
+          setLoggerContext(projectID)
           synchronizeProject(projectID, dataset, shares, latestShareTimestamp)
         } finally {
-          loggingForInstallTarget(null)
+          clearLoggerContext()
         }
       } else
         logger.mark(installTarget = projectID).info("skipping share sync; target is disabled")
@@ -155,7 +159,7 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
   ) {
     dataset.projects.forEach {
       try {
-        loggingForInstallTarget(it)
+        setLoggerContext(it)
 
         val targetDB = appDB.accessor(it, dataset.type)
 
@@ -177,7 +181,7 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
           logger.info("skipping share sync, shares are up to date")
         }
       } finally {
-        loggingForInstallTarget(null)
+        clearLoggerContext()
       }
     }
   }
@@ -215,13 +219,13 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
         // If S3 does not have a share offer file present, any share offer
         // record in the internal cache db will be removed.
         when (shareState.offer) {
-          ShareState.Yes -> db.upsertDatasetShareOffer(
+          ShareState.YES -> db.upsertDatasetShareOffer(
             ShareOfferRecord(dataset.datasetID, shareRecipientUserID, DatasetShareOffer.Action.Grant))
 
-          ShareState.No -> db.upsertDatasetShareOffer(
+          ShareState.NO -> db.upsertDatasetShareOffer(
             ShareOfferRecord(dataset.datasetID, shareRecipientUserID, DatasetShareOffer.Action.Revoke))
 
-          ShareState.Absent -> db.deleteShareOffer(dataset.datasetID, shareRecipientUserID)
+          ShareState.ABSENT -> db.deleteShareOffer(dataset.datasetID, shareRecipientUserID)
         }
 
         // Process the share receipt.  If S3 has a share receipt file present,
@@ -229,13 +233,13 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
         // database.  If S3 does not have a share receipt file present, any
         // share receipt record in the internal cache db will be removed.
         when (shareState.receipt) {
-          ShareState.Yes -> db.upsertDatasetShareReceipt(
+          ShareState.YES -> db.upsertDatasetShareReceipt(
             ShareReceiptRecord(dataset.datasetID, shareRecipientUserID, DatasetShareReceipt.Action.Accept))
 
-          ShareState.No -> db.upsertDatasetShareReceipt(
+          ShareState.NO -> db.upsertDatasetShareReceipt(
             ShareReceiptRecord(dataset.datasetID, shareRecipientUserID, DatasetShareReceipt.Action.Reject))
 
-          ShareState.Absent -> db.deleteShareReceipt(dataset.datasetID, shareRecipientUserID)
+          ShareState.ABSENT -> db.deleteShareReceipt(dataset.datasetID, shareRecipientUserID)
         }
 
         // We have processed the share details for the current recipient user.
@@ -294,7 +298,7 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
         // visibility record.  Since a visibility record may have already
         // existed, or been created by a competing worker, unique constraint
         // violations will be ignored on insert.
-        if (shareState.visibleInTarget) {
+        if (shareState.isVisibleInTarget) {
           logger.debug("ensuring dataset is visible to share recipient {}", shareRecipient)
           context(logger) {
             db.tryInsertDatasetVisibility(dataset.datasetID, shareRecipient)
@@ -341,9 +345,9 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
     dataset.projects.forEach { projectID ->
 
       if (!AppDatabaseRegistry.contains(projectID, dataset.type)) {
-        loggingForInstallTarget(projectID)
+        setLoggerContext(projectID)
         logger.warn("cannot purge dataset visibility records from disabled install target")
-        loggingForInstallTarget(null)
+        clearLoggerContext()
         return@forEach
       }
 
@@ -353,15 +357,15 @@ class ShareLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abort
 
   private fun computeShareState(shareDetails: Pair<ShareOffer, ShareReceipt>) =
     ShareInfo(
-      offer = when (shareDetails.first.load()?.action) {
-        null                            -> ShareState.Absent
-        DatasetShareOffer.Action.Grant  -> ShareState.Yes
-        DatasetShareOffer.Action.Revoke -> ShareState.No
+      /*offer =*/ when (shareDetails.first.load()?.action) {
+        null                            -> ShareState.ABSENT
+        DatasetShareOffer.Action.Grant  -> ShareState.YES
+        DatasetShareOffer.Action.Revoke -> ShareState.NO
       },
-      receipt = when (shareDetails.second.load()?.action) {
-        null                              -> ShareState.Absent
-        DatasetShareReceipt.Action.Accept -> ShareState.Yes
-        DatasetShareReceipt.Action.Reject -> ShareState.No
+      /*receipt =*/ when (shareDetails.second.load()?.action) {
+        null                              -> ShareState.ABSENT
+        DatasetShareReceipt.Action.Accept -> ShareState.YES
+        DatasetShareReceipt.Action.Reject -> ShareState.NO
       },
     )
 

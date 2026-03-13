@@ -22,6 +22,8 @@ const val PrefixRequestURI = "U"
 
 // region Logger Wrapping
 
+fun markString(key: String, value: Any) = "$key=$value"
+
 inline fun Logger.mark(marks: Array<String>) =
   when (this) {
     is MarkedLogger -> copy(marks)
