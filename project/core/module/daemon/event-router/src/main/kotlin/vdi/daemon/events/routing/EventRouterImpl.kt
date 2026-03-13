@@ -19,14 +19,13 @@ import vdi.core.util.orElse
 import vdi.daemon.events.routing.model.MinIOEvent
 import vdi.daemon.events.routing.model.MinIOEventAction
 import vdi.json.JSON
-import vdi.logging.logger
 import vdi.logging.markedLogger
 import vdi.model.meta.DatasetID
 import vdi.model.meta.UserID
 
 internal class EventRouterImpl(private val config: EventRouterConfig, abortCB: AbortCB)
   : EventRouter
-  , AbstractVDIModule(abortCB, logger<EventRouter>())
+  , AbstractVDIModule(abortCB)
 {
   private val es: RabbitMQEventSource<MinIOEvent> = runBlocking {
     try {

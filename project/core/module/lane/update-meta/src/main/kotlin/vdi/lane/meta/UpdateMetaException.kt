@@ -8,20 +8,6 @@ class UpdateMetaException(
   message: String,
   cause: Throwable?,
 ): Throwable(message, cause) {
-  constructor(ownerId: UserID, datasetId: String): this(
-    ownerId,
-    datasetId,
-    "install-meta failed for dataset $ownerId/$datasetId",
-    null,
-  )
-
-  constructor(ownerId: UserID, datasetId: String, message: String): this(
-    ownerId,
-    datasetId,
-    message,
-    null
-  )
-
   constructor(ownerId: UserID, datasetId: String, cause: Throwable): this(
     ownerId,
     datasetId,

@@ -1,6 +1,7 @@
 package vdi.core.modules
 
 import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.veupathdb.lib.s3.s34k.S3Api
 import org.veupathdb.lib.s3.s34k.S3Client
 import org.veupathdb.lib.s3.s34k.S3Config
@@ -19,13 +20,10 @@ import vdi.core.s3.DatasetObjectStore
  *
  * Provides common functionality used by most implementations of the
  * [VDIModule] interface.
- *
- * @author Elizabeth Paige Harper - https://github.com/foxcapades
  */
-abstract class AbstractVDIModule(
-  protected val abortCB: AbortCB,
-  protected val logger: Logger,
-) : VDIModule {
+abstract class AbstractVDIModule(protected val abortCB: AbortCB): VDIModule {
+  protected val logger = LoggerFactory.getLogger(javaClass)
+
   private val shutdownTrigger = Trigger()
 
   private val shutdownConfirm = Trigger()

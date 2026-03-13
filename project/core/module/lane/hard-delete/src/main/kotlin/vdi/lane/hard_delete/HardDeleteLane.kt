@@ -1,18 +1,31 @@
 package vdi.lane.hard_delete
 
-import vdi.core.modules.VDIModule
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import vdi.core.config.vdi.VDIConfig
+import vdi.core.modules.AbortCB
+import vdi.core.modules.AbstractVDIModule
 
-/**
- * Hard Delete Trigger Handler
- *
- * This module consumes the Kafka topic for hard deletion trigger events and
- * logs them.
- *
- * This module is a leftover from a previous design iteration and is being kept
- * for the possible future where it is needed again.
- *
- * @since 1.0.0
- *
- * @author Elizabeth Paige Harper - https://github.com/Foxcapades
- */
-sealed interface HardDeleteLane: VDIModule
+class HardDeleteLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abortCB) {
+  private val config = HardDeleteLaneConfig(vdiConfig)
+
+  override suspend fun run() {
+    val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
+
+    coroutineScope {
+      launch(Dispatchers.IO) {
+        while (!isShutDown()) {
+          kc.fetchMessages(config.eventMsgKey)
+            .forEach { logger.info("received hard-delete event for dataset {}/{} from {}", it.userID, it.datasetID, it.eventSource) }
+        }
+      }
+    }
+
+    logger.info("closing kafka client")
+    kc.close()
+    logger.info("kafka client closed")
+    confirmShutdown()
+  }
+}
+

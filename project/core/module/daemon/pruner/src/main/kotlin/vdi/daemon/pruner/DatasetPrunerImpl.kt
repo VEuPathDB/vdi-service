@@ -2,14 +2,13 @@ package vdi.daemon.pruner
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import vdi.logging.logger
 import vdi.core.metrics.Metrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractJobExecutor
 import vdi.core.pruner.Pruner
 
 internal class DatasetPrunerImpl(private val config: DatasetPrunerConfig, abortCB: AbortCB) : DatasetPruner,
-  AbstractJobExecutor(abortCB, logger<DatasetPruner>(), config.wakeupInterval) {
+  AbstractJobExecutor(abortCB, config.wakeupInterval) {
 
   private var lastPrune = now()
 

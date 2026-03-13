@@ -1,14 +1,13 @@
 package vdi.daemon.reconciler
 
 import kotlin.time.Duration.Companion.milliseconds
-import vdi.logging.logger
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractJobExecutor
 import vdi.core.reconciler.Reconciler as Recon
 
 internal class ReconcilerImpl(private val config: ReconcilerDaemonConfig, abortCB: AbortCB)
   : Reconciler
-  , AbstractJobExecutor(abortCB, logger<Reconciler>())
+  , AbstractJobExecutor(abortCB)
 {
   private var lastSlimRun = 0L
 
