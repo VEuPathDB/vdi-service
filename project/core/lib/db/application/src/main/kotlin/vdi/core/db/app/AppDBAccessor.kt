@@ -23,7 +23,11 @@ interface AppDBAccessor {
    * @return The located [DatasetRecord] or `null` if no matching record could
    * be found.
    */
+  @JvmSynthetic
   fun selectDataset(datasetID: DatasetID): DatasetRecord?
+
+  fun selectDatasetById(datasetId: String): DatasetRecord? =
+    selectDataset(DatasetID(datasetId))
 
   /**
    * Looks up a dataset install message record for the target dataset and
@@ -59,7 +63,11 @@ interface AppDBAccessor {
    * @return The located [SyncControlRecord], or `null` if no matching record
    * could be found.
    */
+  @JvmSynthetic
   fun selectDatasetSyncControlRecord(datasetID: DatasetID): SyncControlRecord?
+
+  fun selectDatasetSyncControlRecordById(datasetId: String) =
+    selectDatasetSyncControlRecord(DatasetID(datasetId))
 
   /**
    * Retrieves all dataset visibility records for the target dataset.

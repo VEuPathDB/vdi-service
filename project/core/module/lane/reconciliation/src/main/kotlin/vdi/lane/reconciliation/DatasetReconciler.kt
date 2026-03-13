@@ -29,8 +29,8 @@ internal class DatasetReconciler(
     ctx.logger.info("beginning reconciliation")
     try {
       reconcile(ReconcilerTarget(
-        ctx.datasetID.toString(),
-        datasetManager.getDatasetDirectory(ctx.ownerID, ctx.datasetID),
+        ctx.datasetId,
+        datasetManager.getDatasetDirectory(ctx.ownerId, DatasetID(ctx.datasetId)),
         ctx.source,
         ctx.logger,
       ))
@@ -70,7 +70,7 @@ internal class DatasetReconciler(
     // If we determined that a reimport is possible and required (the
     // import-ready.zip file exists but no install-ready.zip file exists) then
     // perform the reimport and halt here.
-    if (reimport == ReimportIndicator.NeedReimport) {
+    if (reimport == ReimportIndicator.NEEDS_REIMPORT) {
       return tryReimport(ctx)
     }
 
@@ -91,11 +91,11 @@ internal class DatasetReconciler(
     // If we determined that a reimport is not needed by the existence and age
     // of the install-ready files, ensure that the import status for the dataset
     // is correct.
-    if (reimport == ReimportIndicator.ReimportNotNeeded)
+    if (reimport == ReimportIndicator.REIMPORT_NOT_NECESSARY)
       if (cacheDB.getCacheImportControl(ctx) == DatasetImportStatus.Queued)
         cacheDB.updateImportStatus(ctx, DatasetImportStatus.Complete)
 
-    if (reimport != ReimportIndicator.ReimportNotPossible) {
+    if (reimport != ReimportIndicator.REIMPORT_NOT_POSSIBLE) {
       if (!ctx.hasInstallReadyData())
         ctx.logger.warn("missing install-ready file")
 
@@ -111,9 +111,9 @@ internal class DatasetReconciler(
 
   private fun calcNewStatus(ctx: ReconcilerTarget, oldStatus: ReimportIndicator) =
     when (oldStatus) {
-      ReimportIndicator.ReimportNotNeeded   -> DatasetImportStatus.Complete
-      ReimportIndicator.NeedReimport        -> DatasetImportStatus.Queued
-      ReimportIndicator.ReimportNotPossible -> {
+      ReimportIndicator.REIMPORT_NOT_NECESSARY   -> DatasetImportStatus.Complete
+      ReimportIndicator.NEEDS_REIMPORT        -> DatasetImportStatus.Queued
+      ReimportIndicator.REIMPORT_NOT_POSSIBLE -> {
         if (ctx.hasInstallReadyData() && ctx.hasManifest())
           DatasetImportStatus.Complete
         else if (ctx.hasUploadError())
@@ -137,7 +137,7 @@ internal class DatasetReconciler(
       }
     }
 
-    if (!appDB.isFullyUninstalled(ctx))
+    if (!AppDbUtils.isFullyUninstalled(appDB, ctx))
       fireUninstallEvent(ctx)
   }
 
@@ -174,18 +174,18 @@ internal class DatasetReconciler(
   private fun runDatasetSync(ctx: ReconcilerTarget) {
     val syncStatus = ctx.checkSyncStatus()
 
-    if (syncStatus.metaOutOfSync)
+    if (syncStatus.isMetaOutOfSync)
       fireUpdateMetaEvent(ctx)
 
-    if (syncStatus.sharesOutOfSync)
+    if (syncStatus.isSharesOutOfSync)
       fireShareEvent(ctx)
 
     // If we've already fired an import event, then an install event will be
     // triggered by that import, meaning there is no need to fire an install
     // event here.
-    if (!ctx.haveFiredImportEvent && syncStatus.installOutOfSync)
+    if (!ctx.haveFiredImportEvent && syncStatus.isInstallOutOfSync)
       fireInstallEvent(ctx)
-    else if (!syncStatus.installOutOfSync && ctx.meta!!.revisionHistory != null && isInstalled(ctx))
+    else if (!syncStatus.isInstallOutOfSync && ctx.meta!!.revisionHistory != null && isInstalled(ctx))
       ensureRevisionFlags(ctx)
   }
 
@@ -203,12 +203,12 @@ internal class DatasetReconciler(
     val latestShareTimestamp = datasetDirectory.getLatestShareTimestamp(cacheDBSyncControl.sharesUpdated)
 
     val indicator = SyncIndicator(
-      metaOutOfSync     = cacheDBSyncControl.metaUpdated.isBefore(metaTimestamp),
-      sharesOutOfSync   = cacheDBSyncControl.sharesUpdated.isBefore(latestShareTimestamp),
-      installOutOfSync  = cacheDBSyncControl.dataUpdated.isBefore(installDataTimestamp),
+      /*metaOutOfSync    =*/ cacheDBSyncControl.metaUpdated.isBefore(metaTimestamp),
+      /*sharesOutOfSync  =*/ cacheDBSyncControl.sharesUpdated.isBefore(latestShareTimestamp),
+      /*installOutOfSync =*/ cacheDBSyncControl.dataUpdated.isBefore(installDataTimestamp),
     )
 
-    if (indicator.fullyOutOfSync)
+    if (indicator.isFullyOutOfSync)
       return indicator
 
     meta!!.installTargets.forEach { projectID ->
@@ -219,27 +219,23 @@ internal class DatasetReconciler(
         return@forEach
       }
 
-      val sync = appDB.selectSyncControl(this)
+      val sync = AppDbUtils.selectSyncControl(appDB, this)
         // If the dataset sync record does not exist at all, then fire a sync
         // action for shares and install.  The share sync is most likely going
-        // to be processed before the install, so the shares probably won't make
-        // it to the install target until the next big reconciler run.
-        ?: return SyncIndicator(
-          metaOutOfSync     = true,
-          sharesOutOfSync   = true,
-          installOutOfSync  = true,
-        )
+        // to be processed before the installation, so the shares probably won't
+        // make it to the installation target until the next big reconciler run.
+        ?: return SyncIndicator(true, true, true)
 
-      if (!indicator.metaOutOfSync && sync.metaUpdated.isBefore(metaTimestamp))
-        indicator.metaOutOfSync = true
+      if (!indicator.isMetaOutOfSync && sync.metaUpdated.isBefore(metaTimestamp))
+        indicator.isMetaOutOfSync = true
 
-      if (!indicator.sharesOutOfSync && sync.sharesUpdated.isBefore(latestShareTimestamp))
-        indicator.sharesOutOfSync = true
+      if (!indicator.isSharesOutOfSync && sync.sharesUpdated.isBefore(latestShareTimestamp))
+        indicator.isSharesOutOfSync = true
 
-      if (!indicator.installOutOfSync && sync.dataUpdated.isBefore(installDataTimestamp))
-        indicator.installOutOfSync = true
+      if (!indicator.isInstallOutOfSync && sync.dataUpdated.isBefore(installDataTimestamp))
+        indicator.isInstallOutOfSync = true
 
-      if (indicator.fullyOutOfSync)
+      if (indicator.isFullyOutOfSync)
         return indicator
     }
 
@@ -284,31 +280,31 @@ internal class DatasetReconciler(
     when {
       // If we don't have an import-ready file, we can't rerun the import
       // process
-      !ctx.hasImportReadyData() -> ReimportIndicator.ReimportNotPossible
+      !ctx.hasImportReadyData() -> ReimportIndicator.REIMPORT_NOT_POSSIBLE
 
       // If the import was found to be invalid, then it's a data problem and no
       // amount of reimport attempts will help.
-      cacheDB.isImportInvalid(ctx) -> ReimportIndicator.ReimportNotPossible
+      cacheDB.isImportInvalid(ctx) -> ReimportIndicator.REIMPORT_NOT_POSSIBLE
 
       // If we failed the last import attempt, then only rerun the import if we
       // have no import messages so that we can repopulate that table to
       // indicate to the user what happened.
       cacheDB.isImportFailed(ctx) -> if (cacheDB.isMissingImportMessage(ctx)) {
         ctx.logger.warn("import failed, but we have no error message; marking dataset as needing a reimport to populate the error message")
-        ReimportIndicator.NeedReimport
+        ReimportIndicator.NEEDS_REIMPORT
       } else {
         ctx.logger.info("import failed, reimport attempt not necessary")
-        ReimportIndicator.ReimportNotNeeded
+        ReimportIndicator.REIMPORT_NOT_NECESSARY
       }
 
       // If we are missing the install-ready file and/or the manifest file then
       // we need to rerun the import to get those files back.
-      !(ctx.hasInstallReadyData() && ctx.hasManifest()) -> ReimportIndicator.NeedReimport
+      !(ctx.hasInstallReadyData() && ctx.hasManifest()) -> ReimportIndicator.NEEDS_REIMPORT
 
       // We have an import-ready file, we have no failed import record, we have
       // both the install-ready and manifest files.  There is no need to rerun
       // the import process.
-      else -> ReimportIndicator.ReimportNotNeeded
+      else -> ReimportIndicator.REIMPORT_NOT_NECESSARY
     }
 
   // region Kafka
