@@ -5,7 +5,7 @@ ktor = "3.4.1"
 log4j = "2.25.3"
 slf4j = "2.0.17"
 
-mockito = "5.22.0"
+mockito = "5.23.0"
 junit = "6.0.3"
 
 [plugins]
@@ -59,7 +59,7 @@ ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "kto
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 ktor-server-metrics = { module = "io.ktor:ktor-server-metrics-micrometer", version.ref = "ktor" }
 
-metrics-micrometer = { group = "io.micrometer", name = "micrometer-registry-prometheus", version = "1.16.3" }
+metrics-micrometer = { group = "io.micrometer", name = "micrometer-registry-prometheus", version = "1.16.4" }
 metrics-prometheus = { group = "io.prometheus", name = "prometheus-metrics-tracer-initializer", version = "1.5.0" }
 
 
