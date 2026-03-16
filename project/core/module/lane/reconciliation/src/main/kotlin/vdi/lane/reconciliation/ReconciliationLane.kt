@@ -16,7 +16,7 @@ class ReconciliationLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIMod
 
   private lateinit var reconciler: DatasetReconciler
 
-  private val datasetsInProgress = ConcurrentHashMap.newKeySet<String>(config.workerCount.toInt())
+  private val datasetsInProgress = ConcurrentHashMap.newKeySet<String>(config.workerCount)
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaInConfig)

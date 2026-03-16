@@ -21,6 +21,7 @@ import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.withTransaction
+import vdi.core.metrics.InstallMetrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
 import vdi.core.plugin.client.PluginException
@@ -33,7 +34,6 @@ import vdi.core.s3.getInstallReadyTimestamp
 import vdi.core.util.orElse
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
-import vdi.core.metrics.Metrics.Install as Metrics
 
 class InstallDataLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abortCB) {
   private val config = InstallDataLaneConfig(vdiConfig)
@@ -48,7 +48,7 @@ class InstallDataLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule
     val kc = requireKafkaConsumer(config.eventChannel, config.consumerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val wp = WorkerPool.create<InstallDataLane>(config.jobQueueSize, config.workerPoolSize) {
-      Metrics.queueSize.inc(it.toDouble())
+      InstallMetrics.queueSizeGauge().inc(it.toDouble())
     }
 
     coroutineScope {
@@ -236,7 +236,9 @@ class InstallDataLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule
 
       val status = appDB.selectDatasetInstallMessage(datasetID, InstallType.Data)
 
-      timer = Metrics.duration.labels(dataset.type.name.toString(), dataset.type.version).startTimer()
+      timer = InstallMetrics.durationHistogram()
+        .labels(dataset.type.name.toString(), dataset.type.version)
+        .startTimer()
 
       if (status == null) {
         var race = false
@@ -271,7 +273,9 @@ class InstallDataLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule
 
       return try {
         plugin.client.postInstallData(eventID, datasetID, target, meta, manifest, data, dataPropFiles).use { response ->
-          Metrics.count.labels(dataset.type.name.toString(), dataset.type.version, response.status.code.toString()).inc()
+          InstallMetrics.installCounter()
+            .labels(dataset.type.name.toString(), dataset.type.version, response.status.code.toString())
+            .inc()
 
           when (response) {
             is SuccessWithWarningsResponse -> {

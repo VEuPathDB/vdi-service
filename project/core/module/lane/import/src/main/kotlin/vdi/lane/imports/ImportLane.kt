@@ -16,6 +16,7 @@ import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.initializeDataset
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.withTransaction
+import vdi.core.metrics.ImportMetrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
 import vdi.core.plugin.client.PluginException
@@ -34,7 +35,6 @@ import vdi.model.DatasetMetaFilename
 import vdi.model.DatasetUploadStatus
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetManifest
-import vdi.core.metrics.Metrics.Import as Metrics
 import vdi.io.plugin.responses.ValidationResponse as ValidationBody
 
 class ImportLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abortCB) {
@@ -50,7 +50,7 @@ class ImportLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abor
     val dm = requireDatasetManager(config.s3Config, BucketName(config.s3Bucket))
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
     val wp = WorkerPool.create<ImportLane>(config.jobQueueSize, config.workerCount) {
-      Metrics.queueSize.inc(it.toDouble())
+      ImportMetrics.queueSizeGauge().inc(it.toDouble())
     }
 
     coroutineScope {
@@ -116,7 +116,7 @@ class ImportLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abor
     // Load the dataset metadata from S3
     val datasetMeta = datasetDir.getMetaFile().load()!!
 
-    val timer = Metrics.duration
+    val timer = ImportMetrics.durationHistogram()
       .labels(datasetMeta.type.name.toString(), datasetMeta.type.version)
       .startTimer()
 
@@ -181,7 +181,9 @@ class ImportLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(abor
           .open()!!
           .use { plugin.client.postImport(eventID, datasetID, meta, it) }
           .use { result ->
-            Metrics.count.labels(meta.type.name.toString(), meta.type.version, result.status.code.toString()).inc()
+            ImportMetrics.importCounter()
+              .labels(meta.type.name.toString(), meta.type.version, result.status.code.toString())
+              .inc()
 
             when (result) {
               is StreamSuccessResponse   -> handleImportSuccessResult(result)

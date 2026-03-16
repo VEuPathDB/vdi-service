@@ -12,13 +12,13 @@ class DatabaseDependency(
   private val connection: TargetDatabaseReference,
   extra: Map<String, Any> = emptyMap(),
 ): StaticDependency(
-  name     = connection.identifier,
-  protocol = "",
-  host     = connection.details.server.host,
-  port     = connection.details.server.port,
-  extra    = extra.appendDbInfo(connection.details, connection.dataSource as HikariDataSource),
+  /*name     =*/ connection.identifier,
+  /*protocol =*/ "",
+  /*host     =*/ connection.details.server.host,
+  /*port     =*/ connection.details.server.port.toInt(),
+  /*extra    =*/ extra.appendDbInfo(connection.details, connection.dataSource as HikariDataSource),
 ) {
-  override fun checkStatus() =
+  override fun checkStatus(): Dependency.Status =
     when (connection.details.platform) {
       TargetDBPlatform.Postgres -> pgStatus()
       TargetDBPlatform.Oracle   -> oraStatus()
@@ -31,10 +31,10 @@ class DatabaseDependency(
   private fun runQuery(query: String) =
     try {
       connection.dataSource.connection.use { c -> c.createStatement().use { s -> s.execute(query) } }
-      Dependency.Status.Ok
+      Dependency.Status.OK
     } catch (e: Throwable) {
       LoggerFactory.getLogger(javaClass).error("postgres database healthcheck failed", e)
-      Dependency.Status.NotOk
+      Dependency.Status.NOT_OK
     }
 }
 

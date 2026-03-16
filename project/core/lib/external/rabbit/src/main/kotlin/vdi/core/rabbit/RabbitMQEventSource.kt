@@ -7,7 +7,7 @@ import kotlin.time.Duration.Companion.seconds
 import vdi.core.async.SuspendingSequence
 import vdi.core.health.RemoteDependencies
 import vdi.logging.logger
-import vdi.core.metrics.Metrics
+import vdi.core.metrics.RabbitMetrics
 import vdi.model.field.HostAddress
 
 private const val MaxConnectionRetries = 5
@@ -23,9 +23,9 @@ class RabbitMQEventSource<T : Any>(private val config: RabbitMQConfig, mappingFu
       synchronized(knownHosts) {
         if (address !in knownHosts) {
           knownHosts.add(address)
-          RemoteDependencies.register("RabbitMQ ${address.host}", address.host, address.port) {
-            if (Metrics.RabbitMQ.lastMessageReceived > 0)
-              mapOf("lastMessage" to (System.currentTimeMillis() - Metrics.RabbitMQ.lastMessageReceived).milliseconds.toString())
+          RemoteDependencies.register("RabbitMQ ${address.host}", address.host, address.port.toInt(), "") {
+            if (RabbitMetrics.getLastMessageReceived() > 0)
+              mapOf("lastMessage" to (System.currentTimeMillis() - RabbitMetrics.getLastMessageReceived()).milliseconds.toString())
             else
               mapOf("lastMessage" to "n/a")
           }

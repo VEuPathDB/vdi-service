@@ -13,7 +13,7 @@ import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.purgeDataset
 import vdi.core.db.cache.withTransaction
-import vdi.core.metrics.Metrics
+import vdi.core.metrics.PrunerMetrics
 import vdi.core.s3.DatasetObjectStore
 import vdi.core.s3.files.FileName
 import vdi.core.s3.paths.DataFilePath
@@ -155,9 +155,9 @@ object Pruner {
           PrunableState.Obsoleted   -> runPruneObsolete(bucket, it)
           PrunableState.NotPrunable -> throw IllegalStateException("somehow got state ${it.state} in deletion loop")
         }
-        Metrics.Pruner.count.inc()
+        PrunerMetrics.successCounter().inc()
       } catch (e: Throwable) {
-        Metrics.Pruner.failed.inc()
+        PrunerMetrics.failedCounter().inc()
         it.logger.error("pruning failed", e)
       }
     }
@@ -224,7 +224,7 @@ object Pruner {
     // Log an error and mark the dataset as not prunable for future
     // investigation.
     if (!dir.exists()) {
-      Metrics.Pruner.conflict.inc()
+      PrunerMetrics.conflictCounter().inc()
       logger.error("dataset has records in the cache db but has been deleted from the object store")
       state = PrunableState.NotPrunable
       return
@@ -245,7 +245,7 @@ object Pruner {
 
     // If the dataset does not have a deleted flag
     if (!dir.hasDeleteFlag()) {
-      Metrics.Pruner.conflict.inc()
+      PrunerMetrics.conflictCounter().inc()
       logger.error("dataset is marked as deleted in the cache db but does" +
       " not have a deleted or revised flag in the object store")
 

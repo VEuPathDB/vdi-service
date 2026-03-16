@@ -2,7 +2,7 @@ package vdi.daemon.pruner
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import vdi.core.metrics.Metrics
+import vdi.core.metrics.PrunerMetrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractJobExecutor
 import vdi.core.pruner.Pruner
@@ -31,7 +31,7 @@ internal class DatasetPrunerImpl(private val config: DatasetPrunerConfig, abortC
 
       val end: Duration
 
-      val timer = Metrics.Pruner.duration.startTimer()
+      val timer = PrunerMetrics.durationHistogram().startTimer()
 
       // Attempt to start a pruning job.  If the pruning job executed, this
       // function call will return true after pruning completion.  If a

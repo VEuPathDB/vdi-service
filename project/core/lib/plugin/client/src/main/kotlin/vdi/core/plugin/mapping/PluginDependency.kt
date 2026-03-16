@@ -10,22 +10,26 @@ import vdi.logging.logger
 import vdi.util.fn.leftOr
 
 internal class PluginDependency(
-  name: String,
-  override val host: String,
-  override val port: UShort,
+  private val name: String,
+  private val host: String,
+  private val port: UShort,
   private val client: PluginHandlerClient,
 ): Dependency {
+  private var extra = emptyMap<String, Any?>()
+
   private companion object {
     val Logger = logger<PluginDependency>()
   }
 
-  override val name = "Plugin $name"
+  override fun getName(): String = "Plugin $name"
 
-  override val protocol: String
-    get() = "http"
+  override fun getProtocol(): String = "http"
 
-  override var extra: Map<String, String> = emptyMap()
-    private set
+  override fun getHost(): String = host
+
+  override fun getPort(): Int = port.toInt()
+
+  override fun getExtraFields(): Map<String, Any?> = extra
 
   override fun checkStatus(): Dependency.Status {
     extra = emptyMap()
@@ -34,11 +38,11 @@ internal class PluginDependency(
       runBlocking { client.getServerInfo() }
         .leftOr {
           Logger.error("plugin {} server returned server error {}", name, it.body.message)
-          return Dependency.Status.NotOk
+          return Dependency.Status.NOT_OK
         }
     } catch (e: Throwable) {
       Logger.error("failed to fetch plugin server info for plugin {}", name, e)
-      return Dependency.Status.NotOk
+      return Dependency.Status.NOT_OK
     }
 
     extra = JSON.convertValue(response.manifest)
@@ -50,12 +54,12 @@ internal class PluginDependency(
 
     return when (tag) {
       null, // dev build
-      response.manifest.gitTag -> Dependency.Status.Ok
+      response.manifest.gitTag -> Dependency.Status.OK
 
       else -> {
         extra += "error" to "core server version does not match plugin server version: core = $tag, plugin = ${response.manifest.gitTag}"
 
-        Dependency.Status.NotOk
+        Dependency.Status.NOT_OK
       }
     }
   }

@@ -13,7 +13,7 @@ private fun init(servers: Iterable<HostAddress>) {
     for (server in servers) {
       if (server !in knownServers) {
         knownServers.add(server)
-        RemoteDependencies.register("Kafka $server", server.host, server.port)
+        RemoteDependencies.register("Kafka $server", server.host, server.port.toInt(), "", { emptyMap<String, Any>() })
       }
     }
   }

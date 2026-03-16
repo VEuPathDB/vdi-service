@@ -39,8 +39,8 @@ internal object CacheDBImpl: CacheDB, CacheDBImplBase() {
   init {
     RemoteDependencies.register(DatabaseDependency(this).also {
       when (it.checkStatus()) {
-        Dependency.Status.NotOk,
-        Dependency.Status.Unknown -> throw StartupException("could not connect to cache db")
+        Dependency.Status.NOT_OK,
+        Dependency.Status.UNKNOWN -> throw StartupException("could not connect to cache db")
         else                      -> {}
       }
     })

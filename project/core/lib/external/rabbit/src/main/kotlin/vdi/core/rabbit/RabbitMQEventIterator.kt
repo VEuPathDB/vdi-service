@@ -6,7 +6,7 @@ import kotlin.time.Duration
 import vdi.core.async.SuspendingIterator
 import vdi.core.async.Trigger
 import vdi.logging.logger
-import vdi.core.metrics.Metrics
+import vdi.core.metrics.RabbitMetrics
 
 private const val MAX_LOGGABLE_MESSAGE_SIZE_BYTES = 1024 * 16
 
@@ -33,10 +33,10 @@ class RabbitMQEventIterator<T>(
       if (res != null) {
         try {
           nextValue = mappingFunction(res.body)
-          Metrics.RabbitMQ.lastMessageReceived = System.currentTimeMillis()
+          RabbitMetrics.setLastMessageReceived(System.currentTimeMillis())
           return true
         } catch (e: Throwable) {
-          Metrics.RabbitMQ.unparseableRabbitMessage.inc()
+          RabbitMetrics.unparseableRabbitMessageCounter().inc()
           log.error("message from RabbitMQ could not be parsed as a MinIO event", e)
 
           if (res.body.size <= MAX_LOGGABLE_MESSAGE_SIZE_BYTES)

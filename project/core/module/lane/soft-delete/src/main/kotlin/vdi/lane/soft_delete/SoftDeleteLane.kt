@@ -8,7 +8,6 @@ import vdi.core.db.app.AppDB
 import vdi.core.db.app.AppDatabaseRegistry
 import vdi.core.db.app.model.DeleteFlag
 import vdi.core.db.app.withTransaction
-import vdi.core.metrics.Metrics
 import vdi.core.util.orElse
 import vdi.core.async.WorkerPool
 import vdi.core.config.vdi.VDIConfig
@@ -16,6 +15,7 @@ import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.model.DatasetImportStatus
 import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.db.cache.withTransaction
+import vdi.core.metrics.UninstallMetrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
 import vdi.core.plugin.client.PluginException
@@ -37,7 +37,7 @@ class SoftDeleteLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.kafkaConfig)
     val wp = WorkerPool.create<SoftDeleteLane>(config.jobQueueSize, config.workerCount) {
-      Metrics.softDeleteQueueSize.inc(it.toDouble())
+      UninstallMetrics.queueSizeGauge().inc(it.toDouble())
     }
 
     coroutineScope {
@@ -74,7 +74,7 @@ class SoftDeleteLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(
     // of whether the uninstalls from the dataset's install targets succeed.
     cacheDB.withTransaction { it.updateDatasetDeleted(datasetID, true) }
 
-    val timer = Metrics.Uninstall.duration
+    val timer = UninstallMetrics.durationHistogram()
       .labels(internalDBRecord.type.name.toString(), internalDBRecord.type.version)
       .startTimer()
 
@@ -129,7 +129,9 @@ class SoftDeleteLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(
       throw PluginRequestException.uninstall(handler.name, installTarget, ownerID, datasetID, cause = e)
     }
 
-    Metrics.Uninstall.count.labels(record.type.name.toString(), record.type.version, response.status.code.toString()).inc()
+    UninstallMetrics.uninstallCounter()
+      .labels(record.type.name.toString(), record.type.version, response.status.code.toString())
+      .inc()
 
     when (response) {
       is EmptySuccessResponse -> handleSuccessResponse(handler, installTarget)

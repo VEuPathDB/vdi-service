@@ -26,9 +26,9 @@ internal class DependencySource : DependencySource {
 }
 
 private fun VDep.Status.toCoreStatus() = when (this) {
-  VDep.Status.Ok -> Status.ONLINE
-  VDep.Status.NotOk -> Status.OFFLINE
-  VDep.Status.Unknown -> Status.UNKNOWN
+  VDep.Status.OK -> Status.ONLINE
+  VDep.Status.NOT_OK -> Status.OFFLINE
+  VDep.Status.UNKNOWN -> Status.UNKNOWN
 }
 
 private class RemoteDependency(private val raw: VDep) : ExternalDependency(raw.name) {
@@ -36,8 +36,8 @@ private class RemoteDependency(private val raw: VDep) : ExternalDependency(raw.n
   override fun test(): TestResult {
     logger().info("Checking health for external dependency {}", this.name)
     val status = raw.checkStatus().toCoreStatus()
-    val reachable = (status == Status.UNKNOWN && pinger.isReachable(raw.host, raw.port.toInt()))
+    val reachable = (status == Status.UNKNOWN && pinger.isReachable(raw.host, raw.port))
       || status == Status.ONLINE
-    return TestResult(this, reachable, status, raw.extra)
+    return TestResult(this, reachable, status, raw.extraFields)
   }
 }

@@ -21,7 +21,7 @@ import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.initializeDataset
 import vdi.core.db.cache.withTransaction
 import vdi.core.kafka.EventSource
-import vdi.core.metrics.Metrics
+import vdi.core.metrics.UpdateMetaMetrics
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
 import vdi.core.plugin.client.PluginException
@@ -55,7 +55,7 @@ class UpdateMetaLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(
     val kc = requireKafkaConsumer(config.eventTopic, config.kafkaConsumerConfig)
     val kr = requireKafkaRouter(config.kafkaRouterConfig)
     val wp = WorkerPool.create<UpdateMetaLane>(config.jobQueueSize, config.workerCount) {
-      Metrics.updateMetaQueueSize.inc(it.toDouble())
+      UpdateMetaMetrics.queueSizeGauge().inc(it.toDouble())
     }
 
     coroutineScope {
@@ -132,7 +132,7 @@ class UpdateMetaLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(
       ?: OriginTimestamp
     logger.debug("variable properties timestamp is {}", mappingTimestamp)
 
-    val timer = Metrics.MetaUpdates.duration
+    val timer = UpdateMetaMetrics.durationHistogram()
       .labels(datasetMeta.type.name.toString(), datasetMeta.type.version)
       .startTimer()
 
@@ -239,7 +239,7 @@ class UpdateMetaLane(vdiConfig: VDIConfig, abortCB: AbortCB): AbstractVDIModule(
 
     try {
       plugin.client.postInstallMeta(eventID, datasetID, target, meta, dataPropFiles).use { result ->
-        Metrics.MetaUpdates.count.labels(
+        UpdateMetaMetrics.updateMetaCounter().labels(
           meta.type.name.toString(),
           meta.type.version,
           result.status.toString(),
