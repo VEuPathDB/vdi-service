@@ -140,7 +140,7 @@ object Pruner {
       .asSequence()
       .map(::DeletionContext)
       .onEach { it.determinePrunableState(dsm, threshold) }
-      .filterNot { it.state == PrunableState.NotPrunable }
+      .filterNot { it.state == PrunableState.NOT_PRUNABLE }
       .toList()
 
     logger.info("found {} candidates for pruning", deletable.size)
@@ -151,9 +151,9 @@ object Pruner {
 
       try {
         when (it.state) {
-          PrunableState.Deleted     -> runPruneAll(bucket, it)
-          PrunableState.Obsoleted   -> runPruneObsolete(bucket, it)
-          PrunableState.NotPrunable -> throw IllegalStateException("somehow got state ${it.state} in deletion loop")
+          PrunableState.DELETED     -> runPruneAll(bucket, it)
+          PrunableState.OBSOLETED   -> runPruneObsolete(bucket, it)
+          PrunableState.NOT_PRUNABLE -> throw IllegalStateException("somehow got state ${it.state} in deletion loop")
         }
         PrunerMetrics.successCounter().inc()
       } catch (e: Throwable) {
@@ -218,7 +218,7 @@ object Pruner {
    * @param threshold Start time for the dataset retention window.
    */
   private fun DeletionContext.determinePrunableState(dos: DatasetObjectStore, threshold: OffsetDateTime) {
-    val dir = dos.getDatasetDirectory(ownerID, datasetID)
+    val dir = dos.getDatasetDirectory(ownerId, datasetID)
 
     // If the directory doesn't exist, then it has already been deleted.
     // Log an error and mark the dataset as not prunable for future
@@ -226,7 +226,7 @@ object Pruner {
     if (!dir.exists()) {
       PrunerMetrics.conflictCounter().inc()
       logger.error("dataset has records in the cache db but has been deleted from the object store")
-      state = PrunableState.NotPrunable
+      state = PrunableState.NOT_PRUNABLE
       return
     }
 
@@ -234,12 +234,12 @@ object Pruner {
     if (dir.hasRevisedFlag()) {
       // And that revised flag is outside the retention window
       if (dir.getRevisedFlag().lastModified()!!.isBefore(threshold)) {
-        state = PrunableState.Obsoleted
+        state = PrunableState.OBSOLETED
         return
       }
 
       // And that revised flag is within the retention window
-      state = PrunableState.NotPrunable
+      state = PrunableState.NOT_PRUNABLE
       return
     }
 
@@ -249,18 +249,18 @@ object Pruner {
       logger.error("dataset is marked as deleted in the cache db but does" +
       " not have a deleted or revised flag in the object store")
 
-      state = PrunableState.NotPrunable
+      state = PrunableState.NOT_PRUNABLE
       return
     }
 
     // If the deletion flag is outside the retention window
     if (dir.getDeleteFlag().lastModified()!!.isBefore(threshold)) {
-      state = PrunableState.Deleted
+      state = PrunableState.DELETED
       return
     }
 
     // Not yet old enough to prune
-    state = PrunableState.NotPrunable
+    state = PrunableState.NOT_PRUNABLE
   }
 
   // region Shared Pruning Functionality
@@ -331,7 +331,7 @@ object Pruner {
 
       ctx.safely("failed to remove obsolete revision {} data from object store", revision.revisionID) {
         ctx.logger.info("removing obsolete revision data for {} from object store", revision.revisionID)
-        bucket.pruneAllObjects(ctx.ownerID, revision.revisionID)
+        bucket.pruneAllObjects(ctx.ownerId, revision.revisionID)
       }
     }
   }
@@ -345,7 +345,7 @@ object Pruner {
    */
   private fun S3Bucket.pruneAllObjects(ctx: DeletionContext) {
     ctx.logger.debug("deleting dataset from object store")
-    pruneAllObjects(ctx.ownerID, ctx.datasetID)
+    pruneAllObjects(ctx.ownerId, ctx.datasetID)
   }
 
   /**
@@ -415,7 +415,7 @@ object Pruner {
   private fun S3Bucket.pruneObsoleteRevision(ctx: DeletionContext) {
     ctx.logger.debug("removing unnecessary object store data")
 
-    objects.list(prefix = S3Paths.datasetDir(ctx.ownerID, ctx.datasetID))
+    objects.list(prefix = S3Paths.datasetDir(ctx.ownerId, ctx.datasetID))
       .asSequence()
       .map { it.path }
       .filterNot { path -> retainedRevisionHistoryFiles.any { it(path) } }
@@ -424,5 +424,8 @@ object Pruner {
   }
 
   // endregion Prune Obsolete Revision
+
+  private inline val DeletionContext.datasetID
+    get() = dataset.datasetID
 }
 

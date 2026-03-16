@@ -10,4 +10,6 @@ data class DeletedDataset(
   val ownerID: UserID,
   val projects: List<InstallTargetID>,
   val dataType: DatasetType,
-)
+) {
+  fun getDatasetIdString() = datasetID.asString
+}
