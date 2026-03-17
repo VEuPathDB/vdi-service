@@ -29,90 +29,14 @@ endif::[]
 === Documentation & Schema
 
 Service configuration and REST API documentation in addition to JSON schema
-files to be used with smart editor validation & autocomplete.
+files are generated on commit and tag, then published to GitHub pages.
 
-[NOTE]
---
-Documentation is maintained by version starting with the v1.7.0 release. The
-docs for specific tags may be referenced by replacing the version reference or
-'latest' in the doc url with the desired tag:
-
-[source, subs=attributes]
-{docs-root}/{SERVICE_TAG}/...
---
-
-==== Latest Commit
-
-.Docs
-* {latest-docs}/core/[HTTP API]
-* {latest-docs}/schema/config/full-config.html[Full Stack Config]
-* {latest-docs}/schema/config/plugin-config.html[Plugin Config]
-
-.Schema
-* {latest-docs}/schema/config/full-config.json[Service Stack Configuration Schema]
-* {latest-docs}/schema/config/plugin-config.json[Plugin-Specific Configuration Schema] +
-  (a subset of the full config schema)
-
-==== Latest Release
-
-...
+link:https://veupathdb.github.io/vdi-service/[*Published Documentation Index*]
 
 
 == Operation
 
-=== Logging
-
-==== Log Format
-
-VDI's logging includes structured key/value pairs with log-line-specific data to
-be used in filtering the logs to only lines relevant to a specific task.
-
-The keys are constants link:/project/common/logging/src/main/kotlin/vdi/logging/extensions.kt[defined here].
-
-[NOTE]
-The key/value pairs will always appear in ascending order by key.
-
-[%header,cols="1m,9a"]
-|===
-| Key | Meaning
-| D   | VDI **D**ataset ID
-| E   | Unique **E**vent ID
-| I   | Plugin name, or **I**nstaller
-| O   | Dataset **O**wner user ID
-| P   | **P**roject ID
-| R   | **R**equest ID
-| S   | Plugin **S**cript name
-| T   | Data **T**ype name
-| U   | Request **U**RI
-| W   | **W**orker identifier
-|===
-
-.Example Usage
-[%nowrap, source, shell]
-----
-# Trace an event through the system
-grep -R "E=<EVENT_ID>"
-
-# Trace a specific dataset ID
-grep -R "D=<DATASET_ID>"
-
-# Trace a specific request
-grep -R "R=<REQUEST_ID>"
-
-# Filter by user & project
-grep -R "O=<USER_ID> P=<PROJECT_ID>"
-----
-
-==== Event IDs
-
-VDI is an event driven asynchronous system where a single event can result in
-actions across multiple services.  To help trace the path and results of an
-event, a numeric ID is assigned to each event that will follow the processing of
-that event through each part of the core VDI service and plugin services.
-
-[CAUTION]
-Event IDs may not be issued for requests.  In those cases, the request ID is the
-intended filter field.
+* link:docs/logging.md[Logging]
 
 
 == Development
