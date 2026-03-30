@@ -18,6 +18,7 @@ import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.resources.DatasetsVdiId.PatchDatasetsByVdiIdResponse
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.inputs.JsonSchema
 import vdi.service.rest.server.inputs.applyPatch
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.hasSomethingToUpdate
@@ -81,8 +82,9 @@ private fun DatasetPatchRequestBody.validateAndApply(
 
   if (validators.isNotEmpty()) {
     val serialized = JSON.convertValue<ObjectNode>(newMetadata)
+
     for (schema in validators) {
-      serialized.validate(schema, errors)
+      JsonSchema.validate(serialized, schema, errors)
     }
   }
 

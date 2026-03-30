@@ -13,8 +13,8 @@ import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
 import vdi.service.rest.server.controllers.ControllerBase
+import vdi.service.rest.server.inputs.JsonSchema
 import vdi.service.rest.server.inputs.toDatasetMeta
-import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.DatasetPostResponseBody
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.outputs.wrap
@@ -39,7 +39,7 @@ fun ControllerBase.createDataset(
 
       targets.forEach {
         logger.debug("applying additional schema validation from install target {}", it.name)
-        json.validate(it.metaValidation!!, validationErrors)
+        JsonSchema.validate(json, it.metaValidation, validationErrors)
       }
 
       if (validationErrors.isNotEmpty)
