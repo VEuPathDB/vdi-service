@@ -77,18 +77,21 @@ jobs:
           $DOC_BUILD_DIR/schema/config/plugin-config.json \
           $DOC_BUILD_DIR/schema/config/plugin-config.html
 
+    - name: Copy Index Template
+      run: cp docs/content/docs-index.html index.tpl
+
     - name: Checkout Docs Branch
       uses: actions/checkout@v4
       with:
         clean: 'false'
         ref: gh-pages
 
-#    - name: Generate Doc Index
-#      run: >-
-#        sed '1,/<\/dd>/!d' docs/content/docs-index.html > index.html
-#        PATTERN="$(sed '1,/<!/d;1,/\/dd/!d' docs/content/docs-index.html)"
-#        for i in `find . -maxdepth 1 -type d -name 'v*' -printf '%P '`; do echo $PATTERN | VERSION=$i envsubst >> index.html; done;
-#        sed '1,/-->/d' docs/content/docs-index.html >> index.html;
+    - name: Generate Doc Index
+      run: >-
+        sed '1,/<\/dd>/!d' index.tpl > index.html;
+        export PATTERN="$(sed '1,/<!/d;1,/\/dd/!d' index.tpl)";
+        for i in `find . -maxdepth 1 -type d -name 'v*' -printf '%P '`; do echo $PATTERN | VERSION=$i envsubst >> index.html; done;
+        sed '1,/-->/d' index.tpl >> index.html;
 
     - name: Copy & Commit Docs
       run: >-
@@ -97,6 +100,7 @@ jobs:
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com";
         git config --local user.name "github-actions[bot]";
         git add ${{ env.PUBLISH_DIR }};
+        git add index.html;
         git commit -m "create/update ${{ env.PUBLISH_DIR }}";
 
     - name: Push Docs

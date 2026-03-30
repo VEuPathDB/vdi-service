@@ -1,7 +1,7 @@
 [versions]
-jackson = "2.21.1"
-kotlin = "2.3.10"
-ktor = "3.4.1"
+jackson = "2.21.2"
+kotlin = "2.3.20"
+ktor = "3.4.2"
 log4j = "2.25.3"
 slf4j = "2.0.17"
 
@@ -10,7 +10,7 @@ junit = "6.0.3"
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-shadow = { id = "com.gradleup.shadow", version = "9.3.2" }
+shadow = { id = "com.gradleup.shadow", version = "9.4.1" }
 
 vpdb = { id = "org.veupathdb.lib.gradle.container.container-utils", version = "6.4.2" }
 
@@ -60,7 +60,7 @@ ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "k
 ktor-server-metrics = { module = "io.ktor:ktor-server-metrics-micrometer", version.ref = "ktor" }
 
 metrics-micrometer = { group = "io.micrometer", name = "micrometer-registry-prometheus", version = "1.16.4" }
-metrics-prometheus = { group = "io.prometheus", name = "prometheus-metrics-tracer-initializer", version = "1.5.0" }
+metrics-prometheus = { group = "io.prometheus", name = "prometheus-metrics-tracer-initializer", version = "1.5.1" }
 
 
 #
@@ -114,7 +114,7 @@ junit-launcher = { module = "org.junit.platform:junit-platform-launcher", versio
 # Mockito
 mockito-core   = { module = "org.mockito:mockito-core",          version.ref = "mockito" }
 mockito-junit  = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version = "6.2.3"  }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version = "6.3.0"  }
 
 [bundles]
 jackson = [
