@@ -13,7 +13,8 @@ public final class JsonSchema {
 
     for (var error : result) {
       var location = error.getInstanceLocation().toString();
-      var path = location.replaceAll("\\$|^/|^#/", "");
+      var path = location.replaceAll("\\$|^/|^#/", "")
+        .replaceAll("/", ".");
 
       if (error.getProperty() != null) {
         path = location.isEmpty() ? error.getProperty() : String.format("%s.%s", path, error.getProperty());
