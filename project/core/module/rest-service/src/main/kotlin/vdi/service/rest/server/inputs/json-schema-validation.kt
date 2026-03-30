@@ -19,7 +19,7 @@ fun ObjectNode.validate(schema: Schema, errors: ValidationErrors) {
 
   result.forEach { msg ->
     val path = when (val loc = msg.instanceLocation.toString()) {
-      "$"  -> ""
+      "", "$"  -> ""
       else -> loc.substring(2)
     }.let {
       if (msg.property != null)
