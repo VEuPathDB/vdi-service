@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "externalIdentifiers",
     "funding",
     "shortAttribution",
+    "daysForApproval",
+    "dataDisclaimer",
     "origin",
     "revisionNote"
 })
@@ -73,6 +75,12 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
 
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   private OptionalStringPatch shortAttribution;
+
+  @JsonProperty(JsonField.DAYS_FOR_APPROVAL)
+  private OptionalIntPatch daysForApproval;
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  private OptionalStringPatch dataDisclaimer;
 
   @JsonProperty(JsonField.ORIGIN)
   private String origin;
@@ -238,6 +246,26 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   public void setShortAttribution(OptionalStringPatch shortAttribution) {
     this.shortAttribution = shortAttribution;
+  }
+
+  @JsonProperty(JsonField.DAYS_FOR_APPROVAL)
+  public OptionalIntPatch getDaysForApproval() {
+    return this.daysForApproval;
+  }
+
+  @JsonProperty(JsonField.DAYS_FOR_APPROVAL)
+  public void setDaysForApproval(OptionalIntPatch daysForApproval) {
+    this.daysForApproval = daysForApproval;
+  }
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  public OptionalStringPatch getDataDisclaimer() {
+    return this.dataDisclaimer;
+  }
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  public void setDataDisclaimer(OptionalStringPatch dataDisclaimer) {
+    this.dataDisclaimer = dataDisclaimer;
   }
 
   @JsonProperty(JsonField.ORIGIN)

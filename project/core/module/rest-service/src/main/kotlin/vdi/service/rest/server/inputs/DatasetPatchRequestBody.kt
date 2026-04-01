@@ -110,7 +110,6 @@ private inline fun <T: Any> T?.requireAnd(jPath: String, errors: ValidationError
     validator(this)
 }
 
-
 internal fun DatasetPatchRequestBody.applyPatch(
   original:        DatasetMetadata,
   revisionHistory: DatasetRevisionHistory? = original.revisionHistory,
@@ -137,8 +136,10 @@ internal fun DatasetPatchRequestBody.applyPatch(
     linkedDatasets       = linkedDatasets.unsafePatch(original.linkedDatasets, Iterable<LinkedDataset>::toInternal),
     experimentalOrganism = experimentalOrganism.unsafePatch(original.experimentalOrganism),
     hostOrganism         = hostOrganism.unsafePatch(original.hostOrganism),
-    studyCharacteristics      = studyCharacteristics.applyPatch(original.studyCharacteristics),
+    studyCharacteristics = studyCharacteristics.applyPatch(original.studyCharacteristics),
     funding              = funding.unsafePatch(original.funding, Iterable<DatasetFundingAward>::toInternal),
+    dataDisclaimer       = dataDisclaimer.unsafePatch(original.dataDisclaimer),
+    daysForApproval      = daysForApproval.unsafePatch(original.daysForApproval) { it: Int? -> it ?: -1 }
   )
 
 fun DatasetTypePatch.toInternal() = DatasetType(DataType.of(value.name), value.version)

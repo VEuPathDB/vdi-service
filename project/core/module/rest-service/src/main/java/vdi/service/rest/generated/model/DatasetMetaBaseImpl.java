@@ -23,7 +23,9 @@ import java.util.List;
     "studyCharacteristics",
     "externalIdentifiers",
     "funding",
-    "shortAttribution"
+    "shortAttribution",
+    "daysForApproval",
+    "dataDisclaimer"
 })
 public class DatasetMetaBaseImpl implements DatasetMetaBase {
   @JsonProperty(JsonField.INSTALL_TARGETS)
@@ -76,6 +78,15 @@ public class DatasetMetaBaseImpl implements DatasetMetaBase {
 
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   private String shortAttribution;
+
+  @JsonProperty(
+      value = JsonField.DAYS_FOR_APPROVAL,
+      defaultValue = "-1"
+  )
+  private Integer daysForApproval;
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  private String dataDisclaimer;
 
   @JsonProperty(JsonField.INSTALL_TARGETS)
   public List<String> getInstallTargets() {
@@ -245,5 +256,31 @@ public class DatasetMetaBaseImpl implements DatasetMetaBase {
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   public void setShortAttribution(String shortAttribution) {
     this.shortAttribution = shortAttribution;
+  }
+
+  @JsonProperty(
+      value = JsonField.DAYS_FOR_APPROVAL,
+      defaultValue = "-1"
+  )
+  public Integer getDaysForApproval() {
+    return this.daysForApproval;
+  }
+
+  @JsonProperty(
+      value = JsonField.DAYS_FOR_APPROVAL,
+      defaultValue = "-1"
+  )
+  public void setDaysForApproval(Integer daysForApproval) {
+    this.daysForApproval = daysForApproval;
+  }
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  public String getDataDisclaimer() {
+    return this.dataDisclaimer;
+  }
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  public void setDataDisclaimer(String dataDisclaimer) {
+    this.dataDisclaimer = dataDisclaimer;
   }
 }

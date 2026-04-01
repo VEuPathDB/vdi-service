@@ -29,6 +29,7 @@ public final class JsonField {
   public static final String CREATED_ON = "createdOn";
   public static final String DAEMONS = "daemons";
   public static final String DATA = "data";
+  public static final String DATA_DISCLAIMER = "dataDisclaimer";
   public static final String DATA_FILE = "dataFile";
   public static final String DATA_PROPERTIES_FILE = "dataPropertiesFile";
   public static final String DATA_TYPES = "dataTypes";
@@ -36,6 +37,7 @@ public final class JsonField {
   public static final String DATASET_ID = "datasetId";
   public static final String DATASET_TYPE = "datasetType";
   public static final String DATASET_URI = "datasetUri";
+  public static final String DAYS_FOR_APPROVAL = "daysForApproval";
   public static final String DEPENDENCIES = "dependencies";
   public static final String DEPENDENCY = "dependency";
   public static final String DESCRIPTION = "description";

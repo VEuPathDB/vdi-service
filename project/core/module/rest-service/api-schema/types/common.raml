@@ -323,6 +323,12 @@ types:
         uniqueItems: true
       shortAttribution?: ShortAttribution
       # revisionHistory: (only present in response types)
+      daysForApproval?:
+        type: integer
+        minimum: -1
+        maximum: 365
+        default: -1
+      dataDisclaimer?: string
     additionalProperties: false
 
   DatasetName:

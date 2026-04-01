@@ -27,6 +27,8 @@ import java.util.List;
     "externalIdentifiers",
     "funding",
     "shortAttribution",
+    "daysForApproval",
+    "dataDisclaimer",
     "datasetId",
     "type",
     "visibility",
@@ -91,6 +93,15 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   private String shortAttribution;
+
+  @JsonProperty(
+      value = JsonField.DAYS_FOR_APPROVAL,
+      defaultValue = "-1"
+  )
+  private Integer daysForApproval;
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  private String dataDisclaimer;
 
   @JsonProperty(JsonField.DATASET_ID)
   private String datasetId;
@@ -296,6 +307,32 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   public void setShortAttribution(String shortAttribution) {
     this.shortAttribution = shortAttribution;
+  }
+
+  @JsonProperty(
+      value = JsonField.DAYS_FOR_APPROVAL,
+      defaultValue = "-1"
+  )
+  public Integer getDaysForApproval() {
+    return this.daysForApproval;
+  }
+
+  @JsonProperty(
+      value = JsonField.DAYS_FOR_APPROVAL,
+      defaultValue = "-1"
+  )
+  public void setDaysForApproval(Integer daysForApproval) {
+    this.daysForApproval = daysForApproval;
+  }
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  public String getDataDisclaimer() {
+    return this.dataDisclaimer;
+  }
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  public void setDataDisclaimer(String dataDisclaimer) {
+    this.dataDisclaimer = dataDisclaimer;
   }
 
   @JsonProperty(JsonField.DATASET_ID)

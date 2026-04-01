@@ -578,6 +578,12 @@ types:
         type: DatasetFundingAward[]
         uniqueItems: true
       shortAttribution?: ShortAttribution
+      daysForApproval?:
+        type: integer
+        default: -1
+        minimum: -1
+        maximum: 365
+      dataDisclaimer?: string
   DatasetName:
     displayName: Dataset Name
     description: User-provided name for the dataset.
@@ -638,6 +644,8 @@ types:
       externalIdentifiers?: ExternalIdentifiersPatch
       funding?: FundingPatch
       shortAttribution?: OptionalStringPatch
+      daysForApproval?: OptionalIntPatch
+      dataDisclaimer?: OptionalStringPatch
   DatasetPostMeta:
     type: DatasetMetaBase
     additionalProperties: false
@@ -647,7 +655,7 @@ types:
         type: DatasetVisibility
         default: "private"
   DatasetPostRequestBody:
-    displayName: Dataset Post Request
+    displayName: Dataset POST Body
     description: |-
       HTTP POST request body requesting the creation of a dataset from the
       components included in the request.
@@ -1157,6 +1165,11 @@ types:
     example:
       status: not-found
       message: the requested resource could not be found
+  OptionalIntPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value?: integer
   OptionalStringPatch:
     type: object
     additionalProperties: false

@@ -35,6 +35,8 @@ types:
       externalIdentifiers?: ExternalIdentifiersPatch
       funding?: FundingPatch
       shortAttribution?: OptionalStringPatch
+      daysForApproval?: OptionalIntPatch
+      dataDisclaimer?: OptionalStringPatch
 
   ContactsPatch:
     # language=markdown
@@ -49,6 +51,12 @@ types:
     type: object
     properties:
       value?: string
+    additionalProperties: false
+
+  OptionalIntPatch:
+    type: object
+    properties:
+      value?: integer
     additionalProperties: false
 
   DatasetCharacteristicsPatch:

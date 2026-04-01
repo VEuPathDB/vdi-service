@@ -109,4 +109,22 @@ public interface DatasetMetaBase {
 
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   void setShortAttribution(String shortAttribution);
+
+  @JsonProperty(
+      value = JsonField.DAYS_FOR_APPROVAL,
+      defaultValue = "-1"
+  )
+  Integer getDaysForApproval();
+
+  @JsonProperty(
+      value = JsonField.DAYS_FOR_APPROVAL,
+      defaultValue = "-1"
+  )
+  void setDaysForApproval(Integer daysForApproval);
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  String getDataDisclaimer();
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  void setDataDisclaimer(String dataDisclaimer);
 }

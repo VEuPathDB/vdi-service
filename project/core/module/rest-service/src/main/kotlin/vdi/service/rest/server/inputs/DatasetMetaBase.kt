@@ -2,6 +2,7 @@
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.checkInRange
 import org.veupathdb.lib.request.validation.checkLength
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.reqCheckLength
@@ -52,4 +53,5 @@ fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
   externalIdentifiers?.validate(JsonField.META..JsonField.EXTERNAL_IDENTIFIERS, errors)
   funding.validate(JsonField.META..JsonField.FUNDING, errors)
   shortAttribution?.checkLength(JsonField.META..JsonField.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
+  daysForApproval?.checkInRange(JsonField.META..JsonField.DAYS_FOR_APPROVAL, -1, 365, errors)
 }

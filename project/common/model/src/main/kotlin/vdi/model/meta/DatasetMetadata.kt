@@ -160,6 +160,10 @@ data class DatasetMetadata(
   @param:JsonProperty(DaysForApproval)
   @field:JsonProperty(DaysForApproval)
   val daysForApproval: Int = -1,
+
+  @param:JsonProperty(DataDisclaimer)
+  @field:JsonProperty(DataDisclaimer)
+  val dataDisclaimer: String? = null,
 ) {
   @get:JsonIgnore
   val shortName get() = name.take(40)
@@ -167,6 +171,7 @@ data class DatasetMetadata(
   companion object JsonKey {
     const val Contacts             = "contacts"
     const val Created              = "created"
+    const val DataDisclaimer       = "dataDisclaimer"
     const val DaysForApproval      = "daysForApproval"
     const val Dependencies         = "dependencies"
     const val Description          = "description"

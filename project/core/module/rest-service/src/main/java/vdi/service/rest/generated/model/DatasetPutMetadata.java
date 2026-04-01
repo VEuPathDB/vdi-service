@@ -103,6 +103,18 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   @JsonProperty(JsonField.SHORT_ATTRIBUTION)
   void setShortAttribution(OptionalStringPatch shortAttribution);
 
+  @JsonProperty(JsonField.DAYS_FOR_APPROVAL)
+  OptionalIntPatch getDaysForApproval();
+
+  @JsonProperty(JsonField.DAYS_FOR_APPROVAL)
+  void setDaysForApproval(OptionalIntPatch daysForApproval);
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  OptionalStringPatch getDataDisclaimer();
+
+  @JsonProperty(JsonField.DATA_DISCLAIMER)
+  void setDataDisclaimer(OptionalStringPatch dataDisclaimer);
+
   @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
 
