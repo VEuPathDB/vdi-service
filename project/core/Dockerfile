@@ -38,7 +38,7 @@ RUN gradle --no-daemon \
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-FROM amazoncorretto:25-alpine3.22 AS runtime
+FROM amazoncorretto:26-alpine3.22 AS runtime
 
 RUN apk add --no-cache tzdata \
     && cp /usr/share/zoneinfo/America/New_York /etc/localtime \
