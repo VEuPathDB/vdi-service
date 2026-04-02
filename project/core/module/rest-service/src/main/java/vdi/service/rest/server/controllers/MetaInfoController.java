@@ -8,9 +8,9 @@ import vdi.core.config.vdi.RestServiceConfig;
 import vdi.core.config.vdi.daemons.DaemonConfig;
 import vdi.service.rest.config.SupportedArchiveType;
 import vdi.service.rest.generated.model.*;
-import vdi.service.rest.generated.resources.MetaInfo;
+import vdi.service.rest.generated.resources.ServiceMeta;
 
-public class MetaInfoController implements MetaInfo {
+public class MetaInfoController implements ServiceMeta {
   private final ManifestConfig manifestConfig;
   private final StackConfig stackConfig;
 
@@ -23,12 +23,12 @@ public class MetaInfoController implements MetaInfo {
   }
 
   @Override
-  public GetMetaInfoResponse getMetaInfo() {
+  public GetServiceMetaResponse getServiceMeta() {
     var out = new ServiceMetadataResponseBodyImpl();
     out.setBuildInfo(initBuildInfo(manifestConfig));
     out.setConfiguration(initConfigDetails(stackConfig));
     out.setFeatures(initServiceFeatures());
-    return GetMetaInfoResponse.respond200WithApplicationJson(out);
+    return GetServiceMetaResponse.respond200WithApplicationJson(out);
   }
 
   private static ServiceMetadataBuildInfoOutput initBuildInfo(ManifestConfig metadata) {

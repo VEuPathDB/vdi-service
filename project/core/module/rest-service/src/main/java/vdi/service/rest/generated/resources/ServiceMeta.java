@@ -8,38 +8,38 @@ import vdi.service.rest.generated.model.ServerError;
 import vdi.service.rest.generated.model.ServiceMetadataResponseBody;
 import vdi.service.rest.generated.support.ResponseDelegate;
 
-@Path("/meta-info")
-public interface MetaInfo {
-  String ROOT_PATH = "/meta-info";
+@Path("/service-meta")
+public interface ServiceMeta {
+  String ROOT_PATH = "/service-meta";
 
   @GET
   @Produces("application/json")
-  GetMetaInfoResponse getMetaInfo();
+  GetServiceMetaResponse getServiceMeta();
 
-  class GetMetaInfoResponse extends ResponseDelegate {
-    public GetMetaInfoResponse(Response response, Object entity) {
+  class GetServiceMetaResponse extends ResponseDelegate {
+    public GetServiceMetaResponse(Response response, Object entity) {
       super(response, entity);
     }
 
-    public GetMetaInfoResponse(Response response) {
+    public GetServiceMetaResponse(Response response) {
       super(response);
     }
 
-    public GetMetaInfoResponse(ResponseDelegate response) {
+    public GetServiceMetaResponse(ResponseDelegate response) {
       super(response.delegate, response.entity);
     }
 
-    public static GetMetaInfoResponse respond200WithApplicationJson(
+    public static GetServiceMetaResponse respond200WithApplicationJson(
         ServiceMetadataResponseBody entity) {
       Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetMetaInfoResponse(responseBuilder.build(), entity);
+      return new GetServiceMetaResponse(responseBuilder.build(), entity);
     }
 
-    public static GetMetaInfoResponse respond500WithApplicationJson(ServerError entity) {
+    public static GetServiceMetaResponse respond500WithApplicationJson(ServerError entity) {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
-      return new GetMetaInfoResponse(responseBuilder.build(), entity);
+      return new GetServiceMetaResponse(responseBuilder.build(), entity);
     }
   }
 }
