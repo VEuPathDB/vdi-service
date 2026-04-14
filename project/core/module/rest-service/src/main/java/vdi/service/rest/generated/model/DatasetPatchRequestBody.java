@@ -67,18 +67,6 @@ public interface DatasetPatchRequestBody {
   @JsonProperty(JsonField.LINKED_DATASETS)
   void setLinkedDatasets(LinkedDatasetPatch linkedDatasets);
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  OrganismPatch getExperimentalOrganism();
-
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  void setExperimentalOrganism(OrganismPatch experimentalOrganism);
-
-  @JsonProperty(JsonField.HOST_ORGANISM)
-  OrganismPatch getHostOrganism();
-
-  @JsonProperty(JsonField.HOST_ORGANISM)
-  void setHostOrganism(OrganismPatch hostOrganism);
-
   @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
   DatasetCharacteristicsPatch getStudyCharacteristics();
 

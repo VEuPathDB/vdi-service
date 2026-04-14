@@ -50,7 +50,6 @@ public final class JsonField {
   public static final String ENABLED = "enabled";
   public static final String END = "end";
   public static final String ERRORS = "errors";
-  public static final String EXPERIMENTAL_ORGANISM = "experimentalOrganism";
   public static final String EXTERNAL_IDENTIFIERS = "externalIdentifiers";
   public static final String FEATURES = "features";
   public static final String FILE_COUNT = "fileCount";
@@ -66,7 +65,6 @@ public final class JsonField {
   public static final String GIT_COMMIT = "gitCommit";
   public static final String GIT_TAG = "gitTag";
   public static final String GIT_URL = "gitUrl";
-  public static final String HOST_ORGANISM = "hostOrganism";
   public static final String HYPERLINKS = "hyperlinks";
   public static final String ID = "id";
   public static final String IDENTIFIER = "identifier";
@@ -127,10 +125,8 @@ public final class JsonField {
   public static final String SHORT_NAME = "shortName";
   public static final String SLIM_RUN_INTERVAL = "slimRunInterval";
   public static final String SOURCE_URL = "sourceUrl";
-  public static final String SPECIES = "species";
   public static final String START = "start";
   public static final String STATUS = "status";
-  public static final String STRAIN = "strain";
   public static final String STUDY_CHARACTERISTICS = "studyCharacteristics";
   public static final String STUDY_DESIGN = "studyDesign";
   public static final String STUDY_SPECIES = "studySpecies";

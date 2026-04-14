@@ -75,18 +75,6 @@ public interface DatasetProxyPostMeta extends DatasetPostMeta {
   @JsonProperty(JsonField.LINKED_DATASETS)
   void setLinkedDatasets(List<LinkedDataset> linkedDatasets);
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  DatasetOrganism getExperimentalOrganism();
-
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  void setExperimentalOrganism(DatasetOrganism experimentalOrganism);
-
-  @JsonProperty(JsonField.HOST_ORGANISM)
-  DatasetOrganism getHostOrganism();
-
-  @JsonProperty(JsonField.HOST_ORGANISM)
-  void setHostOrganism(DatasetOrganism hostOrganism);
-
   @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
   DatasetCharacteristics getStudyCharacteristics();
 

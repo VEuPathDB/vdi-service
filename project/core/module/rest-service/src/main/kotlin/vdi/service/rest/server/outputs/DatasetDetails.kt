@@ -12,7 +12,6 @@ import vdi.model.meta.DatasetContact
 import vdi.model.meta.DatasetDependency
 import vdi.model.meta.DatasetFundingAward
 import vdi.model.meta.DatasetHyperlink
-import vdi.model.meta.DatasetOrganism
 import vdi.model.meta.DatasetPublication
 import vdi.model.meta.LinkedDataset
 import vdi.model.meta.SampleYearRange
@@ -30,7 +29,6 @@ import vdi.service.rest.generated.model.DatasetCharacteristics as APICharacteris
 import vdi.service.rest.generated.model.DatasetContact as APIContact
 import vdi.service.rest.generated.model.DatasetFundingAward as APIFunding
 import vdi.service.rest.generated.model.DatasetHyperlink as APIHyperlink
-import vdi.service.rest.generated.model.DatasetOrganism as APIOrganism
 import vdi.service.rest.generated.model.DatasetPublication as APIPublication
 import vdi.service.rest.generated.model.ExternalIdentifiers as APIIdentifiers
 import vdi.service.rest.generated.model.LinkedDataset as APILinkedDataset
@@ -100,8 +98,6 @@ private inline fun DatasetDetails.applyMeta(meta: DatasetMetadata) = apply {
   projectName          = meta.projectName
   programName          = meta.programName
   linkedDatasets       = meta.linkedDatasets.map(::LinkedDataset)
-  experimentalOrganism = meta.experimentalOrganism?.let(::DatasetOrganism)
-  hostOrganism         = meta.hostOrganism?.let(::DatasetOrganism)
   studyCharacteristics = meta.studyCharacteristics?.let(::DatasetCharacteristics)
   externalIdentifiers  = meta.externalIdentifiers?.let(::ExternalIdentifiers)
   funding              = meta.funding.map(::DatasetFundingAward)
@@ -159,12 +155,6 @@ private fun DatasetHyperlink(link: DatasetHyperlink): APIHyperlink =
   DatasetHyperlinkImpl().also {
     it.url         = link.url.toString()
     it.description = link.description
-  }
-
-private fun DatasetOrganism(organism: DatasetOrganism): APIOrganism =
-  DatasetOrganismImpl().also {
-    it.species = organism.species
-    it.strain  = organism.strain
   }
 
 private fun DatasetPublication(publication: DatasetPublication): APIPublication =

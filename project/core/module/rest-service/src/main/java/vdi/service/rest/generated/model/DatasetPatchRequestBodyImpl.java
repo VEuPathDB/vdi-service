@@ -16,8 +16,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "projectName",
     "programName",
     "linkedDatasets",
-    "experimentalOrganism",
-    "hostOrganism",
     "studyCharacteristics",
     "externalIdentifiers",
     "funding",
@@ -55,12 +53,6 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
 
   @JsonProperty(JsonField.LINKED_DATASETS)
   private LinkedDatasetPatch linkedDatasets;
-
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  private OrganismPatch experimentalOrganism;
-
-  @JsonProperty(JsonField.HOST_ORGANISM)
-  private OrganismPatch hostOrganism;
 
   @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
   private DatasetCharacteristicsPatch studyCharacteristics;
@@ -178,26 +170,6 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.LINKED_DATASETS)
   public void setLinkedDatasets(LinkedDatasetPatch linkedDatasets) {
     this.linkedDatasets = linkedDatasets;
-  }
-
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  public OrganismPatch getExperimentalOrganism() {
-    return this.experimentalOrganism;
-  }
-
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  public void setExperimentalOrganism(OrganismPatch experimentalOrganism) {
-    this.experimentalOrganism = experimentalOrganism;
-  }
-
-  @JsonProperty(JsonField.HOST_ORGANISM)
-  public OrganismPatch getHostOrganism() {
-    return this.hostOrganism;
-  }
-
-  @JsonProperty(JsonField.HOST_ORGANISM)
-  public void setHostOrganism(OrganismPatch hostOrganism) {
-    this.hostOrganism = hostOrganism;
   }
 
   @JsonProperty(JsonField.STUDY_CHARACTERISTICS)

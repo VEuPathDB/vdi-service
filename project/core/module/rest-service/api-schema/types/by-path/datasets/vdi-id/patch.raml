@@ -29,8 +29,6 @@ types:
       projectName?: OptionalStringPatch
       programName?: OptionalStringPatch
       linkedDatasets?: LinkedDatasetPatch
-      experimentalOrganism?: OrganismPatch
-      hostOrganism?: OrganismPatch
       studyCharacteristics?: DatasetCharacteristicsPatch
       externalIdentifiers?: ExternalIdentifiersPatch
       funding?: FundingPatch
@@ -184,12 +182,6 @@ types:
       value?:
         type: common.LinkedDataset[]
         uniqueItems: true
-    additionalProperties: false
-
-  OrganismPatch:
-    type: object
-    properties:
-      value?: common.DatasetOrganism
     additionalProperties: false
 
   PublicationsPatch:

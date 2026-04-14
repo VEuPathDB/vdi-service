@@ -134,8 +134,6 @@ internal fun DatasetPatchRequestBody.applyPatch(
     projectName          = projectName.unsafePatch(original.projectName),
     programName          = programName.unsafePatch(original.programName),
     linkedDatasets       = linkedDatasets.unsafePatch(original.linkedDatasets, Iterable<LinkedDataset>::toInternal),
-    experimentalOrganism = experimentalOrganism.unsafePatch(original.experimentalOrganism),
-    hostOrganism         = hostOrganism.unsafePatch(original.hostOrganism),
     studyCharacteristics = studyCharacteristics.applyPatch(original.studyCharacteristics),
     funding              = funding.unsafePatch(original.funding, Iterable<DatasetFundingAward>::toInternal),
     dataDisclaimer       = dataDisclaimer.unsafePatch(original.dataDisclaimer),

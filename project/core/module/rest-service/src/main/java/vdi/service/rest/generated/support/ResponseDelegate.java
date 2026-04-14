@@ -75,17 +75,8 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public Object getEntity() {
-    return this.entity;}
-
-  @Override
   public Response.StatusType getStatusInfo() {
     return this.delegate.getStatusInfo();
-  }
-
-  @Override
-  public <T> T readEntity(GenericType<T> p0) {
-    return this.delegate.readEntity(p0);
   }
 
   @Override
@@ -94,13 +85,18 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public <T> T readEntity(Class<T> p0) {
+  public <T> T readEntity(GenericType<T> p0) {
     return this.delegate.readEntity(p0);
   }
 
   @Override
   public <T> T readEntity(Class<T> p0, Annotation[] p1) {
     return this.delegate.readEntity(p0,p1);
+  }
+
+  @Override
+  public <T> T readEntity(Class<T> p0) {
+    return this.delegate.readEntity(p0);
   }
 
   @Override
@@ -162,6 +158,10 @@ public class ResponseDelegate extends Response {
   public String getHeaderString(String p0) {
     return this.delegate.getHeaderString(p0);
   }
+
+  @Override
+  public Object getEntity() {
+    return this.entity;}
 
   public static class HeaderBuilderBase {
     protected final Map<String, String> headerMap;
