@@ -116,13 +116,13 @@ fun AppDBTransaction.upsertDatasetRecord(
   replace(datasetID, meta.funding, ::deleteFundingAwards, ::insertFundingAwards)
 
   deleteCharacteristics(datasetID)
-  meta.studyCharacteristics?.also { characteristics -> insertCharacteristics(datasetID, characteristics) }
+  meta.datasetCharacteristics?.also { characteristics -> insertCharacteristics(datasetID, characteristics) }
 
-  replace(datasetID, meta.studyCharacteristics?.countries, ::deleteCountries, ::insertCountries)
-  replace(datasetID, meta.studyCharacteristics?.studySpecies, ::deleteSpecies, ::insertSpecies)
-  replace(datasetID, meta.studyCharacteristics?.outcomes, ::deleteOutcomes, ::insertOutcomes)
-  replace(datasetID, meta.studyCharacteristics?.associatedFactors, ::deleteAssociatedFactors, ::insertAssociatedFactors)
-  replace(datasetID, meta.studyCharacteristics?.sampleTypes, ::deleteSampleTypes, ::insertSampleTypes)
+  replace(datasetID, meta.datasetCharacteristics?.countries, ::deleteCountries, ::insertCountries)
+  replace(datasetID, meta.datasetCharacteristics?.studySpecies, ::deleteSpecies, ::insertSpecies)
+  replace(datasetID, meta.datasetCharacteristics?.outcomes, ::deleteOutcomes, ::insertOutcomes)
+  replace(datasetID, meta.datasetCharacteristics?.associatedFactors, ::deleteAssociatedFactors, ::insertAssociatedFactors)
+  replace(datasetID, meta.datasetCharacteristics?.sampleTypes, ::deleteSampleTypes, ::insertSampleTypes)
   replace(datasetID, meta.externalIdentifiers?.dois, ::deleteDOIs, ::insertDOIs)
   replace(datasetID, meta.externalIdentifiers?.bioprojectIDs, ::deleteBioprojectIDs, ::insertBioprojectIDs)
   replace(datasetID, meta.linkedDatasets, ::deleteExternalDatasetLinks, ::insertExternalDatasetLinks)

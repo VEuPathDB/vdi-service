@@ -114,7 +114,7 @@ private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
   || projectName != null
   || programName != null
   || linkedDatasets != null
-  || (studyCharacteristics != null && studyCharacteristics.hasSomethingToUpdate())
+  || (datasetCharacteristics != null && datasetCharacteristics.hasSomethingToUpdate())
   || (externalIdentifiers != null && externalIdentifiers.hasSomethingToUpdate())
   || funding != null
 

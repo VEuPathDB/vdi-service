@@ -21,7 +21,7 @@ import java.util.List;
     "projectName",
     "programName",
     "linkedDatasets",
-    "studyCharacteristics",
+    "datasetCharacteristics",
     "externalIdentifiers",
     "funding",
     "shortAttribution",
@@ -74,8 +74,8 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty(JsonField.LINKED_DATASETS)
   private List<LinkedDataset> linkedDatasets;
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  private DatasetCharacteristics studyCharacteristics;
+  @JsonProperty(JsonField.DATASET_CHARACTERISTICS)
+  private DatasetCharacteristics datasetCharacteristics;
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
   private ExternalIdentifiers externalIdentifiers;
@@ -241,14 +241,14 @@ public class DatasetDetailsImpl implements DatasetDetails {
     this.linkedDatasets = linkedDatasets;
   }
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  public DatasetCharacteristics getStudyCharacteristics() {
-    return this.studyCharacteristics;
+  @JsonProperty(JsonField.DATASET_CHARACTERISTICS)
+  public DatasetCharacteristics getDatasetCharacteristics() {
+    return this.datasetCharacteristics;
   }
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  public void setStudyCharacteristics(DatasetCharacteristics studyCharacteristics) {
-    this.studyCharacteristics = studyCharacteristics;
+  @JsonProperty(JsonField.DATASET_CHARACTERISTICS)
+  public void setDatasetCharacteristics(DatasetCharacteristics datasetCharacteristics) {
+    this.datasetCharacteristics = datasetCharacteristics;
   }
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)

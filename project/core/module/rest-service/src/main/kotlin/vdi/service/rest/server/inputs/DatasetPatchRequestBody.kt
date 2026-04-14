@@ -31,7 +31,7 @@ internal fun DatasetPatchRequestBody.cleanup() {
   programName?.apply { cleanupString(::getValue) }
   linkedDatasets?.apply { cleanupList(::getValue, LinkedDataset?::cleanup) }
 
-  studyCharacteristics?.apply {
+  datasetCharacteristics?.apply {
     studyDesign?.apply { cleanupString(::getValue) }
     studyType?.apply { cleanupString(::getValue) }
     countries?.apply { cleanupDistinctList(::getValue, String?::cleanup) }
@@ -94,7 +94,7 @@ internal fun DatasetPatchRequestBody.validate(
   programName?.value?.checkLength(JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
   linkedDatasets?.value?.validate(JF.LINKED_DATASETS, errors)
 
-  studyCharacteristics?.validate(original.studyCharacteristics, errors)
+  datasetCharacteristics?.validate(original.datasetCharacteristics, errors)
   externalIdentifiers?.validate(JF.EXTERNAL_IDENTIFIERS, errors)
 
   funding?.value?.validate(JF.FUNDING, errors)
@@ -115,29 +115,29 @@ internal fun DatasetPatchRequestBody.applyPatch(
   revisionHistory: DatasetRevisionHistory? = original.revisionHistory,
 ) =
   DatasetMetadata(
-    type                 = type?.toInternal() ?: original.type,
-    installTargets       = original.installTargets,
-    visibility           = visibility.unsafePatch(original.visibility, APIVisibility::toInternal),
-    owner                = original.owner,
-    name                 = name.unsafePatch(original.name),
-    summary              = summary.unsafePatch(original.summary),
-    origin               = original.origin,
-    created              = original.created,
-    description          = description.unsafePatch(original.description),
-    shortAttribution     = shortAttribution.unsafePatch(original.shortAttribution),
-    sourceURL            = original.sourceURL,
-    dependencies         = original.dependencies,
-    publications         = publications.unsafePatch(original.publications, List<DatasetPublication>::toInternal),
-    externalIdentifiers  = externalIdentifiers.applyPatch(original.externalIdentifiers),
-    contacts             = contacts.unsafePatch(original.contacts, Iterable<DatasetContact>::toInternal),
-    revisionHistory      = revisionHistory,
-    projectName          = projectName.unsafePatch(original.projectName),
-    programName          = programName.unsafePatch(original.programName),
-    linkedDatasets       = linkedDatasets.unsafePatch(original.linkedDatasets, Iterable<LinkedDataset>::toInternal),
-    studyCharacteristics = studyCharacteristics.applyPatch(original.studyCharacteristics),
-    funding              = funding.unsafePatch(original.funding, Iterable<DatasetFundingAward>::toInternal),
-    dataDisclaimer       = dataDisclaimer.unsafePatch(original.dataDisclaimer),
-    daysForApproval      = daysForApproval.unsafePatch(original.daysForApproval) { it: Int? -> it ?: -1 }
+    type                   = type?.toInternal() ?: original.type,
+    installTargets         = original.installTargets,
+    visibility             = visibility.unsafePatch(original.visibility, APIVisibility::toInternal),
+    owner                  = original.owner,
+    name                   = name.unsafePatch(original.name),
+    summary                = summary.unsafePatch(original.summary),
+    origin                 = original.origin,
+    created                = original.created,
+    description            = description.unsafePatch(original.description),
+    shortAttribution       = shortAttribution.unsafePatch(original.shortAttribution),
+    sourceURL              = original.sourceURL,
+    dependencies           = original.dependencies,
+    publications           = publications.unsafePatch(original.publications, List<DatasetPublication>::toInternal),
+    externalIdentifiers    = externalIdentifiers.applyPatch(original.externalIdentifiers),
+    contacts               = contacts.unsafePatch(original.contacts, Iterable<DatasetContact>::toInternal),
+    revisionHistory        = revisionHistory,
+    projectName            = projectName.unsafePatch(original.projectName),
+    programName            = programName.unsafePatch(original.programName),
+    linkedDatasets         = linkedDatasets.unsafePatch(original.linkedDatasets, Iterable<LinkedDataset>::toInternal),
+    datasetCharacteristics = datasetCharacteristics.applyPatch(original.datasetCharacteristics),
+    funding                = funding.unsafePatch(original.funding, Iterable<DatasetFundingAward>::toInternal),
+    dataDisclaimer         = dataDisclaimer.unsafePatch(original.dataDisclaimer),
+    daysForApproval        = daysForApproval.unsafePatch(original.daysForApproval) { it: Int? -> it ?: -1 }
   )
 
 fun DatasetTypePatch.toInternal() = DatasetType(DataType.of(value.name), value.version)
@@ -151,19 +151,19 @@ private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristic
       studyDesign.value == null -> {
         // then the study type must also be set to null (study type requires study design)
         if (studyType == null || studyType.value != null)
-          errors.add(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE, "cannot remove study design without also removing study type")
+          errors.add(JF.DATASET_CHARACTERISTICS..JF.STUDY_TYPE, "cannot remove study design without also removing study type")
       }
 
       // If the study design has been set, AND no study type value was provided
       studyType == null -> {
         // then the original must already have a study type value
-        original?.studyType.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE, errors) {}
+        original?.studyType.require(JF.DATASET_CHARACTERISTICS..JF.STUDY_TYPE, errors) {}
       }
 
       // If the study design has been set, AND the client is trying to remove out the study type value.
       studyType.value == null -> {
         // No.
-        errors.add(JF.STUDY_CHARACTERISTICS..JF.STUDY_TYPE)
+        errors.add(JF.DATASET_CHARACTERISTICS..JF.STUDY_TYPE)
       }
     }
 
@@ -173,25 +173,25 @@ private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristic
       // we already know the client didn't attempt to change the study design
       // value by virtue of being in this else block.
       studyType.value == null -> {
-        null.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
+        null.require(JF.DATASET_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
       }
 
       // If the client is attempting to change the study type value without also
       // providing a study design value
       else -> {
         // then the action is only valid if we already had a study design value.
-        original?.studyDesign.require(JF.STUDY_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
+        original?.studyDesign.require(JF.DATASET_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
       }
     }
   }
 
-  countries?.value?.validateCountries(JF.STUDY_CHARACTERISTICS, errors)
+  countries?.value?.validateCountries(JF.DATASET_CHARACTERISTICS, errors)
 
-  years?.value?.validate(JF.STUDY_CHARACTERISTICS..JF.YEARS, errors)
+  years?.value?.validate(JF.DATASET_CHARACTERISTICS..JF.YEARS, errors)
 
-  studySpecies?.value?.validateStudySpecies(JF.STUDY_CHARACTERISTICS, errors)
-  outcomes?.value?.validateOutcomes(JF.STUDY_CHARACTERISTICS, errors)
-  associatedFactors?.value?.validateAssociatedFactors(JF.STUDY_CHARACTERISTICS, errors)
-  participantAges?.value?.validateParticipantAges(JF.STUDY_CHARACTERISTICS, errors)
-  sampleTypes?.value?.validateSampleTypes(JF.STUDY_CHARACTERISTICS, errors)
+  studySpecies?.value?.validateStudySpecies(JF.DATASET_CHARACTERISTICS, errors)
+  outcomes?.value?.validateOutcomes(JF.DATASET_CHARACTERISTICS, errors)
+  associatedFactors?.value?.validateAssociatedFactors(JF.DATASET_CHARACTERISTICS, errors)
+  participantAges?.value?.validateParticipantAges(JF.DATASET_CHARACTERISTICS, errors)
+  sampleTypes?.value?.validateSampleTypes(JF.DATASET_CHARACTERISTICS, errors)
 }

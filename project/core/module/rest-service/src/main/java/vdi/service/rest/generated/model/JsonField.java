@@ -34,6 +34,7 @@ public final class JsonField {
   public static final String DATA_PROPERTIES_FILE = "dataPropertiesFile";
   public static final String DATA_TYPES = "dataTypes";
   public static final String DATA_UPDATE_TIME = "dataUpdateTime";
+  public static final String DATASET_CHARACTERISTICS = "datasetCharacteristics";
   public static final String DATASET_ID = "datasetId";
   public static final String DATASET_TYPE = "datasetType";
   public static final String DATASET_URI = "datasetUri";
@@ -127,7 +128,6 @@ public final class JsonField {
   public static final String SOURCE_URL = "sourceUrl";
   public static final String START = "start";
   public static final String STATUS = "status";
-  public static final String STUDY_CHARACTERISTICS = "studyCharacteristics";
   public static final String STUDY_DESIGN = "studyDesign";
   public static final String STUDY_SPECIES = "studySpecies";
   public static final String STUDY_TYPE = "studyType";

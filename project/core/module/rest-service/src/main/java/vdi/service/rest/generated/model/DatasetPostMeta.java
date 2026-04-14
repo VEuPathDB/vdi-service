@@ -74,11 +74,11 @@ public interface DatasetPostMeta extends DatasetMetaBase {
   @JsonProperty(JsonField.LINKED_DATASETS)
   void setLinkedDatasets(List<LinkedDataset> linkedDatasets);
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  DatasetCharacteristics getStudyCharacteristics();
+  @JsonProperty(JsonField.DATASET_CHARACTERISTICS)
+  DatasetCharacteristics getDatasetCharacteristics();
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  void setStudyCharacteristics(DatasetCharacteristics studyCharacteristics);
+  @JsonProperty(JsonField.DATASET_CHARACTERISTICS)
+  void setDatasetCharacteristics(DatasetCharacteristics datasetCharacteristics);
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
   ExternalIdentifiers getExternalIdentifiers();

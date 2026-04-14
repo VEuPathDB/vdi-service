@@ -17,32 +17,31 @@ fun DatasetProxyPostMeta.cleanup() {
 
 fun DatasetProxyPostMeta.validate(errors: ValidationErrors) {
   type.validate(JsonField.META..JsonField.TYPE, installTargets, errors)
-
   (this as DatasetPostMeta).validate(errors)
 }
 
 fun DatasetProxyPostMeta.toInternal(userID: UserID, url: String?) =
   DatasetMetadata(
-    type                 = type.toInternal(),
-    installTargets       = installTargets.toSet(),
-    visibility           = visibility.toInternal(),
-    owner                = userID,
-    name                 = name,
-    summary              = summary,
-    description          = description,
-    origin               = origin,
-    created              = createdOn ?: OffsetDateTime.now(),
-    sourceURL            = url?.let(URI::create),
-    dependencies         = dependencies.toInternalDistinct(DatasetDependency::toInternal),
-    publications         = publications.toInternalDistinct(DatasetPublication::toInternal),
-    contacts             = contacts.toInternalDistinct(DatasetContact::toInternal),
-    shortAttribution     = shortAttribution,
-    projectName          = projectName,
-    programName          = programName,
-    linkedDatasets       = linkedDatasets.toInternalDistinct(LinkedDataset::toInternal),
-    studyCharacteristics = studyCharacteristics?.toInternal(),
-    externalIdentifiers  = externalIdentifiers?.toInternal(),
-    funding              = funding.toInternalDistinct(DatasetFundingAward::toInternal),
-    daysForApproval      = daysForApproval ?: -1,
-    dataDisclaimer       = dataDisclaimer,
+    type                   = type.toInternal(),
+    installTargets         = installTargets.toSet(),
+    visibility             = visibility.toInternal(),
+    owner                  = userID,
+    name                   = name,
+    summary                = summary,
+    description            = description,
+    origin                 = origin,
+    created                = createdOn ?: OffsetDateTime.now(),
+    sourceURL              = url?.let(URI::create),
+    dependencies           = dependencies.toInternalDistinct(DatasetDependency::toInternal),
+    publications           = publications.toInternalDistinct(DatasetPublication::toInternal),
+    contacts               = contacts.toInternalDistinct(DatasetContact::toInternal),
+    shortAttribution       = shortAttribution,
+    projectName            = projectName,
+    programName            = programName,
+    linkedDatasets         = linkedDatasets.toInternalDistinct(LinkedDataset::toInternal),
+    datasetCharacteristics = datasetCharacteristics?.toInternal(),
+    externalIdentifiers    = externalIdentifiers?.toInternal(),
+    funding                = funding.toInternalDistinct(DatasetFundingAward::toInternal),
+    daysForApproval        = daysForApproval ?: -1,
+    dataDisclaimer         = dataDisclaimer,
   )

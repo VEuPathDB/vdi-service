@@ -67,11 +67,11 @@ public interface DatasetPatchRequestBody {
   @JsonProperty(JsonField.LINKED_DATASETS)
   void setLinkedDatasets(LinkedDatasetPatch linkedDatasets);
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  DatasetCharacteristicsPatch getStudyCharacteristics();
+  @JsonProperty(JsonField.DATASET_CHARACTERISTICS)
+  DatasetCharacteristicsPatch getDatasetCharacteristics();
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  void setStudyCharacteristics(DatasetCharacteristicsPatch studyCharacteristics);
+  @JsonProperty(JsonField.DATASET_CHARACTERISTICS)
+  void setDatasetCharacteristics(DatasetCharacteristicsPatch datasetCharacteristics);
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
   ExternalIdentifiersPatch getExternalIdentifiers();

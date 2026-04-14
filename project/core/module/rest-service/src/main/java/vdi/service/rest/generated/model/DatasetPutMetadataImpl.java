@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "projectName",
     "programName",
     "linkedDatasets",
-    "studyCharacteristics",
+    "datasetCharacteristics",
     "externalIdentifiers",
     "funding",
     "shortAttribution",
@@ -56,8 +56,8 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.LINKED_DATASETS)
   private LinkedDatasetPatch linkedDatasets;
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  private DatasetCharacteristicsPatch studyCharacteristics;
+  @JsonProperty(JsonField.DATASET_CHARACTERISTICS)
+  private DatasetCharacteristicsPatch datasetCharacteristics;
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)
   private ExternalIdentifiersPatch externalIdentifiers;
@@ -180,14 +180,14 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
     this.linkedDatasets = linkedDatasets;
   }
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  public DatasetCharacteristicsPatch getStudyCharacteristics() {
-    return this.studyCharacteristics;
+  @JsonProperty(JsonField.DATASET_CHARACTERISTICS)
+  public DatasetCharacteristicsPatch getDatasetCharacteristics() {
+    return this.datasetCharacteristics;
   }
 
-  @JsonProperty(JsonField.STUDY_CHARACTERISTICS)
-  public void setStudyCharacteristics(DatasetCharacteristicsPatch studyCharacteristics) {
-    this.studyCharacteristics = studyCharacteristics;
+  @JsonProperty(JsonField.DATASET_CHARACTERISTICS)
+  public void setDatasetCharacteristics(DatasetCharacteristicsPatch datasetCharacteristics) {
+    this.datasetCharacteristics = datasetCharacteristics;
   }
 
   @JsonProperty(JsonField.EXTERNAL_IDENTIFIERS)

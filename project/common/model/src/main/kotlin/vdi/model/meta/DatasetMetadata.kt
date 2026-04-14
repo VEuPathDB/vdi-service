@@ -136,9 +136,10 @@ data class DatasetMetadata(
   /**
    * @since v1.7.0
    */
+  @param:JsonAlias(LegacyDatasetCharacteristics)
   @param:JsonProperty(Characteristics)
   @field:JsonProperty(Characteristics)
-  val studyCharacteristics: DatasetCharacteristics? = null,
+  val datasetCharacteristics: DatasetCharacteristics? = null,
 
   /**
    * @since v1.7.0
@@ -209,11 +210,12 @@ data class DatasetMetadata(
     const val RevisionHistory     = "revisionHistory"
     const val ShortAttribution    = "shortAttribution"
     const val SourceURL           = "sourceUrl"
-    const val Characteristics     = "studyCharacteristics"
+    const val Characteristics     = "datasetCharacteristics"
     const val Summary             = "summary"
     const val Type                = "type"
     const val Visibility          = "visibility"
 
+    private const val LegacyDatasetCharacteristics = "studyCharacteristics"
     private const val LegacyInstallTargets = "projects"
   }
 }

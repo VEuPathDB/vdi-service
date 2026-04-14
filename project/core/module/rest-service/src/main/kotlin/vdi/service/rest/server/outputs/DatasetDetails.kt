@@ -87,29 +87,29 @@ internal fun DatasetDetails(
  */
 @Suppress("NOTHING_TO_INLINE")
 private inline fun DatasetDetails.applyMeta(meta: DatasetMetadata) = apply {
-  installTargets       = meta.installTargets.toList()
-  name                 = meta.name
-  summary              = meta.summary
-  description          = meta.description
-  origin               = meta.origin
-  dependencies         = DatasetDependencies(meta.dependencies)
-  publications         = meta.publications.map(::DatasetPublication)
-  contacts             = meta.contacts.map(::DatasetContact)
-  projectName          = meta.projectName
-  programName          = meta.programName
-  linkedDatasets       = meta.linkedDatasets.map(::LinkedDataset)
-  studyCharacteristics = meta.studyCharacteristics?.let(::DatasetCharacteristics)
-  externalIdentifiers  = meta.externalIdentifiers?.let(::ExternalIdentifiers)
-  funding              = meta.funding.map(::DatasetFundingAward)
-  shortAttribution     = meta.shortAttribution
-  type                 = DatasetTypeOutput(meta.type)
-  visibility           = DatasetVisibility(meta.visibility)
-  created              = meta.created
-  sourceUrl            = meta.sourceURL?.toString()
-  revisionHistory      = meta.revisionHistory?.let(::RevisionHistory)
-  shortName            = meta.shortName
-  daysForApproval      = meta.daysForApproval
-  dataDisclaimer       = meta.dataDisclaimer
+  installTargets         = meta.installTargets.toList()
+  name                   = meta.name
+  summary                = meta.summary
+  description            = meta.description
+  origin                 = meta.origin
+  dependencies           = DatasetDependencies(meta.dependencies)
+  publications           = meta.publications.map(::DatasetPublication)
+  contacts               = meta.contacts.map(::DatasetContact)
+  projectName            = meta.projectName
+  programName            = meta.programName
+  linkedDatasets         = meta.linkedDatasets.map(::LinkedDataset)
+  datasetCharacteristics = meta.datasetCharacteristics?.let(::DatasetCharacteristics)
+  externalIdentifiers    = meta.externalIdentifiers?.let(::ExternalIdentifiers)
+  funding                = meta.funding.map(::DatasetFundingAward)
+  shortAttribution       = meta.shortAttribution
+  type                   = DatasetTypeOutput(meta.type)
+  visibility             = DatasetVisibility(meta.visibility)
+  created                = meta.created
+  sourceUrl              = meta.sourceURL?.toString()
+  revisionHistory        = meta.revisionHistory?.let(::RevisionHistory)
+  shortName              = meta.shortName
+  daysForApproval        = meta.daysForApproval
+  dataDisclaimer         = meta.dataDisclaimer
 }
 
 private fun DatasetCharacteristics(characteristics: DatasetCharacteristics): APICharacteristics =

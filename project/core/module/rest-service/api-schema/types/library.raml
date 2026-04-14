@@ -565,7 +565,7 @@ types:
           related to the dataset represented by this metadata object.
         type: LinkedDataset[]
         uniqueItems: true
-      studyCharacteristics?: DatasetCharacteristics
+      datasetCharacteristics?: DatasetCharacteristics
       externalIdentifiers?: ExternalIdentifiers
       funding?:
         type: DatasetFundingAward[]
@@ -625,7 +625,7 @@ types:
       projectName?: OptionalStringPatch
       programName?: OptionalStringPatch
       linkedDatasets?: LinkedDatasetPatch
-      studyCharacteristics?: DatasetCharacteristicsPatch
+      datasetCharacteristics?: DatasetCharacteristicsPatch
       externalIdentifiers?: ExternalIdentifiersPatch
       funding?: FundingPatch
       shortAttribution?: OptionalStringPatch
