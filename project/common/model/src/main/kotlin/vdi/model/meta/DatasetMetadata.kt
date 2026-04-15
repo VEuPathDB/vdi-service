@@ -29,7 +29,7 @@ data class DatasetMetadata(
   val visibility: DatasetVisibility,
 
   /**
-   * VPDB user ID of the user who created the dataset.
+   * VEuPathDB user ID of the user who created the dataset.
    */
   @param:JsonProperty(Owner)
   @field:JsonProperty(Owner)
