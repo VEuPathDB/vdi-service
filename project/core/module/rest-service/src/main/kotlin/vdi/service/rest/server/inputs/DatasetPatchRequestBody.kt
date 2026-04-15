@@ -14,8 +14,10 @@ import vdi.service.rest.generated.model.DatasetContact
 import vdi.service.rest.generated.model.DatasetFundingAward
 import vdi.service.rest.generated.model.DatasetHyperlink
 import vdi.service.rest.generated.model.DatasetPublication
+import vdi.service.rest.generated.model.DatasetSource
 import vdi.service.rest.generated.model.LinkedDataset
 import vdi.service.rest.generated.model.SampleYearRange
+import vdi.service.rest.server.conversion.DatasetSourceConverter
 import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
 import vdi.service.rest.generated.model.JsonField as JF
 
@@ -100,6 +102,8 @@ internal fun DatasetPatchRequestBody.validate(
   funding?.value?.validate(JF.FUNDING, errors)
   shortAttribution?.value?.checkLength(JF.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
 
+  datasetSources?.value?.also { DatasetSourceConverter.validate(it, JF.DATASET_SOURCES, errors) }
+
   return errors
 }
 
@@ -137,7 +141,8 @@ internal fun DatasetPatchRequestBody.applyPatch(
     datasetCharacteristics = datasetCharacteristics.applyPatch(original.datasetCharacteristics),
     funding                = funding.unsafePatch(original.funding, Iterable<DatasetFundingAward>::toInternal),
     dataDisclaimer         = dataDisclaimer.unsafePatch(original.dataDisclaimer),
-    daysForApproval        = daysForApproval.unsafePatch(original.daysForApproval) { it: Int? -> it ?: -1 }
+    daysForApproval        = daysForApproval.unsafePatch(original.daysForApproval) { it: Int? -> it ?: -1 },
+    datasetSources         = datasetSources.unsafePatch(original.datasetSources) { it: List<DatasetSource> -> DatasetSourceConverter.toInternal(it) }
   )
 
 fun DatasetTypePatch.toInternal() = DatasetType(DataType.of(value.name), value.version)

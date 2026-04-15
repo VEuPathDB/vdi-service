@@ -117,6 +117,12 @@ public interface DatasetDetails extends DatasetMetaBase {
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   void setDataDisclaimer(String dataDisclaimer);
 
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  List<DatasetSource> getDatasetSources();
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  void setDatasetSources(List<DatasetSource> datasetSources);
+
   @JsonProperty(JsonField.DATASET_ID)
   String getDatasetId();
 

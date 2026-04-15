@@ -103,6 +103,12 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   void setDataDisclaimer(OptionalStringPatch dataDisclaimer);
 
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  DatasetSourcesPatch getDatasetSources();
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  void setDatasetSources(DatasetSourcesPatch datasetSources);
+
   @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
 

@@ -172,6 +172,7 @@ types:
           maxLength: 128
       years?: SampleYearRange
       studySpecies?:
+        displayName: Study Population Species
         type: array
         uniqueItems: true
         items:
@@ -577,6 +578,9 @@ types:
         minimum: -1
         maximum: 365
       dataDisclaimer?: string
+      datasetSources?:
+        type: DatasetSource[]
+        uniqueItems: true
   DatasetName:
     displayName: Dataset Name
     description: User-provided name for the dataset.
@@ -631,6 +635,7 @@ types:
       shortAttribution?: OptionalStringPatch
       daysForApproval?: OptionalIntPatch
       dataDisclaimer?: OptionalStringPatch
+      datasetSources?: DatasetSourcesPatch
   DatasetPostMeta:
     type: DatasetMetaBase
     additionalProperties: false
@@ -854,10 +859,37 @@ types:
           A value of `reject` means that the dataset that a share was offered
           for should become unavailable to the rejecting user.
         type: ShareReceiptAction
+  DatasetSource:
+    displayName: Dataset Source
+    description: External dataset source reference.
+    type: object
+    additionalProperties: false
+    properties:
+      url:
+        description: URL to the external data source.
+        type: string
+        minLength: 10
+      version:
+        description: |
+          Version of the data that was retrieved from the dataset source url.
+
+          If the data source does not have versioning, this value may be the
+          date the data was retrieved.
+        type: string
+        minLength: 1
+        maxLength: 128
   DatasetSourceUrl:
     description: |
       URL of the dataset data source, if the dataset was uploaded via URL.
     type: string
+    minLength: 10
+  DatasetSourcesPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value?:
+        type: DatasetSource[]
+        uniqueItems: true
   DatasetStatusInfo:
     description: Information about the import and install status of a dataset.
     type: object

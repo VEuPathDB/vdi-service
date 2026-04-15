@@ -24,6 +24,7 @@ import java.util.List;
     "shortAttribution",
     "daysForApproval",
     "dataDisclaimer",
+    "datasetSources",
     "type",
     "visibility"
 })
@@ -81,6 +82,9 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
 
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   private String dataDisclaimer;
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  private List<DatasetSource> datasetSources;
 
   @JsonProperty(JsonField.TYPE)
   private DatasetTypeInput type;
@@ -265,6 +269,16 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   public void setDataDisclaimer(String dataDisclaimer) {
     this.dataDisclaimer = dataDisclaimer;
+  }
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  public List<DatasetSource> getDatasetSources() {
+    return this.datasetSources;
+  }
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  public void setDatasetSources(List<DatasetSource> datasetSources) {
+    this.datasetSources = datasetSources;
   }
 
   @JsonProperty(JsonField.TYPE)

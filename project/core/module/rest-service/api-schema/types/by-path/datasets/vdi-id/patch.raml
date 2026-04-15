@@ -35,6 +35,7 @@ types:
       shortAttribution?: OptionalStringPatch
       daysForApproval?: OptionalIntPatch
       dataDisclaimer?: OptionalStringPatch
+      datasetSources?: DatasetSourcesPatch
 
   ContactsPatch:
     # language=markdown
@@ -199,8 +200,15 @@ types:
     additionalProperties: false
 
   VisibilityPatch:
-    # language=markdown
     type: object
     properties:
       value?: common.DatasetVisibility
     additionalProperties: false
+
+  DatasetSourcesPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value?:
+        type: common.DatasetSource[]
+        uniqueItems: true

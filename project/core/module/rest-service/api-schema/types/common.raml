@@ -6,13 +6,13 @@ uses:
 types:
   BioprojectIDReference:
     type: object
-    additionalProperties: false
     properties:
       id:
         type: string
         minLength: 4
         maxLength: 64
       description?: string
+    additionalProperties: false
 
   DatasetCharacteristics:
     type: object
@@ -33,6 +33,7 @@ types:
         uniqueItems: true
       years?: SampleYearRange
       studySpecies?:
+        displayName: Study Population Species
         type: array
         items:
           type: string
@@ -321,6 +322,9 @@ types:
         maximum: 365
         default: -1
       dataDisclaimer?: string
+      datasetSources?:
+        type: DatasetSource[]
+        uniqueItems: true
     additionalProperties: false
 
   DatasetName:
@@ -416,6 +420,28 @@ types:
     description: |
       URL of the dataset data source, if the dataset was uploaded via URL.
     type: string
+    minLength: 10
+
+  DatasetSource:
+    displayName: Dataset Source
+    description: External dataset source reference.
+    type: object
+    properties:
+      url:
+        description: URL to the external data source.
+        type: string
+        minLength: 10
+      version:
+        # language=markdown
+        description: |
+          Version of the data that was retrieved from the dataset source url.
+
+          If the data source does not have versioning, this value may be the
+          date the data was retrieved.
+        type: string
+        minLength: 1
+        maxLength: 128
+    additionalProperties: false
 
   DatasetStatusInfo:
     description: Information about the import and install status of a dataset.

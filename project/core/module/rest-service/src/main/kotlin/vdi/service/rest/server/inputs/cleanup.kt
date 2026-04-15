@@ -135,3 +135,15 @@ internal fun <T: Any> T.cleanupString(getter: KFunction0<String?>, nullOutBlanks
     it?.trim()
       ?.run { if (nullOutBlanks && isEmpty()) null else this }
   }
+
+
+@Suppress("UNCHECKED_CAST")
+internal fun <T: Any, V: Any> T.cleanupIfNotNull(getter: KFunction0<V?>, using: (V) -> V) {
+  val setter = getter.name.replaceFirst('g', 's')
+    .let { setter -> this::class.declaredMemberFunctions.first { it.name == setter } }
+    .let { it as KFunction2<T, V, Unit> }
+
+  getter()
+    ?.let(using)
+    ?.also { setter(this, it) }
+}

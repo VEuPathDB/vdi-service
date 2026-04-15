@@ -21,7 +21,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "funding",
     "shortAttribution",
     "daysForApproval",
-    "dataDisclaimer"
+    "dataDisclaimer",
+    "datasetSources"
 })
 public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.TYPE)
@@ -71,6 +72,9 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
 
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   private OptionalStringPatch dataDisclaimer;
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  private DatasetSourcesPatch datasetSources;
 
   @JsonProperty(JsonField.TYPE)
   public DatasetTypePatch getType() {
@@ -230,5 +234,15 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   public void setDataDisclaimer(OptionalStringPatch dataDisclaimer) {
     this.dataDisclaimer = dataDisclaimer;
+  }
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  public DatasetSourcesPatch getDatasetSources() {
+    return this.datasetSources;
+  }
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  public void setDatasetSources(DatasetSourcesPatch datasetSources) {
+    this.datasetSources = datasetSources;
   }
 }

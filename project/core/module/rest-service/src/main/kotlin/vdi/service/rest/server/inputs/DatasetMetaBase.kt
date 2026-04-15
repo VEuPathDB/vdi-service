@@ -7,6 +7,7 @@ import org.veupathdb.lib.request.validation.checkLength
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.reqCheckLength
 import vdi.service.rest.generated.model.*
+import vdi.service.rest.server.conversion.DatasetSourceConverter
 
 val DatasetNameLengthRange = 3..1024
 val OriginLengthRange = 3..256
@@ -31,6 +32,8 @@ fun DatasetMetaBase.cleanup() {
   cleanup(::getExternalIdentifiers, ExternalIdentifiers?::cleanup)
   cleanupDistinctList(::getFunding, DatasetFundingAward?::cleanup)
   cleanupString(::getShortAttribution)
+  cleanupString(::getDataDisclaimer)
+  cleanupIfNotNull(::getDatasetSources, DatasetSourceConverter::cleanup)
 }
 
 fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
@@ -50,4 +53,5 @@ fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
   funding.validate(JsonField.META..JsonField.FUNDING, errors)
   shortAttribution?.checkLength(JsonField.META..JsonField.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
   daysForApproval?.checkInRange(JsonField.META..JsonField.DAYS_FOR_APPROVAL, -1, 365, errors)
+  datasetSources?.also { DatasetSourceConverter.validate(it, JsonField.META..JsonField.DATASET_SOURCES, errors) }
 }

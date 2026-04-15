@@ -27,6 +27,7 @@ import java.util.List;
     "shortAttribution",
     "daysForApproval",
     "dataDisclaimer",
+    "datasetSources",
     "datasetId",
     "type",
     "visibility",
@@ -94,6 +95,9 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   private String dataDisclaimer;
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  private List<DatasetSource> datasetSources;
 
   @JsonProperty(JsonField.DATASET_ID)
   private String datasetId;
@@ -305,6 +309,16 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   public void setDataDisclaimer(String dataDisclaimer) {
     this.dataDisclaimer = dataDisclaimer;
+  }
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  public List<DatasetSource> getDatasetSources() {
+    return this.datasetSources;
+  }
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  public void setDatasetSources(List<DatasetSource> datasetSources) {
+    this.datasetSources = datasetSources;
   }
 
   @JsonProperty(JsonField.DATASET_ID)

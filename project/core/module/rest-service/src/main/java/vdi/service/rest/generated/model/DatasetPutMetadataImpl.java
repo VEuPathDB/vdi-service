@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "shortAttribution",
     "daysForApproval",
     "dataDisclaimer",
+    "datasetSources",
     "origin",
     "revisionNote"
 })
@@ -73,6 +74,9 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
 
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   private OptionalStringPatch dataDisclaimer;
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  private DatasetSourcesPatch datasetSources;
 
   @JsonProperty(JsonField.ORIGIN)
   private String origin;
@@ -238,6 +242,16 @@ public class DatasetPutMetadataImpl implements DatasetPutMetadata {
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   public void setDataDisclaimer(OptionalStringPatch dataDisclaimer) {
     this.dataDisclaimer = dataDisclaimer;
+  }
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  public DatasetSourcesPatch getDatasetSources() {
+    return this.datasetSources;
+  }
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  public void setDatasetSources(DatasetSourcesPatch datasetSources) {
+    this.datasetSources = datasetSources;
   }
 
   @JsonProperty(JsonField.ORIGIN)

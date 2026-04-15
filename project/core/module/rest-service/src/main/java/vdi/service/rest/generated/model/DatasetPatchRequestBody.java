@@ -102,4 +102,10 @@ public interface DatasetPatchRequestBody {
 
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   void setDataDisclaimer(OptionalStringPatch dataDisclaimer);
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  DatasetSourcesPatch getDatasetSources();
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  void setDatasetSources(DatasetSourcesPatch datasetSources);
 }

@@ -23,7 +23,8 @@ import java.util.List;
     "funding",
     "shortAttribution",
     "daysForApproval",
-    "dataDisclaimer"
+    "dataDisclaimer",
+    "datasetSources"
 })
 public class DatasetMetaBaseImpl implements DatasetMetaBase {
   @JsonProperty(JsonField.INSTALL_TARGETS)
@@ -79,6 +80,9 @@ public class DatasetMetaBaseImpl implements DatasetMetaBase {
 
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   private String dataDisclaimer;
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  private List<DatasetSource> datasetSources;
 
   @JsonProperty(JsonField.INSTALL_TARGETS)
   public List<String> getInstallTargets() {
@@ -254,5 +258,15 @@ public class DatasetMetaBaseImpl implements DatasetMetaBase {
   @JsonProperty(JsonField.DATA_DISCLAIMER)
   public void setDataDisclaimer(String dataDisclaimer) {
     this.dataDisclaimer = dataDisclaimer;
+  }
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  public List<DatasetSource> getDatasetSources() {
+    return this.datasetSources;
+  }
+
+  @JsonProperty(JsonField.DATASET_SOURCES)
+  public void setDatasetSources(List<DatasetSource> datasetSources) {
+    this.datasetSources = datasetSources;
   }
 }

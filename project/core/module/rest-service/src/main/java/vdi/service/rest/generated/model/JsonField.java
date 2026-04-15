@@ -36,6 +36,7 @@ public final class JsonField {
   public static final String DATA_UPDATE_TIME = "dataUpdateTime";
   public static final String DATASET_CHARACTERISTICS = "datasetCharacteristics";
   public static final String DATASET_ID = "datasetId";
+  public static final String DATASET_SOURCES = "datasetSources";
   public static final String DATASET_TYPE = "datasetType";
   public static final String DATASET_URI = "datasetUri";
   public static final String DAYS_FOR_APPROVAL = "daysForApproval";
