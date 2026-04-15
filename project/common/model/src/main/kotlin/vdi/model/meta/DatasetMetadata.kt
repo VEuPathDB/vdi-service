@@ -181,6 +181,15 @@ data class DatasetMetadata(
   @param:JsonProperty(DataDisclaimer)
   @field:JsonProperty(DataDisclaimer)
   val dataDisclaimer: String? = null,
+
+  /**
+   * External sites or repositories where the dataset data is or was available.
+   *
+   * @since v1.8.0
+   */
+  @param:JsonProperty(DatasetSources)
+  @field:JsonProperty(DatasetSources)
+  val datasetSources: List<DatasetSource> = emptyList(),
 ) {
   /**
    * Truncated name for the dataset.
@@ -191,26 +200,27 @@ data class DatasetMetadata(
   val shortName get() = name.take(40)
 
   companion object JsonKey {
+    const val Characteristics     = "datasetCharacteristics"
     const val Contacts            = "contacts"
     const val Created             = "created"
     const val DataDisclaimer      = "dataDisclaimer"
+    const val DatasetSources      = "datasetSources"
     const val DaysForApproval     = "daysForApproval"
     const val Dependencies        = "dependencies"
     const val Description         = "description"
     const val ExternalIdentifiers = "externalIdentifiers"
     const val Funding             = "funding"
     const val InstallTargets      = "installTargets"
+    const val LinkedDatasets      = "linkedDatasets"
     const val Name                = "name"
     const val Origin              = "origin"
     const val Owner               = "owner"
     const val ProgramName         = "programName"
     const val ProjectName         = "projectName"
     const val Publications        = "publications"
-    const val LinkedDatasets      = "linkedDatasets"
     const val RevisionHistory     = "revisionHistory"
     const val ShortAttribution    = "shortAttribution"
     const val SourceURL           = "sourceUrl"
-    const val Characteristics     = "datasetCharacteristics"
     const val Summary             = "summary"
     const val Type                = "type"
     const val Visibility          = "visibility"
