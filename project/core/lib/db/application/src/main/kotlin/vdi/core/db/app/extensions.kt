@@ -80,6 +80,7 @@ fun AppDBTransaction.purgeDatasetControlTables(datasetID: DatasetID, flag: Delet
   deleteInstallMessages(datasetID)
   deleteExternalDatasetLinks(datasetID)
   deleteDatasetMeta(datasetID)
+  deleteDatasetOrganisms(datasetID)
   deleteDatasetProjectLinks(datasetID)
   deletePublications(datasetID)
   deleteSampleTypes(datasetID)
@@ -112,6 +113,12 @@ fun AppDBTransaction.upsertDatasetRecord(
   replace(datasetID, meta.publications, ::deletePublications, ::insertPublications)
   replace(datasetID, meta.externalIdentifiers?.hyperlinks, ::deleteHyperlinks, ::insertHyperlinks)
   replace(datasetID, meta.contacts, ::deleteContacts, ::insertContacts)
+
+  deleteDatasetOrganisms(datasetID)
+  if (meta.experimentalOrganism != null)
+    insertExperimentalOrganism(datasetID, meta.experimentalOrganism!!)
+  if (meta.hostOrganism != null)
+    insertHostOrganism(datasetID, meta.hostOrganism!!)
 
   replace(datasetID, meta.funding, ::deleteFundingAwards, ::insertFundingAwards)
 

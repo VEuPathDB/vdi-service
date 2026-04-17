@@ -31,6 +31,9 @@ import vdi.core.db.app.sql.dataset_link.insertLinks
 import vdi.core.db.app.sql.dataset_meta.deleteDatasetMeta
 import vdi.core.db.app.sql.dataset_meta.insertDatasetMeta
 import vdi.core.db.app.sql.dataset_meta.updateDatasetMeta
+import vdi.core.db.app.sql.dataset_organism.deleteDatasetOrganisms
+import vdi.core.db.app.sql.dataset_organism.insertExperimentalOrganism
+import vdi.core.db.app.sql.dataset_organism.insertHostOrganism
 import vdi.core.db.app.sql.dataset_project.*
 import vdi.core.db.app.sql.dataset_publication.deleteDatasetPublications
 import vdi.core.db.app.sql.dataset_publication.insertDatasetPublications
@@ -260,6 +263,22 @@ internal abstract class AppDBTransactionImpl(
   }
 
   // endregion dataset_meta
+
+  // region dataset_organism
+
+  override fun deleteDatasetOrganisms(datasetID: DatasetID) =
+    connection.deleteDatasetOrganisms(schema, datasetID)
+      .also { if (it > 0) logger.debug("deleted {} dataset_organism records from dataset {}", it, datasetID) }
+
+  override fun insertExperimentalOrganism(datasetID: DatasetID, organism: DatasetOrganism) =
+    (connection.insertExperimentalOrganism(schema, datasetID, organism) > 0)
+      .also { if (it) logger.debug("inserted experimental dataset_organism record for dataset {}", datasetID) }
+
+  override fun insertHostOrganism(datasetID: DatasetID, organism: DatasetOrganism) =
+    (connection.insertHostOrganism(schema, datasetID, organism) > 0)
+      .also { if (it) logger.debug("inserted host dataset_organism record for dataset {}", datasetID) }
+
+  // endregion dataset_organism
 
   // region dataset_project
 

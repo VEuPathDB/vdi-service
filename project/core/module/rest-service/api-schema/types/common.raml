@@ -6,13 +6,13 @@ uses:
 types:
   BioprojectIDReference:
     type: object
+    additionalProperties: false
     properties:
       id:
         type: string
         minLength: 4
         maxLength: 64
       description?: string
-    additionalProperties: false
 
   DatasetCharacteristics:
     type: object
@@ -309,6 +309,14 @@ types:
           related to the dataset represented by this metadata object.
         type: LinkedDataset[]
         uniqueItems: true
+      experimentalOrganism?:
+        # language=markdown
+        description: |-
+          Required for Genomics, VectorBase, and Microbiome.
+
+          Optional for ClinEpi.
+        type: DatasetOrganism
+      hostOrganism?: DatasetOrganism
       datasetCharacteristics?: DatasetCharacteristics
       externalIdentifiers?: ExternalIdentifiers
       funding?:
@@ -333,6 +341,13 @@ types:
     description: User-provided name for the dataset.
     minLength: 3
     maxLength: 1024
+
+  DatasetOrganism:
+    type: object
+    additionalProperties: false
+    properties:
+      species: string
+      strain: string
 
   DatasetOrigin:
     displayName: Dataset Origin

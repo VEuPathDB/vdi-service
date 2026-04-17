@@ -216,6 +216,16 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // endregion dataset_meta
 
+  // region dataset_organism
+
+  fun deleteDatasetOrganisms(datasetID: DatasetID): Int
+
+  fun insertExperimentalOrganism(datasetID: DatasetID, organism: DatasetOrganism): Boolean
+
+  fun insertHostOrganism(datasetID: DatasetID, organism: DatasetOrganism): Boolean
+
+  // endregion dataset_organism
+
   // region dataset_project
 
   /**

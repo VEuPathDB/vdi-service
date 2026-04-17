@@ -136,6 +136,20 @@ data class DatasetMetadata(
   /**
    * @since v1.7.0
    */
+  @param:JsonProperty(ExperimentalOrganism)
+  @field:JsonProperty(ExperimentalOrganism)
+  val experimentalOrganism: DatasetOrganism? = null,
+
+  /**
+   * @since v1.7.0
+   */
+  @param:JsonProperty(HostOrganism)
+  @field:JsonProperty(HostOrganism)
+  val hostOrganism: DatasetOrganism? = null,
+
+  /**
+   * @since v1.7.0
+   */
   @param:JsonAlias(LegacyDatasetCharacteristics)
   @param:JsonProperty(Characteristics)
   @field:JsonProperty(Characteristics)
@@ -200,30 +214,32 @@ data class DatasetMetadata(
   val shortName get() = name.take(40)
 
   companion object JsonKey {
-    const val Characteristics     = "datasetCharacteristics"
-    const val Contacts            = "contacts"
-    const val Created             = "created"
-    const val DataDisclaimer      = "dataDisclaimer"
-    const val DatasetSources      = "datasetSources"
-    const val DaysForApproval     = "daysForApproval"
-    const val Dependencies        = "dependencies"
-    const val Description         = "description"
-    const val ExternalIdentifiers = "externalIdentifiers"
-    const val Funding             = "funding"
-    const val InstallTargets      = "installTargets"
-    const val LinkedDatasets      = "linkedDatasets"
-    const val Name                = "name"
-    const val Origin              = "origin"
-    const val Owner               = "owner"
-    const val ProgramName         = "programName"
-    const val ProjectName         = "projectName"
-    const val Publications        = "publications"
-    const val RevisionHistory     = "revisionHistory"
-    const val ShortAttribution    = "shortAttribution"
-    const val SourceURL           = "sourceUrl"
-    const val Summary             = "summary"
-    const val Type                = "type"
-    const val Visibility          = "visibility"
+    const val Characteristics      = "datasetCharacteristics"
+    const val Contacts             = "contacts"
+    const val Created              = "created"
+    const val DataDisclaimer       = "dataDisclaimer"
+    const val DatasetSources       = "datasetSources"
+    const val DaysForApproval      = "daysForApproval"
+    const val Dependencies         = "dependencies"
+    const val Description          = "description"
+    const val ExperimentalOrganism = "experimentalOrganism"
+    const val ExternalIdentifiers  = "externalIdentifiers"
+    const val Funding              = "funding"
+    const val HostOrganism         = "hostOrganism"
+    const val InstallTargets       = "installTargets"
+    const val LinkedDatasets       = "linkedDatasets"
+    const val Name                 = "name"
+    const val Origin               = "origin"
+    const val Owner                = "owner"
+    const val ProgramName          = "programName"
+    const val ProjectName          = "projectName"
+    const val Publications         = "publications"
+    const val RevisionHistory      = "revisionHistory"
+    const val ShortAttribution     = "shortAttribution"
+    const val SourceURL            = "sourceUrl"
+    const val Summary              = "summary"
+    const val Type                 = "type"
+    const val Visibility           = "visibility"
 
     private const val LegacyDatasetCharacteristics = "studyCharacteristics"
     private const val LegacyInstallTargets = "projects"
