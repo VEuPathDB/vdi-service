@@ -18,7 +18,7 @@ public interface Plugins {
 
   @GET
   @Produces("application/json")
-  GetPluginsResponse getPlugins(@QueryParam("installTarget") String installTarget);
+  GetPluginsResponse getPlugins(@QueryParam("install-target") String installTarget);
 
   class GetPluginsResponse extends ResponseDelegate {
     public GetPluginsResponse(Response response, Object entity) {
