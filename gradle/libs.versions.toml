@@ -18,7 +18,7 @@ vpdb = { id = "org.veupathdb.lib.gradle.container.container-utils", version = "6
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-engine = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
-kt-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.2" }
+kt-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.11.0" }
 
 # Logging
 log-slf4j-api = { module = "org.slf4j:slf4j-api",      version.ref = "slf4j" }
