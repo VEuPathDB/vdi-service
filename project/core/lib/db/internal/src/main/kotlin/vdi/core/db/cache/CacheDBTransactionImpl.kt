@@ -18,7 +18,7 @@ internal class CacheDBTransactionImpl(
   private val con: Connection,
   override val details: CacheDBConnectionDetails,
 ): CacheDBTransaction, CacheDBImplBase() {
-  private val log = logger("CacheDB")
+  private val log = logger<CacheDB>()
 
   private var committed = false
 
