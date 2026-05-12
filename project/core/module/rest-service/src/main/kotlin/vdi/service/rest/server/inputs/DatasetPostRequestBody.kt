@@ -21,6 +21,9 @@ fun DatasetPostRequestBody.cleanup() {
   dataPropertiesFile = dataPropertiesFile.takeUnless(Collection<*>::isNullOrEmpty)
 }
 
+/**
+ * Validates an incoming dataset creation POST request.
+ */
 @Suppress("DuplicatedCode") // overlap in generated API pojo field names
 fun DatasetPostRequestBody.validate(): Either<BadRequestError, ValidationErrors> {
   // DatasetPostRequestBody is not a JSON object, it is a multipart/form-data

@@ -7,6 +7,9 @@ import kotlin.reflect.full.findAnnotation
 import vdi.core.install.InstallTargetRegistry
 
 
+fun newJsonPath(rootField: String) = "$.$rootField"
+
+
 /* ┌────────────────────────────────────────────────────────────────────────┐ *\
  * │                                                                        │ *
  * │   Scalar Collection Type Validations                                   │ *

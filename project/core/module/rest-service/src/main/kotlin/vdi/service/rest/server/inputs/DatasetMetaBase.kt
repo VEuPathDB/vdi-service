@@ -39,23 +39,25 @@ fun DatasetMetaBase.cleanup() {
 }
 
 fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
-  installTargets.validateProjects(JsonField.META..JsonField.INSTALL_TARGETS, errors)
-  name.reqCheckLength(JsonField.META..JsonField.NAME, DatasetNameLengthRange, errors)
-  summary.reqCheckLength(JsonField.META..JsonField.SUMMARY, SummaryLengthRange, errors)
+  val root = newJsonPath(JsonField.DETAILS)
+
+  installTargets.validateProjects(root..JsonField.INSTALL_TARGETS, errors)
+  name.reqCheckLength(root..JsonField.NAME, DatasetNameLengthRange, errors)
+  summary.reqCheckLength(root..JsonField.SUMMARY, SummaryLengthRange, errors)
   // description - no validation
-  origin.reqCheckLength(JsonField.META..JsonField.ORIGIN, OriginLengthRange, errors)
-  dependencies.validate(JsonField.META..JsonField.DEPENDENCIES, errors)
-  publications.validate(JsonField.META..JsonField.PUBLICATIONS, errors)
-  contacts.validate(JsonField.META..JsonField.CONTACTS, strict, errors)
-  projectName?.checkLength(JsonField.META..JsonField.PROJECT_NAME, ProjectNameLengthRange, errors)
-  programName?.checkLength(JsonField.META..JsonField.PROGRAM_NAME, ProgramNameLengthRange, errors)
-  linkedDatasets.validate(JsonField.META..JsonField.LINKED_DATASETS, errors)
-  experimentalOrganism?.validate(JsonField.META..JsonField.EXPERIMENTAL_ORGANISM, errors)
-  hostOrganism.validate(JsonField.META..JsonField.HOST_ORGANISM, errors)
-  datasetCharacteristics?.validate(JsonField.META..JsonField.DATASET_CHARACTERISTICS, errors)
-  externalIdentifiers?.validate(JsonField.META..JsonField.EXTERNAL_IDENTIFIERS, errors)
-  funding.validate(JsonField.META..JsonField.FUNDING, errors)
-  shortAttribution?.checkLength(JsonField.META..JsonField.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
-  daysForApproval?.checkInRange(JsonField.META..JsonField.DAYS_FOR_APPROVAL, -1, 365, errors)
-  datasetSources?.also { DatasetSourceConverter.validate(it, JsonField.META..JsonField.DATASET_SOURCES, errors) }
+  origin.reqCheckLength(root..JsonField.ORIGIN, OriginLengthRange, errors)
+  dependencies.validate(root..JsonField.DEPENDENCIES, errors)
+  publications.validate(root..JsonField.PUBLICATIONS, errors)
+  contacts.validate(root..JsonField.CONTACTS, strict, errors)
+  projectName?.checkLength(root..JsonField.PROJECT_NAME, ProjectNameLengthRange, errors)
+  programName?.checkLength(root..JsonField.PROGRAM_NAME, ProgramNameLengthRange, errors)
+  linkedDatasets.validate(root..JsonField.LINKED_DATASETS, errors)
+  experimentalOrganism?.validate(root..JsonField.EXPERIMENTAL_ORGANISM, errors)
+  hostOrganism.validate(root..JsonField.HOST_ORGANISM, errors)
+  datasetCharacteristics?.validate(root..JsonField.DATASET_CHARACTERISTICS, errors)
+  externalIdentifiers?.validate(root..JsonField.EXTERNAL_IDENTIFIERS, errors)
+  funding.validate(root..JsonField.FUNDING, errors)
+  shortAttribution?.checkLength(root..JsonField.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
+  daysForApproval?.checkInRange(root..JsonField.DAYS_FOR_APPROVAL, -1, 365, errors)
+  datasetSources?.also { DatasetSourceConverter.validate(it, JsonField.DETAILS..JsonField.DATASET_SOURCES, errors) }
 }

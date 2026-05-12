@@ -21,7 +21,7 @@ data class DatasetRecord(
     meta:            DatasetMetadata,
     category:        String,
     deletionState:   DeleteFlag = DeleteFlag.NOT_DELETED,
-  ): this (
+  ): this(
     datasetID,
     meta.owner,
     meta.type,

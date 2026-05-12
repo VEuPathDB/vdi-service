@@ -28,7 +28,7 @@ internal fun DatasetPostMeta.cleanup() {
 }
 
 internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
-  type.validate(JF.META..JF.TYPE, installTargets, errors)
+  type.validate(newJsonPath(JF.DETAILS)..JF.TYPE, installTargets, errors)
   (this as DatasetMetaBase).validate(visibility == DatasetVisibility.PUBLIC, errors)
 }
 
