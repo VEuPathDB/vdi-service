@@ -27,6 +27,7 @@ import vdi.core.plugin.registry.PluginRegistry
 import vdi.logging.mark
 import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
+import vdi.model.misc.UploadErrorReport
 import vdi.service.rest.config.SupportedArchiveType
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.BadRequestError
@@ -166,7 +167,11 @@ fun ControllerBase.writeMetadata(userID: UserID, datasetID: DatasetID, datasetMe
     CacheDB().withTransaction { it.upsertUploadStatus(datasetID, DatasetUploadStatus.Failed) }
 
     try {
-      DatasetStore.putUploadError(userID, datasetID, "internal server error while communicating with object store", e)
+      DatasetStore.putUploadError(
+        userID,
+        datasetID,
+        UploadErrorReport(DatasetUploadStatus.Failed, "internal server error while communicating with object store", e),
+      )
     } catch (e2: Throwable) {
       e.addSuppressed(e2)
     }
@@ -242,7 +247,7 @@ fun ControllerBase.uploadFiles(
       uploadStatus = DatasetUploadStatus.Rejected
 
       try {
-        DatasetStore.putUploadError(userID, datasetID, e.message!!)
+        DatasetStore.putUploadError(userID, datasetID, UploadErrorReport(uploadStatus, e.message!!))
       } catch (e2: Throwable) {
         e.addSuppressed(e2)
       }
@@ -252,7 +257,7 @@ fun ControllerBase.uploadFiles(
       Metrics.Upload.failed.inc()
 
       try {
-        DatasetStore.putUploadError(userID, datasetID, "internal server error", e)
+        DatasetStore.putUploadError(userID, datasetID, UploadErrorReport(uploadStatus, "internal server error", e))
       } catch (e2: Throwable) {
         e.addSuppressed(e2)
       }
@@ -333,7 +338,7 @@ private fun Path.repack(
     SupportedArchiveType.ZIP.matches(name) -> {
       validateZip(dataTypeMeta, controller.getUserRemainingQuota(uploadConfig))
         ?.let { Either.right(it) }
-        ?: Either.left(repackZip(into, using))
+        ?: repackZip(into, using)
     }
 
     SupportedArchiveType.TAR_GZ.matches(name) -> {
@@ -370,7 +375,7 @@ private fun List<Path>.pack(into: Path): List<DatasetFileInfo> {
  * @return A map of upload files and their sizes.
  */
 context(logger: Logger)
-private fun Path.repackZip(into: Path, using: Path): List<DatasetFileInfo> {
+private fun Path.repackZip(into: Path, using: Path): Either<List<DatasetFileInfo>, BadRequestError> {
   logger.trace("repacking zip file {} into {}", this, into)
 
   // Map of file names to sizes that will be stored in the postgres database.
@@ -392,7 +397,7 @@ private fun Path.repackZip(into: Path, using: Path): List<DatasetFileInfo> {
             return@forEach
           }
 
-          throw BadRequestException("uploaded zip file must not contain subdirectories")
+          return Either.right(BadRequestError("uploaded zip file must not contain subdirectories"))
         }
 
         val tmpFile = using.resolve(entry.name)
@@ -405,17 +410,17 @@ private fun Path.repackZip(into: Path, using: Path): List<DatasetFileInfo> {
         unpacked.add(tmpFile)
       }
   } catch (_: IllegalStateException) {
-    throw BadRequestException("decompressed file size is too large")
+    return Either.right(BadRequestError("decompressed file size is too large"))
   }
 
   // ensure that the zip actually contained some files
   if (unpacked.isEmpty())
-    throw BadRequestException("uploaded file was empty or was not a valid zip")
+    return Either.right(BadRequestError("uploaded file was empty or was not a valid zip"))
 
   logger.info("Compressing file from {} into {}", unpacked, into)
   into.compress(unpacked)
 
-  return files
+  return Either.left(files)
 }
 
 /**

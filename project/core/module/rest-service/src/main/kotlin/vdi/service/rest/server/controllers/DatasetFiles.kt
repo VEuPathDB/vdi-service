@@ -128,7 +128,7 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
 
     // remove the stacktrace information if the requester is a normal user.
     if (forUser)
-      jacksonObject.remove(UploadErrorReport.Stacktrace)
+      jacksonObject.remove(UploadErrorReport.JsonKey.Stacktrace)
 
     val response = Response.status(200)
       .type(MediaType.APPLICATION_JSON)

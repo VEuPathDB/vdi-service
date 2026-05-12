@@ -15,6 +15,7 @@ import vdi.core.s3.paths.S3Paths
 import vdi.core.s3.util.S3Config
 import vdi.json.JSON
 import vdi.json.toJSONString
+import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 import vdi.model.misc.UploadErrorReport
 
@@ -131,11 +132,9 @@ object DatasetStore {
   fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
     bucket.objects.list(prefix = S3Paths.datasetDir(userID, datasetID))
 
-  fun putUploadError(userID: UserID, datasetID: DatasetID, message: String, ex: Throwable? = null) {
+  fun putUploadError(userID: UserID, datasetID: DatasetID, error: UploadErrorReport) {
     store.getDatasetDirectory(userID, datasetID)
-      .putUploadErrorFile(
-        ex?.let { UploadErrorReport(message, it) }
-          ?: UploadErrorReport(message))
+      .putUploadErrorFile(error)
   }
 
   @JvmStatic
