@@ -1,10 +1,8 @@
 package vdi.core.db.app.sql.dataset_meta
 
-import io.foxcapades.kdbc.set
 import io.foxcapades.kdbc.withPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.sql.Table
-import vdi.core.db.jdbc.set
 import vdi.core.db.jdbc.setDatasetID
 import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata

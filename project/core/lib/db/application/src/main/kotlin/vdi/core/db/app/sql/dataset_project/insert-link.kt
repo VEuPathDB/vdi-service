@@ -19,9 +19,11 @@ INSERT INTO
   )
 VALUES
   (?, ?, ?)
+ON CONFLICT (dataset_id, project_id)
+  DO NOTHING
 """
 
-internal fun Connection.insertDatasetProjectLink(schema: String, datasetID: DatasetID, installTarget: InstallTargetID) {
+internal fun Connection.tryInsertDatasetProjectLink(schema: String, datasetID: DatasetID, installTarget: InstallTargetID) {
   withPreparedUpdate(sql(schema)) {
     setDatasetID(1, datasetID)
     setString(2, installTarget)

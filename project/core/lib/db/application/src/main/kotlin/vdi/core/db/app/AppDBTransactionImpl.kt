@@ -291,7 +291,7 @@ internal abstract class AppDBTransactionImpl(
   }
 
   override fun insertDatasetProjectLink(datasetID: DatasetID) {
-    connection.insertDatasetProjectLink(schema, datasetID, installTarget)
+    connection.tryInsertDatasetProjectLink(schema, datasetID, installTarget)
   }
 
   override fun insertDatasetProjectLinks(datasetID: DatasetID, projectIDs: Iterable<InstallTargetID>) {

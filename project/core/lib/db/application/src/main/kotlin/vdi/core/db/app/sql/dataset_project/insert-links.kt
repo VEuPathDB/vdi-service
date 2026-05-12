@@ -18,6 +18,8 @@ INSERT INTO
   )
 VALUES
   (?, ?, ?)
+ON CONFLICT (dataset_id, project_id)
+  DO NOTHING
 """
 
 internal fun Connection.insertDatasetProjectLinks(
