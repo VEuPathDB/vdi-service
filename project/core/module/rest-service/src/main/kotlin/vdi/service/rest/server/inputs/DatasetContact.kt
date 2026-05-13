@@ -33,9 +33,9 @@ private fun APIContact.validate(
     else
       String::checkLength
 
-  firstName?.strictValidator(jPath..JsonField.FIRST_NAME, index, ContactNameLengthRange, errors)
+  firstName?.reqCheckLength(jPath..JsonField.FIRST_NAME, index, ContactNameLengthRange, errors)
   middleName?.checkLength(jPath..JsonField.MIDDLE_NAME, index, ContactNameLengthRange, errors)
-  lastName?.strictValidator(jPath..JsonField.LAST_NAME, index, ContactNameLengthRange, errors)
+  lastName?.reqCheckLength(jPath..JsonField.LAST_NAME, index, ContactNameLengthRange, errors)
   email?.strictValidator(jPath..JsonField.EMAIL, index, EmailLengthRange, errors)
   affiliation?.strictValidator(jPath..JsonField.AFFILIATION, index, AffiliationLengthRange, errors)
   country?.strictValidator(jPath..JsonField.COUNTRY, index, CountryLengthRange, errors)
