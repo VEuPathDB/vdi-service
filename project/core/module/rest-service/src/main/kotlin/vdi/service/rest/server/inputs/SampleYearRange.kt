@@ -3,7 +3,9 @@ package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.reqCheckInRange
+import org.veupathdb.lib.request.validation.rangeTo
 import vdi.model.meta.SampleYearRange
+import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.SampleYearRange as APIYearRange
 
 private const val MinYear: Short = 1500
@@ -14,8 +16,8 @@ fun APIYearRange?.cleanup() =
   this?.takeUnless { it.start == null && it.end == null }
 
 fun APIYearRange.validate(jPath: String, errors: ValidationErrors) {
-  start.reqCheckInRange(jPath, MinYear, MaxYear, errors)
-  end.reqCheckInRange(jPath, MinYear, MaxYear, errors)
+  start.reqCheckInRange(jPath..JsonField.START, MinYear, MaxYear, errors)
+  end.reqCheckInRange(jPath..JsonField.END, MinYear, MaxYear, errors)
 }
 
 fun APIYearRange.toInternal() = SampleYearRange(start, end)

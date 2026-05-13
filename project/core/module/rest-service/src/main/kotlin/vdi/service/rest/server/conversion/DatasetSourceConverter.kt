@@ -10,7 +10,7 @@ import vdi.service.rest.generated.model.DatasetSource as RamlDatasetSource
 
 object DatasetSourceConverter: APIListTypeConverter<RamlDatasetSource?, VdiDatasetSource> {
   private inline val ValidUrlLengths
-    get() = 10..8192
+    get() = 7..8192
 
   private inline val ValidVersionLengths
     get() = 1..128
