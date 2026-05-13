@@ -59,5 +59,5 @@ fun DatasetMetaBase.validate(strict: Boolean, errors: ValidationErrors) {
   funding.validate(root..JsonField.FUNDING, errors)
   shortAttribution?.checkLength(root..JsonField.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
   daysForApproval?.checkInRange(root..JsonField.DAYS_FOR_APPROVAL, -1, 365, errors)
-  datasetSources?.also { DatasetSourceConverter.validate(it, JsonField.DETAILS..JsonField.DATASET_SOURCES, errors) }
+  datasetSources?.also { DatasetSourceConverter.validate(it, root..JsonField.DATASET_SOURCES, errors) }
 }
