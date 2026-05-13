@@ -67,13 +67,16 @@ private fun ControllerBase.getDatasetByID(
     emptyList()
   }
 
+  val uploadReport = when (CacheDB().selectUploadStatus(datasetID)) {
+    DatasetUploadStatus.Success -> null
+    else -> DatasetStore.getUploadErrorReport(dataset.ownerID, datasetID)
+  }
+
+
   return left(DatasetDetails(
     datasetID       = datasetID,
     meta            = metaJson,
-    uploadStatus    = CacheDB().selectUploadStatus(datasetID)
-      // For backwards compatibility, report success for datasets whose status
-      // isn't recorded.  The reconciler should remedy this.
-      ?: DatasetUploadStatus.Success,
+    uploadError     = uploadReport,
     importStatus    = CacheDB().selectImportControl(datasetID),
     importMessages  = CacheDB().selectImportMessages(datasetID),
     shares          = shares,

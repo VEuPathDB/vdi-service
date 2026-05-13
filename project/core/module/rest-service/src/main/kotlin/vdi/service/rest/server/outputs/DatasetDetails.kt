@@ -16,6 +16,7 @@ import vdi.model.meta.DatasetOrganism
 import vdi.model.meta.DatasetPublication
 import vdi.model.meta.LinkedDataset
 import vdi.model.meta.SampleYearRange
+import vdi.model.misc.UploadErrorReport
 import vdi.service.rest.conversion.BioprojectIDReference
 import vdi.service.rest.conversion.DOIReference
 import vdi.service.rest.conversion.DatasetImportStatusInfo
@@ -24,7 +25,6 @@ import vdi.service.rest.conversion.DatasetOwner
 import vdi.service.rest.conversion.DatasetStatusInfo
 import vdi.service.rest.conversion.DatasetUploadStatusInfo
 import vdi.service.rest.generated.model.*
-import vdi.service.rest.lookups.DatasetStatusLookups
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.generated.model.DatasetCharacteristics as APICharacteristics
 import vdi.service.rest.generated.model.DatasetContact as APIContact
@@ -43,7 +43,7 @@ import vdi.service.rest.generated.model.SampleYearRange as APIYears
 internal fun DatasetDetails(
   datasetID: DatasetID,
   meta: DatasetMetadata,
-  uploadStatus: DatasetUploadStatus,
+  uploadError: UploadErrorReport?,
   importStatus: DatasetImportStatus?,
   importMessages: List<String>,
   shares: List<DatasetShare>,
@@ -62,13 +62,8 @@ internal fun DatasetDetails(
         .takeUnless(List<*>::isEmpty)
       it.status = DatasetStatusInfo(
         DatasetUploadStatusInfo(
-          uploadStatus,
-          when (uploadStatus) {
-            DatasetUploadStatus.Failed,
-            DatasetUploadStatus.Rejected ->
-              DatasetStatusLookups.getUploadError(meta.owner, datasetID.asString)
-            else -> null
-          }
+          uploadError?.status ?: DatasetUploadStatus.Success,
+          uploadError?.message,
         ),
         importStatus?.let { status ->
           DatasetImportStatusInfo(status, importMessages.takeUnless(Collection<*>::isEmpty))
