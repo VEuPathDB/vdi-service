@@ -49,9 +49,6 @@ internal fun Iterable<APIContact?>.validate(jPath: String, strict: Boolean, erro
 
       if (isPrimary)
         primaries++
-
-      if (primaries > 1)
-        errors.add(jPath..i)
     }
   }
 
