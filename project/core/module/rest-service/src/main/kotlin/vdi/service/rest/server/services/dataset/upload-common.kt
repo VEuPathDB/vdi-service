@@ -277,7 +277,7 @@ fun ControllerBase.uploadFiles(
       for (path in uploadRefs.docs)
         DatasetStore.putDocumentFile(userID, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
-      logger.error("dataset additional document file(s) upload to object-store failed:", e)
+      logger.error("failed to upload dataset documentation file(s) to object-store:", e)
       throw e
     }
   }
@@ -288,7 +288,7 @@ fun ControllerBase.uploadFiles(
       for (path in uploadRefs.props)
         DatasetStore.putVariablePropertiesFile(userID, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
-      logger.error("dataset additional document file(s) upload to object-store failed:", e)
+      logger.error("failed to upload data properties file(s) to object-store:", e)
       throw e
     }
   }
