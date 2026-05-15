@@ -3,7 +3,7 @@ jackson = "2.21.3"
 kotlin = "2.3.21"
 ktor = "3.4.3"
 log4j = "2.26.0"
-slf4j = "2.0.17"
+slf4j = "2.0.18"
 
 mockito = "5.23.0"
 junit = "6.0.3"
