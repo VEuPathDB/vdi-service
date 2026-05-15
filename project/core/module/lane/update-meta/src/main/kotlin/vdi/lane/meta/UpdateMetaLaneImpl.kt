@@ -210,7 +210,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     }
 
     // Attempt to run the target plugin's install-meta script.
-    val variablePropertiesInstallSucceeded = try {
+    val datasetPropertiesInstallSucceeded = try {
       runPluginInstallMeta(metaTimestamp)
     } catch (e: Throwable) {
       logger.error("plugin error", PluginRequestException.installMeta(plugin.name, target, ownerID, datasetID, cause = e))
@@ -221,7 +221,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
     // If the install-meta script failed, AND the user is attempting to promote
     // the dataset to community, then refuse to change the visibility.
-    if (!variablePropertiesInstallSucceeded && shouldRevertToPrivateOnVariablePropertiesError(meta)) {
+    if (!datasetPropertiesInstallSucceeded && shouldRevertToPrivateOnDatasetPropertiesError(meta)) {
       logger.warn("refusing to make dataset public due to unsuccessful install-meta")
       newMeta = meta.copy(visibility = DatasetVisibility.Private)
     }
@@ -378,12 +378,12 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
   /**
    * Determines if the metadata JSON visibility field should be reset to private
-   * on failure of a variable properties install attempt.
+   * on failure of a dataset properties install attempt.
    *
    * This is done to avoid making promoting a dataset to community if required
    * data is not installed.
    */
-  private fun UpdateMetaContext.WithPlugin.shouldRevertToPrivateOnVariablePropertiesError(meta: DatasetMetadata): Boolean {
+  private fun UpdateMetaContext.WithPlugin.shouldRevertToPrivateOnDatasetPropertiesError(meta: DatasetMetadata): Boolean {
     val publicInTarget = appDB.accessor(target, meta.type)!!
       .selectDataset(datasetID)
       ?.isPublic ?: false
