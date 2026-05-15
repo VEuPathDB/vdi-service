@@ -8,10 +8,10 @@ import vdi.model.meta.DatasetID
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.DatasetFiles
 import vdi.service.rest.server.outputs.*
-import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesVariablePropertiesByVdiIdAndFileNameResponse as GetResponse
-import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.PutDatasetsFilesVariablePropertiesByVdiIdAndFileNameResponse as PutResponse
+import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse as GetResponse
+import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.PutDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse as PutResponse
 
-fun DatasetFiles.getVariablePropertiesFile(
+fun DatasetFiles.getDatasetPropertiesFile(
   datasetID: DatasetID,
   fileName:  String,
   download:  Boolean,
@@ -39,7 +39,7 @@ fun DatasetFiles.getVariablePropertiesFile(
   )
 }
 
-fun DatasetFiles.putVariablePropertiesFile(
+fun DatasetFiles.putDatasetPropertiesFile(
   datasetID: DatasetID,
   fileName:  String,
   file:      File,

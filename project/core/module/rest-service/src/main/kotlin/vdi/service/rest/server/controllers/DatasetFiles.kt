@@ -77,20 +77,20 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
       else -> putUserDocument(DatasetID(vdiId), fileName, entity)
     }
 
-  override fun getDatasetsFilesVariablePropertiesByVdiIdAndFileName(
+  override fun getDatasetsFilesDatasetPropertiesByVdiIdAndFileName(
     vdiId:    String,
     fileName: String,
     // IMPORTANT: java primitives are boxed by code-gen and must be marked as
     // nullable in kotlin, otherwise valid requests will return unexpected 404s.
     download: Boolean?,
-  ) = getVariablePropertiesFile(DatasetID(vdiId), fileName, download ?: true, maybeUser == null)
+  ) = getDatasetPropertiesFile(DatasetID(vdiId), fileName, download ?: true, maybeUser == null)
 
-  override fun putDatasetsFilesVariablePropertiesByVdiIdAndFileName(
+  override fun putDatasetsFilesDatasetPropertiesByVdiIdAndFileName(
     vdiId:    String,
     fileName: String,
     entity:   File?,
   ) = entity
-    ?.let { putVariablePropertiesFile(DatasetID(vdiId), fileName, it, maybeUser == null) }
+    ?.let { putDatasetPropertiesFile(DatasetID(vdiId), fileName, it, maybeUser == null) }
     ?: BadRequestError("upload content not provided").wrap()
 
   override fun getDatasetsFilesByVdiIdAndFileName(
