@@ -36,7 +36,7 @@ internal class S3DatasetPathFactory(
 
   fun documentFile(fileName: String) = S3Paths.datasetDocumentFile(ownerID, datasetID, fileName)
 
-  fun mappingsDir() = S3Paths.variablePropertiesDir(ownerID, datasetID)
+  fun mappingsDir() = S3Paths.datasetPropertiesDir(ownerID, datasetID)
 
-  fun mappingFile(fileName: String) = S3Paths.variablePropertiesFile(ownerID, datasetID, fileName)
+  fun mappingFile(fileName: String) = S3Paths.datasetPropertiesFile(ownerID, datasetID, fileName)
 }

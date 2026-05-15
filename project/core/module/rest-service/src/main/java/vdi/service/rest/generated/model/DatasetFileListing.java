@@ -26,9 +26,9 @@ public interface DatasetFileListing {
   @JsonProperty(JsonField.DOCUMENTS)
   void setDocuments(List<DatasetFileDetails> documents);
 
-  @JsonProperty(JsonField.VARIABLE_PROPERTIES)
-  List<DatasetFileDetails> getVariableProperties();
+  @JsonProperty(JsonField.DATASET_PROPERTIES)
+  List<DatasetFileDetails> getDatasetProperties();
 
-  @JsonProperty(JsonField.VARIABLE_PROPERTIES)
-  void setVariableProperties(List<DatasetFileDetails> variableProperties);
+  @JsonProperty(JsonField.DATASET_PROPERTIES)
+  void setDatasetProperties(List<DatasetFileDetails> datasetProperties);
 }

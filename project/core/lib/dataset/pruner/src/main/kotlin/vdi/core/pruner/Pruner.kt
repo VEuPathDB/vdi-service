@@ -20,7 +20,7 @@ import vdi.core.s3.paths.DataFilePath
 import vdi.core.s3.paths.FlagFilePath
 import vdi.core.s3.paths.MetaFilePath
 import vdi.core.s3.paths.S3Paths
-import vdi.core.s3.paths.VariablePropsFilePath
+import vdi.core.s3.paths.DatasetPropsFilePath
 import vdi.logging.logger
 import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
@@ -65,8 +65,8 @@ object Pruner {
     { MetaFilePath.matches(it) && it.endsWith(FileName.ManifestFile) },
     { MetaFilePath.matches(it) && it.endsWith(FileName.MetadataFile) },
 
-    // Keep the variable properties
-    { VariablePropsFilePath.matches(it) },
+    // Keep the dataset properties
+    { DatasetPropsFilePath.matches(it) },
 
     // Keep the original user upload
     { DataFilePath.matches(it) && (

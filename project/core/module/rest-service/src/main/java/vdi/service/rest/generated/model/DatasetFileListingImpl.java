@@ -10,7 +10,7 @@ import java.util.List;
     "upload",
     "install",
     "documents",
-    "variableProperties"
+    "datasetProperties"
 })
 public class DatasetFileListingImpl implements DatasetFileListing {
   @JsonProperty(JsonField.UPLOAD)
@@ -22,8 +22,8 @@ public class DatasetFileListingImpl implements DatasetFileListing {
   @JsonProperty(JsonField.DOCUMENTS)
   private List<DatasetFileDetails> documents;
 
-  @JsonProperty(JsonField.VARIABLE_PROPERTIES)
-  private List<DatasetFileDetails> variableProperties;
+  @JsonProperty(JsonField.DATASET_PROPERTIES)
+  private List<DatasetFileDetails> datasetProperties;
 
   @JsonProperty(JsonField.UPLOAD)
   public DatasetZipDetails getUpload() {
@@ -55,13 +55,13 @@ public class DatasetFileListingImpl implements DatasetFileListing {
     this.documents = documents;
   }
 
-  @JsonProperty(JsonField.VARIABLE_PROPERTIES)
-  public List<DatasetFileDetails> getVariableProperties() {
-    return this.variableProperties;
+  @JsonProperty(JsonField.DATASET_PROPERTIES)
+  public List<DatasetFileDetails> getDatasetProperties() {
+    return this.datasetProperties;
   }
 
-  @JsonProperty(JsonField.VARIABLE_PROPERTIES)
-  public void setVariableProperties(List<DatasetFileDetails> variableProperties) {
-    this.variableProperties = variableProperties;
+  @JsonProperty(JsonField.DATASET_PROPERTIES)
+  public void setDatasetProperties(List<DatasetFileDetails> datasetProperties) {
+    this.datasetProperties = datasetProperties;
   }
 }

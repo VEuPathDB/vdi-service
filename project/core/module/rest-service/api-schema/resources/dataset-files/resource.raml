@@ -120,11 +120,11 @@ get:
         body: lib.ServerError
 
 /dataset-properties/{file-name}:
-  displayName: Variable Properties Files
+  displayName: Dataset Properties Files
   uriParameters:
     file-name:
   get:
-    displayName: Get Variable Properties File
+    displayName: Get Dataset Properties File
     queryParameters:
       download:
         type: boolean
@@ -150,7 +150,7 @@ get:
         body: lib.ServerError
 
   put:
-    displayName: Put Variable Properties File
+    displayName: Put Dataset Properties File
     body:
       text/tab-separated-values: file
     responses:

@@ -311,7 +311,7 @@ internal class ReconcilerInstance(
   private fun DatasetDirectory.isOutOfSync(targetLastUpdated: SyncControlRecord): SyncStatus {
     return SyncStatus(
       metaOutOfSync    = targetLastUpdated.metaUpdated.isBefore(getMetaFile().lastModified())
-        || getLatestVariablePropertiesTimestamp()?.let { targetLastUpdated.metaUpdated.isBefore(it) } == true,
+        || getLatestDatasetPropertiesTimestamp()?.let { targetLastUpdated.metaUpdated.isBefore(it) } == true,
       sharesOutOfSync  = targetLastUpdated.sharesUpdated.isBefore(getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
       installOutOfSync = false, // DISABLED -- datasets are versioned, data files should not be updated
     )

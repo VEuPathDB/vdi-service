@@ -27,7 +27,7 @@ fun DatasetFiles.getDatasetPropertiesFile(
     ?: return Respond400("data type ${dataset.type} is not currently enabled"))
     .also { meta -> if (!meta.usesDataPropertiesFiles) return Respond404() }
 
-  val stream = DatasetStore.getVariablePropertiesFile(dataset.ownerID, datasetID, fileName)?.stream
+  val stream = DatasetStore.getDatasetPropertiesFile(dataset.ownerID, datasetID, fileName)?.stream
     ?: return Respond404()
 
   return GetResponse.respond200WithTextTabSeparatedValues(
@@ -56,7 +56,7 @@ fun DatasetFiles.putDatasetPropertiesFile(
   if (!dtConfig.usesDataPropertiesFiles)
     return Respond403("dataset type does not permit additional data properties")
 
-  DatasetStore.putVariablePropertiesFile(dataset.ownerID, datasetID, fileName, file::inputStream)
+  DatasetStore.putDatasetPropertiesFile(dataset.ownerID, datasetID, fileName, file::inputStream)
 
   return PutResponse.respond202()
 }

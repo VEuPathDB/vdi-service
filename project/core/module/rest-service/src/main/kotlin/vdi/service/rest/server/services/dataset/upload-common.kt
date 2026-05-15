@@ -286,7 +286,7 @@ fun ControllerBase.uploadFiles(
     logger.debug("uploading data properties files")
     try {
       for (path in uploadRefs.props)
-        DatasetStore.putVariablePropertiesFile(userID, datasetID, path.name, path::inputStream)
+        DatasetStore.putDatasetPropertiesFile(userID, datasetID, path.name, path::inputStream)
     } catch (e: Throwable) {
       logger.error("failed to upload data properties file(s) to object-store:", e)
       throw e

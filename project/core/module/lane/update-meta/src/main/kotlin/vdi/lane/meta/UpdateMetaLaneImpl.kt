@@ -31,7 +31,7 @@ import vdi.core.plugin.client.response.ValidationErrorResponse
 import vdi.core.plugin.mapping.PluginHandlers
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.core.s3.DatasetDirectory
-import vdi.core.s3.getLatestVariablePropertiesTimestamp
+import vdi.core.s3.getLatestDatasetPropertiesTimestamp
 import vdi.core.util.orElse
 import vdi.logging.logger
 import vdi.model.DatasetMetaFilename
@@ -129,9 +129,9 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     val metaTimestamp = dir.getMetaFile().lastModified()!!
     logger.debug("meta json timestamp is {}", metaTimestamp)
 
-    val mappingTimestamp = dir.getLatestVariablePropertiesTimestamp()
+    val mappingTimestamp = dir.getLatestDatasetPropertiesTimestamp()
       ?: OriginTimestamp
-    logger.debug("variable properties timestamp is {}", mappingTimestamp)
+    logger.debug("dataset properties timestamp is {}", mappingTimestamp)
 
     val timer = Metrics.MetaUpdates.duration
       .labels(datasetMeta.type.name.toString(), datasetMeta.type.version)

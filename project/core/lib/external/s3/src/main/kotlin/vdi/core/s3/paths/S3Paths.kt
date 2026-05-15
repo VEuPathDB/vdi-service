@@ -116,11 +116,11 @@ object S3Paths {
   fun datasetDocumentFile(userID: UserID, datasetID: DatasetID, fileName: String) =
     documentsPath(userID, datasetID).append(fileName).toString()
 
-  fun variablePropertiesDir(userID: UserID, datasetID: DatasetID) =
-    mappingsPath(userID, datasetID).dirPath()
+  fun datasetPropertiesDir(userID: UserID, datasetID: DatasetID) =
+    datasetPropsPath(userID, datasetID).dirPath()
 
-  fun variablePropertiesFile(userID: UserID, datasetID: DatasetID, fileName: String) =
-    mappingsPath(userID, datasetID).append(fileName).toString()
+  fun datasetPropertiesFile(userID: UserID, datasetID: DatasetID, fileName: String) =
+    datasetPropsPath(userID, datasetID).append(fileName).toString()
 
   fun uploadErrorFile(userID: UserID, datasetID: DatasetID) =
     datasetPath(userID, datasetID).append(FileName.UploadErrorFile).toString()
@@ -160,8 +160,8 @@ object S3Paths {
   private inline fun documentsPath(userID: UserID, datasetID: DatasetID) =
     datasetPath(userID, datasetID).append(FileName.DocumentDirectory)
 
-  private inline fun mappingsPath(userID: UserID, datasetID: DatasetID) =
-    datasetPath(userID, datasetID).append(FileName.MappingDirectory)
+  private inline fun datasetPropsPath(userID: UserID, datasetID: DatasetID) =
+    datasetPath(userID, datasetID).append(FileName.DatasetPropsDirectory)
 
   // endregion Path "Constants"
 }

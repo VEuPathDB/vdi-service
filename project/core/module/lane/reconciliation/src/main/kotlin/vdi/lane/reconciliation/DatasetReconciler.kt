@@ -194,7 +194,7 @@ internal class DatasetReconciler(
 
     val metaTimestamp = maxOf(
       datasetDirectory.getMetaTimestamp() ?: cacheDBSyncControl.metaUpdated,
-      datasetDirectory.getLatestVariablePropertiesTimestamp() ?: cacheDBSyncControl.metaUpdated,
+      datasetDirectory.getLatestDatasetPropertiesTimestamp() ?: cacheDBSyncControl.metaUpdated,
     )
 
     val installDataTimestamp = datasetDirectory.getInstallReadyTimestamp()

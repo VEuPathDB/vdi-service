@@ -15,7 +15,6 @@ import vdi.core.s3.paths.S3Paths
 import vdi.core.s3.util.S3Config
 import vdi.json.JSON
 import vdi.json.toJSONString
-import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 import vdi.model.misc.UploadErrorReport
 
@@ -120,14 +119,14 @@ object DatasetStore {
   fun listDocumentFiles(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
     bucket.objects.list(prefix = S3Paths.datasetDocumentsDir(userID, datasetID))
 
-  fun getVariablePropertiesFile(userID: UserID, datasetID: DatasetID, filename: String) =
-    bucket.objects.open(S3Paths.variablePropertiesFile(userID, datasetID, filename))
+  fun getDatasetPropertiesFile(userID: UserID, datasetID: DatasetID, filename: String) =
+    bucket.objects.open(S3Paths.datasetPropertiesFile(userID, datasetID, filename))
 
-  fun putVariablePropertiesFile(userID: UserID, datasetID: DatasetID, filename: String, fn: () -> InputStream) =
-    fn().use { bucket.objects[S3Paths.variablePropertiesFile(userID, datasetID, filename)] = it }
+  fun putDatasetPropertiesFile(userID: UserID, datasetID: DatasetID, filename: String, fn: () -> InputStream) =
+    fn().use { bucket.objects[S3Paths.datasetPropertiesFile(userID, datasetID, filename)] = it }
 
-  fun listVariablePropertiesFiles(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
-    bucket.objects.list(prefix = S3Paths.variablePropertiesDir(userID, datasetID))
+  fun listDatasetPropertiesFiles(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
+    bucket.objects.list(prefix = S3Paths.datasetPropertiesDir(userID, datasetID))
 
   fun listObjectsForDataset(userID: UserID, datasetID: DatasetID): Iterable<S3Object> =
     bucket.objects.list(prefix = S3Paths.datasetDir(userID, datasetID))

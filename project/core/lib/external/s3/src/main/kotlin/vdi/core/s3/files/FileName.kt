@@ -35,7 +35,7 @@ object FileName {
   const val ShareReceiptFile = "share-receipt.json"
 
   // Mapping Files
-  const val MappingDirectory = "mappings"
+  const val DatasetPropsDirectory = "datasetProperties"
 
   // Document Files
   const val DocumentDirectory = "documents"

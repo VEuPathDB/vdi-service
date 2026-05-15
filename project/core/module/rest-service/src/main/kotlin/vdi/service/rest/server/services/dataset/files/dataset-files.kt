@@ -75,7 +75,7 @@ fun listDatasetFiles(owner: UserID, vdiId: DatasetID) =
     documents = DatasetStore.listDocumentFiles(owner, vdiId)
       .map(::DatasetFileDetails)
       .takeUnless(Collection<*>::isEmpty)
-    variableProperties = DatasetStore.listVariablePropertiesFiles(owner, vdiId)
+    datasetProperties = DatasetStore.listDatasetPropertiesFiles(owner, vdiId)
       .map(::DatasetFileDetails)
       .takeUnless(Collection<*>::isEmpty)
   }
