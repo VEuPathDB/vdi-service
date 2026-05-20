@@ -10,6 +10,7 @@ internal object Table {
   const val Dependencies      = "dataset_dependency"
   const val Outcomes          = "dataset_outcome"
   const val DOIs              = "dataset_doi"
+  const val ExternalSource    = "dataset_source"
   const val FundingAwards     = "dataset_funding_award"
   const val Hyperlinks        = "dataset_hyperlink"
   const val InstallActivity   = "dataset_install_activity"

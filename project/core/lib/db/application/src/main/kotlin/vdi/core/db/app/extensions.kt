@@ -86,6 +86,7 @@ fun AppDBTransaction.purgeDatasetControlTables(datasetID: DatasetID, flag: Delet
   deleteSampleTypes(datasetID)
   deleteSpecies(datasetID)
   deleteDatasetVisibilities(datasetID)
+  deleteDatasetSources(datasetID)
   deleteSyncControl(datasetID)
   if (flag != null)
     updateDatasetDeletedFlag(datasetID, flag)
@@ -133,6 +134,7 @@ fun AppDBTransaction.upsertDatasetRecord(
   replace(datasetID, meta.externalIdentifiers?.dois, ::deleteDOIs, ::insertDOIs)
   replace(datasetID, meta.externalIdentifiers?.bioprojectIDs, ::deleteBioprojectIDs, ::insertBioprojectIDs)
   replace(datasetID, meta.linkedDatasets, ::deleteExternalDatasetLinks, ::insertExternalDatasetLinks)
+  replace(datasetID, meta.datasetSources, ::deleteDatasetSources, ::insertDatasetSources)
 }
 
 @Suppress("NOTHING_TO_INLINE")

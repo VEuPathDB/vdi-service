@@ -39,6 +39,8 @@ import vdi.core.db.app.sql.dataset_publication.deleteDatasetPublications
 import vdi.core.db.app.sql.dataset_publication.insertDatasetPublications
 import vdi.core.db.app.sql.dataset_sample_type.deleteSampleTypes
 import vdi.core.db.app.sql.dataset_sample_type.insertSampleTypes
+import vdi.core.db.app.sql.dataset_source.deleteDatasetSources
+import vdi.core.db.app.sql.dataset_source.insertDatasetSources
 import vdi.core.db.app.sql.dataset_species.deleteSpecies
 import vdi.core.db.app.sql.dataset_species.insertSpecies
 import vdi.core.db.app.sql.dataset_visibility.*
@@ -393,6 +395,17 @@ internal abstract class AppDBTransactionImpl(
   }
 
   // endregion sync_control
+
+  // region dataset_source
+  override fun insertDatasetSources(datasetID: DatasetID, sources: Iterable<DatasetSource>) {
+    connection.insertDatasetSources(schema, datasetID, sources)
+  }
+
+  override fun deleteDatasetSources(datasetID: DatasetID) {
+    connection.deleteDatasetSources(schema, datasetID)
+  }
+
+  // endregion dataset_source
 
   override fun rollback() {
     connection.rollback()

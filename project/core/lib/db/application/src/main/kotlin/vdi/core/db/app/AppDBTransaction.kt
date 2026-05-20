@@ -401,6 +401,14 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   // endregion sync_control
 
+  // region dataset_source
+
+  fun insertDatasetSources(datasetID: DatasetID, sources: Iterable<DatasetSource>)
+
+  fun deleteDatasetSources(datasetID: DatasetID)
+
+  // endregion dataset_source
+
 
   fun rollback()
 
