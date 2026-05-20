@@ -5,10 +5,10 @@ import vdi.model.meta.DatasetContact
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.DatasetContact as APIContact
 
-private val ContactNameLengthRange = 3..300
-private val EmailLengthRange = 5..1024
-private val AffiliationLengthRange = 3..4000
-private val CountryLengthRange = Range3To200
+private inline val ContactNameLengthRange get() = 3..300
+private inline val EmailLengthRange get() = 5..1024
+private inline val AffiliationLengthRange get() = 3..4000
+private inline val CountryLengthRange get() = 2..200
 
 internal fun APIContact?.cleanup() = this?.apply {
   cleanupString(::getFirstName)
@@ -22,30 +22,29 @@ internal fun APIContact?.cleanup() = this?.apply {
 
 private fun APIContact.validate(
   jPath: String,
-  index: Int,
   errors: ValidationErrors,
   strict: Boolean = false,
 ) {
   // conditionally require "strict" fields
-  val strictValidator: String.(String, Int, IntRange, ValidationErrors) -> Unit =
+  val strictValidator: String.(String, IntRange, ValidationErrors) -> Unit =
     if (strict)
       String::reqCheckLength
     else
       String::checkLength
 
-  firstName?.reqCheckLength(jPath..JsonField.FIRST_NAME, index, ContactNameLengthRange, errors)
-  middleName?.checkLength(jPath..JsonField.MIDDLE_NAME, index, ContactNameLengthRange, errors)
-  lastName?.reqCheckLength(jPath..JsonField.LAST_NAME, index, ContactNameLengthRange, errors)
-  email?.strictValidator(jPath..JsonField.EMAIL, index, EmailLengthRange, errors)
-  affiliation?.strictValidator(jPath..JsonField.AFFILIATION, index, AffiliationLengthRange, errors)
-  country?.strictValidator(jPath..JsonField.COUNTRY, index, CountryLengthRange, errors)
+  firstName?.reqCheckLength(jPath..JsonField.FIRST_NAME, ContactNameLengthRange, errors)
+  middleName?.checkLength(jPath..JsonField.MIDDLE_NAME, ContactNameLengthRange, errors)
+  lastName?.reqCheckLength(jPath..JsonField.LAST_NAME, ContactNameLengthRange, errors)
+  email?.strictValidator(jPath..JsonField.EMAIL, EmailLengthRange, errors)
+  affiliation?.strictValidator(jPath..JsonField.AFFILIATION, AffiliationLengthRange, errors)
+  country?.strictValidator(jPath..JsonField.COUNTRY, CountryLengthRange, errors)
 }
 
 internal fun Iterable<APIContact?>.validate(jPath: String, strict: Boolean, errors: ValidationErrors) {
   var primaries = 0
   forEachIndexed { i, c ->
     c.require(jPath, i, errors) {
-      validate(jPath, i, errors, strict)
+      validate(jPath..i, errors, strict)
 
       if (isPrimary)
         primaries++
