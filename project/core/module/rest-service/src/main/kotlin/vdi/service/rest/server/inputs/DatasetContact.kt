@@ -8,7 +8,7 @@ import vdi.service.rest.generated.model.DatasetContact as APIContact
 private inline val ContactNameLengthRange get() = 2..300
 private inline val EmailLengthRange get() = 5..1024
 private inline val AffiliationLengthRange get() = 3..4000
-private inline val CountryLengthRange get() = 2..200
+private inline val CountryLengthRange get() = 3..200
 
 internal fun APIContact?.cleanup() = this?.apply {
   cleanupString(::getFirstName)
