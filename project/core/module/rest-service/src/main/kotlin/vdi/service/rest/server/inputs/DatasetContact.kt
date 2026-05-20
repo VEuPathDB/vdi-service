@@ -5,7 +5,7 @@ import vdi.model.meta.DatasetContact
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.DatasetContact as APIContact
 
-private inline val ContactNameLengthRange get() = 3..300
+private inline val ContactNameLengthRange get() = 2..300
 private inline val EmailLengthRange get() = 5..1024
 private inline val AffiliationLengthRange get() = 3..4000
 private inline val CountryLengthRange get() = 2..200
@@ -33,7 +33,7 @@ private fun APIContact.validate(
       String::checkLength
 
   firstName?.reqCheckLength(jPath..JsonField.FIRST_NAME, ContactNameLengthRange, errors)
-  middleName?.checkLength(jPath..JsonField.MIDDLE_NAME, ContactNameLengthRange, errors)
+  middleName?.checkLength(jPath..JsonField.MIDDLE_NAME, 0..300, errors)
   lastName?.reqCheckLength(jPath..JsonField.LAST_NAME, ContactNameLengthRange, errors)
   email?.strictValidator(jPath..JsonField.EMAIL, EmailLengthRange, errors)
   affiliation?.strictValidator(jPath..JsonField.AFFILIATION, AffiliationLengthRange, errors)
