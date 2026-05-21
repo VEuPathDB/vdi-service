@@ -3,6 +3,7 @@ package vdi.service.rest.server.services.dataset
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
 import org.veupathdb.lib.request.validation.ValidationErrors
+import org.veupathdb.lib.request.validation.rangeTo
 import vdi.core.db.app.AppDB
 import vdi.core.db.app.model.InstallStatus
 import vdi.core.db.cache.CacheDB
@@ -126,6 +127,26 @@ private fun DatasetMetadata.isPromotingToCommunity(original: DatasetMetadata) =
   visibility != DatasetVisibility.Private && original.visibility == DatasetVisibility.Private
 
 private fun DatasetMetadata.validateForPromotion(datasetID: DatasetID, errors: ValidationErrors) {
+  // Require contact requirements
+  if (contacts.isEmpty()) {
+    errors.add(JsonField.CONTACTS, "at least one contact must be provided")
+  } else {
+    val primaries = contacts.count { it.isPrimary }
+
+    if (primaries != 1)
+      errors.add(JsonField.CONTACTS, "exactly one contact must be marked as primary")
+
+    for (i in contacts.indices) {
+      val jPath = JsonField.CONTACTS..i
+      if (contacts[i].email == null)
+        errors.add(jPath..JsonField.EMAIL, "email address is required")
+      if (contacts[i].affiliation == null)
+        errors.add(jPath..JsonField.AFFILIATION, "affiliated organization is required")
+      if (contacts[i].country == null)
+        errors.add(jPath..JsonField.COUNTRY, "country is required")
+    }
+  }
+
   val typeConfig = PluginRegistry.require(type)
 
   // If the target data type doesn't use dataset properties files, then there
