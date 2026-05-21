@@ -4,20 +4,23 @@ import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.reqCheckLength
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.require
+import java.net.URI
+import java.net.URISyntaxException
 import vdi.service.rest.generated.model.DatasetSourceImpl
+import vdi.service.rest.generated.model.JsonField
+import vdi.service.rest.server.inputs.cleanupString
 import vdi.model.meta.DatasetSource as VdiDatasetSource
 import vdi.service.rest.generated.model.DatasetSource as RamlDatasetSource
 
 object DatasetSourceConverter: APIListTypeConverter<RamlDatasetSource?, VdiDatasetSource> {
-  private inline val ValidUrlLengths
-    get() = 7..8192
-
   private inline val ValidVersionLengths
     get() = 1..128
 
-  // noop; nothing to clean in this type
-  override fun cleanup(value: List<RamlDatasetSource?>): List<RamlDatasetSource?> = value
-  override fun cleanupSingle(value: RamlDatasetSource?): RamlDatasetSource? = value
+  override fun cleanupSingle(value: RamlDatasetSource?): RamlDatasetSource? =
+    value?.apply {
+      cleanupString(::getUrl)
+      cleanupString(::getVersion)
+    }
 
   override fun validate(
     value: List<RamlDatasetSource?>,
@@ -45,8 +48,14 @@ object DatasetSourceConverter: APIListTypeConverter<RamlDatasetSource?, VdiDatas
     index: Int,
     errors: ValidationErrors,
   ) {
-    value!!.url?.reqCheckLength(jsonPath, index, ValidUrlLengths, errors)
-    value.version?.reqCheckLength(jsonPath, index, ValidVersionLengths, errors)
+    value!!.url.require(jsonPath..JsonField.URL, errors) {
+      try {
+        URI(this)
+      } catch (_: URISyntaxException) {
+        errors.add(jsonPath..JsonField.URL, "malformed url")
+      }
+    }
+    value.version.reqCheckLength(jsonPath..JsonField.VERSION, ValidVersionLengths, errors)
   }
 
   override fun toSingleInternal(value: RamlDatasetSource?): VdiDatasetSource =

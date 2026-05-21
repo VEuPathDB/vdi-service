@@ -10,6 +10,7 @@ import java.time.ZoneOffset
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.*
+import vdi.service.rest.server.conversion.DatasetSourceConverter
 import vdi.service.rest.generated.model.JsonField as JF
 
 /**
@@ -58,4 +59,5 @@ internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
     shortAttribution       = shortAttribution,
     dataDisclaimer         = dataDisclaimer,
     daysForApproval        = daysForApproval ?: -1,
+    datasetSources         = datasetSources?.let(DatasetSourceConverter::toInternal) ?: emptyList(),
   )
