@@ -26,7 +26,7 @@ import vdi.service.rest.server.services.dataset.files.*
 import vdi.util.fn.fold
 import vdi.util.fn.mapLeft
 
-@Authenticated(adminOverride = ALLOW_ALWAYS)
+@Authenticated(adminOverride = ALLOW_ALWAYS, allowGuests = true)
 class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, ControllerBase(request) {
   override fun getDatasetsFilesByVdiId(rawID: String): GetDatasetsFilesByVdiIdResponse =
     when (maybeUser) {
