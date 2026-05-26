@@ -48,9 +48,10 @@ internal class PluginDependency(
     val tag = loadManifestConfig()
       .gitTag.takeUnless { it == "snapshot" || it == "unknown" }
 
-    return when (tag) {
-      null, // dev build
-      response.manifest.gitTag -> Dependency.Status.Ok
+
+    return when {
+      tag == null || // dev build
+      checkTag(tag, response.manifest.gitTag) -> Dependency.Status.Ok
 
       else -> {
         extra += "error" to "core server version does not match plugin server version: core = $tag, plugin = ${response.manifest.gitTag}"
@@ -58,5 +59,14 @@ internal class PluginDependency(
         Dependency.Status.NotOk
       }
     }
+  }
+
+  private fun checkTag(a: String, b: String): Boolean {
+    val aSplit = a.split('.', limit = 3)
+    val bSplit = b.split('.', limit = 3)
+
+    return aSplit.size > 2 && bSplit.size > 2
+      && aSplit[0] == bSplit[0]
+      && aSplit[1] == bSplit[1]
   }
 }
