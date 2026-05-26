@@ -21,7 +21,7 @@ internal fun DatasetRecord.toExternal(
   return DatasetListEntryImpl().also { out ->
     out.datasetId      = datasetID.toString()
     out.owner          = DatasetOwner(owner)
-    out.type           = DatasetTypeOutput(this, PluginRegistry.require(type).category)
+    out.type           = type.toExternal()
     out.visibility     = DatasetVisibility(visibility, -1)
     out.name           = name
     out.origin         = origin

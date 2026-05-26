@@ -101,7 +101,7 @@ private inline fun DatasetDetails.applyMeta(meta: DatasetMetadata) = apply {
   externalIdentifiers    = meta.externalIdentifiers?.let(::ExternalIdentifiers)
   funding                = meta.funding.map(::DatasetFundingAward)
   shortAttribution       = meta.shortAttribution
-  type                   = DatasetTypeOutput(meta.type)
+  type                   = meta.type.toExternal()
   visibility             = DatasetVisibility(meta.visibility, meta.daysForApproval)
   created                = meta.created
   sourceUrl              = meta.sourceURL?.toString()
@@ -196,7 +196,7 @@ private fun LinkedDataset(link: LinkedDataset): APILinkedDataset =
 private fun RelatedDatasetInfo(other: RelatedDataset): RelatedDatasetInfo =
   RelatedDatasetInfoImpl().apply {
     datasetId = other.datasetID.toString()
-    type      = DatasetTypeOutput(other.datasetType)
+    type      = other.datasetType.toExternal()
     name      = other.name
     summary   = other.summary
     created   = other.created
