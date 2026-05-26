@@ -94,7 +94,7 @@ private fun AllDatasetsListEntry(
     it.datasetId      = row.datasetID.toString()
     it.owner          = row.ownerID.toLong()
     it.datasetType    = row.type.toExternal()
-    it.visibility     = DatasetVisibility(row.visibility)
+    it.visibility     = DatasetVisibility(row.visibility, -1)
     it.name           = row.name
     it.summary        = row.summary
     it.description    = row.description

@@ -62,7 +62,7 @@ internal fun DatasetRecord.toExternal(
     datasetID        = datasetID,
     owner            = DatasetOwner(owner),
     datasetType      = DatasetTypeOutput(this, PluginRegistry.require(type).category),
-    visibility       = DatasetVisibility(visibility),
+    visibility       = DatasetVisibility(visibility, -1),
     name             = name,
     origin           = origin,
     installTargets   = projects,
