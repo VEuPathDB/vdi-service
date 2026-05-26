@@ -1,56 +1,16 @@
 package vdi.service.rest.server.outputs
 
-import java.time.OffsetDateTime
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.cache.model.DatasetFileSummary
 import vdi.core.db.cache.model.DatasetRecord
 import vdi.core.plugin.registry.PluginRegistry
-import vdi.model.meta.DatasetID
 import vdi.model.meta.InstallTargetID
-import vdi.service.rest.conversion.DatasetImportStatusInfo
-import vdi.service.rest.conversion.DatasetInstallStatusListEntry
-import vdi.service.rest.generated.model.*
-import vdi.service.rest.conversion.DatasetOwner
-import vdi.service.rest.conversion.DatasetStatusInfo
-import vdi.service.rest.conversion.DatasetUploadStatusInfo
+import vdi.service.rest.conversion.*
+import vdi.service.rest.generated.model.DatasetListEntry
+import vdi.service.rest.generated.model.DatasetListEntryImpl
+import vdi.service.rest.generated.model.DatasetListShareUser
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.util.defaultZone
-
-@Suppress("DuplicatedCode") // overlap in separate API type fields
-internal fun DatasetListEntry(
-  datasetID: DatasetID,
-  owner: DatasetOwner,
-  datasetType: DatasetTypeOutput,
-  visibility: DatasetVisibility,
-  name: String,
-  origin: String,
-  installTargets: List<InstallTargetID>,
-  status: DatasetStatusInfo,
-  shares: List<DatasetListShareUser>?,
-  fileCount: Int,
-  fileSizeTotal: Long,
-  created: OffsetDateTime,
-  summary: String?,
-  description: String?,
-  originalID: DatasetID?,
-): DatasetListEntry =
-  DatasetListEntryImpl().also {
-    it.datasetId = datasetID.toString()
-    it.owner = owner
-    it.type = datasetType
-    it.visibility = visibility
-    it.name = name
-    it.origin = origin
-    it.installTargets = installTargets
-    it.status = status
-    it.shares = shares
-    it.fileCount = fileCount
-    it.fileSizeTotal = fileSizeTotal
-    it.created = created
-    it.summary = summary
-    it.description = description
-    it.originalId = originalID?.toString()
-  }
 
 internal fun DatasetRecord.toExternal(
   owner:    UserDetails,
@@ -58,15 +18,15 @@ internal fun DatasetRecord.toExternal(
   fileInfo: DatasetFileSummary?,
   shares:   List<DatasetListShareUser>?,
 ): DatasetListEntry {
-  return DatasetListEntry(
-    datasetID        = datasetID,
-    owner            = DatasetOwner(owner),
-    datasetType      = DatasetTypeOutput(this, PluginRegistry.require(type).category),
-    visibility       = DatasetVisibility(visibility, -1),
-    name             = name,
-    origin           = origin,
-    installTargets   = projects,
-    status           = DatasetStatusInfo(
+  return DatasetListEntryImpl().also { out ->
+    out.datasetId      = datasetID.toString()
+    out.owner          = DatasetOwner(owner)
+    out.type           = DatasetTypeOutput(this, PluginRegistry.require(type).category)
+    out.visibility     = DatasetVisibility(visibility, -1)
+    out.name           = name
+    out.origin         = origin
+    out.installTargets = projects
+    out.status         = DatasetStatusInfo(
       DatasetUploadStatusInfo(uploadStatus, null),
       importStatus?.let { DatasetImportStatusInfo(it, null) },
       installs
@@ -75,13 +35,13 @@ internal fun DatasetRecord.toExternal(
         ?.map(::DatasetInstallStatusListEntry)
         ?.toList()
         ?.takeUnless(List<*>::isEmpty),
-    ),
-    shares           = shares,
-    fileCount        = fileInfo?.count?.toInt() ?: 0,
-    fileSizeTotal    = fileInfo?.size?.toLong() ?: 0,
-    created          = created.defaultZone(),
-    summary          = summary,
-    description      = description,
-    originalID       = originalID,
-  )
+    )
+    out.shares         = shares
+    out.fileCount      = fileInfo?.count?.toInt() ?: 0
+    out.fileSizeTotal  = fileInfo?.size?.toLong() ?: 0
+    out.created        = created.defaultZone()
+    out.summary        = summary
+    out.description    = description
+    out.originalId     = originalID?.toString()
+  }
 }
