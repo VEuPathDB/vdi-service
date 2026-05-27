@@ -8,8 +8,8 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.slf4j.Logger
 import kotlin.time.Duration.Companion.seconds
-import vdi.io.plugin.responses.ErrorResponse
 import vdi.io.plugin.responses.InstallMetaResponse
+import vdi.io.plugin.responses.ValidationResponse
 import vdi.json.JSON
 import vdi.model.DatasetMetaFilename
 import vdi.model.Environment
@@ -63,7 +63,7 @@ private constructor(
       val logger:      Logger,
     )
 
-    suspend fun runJob(job: InstallMetaJob): ErrorResponse? {
+    suspend fun runJob(job: InstallMetaJob): InstallMetaResponse? {
       val timer = job.metrics.installMetaScriptDuration.startTimer()
 
       return job.executor.executeScript(
@@ -99,8 +99,8 @@ private constructor(
             }
 
             InstallMetaScript.ExitCode.ValidationError -> {
-              job.logger.info("validation failed with")
-              TODO("WAAAAA")
+              job.logger.info("validation failed with {} validation message(s)", warnings.size)
+              ValidationResponse(false, warnings)
             }
 
             else -> job.script.scriptConfig.newErrorResponse(

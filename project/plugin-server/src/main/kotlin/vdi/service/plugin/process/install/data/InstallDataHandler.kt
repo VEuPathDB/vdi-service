@@ -13,6 +13,7 @@ import vdi.io.plugin.requests.InstallMetaRequest
 import vdi.io.plugin.responses.InstallDataResponse
 import vdi.io.plugin.responses.MissingDependencyResponse
 import vdi.io.plugin.responses.ServerErrorResponse
+import vdi.io.plugin.responses.ValidationResponse
 import vdi.json.JSON
 import vdi.logging.mark
 import vdi.model.DatasetMetaFilename
@@ -63,7 +64,7 @@ private constructor(
     runInstallData(installWorkspace, warnings)
       ?.also { return it }
 
-    InstallMetaHandler.runJob(InstallMetaJob(
+    val metaInstallResult = InstallMetaHandler.runJob(InstallMetaJob(
       executor,
       workspace,
       metaFile,
@@ -86,6 +87,11 @@ private constructor(
       buildScriptEnv(),
       metaLogger(),
     ))
+
+    if (metaInstallResult is ValidationResponse) {
+      warnings.addAll(metaInstallResult.basicWarnings)
+      warnings.addAll(metaInstallResult.communityWarnings)
+    }
 
     return newValidationResponse(true, warnings)
   }

@@ -58,7 +58,7 @@ private suspend fun ApplicationCall.withParsedRequest(
         }
       }
     } finally {
-      part.dispose
+      part.release()
     }
   }
 
