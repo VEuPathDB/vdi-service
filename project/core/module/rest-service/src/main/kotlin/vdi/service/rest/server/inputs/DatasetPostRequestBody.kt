@@ -51,17 +51,17 @@ fun DatasetPostRequestBody.validate(): Either<BadRequestError, ValidationErrors>
 
   val dataTypeConfig = details.type?.toInternal()?.let(PluginRegistry::get)
 
-  // If no mapping files were provided
+  // If no dataset properties files were provided
   if (dataPropertiesFile == null) {
     // AND the dataset is NOT private
-    // AND the data type uses variable mapping files
+    // AND the data type uses dataset properties files
     if (details.visibility != DatasetVisibility.PRIVATE && dataTypeConfig?.usesDataPropertiesFiles == true) {
-      return left(BadRequestError("must provide at least one mapping file"))
+      return left(BadRequestError("must provide at least one dataset properties file"))
     }
-  // If at least one mapping file was provided
-  // AND the data type doesn't use mapping files
+  // If at least one dataset properties file was provided
+  // AND the data type doesn't use dataset properties files
   } else if (dataTypeConfig?.usesDataPropertiesFiles == false) {
-    return left(BadRequestError("chosen data type does not permit mapping files"))
+    return left(BadRequestError("chosen data type does not permit dataset properties files"))
   }
 
   return right(ValidationErrors().also { details.validate(it) })
