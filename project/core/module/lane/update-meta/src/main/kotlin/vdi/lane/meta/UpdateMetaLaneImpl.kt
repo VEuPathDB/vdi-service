@@ -190,7 +190,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
   }
 
   private suspend fun UpdateMetaContext.WithPlugin.updateTargetMeta(metaTimestamp: OffsetDateTime) {
-    if (!shouldRunInstallMetaScript(metaTimestamp))
+    if (!shouldUpdateTargetMeta(metaTimestamp))
       return
 
     // Ensure at least some record exists for the dataset before attempting
@@ -209,19 +209,29 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
     }
 
-    // Attempt to run the target plugin's install-meta script.
-    val datasetPropertiesInstallSucceeded = try {
-      runPluginInstallMeta(metaTimestamp)
-    } catch (e: Throwable) {
-      logger.error("plugin error", PluginRequestException.installMeta(plugin.name, target, ownerID, datasetID, cause = e))
-      false
+    val datasetPropertiesInstallFailed = with(appDB.accessor(target, plugin.type)!!) {
+      // Bail out here if the dataset does not already have a successful data
+      // install recorded.  The install-meta script requires installed data to
+      // function.
+      if (selectDatasetInstallMessage(datasetID, InstallType.Data)?.status != InstallStatus.Complete)
+        return@with false
+
+      // Attempt to run the target plugin's install-meta script.
+      val installMetaSucceeded = try {
+         runPluginInstallMeta(metaTimestamp)
+      } catch (e: Throwable) {
+        logger.error("plugin error", PluginRequestException.installMeta(plugin.name, target, ownerID, datasetID, cause = e))
+        false
+      }
+
+      return@with !installMetaSucceeded
     }
 
     var newMeta = meta
 
     // If the install-meta script failed, AND the user is attempting to promote
     // the dataset to community, then refuse to change the visibility.
-    if (!datasetPropertiesInstallSucceeded && shouldRevertToPrivateOnDatasetPropertiesError(meta)) {
+    if (datasetPropertiesInstallFailed && shouldRevertToPrivateOnDatasetPropertiesError(meta)) {
       logger.warn("refusing to make dataset public due to unsuccessful install-meta")
       newMeta = meta.copy(visibility = DatasetVisibility.Private)
     }
@@ -287,7 +297,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     }
   }
 
-  private fun UpdateMetaContext.WithPlugin.shouldRunInstallMetaScript(metaTimestamp: OffsetDateTime): Boolean {
+  private fun UpdateMetaContext.WithPlugin.shouldUpdateTargetMeta(metaTimestamp: OffsetDateTime): Boolean {
     if (!plugin.appliesToProject(target)) {
       logger.warn("install target does not support data type; skipping meta update")
       return false
@@ -298,11 +308,12 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       return false
     }
 
-    val succeeded = appDb.selectDatasetInstallMessage(datasetID, InstallType.Data)
-      ?.status == InstallStatus.Complete
+    val failed = appDb
+      .selectDatasetInstallMessages(datasetID)
+      .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
 
-    if (!succeeded) {
-      logger.info("skipping install-meta as install-data does not have a successful completion recorded")
+    if (failed) {
+      logger.info("skipping update due to previous failures")
       return false
     }
 
