@@ -190,7 +190,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
   }
 
   private suspend fun UpdateMetaContext.WithPlugin.updateTargetMeta(metaTimestamp: OffsetDateTime) {
-    if (!shouldUpdateTargetMeta(metaTimestamp))
+    if (!shouldRunInstallMetaScript(metaTimestamp))
       return
 
     // Ensure at least some record exists for the dataset before attempting
@@ -287,7 +287,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     }
   }
 
-  private fun UpdateMetaContext.WithPlugin.shouldUpdateTargetMeta(metaTimestamp: OffsetDateTime): Boolean {
+  private fun UpdateMetaContext.WithPlugin.shouldRunInstallMetaScript(metaTimestamp: OffsetDateTime): Boolean {
     if (!plugin.appliesToProject(target)) {
       logger.warn("install target does not support data type; skipping meta update")
       return false
@@ -298,12 +298,11 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       return false
     }
 
-    val failed = appDb
-      .selectDatasetInstallMessages(datasetID)
-      .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
+    val succeeded = appDb.selectDatasetInstallMessage(datasetID, InstallType.Data)
+      ?.status == InstallStatus.Complete
 
-    if (failed) {
-      logger.info("skipping update due to previous failures")
+    if (!succeeded) {
+      logger.info("skipping install-meta as install-data does not have a successful completion recorded")
       return false
     }
 
