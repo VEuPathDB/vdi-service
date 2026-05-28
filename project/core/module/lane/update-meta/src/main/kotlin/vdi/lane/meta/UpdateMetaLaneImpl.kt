@@ -209,19 +209,30 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
     }
 
-    // Attempt to run the target plugin's install-meta script.
-    val datasetPropertiesInstallSucceeded = try {
-      runPluginInstallMeta(metaTimestamp)
-    } catch (e: Throwable) {
-      logger.error("plugin error", PluginRequestException.installMeta(plugin.name, target, ownerID, datasetID, cause = e))
-      false
+    val datasetPropertiesInstallFailed = with(appDB.accessor(target, plugin.type)!!) {
+      // Stop here if the dataset does not already have a successful data
+      // install recorded.  The install-meta script requires installed data to
+      // function.
+      if (selectDatasetInstallMessage(datasetID, InstallType.Data)?.status != InstallStatus.Complete)
+        return@with false
+
+      // Attempt to run the target plugin's install-meta script.
+      val installMetaSucceeded = try {
+         runPluginInstallMeta(metaTimestamp)
+      } catch (e: Throwable) {
+        logger.error("plugin error", PluginRequestException.installMeta(plugin.name, target, ownerID, datasetID, cause = e))
+        false
+      }
+
+      // flip it since we're checking for failure
+      return@with !installMetaSucceeded
     }
 
     var newMeta = meta
 
     // If the install-meta script failed, AND the user is attempting to promote
     // the dataset to community, then refuse to change the visibility.
-    if (!datasetPropertiesInstallSucceeded && shouldRevertToPrivateOnDatasetPropertiesError(meta)) {
+    if (datasetPropertiesInstallFailed && shouldRevertToPrivateOnDatasetPropertiesError(meta)) {
       logger.warn("refusing to make dataset public due to unsuccessful install-meta")
       newMeta = meta.copy(visibility = DatasetVisibility.Private)
     }
