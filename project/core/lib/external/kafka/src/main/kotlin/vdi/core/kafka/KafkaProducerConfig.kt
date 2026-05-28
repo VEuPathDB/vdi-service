@@ -1,7 +1,7 @@
 package vdi.core.kafka
 
 import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.common.record.CompressionType
+import org.apache.kafka.common.record.internal.CompressionType
 import java.util.Properties
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -148,8 +148,9 @@ data class KafkaProducerConfig(
     inline val BufferMemoryBytes
       get() = 33554432L
 
+    @Suppress("RemoveRedundantQualifierName") // required to avoid name class name collision with variable name
     inline val CompressionType
-      get() = org.apache.kafka.common.record.CompressionType.NONE
+      get() = org.apache.kafka.common.record.internal.CompressionType.NONE
 
     inline val SendRetries
       get() = 2147483647
