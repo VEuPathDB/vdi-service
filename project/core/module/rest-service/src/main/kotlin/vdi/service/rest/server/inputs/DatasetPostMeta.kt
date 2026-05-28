@@ -1,5 +1,3 @@
-@file:JvmName("DatasetPostMetaInputAdaptor")
-
 package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors

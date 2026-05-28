@@ -25,19 +25,19 @@ private fun APIContact.validate(
   errors: ValidationErrors,
   strict: Boolean = false,
 ) {
-  // conditionally require "strict" fields
-  val strictValidator: String.(String, IntRange, ValidationErrors) -> Unit =
+  // conditionally requires "strict" fields.
+  val strictValidator: String?.(String, IntRange, ValidationErrors) -> Unit =
     if (strict)
-      String::reqCheckLength
+      String?::reqCheckLength
     else
-      String::checkLength
+      ({ a, b, c -> this?.checkLength(a, b, c) })
 
-  firstName?.reqCheckLength(jPath..JsonField.FIRST_NAME, ContactNameLengthRange, errors)
+  firstName.reqCheckLength(jPath..JsonField.FIRST_NAME, ContactNameLengthRange, errors)
   middleName?.checkLength(jPath..JsonField.MIDDLE_NAME, 0..300, errors)
-  lastName?.reqCheckLength(jPath..JsonField.LAST_NAME, ContactNameLengthRange, errors)
-  email?.strictValidator(jPath..JsonField.EMAIL, EmailLengthRange, errors)
-  affiliation?.strictValidator(jPath..JsonField.AFFILIATION, AffiliationLengthRange, errors)
-  country?.strictValidator(jPath..JsonField.COUNTRY, CountryLengthRange, errors)
+  lastName.reqCheckLength(jPath..JsonField.LAST_NAME, ContactNameLengthRange, errors)
+  email.strictValidator(jPath..JsonField.EMAIL, EmailLengthRange, errors)
+  affiliation.strictValidator(jPath..JsonField.AFFILIATION, AffiliationLengthRange, errors)
+  country.strictValidator(jPath..JsonField.COUNTRY, CountryLengthRange, errors)
 }
 
 internal fun Iterable<APIContact?>.validate(jPath: String, strict: Boolean, errors: ValidationErrors) {
