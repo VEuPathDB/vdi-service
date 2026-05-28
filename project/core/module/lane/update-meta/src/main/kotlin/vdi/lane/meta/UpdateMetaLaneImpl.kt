@@ -210,7 +210,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     }
 
     val datasetPropertiesInstallFailed = with(appDB.accessor(target, plugin.type)!!) {
-      // Bail out here if the dataset does not already have a successful data
+      // Stop here if the dataset does not already have a successful data
       // install recorded.  The install-meta script requires installed data to
       // function.
       if (selectDatasetInstallMessage(datasetID, InstallType.Data)?.status != InstallStatus.Complete)
@@ -224,6 +224,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
         false
       }
 
+      // flip it since we're checking for failure
       return@with !installMetaSucceeded
     }
 
