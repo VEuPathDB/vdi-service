@@ -204,17 +204,17 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       ))
     }
 
-    appDB.withTransaction(target, plugin.type) {
-      logger.debug("upserting install-meta message into app db")
-      it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
-    }
-
     val datasetPropertiesInstallFailed = with(appDB.accessor(target, plugin.type)!!) {
       // Stop here if the dataset does not already have a successful data
       // install recorded.  The install-meta script requires installed data to
       // function.
       if (selectDatasetInstallMessage(datasetID, InstallType.Data)?.status != InstallStatus.Complete)
         return@with false
+
+      appDB.withTransaction(target, plugin.type) {
+        logger.debug("upserting install-meta message into app db")
+        it.upsertInstallMetaMessage(datasetID, InstallStatus.Running)
+      }
 
       // Attempt to run the target plugin's install-meta script.
       val installMetaSucceeded = try {
