@@ -20,6 +20,7 @@ import vdi.core.db.app.model.InstallType
 import vdi.core.db.app.withTransaction
 import vdi.core.db.cache.CacheDB
 import vdi.core.db.cache.withTransaction
+import vdi.core.kafka.EventSource
 import vdi.core.modules.AbortCB
 import vdi.core.modules.AbstractVDIModule
 import vdi.core.plugin.client.PluginException
@@ -335,7 +336,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
 
     // Refire update meta after successful data install to run the install-meta
     // script, which requires the dataset data already be installed to work.
-    kafka.sendUpdateMetaTrigger(eventID, ownerID, datasetID, source)
+    kafka.sendUpdateMetaTrigger(eventID, ownerID, datasetID, EventSource.INSTALL_DATA_LANE)
   }
 
   private fun InstallationContext.WithPlugin.handleValidationFailureResponse(
