@@ -1,5 +1,5 @@
 [versions]
-jackson = "2.21.3"
+jackson = "2.21.4"
 kotlin = "2.3.21"
 ktor = "3.5.0"
 log4j = "2.26.0"
