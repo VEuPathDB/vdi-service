@@ -90,7 +90,7 @@ jobs:
       run: >-
         sed '1,/<\/dd>/!d' index.tpl > index.html;
         export PATTERN="$(sed '1,/<!/d;1,/\/dd/!d' index.tpl)";
-        for i in `find . -maxdepth 1 -type d -name 'v*' -printf '%P '`; do echo $PATTERN | VERSION=$i envsubst >> index.html; done;
+        while read -r i; do echo $PATTERN | VERSION=$i envsubst >> index.html; done < <(find . -maxdepth 1 -type d -name 'v*' -printf '%P\n' | sort -hr)
         sed '1,/-->/d' index.tpl >> index.html;
 
     - name: Copy & Commit Docs
