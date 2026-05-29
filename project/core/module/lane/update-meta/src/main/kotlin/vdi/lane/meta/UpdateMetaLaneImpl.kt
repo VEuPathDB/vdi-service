@@ -318,13 +318,15 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       return false
     }
 
-    val sync = appDb.selectDatasetSyncControlRecord(datasetID)
-      ?: return true
-
-    if (!sync.metaUpdated.isBefore(metaTimestamp)) {
-      logger.info("skipping update; nothing has changed")
-      return false
-    }
+    // FIXME: Temporarily disabling meta timestamp check.  Meta updates will
+    //        always happen until re-enabled.
+//    val sync = appDb.selectDatasetSyncControlRecord(datasetID)
+//      ?: return true
+//
+//    if (!sync.metaUpdated.isBefore(metaTimestamp)) {
+//      logger.info("skipping update; nothing has changed")
+//      return false
+//    }
 
     return true
   }
