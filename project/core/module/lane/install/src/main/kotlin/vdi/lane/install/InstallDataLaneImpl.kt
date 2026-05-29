@@ -47,6 +47,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
 
   override suspend fun run() {
     val kc = requireKafkaConsumer(config.eventChannel, config.consumerConfig)
+    val kr = requireKafkaRouter(config.producerConfig)
     val dm = requireDatasetManager(config.s3Config, config.s3Bucket)
     val wp = WorkerPool.create<InstallDataLane>(config.jobQueueSize, config.workerPoolSize) {
       Metrics.queueSize.inc(it.toDouble())
@@ -56,7 +57,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
       launch(Dispatchers.IO) {
         while (!isShutDown())
           kc.fetchMessages(config.eventMsgKey).forEach { msg ->
-            InstallationContext(msg, dm, logger)
+            InstallationContext(msg, dm, kr, logger)
               .also { it.logger.info("received install job from source {}", msg.eventSource) }
               .also { wp.submit { it.tryInstallData() } }
           }
@@ -180,7 +181,7 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
               return@all true
             }
 
-            withPlugin(meta, handler, projectID).installData(
+            withPlugin(handler, projectID).installData(
               installableFileTimestamp,
               metaStream,
               manifestStream,
@@ -331,6 +332,10 @@ internal class InstallDataLaneImpl(private val config: InstallDataLaneConfig, ab
         res.getWarningsSequence().joinToString("\n").takeUnless(String::isEmpty)
       ))
     }
+
+    // Refire update meta after successful data install to run the install-meta
+    // script, which requires the dataset data already be installed to work.
+    kafka.sendUpdateMetaTrigger(eventID, ownerID, datasetID, source)
   }
 
   private fun InstallationContext.WithPlugin.handleValidationFailureResponse(

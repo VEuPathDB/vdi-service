@@ -2,15 +2,16 @@ package vdi.lane.install
 
 import org.slf4j.Logger
 import vdi.core.kafka.EventMessage
+import vdi.core.kafka.router.KafkaRouter
 import vdi.core.plugin.mapping.PluginHandler
 import vdi.core.s3.DatasetObjectStore
 import vdi.logging.mark
-import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.InstallTargetID
 
 internal class InstallationContext(
   private val msg: EventMessage,
   val store: DatasetObjectStore,
+  val kafka: KafkaRouter,
   logger: Logger,
 ) {
   val logger = logger.mark(msg.eventID, msg.userID, msg.datasetID)
@@ -27,30 +28,31 @@ internal class InstallationContext(
   val source
     get() = msg.eventSource
 
-  fun withPlugin(meta: DatasetMetadata, plugin: PluginHandler, target: InstallTargetID) =
-    WithPlugin(this, meta, plugin, target)
+  fun withPlugin(plugin: PluginHandler, target: InstallTargetID) =
+    WithPlugin(plugin, target)
 
-  class WithPlugin(
-    private val root: InstallationContext,
-    val meta: DatasetMetadata,
+  inner class WithPlugin(
     val plugin: PluginHandler,
     val target: InstallTargetID,
   ) {
-    val logger = root.logger.mark(meta.type, plugin.name, target)
+    val logger = this@InstallationContext.logger.mark(plugin.type, plugin.name, target)
 
     val eventID
-      get() = root.msg.eventID
+      get() = this@InstallationContext.eventID
 
     val ownerID
-      get() = root.msg.userID
+      get() = this@InstallationContext.msg.userID
 
     val datasetID
-      get() = root.msg.datasetID
+      get() = this@InstallationContext.msg.datasetID
 
     val source
-      get() = root.msg.eventSource
+      get() = this@InstallationContext.msg.eventSource
 
     val type
       get() = plugin.type
+
+    val kafka
+      get() = this@InstallationContext.kafka
   }
 }

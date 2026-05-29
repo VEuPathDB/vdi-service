@@ -1,7 +1,6 @@
 package vdi.service.plugin.process.install.data
 
 import io.ktor.http.ContentType
-import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.plugins.BadRequestException
@@ -21,6 +20,8 @@ import vdi.model.meta.DatasetMetadata
 import vdi.service.plugin.model.ApplicationContext
 import vdi.service.plugin.server.context.*
 import vdi.service.plugin.util.parseAsJson
+import vdi.service.plugin.util.toKtxPath
+import vdi.util.fs.TempFiles
 
 private const val INSTALL_PAYLOAD_FILE_NAME = "install-ready.zip"
 private const val INSTALL_DETAILS_MAX_SIZE = 1024uL
@@ -33,8 +34,8 @@ internal suspend fun ApplicationCall.withInstallDataContext(
   if (!request.contentType().match(ContentType.MultiPart.FormData))
     throw UnsupportedMediaTypeException(request.contentType())
 
-  withDoubleTempDirs { workspace, propsPath -> withContext(Dispatchers.IO) {
-    withParsedRequest(appCtx, workspace, propsPath, fn)
+  TempFiles.withTempDirectory { workspace -> withContext(Dispatchers.IO) {
+    withParsedRequest(appCtx, workspace.toKtxPath(), fn)
   } }
 }
 
@@ -42,7 +43,6 @@ internal suspend fun ApplicationCall.withInstallDataContext(
 private suspend fun ApplicationCall.withParsedRequest(
   appCtx:    ApplicationContext,
   workspace: Path,
-  propsDir:  Path,
   fn:        suspend (context: InstallDataContext) -> Unit,
 ) {
   contract { callsInPlace(fn, InvocationKind.EXACTLY_ONCE) }
@@ -74,10 +74,6 @@ private suspend fun ApplicationCall.withParsedRequest(
           reqNull(payload, FormField.Payload)
           payload = part.handlePayload(workspace, INSTALL_PAYLOAD_FILE_NAME)
         }
-
-        FormField.DataDict -> {
-          part.handlePayload(propsDir, (part as PartData.FileItem).originalFileName!!)
-        }
       }
     } finally {
       part.release()
@@ -101,10 +97,8 @@ private suspend fun ApplicationCall.withParsedRequest(
         databaseConfig     = it,
         metadata           = meta,
         payload            = payload,
-        metaConfig         = appCtx.config.installMetaScript,
         dataConfig         = appCtx.config.installDataScript,
         compatConfig       = appCtx.config.checkCompatScript,
-        dataPropertiesPath = propsDir,
       ))
     }
   }

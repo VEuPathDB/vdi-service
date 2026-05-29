@@ -9,19 +9,14 @@ import java.io.IOException
 import java.io.OutputStreamWriter
 import kotlin.io.path.relativeTo
 import kotlin.time.Duration.Companion.seconds
-import vdi.io.plugin.requests.InstallMetaRequest
 import vdi.io.plugin.responses.InstallDataResponse
 import vdi.io.plugin.responses.MissingDependencyResponse
 import vdi.io.plugin.responses.ServerErrorResponse
-import vdi.io.plugin.responses.ValidationResponse
 import vdi.json.JSON
 import vdi.logging.mark
 import vdi.model.DatasetMetaFilename
 import vdi.model.meta.DatasetMetadata
 import vdi.service.plugin.metrics.ScriptMetrics
-import vdi.service.plugin.process.install.meta.InstallMetaContext
-import vdi.service.plugin.process.install.meta.InstallMetaHandler
-import vdi.service.plugin.process.install.meta.InstallMetaHandler.Companion.InstallMetaJob
 import vdi.service.plugin.script.ScriptExecutor
 import vdi.service.plugin.script.ScriptProcess
 import vdi.service.plugin.script.newErrorResponse
@@ -63,35 +58,6 @@ private constructor(
 
     runInstallData(installWorkspace, warnings)
       ?.also { return it }
-
-    val metaInstallResult = InstallMetaHandler.runJob(InstallMetaJob(
-      executor,
-      workspace,
-      metaFile,
-      InstallMetaContext(
-        pluginName         = scriptContext.pluginName,
-        workspace          = scriptContext.workspace,
-        customPath         = scriptContext.customPath,
-        request            = scriptContext.request.let { InstallMetaRequest(
-          eventID       = it.eventID,
-          vdiID         = it.vdiID,
-          installTarget = it.installTarget,
-          meta          = scriptContext.metadata,
-        ) },
-        installPath        = scriptContext.installPath,
-        dataPropertiesPath = scriptContext.dataPropertiesPath,
-        databaseConfig     = scriptContext.databaseConfig,
-        scriptConfig       = scriptContext.metaConfig,
-      ),
-      metrics,
-      buildScriptEnv(),
-      metaLogger(),
-    ))
-
-    if (metaInstallResult is ValidationResponse) {
-      warnings.addAll(metaInstallResult.basicWarnings)
-      warnings.addAll(metaInstallResult.communityWarnings)
-    }
 
     return newValidationResponse(true, warnings)
   }
@@ -249,7 +215,6 @@ private constructor(
     installDir.resolve(DatasetMetaFilename)
       .also { JSON.writeValue(it, meta) }
 
-  private fun metaLogger() = logger.mark(scriptName = scriptContext.metaConfig.kind.name)
   private fun compatLogger() = logger.mark(scriptName = scriptContext.compatConfig.kind.name)
 }
 

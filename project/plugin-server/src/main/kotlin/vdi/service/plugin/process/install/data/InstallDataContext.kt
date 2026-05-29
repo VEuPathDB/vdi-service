@@ -6,7 +6,6 @@ import vdi.io.plugin.requests.InstallDataRequest
 import vdi.logging.logger
 import vdi.logging.mark
 import vdi.model.meta.DatasetMetadata
-import vdi.service.plugin.process.install.meta.InstallMetaScript
 import vdi.service.plugin.server.context.InstallScriptContext
 
 internal class InstallDataContext(
@@ -16,10 +15,9 @@ internal class InstallDataContext(
   override val request: InstallDataRequest,
   override val installPath: Path,
   override val databaseConfig: TargetDatabaseDetails,
-  override val dataPropertiesPath: Path,
+  override val dataPropertiesPath: Path? = null,
   val payload: Path,
   val metadata: DatasetMetadata,
-  val metaConfig: InstallMetaScript,
   val dataConfig: InstallDataScript,
   val compatConfig: CheckCompatibilityScript,
 ): InstallScriptContext<InstallDataRequest, InstallDataScript> {
