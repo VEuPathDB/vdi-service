@@ -192,10 +192,8 @@ internal class DatasetReconciler(
   private fun ReconcilerTarget.checkSyncStatus(): SyncIndicator {
     val cacheDBSyncControl = cacheDB.requireSyncControl(this)
 
-    val metaTimestamp = maxOf(
-      datasetDirectory.getMetaTimestamp() ?: cacheDBSyncControl.metaUpdated,
-      datasetDirectory.getLatestDatasetPropertiesTimestamp() ?: cacheDBSyncControl.metaUpdated,
-    )
+    var metaTimestamp = datasetDirectory.getMetaTimestamp()
+      ?: cacheDBSyncControl.metaUpdated
 
     val installDataTimestamp = datasetDirectory.getInstallReadyTimestamp()
       ?: cacheDBSyncControl.dataUpdated
@@ -210,6 +208,13 @@ internal class DatasetReconciler(
 
     if (indicator.fullyOutOfSync)
       return indicator
+
+    // For app databases, the data properties file is considered as part of the
+    // meta timestamp.
+    metaTimestamp = maxOf(
+      metaTimestamp,
+      datasetDirectory.getLatestDatasetPropertiesTimestamp() ?: cacheDBSyncControl.metaUpdated,
+    )
 
     meta!!.installTargets.forEach { projectID ->
       val appDB = appDB.accessor(projectID, meta!!.type)
