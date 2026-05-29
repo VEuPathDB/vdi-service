@@ -11,7 +11,7 @@ class DataTypeConfig(
   @field:JsonProperty(KeyProjectIDs)
   val installTargets: Array<String>?,
 
-  val maxFileSize: ULong = Long.MAX_VALUE.toULong(),
+  val maxFileSize: ULong? = null,
   val allowedFileExtensions: Array<String> = emptyArray(),
   val typeChangesEnabled: Boolean = false,
   val usesDataProperties: Boolean = false,

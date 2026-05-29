@@ -13,7 +13,9 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDatasetTypeMeta>> {
     val conflicts = HashMap<DatasetType, MutableList<String>>(1)
     val tmpCats   = HashMap<DatasetType, PluginDatasetTypeMeta>(12)
 
-    mapping = loadAndCacheStackConfig().vdi.plugins
+    val vdiConfig = loadAndCacheStackConfig().vdi;
+
+    mapping = vdiConfig.plugins
       .asSequence()
       .flatMap { (pluginName, plug) ->
         plug.dataTypes.asSequence()
@@ -21,7 +23,7 @@ object PluginRegistry: Iterable<Pair<DatasetType, PluginDatasetTypeMeta>> {
             .also { dt -> tmpCats[dt] = PluginDatasetTypeMeta(
               plugin                        = pluginName,
               category                      = it.category,
-              maxFileSize                   = it.maxFileSize,
+              maxFileSize                   = it.maxFileSize ?: vdiConfig.restService.maxUploadSize,
               allowedFileExtensions         = it.allowedFileExtensions,
               typeChangesEnabled            = it.typeChangesEnabled,
               usesDataPropertiesFiles       = it.usesDataProperties,
