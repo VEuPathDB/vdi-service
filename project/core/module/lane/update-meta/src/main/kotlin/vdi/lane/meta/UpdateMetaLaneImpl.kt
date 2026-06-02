@@ -238,9 +238,22 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     }
 
     // Update/insert full set of dataset records.
-    appDB.withTransaction(target, plugin.type) {
-      val record = DatasetRecord(datasetID, newMeta, PluginRegistry.require(meta.type).category)
-      it.upsertDatasetRecord(record, newMeta, metaTimestamp)
+    try {
+      appDB.withTransaction(target, plugin.type) {
+        val record = DatasetRecord(datasetID, newMeta, PluginRegistry.require(meta.type).category)
+        it.upsertDatasetRecord(record, newMeta, metaTimestamp)
+        it.upsertInstallMetaMessage(datasetID, InstallStatus.Complete)
+      }
+    } catch (e: Throwable) {
+      appDB.withTransaction(target, plugin.type) {
+        it.upsertInstallMetaMessage(
+          datasetID,
+          InstallStatus.FailedInstallation,
+          "installation failed due to unexpected database error"
+        )
+      }
+
+      throw e
     }
   }
 
@@ -333,13 +346,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
   private fun UpdateMetaContext.WithPlugin.handleSuccessResponse() {
     logger.info("dataset meta installed successfully")
-
-    appDB.withTransaction(target, plugin.type) {
-      it.upsertInstallMetaMessage(
-        datasetID,
-        InstallStatus.Complete
-      )
-    }
+    // No longer doing anything special in this case.
   }
 
   private fun UpdateMetaContext.WithPlugin.handleValidationError(response: ValidationErrorResponse) {
