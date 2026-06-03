@@ -7,7 +7,6 @@ import vdi.core.db.cache.model.DatasetShare
 import vdi.core.db.cache.model.RelatedDataset
 import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
-import vdi.model.meta.DatasetCharacteristics
 import vdi.model.meta.DatasetContact
 import vdi.model.meta.DatasetDependency
 import vdi.model.meta.DatasetFundingAward
@@ -15,10 +14,7 @@ import vdi.model.meta.DatasetHyperlink
 import vdi.model.meta.DatasetOrganism
 import vdi.model.meta.DatasetPublication
 import vdi.model.meta.LinkedDataset
-import vdi.model.meta.SampleYearRange
 import vdi.model.misc.UploadErrorReport
-import vdi.service.rest.conversion.BioprojectIDReference
-import vdi.service.rest.conversion.DOIReference
 import vdi.service.rest.conversion.DatasetImportStatusInfo
 import vdi.service.rest.conversion.DatasetInstallStatusListEntry
 import vdi.service.rest.conversion.DatasetOwner
@@ -26,7 +22,9 @@ import vdi.service.rest.conversion.DatasetStatusInfo
 import vdi.service.rest.conversion.DatasetUploadStatusInfo
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.model.UserDetails
-import vdi.service.rest.generated.model.DatasetCharacteristics as APICharacteristics
+import vdi.service.rest.server.conversion.BioprojectIDReference
+import vdi.service.rest.server.conversion.DatasetCharacteristics
+import vdi.service.rest.server.conversion.DOIReference
 import vdi.service.rest.generated.model.DatasetContact as APIContact
 import vdi.service.rest.generated.model.DatasetFundingAward as APIFunding
 import vdi.service.rest.generated.model.DatasetHyperlink as APIHyperlink
@@ -34,7 +32,6 @@ import vdi.service.rest.generated.model.DatasetOrganism as APIOrganism
 import vdi.service.rest.generated.model.DatasetPublication as APIPublication
 import vdi.service.rest.generated.model.ExternalIdentifiers as APIIdentifiers
 import vdi.service.rest.generated.model.LinkedDataset as APILinkedDataset
-import vdi.service.rest.generated.model.SampleYearRange as APIYears
 
 /**
  * API type conversion for use when the dataset metadata is available from the
@@ -110,19 +107,6 @@ private inline fun DatasetDetails.applyMeta(meta: DatasetMetadata) = apply {
   daysForApproval        = meta.daysForApproval
   dataDisclaimer         = meta.dataDisclaimer
 }
-
-private fun DatasetCharacteristics(characteristics: DatasetCharacteristics): APICharacteristics =
-  DatasetCharacteristicsImpl().also {
-    it.studyDesign       = characteristics.studyDesign
-    it.studyType         = characteristics.studyType
-    it.countries         = characteristics.countries
-    it.years             = characteristics.years?.let(::SampleYearRange)
-    it.studySpecies      = characteristics.studySpecies
-    it.outcomes          = characteristics.outcomes
-    it.associatedFactors = characteristics.associatedFactors
-    it.participantAges   = characteristics.participantAges
-    it.sampleTypes       = characteristics.sampleTypes
-  }
 
 private fun DatasetContact(contact: DatasetContact): APIContact =
   DatasetContactImpl().apply {
@@ -201,10 +185,4 @@ private fun RelatedDatasetInfo(other: RelatedDataset): RelatedDatasetInfo =
     summary   = other.summary
     created   = other.created
     relatedBy = ImplicitRelation(other)
-  }
-
-private fun SampleYearRange(years: SampleYearRange): APIYears =
-  SampleYearRangeImpl().also {
-    it.start = years.start
-    it.end   = years.end
   }
