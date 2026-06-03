@@ -9,11 +9,7 @@ import vdi.model.DatasetUploadStatus
 import vdi.model.meta.*
 import vdi.model.meta.DatasetContact
 import vdi.model.meta.DatasetDependency
-import vdi.model.meta.DatasetFundingAward
-import vdi.model.meta.DatasetHyperlink
-import vdi.model.meta.DatasetOrganism
 import vdi.model.meta.DatasetPublication
-import vdi.model.meta.LinkedDataset
 import vdi.model.misc.UploadErrorReport
 import vdi.service.rest.conversion.DatasetImportStatusInfo
 import vdi.service.rest.conversion.DatasetInstallStatusListEntry
@@ -24,14 +20,14 @@ import vdi.service.rest.generated.model.*
 import vdi.service.rest.model.UserDetails
 import vdi.service.rest.server.conversion.BioprojectIDReference
 import vdi.service.rest.server.conversion.DatasetCharacteristics
+import vdi.service.rest.server.conversion.DatasetFundingAward
+import vdi.service.rest.server.conversion.DatasetHyperlink
+import vdi.service.rest.server.conversion.DatasetOrganism
 import vdi.service.rest.server.conversion.DOIReference
+import vdi.service.rest.server.conversion.LinkedDataset
 import vdi.service.rest.generated.model.DatasetContact as APIContact
-import vdi.service.rest.generated.model.DatasetFundingAward as APIFunding
-import vdi.service.rest.generated.model.DatasetHyperlink as APIHyperlink
-import vdi.service.rest.generated.model.DatasetOrganism as APIOrganism
 import vdi.service.rest.generated.model.DatasetPublication as APIPublication
 import vdi.service.rest.generated.model.ExternalIdentifiers as APIIdentifiers
-import vdi.service.rest.generated.model.LinkedDataset as APILinkedDataset
 
 /**
  * API type conversion for use when the dataset metadata is available from the
@@ -128,24 +124,6 @@ private fun DatasetDependencies(dependencies: Collection<DatasetDependency>) =
     }
   }
 
-private fun DatasetFundingAward(award: DatasetFundingAward): APIFunding =
-  DatasetFundingAwardImpl().also {
-    it.agency      = award.agency
-    it.awardNumber = award.awardNumber
-  }
-
-private fun DatasetHyperlink(link: DatasetHyperlink): APIHyperlink =
-  DatasetHyperlinkImpl().also {
-    it.url         = link.url.toString()
-    it.description = link.description
-  }
-
-private fun DatasetOrganism(organism: DatasetOrganism): APIOrganism =
-  DatasetOrganismImpl().also {
-    it.species = organism.species
-    it.strain  = organism.strain
-  }
-
 private fun DatasetPublication(publication: DatasetPublication): APIPublication =
   DatasetPublicationImpl().also {
     it.identifier = publication.identifier
@@ -169,12 +147,6 @@ private fun ImplicitRelation(other: RelatedDataset): ImplicitRelation =
       identifier = other.publication!!.identifier
       type       = DatasetPublicationType(other.publication!!.type)
     }
-  }
-
-private fun LinkedDataset(link: LinkedDataset): APILinkedDataset =
-  LinkedDatasetImpl().apply {
-    datasetUri    = link.datasetURI.toString()
-    sharesRecords = link.sharesRecords
   }
 
 private fun RelatedDatasetInfo(other: RelatedDataset): RelatedDatasetInfo =
