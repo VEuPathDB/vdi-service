@@ -15,6 +15,7 @@ import vdi.logging.MetaLogger
 import vdi.service.rest.config.ServiceConfig
 import vdi.service.rest.health.DependencySource
 import vdi.service.rest.s3.DatasetStore
+import vdi.service.rest.server.Resources
 
 class RestService(config: StackConfig, manifest: ManifestConfig): Server() {
   private val options = ServiceConfig(config, manifest)
