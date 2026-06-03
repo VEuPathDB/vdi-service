@@ -19,18 +19,20 @@ INSERT INTO
   , program_name      -- 5  program_name
   , project_name
   , short_attribution
-  , short_name        -- 8  short_name
+  , short_name
+  , disclaimer        -- 9  disclaimer
   )
 VALUES
-  (?, ?, ?, ?, ?, ?, ?, ?)
+  (?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON CONFLICT (dataset_id) DO UPDATE SET
-  name = ?             -- 9 name
+  name = ?              -- 10 name
 , summary = ?
 , description = ?
 , program_name = ?
 , project_name = ?
-, short_attribution = ?
-, short_name = ?      -- 15 short_name
+, short_attribution = ? -- 15
+, short_name = ?
+, disclaimer = ?        -- 17 disclaimer
 """
 
 internal fun Connection.upsertDatasetMeta(schema: String, datasetID: DatasetID, meta: DatasetMetadata) {
@@ -44,14 +46,16 @@ internal fun Connection.upsertDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(6, meta.projectName)
     setString(7, meta.shortAttribution)
     setString(8, meta.shortName)
+    setString(9, meta.dataDisclaimer)
 
     // update
-    setString(9, meta.name)
-    setString(10, meta.summary)
-    setString(11, meta.description)
-    setString(12, meta.programName)
-    setString(13, meta.projectName)
-    setString(14, meta.shortAttribution)
-    setString(15, meta.shortName)
+    setString(10, meta.name)
+    setString(11, meta.summary)
+    setString(12, meta.description)
+    setString(13, meta.programName)
+    setString(14, meta.projectName)
+    setString(15, meta.shortAttribution)
+    setString(16, meta.shortName)
+    setString(17, meta.dataDisclaimer)
   }
 }

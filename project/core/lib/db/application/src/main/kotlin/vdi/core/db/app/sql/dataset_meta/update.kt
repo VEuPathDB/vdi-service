@@ -20,8 +20,9 @@ SET
 , project_name = ?       -- 5  project_name
 , short_attribution = ?
 , short_name = ?
+, disclaimer = ?        -- 8
 WHERE
-  dataset_id = ?  -- 8
+  dataset_id = ?  -- 9
 """
 
 internal fun Connection.updateDatasetMeta(schema: String, datasetID: DatasetID, meta: DatasetMetadata) {
@@ -33,6 +34,7 @@ internal fun Connection.updateDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(5, meta.projectName)
     setString(6, meta.shortAttribution)
     setString(7, meta.shortName)
-    setDatasetID(8, datasetID)
+    setString(8, meta.dataDisclaimer)
+    setDatasetID(9, datasetID)
   }
 }

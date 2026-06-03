@@ -8,7 +8,7 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetMetadata
 
 private fun sql(schema: String) =
-// language=sql
+// language=PostgreSQL
 """
 INSERT INTO
   ${schema}.${Table.Meta} (
@@ -20,9 +20,10 @@ INSERT INTO
   , project_name
   , short_attribution
   , short_name
+  , disclaimer        -- 9  disclaimer
   )
 VALUES
-  (?, ?, ?, ?, ?, ?, ?, ?)
+  (?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 @Suppress("DuplicatedCode")
@@ -36,5 +37,6 @@ internal fun Connection.insertDatasetMeta(schema: String, datasetID: DatasetID, 
     setString(6, meta.projectName)
     setString(7, meta.shortAttribution)
     setString(8, meta.shortName)
+    setString(9, meta.dataDisclaimer)
   }
 }
