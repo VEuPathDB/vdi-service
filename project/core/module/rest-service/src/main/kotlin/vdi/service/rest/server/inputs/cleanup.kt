@@ -93,9 +93,9 @@ internal fun String?.cleanup(emptyToNull: Boolean = true) =
 internal inline fun <T: Any, O: Any> T.cleanup(getter: KFunction0<O?>, fn: (O?) -> O?) {
   val setter = getter.name.replaceFirst('g', 's')
     .let { setter -> this::class.declaredMemberFunctions.first { it.name == setter } }
-    .let { it as KFunction2<T, O, Unit> }
+    .let { it as KFunction2<T, O?, Unit> }
 
-  fn(getter())?.also { setter(this, it) }
+  fn(getter()).also { setter(this, it) }
 }
 
 /**
@@ -133,7 +133,7 @@ internal fun <T: Any, V: Any> T.ensureNotNull(getter: KFunction0<V?>, value: V) 
 internal fun <T: Any> T.cleanupString(getter: KFunction0<String?>, nullOutBlanks: Boolean = true) =
   cleanup(getter) {
     it?.trim()
-      ?.run { if (nullOutBlanks && isEmpty()) null else this }
+      ?.run { if (nullOutBlanks && isBlank()) null else this }
   }
 
 
