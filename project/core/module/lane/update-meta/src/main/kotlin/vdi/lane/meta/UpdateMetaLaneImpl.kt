@@ -193,6 +193,10 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     if (!shouldUpdateTargetMeta(metaTimestamp))
       return
 
+    // FIXME: this is just to keep track of if one of the two different 'meta'
+    //        install steps failed. The worst non-null status will be reported.
+    var worstStatus = InstallStatus.Complete
+
     // Ensure at least some record exists for the dataset before attempting
     // to write anything else to the target database.
     appDB.withTransaction(target, plugin.type) {
@@ -204,12 +208,12 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       ))
     }
 
-    val datasetPropertiesInstallFailed = with(appDB.accessor(target, plugin.type)!!) {
+    val datasetPropertiesInstallStatus = with(appDB.accessor(target, plugin.type)!!) {
       // Stop here if the dataset does not already have a successful data
       // install recorded.  The install-meta script requires installed data to
       // function.
       if (selectDatasetInstallMessage(datasetID, InstallType.Data)?.status != InstallStatus.Complete)
-        return@with false
+        return@with null
 
       appDB.withTransaction(target, plugin.type) {
         logger.debug("upserting install-meta message into app db")
@@ -217,24 +221,26 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       }
 
       // Attempt to run the target plugin's install-meta script.
-      val installMetaSucceeded = try {
+      try {
          runPluginInstallMeta(metaTimestamp)
       } catch (e: Throwable) {
         logger.error("plugin error", PluginRequestException.installMeta(plugin.name, target, ownerID, datasetID, cause = e))
-        false
+        InstallStatus.FailedInstallation
       }
-
-      // flip it since we're checking for failure
-      return@with !installMetaSucceeded
     }
 
     var newMeta = meta
 
-    // If the install-meta script failed, AND the user is attempting to promote
-    // the dataset to community, then refuse to change the visibility.
-    if (datasetPropertiesInstallFailed && shouldRevertToPrivateOnDatasetPropertiesError(meta)) {
-      logger.warn("refusing to make dataset public due to unsuccessful install-meta")
-      newMeta = meta.copy(visibility = DatasetVisibility.Private)
+    // If the install-meta script failed...
+    if (datasetPropertiesInstallStatus != InstallStatus.Complete) {
+      // AND the user is attempting to promote the dataset to community, then
+      // refuse to change the visibility.
+      if (shouldRevertToPrivateOnDatasetPropertiesError(meta)) {
+        logger.warn("refusing to make dataset public due to unsuccessful install-meta")
+        newMeta = meta.copy(visibility = DatasetVisibility.Private)
+      }
+
+      worstStatus = datasetPropertiesInstallStatus ?: worstStatus
     }
 
     // Update/insert full set of dataset records.
@@ -242,7 +248,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       appDB.withTransaction(target, plugin.type) {
         val record = DatasetRecord(datasetID, newMeta, PluginRegistry.require(meta.type).category)
         it.upsertDatasetRecord(record, newMeta, metaTimestamp)
-        it.upsertInstallMetaMessage(datasetID, InstallStatus.Complete)
+        it.upsertInstallMetaMessage(datasetID, worstStatus)
       }
     } catch (e: Throwable) {
       appDB.withTransaction(target, plugin.type) {
@@ -257,7 +263,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     }
   }
 
-  private suspend fun UpdateMetaContext.WithPlugin.runPluginInstallMeta(metaTimestamp: OffsetDateTime): Boolean {
+  private suspend fun UpdateMetaContext.WithPlugin.runPluginInstallMeta(metaTimestamp: OffsetDateTime): InstallStatus {
     val dataPropFiles = directory.getDataPropertiesFiles()
       .map { PluginDataPropsFile(it.baseName, it.open()!!) }
       .asIterable()
@@ -274,15 +280,15 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
           return when (result) {
             is EmptySuccessResponse -> {
               handleSuccessResponse()
-              true
+              InstallStatus.Complete
             }
             is ValidationErrorResponse -> {
               handleValidationError(result)
-              false
+              InstallStatus.FailedValidation
             }
             is ServiceErrorResponse -> {
               handleUnexpectedErrorResponse(result)
-              false
+              InstallStatus.FailedInstallation
             }
           }
         } catch (e: Throwable) {
