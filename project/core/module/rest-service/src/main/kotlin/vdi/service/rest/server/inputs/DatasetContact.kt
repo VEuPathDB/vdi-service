@@ -20,22 +20,33 @@ internal fun APIContact?.cleanup() = this?.apply {
   cleanupString(::getCountry)
 }
 
+private inline fun String?.looseValidator(path: String, range: IntRange, errors: ValidationErrors) {
+  this?.checkLength(path, range, errors)
+}
+
 private fun APIContact.validate(
   jPath: String,
   errors: ValidationErrors,
   strict: Boolean = false,
 ) {
-  // conditionally requires "strict" fields.
-  val strictValidator: String?.(String, IntRange, ValidationErrors) -> Unit =
+  // If strict is on, require fields to be non-null.
+  val strictValidator =
     if (strict)
       String?::reqCheckLength
     else
-      ({ a, b, c -> this?.checkLength(a, b, c) })
+      String?::looseValidator
+
+  // If contact is primary, apply strict rules, else normal rules.
+  val semiStrictValidator =
+    if (isPrimary)
+      strictValidator
+    else
+      String?::looseValidator
 
   firstName.reqCheckLength(jPath..JsonField.FIRST_NAME, ContactNameLengthRange, errors)
   middleName?.checkLength(jPath..JsonField.MIDDLE_NAME, 0..300, errors)
   lastName.reqCheckLength(jPath..JsonField.LAST_NAME, ContactNameLengthRange, errors)
-  email.strictValidator(jPath..JsonField.EMAIL, EmailLengthRange, errors)
+  email.semiStrictValidator(jPath..JsonField.EMAIL, EmailLengthRange, errors)
   affiliation.strictValidator(jPath..JsonField.AFFILIATION, AffiliationLengthRange, errors)
   country.strictValidator(jPath..JsonField.COUNTRY, CountryLengthRange, errors)
 }
