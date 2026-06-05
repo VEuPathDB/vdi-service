@@ -193,10 +193,6 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     if (!shouldUpdateTargetMeta(metaTimestamp))
       return
 
-    // FIXME: this is just to keep track of if one of the two different 'meta'
-    //        install steps failed. The worst non-null status will be reported.
-    var worstStatus = InstallStatus.Complete
-
     // Ensure at least some record exists for the dataset before attempting
     // to write anything else to the target database.
     appDB.withTransaction(target, plugin.type) {
@@ -208,6 +204,8 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       ))
     }
 
+    // Record the dataset properties install status IF an install-meta call
+    // happened.  If the call didn't happen, this value will be null.
     val datasetPropertiesInstallStatus = with(appDB.accessor(target, plugin.type)!!) {
       // Stop here if the dataset does not already have a successful data
       // install recorded.  The install-meta script requires installed data to
@@ -239,8 +237,6 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
         logger.warn("refusing to make dataset public due to unsuccessful install-meta")
         newMeta = meta.copy(visibility = DatasetVisibility.Private)
       }
-
-      worstStatus = datasetPropertiesInstallStatus ?: worstStatus
     }
 
     // Update/insert full set of dataset records.
@@ -248,7 +244,12 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
       appDB.withTransaction(target, plugin.type) {
         val record = DatasetRecord(datasetID, newMeta, PluginRegistry.require(meta.type).category)
         it.upsertDatasetRecord(record, newMeta, metaTimestamp)
-        it.upsertInstallMetaMessage(datasetID, worstStatus)
+
+        // If install-meta didn't run, then no status has been set yet.  Set one
+        // here indicating that we successfully wrote to the control tables at
+        // least.
+        if (datasetPropertiesInstallStatus == null)
+          it.upsertInstallMetaMessage(datasetID, InstallStatus.Complete)
       }
     } catch (e: Throwable) {
       appDB.withTransaction(target, plugin.type) {
@@ -263,7 +264,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
     }
   }
 
-  private suspend fun UpdateMetaContext.WithPlugin.runPluginInstallMeta(metaTimestamp: OffsetDateTime): InstallStatus {
+  private suspend fun UpdateMetaContext.WithPlugin.runPluginInstallMeta(metaTimestamp: OffsetDateTime): InstallStatus? {
     val dataPropFiles = directory.getDataPropertiesFiles()
       .map { PluginDataPropsFile(it.baseName, it.open()!!) }
       .asIterable()
@@ -352,7 +353,13 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
   private fun UpdateMetaContext.WithPlugin.handleSuccessResponse() {
     logger.info("dataset meta installed successfully")
-    // No longer doing anything special in this case.
+
+    appDB.withTransaction(target, plugin.type) {
+      it.upsertInstallMetaMessage(
+        datasetID,
+        InstallStatus.Complete
+      )
+    }
   }
 
   private fun UpdateMetaContext.WithPlugin.handleValidationError(response: ValidationErrorResponse) {
