@@ -89,12 +89,6 @@ private fun DatasetPatchRequestBody.validateAndApply(
     }
   }
 
-  if (errors.isNotEmpty)
-    return left(errors)
-
-  // If the PATCH body seems valid at a surface level, move on to performing
-  // heavier validations.
-
   if (newMetadata.isPromotingToCommunity(original))
     newMetadata.validateForPromotion(datasetID, errors)
 
