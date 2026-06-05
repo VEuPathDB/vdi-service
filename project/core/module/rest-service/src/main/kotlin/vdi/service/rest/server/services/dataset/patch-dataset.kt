@@ -138,7 +138,7 @@ private fun DatasetMetadata.validateForPromotion(datasetID: DatasetID, errors: V
 
     for (i in contacts.indices) {
       val jPath = JsonField.CONTACTS..i
-      if (contacts[i].email == null)
+      if (contacts[i].isPrimary && contacts[i].email == null)
         errors.add(jPath..JsonField.EMAIL, "email address is required")
       if (contacts[i].affiliation == null)
         errors.add(jPath..JsonField.AFFILIATION, "affiliated organization is required")
