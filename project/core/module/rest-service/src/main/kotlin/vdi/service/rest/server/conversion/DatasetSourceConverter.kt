@@ -48,14 +48,14 @@ object DatasetSourceConverter: APIListTypeConverter<RamlDatasetSource?, VdiDatas
     index: Int,
     errors: ValidationErrors,
   ) {
-    value!!.url.require(jsonPath..JsonField.URL, errors) {
+    value!!.url.require(jsonPath..JsonField.URL, index, errors) {
       try {
         URI(this)
       } catch (_: URISyntaxException) {
-        errors.add(jsonPath..JsonField.URL, "malformed url")
+        errors.add(jsonPath..JsonField.URL, index, "malformed url")
       }
     }
-    value.version.reqCheckLength(jsonPath..JsonField.VERSION, ValidVersionLengths, errors)
+    value.version.reqCheckLength(jsonPath..JsonField.VERSION, index, ValidVersionLengths, errors)
   }
 
   override fun toSingleInternal(value: RamlDatasetSource?): VdiDatasetSource =
