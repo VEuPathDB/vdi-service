@@ -311,7 +311,10 @@ internal class ReconcilerInstance(
   private fun DatasetDirectory.isOutOfSync(targetLastUpdated: SyncControlRecord): SyncStatus {
     return SyncStatus(
       metaOutOfSync    = targetLastUpdated.metaUpdated.isBefore(getMetaFile().lastModified())
-        || getLatestDatasetPropertiesTimestamp()?.let { targetLastUpdated.metaUpdated.isBefore(it) } == true,
+        || (
+          targetLastUpdated !is TempHackCacheDBReconcilerTargetRecord
+          && getLatestDatasetPropertiesTimestamp()?.let { targetLastUpdated.metaUpdated.isBefore(it) } == true
+        ),
       sharesOutOfSync  = targetLastUpdated.sharesUpdated.isBefore(getLatestShareTimestamp(targetLastUpdated.sharesUpdated)),
       installOutOfSync = false, // DISABLED -- datasets are versioned, data files should not be updated
     )
