@@ -52,7 +52,7 @@ object DatasetSourceConverter: APIListTypeConverter<RamlDatasetSource?, VdiDatas
       try {
         URI(this)
       } catch (_: URISyntaxException) {
-        errors.add(jsonPath..JsonField.URL, index, "malformed url")
+        errors.add((jsonPath..JsonField.URL)..index, "malformed url")
       }
     }
     value.version.reqCheckLength(jsonPath..JsonField.VERSION, index, ValidVersionLengths, errors)
