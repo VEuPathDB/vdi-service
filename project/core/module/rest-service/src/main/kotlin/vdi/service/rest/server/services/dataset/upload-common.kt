@@ -127,6 +127,7 @@ fun resolveUploadFiles(
     data    = data.toTempPaths(tmpDir),
     docs    = docs.toTempPaths(tmpDir),
     props   = props.toTempPaths(tmpDir),
+    wasURL  = false,
   )
 
 fun ControllerBase.resolveURLFile(
@@ -140,7 +141,8 @@ fun ControllerBase.resolveURLFile(
     tempDir = tmpDir,
     data    = listOf(downloadRemoteFile(url.toURL(), uploadConfig, tmpDir)),
     docs    = docs.toTempPaths(tmpDir),
-    props   = props.toTempPaths(tmpDir)
+    props   = props.toTempPaths(tmpDir),
+    wasURL  = true,
   )
 
 data class UploadFileReferences(
@@ -148,6 +150,7 @@ data class UploadFileReferences(
   val data:    List<Path>,
   val docs:    List<Path>,
   val props:   List<Path>,
+  val wasURL:  Boolean,
 )
 
 private fun Sequence<File>.toTempPaths(tmpDir: Path): List<Path> =
@@ -216,10 +219,11 @@ fun ControllerBase.uploadFiles(
         TempFiles.withTempDirectory { dir ->
           context(logger) {
             uploadRefs.data[0].repack(
-              into = archive,
-              using = dir,
+              into         = archive,
+              using        = dir,
               dataTypeMeta = PluginRegistry.require(datasetMeta.type),
               uploadConfig = uploadConfig,
+              wasURL       = uploadRefs.wasURL
             )
           }
         }
@@ -331,6 +335,7 @@ context(logger: Logger, controller: ControllerBase)
 private fun Path.repack(
   into:         Path,
   using:        Path,
+  wasURL:       Boolean,
   dataTypeMeta: PluginDatasetTypeMeta,
   uploadConfig: UploadConfig,
 ): Either<List<DatasetFileInfo>, BadRequestError> =
@@ -347,7 +352,7 @@ private fun Path.repack(
         ?: Either.left(repackTar(into, using))
     }
 
-    else -> repackRaw(into, dataTypeMeta)
+    else -> repackRaw(into, dataTypeMeta, wasURL)
   }
 
 /**
@@ -485,13 +490,20 @@ private fun Path.validateTar(dataTypeMeta: PluginDatasetTypeMeta, remainingQuota
 }
 
 context(logger: Logger)
-private fun Path.repackRaw(into: Path, dataTypeMeta: PluginDatasetTypeMeta): Either<List<DatasetFileInfo>, BadRequestError> {
+private fun Path.repackRaw(
+  into:         Path,
+  dataTypeMeta: PluginDatasetTypeMeta,
+  wasURL:       Boolean,
+): Either<List<DatasetFileInfo>, BadRequestError> {
   logger.trace("packing raw file {} into {}", this, into)
 
   if (fileSize() > dataTypeMeta.maxFileSize.toLong())
     return Either.right(BadRequestError("uploaded file larger than the max permitted size of ${dataTypeMeta.maxFileSize.toFileSizeString()}"))
 
-  if (!dataTypeMeta.allowedFileExtensions.matchesFilename(name.lowercase()))
+  // IF the upload file didn't come from a URL (urls may not have extensions)
+  //   AND the non-url file has an unknown extension
+  // THEN reject it.
+  if (!wasURL && !dataTypeMeta.allowedFileExtensions.matchesFilename(name.lowercase()))
     return Either.right(BadRequestError("uploaded file has an unrecognized or disallowed file extension"))
 
   into.compress(listOf(this))
