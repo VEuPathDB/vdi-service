@@ -37,6 +37,8 @@ internal fun URL.fetchContent(): URLFetchResult {
 
     val con = currentURL.openConnection() as HttpURLConnection
 
+    con.connectTimeout = 20_000
+
     try {
       val code = con.responseCode
       val name = con.headerFields["Content-Disposition"]
