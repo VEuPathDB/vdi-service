@@ -18,5 +18,5 @@ internal fun DatasetType.toExternal(): APIType =
   DatasetTypeOutputImpl().also {
     it.name     = name.toString()
     it.version  = version
-    it.category = PluginRegistry.require(this).category
+    it.category = PluginRegistry[this]?.category ?: "unknown"
   }

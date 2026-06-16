@@ -3,7 +3,6 @@ package vdi.service.rest.server.outputs
 import vdi.core.db.app.model.InstallStatuses
 import vdi.core.db.cache.model.DatasetFileSummary
 import vdi.core.db.cache.model.DatasetRecord
-import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.InstallTargetID
 import vdi.service.rest.conversion.*
 import vdi.service.rest.generated.model.DatasetListEntry
