@@ -72,7 +72,6 @@ private fun ControllerBase.getDatasetByID(
     else -> DatasetStore.getUploadErrorReport(dataset.ownerID, datasetID)
   }
 
-
   return left(DatasetDetails(
     datasetID       = datasetID,
     meta            = metaJson,

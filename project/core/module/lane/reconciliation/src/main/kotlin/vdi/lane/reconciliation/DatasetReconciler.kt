@@ -125,6 +125,18 @@ internal class DatasetReconciler(
 
   private fun ensureUninstalled(ctx: ReconcilerTarget) {
     if (!ctx.hasMeta()) {
+      // BUG FIX: ensure that the dataset is marked as deleted in the cache db
+      // if it has a record.
+      //
+      // CONTEXT: Datasets being copied into a blank minio instance that were
+      // already in a deleted state were being created in the cache db by the
+      // reconciliation process, however the lack of a meta.json file was
+      // resulting in them _not_ being marked as deleted by this if block.
+      cacheDB.withTransaction { it.updateDatasetDeleted(
+        ctx.datasetId.toDatasetID(),
+        true,
+      ) }
+
       ctx.logger.error("dataset does not have a meta file, cannot uninstall")
       return
     }
