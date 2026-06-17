@@ -10,7 +10,7 @@ import vdi.core.db.jdbc.setDatasetID
 import vdi.core.db.app.sql.setUserID
 
 private fun sql(schema: String) =
-// language=oracle
+// language=PostgreSQL
 """
 INSERT INTO
   ${schema}.${Table.Dataset} (
