@@ -245,6 +245,10 @@ internal class ImportLaneImpl(private val config: ImportLaneConfig, abortCB: Abo
 
     // Record the status update to the cache DB
     cacheDB.withTransaction { transaction ->
+      // Replace any existing import status messages with the new messages (if
+      // any).
+      transaction.deleteImportMessages(datasetID)
+
       if (
         warnings?.basicWarnings?.isNotEmpty() == true
         || warnings?.communityWarnings?.isNotEmpty() == true
