@@ -41,12 +41,11 @@ ON CONFLICT DO NOTHING
 """
 
   context(con: Connection)
-  fun insert(datasetID: DatasetID, status: DatasetUploadStatus) {
+  fun insert(datasetID: DatasetID, status: DatasetUploadStatus) =
     con.withPreparedUpdate(InsertSQL) {
       setDatasetID(1, datasetID)
       setString(2, status.toString())
     }
-  }
 
   // language=postgresql
   private const val SelectSingleSQL = """

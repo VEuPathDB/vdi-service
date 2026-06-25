@@ -87,6 +87,13 @@ internal fun CacheDB.tryInitDataset(ctx: ReconcilerTarget, importStatus: Dataset
   }
 }
 
+internal fun CacheDB.isUploading(ctx: ReconcilerTarget): Boolean {
+  if (ctx.uploadStatus == null)
+    ctx.uploadStatus = selectUploadStatus(ctx.datasetId.toDatasetID())
+
+  return ctx.uploadStatus == DatasetUploadStatus.Running
+}
+
 internal fun CacheDB.isImportFailed(ctx: ReconcilerTarget, refresh: Boolean = false) =
   getCacheImportControl(ctx, refresh) == DatasetImportStatus.Failed
 

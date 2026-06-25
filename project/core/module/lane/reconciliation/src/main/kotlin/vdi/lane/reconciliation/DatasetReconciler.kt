@@ -116,7 +116,7 @@ internal class DatasetReconciler(
       ReimportIndicator.ReimportNotPossible -> {
         if (ctx.hasInstallReadyData() && ctx.hasManifest())
           DatasetImportStatus.Complete
-        else if (ctx.hasUploadError())
+        else if (ctx.hasUploadError() || cacheDB.isUploading(ctx))
           null
         else
           DatasetImportStatus.Failed

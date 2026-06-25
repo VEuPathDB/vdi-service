@@ -185,8 +185,8 @@ internal class CacheDBTransactionImpl(
   }
 
   override fun tryInsertUploadStatus(datasetID: DatasetID, status: DatasetUploadStatus) {
-    log.debug("soft-inserting upload status record for dataset {} for status {}", datasetID, status)
-    runQuery { UploadStatus.insert(datasetID, status) }
+    if (runQuery { UploadStatus.insert(datasetID, status) } > 0)
+      log.debug("inserted new upload status {} for dataset {}", status, datasetID)
   }
 
   override fun commit() {

@@ -7,6 +7,7 @@ import vdi.core.db.cache.model.DatasetImportStatus;
 import vdi.core.kafka.EventSource;
 import vdi.core.s3.DatasetDirectory;
 import vdi.core.s3.files.FileName;
+import vdi.model.DatasetUploadStatus;
 import vdi.model.meta.DatasetManifest;
 import vdi.model.meta.DatasetMetadata;
 import vdi.model.meta.UserID;
@@ -39,6 +40,9 @@ public class ReconcilerTarget {
 
   @Nullable
   public Boolean hasImportMessages;
+
+  @Nullable
+  public DatasetUploadStatus uploadStatus;
 
   public boolean haveFiredMetaUpdateEvent;
   public boolean haveFiredImportEvent;
