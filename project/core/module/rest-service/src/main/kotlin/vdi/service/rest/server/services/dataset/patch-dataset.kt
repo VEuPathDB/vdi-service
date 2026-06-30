@@ -68,8 +68,10 @@ private fun DatasetPatchRequestBody.validateAndApply(
 ): Either<ValidationErrors, DatasetMetadata> {
   cleanup()
 
+  val jPath = "$";
+
   // Run standard validation.
-  val errors = validate(original)
+  val errors = validate(original, jPath)
 
   if (errors.isNotEmpty)
     return left(errors)
@@ -90,7 +92,7 @@ private fun DatasetPatchRequestBody.validateAndApply(
   }
 
   if (newMetadata.isPromotingToCommunity(original))
-    newMetadata.validateForPromotion(datasetID, errors)
+    newMetadata.validateForPromotion(datasetID, jPath, errors)
 
   if (errors.isNotEmpty)
     return left(errors)
@@ -120,18 +122,20 @@ private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
 private fun DatasetMetadata.isPromotingToCommunity(original: DatasetMetadata) =
   visibility != DatasetVisibility.Private && original.visibility == DatasetVisibility.Private
 
-private fun DatasetMetadata.validateForPromotion(datasetID: DatasetID, errors: ValidationErrors) {
+private fun DatasetMetadata.validateForPromotion(datasetID: DatasetID, jPath: String, errors: ValidationErrors) {
   // Require contact requirements
   if (contacts.isEmpty()) {
-    errors.add(JsonField.CONTACTS, "at least one contact must be provided")
+    errors.add(jPath..JsonField.CONTACTS, "at least one contact must be provided")
   } else {
+    val contactPath = jPath..JsonField.CONTACTS;
+
     val primaries = contacts.count { it.isPrimary }
 
     if (primaries != 1)
-      errors.add(JsonField.CONTACTS, "exactly one contact must be marked as primary")
+      errors.add(contactPath, "exactly one contact must be marked as primary")
 
     for (i in contacts.indices) {
-      val jPath = JsonField.CONTACTS..i
+      val jPath = contactPath..i
       if (contacts[i].isPrimary && contacts[i].email == null)
         errors.add(jPath..JsonField.EMAIL, "email address is required")
       if (contacts[i].affiliation == null)
@@ -156,5 +160,5 @@ private fun DatasetMetadata.validateForPromotion(datasetID: DatasetID, errors: V
     .all { it?.status == InstallStatus.Complete }
 
   if (!metaInstallsSucceeded)
-    errors.add(JsonField.VISIBILITY, "cannot promote dataset to community with dataset install failures")
+    errors.add(jPath..JsonField.VISIBILITY, "cannot promote dataset to community with dataset install failures")
 }

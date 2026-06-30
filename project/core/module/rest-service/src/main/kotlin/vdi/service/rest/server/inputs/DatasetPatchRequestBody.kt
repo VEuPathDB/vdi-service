@@ -56,53 +56,56 @@ internal fun DatasetPatchRequestBody.cleanup() {
 
 internal fun DatasetPatchRequestBody.validate(
   original:  DatasetMetadata,
+  jPath:     String,
   errors:    ValidationErrors = ValidationErrors(),
 ): ValidationErrors {
   visibility?.apply {
-    value.require(JF.VISIBILITY, errors) {}
+    value.require(jPath..JF.VISIBILITY, errors) {}
   }
 
   type?.apply {
-    value.requireAnd(JF.TYPE, errors) {
-      validate(JF.TYPE, original.installTargets, errors)
+    val typePath = jPath..JF.TYPE
+
+    value.requireAnd(typePath, errors) {
+      validate(typePath, original.installTargets, errors)
 
       val originalHandler = PluginRegistry[original.type]
 
       if (originalHandler == null)
-        errors.add(JF.TYPE, "original dataset type is disabled")
+        errors.add(typePath, "original dataset type is disabled")
       else if (!PluginRegistry.require(original.type).typeChangesEnabled)
-        errors.add(JF.TYPE, "cannot change dataset type from ${original.type}")
+        errors.add(typePath, "cannot change dataset type from ${original.type}")
       else if (PluginRegistry[DatasetType(DataType.of(name), version)] == null)
-        errors.add(JF.TYPE, "no installers available for given dataset type")
+        errors.add(typePath, "no installers available for given dataset type")
     }
   }
 
-  name?.apply { value.requireAnd(JF.NAME, errors) { checkLength(JF.NAME, DatasetNameLengthRange, errors) } }
+  name?.apply { value.requireAnd(jPath..JF.NAME, errors) { checkLength(JF.NAME, DatasetNameLengthRange, errors) } }
 
   summary?.apply {
-    value.requireAnd(JF.SUMMARY, errors) {
-      checkLength(JF.SUMMARY, SummaryLengthRange, errors)
+    value.requireAnd(jPath..JF.SUMMARY, errors) {
+      checkLength(jPath..JF.SUMMARY, SummaryLengthRange, errors)
     }
   }
 
   // description (nothing to validate)
-  publications?.value?.validate(JF.PUBLICATIONS, errors)
+  publications?.value?.validate(jPath..JF.PUBLICATIONS, errors)
 
   contacts?.apply {
-    value?.validate(JF.CONTACTS, false, errors)
+    value?.validate(jPath..JF.CONTACTS, false, errors)
   }
 
-  projectName?.value?.checkLength(JF.PROJECT_NAME, ProjectNameLengthRange, errors)
-  programName?.value?.checkLength(JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
-  linkedDatasets?.value?.validate(JF.LINKED_DATASETS, errors)
+  projectName?.value?.checkLength(jPath..JF.PROJECT_NAME, ProjectNameLengthRange, errors)
+  programName?.value?.checkLength(jPath..JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
+  linkedDatasets?.value?.validate(jPath..JF.LINKED_DATASETS, errors)
 
-  datasetCharacteristics?.validate(original.datasetCharacteristics, errors)
-  externalIdentifiers?.validate(JF.EXTERNAL_IDENTIFIERS, errors)
+  datasetCharacteristics?.validate(original.datasetCharacteristics, jPath..JF.DATASET_CHARACTERISTICS, errors)
+  externalIdentifiers?.validate(jPath..JF.EXTERNAL_IDENTIFIERS, errors)
 
-  funding?.value?.validate(JF.FUNDING, errors)
-  shortAttribution?.value?.checkLength(JF.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
+  funding?.value?.validate(jPath..JF.FUNDING, errors)
+  shortAttribution?.value?.checkLength(jPath..JF.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
 
-  datasetSources?.value?.also { DatasetSourceConverter.validate(it, JF.DATASET_SOURCES, errors) }
+  datasetSources?.value?.also { DatasetSourceConverter.validate(it, jPath..JF.DATASET_SOURCES, errors) }
 
   return errors
 }
@@ -147,7 +150,8 @@ internal fun DatasetPatchRequestBody.applyPatch(
 
 fun DatasetTypePatch.toInternal() = DatasetType(DataType.of(value.name), value.version)
 
-private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristics?, errors: ValidationErrors) {
+private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristics?, jPath: String, errors: ValidationErrors) {
+
 
   // If the client is attempting to change the study design value
   if (studyDesign != null) {
@@ -156,19 +160,19 @@ private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristic
       studyDesign.value == null -> {
         // then the study type must also be set to null (study type requires study design)
         if (studyType == null || studyType.value != null)
-          errors.add(JF.DATASET_CHARACTERISTICS..JF.STUDY_TYPE, "cannot remove study design without also removing study type")
+          errors.add(jPath..JF.STUDY_TYPE, "cannot remove study design without also removing study type")
       }
 
       // If the study design has been set, AND no study type value was provided
       studyType == null -> {
         // then the original must already have a study type value
-        original?.studyType.require(JF.DATASET_CHARACTERISTICS..JF.STUDY_TYPE, errors) {}
+        original?.studyType.require(jPath..JF.STUDY_TYPE, errors) {}
       }
 
       // If the study design has been set, AND the client is trying to remove out the study type value.
       studyType.value == null -> {
         // No.
-        errors.add(JF.DATASET_CHARACTERISTICS..JF.STUDY_TYPE)
+        errors.add(jPath..JF.STUDY_TYPE)
       }
     }
 
@@ -178,25 +182,25 @@ private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristic
       // we already know the client didn't attempt to change the study design
       // value by virtue of being in this else block.
       studyType.value == null -> {
-        null.require(JF.DATASET_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
+        null.require(jPath..JF.STUDY_DESIGN, errors) {}
       }
 
       // If the client is attempting to change the study type value without also
       // providing a study design value
       else -> {
         // then the action is only valid if we already had a study design value.
-        original?.studyDesign.require(JF.DATASET_CHARACTERISTICS..JF.STUDY_DESIGN, errors) {}
+        original?.studyDesign.require(jPath..JF.STUDY_DESIGN, errors) {}
       }
     }
   }
 
-  countries?.value?.validateCountries(JF.DATASET_CHARACTERISTICS, errors)
+  countries?.value?.validateCountries(jPath, errors)
 
-  years?.value?.validate(JF.DATASET_CHARACTERISTICS..JF.YEARS, errors)
+  years?.value?.validate(jPath..JF.YEARS, errors)
 
-  studySpecies?.value?.validateStudySpecies(JF.DATASET_CHARACTERISTICS, errors)
-  outcomes?.value?.validateOutcomes(JF.DATASET_CHARACTERISTICS, errors)
-  associatedFactors?.value?.validateAssociatedFactors(JF.DATASET_CHARACTERISTICS, errors)
-  participantAges?.value?.validateParticipantAges(JF.DATASET_CHARACTERISTICS, errors)
-  sampleTypes?.value?.validateSampleTypes(JF.DATASET_CHARACTERISTICS, errors)
+  studySpecies?.value?.validateStudySpecies(jPath, errors)
+  outcomes?.value?.validateOutcomes(jPath, errors)
+  associatedFactors?.value?.validateAssociatedFactors(jPath, errors)
+  participantAges?.value?.validateParticipantAges(jPath, errors)
+  sampleTypes?.value?.validateSampleTypes(jPath, errors)
 }

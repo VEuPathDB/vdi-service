@@ -23,8 +23,6 @@ kotlin {
 
     progressiveMode = true
     extraWarnings = true
-
-    freeCompilerArgs.set(listOf("-Xcontext-parameters"))
   }
 }
 

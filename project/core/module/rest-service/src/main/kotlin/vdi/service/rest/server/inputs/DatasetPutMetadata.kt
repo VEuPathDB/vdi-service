@@ -3,6 +3,7 @@ package vdi.service.rest.server.inputs
 
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.checkLength
+import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.reqCheckLength
 import vdi.model.meta.DatasetMetadata
 import vdi.service.rest.generated.model.DatasetPatchRequestBody
@@ -23,8 +24,10 @@ fun DatasetPutMetadata.cleanup() {
 }
 
 fun DatasetPutMetadata.validate(original: DatasetMetadata, errors: ValidationErrors) {
-  (this as DatasetPatchRequestBody).validate(original, errors)
+  val jPath = "$"
 
-  origin?.checkLength(JsonField.ORIGIN, OriginLengthRange, errors)
-  revisionNote.reqCheckLength(JsonField.REVISION_NOTE, RevisionNoteLengthRange, errors)
+  (this as DatasetPatchRequestBody).validate(original, jPath, errors)
+
+  origin?.checkLength(jPath..JsonField.ORIGIN, OriginLengthRange, errors)
+  revisionNote.reqCheckLength(jPath..JsonField.REVISION_NOTE, RevisionNoteLengthRange, errors)
 }
