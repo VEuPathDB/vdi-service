@@ -7,7 +7,10 @@ import vdi.model.meta.DatasetID
 import vdi.model.meta.DatasetVisibility
 import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.DatasetFileListingImpl
+import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse as DeleteResponse
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesByVdiIdResponse
+import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesInstallByVdiIdResponse as DataResponse
+import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesUploadByVdiIdResponse as UploadResponse
 import vdi.service.rest.s3.DatasetStore
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.outputs.DatasetFileDetails
@@ -15,8 +18,6 @@ import vdi.service.rest.server.outputs.DatasetZipDetails
 import vdi.service.rest.server.outputs.Static404
 import vdi.service.rest.server.outputs.wrap
 import vdi.util.fn.Either
-import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesInstallByVdiIdResponse as DataResponse
-import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.GetDatasetsFilesUploadByVdiIdResponse as UploadResponse
 
 // region Install-Ready
 
@@ -81,6 +82,22 @@ fun listDatasetFiles(owner: UserID, vdiId: DatasetID) =
   }
 
 // endregion List Files
+
+// region Dataset Properties
+
+fun ControllerBase.deleteDatasetPropertiesFile(datasetID: DatasetID, filename: String): DeleteResponse {
+  val userId = maybeUserID ?: return DeleteResponse.respond404WithApplicationJson(Static404)
+
+  CacheDB().selectDatasetForUser(userID, datasetID)
+    ?.takeIf { it.ownerID == userId }
+    ?: return DeleteResponse.respond404WithApplicationJson(Static404)
+
+  DatasetStore.deleteDatasetPropertiesFile(userId, datasetID, filename)
+
+  return DeleteResponse.respond204()
+}
+
+// endregion Dataset Properties
 
 /**
  * Attempts to locate a dataset record that is visible to the target user.

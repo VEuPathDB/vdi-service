@@ -34,6 +34,11 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
       else -> listDatasetFilesForUser(DatasetID(rawID))
     }
 
+  override fun deleteDatasetsFilesDatasetPropertiesByVdiIdAndFileName(
+    vdiId: String,
+    fileName: String,
+  ) = deleteDatasetPropertiesFile(DatasetID(vdiId), fileName)
+
   override fun getDatasetsFilesUploadByVdiId(rawID: String): GetDatasetsFilesUploadByVdiIdResponse {
     return when (maybeUser) {
       null -> getUploadFileForAdmin(DatasetID(rawID))

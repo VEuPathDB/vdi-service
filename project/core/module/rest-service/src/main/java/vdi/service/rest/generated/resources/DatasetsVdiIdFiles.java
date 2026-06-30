@@ -3,6 +3,7 @@ package vdi.service.rest.generated.resources;
 import java.io.File;
 import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -77,6 +78,12 @@ public interface DatasetsVdiIdFiles {
   @Consumes("application/octet-stream")
   PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse putDatasetsFilesDocumentsByVdiIdAndFileName(
       @PathParam("vdi-id") String vdiId, @PathParam("file-name") String fileName, File entity);
+
+  @DELETE
+  @Path("/dataset-properties/{file-name}")
+  @Produces("application/json")
+  DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse deleteDatasetsFilesDatasetPropertiesByVdiIdAndFileName(
+      @PathParam("vdi-id") String vdiId, @PathParam("file-name") String fileName);
 
   @GET
   @Path("/dataset-properties/{file-name}")
@@ -373,6 +380,54 @@ public interface DatasetsVdiIdFiles {
       Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
       responseBuilder.entity(entity);
       return new PutDatasetsFilesDocumentsByVdiIdAndFileNameResponse(responseBuilder.build(), entity);
+    }
+  }
+
+  class DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse extends ResponseDelegate {
+    public DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse(Response response,
+        Object entity) {
+      super(response, entity);
+    }
+
+    public DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse(Response response) {
+      super(response);
+    }
+
+    public DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse(ResponseDelegate response) {
+      super(response.delegate, response.entity);
+    }
+
+    public static DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse respond204() {
+      Response.ResponseBuilder responseBuilder = Response.status(204);
+      return new DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse(responseBuilder.build());
+    }
+
+    public static DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse respond401WithApplicationJson(
+        UnauthorizedError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse(responseBuilder.build(), entity);
+    }
+
+    public static DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse respond404WithApplicationJson(
+        NotFoundError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(404).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse(responseBuilder.build(), entity);
+    }
+
+    public static DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse respond410WithApplicationJson(
+        GoneError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(410).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse(responseBuilder.build(), entity);
+    }
+
+    public static DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse respond500WithApplicationJson(
+        ServerError entity) {
+      Response.ResponseBuilder responseBuilder = Response.status(500).header("Content-Type", "application/json");
+      responseBuilder.entity(entity);
+      return new DeleteDatasetsFilesDatasetPropertiesByVdiIdAndFileNameResponse(responseBuilder.build(), entity);
     }
   }
 

@@ -123,6 +123,20 @@ get:
   displayName: Dataset Properties Files
   uriParameters:
     file-name:
+  delete:
+    displayName: Delete Dataset Properties File
+    responses:
+      204:
+      401:
+        body: lib.UnauthorizedError
+      404:
+        body: lib.NotFoundError
+      410:
+        description: Parent dataset has been deleted, or is no longer public.
+        body: lib.GoneError
+      500:
+        body: lib.ServerError
+
   get:
     displayName: Get Dataset Properties File
     queryParameters:

@@ -65,6 +65,71 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
+  public int getStatus() {
+    return this.delegate.getStatus();
+  }
+
+  @Override
+  public MultivaluedMap<String, Object> getMetadata() {
+    return this.delegate.getMetadata();
+  }
+
+  @Override
+  public String getHeaderString(String p0) {
+    return this.delegate.getHeaderString(p0);
+  }
+
+  @Override
+  public Response.StatusType getStatusInfo() {
+    return this.delegate.getStatusInfo();
+  }
+
+  @Override
+  public <T> T readEntity(GenericType<T> p0) {
+    return this.delegate.readEntity(p0);
+  }
+
+  @Override
+  public <T> T readEntity(Class<T> p0) {
+    return this.delegate.readEntity(p0);
+  }
+
+  @Override
+  public <T> T readEntity(Class<T> p0, Annotation[] p1) {
+    return this.delegate.readEntity(p0,p1);
+  }
+
+  @Override
+  public <T> T readEntity(GenericType<T> p0, Annotation[] p1) {
+    return this.delegate.readEntity(p0,p1);
+  }
+
+  @Override
+  public boolean hasEntity() {
+    return this.delegate.hasEntity();
+  }
+
+  @Override
+  public boolean bufferEntity() {
+    return this.delegate.bufferEntity();
+  }
+
+  @Override
+  public MediaType getMediaType() {
+    return this.delegate.getMediaType();
+  }
+
+  @Override
+  public Set<String> getAllowedMethods() {
+    return this.delegate.getAllowedMethods();
+  }
+
+  @Override
+  public Map<String, NewCookie> getCookies() {
+    return this.delegate.getCookies();
+  }
+
+  @Override
   public EntityTag getEntityTag() {
     return this.delegate.getEntityTag();
   }
@@ -95,73 +160,8 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public String getHeaderString(String p0) {
-    return this.delegate.getHeaderString(p0);
-  }
-
-  @Override
   public Object getEntity() {
     return this.entity;}
-
-  @Override
-  public Response.StatusType getStatusInfo() {
-    return this.delegate.getStatusInfo();
-  }
-
-  @Override
-  public <T> T readEntity(GenericType<T> p0, Annotation[] p1) {
-    return this.delegate.readEntity(p0,p1);
-  }
-
-  @Override
-  public <T> T readEntity(Class<T> p0, Annotation[] p1) {
-    return this.delegate.readEntity(p0,p1);
-  }
-
-  @Override
-  public <T> T readEntity(Class<T> p0) {
-    return this.delegate.readEntity(p0);
-  }
-
-  @Override
-  public <T> T readEntity(GenericType<T> p0) {
-    return this.delegate.readEntity(p0);
-  }
-
-  @Override
-  public boolean hasEntity() {
-    return this.delegate.hasEntity();
-  }
-
-  @Override
-  public boolean bufferEntity() {
-    return this.delegate.bufferEntity();
-  }
-
-  @Override
-  public MediaType getMediaType() {
-    return this.delegate.getMediaType();
-  }
-
-  @Override
-  public Set<String> getAllowedMethods() {
-    return this.delegate.getAllowedMethods();
-  }
-
-  @Override
-  public Map<String, NewCookie> getCookies() {
-    return this.delegate.getCookies();
-  }
-
-  @Override
-  public int getStatus() {
-    return this.delegate.getStatus();
-  }
-
-  @Override
-  public MultivaluedMap<String, Object> getMetadata() {
-    return this.delegate.getMetadata();
-  }
 
   public static class HeaderBuilderBase {
     protected final Map<String, String> headerMap;

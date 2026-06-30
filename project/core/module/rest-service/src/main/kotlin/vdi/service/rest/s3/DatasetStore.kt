@@ -147,6 +147,10 @@ object DatasetStore {
       .getUploadErrorFile()
       .load()
 
+  @JvmStatic
+  fun deleteDatasetPropertiesFile(userID: UserID, datasetID: DatasetID, fileName: String) =
+    bucket.objects.delete(S3Paths.datasetPropertiesFile(userID, datasetID, fileName))
+
   fun streamAll() = bucket.objects.streamAll().stream()
 
   fun hasDeleteFlag(userID: UserID, datasetID: DatasetID): Boolean =
