@@ -6,7 +6,7 @@ log4j = "2.26.0"
 slf4j = "2.0.18"
 
 mockito = "5.23.0"
-junit = "6.1.0"
+junit = "6.1.1"
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -109,7 +109,7 @@ junit-params   = { module = "org.junit.jupiter:junit-jupiter-params", version.re
 
 junit-engine   = { module = "org.junit.jupiter:junit-jupiter-engine",     version.ref = "junit" }
 junit-compat   = { module = "org.junit.vintage:junit-vintage-engine",     version.ref = "junit" }
-junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version     = "6.1.0" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version     = "6.1.1" }
 
 # Mockito
 mockito-core   = { module = "org.mockito:mockito-core",          version.ref = "mockito" }
