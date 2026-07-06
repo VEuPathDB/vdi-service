@@ -1,8 +1,6 @@
 package vdi.core.rabbit
 
 import com.rabbitmq.client.ConnectionFactory
-import com.rabbitmq.client.TrustEverythingTrustManager
-import io.netty.handler.ssl.SslContextBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
@@ -22,11 +20,7 @@ internal class RabbitInstanceFactory(config: RabbitMQConfig) {
 
       netty().apply {
         if (config.connection.useTLS) {
-          sslContext(
-            SslContextBuilder.forClient()
-              .trustManager(TrustEverythingTrustManager())
-              .build()
-          )
+          useTlsWithNoVerification()
         }
       }
     }
