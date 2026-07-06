@@ -24,6 +24,7 @@ import vdi.service.rest.server.conversion.DatasetFundingAward
 import vdi.service.rest.server.conversion.DatasetHyperlink
 import vdi.service.rest.server.conversion.DatasetOrganism
 import vdi.service.rest.server.conversion.DOIReference
+import vdi.service.rest.server.conversion.DatasetSourceConverter
 import vdi.service.rest.server.conversion.LinkedDataset
 import vdi.service.rest.generated.model.DatasetContact as APIContact
 import vdi.service.rest.generated.model.DatasetPublication as APIPublication
@@ -94,14 +95,15 @@ private inline fun DatasetDetails.applyMeta(meta: DatasetMetadata) = apply {
   externalIdentifiers    = meta.externalIdentifiers?.let(::ExternalIdentifiers)
   funding                = meta.funding.map(::DatasetFundingAward)
   shortAttribution       = meta.shortAttribution
+  daysForApproval        = meta.daysForApproval
+  dataDisclaimer         = meta.dataDisclaimer
+  datasetSources         = DatasetSourceConverter.toExternal(meta.datasetSources)
   type                   = meta.type.toExternal()
   visibility             = DatasetVisibility(meta.visibility, meta.daysForApproval)
   created                = meta.created
   sourceUrl              = meta.sourceURL?.toString()
   revisionHistory        = meta.revisionHistory?.let(::RevisionHistory)
   shortName              = meta.shortName
-  daysForApproval        = meta.daysForApproval
-  dataDisclaimer         = meta.dataDisclaimer
 }
 
 private fun DatasetContact(contact: DatasetContact): APIContact =
