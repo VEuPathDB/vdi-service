@@ -68,7 +68,7 @@ private fun DatasetPatchRequestBody.validateAndApply(
 ): Either<ValidationErrors, DatasetMetadata> {
   cleanup()
 
-  val jPath = "$";
+  val jPath = "$"
 
   // Run standard validation.
   val errors = validate(original, jPath)
@@ -111,9 +111,15 @@ private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
   || projectName != null
   || programName != null
   || linkedDatasets != null
+  || experimentalOrganism != null
+  || hostOrganism != null
   || (datasetCharacteristics != null && datasetCharacteristics.hasSomethingToUpdate())
   || (externalIdentifiers != null && externalIdentifiers.hasSomethingToUpdate())
   || funding != null
+  || shortAttribution != null
+  || daysForApproval != null
+  || dataDisclaimer != null
+  || datasetSources != null
 
 /**
  * Tests if the PATCH request is attempting to promote the target dataset to a
