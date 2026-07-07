@@ -12,10 +12,10 @@ import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated.AdminOverrideOption.ALLOW_ALWAYS
 import java.io.File
 import vdi.core.db.cache.CacheDB
+import vdi.core.s3.files.FileName
 import vdi.json.JSON
 import vdi.model.meta.DatasetID
 import vdi.model.misc.UploadErrorReport
-import vdi.service.rest.generated.model.DatasetsVdiIdFilesFileNameFileName
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles
 import vdi.service.rest.generated.resources.DatasetsVdiIdFiles.*
 import vdi.service.rest.s3.DatasetStore
@@ -100,7 +100,7 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
 
   override fun getDatasetsFilesByVdiIdAndFileName(
     vdiId: String,
-    fileName: DatasetsVdiIdFilesFileNameFileName,
+    fileName: String,
     // IMPORTANT: java primitives are boxed by code-gen and must be marked as
     // nullable in kotlin, otherwise valid requests will return unexpected 404s.
     download: Boolean?,
@@ -108,7 +108,7 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
 
   private fun getDatasetMetaFileJson(
     vdiId: String,
-    fileName: DatasetsVdiIdFilesFileNameFileName,
+    fileName: String,
     forUser: Boolean,
     download: Boolean
   ): GetDatasetsFilesByVdiIdAndFileNameResponse {
@@ -118,15 +118,17 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
       return GetDatasetsFilesByVdiIdAndFileNameResponse.respond404WithApplicationJson(NotFoundError())
 
     val responseContent = when (fileName) {
-      DatasetsVdiIdFilesFileNameFileName.METADATAJSON -> DatasetStore.getDatasetMeta(
+      FileName.MetadataFile -> DatasetStore.getDatasetMeta(
         cacheDbDatasetRecord.ownerID,
         cacheDbDatasetRecord.datasetID,
       )
 
-      DatasetsVdiIdFilesFileNameFileName.UPLOADERRORSJSON -> DatasetStore.getUploadErrorReport(
+      FileName.UploadErrorFile -> DatasetStore.getUploadErrorReport(
         cacheDbDatasetRecord.ownerID,
         cacheDbDatasetRecord.datasetID,
       )
+
+      else -> return GetDatasetsFilesByVdiIdAndFileNameResponse.respond404WithApplicationJson(NotFoundError())
     }
 
     val jacksonObject = JSON.convertValue(responseContent, ObjectNode::class.java)
@@ -135,15 +137,13 @@ class DatasetFiles(@Context request: ContainerRequest): DatasetsVdiIdFiles, Cont
     if (forUser)
       jacksonObject.remove(UploadErrorReport.JsonKey.Stacktrace)
 
-    val response = Response.status(200)
-      .type(MediaType.APPLICATION_JSON)
-      .entity(StreamingOutput {
-        JSON.writeValue(it, jacksonObject)
-      })
-
-    if (download)
-      response.header(HttpHeaders.CONTENT_DISPOSITION, makeContentDisposition(fileName.value))
-
-    return GetDatasetsFilesByVdiIdAndFileNameResponse(response.build())
+    return GetDatasetsFilesByVdiIdAndFileNameResponse
+      .respond200WithApplicationJson(
+        jacksonObject.toString(),
+        GetDatasetsFilesByVdiIdAndFileNameResponse.headersFor200().apply {
+          if (download)
+            withContentDisposition(makeContentDisposition(fileName))
+        }
+      )
   }
 }

@@ -15,7 +15,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import vdi.service.rest.generated.model.BadRequestError;
 import vdi.service.rest.generated.model.DatasetFileListing;
-import vdi.service.rest.generated.model.DatasetsVdiIdFilesFileNameFileName;
 import vdi.service.rest.generated.model.ForbiddenError;
 import vdi.service.rest.generated.model.GoneError;
 import vdi.service.rest.generated.model.NotFoundError;
@@ -106,8 +105,7 @@ public interface DatasetsVdiIdFiles {
   @Path("/{file-name}")
   @Produces("application/json")
   GetDatasetsFilesByVdiIdAndFileNameResponse getDatasetsFilesByVdiIdAndFileName(
-      @PathParam("vdi-id") String vdiId,
-      @PathParam("file-name") DatasetsVdiIdFilesFileNameFileName fileName,
+      @PathParam("vdi-id") String vdiId, @PathParam("file-name") String fileName,
       @QueryParam("download") @DefaultValue("true") Boolean download);
 
   class GetDatasetsFilesByVdiIdResponse extends ResponseDelegate {
