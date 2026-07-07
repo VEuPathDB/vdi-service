@@ -331,7 +331,7 @@ internal class UpdateMetaLaneImpl(private val config: UpdateMetaLaneConfig, abor
 
     val failed = appDb
       .selectDatasetInstallMessages(datasetID)
-      .any { it.status == InstallStatus.FailedInstallation || it.status == InstallStatus.FailedValidation }
+      .any { it.status == InstallStatus.FailedInstallation }
 
     if (failed) {
       logger.info("skipping update due to previous failures")

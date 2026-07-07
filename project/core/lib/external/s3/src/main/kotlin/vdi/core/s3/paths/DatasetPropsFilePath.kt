@@ -23,5 +23,7 @@ sealed interface DatasetPropsFilePath: DatasetPath {
     override val userID: UserID,
     override val datasetID: DatasetID,
     override val bucketName: String
-  ): DatasetPropsFilePath
+  ): DatasetPropsFilePath {
+    override fun toString() = pathString
+  }
 }

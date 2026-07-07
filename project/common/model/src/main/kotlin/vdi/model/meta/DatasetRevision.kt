@@ -55,8 +55,6 @@ open class DatasetRevision(
 
   /**
    * Represents the type of action taken to update a VDI dataset's data.
-   *
-   * @since 18.0.0
    */
   enum class Action(
     /**
