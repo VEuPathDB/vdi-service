@@ -33,6 +33,8 @@ internal fun DatasetPatchRequestBody.cleanup() {
   programName?.apply { cleanupString(::getValue) }
   linkedDatasets?.apply { cleanupList(::getValue, LinkedDataset?::cleanup) }
 
+  experimentalOrganism?.value?.cleanup()
+
   datasetCharacteristics?.apply {
     studyDesign?.apply { cleanupString(::getValue) }
     studyType?.apply { cleanupString(::getValue) }
@@ -98,6 +100,9 @@ internal fun DatasetPatchRequestBody.validate(
   projectName?.value?.checkLength(jPath..JF.PROJECT_NAME, ProjectNameLengthRange, errors)
   programName?.value?.checkLength(jPath..JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
   linkedDatasets?.value?.validate(jPath..JF.LINKED_DATASETS, errors)
+
+  experimentalOrganism?.value?.validate(jPath..JF.EXPERIMENTAL_ORGANISM, errors)
+  hostOrganism?.value?.validate(jPath..JF.HOST_ORGANISM, errors)
 
   datasetCharacteristics?.validate(original.datasetCharacteristics, jPath..JF.DATASET_CHARACTERISTICS, errors)
   externalIdentifiers?.validate(jPath..JF.EXTERNAL_IDENTIFIERS, errors)
