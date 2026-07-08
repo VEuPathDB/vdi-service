@@ -54,6 +54,8 @@ internal fun DatasetPatchRequestBody.cleanup() {
   }
   funding?.apply { cleanupList(::getValue, DatasetFundingAward?::cleanup) }
   shortAttribution?.apply { cleanupString(::getValue) }
+
+  datasetSources?.apply { value = value?.let(DatasetSourceConverter::cleanup) }
 }
 
 internal fun DatasetPatchRequestBody.validate(
