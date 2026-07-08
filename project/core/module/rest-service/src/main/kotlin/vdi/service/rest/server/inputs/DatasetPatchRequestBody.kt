@@ -34,6 +34,7 @@ internal fun DatasetPatchRequestBody.cleanup() {
   linkedDatasets?.apply { cleanupList(::getValue, LinkedDataset?::cleanup) }
 
   experimentalOrganism?.value?.cleanup()
+  hostOrganism?.value?.cleanup()
 
   datasetCharacteristics?.apply {
     studyDesign?.apply { cleanupString(::getValue) }
@@ -154,7 +155,9 @@ internal fun DatasetPatchRequestBody.applyPatch(
     revisionHistory        = revisionHistory,
     daysForApproval        = daysForApproval.unsafePatch(original.daysForApproval) { it: Int? -> it ?: -1 },
     dataDisclaimer         = dataDisclaimer.unsafePatch(original.dataDisclaimer),
-    datasetSources         = datasetSources.unsafePatch(original.datasetSources) { it: List<DatasetSource> -> DatasetSourceConverter.toInternal(it) }
+    datasetSources         = datasetSources.unsafePatch(original.datasetSources) { it: List<DatasetSource>? ->
+      it?.let(DatasetSourceConverter::toInternal) ?: emptyList()
+    }
   )
 
 fun DatasetTypePatch.toInternal() = DatasetType(DataType.of(value.name), value.version)

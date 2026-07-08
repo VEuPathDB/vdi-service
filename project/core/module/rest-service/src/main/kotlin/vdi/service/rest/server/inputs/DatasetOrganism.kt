@@ -24,8 +24,11 @@ fun APIOrganism?.validate(jPath: String, errors: ValidationErrors) {
 }
 
 fun OrganismPatch?.applyPatch(original: DatasetOrganism?) =
-  when (this) {
-    null -> original
+  when {
+    this == null -> original
+
+    this.value == null -> null
+
     else -> DatasetOrganism(
       species = value.species,
       strain  = value.strain,
