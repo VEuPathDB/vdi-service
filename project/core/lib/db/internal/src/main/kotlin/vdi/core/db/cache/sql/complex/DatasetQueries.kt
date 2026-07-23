@@ -190,6 +190,7 @@ FROM
     USING (dataset_id)
 WHERE
   dataset_id != ?
+  AND is_deleted = FALSE
   AND publication_id IN (SELECT publication_id FROM root_publications)
 """
 
@@ -227,6 +228,7 @@ FROM
     USING (dataset_id)
 WHERE
   d.owner_id = ?
+  AND is_deleted = FALSE
   AND m.program_name = ?
 """
 
@@ -263,6 +265,7 @@ FROM
     USING (dataset_id)
 WHERE
   d.owner_id = ?
+  AND is_deleted = FALSE
   AND m.project_name = ?
 """
 

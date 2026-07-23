@@ -41,6 +41,7 @@ private fun ControllerBase.getDatasetByID(
   datasetID: DatasetID,
   includeDeleted: Boolean,
 ): Either<DatasetDetails, GetDatasetsByVdiIdResponse> {
+
   // Lookup dataset that is owned by or shared with the current user
   //
   // NOTE: we don't look for the latest revision here as the controller will
