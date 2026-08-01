@@ -23,6 +23,7 @@ private val SafeKeys = arrayOf(
   "TEMPLATE_DB_USER",
   "TEMPLATE_DB_PASS",
   "TZ",
+  "CLAUDE_API_KEY",
 )
 
 private val BaseMap: Map<String, String> = HashMap<String, String>(SafeKeys.size)
