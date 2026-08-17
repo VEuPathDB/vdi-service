@@ -34,8 +34,6 @@ fun APIPublication?.cleanup() = this?.apply {
 }
 
 fun APIPublication.validate(jPath: String, index: Int, errors: ValidationErrors) {
-  val seenIdentifiers = mutableSetOf<String>()
-
   identifier.require(jPath, index, errors) {
     val path = jPath..index
     val idPath = path..JsonField.IDENTIFIER
@@ -53,17 +51,14 @@ fun APIPublication.validate(jPath: String, index: Int, errors: ValidationErrors)
             errors.add(idPath, "invalid DOI format")
       }
     }
-
-    if (identifier in seenIdentifiers)
-      errors.add(path, "duplicate publication identifier")
-    else
-      seenIdentifiers.add(identifier)
   }
 }
 
 fun Collection<APIPublication>.validate(jPath: String, errors: ValidationErrors) {
   if (isEmpty())
     return
+
+  val seenIdentifiers = mutableSetOf<String>()
 
   var primaries = 0
 
@@ -74,6 +69,11 @@ fun Collection<APIPublication>.validate(jPath: String, errors: ValidationErrors)
       if (isPrimary)
         primaries++
     }
+
+    if (p.identifier in seenIdentifiers)
+      errors.add(jPath..i, "duplicate publication identifier")
+    else
+      seenIdentifiers.add(p.identifier)
   }
 
   if (primaries == 0)
