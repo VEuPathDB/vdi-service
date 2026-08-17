@@ -8,7 +8,7 @@ import org.veupathdb.lib.request.validation.require
 import vdi.model.meta.DOIReference
 import vdi.service.rest.generated.model.DOIReference as APIDOIReference
 
-val DOIPattern = Regex("^(?:doi:)?\\d+(\\.\\d+)+/.+\$", RegexOption.IGNORE_CASE)
+val DOIPattern = Regex("^(?:doi:)?\\d+(\\.\\d+)+/.+$", RegexOption.IGNORE_CASE)
 
 internal val DOIValidLengthRange = 6..128
 

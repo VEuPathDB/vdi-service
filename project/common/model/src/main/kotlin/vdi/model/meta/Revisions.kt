@@ -19,12 +19,12 @@ data class DatasetRevisionHistory(
    * List of all dataset revisions, including both the original dataset upload
    * and the current revision.
    */
-  @param:JsonProperty(RevisionHistory)
-  @field:JsonProperty(RevisionHistory)
+  @param:JsonProperty(Revisions)
+  @field:JsonProperty(Revisions)
   val revisions: List<DatasetRevision>,
 ) {
   companion object JsonKey {
-    const val OriginalID      = "originalId"
-    const val RevisionHistory = "revisionHistory"
+    const val OriginalID = "originalId"
+    const val Revisions  = "revisions"
   }
 }

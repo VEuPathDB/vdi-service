@@ -34,22 +34,30 @@ fun APIPublication?.cleanup() = this?.apply {
 }
 
 fun APIPublication.validate(jPath: String, index: Int, errors: ValidationErrors) {
+  val seenIdentifiers = mutableSetOf<String>()
+
   identifier.require(jPath, index, errors) {
+    val path = jPath..index
+    val idPath = path..JsonField.IDENTIFIER
+
     when (type!!) {
       DatasetPublicationType.PMID -> {
-        val path = jPath..JsonField.IDENTIFIER
-        if (identifier.checkLength(path, index, PubMedLengthRange, errors))
+        if (identifier.checkLength(idPath, PubMedLengthRange, errors))
           if (!PubMedIDPattern.matches(identifier))
-            errors.add(path..index, "invalid PMID format")
+            errors.add(idPath, "invalid PMID format")
       }
 
       DatasetPublicationType.DOI -> {
-        val path = jPath..JsonField.DOI
-        if (identifier.checkLength(jPath..JsonField.IDENTIFIER, index, DOIValidLengthRange, errors))
+        if (identifier.checkLength(idPath, DOIValidLengthRange, errors))
           if (!DOIPattern.matches(identifier))
-            errors.add(path..index, "invalid DOI format")
+            errors.add(idPath, "invalid DOI format")
       }
     }
+
+    if (identifier in seenIdentifiers)
+      errors.add(path, "duplicate publication identifier")
+    else
+      seenIdentifiers.add(identifier)
   }
 }
 
