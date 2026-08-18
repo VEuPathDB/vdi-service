@@ -93,7 +93,7 @@ internal class DatasetReconciler(
     // is correct.
     if (reimport == ReimportIndicator.ReimportNotNeeded)
       if (cacheDB.getCacheImportControl(ctx) == DatasetImportStatus.Queued)
-        cacheDB.updateImportStatus(ctx, DatasetImportStatus.Complete)
+        cacheDB.updateImportStatus(ctx, DatasetImportStatus.Complete, true)
 
     if (reimport != ReimportIndicator.ReimportNotPossible) {
       if (!ctx.hasInstallReadyData())
