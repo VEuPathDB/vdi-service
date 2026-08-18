@@ -16,7 +16,7 @@ import vdi.model.meta.toDatasetID
 
 internal fun CacheDB.updateImportStatus(ctx: ReconcilerTarget, status: DatasetImportStatus) {
   try {
-    withTransaction { it.upsertImportControl(ctx.datasetId.toDatasetID(), status) }
+    withTransaction { it.tryInsertImportControl(ctx.datasetId.toDatasetID(), status) }
   } catch (e: Throwable) {
     ctx.logger.error("failed to update dataset import status to {}", status, e)
   }
