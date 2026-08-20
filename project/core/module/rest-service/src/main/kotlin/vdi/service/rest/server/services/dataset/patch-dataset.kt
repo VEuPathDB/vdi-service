@@ -159,6 +159,9 @@ private fun DatasetMetadata.validateForPromotion(datasetID: DatasetID, jPath: St
   if (!typeConfig.usesDataPropertiesFiles)
     return
 
+  if (!DatasetStore.hasDatasetPropertiesFiles(owner, datasetID))
+    errors.add(jPath..JsonField.VISIBILITY, "missing dataset properties file(s)")
+
   val metaInstallsSucceeded = installTargets
     .asSequence()
     .map { AppDB(it, type)?.selectDatasetInstallMessages(datasetID) }

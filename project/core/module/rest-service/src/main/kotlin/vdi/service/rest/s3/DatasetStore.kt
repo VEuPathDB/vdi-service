@@ -11,6 +11,7 @@ import vdi.core.config.vdi.ObjectStoreConfig
 import vdi.core.s3.DatasetDirectory
 import vdi.core.s3.DatasetObjectStore
 import vdi.core.s3.files.FileName
+import vdi.core.s3.getLatestDatasetPropertiesTimestamp
 import vdi.core.s3.paths.S3Paths
 import vdi.core.s3.util.S3Config
 import vdi.json.JSON
@@ -150,6 +151,11 @@ object DatasetStore {
   @JvmStatic
   fun deleteDatasetPropertiesFile(userID: UserID, datasetID: DatasetID, fileName: String) =
     bucket.objects.delete(S3Paths.datasetPropertiesFile(userID, datasetID, fileName))
+
+  @JvmStatic
+  fun hasDatasetPropertiesFiles(userID: UserID, datasetID: DatasetID) =
+    store.getDatasetDirectory(userID, datasetID)
+      .getLatestDatasetPropertiesTimestamp() != null
 
   fun streamAll() = bucket.objects.streamAll().stream()
 
