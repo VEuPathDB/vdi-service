@@ -204,6 +204,16 @@ data class DatasetMetadata(
   @param:JsonProperty(DatasetSources)
   @field:JsonProperty(DatasetSources)
   val datasetSources: List<DatasetSource> = emptyList(),
+
+  /**
+   * Flags indicating metadata content sections/categories that may have been
+   * explcitly marked as required or absent.
+   *
+   * @since v1.9.0
+   */
+  @param:JsonProperty(MetadataContentFlags)
+  @field:JsonProperty(MetadataContentFlags)
+  val metadataContentFlags: MetadataContentFlags = MetadataContentFlags(),
 ) {
   /**
    * Truncated name for the dataset.
@@ -228,6 +238,7 @@ data class DatasetMetadata(
     const val HostOrganism         = "hostOrganism"
     const val InstallTargets       = "installTargets"
     const val LinkedDatasets       = "linkedDatasets"
+    const val MetadataContentFlags = "metadataContentFlags"
     const val Name                 = "name"
     const val Origin               = "origin"
     const val Owner                = "owner"
