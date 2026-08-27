@@ -19,6 +19,7 @@ private val AssociatedFactorValidLength = CommonLengthRange
 private val ParticipantAgeValidLength = CommonLengthRange
 private val SampleTypeValidLength = CommonLengthRange
 
+const val ErrorDatasetCharacteristicsRequired = "dataset characteristics are required"
 
 fun APIDatasetCharacteristics?.cleanup() = this?.also {
   cleanupString(::getStudyDesign)

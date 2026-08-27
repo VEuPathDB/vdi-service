@@ -38,6 +38,7 @@ types:
       daysForApproval?: OptionalIntPatch
       dataDisclaimer?: OptionalStringPatch
       datasetSources?: DatasetSourcesPatch
+      metadataContentFlags: MetadataContentFlagsPatch
 
   ContactsPatch:
     # language=markdown
@@ -58,6 +59,12 @@ types:
     type: object
     properties:
       value?: integer
+    additionalProperties: false
+
+  OptionalBooleanPatch:
+    type: object
+    properties:
+      value?: boolean
     additionalProperties: false
 
   DatasetCharacteristicsPatch:
@@ -186,6 +193,16 @@ types:
         type: common.LinkedDataset[]
         uniqueItems: true
     additionalProperties: false
+
+  MetadataContentFlagsPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      hasDatasetCharacteristics?: OptionalBooleanPatch
+      hasDataDisclaimer?: OptionalBooleanPatch
+      hasDatasetSources?: OptionalBooleanPatch
+      hasOrganismData?: OptionalBooleanPatch
+      hasPublications?: OptionalBooleanPatch
 
   OrganismPatch:
     type: object

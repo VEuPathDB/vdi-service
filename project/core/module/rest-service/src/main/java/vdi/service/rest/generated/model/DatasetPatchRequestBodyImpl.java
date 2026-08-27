@@ -24,7 +24,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "shortAttribution",
     "daysForApproval",
     "dataDisclaimer",
-    "datasetSources"
+    "datasetSources",
+    "metadataContentFlags"
 })
 public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.TYPE)
@@ -83,6 +84,9 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
 
   @JsonProperty(JsonField.DATASET_SOURCES)
   private DatasetSourcesPatch datasetSources;
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  private MetadataContentFlagsPatch metadataContentFlags;
 
   @JsonProperty(JsonField.TYPE)
   public DatasetTypePatch getType() {
@@ -272,5 +276,15 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.DATASET_SOURCES)
   public void setDatasetSources(DatasetSourcesPatch datasetSources) {
     this.datasetSources = datasetSources;
+  }
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  public MetadataContentFlagsPatch getMetadataContentFlags() {
+    return this.metadataContentFlags;
+  }
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  public void setMetadataContentFlags(MetadataContentFlagsPatch metadataContentFlags) {
+    this.metadataContentFlags = metadataContentFlags;
   }
 }

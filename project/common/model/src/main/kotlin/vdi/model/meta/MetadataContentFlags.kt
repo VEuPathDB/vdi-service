@@ -70,6 +70,8 @@ data class MetadataContentFlags(
     Undefined,
     ;
 
+    val isTrue get() = this == True
+
     @get:JsonValue
     val jsonValue: Boolean?
       get() = when (this) {

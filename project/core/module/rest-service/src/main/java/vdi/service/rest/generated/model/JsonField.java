@@ -69,6 +69,11 @@ public final class JsonField {
   public static final String GIT_COMMIT = "gitCommit";
   public static final String GIT_TAG = "gitTag";
   public static final String GIT_URL = "gitUrl";
+  public static final String HAS_DATA_DISCLAIMER = "hasDataDisclaimer";
+  public static final String HAS_DATASET_CHARACTERISTICS = "hasDatasetCharacteristics";
+  public static final String HAS_DATASET_SOURCES = "hasDatasetSources";
+  public static final String HAS_ORGANISM_DATA = "hasOrganismData";
+  public static final String HAS_PUBLICATIONS = "hasPublications";
   public static final String HOST_ORGANISM = "hostOrganism";
   public static final String HYPERLINKS = "hyperlinks";
   public static final String ID = "id";
@@ -93,6 +98,7 @@ public final class JsonField {
   public static final String MESSAGES = "messages";
   public static final String META = "meta";
   public static final String META_UPDATE_TIME = "metaUpdateTime";
+  public static final String METADATA_CONTENT_FLAGS = "metadataContentFlags";
   public static final String MIDDLE_NAME = "middleName";
   public static final String NAME = "name";
   public static final String OFFSET = "offset";

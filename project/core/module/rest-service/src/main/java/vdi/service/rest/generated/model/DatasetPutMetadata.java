@@ -121,6 +121,12 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   @JsonProperty(JsonField.DATASET_SOURCES)
   void setDatasetSources(DatasetSourcesPatch datasetSources);
 
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  MetadataContentFlagsPatch getMetadataContentFlags();
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  void setMetadataContentFlags(MetadataContentFlagsPatch metadataContentFlags);
+
   @JsonProperty(JsonField.ORIGIN)
   String getOrigin();
 

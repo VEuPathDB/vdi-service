@@ -38,6 +38,7 @@ import java.util.List;
     "sourceUrl",
     "revisionHistory",
     "shortName",
+    "metadataContentFlags",
     "relatedDatasets",
     "shares",
     "status",
@@ -130,6 +131,9 @@ public class DatasetDetailsImpl implements DatasetDetails {
 
   @JsonProperty(JsonField.SHORT_NAME)
   private String shortName;
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  private MetadataContentFlags metadataContentFlags;
 
   @JsonProperty(JsonField.RELATED_DATASETS)
   private List<RelatedDatasetInfo> relatedDatasets;
@@ -427,6 +431,16 @@ public class DatasetDetailsImpl implements DatasetDetails {
   @JsonProperty(JsonField.SHORT_NAME)
   public void setShortName(String shortName) {
     this.shortName = shortName;
+  }
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  public MetadataContentFlags getMetadataContentFlags() {
+    return this.metadataContentFlags;
+  }
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  public void setMetadataContentFlags(MetadataContentFlags metadataContentFlags) {
+    this.metadataContentFlags = metadataContentFlags;
   }
 
   @JsonProperty(JsonField.RELATED_DATASETS)

@@ -368,6 +368,7 @@ types:
       sourceUrl?: DatasetSourceUrl
       revisionHistory?: RevisionHistory
       shortName: ShortName
+      metadataContentFlags: MetadataContentFlags
       relatedDatasets?:
         displayName: Implicitly Related Datasets
         # language=markdown
@@ -651,6 +652,7 @@ types:
       daysForApproval?: OptionalIntPatch
       dataDisclaimer?: OptionalStringPatch
       datasetSources?: DatasetSourcesPatch
+      metadataContentFlags: MetadataContentFlagsPatch
   DatasetPostMeta:
     type: DatasetMetaBase
     additionalProperties: false
@@ -1179,6 +1181,24 @@ types:
       value?:
         type: LinkedDataset[]
         uniqueItems: true
+  MetadataContentFlags:
+    type: object
+    additionalProperties: false
+    properties:
+      hasDatasetCharacteristics?: boolean
+      hasDataDisclaimer?: boolean
+      hasDatasetSources?: boolean
+      hasOrganismData?: boolean
+      hasPublications?: boolean
+  MetadataContentFlagsPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      hasDatasetCharacteristics?: OptionalBooleanPatch
+      hasDataDisclaimer?: OptionalBooleanPatch
+      hasDatasetSources?: OptionalBooleanPatch
+      hasOrganismData?: OptionalBooleanPatch
+      hasPublications?: OptionalBooleanPatch
   MethodNotAllowedError:
     displayName: Method Not Allowed
     description: |
@@ -1197,6 +1217,11 @@ types:
     example:
       status: not-found
       message: the requested resource could not be found
+  OptionalBooleanPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value?: boolean
   OptionalIntPatch:
     type: object
     additionalProperties: false

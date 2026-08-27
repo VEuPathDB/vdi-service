@@ -54,9 +54,12 @@ fun APIPublication.validate(jPath: String, index: Int, errors: ValidationErrors)
   }
 }
 
+const val ErrorPublicationsRequired = "at least one publication is required"
+
 fun Collection<APIPublication>.validate(jPath: String, errors: ValidationErrors) {
-  if (isEmpty())
+  if (isEmpty()) {
     return
+  }
 
   val seenIdentifiers = mutableSetOf<String>()
 

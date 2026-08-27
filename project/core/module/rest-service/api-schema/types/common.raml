@@ -595,6 +595,16 @@ types:
       datasetUri: string
       sharesRecords: boolean
 
+  MetadataContentFlags:
+    type: object
+    additionalProperties: false
+    properties:
+      hasDatasetCharacteristics?: boolean
+      hasDataDisclaimer?: boolean
+      hasDatasetSources?: boolean
+      hasOrganismData?: boolean
+      hasPublications?: boolean
+
   PartialDate:
     displayName: Partial Datetime
     description: |

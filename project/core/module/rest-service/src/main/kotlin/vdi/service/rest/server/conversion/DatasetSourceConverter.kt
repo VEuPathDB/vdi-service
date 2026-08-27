@@ -5,7 +5,6 @@ import org.veupathdb.lib.request.validation.reqCheckLength
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.require
 import java.net.URI
-import java.net.URISyntaxException
 import vdi.service.rest.generated.model.DatasetSourceImpl
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.server.inputs.cleanupString
@@ -13,6 +12,8 @@ import vdi.model.meta.DatasetSource as VdiDatasetSource
 import vdi.service.rest.generated.model.DatasetSource as RamlDatasetSource
 
 object DatasetSourceConverter: APIListTypeConverter<RamlDatasetSource?, VdiDatasetSource> {
+  const val ErrorDatasetSourcesRequired = "at least one dataset source is required"
+
   private inline val ValidVersionLengths
     get() = 1..128
 

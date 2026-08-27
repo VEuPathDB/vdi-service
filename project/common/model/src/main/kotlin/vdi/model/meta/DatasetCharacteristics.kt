@@ -1,5 +1,6 @@
 package vdi.model.meta
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
@@ -45,6 +46,18 @@ data class DatasetCharacteristics(
   @field:JsonProperty(SampleTypes)
   val sampleTypes: List<String> = emptyList(),
 ) {
+  @get:JsonIgnore
+  val isEmpty: Boolean
+    get() = studyDesign == null
+      && studyType == null
+      && countries.isEmpty()
+      && years == null
+      && studySpecies.isEmpty()
+      && outcomes.isEmpty()
+      && associatedFactors.isEmpty()
+      && participantAges.isNullOrEmpty()
+      && sampleTypes.isEmpty()
+
   companion object JsonKey {
     const val AssociatedFactors = "associatedFactors"
     const val Countries         = "countries"

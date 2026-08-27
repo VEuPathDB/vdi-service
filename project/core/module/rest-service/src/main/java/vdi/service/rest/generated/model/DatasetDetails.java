@@ -183,6 +183,12 @@ public interface DatasetDetails extends DatasetMetaBase {
   @JsonProperty(JsonField.SHORT_NAME)
   void setShortName(String shortName);
 
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  MetadataContentFlags getMetadataContentFlags();
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  void setMetadataContentFlags(MetadataContentFlags metadataContentFlags);
+
   @JsonProperty(JsonField.RELATED_DATASETS)
   List<RelatedDatasetInfo> getRelatedDatasets();
 

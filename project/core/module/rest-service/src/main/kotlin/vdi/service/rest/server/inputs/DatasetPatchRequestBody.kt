@@ -6,7 +6,6 @@ import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.require
 import vdi.core.plugin.registry.PluginRegistry
 import vdi.model.meta.*
-import vdi.model.meta.DatasetCharacteristics
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.generated.model.BioprojectIDReference
 import vdi.service.rest.generated.model.DOIReference
@@ -93,9 +92,6 @@ internal fun DatasetPatchRequestBody.validate(
     }
   }
 
-  // description (nothing to validate)
-  publications?.value?.validate(jPath..JF.PUBLICATIONS, errors)
-
   contacts?.apply {
     value?.validate(jPath..JF.CONTACTS, false, errors)
   }
@@ -107,13 +103,16 @@ internal fun DatasetPatchRequestBody.validate(
   experimentalOrganism?.value?.validate(jPath..JF.EXPERIMENTAL_ORGANISM, errors)
   hostOrganism?.value?.validate(jPath..JF.HOST_ORGANISM, errors)
 
-  datasetCharacteristics?.validate(original.datasetCharacteristics, jPath..JF.DATASET_CHARACTERISTICS, errors)
   externalIdentifiers?.validate(jPath..JF.EXTERNAL_IDENTIFIERS, errors)
 
   funding?.value?.validate(jPath..JF.FUNDING, errors)
   shortAttribution?.value?.checkLength(jPath..JF.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
 
-  datasetSources?.value?.also { DatasetSourceConverter.validate(it, jPath..JF.DATASET_SOURCES, errors) }
+  validateDataDisclaimer(jPath, original, errors)
+  validateDatasetCharacteristics(jPath, original, errors)
+  validateDatasetSources(jPath, original, errors)
+  validatePublications(jPath, original, errors)
+//  validateOrganismData() TODO - experimental organism list???
 
   return errors
 }
@@ -162,57 +161,130 @@ internal fun DatasetPatchRequestBody.applyPatch(
 
 fun DatasetTypePatch.toInternal() = DatasetType(DataType.of(value.name), value.version)
 
-private fun DatasetCharacteristicsPatch.validate(original: DatasetCharacteristics?, jPath: String, errors: ValidationErrors) {
+private fun DatasetPatchRequestBody.validateDatasetCharacteristics(
+  jPath: String,
+  originalMeta: DatasetMetadata,
+  errors: ValidationErrors,
+) {
+  val characteristicsRequired = metadataContentFlags.hasDatasetCharacteristics
+    .coalesce(originalMeta.metadataContentFlags.hasDatasetCharacteristics)
+    .isTrue
 
+  if (
+    (datasetCharacteristics == null || datasetCharacteristics.isEmpty)
+    && characteristicsRequired
+    && originalMeta.datasetCharacteristics?.isEmpty == true
+  ) {
+    errors.add(
+      jPath..JF.METADATA_CONTENT_FLAGS..JF.HAS_DATASET_CHARACTERISTICS,
+      ErrorDatasetCharacteristicsRequired,
+    )
 
-  // If the client is attempting to change the study design value
-  if (studyDesign != null) {
-    when {
-      // If the client explicitly set the study design value to null
-      studyDesign.value == null -> {
-        // then the study type must also be set to null (study type requires study design)
-        if (studyType == null || studyType.value != null)
-          errors.add(jPath..JF.STUDY_TYPE, "cannot remove study design without also removing study type")
-      }
-
-      // If the study design has been set, AND no study type value was provided
-      studyType == null -> {
-        // then the original must already have a study type value
-        original?.studyType.require(jPath..JF.STUDY_TYPE, errors) {}
-      }
-
-      // If the study design has been set, AND the client is trying to remove out the study type value.
-      studyType.value == null -> {
-        // No.
-        errors.add(jPath..JF.STUDY_TYPE)
-      }
-    }
-
-    // If the client is attempting to change the study type value
-  } else if (studyType != null) {
-    when {
-      // we already know the client didn't attempt to change the study design
-      // value by virtue of being in this else block.
-      studyType.value == null -> {
-        null.require(jPath..JF.STUDY_DESIGN, errors) {}
-      }
-
-      // If the client is attempting to change the study type value without also
-      // providing a study design value
-      else -> {
-        // then the action is only valid if we already had a study design value.
-        original?.studyDesign.require(jPath..JF.STUDY_DESIGN, errors) {}
-      }
-    }
+    return
   }
 
-  countries?.value?.validateCountries(jPath, errors)
+  datasetCharacteristics.validate(
+    originalMeta.datasetCharacteristics,
+    jPath..JF.DATASET_CHARACTERISTICS,
+    errors,
+  )
 
-  years?.value?.validate(jPath..JF.YEARS, errors)
-
-  studySpecies?.value?.validateStudySpecies(jPath, errors)
-  outcomes?.value?.validateOutcomes(jPath, errors)
-  associatedFactors?.value?.validateAssociatedFactors(jPath, errors)
-  participantAges?.value?.validateParticipantAges(jPath, errors)
-  sampleTypes?.value?.validateSampleTypes(jPath, errors)
+  if (!datasetCharacteristics.isEmpty)
+    metadataContentFlags = (metadataContentFlags ?: MetadataContentFlagsPatchImpl())
+      .apply { hasDatasetCharacteristics = OptionalBooleanPatch(true) }
 }
+
+private fun DatasetPatchRequestBody.validateDatasetSources(
+  jPath: String,
+  originalMeta: DatasetMetadata,
+  errors: ValidationErrors
+) {
+  if (datasetSources == null || datasetSources.value.isNullOrEmpty()) {
+    if (
+      metadataContentFlags?.hasDatasetSources
+        .coalesce(originalMeta.metadataContentFlags.hasDatasetSources)
+        .isTrue
+      && originalMeta.datasetSources.isEmpty()
+    ) {
+      errors.add(
+        jPath..JF.METADATA_CONTENT_FLAGS..JF.HAS_DATASET_SOURCES,
+        DatasetSourceConverter.ErrorDatasetSourcesRequired,
+      )
+    }
+
+    return
+  }
+
+  DatasetSourceConverter.validate(datasetSources.value, jPath..JF.DATASET_SOURCES, errors)
+
+  metadataContentFlags = (metadataContentFlags ?: MetadataContentFlagsPatchImpl())
+    .apply { hasDatasetSources = OptionalBooleanPatch(true) }
+}
+
+private fun DatasetPatchRequestBody.validatePublications(
+  jPath: String,
+  originalMeta: DatasetMetadata,
+  errors: ValidationErrors,
+) {
+  // IF the patch request did not contain a publications value
+  // OR the patch is explicitly attempting to remove any/all publications
+  if (publications == null || publications.value.isNullOrEmpty()) {
+
+    // AND (
+    //   the user has marked publications as being required in this request
+    //   OR
+    //   the user left the metadata in a pre-existing state of requiring
+    //   publications
+    // )
+    // AND the dataset doesn't have pre-existing publications,
+    // THEN return an error
+    //
+    // NOTES:
+    // * case 1 is a no-op if the dataset does have publications
+    // * case 2 shouldn't normally be possible, but bugs abound and it's better
+    //   to be safe than throw cryptic exceptions.
+    if (
+      metadataContentFlags?.hasPublications
+        .coalesce(originalMeta.metadataContentFlags.hasPublications)
+        .isTrue
+      && originalMeta.publications.isEmpty()
+    ) {
+      errors.add(jPath..JF.METADATA_CONTENT_FLAGS..JF.HAS_PUBLICATIONS, ErrorPublicationsRequired)
+    }
+
+    return
+  }
+
+  // The patch request provided publications.
+  publications.value.validate(jPath = jPath..JF.PUBLICATIONS, errors)
+
+  // If publications are provided, make sure the content flag is set correctly.
+  metadataContentFlags = (metadataContentFlags ?: MetadataContentFlagsPatchImpl())
+    .apply { hasPublications = OptionalBooleanPatch(true) }
+}
+
+private fun DatasetPatchRequestBody.validateDataDisclaimer(
+  jPath: String,
+  originalMeta: DatasetMetadata,
+  errors: ValidationErrors,
+) {
+  if (
+    (dataDisclaimer == null || dataDisclaimer.value.isNullOrEmpty())
+    && metadataContentFlags?.hasDataDisclaimer
+      .coalesce(originalMeta.metadataContentFlags.hasDataDisclaimer)
+      .isTrue
+    && originalMeta.dataDisclaimer.isNullOrEmpty()
+  ) {
+    errors.add(jPath..JF.METADATA_CONTENT_FLAGS..JF.DATA_DISCLAIMER, "data disclaimer is required")
+    return
+  }
+
+  metadataContentFlags = (metadataContentFlags ?: MetadataContentFlagsPatchImpl())
+    .apply { hasDataDisclaimer = OptionalBooleanPatch(true) }
+}
+
+private fun OptionalBooleanPatch?.coalesce(original: MetadataContentFlags.FlagState) =
+  when {
+    this == null -> original
+    else         -> MetadataContentFlags.FlagState.fromBoolean(this.value)
+  }
