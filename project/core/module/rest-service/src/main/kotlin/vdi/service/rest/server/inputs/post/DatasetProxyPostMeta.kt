@@ -1,4 +1,4 @@
-package vdi.service.rest.server.inputs
+package vdi.service.rest.server.inputs.post
 
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
@@ -7,6 +7,11 @@ import java.time.OffsetDateTime
 import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.*
+import vdi.service.rest.server.inputs.cleanup
+import vdi.service.rest.server.inputs.newJsonPath
+import vdi.service.rest.server.inputs.toInternal
+import vdi.service.rest.server.inputs.toInternalDistinct
+import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
 
 fun DatasetProxyPostMeta.cleanup() {

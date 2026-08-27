@@ -1,4 +1,4 @@
-package vdi.service.rest.server.inputs
+package vdi.service.rest.server.inputs.post
 
 import jakarta.ws.rs.BadRequestException
 import org.veupathdb.lib.request.validation.ValidationErrors
@@ -6,6 +6,7 @@ import java.net.URI
 import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
+import vdi.service.rest.server.inputs.cleanup
 
 internal fun DatasetProxyPostRequestBody.cleanup() {
   details?.cleanup()

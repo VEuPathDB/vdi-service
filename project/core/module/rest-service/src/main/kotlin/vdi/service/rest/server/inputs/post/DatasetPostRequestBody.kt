@@ -1,4 +1,4 @@
-package vdi.service.rest.server.inputs
+package vdi.service.rest.server.inputs.post
 
 import org.veupathdb.lib.request.validation.ValidationErrors
 import java.net.URI
@@ -7,6 +7,7 @@ import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.BadRequestError
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.DatasetVisibility
+import vdi.service.rest.server.inputs.toInternal
 import vdi.service.rest.server.outputs.BadRequestError
 import vdi.util.fn.Either
 import vdi.util.fn.Either.Companion.left

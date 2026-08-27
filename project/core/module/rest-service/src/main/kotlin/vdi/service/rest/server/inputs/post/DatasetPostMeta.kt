@@ -1,4 +1,4 @@
-package vdi.service.rest.server.inputs
+package vdi.service.rest.server.inputs.post
 
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
@@ -9,6 +9,13 @@ import vdi.model.meta.DatasetMetadata
 import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.server.conversion.DatasetSourceConverter
+import vdi.service.rest.server.conversion.MetadataContentFlagsConverter
+import vdi.service.rest.server.inputs.cleanup
+import vdi.service.rest.server.inputs.ensureNotNull
+import vdi.service.rest.server.inputs.newJsonPath
+import vdi.service.rest.server.inputs.toInternal
+import vdi.service.rest.server.inputs.toInternalDistinct
+import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.generated.model.JsonField as JF
 
 /**
@@ -58,4 +65,5 @@ internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
     dataDisclaimer         = dataDisclaimer,
     daysForApproval        = daysForApproval ?: -1,
     datasetSources         = datasetSources?.let(DatasetSourceConverter::toInternal) ?: emptyList(),
+    metadataContentFlags   = MetadataContentFlagsConverter.toInternal(metadataContentFlags)
   )

@@ -14,7 +14,7 @@ import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
 import vdi.service.rest.server.controllers.ControllerBase
 import vdi.service.rest.server.inputs.JsonSchema
-import vdi.service.rest.server.inputs.toDatasetMeta
+import vdi.service.rest.server.inputs.post.toDatasetMeta
 import vdi.service.rest.server.outputs.DatasetPostResponseBody
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.outputs.wrap

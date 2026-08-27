@@ -11,8 +11,8 @@ import vdi.model.meta.DatasetID
 import vdi.service.rest.config.UploadConfig
 import vdi.service.rest.generated.model.DatasetPostRequestBody
 import vdi.service.rest.generated.resources.Datasets
-import vdi.service.rest.server.inputs.cleanup
-import vdi.service.rest.server.inputs.validate
+import vdi.service.rest.server.inputs.post.cleanup
+import vdi.service.rest.server.inputs.post.validate
 import vdi.service.rest.server.outputs.BadRequestError
 import vdi.service.rest.server.outputs.UnprocessableEntityError
 import vdi.service.rest.server.services.dataset.createDataset

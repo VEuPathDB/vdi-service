@@ -151,4 +151,10 @@ public interface DatasetPostMeta extends DatasetMetaBase {
       defaultValue = "private"
   )
   void setVisibility(DatasetVisibility visibility);
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  MetadataContentFlags getMetadataContentFlags();
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  void setMetadataContentFlags(MetadataContentFlags metadataContentFlags);
 }

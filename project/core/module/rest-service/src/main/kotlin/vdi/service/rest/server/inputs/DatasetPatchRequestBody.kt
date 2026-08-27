@@ -17,6 +17,7 @@ import vdi.service.rest.generated.model.DatasetSource
 import vdi.service.rest.generated.model.LinkedDataset
 import vdi.service.rest.generated.model.SampleYearRange
 import vdi.service.rest.server.conversion.DatasetSourceConverter
+import vdi.service.rest.server.inputs.patch.applyPatch
 import vdi.service.rest.generated.model.DatasetVisibility as APIVisibility
 import vdi.service.rest.generated.model.JsonField as JF
 
@@ -108,11 +109,20 @@ internal fun DatasetPatchRequestBody.validate(
   funding?.value?.validate(jPath..JF.FUNDING, errors)
   shortAttribution?.value?.checkLength(jPath..JF.SHORT_ATTRIBUTION, ShortAttributionLengthRange, errors)
 
-  validateDataDisclaimer(jPath, original, errors)
+  // Field Study or Clinical Trial?
   validateDatasetCharacteristics(jPath, original, errors)
-  validateDatasetSources(jPath, original, errors)
+
+  // Includes Biological Data about Organisms?
+  // validateOrganismData() TODO - experimental organism list???
+
+  // Associated Publication Available?
   validatePublications(jPath, original, errors)
-//  validateOrganismData() TODO - experimental organism list???
+
+  // Available from External Source?
+  validateDatasetSources(jPath, original, errors)
+
+  // Any Reuse Considerations?
+  validateDataDisclaimer(jPath, original, errors)
 
   return errors
 }
@@ -156,7 +166,8 @@ internal fun DatasetPatchRequestBody.applyPatch(
     dataDisclaimer         = dataDisclaimer.unsafePatch(original.dataDisclaimer),
     datasetSources         = datasetSources.unsafePatch(original.datasetSources) { it: List<DatasetSource>? ->
       it?.let(DatasetSourceConverter::toInternal) ?: emptyList()
-    }
+    },
+    metadataContentFlags   = metadataContentFlags.applyPatch(original.metadataContentFlags)
   )
 
 fun DatasetTypePatch.toInternal() = DatasetType(DataType.of(value.name), value.version)

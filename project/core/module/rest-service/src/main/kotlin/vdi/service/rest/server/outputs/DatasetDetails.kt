@@ -26,6 +26,7 @@ import vdi.service.rest.server.conversion.DatasetOrganism
 import vdi.service.rest.server.conversion.DOIReference
 import vdi.service.rest.server.conversion.DatasetSourceConverter
 import vdi.service.rest.server.conversion.LinkedDataset
+import vdi.service.rest.server.conversion.MetadataContentFlagsConverter
 import vdi.service.rest.generated.model.DatasetContact as APIContact
 import vdi.service.rest.generated.model.DatasetPublication as APIPublication
 import vdi.service.rest.generated.model.ExternalIdentifiers as APIIdentifiers
@@ -104,6 +105,7 @@ private inline fun DatasetDetails.applyMeta(meta: DatasetMetadata) = apply {
   sourceUrl              = meta.sourceURL?.toString()
   revisionHistory        = meta.revisionHistory?.let(::RevisionHistory)
   shortName              = meta.shortName
+  metadataContentFlags   = MetadataContentFlagsConverter.toExternal(meta.metadataContentFlags)
 }
 
 private fun DatasetContact(contact: DatasetContact): APIContact =

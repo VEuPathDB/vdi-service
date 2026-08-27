@@ -73,7 +73,7 @@ data class MetadataContentFlags(
     val isTrue get() = this == True
 
     @get:JsonValue
-    val jsonValue: Boolean?
+    val asBoolean: Boolean?
       get() = when (this) {
         True      -> true
         False     -> false

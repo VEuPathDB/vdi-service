@@ -28,7 +28,8 @@ import java.util.List;
     "dataDisclaimer",
     "datasetSources",
     "type",
-    "visibility"
+    "visibility",
+    "metadataContentFlags"
 })
 public class DatasetPostMetaImpl implements DatasetPostMeta {
   @JsonProperty(JsonField.INSTALL_TARGETS)
@@ -102,6 +103,9 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
       defaultValue = "private"
   )
   private DatasetVisibility visibility;
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  private MetadataContentFlags metadataContentFlags;
 
   @JsonProperty(JsonField.INSTALL_TARGETS)
   public List<String> getInstallTargets() {
@@ -333,5 +337,15 @@ public class DatasetPostMetaImpl implements DatasetPostMeta {
   )
   public void setVisibility(DatasetVisibility visibility) {
     this.visibility = visibility;
+  }
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  public MetadataContentFlags getMetadataContentFlags() {
+    return this.metadataContentFlags;
+  }
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  public void setMetadataContentFlags(MetadataContentFlags metadataContentFlags) {
+    this.metadataContentFlags = metadataContentFlags;
   }
 }

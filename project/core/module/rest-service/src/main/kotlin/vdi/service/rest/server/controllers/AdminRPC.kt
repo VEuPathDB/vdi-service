@@ -19,8 +19,8 @@ import vdi.service.rest.generated.model.DatasetObjectPurgeRequestBody
 import vdi.service.rest.generated.model.DatasetProxyPostRequestBody
 import vdi.service.rest.generated.model.InstallCleanupRequestBody
 import vdi.service.rest.generated.resources.AdminRpc
-import vdi.service.rest.server.inputs.cleanup
-import vdi.service.rest.server.inputs.validate
+import vdi.service.rest.server.inputs.post.cleanup
+import vdi.service.rest.server.inputs.post.validate
 import vdi.service.rest.server.outputs.*
 import vdi.service.rest.server.services.admin.rpc.purgeDataset
 import vdi.service.rest.server.services.dataset.createDataset

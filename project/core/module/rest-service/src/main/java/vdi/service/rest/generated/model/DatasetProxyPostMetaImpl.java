@@ -32,6 +32,7 @@ import java.util.List;
     "datasetSources",
     "type",
     "visibility",
+    "metadataContentFlags",
     "createdOn"
 })
 public class DatasetProxyPostMetaImpl implements DatasetProxyPostMeta {
@@ -106,6 +107,9 @@ public class DatasetProxyPostMetaImpl implements DatasetProxyPostMeta {
       defaultValue = "private"
   )
   private DatasetVisibility visibility;
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  private MetadataContentFlags metadataContentFlags;
 
   @JsonProperty(JsonField.CREATED_ON)
   private OffsetDateTime createdOn;
@@ -340,6 +344,16 @@ public class DatasetProxyPostMetaImpl implements DatasetProxyPostMeta {
   )
   public void setVisibility(DatasetVisibility visibility) {
     this.visibility = visibility;
+  }
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  public MetadataContentFlags getMetadataContentFlags() {
+    return this.metadataContentFlags;
+  }
+
+  @JsonProperty(JsonField.METADATA_CONTENT_FLAGS)
+  public void setMetadataContentFlags(MetadataContentFlags metadataContentFlags) {
+    this.metadataContentFlags = metadataContentFlags;
   }
 
   @JsonProperty(JsonField.CREATED_ON)
