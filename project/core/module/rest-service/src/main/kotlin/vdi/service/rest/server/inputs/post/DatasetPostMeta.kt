@@ -6,6 +6,7 @@ import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import vdi.model.meta.DatasetMetadata
+import vdi.model.meta.MetadataContentFlags
 import vdi.model.meta.UserID
 import vdi.service.rest.generated.model.*
 import vdi.service.rest.server.conversion.DatasetSourceConverter
@@ -65,5 +66,6 @@ internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
     dataDisclaimer         = dataDisclaimer,
     daysForApproval        = daysForApproval ?: -1,
     datasetSources         = datasetSources?.let(DatasetSourceConverter::toInternal) ?: emptyList(),
-    metadataContentFlags   = MetadataContentFlagsConverter.toInternal(metadataContentFlags)
+    metadataContentFlags   = metadataContentFlags?.let(MetadataContentFlagsConverter::toInternal)
+      ?: MetadataContentFlags()
   )
