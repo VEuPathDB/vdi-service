@@ -121,6 +121,7 @@ private fun getUserDetails(ownerID: UserID, shares: Collection<DatasetShare>, re
     .associateBy { it.userID }
 
 private fun getRelatedDatasets(datasetID: DatasetID, meta: DatasetMetadata): Sequence<RelatedDataset> =
-  (meta.projectName?.let { CacheDB().selectDatasetsByProjectName(meta.owner, it) } ?: emptyList()).asSequence() +
+  ((meta.projectName?.let { CacheDB().selectDatasetsByProjectName(meta.owner, it) } ?: emptyList()).asSequence() +
   (meta.programName?.let { CacheDB().selectDatasetsByProgramName(meta.owner, it) } ?: emptyList()).asSequence() +
-  CacheDB().selectDatasetsByCommonPublication(datasetID)
+  CacheDB().selectDatasetsByCommonPublication(datasetID))
+    .filter { it.datasetID != datasetID }
