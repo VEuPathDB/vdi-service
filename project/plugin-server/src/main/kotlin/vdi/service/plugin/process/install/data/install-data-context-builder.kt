@@ -24,7 +24,7 @@ import vdi.service.plugin.util.toKtxPath
 import vdi.util.fs.TempFiles
 
 private const val INSTALL_PAYLOAD_FILE_NAME = "install-ready.zip"
-private const val INSTALL_DETAILS_MAX_SIZE = 1024uL
+private const val INSTALL_DETAILS_MAX_SIZE = 32768uL
 
 @Suppress("DuplicatedCode")
 internal suspend fun ApplicationCall.withInstallDataContext(
@@ -62,7 +62,7 @@ private suspend fun ApplicationCall.withParsedRequest(
 
         FormField.Metadata -> {
           reqNull(meta, FormField.Metadata)
-          meta = part.parseAsJson(16384uL)
+          meta = part.parseAsJson(32768uL)
         }
 
         FormField.Manifest -> {

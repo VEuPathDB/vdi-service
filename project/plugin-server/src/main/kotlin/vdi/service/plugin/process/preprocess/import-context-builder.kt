@@ -25,7 +25,7 @@ import vdi.service.plugin.util.toKtxPath
 import vdi.util.fs.TempFiles
 
 private const val IMPORT_PAYLOAD_FILE_NAME = "import.zip"
-private const val IMPORT_DETAILS_MAX_SIZE  = 16384uL
+private const val IMPORT_DETAILS_MAX_SIZE  = 32768uL
 
 @OptIn(ExperimentalContracts::class)
 internal suspend fun ApplicationCall.withImportContext(
