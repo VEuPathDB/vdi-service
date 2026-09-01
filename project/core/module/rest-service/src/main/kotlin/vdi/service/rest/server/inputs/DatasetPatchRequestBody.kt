@@ -277,14 +277,15 @@ private fun DatasetPatchRequestBody.validateDataDisclaimer(
   originalMeta: DatasetMetadata,
   errors: ValidationErrors,
 ) {
-  if (
-    (dataDisclaimer == null || dataDisclaimer.value.isNullOrEmpty())
-    && metadataContentFlags?.hasDataDisclaimer
+  if (dataDisclaimer == null || dataDisclaimer.value.isNullOrEmpty()) {
+    if (metadataContentFlags?.hasDataDisclaimer
       .coalesce(originalMeta.metadataContentFlags.hasDataDisclaimer)
       .isTrue
     && originalMeta.dataDisclaimer.isNullOrEmpty()
-  ) {
-    errors.add(jPath..JF.METADATA_CONTENT_FLAGS..JF.DATA_DISCLAIMER, "data disclaimer is required")
+    ) {
+      errors.add(jPath..JF.METADATA_CONTENT_FLAGS..JF.DATA_DISCLAIMER, "data disclaimer is required")
+    }
+
     return
   }
 
