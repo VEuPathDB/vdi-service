@@ -177,19 +177,17 @@ private fun DatasetPatchRequestBody.validateDatasetCharacteristics(
   originalMeta: DatasetMetadata,
   errors: ValidationErrors,
 ) {
-  val characteristicsRequired = metadataContentFlags.hasDatasetCharacteristics
+  val characteristicsRequired = metadataContentFlags?.hasDatasetCharacteristics
     .coalesce(originalMeta.metadataContentFlags.hasDatasetCharacteristics)
     .isTrue
 
-  if (
-    (datasetCharacteristics == null || datasetCharacteristics.isEmpty)
-    && characteristicsRequired
-    && originalMeta.datasetCharacteristics?.isEmpty == true
-  ) {
-    errors.add(
-      jPath..JF.METADATA_CONTENT_FLAGS..JF.HAS_DATASET_CHARACTERISTICS,
-      ErrorDatasetCharacteristicsRequired,
-    )
+  if (datasetCharacteristics == null || datasetCharacteristics.isEmpty) {
+    if (characteristicsRequired && originalMeta.datasetCharacteristics?.isEmpty == true) {
+      errors.add(
+        jPath..JF.METADATA_CONTENT_FLAGS..JF.HAS_DATASET_CHARACTERISTICS,
+        ErrorDatasetCharacteristicsRequired,
+      )
+    }
 
     return
   }
