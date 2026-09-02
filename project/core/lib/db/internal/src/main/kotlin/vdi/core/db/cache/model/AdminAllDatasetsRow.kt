@@ -22,7 +22,4 @@ data class AdminAllDatasetsRow(
   override val inserted: OffsetDateTime,
   override val originalID: DatasetID?,
   override val uploadStatus: DatasetUploadStatus,
-  val importMessage: String?,
-  val uploadFiles: List<DatasetFileInfo>,
-  val installFiles: List<DatasetFileInfo>,
 ) : Dataset, CoreDatasetMeta, DatasetProjectLinks

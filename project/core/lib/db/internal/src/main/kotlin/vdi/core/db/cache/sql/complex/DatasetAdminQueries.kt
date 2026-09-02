@@ -140,17 +140,6 @@ SELECT
     WHERE p.dataset_id = d.dataset_id
   ) AS projects
 , i.status as import_status
-, s.message
-, array(
-    SELECT (f.file_name, f.file_size)
-    FROM vdi.upload_files AS f
-    WHERE f.dataset_id = d.dataset_id
-  ) AS upload_files
-, array(
-    SELECT (f.file_name, f.file_size)
-    FROM vdi.install_files AS f
-    WHERE f.dataset_id = d.dataset_id
-  ) AS install_files
 , r.original_id
 , us.status AS upload_status
 FROM
@@ -158,8 +147,6 @@ FROM
   INNER JOIN vdi.dataset_metadata AS m
     USING (dataset_id)
   LEFT JOIN vdi.import_control AS i
-    USING (dataset_id)
-  LEFT JOIN vdi.import_messages AS s
     USING (dataset_id)
   LEFT JOIN vdi.dataset_revisions AS r
     ON r.revision_id = d.dataset_id
@@ -246,9 +233,6 @@ WHERE
             importStatus  = importStatus,
             inserted      = it.getDateTime("inserted"),
             originalID    = it.optDatasetID("original_id"),
-            importMessage = it.getString("message"),
-            uploadFiles   = it.getFileDetailList("upload_files"),
-            installFiles  = it.getFileDetailList("install_files"),
             uploadStatus = getString("upload_status")?.let(DatasetUploadStatus.Companion::fromString)
               ?: when (importStatus) {
                 null -> DatasetUploadStatus.Running
