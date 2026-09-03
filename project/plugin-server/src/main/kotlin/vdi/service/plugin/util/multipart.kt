@@ -23,9 +23,9 @@ fun <T: Any> PartData.parseAsJson(maxInputSize: ULong, type: KClass<T>): T =
       is PartData.FormItem          -> value.byteInputStream().asSource().buffered()
     }
   ) {
-    if (maxInputSize > MaxSizeToLoadInMemory)
-      this.parseAsJson(ByteArray(MaxSizeToLoadInMemory.toInt()), type)
-    else
+//    if (maxInputSize > MaxSizeToLoadInMemory)
+//      this.parseAsJson(ByteArray(MaxSizeToLoadInMemory.toInt()), type)
+//    else
       this.parseAsJson(type)
   }
 
