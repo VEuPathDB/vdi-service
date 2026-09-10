@@ -61,13 +61,14 @@ internal fun CacheDB.dropImportMessages(ctx: ReconcilerTarget) =
 
 internal fun CacheDB.tryInitDataset(ctx: ReconcilerTarget, importStatus: DatasetImportStatus?) {
   val meta = ctx.meta ?: DatasetMetadata(
-    type           = DatasetType(DataType.of("unknown"), "unknown"),
-    installTargets = emptySet(),
-    visibility     = DatasetVisibility.Private,
-    owner          = ctx.userId,
-    name           = "unknown",
-    origin         = "unknown",
-    created        = OriginTimestamp
+    vdiMetadataVersion = DatasetMetadata.MetadataSchemaVersion,
+    type               = DatasetType(DataType.of("unknown"), "unknown"),
+    installTargets     = emptySet(),
+    visibility         = DatasetVisibility.Private,
+    owner              = ctx.userId,
+    name               = "unknown",
+    origin             = "unknown",
+    created            = OriginTimestamp
   )
 
   withTransaction { db ->

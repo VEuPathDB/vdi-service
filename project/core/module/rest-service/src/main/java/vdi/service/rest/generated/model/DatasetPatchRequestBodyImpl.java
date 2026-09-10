@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "projectName",
     "programName",
     "linkedDatasets",
-    "experimentalOrganism",
+    "experimentalOrganisms",
     "hostOrganism",
     "datasetCharacteristics",
     "externalIdentifiers",
@@ -58,8 +58,8 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
   @JsonProperty(JsonField.LINKED_DATASETS)
   private LinkedDatasetPatch linkedDatasets;
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  private OrganismPatch experimentalOrganism;
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISMS)
+  private OrganismsPatch experimentalOrganisms;
 
   @JsonProperty(JsonField.HOST_ORGANISM)
   private OrganismPatch hostOrganism;
@@ -188,14 +188,14 @@ public class DatasetPatchRequestBodyImpl implements DatasetPatchRequestBody {
     this.linkedDatasets = linkedDatasets;
   }
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  public OrganismPatch getExperimentalOrganism() {
-    return this.experimentalOrganism;
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISMS)
+  public OrganismsPatch getExperimentalOrganisms() {
+    return this.experimentalOrganisms;
   }
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  public void setExperimentalOrganism(OrganismPatch experimentalOrganism) {
-    this.experimentalOrganism = experimentalOrganism;
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISMS)
+  public void setExperimentalOrganisms(OrganismsPatch experimentalOrganisms) {
+    this.experimentalOrganisms = experimentalOrganisms;
   }
 
   @JsonProperty(JsonField.HOST_ORGANISM)

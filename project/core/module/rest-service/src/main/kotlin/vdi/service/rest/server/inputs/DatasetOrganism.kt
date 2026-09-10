@@ -4,6 +4,7 @@ package vdi.service.rest.server.inputs
 import org.veupathdb.lib.request.validation.ValidationErrors
 import org.veupathdb.lib.request.validation.rangeTo
 import org.veupathdb.lib.request.validation.reqCheckLength
+import org.veupathdb.lib.request.validation.require
 import vdi.model.meta.DatasetOrganism
 import vdi.service.rest.generated.model.JsonField
 import vdi.service.rest.generated.model.OrganismPatch
@@ -23,6 +24,14 @@ fun APIOrganism?.validate(jPath: String, errors: ValidationErrors) {
   }
 }
 
+fun APIOrganism.validate(jPath: String, index: Int, errors: ValidationErrors) {
+  species.reqCheckLength(jPath..JsonField.SPECIES, index, LengthRange, errors)
+  strain.reqCheckLength(jPath..JsonField.STRAIN, index, LengthRange, errors)
+}
+
+fun Iterable<APIOrganism?>.validate(jPath: String, errors: ValidationErrors) =
+  forEachIndexed { i, row -> row.require(jPath, i, errors) { validate(jPath, i, errors) } }
+
 fun OrganismPatch?.applyPatch(original: DatasetOrganism?) =
   when {
     this == null -> original
@@ -37,4 +46,8 @@ fun OrganismPatch?.applyPatch(original: DatasetOrganism?) =
 
 fun APIOrganism.toInternal() =
   DatasetOrganism(species, strain)
+
+
+fun Iterable<APIOrganism>.toInternal(): List<DatasetOrganism> =
+  map(APIOrganism::toInternal)
 

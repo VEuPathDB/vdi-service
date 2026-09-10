@@ -13,7 +13,7 @@ data class DatasetType(
 ) {
   override fun toString() = "$name:$version"
 
-  object JsonKey {
+  companion object JsonKey {
     const val Name    = "name"
     const val Version = "version"
   }

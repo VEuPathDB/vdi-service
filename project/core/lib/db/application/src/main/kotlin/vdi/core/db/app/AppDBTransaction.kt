@@ -220,7 +220,7 @@ interface AppDBTransaction: AppDBAccessor, AutoCloseable {
 
   fun deleteDatasetOrganisms(datasetID: DatasetID): Int
 
-  fun insertExperimentalOrganism(datasetID: DatasetID, organism: DatasetOrganism): Boolean
+  fun insertExperimentalOrganisms(datasetID: DatasetID, organisms: Iterable<DatasetOrganism>): Boolean
 
   fun insertHostOrganism(datasetID: DatasetID, organism: DatasetOrganism): Boolean
 

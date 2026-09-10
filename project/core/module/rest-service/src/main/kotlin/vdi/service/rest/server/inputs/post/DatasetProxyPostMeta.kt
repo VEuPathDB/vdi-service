@@ -27,6 +27,7 @@ fun DatasetProxyPostMeta.validate(errors: ValidationErrors) {
 
 fun DatasetProxyPostMeta.toInternal(userID: UserID, url: String?) =
   DatasetMetadata(
+    vdiMetadataVersion     = DatasetMetadata.MetadataSchemaVersion,
     type                   = type.toInternal(),
     installTargets         = installTargets.toSet(),
     visibility             = visibility.toInternal(),
@@ -44,7 +45,7 @@ fun DatasetProxyPostMeta.toInternal(userID: UserID, url: String?) =
     projectName            = projectName,
     programName            = programName,
     linkedDatasets         = linkedDatasets.toInternalDistinct(LinkedDataset::toInternal),
-    experimentalOrganism   = experimentalOrganism?.toInternal(),
+    experimentalOrganisms  = experimentalOrganisms.toInternalDistinct(DatasetOrganism::toInternal),
     hostOrganism           = hostOrganism?.toInternal(),
     datasetCharacteristics = datasetCharacteristics?.toInternal(),
     externalIdentifiers    = externalIdentifiers?.toInternal(),

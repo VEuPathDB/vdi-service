@@ -32,7 +32,7 @@ import vdi.core.db.app.sql.dataset_meta.deleteDatasetMeta
 import vdi.core.db.app.sql.dataset_meta.insertDatasetMeta
 import vdi.core.db.app.sql.dataset_meta.updateDatasetMeta
 import vdi.core.db.app.sql.dataset_organism.deleteDatasetOrganisms
-import vdi.core.db.app.sql.dataset_organism.insertExperimentalOrganism
+import vdi.core.db.app.sql.dataset_organism.insertExperimentalOrganisms
 import vdi.core.db.app.sql.dataset_organism.insertHostOrganism
 import vdi.core.db.app.sql.dataset_project.*
 import vdi.core.db.app.sql.dataset_publication.deleteDatasetPublications
@@ -272,9 +272,9 @@ internal abstract class AppDBTransactionImpl(
     connection.deleteDatasetOrganisms(schema, datasetID)
       .also { if (it > 0) logger.debug("deleted {} dataset_organism records from dataset {}", it, datasetID) }
 
-  override fun insertExperimentalOrganism(datasetID: DatasetID, organism: DatasetOrganism) =
-    (connection.insertExperimentalOrganism(schema, datasetID, organism) > 0)
-      .also { if (it) logger.debug("inserted experimental dataset_organism record for dataset {}", datasetID) }
+  override fun insertExperimentalOrganisms(datasetID: DatasetID, organisms: Iterable<DatasetOrganism>) =
+    (connection.insertExperimentalOrganisms(schema, datasetID, organisms))
+      .also { if (it > 0) logger.debug("inserted {} experimental dataset_organisms record for dataset {}", it, datasetID) } > 0
 
   override fun insertHostOrganism(datasetID: DatasetID, organism: DatasetOrganism) =
     (connection.insertHostOrganism(schema, datasetID, organism) > 0)

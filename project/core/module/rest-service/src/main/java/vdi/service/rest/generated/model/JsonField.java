@@ -53,7 +53,7 @@ public final class JsonField {
   public static final String ENABLED = "enabled";
   public static final String END = "end";
   public static final String ERRORS = "errors";
-  public static final String EXPERIMENTAL_ORGANISM = "experimentalOrganism";
+  public static final String EXPERIMENTAL_ORGANISMS = "experimentalOrganisms";
   public static final String EXTERNAL_IDENTIFIERS = "externalIdentifiers";
   public static final String FEATURES = "features";
   public static final String FILE_COUNT = "fileCount";

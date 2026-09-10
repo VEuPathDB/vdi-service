@@ -30,7 +30,10 @@ import vdi.util.fn.Either.Companion.left
 import vdi.util.fn.Either.Companion.right
 import vdi.util.fn.leftOrNull
 
-fun <T: ControllerBase> T.updateDatasetMeta(datasetID: DatasetID, patch: DatasetPatchRequestBody): PatchDatasetsByVdiIdResponse {
+fun <T: ControllerBase> T.updateDatasetMeta(
+  datasetID: DatasetID,
+  patch: DatasetPatchRequestBody,
+): PatchDatasetsByVdiIdResponse {
   val cacheDB = CacheDB()
 
   val dataset = cacheDB.selectDataset(datasetID)
@@ -111,7 +114,7 @@ private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
   || projectName != null
   || programName != null
   || linkedDatasets != null
-  || experimentalOrganism != null
+  || experimentalOrganisms != null
   || hostOrganism != null
   || (datasetCharacteristics != null && datasetCharacteristics.hasSomethingToUpdate())
   || (externalIdentifiers != null && externalIdentifiers.hasSomethingToUpdate())
@@ -133,7 +136,7 @@ private fun DatasetMetadata.validateForPromotion(datasetID: DatasetID, jPath: St
   if (contacts.isEmpty()) {
     errors.add(jPath..JsonField.CONTACTS, "at least one contact must be provided")
   } else {
-    val contactPath = jPath..JsonField.CONTACTS;
+    val contactPath = jPath..JsonField.CONTACTS
 
     val primaries = contacts.count { it.isPrimary }
 

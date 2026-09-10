@@ -567,12 +567,7 @@ types:
           related to the dataset represented by this metadata object.
         type: LinkedDataset[]
         uniqueItems: true
-      experimentalOrganism?:
-        description: |-
-          Required for Genomics, VectorBase, and Microbiome.
-
-          Optional for ClinEpi.
-        type: DatasetOrganism
+      experimentalOrganisms?: DatasetOrganism[]
       hostOrganism?: DatasetOrganism
       datasetCharacteristics?: DatasetCharacteristics
       externalIdentifiers?: ExternalIdentifiers
@@ -643,7 +638,7 @@ types:
       projectName?: OptionalStringPatch
       programName?: OptionalStringPatch
       linkedDatasets?: LinkedDatasetPatch
-      experimentalOrganism?: OrganismPatch
+      experimentalOrganisms?: OrganismsPatch
       hostOrganism?: OrganismPatch
       datasetCharacteristics?: DatasetCharacteristicsPatch
       externalIdentifiers?: ExternalIdentifiersPatch
@@ -1238,6 +1233,11 @@ types:
     additionalProperties: false
     properties:
       value?: DatasetOrganism
+  OrganismsPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value: DatasetOrganism[]
   PartialDate:
     displayName: Partial Datetime
     description: |

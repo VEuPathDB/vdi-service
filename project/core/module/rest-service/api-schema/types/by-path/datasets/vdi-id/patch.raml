@@ -29,7 +29,7 @@ types:
       projectName?: OptionalStringPatch
       programName?: OptionalStringPatch
       linkedDatasets?: LinkedDatasetPatch
-      experimentalOrganism?: OrganismPatch
+      experimentalOrganisms?: OrganismsPatch
       hostOrganism?: OrganismPatch
       datasetCharacteristics?: DatasetCharacteristicsPatch
       externalIdentifiers?: ExternalIdentifiersPatch
@@ -66,6 +66,12 @@ types:
     properties:
       value?: boolean
     additionalProperties: false
+
+  OrganismsPatch:
+    type: object
+    additionalProperties: false
+    properties:
+      value: common.DatasetOrganism[]
 
   DatasetCharacteristicsPatch:
     type: object

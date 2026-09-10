@@ -67,11 +67,11 @@ public interface DatasetPutMetadata extends DatasetPatchRequestBody {
   @JsonProperty(JsonField.LINKED_DATASETS)
   void setLinkedDatasets(LinkedDatasetPatch linkedDatasets);
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  OrganismPatch getExperimentalOrganism();
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISMS)
+  OrganismsPatch getExperimentalOrganisms();
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  void setExperimentalOrganism(OrganismPatch experimentalOrganism);
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISMS)
+  void setExperimentalOrganisms(OrganismsPatch experimentalOrganisms);
 
   @JsonProperty(JsonField.HOST_ORGANISM)
   OrganismPatch getHostOrganism();

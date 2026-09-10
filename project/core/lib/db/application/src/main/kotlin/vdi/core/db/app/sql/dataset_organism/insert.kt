@@ -1,6 +1,7 @@
 package vdi.core.db.app.sql.dataset_organism
 
 import io.foxcapades.kdbc.set
+import io.foxcapades.kdbc.usingPreparedBatchUpdate
 import io.foxcapades.kdbc.usingPreparedUpdate
 import java.sql.Connection
 import vdi.core.db.app.model.OrganismType
@@ -36,14 +37,14 @@ internal fun Connection.insertHostOrganism(
     insert[4] = organism.strain
   }
 
-internal fun Connection.insertExperimentalOrganism(
+internal fun Connection.insertExperimentalOrganisms(
   schema: String,
   datasetID: DatasetID,
-  organism: DatasetOrganism,
+  organisms: Iterable<DatasetOrganism>,
 ) =
-  usingPreparedUpdate(sql(schema)) { insert ->
+  usingPreparedBatchUpdate(sql(schema), organisms) { insert, org ->
     insert[1] = datasetID
     insert[2] = OrganismType.Experimental
-    insert[3] = organism.species
-    insert[4] = organism.strain
-  }
+    insert[3] = org.species
+    insert[4] = org.strain
+  }.reduce(Int::plus)

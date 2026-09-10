@@ -309,13 +309,7 @@ types:
           related to the dataset represented by this metadata object.
         type: LinkedDataset[]
         uniqueItems: true
-      experimentalOrganism?:
-        # language=markdown
-        description: |-
-          Required for Genomics, VectorBase, and Microbiome.
-
-          Optional for ClinEpi.
-        type: DatasetOrganism
+      experimentalOrganisms?: DatasetOrganism[]
       hostOrganism?: DatasetOrganism
       datasetCharacteristics?: DatasetCharacteristics
       externalIdentifiers?: ExternalIdentifiers

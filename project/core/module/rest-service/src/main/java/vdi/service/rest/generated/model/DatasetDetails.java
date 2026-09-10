@@ -75,11 +75,11 @@ public interface DatasetDetails extends DatasetMetaBase {
   @JsonProperty(JsonField.LINKED_DATASETS)
   void setLinkedDatasets(List<LinkedDataset> linkedDatasets);
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  DatasetOrganism getExperimentalOrganism();
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISMS)
+  List<DatasetOrganism> getExperimentalOrganisms();
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  void setExperimentalOrganism(DatasetOrganism experimentalOrganism);
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISMS)
+  void setExperimentalOrganisms(List<DatasetOrganism> experimentalOrganisms);
 
   @JsonProperty(JsonField.HOST_ORGANISM)
   DatasetOrganism getHostOrganism();

@@ -41,6 +41,7 @@ internal fun DatasetPostMeta.validate(errors: ValidationErrors) {
 
 internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
   DatasetMetadata(
+    vdiMetadataVersion     = DatasetMetadata.MetadataSchemaVersion,
     type                   = type.toInternal(),
     installTargets         = installTargets.toSet(),
     visibility             = visibility.toInternal(),
@@ -57,7 +58,7 @@ internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
     projectName            = projectName,
     programName            = programName,
     linkedDatasets         = linkedDatasets.toInternalDistinct(LinkedDataset::toInternal),
-    experimentalOrganism   = experimentalOrganism?.toInternal(),
+    experimentalOrganisms  = experimentalOrganisms.toInternalDistinct(DatasetOrganism::toInternal),
     hostOrganism           = hostOrganism?.toInternal(),
     datasetCharacteristics = datasetCharacteristics?.toInternal(),
     externalIdentifiers    = externalIdentifiers?.toInternal(),
@@ -67,5 +68,5 @@ internal fun DatasetPostMeta.toInternal(userID: UserID, url: String?) =
     daysForApproval        = daysForApproval ?: -1,
     datasetSources         = datasetSources?.let(DatasetSourceConverter::toInternal) ?: emptyList(),
     metadataContentFlags   = metadataContentFlags?.let(MetadataContentFlagsConverter::toInternal)
-      ?: MetadataContentFlags()
+      ?: MetadataContentFlags(),
   )

@@ -12,6 +12,7 @@ import vdi.service.rest.generated.model.DOIReference
 import vdi.service.rest.generated.model.DatasetContact
 import vdi.service.rest.generated.model.DatasetFundingAward
 import vdi.service.rest.generated.model.DatasetHyperlink
+import vdi.service.rest.generated.model.DatasetOrganism
 import vdi.service.rest.generated.model.DatasetPublication
 import vdi.service.rest.generated.model.DatasetSource
 import vdi.service.rest.generated.model.LinkedDataset
@@ -33,7 +34,8 @@ internal fun DatasetPatchRequestBody.cleanup() {
   programName?.apply { cleanupString(::getValue) }
   linkedDatasets?.apply { cleanupList(::getValue, LinkedDataset?::cleanup) }
 
-  experimentalOrganism?.value?.cleanup()
+  experimentalOrganisms?.apply { cleanupList(::getValue, DatasetOrganism?::cleanup) }
+
   hostOrganism?.value?.cleanup()
 
   datasetCharacteristics?.apply {
@@ -101,7 +103,7 @@ internal fun DatasetPatchRequestBody.validate(
   programName?.value?.checkLength(jPath..JF.PROGRAM_NAME, ProgramNameLengthRange, errors)
   linkedDatasets?.value?.validate(jPath..JF.LINKED_DATASETS, errors)
 
-  experimentalOrganism?.value?.validate(jPath..JF.EXPERIMENTAL_ORGANISM, errors)
+  experimentalOrganisms?.value?.validate(jPath..JF.EXPERIMENTAL_ORGANISMS, errors)
   hostOrganism?.value?.validate(jPath..JF.HOST_ORGANISM, errors)
 
   externalIdentifiers?.validate(jPath..JF.EXTERNAL_IDENTIFIERS, errors)
@@ -113,7 +115,7 @@ internal fun DatasetPatchRequestBody.validate(
   validateDatasetCharacteristics(jPath, original, errors)
 
   // Includes Biological Data about Organisms?
-  // validateOrganismData() TODO - experimental organism list???
+  validateExperimentalOrganisms(jPath, original, errors)
 
   // Associated Publication Available?
   validatePublications(jPath, original, errors)
@@ -139,6 +141,7 @@ internal fun DatasetPatchRequestBody.applyPatch(
   revisionHistory: DatasetRevisionHistory? = original.revisionHistory,
 ) =
   DatasetMetadata(
+    vdiMetadataVersion     = DatasetMetadata.MetadataSchemaVersion,
     type                   = type?.toInternal() ?: original.type,
     installTargets         = original.installTargets,
     visibility             = visibility.unsafePatch(original.visibility, APIVisibility::toInternal),
@@ -156,7 +159,7 @@ internal fun DatasetPatchRequestBody.applyPatch(
     projectName            = projectName.unsafePatch(original.projectName),
     programName            = programName.unsafePatch(original.programName),
     linkedDatasets         = linkedDatasets.unsafePatch(original.linkedDatasets, Iterable<LinkedDataset>::toInternal),
-    experimentalOrganism   = experimentalOrganism.applyPatch(original.experimentalOrganism),
+    experimentalOrganisms              = experimentalOrganisms.unsafePatch(original.experimentalOrganisms, Iterable<DatasetOrganism>::toInternal),
     hostOrganism           = hostOrganism.applyPatch(original.hostOrganism),
     datasetCharacteristics = datasetCharacteristics.applyPatch(original.datasetCharacteristics),
     externalIdentifiers    = externalIdentifiers.applyPatch(original.externalIdentifiers),
@@ -272,6 +275,31 @@ private fun DatasetPatchRequestBody.validatePublications(
     .apply { hasPublications = OptionalBooleanPatch(true) }
 }
 
+private fun DatasetPatchRequestBody.validateExperimentalOrganisms(
+  jPath: String,
+  originalMeta: DatasetMetadata,
+  errors: ValidationErrors,
+) {
+  if (experimentalOrganisms == null || experimentalOrganisms.value.isNullOrEmpty()) {
+    if (
+      metadataContentFlags?.hasOrganismData
+        .coalesce(originalMeta.metadataContentFlags.hasOrganismData)
+        .isTrue
+      && originalMeta.experimentalOrganisms.isEmpty()
+    ) {
+      errors.add(jPath..JF.METADATA_CONTENT_FLAGS..JF.HAS_PUBLICATIONS, ErrorPublicationsRequired)
+    }
+
+    return
+  }
+
+  // The patch request provided publications.
+  experimentalOrganisms.value.validate(jPath = jPath..JF.EXPERIMENTAL_ORGANISMS, errors)
+
+  // If publications are provided, make sure the content flag is set correctly.
+  metadataContentFlags = (metadataContentFlags ?: MetadataContentFlagsPatchImpl())
+    .apply { hasOrganismData = OptionalBooleanPatch(true) }
+}
 private fun DatasetPatchRequestBody.validateDataDisclaimer(
   jPath: String,
   originalMeta: DatasetMetadata,

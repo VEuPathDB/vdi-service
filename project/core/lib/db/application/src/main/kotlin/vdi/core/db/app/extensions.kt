@@ -116,8 +116,8 @@ fun AppDBTransaction.upsertDatasetRecord(
   replace(datasetID, meta.contacts, ::deleteContacts, ::insertContacts)
 
   deleteDatasetOrganisms(datasetID)
-  if (meta.experimentalOrganism != null)
-    insertExperimentalOrganism(datasetID, meta.experimentalOrganism!!)
+  if (meta.experimentalOrganisms.isNotEmpty())
+    insertExperimentalOrganisms(datasetID, meta.experimentalOrganisms)
   if (meta.hostOrganism != null)
     insertHostOrganism(datasetID, meta.hostOrganism!!)
 

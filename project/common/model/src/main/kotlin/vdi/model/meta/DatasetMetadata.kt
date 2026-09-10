@@ -3,10 +3,23 @@ package vdi.model.meta
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import java.net.URI
 import java.time.OffsetDateTime
+import vdi.model.serial.DatasetMetadataUnmarshaler
 
+@JsonDeserialize(using = DatasetMetadataUnmarshaler::class)
 data class DatasetMetadata(
+  /**
+   * Version number representing a revision of the dataset metadata schema.
+   *
+   * Used for tracking and applying metadata schema updates, especially in cases
+   * of breaking changes.
+   */
+  @param:JsonProperty(VDIMetaVersion)
+  @field:JsonProperty(VDIMetaVersion)
+  val vdiMetadataVersion: Int,
+
   @param:JsonProperty(Type)
   @field:JsonProperty(Type)
   val type: DatasetType,
@@ -136,13 +149,6 @@ data class DatasetMetadata(
   /**
    * @since v1.7.0
    */
-  @param:JsonProperty(ExperimentalOrganism)
-  @field:JsonProperty(ExperimentalOrganism)
-  val experimentalOrganism: DatasetOrganism? = null,
-
-  /**
-   * @since v1.7.0
-   */
   @param:JsonProperty(HostOrganism)
   @field:JsonProperty(HostOrganism)
   val hostOrganism: DatasetOrganism? = null,
@@ -214,6 +220,13 @@ data class DatasetMetadata(
   @param:JsonProperty(MetadataContentFlags)
   @field:JsonProperty(MetadataContentFlags)
   val metadataContentFlags: MetadataContentFlags = MetadataContentFlags(),
+
+  /**
+   * @since v1.9.0
+   */
+  @param:JsonProperty(ExperimentalOrganisms)
+  @field:JsonProperty(ExperimentalOrganisms)
+  val experimentalOrganisms: List<DatasetOrganism> = mutableListOf(),
 ) {
   /**
    * Truncated name for the dataset.
@@ -223,34 +236,43 @@ data class DatasetMetadata(
   @get:JsonIgnore
   val shortName get() = name.take(40)
 
-  companion object JsonKey {
-    const val Characteristics      = "datasetCharacteristics"
-    const val Contacts             = "contacts"
-    const val Created              = "created"
-    const val DataDisclaimer       = "dataDisclaimer"
-    const val DatasetSources       = "datasetSources"
-    const val DaysForApproval      = "daysForApproval"
-    const val Dependencies         = "dependencies"
-    const val Description          = "description"
-    const val ExperimentalOrganism = "experimentalOrganism"
-    const val ExternalIdentifiers  = "externalIdentifiers"
-    const val Funding              = "funding"
-    const val HostOrganism         = "hostOrganism"
-    const val InstallTargets       = "installTargets"
-    const val LinkedDatasets       = "linkedDatasets"
-    const val MetadataContentFlags = "metadataContentFlags"
-    const val Name                 = "name"
-    const val Origin               = "origin"
-    const val Owner                = "owner"
-    const val ProgramName          = "programName"
-    const val ProjectName          = "projectName"
-    const val Publications         = "publications"
-    const val RevisionHistory      = "revisionHistory"
-    const val ShortAttribution     = "shortAttribution"
-    const val SourceURL            = "sourceUrl"
-    const val Summary              = "summary"
-    const val Type                 = "type"
-    const val Visibility           = "visibility"
+  companion object {
+    const val MetadataSchemaVersion = 2
+
+    const val Characteristics       = "datasetCharacteristics"
+    const val Contacts              = "contacts"
+    const val Created               = "created"
+    const val DataDisclaimer        = "dataDisclaimer"
+    const val DatasetSources        = "datasetSources"
+    const val DaysForApproval       = "daysForApproval"
+    const val Dependencies          = "dependencies"
+    const val Description           = "description"
+    const val ExternalIdentifiers   = "externalIdentifiers"
+    const val Funding               = "funding"
+    const val HostOrganism          = "hostOrganism"
+    const val InstallTargets        = "installTargets"
+    const val LinkedDatasets        = "linkedDatasets"
+    const val MetadataContentFlags  = "metadataContentFlags"
+    const val Name                  = "name"
+    const val Origin                = "origin"
+    const val ExperimentalOrganisms = "experimentalOrganisms"
+    const val Owner                 = "owner"
+    const val ProgramName           = "programName"
+    const val ProjectName           = "projectName"
+    const val Publications          = "publications"
+    const val RevisionHistory       = "revisionHistory"
+    const val ShortAttribution      = "shortAttribution"
+    const val SourceURL             = "sourceUrl"
+    const val Summary               = "summary"
+    const val Type                  = "type"
+    const val VDIMetaVersion        = "vdiMetadataVersion"
+    const val Visibility            = "visibility"
+
+    /**
+     * **Deprecated** This field was replaced by [experimentalOrganisms] in VDI v1.9.0
+     */
+    @Deprecated("legacy json key kept for metadata migrations")
+    const val LegacyExperimentalOrganism = "experimentalOrganism"
 
     private const val LegacyDatasetCharacteristics = "studyCharacteristics"
     private const val LegacyInstallTargets = "projects"

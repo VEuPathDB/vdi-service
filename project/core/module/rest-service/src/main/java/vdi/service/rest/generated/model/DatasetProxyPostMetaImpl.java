@@ -21,7 +21,7 @@ import java.util.List;
     "projectName",
     "programName",
     "linkedDatasets",
-    "experimentalOrganism",
+    "experimentalOrganisms",
     "hostOrganism",
     "datasetCharacteristics",
     "externalIdentifiers",
@@ -69,8 +69,8 @@ public class DatasetProxyPostMetaImpl implements DatasetProxyPostMeta {
   @JsonProperty(JsonField.LINKED_DATASETS)
   private List<LinkedDataset> linkedDatasets;
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  private DatasetOrganism experimentalOrganism;
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISMS)
+  private List<DatasetOrganism> experimentalOrganisms;
 
   @JsonProperty(JsonField.HOST_ORGANISM)
   private DatasetOrganism hostOrganism;
@@ -224,14 +224,14 @@ public class DatasetProxyPostMetaImpl implements DatasetProxyPostMeta {
     this.linkedDatasets = linkedDatasets;
   }
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  public DatasetOrganism getExperimentalOrganism() {
-    return this.experimentalOrganism;
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISMS)
+  public List<DatasetOrganism> getExperimentalOrganisms() {
+    return this.experimentalOrganisms;
   }
 
-  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISM)
-  public void setExperimentalOrganism(DatasetOrganism experimentalOrganism) {
-    this.experimentalOrganism = experimentalOrganism;
+  @JsonProperty(JsonField.EXPERIMENTAL_ORGANISMS)
+  public void setExperimentalOrganisms(List<DatasetOrganism> experimentalOrganisms) {
+    this.experimentalOrganisms = experimentalOrganisms;
   }
 
   @JsonProperty(JsonField.HOST_ORGANISM)

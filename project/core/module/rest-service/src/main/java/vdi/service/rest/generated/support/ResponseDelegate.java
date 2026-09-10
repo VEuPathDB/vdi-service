@@ -60,6 +60,11 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
+  public MultivaluedMap<String, Object> getHeaders() {
+    return this.delegate.getHeaders();
+  }
+
+  @Override
   public int getStatus() {
     return this.delegate.getStatus();
   }
@@ -67,15 +72,6 @@ public class ResponseDelegate extends Response {
   @Override
   public MultivaluedMap<String, Object> getMetadata() {
     return this.delegate.getMetadata();
-  }
-
-  @Override
-  public Object getEntity() {
-    return this.entity;}
-
-  @Override
-  public Response.StatusType getStatusInfo() {
-    return this.delegate.getStatusInfo();
   }
 
   @Override
@@ -159,9 +155,13 @@ public class ResponseDelegate extends Response {
   }
 
   @Override
-  public MultivaluedMap<String, Object> getHeaders() {
-    return this.delegate.getHeaders();
+  public Response.StatusType getStatusInfo() {
+    return this.delegate.getStatusInfo();
   }
+
+  @Override
+  public Object getEntity() {
+    return this.entity;}
 
   public static class HeaderBuilderBase {
     protected final Map<String, String> headerMap;
