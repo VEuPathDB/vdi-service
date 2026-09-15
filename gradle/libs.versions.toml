@@ -1,6 +1,6 @@
 [versions]
 jackson = "2.22.2"
-kotlin = "2.4.10"
+kotlin = "2.4.20"
 ktor = "3.5.2"
 log4j = "2.26.1"
 slf4j = "2.0.18"
