@@ -23,6 +23,7 @@ import vdi.service.rest.server.inputs.JsonSchema
 import vdi.service.rest.server.inputs.applyPatch
 import vdi.service.rest.server.inputs.cleanup
 import vdi.service.rest.server.inputs.hasSomethingToUpdate
+import vdi.service.rest.server.inputs.patch.hasSomethingToUpdate
 import vdi.service.rest.server.inputs.validate
 import vdi.service.rest.server.outputs.*
 import vdi.util.fn.Either
@@ -123,6 +124,7 @@ private fun DatasetPatchRequestBody.hasSomethingToUpdate(): Boolean =
   || daysForApproval != null
   || dataDisclaimer != null
   || datasetSources != null
+  || metadataContentFlags?.hasSomethingToUpdate() == true
 
 /**
  * Tests if the PATCH request is attempting to promote the target dataset to a

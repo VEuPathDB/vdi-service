@@ -24,3 +24,10 @@ private fun OptionalBooleanPatch?.orElse(previous: FlagState) =
     previous
   else
     FlagState.fromBoolean(value)
+
+fun MetadataContentFlagsPatch.hasSomethingToUpdate() =
+  hasDatasetCharacteristics != null
+  || hasDataDisclaimer != null
+  || hasDatasetSources != null
+  || hasOrganismData != null
+  || hasPublications != null
