@@ -170,7 +170,8 @@ internal fun DatasetPatchRequestBody.applyPatch(
     datasetSources         = datasetSources.unsafePatch(original.datasetSources) { it: List<DatasetSource>? ->
       it?.let(DatasetSourceConverter::toInternal) ?: emptyList()
     },
-    metadataContentFlags   = metadataContentFlags.applyPatch(original.metadataContentFlags)
+    metadataContentFlags   = metadataContentFlags?.applyPatch(original.metadataContentFlags)
+      ?: original.metadataContentFlags
   )
 
 fun DatasetTypePatch.toInternal() = DatasetType(DataType.of(value.name), value.version)
