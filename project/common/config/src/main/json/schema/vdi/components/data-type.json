@@ -46,7 +46,7 @@
 
     "allowedFileExtensions": {
       "title": "Permitted File Extensions",
-      "description": "File extensions that are allowed on raw uploaded files, or on the content files of archive uploads.\n\nThis list should not include the supported vdi archive extensions.",
+      "description": "File extensions that are allowed on raw uploaded files, or on the content files of archive uploads.\n\nIf this list is absent or empty, VDI will not attempt to validate individiual data file name extensions.\n\nThis list should not include the supported vdi archive extensions.",
       "type": "array",
       "items": {
         "type": "string",
