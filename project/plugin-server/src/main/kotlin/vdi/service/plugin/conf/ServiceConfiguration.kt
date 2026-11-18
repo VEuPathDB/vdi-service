@@ -12,9 +12,6 @@ import vdi.service.plugin.process.uninstall.UninstallScript
 
 /**
  * Service Specific Configuration Options
- *
- * @author Elizabeth Paige Harper - https://github.com/foxcapades
- * @since 1.0.0
  */
 internal class ServiceConfiguration(
   val name: String,

@@ -3,9 +3,6 @@ package vdi.service.rest.server.controllers
 import com.fasterxml.jackson.databind.node.ObjectNode
 import jakarta.ws.rs.ForbiddenException
 import jakarta.ws.rs.core.Context
-import jakarta.ws.rs.core.HttpHeaders
-import jakarta.ws.rs.core.MediaType
-import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.core.StreamingOutput
 import org.glassfish.jersey.server.ContainerRequest
 import org.veupathdb.lib.container.jaxrs.server.annotations.Authenticated
